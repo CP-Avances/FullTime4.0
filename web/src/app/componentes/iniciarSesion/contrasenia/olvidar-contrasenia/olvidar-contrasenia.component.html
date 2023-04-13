@@ -1,0 +1,33 @@
+<header id="home-section">
+    <div class="dark-overlay">
+        <div class="home-inner">
+            <div class="container">
+                <div class="row">
+                    <div class="col d-flex align-items-center justify-content-center">
+                        <mat-card class="mat-elevation-z8">
+                            <img src="../../../../../assets/imagenes/logo/logoAdmin.png"> <br><br>
+                            <span>Cambiar contraseña</span>
+                            <form [formGroup]="formulario">
+                                <mat-form-field>
+                                    <mat-label>Ingresa correo electrónico</mat-label>
+                                    <input matInput placeholder="pat@example.com" [formControl]="correo" required>
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresa el correo electrónico asociada a tu cuenta de usuario para enviarte un mail y cambiar tu contraseña.">
+                                        help_outline</mat-icon>
+                                    <mat-error *ngIf="correo.invalid">{{ObtenerMensajeCampoUsuarioError()}}</mat-error>
+                                </mat-form-field>
+                            </form>
+                            <br>
+                            <div style="margin: auto;">
+                                <button type="submit" class="btn" (click)="EnviarCorreoConfirmacion(formulario.value)"
+                                    [disabled]="!formulario.valid">Enviar</button>
+                                <button type="submit" class="btn" (click)="Cancelar();">Cancelar</button>
+                            </div>
+                        </mat-card>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<app-footer></app-footer>

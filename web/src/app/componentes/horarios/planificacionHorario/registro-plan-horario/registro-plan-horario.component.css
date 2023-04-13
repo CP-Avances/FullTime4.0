@@ -1,0 +1,24 @@
+.btn { background-color: rgb(80,87,97); color: white; }
+
+.planHorarioE { 
+    font-size: 25px; 
+    text-align: center; 
+    background: rgb(52,65,84); 
+    color: white;  
+    padding-top: 10px; 
+}
+
+#movilidad { 
+    cursor: grab;
+    color: blue;
+    font-size: 20px;
+    margin-left: 10px;
+}
+
+
+
+#fec { font-size: 13px; }
+
+
+
+mat-form-field {padding: 10px 10px 0px 10px;}

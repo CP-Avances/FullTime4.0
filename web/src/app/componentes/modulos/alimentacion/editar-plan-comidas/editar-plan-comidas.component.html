@@ -1,0 +1,117 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        EDITAR PLANIFICACION SERVICIO ALIMENTACIÓN</span>
+    <mat-icon class="float-right" id="cerrar" (click)="CerrarRegistroPlanificacion()">highlight_off</mat-icon>
+</div>
+<!-- FORMULARIO DE PLANIFICACIÓN DE SERVICIO DE ALIMENTACIÓN -->
+<div>
+    <div class="nota">
+        <span>NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+            Guardar.</span>
+    </div>
+    <form [formGroup]="PlanificacionComidasForm">
+        <div class="d-flex flex-wrap justify-content-center">
+            <mat-form-field>
+                <mat-label id="selecAlmuerzo">Fecha Actual</mat-label>
+                <input matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa" formControlName="fechaForm" required
+                    [disabled]="true">
+                <mat-datepicker-toggle matSuffix [for]="picker" id="i-cursor" matTooltipPosition="right"
+                    matTooltip="Fecha en la que se registra la planificación.">
+                </mat-datepicker-toggle>
+                <mat-datepicker touchUi #picker></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label id="selecAlmuerzo">Tipo de Servicio</mat-label>
+                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                    matTooltip="Lista de tipos de servicios registrados.">
+                    help_outline</mat-icon>
+                <mat-select formControlName="tipoForm" required>
+                    <mat-option *ngFor="let s of servicios" [value]="s.id"
+                        (click)="ObtenerPlatosComidas(PlanificacionComidasForm.value)">
+                        {{s.nombre}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label id="selecAlmuerzo">Menú</mat-label>
+                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                    matTooltip="Lista de menús de acuerdo al tipo de servicio seelccionado.">
+                    help_outline</mat-icon>
+                <mat-select formControlName="idComidaForm" required>
+                    <mat-option *ngFor="let m of tipoComidas" [value]="m.id"
+                        (click)="ObtenerDetalleMenu(PlanificacionComidasForm.value)">
+                        {{m.nombre}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label id="selecAlmuerzo">Alimentación</mat-label>
+                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                    matTooltip="Lista de platos de comida registrados en el sistema.">
+                    help_outline</mat-icon>
+                <mat-select formControlName="platosForm" required>
+                    <mat-option *ngFor="let d of detalle" [value]="d.id_detalle">
+                        {{d.plato}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label id="selecAlmuerzo">Fecha Inicio</mat-label>
+                <input matInput [matDatepicker]="picker2" placeholder="dd/mm/aaaa" formControlName="fechaInicioForm"
+                    required>
+                <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor" matTooltipPosition="right"
+                    matTooltip="Ingresar fecha en la que inicia la planificación de servicio de alimentación. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                </mat-datepicker-toggle>
+                <mat-datepicker touchUi #picker2></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label id="selecAlmuerzo">Fecha Fin</mat-label>
+                <input matInput [matDatepicker]="picker3" placeholder="dd/mm/aaaa" formControlName="fechaFinForm"
+                    required>
+                <mat-datepicker-toggle matSuffix [for]="picker3" id="i-cursor" matTooltipPosition="right"
+                    matTooltip="Ingresar fecha en la que finaliza la planificación de servicio de alimentación. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                </mat-datepicker-toggle>
+                <mat-datepicker touchUi #picker3></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label id="selecAlmuerzo">Hora de inicio</mat-label>
+                <input matInput type="time" placeholder="Ejm: 1" formControlName="horaInicioForm" required readonly>
+                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                    matTooltip="Hora en la que inicia el servicio de alimentación.">
+                    help_outline</mat-icon>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label id="selecAlmuerzo">Hora de fin</mat-label>
+                <input matInput type="time" placeholder="Ejm: 1" formControlName="horaFinForm" required readonly>
+                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                    matTooltip="Hora de finalización del servicio de alimentación.">
+                    help_outline</mat-icon>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label id="selecAlmuerzo">Observación</mat-label>
+                <input matInput placeholder="Ejm: 1" formControlName="observacionForm"
+                    (keypress)="IngresarSoloLetras($event)" required>
+                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                    matTooltip="Ingresar una indicación de la planificación de servicio de alimentación.">
+                    help_outline</mat-icon>
+                <mat-error *ngIf="observacionF.invalid">{{ObtenerMensajeErrorObservacion()}}</mat-error>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label id="selecAlmuerzo">Servicio Extra</mat-label>
+                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                    matTooltip="Indicar si es un servicio extra.">
+                    help_outline</mat-icon>
+                <mat-select formControlName="extraForm" required>
+                    <mat-option value=true>Si</mat-option>
+                    <mat-option value=false>No</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </form>
+    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
+        <button mat-raised-button id="btn-raised" type="submit" (click)="InsertarPlanificacion(PlanificacionComidasForm.value)"
+            [disabled]="!PlanificacionComidasForm.valid">Guardar</button>
+        <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarRegistroPlanificacion()">Salir</button-->
+    </div>
+</div>

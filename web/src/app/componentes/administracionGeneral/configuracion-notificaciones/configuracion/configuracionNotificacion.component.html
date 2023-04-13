@@ -1,0 +1,51 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        HABILITAR NOTIFICACIONES</span>
+    <mat-icon class="float-right" id="cerrar" (click)="this.ventana.close(false)">highlight_off</mat-icon>
+</div>
+<form class="example-form" [formGroup]="formGroup" ngNativeValidate>
+    <br>
+    <div class="d-flex flex-wrap justify-content-center">
+        <div class="caja">
+            <p>PERMISOS</p>
+            <div class="d-flex flex-wrap justify-content-start">
+                <mat-slide-toggle formControlName="permisoMail">Correo </mat-slide-toggle>
+                <mat-slide-toggle formControlName="permisoNoti">Notificaciones</mat-slide-toggle>
+            </div>
+        </div>
+        <div class="caja">
+            <p>VACACIONES</p>
+            <div class="d-flex flex-wrap justify-content-start">
+                <mat-slide-toggle formControlName="vacaMail">Correo </mat-slide-toggle>
+                <mat-slide-toggle formControlName="vacaNoti">Notificaciones</mat-slide-toggle>
+            </div>
+        </div>
+        <div class="caja">
+            <p>HORAS EXTRAS</p>
+            <div class="d-flex flex-wrap justify-content-start">
+                <mat-slide-toggle formControlName="horaExtraMail">Correo </mat-slide-toggle>
+                <mat-slide-toggle formControlName="horaExtraNoti">Notificaciones</mat-slide-toggle>
+            </div>
+        </div>
+        <div class="caja">
+            <p>ALIMENTACIÓN</p>
+            <div class="d-flex flex-wrap justify-content-start">
+                <mat-slide-toggle formControlName="comidaMail">Correo </mat-slide-toggle>
+                <mat-slide-toggle formControlName="comidaNoti">Notificaciones</mat-slide-toggle>
+            </div>
+        </div>
+        <div class="caja">
+            <p>COMUNICADOS</p>
+            <div class="d-flex flex-wrap justify-content-start">
+                <mat-slide-toggle formControlName="comunicadoMail">Correo </mat-slide-toggle>
+                <mat-slide-toggle formControlName="comunicadoNoti">Notificaciones</mat-slide-toggle>
+            </div>
+        </div>
+    </div>
+</form>
+<div class="d-flex justify-content-around" style="padding-top: 2%; margin-bottom: 3%;">
+    <button mat-raised-button id="btn-raised" type="submit" [mat-dialog-close]="empleados" cdkFocusInitial
+        (click)="ActualizarConfiguracion(formGroup.value)">Guardar</button>
+    <!--button mat-raised-button id="btn-raised" type="submit" (click)="this.ventana.close(false)" mat-button mat-dialog-close>Cancelar</button-->
+</div>

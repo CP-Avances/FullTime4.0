@@ -1,0 +1,73 @@
+mat-form-field { padding: 10px 15px 0px 15px;}
+
+.tituloEmpleados { 
+    font-size: 20px; 
+    text-align: center; 
+    background: rgb(52,65,84); 
+    color: white; 
+    padding-top: 10px; 
+    padding-bottom: 6px; 
+}
+
+#resulEmpleados { 
+    font-size: 17px; 
+    text-align: center; 
+    background: rgb(52,65,84); 
+    color: white; 
+    padding-top: 10px; 
+    padding-bottom: 6px; 
+}
+
+table { width: 100%; font-size: 14px;}
+
+tr { text-align: center; }
+
+td { padding-top: 10px; text-align: center; }
+
+
+
+.mat-expansion-panel-header-description {
+    flex-basis: 0;
+}
+
+.mat-expansion-panel-header-description {
+    justify-content: space-between;
+    align-items: center;
+}
+
+mat-expansion-panel-header { text-align: center; background: rgb(52,65,84); }
+
+mat-panel-title { color: white; }
+
+mat-panel-description { color: white; }
+
+mat-icon { cursor: pointer; }
+
+.i-barra { color: rgb(255, 255, 255) }
+
+.mat-expansion-panel-header.mat-expanded,
+.mat-expansion-panel-header.mat-expanded:hover {
+    background: rgb(52,65,84);
+}
+
+#boton { background-color: rgb(80,87,97); color: white; margin-top: 10px;}
+
+#botones { background-color: rgb(80,87,97); color: white; margin: 10px 10px 10px 10px;}
+
+#ayuda_fec {color: black}
+
+.mat-radio-button ~ .mat-radio-button {
+    margin-left: 16px;
+}
+
+.i-pdf { color: red; font-size: 30px; }
+
+.i-print { color: rgb(0, 0, 0); font-size: 30px; }
+
+.i-download { color: rgb(0, 102, 255); font-size: 30px; }
+
+.i-excel { color: rgb(19, 172, 19); font-size: 30px; }
+  
+.example-radio-button {
+    margin: 5px;
+}

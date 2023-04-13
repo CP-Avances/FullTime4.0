@@ -1,0 +1,36 @@
+<div class="container" *ngFor="let a of datosTipos" style="padding-top: 15px;">
+    <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo">
+            <span>{{a.nombre.toUpperCase()}}</span>
+        </div>
+        <mat-card-content>
+            <div class="container" style="padding-top: 15px;">
+                <div class="row">
+                    <div class="col" id="verticalLine">
+                        <label class="col-sm col-form-label"><b>Descripcion:</b>
+                            {{a.descripcion}}
+                        </label>
+                        <br>
+                        <label class="col-sm col-form-label"><b>Base Legal:</b>
+                            {{a.base_legal}}</label>
+                        <br>
+                        <label *ngIf="a.tipo_permiso === true" class="col-sm col-form-label"><b>Tipo:</b>
+                            Permiso</label>
+                        <label *ngIf="a.tipo_vacacion === true" class="col-sm col-form-label"><b>Tipo:</b>
+                            Vacación</label>
+                        <label *ngIf="a.tipo_situacion_propuesta === true" class="col-sm col-form-label"><b>Tipo:</b>
+                            Situación Propuesta</label>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <i id="editarF" (click)="EditarDatosTipoAccion(a)" matSuffix matTooltipPosition="right"
+                        matTooltip="Modificar datos de este registro" class="fas fa-edit">
+                        <p>Editar</p>
+                    </i>
+                </div>
+            </div>
+            <input type="submit" class="btn btn-sm" [routerLink]="['/acciones-personal/']"
+                value="Ir a lista tipos acción personal">
+        </mat-card-content>
+    </mat-card>
+</div>

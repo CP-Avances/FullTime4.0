@@ -1,0 +1,14 @@
+.btn { margin-left: 20px; background-color: rgb(80,87,97); color: white; }
+
+td { padding-top: 10px; text-align: center;  }
+
+table { width: 100%; font-size: 14px; }
+
+#boton { background-color: rgb(40, 48, 59); color: white; margin-top: 10px;}
+
+mat-form-field { padding: 10px 15px 0px 15px;}
+
+#SelectCheck {
+    cursor: pointer;
+    margin-left: 10px;
+}

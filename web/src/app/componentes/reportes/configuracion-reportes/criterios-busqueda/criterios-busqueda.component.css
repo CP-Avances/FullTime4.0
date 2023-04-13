@@ -1,0 +1,11 @@
+mat-form-field { padding: 10px 15px 0px 15px;}
+
+#boton { background-color: rgb(80,87,97); color: white; margin-top: 10px;}
+
+.mat-radio-button ~ .mat-radio-button {
+    margin-left: 16px;
+}
+
+mat-icon { cursor: pointer; }
+
+

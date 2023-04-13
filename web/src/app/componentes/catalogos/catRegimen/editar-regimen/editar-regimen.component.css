@@ -1,0 +1,158 @@
+.btn {
+    background-color: rgb(80, 87, 97);
+    margin-left: 15px;
+    color: white;
+}
+
+p {
+    font-size: x-small;
+}
+
+#validar {
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+    color: red;
+    left: 10px;
+    top: 15px;
+}
+
+#correcto {
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+    color: darkgreen;
+    left: 10px;
+    top: 15px;
+}
+
+mat-form-field {
+    width: 320px;
+    padding: 10px 10px 0px 10px;
+}
+
+
+/** ESTILO TAMAÑO DE mat-form-field */
+#periodo {
+    width: 160px;
+    padding: 0px 10px 0px 5px;
+}
+
+#Vacacion_periodo{
+    width: 240px;
+    padding: 0px 5px 0px 5px;
+}
+
+#Máximo_días{
+    width: 220px;
+    padding: 10px 10px 0px 10px;
+}
+
+#campos {
+    width: 140px;
+    padding: 0px 10px 0px 10px;
+}
+
+#campos_antiguedad {
+    width: 120px;
+    padding: 0px 5px 0px 5px;
+}
+
+#campos_calculos {
+    width: 230px;
+    padding: 5px 5px 0px 10px;
+}
+
+button {
+    margin: 5px 10px 5px 10px;
+}
+
+.button {
+    margin: 5px 10px 5px 10px;
+}
+
+label {
+    font-size: small;
+}
+
+/** ESTILOS TAMAÑO DE LETRA **/
+#letras_1 {
+    font-size: 11px;
+}
+
+#letras_2 {
+    font-size: 12px;
+}
+
+#letras_3 {
+    font-size: 13px;
+}
+
+#letras_4 {
+    font-size: 14px;
+}
+
+#check {
+    width: 300px;
+    padding: 15px 20px 15px 20x;
+    margin-bottom: 10px;
+    margin-top: 20px;
+    margin-right: 20px;
+    margin-left: 20px;
+    font-size: 12px;
+}
+
+.check {
+    width: 210px;
+    padding: 15px 10px 15px 10x;
+    margin-bottom: 10px;
+    margin-top: 20px;
+    margin-right: 5px;
+    font-size: 14px;
+}
+
+#check_ {
+    width: 210px;
+    padding: 15px 20px 5px 20x;
+    margin-top: 20px;
+    margin-right: 20px;
+    font-size: 14px;
+}
+
+.mat-radio-button~.mat-radio-button {
+    margin-left: 50px;
+}
+
+mat-radio-group {
+    padding: 20px 20px 20px 20x;
+    margin-bottom: 10px;
+}
+
+
+.subtitulo {
+    font-weight: bold;
+    font-size: 15px;
+    color: rgb(0, 0, 0);
+}
+
+#icono {
+    color: rgba(8, 10, 124, 0.828);
+}
+
+#error {
+    font-size: xx-small;
+    color: red;
+    width: max-content;
+    margin: 0%;
+    padding: 0%;
+}
+
+#error_ {
+    font-size: xx-small;
+    color: red;
+    width: max-content;
+}
+
+hr {
+    background-color: rgb(243, 239, 239);
+}

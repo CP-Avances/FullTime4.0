@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<root>
+  <lista_permisos id="23">
+    <nombre>Jhonatan Heredia</nombre>
+    <estado>Pre-autorizado</estado>
+    <tipo_permiso>Capacitaciones</tipo_permiso>
+    <fecha_inicial>Mié. 01/03/2023</fecha_inicial>
+    <fecha_final>Vie. 03/03/2023</fecha_final>
+  </lista_permisos>
+  <lista_permisos id="20">
+    <nombre>Jhonatan Heredia</nombre>
+    <estado>Pre-autorizado</estado>
+    <tipo_permiso>Capacitaciones</tipo_permiso>
+    <fecha_inicial>Lun. 02/01/2023</fecha_inicial>
+    <fecha_final>Mar. 03/01/2023</fecha_final>
+  </lista_permisos>
+</root>

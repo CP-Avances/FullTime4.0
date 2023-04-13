@@ -1,0 +1,111 @@
+<br>
+<div class="container" style="margin-bottom: 15px; padding-bottom: 15px;">
+    <div class="row">
+        <div class="col-sm">
+            <div id="titulo">
+                <span>RÉGIMEN LABORAL</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9">
+                <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
+                    <button mat-raised-button id="btn-raised" type="submit" [routerLink]="['/regimenLaboral']">
+                        Crear régimen laboral
+                    </button>
+                    <button mat-raised-button id="btn-raised" type="submit" (click)="LimpiarCampos()" matSuffix
+                        matTooltipPosition="right"
+                        matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">Mostrar lista
+                    </button>
+                </div>
+            </mat-card>
+        </div>
+    </div>
+</div>
+<div class="container" style="padding-bottom: 50px; text-align: center;">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="resultados">RESULTADO DE BÚSQUEDA</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col" rowspan="2">Régimen Laboral</th>
+                        <th scope="col" rowspan="2">Periodo</th>
+                        <th scope="col" colspan="3">VACACIONES</th>
+                        <th scope="col" rowspan="2">Acciones</th>
+                    </tr>
+                    <tr>
+                        <th scope="col">Días hábiles</th>
+                        <th scope="col">Días libres</th>
+                        <th scope="col">Días calendario</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" [formControl]="descripcionF"
+                                    [(ngModel)]="filtroRegimenLaboral">
+                            </mat-form-field>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda de Régimen Laboral por su descripción.">
+                                help_outline
+                            </mat-icon>
+                        </td>
+                    </tr>
+                    <tr
+                        *ngFor="let regimenL of regimen | filtroRegion: filtroRegimenLaboral | paginate:tamanio_pagina:numero_pagina">
+                        <td>{{regimenL.descripcion}}</td>
+                        <td>{{regimenL.mes_periodo}} meses</td>
+                        <td>{{regimenL.vacacion_dias_laboral}}</td>
+                        <td>{{regimenL.vacacion_dias_libre}}</td>
+                        <td>{{regimenL.vacacion_dias_calendario}}</td>
+                        <td class="d-flex justify-content-center">
+                            <i matSuffix matTooltipPosition="right" matTooltip="Ver datos generales de este registro."
+                                class="fas fa-eye" id="t-ver" [routerLink]="['/verRegimen/',regimenL.id]">
+                                <p>Ver</p>
+                            </i>
+                            <i class="fas fa-edit" id="t-editar" [routerLink]="['/regimen/laboral/',regimenL.id]" 
+                                matSuffix matTooltipPosition="right"
+                                matTooltip="Editar los datos generales de este registro.">
+                                <p>Editar</p>
+                            </i>
+                            <i  class="far fa-trash-alt" id="t-eliminar" matSuffix
+                                matTooltipPosition="right" matTooltip="Eliminar este registro."
+                                (click)="ConfirmarDelete(regimenL)">
+                                <p>Eliminar</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="regimen.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+            <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Regímenes Laborales en formato PDF.">
+                <p>PDF</p>
+            </i>
+            <i (click)="ExportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Regímenes Laborales en formato EXCEL.">
+                <p>XLSL</p>
+            </i>
+            <i (click)="ExportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Regímenes Laborales en formato CSV.">
+                <p>CSV</p>
+            </i>
+            <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Regímenes Laborales en formato XML.">
+                <p>XML</p>
+            </i>
+        </div>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+            <p> Reporte de régimen laboral. </p>
+        </div>
+    </div>
+</div>

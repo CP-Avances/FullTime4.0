@@ -1,0 +1,26 @@
+.btn {
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
+
+p {
+    font-size: x-small;
+}
+
+td {
+    padding-top: 10px;
+    text-align: center;
+}
+
+button {
+    margin: 5px 10px 5px 10px;
+}
+
+#funtion {
+    color: rgb(17, 4, 66);
+    cursor: pointer;
+}
+
+table {
+    width: 100%;
+}

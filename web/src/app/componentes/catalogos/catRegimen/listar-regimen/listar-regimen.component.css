@@ -1,0 +1,31 @@
+.btn {
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
+
+p {
+    font-size: x-small;
+    text-align: center;
+}
+
+td {
+    padding-top: 10px;
+    text-align: center;
+}
+
+th {
+    font-size: small;
+}
+
+button {
+    margin: 5px 10px 5px 10px;
+}
+
+table {
+    width: 100%;
+    font-size: 12px;
+}
+
+.scrollme {
+    overflow-x: scroll;
+}

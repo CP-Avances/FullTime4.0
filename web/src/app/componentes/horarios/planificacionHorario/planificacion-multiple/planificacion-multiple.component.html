@@ -1,0 +1,128 @@
+<div class="container" style="padding-top: 15px; padding-bottom: 25px;">
+    <div class="row">
+        <div class="col-md">
+            <div id="titulo">
+                <span>CARGA MÚLTIPLE DE HORARIOS</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9" id="carta1">
+                <div class="row" style="text-align: center;">
+                    <div class="col-md">
+                        <form method="post" enctype="multipart/form-data">
+                            <input (change)="fileChangeHorario($event)" type="file" [formControl]="archivoHorarioForm"
+                                id="file1"
+                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                            <label for="file1" class="btn-2" matSuffix 
+                                matTooltipPosition="right"
+                                matTooltip="Presionar para seleccionar Plantilla con nombre Planificacion Multiple">
+                                Subir Varios Horarios</label>
+                        </form>
+                    </div>
+                    <div class="col-md">
+                        <form method="post" enctype="multipart/form-data">
+                            <input (change)="fileChangeHorarioFijo($event)" type="file" [formControl]="archivoHorarioForm"
+                                id="file2"
+                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                            <label for="file2" class="btn-2" matSuffix 
+                                matTooltipPosition="right"
+                                matTooltip="Presionar para seleccionar Plantilla con nombre MultiplesEmpleados_HorarioFijo">
+                                Subir Horario Fijo</label>
+                        </form>
+                    </div>
+                </div>
+            </mat-card>
+        </div>
+        <div class="col-sm">
+            <div id="titulo">
+                <span>DESCARGAR PLANTILLAS</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9" id="carta1">
+                <div class="row" style="text-align: center;">
+                    <div class="col-md">
+                        <a mat-button type="submit" id="descargar" class="btn btn-sm" matSuffix
+                            matTooltipPosition="right" matTooltip="Dar click para ver o descargar el documento"
+                            href="{{hipervinculo}}/plantillaD/documento/Planificacion Multiple.xlsx">
+                            <span class="material-icons">cloud_download</span> Plantilla Varios Horarios
+                        </a>
+                    </div>
+                    <div class="col-md">
+                        <a mat-button type="submit" id="descargar" class="btn btn-sm" matSuffix
+                            matTooltipPosition="right" matTooltip="Dar click para ver o descargar el documento"
+                            href="{{hipervinculo}}/plantillaD/documento/MultiplesEmpleados_HorarioFijo.xlsx">
+                            <span class="material-icons">cloud_download</span> Plantilla Horario Fijo
+                        </a>
+                    </div>
+                </div>
+            </mat-card>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md">
+            <div id="titulo">
+                <span>CARGA MÚLTIPLE PERIODO VACACIONES</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9" id="carta1">
+                <div class="container" style="text-align: center;">
+                    <form method="post" enctype="multipart/form-data">
+                        <input (change)="fileChangeVacacion($event)" type="file" [formControl]="archivoVacacionForm"
+                            id="file3"
+                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                        <label for="file3" class="btn-2" matSuffix 
+                            matTooltipPosition="right"
+                            matTooltip="Presionar para seleccionar Plantilla con nombre Periodo Vacaciones">Subir
+                            Periodo Vacaciones</label>
+                    </form>
+                </div>
+            </mat-card>
+        </div>
+        <div class="col-sm">
+            <div id="titulo">
+                <span>DESCARGAR PLANTILLA PERIODO VACACIONES</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9" id="carta1">
+                <div class="container" style="text-align: center;">
+                    <a mat-button type="submit" id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                        matTooltip="Dar click para ver o descargar el documento"
+                        href="{{hipervinculo}}/plantillaD/documento/Periodo Vacaciones.xlsx">
+                        <span class="material-icons">cloud_download</span> Plantilla Periodo Vacaciones
+                    </a>
+                </div>
+            </mat-card>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md">
+            <div id="titulo">
+                <span>CARGA PLANIFICACIÓN MULTIPLES EMPLEADOS</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9" id="carta1">
+                <div class="container" style="text-align: center;">
+                    <form method="post" enctype="multipart/form-data">
+                        <input (change)="fileChangePrueba($event)" type="file" [formControl]="archivoPruebaForm"
+                            id="file4"
+                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                        <label for="file4" class="btn-2" matSuffix 
+                            matTooltipPosition="right"
+                            matTooltip="Presionar para seleccionar Plantilla con nombre PlanDetalle Multiples Empleados">Subir
+                            Planificacion Multiple</label>
+                    </form>
+                </div>
+            </mat-card>
+        </div>
+        <div class="col-md">
+            <div id="titulo">
+                <span>DESCARGAR PLANTILLA PLANIFICACIÓN EMPLEADOS</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9" id="carta1">
+                <div class="container" style="text-align: center;">
+                    <a mat-button type="submit" id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                        matTooltip="Dar click para ver o descargar el documento"
+                        href="{{hipervinculo}}/plantillaD/documento/PlanDetalle Multiples Empleados.xlsx">
+                        <span class="material-icons">cloud_download</span> Planificación Empleados
+                    </a>
+                </div>
+            </mat-card>
+        </div>
+    </div>
+</div>

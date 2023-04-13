@@ -1,0 +1,28 @@
+a {
+    color: rgb(221, 221, 221);
+}
+
+.footer {
+    background-color: rgb(37, 102, 139);
+    padding-bottom: 1px;
+    padding-top: 5px;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    height: 10%;
+    width: 100%;
+    left: 0;
+}
+
+.foo {
+    text-align: left;
+    padding: 10px 10px 10px 10px;
+    color: rgb(199, 199, 199);
+}
+
+.foo1 {
+    text-align: right;
+    padding: 0px 10px 0px 10px;
+    height: 60px;
+    width: 145px;
+}

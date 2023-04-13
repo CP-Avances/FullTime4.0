@@ -1,0 +1,115 @@
+<div class="container" style="padding-top: 20px; padding-bottom: 20px;">
+    <div class="row">
+        <div class="col">
+            <div class="d-flex bd-highlight" id="titulo">
+                <span class="w-100 bd-highlight">
+                    CRÍTERIOS DE BÚSQUEDA</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9">
+                <form [formGroup]="buscador">
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <mat-form-field>
+                            <mat-label>Buscar por usuario</mat-label>
+                            <input matInput placeholder="Ej: " [(ngModel)]="filtroTimbreEmpl"
+                                [formControl]="nom_empleado" (keypress)="IngresarSoloLetras($event)">
+                            <mat-error *ngIf="nom_empleado.invalid">Indispensable ingresar más de dos letras
+                            </mat-error>
+                            <mat-icon matSuffix matTooltipPosition="right" id="i-cursor"
+                                matTooltip="Búsqueda por el nombre del usuario">
+                                help_outline</mat-icon>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label>Buscar por estado</mat-label>
+                            <input matInput placeholder="Ej: " [(ngModel)]="filtroTimbreEsta" [formControl]="estado"
+                                type="text" (keypress)="IngresarSoloLetras($event)">
+                            <mat-error *ngIf="estado.invalid">Indispensable ingresar más de dos letras
+                            </mat-error>
+                            <mat-icon matSuffix matTooltipPosition="right" id="i-cursor"
+                                matTooltip="Búsqueda por estado de la solicitud">
+                                help_outline</mat-icon>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label>Buscar por fecha</mat-label>
+                            <input matInput placeholder="Ej: " [(ngModel)]="filtroTimbreFech" [formControl]="fecha"
+                                type="text">
+                            <mat-error *ngIf="fecha.invalid">Indispensable ingresar más de dos letras
+                            </mat-error>
+                            <mat-icon matSuffix matTooltipPosition="right" id="i-cursor"
+                                matTooltip="Búsqueda por fecha de la solicitud">
+                                help_outline</mat-icon>
+                        </mat-form-field>
+                    </div>
+                </form>
+                <div class="d-flex justify-content-around">
+                    <button mat-button type="submit" class="btn btn-sm" id="boton" (click)="limpiarCampos()">Mostrar
+                        lista</button>
+                </div>
+            </mat-card>
+        </div>
+    </div>
+</div>
+<div class="container table-responsive" style="padding-bottom: 50px;">
+    <div class="mat-elevation-z8" style="background-color: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
+                matTooltipPosition="right"
+                matTooltip="Activa o desactiva selección múltiple para desactivar empleados masivamente"
+                id="SelectCheck">library_add_check</mat-icon>
+            <button *ngIf="btnCheckHabilitar" class="btn btn-primary" style="float: left; margin-left: 10px;"
+                (click)="Deshabilitar(2)">Confirmar</button>
+            <span class="w-100 bd-highlight">
+                LISTA DE TODAS LAS NOTIFICACIONES</span>
+        </div>
+        <table class="table table-hover table-sm ">
+            <thead class="thead-light">
+                <tr style="text-align: center;">
+                    <th>
+                        <mat-checkbox *ngIf="btnCheckHabilitar" (change)="$event ? masterToggle() : null"
+                            [checked]="selectionUno.hasValue() && isAllSelected()"
+                            [indeterminate]="selectionUno.hasValue() && !isAllSelected()"
+                            [aria-label]="checkboxLabel()">
+                        </mat-checkbox>
+                    </th>
+                    <th scope="col">Empleado</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Fecha</th>
+                    <th scope="col">Hora</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr
+                    *ngFor="let n of notificaciones | avisoEmpl: filtroTimbreEmpl | avisoEstado: filtroTimbreEsta | avisoFech: filtroTimbreFech | paginate:tamanio_pagina:numero_pagina">
+                    <td>
+                        <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
+                            (change)="$event ? selectionUno.toggle(n) : null" [checked]="selectionUno.isSelected(n)"
+                            [aria-label]="checkboxLabel(n)">
+                        </mat-checkbox>
+                    </td>
+                    <td>{{n.empleado}}</td>
+                    <td>{{n.estado}}</td>
+                    <td>{{n.create_at.split('T')[0]}}</td>
+                    <td>{{n.create_at.slice(11,16)}}</td>
+                    <td>
+                        <a *ngIf="n.id_vacaciones === null && n.id_hora_extra === null"
+                            [routerLink]="['/ver-permiso/', n.id_permiso]" (click)="CambiarVistaNotificacion(n.id)">
+                            permiso
+                        </a>
+                        <a *ngIf="n.id_permiso === null && n.id_hora_extra === null"
+                            [routerLink]="['/ver-vacacion/', n.id_vacaciones]" (click)="CambiarVistaNotificacion(n.id)">
+                            vacación
+                        </a>
+                        <a *ngIf="n.id_permiso === null && n.id_vacaciones === null"
+                            [routerLink]="['/ver-hora-extra/', n.id_hora_extra]"
+                            (click)="CambiarVistaNotificacion(n.id)">
+                            hora extra
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <mat-paginator id="pagina" [length]="notificaciones.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>

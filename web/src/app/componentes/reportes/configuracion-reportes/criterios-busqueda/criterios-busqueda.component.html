@@ -1,0 +1,144 @@
+<div id="titulo">
+    <span>CRÍTERIOS DE BÚSQUEDA</span>
+</div>
+<mat-card class="example-card mat-elevation-z9">
+    <form [formGroup]="buscador">
+        <mat-radio-group class="d-flex flex-wrap justify-content-center" [formControl]="seleccion">
+            <mat-radio-button class="example-radio-button" *ngFor="let c of check" [value]="c.opcion"
+                (change)="BuscarPorTipo($event)">{{c.valor}}</mat-radio-button>
+        </mat-radio-group>
+    </form>
+    <!-- Form para SUCURSALES -->
+    <form [formGroup]="buscador" *ngIf="_booleanOptions.bool_suc">
+        <div class="d-flex flex-wrap justify-content-center">
+            <mat-form-field>
+                <mat-label>Sucursal</mat-label>
+                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreSuc" (input)="Filtrar(filtroNombreSuc, 1)"
+                    [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
+                <mat-error *ngIf="nombre_suc.invalid">Indispensable ingresar dos letras
+                </mat-error>
+                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de sucursales por nombre.">
+                    help_outline</mat-icon>
+            </mat-form-field>
+        </div>
+    </form>
+    <!-- Form para DEPARTAMENTOS -->
+    <form [formGroup]="buscador" *ngIf="_booleanOptions.bool_dep">
+        <div class="d-flex flex-wrap justify-content-center">
+            <mat-form-field>
+                <mat-label>Departamento</mat-label>
+                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreDep" (input)="Filtrar(filtroNombreDep, 2)"
+                    [formControl]="nombre_dep" type="text" (keypress)="IngresarSoloLetras($event)">
+                <mat-error *ngIf="nombre_dep.invalid">Indispensable ingresar dos letras
+                </mat-error>
+                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de departamentos por nombre.">
+                    help_outline</mat-icon>
+            </mat-form-field>
+        </div>
+    </form>
+    <!-- Form para EMPLEADOS -->
+    <form [formGroup]="buscador" *ngIf="_booleanOptions.bool_emp">
+        <div class="d-flex flex-wrap justify-content-center">
+            <mat-form-field>
+                <mat-label>Código</mat-label>
+                <input matInput placeholder="Buscar" [(ngModel)]="filtroCodigo" (input)="Filtrar(filtroCodigo, 3)"
+                    [formControl]="codigo" (keypress)="IngresarSoloNumeros($event)">
+                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de datos de empleado por código.">
+                    help_outline</mat-icon>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>CI o pasaporte</mat-label>
+                <input matInput placeholder="Buscar" [(ngModel)]="filtroCedula" maxlength="10"
+                    (input)="Filtrar(filtroCedula, 4)"
+                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
+                <mat-error *ngIf="cedula.invalid">Indispensable ingresar dos valores
+                </mat-error>
+                <mat-icon matSuffix matTooltipPosition="right"
+                    matTooltip="Búsqueda de datos de empleado por cédula de identificación o pasaporte.">
+                    help_outline</mat-icon>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Nombres</mat-label>
+                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreEmp" (input)="Filtrar(filtroNombreEmp, 5)"
+                    [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
+                <mat-error *ngIf="nombre_emp.invalid">Indispensable ingresar dos letras
+                </mat-error>
+                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de datos de empleado por nombre.">
+                    help_outline</mat-icon>
+            </mat-form-field>
+        </div>
+    </form>
+    <!-- Form para TABULADO -->
+    <form [formGroup]="buscador" *ngIf="_booleanOptions.bool_tab">
+        <div class="d-flex flex-wrap justify-content-center">
+            <mat-form-field>
+                <mat-label>Código</mat-label>
+                <input matInput placeholder="Buscar" [(ngModel)]="filtroCodigo_tab"
+                    (input)="Filtrar(filtroCodigo_tab, 6)" [formControl]="codigo"
+                    (keypress)="IngresarSoloNumeros($event)">
+                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de datos de empleado por código.">
+                    help_outline</mat-icon>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>CI o pasaporte</mat-label>
+                <input matInput placeholder="Buscar" [(ngModel)]="filtroCedula_tab" maxlength="10"
+                    (input)="Filtrar(filtroCedula_tab, 7)"
+                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
+                <mat-error *ngIf="cedula.invalid">Indispensable ingresar dos valores
+                </mat-error>
+                <mat-icon matSuffix matTooltipPosition="right"
+                    matTooltip="Búsqueda de datos de empleado por cédula de identificación o pasaporte.">
+                    help_outline</mat-icon>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Nombres</mat-label>
+                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreTab" (input)="Filtrar(filtroNombreTab, 8)"
+                    [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
+                <mat-error *ngIf="nombre_emp.invalid">Indispensable ingresar dos letras
+                </mat-error>
+                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de datos de empleado por nombre.">
+                    help_outline</mat-icon>
+            </mat-form-field>
+        </div>
+    </form>
+    <!-- Form para INCOMPLETOS -->
+    <form [formGroup]="buscador" *ngIf="_booleanOptions.bool_inc">
+        <div class="d-flex flex-wrap justify-content-center">
+            <mat-form-field>
+                <mat-label>Código</mat-label>
+                <input matInput placeholder="Buscar" [(ngModel)]="filtroCodigo_inc"
+                    (input)="Filtrar(filtroCodigo_inc, 9)" [formControl]="codigo"
+                    (keypress)="IngresarSoloNumeros($event)">
+                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de datos de empleado por código.">
+                    help_outline</mat-icon>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>CI o pasaporte</mat-label>
+                <input matInput placeholder="Buscar" [(ngModel)]="filtroCedula_inc" maxlength="10"
+                    (input)="Filtrar(filtroCedula_inc, 10)"
+                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
+                <mat-error *ngIf="cedula.invalid">Indispensable ingresar dos valores
+                </mat-error>
+                <mat-icon matSuffix matTooltipPosition="right"
+                    matTooltip="Búsqueda de datos de empleado por cédula de identificación o pasaporte.">
+                    help_outline</mat-icon>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Nombres</mat-label>
+                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreInc"
+                    (input)="Filtrar(filtroNombreInc, 11)" [formControl]="nombre_emp" type="text"
+                    (keypress)="IngresarSoloLetras($event)">
+                <mat-error *ngIf="nombre_emp.invalid">Indispensable ingresar dos letras
+                </mat-error>
+                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de datos de empleado por nombre.">
+                    help_outline</mat-icon>
+            </mat-form-field>
+        </div>
+    </form>
+    <div class="d-flex justify-content-around">
+        <button mat-button type="submit" class="btn btn-sm" id="boton" (click)="limpiarCampos()">Cancelar</button>
+    </div>
+</mat-card>

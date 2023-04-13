@@ -1,0 +1,33 @@
+td { padding-top: 10px; text-align: center; font-size: 14px;}
+
+p { font-size: x-small; }
+
+.btn { background-color: rgb(80,87,97); color: white; margin: 5px 10px 5px 10px;}
+
+.fas { color:green; margin-left: 20px; cursor: pointer;  }
+
+.far { color:red; margin-left: 20px; cursor: pointer;  }
+
+/*.enrolado-tooltip { background-color : rgb(3, 167, 167); }*/
+
+.datosEnrolado { 
+    font-size: 20px; 
+    text-align: center; 
+    background: rgb(52,65,84); 
+    color: white; 
+    padding-top: 10px; 
+    padding-bottom: 6px; 
+}
+
+#resulDis { 
+    font-size: 17px; 
+    text-align: center; 
+    background: rgb(52,65,84); 
+    color: white; 
+    padding-top: 10px; 
+    padding-bottom: 6px; 
+}
+
+
+
+#iconoEditar { text-align: center; }

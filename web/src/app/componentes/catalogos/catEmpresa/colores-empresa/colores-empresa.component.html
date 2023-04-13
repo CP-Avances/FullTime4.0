@@ -1,0 +1,91 @@
+<div id="resultados" *ngIf='verColores'>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane" id="mover">
+        SELECCIONAR COLORES
+    </span>
+    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+</div>
+<div style="text-align: center; padding-top: 15px;" *ngIf='verColores'>
+    <form [formGroup]="coloresForm">
+        <div class="row">
+            <div class="col-3">
+                <label style="margin-left: 40px;">Principal</label>
+                <br>
+                <input style="margin-left: 45px;" type="color" [(ngModel)]="p_color" value="p_color"
+                    [formControl]="principal" matSuffix matTooltip="Seleccionar color principal.">
+            </div>
+            <div class="col-3"></div>
+            <div class="col-3">
+                <label style="margin-left: 5px;">Secundario</label>
+                <br>
+                <input style="margin-left: 15px;" type="color" [(ngModel)]="s_color" value="s_color"
+                    [formControl]="secundario" matSuffix matTooltip="Seleccionar color secundario.">
+            </div>
+            <div class="col-3"></div>
+        </div>
+    </form>
+    <div style="padding-top: 20px;">
+        <button type="submit" class="btn btn-sm float-left" (click)="GenerarPdf('open')">Visualizar</button>
+        <button type="submit" class="btn btn-sm float-right" (click)="CambiarColores()">Guardar</button>
+    </div>
+</div>
+
+<!--   ****************** FORMULARIO DE REGISTRO DE MARCA DE AGUA  ****************************  -->
+
+<div style="text-align: center;" *ngIf='verFrase'>
+    <div id="resultados">
+        <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane" id="mover">
+            MARCA DE AGUA
+        </span>
+        <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+    </div>
+    <div class="container">
+        <form [formGroup]="fraseForm">
+            <div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; width: 100%;">
+                <mat-radio-group aria-label="Select an option" [formControl]="fraseReporte" required>
+                    <div class="d-flex flex-wrap justify-content-start" style="position: relative; left: 3px;">
+                        <mat-radio-button (change)="CambiarFrase($event)" value="Confidencial">
+                            <label>Confidencial</label>
+                        </mat-radio-button>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-start" style="position: relative; left: 3px;">
+                        <mat-radio-button (change)="CambiarFrase($event)" value="FullTime">
+                            <label>FullTime</label>
+                        </mat-radio-button>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-start" style="position: relative; left: 3px;">
+                        <mat-radio-button (change)="CambiarFrase($event)" value="">
+                            <label>Ninguna</label>
+                        </mat-radio-button>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-start" style="position: relative; left: 3px;">
+                        <mat-radio-button (click)="IngresarFrase()" value="Otro">
+                            <label>Otra</label>
+                        </mat-radio-button>
+                    </div>
+                </mat-radio-group>
+            </div>
+         </form>
+
+        <div class="d-flex flex-wrap justify-content-start">
+            <mat-form-field *ngIf="ingresarOtro">
+                <mat-label>Frase</mat-label>
+                <input matInput placeholder="Ingresar nombre" [formControl]="nuevaF" maxlength="50"
+                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
+                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                    matTooltip="Ingresar frase que será usada como marca de agua en los reportes.">
+                    help_outline
+                </mat-icon>
+            </mat-form-field>
+        </div>
+        <div class="d-flex flex-wrap justify-content-center" style="padding-top: 15px; margin-bottom: 3%;">
+            <button mat-raised-button id="btn-raised" type="submit" (click)="VerArchivo(fraseForm.value)">Visualizar</button>
+            <button mat-raised-button id="btn-raised" type="submit" (click)="GuardarFrase(fraseForm.value)">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<div class="pantalla-progress" *ngIf="habilitarprogress">
+    <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
+    </mat-progress-spinner>
+</div>

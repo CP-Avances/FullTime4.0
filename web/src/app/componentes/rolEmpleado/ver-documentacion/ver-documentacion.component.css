@@ -1,0 +1,13 @@
+mat-icon {
+    cursor: pointer;
+}
+
+p {
+    font-size: x-small;
+}
+
+.far {
+    color: red;
+    cursor: pointer;
+    margin-left: 20px;
+}

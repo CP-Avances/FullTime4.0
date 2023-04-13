@@ -1,0 +1,30 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        MODIFICAR ROL</span>
+    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentanaRegistroRol()">highlight_off</mat-icon>
+</div>
+<form [formGroup]="nuevoRolForm">
+    <div tyle="text-align: center;">
+        <div class="nota">
+            <span>NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                Guardar.</span>
+        </div>
+        <div class="d-flex flex-wrap justify-content-between">
+            <mat-form-field>
+                <mat-label>Descripción</mat-label>
+                <input matInput placeholder="Ej: Administrador" [formControl]="descripcion"
+                    (keypress)="IngresarSoloLetras($event)" required>
+                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                    matTooltip="Modificar nombre de identificación del rol.">
+                    help_outline</mat-icon>
+                <mat-error *ngIf="descripcion.invalid">{{ObtenerMensajeErrorDescripcion()}}</mat-error>
+            </mat-form-field>
+        </div>
+    </div>
+</form>
+<div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 2%;">
+    <button mat-raised-button id="btn-raised" type="submit" (click)="InsertarRol(nuevoRolForm.value)"
+        [disabled]="!nuevoRolForm.valid" value="Guardar">Guardar</button>
+    <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentanaRegistroRol()" value="Salir">Salir</button-->
+</div>

@@ -1,0 +1,61 @@
+<div id="resultados">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        REGISTRAR AUTORIZACIÓN</span>
+    <mat-icon class="float-right" id="cerrar" (click)="dialogRef.close()">highlight_off</mat-icon>
+</div>
+<form [formGroup]="nuevaAutorizacionesForm">
+    <mat-card-content>
+        <div class="container" style="text-align: center;">
+            <div class="nota">
+                <span>NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                    Guardar.</span>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <mat-form-field>
+                        <mat-label>Orden</mat-label>
+                        <mat-icon id="notifica" matSuffix  matTooltipPosition="right"
+                            matTooltip="Lista de orden">
+                            help_outline</mat-icon>
+                        <mat-select [formControl]="orden" required>
+                            <mat-option *ngFor="let o of ordenes" [value]="o.valor">
+                                {{o.valor}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <br>
+                    <mat-form-field>
+                        <mat-label>Estados</mat-label>
+                        <mat-icon id="notifica" matSuffix  matTooltipPosition="right"
+                            matTooltip="Lista de estados">
+                            help_outline</mat-icon>
+                        <mat-select [formControl]="estado" required>
+                            <mat-option *ngFor="let e of estados" [value]="e.id">
+                                {{e.nombre}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="col" *ngIf="Habilitado">
+                    <mat-form-field>
+                        <mat-label>Departamento</mat-label>
+                        <mat-icon id="notifica" matSuffix  matTooltipPosition="right"
+                            matTooltip="Lista de orden">
+                            help_outline</mat-icon>
+                        <mat-select [formControl]="idDepartamento">
+                            <mat-option *ngFor="let d of departamentos" [value]="d.id_departamento">
+                                {{d.nombre}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+    </mat-card-content>
+</form>
+<div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
+    <button mat-raised-button id="btn-raised" type="submit" (click)="insertarAutorizacion(nuevaAutorizacionesForm.value)"
+        [disabled]="!nuevaAutorizacionesForm.valid">Guardar</button>
+    <!--button mat-raised-button id="btn-raised" type="submit" (click)="dialogRef.close()">Salir</button-->
+</div>

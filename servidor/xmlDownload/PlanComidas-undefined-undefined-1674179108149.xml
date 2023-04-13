@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<root>
+  <lista_servicios_alimentacion id="9">
+    <nombre>Jhonatan Heredia</nombre>
+    <estado>PENDIENTE</estado>
+    <fecha_comida>Jue. 05/01/2023</fecha_comida>
+    <hora_inicial>08:00:00 AM</hora_inicial>
+    <hora_final>09:00:00 AM</hora_final>
+  </lista_servicios_alimentacion>
+  <lista_servicios_alimentacion id="7">
+    <nombre>Jhonatan Heredia</nombre>
+    <estado>PENDIENTE</estado>
+    <fecha_comida>Mié. 04/01/2023</fecha_comida>
+    <hora_inicial>08:00:00 AM</hora_inicial>
+    <hora_final>09:00:00 AM</hora_final>
+  </lista_servicios_alimentacion>
+</root>

@@ -1,0 +1,33 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        Cambia Estado de la Solicitud de Vacación</span>
+    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentanaPermiso()">highlight_off</mat-icon>
+</div>
+<div>
+    <form [formGroup]="VacacionForm">
+        <mat-card-content>
+            <div class="container" style="padding-top: 15px; text-align: center;">
+                <div class="row">
+                    <div class="col-sm">
+                        <mat-form-field>
+                            <mat-label>Estado</mat-label>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Indicar cual es el estado de las vacaciones">
+                                help_outline
+                            </mat-icon>
+                            <mat-select [formControl]="estadoF">
+                                <mat-option *ngFor="let e of estados" [value]="e.valor">{{e.nombre}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </mat-card-content>
+    </form>
+    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 4%;">
+        <button mat-raised-button id="btn-raised" type="submit" [disabled]="!VacacionForm.valid"
+        (click)="EditarEstadoVacacion(VacacionForm.value)" value="Guardar">Guardar</button>
+        <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentanaPermiso()" value="Salir">Salir</button-->
+    </div>
+</div>

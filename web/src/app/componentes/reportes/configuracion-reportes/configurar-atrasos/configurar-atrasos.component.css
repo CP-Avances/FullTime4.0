@@ -1,0 +1,12 @@
+
+.btn { margin-left: 15px; }
+
+#cancelar { background-color: rgb(80,87,97); color: white; }
+
+p { font-size: 13px; }
+
+#titulo { font-size: 14px; text-align: center; color: blue; font-weight: bold; }
+
+#mensaje { font-size: 14px; text-align: center; color: red; font-weight: bold; }
+
+li { font-size: 13px; }

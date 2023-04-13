@@ -1,0 +1,93 @@
+<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;">
+    <div class="row">
+        <div class="col-md">
+            <div id="titulo">
+                <span>CIUDADES</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z8">
+                <div class="d-flex justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
+                    <button mat-raised-button id="btn-raised" type="submit" (click)="AbrirVentanaRegistrarCiudad()">
+                        Crear ciudad
+                    </button>
+                    <button mat-raised-button id="btn-raised" type="submit" (click)="LimpiarCampos()" matSuffix
+                        matTooltipPosition="right"
+                        matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
+                        Mostrar lista
+                    </button>
+                </div>
+            </mat-card>
+        </div>
+    </div>
+</div>
+<div class="container" style="padding-bottom: 50px; text-align: center;">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="resultados">RESULTADO DE BÚSQUEDA</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Provincia-Departamento-Estado</th>
+                        <th scope="col">Ciudad</th>
+                        <th scope="col">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" (keypress)="IngresarSoloLetras($event)"
+                                    [formControl]="provinciaF" [(ngModel)]="filtroProvincias">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" (keypress)="IngresarSoloLetras($event)"
+                                    [formControl]="ciudadF" [(ngModel)]="filtroCiudad">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda de ciudades de acuerdo a cada columna de la tabla.">
+                                help_outline</mat-icon>
+                        </td>
+                    </tr>
+                    <tr
+                        *ngFor="let ciudad of datosCiudades | filtroProvincia: filtroProvincias | filtrosNombres: filtroCiudad | paginate:tamanio_pagina:numero_pagina">
+                        <td>{{ciudad.provincia}}</td>
+                        <td>{{ciudad.nombre}}</td>
+                        <td class="d-flex justify-content-center">
+                            <i (click)="ConfirmarDelete(ciudad)" class="far fa-trash-alt" matSuffix
+                                matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                <p>Eliminar</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="datosCiudades.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+            <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Ciudades en formato PDF.">
+                <p>PDF</p>
+            </i>
+            <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Ciudades en formato EXCEL.">
+                <p>XLSL</p>
+            </i>
+            <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Ciudades en formato CSV.">
+                <p>CSV</p>
+            </i>
+            <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Ciudades en formato XML.">
+                <p>XML</p>
+            </i>
+        </div>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+            <p> Reporte de ciudades. </p>
+        </div>
+    </div>
+</div>

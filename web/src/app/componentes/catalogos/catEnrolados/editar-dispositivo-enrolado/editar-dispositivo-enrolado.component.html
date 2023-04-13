@@ -1,0 +1,38 @@
+<div class="d-flex bd-highlight tituloEnrolado_reloj">
+    <mat-icon class="flex-shrink-1 bd-highlight align-self-center" id="movilidad">open_with</mat-icon>
+    <h5 class="w-100 bd-highlight align-self-center">Agregar dispositivo a {{data.nombre_enrolado}} </h5>
+</div>
+<div style="text-align: center">
+    <form [formGroup]="asignarRelojForm">
+        <div class="container">
+            <div class="nota">
+                <span>NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón Guardar.</span>
+            </div>
+            <mat-form-field>
+                <mat-label id="selecDispositivo">Seleccionar Dispositivo</mat-label>
+                <mat-icon id="enrolado_reloj" matSuffix 
+                    matTooltipPosition="right" matTooltip="Lista de dispositivos existentes en la empresa">
+                    help_outline</mat-icon>
+                <mat-select [formControl]="dispositivoF" required>
+                    <mat-option *ngFor="let d of dispositivos" [value]="d.id">
+                        {{d.nombre}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </form>
+    <div class="d-flex flex-wrap justify-content-center">
+        <input type="submit" class="btn btn-sm" [disabled]="!asignarRelojForm.valid"
+            (click)="InsertarEnroladoReloj(asignarRelojForm.value)" value="Guardar">
+        <input type="submit" class="btn btn-sm" (click)="CerrarVentanaAsignarReloj()" value="Salir">
+    </div>
+</div>
+
+<div class="pantalla-progress" *ngIf="habilitarprogress">
+    <mat-progress-spinner
+        class="progress"
+        [color]="color"
+        [mode]="mode"
+        [value]="value">
+    </mat-progress-spinner>
+</div>

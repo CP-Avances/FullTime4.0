@@ -1,0 +1,40 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        REGISTRAR COORDENADAS</span>
+    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+</div>
+<form [formGroup]="CoordenadasForm">
+    <div style="text-align: center">
+        <div class="nota">
+            <span>NOTA: Registrar Coordenadas de Ubicación.</span>
+        </div>
+        <div class="d-flex flex-wrap justify-content-center">
+            <mat-form-field>
+                <mat-label>Descripción</mat-label>
+                <input matInput [formControl]="descripcion" required>
+                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar una descripción.">
+                    help_outline</mat-icon>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Latitud</mat-label>
+                <input matInput [formControl]="latitud" required>
+                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar coordenada de latitud.">
+                    help_outline</mat-icon>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Longitud</mat-label>
+                <input matInput [formControl]="longitud" required>
+                <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar coordenada de longitud.">
+                    help_outline</mat-icon>
+            </mat-form-field>
+        </div>
+    </div>
+</form>
+<div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
+    <button mat-raised-button id="btn-raised" type="submit" (click)="TomarCoordenadasMapa()" value="Mapa">Mapa</button>
+    <button mat-raised-button id="btn-raised" type="submit" (click)="VerificarDatos(CoordenadasForm.value)"
+        [disabled]=" !CoordenadasForm.valid" value="Guardar">Guardar</button>
+    <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentana()">Cancelar</button-->
+</div>
+

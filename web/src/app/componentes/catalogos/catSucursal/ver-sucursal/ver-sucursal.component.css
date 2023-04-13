@@ -1,0 +1,61 @@
+table {
+    width: 100%;
+    font-size: 14px;
+}
+
+p {
+    font-size: x-small;
+    text-align: center;
+}
+
+td {
+    padding-top: 10px;
+    text-align: center;
+}
+
+#datosF {
+    font-weight: bold;
+    font-size: 15px;
+    padding-right: 5px;
+}
+
+label{
+    font-style: normal;
+    font-size: 15px;
+    padding-left: 5px;
+}
+
+.caja {
+    padding: 0px 15px 0px 15px;
+    font-size: 18px;
+
+}
+
+#verticalLine {
+    border-left: 1px solid rgb(52, 65, 84);
+}
+
+#eliminar {
+    color: red;
+    cursor: pointer;
+    margin-left: 20px;
+}
+
+#editarI {
+    color: green;
+    cursor: pointer;
+    margin-left: 25px;
+}
+
+.btn {
+    background-color: rgb(80, 87, 97);
+    margin-left: 15px;
+    color: white;
+}
+
+#editarF {
+    color: green;
+    cursor: pointer;
+    text-align: center;
+    margin-left: 15px;
+}

@@ -1,0 +1,159 @@
+<!--Cambios Jenny-->
+<div class="container" style="padding-bottom: 25px; text-align: center; padding-top: 15px;" *ngIf="lista_permisos">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
+                matTooltipPosition="right" matTooltip="Autorizar a todos los empleados su Solicitud de Horas Extras"
+                id="SelectCheck">library_add_check</mat-icon>
+            <button *ngIf="btnCheckHabilitar" class="btn btn-primary" (click)="AutorizarPermisosMultiple()"
+                style="float: left; margin-left: 10px;">Autorizar</button>
+            <span class="w-100 bd-highlight">
+                LISTA DE PERMISOS SOLICITADOS POR USUARIO</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th>
+                            <mat-checkbox *ngIf="btnCheckHabilitar" (change)="$event ? masterToggle() : null"
+                                [checked]="selectionUno.hasValue() && isAllSelected()"
+                                [indeterminate]="selectionUno.hasValue() && !isAllSelected()"
+                                [aria-label]="checkboxLabel()">
+                            </mat-checkbox>
+                        </th>
+                        <th scope="col">Empleado</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Tipo Permiso</th>
+                        <th scope="col">Fecha Inicio</th>
+                        <th scope="col">Fecha Final</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let e of listaPermisosFiltradas | paginate:tamanio_pagina:numero_pagina">
+                        <td>
+                            <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionUno.toggle(e) : null" [checked]="selectionUno.isSelected(e)"
+                                [aria-label]="checkboxLabel(e)">
+                            </mat-checkbox>
+                        </td>
+                        <td>{{e.nombre}} {{e.apellido}}</td>
+                        <td>{{e.estado}}</td>
+                        <td>{{e.nom_permiso}}</td>
+                        <td>{{e.fec_inicio_}}</td>
+                        <td>{{e.fec_final_}}</td>
+                        <td class="d-flex justify-content-center">
+                            <i class="fas fa-edit" id="edit" style="margin-right: 20px;"
+                                (click)="EditarPermiso(e.id, e.id_emple_solicita)" matSuffix matTooltipPosition="right"
+                                matTooltip="Modificar los datos generales de este registro">
+                                <p>Editar</p>
+                            </i>
+                            <i *ngIf="auto_individual" class="fas fa-file-alt"
+                                style="color:rgb(197, 95, 11); margin-left: 15px;" matSuffix matTooltipPosition="right"
+                                matTooltip="Cambiar el estado del documentdo de autorazación"
+                                [routerLink]="['/ver-permiso',e.id]">
+                                <p>Autorizar</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="listaPermisosFiltradas.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+            <i (click)="generarPdf('download','Permisos solicitados')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Tipo de Permisos en formato PDF.">
+                <p>PDF</p>
+            </i>
+            <i (click)="exportToExcel('Permisos solicitados')" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Tipo de Permisos en formato EXCEL.">
+                <p>XLSL</p>
+            </i>
+            <i (click)="exportToCVS('Permisos solicitados')" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Tipo de Permisos en formato CSV.">
+                <p>CSV</p>
+            </i>
+            <i (click)="exportToXML('Permisos solicitados')" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Tipo de Permisos en formato XML.">
+                <p>XML</p>
+            </i>
+        </div>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+            <p> Reporte de permisos solicitados. </p>
+        </div>
+    </div>
+</div>
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="lista_autorizados">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <span class="w-100 bd-highlight">
+                LISTA DE PERMISOS AUTORIZADOS O NEGADOS</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Empleado</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Tipo Permiso</th>
+                        <th scope="col">Fecha Inicio</th>
+                        <th scope="col">Fecha Final</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let e of listaPermisosAutorizadosFiltrados | paginate:tamanio_pagina_autorizado:numero_pagina_autorizado">
+                        <td>{{e.nombre}} {{e.apellido}}</td>
+                        <td>{{e.estado}}</td>
+                        <td>{{e.nom_permiso}}</td>
+                        <td>{{e.fec_inicio_}}</td>
+                        <td>{{e.fec_final_}}</td>
+                        <td class="d-flex justify-content-center">
+                            <i *ngIf="auto_individual" class="fas fa-file-alt"
+                                style="color:rgb(197, 95, 11); margin-left: 15px;" matSuffix matTooltipPosition="right"
+                                matTooltip="Cambiar el estado del documentdo de autorización"
+                                [routerLink]="['/ver-permiso',e.id]">
+                                <p>Documento</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="listaPermisosAutorizadosFiltrados.length"
+            [pageSize]="tamanio_pagina_autorizado" [pageSizeOptions]="pageSizeOptions_autorizado" id="pagina"
+            (page)="ManejarPaginaAutorizados($event)" showFirstLastButtons>
+        </mat-paginator>
+        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+            <i (click)="generarPdf('download','Permisos autorizados')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Tipo de Permisos en formato PDF.">
+                <p>PDF</p>
+            </i>
+            <i (click)="exportToExcel('Permisos autorizados')" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Tipo de Permisos en formato EXCEL.">
+                <p>XLSL</p>
+            </i>
+            <i (click)="exportToCVS('Permisos autorizados')" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Tipo de Permisos en formato CSV.">
+                <p>CSV</p>
+            </i>
+            <i (click)="exportToXML('Permisos autorizados')" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Tipo de Permisos en formato XML.">
+                <p>XML</p>
+            </i>
+        </div>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+            <p> Reporte de permisos autorizados o negados. </p>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="(validarMensaje1) && (validarMensaje2)" class="container"
+    style="padding-bottom: 50px; text-align: center; padding-top: 20px;">
+    <div class="mat-elevation-z8" style="color: rgb(158, 154, 154); padding: 2%;">
+        <h5> Por el Momento no tiene Solicitudes de Permisos para Aprobar </h5>
+    </div>
+</div>

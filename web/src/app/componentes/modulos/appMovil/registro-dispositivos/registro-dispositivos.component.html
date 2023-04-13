@@ -1,0 +1,123 @@
+<div class="container" style="padding-bottom: 50px; text-align: center; padding-top: 20px;">
+    <!-- TABLA QUE HABILITA LOS USUARIOS SELECCIONADOS -->
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <mat-icon (click)="HabilitarSeleccion()" class="flex-shrink-1 bd-highlight" matSuffix
+                matTooltipPosition="right" matTooltip="Habilitar selección múltiple." id="SelectCheck">
+                library_add_check
+            </mat-icon>
+            <span class="w-100 bd-highlight">
+                LISTA DISPOSITIVOS MÓVILES REGISTRADOS
+            </span>
+            <button *ngIf="multiple" class="btn btn-outline-light btn-sm" matSuffix
+                matTooltipPosition="right"
+                matTooltip="Elimina los dispositivos seleccionados."
+                style="float: right; margin-right: 10px;" (click)="AbrirVentanaEliminar(1)">
+                Eliminar Dispositivo
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th>
+                            <mat-checkbox *ngIf="habilitar" [hidden]="ocultar"
+                                (change)="$event ? masterToggleEmp() : null"
+                                [checked]="selectionEmp.hasValue() && isAllSelectedEmp()"
+                                [indeterminate]="selectionEmp.hasValue() && !isAllSelectedEmp()"
+                                [aria-label]="checkboxLabelEmp()">
+                            </mat-checkbox>
+                        </th>
+                        <th scope="col">Código</th>
+                        <th scope="col">Empleado</th>
+                        <th scope="col">Cédula</th>
+                        <th scope="col">Id Dispositivo</th>
+                        <th scope="col">Modelo</th>
+                        <th scope="col">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <mat-form-field class="input-tables codigo">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCodigo" [formControl]="codigo"
+                                    (keypress)="IngresarSoloNumeros($event)">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombre" [formControl]="nombre"
+                                    type="text" (keypress)="IngresarSoloLetras($event)">
+                                <mat-error *ngIf="nombre.invalid">
+                                    Indispensable ingresar dos letras
+                                </mat-error>
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field class="input-tables cedula">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCedula" maxlength="10"
+                                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
+                                <mat-error *ngIf="cedula.invalid">
+                                    Indispensable ingresar dos valores
+                                </mat-error>
+                            </mat-form-field>
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr
+                        *ngFor="let d of dispositivosRegistrados | emplCodigo: filtroCodigo | emplNombre: filtroNombre | emplCedula: filtroCedula | paginate:tamanio_pagina:numero_pagina">
+                        <td>
+                            <mat-checkbox *ngIf="habilitar" (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionEmp.toggle(d) : null" [checked]="selectionEmp.isSelected(d)"
+                                [aria-label]="checkboxLabelEmp(d)">
+                            </mat-checkbox>
+                        </td>
+                        <td scope="row">{{d.codigo}}</td>
+                        <td>{{d.nombre}}</td>
+                        <td>{{d.cedula}}</td>
+                        <td>{{d.id_dispositivo}}</td>
+                        <td>{{d.modelo_dispositivo}}</td>
+                        <td class="d-flex justify-content-center">
+                            <div style="height: 100%;">
+                                <i (click)="AbrirVentanaEliminar(d)" *ngIf="individual" class="far fa-trash-alt"
+                                    id="t-eliminar" matSuffix matTooltipPosition="right"
+                                    matTooltip="Eliminar registro de dispositivo.">
+                                <p>Eliminar</p>
+                                </i>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="dispositivosRegistrados.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" id="estilo" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 1%;">
+            <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Dispositivos en formato PDF.">
+                <p>PDF</p>
+            </i>
+            <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Dispositivos en formato EXCEL.">
+                <p>XLSL</p>
+            </i>
+            <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Dispositivos en formato CSV.">
+                <p>CSV</p>
+            </i>
+            <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Dispositivos en formato XML.">
+                <p>XML</p>
+            </i>
+        </div>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+            <p> Reporte de dispositivos registrados. </p>
+        </div>
+    </div>
+</div>

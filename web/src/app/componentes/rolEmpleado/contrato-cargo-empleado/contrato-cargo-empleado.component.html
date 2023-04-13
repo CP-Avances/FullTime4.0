@@ -1,0 +1,280 @@
+<div class="container" style="padding-top: 20px; padding-bottom: 25px;">
+    <div class="row">
+        <div class="col-md" style="padding-bottom: 20px;">
+            <mat-card class="mat-elevation-z8">
+                <div id="titulo">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col" style="text-align: center;">
+                                <h5>CONTRATO DE TRABAJO</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <mat-card-content>
+                    <div class="container" *ngFor="let ce of contratoEmpleado" style="padding-top: 15px;">
+                        <div class="d-flex flex-wrap justify-content-between" style="margin-bottom: 10px;">
+                            <div class="row">
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Código:</label>
+                                        <label>{{ce.id}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Regimen:</label>
+                                        <label>{{ce.descripcion}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Fecha Ingreso:</label>
+                                        <label>{{ce.fec_ingreso_}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Fecha Salida:</label>
+                                        <label *ngIf="ce.fec_salida === null; else fechaSalida">Sin fecha</label>
+                                        <ng-template #fechaSalida>
+                                            <label>{{ce.fec_salida_}}</label>
+                                        </ng-template>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Modalidad Trabajo:</label>
+                                        <label>{{ce.nombre_contrato}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Control de Asistencia:</label>
+                                        <label> {{ce.asis_controla === true ? 'Si' : 'No'}} </label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Control de Vacaciones:</label>
+                                        <label> {{ce.vaca_controla === true ? 'Si' : 'No'}} </label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start"
+                                        *ngIf="ce.doc_nombre != null && ce.doc_nombre != ''">
+                                        <label id="datosF">Contrato:</label>
+                                        <a class="fas fa-file-alt"
+                                            style="color:rgb(11, 70, 197); text-align: center; margin-left: 20px;"
+                                            matSuffix matTooltipPosition="right"
+                                            matTooltip="Dar click para descargar contrato de trabajo"
+                                            href="{{hipervinculo}}/contratoEmpleado/documentos/{{ce.documento}}"
+                                            target="_blank">
+                                            <p>{{ce.doc_nombre}}</p>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+            <br>
+            <mat-card class="mat-elevation-z8">
+                <div id="titulo">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col" style="text-align: center;">
+                                <h5>CONTRATOS ANTERIORES</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <mat-card-content>
+                    <div class="container" style="padding-top: 15px; text-align: center;">
+                        <form [formGroup]="contratoForm">
+                            <mat-form-field>
+                                <mat-label>Período del Contrato</mat-label>
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                    matTooltip="Lista de contratos del empleado">
+                                    help_outline</mat-icon>
+                                <mat-select [formControl]="fechaContrato">
+                                    <mat-option *ngFor="let c of contratoBuscado" [value]="c.id"
+                                        (click)="ObtenerContratoSeleccionado(contratoForm.value)">
+                                        {{c.fec_ingreso_}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </form>
+                    </div>
+                    <div class="container" *ngFor="let ce of contratoSeleccionado" style="padding-top: 15px;">
+                        <div class="d-flex flex-wrap justify-content-between" style="margin-bottom: 10px;">
+                            <div class="row">
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Código:</label>
+                                        <label>{{ce.id}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Regimen:</label>
+                                        <label>{{ce.descripcion}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Fecha Ingreso:</label>
+                                        <label>{{ce.fec_ingreso_}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Fecha Salida:</label>
+                                        <label *ngIf="ce.fec_salida === null">Sin fecha</label>
+                                        <label *ngIf="ce.fec_salida != null">{{ce.fec_salida_}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Control de Asistencia:</label>
+                                        <label *ngIf="ce.asis_controla == true">Si</label>
+                                        <label *ngIf="ce.asis_controla == false">No</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Control de Vacaciones:</label>
+                                        <label *ngIf="ce.vaca_controla == true">Si</label>
+                                        <label *ngIf="ce.vaca_controla == false">No</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start"
+                                        *ngIf="ce.doc_nombre != null && ce.doc_nombre != ''">
+                                        <label id="datosF">Contrato:</label>
+                                        <a class="fas fa-file-alt"
+                                            style="color:rgb(11, 70, 197); text-align: center; margin-left: 20px;"
+                                            matSuffix matTooltipPosition="right"
+                                            matTooltip="Dar click para descargar contrato de trabajo"
+                                            href="{{hipervinculo}}/contratoEmpleado/documentos/{{ce.documento}}"
+                                            target="_blank">
+                                            <p>{{ce.doc_nombre}}</p>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <a mat-button type="submit" (click)="LimpiarContrato()">
+                                <i class="fa fa-times-circle" matTooltipPosition="right" id="cerrar"
+                                    matTooltip="Cerrar Registro">
+                                    <p>Cerrar</p>
+                                </i>
+                            </a>
+                        </div>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+        </div>
+        <div class="col-md">
+            <mat-card class="mat-elevation-z8">
+                <div id="titulo">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col" style="text-align: center;">
+                                <h5>CARGO ACTUAL</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <mat-card-content>
+                    <div class="container" *ngFor="let c of cargoEmpleado" style="padding-top: 15px;">
+                        <div class="d-flex flex-wrap justify-content-between" style="margin-bottom: 10px;">
+                            <div class="row">
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Código:</label>
+                                        <label>{{c.id}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Sucursal:</label>
+                                        <label>{{c.sucursal}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Cargo:</label>
+                                        <label>{{c.nombre_cargo}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Departamento:</label>
+                                        <label>{{c.departamento}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Fecha Ingreso:</label>
+                                        <label>{{c.fec_inicio_}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Fecha Final:</label>
+                                        <label>{{c.fec_final_}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Sueldo:</label>
+                                        <label>$ {{c.sueldo}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Horas de Trabajo:</label>
+                                        <label>{{c.hora_trabaja}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+            <br>
+            <mat-card class="mat-elevation-z8">
+                <div id="titulo">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col" style="text-align: center;">
+                                <h5>CARGOS ANTERIORES</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <mat-card-content>
+                    <div class="container" style="padding-top: 15px; text-align: center;">
+                        <form [formGroup]="cargoForm">
+                            <mat-form-field>
+                                <mat-label>Período del Cargo</mat-label>
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                    matTooltip="Seleccionar contrato para obtener la lista de sus respectivos cargos">
+                                    help_outline</mat-icon>
+                                <mat-select [formControl]="fechaICargo">
+                                    <mat-option *ngFor="let c of listaCargos" [value]="c.id"
+                                        (click)="ObtenerCargoSeleccionado(cargoForm.value)">
+                                        {{c.fec_inicio_}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </form>
+                    </div>
+                    <div class="container" *ngFor="let c of cargoSeleccionado" style="padding-top: 15px;">
+                        <div class="d-flex flex-wrap justify-content-between" style="margin-bottom: 10px;">
+                            <div class="row">
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Código:</label>
+                                        <label>{{c.id}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Sucursal:</label>
+                                        <label>{{c.sucursal}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Cargo:</label>
+                                        <label>{{c.nombre_cargo}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Departamento:</label>
+                                        <label>{{c.departamento}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Fecha Ingreso:</label>
+                                        <label>{{c.fec_inicio_}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Fecha Final:</label>
+                                        <label>{{c.fec_final_}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Sueldo:</label>
+                                        <label>$ {{c.sueldo}}</label>
+                                    </div>
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Horas de Trabajo:</label>
+                                        <label>{{c.hora_trabaja}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </div>
+</div>

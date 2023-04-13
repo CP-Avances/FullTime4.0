@@ -1,0 +1,228 @@
+<div class="container" style="padding-top: 15px;">
+    <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo">
+            <span>REGISTRAR DISPOSITIVOS</span>
+        </div>
+
+        <!-- ****************************** PRIMER FORMULARIO ******************************************* -->
+        <mat-horizontal-stepper [linear]="isLinear" #stepper>
+            <mat-step [stepControl]="primerFormulario">
+                <ng-template matStepLabel>
+                    <mat-icon id="icono" matSuffix matTooltipPosition="right"
+                        matTooltip="Sección 1: Información general">
+                        settings
+                    </mat-icon>
+                </ng-template>
+                <div class="subtitulo">
+                    <span>Información general</span>
+                </div>
+                <div class="nota">
+                    <span>
+                        Por favor llenar todos los campos obligatorios (*) del formulario y dar click en Siguiente
+                        para continuar.
+                    </span>
+                </div>
+                <form [formGroup]="primerFormulario">
+                    <div class="row">
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-form-field>
+                                    <mat-label id="letras">Seleccionar establecimiento</mat-label>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Seleccionar en que sucursal se encuentra el dispositivo.">
+                                        help_outline
+                                    </mat-icon>
+                                    <mat-select [formControl]="idSucursalF" required>
+                                        <mat-option *ngFor="let s of sucursales" [value]="s.id"
+                                            (click)="ObtenerDepartamentos(primerFormulario.value)">{{s.nombre}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+
+                                <mat-form-field>
+                                    <mat-label id="letras">Seleccionar departamento</mat-label>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Indicar en que departamento se encuentra el dispositivo.">
+                                        help_outline
+                                    </mat-icon>
+                                    <mat-select [formControl]="idDepartamentoF" required>
+                                        <mat-option *ngFor="let d of departamento" [value]="d.id">
+                                            {{d.nombre}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+
+                                <mat-form-field>
+                                    <mat-label id="letras">Nombre del dispositivo</mat-label>
+                                    <input matInput placeholder="Nombre del dispositivo" [formControl]="nombreF"
+                                        required>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar nombre del nuevo dispositivo.">
+                                        help_outline</mat-icon>
+                                    <mat-error *ngIf="nombreF.invalid">Ingresar un nombre válido.</mat-error>
+                                </mat-form-field>
+
+                                <mat-form-field>
+                                    <mat-label id="letras">Código</mat-label>
+                                    <input matInput placeholder="Código del dispositivo" [formControl]="codigoF"
+                                        required (keypress)="IngresarSoloNumeros($event)">
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar el código que tiene el dispositivo.">
+                                        help_outline
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-form-field>
+                                    <mat-label id="letras">IP</mat-label>
+                                    <input matInput placeholder="Ingresar IP del reloj." [formControl]="ipF"
+                                        (keypress)="IngresarIp($event)" required>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar dirección IP del dispositivo.">
+                                        help_outline
+                                    </mat-icon>
+                                    <mat-error *ngIf="ipF.invalid">{{ObtenerMensajeErrorIp()}}</mat-error>
+                                </mat-form-field>
+
+                                <mat-form-field>
+                                    <mat-label id="letras">Puerto</mat-label>
+                                    <input matInput placeholder="Ingresar puerto" [formControl]="puertoF"
+                                        (keypress)="IngresarSoloNumeros($event)" required>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar puerto que usa el dispositivo.">
+                                        help_outline
+                                    </mat-icon>
+                                    <mat-error *ngIf="puertoF.invalid">{{ObtenerMensajeErrorPuerto()}}</mat-error>
+                                </mat-form-field>
+
+                                <mat-radio-group aria-label="Select an option" formControlName="funcionesForm" required>
+                                    <label class="d-flex justify-content-start">
+                                        <span style="margin-left: 10px;">Tiene acciones *</span>
+                                    </label>
+                                    <div class="d-flex justify-content-around">
+                                        <mat-radio-button value="true" (click)="ActivarVista()">
+                                            <label id="textoradiobtn">Si</label>
+                                        </mat-radio-button>
+                                        <mat-radio-button value="false" (click)="DesactivarVista()">
+                                            <label id="textoradiobtn">No</label> 
+                                        </mat-radio-button>
+                                    </div>
+                                </mat-radio-group>
+                                <mat-form-field *ngIf=(activarCampo)>
+                                    <mat-label>Número de acciones</mat-label>
+                                    <input matInput placeholder="Acciones del dispositivo." [formControl]="numeroF"
+                                        required (keypress)="IngresarSoloNumeros($event)">
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar el número de acciones que tiene el dispositivo.">
+                                        help_outline
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div style="text-align: center; padding-top: 25px;">
+                    <button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentana()" class="float-left">Cancelar</button>
+                    <button mat-raised-button id="btn-raised" matStepperNext class="float-right">Siguiente</button>
+                </div>
+            </mat-step>
+
+            <!-- ********************************* SEGUNDO FORMULARIO ************************************* -->
+            <mat-step [stepControl]="segundoFormulario">
+                <ng-template matStepLabel>
+                    <mat-icon id="icono" matSuffix matTooltipPosition="right"
+                        matTooltip="Sección 2: Información dispositivo">
+                        alarm_on
+                    </mat-icon>
+                </ng-template>
+                <div class="subtitulo">
+                    <span>Dispositivo</span>
+                </div>
+                <div class="nota">
+                    <span>Llenar todos los campos obligatorios (*) del formulario y dar click en Guardar.</span>
+                </div>
+                <form [formGroup]="segundoFormulario">
+                    <div class="row">
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-form-field>
+                                    <mat-label>Marca</mat-label>
+                                    <input matInput placeholder="Ingresar marca" [formControl]="marcaF">
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar la marca del dispositivo.">help_outline
+                                    </mat-icon>
+                                    <mat-error *ngIf="marcaF.invalid">Ingresar una marca válida</mat-error>
+                                </mat-form-field>
+                                <mat-form-field>
+                                    <mat-label>Modelo</mat-label>
+                                    <input matInput placeholder="Ingresar modelo" [formControl]="modeloF">
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar el modelo del dispositivo.">help_outline
+                                    </mat-icon>
+                                    <mat-error *ngIf="modeloF.invalid">Ingresar un modelo válido</mat-error>
+                                </mat-form-field>
+                                <mat-form-field>
+                                    <mat-label>ID de fabricación</mat-label>
+                                    <input matInput placeholder="Ingresar id fabricación"
+                                        [formControl]="idFabricacionF">
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="left"
+                                        matTooltip="Ingresar ID de fabricación del dispositivo.">
+                                        help_outline</mat-icon>
+                                    <mat-error id="mensaje" *ngIf="idFabricacionF.invalid">
+                                        Ingresar un id de fabricación válido.
+                                    </mat-error>
+                                </mat-form-field>
+                                <mat-form-field>
+                                    <mat-label>Fabricante</mat-label>
+                                    <input matInput placeholder="Ingresar fabricante" [formControl]="fabricanteF">
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="left"
+                                        matTooltip="Ingresar nombre de empresa fabricante del dispositivo.">
+                                        help_outline
+                                    </mat-icon>
+                                    <mat-error *ngIf="fabricanteF.invalid">Ingresar un modelo válido.</mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-form-field>
+                                    <mat-label>Serie</mat-label>
+                                    <input matInput placeholder="Ingresar serie" [formControl]="serieF">
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar la serie del dispositivo.">help_outline
+                                    </mat-icon>
+                                    <mat-error *ngIf="serieF.invalid">Ingresar una serie válida</mat-error>
+                                </mat-form-field>
+                                <mat-form-field>
+                                    <mat-label>Dirección Física MAC</mat-label>
+                                    <input matInput placeholder="Ingresar dirección MAC" [formControl]="macF">
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="left"
+                                        matTooltip="Ingresar dirección física (MAC) del dispositivo ">
+                                        help_outline</mat-icon>
+                                    <mat-error *ngIf="macF.invalid">Ingresar una dirección MAC válida</mat-error>
+                                </mat-form-field>
+                                <mat-form-field>
+                                    <mat-label>Contraseña</mat-label>
+                                    <input matInput placeholder="Ingresar contraseña" [formControl]="contraseniaF">
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar contraseña del dispositivo.">vpn_key
+                                    </mat-icon>
+                                    <mat-error *ngIf="contraseniaF.invalid">Ingresar una contraseña válida.</mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div style="text-align: center; padding-top: 25px;">
+                    <button mat-raised-button id="btn-raised" matStepperPrevious class="float-left">Atrás</button>
+                    <button mat-raised-button id="btn-raised" (click)="InsertarReloj(primerFormulario.value, segundoFormulario.value)"
+                        [disabled]="!segundoFormulario.valid">Guardar
+                    </button>
+                    <button mat-raised-button id="btn-raised" (click)="CerrarVentana()" class="float-right">Cancelar</button>
+                </div>
+            </mat-step>
+        </mat-horizontal-stepper>
+    </mat-card>
+</div>

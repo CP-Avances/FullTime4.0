@@ -1,0 +1,135 @@
+<div class="container" style="padding-bottom: 25px; text-align: center; padding-top: 20px;">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="titulo">
+            ADMINISTRACIÓN DE TIMBRES
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Código</th>
+                        <th scope="col">Cédula</th>
+                        <th scope="col">Empleado</th>
+                        <th scope="col">Departamento</th>
+                        <th scope="col">Cargo</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <mat-form-field class="input-tables codigo">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCodigo" [formControl]="codigo"
+                                    (keypress)="IngresarSoloNumeros($event)">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field  class="input-tables cedula">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCedula" maxlength="10"
+                                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroEmpleado" [formControl]="nombre"
+                                    type="text" (keypress)="IngresarSoloLetras($event)">
+                            </mat-form-field>
+                        </td>
+                        <td></td>
+                        <td>
+                            <mat-icon id="i-ayuda" (click)="LimpiarCampos()" matSuffix matTooltipPosition="right"
+                                matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
+                                format_clear
+                            </mat-icon>
+                        </td>
+                        <td>
+                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda de datos de empleado de acuerdo a las columnas de la tabla.">
+                                help_outline
+                            </mat-icon>
+                        </td>
+                    </tr>
+                    <tr
+                        *ngFor="let d of datosEmpleado | emplCargo: filtroCargo | departamento: filtroDepartamento | emplCodigo: filtroCodigo | emplCedula: filtroCedula | nombreApellido: filtroEmpleado | paginate:tamanio_pagina_e:numero_pagina_e">
+                        <th scope="row">{{d.codigo}}</th>
+                        <td>{{d.cedula}}</td>
+                        <td>{{d.apellido}} {{d.nombre}}</td>
+                        <td>{{d.departamento | titlecase}}</td>
+                        <td>{{d.cargo}}</td>
+                        <td class="d-flex justify-content-center">
+                            <i matSuffix matTooltipPosition="right" matTooltip="Ver lista de timbres del empleado."
+                                class="fas fa-eye" id="t-ver" (click)="ObtenerListaTimbres(d.id, d.nombre, d.apellido)">
+                                <p>Ver</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="datosEmpleado.length" [pageSize]="tamanio_pagina_e"
+            [pageSizeOptions]="pageSizeOptions_e" id="pagina" (page)="ManejarPaginaE($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="lista">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="titulo">LISTA DE TIMBRES DE {{selec_nombre.toUpperCase()}}
+            <mat-icon style="float: right; margin-right: 10px;" (click)="CerrarTabla()" matSuffix
+                matTooltipPosition="right" matTooltip="Cerrar lista de datos seleccionada." id="cerrar">
+                highlight_off</mat-icon>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Maps</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Hora</th>
+                        <th scope="col">Acción</th>
+                        <th scope="col">Observacion</th>
+                        <th scope="col">Latitud</th>
+                        <th scope="col">Longitud</th>
+                        <th scope="col">Reloj</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <mat-form-field class="input-tables fecha">
+                                <input matInput (keyup)="applyFilter($event)" placeholder="Buscar" #input>
+                            </mat-form-field>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr
+                        *ngFor="let t of timbres | fecTimbre: filtroFechaTimbre | paginate:tamanio_pagina:numero_pagina">
+                        <td>
+                            <mat-icon aria-hidden="false" id="accion" (click)="AbrirMapa(t.latitud, t.longitud)"
+                                matSuffix matTooltipPosition="right"
+                                matTooltip="Direccionar al mapa con ubicación del timbre seleccionado.">
+                                location_on
+                            </mat-icon>
+                        </td>
+                        <td>{{t.fecha}}</td>
+                        <td>{{t.hora}}</td>
+                        <td>{{t.tecl_funcion}}</td>
+                        <td>{{t.observacion}}</td>
+                        <td>{{t.latitud}}</td>
+                        <td>{{t.longitud}}</td>
+                        <td>{{t.id_reloj}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="timbres.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>

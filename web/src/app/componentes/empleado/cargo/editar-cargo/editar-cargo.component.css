@@ -1,0 +1,13 @@
+.btn {
+    background-color: rgb(80, 87, 97);
+    margin-left: 15px;
+    color: white;
+}
+
+mat-form-field {
+    width: 200px;
+}
+
+#letras {
+    font-size: 14px;
+}

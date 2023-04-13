@@ -1,0 +1,104 @@
+<div class="container" style="padding-top: 15px; padding-bottom: 25px;">
+    <div id="titulo">
+        <span>FUNCIONES QUE TENDRÁ EL ROL {{nombreRol.toUpperCase()}}</span>
+    </div>
+    <mat-card class="example-card mat-elevation-z8">
+        <!-- Formulario Completo -->
+        <mat-card-content>
+            <div class="nota">
+                <span>
+                    Seleccionar las funciones o acciones que puede realizar el rol {{nombreRol}} dentro del sistema.
+                </span>
+            </div>
+            <form [formGroup]="nuevoRolPermisoForm">
+                <div class="container" style="text-align: center;">
+                    <div class="row">
+                        <div class="col-sm">
+                            <mat-form-field>
+                                <mat-label>Seleccionar Función</mat-label>
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                    matTooltip="Lista de funciones que se podrán realizar en el sistema">
+                                    help_outline
+                                </mat-icon>
+                                <mat-select [formControl]="funcion" required>
+                                    <mat-option *ngFor="let f of funciones" [value]="f.value">
+                                        {{f.value}}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="funcion.invalid">{{obtenerMensajeErrorFuncion()}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-sm">
+                            <mat-form-field>
+                                <mat-label>Seleccionar Links</mat-label>
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                    matTooltip="Secciones del sistema a las que va a afectar la función seleccionada">
+                                    help_outline
+                                </mat-icon>
+                                <mat-select [formControl]="link" required>
+                                    <mat-option *ngFor="let l of links" [value]="l.value">
+                                        {{l.viewValue}}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="link.invalid">{{obtenerMensajeErrorLink()}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-sm">
+                            <mat-form-field>
+                                <mat-label id="funcion">Seleccionar Etiquetas</mat-label>
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                    matTooltip="Lista de nombres que referencian las funciones que se pueden realizar en el sistema">
+                                    help_outline
+                                </mat-icon>
+                                <mat-select [formControl]="etiqueta" required>
+                                    <mat-option *ngFor="let e of etiquetas" [value]="e.value">
+                                        {{e.value}}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="etiqueta.invalid">{{obtenerMensajeErrorEtiqueta()}}</mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </mat-card-content>
+        <mat-card-actions>
+            <div class="container" style="text-align: center;">
+                <button mat-raised-button id="btn-raised" type="submit" [routerLink]="['/roles']">Atrás</button>
+                <button mat-raised-button id="btn-raised" type="submit" [disabled]="!nuevoRolPermisoForm.valid"
+                    (click)="insertarRolPermiso(nuevoRolPermisoForm.value)" value="Guardar">Guardar</button>
+                <button mat-raised-button id="btn-raised" type="submit" (click)="limpliarCampos()" value="Cancelar">Cancelar</button>
+            </div>
+        </mat-card-actions>
+    </mat-card>
+</div>
+<br>
+<div class="container" style="padding-bottom: 10px; margin-bottom: 35px;">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="resultados">RESULTADO DE BÚSQUEDA</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Id </th>
+                        <th scope="col">Funcion</th>
+                        <th scope="col">Link</th>
+                        <th scope="col">Etiqueta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Falta paginacion -->
+                    <tr *ngFor="let g of guardarRoles | paginate:tamanio_pagina:numero_pagina">
+                        <th style="padding-top: 10px; text-align: center;" scope="row">{{g.id}}</th>
+                        <td style="padding-top: 10px;">{{g.funcion}}</td>
+                        <td style="padding-top: 10px;">{{g.link}}</td>
+                        <td style="padding-top: 10px;">{{g.etiqueta}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="guardarRoles.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>

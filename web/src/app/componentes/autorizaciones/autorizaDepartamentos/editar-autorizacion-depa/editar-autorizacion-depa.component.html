@@ -1,0 +1,76 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        MODIFICAR AUTORIZAR DEPARTAMENTO
+    </span>
+    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+</div>
+<div class="scrollbar scrollbar-primary">
+    <!-- FORMULARIO COMPLETO -->
+    <form [formGroup]="formulario">
+        <mat-card-content>
+            <div class="container" style="text-align: center;">
+                <div class="nota">
+                    <span>
+                        NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                        Guardar.
+                    </span>
+                </div>
+                <div class="row">
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Empleado</mat-label>
+                                <input id="letras" matInput placeholder="Empleado" [formControl]="nombreEmpleadoF"
+                                    readonly="readonly" required>
+                            </mat-form-field>
+                            <mat-form-field>
+                                <mat-label id="fuente">Seleccionar Sucursal</mat-label>
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                    matTooltip="Seleccionar una de las sucursales existentes en la empresa.">
+                                    help_outline</mat-icon>
+                                <mat-select [formControl]="idSucursal" required>
+                                    <mat-option *ngFor="let s of sucursales" [value]="s.id"
+                                        (click)="ObtenerDepartamentos(formulario.value)">{{s.nombre}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Departamento</mat-label>
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                    matTooltip="Lista de departamentos existentes en la empresa.">
+                                    help_outline</mat-icon>
+                                <mat-select [formControl]="idDepartamento" required>
+                                    <mat-option *ngFor="let d of departamento" [value]="d.id">{{d.nombre}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            <mat-radio-group aria-label="Select an option" [formControl]="autorizarF" required>
+                                <label class="d-flex justify-content-between"
+                                    style="position: relative; left:10px; font-size: 15px; padding-top: 10px;">
+                                    <span>Autoriza *</span>
+                                </label>
+                                <mat-radio-button class="example-match" ngDefaultControl [(ngModel)]="selec1"
+                                    [checked]="selec1" [ngModelOptions]="{standalone: true}" value="true">
+                                    <label id="textoradiobtn">Si</label>
+                                </mat-radio-button>
+                                <mat-radio-button class="example-match" ngDefaultControl [(ngModel)]="selec2"
+                                    [checked]="selec2" [ngModelOptions]="{standalone: true}" value="false">
+                                    <label id="textoradiobtn">No</label>
+                                </mat-radio-button>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-card-content>
+    </form>
+    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
+        <button mat-raised-button id="btn-raised" type="submit" (click)="InsertarAutorizacion(formulario.value)"
+            [disabled]="!formulario.valid">Guardar</button>
+        <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentana()">Salir</button-->
+    </div>
+</div>

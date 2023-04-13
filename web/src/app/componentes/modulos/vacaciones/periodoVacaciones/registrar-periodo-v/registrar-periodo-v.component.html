@@ -1,0 +1,112 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        REGISTRAR PERIODO VACACIONES</span>
+    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentanaRegistroPerVacaciones()">highlight_off</mat-icon>
+</div>
+<div>
+    <!-- Formulario Completo -->
+    <form [formGroup]="PerVacacionesForm">
+        <mat-card-content>
+            <div class="container" style="text-align: center">
+                <div class="nota">
+                    <span>NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                        Guardar.</span>
+                </div>
+                <div class="d-flex flex-wrap justify-content-around">
+                    <mat-form-field>
+                        <mat-label>Empleado</mat-label>
+                        <input id="nomEmple" matInput placeholder="Empleado" [formControl]="nombreEmpleadoF"
+                            readonly="readonly" required>
+                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Nombre del empleado">
+                            help_outline</mat-icon>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Descripción</mat-label>
+                        <input matInput placeholder="Ej:" [formControl]="descripcionF" required>
+                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" 
+                            matTooltip="Ingresar nombre del período de vacaciones">help_outline</mat-icon>
+                        <mat-error *ngIf="descripcionF.invalid">{{ObtenerMensajeErrorNombre()}}</mat-error>
+                        <mat-error *ngIf="descripcionF.invalid">Ingrese una descripción válida</mat-error>
+                    </mat-form-field>
+                    <mat-radio-group aria-label="Select an option" [formControl]="estadoF" required>
+                        <label class="d-flex justify-content-between">
+                            <span>Vacaciones usadas *</span>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Indicación de que el empleado hizo uso de sus vacaciones">help_outline
+                            </mat-icon>
+                        </label>
+                        <div class="d-flex justify-content-around">
+                            <mat-radio-button [value]=1>
+                                <label>Si</label></mat-radio-button>
+                            <mat-radio-button [value]=2>
+                                <label>No</label></mat-radio-button>
+                        </div>
+                    </mat-radio-group>
+                    <mat-form-field>
+                        <mat-label id="fec">Fecha de inicio de período</mat-label>
+                        <input matInput [matDatepicker]="picker" (dateInput)="validarFecha($event)"
+                            placeholder="dd/mm/aaaa" [formControl]="fechaInicioF" required>
+                        <mat-datepicker-toggle matSuffix [for]="picker" id="i-cursor" matTooltipPosition="right"
+                            matTooltip="Ingresar la fecha de inicio de período de vacaciones. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                        </mat-datepicker-toggle>
+                        <mat-datepicker touchUi #picker></mat-datepicker>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label id="fec">Fecha de fin de período</mat-label>
+                        <input matInput [matDatepicker]="picker2" placeholder="dd/mm/aaaa" [formControl]="fechaFinF">
+                        <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor" matTooltipPosition="right"
+                            matTooltip="Ingresar la fecha de finalización de período de vacaciones. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                        </mat-datepicker-toggle>
+                        <mat-datepicker touchUi #picker2></mat-datepicker>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label id="dias">Días de vacación por antiguedad</mat-label>
+                        <input matInput placeholder="Días de incremento" [formControl]="diaAntiguedadF" required
+                            (keypress)="IngresarSoloNumeros($event)">
+                        <mat-icon id="i-cursor" matSuffix  matTooltipPosition="right"
+                            matTooltip="Número de días que se incrementán a los días de vacaciones que se le conceden al empleado al cumplir los años indicados de antiguedad">
+                            help_outline</mat-icon>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label id="dias">Días de vacaciones disponibles</mat-label>
+                        <input matInput placeholder="Días de incremento" [formControl]="diaVacacionF" required
+                            (keypress)="IngresarSoloNumeros($event)">
+                        <mat-icon id="i-cursor" matSuffix  matTooltipPosition="right"
+                            matTooltip="Número de días de vacaciones que tiene disponibles el empleado">
+                            help_outline</mat-icon>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label id="dias">Horas de vacaciones disponibles</mat-label>
+                        <input matInput placeholder="Días de incremento" [formControl]="horaVacacionF" required
+                            (keypress)="IngresarSoloNumeros($event)">
+                        <mat-icon id="i-cursor" matSuffix  matTooltipPosition="right"
+                            matTooltip="Número de horas de vacaciones que tiene disponibles el empleado">
+                            help_outline</mat-icon>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label id="dias">Minutos vacaciones disponibles</mat-label>
+                        <input matInput placeholder="Días de incremento" [formControl]="minVacacionF" required
+                            (keypress)="IngresarSoloNumeros($event)">
+                        <mat-icon id="i-cursor" matSuffix  matTooltipPosition="right"
+                            matTooltip="Número de minutos de vacaciones que tiene disponibles el empleado">
+                            help_outline</mat-icon>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label id="dias">Días de vacaciones perdidos</mat-label>
+                        <input matInput placeholder="Días de incremento" [formControl]="diaPerdidoF" required
+                            (keypress)="IngresarSoloNumeros($event)">
+                        <mat-icon id="i-cursor" matSuffix  matTooltipPosition="right"
+                            matTooltip="Número de días de vacaciones perdidos por no usarlos dentro del período permitido">
+                            help_outline</mat-icon>
+                    </mat-form-field>
+                </div>
+            </div>
+        </mat-card-content>
+    </form>
+    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 2%;">
+        <button mat-raised-button id="btn-raised" type="submit" [disabled]="!PerVacacionesForm.valid"
+        (click)="ValidarDatosPerVacacion(PerVacacionesForm.value)" value="Guardar"> Guardar</button>
+        <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentanaRegistroPerVacaciones()" value="Salir">Salir</button-->
+    </div>
+</div>

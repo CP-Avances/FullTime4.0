@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<root>
+  <empleado codigo="1">
+    <cedula>1542541256</cedula>
+    <apellido>Pazmiño</apellido>
+    <nombre>Jose Luis</nombre>
+    <estadoCivil>Soltero/a</estadoCivil>
+    <genero>Masculino</genero>
+    <correo>jentipan7@gmail.com</correo>
+    <fechaNacimiento>Lun. 05/04/1993</fechaNacimiento>
+    <estado>Activo</estado>
+    <domicilio>Los Valles</domicilio>
+    <telefono>0984562154</telefono>
+    <nacionalidad>Ecuatoriano</nacionalidad>
+  </empleado>
+</root>

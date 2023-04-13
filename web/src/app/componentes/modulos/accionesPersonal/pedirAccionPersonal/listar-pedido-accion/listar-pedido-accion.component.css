@@ -1,0 +1,12 @@
+.btn-sm { background-color: rgb(80,87,97); color: white; } 
+
+p { font-size: x-small; }
+
+table { width: 100%; font-size: 14px;}
+
+tr { text-align: center; }
+
+td { padding-top: 10px; text-align: center; }
+
+#pdf { color:red; font-size: 20px; text-align: center; cursor: pointer; margin-left: 20px;}
+

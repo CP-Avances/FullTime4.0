@@ -1,0 +1,151 @@
+<br>
+<div class="container" style="margin-bottom: 25px; padding-bottom: 10px;">
+    <div class="row">
+        <div class="col-md" style="margin-bottom: 25px; padding-bottom: 10px;">
+            <div class="TituloEnrolado">
+                <span>EMPLEADOS ENROLADOS</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z8">
+                <h5 style="text-align: center">Críterios de Búsqueda</h5>
+                <!-- Formulario Completo -->
+                <form>
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <mat-form-field>
+                            <mat-label>Ingresar ID de usuario</mat-label>
+                            <input matInput placeholder="Ej: " [(ngModel)]="filtroIdUser"
+                                [formControl]="idUser" (keypress)="IngresarSoloNumeros($event)">
+                            <mat-icon id="i_enrolado" matSuffix 
+                                matTooltipPosition="right"
+                                matTooltip="Búsqueda del empleado enrolado por el ID de usuario">
+                                help_outline</mat-icon>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label>Ingresar Nombre</mat-label>
+                            <input matInput placeholder="Ej: " [(ngModel)]="filtroEnrNombre"
+                                [formControl]="nombre" type="text" (keypress)="IngresarSoloLetras($event)">
+                            <mat-icon id="i_enrolado" matSuffix 
+                                matTooltipPosition="right"
+                                matTooltip="Búsqueda del empleado enrolado por el nombre">
+                                help_outline</mat-icon>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label>Seleccionar Estado</mat-label>
+                            <mat-icon id="i_enrolado" matSuffix 
+                                matTooltipPosition="right"
+                                matTooltip="Búsqueda del empleado enrolado por el estado">
+                                help_outline</mat-icon>
+                            <mat-select [formControl]="activo" [(ngModel)]="filtroActivo">
+                                <mat-option *ngFor="let d of activoBus" [value]="d.value">
+                                    {{d.viewValue}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </form>
+                <div class="d-flex flex-wrap justify-content-around">
+                    <button type="button" class="btn btn-sm" (click)="AbrirVentanaRegistrarEnrolado()">Enrolar a un
+                        empleado
+                    </button>
+                    <input type="submit" class="btn btn-sm" (click)="limpiarCampos()" value="Cancelar">
+                </div>
+            </mat-card>
+        </div>
+        <div class="col-md">
+            <div class="TituloEnrolado">
+                <span>REGISTRO MÚLTIPLE DE ENROLADOS</span>
+            </div>
+            <mat-card class="mat-elevation-z9 d-flex flex-wrap justify-content-center" id="carta1">
+                <form method="post" enctype="multipart/form-data">
+                    <input (change)="fileChange($event)" type="file" [formControl]="archivoForm" id="file"
+                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                    <label for="file" class="btn-2" matSuffix 
+                        matTooltipPosition="right"
+                        matTooltip="Presionar para seleccionar Plantilla con nombre Enrolados">Subir
+                        Enrolados</label>
+                </form>
+                <a mat-button type="submit" id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                    matTooltip="Dar click para ver o descargar el documento"
+                    href="{{hipervinculo}}/plantillaD/documento/Enrolados.xlsx">
+                    <span class="material-icons">cloud_download</span> Descargar Plantilla Enrolados
+                </a>
+            </mat-card>
+        </div>
+    </div>
+</div>
+<div class="container" style="padding-bottom: 50px; text-align: center;">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="resulEnrolado">RESULTADO DE BÚSQUEDA</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Id Usuario</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Código</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Finger</th>
+                        <th scope="col">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let enrolado of enrolados | iduser: filtroIdUser | activo: filtroActivo | enrNombre: filtroEnrNombre | paginate:tamanio_pagina:numero_pagina">
+                        <td>{{enrolado.id_usuario}}</td>
+                        <td>{{enrolado.nombre}}</td>
+                        <td>{{enrolado.codigo}}</td>
+                        <td *ngIf="enrolado.activo == true">Activo</td>
+                        <td *ngIf="enrolado.activo == false">Inactivo</td>
+                        <td>{{enrolado.finger}}</td>
+                        <td class="d-flex justify-content-center">
+                            <i matSuffix  matTooltipPosition="right"
+                                matTooltip="Agregar empleado enrolado a un dispositivo" class="far fa-clock" id="enr_reloj"
+                                (click)="AbrirVentanaAsignarReloj(enrolado)">
+                                <p>Dispositivo</p>
+                            </i>
+                            <i matSuffix  matTooltipPosition="right"
+                                matTooltip="Ver datos generales del empleado enrolado" class="fas fa-eye" id="verEnrolado"
+                                [routerLink]="['/enroladoDispositivo/', enrolado.id]">
+                                <p>Ver</p>
+                            </i>
+                            <i (click)="AbrirVentanaEditar(enrolado)" matSuffix 
+                                matTooltipPosition="right" matTooltip="Modificar datos generales del empleado enrolado"
+                                class="fas fa-edit">
+                                <p>Editar</p>
+                            </i>
+                            <i (click)="ConfirmarDelete(enrolado)" matSuffix 
+                                matTooltipPosition="right" matTooltip="Eliminar registro de empleado enrolado"
+                                class="far fa-trash-alt">
+                                <p>Eliminar</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <mat-paginator id="pagina" [length]="enrolados.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
+            id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+        <div class="d-flex justify-content-end" style="margin-right: 5%;">
+            <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
+                
+                matTooltip="Descargar Lista de Usuarios Enrolados en formato PDF">
+                <p>PDF</p>
+            </i>
+            <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                
+                matTooltip="Descargar Lista de Usuarios Enrolados en formato EXCEL">
+                <p>XLSL</p>
+            </i>
+            <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                
+                matTooltip="Descargar Lista de Usuarios Enrolados en formato CSV">
+                <p>CSV</p>
+            </i>
+            <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                
+                matTooltip="Descargar Lista de Usuarios Enrolados en formato XML">
+                <p>XML</p>
+            </i>
+        </div>
+    </div>
+</div>

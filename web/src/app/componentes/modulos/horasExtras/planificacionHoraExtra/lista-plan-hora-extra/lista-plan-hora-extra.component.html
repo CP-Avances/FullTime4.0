@@ -1,0 +1,338 @@
+<!--*********** LISTA DE SOLICITUDES DE PLANIFICACIONES HORAS EXTRAS PENDIENTES O PREAUTORIZADAS *************-->
+<br *ngIf="!HabilitarPlan">
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!HabilitarPlan">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
+                matTooltipPosition="right" matTooltip="Autorizar a todos los empleados la Planificación de Horas Extras"
+                id="SelectCheck">library_add_check</mat-icon>
+            <button *ngIf="btnCheckHabilitar" class="btn btn-primary" (click)="AutorizarHoras('pedido')"
+                style="float: left; margin-left: 10px;">Autorizar</button>
+            <span class="w-100 bd-highlight">
+                USUARIOS QUE HAN REALIZADO PLANIFICACIÓN DE HORAS EXTRAS</span>
+            <button class="btn btn-sm" style="float: right; margin-right: 10px;" ngDefaultControl
+                [(ngModel)]="totalHorasExtras" [ngModelOptions]="{standalone: true}">Horas Totales
+                {{totalHorasExtras}}</button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th>
+                            <mat-checkbox *ngIf="btnCheckHabilitar" (change)="$event ? masterToggle() : null"
+                                [checked]="selectionUno.hasValue() && isAllSelected()"
+                                [indeterminate]="selectionUno.hasValue() && !isAllSelected()"
+                                [aria-label]="checkboxLabel()">
+                            </mat-checkbox>
+                        </th>
+                        <th scope="col">Cédula</th>
+                        <th scope="col">Empleado</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Fecha Desde</th>
+                        <th scope="col">Fecha Hasta</th>
+                        <th scope="col">Horas Planificadas</th>
+                        <th scope="col">Fecha Timbre</th>
+                        <th scope="col">Horas Realizadas</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCedula" maxlength="10"
+                                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroEmpleado" [formControl]="nombre"
+                                    type="text" (keypress)="IngresarSoloLetras($event)">
+                            </mat-form-field>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <mat-icon id="i-ayuda" (click)="limpiarCampos()" matSuffix matTooltipPosition="right"
+                                matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
+                                format_clear
+                            </mat-icon>
+                        </td>
+                        <td>
+                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right" 
+                                matTooltip="Búsqueda de datos de acuerdo a la columna de la tabla.">
+                                help_outline</mat-icon>
+                        </td>
+                    </tr>
+                    <tr
+                        *ngFor="let h of horas_extras_plan | emplCedula: filtroCedula | nombreApellido: filtroEmpleado | paginate:tamanio_pagina:numero_pagina; index as i">
+                        <td>
+                            <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionUno.toggle(h) : null" [checked]="selectionUno.isSelected(h)"
+                                [aria-label]="checkboxLabel(h)">
+                            </mat-checkbox>
+                        </td>
+                        <td>{{h.cedula}}</td>
+                        <td>{{h.nombre}} {{h.apellido}}</td>
+                        <td>{{h.plan_estado}}</td>
+                        <td>{{h.fecha_desde.split('T')[0]}}</td>
+                        <td>{{h.fecha_hasta.split('T')[0]}}</td>
+                        <td>{{h.hora_total_plan}}</td>
+                        <td>{{h.fecha_timbre.split('T')[0]}}</td>
+                        <td>{{h.hora_total_timbre}}</td>
+                        <td class="d-flex justify-content-center">
+                            <!--   <a class="fas fa-file-alt" style="color:rgb(197, 95, 11); margin-left: 15px;" matSuffix
+                                matTooltipPosition="right" matTooltip="Cambiar el estado del documento de autorazación"
+                                [routerLink]="['/ver-hora-extra', h.id]">
+                                <p>Documento</p>
+                            </a>-->
+                            <i id="iconos" *ngIf="auto_individual" class="fas fa-stopwatch" id="plan"
+                                (click)="AbrirTiempoAutorizacion(h.hora_total_timbre, h.id_plan_extra, h, h.empl_id)"
+                                matTooltipPosition="right" matTooltip="Tiempo que se le autoriza de la hora extra.">
+                                <p>Autorizar Horas</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <div>
+            <button class="btn btn-sm float-right" ngDefaultControl [(ngModel)]="horasSumadas"
+                style="margin-right: 10px;" [ngModelOptions]="{standalone: true}">Sub-total Horas
+                {{horasSumadas}}</button>
+        </div>
+        <br>
+        <mat-paginator id="pagina" [length]="horas_extras_plan.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>
+<!--************** LISTA DE SOLICITUDES DE PLANIFICACIONES HORAS EXTRAS CON OBSERVACIONES  *********************-->
+<br *ngIf="!HabilitarObservacion">
+<div class="container" style="margin-bottom: 25px; padding-bottom: 10px;" *ngIf="!HabilitarObservacion">
+    <div class="row">
+        <div class="col-lg-7" style="margin-bottom: 15px;">
+            <mat-accordion>
+                <mat-expansion-panel hideToggle>
+                    <mat-expansion-panel-header class="d-flex bd-highlight">
+                        <mat-panel-title class="w-100 bd-highlight">
+                            Críterios de Búsqueda
+                        </mat-panel-title>
+                        <mat-icon class="flex-shrink-1 bd-highlight" matTooltipPosition="right"
+                            matTooltip="Se puede filtra de acuerdo al campo que escriba">search</mat-icon>
+                    </mat-expansion-panel-header>
+
+                    <form [formGroup]="buscador">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <!--  <mat-form-field>
+                                <mat-label>Ingresar Código</mat-label>
+                                <input matInput placeholder="Ej: " [(ngModel)]="filtroCodigo"
+                                    [formControl]="codigo" (keypress)="IngresarSoloNumeros($event)">
+                                <mat-icon id="iemple" matSuffix matTooltipPosition="right"
+                                    
+                                    matTooltip="Búsqueda de datos de empleado por código.">
+                                    help_outline</mat-icon>
+                            </mat-form-field>-->
+                            <mat-form-field>
+                                <mat-label>Ingresar CI o pasaporte</mat-label>
+                                <input matInput placeholder="Ej: " [(ngModel)]="filtroCedulaO" maxlength="10"
+                                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
+                                <mat-error *ngIf="cedula.invalid">Indispensable ingresar dos valores
+                                </mat-error>
+                                <mat-icon id="iemple" matSuffix matTooltipPosition="right"
+                                    
+                                    matTooltip="Búsqueda de empleado por la cédula de identificación o pasaporte">
+                                    help_outline</mat-icon>
+                            </mat-form-field>
+                            <!--  <mat-form-field>
+                                <mat-label>Ingresar Nombres</mat-label>
+                                <input matInput placeholder="Ej: " [(ngModel)]="filtroNombre"
+                                    [formControl]="nombre" type="text" (keypress)="IngresarSoloLetras($event)">
+                                <mat-error *ngIf="nombre.invalid">Indispensable ingresar dos letras
+                                </mat-error>
+                                <mat-icon id="iemple" matSuffix matTooltipPosition="right"
+                                    
+                                    matTooltip="Búsqueda de empleado por el nombre">
+                                    help_outline</mat-icon>
+                            </mat-form-field>
+                            <mat-form-field>
+                                <mat-label>Ingresar Apellidos</mat-label>
+                                <input matInput placeholder="Ej: " [(ngModel)]="filtroApellido"
+                                    [formControl]="apellido" type="text"
+                                    (keypress)="IngresarSoloLetras($event)">
+                                <mat-error *ngIf="apellido.invalid">Indispensable ingresar dos letras
+                                </mat-error>
+                                <mat-icon id="iemple" matSuffix matTooltipPosition="right"
+                                    
+                                    matTooltip="Búsqueda de empleado por el apellido">
+                                    help_outline</mat-icon>
+                            </mat-form-field>-->
+                        </div>
+                    </form>
+                    <div class="d-flex justify-content-around">
+                        <button mat-button type="submit" class="btn btn-sm" id="boton"
+                            (click)="limpiarCampos()">Cancelar</button>
+                    </div>
+                </mat-expansion-panel>
+            </mat-accordion>
+        </div>
+    </div>
+</div>
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!HabilitarObservacion">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccionO()" matSuffix
+                matTooltipPosition="right" matTooltip="Autorizar a todos los empleados la Planificación de Horas Extras"
+                id="SelectCheck">library_add_check</mat-icon>
+            <button *ngIf="btnCheckHabilitarO" class="btn btn-primary" (click)="AutorizarHoras('observacion')"
+                style="float: left; margin-left: 10px;">Autorizar</button>
+            <span class="w-100 bd-highlight">
+                USUARIOS QUE REQUIEREN JUSTIFICAR HORAS EXTRAS</span>
+            <button class="btn btn-sm" style="float: right; margin-right: 10px;" ngDefaultControl
+                [(ngModel)]="totalHorasExtrasO" [ngModelOptions]="{standalone: true}">Horas Totales
+                {{totalHorasExtrasO}}</button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th>
+                            <mat-checkbox *ngIf="btnCheckHabilitarO" (change)="$event ? masterToggleO() : null"
+                                [checked]="selectionDos.hasValue() && isAllSelectedO()"
+                                [indeterminate]="selectionDos.hasValue() && !isAllSelectedO()"
+                                [aria-label]="checkboxLabel()">
+                            </mat-checkbox>
+                        </th>
+                        <th scope="col">Cédula</th>
+                        <th scope="col">Empleado</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Fecha Desde</th>
+                        <th scope="col">Fecha Hasta</th>
+                        <th scope="col">Horas Planificadas</th>
+                        <th scope="col">Fecha Timbre</th>
+                        <th scope="col">Horas Realizadas</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let h of horas_extras_plan_observacion | emplCedula: filtroCedulaO | paginate:tamanio_pagina_O:numero_pagina_O; index as i">
+                        <th>
+                            <mat-checkbox *ngIf="btnCheckHabilitarO" (change)="$event ? masterToggleO() : null"
+                                [checked]="selectionDos.hasValue() && isAllSelectedO()"
+                                [indeterminate]="selectionDos.hasValue() && !isAllSelectedO()"
+                                [aria-label]="checkboxLabel()">
+                            </mat-checkbox>
+                        </th>
+                        <td>{{h.cedula}}</td>
+                        <td>{{h.nombre}} {{h.apellido}}</td>
+                        <td>{{h.plan_estado}}</td>
+                        <td>{{h.fecha_desde.split('T')[0]}}</td>
+                        <td>{{h.fecha_hasta.split('T')[0]}}</td>
+                        <td>{{h.hora_total_plan}}</td>
+                        <td>{{h.fecha_timbre.split('T')[0]}}</td>
+                        <td>{{h.hora_total_timbre}}</td>
+                        <td class="d-flex justify-content-center">
+                            <!--   <a class="fas fa-file-alt" style="color:rgb(197, 95, 11); margin-left: 15px;" matSuffix
+                                matTooltipPosition="right" matTooltip="Cambiar el estado del documento de autorazación"
+                                [routerLink]="['/ver-hora-extra', h.id]">
+                                <p>Documento</p>
+                            </a>-->
+                            <i id="iconos" *ngIf="auto_individualO" class="fas fa-stopwatch"
+                                style="color:rgb(8, 96, 168); margin-left: 15px;"
+                                (click)="AbrirTiempoAutorizacion(h.hora_total_timbre, h.id_plan_extra, h, h.empl_id)"
+                                matTooltipPosition="right" matTooltip="Tiempo que se le autoriza de la hora extra.">
+                                <p>Autorizar Horas</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <div>
+            <button class="btn btn-sm float-right" ngDefaultControl [(ngModel)]="horasSumadas2"
+                style="margin-right: 10px;" [ngModelOptions]="{standalone: true}">Sub-total Horas
+                {{horasSumadas2}}</button>
+        </div>
+        <br>
+        <mat-paginator id="pagina" [length]="horas_extras_plan_observacion.length" [pageSize]="tamanio_pagina_O"
+            [pageSizeOptions]="pageSizeOptions_O" id="pagina" (page)="ManejarPaginaObserva($event)"
+            showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>
+<!--******************** LISTA DE SOLICITUDES DE PLANIFICACIONES HORAS EXTRAS AUTORIZADAS *********************-->
+<br *ngIf="!HabilitarAutoriza">
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!HabilitarAutoriza">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <span class="w-100 bd-highlight">
+                LISTA DE PLANIFICACIONES DE HORAS EXTRAS REALIZADAS AUTORIZADAS</span>
+            <button class="btn btn-sm" style="float: right; margin-right: 10px;" ngDefaultControl
+                [(ngModel)]="totalAutorizadas" [ngModelOptions]="{standalone: true}">Horas Totales
+                {{totalAutorizadas}}</button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Cédula</th>
+                        <th scope="col">Empleado</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Fecha Desde</th>
+                        <th scope="col">Fecha Hasta</th>
+                        <th scope="col">Horas Planificadas</th>
+                        <th scope="col">Fecha Timbre</th>
+                        <th scope="col">Horas Realizadas</th>
+                        <!--   <th scope="col">Acciones</th>-->
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let h of horas_extras_autorizadas | paginate:tamanio_pagina_auto:numero_pagina_auto; index as i">
+                        <td>{{h.cedula}}</td>
+                        <td>{{h.nombre}} {{h.apellido}}</td>
+                        <td>{{h.plan_estado}}</td>
+                        <td>{{h.fecha_desde.split('T')[0]}}</td>
+                        <td>{{h.fecha_hasta.split('T')[0]}}</td>
+                        <td>{{h.hora_total_plan}}</td>
+                        <td>{{h.fecha_timbre.split('T')[0]}}</td>
+                        <td>{{h.hora_total_timbre}}</td>
+                        <!--  <td class="d-flex justify-content-center">
+                              <a class="fas fa-file-alt" style="color:rgb(197, 95, 11); margin-left: 15px;" matSuffix
+                                matTooltipPosition="right" matTooltip="Cambiar el estado del documento de autorazación"
+                                [routerLink]="['/ver-hora-extra', h.id]">
+                                <p>Documento</p>
+                            </a>
+                            <i id="iconos" *ngIf="auto_individualO" class="fas fa-stopwatch"
+                                style="color:rgb(8, 96, 168); margin-left: 15px;"
+                                (click)="AbrirTiempoAutorizacion(h.hora_total_timbre, h.id_plan_extra, h, h.empl_id)"
+                                matTooltipPosition="right" matTooltip="Tiempo que se le autoriza de la hora extra.">
+                                <p>Autorizar Horas</p>
+                            </i>
+                        </td>-->
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <div>
+            <button class="btn btn-sm float-right" ngDefaultControl [(ngModel)]="horasSumadas_auto"
+                style="margin-right: 10px;" [ngModelOptions]="{standalone: true}">Sub-total Horas
+                {{horasSumadas_auto}}</button>
+        </div>
+        <br>
+        <mat-paginator id="pagina" [length]="horas_extras_autorizadas.length" [pageSize]="tamanio_pagina_auto"
+            [pageSizeOptions]="pageSizeOptions_auto" id="pagina" (page)="ManejarPagina_auto($event)"
+            showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>

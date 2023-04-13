@@ -1,0 +1,40 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        ACCIONES TIMBRES</span>
+    <mat-icon class="float-right" id="cerrar" (click)="this.dialogRef.close()">highlight_off</mat-icon>
+</div>
+<div class="container">
+    <small>
+        Si utiliza relojes con timbres de 6 o 3 acciones da click en <strong>Si</strong>. <br>
+        Si utilzas relojes con timbres sin acciones da click en <strong>No</strong>.
+    </small>
+    <hr>
+    <form class="example-form" [formGroup]="formGroup" ngNativeValidate>
+        <div class="d-flex flex-wrap">
+            <div class="caja">
+                <div class="d-flex flex-wrap justify-content-start">
+                    <mat-radio-group aria-label="Select an option" formControlName="acciones_timbres" required>
+                        <label class="d-flex justify-content-start">
+                            <p>RELOJ CON ACCIONES (6 o 3)</p>
+                            <mat-icon matSuffix matTooltipPosition="right"
+                                matTooltip="Ayuda a identificar si los reportes deben tomar en cuenta los timbres con acciones o sin acciones.">
+                                help_outline
+                            </mat-icon>
+                        </label>
+                        <div class="d-flex justify-content-center">
+                            <mat-radio-button [value]="true">Si</mat-radio-button>
+                            <mat-radio-button [value]="false">No</mat-radio-button>
+                        </div>
+                    </mat-radio-group>
+                </div>
+            </div>
+        </div>
+    </form>
+    <hr>
+    <small>Para guardar los cambios es necesario ingresar nuevamente al sistema.</small>
+</div>
+<div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
+    <button mat-raised-button id="btn-raised" type="submit" (click)="GuardarAccion(formGroup.value)">Guardar</button>
+    <!--button mat-raised-button id="btn-raised" type="submit" (click)="this.dialogRef.close()">Cancelar</button-->
+</div>

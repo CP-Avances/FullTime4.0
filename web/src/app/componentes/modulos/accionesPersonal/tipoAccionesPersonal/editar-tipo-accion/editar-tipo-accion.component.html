@@ -1,0 +1,104 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        MODIFICAR TIPO DE ACCIONES DE PERSONAL</span>
+    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentanaRegistro()">highlight_off</mat-icon>
+</div>
+<div class="scrollbar scrollbar-primary">
+    <!-- Formulario Completo -->
+    <form [formGroup]="AccionesForm">
+        <div class="container">
+            <div class="nota">
+                <span>NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                    Guardar.</span>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="d-flex flex-wrap justify-content-between">
+                        <mat-form-field *ngIf="vistaTipo">
+                            <mat-label id="letra">Tipo de Acción Personal</mat-label>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Seleccionar uno de los tipos de acción de personal">
+                                help_outline
+                            </mat-icon>
+                            <mat-select [formControl]="tipoAccionF">
+                                <mat-option *ngFor="let t of tipos" [value]="t.id"
+                                    (click)="IngresarTipoAccion(AccionesForm.value)">
+                                    {{t.descripcion}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field *ngIf="ingresoTipo">
+                            <mat-label id="letra">Ingresar tipo de acción personal</mat-label>
+                            <input matInput placeholder="Ej: Traspaso" [formControl]="otroTipoF" [ngStyle]="estiloT">
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Regresar a la lista de tipos de acción de personal."
+                                (click)="VerTiposAccion()">
+                                help_outline</mat-icon>
+                            <mat-error *ngIf="otroTipoF.invalid">Ingresar un nombre válido</mat-error>
+                        </mat-form-field>
+                        <mat-form-field style="width: 100%;">
+                            <mat-label id="letra">Base Legal</mat-label>
+                            <textarea matInput #legal maxlength="500" placeholder="Ingresar base legal"
+                                [formControl]="baseLegalF" required></textarea>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Escribir fundamento legal del nuevo tipo de acción de personal.">
+                                help_outline</mat-icon>
+                            <mat-hint align="start"><strong>Ingresar hasta 500 caracteres</strong></mat-hint>
+                            <mat-hint align="end">{{legal.value.length}} / 500</mat-hint>
+                        </mat-form-field>
+                        <mat-form-field style="width: 100%;">
+                            <mat-label id="letra">Descripción</mat-label>
+                            <textarea matInput #des maxlength="100" placeholder="Ingresar base legal"
+                                [formControl]="descripcionF" required></textarea>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Ingresar una descripción del nuevo tipo de acción de personal">
+                                help_outline</mat-icon>
+                            <mat-hint align="start"><strong>Ingresar hasta 100 caracteres</strong></mat-hint>
+                            <mat-hint align="end">{{des.value.length}} / 100</mat-hint>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col">
+                    <label class="d-flex justify-content-start">
+                        <span style="margin-left: 10px;">Tipo</span>
+                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                            matTooltip="Indicar de que tipo es la nueva acción de personal">
+                            help_outline
+                        </mat-icon>
+                    </label>
+                    <section style="margin-left: 35px;">
+                        <mat-radio-group aria-label="Select an option" formControlName="tipoForm">
+                            <mat-radio-button ngDefaultControl [(ngModel)]="selec1" [checked]="selec1"
+                                [ngModelOptions]="{standalone: true}" (click)="CambiarEstadosPermisos()"
+                                [value]="selec1">
+                                <label id="textoradiobtn">Permiso</label>
+                            </mat-radio-button>
+                            <br>
+                            <mat-radio-button ngDefaultControl [(ngModel)]="selec2" [checked]="selec2"
+                                [ngModelOptions]="{standalone: true}" (click)="CambiarEstadosVacaciones()"
+                                [value]="selec2">
+                                <label id="textoradiobtn">Vacación</label>
+                            </mat-radio-button>
+                            <br>
+                            <mat-radio-button ngDefaultControl [(ngModel)]="selec3" [checked]="selec3"
+                                [ngModelOptions]="{standalone: true}" (click)="CambiarEstadosSituacion()"
+                                [value]="selec3">
+                                <label id="textoradiobtn">Situación Propuesta</label>
+                            </mat-radio-button>
+                        </mat-radio-group>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </form>
+    <br>
+    <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
+        <button mat-raised-button id="btn-raised" type="submit" [disabled]="!AccionesForm.valid"
+            (click)="InsertarAccion(AccionesForm.value)" value="Guardar">Guardar</button>
+        <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentanaRegistro()" value=" Salir">Salir</button-->
+    </div>
+</div>

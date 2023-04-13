@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<root>
+  <regimen_laboral id="1">
+    <descripcion>Codigo de trabajo</descripcion>
+    <pais>ECUADOR</pais>
+    <meses_periodo>12</meses_periodo>
+    <dias_mes>30</dias_mes>
+    <trabajo_minimo_mes>0</trabajo_minimo_mes>
+    <trabajo_minimo_hora>0</trabajo_minimo_hora>
+    <dias_anio_vacacion>11</dias_anio_vacacion>
+    <dias_libres>4</dias_libres>
+    <dias_calendario_vacacion>15</dias_calendario_vacacion>
+    <max_dias_acumulables>60</max_dias_acumulables>
+    <dias_laborales_ganados_mes>0.9166666667</dias_laborales_ganados_mes>
+    <dias_calendario_ganados_mes>1.25</dias_calendario_ganados_mes>
+    <dias_laborales_ganados_dia>0.0305555556</dias_laborales_ganados_dia>
+    <dias_calendario_ganados_dia>0.0416666667</dias_calendario_ganados_dia>
+    <anios_antiguedad>5</anios_antiguedad>
+    <dia_incr_antiguedad>1</dia_incr_antiguedad>
+  </regimen_laboral>
+</root>

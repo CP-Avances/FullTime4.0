@@ -1,0 +1,35 @@
+p {
+    font-size: x-small;
+}
+
+td {
+    padding-top: 10px;
+    text-align: center;
+}
+
+hr {
+    background-color: black;
+}
+
+.btn {
+    background-color: rgb(80, 87, 97);
+    margin-left: 15px;
+    color: white;
+}
+
+#editarI {
+    margin-left: 25px;
+    color: green;
+    cursor: pointer;
+}
+
+#editarF {
+    color: green;
+    cursor: pointer;
+}
+
+#datosF {
+    padding-right: 5px;
+    font-weight: bold;
+    font-size: 15px;
+}

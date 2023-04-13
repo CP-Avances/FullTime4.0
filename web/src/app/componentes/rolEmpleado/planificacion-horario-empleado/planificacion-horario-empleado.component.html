@@ -1,0 +1,54 @@
+<div class="container" style="padding-bottom: 25px; padding-top: 20px;">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <div class="w-100 bd-highlight">
+                <h5>PLANIFICACIÓN HORARIO</h5>
+            </div>
+            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
+                <button type="submit" class="btn btn-outline-light btn-sm"
+                    (click)="AbrirVentanaHorarioRotativo()">Añadir</button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm ">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Fecha Inicio</th>
+                        <th scope="col">Fecha Final</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let h of horarioRotativo | paginate:tamanio_pagina:numero_pagina">
+                        <td>{{h.fec_inicio_}}</td>
+                        <td>{{h.fec_final_}}</td>
+                        <td class="d-flex justify-content-center">
+
+                            <i *ngFor="let e of empleadoUno" matSuffix matTooltipPosition="right"
+                                matTooltip="Ver datos generales de la planificación" class="fas fa-eye" id="t-ver"
+                                [routerLink]="['/horarioRotativo/', h.id, e.id]">
+                                <p>Ver</p>
+                            </i>
+                            <i matSuffix matTooltipPosition="right"
+                                matTooltip="Agregar Detalles de Planificación de Horario" class="far fa-list-alt"
+                                id="t-detalles" (click)="AbrirVentanaDetallePlanHorario(h)">
+                                <p>Detalle</p>
+                            </i>
+                            <i class="fas fa-edit" id="t-editar" (click)="AbrirEditarHorarioRotativo(h)" matSuffix
+                                matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro">
+                                <p>Editar</p>
+                            </i>
+                            <i class="far fa-trash-alt" (click)="ConfirmarHorarioRotativo(h)" id="t-eliminar"
+                                matSuffix matTooltipPosition="right" matTooltip="Eliminar registro">
+                                <p>Eliminar</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="horarioRotativo.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>

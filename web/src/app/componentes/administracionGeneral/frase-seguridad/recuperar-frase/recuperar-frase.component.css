@@ -1,0 +1,55 @@
+@media (max-width: 992px) {
+    .home-inner {
+        padding-top: 100px;
+    }
+}
+
+img {
+    width: 100%;
+}
+
+mat-form-field {
+    width: 230px;
+}
+
+.home-inner {
+    padding: 100px 100px 15px 100px;
+}
+
+.btn {
+    background-color: rgb(80, 87, 97);
+    border-radius: 5px;
+    margin-left: 15px;
+    color: white;
+}
+
+.dark-overlay {
+    background-color: rgba(0, 0, 0, .6);
+    min-width: 100%;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+}
+
+mat-card {
+    padding-bottom: 25px;
+    border-radius: 25px;
+    border-style: groove;
+    padding-top: 25px;
+    text-align: center;
+    width: 300px;
+    margin: auto;
+}
+
+#home-section {
+    background-attachment: fixed;
+    background-size: cover;
+    background: url('../../../../../assets/imagenes/fingerprint.jpg') no-repeat;
+    min-height: 100vh;
+}
+
+#fuente {
+    font-size: x-small;
+}

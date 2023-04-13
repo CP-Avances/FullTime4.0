@@ -1,0 +1,263 @@
+<div class="container" style="padding-top: 15px;">
+    <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo">
+            <span>INFORMACIÓN DE EMPRESA</span>
+        </div>
+
+        <!-- ****************************** PRIMER FORMULARIO ******************************************* -->
+        <mat-horizontal-stepper [linear]="isLinear" #stepper>
+            <mat-step [stepControl]="primerFormulario">
+                <ng-template matStepLabel>
+                    <mat-icon id="icono" matSuffix matTooltipPosition="right"
+                        matTooltip="Sección 1: Información general">
+                        settings
+                    </mat-icon>
+                </ng-template>
+                <div class="subtitulo">
+                    <span>Información general</span>
+                </div>
+                <div class="nota">
+                    <span>Por favor llenar todos los campos obligatorios (*) del formulario y dar click en Siguiente
+                        para continuar.</span>
+                </div>
+                <form [formGroup]="primerFormulario">
+                    <div class="row">
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-form-field>
+                                    <mat-label>Nombre de empresa</mat-label>
+                                    <input matInput placeholder="Nombre empresa" [formControl]="nombreF" required>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar nombre de la empresa.">
+                                        help_outline</mat-icon>
+                                </mat-form-field>
+                                <mat-form-field>
+                                    <mat-label>RUC</mat-label>
+                                    <input matInput placeholder="Ingresar RUC" [formControl]="rucF" maxlength="13"
+                                        oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                        (keypress)="IngresarSoloNumeros($event)" required>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar RUC de la empresa.">
+                                        help_outline
+                                    </mat-icon>
+                                </mat-form-field>
+                                <mat-form-field>
+                                    <mat-label>Número partida presupuestaria</mat-label>
+                                    <input matInput placeholder="Ingresar número" [formControl]="numeroF"
+                                        (keypress)="IngresarSoloNumeros($event)">
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar número de partida presupuestaria de la empresa.">
+                                        help_outline
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-form-field id="campos">
+                                    <mat-label>Teléfono</mat-label>
+                                    <input matInput placeholder="Ingresar teléfono" [formControl]="telefonoF"
+                                        maxlength="10" (keypress)="IngresarSoloNumeros($event)"
+                                        oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                        required>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar número de contacto empresarial.">
+                                        help_outline</mat-icon>
+                                </mat-form-field>
+                                <mat-form-field>
+                                    <mat-label>Dirección</mat-label>
+                                    <input matInput placeholder="Ingresar dirección" [formControl]="direccionF"
+                                        required>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar dirección de ubicación de la empresa.">
+                                        help_outline
+                                    </mat-icon>
+                                </mat-form-field>
+                                <mat-form-field>
+                                    <mat-label>Correo</mat-label>
+                                    <input matInput placeholder="Ingresar correo" [formControl]="correoF" required>
+                                    <mat-error *ngIf="correoF.invalid">
+                                        Ingresar una dirección de correo válida.
+                                    </mat-error>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar correo electrónico empresarial.">
+                                        help_outline
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div style="text-align: center; padding-top: 25px;">
+                    <button mat-raised-button id="btn-raised" (click)="Salir()" class="float-left">Cancelar</button>
+                    <button mat-raised-button id="btn-raised" matStepperNext class="float-right">Siguiente</button>
+                </div>
+            </mat-step>
+
+            <!-- ********************************* SEGUNDO FORMULARIO ************************************* -->
+            <mat-step [stepControl]="segundoFormulario">
+                <ng-template matStepLabel>
+                    <mat-icon id="icono" matSuffix matTooltipPosition="right" matTooltip="Sección 2: Establecimientos">
+                        home
+                    </mat-icon>
+                </ng-template>
+                <div class="subtitulo">
+                    <span>Establecimientos</span>
+                </div>
+                <div class="nota">
+                    <span>Llenar todos los campos obligatorios (*) del formulario y dar click en Guardar.</span>
+                </div>
+                <form [formGroup]="segundoFormulario">
+                    <div class="row">
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <label style="padding-top: 10px; position: relative; left:10px;">Tipo empresa *:</label>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-radio-group aria-label="Select an option" [formControl]="tipoF" required>
+                                    <div class="d-flex flex-wrap justify-content-start"
+                                        style="position: relative; left: 30px;">
+                                        <mat-radio-button (change)="SeleccionarTipo($event)" value="Persona Natural">
+                                            Persona Natural
+                                        </mat-radio-button>
+                                    </div>
+                                    <div class="d-flex flex-wrap justify-content-start"
+                                        style="position: relative; left: 30px;">
+                                        <mat-radio-button (change)="SeleccionarTipo($event)" value="Privada">
+                                            Privada
+                                        </mat-radio-button>
+                                    </div>
+                                    <div class="d-flex flex-wrap justify-content-start"
+                                        style="position: relative; left: 30px;">
+                                        <mat-radio-button (change)="SeleccionarTipo($event)" value="Publica">
+                                            Pública
+                                        </mat-radio-button>
+                                    </div>
+                                    <div class="d-flex flex-wrap justify-content-start"
+                                        style="position: relative; left: 30px;">
+                                        <mat-radio-button (change)="SeleccionarTipo($event)" value="ONG">
+                                            ONG
+                                        </mat-radio-button>
+                                    </div>
+                                    <div class="d-flex flex-wrap justify-content-start"
+                                        style="position: relative; left: 30px;">
+                                        <mat-radio-button (change)="SeleccionarTipo($event)" value="Otro">Otro
+                                        </mat-radio-button>
+                                    </div>
+                                </mat-radio-group>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-form-field *ngIf="HabilitarOtro" id="campos">
+                                    <mat-label>Tipo de empresa *</mat-label>
+                                    <input matInput placeholder="Ingresar nombre" [formControl]="otroF" id="otro">
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar el nombre del tipo de empresa.">
+                                        help_outline
+                                    </mat-icon>
+                                </mat-form-field>
+                                <mat-form-field id="campos">
+                                    <mat-label ngDefaultControl [(ngModel)]="valor"
+                                        [ngModelOptions]="{standalone: true}">
+                                        {{valor}}
+                                    </mat-label>
+                                    <input matInput placeholder="Ingresar nombre" [formControl]="representanteF"
+                                        required id="repre">
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar el nombre del representante de la empresa.">
+                                        help_outline
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <label style="padding-top: 10px; position: relative; left:10px;">
+                                    Establecimientos *:
+                                </label>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-radio-group aria-label="Select an option" [formControl]="establecimientoF"
+                                    required>
+                                    <div class="d-flex flex-wrap justify-content-start"
+                                        style="position: relative; left: 30px;">
+                                        <mat-radio-button (change)="SeleccionarTipo($event)" value="Sucursales">
+                                            Sucursales
+                                        </mat-radio-button>
+                                    </div>
+                                    <div class="d-flex flex-wrap justify-content-start"
+                                        style="position: relative; left: 30px;">
+                                        <mat-radio-button (change)="SeleccionarTipo($event)" value="Agencias">
+                                            Agencias
+                                        </mat-radio-button>
+                                    </div>
+                                    <div class="d-flex flex-wrap justify-content-start"
+                                        style="position: relative; left: 30px;">
+                                        <mat-radio-button (change)="SeleccionarTipo($event)" value="Otros">Otro
+                                        </mat-radio-button>
+                                    </div>
+                                </mat-radio-group>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-form-field *ngIf="HabilitarOtroE" id="campos">
+                                    <mat-label id="letras">Nombre establecimiento *</mat-label>
+                                    <input matInput placeholder="Ingresar nombre" [formControl]="otroE">
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar el nombre del establecimiento.">
+                                        help_outline
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <label style="padding-top: 10px; position: relative; left:10px;">
+                                    Autorizaciones solicitudes *:
+                                </label>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-radio-group aria-label="Select an option" [formControl]="cambiosF" required>
+                                    <div class="d-flex flex-wrap justify-content-start"
+                                        style="position: relative; left: 30px;">
+                                        <mat-radio-button (change)="SeleccionarTipo($event)" value=true
+                                            matTooltipPosition="right"
+                                            matTooltip="Se podrá modificar la autorización de solicitudes de permisos, vacaciones u horas extras hasta x número de días previos a la fecha de expiración de la solicitud. El número de días previos será definido por el administrador del sistema.">
+                                            Con restricciones
+                                        </mat-radio-button>
+                                    </div>
+                                    <div class="d-flex flex-wrap justify-content-start"
+                                        style="position: relative; left: 30px;">
+                                        <mat-radio-button (change)="SeleccionarTipo($event)" value=false
+                                            matTooltip="Se podrá modificar la autorización de solicitudes de permisos, vacaciones u horas extras sin ningún tipo de restrición.">
+                                            Sin restricciones
+                                        </mat-radio-button>
+                                    </div>
+                                </mat-radio-group>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-form-field *ngIf="habilitarDias" id="campos">
+                                    <mat-label id="letras">No. días previos a la fecha *</mat-label>
+                                    <input (keypress)="IngresarSoloNumeros($event)" matInput
+                                        placeholder="Días previos a la fecha" [formControl]="dias_cambioF">
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar el número de días que tendra para realizar un cambio en la autorización de solicitud de permisos, vacaciones u horas extras antes de la fecha de su cumplimiento.">
+                                        help_outline
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div style="text-align: center; padding-top: 25px;">
+                    <button mat-raised-button id="btn-raised" matStepperPrevious class="float-left">Atrás</button>
+                    <button mat-raised-button id="btn-raised" (click)="InsertarEmpresa(primerFormulario.value, segundoFormulario.value)"
+                        [disabled]="!segundoFormulario.valid"> Guardar </button>
+                    <button mat-raised-button id="btn-raised" (click)="Salir()" class="float-right">Cancelar</button>
+                </div>
+            </mat-step>
+        </mat-horizontal-stepper>
+    </mat-card>
+</div>
+<div class="pantalla-progress" *ngIf="habilitarprogress">
+    <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
+    </mat-progress-spinner>
+</div>

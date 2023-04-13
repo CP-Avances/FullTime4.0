@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<root>
+  <provincia id="1224">
+    <nombre>Azuay</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1225">
+    <nombre>Bolivar</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1226">
+    <nombre>Cañar</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1227">
+    <nombre>Carchi</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1228">
+    <nombre>Chimborazo</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1229">
+    <nombre>Cotopaxi</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1230">
+    <nombre>El Oro</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1231">
+    <nombre>Esmeraldas</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1232">
+    <nombre>Galapagos</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1233">
+    <nombre>Guayas</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1234">
+    <nombre>Imbabura</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1235">
+    <nombre>Loja</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1236">
+    <nombre>Los Rios</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1237">
+    <nombre>Manabi</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1238">
+    <nombre>Morona Santiago</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1239">
+    <nombre>Napo</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1240">
+    <nombre>Orellana</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1241">
+    <nombre>Pastaza</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1242">
+    <nombre>Pichincha</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1243">
+    <nombre>Santa Elena</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1244">
+    <nombre>Santo Domingo de los Tsachilas</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1245">
+    <nombre>Sucumbios</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1246">
+    <nombre>Tungurahua</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+  <provincia id="1247">
+    <nombre>Zamora Chinchipe</nombre>
+    <pais>ECUADOR</pais>
+  </provincia>
+</root>

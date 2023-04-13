@@ -1,0 +1,28 @@
+p {
+    font-size: x-small;
+}
+
+tr {
+    text-align: center;
+}
+
+table {
+    width: 100%;
+    font-size: 14px;
+}
+
+.fas {
+    color: green;
+    cursor: pointer;
+}
+
+td {
+    padding-top: 10px;
+    text-align: center;
+}
+
+.button {
+    background-color: rgb(80, 87, 97);
+    color: white;
+    margin: 5px 10px 5px 10px;
+}

@@ -1,0 +1,29 @@
+.btn {
+    margin-left: 15px;
+}
+
+#cancelar {
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
+
+p {
+    font-size: 14px;
+}
+
+#mensaje {
+    font-weight: bold;
+    text-align: center;
+    font-size: 14px;
+    color: red;
+}
+
+#aceptar{
+    margin: 5px 10px 5px 10px;
+    font-size: 14px;
+    color: white;
+    font-style: normal;
+    font-weight: 900;
+    letter-spacing: 0.2px;
+    word-wrap: break-word;
+}

@@ -1,0 +1,9 @@
+.btn { margin-left: 15px; background-color: rgb(80,87,97); color: white; }
+
+p { font-size: x-small; }
+
+td { padding-top: 10px; text-align: center; }
+
+table {width: 100%; font-size: 14px;}
+
+#accion { color:green; cursor: pointer; }

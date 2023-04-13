@@ -1,0 +1,140 @@
+import { Validators, FormControl, FormGroup } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, OnInit, Inject } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
+
+import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
+import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
+import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+
+@Component({
+  selector: 'app-editar-autorizacion-depa',
+  templateUrl: './editar-autorizacion-depa.component.html',
+  styleUrls: ['./editar-autorizacion-depa.component.css']
+})
+
+export class EditarAutorizacionDepaComponent implements OnInit {
+
+  // VARIABLES DE ALMACENAMIENTO
+  departamento: any = [];
+  sucursales: any = [];
+  empleados: any = [];
+  idEmpresa: number;
+
+  selec1: boolean = false;
+  selec2: boolean = false;
+
+  // VARIABLES DE FORMULARIO
+  nombreEmpleadoF = new FormControl('', [Validators.required]);
+  idDepartamento = new FormControl('', [Validators.required]);
+  idSucursal = new FormControl('', [Validators.required]);
+  autorizarF = new FormControl('', [Validators.required]);
+
+  // AGREGAR FORMULARIO A UN GRUPO
+  public formulario = new FormGroup({
+    nombreEmpleadoForm: this.nombreEmpleadoF,
+    idSucursalForm: this.idSucursal,
+    autorizarForm: this.autorizarF,
+    idDeparForm: this.idDepartamento,
+  });
+
+  constructor(
+    private restCatDepartamento: DepartamentosService,
+    private restAutoriza: AutorizaDepartamentoService,
+    private restSucursales: SucursalService,
+    private toastr: ToastrService,
+    private rest: EmpleadoService,
+    public ventana: MatDialogRef<EditarAutorizacionDepaComponent>,
+    @Inject(MAT_DIALOG_DATA) public datoEmpleado: any,
+  ) {
+    this.idEmpresa = parseInt(localStorage.getItem('empresa') as string);
+  }
+
+  ngOnInit(): void {
+    this.BuscarSucursales();
+    this.ObtenerEmpleados(this.datoEmpleado.idEmpleado);
+    this.CargarDatos();
+  }
+
+  // METODO PARA IMPRIMIR DATOS EN FORMULARIO
+  CargarDatos() {
+    this.restSucursales.BuscarSucursalEmpresa(this.datoEmpleado.datosAuto.id_empresa).subscribe(datos => {
+      this.sucursales = datos;
+    });
+    this.restCatDepartamento.BuscarDepartamentoSucursal(this.datoEmpleado.datosAuto.id_sucursal).subscribe(datos => {
+      this.departamento = datos;
+    });
+    this.formulario.patchValue({
+      idSucursalForm: this.datoEmpleado.datosAuto.id_sucursal,
+      autorizarForm: this.datoEmpleado.datosAuto.estado,
+      idDeparForm: this.datoEmpleado.datosAuto.id_departamento,
+    })
+    if (this.datoEmpleado.datosAuto.estado === true) {
+      this.selec1 = true;
+    }
+    else {
+      this.selec2 = true;
+    }
+  }
+
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  ObtenerEmpleados(idemploy: any) {
+    this.empleados = [];
+    this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
+      this.empleados = data;
+      this.formulario.patchValue({
+        nombreEmpleadoForm: this.empleados[0].nombre + ' ' + this.empleados[0].apellido,
+      })
+    })
+  }
+
+  // METODO PARA LISTAR SUCURSALES
+  BuscarSucursales() {
+    this.sucursales = [];
+    this.restSucursales.BuscarSucursalEmpresa(this.idEmpresa).subscribe(datos => {
+      this.sucursales = datos;
+    });
+  }
+
+  // METODO PARA LISTAR DEPARTAMENTOS
+  ObtenerDepartamentos(form: any) {
+    this.departamento = [];
+    let idSucursal = form.idSucursalForm;
+    this.restCatDepartamento.BuscarDepartamentoSucursal(idSucursal).subscribe(datos => {
+      this.departamento = datos;
+    }, error => {
+      this.toastr.info('Sucursal no cuenta con departamentos registrados.', '', {
+        timeOut: 6000,
+      })
+    });
+  }
+
+  // METODO PARA REGISTRAR AUTORIZACION
+  InsertarAutorizacion(form: any) {
+    let autorizarDepar = {
+      id_departamento: form.idDeparForm,
+      id_empl_cargo: this.datoEmpleado.datosAuto.id_empl_cargo,
+      estado: form.autorizarForm,
+      id: this.datoEmpleado.datosAuto.id
+    }
+    this.restAutoriza.ActualizarDatos(autorizarDepar).subscribe(res => {
+      this.toastr.success('Operación Exitosa.', 'Registro actualizado.', {
+        timeOut: 6000,
+      });
+      this.CerrarVentana();
+    });
+  }
+
+  // METODO PARA LIMPIAR FORMULARIO
+  LimpiarCampos() {
+    this.formulario.reset();
+  }
+
+  // METODO PARA CERRAR VENTANA DE REGISTRO
+  CerrarVentana() {
+    this.LimpiarCampos();
+    this.ventana.close();
+  }
+
+}

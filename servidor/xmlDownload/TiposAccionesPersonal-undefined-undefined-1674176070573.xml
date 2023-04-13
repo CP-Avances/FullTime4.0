@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<root>
+  <tipo_accion_personal id="1">
+    <nombre>Traspaso</nombre>
+    <descripcion>Descripción del traspaso</descripcion>
+    <base_legal>Base legal de traaspaso</base_legal>
+    <tipo_permiso>Situación propuesta</tipo_permiso>
+  </tipo_accion_personal>
+</root>

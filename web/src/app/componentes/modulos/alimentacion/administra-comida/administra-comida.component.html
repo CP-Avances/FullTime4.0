@@ -1,0 +1,60 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        ADMINISTRAR MÓDULO DE ALIMENTACIÓN</span>
+    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+</div>
+<div>
+    <!-- Formulario Completo -->
+    <form [formGroup]="formulario">
+        <mat-card-content>
+            <div class="container" style="text-align: center;">
+                <div class="nota">
+                    <span>NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                        Guardar.</span>
+                </div>
+                <div class="row">
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-around">
+                            <mat-form-field>
+                                <mat-label>Empleado</mat-label>
+                                <input id="letras" matInput placeholder="Empleado" [formControl]="nombreEmpleadoF"
+                                    readonly="readonly" required>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-around">
+                            <mat-radio-group required aria-label="select an option" [formControl]="comidaF"
+                                [value]="comidaF.value">
+                                <label class="d-flex justify-content-between"
+                                    style="position: relative; left:10px; font-size: 15px; padding-top: 10px;">
+                                    <span>Administrar módulo *</span>
+                                </label>
+                                <div class="d-flex justify-content-around">
+                                    <mat-radio-button class="example-match" ngDefaultControl [(ngModel)]="selec1"
+                                        [checked]="selec1" [ngModelOptions]="{standalone: true}" value="true" matSuffix
+                                        matTooltipPosition="right"
+                                        matTooltip="Usuario Administra el Módulo de Alimentación.">
+                                        <label id="textlabel">Si</label> 
+                                    </mat-radio-button>
+                                    <mat-radio-button class="example-match" ngDefaultControl [(ngModel)]="selec2"
+                                        [checked]="selec2" [ngModelOptions]="{standalone: true}" value="false" matSuffix
+                                        matTooltipPosition="right"
+                                        matTooltip="Usuario NO Administra el Módulo de Alimentación.">
+                                        <label id="textlabel">No</label>
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-card-content>
+    </form>
+    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
+        <button mat-raised-button id="btn-raised" type="submit" (click)="InsertarAutorizacion(formulario.value)"
+            [disabled]="!formulario.valid" value="Guardar">Guardar</button>
+        <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentana()" value="Salir">Salir</button-->
+    </div>
+</div>

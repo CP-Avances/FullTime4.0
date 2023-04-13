@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<root>
+  <lista_permisos id="47">
+    <nombre>Jhonatan Heredia</nombre>
+    <estado>Pendiente</estado>
+    <fecha_inicio>Mié. 05/04/2023</fecha_inicio>
+    <fecha_final>Vie. 07/04/2023</fecha_final>
+    <fecha_ingreso>Dom. 09/04/2023</fecha_ingreso>
+  </lista_permisos>
+  <lista_permisos id="46">
+    <nombre>Jhonatan Heredia</nombre>
+    <estado>Pre-autorizado</estado>
+    <fecha_inicio>Jue. 05/01/2023</fecha_inicio>
+    <fecha_final>Dom. 08/01/2023</fecha_final>
+    <fecha_ingreso>Jue. 12/01/2023</fecha_ingreso>
+  </lista_permisos>
+</root>

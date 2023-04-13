@@ -1,0 +1,72 @@
+
+.btn {
+    margin-left: 15px;
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
+
+td {
+    padding-top: 10px;
+    text-align: center;
+}
+
+mat-form-field {
+    padding: 10px 15px 0px 15px;
+}
+
+table {
+    width: 100%;
+    font-size: 14px;
+}
+
+mat-form-field.input-tables {
+    background: transparent;
+    font-size: 14px;
+    text-align: center;
+    outline: none;
+    fill: none;
+    height: 65px;
+}
+
+.codigo { width: 70px; }
+.cedula { width: 100px; }
+
+mat-expansion-panel-header { text-align: center; background: rgb(52,65,84); }
+
+mat-panel-title { color: white; }
+
+mat-panel-description { color: white; }
+
+#SelectCheck {
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.mat-radio-button~.mat-radio-button {
+    margin-left: 16px;
+}
+
+#plan {
+    color: rgb(52, 65, 84);
+    text-align: center;
+    cursor: pointer;
+}
+
+p {
+    font-size: x-small;
+}
+
+#resultados_dh {
+    color: white;
+    font-size: 16px;
+    text-align: center;
+    background: rgb(3, 50, 120);
+    padding-top: 10px;
+    padding-bottom: 6px;
+}
+
+#plan_dh {
+    color: rgb(3, 50, 120);
+    text-align: center;
+    cursor: pointer;
+}

@@ -1,0 +1,291 @@
+<!-- TABLA CON LISTA DE TIPOS DE NOTIFICACIONES -->
+<div class="container" style="padding-bottom: 30px; text-align: center; padding-top: 15px;">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <span class="w-100 bd-highlight">
+                LISTA DE TIPOS DE NOTIFICACIONES</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">N°</th>
+                        <th scope="col">Notificación</th>
+                        <th scope="col">Listar Usuarios</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let t of tipos | paginate:tamanio_pagina:numero_pagina">
+                        <td>{{t.id}}</td>
+                        <td>{{t.nombre}}</td>
+                        <td class="d-flex justify-content-center">
+                            <i matSuffix  matTooltipPosition="right"
+                                matTooltip="Listar usuarios a quienes se ha enviado notificaciones." class="fas fa-eye"
+                                id="enviar" (click)="MostrarTablas(t.id, 'E')">
+                                <p>Enviados</p>
+                            </i>
+                            <i matSuffix  matTooltipPosition="right"
+                                matTooltip="Listar usuarios de los cuales se ha recibido notificaciones."
+                                class="fas fa-eye" id="recibir" (click)="MostrarTablas(t.id, 'R')">
+                                <p>Recibidos</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="tipos.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
+            id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>
+<div class="container" style="padding-bottom: 25px; text-align: center;" *ngIf='fechas'>
+    <div id="titulo">
+        <span>Búsqueda Rango Fechas</span>
+    </div>
+    <mat-card class="example-card mat-elevation-z9">
+        <form [formGroup]="fechasForm">
+            <div class="d-flex flex-wrap justify-content-center">
+                <mat-form-field>
+                    <mat-label>Fecha Inicial</mat-label>
+                    <input matInput [matDatepicker]="picker1" [formControl]="fechaInicialF" required>
+                    <mat-datepicker-toggle matSuffix [for]="picker1" id="i-cursor" 
+                        matTooltipPosition="right" matTooltip="Fecha de inicio de periodo">
+                    </mat-datepicker-toggle>
+                    <mat-datepicker touchUi #picker1></mat-datepicker>
+                </mat-form-field>
+                <br>
+                <mat-form-field>
+                    <mat-label>Fecha Final</mat-label>
+                    <input matInput [matDatepicker]="picker2" [formControl]="fechaFinalF" required>
+                    <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor" 
+                        matTooltipPosition="right" matTooltip="Fecha de fin de periodo">
+                    </mat-datepicker-toggle>
+                    <mat-datepicker touchUi #picker2></mat-datepicker>
+                </mat-form-field>
+            </div>
+        </form>
+        <div class="d-flex justify-content-around">
+            <button mat-button type="submit" class="btn btn-sm" (click)="LimpiarFechas()">Cancelar
+            </button>
+        </div>
+    </mat-card>
+</div>
+
+<!-- TABLA CON LISTA DE USUARIO PERMISOS-->
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf='tabla_permisos'>
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <span class="w-100 bd-highlight">
+                LISTA DE USUARIOS - PERMISOS</span>
+            <mat-icon (click)="CerrarTabla()" matSuffix matTooltipPosition="right"
+                matTooltip="Cerrar lista de datos seleccionada." id="cerrar">
+                close</mat-icon>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Cédula</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Apellido</th>
+                        <th scope="col">Notificaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let u of usuarios_permisos | paginate:tamanio_pagina:numero_pagina">
+                        <td>{{u.cedula}}</td>
+                        <td>{{u.nombre}}</td>
+                        <td>{{u.apellido}}</td>
+                        <td class="d-flex justify-content-center">
+                            <i (click)="ImprimirDatos(u.id_empleado, fechasForm.value)" id="pdf" class="fas fa-file-pdf"
+                                matSuffix matTooltipPosition="right" matTooltip="Descargar reporte en formato PDF.">
+                                <p>PDF</p>
+                            </i>
+                            <!--
+                            <i (click)="ImprimirDatos(u.id_send_empl, 'R', fechasForm.value)" class="fas fa-file-import"
+                                id="recibir" matSuffix matTooltipPosition="right" 
+                                matTooltip="Modificar los datos generales de este registro">
+                                <p>Recibidos</p>
+                            </i>
+                     
+                            <i (click)="GenerarPDF('download', u.id, 'D')" class="fas fa-file-excel" id="eliminar"
+                                matSuffix matTooltipPosition="right" 
+                                matTooltip="Modificar los datos generales de este registro">
+                                <p>Eliminados</p>
+                            </i>
+                            -->
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="tipos.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
+            id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>
+
+<!-- TABLA CON LISTA DE USUARIO VACACIONES-->
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf='tabla_vacaciones'>
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <span class="w-100 bd-highlight">
+                LISTA DE USUARIOS - VACACIONES</span>
+            <mat-icon (click)="CerrarTabla()" matSuffix matTooltipPosition="right"
+                matTooltip="Cerrar lista de datos seleccionada." id="cerrar">
+                close</mat-icon>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Cédula</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Apellido</th>
+                        <th scope="col">Notificaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let u of usuarios_vacaciones | paginate:tamanio_pagina:numero_pagina">
+                        <td>{{u.cedula}}</td>
+                        <td>{{u.nombre}}</td>
+                        <td>{{u.apellido}}</td>
+                        <td class="d-flex justify-content-center">
+                        <td class="d-flex justify-content-center">
+                            <i (click)="ImprimirDatos(u.id_empleado, fechasForm.value)" id="pdf" class="fas fa-file-pdf"
+                                matSuffix matTooltipPosition="right" matTooltip="Descargar reporte en formato PDF.">
+                                <p>PDF</p>
+                            </i>
+                            <!--
+                            <i (click)="ImprimirDatos(u.id_send_empl, 'R', fechasForm.value)" class="fas fa-file-import"
+                                id="recibir" matSuffix matTooltipPosition="right" 
+                                matTooltip="Modificar los datos generales de este registro">
+                                <p>Recibidos</p>
+                            </i>
+                         
+                            <i (click)="GenerarPDF('download', u.id, 'D')" class="fas fa-file-excel" id="eliminar"
+                                matSuffix matTooltipPosition="right" 
+                                matTooltip="Modificar los datos generales de este registro">
+                                <p>Eliminados</p>
+                            </i>
+                            -->
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="tipos.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
+            id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>
+
+<!-- TABLA CON LISTA DE USUARIO HORAS EXTRAS-->
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf='tabla_horas_extras'>
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <span class="w-100 bd-highlight">
+                LISTA DE USUARIOS - HORAS EXTRAS</span>
+            <mat-icon (click)="CerrarTabla()" matSuffix matTooltipPosition="right"
+                matTooltip="Cerrar lista de datos seleccionada." id="cerrar">
+                close</mat-icon>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Cédula</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Apellido</th>
+                        <th scope="col">Notificaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let u of usuarios_extras | paginate:tamanio_pagina:numero_pagina">
+                        <td>{{u.cedula}}</td>
+                        <td>{{u.nombre}}</td>
+                        <td>{{u.apellido}}</td>
+                        <td class="d-flex justify-content-center">
+                        <td class="d-flex justify-content-center">
+                            <i (click)="ImprimirDatos(u.id_empleado, fechasForm.value)" id="pdf" class="fas fa-file-pdf"
+                                matSuffix matTooltipPosition="right" matTooltip="Descargar reporte en formato PDF.">
+                                <p>PDF</p>
+                            </i>
+                            <!--
+                            <i (click)="ImprimirDatos(u.id_send_empl, 'R', fechasForm.value)" class="fas fa-file-import"
+                                id="recibir" matSuffix matTooltipPosition="right" 
+                                matTooltip="Modificar los datos generales de este registro">
+                                <p>Recibidos</p>
+                            </i>
+                     
+                            <i (click)="GenerarPDF('download', u.id, 'D')" class="fas fa-file-excel" id="eliminar"
+                                matSuffix matTooltipPosition="right" 
+                                matTooltip="Modificar los datos generales de este registro">
+                                <p>Eliminados</p>
+                            </i>
+                            -->
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="tipos.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
+            id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>
+
+<!-- TABLA CON LISTA DE USUARIO PLAN COMIDAS-->
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf='tabla_plan_comidas'>
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <span class="w-100 bd-highlight">
+                LISTA DE USUARIOS - SERVICIO ALIMENTACIÓN</span>
+            <mat-icon (click)="CerrarTabla()" matSuffix matTooltipPosition="right"
+                matTooltip="Cerrar lista de datos seleccionada." id="cerrar">
+                close</mat-icon>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Cédula</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Apellido</th>
+                        <th scope="col">Notificaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let u of usuarios_comidas | paginate:tamanio_pagina:numero_pagina">
+                        <td>{{u.cedula}}</td>
+                        <td>{{u.nombre}}</td>
+                        <td>{{u.apellido}}</td>
+                        <td class="d-flex justify-content-center">
+                        <td class="d-flex justify-content-center">
+                            <i (click)="ImprimirDatos(u.id_empleado, fechasForm.value)" id="pdf" class="fas fa-file-pdf"
+                                matSuffix matTooltipPosition="right" matTooltip="Descargar reporte en formato PDF.">
+                                <p>PDF</p>
+                            </i>
+                            <!--    <i (click)="ImprimirDatos(u.id, 'R', fechasForm.value)" class="fas fa-file-import"
+                                id="recibir" matSuffix matTooltipPosition="right" 
+                                matTooltip="Modificar los datos generales de este registro">
+                                <p>Recibidos</p>
+                            </i>
+                          
+                            <i (click)="GenerarPDF('download', u.id, 'D')" class="fas fa-file-excel" id="eliminar"
+                                matSuffix matTooltipPosition="right" 
+                                matTooltip="Modificar los datos generales de este registro">
+                                <p>Eliminados</p>
+                            </i>
+                            -->
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="tipos.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
+            id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>

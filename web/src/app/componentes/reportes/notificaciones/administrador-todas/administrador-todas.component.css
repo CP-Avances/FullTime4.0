@@ -1,0 +1,15 @@
+.btn { margin-left: 20px; background-color: rgb(80,87,97); color: white; }
+
+p { font-size: x-small; }
+
+td { padding-top: 10px; text-align: center;  }
+
+#enviar { color:green; cursor: pointer; }
+
+#recibir { color:rgb(0, 41, 128); margin-left: 20px; cursor: pointer; }
+
+#eliminar { color:red; margin-left: 20px; cursor: pointer; }
+
+table { width: 100%; font-size: 14px; }
+
+mat-form-field { padding: 10px 15px 0px 15px;}

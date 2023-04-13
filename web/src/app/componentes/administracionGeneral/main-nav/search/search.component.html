@@ -1,0 +1,14 @@
+<form style="margin-top: 10px; margin-left: 5px;" >
+  <mat-form-field 
+    style="margin-top: 10px; font-size: 13px; min-width: 50px; max-width: 500px; height: 65px;">
+    <mat-icon matPrefix>search</mat-icon>
+    <input type="text" placeholder="Buscar Empleados" aria-label="Number" matInput [formControl]="myControl"
+      [matAutocomplete]="auto">
+    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+      <mat-option *ngFor="let option of filteredOptions | async" [value]="option" type="submit"
+        (click)="abrirInfoEmpleado(option)">
+        {{option}}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+</form>

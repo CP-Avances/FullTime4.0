@@ -1,0 +1,21 @@
+#botones { background-color: rgb(80,87,97); color: white; margin: 10px 10px 10px 10px;}
+
+#ayuda_fec {color: black}
+
+.example-card { max-width: 100%; margin-bottom: 25px;}
+
+mat-form-field { padding: 10px 15px 0px 15px; }
+
+mat-icon {
+  cursor: pointer;
+}
+
+#charts_salidas_antes_macro { width: 1050px; height: 450px;}
+
+.scroll-box {
+  overflow-y: scroll;
+  height: 100%;
+  overflow-x: scroll;
+  width: 100%;
+  padding: 1rem;
+}

@@ -1,0 +1,268 @@
+mat-divider {
+    background: rgba(131, 131, 131, 0.609);
+}
+
+p {
+    margin-top: 1%;
+    font-size: x-small;
+}
+
+#items{
+    font-size: 14px;
+    margin-top: 8%;
+    font-style: normal;
+    font-weight: 900;
+    letter-spacing: 1px;
+    word-wrap: break-word;
+  }
+
+.material-icons {
+    margin-right: 8px;
+}
+
+.fas {
+    cursor: pointer;
+}
+
+.far {
+    cursor: pointer;
+}
+
+#cerrar {
+    color: rgb(38, 0, 255);
+    margin-right: 5px;
+    cursor: pointer;
+    margin-left: 15px;
+    text-align: center;
+}
+
+mat-tab-group {
+    background: rgb(232, 232, 232);
+    background: radial-gradient(circle, rgba(232, 232, 232, 0.8883928571428571) 0%, rgba(249, 249, 249, 1) 100%);
+}
+
+#Selector {
+    color: white;
+    padding: 7% 25%;
+}
+
+mat-grid-tile {
+    background-color: rgb(80, 87, 97);
+}
+
+mat-grid-tile:hover {
+    background-color: rgba(10, 10, 10, 0.609);
+}
+
+#datosF {
+    font-weight: bold;
+    font-size: 15px;
+    padding-right: 5px;
+}
+
+label{
+    font-size: 15px;
+}
+
+
+#avatar {
+    border-radius: 100%;
+    height: 100px;
+    width: 100px;
+    background-color: rgb(126, 126, 126);
+    margin-bottom: 10px;
+}
+
+#avatarImagen {
+    border-radius: 100%;
+    height: 100px;
+    width: 100px;
+}
+
+.iniciales {
+    color: white;
+    font-weight: bold;
+    font-size: 60px;
+}
+
+#edit {
+    color: green;
+    margin-right: 5px;
+    cursor: pointer;
+    margin-left: 15px;
+    text-align: center;
+}
+
+#detalle{
+    color: rgb(38, 0, 255);
+    margin-right: 5px;
+    cursor: pointer;
+    margin-left: 15px;
+    text-align: center;
+}
+
+#ver{
+    color: indianred;
+    margin-right: 5px;
+    cursor: pointer;
+    margin-left: 15px;
+    text-align: center;
+}
+
+#delete {
+    color: red;
+    cursor: pointer;
+    margin-left: 15px;
+    text-align: center;
+}
+
+table {
+    width: 100%;
+    font-size: 13px;
+}
+
+td {
+    padding-top: 10px;
+    text-align: center;
+}
+
+.caja1 {
+    padding: 0px 10px 0px 10px;
+    width: 250px;
+}
+
+.espacio {
+    padding: 0px 10px 0px 10px;
+    font-size: 13px;
+}
+
+#cancel {
+    color: red;
+    cursor: pointer;
+    font-size: 15px;
+    text-align: center;
+    margin-right: 20px;
+}
+
+[type="file"] {
+    height: 0;
+    overflow: hidden;
+    width: 0;
+}
+
+[type="file"]+label {
+    background: #f15d22;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    font-family: "Poppins", sans-serif;
+    font-size: inherit;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    outline: none;
+    padding: 1rem 50px;
+    position: relative;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+    vertical-align: middle;
+}
+
+[type="file"]+label.btn-2 {
+    background-color: rgb(150, 243, 141);
+    overflow: hidden;
+}
+
+[type="file"]+label.btn-2::before {
+    color: #fff;
+    content: "\f382";
+    font-family: "Font Awesome 5 Pro";
+    font-size: 100%;
+    height: 100%;
+    right: 130%;
+    line-height: 3.3;
+    position: absolute;
+    top: 0px;
+    margin-left: 5px;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+[type="file"]+label.btn-2:hover {
+    background-color: rgb(21, 130, 1);
+}
+
+[type="file"]+label.btn-2:hover::before {
+    right: 80%
+}
+
+#descargar:hover {
+    font-weight: bold;
+    font-size: 14px;
+    font-family: "Poppins", sans-serif;
+    border-radius: 5px;
+    height: 60px;
+    background-color: rgb(0, 76, 255);
+    color: white;
+    padding-top: 9px;
+    padding-bottom: 5px;
+}
+
+#descargar {
+    font-weight: bold;
+    font-size: 14px;
+    font-family: "Poppins", sans-serif;
+    border-radius: 5px;
+    height: 58px;
+    background-color: #93a3c7;
+    overflow: hidden;
+    color: white;
+    padding-top: 9px;
+    padding-bottom: 5px;
+}
+
+#geolocalizacion {
+    height: 400px;
+    width: 100%;
+    border: 2px solid white;
+    margin-bottom: 50px;
+}
+
+.mat-radio-button.mat-accent .mat-radio-ripple .mat-ripple-element {
+    background-color: rgb(22, 92, 125) !important;
+}
+
+.mat-radio-button.mat-accent .mat-radio-inner-circle {
+    background-color: rgb(22, 92, 125) !important;
+    z-index: 3;
+}
+
+.mat-radio-button .mat-radio-outer-circle {
+    border-color: rgb(22, 92, 125) !important;
+    z-index: 3;
+}
+
+#listar {
+    font-size: 15px;
+    color: blue;
+    cursor: pointer;
+    text-align: center;
+    margin-left: 30px;
+}
+
+#solicitud {
+    color: rgb(243, 107, 23);
+    margin-right: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    text-align: center;
+}
+
+#btndocumento{
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: 0px;
+    word-wrap: break-word;
+  }

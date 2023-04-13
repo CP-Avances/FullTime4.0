@@ -1,0 +1,56 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        MODIFICAR TÍTULO PROFESIONAL</span>
+    <mat-icon class="float-right" id="cerrar" (click)="Cancelar()" matSuffix matTooltipPosition="right" matTooltip="Salir">
+        highlight_off</mat-icon>
+</div>
+<form [formGroup]="formulario">
+    <mat-card-content>
+        <div class="container" style="text-align: center;">
+            <div class="nota">
+                <span>
+                    NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                    Guardar.
+                </span>
+            </div>
+            <mat-form-field>
+                <mat-label>Seleccionar título</mat-label>
+                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                    matTooltip="Seleccionar título profesional que disponga el usuario.">
+                    help_outline
+                </mat-icon>
+                <mat-select [formControl]="idTitulo" required>
+                    <mat-option *ngFor="let ct of cgTitulos" [value]="ct.id">
+                        {{ct.nombre}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <br>
+            <mat-form-field>
+                <mat-label>Observaciones</mat-label>
+                <input matInput placeholder="ejemplo" (keypress)="IngresarSoloLetras($event)" [formControl]="observa"
+                    required>
+                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                    matTooltip="Ingresar una descripción corta.">
+                    help_outline
+                </mat-icon>
+            </mat-form-field>
+        </div>
+    </mat-card-content>
+</form>
+<div style="text-align: center; margin: 2% 0% 3% 0%">
+    <button mat-button type="submit" class="btn" (click)="ActualizarTituloEmpleado(formulario.value); Cancelar();"
+        [disabled]="!formulario.valid">
+        <span class="material-icons alinear" matSuffix matTooltipPosition="right"
+            matTooltip="Guardar registro">save</span>
+    </button>
+    <!--button mat-button type="submit" class="btn" (click)="Cancelar()">
+        <span class="material-icons alinear" matSuffix matTooltipPosition="right"
+            matTooltip="Cancelar registro">close</span>
+    </button-->
+    <button mat-button type="submit" class="btn" (click)="VerificarTitulo()">
+        <span class="material-icons alinear" matSuffix matTooltipPosition="right"
+            matTooltip="Verificar título profesional del empleado antes de registrarlo">insert_link</span>
+    </button>
+</div>

@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<root>
+  <empleado codigo="1">
+    <cedula>1542541256</cedula>
+    <apellido>Pazmiño</apellido>
+    <nombre>Jose Luis</nombre>
+    <estadoCivil>Soltero/a</estadoCivil>
+    <genero>Masculino</genero>
+    <correo>jentipan7@gmail.com</correo>
+    <fechaNacimiento>1993-04-05</fechaNacimiento>
+    <estado>Activo</estado>
+    <domicilio>Los Valles</domicilio>
+    <telefono>0984562154</telefono>
+    <nacionalidad>Ecuatoriano</nacionalidad>
+  </empleado>
+  <empleado codigo="8">
+    <cedula>1801239466</cedula>
+    <apellido>Pazmiño</apellido>
+    <nombre>Jose Luis</nombre>
+    <estadoCivil>Unión de Hecho</estadoCivil>
+    <genero>Masculino</genero>
+    <correo>jlp1155@hotmail.com</correo>
+    <fechaNacimiento>1955-01-01</fechaNacimiento>
+    <estado>Activo</estado>
+    <domicilio>Quito</domicilio>
+    <telefono>0236589552</telefono>
+    <nacionalidad>Ecuatoriano</nacionalidad>
+  </empleado>
+  <empleado codigo="16">
+    <cedula>1718346552</cedula>
+    <apellido>Pazmiño</apellido>
+    <nombre>Paola</nombre>
+    <estadoCivil>Soltero/a</estadoCivil>
+    <genero>Femenino</genero>
+    <correo>ppazmino@casapazmino.com.ec</correo>
+    <fechaNacimiento>1983-05-24</fechaNacimiento>
+    <estado>Activo</estado>
+    <domicilio>Quito</domicilio>
+    <telefono>0956822565</telefono>
+    <nacionalidad>Ecuatoriana</nacionalidad>
+  </empleado>
+  <empleado codigo="35">
+    <cedula>1722128905</cedula>
+    <apellido>Tipan Villegas</apellido>
+    <nombre>Jenny Patricia</nombre>
+    <estadoCivil>Soltero/a</estadoCivil>
+    <genero>Femenino</genero>
+    <correo>jtipan@casapazmino.com.ec</correo>
+    <fechaNacimiento>1993-04-05</fechaNacimiento>
+    <estado>Activo</estado>
+    <domicilio>Santa Rita</domicilio>
+    <telefono>0958770577</telefono>
+    <nacionalidad>Ecuatoriana</nacionalidad>
+    <imagen>_TBkiJJy-mk3soQSMi5uWWFV.jpg</imagen>
+  </empleado>
+  <empleado codigo="55">
+    <cedula>1725458291</cedula>
+    <apellido>Pantoja Yumbo</apellido>
+    <nombre>Luis Fernando</nombre>
+    <estadoCivil>Soltero/a</estadoCivil>
+    <genero>Masculino</genero>
+    <correo>lpantoja@casapazmino.com.ec</correo>
+    <fechaNacimiento>1193-04-05</fechaNacimiento>
+    <estado>Activo</estado>
+    <domicilio>Los Valles</domicilio>
+    <telefono>0658942264</telefono>
+    <nacionalidad>Ecuatoriano</nacionalidad>
+  </empleado>
+  <empleado codigo="89">
+    <cedula>1717278210</cedula>
+    <apellido>Robalino Lavayen</apellido>
+    <nombre>Josue Larry</nombre>
+    <estadoCivil>Soltero/a</estadoCivil>
+    <genero>Masculino</genero>
+    <correo>departamentosistemascp@gmail.com</correo>
+    <fechaNacimiento>1983-02-07</fechaNacimiento>
+    <estado>Activo</estado>
+    <domicilio>Quito</domicilio>
+    <telefono>0236589566</telefono>
+    <nacionalidad>Ecuatoriano</nacionalidad>
+  </empleado>
+  <empleado codigo="5008">
+    <cedula>1753595717</cedula>
+    <apellido>Heredia</apellido>
+    <nombre>Jhonatan</nombre>
+    <estadoCivil>Soltero/a</estadoCivil>
+    <genero>Masculino</genero>
+    <correo>pasantesistemas@casapazmino.com.ec</correo>
+    <fechaNacimiento>1993-04-05</fechaNacimiento>
+    <estado>Activo</estado>
+    <domicilio>Los Valles</domicilio>
+    <telefono>0956236442</telefono>
+    <nacionalidad>Ecuatoriano</nacionalidad>
+    <imagen>DsZtBXOP26aywlr1vMOQGMnC.jpg</imagen>
+  </empleado>
+</root>

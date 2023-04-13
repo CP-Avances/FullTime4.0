@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<root>
+  <Pedidos id="18">
+    <codigo>5008</codigo>
+    <cedula>1753595717</cedula>
+    <apellido>Heredia</apellido>
+    <nombre>Jhonatan</nombre>
+  </Pedidos>
+  <Pedidos id="17">
+    <codigo>89</codigo>
+    <cedula>1717278210</cedula>
+    <apellido>Robalino Lavayen</apellido>
+    <nombre>Josue Larry</nombre>
+  </Pedidos>
+</root>

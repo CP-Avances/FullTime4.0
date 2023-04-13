@@ -1,0 +1,19 @@
+.barraTitulo { 
+    text-align: center; 
+    background: rgb(52,65,84); 
+    color: white; 
+    padding-top: 14px; 
+    padding-bottom: 6px; 
+}
+
+#datosF { font-weight: bold; font-size: 15px; padding-right: 5px;}
+
+#edit { color:green; margin-right: 5px; cursor: pointer; font-size: 15px; text-align: center; }
+
+#delete { color:red;  cursor: pointer; text-align: center; }
+
+p { font-size: x-small; }
+
+
+
+.caja1 {padding: 0px 10px 0px 10px; width: 250px; }

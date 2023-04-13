@@ -1,0 +1,117 @@
+<div class="container" style="padding-top: 15px;">
+    <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo">
+            <span>
+                ASIGNACIÓN DE CIUDADES
+            </span>
+        </div>
+        <form [formGroup]="formulario">
+            <div class="container">
+                <div style="padding-top: 20px; padding-bottom: 5px;">
+                    <div id="titulo">
+                        <span>
+                            {{feriado.descripcion}}
+                        </span>
+                    </div>
+                </div>
+                <div class="nota">
+                    <span>
+                        NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el
+                        botón Guardar.
+                    </span>
+                </div>
+                <div class="row">
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-between">
+                            <mat-form-field>
+                                <mat-label>Seleccionar continente</mat-label>
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                    matTooltip="Lista de continentes.">
+                                    help_outline
+                                </mat-icon>
+                                <mat-select [formControl]="nombreContinenteF" required>
+                                    <mat-option *ngFor="let c of continentes" [value]="c.continente"
+                                        (click)="FiltrarPaises(formulario.value)">
+                                        {{c.continente}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-between">
+                            <mat-form-field>
+                                <input type="text" placeholder="Seleccionar país" aria-label="Number" matInput
+                                    [formControl]="nombrePaisF" [matAutocomplete]="auto" required>
+                                <mat-autocomplete #auto="matAutocomplete">
+                                    <mat-option *ngFor="let option of filteredOptPais | async" [value]="option.nombre"
+                                        (click)="FiltrarProvincias(formulario.value)">
+                                        {{option.nombre}}
+                                    </mat-option>
+                                </mat-autocomplete>
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                    matTooltip="Lista de países del continente seleccionado.">
+                                    help_outline
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-between">
+                            <mat-form-field>
+                                <input type="text" placeholder="Seleccionar provincia" aria-label="Number" matInput
+                                    [formControl]="idProvinciaF" [matAutocomplete]="auto1" required>
+                                <mat-autocomplete #auto1="matAutocomplete">
+                                    <mat-option *ngFor="let option of filteredOptProv | async" [value]="option.nombre"
+                                        (click)="FiltrarCiudades(formulario.value)">
+                                        {{option.nombre}}
+                                    </mat-option>
+                                </mat-autocomplete>
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                    matTooltip="Lista de provincias, departamentos o estados del país seleccionado.">
+                                    help_outline
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+                <div style="padding-top: 20px;" *ngIf="!Habilitar">
+                    <div id="titulo">
+                        <span>
+                            LISTA DE CIUDADES
+                        </span>
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap justify-content-start" *ngIf="!Habilitar">
+                    <div class="modal-body" style="margin-left: 60px;">
+                        <div class="container-fluid">
+                            <!--    (change)="$event.target.checked ? AgregarTodos() : QuitarTodos()">-->
+                            <input class="form-check-input" type="checkbox" id="seleccionar"
+                                (change)="$event.target ? AgregarTodos() : QuitarTodos()">
+                            <label class="form-check-label" for="inlineCheckbox1"
+                                style="font-size: 15px; color: blue; font-weight: bold;">Todas</label>
+                            <div class="row" style="text-align: center; padding-top: 20px;">
+                                <div class="col-md-6 col-lg-6 col-6" style="text-align:left;"
+                                    *ngFor="let n of nombreCiudades; index as i">
+                                    <input class="form-check-input" type="checkbox" name="ciudadesSeleccionadas"
+                                        id="ciudadesSeleccionadas{{i}}"
+                                        (change)="$event.target  ? AgregarCiudad(n) : QuitarCiudad(n)">
+                                    <label class="form-check-label" for="inlineCheckbox1">{{n.descripcion}}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between" style="padding-top: 15px; margin-bottom: 2%;">
+                    <button mat-raised-button id="btn-raised" type="submit" class="float-left" [disabled]="!formulario.valid"
+                        (click)="InsertarFeriadoCiudad()" value="Guardar">Guardar</button>
+                    <button mat-raised-button id="btn-raised" type="submit" class="float-right" (click)="CerrarVentana()" value="Cancelar">Cancelar</button>
+                </div>
+            </div>
+        </form>
+    </mat-card>
+</div>
+<div class="pantalla-progress" *ngIf="habilitarprogress">
+    <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
+    </mat-progress-spinner>
+</div>

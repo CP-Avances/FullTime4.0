@@ -1,0 +1,60 @@
+
+<div id="resultados">
+    <span *ngIf="contenidoDeshabilitar" cdkDrag cdkDragRootElement=".cdk-overlay-pane" id="mover">
+        DESHABILITAR USUARIOS
+    </span>
+    <span *ngIf="contenidoHabilitar" cdkDrag cdkDragRootElement=".cdk-overlay-pane" id="mover">
+        HABILITAR USUARIOS
+    </span>
+    <span *ngIf="contenidoReactivar" cdkDrag cdkDragRootElement=".cdk-overlay-pane" id="mover">
+        REINCORPORAR USUARIOS
+    </span>
+</div>
+<mat-card-content>
+    <div style="text-align: center;" *ngIf="contenidoDeshabilitar">
+        <p *ngIf="Empleados.lista.length > 1">Los usuarios seleccionados serán <b>DESHABILITADOS</b> del sistema. <br>
+            Los usuarios no podrán acceder al sistema.
+        </p>
+        <p *ngIf="Empleados.lista.length < 2">El usuario seleccionado será <b>DESHABILITADO</b> del sistema. <br>
+            El usuario no podrá acceder al sistema.
+        </p>
+        <p id="mensaje" *ngIf="Empleados.lista.length > 1">¿ESTÁ SEGURO DE DESHABILITAR ESTOS USUARIOS?</p>
+        <p id="mensaje" *ngIf="Empleados.lista.length < 2">¿ESTÁ SEGURO DE DESHABILITAR ESTE USUARIO?</p>
+    </div>
+
+    <div *ngIf="contenidoHabilitar">
+        <p *ngIf="Empleados.lista.length > 1">Los usuarios seleccionados serán <b>HABILITADOS</b> en el sistema. <br>
+            Los usuarios podrán acceder al sistema.
+        </p>
+        <p *ngIf="Empleados.lista.length < 2">El usuario seleccionado será <b>HABILITADO</b> en el sistema. <br>
+            El usuario podrá acceder al sistema.
+        </p>
+        <p id="mensaje" *ngIf="Empleados.lista.length > 1">¿ESTÁ SEGURO DE HABILITAR ESTOS USUARIOS?</p>
+        <p id="mensaje" *ngIf="Empleados.lista.length < 2">¿ESTÁ SEGURO DE HABILITAR ESTE USUARIO?</p>
+    </div>
+
+    <div *ngIf="contenidoReactivar">
+        <p *ngIf="Empleados.lista.length > 1">Los usuarios seleccionados serán <b>REINCORPORADOS</b> con información
+            actualizada debido a su reingreso a la entidad. <br>
+            Los usuarios podrán acceder al sistema.
+        </p>
+        <p *ngIf="Empleados.lista.length < 2">El usuario seleccionado será <b>REINCORPORADO</b> con información
+            actualizada debido a su reingreso a la entidad. <br>
+            El usuario podrá acceder al sistema.
+        </p>
+        <p id="mensaje" *ngIf="Empleados.lista.length > 1">¿ESTÁ SEGURO DE REINCORPORAR ESTOS USUARIOS?</p>
+        <p id="mensaje" *ngIf="Empleados.lista.length < 2">¿ESTÁ SEGURO DE REINCORPORAR ESTE USUARIO?</p>
+    </div>
+
+    <div *ngIf="Empleados.lista.length === 1" style="margin-top: 5%;">
+        <ul *ngFor="let e of Empleados.lista">
+            <li style="margin-top: -10px;">{{e.empleado}}</li>
+        </ul>
+    </div>
+
+</mat-card-content>
+<div style="text-align: center; margin-bottom: 3%;">
+    <button mat-raised-button id="aceptar" color="primary" (click)="ConfirmarListaEmpleados()"
+        cdkFocusInitial>Confirmar</button>&nbsp;&nbsp;
+    <button mat-raised-button id="btn-raised" (click)="ventana.close(false)">Cancelar</button>
+</div>

@@ -1,0 +1,107 @@
+<div class="container" *ngFor="let h of datosHorario" style="padding-top: 15px;">
+    <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo">
+            <span>{{h.nombre.toUpperCase()}}</span>
+        </div>
+        <mat-card-content>
+            <div class="container" style="padding-top: 15px;">
+                <div class="row">
+                    <div class="col-md">
+                        <div class="espacio d-flex justify-content-start">
+                            <label id="datosF">Código:</label>
+                            <label>{{h.codigo}}</label>
+                        </div>
+                        <div class="espacio d-flex justify-content-start">
+                            <label id="datosF">Horas de trabajo:</label>
+                            <label>{{h.hora_trabajo}}</label>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="espacio d-flex justify-content-start">
+                            <label id="datosF">Minutos alimentación:</label>
+                            <label>{{h.min_almuerzo}} min.</label>
+                        </div>
+                        <div class="espacio d-flex justify-content-start">
+                            <label id="datosF">Horario nocturno:</label>
+                            <label>{{h.nocturno.toString() | i18nSelect: booleanMap}}</label>
+                        </div>
+                        <div *ngIf="h.doc_nombre != null && h.doc_nombre != ''"
+                            class="espacio d-flex justify-content-start">
+                            <label id="datosF">Documento:</label>
+                            <label>
+                                <a class="fas fa-file-alt"
+                                    style="color:rgb(197, 95, 11); margin-left: 15px; text-align: center;" matSuffix
+                                    matTooltipPosition="right" matTooltip="Dar click para ver o descargar el documento."
+                                    href="{{hipervinculo}}/horario/documentos/{{h.documento}}" target="_blank">
+                                    <p>{{h.doc_nombre}}</p>
+                                </a>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <i id="editarF" (click)="AbrirVentanaEditar(h)" matSuffix matTooltipPosition="right"
+                        matTooltip="Modificar datos de este registro." class="fas fa-edit">
+                        <p>Editar</p>
+                    </i>
+                    <mat-icon (click)="CalcularHorasTrabaja()" style="margin: 0px 10px; cursor: pointer; color: blue;"
+                        matTooltip="Verificar que detalle de horario se encuentre acorde a los datos de horario registrados.">
+                        calculate</mat-icon>
+                </div>
+            </div>
+            <hr>
+            <div class="container" style="padding-bottom: 25px; text-align: center;">
+                <div class="mat-elevation-z8" style="background: white;">
+                    <div id="resultados">DETALLES DE HORARIO</div>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead class="thead-light">
+                                <tr style="text-align: center;">
+                                    <th scope="col">Orden</th>
+                                    <th scope="col">Hora</th>
+                                    <th scope="col">Minutos espera</th>
+                                    <th scope="col">Acción</th>
+                                    <th scope="col">Otro día</th>
+                                    <th scope="col">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let dh of detalles | paginate:tamanio_pagina:numero_pagina">
+                                    <td>{{dh.orden}}</td>
+                                    <td>{{dh.hora_}}</td>
+                                    <td>{{dh.minu_espera}}</td>
+                                    <td>{{dh.tipo_accion_show}}</td>
+                                    <td *ngIf="dh.segundo_dia === false && dh.tercer_dia === false">
+                                    </td>
+                                    <td *ngIf="dh.segundo_dia === true">SI</td>
+                                    <td *ngIf="dh.tercer_dia === true">SI</td>
+                                    <td>
+                                        <i id="editarI" (click)="AbrirVentanaEditarDetalle(dh)" matSuffix
+                                            matTooltipPosition="right" matTooltip="Modificar datos de este registro."
+                                            class="fas fa-edit">
+                                            <p>Editar</p>
+                                        </i>
+                                        <i matSuffix matTooltipPosition="right" matTooltip="Eliminar registro."
+                                            class="far fa-trash-alt" (click)="ConfirmarDelete(dh)" id="t-eliminar">
+                                            <p>Eliminar</p>
+                                        </i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <mat-paginator id="pagina" [length]="detalles.length" [pageSize]="tamanio_pagina"
+                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)"
+                        showFirstLastButtons>
+                    </mat-paginator>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap justify-content-between">
+                <button mat-raised-button id="btn-raised" type="submit" class="float-left" (click)="AbrirVentanaDetalles(h)"
+                    value="Registrar detalle">Registrar detalle</button>
+                <button mat-raised-button id="btn-raised" type="submit" class="float-right" [routerLink]="['/horario/']"
+                    value="Ir a lista de horarios">Ir a lista de horarios</button>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

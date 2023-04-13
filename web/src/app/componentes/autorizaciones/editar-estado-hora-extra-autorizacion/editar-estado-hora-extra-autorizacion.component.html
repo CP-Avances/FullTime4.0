@@ -1,0 +1,29 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        APROBACIÓN DE HORA EXTRA</span>
+    <mat-icon class="float-right" id="cerrar" (click)="ventana.close()">highlight_off</mat-icon>
+</div>
+<div class="container" style="text-align: center;">
+    <div class="nota">
+        <span>NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+            Guardar.</span>
+    </div>
+    <form [formGroup]="estadoAutorizacionesForm">
+        <mat-form-field>
+            <mat-label>Estados</mat-label>
+            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Lista de estados">
+                help_outline</mat-icon>
+            <mat-select [formControl]="estado" required>
+                <mat-option *ngFor="let e of estados" [value]="e.id">
+                    {{e.nombre}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </form>
+</div>
+<div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
+    <button mat-raised-button id="btn-raised" type="submit" (click)="ActualizarEstadoAutorizacion(estadoAutorizacionesForm.value)"
+        [disabled]="!estadoAutorizacionesForm.valid">Guardar</button>
+    <!--button mat-raised-button id="btn-raised" type="submit" (click)="ventana.close()">Salir</button-->
+</div>

@@ -1,0 +1,57 @@
+<div class="container" style="padding-top: 15px; padding-bottom: 25px;">
+    <div class="row">
+        <div class="col-md">
+            <mat-card class="mat-elevation-z8">
+                <div class="d-flex bd-highlight" id="titulo">
+                    <span class="w-100 bd-highlight">PROCESOS</span>
+                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                        (click)="AbrirVentanaProcesos()">Añadir</button>
+                </div>
+                <mat-card-content>
+                    <div class="container" *ngFor="let e of empleadoProcesos | paginate:tamanio_pagina:numero_pagina"
+                        style="padding-top: 15px;">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Proceso:</label>
+                                        <label>{{e.proceso}}</label>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Fecha Inicio:</label>
+                                        <label>{{e.fec_inicio_}}</label>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="espacio d-flex justify-content-start">
+                                        <label id="datosF">Fecha Final:</label>
+                                        <label>{{e.fec_final_}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <i class="fas fa-edit" id="edit" (click)="AbrirVentanaEditarProceso(e)" matSuffix
+                                    matTooltipPosition="right"
+                                    matTooltip="Modificar los datos generales de este registro">
+                                    <p>Editar</p>
+                                </i>
+                                <i style="color:red; margin-left: 15px;" (click)="ConfirmarDeleteProceso(e)"
+                                    class=" far fa-trash-alt" matTooltipPosition="right" id="delete"
+                                    matTooltip="Eliminar registro">
+                                    <p>Eliminar</p>
+                                </i>
+                            </div>
+                        </div>
+                        <mat-divider style="margin-bottom: 10px;"></mat-divider>
+                    </div>
+                    <mat-paginator id="pagina" [length]="empleadoProcesos.length" [pageSize]="tamanio_pagina"
+                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)"
+                        showFirstLastButtons>
+                    </mat-paginator>
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </div>
+</div>

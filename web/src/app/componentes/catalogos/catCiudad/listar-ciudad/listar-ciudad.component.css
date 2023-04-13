@@ -1,0 +1,24 @@
+p {
+    font-size: x-small;
+}
+
+.far {
+    cursor: pointer;
+    color: red;
+}
+
+table {
+    font-size: 14px;
+    width: 100%;
+}
+
+td {
+    padding-top: 10px;
+    text-align: center;
+}
+
+.btn {
+    background-color: rgb(80, 87, 97);
+    margin-left: 15px;
+    color: white;
+}

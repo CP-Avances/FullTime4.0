@@ -1,0 +1,36 @@
+<div class="container" style="padding-top: 15px; padding-bottom: 30px;">
+    <mat-card class="mat-elevation-z8">
+        <div class="d-flex bd-highlight" id="titulo">
+            <div class="w-100 bd-highlight">
+                <h5>CONFIGURACIÓN MENSAJE DE CUMPLEAÑOS</h5>
+            </div>
+            <div class="flex-shrink-1 bd-highlight" *ngIf="HabilitarBtn">
+                <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
+                    (click)="AbrirRegistrarMensaje()">Añadir</button>
+            </div>
+        </div>
+        <br>
+        <div class="d-flex flex-wrap justify-content-center" *ngFor="let c of cumple">
+            <div class="caja">
+                <label>Asunto:</label>
+                <span>{{c.titulo}}</span>
+                <i class="fas fa-edit" style="float: right;" id="t-editar" (click)="EditarMensaje(c)" matSuffix
+                    matTooltipPosition="right" matTooltip="Modificar el mensaje de felicitación">
+                    <p>Editar</p>
+                </i>
+            </div>
+            <div class="caja" *ngIf="c.url != null && c.url != ''">
+                <label>Link:</label>
+                <a href="{{c.url}}" target="_blank"> ! VER FELICITACIONES ! </a>
+            </div>
+            <div class="caja">
+                <label>Mensaje:</label>
+                <span>{{c.mensaje}} </span>
+            </div>
+            <div class="caja">
+                <label>Imagen:</label><br>
+                <img class="img-fluid rounded mx-auto d-block" src="{{API_URL}}/birthday/img/{{c.img}}">
+            </div>
+        </div>
+    </mat-card>
+</div>

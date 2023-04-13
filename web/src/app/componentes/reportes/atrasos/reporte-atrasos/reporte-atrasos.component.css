@@ -1,0 +1,11 @@
+.btn-sm { background-color: rgb(80,87,97); color: white; } 
+
+p { font-size: x-small; }
+
+mat-form-field { padding: 10px 15px 0px 15px;}
+
+table { width: 100%; font-size: 13px;}
+
+tr { text-align: center; }
+
+td { padding-top: 10px; text-align: center; }

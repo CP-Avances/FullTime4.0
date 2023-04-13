@@ -1,0 +1,99 @@
+<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;">
+    <div class="row">
+        <div class="col-md">
+            <div id="titulo">
+                <span>ACCIONES DE PERSONAL PROCESOS</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z8">
+                <div class="d-flex justify-content-around" style="margin-top: 1%; margin-bottom: 2%;">
+                    <button mat-raised-button id="btn-raised" type="submit" (click)="AbrirVentanaRegistrarProceso()">Crear nuevo
+                        proceso
+                    </button>
+                    <button mat-raised-button id="btn-raised" type="submit" (click)="limpiarCampoBuscar()" matSuffix
+                        matTooltipPosition="right"
+                        matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
+                        Mostrar lista</button>
+                </div>
+            </mat-card>
+        </div>
+    </div>
+</div>
+<div class="container" style="padding-bottom: 50px; text-align: center;">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="resultados">LISTA DE PROCESOS</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Nivel</th>
+                        <th scope="col">Proceso Superior</th>
+                        <th scope="col">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombre"
+                                    (keypress)="IngresarSoloLetras($event)" [formControl]="buscarNombre">
+                            </mat-form-field>
+                        </td>
+                        <td></td>
+                        <td>
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroProPadre"
+                                    (keypress)="IngresarSoloLetras($event)" [formControl]="buscarPadre">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda del proceso de acuerdo a las columnas de la tabla.">
+                                help_outline</mat-icon>
+                        </td>
+                    </tr>
+                    <tr
+                        *ngFor="let proceso of procesos | nombre:filtroNombre | nivel:filtroNivel | padre:filtroProPadre | paginate:tamanio_pagina:numero_pagina">
+                        <td>{{proceso.nombre}}</td>
+                        <td>{{proceso.nivel}}</td>
+                        <td>{{proceso.proc_padre}}</td>
+                        <td>
+                            <i class="fas fa-edit" (click)="AbrirVentanaEditar(proceso)" id="accion" matSuffix
+                                matTooltipPosition="right" matTooltip="Modificar los datos generales del registro.">
+                                <p>Editar</p>
+                            </i>
+                            <i class="far fa-trash-alt" (click)="ConfirmarDelete(proceso)" id="t-eliminar" matSuffix
+                                matTooltipPosition="right" matTooltip="Eliminar registro.">
+                                <p>Eliminar</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="procesos.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
+            id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+            <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Procesos de Acciones de Personal en formato PDF.">
+                <p>PDF</p>
+            </i>
+            <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Procesos de Acciones de Personal en formato EXCEL.">
+                <p>XLSL</p>
+            </i>
+            <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Procesos de Acciones de Personal en formato CSV.">
+                <p>CSV</p>
+            </i>
+            <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Procesos de Acciones de Personal en formato XML.">
+                <p>XML</p>
+            </i>
+        </div>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+            <p> Reporte de procesos. </p>
+        </div>
+    </div>
+</div>

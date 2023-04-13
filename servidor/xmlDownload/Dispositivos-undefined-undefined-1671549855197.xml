@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<root>
+  <dispositivo id="1548">
+    <nombre>OFICINA</nombre>
+    <ip>192.168.0.131</ip>
+    <puerto>4370</puerto>
+    <marca/>
+    <modelo/>
+    <serie/>
+    <id_fabricacion/>
+    <fabricante/>
+    <mac/>
+    <nomdepar>SISTEMAS</nomdepar>
+    <nomsucursal>Sucursal Central</nomsucursal>
+    <nomempresa>CASA PAZMINO</nomempresa>
+    <nomciudad>Quito</nomciudad>
+  </dispositivo>
+</root>

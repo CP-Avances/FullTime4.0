@@ -1,0 +1,40 @@
+p {
+    font-size: x-small;
+}
+
+mat-form-field.input-tables {
+    background: transparent;
+    font-size: 14px;
+    text-align: center;
+    outline: none;
+    fill: none;
+    height: 65px;
+}
+
+.codigo {width: 70px;}
+.nombre {width: 120px;}
+.cedula {width: 110px;}
+
+mat-expansion-panel-header {
+    text-align: center;
+    background: rgb(52, 65, 84);
+}
+
+mat-panel-title {
+    color: white;
+}
+
+mat-panel-description {
+    color: white;
+}
+
+#SelectCheck {
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+
+table {
+    width: 100%;
+    font-size: 14px;
+}

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<root>
+  <tipo_comida id="1">
+    <servicio>Desayuno</servicio>
+    <menu>Americano</menu>
+    <hora_inicia>08:00:00</hora_inicia>
+    <hora_finaliza>09:00:00</hora_finaliza>
+  </tipo_comida>
+</root>

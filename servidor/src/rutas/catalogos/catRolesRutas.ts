@@ -1,0 +1,41 @@
+import { Router } from 'express';
+import ROLES_CONTROLADOR from '../../controlador/catalogos/catRolesControlador';
+import { TokenValidation } from '../../libs/verificarToken';
+
+class PruebasRutas {
+    public router: Router = Router();
+
+    constructor() {
+        this.configuracion();
+    }
+
+    configuracion(): void {
+
+        // METODO PARA LISTAR ROLES DEL SISTEMA
+        this.router.get('/', TokenValidation, ROLES_CONTROLADOR.ListarRoles);
+        // METODO PARA ELIMINAR REGISTRO
+        this.router.delete('/eliminar/:id', TokenValidation, ROLES_CONTROLADOR.EliminarRol);
+        // METODO PARA CREAR ARCHIVO XML
+        this.router.post('/xmlDownload/', TokenValidation, ROLES_CONTROLADOR.FileXML);
+        // METODO PARA DESCARGAR ARCHIVO XML
+        this.router.get('/download/:nameXML', ROLES_CONTROLADOR.downloadXML);
+        // METODO PARA REGISTRAR ROL
+        this.router.post('/', TokenValidation, ROLES_CONTROLADOR.CrearRol);
+
+
+
+
+
+        this.router.get('/:id', TokenValidation, ROLES_CONTROLADOR.ObtnenerUnRol);
+        this.router.get('/actualiza/:id', TokenValidation, ROLES_CONTROLADOR.ListarRolesActualiza);
+
+        this.router.put('/', TokenValidation, ROLES_CONTROLADOR.ActualizarRol);
+
+
+
+    }
+}
+
+const ROLES_RUTAS = new PruebasRutas();
+
+export default ROLES_RUTAS.router;

@@ -1,0 +1,52 @@
+@media (max-width: 992px) {
+    .home-inner {
+        padding-top: 100px;
+    }
+}
+
+img {
+    width: 100%;
+}
+
+
+mat-form-field {
+    width: 250px;
+}
+
+.home-inner {
+    padding: 100px 100px 15px 100px;
+}
+
+.btn {
+    background-color: rgb(80, 87, 97);
+    border-radius: 5px;
+    margin-left: 15px;
+    color: white;
+}
+
+mat-card {
+    padding-bottom: 25px;
+    border-radius: 25px;
+    border-style: groove;
+    padding-top: 25px;
+    text-align: center;
+    margin: auto;
+    width: 300px;
+}
+
+.dark-overlay {
+    background-color: rgba(0, 0, 0, .6);
+    min-width: 100%;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+#home-section {
+    background-attachment: fixed;
+    background-size: cover;
+    background: url('../../../../../assets/imagenes/apple.jpg') no-repeat;
+    min-height: 100vh;
+}

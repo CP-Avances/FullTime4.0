@@ -1,0 +1,50 @@
+textarea {
+    height: 75px;
+}
+
+mat-icon {
+    cursor: pointer;
+}
+
+mat-label {
+    font-size: 14px;
+}
+
+hr {
+    background-color: black;
+}
+
+td {
+    padding-top: 10px;
+    text-align: center;
+}
+
+mat-form-field {
+    padding: 10px 15px 0px 15px;
+}
+
+#ver {
+    padding: 10px 10px 0px 10px;
+    width: 100%;
+}
+
+.btn {
+    background-color: rgb(80, 87, 97);
+    margin: 5px 10px 5px 10px;
+    color: white;
+}
+
+.mat-radio-button~.mat-radio-button {
+    margin-left: 16px;
+}
+
+
+#SelectCheck {
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+table {
+    width: 100%;
+    font-size: 14px;
+}

@@ -1,0 +1,139 @@
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
+
+.example-card {
+    max-width: 500px;
+}
+
+.row .col-md-6 {
+    margin: 15px 0px 0px 0px;
+}
+
+.btn-lg {
+    width: 180px;
+    height: 70px;
+    margin: 7px 7px 7px 7px;
+    color: white;
+}
+
+.icon-menu {
+    margin-right: 10px;
+    margin-left: -7px;
+    color: white;
+}
+
+/* REPORTES */
+.boton-uno {
+    background: linear-gradient(to right, rgb(245, 4, 96), rgb(173, 4, 69));
+    font-size: 16px;
+}
+
+/* HORAS EXTRAS */
+.boton-dos {
+    background: linear-gradient(to right, rgb(15, 206, 171), rgb(2, 100, 82));
+    font-size: 16px;
+}
+
+/* VACACIONES */
+.boton-tre {
+    background: linear-gradient(to right, rgb(1, 168, 23), rgb(0, 107, 14));
+    font-size: 16px;
+}
+
+/* PERMISOS */
+.boton-cua {
+    background: linear-gradient(to right, rgb(235, 212, 8), rgb(177, 159, 2));
+    font-size: 16px;
+}
+
+/* ACCIONES PERSONAL */
+.boton-cin {
+    background: linear-gradient(to right, rgb(255, 67, 224), rgb(185, 45, 162));
+    font-size: 15px;
+}
+
+/* MOVIL */
+.boton-sei {
+    background: linear-gradient(to right, rgb(0, 119, 255), rgb(0, 84, 180));
+    font-size: 15px;
+}
+
+/* ALIMENTACION */
+.boton-sie {
+    background: linear-gradient(to right, rgb(241, 160, 67), rgb(148, 81, 4));
+    font-size: 16px;
+}
+
+/* GEOLOCALIZACION */
+.boton-ocho {
+    background: linear-gradient(to right, rgb(11, 194, 226), rgb(2, 113, 146));
+    font-size: 16px;
+}
+
+.boton-inactivo {
+    background: linear-gradient(to right, rgb(164, 166, 167), rgb(131, 132, 133));
+    font-size: 16px;
+}
+
+#charts_inasistencia {
+    width: 100%;
+    height: 350px;
+}
+
+#charts_hora_extra {
+    width: 100%;
+    height: 350px;
+}
+
+#charts_asistencia {
+    width: 100%;
+    height: 350px;
+}
+
+#charts_retrasos {
+    width: 100%;
+    height: 350px;
+}
+
+#charts_marcaciones {
+    width: 100%;
+    height: 350px;
+}
+
+#charts_tiempo_jornada {
+    width: 100%;
+    height: 350px;
+}
+
+#charts_jornada_hora_extra {
+    width: 100%;
+    height: 350px;
+}
+
+#charts_salidas_antes {
+    width: 100%;
+    height: 350px;
+}
+
+.scroll-box {
+    overflow-y: scroll;
+    height: 100%;
+    overflow-x: scroll;
+    width: 100%;
+    padding: 1rem;
+}
+
+@media only screen and (max-width: 800px) {
+
+    .btn-lg {
+        width: 180px;
+        height: 80px;
+        margin: 2px 2px 2px 2px;
+        font-size: 15px;
+    }
+
+}

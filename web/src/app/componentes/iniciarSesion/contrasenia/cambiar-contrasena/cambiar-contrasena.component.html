@@ -1,0 +1,64 @@
+<div style="text-align: center;">
+    <img src="../../../../../assets/imagenes/logo/logoAdmin.png"> <br><br>
+    <span>Confirmar nueva contraseña</span>
+    <form [formGroup]="formulario">
+        <div class="nota">
+            <span>
+                NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                Guardar.
+            </span>
+        </div>
+        <mat-form-field>
+            <mat-label>Contraseña actual</mat-label>
+            <input matInput placeholder="Máximo 10 caracteres" [type]="hide1 ? 'password' : 'text'" maxlength="10"
+                oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                formControlName="aPass" required>
+            <button mat-icon-button matSuffix (click)="hide1 = !hide1" [attr.aria-label]="'Hide password'"
+                [attr.aria-pressed]="hide1">
+                <mat-icon id="iEnrol" matSuffix matTooltipPosition="right"
+                    matTooltip="Ocultar o mostrar la contraseña ingresada">
+                    {{hide1 ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+            <mat-label>Nueva contraseña</mat-label>
+            <input matInput placeholder="Máximo 10 caracteres" [type]="hide2 ? 'password' : 'text'" maxlength="10"
+                oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                formControlName="nPass" required>
+            <button mat-icon-button matSuffix (click)="hide2 = !hide2" [attr.aria-label]="'Hide password'"
+                [attr.aria-pressed]="hide2">
+                <mat-icon id="iEnrol" matSuffix matTooltipPosition="right"
+                    matTooltip="Ocultar o mostrar la contraseña ingresada.">
+                    {{hide2 ? 'visibility_off' : 'visibility'}}
+                </mat-icon>
+            </button>
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+            <mat-label>Confirmar contraseña</mat-label>
+            <input matInput placeholder="máximo 10 caracteres" [type]="hide3 ? 'password' : 'text'" maxlength="10"
+                oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                formControlName="cPass" required>
+            <button mat-icon-button matSuffix (click)="hide3 = !hide3" [attr.aria-label]="'Hide password'"
+                [attr.aria-pressed]="hide3">
+                <mat-icon id="iEnrol" matSuffix matTooltipPosition="right"
+                    matTooltip="Ocultar o mostrar la contraseña ingresada">
+                    {{hide3 ? 'visibility_off' : 'visibility'}}
+                </mat-icon>
+            </button>
+        </mat-form-field>
+        <br>
+        <div style="text-align: center;">
+            <button type="submit" class="btn" (click)="CompararContrasenia(formulario.value)"
+                [disabled]="!formulario.valid">
+                Cambiar Contraseña
+            </button>
+        </div>
+        <br>
+        <div style="text-align: center;">
+            <button type="submit" class="btn" (click)="CerrarRegistro(false)">Salir</button>
+        </div>
+    </form>
+
+</div>

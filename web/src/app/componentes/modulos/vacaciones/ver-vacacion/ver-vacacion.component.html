@@ -1,0 +1,126 @@
+<div class="container" style="padding-top: 15px; padding-bottom: 25px;">
+    <div class="container" style="padding-bottom: 15px;">
+        <mat-card class="mat-elevation-z8">
+            <div id="titulo">
+                <h5>INFORMACIÓN DE VACACIÓN</h5>  
+            </div>
+            <mat-card-content>
+                <div class="container" *ngFor="let v of vacacion" style="padding-top: 15px;">
+                    <div class="row">
+                        <div class="col-md">
+                            <div class="caja1 d-flex justify-content-start">
+                                <label id="datosF">Colaborador:</label>
+                                <label>{{v.fullname}}</label>
+                            </div>
+                            <div class="caja1 d-flex justify-content-start">
+                                <label id="datosF">Cédula:</label>
+                                <label>{{v.cedula}}</label>
+                            </div>
+                            <div class="caja1 d-flex justify-content-start">
+                                <label id="datosF">Motivo:</label>
+                                <label>Vacaciones</label>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="caja1 d-flex justify-content-start">
+                                <label id="datosF">Fecha Desde:</label>
+                                <label>{{v.fec_inicio_}}</label>
+                            </div>
+                            <div class="caja1 d-flex justify-content-start">
+                                <label id="datosF">Fecha Hasta:</label>
+                                <label>{{v.fec_final_}}</label>
+                            </div>
+                            <div class="caja1 d-flex justify-content-start">
+                                <label id="datosF">Fecha Ingreso:</label>
+                                <label>{{v.fec_ingreso_}}</label>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="caja1 d-flex justify-content-start">
+                                <label id="datosF">Días Laborables:</label>
+                                <label>{{v.dia_laborable}}</label>
+                            </div>
+                            <div class="caja1 d-flex justify-content-start">
+                                <label id="datosF">Días Libres:</label>
+                                <label>{{v.dia_libre}}</label>
+                            </div>
+                            <div class="caja1 d-flex justify-content-start">
+                                <label id="datosF">Legalizado:</label>
+                                <label *ngIf="v.legalizado == true">Sí</label>
+                                <label *ngIf="v.legalizado == false">No</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+    <div class="container" style="padding-bottom: 15px;">
+        <mat-card class="mat-elevation-z8">
+            <div id="titulo">
+                <h5>INFORMACIÓN DE LA APROBACIÓN</h5>
+            </div>
+            <mat-card-content>
+                <div class="container" style="padding-top: 15px;" *ngFor="let a of autorizacion">
+                    <div class="row">
+                        <div class="col">
+                            <div *ngFor="let ea of empleado_estado">
+                                <div class="row">
+                                    <div class="col-md">
+                                        <div class="caja1 d-flex justify-content-start">
+                                            <label id="datosF">Revisado por:</label>
+                                            <label>{{ea.nombre}}</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md">
+                                        <div class="caja1 d-flex justify-content-start">
+                                            <label id="datosF">Departamento:</label>
+                                            <label>{{ea.departamento}}</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md">
+                                        <div class="caja1 d-flex justify-content-start">
+                                            <label id="datosF">Acción:</label>
+                                            <label>{{ea.estado}}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                            </div>
+                            
+                            <div *ngIf="!estado" class="caja1 d-flex justify-content-start">
+                                <label id="datosF">La solicitud esta en estado: Pendiente <br></label>
+                                <label id="datosF">La solicitud debe ser autorizada primero para descargar la informacion</label>
+                            </div>
+
+                            <div *ngIf="estado" class="caja1 d-flex justify-content-start">
+                                <label id="datosF">Descargar Vacación:</label>
+                                <label>
+                                    <i id="iconos" (click)="GenerarPdf('download')" matSuffix matTooltipPosition="right"
+                                        matTooltip="Descargar Solicitud de Permiso en formato PDF">
+                                        <label
+                                            style="font-size: 14px; color: red; font-weight: bold;">Solicitud.pdf</label>
+                                    </i>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 5px;">
+                        <div class="col">
+                        </div>
+                        <div class="col">
+                        </div>
+                        <div class="col" style="text-align: right;">
+                            <i *ngIf="!habilitarActualizar" class="fas fa-edit" id="t-editar"
+                                matSuffix matTooltipPosition="right"
+                                (click)="AbrirVentanaEditarAutorizacion(a)" matTooltip="Cambiar el estado del permiso" [hidden] = "ocultar">
+                                <p>Estado</p>
+                            </i>
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+
+</div>
