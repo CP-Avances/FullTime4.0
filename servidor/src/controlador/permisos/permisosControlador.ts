@@ -322,24 +322,29 @@ class PermisosControlador {
     }
 
     // REGISTRAR DOCUMENTO DE RESPALDO DE PERMISO  
-    public async GuardarDocumentoPermiso(req: Request, res: Response): Promise<void> {
-        let list: any = req.files;
-        let doc = list.uploads[0].path.split("\\")[1];
+    public async GuardarDocumentoPermiso(req: Request, res: Response): Promise<any> {
+        console.log('rec ', req.file)
+        // LEER DATOS DE IMAGEN
+        let doc = req.file?.originalname;
         let { archivo } = req.params;
         let { documento } = req.params;
         let id = req.params.id
 
+        console.log('doc', doc, 'rec ', req.file)
         // ACTUALIZAR REGISTRO
         await pool.query(
             `
             UPDATE permisos SET documento = $2, docu_nombre = $3 WHERE id = $1
             `, [id, doc, documento]);
+
         res.jsonp({ message: 'Documento Actualizado' });
 
         if (archivo != 'null' && archivo != '' && archivo != null) {
-            let filePath = `servidor\\permisos\\${archivo}`
-            let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-            fs.unlinkSync(direccionCompleta);
+            if (archivo != doc) {
+                let filePath = `servidor\\permisos\\${archivo}`
+                let direccionCompleta = __dirname.split("servidor")[0] + filePath;
+                fs.unlinkSync(direccionCompleta);
+            }
         }
     }
 

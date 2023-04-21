@@ -1,25 +1,31 @@
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        REGISTRAR PARÁMETRO GENERAL</span>
+        REGISTRAR PARÁMETRO GENERAL
+    </span>
     <mat-icon class="float-right" id="cerrar" (click)="ventana.close()">highlight_off</mat-icon>
 </div>
-<form [formGroup]="formulario">
-    <div style="text-align: center">
-        <div class="nota">
-            <span>NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
-                Guardar.</span>
+<div class="container">
+    <form [formGroup]="formulario">
+        <div style="text-align: center">
+            <div class="nota">
+                <span>
+                    NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                    Guardar.
+                </span>
+            </div>
+            <div class="d-flex flex-wrap justify-content-center">
+                <mat-form-field>
+                    <mat-label>Descripción general</mat-label>
+                    <input matInput [formControl]="descripcion" required>
+                </mat-form-field>
+            </div>
         </div>
-        <div class="d-flex flex-wrap justify-content-center">
-            <mat-form-field>
-                <mat-label>Descripción general</mat-label>
-                <input matInput [formControl]="descripcion" required>
-            </mat-form-field>
-        </div>
-    </div>
-</form>
+    </form>
+</div>
 <div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 2%;">
-    <button mat-raised-button id="btn-raised" type="submit" [disabled]="!formulario.valid" value="Guardar"
-        (click)="GuardarDatos(formulario.value)">Guardar</button>
-    <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentana()" value="Cancelar">Cancelar</button-->
+    <button id="btn-raised" class="btn btn-sm" [disabled]="!formulario.valid" value="Guardar"
+        (click)="GuardarDatos(formulario.value)">
+        Guardar
+    </button>
 </div>

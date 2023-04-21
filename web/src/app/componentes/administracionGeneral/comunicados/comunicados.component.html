@@ -35,9 +35,9 @@
             </div>
         </form>
         <div class="d-flex flex-wrap justify-content-center" style="padding-bottom: 10px;">
-            <button mat-raised-button id="btn-raised" type="submit" [disabled]="!comunicadoForm.valid"
+            <button id="btn-raised"  class="btn btn-sm" [disabled]="!comunicadoForm.valid"
                 (click)="GuardarRegistros(comunicadoForm.value)">Enviar</button>
-            <button mat-raised-button id="btn-raised" type="submit" [routerLink]="['/home']">Cancelar</button>
+            <button id="btn-raised"  class="btn btn-sm" [routerLink]="['/home']">Cancelar</button>
         </div>
 
 

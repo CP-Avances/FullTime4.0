@@ -97,8 +97,7 @@
     </form>
     <br>
     <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-        <button mat-raised-button id="btn-raised" type="submit" [disabled]="!AccionesForm.valid"
+        <button id="btn-raised"  class="btn btn-sm" [disabled]="!AccionesForm.valid"
             (click)="InsertarAccion(AccionesForm.value)" value="Guardar">Guardar</button>
-        <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentanaRegistro()" value=" Salir">Salir</button-->
     </div>
 </div>

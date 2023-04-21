@@ -142,6 +142,12 @@ export class MainNavComponent implements OnInit {
         });
       }
     });
+
+    var f = moment();
+    let hora: number = parseInt(moment(f).format('HH'));
+    let fecha: string = moment(f).format('YYYY-MM-DD');
+    console.log('HORAS ',hora, ' fechas ', fecha)
+
   }
 
   // METODO PARA REGISTRAR FRASE DE SEGURIDAD
@@ -184,8 +190,8 @@ export class MainNavComponent implements OnInit {
       this.restEmpresa.ConsultarEmpresas().subscribe(res => {
         localStorage.setItem('name_empresa', res[0].nombre);
         this.MetodoSubSelectMenu(res[0].nombre)
-        console.log("Informacion: ",res)
-        console.log("Estado: ",this.HabilitarAlimentacion);
+        console.log("Informacion: ", res)
+        console.log("Estado: ", this.HabilitarAlimentacion);
       })
     }
   }

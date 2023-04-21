@@ -158,9 +158,8 @@
     </mat-card-content>
     <div class="d-flex flex-wrap justify-content-center" style="padding-top: 2%; margin-bottom: 2%;">
         <mat-card-actions style="text-align: center">
-            <button mat-raised-button id="btn-raised" type="submit" [disabled]="!formulario.valid"
+            <button id="btn-raised"  class="btn btn-sm" [disabled]="!formulario.valid"
                 (click)="ValidarDatosContrato(formulario.value)" value="Guardar">Guardar</button>
-            <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentana()" value=" Salir">Salir</button-->
         </mat-card-actions>
     </div>
 </div>

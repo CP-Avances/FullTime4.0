@@ -1,4 +1,4 @@
-import { ImagenBase64LogosEmpresas } from '../../libs/ImagenCodificacion'
+import { ImagenBase64LogosEmpresas } from '../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';
 const builder = require('xmlbuilder');
 import pool from '../../database';
@@ -39,8 +39,6 @@ class EmpresaControlador {
 
         const codificado = await ImagenBase64LogosEmpresas(file_name.logo);
 
-        console.log("file_name: ",file_name.logo);
-
         if (codificado === 0) {
             res.status(200).jsonp({ imagen: 0, nom_empresa: file_name.nombre })
         } else {
@@ -48,47 +46,60 @@ class EmpresaControlador {
         }
     }
 
+
     // METODO PARA EDITAR LOGO DE EMPRESA
     public async ActualizarLogoEmpresa(req: Request, res: Response): Promise<any> {
-        let list: any = req.files;
-        let logo = list.image[0].path.split("\\")[1];
-        console.log("logo: ",logo);
+
+        // LEER DATOS DE IMAGEN
+        let logo = req.file?.originalname;
         let id = req.params.id_empresa;
 
+        // CONSULTAR SI EXISTE UNA IMAGEN
         const logo_name = await pool.query(
             `
             SELECT nombre, logo FROM cg_empresa WHERE id = $1
             `
             , [id]);
 
-        if (logo_name.rowCount > 0) {
-            logo_name.rows.map(async (obj: any) => {
+        logo_name.rows.map(async (obj: any) => {
+            // LA IMAGEN EXISTE
+            if (obj.logo != null) {
+                try {
+                    let filePath = `servidor/logos/${obj.logo}`;
+                    let direccionCompleta = __dirname.split("servidor")[0] + filePath;
 
-                console.log("logo_name: ",obj.logo);
+                    // SI EL NOMBRE DE LA IMAGEN YA EXISTE SOLO SE ACTUALIZA CASO CONTRARIO SE ELIMINA
+                    if (obj.logo != logo) {
 
-                if (obj.logo != null) {
-                    console.log("lsi entro: ",obj.logo);
-                    try {
-                        let filePath = `servidor/logos/${obj.logo}`;
-                        let direccionCompleta = __dirname.split("servidor")[0] + filePath;
                         // ELIMINAR LOGO DEL SERVIDOR
                         fs.unlinkSync(direccionCompleta);
+
+                        // ACTUALIZAR REGISTRO DE IMAGEN
                         await pool.query(
-                            `UPDATE cg_empresa SET logo = $2 WHERE id = $1`
+                            `
+                            UPDATE cg_empresa SET logo = $2 WHERE id = $1
+                            `
                             , [id, logo]);
-                    } catch (error) {
-                        await pool.query('', [id, logo]);
                     }
-                } else {
+                } catch (error) {
+                    // ACTUALIZAR REGISTRO DE IMAGEN SI ESTA NO CONSTA EN EL SERVIDOR
                     await pool.query(
                         `
-                        UPDATE cg_empresa SET logo = $2 WHERE id = $1
-                        `
+                            UPDATE cg_empresa SET logo = $2 WHERE id = $1
+                            `
                         , [id, logo]);
                 }
-            });
-        }
+            } else {
+                // SI NO EXISTE UNA IMAGEN SE REGISTRA EN LA BASE DE DATOS Y EL SERVIDOR
+                await pool.query(
+                    `
+                        UPDATE cg_empresa SET logo = $2 WHERE id = $1
+                        `
+                    , [id, logo]);
+            }
+        });
 
+        // LEER DATOS DE IMAGEN
         const codificado = await ImagenBase64LogosEmpresas(logo);
         res.send({ imagen: codificado, nom_empresa: logo_name.rows[0].nombre, message: 'Logo actualizado' })
     }
@@ -160,8 +171,9 @@ class EmpresaControlador {
 
     // METODO PARA ACTUALIZAR LOGO CABECERA DE CORREO
     public async ActualizarCabeceraCorreo(req: Request, res: Response): Promise<any> {
-        let list: any = req.files;
-        let logo = list.image[0].path.split("\\")[1];
+
+        // LEER DATOS DE IMAGEN
+        let logo = req.file?.originalname;
         let id = req.params.id_empresa;
 
         const logo_name = await pool.query(
@@ -170,35 +182,41 @@ class EmpresaControlador {
             `
             , [id]);
 
-        if (logo_name.rowCount > 0) {
-            logo_name.rows.map(async (obj: any) => {
-                if (obj.cabecera_firma != null) {
-                    try {
-                        // ELIMINAR IMAGEN DE SERVIDOR
-                        let filePath = `servidor\\logos\\${obj.cabecera_firma}`;
-                        let direccionCompleta = __dirname.split("servidor")[0] + filePath;
+        logo_name.rows.map(async (obj: any) => {
+            if (obj.cabecera_firma != null) {
+
+                try {
+                    let filePath = `servidor/logos/${obj.cabecera_firma}`;
+                    let direccionCompleta = __dirname.split("servidor")[0] + filePath;
+
+                    // SI EL NOMBRE DE LA IMAGEN YA EXISTE SOLO SE ACTUALIZA CASO CONTRARIO SE ELIMINA
+                    if (obj.cabecera_firma != logo) {
+
+                        // ELIMINAR LOGO DEL SERVIDOR
                         fs.unlinkSync(direccionCompleta);
-                        await pool.query(
-                            `
-                            UPDATE cg_empresa SET cabecera_firma = $2 WHERE id = $1
-                            `
-                            , [id, logo]);
-                    } catch (error) {
+
+                        // ACTUALIZAR REGISTRO DE IMAGEN
                         await pool.query(
                             `
                             UPDATE cg_empresa SET cabecera_firma = $2 WHERE id = $1
                             `
                             , [id, logo]);
                     }
-                } else {
+                } catch (error) {
                     await pool.query(
                         `
                         UPDATE cg_empresa SET cabecera_firma = $2 WHERE id = $1
                         `
                         , [id, logo]);
                 }
-            });
-        }
+            } else {
+                await pool.query(
+                    `
+                    UPDATE cg_empresa SET cabecera_firma = $2 WHERE id = $1
+                    `
+                    , [id, logo]);
+            }
+        });
 
         const codificado = await ImagenBase64LogosEmpresas(logo);
         res.send({ imagen: codificado, message: 'Registro actualizado.' })
@@ -226,8 +244,9 @@ class EmpresaControlador {
 
     // METODO PARA ACTUALIZAR PIE DE FIRMA DE CORREO
     public async ActualizarPieCorreo(req: Request, res: Response): Promise<any> {
-        let list: any = req.files;
-        let logo = list.image[0].path.split("\\")[1];
+
+        // LEER DATOS DE IMAGEN
+        let logo = req.file?.originalname;
         let id = req.params.id_empresa;
 
         const logo_name = await pool.query(
@@ -236,35 +255,41 @@ class EmpresaControlador {
             `
             , [id]);
 
-        if (logo_name.rowCount > 0) {
-            logo_name.rows.map(async (obj: any) => {
-                if (obj.pie_firma != null) {
-                    try {
-                        // ELIMINAR LOGO DE SERVIDOR
-                        let filePath = `servidor\\logos\\${obj.pie_firma}`;
-                        let direccionCompleta = __dirname.split("servidor")[0] + filePath;
+        logo_name.rows.map(async (obj: any) => {
+            if (obj.pie_firma != null) {
+
+                try {
+                    let filePath = `servidor/logos/${obj.pie_firma}`;
+                    let direccionCompleta = __dirname.split("servidor")[0] + filePath;
+
+                    // SI EL NOMBRE DE LA IMAGEN YA EXISTE SOLO SE ACTUALIZA CASO CONTRARIO SE ELIMINA
+                    if (obj.pie_firma != logo) {
+
+                        // ELIMINAR LOGO DEL SERVIDOR
                         fs.unlinkSync(direccionCompleta);
-                        await pool.query(
-                            `
-                            UPDATE cg_empresa SET pie_firma = $2 WHERE id = $1
-                            `
-                            , [id, logo]);
-                    } catch (error) {
+
+                        // ACTUALIZAR REGISTRO DE IMAGEN
                         await pool.query(
                             `
                             UPDATE cg_empresa SET pie_firma = $2 WHERE id = $1
                             `
                             , [id, logo]);
                     }
-                } else {
+                } catch (error) {
                     await pool.query(
                         `
                         UPDATE cg_empresa SET pie_firma = $2 WHERE id = $1
                         `
                         , [id, logo]);
                 }
-            });
-        }
+            } else {
+                await pool.query(
+                    `
+                    UPDATE cg_empresa SET pie_firma = $2 WHERE id = $1
+                    `
+                    , [id, logo]);
+            }
+        });
 
         const codificado = await ImagenBase64LogosEmpresas(logo);
         res.send({ imagen: codificado, message: 'Registro actualizado.' })

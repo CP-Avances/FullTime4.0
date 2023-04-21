@@ -174,7 +174,7 @@
                             <div class="d-flex flex-wrap justify-content-start">
                                 <section class="d-flex flex-column bd-highlight">
                                     <div class="bd-highlight">
-                                        <form method="post" enctype="multipart/form-data">
+                                        <form method="post">
                                             <input (change)="fileChange($event)" type="file" [formControl]="archivoForm"
                                                 id="file">
                                             <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()">
@@ -201,8 +201,7 @@
         </mat-card-content>
     </form>
     <div style="text-align: center; margin-bottom: 3%;">
-        <button mat-raised-button id="btn-raised" type="submit" (click)="InsertarPermiso(formulario.value)"
+        <button id="btn-raised"  class="btn btn-sm" (click)="InsertarPermiso(formulario.value)"
             [disabled]="!formulario.valid">Guardar</button>
-        <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentana()">Salir</button-->
     </div>
 </mat-card>

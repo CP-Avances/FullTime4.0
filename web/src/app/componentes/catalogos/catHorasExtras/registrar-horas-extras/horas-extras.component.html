@@ -79,10 +79,10 @@
                     </div>
                 </form>
                 <div>
-                    <button mat-raised-button id="btn-raised" type="submit" class="float-left" [routerLink]="['/listaHorasExtras']">Lista de horas extras
+                    <button id="btn-raised" class="btn btn-sm float-left" [routerLink]="['/listaHorasExtras']">Lista de horas extras
                     </button>
-                    <button mat-raised-button id="btn-raised" type="submit" (click)="stepper.reset()">Cancelar</button>
-                    <button mat-raised-button id="btn-raised" type="submit" matStepperNext class="float-right">Siguiente</button>
+                    <button id="btn-raised"  class="btn btn-sm" (click)="stepper.reset()">Cancelar</button>
+                    <button id="btn-raised" matStepperNext class="btn btn-sm float-right">Siguiente</button>
                 </div>
             </mat-step>
             <mat-step [stepControl]="segundoFormGroup">
@@ -146,14 +146,14 @@
                     </div>
                 </form>
                 <div>
-                    <button mat-raised-button id="btn-raised" type="submit" class="float-left" [routerLink]="['/listaHorasExtras']">Lista de horas extras
+                    <button id="btn-raised" class="btn btn-sm float-left" [routerLink]="['/listaHorasExtras']">Lista de horas extras
                     </button>
-                    <button mat-raised-button id="btn-raised" type="submit" matStepperPrevious>Atrás</button>
-                    <button mat-raised-button id="btn-raised" type="submit"
+                    <button id="btn-raised"  class="btn btn-sm" matStepperPrevious>Atrás</button>
+                    <button id="btn-raised"  class="btn btn-sm"
                         (click)="insertarHoraExtra(primeroFormGroup.value, segundoFormGroup.value); stepper.reset()"
                         [disabled]="!segundoFormGroup.valid" id="iconoG">Guardar
                     </button>
-                    <button mat-raised-button id="btn-raised" type="submit" (click)="stepper.reset()" class="float-right">Cancelar</button>
+                    <button id="btn-raised" (click)="stepper.reset()" class="btn btn-sm float-right">Cancelar</button>
                 </div>
             </mat-step>
         </mat-horizontal-stepper>

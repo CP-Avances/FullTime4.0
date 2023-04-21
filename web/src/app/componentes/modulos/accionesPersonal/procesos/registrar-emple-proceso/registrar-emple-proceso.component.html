@@ -61,8 +61,7 @@
         </mat-card-content>
     </form>
     <div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 2%;">
-        <button mat-raised-button id="btn-raised" type="submit" [disabled]="!EmpleProcesoForm.valid"
+        <button id="btn-raised"  class="btn btn-sm" [disabled]="!EmpleProcesoForm.valid"
         (click)="ValidarDatosProeso(EmpleProcesoForm.value)" value="Guardar"> Guardar</button>
-        <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentanaRegistroProceso()" value="Salir">Salir</button-->
     </div>
 </div>

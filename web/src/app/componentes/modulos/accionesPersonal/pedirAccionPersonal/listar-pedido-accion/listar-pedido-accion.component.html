@@ -6,11 +6,11 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="d-flex justify-content-around" style="margin-top: 1%; margin-bottom: 2%;">
-                    <button mat-raised-button id="btn-raised" type="submit" [routerLink]="['/pedidoAccion']"
+                    <button id="btn-raised"  class="btn btn-sm" [routerLink]="['/pedidoAccion']"
                         matSuffix matTooltipPosition="right"
                         matTooltip="Dar clic para realizar un pedido de acción de personal.">Registrar pedido acción
                         personal</button>
-                    <button mat-raised-button id="btn-raised" type="submit" (click)="LimpiarCampos()" matSuffix
+                    <button id="btn-raised"  class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
                         matTooltipPosition="right"
                         matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">Mostrar
                         lista</button>

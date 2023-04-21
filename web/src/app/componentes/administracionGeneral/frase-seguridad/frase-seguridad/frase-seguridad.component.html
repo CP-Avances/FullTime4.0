@@ -24,11 +24,8 @@
         </mat-form-field>
         <br><br><br>
         <div style="text-align: center;">
-            <button mat-raised-button id="btn-raised" type="submit" (click)="IngresarFrase(formulario.value)"
+            <button id="btn-raised"  class="btn btn-sm" (click)="IngresarFrase(formulario.value)"
                 [disabled]="!formulario.valid">Guardar</button>
         </div>
-        <!--div style="text-align: center;">
-            <button mat-raised-button id="btn-raised" type="submit" (click)="CerrarRegistro(false)">Salir</button>
-        </div-->
     </form>
 </div>

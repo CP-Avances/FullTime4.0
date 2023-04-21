@@ -22,6 +22,12 @@ import { EditarDetalleParametroComponent } from '../editar-detalle-parametro/edi
 
 export class VerParametroComponent implements OnInit {
 
+  formato12: string = 'rgb(80, 87, 97)';
+  formato24: string = 'rgb(80, 87, 97)';
+  formatoA: string = 'rgb(80, 87, 97)';
+  formatoI: string = 'rgb(80, 87, 97)';
+  formatoE: string = 'rgb(80, 87, 97)';
+
   parametros: any = [];
   idParametro: string;
   datosDetalle: any = [];
@@ -120,6 +126,29 @@ export class VerParametroComponent implements OnInit {
         this.seleccion = this.datosDetalle[0].descripcion;
         this.opcion_kardex = this.datosDetalle[0].descripcion;
         this.opcion_laboral = this.datosDetalle[0].descripcion;
+      }
+      if (this.datosDetalle[0].descripcion === 'hh:mm:ss A') {
+        this.formato12 = '#4194F0';
+        this.formato24 = 'rgb(80, 87, 97)';
+      }
+      if (this.datosDetalle[0].descripcion === 'HH:mm:ss') {
+        this.formato24 = '#4194F0';
+        this.formato12 = 'rgb(80, 87, 97)';
+      }
+      if (this.datosDetalle[0].descripcion === 'DD/MM/YYYY') {
+        this.formatoA = '#4194F0';
+        this.formatoI = 'rgb(80, 87, 97)';
+        this.formatoE = 'rgb(80, 87, 97)';
+      }
+      if (this.datosDetalle[0].descripcion === 'MM/DD/YYYY') {
+        this.formatoI = '#4194F0';
+        this.formatoA = 'rgb(80, 87, 97)';
+        this.formatoE = 'rgb(80, 87, 97)';
+      }
+      if (this.datosDetalle[0].descripcion === 'YYYY-MM-DD') {
+        this.formatoE = '#4194F0';
+        this.formatoI = 'rgb(80, 87, 97)';
+        this.formatoA = 'rgb(80, 87, 97)';
       }
     })
   }

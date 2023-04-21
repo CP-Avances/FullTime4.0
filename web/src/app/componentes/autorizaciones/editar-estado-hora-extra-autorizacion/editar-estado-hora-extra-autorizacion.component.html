@@ -23,7 +23,6 @@
     </form>
 </div>
 <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
-    <button mat-raised-button id="btn-raised" type="submit" (click)="ActualizarEstadoAutorizacion(estadoAutorizacionesForm.value)"
+    <button id="btn-raised"  class="btn btn-sm" (click)="ActualizarEstadoAutorizacion(estadoAutorizacionesForm.value)"
         [disabled]="!estadoAutorizacionesForm.valid">Guardar</button>
-    <!--button mat-raised-button id="btn-raised" type="submit" (click)="ventana.close()">Salir</button-->
 </div>

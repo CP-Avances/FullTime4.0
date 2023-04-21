@@ -1,15 +1,18 @@
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        REGISTRAR DEPARTAMENTO</span>
+        REGISTRAR DEPARTAMENTO
+    </span>
     <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
 </div>
 <div class="container">
     <form [formGroup]="formulario">
         <div style="text-align: center">
             <div class="nota">
-                <span>NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
-                    Guardar.</span>
+                <span>
+                    NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                    Guardar.
+                </span>
             </div>
             <div class="row" style="width: 100%;">
                 <div class="col-md">
@@ -17,7 +20,8 @@
                         <mat-form-field *ngIf="Habilitar">
                             <mat-label id="letras">Seleccionar establecimiento</mat-label>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                matTooltip="Lista de establecimientos.">help_outline
+                                matTooltip="Lista de establecimientos.">
+                                help_outline
                             </mat-icon>
                             <mat-select [formControl]="idSucursal" required>
                                 <mat-option *ngFor="let suc of sucursales" [value]="suc.id"
@@ -30,7 +34,9 @@
                             <mat-label>Departamento</mat-label>
                             <input matInput placeholder="Ej: Contabilidad" [formControl]="nombre" required>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                matTooltip="Ingresar nombre del nuevo departamento.">help_outline</mat-icon>
+                                matTooltip="Ingresar nombre del nuevo departamento.">
+                                help_outline
+                            </mat-icon>
                         </mat-form-field>
                     </div>
                 </div>
@@ -39,7 +45,9 @@
                         <mat-form-field>
                             <mat-label>Nivel</mat-label>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                matTooltip="Seleccionar niveles del departamento.">help_outline</mat-icon>
+                                matTooltip="Seleccionar niveles del departamento.">
+                                help_outline
+                            </mat-icon>
                             <mat-select [formControl]="nivel" required>
                                 <mat-option *ngFor="let n of niveles" [value]="n.nombre">
                                     {{n.valor}}
@@ -49,7 +57,8 @@
                         <mat-form-field>
                             <mat-label id="letras">Departamento superior</mat-label>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                matTooltip="Seleccionar departamento superior del nuevo departamento.">help_outline
+                                matTooltip="Seleccionar departamento de nivel superior.">
+                                help_outline
                             </mat-icon>
                             <mat-select [formControl]="depaPadre">
                                 <mat-option *ngFor="let departamento of departamentos" [value]="departamento.id">
@@ -64,9 +73,8 @@
     </form>
 </div>
 <div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 2%;">
-    <button mat-raised-button id="btn-raised" type="submit" [disabled]="!formulario.valid" value="Guardar"
-    (click)="InsertarDepartamento(formulario.value)">Guardar</button>
-    <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentana()" value="Salir">Salir</button-->
+    <button id="btn-raised" class="btn btn-sm" [disabled]="!formulario.valid" value="Guardar"
+        (click)="InsertarDepartamento(formulario.value)">Guardar</button>
 </div>
 <div class="pantalla-progress" *ngIf="habilitarprogress">
     <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">

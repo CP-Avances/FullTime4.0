@@ -1369,7 +1369,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
     var id = permiso.id;
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
-      formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
     this.restP.SubirArchivoRespaldo(formData, id, form.nombreCertificadoForm, null).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Documento registrado.', {

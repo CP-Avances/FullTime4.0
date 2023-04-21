@@ -29,7 +29,7 @@
     </form>
 
     <div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 3%;">
-        <button mat-raised-button id="btn-raised" type="submit" [disabled]="!formulario.valid" value="Guardar"
+        <button id="btn-raised"  class="btn btn-sm" [disabled]="!formulario.valid" value="Guardar"
             (click)="InsertarEmpresa(formulario.value)">Guardar</button>
     </div>
 </div>

@@ -43,24 +43,29 @@
             <!-- CONTENIDO DE SELECCION DE FORMATO DE FECHAS -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="formato_fecha">
                 <div class="nota">
-                    <span>NOTA: Seleccionar el tipo de formato de fecha con el cual se va a trabajar en el
-                        sistema.</span>
+                    <span>
+                        NOTA: Seleccionar el tipo de formato de fecha con el cual se va a trabajar en el
+                        sistema.
+                    </span>
                 </div>
                 <div class="d-flex flex-wrap justify-content-around" style="padding-top: 10px;">
                     <div class="d-flex flex-wrap justify-content-around" style="padding-bottom: 10px;">
-                        <button mat-button type="button" class="btn btn-sm" style="font-size: 12px;"
+                        <button mat-button type="button" class="btn-sm"
+                            [ngStyle]="{'font-size.px':12, 'background-color':formatoA, 'color':'white'}"
                             (click)="GuardarDatos(1)">
                             Formato americano: DD/MM/YYYY
                         </button>
                     </div>
                     <div class="d-flex flex-wrap justify-content-around" style="padding-bottom: 10px;">
-                        <button mat-button type="button" class="btn btn-sm" style="font-size: 12px;"
+                        <button mat-button type="button" class="btn-sm"
+                            [ngStyle]="{'font-size.px':12, 'background-color':formatoI, 'color':'white'}"
                             (click)="GuardarDatos(2)">
                             Formato inglés: MM/DD/YYYY
                         </button>
                     </div>
                     <div class="d-flex flex-wrap justify-content-around" style="padding-bottom: 10px;">
-                        <button mat-button type="button" class="btn btn-sm" style="font-size: 12px;"
+                        <button mat-button type="button" class="btn-sm"
+                            [ngStyle]="{'font-size.px':12, 'background-color':formatoE, 'color':'white'}"
                             (click)="GuardarDatos(3)">
                             Formato estándar: YYYY-MM-DD
                         </button>
@@ -70,19 +75,23 @@
             <!-- CONTENIDO DE SELECCION DE FORMATO DE HORAS -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="formato_hora">
                 <div class="nota">
-                    <span>NOTA: Seleccionar el tipo de formato de hora con el cual se va a trabajar en el
-                        sistema.</span>
+                    <span>
+                        NOTA: Seleccionar el tipo de formato de hora con el cual se va a trabajar en el
+                        sistema.
+                    </span>
                 </div>
                 <div class="d-flex flex-wrap justify-content-around" style="padding-top: 10px;">
                     <div class="d-flex flex-wrap justify-content-around" style="padding-bottom: 10px;">
-                        <button mat-button type="button" class="btn btn-sm" style="font-size: 12px;"
+                        <button mat-button type="button" class="btn-sm"
+                            [ngStyle]="{'font-size.px':12, 'background-color':formato12, 'color':'white'}"
                             (click)="GuardarDatos(4)">
                             Formato de 12 horas
                         </button>
                     </div>
                     <div class="d-flex flex-wrap justify-content-around" style="padding-bottom: 10px;">
-                        <button mat-button type="button" class="btn btn-sm" style="font-size: 12px;"
-                            (click)="GuardarDatos(5)">
+                        <button mat-button type="button" class="btn-sm"
+                            [ngStyle]="{'font-size.px':12, 'background-color':formato24, 'color':'white'}"
+                            style="font-size: 12px;" (click)="GuardarDatos(5)">
                             Formato de 24 horas
                         </button>
                     </div>
@@ -93,23 +102,47 @@
                 <div class="nota">
                     <span>NOTA: Seleccionar el tipo de carga de días de vacaciones.</span>
                 </div>
-                <div class="d-flex flex-wrap justify-content-around" style="padding-top: 10px;">
-                    <mat-radio-group aria-label="Select an option" [(ngModel)]="seleccion">
-                        <div class="d-flex flex-wrap justify-content-around">
-                            <mat-radio-button value="horas" (change)="SelecionarCarga($event)">
-                                Horas
-                            </mat-radio-button>
-                            <mat-radio-button value="diaria" (change)="SelecionarCarga($event)">
-                                Diaria
-                            </mat-radio-button>
-                            <mat-radio-button value="mensual" (change)="SelecionarCarga($event)">
-                                Mensual
-                            </mat-radio-button>
-                            <mat-radio-button value="anual" (change)="SelecionarCarga($event)">
-                                Anual
-                            </mat-radio-button>
+                <div class="row">
+                    <div class="col-md"></div>
+                    <div class="col-md">
+                        <div class="contenedor d-flex flex-wrap justify-content-start">
+                            <mat-radio-group aria-label="Select an option" [(ngModel)]="seleccion">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-radio-button value="horas" (change)="SelecionarCarga($event)">
+                                        Horas
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
                         </div>
-                    </mat-radio-group>
+                        <div class="contenedor d-flex flex-wrap justify-content-start">
+                            <mat-radio-group aria-label="Select an option" [(ngModel)]="seleccion">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-radio-button value="diaria" (change)="SelecionarCarga($event)">
+                                        Diaria
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                        <div class="contenedor d-flex flex-wrap justify-content-start">
+                            <mat-radio-group aria-label="Select an option" [(ngModel)]="seleccion">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-radio-button value="mensual" (change)="SelecionarCarga($event)">
+                                        Mensual
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                        <div class="contenedor d-flex flex-wrap justify-content-start">
+                            <mat-radio-group aria-label="Select an option" [(ngModel)]="seleccion">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-radio-button value="anual" (change)="SelecionarCarga($event)">
+                                        Anual
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                    <div class="col-md"></div>
                 </div>
             </div>
             <!-- CONTENIDO DE SELECCION DE TIPO DE DESCARGA DE KARDEX DE VACACIONES -->
@@ -117,17 +150,29 @@
                 <div class="nota">
                     <span>NOTA: Seleccionar el tipo de descarga de Kardex de vacaciones.</span>
                 </div>
-                <div class="d-flex flex-wrap justify-content-around" style="padding-top: 10px;">
-                    <mat-radio-group aria-label="Select an option" [(ngModel)]="opcion_kardex">
-                        <div class="d-flex flex-wrap justify-content-around">
-                            <mat-radio-button value="periodos" (change)="SelecionarDescarga($event)">
-                                Periodos
-                            </mat-radio-button>
-                            <mat-radio-button value="global" (change)="SelecionarDescarga($event)">
-                                Global
-                            </mat-radio-button>
+                <div class="row">
+                    <div class="col-md"></div>
+                    <div class="col-md">
+                        <div class="contenedor d-flex flex-wrap justify-content-start">
+                            <mat-radio-group aria-label="Select an option" [(ngModel)]="opcion_kardex">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-radio-button value="periodos" (change)="SelecionarDescarga($event)">
+                                        Periodos
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
                         </div>
-                    </mat-radio-group>
+                        <div class="contenedor d-flex flex-wrap justify-content-start">
+                            <mat-radio-group aria-label="Select an option" [(ngModel)]="opcion_kardex">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-radio-button value="global" (change)="SelecionarDescarga($event)">
+                                        Global
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                    <div class="col-md"></div>
                 </div>
             </div>
             <!-- CONTENIDO HABILITAR OPCIONES FORMATO LABORAL - CALENDARIO -->
@@ -135,17 +180,29 @@
                 <div class="nota">
                     <span>NOTA: Seleccionar tipo de formato laboral o calendario para visualización de datos.</span>
                 </div>
-                <div class="d-flex flex-wrap justify-content-around" style="padding-top: 10px;">
-                    <mat-radio-group aria-label="Select an option" [(ngModel)]="opcion_laboral">
-                        <div class="d-flex flex-wrap justify-content-around">
-                            <mat-radio-button value="laboral" (change)="SelecionarLaboral($event)">
-                                Laboral
-                            </mat-radio-button>
-                            <mat-radio-button value="calendario" (change)="SelecionarLaboral($event)">
-                                Calendario
-                            </mat-radio-button>
+                <div class="row">
+                    <div class="col-md"></div>
+                    <div class="col-md">
+                        <div class="contenedor d-flex flex-wrap justify-content-start">
+                            <mat-radio-group aria-label="Select an option" [(ngModel)]="opcion_laboral">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-radio-button value="laboral" (change)="SelecionarLaboral($event)" matSuffix>
+                                        Laboral
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
                         </div>
-                    </mat-radio-group>
+                        <div class="contenedor d-flex flex-wrap justify-content-start">
+                            <mat-radio-group aria-label="Select an option" [(ngModel)]="opcion_laboral">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-radio-button value="calendario" (change)="SelecionarLaboral($event)" matSuffix>
+                                        Calendario
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                    <div class="col-md"></div>
                 </div>
             </div>
             <div class="container" style="padding-bottom: 25px; text-align: center;">
@@ -183,8 +240,10 @@
                     </mat-paginator>
                 </div>
             </div>
-            <button mat-raised-button id="btn-raised" type="submit" [routerLink]="['/parametros/']" value="Lista parámetros generales">
-                Lista parámetros generales</button>
+            <button id="btn-raised" class="btn btn-sm" [routerLink]="['/parametros/']"
+                value="Lista parámetros generales">
+                Lista parámetros generales
+            </button>
             <button mat-raised-button id="btn-raised" *ngIf="formato" type="submit" (click)="AbrirVentanaDetalles(tp)"
                 value="Registrar detalle">Registrar detalle</button>
         </mat-card-content>

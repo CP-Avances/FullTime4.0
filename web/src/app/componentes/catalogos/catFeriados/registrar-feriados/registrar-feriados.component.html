@@ -47,9 +47,8 @@
     </mat-card-content>
 </form>
 <mat-card-actions class="d-flex justify-content-around">
-    <button mat-raised-button id="btn-raised" type="submit" [disabled]="!formulario.valid" (click)="InsertarFeriado(formulario.value)"
+    <button id="btn-raised"  class="btn btn-sm" [disabled]="!formulario.valid" (click)="InsertarFeriado(formulario.value)"
         value="Guardar">Guardar</button>
-    <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentana()" value="Salir">Salir</button-->
 </mat-card-actions>
 
 <div class="pantalla-progress" *ngIf="habilitarprogress">

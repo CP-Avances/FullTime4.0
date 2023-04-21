@@ -46,7 +46,6 @@
     </div>
 </form>
 <div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 2%;">
-    <button mat-raised-button id="btn-raised" type="submit" (click)="InsertarTitulo(formulario.value)"
+    <button id="btn-raised"  class="btn btn-sm" (click)="InsertarTitulo(formulario.value)"
         [disabled]="!formulario.valid" value="Guardar">Guardar</button>
-    <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentana()" value="Salir">Salir</button-->
 </div>

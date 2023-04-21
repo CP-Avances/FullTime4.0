@@ -32,9 +32,8 @@
     </div>
 </form>
 <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
-    <button mat-raised-button id="btn-raised" type="submit" (click)="TomarCoordenadasMapa()" value="Mapa">Mapa</button>
-    <button mat-raised-button id="btn-raised" type="submit" (click)="VerificarDatos(CoordenadasForm.value)"
+    <button id="btn-raised"  class="btn btn-sm" (click)="TomarCoordenadasMapa()" value="Mapa">Mapa</button>
+    <button id="btn-raised"  class="btn btn-sm" (click)="VerificarDatos(CoordenadasForm.value)"
         [disabled]=" !CoordenadasForm.valid" value="Guardar">Guardar</button>
-    <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentana()">Cancelar</button-->
 </div>
 

@@ -554,10 +554,10 @@
 
         </mat-horizontal-stepper>
         <div style="text-align: center; margin-bottom: 3%;">
-            <button mat-raised-button id="btn-raised" type="submit"
+            <button id="btn-raised"  class="btn btn-sm"
                 (click)="InsertarAccionPersonal(firstFormGroup.value,secondFormGroup.value,thirdFormGroup.value,fourthFormGroup.value,fifthFormGroup.value,sixthFormGroup.value,seventhFormGroup.value,eighthFormGroup.value)"
                 [disabled]="!eighthFormGroup.valid" value="Guardar">Guardar</button>
-            <button mat-raised-button id="btn-raised" type="submit" [routerLink]="['/listaPedidos/']" value="Cancelar">Cancelar</button>
+            <button id="btn-raised"  class="btn btn-sm" [routerLink]="['/listaPedidos/']" value="Cancelar">Cancelar</button>
         </div>
     </mat-card>
 </div>

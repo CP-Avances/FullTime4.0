@@ -46,9 +46,9 @@
                     </mat-card-content>
                 </form>
                 <mat-card-actions class="d-flex flex-wrap justify-content-center">
-                    <button mat-raised-button id="btn-raised" type="submit" (click)="RegistrarConfiguracion(formulario.value)"
+                    <button id="btn-raised"  class="btn btn-sm" (click)="RegistrarConfiguracion(formulario.value)"
                         [disabled]="registrar">Guardar</button>
-                    <button mat-raised-button id="btn-raised" type="submit" [routerLink]="['/home']">Cancelar</button>
+                    <button id="btn-raised"  class="btn btn-sm" [routerLink]="['/home']">Cancelar</button>
                 </mat-card-actions>
             </mat-card>
         </div>

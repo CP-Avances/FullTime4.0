@@ -4,10 +4,10 @@
     </div>
     <mat-card class="example-card mat-elevation-z9">
         <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-            <button mat-raised-button id="btn-raised" type="submit" (click)="AbrirVentanaRegistrarSucursal()">
+            <button id="btn-raised"  class="btn btn-sm" (click)="AbrirVentanaRegistrarSucursal()">
                 Crear establecimiento
             </button>
-            <button mat-raised-button id="btn-raised" type="submit" (click)="LimpiarCampoBuscar()" matSuffix
+            <button id="btn-raised"  class="btn btn-sm" (click)="LimpiarCampoBuscar()" matSuffix
                 matTooltipPosition="right"
                 matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
                 Mostrar lista
@@ -22,7 +22,6 @@
             <table class="table table-hover table-sm ">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th scope="col">Código</th>
                         <th scope="col">Empresa</th>
                         <th scope="col">Establecimiento</th>
                         <th scope="col">Ciudad</th>
@@ -31,7 +30,6 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td></td>
                         <td></td>
                         <td>
                             <mat-form-field id="t-inputs">
@@ -48,21 +46,20 @@
                         <td>
                             <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
                                 matTooltip="Búsqueda de establecimientos de acuerdo a la columna de la tabla.">
-                                help_outline</mat-icon>
+                                help_outline
+                            </mat-icon>
                         </td>
                     </tr>
                     <tr
                         *ngFor="let s of sucursales | sucCiudad: filtroCiudadSuc | sucNombre: filtroNombreSuc | paginate:tamanio_pagina:numero_pagina">
-                        <td>{{s.id}}</td>
                         <td>{{s.nomempresa}}</td>
                         <td>{{s.nombre}}</td>
                         <td>{{s.descripcion}}</td>
                         <td class="d-flex justify-content-center">
-                            <i matSuffix matTooltipPosition="right" matTooltip="Ver datos generales de este registro."
+                            <i matSuffix matTooltipPosition="right" matTooltip="Ver lista de departamentos del establecimiento."
                                 class="fa fa-building" id="ver" [routerLink]="['/vistaSucursales/', s.id]">
                                 <p>Departamento</p>
                             </i>
-
                             <i id="t-editar" class="fas fa-edit" (click)="AbrirVentanaEditar(s)" matSuffix
                                 matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro.">
                                 <p>Editar</p>

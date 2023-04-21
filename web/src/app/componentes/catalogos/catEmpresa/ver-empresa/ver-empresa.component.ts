@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { ThemePalette } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
@@ -17,24 +19,23 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
 import { LogosComponent } from 'src/app/componentes/catalogos/catEmpresa/logos/logos.component';
 
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
+import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { ThemePalette } from '@angular/material/core';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 
 @Component({
   selector: 'app-ver-empresa',
   templateUrl: './ver-empresa.component.html',
-  styleUrls: ['./ver-empresa.component.css']
+  styleUrls: ['./ver-empresa.component.css'],
 })
+
 export class VerEmpresaComponent implements OnInit {
 
   idEmpresa: string;
   datosEmpresa: any = [];
   datosSucursales: any = [];
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA
+  // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
@@ -42,6 +43,7 @@ export class VerEmpresaComponent implements OnInit {
   //IMAGEN
   logo: string;
   imagen_default: boolean = true;
+
   sinCambios: boolean = true;
   conCambios: boolean = true;
   cambiosTodos: boolean = true;
@@ -84,13 +86,12 @@ export class VerEmpresaComponent implements OnInit {
     var aux = cadena.split("/");
     this.idEmpresa = aux[2];
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
-    console.log("Id empleado: ",this.idEmpleado);
   }
 
   ngOnInit(): void {
+    this.ObtenerEmpleados(this.idEmpleado);
     this.CargarDatosEmpresa();
     this.ObtenerSucursal();
-    this.ObtenerEmpleados(this.idEmpleado);
   }
 
   // METODO DE CONTROL DE PAGINACION
@@ -133,6 +134,8 @@ export class VerEmpresaComponent implements OnInit {
         this.conCambios = true;
         this.cambiosTodos = true;
       }
+
+      this.ObtenerColores();
     });
   }
 
@@ -175,13 +178,13 @@ export class VerEmpresaComponent implements OnInit {
   AbrirVentanaRegistrarSucursal() {
     this.ventana.open(RegistrarSucursalesComponent, { width: '650px', data: parseInt(this.idEmpresa) })
       .afterClosed().subscribe((items: any) => {
-          this.ObtenerSucursal();
+        this.ObtenerSucursal();
       });
   }
 
   // VENTANA PARA REVISAR FORMATO DE REPORTES COLORES
   AbrirVentanaReportes(datos_empresa: any, ventana: any) {
-    this.ventana.open(ColoresEmpresaComponent, {width: '340px',data: { datos: datos_empresa, ventana: ventana }})
+    this.ventana.open(ColoresEmpresaComponent, { width: '340px', data: { datos: datos_empresa, ventana: ventana } })
       .afterClosed().subscribe((items: any) => {
         if (items) {
           if (items.actualizar === true) {
@@ -195,7 +198,8 @@ export class VerEmpresaComponent implements OnInit {
 
   // METODO PARA EDITAR LOGO DE EMPRESA
   EditarLogo() {
-    this.ventana.open(LogosComponent, { width: '500px', data: { empresa: parseInt(this.idEmpresa), pagina: 'empresa' }
+    this.ventana.open(LogosComponent, {
+      width: '500px', data: { empresa: parseInt(this.idEmpresa), pagina: 'empresa' }
     }).afterClosed()
       .subscribe((res: any) => {
         this.ObtenerLogotipo();
@@ -243,17 +247,17 @@ export class VerEmpresaComponent implements OnInit {
       id: this.datosEmpresa[0].id
     }
     this.empresa.ActualizarColores(datos).subscribe(data => {
-      this.toastr.success('Colores de encabezados de reportes registrados.', '', {
+      this.toastr.success('Colores de reportes configurados.', '', {
         timeOut: 6000,
       });
-      this.obtenerColores();
+      this.ObtenerColores();
       this.habilitarprogress = false;
     })
   }
 
   // METODO PARA OBTENER DATOS DE EMPRESA COLORES - MARCA DE AGUA
   public empresas: any = [];
-  obtenerColores() {
+  ObtenerColores() {
     this.empresas = [];
     this.empresa.ConsultarDatosEmpresa(this.datosEmpresa[0].id).subscribe(res => {
       this.empresas = res;
@@ -263,7 +267,7 @@ export class VerEmpresaComponent implements OnInit {
     });
   }
 
-  // METODO PARA VER LA INFORMACIÓN DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -275,8 +279,8 @@ export class VerEmpresaComponent implements OnInit {
    ** **                                 METODO PARA EXPORTAR A PDF                                   ** **
    ** ************************************************************************************************** **/
 
-   // GENERACION DE REPORTE DE PDF
-   GenerarPdf(action = 'open') {
+  // GENERACION DE REPORTE DE PDF
+  GenerarPdf(action = 'open') {
     const documentDefinition = this.getDocumentDefinicion();
     pdfMake.createPdf(documentDefinition).open();
   }
@@ -285,15 +289,15 @@ export class VerEmpresaComponent implements OnInit {
   getDocumentDefinicion() {
     sessionStorage.setItem('Empresas', this.empresas);
 
-    console.log("Empleado Nombre: ",this.empleado[0].nombre);
+    console.log("Empleado Nombre: ", this.empleado[0].nombre);
     return {
 
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
-      header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 5, fontSize: 9, opacity: 0.3, alignment: 'right' },
+      header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 5, fontSize: 9, opacity: 0.3, alignment: 'right', color: '#0A54A7' },
 
-      // PIE DE PÁGINA
+      // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');

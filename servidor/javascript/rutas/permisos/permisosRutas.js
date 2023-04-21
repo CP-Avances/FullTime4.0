@@ -6,11 +6,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const verificarPermisos_1 = require("../../libs/Modulos/verificarPermisos");
 const verificarToken_1 = require("../../libs/verificarToken");
 const express_1 = require("express");
+const multer_1 = __importDefault(require("multer"));
 const permisosControlador_1 = __importDefault(require("../../controlador/permisos/permisosControlador"));
 const multipart = require('connect-multiparty');
 const multipartMiddleware = multipart({
     uploadDir: './permisos',
 });
+const storage = multer_1.default.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'permisos');
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname);
+    }
+});
+const upload = (0, multer_1.default)({ storage: storage });
 class PermisosRutas {
     constructor() {
         this.router = (0, express_1.Router)();
@@ -36,7 +46,7 @@ class PermisosRutas {
         // ACTUALIZAR PERMISO
         this.router.put('/:id/permiso-solicitado', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EditarPermiso);
         // GUARDAR DOCUMENTO DE RESPALDO DE PERMISO
-        this.router.put('/:id/documento/:documento/archivo/:archivo', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation, multipartMiddleware], permisosControlador_1.default.GuardarDocumentoPermiso);
+        this.router.put('/:id/documento/:documento/archivo/:archivo', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation, upload.single('uploads')], permisosControlador_1.default.GuardarDocumentoPermiso);
         // ELIMINAR DOCUMENTO
         this.router.put('/eliminar-documento', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EliminarDocumentoPermiso);
         // BUSQUEDA DE PERMISOS POR ID DE EMPLEADO
@@ -53,6 +63,8 @@ class PermisosRutas {
         this.router.get('/documentos/:docs', permisosControlador_1.default.ObtenerDocumentoPermiso);
         // ENVIAR CORREO MEDIANTE APLICACION WEB
         this.router.post('/mail-noti/', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EnviarCorreoWeb);
+        // GUARDAR DOCUMENTO DE RESPALDO DE PERMISO APLICACION MOVIL
+        this.router.put('/:id/documento-movil/:documento/archivo/:archivo', upload.single('uploads'), permisosControlador_1.default.GuardarDocumentoPermiso);
         this.router.get('/', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.ListarPermisos);
         this.router.get('/lista/', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.ListarEstadosPermisos);
         this.router.get('/lista-autorizados/', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.ListarPermisosAutorizados);
@@ -74,8 +86,6 @@ class PermisosRutas {
         this.router.delete('/eliminar-movil/:documento', permisosControlador_1.default.EliminarPermisoMovil);
         // ENVIAR CORREO MEDIANTE APLICACION MOVIL
         this.router.post('/mail-noti-permiso-movil/:id_empresa', permisosControlador_1.default.EnviarCorreoPermisoMovil);
-        // GUARDAR DOCUMENTO DE RESPALDO DE PERMISO APLICACION MOVIL
-        this.router.put('/:id/documento-movil/:documento', [multipartMiddleware], permisosControlador_1.default.GuardarDocumentoPermiso);
     }
 }
 const PERMISOS_RUTAS = new PermisosRutas();

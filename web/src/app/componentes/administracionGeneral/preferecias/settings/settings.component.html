@@ -45,9 +45,8 @@
     </div>
 </form>
 <div class="d-flex flex-wrap justify-content-center" style="padding-top: 2%; margin-bottom: 3%;">
-    <button *ngIf="btnActualizar" mat-raised-button id="btn-raised" type="submit" (click)="ActualizarConfiguracion(formGroup.value)">
+    <button *ngIf="btnActualizar" id="btn-raised"  class="btn btn-sm" (click)="ActualizarConfiguracion(formGroup.value)">
         Guardar
     </button>
-    <button *ngIf="btnCrear" mat-raised-button id="btn-raised" type="submit" (click)="CrearConfiguracion(formGroup.value)">Guardar</button>
-    <!--button mat-raised-button id="btn-raised" type="submit" (click)="this.dialogRef.close()">Cancelar</button-->
+    <button *ngIf="btnCrear" id="btn-raised"  class="btn btn-sm" (click)="CrearConfiguracion(formGroup.value)">Guardar</button>
 </div>

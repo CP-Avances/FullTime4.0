@@ -81,8 +81,8 @@
                 </div>
             </form>
             <div>
-                <button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentana()">Cancelar</button>
-                <button mat-raised-button id="btn-raised" type="submit" matStepperNext class="float-right">Siguiente</button>
+                <button id="btn-raised"  class="btn btn-sm" (click)="CerrarVentana()">Cancelar</button>
+                <button id="btn-raised" matStepperNext class="btn btn-sm float-right">Siguiente</button>
             </div>
         </mat-step>
         <mat-step [stepControl]="segundoFormGroup">
@@ -148,12 +148,12 @@
                 </div>
             </form>
             <div>
-                <button mat-raised-button id="btn-raised" type="submit" matStepperPrevious class="float-left">Atrás</button>
-                <button mat-raised-button id="btn-raised" type="submit"
+                <button id="btn-raised" matStepperPrevious class="btn btn-sm float-left">Atrás</button>
+                <button id="btn-raised"  class="btn btn-sm"
                     (click)="insertarHoraExtra(primeroFormGroup.value, segundoFormGroup.value); stepper.reset()"
                     [disabled]="!segundoFormGroup.valid">Guardar
                 </button>
-                <button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentana()" class="float-right">Cancelar</button>
+                <button id="btn-raised" (click)="CerrarVentana()" class="btn btn-sm float-right">Cancelar</button>
             </div>
         </mat-step>
     </mat-horizontal-stepper>

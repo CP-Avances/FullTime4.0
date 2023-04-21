@@ -97,10 +97,10 @@
 
                 <div *ngIf="activar_boton_dh" class="d-flex flex-wrap justify-content-center"
                     style="padding-top: 15px;">
-                    <button mat-raised-button id="btn-raised" type="submit" (click)="GuardarRegistros_DH(0)">
+                    <button id="btn-raised"  class="btn btn-sm" (click)="GuardarRegistros_DH(0)">
                         Habilitar usuarios
                     </button>
-                    <button mat-raised-button id="btn-raised" type="submit" (click)="LimpiarFormulario(1)">Cancelar</button>
+                    <button id="btn-raised"  class="btn btn-sm" (click)="LimpiarFormulario(1)">Cancelar</button>
                 </div>
 
                 <hr>
@@ -395,9 +395,9 @@
                 </form>
 
                 <div *ngIf="activar_boton" class="d-flex flex-wrap justify-content-center" style="padding-top: 15px;">
-                    <button mat-raised-button id="btn-raised" type="submit" (click)="GuardarRegistros(0)">Deshabilitar
+                    <button id="btn-raised"  class="btn btn-sm" (click)="GuardarRegistros(0)">Deshabilitar
                         usuarios</button>
-                    <button mat-raised-button id="btn-raised" type="submit" (click)="LimpiarFormulario(2)">Cancelar</button>
+                    <button id="btn-raised"  class="btn btn-sm" (click)="LimpiarFormulario(2)">Cancelar</button>
                 </div>
 
                 <hr>

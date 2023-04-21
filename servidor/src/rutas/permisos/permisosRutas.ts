@@ -1,12 +1,24 @@
 import { ModuloPermisosValidation } from '../../libs/Modulos/verificarPermisos'
 import { TokenValidation } from '../../libs/verificarToken'
 import { Router } from 'express';
+import multer from 'multer';
 import PERMISOS_CONTROLADOR from '../../controlador/permisos/permisosControlador';
 const multipart = require('connect-multiparty');
 
 const multipartMiddleware = multipart({
     uploadDir: './permisos',
 });
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'permisos')
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname)
+    }
+})
+
+const upload = multer({ storage: storage });
 
 class PermisosRutas {
     public router: Router = Router();
@@ -36,7 +48,7 @@ class PermisosRutas {
         // ACTUALIZAR PERMISO
         this.router.put('/:id/permiso-solicitado', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.EditarPermiso);
         // GUARDAR DOCUMENTO DE RESPALDO DE PERMISO
-        this.router.put('/:id/documento/:documento/archivo/:archivo', [TokenValidation, ModuloPermisosValidation, multipartMiddleware], PERMISOS_CONTROLADOR.GuardarDocumentoPermiso);
+        this.router.put('/:id/documento/:documento/archivo/:archivo', [TokenValidation, ModuloPermisosValidation, upload.single('uploads')], PERMISOS_CONTROLADOR.GuardarDocumentoPermiso);
         // ELIMINAR DOCUMENTO
         this.router.put('/eliminar-documento', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.EliminarDocumentoPermiso);
         // BUSQUEDA DE PERMISOS POR ID DE EMPLEADO
@@ -54,7 +66,8 @@ class PermisosRutas {
         // ENVIAR CORREO MEDIANTE APLICACION WEB
         this.router.post('/mail-noti/', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.EnviarCorreoWeb);
 
-
+        // GUARDAR DOCUMENTO DE RESPALDO DE PERMISO APLICACION MOVIL
+        this.router.put('/:id/documento-movil/:documento/archivo/:archivo', upload.single('uploads'), PERMISOS_CONTROLADOR.GuardarDocumentoPermiso);
 
 
 
@@ -101,8 +114,8 @@ class PermisosRutas {
 
         // ENVIAR CORREO MEDIANTE APLICACION MOVIL
         this.router.post('/mail-noti-permiso-movil/:id_empresa', PERMISOS_CONTROLADOR.EnviarCorreoPermisoMovil);
-        // GUARDAR DOCUMENTO DE RESPALDO DE PERMISO APLICACION MOVIL
-        this.router.put('/:id/documento-movil/:documento', [multipartMiddleware], PERMISOS_CONTROLADOR.GuardarDocumentoPermiso);
+
+
     }
 }
 
