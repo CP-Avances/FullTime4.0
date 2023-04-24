@@ -62,7 +62,7 @@
         <mat-paginator id="pagina" [length]="listaPermisosFiltradas.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
             <i (click)="generarPdf('download','Permisos solicitados')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de Tipo de Permisos en formato PDF.">
                 <p>PDF</p>
@@ -127,7 +127,7 @@
             [pageSize]="tamanio_pagina_autorizado" [pageSizeOptions]="pageSizeOptions_autorizado" id="pagina"
             (page)="ManejarPaginaAutorizados($event)" showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
             <i (click)="generarPdf('download','Permisos autorizados')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de Tipo de Permisos en formato PDF.">
                 <p>PDF</p>

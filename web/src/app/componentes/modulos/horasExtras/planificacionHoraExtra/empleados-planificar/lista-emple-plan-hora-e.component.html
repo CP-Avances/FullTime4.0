@@ -6,7 +6,7 @@
                 <span>CRÍTERIOS DE BÚSQUEDA</span>
             </div>
             <br>
-            <form [formGroup]="buscador">
+            <form>
                 <mat-radio-group class="d-flex flex-wrap justify-content-center" [formControl]="seleccion">
                     <mat-radio-button class="example-radio-button" *ngFor="let c of check" [value]="c.opcion"
                         (change)="BuscarPorTipo($event)">
@@ -14,7 +14,7 @@
                 </mat-radio-group>
             </form>
             <!-- FORM PARA SUCURSALES -->
-            <form [formGroup]="buscador" *ngIf="_booleanOptions.bool_suc">
+            <form *ngIf="_booleanOptions.bool_suc">
                 <div class="d-flex flex-wrap justify-content-center">
                     <mat-form-field>
                         <mat-label>Sucursal</mat-label>
@@ -28,8 +28,9 @@
                     </mat-form-field>
                 </div>
             </form>
+
             <!-- FORM PARA DEPARTAMENTOS -->
-            <form [formGroup]="buscador" *ngIf="_booleanOptions.bool_dep">
+            <form *ngIf="_booleanOptions.bool_dep">
                 <div class="d-flex flex-wrap justify-content-center">
                     <mat-form-field>
                         <mat-label>Departamento</mat-label>
@@ -44,8 +45,9 @@
                     </mat-form-field>
                 </div>
             </form>
+
             <!-- FORM PARA EMPLEADOS -->
-            <form [formGroup]="buscador" *ngIf="_booleanOptions.bool_emp">
+            <form *ngIf="_booleanOptions.bool_emp">
                 <div class="d-flex flex-wrap justify-content-center">
                     <mat-form-field>
                         <mat-label>Código</mat-label>
@@ -145,6 +147,7 @@
                     [pageSizeOptions]="pageSizeOptions_suc" (page)="ManejarPaginaResultados($event)"
                     showFirstLastButtons>
                 </mat-paginator>
+                <br>
             </div>
 
             <!-- TABLA PARA DEPARTAMENTOS -->
@@ -204,6 +207,7 @@
                     [pageSizeOptions]="pageSizeOptions_dep" (page)="ManejarPaginaResultados($event)"
                     showFirstLastButtons>
                 </mat-paginator>
+                <br>
             </div>
 
             <!-- TABLA PARA EMPLEADOS -->
@@ -267,8 +271,8 @@
                     [pageSizeOptions]="pageSizeOptions_emp" (page)="ManejarPaginaResultados($event)"
                     showFirstLastButtons>
                 </mat-paginator>
+                <br>
             </div>
-
         </mat-card-content>
     </mat-card>
 </div>

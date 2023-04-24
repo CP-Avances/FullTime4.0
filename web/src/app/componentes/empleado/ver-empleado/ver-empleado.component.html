@@ -848,6 +848,7 @@
                 <mat-paginator id="pagina" [length]="horariosEmpleado.length" [pageSize]="tamanio_pagina"
                     [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
                 </mat-paginator>
+                <br>
             </div>
         </div>
     </mat-tab>
@@ -912,6 +913,7 @@
                 <mat-paginator id="pagina" [length]="horarioRotativo.length" [pageSize]="tamanio_pagina"
                     [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
                 </mat-paginator>
+                <br>
             </mat-card>
         </div>
     </mat-tab>
@@ -1049,6 +1051,7 @@
                 <mat-paginator id="pagina" [length]="permisosTotales.length" [pageSize]="tamanio_pagina"
                     [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
                 </mat-paginator>
+                <br>
             </mat-card>
         </div>
     </mat-tab>
@@ -1202,7 +1205,7 @@
                         <mat-divider></mat-divider>
                     </div>
                     <mat-paginator id="pagina" [length]="vacaciones.length" [pageSize]="tamanio_pagina"
-                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)"
+                        [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)"
                         showFirstLastButtons>
                     </mat-paginator>
                 </mat-card-content>
@@ -1298,6 +1301,7 @@
                 <mat-paginator id="pagina" [length]="hora_extra.length" [pageSize]="tamanio_pagina"
                     [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
                 </mat-paginator>
+                <br>
             </mat-card>
         </div>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="plan_horas">
@@ -1372,6 +1376,7 @@
                 <mat-paginator id="pagina" [length]="hora_extra_plan.length" [pageSize]="tamanio_pagina"
                     [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
                 </mat-paginator>
+                <br>
             </mat-card>
         </div>
     </mat-tab>
@@ -1464,6 +1469,7 @@
                 <mat-paginator id="pagina" [length]="solicitaComida.length" [pageSize]="tamanio_pagina"
                     [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
                 </mat-paginator>
+                <br>
             </mat-card>
         </div>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="plan_comida">

@@ -96,6 +96,7 @@
                         [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)"
                         showFirstLastButtons>
                     </mat-paginator>
+                    <br>
                 </div>
             </div>
         </mat-card-content>
@@ -232,6 +233,7 @@
                     [pageSizeOptions]="pageSizeOptions_suc" (page)="ManejarPaginaResultados($event)"
                     showFirstLastButtons>
                 </mat-paginator>
+                <br>
             </div>
             <!-- TABLA PARA DEPARTAMENTOS -->
             <div *ngIf="_booleanOptions.bool_dep" class="mat-elevation-z8" style="background: white;">
@@ -273,6 +275,7 @@
                     [pageSizeOptions]="pageSizeOptions_dep" (page)="ManejarPaginaResultados($event)"
                     showFirstLastButtons>
                 </mat-paginator>
+                <br>
             </div>
             <!-- TABLA PARA EMPLEADOS -->
             <div *ngIf="_booleanOptions.bool_emp" class="mat-elevation-z8" style="background: white;">
@@ -318,8 +321,8 @@
                     [pageSizeOptions]="pageSizeOptions_emp" (page)="ManejarPaginaResultados($event)"
                     showFirstLastButtons>
                 </mat-paginator>
+                <br>
             </div>
-
         </mat-card-content>
     </mat-card>
 </div>

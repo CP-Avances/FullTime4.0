@@ -14,3 +14,9 @@ table { width: 100%; font-size: 14px; }
     cursor: pointer;
     margin-left: 10px;
 }
+
+@media only screen and (min-width: 900px){
+    .btn_horas{
+        float: left;
+    }
+}

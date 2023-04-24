@@ -144,7 +144,7 @@
         <mat-paginator id="pagina" [length]="horarios.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
             <i (click)="GenerarPDF('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de Horarios en formato PDF.">
                 <p>PDF</p>

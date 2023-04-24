@@ -32,7 +32,7 @@ import { HorariosMultiplesComponent } from '../horarios-multiples/horarios-multi
 
 export class HorarioMultipleEmpleadoComponent implements OnInit {
 
-  buscador !: FormGroup;
+  //buscador !: FormGroup;
 
   // VARIABLE USADA PARA ALMACENAR LISTA DE EMPLEADOS QUE NO SE ASIGNAN HORARIO
   empleados_sin_asignacion: any = [];

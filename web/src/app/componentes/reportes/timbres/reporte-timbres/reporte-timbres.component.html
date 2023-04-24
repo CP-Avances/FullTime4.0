@@ -29,8 +29,8 @@
                         </mat-form-field>
                     </div>
                 </form>
-                <div class="d-flex justify-content-around">
-                    <button mat-button type="submit" class="btn btn-sm" (click)="LimpiarFechas()">Cancelar
+                <div class="d-flex justify-content-around" style="margin-bottom: 5px;">
+                    <button mat-raised-button id="btn-raised" type="submit" (click)="LimpiarFechas()">Cancelar
                     </button>
                 </div>
             </mat-card>
@@ -115,5 +115,6 @@
         <mat-paginator id="pagina" [length]="datosEmpleado.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
+        <br>
     </div>
 </div>
