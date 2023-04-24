@@ -70,6 +70,7 @@
         <mat-paginator id="pagina" [length]="datosEmpleado.length" [pageSize]="tamanio_pagina_e"
             [pageSizeOptions]="pageSizeOptions_e" id="pagina" (page)="ManejarPaginaE($event)" showFirstLastButtons>
         </mat-paginator>
+        <br>
     </div>
 </div>
 <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="lista">
@@ -131,5 +132,6 @@
         <mat-paginator id="pagina" [length]="timbres.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
+        <br>
     </div>
 </div>

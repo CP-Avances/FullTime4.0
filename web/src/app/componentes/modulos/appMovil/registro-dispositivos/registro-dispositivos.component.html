@@ -98,7 +98,7 @@
             [pageSizeOptions]="pageSizeOptions" id="estilo" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
 
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 1%;">
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
             <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de Dispositivos en formato PDF.">
                 <p>PDF</p>

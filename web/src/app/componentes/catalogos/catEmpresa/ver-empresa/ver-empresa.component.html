@@ -3,7 +3,7 @@
         <div id="titulo">
             <span>{{e.nombre.toUpperCase()}}</span>
         </div>
-        <mat-card-content>
+        <div>
             <div class="container" style="padding-top: 15px;">
                 <div class="row">
                     <div class="col-3"></div>
@@ -166,7 +166,7 @@
             </div>
             <hr>
             <!--  ************************* TABLA LISTA DE ESTABLECIMIENTOS ******************************** -->
-            <div class="container" style="padding-bottom: 50px; text-align: center;">
+            <div class="container" style="padding-bottom: 50px; text-align: center; padding: 0%;">
                 <div class="mat-elevation-z8" style="background: white;">
                     <div class="d-flex bd-highlight" id="titulo">
                         <div class="w-100 bd-highlight">
@@ -213,11 +213,12 @@
                         </table>
                     </div>
                     <mat-paginator id="pagina" [length]="datosSucursales.length" [pageSize]="tamanio_pagina"
-                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)"
+                        [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)"
                         showFirstLastButtons>
                     </mat-paginator>
+                    <br>
                 </div>
             </div>
-        </mat-card-content>
+        </div>
     </mat-card>
 </div>

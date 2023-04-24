@@ -48,7 +48,7 @@
         <mat-paginator id="pagina" [length]="listaPlan.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
             <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista planificaciones de horas extras en formato PDF.">
                 <p>PDF</p>
@@ -149,5 +149,6 @@
             [pageSizeOptions]="pageSizeOptions_empleado" id="pagina" (page)="ManejarPaginaEmpleados($event)"
             showFirstLastButtons>
         </mat-paginator>
+        <br>
     </div>
 </div>

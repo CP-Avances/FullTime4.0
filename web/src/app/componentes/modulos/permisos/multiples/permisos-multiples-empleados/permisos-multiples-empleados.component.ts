@@ -24,7 +24,7 @@ import { MainNavService } from 'src/app/componentes/administracionGeneral/main-n
 
 export class PermisosMultiplesEmpleadosComponent implements OnInit {
 
-  buscador !: FormGroup;
+  //buscador!: FormGroup;
 
   idEmpleadoLogueado: any;
 
