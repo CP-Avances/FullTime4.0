@@ -29,9 +29,8 @@
         </mat-form-field>
         <br>
         <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 4%;">
-            <button mat-raised-button id="btn-raised" type="submit" (click)="CompararContrasenia(formulario.value)"
+            <button id="btn-raised"  class="btn btn-sm" (click)="CompararContrasenia(formulario.value)"
                 [disabled]="!formulario.valid">Confirmar Contraseña</button>
-            <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarRegistro()">Salir</button-->
         </div>
     </form>
 </div>
@@ -62,11 +61,10 @@
             <button mat-raised-button type="submit" class="btn btn-link verde" (click)="RecuperarFrase()">
                 Olvido su frase de seguridad?
             </button>
-            <button mat-raised-button id="btn-raised" type="submit" (click)="CompararFrase(fraseForm.value)"
+            <button id="btn-raised"  class="btn btn-sm" (click)="CompararFrase(fraseForm.value)"
                 [disabled]="!fraseForm.valid">
                 Confirmar Frase
             </button>
-            <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarRegistro()">Salir</button-->
         </div>
     </form>
 </div>

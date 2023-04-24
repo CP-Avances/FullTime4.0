@@ -29,8 +29,8 @@
                     </i>
                 </div>
                 <div style="text-align: right;">
-                    <button mat-raised-button id="btn-raised" type="submit" (click)="AbrirVentanaBusqueda()" value="Asignar a usuario">Asignar a usuario</button>
-                    <button mat-raised-button id="btn-raised" type="submit" class="float-right" [routerLink]="['/coordenadas/']" value="Atras">Atras</button>
+                    <button id="btn-raised"  class="btn btn-sm" (click)="AbrirVentanaBusqueda()" value="Asignar a usuario">Asignar a usuario</button>
+                    <button id="btn-raised"  class="btn btn-sm" class="float-right" [routerLink]="['/coordenadas/']" value="Atras">Atras</button>
                 </div>
             </div>
             <hr>
@@ -96,6 +96,7 @@
                         [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)"
                         showFirstLastButtons>
                     </mat-paginator>
+                    <br>
                 </div>
             </div>
         </mat-card-content>
@@ -186,8 +187,8 @@
                 </div>
             </form>
             <div class="d-flex justify-content-around">
-                <button mat-raised-button id="btn-raised" type="submit" (click)="GuardarRegistros()" value="Guardar registro">Guardar registro</button>
-                <button mat-raised-button id="btn-raised" type="submit" (click)="limpiarCampos()">Cancelar</button>
+                <button id="btn-raised"  class="btn btn-sm" (click)="GuardarRegistros()" value="Guardar registro">Guardar registro</button>
+                <button id="btn-raised"  class="btn btn-sm" (click)="limpiarCampos()">Cancelar</button>
             </div>
 
 
@@ -232,6 +233,7 @@
                     [pageSizeOptions]="pageSizeOptions_suc" (page)="ManejarPaginaResultados($event)"
                     showFirstLastButtons>
                 </mat-paginator>
+                <br>
             </div>
             <!-- TABLA PARA DEPARTAMENTOS -->
             <div *ngIf="_booleanOptions.bool_dep" class="mat-elevation-z8" style="background: white;">
@@ -273,6 +275,7 @@
                     [pageSizeOptions]="pageSizeOptions_dep" (page)="ManejarPaginaResultados($event)"
                     showFirstLastButtons>
                 </mat-paginator>
+                <br>
             </div>
             <!-- TABLA PARA EMPLEADOS -->
             <div *ngIf="_booleanOptions.bool_emp" class="mat-elevation-z8" style="background: white;">
@@ -318,8 +321,8 @@
                     [pageSizeOptions]="pageSizeOptions_emp" (page)="ManejarPaginaResultados($event)"
                     showFirstLastButtons>
                 </mat-paginator>
+                <br>
             </div>
-
         </mat-card-content>
     </mat-card>
 </div>

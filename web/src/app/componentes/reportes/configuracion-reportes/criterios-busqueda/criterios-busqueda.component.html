@@ -5,7 +5,9 @@
     <form [formGroup]="buscador">
         <mat-radio-group class="d-flex flex-wrap justify-content-center" [formControl]="seleccion">
             <mat-radio-button class="example-radio-button" *ngFor="let c of check" [value]="c.opcion"
-                (change)="BuscarPorTipo($event)">{{c.valor}}</mat-radio-button>
+                (change)="BuscarPorTipo($event)">
+                <label>{{c.valor}}</label>
+            </mat-radio-button>
         </mat-radio-group>
     </form>
     <!-- Form para SUCURSALES -->
@@ -138,7 +140,7 @@
             </mat-form-field>
         </div>
     </form>
-    <div class="d-flex justify-content-around">
-        <button mat-button type="submit" class="btn btn-sm" id="boton" (click)="limpiarCampos()">Cancelar</button>
+    <div class="d-flex justify-content-around" style="margin-bottom: 10px;">
+        <button mat-raised-button id="btn-raised" type="submit" id="boton" (click)="limpiarCampos()">Cancelar</button>
     </div>
 </mat-card>

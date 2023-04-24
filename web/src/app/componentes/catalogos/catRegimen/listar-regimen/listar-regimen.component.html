@@ -1,5 +1,4 @@
-<br>
-<div class="container" style="margin-bottom: 15px; padding-bottom: 15px;">
+<div class="container" style="margin-bottom: 15px; padding-bottom: 15px; padding-top: 15px;">
     <div class="row">
         <div class="col-sm">
             <div id="titulo">
@@ -7,12 +6,13 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                    <button mat-raised-button id="btn-raised" type="submit" [routerLink]="['/regimenLaboral']">
+                    <button id="btn-raised" class="btn btn-sm" [routerLink]="['/regimenLaboral']">
                         Crear régimen laboral
                     </button>
-                    <button mat-raised-button id="btn-raised" type="submit" (click)="LimpiarCampos()" matSuffix
+                    <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
                         matTooltipPosition="right"
-                        matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">Mostrar lista
+                        matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
+                        Mostrar lista
                     </button>
                 </div>
             </mat-card>
@@ -68,14 +68,13 @@
                                 class="fas fa-eye" id="t-ver" [routerLink]="['/verRegimen/',regimenL.id]">
                                 <p>Ver</p>
                             </i>
-                            <i class="fas fa-edit" id="t-editar" [routerLink]="['/regimen/laboral/',regimenL.id]" 
+                            <i class="fas fa-edit" id="t-editar" [routerLink]="['/regimen/laboral/',regimenL.id]"
                                 matSuffix matTooltipPosition="right"
                                 matTooltip="Editar los datos generales de este registro.">
                                 <p>Editar</p>
                             </i>
-                            <i  class="far fa-trash-alt" id="t-eliminar" matSuffix
-                                matTooltipPosition="right" matTooltip="Eliminar este registro."
-                                (click)="ConfirmarDelete(regimenL)">
+                            <i class="far fa-trash-alt" id="t-eliminar" matSuffix matTooltipPosition="right"
+                                matTooltip="Eliminar este registro." (click)="ConfirmarDelete(regimenL)">
                                 <p>Eliminar</p>
                             </i>
                         </td>
@@ -86,7 +85,7 @@
         <mat-paginator id="pagina" [length]="regimen.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
             <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de Regímenes Laborales en formato PDF.">
                 <p>PDF</p>

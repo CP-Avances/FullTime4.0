@@ -8,4 +8,10 @@ mat-form-field { padding: 10px 15px 0px 15px;}
 
 mat-icon { cursor: pointer; }
 
-
+label{
+    font-size: 14px;
+    margin: 12px 0px 0px 0px;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+}

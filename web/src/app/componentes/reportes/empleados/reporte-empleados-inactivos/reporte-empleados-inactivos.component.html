@@ -107,8 +107,8 @@
                         </mat-form-field>
                     </div>
                 </form>
-                <div class="d-flex justify-content-around">
-                    <button mat-button type="submit" class="btn btn-sm" id="boton"
+                <div class="d-flex justify-content-around" style="margin-bottom: 5px;">
+                    <button mat-raised-button id="btn-raised" type="submit" id="boton"
                         (click)="limpiarCampos()">Cancelar</button>
                 </div>
             </mat-card>
@@ -155,6 +155,7 @@
         <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
             id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
+        <br>
     </div>
     <!-- TABLA PARA DEPARTAMENTOS -->
     <div *ngIf="bool_dep" class="mat-elevation-z8" style="background: white;">
@@ -195,6 +196,7 @@
         <mat-paginator id="pagina" [length]="departamentos.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
             id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
+        <br>
     </div>
     <!-- TABLA PARA EMPLEADOS -->
     <div *ngIf="bool_emp" class="mat-elevation-z8" style="background: white;">
@@ -234,5 +236,6 @@
         <mat-paginator id="pagina" [length]="empleados.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
             id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
+        <br>
     </div>
 </div>

@@ -42,7 +42,6 @@
     </div>
 </form>
 <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
-    <button mat-raised-button id="btn-raised" type="submit" (click)="InsertarDetalle(TipoComidaForm.value)"
+    <button id="btn-raised"  class="btn btn-sm" (click)="InsertarDetalle(TipoComidaForm.value)"
         [disabled]="!TipoComidaForm.valid">Guardar</button>
-    <!--button mat-raised-button id="btn-raised" type="submit" (click)="Salir()">Salir</button-->
 </div>

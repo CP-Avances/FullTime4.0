@@ -69,8 +69,7 @@
         </mat-card-content>
     </form>
     <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
-        <button mat-raised-button id="btn-raised" type="submit" (click)="InsertarAutorizacion(formulario.value)"
+        <button id="btn-raised"  class="btn btn-sm" (click)="InsertarAutorizacion(formulario.value)"
             [disabled]="!formulario.valid">Guardar</button>
-        <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentana()">Salir</button-->
     </div>
 </div>

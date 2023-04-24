@@ -76,6 +76,7 @@
         <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
             id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
+        <br>
     </div>
     <!-- TABLA PARA DEPARTAMENTOS -->
     <div *ngIf="bool.bool_dep" class="mat-elevation-z8" style="background: white;">
@@ -116,6 +117,7 @@
         <mat-paginator id="pagina" [length]="departamentos.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
             id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
+        <br>
     </div>
     <!-- TABLA PARA EMPLEADOS -->
     <div *ngIf="bool.bool_emp" class="mat-elevation-z8" style="background: white;">
@@ -160,6 +162,7 @@
         <mat-paginator id="pagina" [length]="empleados.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
             id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
+        <br>
     </div>
     <!-- TABLA PARA TABULACION -->
     <div *ngIf="bool.bool_tab" class="mat-elevation-z8" style="background: white;">
@@ -195,5 +198,6 @@
         <mat-paginator id="pagina" [length]="tabular.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
             id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
+        <br>
     </div>
 </div>

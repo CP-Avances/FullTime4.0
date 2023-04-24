@@ -79,6 +79,7 @@
         <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina_suc"
             [pageSizeOptions]="pageSizeOptions_suc" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
+        <br>
     </div>
     <!-- TABLA PARA DEPARTAMENTOS -->
     <div *ngIf="bool.bool_dep" class="mat-elevation-z8" style="background: white;">
@@ -119,6 +120,7 @@
         <mat-paginator id="pagina" [length]="departamentos.length" [pageSize]="tamanio_pagina_dep"
             [pageSizeOptions]="pageSizeOptions_dep" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
+        <br>
     </div>
     <!-- TABLA PARA EMPLEADOS -->
     <div *ngIf="bool.bool_emp" class="mat-elevation-z8" style="background: white;">
@@ -163,6 +165,7 @@
         <mat-paginator id="pagina" [length]="empleados.length" [pageSize]="tamanio_pagina_emp"
             [pageSizeOptions]="pageSizeOptions_emp" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
+        <br>
     </div>
     <!-- TABLA PARA TABULADO -->
     <div *ngIf="bool.bool_tab" class="mat-elevation-z8" style="background: white;">
@@ -202,6 +205,7 @@
         <mat-paginator id="pagina" [length]="tabulado.length" [pageSize]="tamanio_pagina_tab"
             [pageSizeOptions]="pageSizeOptions_tab" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
+        <br>
     </div>
     <!-- TABLA PARA INCOMPETOS -->
     <div *ngIf="bool.bool_inc" class="mat-elevation-z8" style="background: white;">
@@ -241,5 +245,6 @@
         <mat-paginator id="pagina" [length]="incompletos.length" [pageSize]="tamanio_pagina_inc"
             [pageSizeOptions]="pageSizeOptions_inc" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
+        <br>
     </div>
 </div>

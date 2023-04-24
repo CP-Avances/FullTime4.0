@@ -30,16 +30,13 @@
         </mat-form-field>
         <br><br><br>
         <div class="caja1">
-            <button mat-raised-button id="btn-raised" type="submit" class="btn btn-link verde" (click)="RecuperarFrase()">
+            <button id="btn-raised"  class="btn btn-sm" class="btn btn-link verde" (click)="RecuperarFrase()">
                 Olvido su frase de seguridad?
             </button>
         </div>
         <div style="text-align: center;">
-            <button mat-raised-button id="btn-raised" type="submit" (click)="CompararFrase(formulario.value)"
+            <button id="btn-raised"  class="btn btn-sm" (click)="CompararFrase(formulario.value)"
                 [disabled]="!formulario.valid">Guardar Frase</button>
         </div>
-        <!--div style="text-align: center;">
-            <button mat-raised-button id="btn-raised" type="submit" (click)="CerrarRegistro()">Salir</button>
-        </div-->
     </form>
 </div>

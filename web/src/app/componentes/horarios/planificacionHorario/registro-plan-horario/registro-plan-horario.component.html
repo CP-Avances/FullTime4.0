@@ -38,7 +38,6 @@
     </mat-card-content>
 </form>
 <div class="d-flex flex-wrap justify-content-center" style="padding-top: 2%; margin-bottom: 2%;">
-    <button mat-raised-button id="btn-raised" type="submit" [disabled]="!PlanHorarioForm.valid"
+    <button id="btn-raised"  class="btn btn-sm" [disabled]="!PlanHorarioForm.valid"
         (click)="ValidarDatosPlanHorario(PlanHorarioForm.value)" value="Guardar">Guardar</button>
-    <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentanaPlanHorario()" value=" Salir">Salir</button-->
 </div>

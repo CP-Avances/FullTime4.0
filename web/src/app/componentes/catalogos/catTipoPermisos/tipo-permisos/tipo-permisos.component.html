@@ -396,11 +396,11 @@
                 </form>
                 <br>
                 <div class="d-flex justify-content-between">
-                    <button mat-raised-button id="btn-raised" matStepperPrevious class="float-left">Atrás</button>
-                    <button mat-raised-button id="btn-raised" type="submit"
+                    <button id="btn-raised" matStepperPrevious class="btn btn-sm float-left">Atrás</button>
+                    <button id="btn-raised"  class="btn btn-sm"
                         (click)="InsertarTipoPermiso(primeroFormGroup.value, segundoFormGroup.value, tercerFormGroup.value);"
                         [disabled]="!tercerFormGroup.valid" value="Guardar">Guardar</button>
-                    <button mat-raised-button id="btn-raised" (click)="stepper.reset()" class="float-right">Cancelar</button>
+                    <button id="btn-raised" (click)="stepper.reset()" class="btn btn-sm float-right">Cancelar</button>
                 </div>
             </mat-step>
         </mat-horizontal-stepper>

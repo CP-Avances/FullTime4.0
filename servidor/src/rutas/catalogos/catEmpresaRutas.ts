@@ -1,12 +1,18 @@
-import { Router } from 'express';
-import EMPRESA_CONTROLADOR from '../../controlador/catalogos/catEmpresaControlador';
 import { TokenValidation } from '../../libs/verificarToken';
+import { Router } from 'express';
+import multer from 'multer';
+import EMPRESA_CONTROLADOR from '../../controlador/catalogos/catEmpresaControlador';
 
-const multipart = require('connect-multiparty');
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'logos')
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname)
+    }
+})
 
-const multipartMiddleware = multipart({
-    uploadDir: './logos',
-});
+const upload = multer({ storage: storage });
 
 class DepartamentoRutas {
     public router: Router = Router();
@@ -22,7 +28,7 @@ class DepartamentoRutas {
         // BUSQUEDA DE LOGO 
         this.router.get('/logo/codificado/:id_empresa', TokenValidation, EMPRESA_CONTROLADOR.getImagenBase64);
         // METODO PARA EDITAR LOGO DE EMPRESA
-        this.router.put('/logo/:id_empresa/uploadImage', [TokenValidation, multipartMiddleware], EMPRESA_CONTROLADOR.ActualizarLogoEmpresa);
+        this.router.put('/logo/:id_empresa/uploadImage', [TokenValidation, upload.single('image')], EMPRESA_CONTROLADOR.ActualizarLogoEmpresa);
         // BUSCAR DATOS GENERALES DE EMPRESA
         this.router.get('/buscar/datos/:id', TokenValidation, EMPRESA_CONTROLADOR.ListarEmpresaId);
         // ACTUALIZAR DATOS DE EMPRESA
@@ -34,15 +40,18 @@ class DepartamentoRutas {
         // METODO PARA ACTUALIZAR NIVEL DE SEGURIDAD DE EMPRESA
         this.router.put('/doble/seguridad', TokenValidation, EMPRESA_CONTROLADOR.ActualizarSeguridad);
         // METODO PARA ACTUALIZAR LOGO CABECERA DE CORREO
-        this.router.put('/cabecera/:id_empresa/uploadImage', [TokenValidation, multipartMiddleware], EMPRESA_CONTROLADOR.ActualizarCabeceraCorreo);
+        this.router.put('/cabecera/:id_empresa/uploadImage', [TokenValidation, upload.single('image')], EMPRESA_CONTROLADOR.ActualizarCabeceraCorreo);
         // METODO PARA BUSCAR LOGO CABECERA DE CORREO
         this.router.get('/cabecera/codificado/:id_empresa', TokenValidation, EMPRESA_CONTROLADOR.VerCabeceraCorreo);
         // METODO PARA ACTUALIZAR LOGO PIE DE FIRMA CORREO
-        this.router.put('/pie-firma/:id_empresa/uploadImage', [TokenValidation, multipartMiddleware], EMPRESA_CONTROLADOR.ActualizarPieCorreo);
+        this.router.put('/pie-firma/:id_empresa/uploadImage', [TokenValidation, upload.single('image')], EMPRESA_CONTROLADOR.ActualizarPieCorreo);
         // METODO PARA BUSCAR LOGO PIE DE FIRMA DE CORREO
         this.router.get('/pie-firma/codificado/:id_empresa', TokenValidation, EMPRESA_CONTROLADOR.VerPieCorreo);
         // METODO PARA ACTUALIZAR DATOS DE CORREO
         this.router.put('/credenciales/:id_empresa', TokenValidation, EMPRESA_CONTROLADOR.EditarPassword);
+
+
+
 
 
 

@@ -29,9 +29,9 @@
             </mat-form-field>
         </form>
         <div class="d-flex flex-wrap justify-content-around" style="margin: 10px 10px 0px 10px;">
-            <button mat-raised-button id="btn-raised" type="submit" [disabled]="fechasConsultaForm.invalid"
+            <button id="btn-raised"  class="btn btn-sm" [disabled]="fechasConsultaForm.invalid"
                 (click)="ValidarRangofechas(fechasConsultaForm.value)">Aceptar</button>
-            <button mat-raised-button id="btn-raised" type="submit"
+            <button id="btn-raised"  class="btn btn-sm"
                 (click)="limpiarCamposRango()">Cancelar</button>
         </div>
     </div>

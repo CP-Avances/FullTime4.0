@@ -1,9 +1,9 @@
-
 /* ESTILOS COMO CONFIGURACIÓN GLOBAL */
 
 html,
 body {
     height: 100%;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
 body {
@@ -143,7 +143,7 @@ body {
     height: 65px;
 }
 
-#cerrar{
+#cerrar {
     color: red;
     cursor: pointer;
     margin-right: 2%;
@@ -160,12 +160,12 @@ body {
 }
 
 /* ESTILO PARA BOTONES DE TIPO "MAT-RAISED-BUTTON" */
-#btn-raised{
+#btn-raised {
     background-color: rgb(80, 87, 97);
     margin: 5px 10px 5px 10px;
     color: white;
     font-style: normal;
-    font-weight: 900;
+    font-weight: 500;
     letter-spacing: 0.2px;
     word-wrap: break-word;
 }
@@ -197,7 +197,7 @@ body {
 }*/
 
 .nota {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: bold;
     text-align: justify;
     padding: 13px 5px 10px 5px;
@@ -207,7 +207,7 @@ body {
 /* ESTILO CURSO EN ICONOS */
 #i-cursor {
     cursor: pointer;
-    
+
 }
 
 /* ESTILO PARA ICONO DE MOVILIDAD */

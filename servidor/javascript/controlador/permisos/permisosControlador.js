@@ -293,21 +293,26 @@ class PermisosControlador {
     }
     // REGISTRAR DOCUMENTO DE RESPALDO DE PERMISO  
     GuardarDocumentoPermiso(req, res) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            let list = req.files;
-            let doc = list.uploads[0].path.split("\\")[1];
+            console.log('rec ', req.file);
+            // LEER DATOS DE IMAGEN
+            let doc = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
             let { archivo } = req.params;
             let { documento } = req.params;
             let id = req.params.id;
+            console.log('doc', doc, 'rec ', req.file);
             // ACTUALIZAR REGISTRO
             yield database_1.default.query(`
             UPDATE permisos SET documento = $2, docu_nombre = $3 WHERE id = $1
             `, [id, doc, documento]);
             res.jsonp({ message: 'Documento Actualizado' });
             if (archivo != 'null' && archivo != '' && archivo != null) {
-                let filePath = `servidor\\permisos\\${archivo}`;
-                let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-                fs_1.default.unlinkSync(direccionCompleta);
+                if (archivo != doc) {
+                    let filePath = `servidor\\permisos\\${archivo}`;
+                    let direccionCompleta = __dirname.split("servidor")[0] + filePath;
+                    fs_1.default.unlinkSync(direccionCompleta);
+                }
             }
         });
     }

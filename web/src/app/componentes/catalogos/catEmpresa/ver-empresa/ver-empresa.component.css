@@ -114,3 +114,10 @@ table {
     font-size: 14px;
 
 }
+
+a.matTooltip.tooltip {
+    font-size: 11px;
+    color: red !important;
+    background-color:yellow;
+    border: 1px solid black;
+}

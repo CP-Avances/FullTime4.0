@@ -32,7 +32,7 @@
                             <mat-datepicker touchUi #pickerYearF></mat-datepicker>
                         </mat-form-field>
                     </form>
-                    <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
+                    <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 2px 10px;">
                         <button mat-button type="submit" class="btn btn-sm" id="botones"
                             [disabled]="fechasKardexForm.invalid"
                             (click)="ValidarRangofechasKardex(fechasKardexForm.value)">Aceptar</button>
@@ -118,5 +118,6 @@
         <mat-paginator id="pagina" [length]="empleados.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
             id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
+        <br>
     </div>
 </div>

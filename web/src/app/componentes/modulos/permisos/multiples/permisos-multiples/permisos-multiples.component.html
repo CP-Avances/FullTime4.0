@@ -169,10 +169,10 @@
             </mat-card-content>
         </form>
         <div style="text-align: center; margin-right: 3%;">
-            <button mat-raised-button id="btn-raised" type="submit" (click)="ValidarRegistroPermiso(formulario.value)"
+            <button id="btn-raised"  class="btn btn-sm" (click)="ValidarRegistroPermiso(formulario.value)"
                 [disabled]="!formulario.valid">
                 Verificar </button>
-            <button mat-raised-button id="btn-raised" type="submit" class="float-right" (click)="CerrarVentana()"> Salir </button>
+            <button id="btn-raised" class="btn btn-sm float-right" (click)="CerrarVentana()"> Salir </button>
         </div>
         <hr>
     </div>

@@ -70,14 +70,7 @@
     </form>
     <br>
     <div class="d-flex justify-content-center">
-        <button mat-raised-button id="btn-raised" type="submit" (click)="ValidarProceso(PedirHoraExtraForm.value)"
+        <button id="btn-raised"  class="btn btn-sm" (click)="ValidarProceso(PedirHoraExtraForm.value)"
             [disabled]="!PedirHoraExtraForm.valid">Guardar</button>
-        <!--button mat-raised-button id="btn-raised" type="submit" (click)="ventana.close()">Salir</button-->
     </div>
 </div>
-
-<!--
-    style="font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;"
-    style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif";
- 
--->

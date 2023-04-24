@@ -45,7 +45,6 @@
     </div>
 </form>
 <div class="d-flex justify-content-around" style="padding-top: 2%; margin-bottom: 3%;">
-    <button mat-raised-button id="btn-raised" type="submit" [mat-dialog-close]="empleados" cdkFocusInitial
+    <button id="btn-raised"  class="btn btn-sm" [mat-dialog-close]="empleados" cdkFocusInitial
         (click)="ActualizarConfiguracion(formGroup.value)">Guardar</button>
-    <!--button mat-raised-button id="btn-raised" type="submit" (click)="this.ventana.close(false)" mat-button mat-dialog-close>Cancelar</button-->
 </div>

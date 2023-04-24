@@ -1,6 +1,7 @@
 .btn {
     background-color: rgb(80, 87, 97);
     color: white;
+    margin: 5px 10px 5px 10px;
 }
 
 .button {
@@ -12,7 +13,7 @@ mat-form-field {
     padding: 10px 10px 0px 10px;
 }
 
-#cont {
+#fuente {
     font-size: 13px;
 }
 

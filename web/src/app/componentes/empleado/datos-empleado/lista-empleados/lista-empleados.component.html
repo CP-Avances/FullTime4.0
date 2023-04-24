@@ -6,10 +6,10 @@
             </div>
             <mat-card class="example-card mat-elevation-z8">
                 <div class="d-flex flex-wrap justify-content-around" style="margin-top: 1%;">
-                    <button mat-raised-button id="btn-raised" type="submit" [routerLink]="['/registrarEmpleado']">
+                    <button id="btn-raised"  class="btn btn-sm" [routerLink]="['/registrarEmpleado']">
                         Crear usuario
                     </button>
-                    <button mat-raised-button id="btn-raised" type="submit" (click)="LimpiarCampos()" matSuffix
+                    <button id="btn-raised"  class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
                         matTooltipPosition="right"
                         matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
                         Mostrar lista
@@ -123,7 +123,7 @@
         <mat-paginator id="pagina" [length]="desactivados.length" [pageSize]="tamanio_paginaDes"
             [pageSizeOptions]="pageSizeOptionsDes" id="pagina" (page)="ManejarPaginaDes($event)" showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
             <i (click)="GenerarPdf('download', 2)" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de Empleados en formato PDF.">
                 <p>PDF</p>
@@ -250,7 +250,7 @@
         <mat-paginator id="pagina" [length]="empleado.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
             <i (click)="GenerarPdf('download', 1)" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de Empleados en formato PDF.">
                 <p>PDF</p>

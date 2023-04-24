@@ -70,9 +70,8 @@
         </mat-card-content>
     </form>
     <mat-card-actions class="d-flex justify-content-around">
-        <button mat-raised-button id="btn-raised" type="submit" [disabled]="!asignarCiudadForm.valid"
+        <button id="btn-raised"  class="btn btn-sm" [disabled]="!asignarCiudadForm.valid"
             (click)="InsertarFeriadoCiudad(asignarCiudadForm.value)" value="Guardar">Guardar</button>
-        <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentana()" value="Salir">Cancelar</button-->
     </mat-card-actions>
 </div>
 <div class="pantalla-progress" *ngIf="habilitarprogress">

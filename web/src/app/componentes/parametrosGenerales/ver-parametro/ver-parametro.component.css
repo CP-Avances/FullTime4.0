@@ -19,12 +19,10 @@ td {
     color: white;
 }
 
-.mat-radio-button~.mat-radio-button {
-    margin-left: 20px;
-}
-
-mat-radio-group {
-    margin-bottom: 10px;
-    padding: 20px 20px 20px 20x;
-}
+.contenedor {
+    display: flex;
+    flex-direction: column;
+    margin:1rem auto;
+    max-width: 500px;
+} 
 

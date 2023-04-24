@@ -7,14 +7,17 @@ import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
 import { Router } from '@angular/router';
 
+
 // IMPORTAR SERVICIOS
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 
+
 @Component({
   selector: 'app-editar-empresa',
   templateUrl: './editar-empresa.component.html',
-  styleUrls: ['./editar-empresa.component.css']
+  styleUrls: ['./editar-empresa.component.css'],
+  //encapsulation: ViewEncapsulation.None
 })
 
 export class EditarEmpresaComponent implements OnInit {
@@ -143,7 +146,7 @@ export class EditarEmpresaComponent implements OnInit {
     }
 
     if (this.data.cambios === true) {
-      this.habilitarDias = true;;
+      this.habilitarDias = true;
       this.cambiosF.setValue('true');
       this.dias_cambioF.setValue(this.data.dias_cambio);
     }
@@ -217,7 +220,7 @@ export class EditarEmpresaComponent implements OnInit {
     this.rest.ActualizarEmpresa(datos).subscribe(response => {
       this.habilitarprogress === false;
       this.Salir();
-      this.toastr.success('Operación Exitosa.', 'Datos de Empresa actualizados.', {
+      this.toastr.success('Operación exitosa.', 'Datos actualizados.', {
         timeOut: 6000,
       })
     });
@@ -254,7 +257,7 @@ export class EditarEmpresaComponent implements OnInit {
     }
     else if (opcion === 'Otros') {
       this.HabilitarOtroE = true;
-      this.toastr.info('Ingresar identificación general de establecimientos.', '', {
+      this.toastr.info('Ingresar identificación general del establecimiento.', '', {
         timeOut: 3000,
       })
       this.otroE.setValue('');
@@ -278,22 +281,7 @@ export class EditarEmpresaComponent implements OnInit {
 
   // METODO PARA CONTROLAR INGRESO DE NUMEROS
   IngresarSoloNumeros(evt: any) {
-    if (window.event) {
-      var keynum = evt.keyCode;
-    }
-    else {
-      keynum = evt.which;
-    }
-    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMÉRICO Y QUE TECLAS NO RECIBIRÁ.
-    if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6 || keynum == 46) {
-      return true;
-    }
-    else {
-      this.toastr.info('No se admite el ingreso de letras', 'Usar solo números', {
-        timeOut: 6000,
-      })
-      return false;
-    }
+    return this.validar.IngresarSoloNumeros(evt);
   }
 
   // METODO PARA CERRAR VENTANA DE EDICION DE DATOS

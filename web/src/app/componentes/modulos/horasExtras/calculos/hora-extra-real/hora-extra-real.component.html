@@ -61,7 +61,7 @@
                         </div>
                     </form>
                     <div class="d-flex justify-content-around">
-                        <button mat-raised-button id="btn-raised" type="submit"
+                        <button id="btn-raised"  class="btn btn-sm"
                             (click)="LimpiarCampos()">Cancelar</button>
                     </div>
                 </mat-expansion-panel>
@@ -177,10 +177,10 @@
                         </div>
                     </form>
                     <div class="d-flex justify-content-around">
-                        <button mat-raised-button id="btn-raised" type="submit" (click)="CalcularTodos(fechasForm.value)">
+                        <button id="btn-raised"  class="btn btn-sm" (click)="CalcularTodos(fechasForm.value)">
                             Calcular
                         </button>
-                        <button mat-raised-button id="btn-raised" type="submit" (click)="LimpiarFechas()">Cancelar
+                        <button id="btn-raised"  class="btn btn-sm" (click)="LimpiarFechas()">Cancelar
                         </button>
                     </div>
                 </mat-expansion-panel>
@@ -231,7 +231,7 @@
         <mat-paginator id="pagina" [length]="datosTotales.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
             id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
-        <!--   <div class="d-flex justify-content-end" style="margin-right: 2%;">
+        <!--   <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
             <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
                  matTooltip="Descargar Lista de Empleados en formato PDF">
                 <p>PDF</p>
