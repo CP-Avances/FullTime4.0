@@ -17,8 +17,10 @@
                     <span>Configuración inicial</span>
                 </div>
                 <div class="nota">
-                    <span>Por favor llenar todos los campos obligatorios (*) del formulario y dar click en Siguiente
-                        para continuar.</span>
+                    <span>
+                        Por favor llenar todos los campos obligatorios (*) del formulario y dar click en Siguiente
+                        para continuar.
+                    </span>
                 </div>
                 <form [formGroup]="primerFormulario">
                     <div class="row">
@@ -35,14 +37,16 @@
                                     </mat-autocomplete>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Seleccionar uno de los paises de la lista.">
-                                        help_outline</mat-icon>
+                                        help_outline
+                                    </mat-icon>
                                 </mat-form-field>
                                 <mat-form-field>
                                     <mat-label id="letras_4">Nombre</mat-label>
                                     <input matInput [formControl]="nombreF" required>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar un nuevo nombre de Régimen Laboral">
-                                        help_outline</mat-icon>
+                                        help_outline
+                                    </mat-icon>
                                 </mat-form-field>
                             </div>
                             <div class="d-flex flex-wrap justify-content-start">
@@ -52,7 +56,8 @@
                                         required (click)="LimpiarCalcular()">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Indicar el número de meses de duración del período laboral.">
-                                        help_outline</mat-icon>
+                                        help_outline
+                                    </mat-icon>
                                 </mat-form-field>
                                 <mat-form-field id="periodo">
                                     <mat-label id="letras_2">Días por mes</mat-label>
@@ -60,7 +65,8 @@
                                         required (click)="LimpiarCalcular()">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Indicar el número de días totales dentro de un mes.">
-                                        help_outline</mat-icon>
+                                        help_outline
+                                    </mat-icon>
                                 </mat-form-field>
                             </div>
                         </div>
@@ -111,8 +117,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="d-flex flex-wrap justify-content-start" style="position: relative; left:10px; width: 350px;">
-                                <mat-checkbox id="check" matSuffix matTooltipPosition="right" 
+                            <div class="d-flex flex-wrap justify-content-start"
+                                style="position: relative; left:3px; width: 350px;">
+                                <mat-checkbox id="check" matSuffix matTooltipPosition="right"
                                     [formControl]="continuidadF"
                                     matTooltip="Indicar si se requiere control de continuidad laboral.">
                                     Requiere continuidad laboral
@@ -122,8 +129,10 @@
                     </div>
                 </form>
                 <div class="d-flex flex-wrap justify-content-between">
-                    <button id="btn-raised" class="btn btn-sm float-left" [routerLink]="['/listarRegimen']">Atrás</button>
-                    <button id="btn-raised" matStepperNext class="btn btn-sm float-right">Siguiente</button>
+                    <button id="btn-raised" class="btn btn-sm float-left"
+                        [routerLink]="['/listarRegimen']">Atrás</button>
+                    <button id="btn-raised" matStepperNext class="btn btn-sm float-right"
+                        [disabled]="!primerFormulario.valid">Siguiente</button>
                 </div>
             </mat-step>
 
@@ -139,15 +148,17 @@
                     <span>Configurar vacaciones</span>
                 </div>
                 <div class="nota">
-                    <span>Por favor llenar todos los campos obligatorios (*) del formulario y dar click en Siguiente
-                        para continuar.</span>
+                    <span>
+                        Por favor llenar todos los campos obligatorios (*) del formulario y dar click en Siguiente
+                        para continuar.
+                    </span>
                 </div>
                 <form [formGroup]="segundoFormulario">
                     <div class="row">
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-start">
                                 <div style="padding-bottom: 15px;">
-                                    <label style="top:10px; position: relative; left:10px;">Días de Vacaciones:</label>
+                                    <label style="top:15px; position: relative; left:10px;">Días de Vacaciones:</label>
                                 </div>
                                 <div class="row">
                                     <div class="col-md">
@@ -155,20 +166,20 @@
                                             <mat-form-field id="campos">
                                                 <mat-label id="letras_2">Días hábiles</mat-label>
                                                 <input matInput [formControl]="diasLaborablesF"
-                                                    (keypress)="IngresarSoloNumeros($event)"
-                                                    [readonly]="escritura_dias" required>
+                                                    (keypress)="IngresarSoloNumeros($event)" [readonly]="escritura_dias"
+                                                    required>
                                             </mat-form-field>
                                             <mat-form-field id="campos">
                                                 <mat-label id="letras_2">Días libres</mat-label>
                                                 <input matInput [formControl]="diasLibresF"
-                                                    (keypress)="IngresarSoloNumeros($event)"
-                                                    [readonly]="escritura_dias" required>
+                                                    (keypress)="IngresarSoloNumeros($event)" [readonly]="escritura_dias"
+                                                    required>
                                             </mat-form-field>
                                             <mat-form-field id="campos">
                                                 <mat-label id="letras_2">Días Calendario</mat-label>
                                                 <input matInput [formControl]="diasCalendarioF"
-                                                    (keypress)="IngresarSoloNumeros($event)"
-                                                    [readonly]="escritura_dias" required>
+                                                    (keypress)="IngresarSoloNumeros($event)" [readonly]="escritura_dias"
+                                                    required>
                                             </mat-form-field>
 
                                             <i id="validar" class="fa fa-check-square-o" matSuffix *ngIf="validar_dias"
@@ -186,27 +197,27 @@
                                             </i>
 
                                         </div>
-                                        <div class="d-flex flex-wrap justify-content-start">
-                                            <mat-checkbox id="check_" matSuffix matTooltipPosition="right"
-                                                [formControl]="acumularF" style="position: relative; left:10px;"
-                                                (change)="ActivarAcumular($event)"
-                                                matTooltip="Activar acumulación de días de vacaciones.">
-                                                Acumular vacaciones
-                                            </mat-checkbox>
-
-                                            <mat-form-field *ngIf="acumular" id="Máximo_días">
-                                                <mat-label id="letras_2">Máximo de días acumulables</mat-label>
-                                                <input matInput [formControl]="diasAcumulacionF"
-                                                    (keypress)="IngresarSoloNumeros($event)" [required]="acumular">
-                                            </mat-form-field>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-start" style="padding-bottom: 20px;">
+                                <mat-checkbox id="check_" matSuffix matTooltipPosition="right" [formControl]="acumularF"
+                                    style="position: relative; left:0px;" (change)="ActivarAcumular($event)"
+                                    matTooltip="Activar acumulación de días de vacaciones.">
+                                    Acumular vacaciones
+                                </mat-checkbox>
+
+                                <mat-form-field *ngIf="acumular" id="Máximo_días">
+                                    <mat-label id="letras_2">Máximo de días acumulables</mat-label>
+                                    <input matInput [formControl]="diasAcumulacionF"
+                                        (keypress)="IngresarSoloNumeros($event)" [required]="acumular">
+                                </mat-form-field>
+                            </div>
+
                             <div class="d-flex flex-wrap justify-content-start">
-                                <label style="padding-top: 10px; position: relative; left:2px;">
+                                <label style="padding-top: 10px; position: relative; left:10px;">
                                     Solicitudes de vacaciones contabiliza:</label>
                             </div>
 
@@ -214,34 +225,6 @@
                                 <mat-checkbox matSuffix matTooltipPosition="right" [formControl]="feriadosF"
                                     matTooltip="Dentro de la solicitud de vacaciones se contabilizará feriados.">
                                     Feriados
-                                </mat-checkbox>
-                            </div>
-
-                            <div class="d-flex flex-wrap justify-content-start" style="position: relative; left: 25px;">
-                                <mat-checkbox matSuffix matTooltipPosition="right" [formControl]="libresF"
-                                    matTooltip="Dentro de la solicitud de vacaciones se contabilizará días libres.">
-                                    Días libres
-                                </mat-checkbox>
-                            </div>
-
-                            <div class="d-flex flex-wrap justify-content-start" style="position: relative; left: 25px;">
-                                <mat-checkbox matSuffix matTooltipPosition="right" [formControl]="licenciasF"
-                                    matTooltip="Dentro de la solicitud de vacaciones se contabilizará liencias.">
-                                    Licencias
-                                </mat-checkbox>
-                            </div>
-
-                            <div class="d-flex flex-wrap justify-content-start" style="position: relative; left: 25px;">
-                                <mat-checkbox matSuffix matTooltipPosition="right" [formControl]="faltasF"
-                                    matTooltip="Dentro de la solicitud de vacaciones se contabilizará faltas injustificadas.">
-                                    Faltas
-                                </mat-checkbox>
-                            </div>
-
-                            <div class="d-flex flex-wrap justify-content-start" style="position: relative; left: 25px;">
-                                <mat-checkbox matSuffix matTooltipPosition="right" [formControl]="permisosF"
-                                    matTooltip="Dentro de la solicitud de vacaciones se contabilizará permisos no justificados.">
-                                    Permisos
                                 </mat-checkbox>
                             </div>
                         </div>
@@ -253,7 +236,8 @@
                                     Vacaciones por periodos
                                 </mat-checkbox>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" *ngIf="nuevo_periodo"
-                                    style="position: relative; top:25px; right:10px;" (click)="RegistrarPeriodo()"
+                                    style="position: relative; top:25px; right:10px; color:blue"
+                                    (click)="RegistrarPeriodo()"
                                     matTooltip="Registrar hasta tres periodos de vacaciones.">
                                     add_box
                                 </mat-icon>
@@ -265,36 +249,39 @@
                                     <input matInput [formControl]="periodoUnoF" [required]="periodo_uno"
                                         [readonly]="escritura_periodo" (keypress)="IngresarSoloNumeros($event)"
                                         (input)="VerificarPeriodos($event, 1)">
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" *ngIf="delete_uno"
+                                    <mat-icon id="cerrar" matSuffix matTooltipPosition="right" *ngIf="delete_uno"
                                         (click)="EliminarPeriodo(1)" matTooltip="Eliminar Registro.">
                                         cancel
                                     </mat-icon>
-                                    <mat-hint align="start" id="error" *ngIf="mensaje1_"><strong>Dias de vacaciones
-                                            deben ser mayores a 5.</strong></mat-hint>
+                                    <mat-hint align="start" id="error" *ngIf="mensaje1_">
+                                        <strong>Dias de vacaciones deben ser mayores a 5.</strong>
+                                    </mat-hint>
                                 </mat-form-field>
                                 <mat-form-field *ngIf="periodo_dos" id="Vacacion_periodo">
                                     <mat-label id="letras_4">2º Periodo</mat-label>
                                     <input matInput [formControl]="periodoDosF" [required]="periodo_dos"
                                         [readonly]="escritura_periodo" (keypress)="IngresarSoloNumeros($event)"
                                         (input)="VerificarPeriodos($event, 2)">
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" *ngIf="delete_dos"
+                                    <mat-icon id="cerrar" matSuffix matTooltipPosition="right" *ngIf="delete_dos"
                                         (click)="EliminarPeriodo(2)" matTooltip="Eliminar Registro.">
                                         cancel
                                     </mat-icon>
-                                    <mat-hint align="start" id="error" *ngIf="mensaje2_"><strong>Dias de vacaciones
-                                            deben ser mayores a 5.</strong></mat-hint>
+                                    <mat-hint align="start" id="error" *ngIf="mensaje2_">
+                                        <strong>Dias de vacaciones deben ser mayores a 5.</strong>
+                                    </mat-hint>
                                 </mat-form-field>
                                 <mat-form-field *ngIf="periodo_tres" id="Vacacion_periodo">
                                     <mat-label id="letras_4">3º Periodo</mat-label>
                                     <input matInput [formControl]="periodoTresF" [required]="periodo_tres"
                                         [readonly]="escritura_periodo" (keypress)="IngresarSoloNumeros($event)"
                                         (input)="VerificarPeriodos($event, 3)">
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" *ngIf="delete_tres"
+                                    <mat-icon id="cerrar" matSuffix matTooltipPosition="right" *ngIf="delete_tres"
                                         (click)="EliminarPeriodo(3)" matTooltip="Eliminar Registro.">
                                         cancel
                                     </mat-icon>
-                                    <mat-hint align="start" id="error" *ngIf="mensaje3_"><strong>Dias de vacaciones
-                                            deben ser mayores a 5.</strong></mat-hint>
+                                    <mat-hint align="start" id="error" *ngIf="mensaje3_">
+                                        <strong>Dias de vacaciones deben ser mayores a 5.</strong>
+                                    </mat-hint>
                                 </mat-form-field>
                             </div>
 
@@ -315,8 +302,9 @@
                     </div>
                 </form>
                 <div>
-                    <button mat-raised-button id="btn-raised" matStepperPrevious>Atrás</button>
-                    <button mat-raised-button id="btn-raised" matStepperNext class="float-right" [disabled]="siguiente">Siguiente</button>
+                    <button class="btn btn-sm" id="btn-raised" matStepperPrevious>Atrás</button>
+                    <button id="btn-raised" matStepperNext class="btn btn-sm float-right"
+                        [disabled]="siguiente">Siguiente</button>
                 </div>
             </mat-step>
 
@@ -363,7 +351,7 @@
                                     </div>
                                 </mat-radio-group>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" *ngIf="variable"
-                                    style="position: relative; left:40px"
+                                    style="position: relative; left:40px; color:blue;"
                                     (click)="RegistrarAntiguedad(tercerFormulario.value)"
                                     matTooltip="Registrar antiguedad para vacaciones.">
                                     add_box
@@ -408,10 +396,10 @@
                                     <input matInput [formControl]="vacaciones_unoF" [required]="antiguo_uno"
                                         [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
                                 </mat-form-field>
-                                <mat-icon id="i-cursor" style="font-size: 18px;" matSuffix
-                                    *ngIf="delete_antiguo_uno" matTooltipPosition="right"
-                                    matTooltip="Eliminar Registro." (click)="EliminarAntiguedad(1)">
-                                        cancel
+                                <mat-icon id="cerrar" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_uno"
+                                    matTooltipPosition="right" matTooltip="Eliminar Registro."
+                                    (click)="EliminarAntiguedad(1)">
+                                    cancel
                                 </mat-icon>
                             </div>
 
@@ -435,10 +423,10 @@
                                     <input matInput [formControl]="vacaciones_dosF" [required]="antiguo_dos"
                                         [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
                                 </mat-form-field>
-                                <mat-icon id="i-cursor" style="font-size: 18px;" matSuffix
-                                    *ngIf="delete_antiguo_dos" matTooltipPosition="right"
-                                    matTooltip="Eliminar Registro." (click)="EliminarAntiguedad(2)">
-                                        cancel
+                                <mat-icon id="cerrar" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_dos"
+                                    matTooltipPosition="right" matTooltip="Eliminar Registro."
+                                    (click)="EliminarAntiguedad(2)">
+                                    cancel
                                 </mat-icon>
                             </div>
 
@@ -462,10 +450,10 @@
                                     <input matInput [formControl]="vacaciones_tresF" [required]="antiguo_tres"
                                         [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
                                 </mat-form-field>
-                                <mat-icon id="i-cursor" style="font-size: 18px;" matSuffix
-                                    *ngIf="delete_antiguo_tres" matTooltipPosition="right"
-                                    matTooltip="Eliminar Registro." (click)="EliminarAntiguedad(3)">
-                                        cancel
+                                <mat-icon id="cerrar" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_tres"
+                                    matTooltipPosition="right" matTooltip="Eliminar Registro."
+                                    (click)="EliminarAntiguedad(3)">
+                                    cancel
                                 </mat-icon>
                             </div>
 
@@ -489,11 +477,11 @@
                                     <input matInput [formControl]="vacaciones_cuatroF" [required]="antiguo_cuatro"
                                         [readonly]="escritura_antiguo" (keypress)="IngresarSoloNumeros($event)">
                                 </mat-form-field>
-                                <mat-icon id="i-cursor" style="font-size: 18px;" matSuffix
-                                    *ngIf="delete_antiguo_cuatro" matTooltipPosition="right"
-                                    matTooltip="Eliminar Registro." (click)="EliminarAntiguedad(4)">
-                                        cancel
-                                    </mat-icon>
+                                <mat-icon id="cerrar" style="font-size: 18px;" matSuffix *ngIf="delete_antiguo_cuatro"
+                                    matTooltipPosition="right" matTooltip="Eliminar Registro."
+                                    (click)="EliminarAntiguedad(4)">
+                                    cancel
+                                </mat-icon>
                             </div>
                             <div class="d-flex flex-wrap justify-content-start">
                                 <i id="validar" class="fa fa-check-square-o" matSuffix *ngIf="validar_antiguo"
@@ -524,46 +512,52 @@
                                     (click)="LimpiarCalcular()">
                                     delete
                                 </mat-icon>
-                            </div> 
+                            </div>
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field id="campos_calculos">
                                     <mat-label id="letras_3">Hábiles: Vacaciones por mes</mat-label>
                                     <input matInput [formControl]="diasMesLaborableF" readonly>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Días laborables de vacaciones ganados por mes.">
-                                        help_outline</mat-icon>
-                                </mat-form-field>
-                                <mat-form-field id="campos_calculos">
-                                    <mat-label id="letras_3">Calendario: Vacaciones por mes</mat-label>
-                                    <input matInput [formControl]="diasMesCalendarioF" readonly>
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Días calendario de vacaciones ganados por mes.">
-                                        help_outline</mat-icon>
+                                        help_outline
+                                    </mat-icon>
                                 </mat-form-field>
                                 <mat-form-field id="campos_calculos">
                                     <mat-label id="letras_3">Hábiles: Vacaciones por día</mat-label>
                                     <input matInput [formControl]="dias_LaborableF" readonly>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Días labaorables de vacaciones ganados por día.">
-                                        help_outline</mat-icon>
+                                        help_outline
+                                    </mat-icon>
+                                </mat-form-field>
+                                <mat-form-field id="campos_calculos">
+                                    <mat-label id="letras_3">Calendario: Vacaciones por mes</mat-label>
+                                    <input matInput [formControl]="diasMesCalendarioF" readonly>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Días calendario de vacaciones ganados por mes.">
+                                        help_outline
+                                    </mat-icon>
                                 </mat-form-field>
                                 <mat-form-field id="campos_calculos">
                                     <mat-label id="letras_3">Calendario: Vacaciones por día</mat-label>
                                     <input matInput [formControl]="dias_CalendarioF" readonly>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Dias calendario de vacaciones ganados por día.">
-                                        help_outline</mat-icon>
+                                        help_outline
+                                    </mat-icon>
                                 </mat-form-field>
                             </div>
                         </div>
                     </div>
                     <div style="text-align: center;">
-                        <button mat-raised-button id="btn-raised" matStepperPrevious class="float-left">Atrás</button>
-                        <button mat-raised-button id="btn-raised"
+                        <button id="btn-raised" matStepperPrevious class="btn btn-sm float-left">Atrás</button>
+                        <button id="btn-raised" class="btn btn-sm"
                             (click)="VerificarRegistro(primerFormulario.value, segundoFormulario.value, tercerFormulario.value)"
-                            [disabled]="activar_guardar">Guardar
+                            [disabled]="activar_guardar">
+                            Guardar
                         </button>
-                        <button mat-raised-button id="btn-raised" (click)="CerrarVentana()" class="float-right">Cancelar</button>
+                        <button id="btn-raised" (click)="CerrarVentana()"
+                            class="btn btn-sm float-right">Cancelar</button>
                     </div>
                 </form>
             </mat-step>

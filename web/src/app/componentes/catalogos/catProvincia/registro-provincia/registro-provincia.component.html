@@ -1,20 +1,24 @@
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        REGISTRA PROVINCIA - DEPARTAMENTO - ESTADO</span>
+        REGISTRA PROVINCIA - DEPARTAMENTO - ESTADO
+    </span>
     <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
 </div>
 <form [formGroup]="formulario">
     <div class="container">
         <div class="nota">
-            <span>NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
-                Guardar.</span>
+            <span>
+                NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                Guardar.
+            </span>
         </div>
         <div class="d-flex flex-wrap justify-content-center">
             <mat-form-field>
                 <mat-label>Seleccionar continente</mat-label>
                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Seleccionar un continente.">
-                    help_outline</mat-icon>
+                    help_outline
+                </mat-icon>
                 <mat-select [formControl]="nombreContinenteF" required>
                     <mat-option *ngFor="let c of continentes" [value]="c.continente"
                         (click)="FiltrarPaises(formulario.value)">
@@ -23,8 +27,8 @@
                 </mat-select>
             </mat-form-field>
             <mat-form-field>
-                <input type="text" placeholder="Seleccionar país" aria-label="Number" matInput [formControl]="nombrePaisF"
-                    [matAutocomplete]="auto" required>
+                <input type="text" placeholder="Seleccionar país" aria-label="Number" matInput
+                    [formControl]="nombrePaisF" [matAutocomplete]="auto" required>
                 <mat-autocomplete #auto="matAutocomplete">
                     <mat-option *ngFor="let option of filteredOptions | async" [value]="option.nombre">
                         {{option.nombre}}
@@ -41,13 +45,14 @@
                     (keypress)="IngresarSoloLetras($event)" required>
                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                     matTooltip="Ingresar nombre de una provincia, departamento o estado ubicado en el país seleccionado.">
-                    help_outline</mat-icon>
+                    help_outline
+                </mat-icon>
                 <mat-error *ngIf="nombreProvinciaF.invalid">Ingrese un nombre válido.</mat-error>
             </mat-form-field>
         </div>
     </div>
 </form>
 <div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 2%;">
-    <button id="btn-raised"  class="btn btn-sm" [disabled]="!formulario.valid" value="Guardar"
-    (click)="InsertarProvincia(formulario.value)">Guardar</button>
+    <button id="btn-raised" class="btn btn-sm" [disabled]="!formulario.valid" value="Guardar"
+        (click)="InsertarProvincia(formulario.value)">Guardar</button>
 </div>

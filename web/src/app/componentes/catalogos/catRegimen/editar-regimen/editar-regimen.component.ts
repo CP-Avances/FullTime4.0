@@ -44,12 +44,12 @@ export class EditarRegimenComponent implements OnInit {
 
   // SEGUNDO FORMULARIO
   diasAcumulacionF = new FormControl('');
-  diasLaborablesF = new FormControl(0);
-  diasCalendarioF = new FormControl(0);
+  diasLaborablesF = new FormControl('');
+  diasCalendarioF = new FormControl('');
   periodoTresF = new FormControl('');
   periodoUnoF = new FormControl('');
   periodoDosF = new FormControl('');
-  diasLibresF = new FormControl(0);
+  diasLibresF = new FormControl('');
   licenciasF = new FormControl(false);
   permisosF = new FormControl(false);
   feriadosF = new FormControl(false);
@@ -79,10 +79,10 @@ export class EditarRegimenComponent implements OnInit {
   variableF: boolean = false;
 
   // CALCULOS DE VACACIONES
-  diasMesCalendarioF = new FormControl(0);
-  diasMesLaborableF = new FormControl(0);
-  dias_CalendarioF = new FormControl(0);
-  dias_LaborableF = new FormControl(0);
+  diasMesCalendarioF = new FormControl('');
+  diasMesLaborableF = new FormControl('');
+  dias_CalendarioF = new FormControl('');
+  dias_LaborableF = new FormControl('');
 
   idRegimen: string;
 
@@ -463,7 +463,7 @@ export class EditarRegimenComponent implements OnInit {
       // VERIFICAR QUE LOS DIAS CALENDARIO SEAN MAYORES A LOS DIAS HABILES
       if (parseFloat(form2.diasCalendarioForm) > parseFloat(form2.diasLaborablesForm)) {
         var libres = Number((parseFloat(form2.diasCalendarioForm) - parseFloat(form2.diasLaborablesForm)).toFixed(10));
-        this.diasLibresF.setValue(libres);
+        this.diasLibresF.setValue(String(libres));
         // VERIFICAR QUE LOS DIAS HABILES SEAN MAYORES A LOS DIAS LIBRES
         if (parseFloat(form2.diasLaborablesForm) > libres) {
           this.validar_dias = false;
@@ -489,7 +489,7 @@ export class EditarRegimenComponent implements OnInit {
       // VERIFICAR QUE LOS DIAS CALENDARIO SEAN MAYORES A LOS DIAS LIBRES
       if (parseFloat(form2.diasCalendarioForm) > parseFloat(form2.diasLibresForm)) {
         var habiles = Number((parseFloat(form2.diasCalendarioForm) - parseFloat(form2.diasLibresForm)).toFixed(10));
-        this.diasLaborablesF.setValue(habiles);
+        this.diasLaborablesF.setValue(String(habiles));
         // VERIFICAR QUE LOS DIAS HABILES SEAN MAYORES A LOS DIAS LIBRES
         if (habiles > parseFloat(form2.diasLibresForm)) {
           this.validar_dias = false;
@@ -540,7 +540,7 @@ export class EditarRegimenComponent implements OnInit {
       // VERIFICAR QUE LOS DIAS HABILES SEAN MAYORES A LOS DIAS LIBRES
       if (parseFloat(form2.diasLaborablesForm) > parseFloat(form2.diasLibresForm)) {
         var calendario = Number((parseFloat(form2.diasLaborablesForm) + parseFloat(form2.diasLibresForm)).toFixed(10));
-        this.diasCalendarioF.setValue(calendario);
+        this.diasCalendarioF.setValue(String(calendario));
         this.validar_dias = false;
         this.correcto_dias = true;
         this.escritura_dias = true;
@@ -1288,6 +1288,7 @@ export class EditarRegimenComponent implements OnInit {
 
   // METODO PARA CALCULAR VACACIONES GANADAS AL MES
   CalcularDiasMeses(form1: any, form2: any) {
+    console.log('ver form ', form2.diasLaborablesForm, ' ', form1.mesesForm)
     // EJEMPLO:
     // 12 --> 11
     //  1 --> x
@@ -1295,8 +1296,8 @@ export class EditarRegimenComponent implements OnInit {
     var dias_laborables_mes = Number((parseFloat(form2.diasLaborablesForm) / parseFloat(form1.mesesForm)).toFixed(10));
     var dias_calendario_mes = Number((parseFloat(form2.diasCalendarioForm) / parseFloat(form1.mesesForm)).toFixed(10));
 
-    this.diasMesLaborableF.setValue(dias_laborables_mes);
-    this.diasMesCalendarioF.setValue(dias_calendario_mes);
+    this.diasMesLaborableF.setValue(String(dias_laborables_mes));
+    this.diasMesCalendarioF.setValue(String(dias_calendario_mes));
 
     // EJEMPLO:
     // 30 --> dias_laborables_mes
@@ -1305,8 +1306,8 @@ export class EditarRegimenComponent implements OnInit {
     var dias_laborables = Number((dias_laborables_mes / parseFloat(form1.diasForm)).toFixed(10));
     var dias_calendario = Number((dias_calendario_mes / parseFloat(form1.diasForm)).toFixed(10));
 
-    this.dias_LaborableF.setValue(dias_laborables);
-    this.dias_CalendarioF.setValue(dias_calendario);
+    this.dias_LaborableF.setValue(String(dias_laborables));
+    this.dias_CalendarioF.setValue(String(dias_calendario));
 
   }
 
@@ -1315,10 +1316,10 @@ export class EditarRegimenComponent implements OnInit {
     this.limpiar_calcular = false;
     this.activar_guardar = true;
     this.calculoF.setValue(false);
-    this.diasMesLaborableF.setValue(0);
-    this.diasMesCalendarioF.setValue(0);
-    this.dias_LaborableF.setValue(0);
-    this.dias_CalendarioF.setValue(0);
+    this.diasMesLaborableF.setValue('');
+    this.diasMesCalendarioF.setValue('');
+    this.dias_LaborableF.setValue('');
+    this.dias_CalendarioF.setValue('');
   }
 
 
