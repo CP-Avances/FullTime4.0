@@ -57,7 +57,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     this.url = this.router.url;
-    this.Geolocalizar();
+    //this.Geolocalizar();
   }
 
   // METODO QUE PERMITE ACCEDER A UBICACION DEL USUARIO

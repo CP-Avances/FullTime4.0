@@ -29,7 +29,10 @@ export class EmplLeafletComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.Geolocalizar()
+    //this.Geolocalizar();
+    this.latitud= -0.1918213;
+    this.longitud = -78.4875258;
+    this.LeerCoordenadas(this.latitud, this.longitud)
   }
 
   // METODO PARA CAPTURAR LA UBICACION DEL USUARIO

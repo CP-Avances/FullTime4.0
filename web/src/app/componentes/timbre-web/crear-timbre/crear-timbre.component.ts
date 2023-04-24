@@ -72,7 +72,9 @@ export class CrearTimbreComponent implements OnInit {
       this.nombre = this.data.name_empleado;
     }
     this.VerDatosEmpleado(this.idEmpleadoLogueado);
-    this.Geolocalizar();
+    //this.Geolocalizar();
+    this.latitud= -0.1918213;
+    this.longitud = -78.4875258;
   }
 
   // METODO DE BUSQUEDA DE DATOS DE EMPLEADO

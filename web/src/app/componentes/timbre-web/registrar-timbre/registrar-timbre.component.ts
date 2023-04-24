@@ -61,7 +61,9 @@ export class RegistrarTimbreComponent implements OnInit {
   ngOnInit(): void {
     this.VerificarFunciones();
     this.BuscarParametro();
-    this.Geolocalizar();
+    //this.Geolocalizar();
+    this.latitud= -0.1918213;
+    this.longitud = -78.4875258;
   }
 
   // METODO PARA CONSULTAR FUNCIONES ACTIVAS DEL SISTEMA
