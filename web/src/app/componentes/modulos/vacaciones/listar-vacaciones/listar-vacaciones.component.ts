@@ -22,6 +22,8 @@ import { VacacionesService } from 'src/app/servicios/vacaciones/vacaciones.servi
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
+import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 export interface VacacionesElemento {
   apellido: string;
@@ -84,6 +86,9 @@ export class ListarVacacionesComponent implements OnInit {
   // Variable oculta el boton de autorizar
   ocultar: boolean = false;
 
+  autorizacion: boolean = false;
+  preautorizacion: boolean = false;
+
   constructor(
     private plantilla: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
     private restV: VacacionesService,
@@ -91,7 +96,9 @@ export class ListarVacacionesComponent implements OnInit {
     private funciones: MainNavService,
     public validar: ValidacionesService,
     public parametro: ParametrosService,
-    public restEmpleado: EmpleadoService
+    public restEmpleado: EmpleadoService,
+    public restAutoriza: AutorizaDepartamentoService,
+    public usuarioDepa: UsuarioService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -127,7 +134,7 @@ export class ListarVacacionesComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
+  ArrayAutorizacionTipos: any = []
   // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
@@ -141,9 +148,21 @@ export class ListarVacacionesComponent implements OnInit {
         this.ObtenerListaVacaciones(this.formato_fecha);
         this.ObtenerListaVacacionesAutorizadas(this.formato_fecha);
       });
+
+    this.restAutoriza.BuscarAutoridadUsuario(this.idEmpleado).subscribe(
+      (res) => {
+        this.ArrayAutorizacionTipos = res;
+      },err => {
+        this.autorizacion = false;
+        this.preautorizacion = false;
+      }
+    );
   }
 
   listaVacacionesFiltrada: any = [];
+  listaVacacionDeparta: any = [];
+  public Vacacionlista: any = [];
+  gerencia:boolean = false;
   ObtenerListaVacaciones(formato_fecha: string) {
     this.restV.ObtenerListaVacaciones().subscribe(res => {
       this.vacaciones = res;
@@ -175,16 +194,46 @@ export class ListarVacacionesComponent implements OnInit {
         data.fec_ingreso_ = this.validar.FormatearFecha(data.fec_ingreso, formato_fecha, this.validar.dia_abreviado);
       })
 
-      if (Object.keys(this.listaVacacionesFiltrada).length == 0) {
-        this.validarMensaje1 = true;
-      }
+      let i = 1;
+      this.listaVacacionesFiltrada.filter(item => {
+          this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_empl_cargo).subscribe(
+            (usuaDep) => {
+              this.ArrayAutorizacionTipos.filter(x => {
+                if(x.id_departamento == 1 && x.estado == true){
+                  this.gerencia = true;
+                  if(item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)){
+                    return this.Vacacionlista.push(item);
+                  }else if(item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)){
+                    return this.Vacacionlista.push(item);
+                  }
+                }else if((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
+                  if(item.estado == 'Pendiente' && x.preautorizar == true){
+                    return this.Vacacionlista.push(item);
+                  }else if(item.estado == 'Pre-autorizado' && x.autorizar == true){
+                    return this.Vacacionlista.push(item);
+                  }
+                }
+              })
 
-      if (this.listaVacacionesFiltrada.length != 0) {
-        this.lista_vacaciones = true;
-      } else {
-        this.lista_vacaciones = false;
-      }
-      console.log(res);
+              //Filtra la lista de autorizacion para almacenar en un array
+              if(this.listaVacacionesFiltrada.length == i){
+                this.listaVacacionDeparta = this.Vacacionlista;
+
+                if (Object.keys(this.listaVacacionDeparta).length == 0) {
+                  this.validarMensaje1 = true;
+                }
+      
+                if(this.listaVacacionDeparta.length != 0) {
+                  this.lista_vacaciones = true;
+                }else {
+                  this.lista_vacaciones = false;
+                }
+                return console.log('listaVacacionDeparta: ',this.listaVacacionDeparta)
+              }
+              i = i+1;
+            }
+          );
+        });
 
     },err => {
       this.validarMensaje1 = true;

@@ -18,6 +18,8 @@ import { EditarEstadoVacacionAutoriacionComponent } from 'src/app/componentes/au
 import { VacacionAutorizacionesComponent } from 'src/app/componentes/autorizaciones/vacacion-autorizaciones/vacacion-autorizaciones.component';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
   selector: 'app-ver-vacacion',
@@ -48,6 +50,9 @@ export class VerVacacionComponent implements OnInit {
   ocultar: boolean = false;
   estado: boolean = false;
 
+  ArrayAutorizacionTipos: any = []
+  gerencia: boolean = false;
+
   constructor(
     public restGeneral: DatosGeneralesService, // SERVICIO DE DATOS GENERALES DE EMPLEADO
     public restEmpre: EmpresaService, // SERVICIO DE DATOS DE EMPRESA
@@ -58,6 +63,8 @@ export class VerVacacionComponent implements OnInit {
     private restA: AutorizacionService, // SERVICIO DE DATOS DE AUTORIZACIÓN
     private restV: VacacionesService, // SERVICIO DE DATOS DE SOLICITUD DE VACACIONES
     private parametro: ParametrosService,
+    public restAutoriza: AutorizaDepartamentoService, //SERVICIO DE DATOS DE AUTORIZACION POR EL EMPLEADO
+    public usuarioDepa: UsuarioService, //SERVICIO DE DATOS DE DEPARTAMENTO POR EL USUARIO DE LA SOLICITUD
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.id_vacacion = this.router.url.split('/')[2];
@@ -93,6 +100,12 @@ export class VerVacacionComponent implements OnInit {
       vacio => {
         this.BuscarDatos(this.formato_fecha);
       });
+
+    this.restAutoriza.BuscarAutoridadUsuario(this.idEmpleado).subscribe(
+      (res) => {
+        this.ArrayAutorizacionTipos = res;
+      }
+    );
   }
 
   // VARIABE DE ALMACENAMIENTO DE DATOS DE COLABORADORES QUE REVISARON SOLICITUD
@@ -120,7 +133,26 @@ export class VerVacacionComponent implements OnInit {
       if(this.idEmpleado == this.vacacion[0].id_empleado){
         this.ocultar = true;
       }else{
-        this.ocultar = false;
+        this.usuarioDepa.ObtenerDepartamentoUsuarios(this.vacacion[0].id_empleado).subscribe((usuaDep) => {
+          this.ArrayAutorizacionTipos.filter(x => {
+            if((x.id_departamento == 1) && (x.estado == true)){
+              this.gerencia = true;
+              if(this.vacacion[0].estado == 2 && x.preautorizar == true){
+                return this.ocultar = true;
+              }else {
+                return this.ocultar = false;
+              }
+            }else if((this.gerencia == false) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
+              if(this.vacacion[0].estado == 2 && x.autorizar == true){
+                return this.ocultar = false;
+              }else if(this.vacacion[0].estado == 1 && x.preautorizar == true){
+                return this.ocultar = false;
+              }else{
+                return this.ocultar = true;
+              }
+            }
+          })
+        })
       }
 
       if(this.vacacion[0].estado > 1){

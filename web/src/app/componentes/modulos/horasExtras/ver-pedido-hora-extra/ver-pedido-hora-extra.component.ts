@@ -21,6 +21,8 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 import { HoraExtraAutorizacionesComponent } from 'src/app/componentes/autorizaciones/hora-extra-autorizaciones/hora-extra-autorizaciones.component';
 import { EditarEstadoHoraExtraAutorizacionComponent } from 'src/app/componentes/autorizaciones/editar-estado-hora-extra-autorizacion/editar-estado-hora-extra-autorizacion.component';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
   selector: 'app-ver-pedido-hora-extra',
@@ -61,6 +63,8 @@ export class VerPedidoHoraExtraComponent implements OnInit {
     private restE: EmpleadoService, // SERVICIO DE DATOS DE EMPLEADO
     public restEmpre: EmpresaService, // SERVICIOS DE DATOS EMPRESA
     public restGeneral: DatosGeneralesService, // SERVICIO DATOS GENERALES DE EMPLEADO
+    public restAutoriza: AutorizaDepartamentoService, //SERVICIO DE DATOS DE AUTORIZACION POR EL EMPLEADO
+    public usuarioDepa: UsuarioService, //SERVICIO DE DATOS DE DEPARTAMENTO POR EL USUARIO DE LA SOLICITUD
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.dataParams = this.router.routerState.snapshot.root.children[0].params;
@@ -81,17 +85,26 @@ export class VerPedidoHoraExtraComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
+  ArrayAutorizacionTipos: any = []
+  gerencia: boolean = false;
+
   // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-        this.BuscarHora(this.formato_fecha)
-      },
-      vacio => {
-        this.BuscarHora(this.formato_fecha)
-      });
+      this.formato_fecha = res[0].descripcion;
+      this.BuscarHora(this.formato_fecha)
+    },
+    vacio => {
+      this.BuscarHora(this.formato_fecha)
+    });
+
+    this.restAutoriza.BuscarAutoridadUsuario(this.idEmpleado).subscribe(
+      (res) => {
+        this.ArrayAutorizacionTipos = res;
+      }
+    );
   }
 
   BuscarHora(fecha: string) {
@@ -143,10 +156,35 @@ export class VerPedidoHoraExtraComponent implements OnInit {
 
       if(this.idEmpleado == this.id_usua_solicita){
         this.habilitarActualizar = false;
+      }else{
+        this.usuarioDepa.ObtenerDepartamentoUsuarios(this.id_usua_solicita).subscribe((usuaDep) => {
+          this.ArrayAutorizacionTipos.filter(x => {
+            if((x.id_departamento == 1) && (x.estado == true)){
+              this.gerencia = true;
+              if(this.hora_extra[0].estado == 2 && x.preautorizar == true){
+                return this.habilitarActualizar = false;
+              }else {
+                return this.habilitarActualizar = true;
+              }
+            }else if((this.gerencia == false) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
+              if(this.hora_extra[0].estado == 2 && x.autorizar == true){
+                return this.habilitarActualizar = true;
+              }else if(this.hora_extra[0].estado == 1 && x.preautorizar == true){
+                return this.habilitarActualizar = true;
+              }else{
+                return this.habilitarActualizar = false;
+              }
+            }
+          })
+        })
       }
+
+      
 
       if(this.hora_extra[0].estado > 1){
         this.estado = true;
+      }else{
+        this.estado = false;
       }
 
       this.ObtenerAprobacion();
@@ -200,6 +238,8 @@ export class VerPedidoHoraExtraComponent implements OnInit {
       })
       // TOMAR TAMAÑO DE ARREGLO DE COLABORADORES QUE REVIZARÓN SOLICITUD
       this.cont = autorizaciones.length - 1;
+
+      console.log('autorizacion .. ', this.autorizacion);
 
     }, error => {
       this.HabilitarAutorizacion = true;
@@ -367,8 +407,6 @@ export class VerPedidoHoraExtraComponent implements OnInit {
   }
 
   SeleccionarMetodo() {
-
-
     let fecha = this.validar.FormatearFecha(this.fechaActual, this.formato_fecha, this.validar.dia_completo);
     let fec_inicio_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_inicio, this.formato_fecha, this.validar.dia_completo);
     let fec_final_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_final, this.formato_fecha, this.validar.dia_completo);

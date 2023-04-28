@@ -22,6 +22,8 @@ import { ParametrosService } from "src/app/servicios/parametrosGenerales/paramet
 import { PermisosService } from "src/app/servicios/permisos/permisos.service";
 import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
 import { MainNavService } from "src/app/componentes/administracionGeneral/main-nav/main-nav.service";
+import { AutorizaDepartamentoService } from "src/app/servicios/autorizaDepartamento/autoriza-departamento.service";
+import { UsuarioService } from "src/app/servicios/usuarios/usuario.service";
 
 export interface PermisosElemento {
   apellido: string;
@@ -47,7 +49,7 @@ export interface PermisosElemento {
   styleUrls: ["./listar-empleado-permiso.component.css"],
 })
 export class ListarEmpleadoPermisoComponent implements OnInit {
-  permisos: any = [];
+  public permisos: any = [];
 
   selectionUno = new SelectionModel<PermisosElemento>(true, []);
 
@@ -82,6 +84,10 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   get logoE(): string {return this.plantilla.logoBase64;}
   get frase(): string {return this.plantilla.marca_Agua;}
 
+  autorizacion: boolean = false;
+  preautorizacion: boolean = false;
+  id_departa: any = [];
+
   constructor(
     private plantilla: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
     private validar: ValidacionesService,
@@ -89,7 +95,9 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     private restP: PermisosService,
     private funciones: MainNavService,
     public parametro: ParametrosService,
-    public restEmpleado: EmpleadoService
+    public restEmpleado: EmpleadoService,
+    public restAutoriza: AutorizaDepartamentoService,
+    public usuarioDepa: UsuarioService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem("empleado") as string);
   }
@@ -129,6 +137,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   formato_fecha: string = "DD/MM/YYYY";
   formato_hora: string = "HH:mm:ss";
 
+  ArrayAutorizacionTipos: any = []
   // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
@@ -139,6 +148,12 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
       },
       (vacio) => {
         this.BuscarHora(this.formato_fecha);
+      }
+    );
+
+    this.restAutoriza.BuscarAutoridadUsuario(this.idEmpleado).subscribe(
+      (res) => {
+        this.ArrayAutorizacionTipos = res;
       }
     );
   }
@@ -158,19 +173,22 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     );
   }
 
-  public listaPermisosFiltradas: any = [];
+  listaPermisosFiltradas: any = [];
+  listaPermisosDeparta: any = [];
+  permilista: any = [];
+  gerencia: boolean;
   obtenerPermisos(fecha: string, hora: string) {
     this.restP.obtenerAllPermisos().subscribe(
       (res) => {
         this.permisos = res;
 
-        //Filtra la lista de Horas Extras para descartar las solicitudes del mismo usuario y almacena en una nueva lista
+        //Filtra la lista de Permisos para descartar las solicitudes del mismo usuario y almacena en una nueva lista
         this.listaPermisosFiltradas = this.permisos.filter((o) => {
           if (this.idEmpleado !== o.id_emple_solicita) {
             return this.listaPermisosFiltradas.push(o);
           }
         });
-
+       
         this.listaPermisosFiltradas.forEach((p) => {
           // TRATAMIENTO DE FECHAS Y HORAS EN FORMATO DD/MM/YYYYY
           p.fec_creacion_ = this.validar.FormatearFecha(
@@ -194,15 +212,48 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
           } else if (p.estado === 2) {
             p.estado = "Pre-autorizado";
           }
+
         });
 
-        if (Object.keys(this.listaPermisosFiltradas).length == 0) {
-          this.validarMensaje1 = true;
-        }
+        let i = 1;
+        this.listaPermisosFiltradas.filter(item => {
+          this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_empl_cargo).subscribe(
+            (usuaDep) => {
+              this.ArrayAutorizacionTipos.filter(x => {
+                if((x.id_departamento == 1) && (x.estado == true)){
+                  this.gerencia = true;
+                  if(item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)){
+                    return this.permilista.push(item);
+                  }else if(item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)){
+                    return this.permilista.push(item);
+                  }
+                }else if((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
+                  if(item.estado == 'Pendiente' && x.preautorizar == true){
+                    return this.permilista.push(item);
+                  }else if(item.estado == 'Pre-autorizado' && x.autorizar == true){
+                    return this.permilista.push(item);
+                  }
+                }
+              })
 
-        if (this.listaPermisosFiltradas.length != 0) {
-          this.lista_permisos = true;
-        }
+              //Filtra la lista de autorizacion para almacenar en un array
+              if(this.listaPermisosFiltradas.length == i){
+                this.listaPermisosDeparta = this.permilista;
+
+                if(Object.keys(this.listaPermisosDeparta).length == 0) {
+                  this.validarMensaje1 = true;
+                }
+      
+                if(this.listaPermisosDeparta.length != 0) {
+                  this.lista_permisos = true;
+                }
+              }
+              i = i+1;
+            }
+          );
+
+        });
+
       },
       (err) => {
         console.log("permisos ALL ", err.error);
@@ -210,6 +261,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
         return this.validar.RedireccionarHomeAdmin(err.error);
       }
     );
+
   }
 
   permisosTotales: any;

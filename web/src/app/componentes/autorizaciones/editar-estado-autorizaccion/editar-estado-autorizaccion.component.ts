@@ -10,6 +10,7 @@ import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.serv
 import { PermisosService } from 'src/app/servicios/permisos/permisos.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
 
 interface Estado {
   id: number,
@@ -24,11 +25,7 @@ interface Estado {
 
 export class EditarEstadoAutorizaccionComponent implements OnInit {
 
-  estados: Estado[] = [
-    { id: 2, nombre: 'Pre-autorizado' },
-    { id: 3, nombre: 'Autorizado' },
-    { id: 4, nombre: 'Negado' }
-  ];
+  estados: Estado[] = [];
 
   estado = new FormControl('', Validators.required);
 
@@ -41,6 +38,8 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
   NotifiRes: any;
   FechaActual: any;
 
+  public ArrayAutorizacionTipos: any = []
+
   constructor(
     private restA: AutorizacionService,
     private restP: PermisosService,
@@ -50,13 +49,14 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
     public ventana: MatDialogRef<EditarEstadoAutorizaccionComponent>,
     public validar: ValidacionesService,
     public parametro: ParametrosService,
+    public restAutoriza: AutorizaDepartamentoService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.idEmpleadoIngresa = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
-    console.log(this.data);
+    console.log('Data: ',this.data);
     console.log(this.data.auto.id_documento);
     console.log(this.data.permiso.id_empleado);
     console.log(this.data.permiso.estado);
@@ -88,7 +88,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
+  gerencia: boolean = false;
   // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
@@ -96,6 +96,44 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
       res => {
         this.formato_fecha = res[0].descripcion;
       });
+
+    this.restAutoriza.BuscarAutoridadUsuario(this.idEmpleadoIngresa).subscribe(
+      (res) => {
+        this.ArrayAutorizacionTipos = res;
+
+        console.log('ArrayAutorizacionTipos: ',this.ArrayAutorizacionTipos);
+
+        this.ArrayAutorizacionTipos.filter(x => {
+          if(x.id_departamento == 1 && x.estado == true){
+            this.gerencia = true;
+            if(x.autorizar == true){
+              this.estados = [
+                { id: 3, nombre: 'Autorizado' },
+                { id: 4, nombre: 'Negado' }
+              ];
+            }else if(x.preautorizar == true){
+              this.estados = [
+                { id: 2, nombre: 'Pre-autorizado' }
+              ];
+            }
+          }
+          else if((this.gerencia == false) && (this.data.auto.id_departamento == x.id_departamento && x.estado == true)){
+            if(x.autorizar == true){
+              this.estados = [
+                { id: 3, nombre: 'Autorizado' },
+                { id: 4, nombre: 'Negado' }
+              ];
+            }else if(x.preautorizar == true){
+              this.estados = [
+                { id: 2, nombre: 'Pre-autorizado' }
+              ];
+            }
+          }
+        });
+      }
+    );
+
+    
   }
 
   BuscarHora() {
@@ -201,8 +239,6 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
 
     // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
     permiso.EmpleadosSendNotiEmail.forEach(e => {
-
-      console.log('for each', e)
 
       // LECTURA DE DATOS LEIDOS
       cont = cont + 1;

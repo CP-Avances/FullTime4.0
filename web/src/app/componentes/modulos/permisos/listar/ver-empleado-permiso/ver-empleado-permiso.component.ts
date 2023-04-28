@@ -19,6 +19,8 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 
 import { EditarEstadoAutorizaccionComponent } from 'src/app/componentes/autorizaciones/editar-estado-autorizaccion/editar-estado-autorizaccion.component';
+import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
   selector: 'app-ver-empleado-permiso',
@@ -64,6 +66,8 @@ export class VerEmpleadoPermisoComponent implements OnInit {
     public restEmpre: EmpresaService, // SERVICIO DE DATOS DE EMPRESA
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     public restE: EmpleadoService, // SERVICIO DE DATOS DE EMPLEADO
+    public restAutoriza: AutorizaDepartamentoService, //SERVICIO DE DATOS DE AUTORIZACION POR EL EMPLEADO
+    public usuarioDepa: UsuarioService, //SERVICIO DE DATOS DE DEPARTAMENTO POR EL USUARIO DE LA SOLICITUD
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.id_permiso = this.router.url.split('/')[2];
@@ -81,7 +85,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
+  ArrayAutorizacionTipos: any = [];
   // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
@@ -92,7 +96,14 @@ export class VerEmpleadoPermisoComponent implements OnInit {
       },
       vacio => {
         this.BuscarHora(this.formato_fecha)
-      });
+      }
+    );
+
+    this.restAutoriza.BuscarAutoridadUsuario(this.idEmpleado).subscribe(
+      (res) => {
+        this.ArrayAutorizacionTipos = res;
+      }
+    );
   }
 
   BuscarHora(fecha: string) {
@@ -112,7 +123,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
   // CONTADOR DE REVISIONES DE SOLICITUD
   lectura: number = 1;
   cont: number;
-
+  gerencia: boolean = false;
   // METODO DE BUSQUEDA DE DATOS DE SOLICITUD Y AUTORIZACIÓN
   BuscarDatos(formato_fecha: string, formato_hora: string) {
     this.InfoPermiso = [];
@@ -135,15 +146,33 @@ export class VerEmpleadoPermisoComponent implements OnInit {
       if(this.idEmpleado == this.InfoPermiso[0].id_empleado){
         this.ocultar = true;
       }else{
-        this.ocultar = false;
+        this.usuarioDepa.ObtenerDepartamentoUsuarios(this.InfoPermiso[0].id_empleado).subscribe((usuaDep) => {
+          this.ArrayAutorizacionTipos.filter(x => {
+            if((x.id_departamento == 1) && (x.estado == true)){
+              this.gerencia = true;
+              if(this.InfoPermiso[0].estado == 2 && x.preautorizar == true){
+                return this.ocultar = true;
+              }else {
+                return this.ocultar = false;
+              }
+            }else if((this.gerencia == false) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
+              if(this.InfoPermiso[0].estado == 2 && x.autorizar == true){
+                return this.ocultar = false;
+              }else if(this.InfoPermiso[0].estado == 1 && x.preautorizar == true){
+                return this.ocultar = false;
+              }else{
+                return this.ocultar = true;
+              }
+            }
+          })
+        })
       }
 
-      console.log("Datos del Permiso: ",this.InfoPermiso);
-      console.log("Id Empleado: ",this.idEmpleado, " = Id de empleado solicita: ",this.InfoPermiso[0].id_empleado);
-
       if(this.InfoPermiso[0].estado > 1){
+        console.log("entro aqui 1");
         this.esconder = true;
       }else{
+        console.log("entro aqui 2");
         this.esconder = false;
       }
 
@@ -157,39 +186,39 @@ export class VerEmpleadoPermisoComponent implements OnInit {
     this.ObtenerSolicitud(this.id_permiso);
   }
 
-
+  estado_auto: any;
   ObtenerAutorizacion(id: number) {
     this.autorizacion = [];
     this.empleado_estado = [];
     this.lectura = 1;
     this.restA.BuscarAutorizacionPermiso(id).subscribe(res1 => {
       this.autorizacion = res1;
-
       // METODO PARA OBTENER EMPLEADOS Y ESTADOS
       var autorizaciones = this.autorizacion[0].id_documento.split(',');
       autorizaciones.map((obj: string) => {
         this.lectura = this.lectura + 1;
         if (obj != '') {
           let empleado_id = obj.split('_')[0];
-          var estado_auto = obj.split('_')[1];
+          this.estado_auto = obj.split('_')[1];
 
           // CAMBIAR DATO ESTADO INT A VARCHAR
-          if (estado_auto === '1') {
-            estado_auto = 'Pendiente';
+          if (this.estado_auto === '1') {
+            this.estado_auto = 'Pendiente';
           }
-          if (estado_auto === '2') {
-            estado_auto = 'Preautorización';
+          if (this.estado_auto === '2') {
+            this.estado_auto = 'Preautorización';
           }
-          if (estado_auto === '3') {
-            estado_auto = 'Autorización';
+          if (this.estado_auto === '3') {
+            this.estado_auto = 'Autorización';
           }
-          if (estado_auto === '4') {
-            estado_auto = 'Permiso Negado';
+          if (this.estado_auto === '4') {
+            this.estado_auto = 'Permiso Negado';
           }
+
           // CREAR ARRAY DE DATOS DE COLABORADORES
           var data = {
             id_empleado: empleado_id,
-            estado: estado_auto
+            estado: this.estado_auto
           }
           this.empleado_estado = this.empleado_estado.concat(data);
           // CUANDO TODOS LOS DATOS SE HAYAN REVISADO EJECUTAR METODO DE INFORMACIÓN DE AUTORIZACIÓN
@@ -200,10 +229,12 @@ export class VerEmpleadoPermisoComponent implements OnInit {
       })
       // TOMAR TAMAÑO DE ARREGLO DE COLABORADORES QUE REVIZARÓN SOLICITUD
       this.cont = autorizaciones.length - 1;
+      console.log("Datos de InfoPermiso[0].estado: ",this.autorizacion.length);
 
     }, error => {
       this.HabilitarAutorizacion = false;
     });
+  
   }
 
   // METODO PARA OBTENER EL LOGO DE LA EMPRESA
@@ -294,6 +325,8 @@ export class VerEmpleadoPermisoComponent implements OnInit {
   }
 
   AbrirVentanaEditarAutorizacion(autoriza: any): void {
+    console.log('autoriza: ',autoriza);
+    console.log('this.InfoPermiso: ',this.InfoPermiso[0]);
     this.ventana.open(EditarEstadoAutorizaccionComponent,
       { width: '350px', data: { auto: autoriza, permiso: this.InfoPermiso[0] } })
       .afterClosed().subscribe(item => {

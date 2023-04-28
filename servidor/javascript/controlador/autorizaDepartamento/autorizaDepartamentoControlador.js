@@ -20,7 +20,7 @@ class AutorizaDepartamentoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
             const AUTORIZA = yield database_1.default.query(`
-            SELECT da.id, da.id_departamento, da.id_empl_cargo, da.estado, cd.nombre AS nom_depar,
+            SELECT da.id, da.id_departamento, da.id_empl_cargo, da.estado, da.autorizar, da.preautorizar, cd.nombre AS nom_depar,
                 ce.id AS id_empresa, ce.nombre AS nom_empresa, s.id AS id_sucursal, 
                 s.nombre AS nom_sucursal
             FROM depa_autorizaciones AS da, cg_departamentos AS cd, cg_empresa AS ce, 
@@ -39,22 +39,22 @@ class AutorizaDepartamentoControlador {
     // METODO PARA REGISTRAR AUTORIZACION
     CrearAutorizaDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_departamento, id_empl_cargo, estado, id_empleado } = req.body;
+            const { id_departamento, id_empl_cargo, estado, id_empleado, autorizar, preautorizar } = req.body;
             yield database_1.default.query(`
-            INSERT INTO depa_autorizaciones (id_departamento, id_empl_cargo, estado, id_empleado)
-            VALUES ($1, $2, $3, $4)
-            `, [id_departamento, id_empl_cargo, estado, id_empleado]);
+            INSERT INTO depa_autorizaciones (id_departamento, id_empl_cargo, estado, id_empleado, autorizar, preautorizar)
+            VALUES ($1, $2, $3, $4, $5, $6)
+            `, [id_departamento, id_empl_cargo, estado, id_empleado, autorizar, preautorizar]);
             res.jsonp({ message: 'Registro guardado.' });
         });
     }
     // METODO PARA ACTUALIZAR REGISTRO
     ActualizarAutorizaDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_departamento, id_empl_cargo, estado, id } = req.body;
+            const { id_departamento, id_empl_cargo, estado, id, autorizar, preautorizar } = req.body;
             yield database_1.default.query(`
-            UPDATE depa_autorizaciones SET id_departamento = $1, id_empl_cargo = $2, estado = $3 
+            UPDATE depa_autorizaciones SET id_departamento = $1, id_empl_cargo = $2, estado = $3, autorizar = $5, preautorizar = $6
             WHERE id = $4
-            `, [id_departamento, id_empl_cargo, estado, id]);
+            `, [id_departamento, id_empl_cargo, estado, id, autorizar, preautorizar]);
             res.jsonp({ message: 'Registro actualizado.' });
         });
     }
