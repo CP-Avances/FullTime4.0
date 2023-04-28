@@ -29,7 +29,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let v of listaVacacionesFiltrada | paginate:tamanio_pagina:numero_pagina">
+                    <tr *ngFor="let v of listaVacacionDeparta | paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionUno.toggle(v) : null" [checked]="selectionUno.isSelected(v)"
@@ -58,7 +58,7 @@
                 </tbody>
             </table>
         </div>
-        <mat-paginator id="pagina" [length]="listaVacacionesFiltrada.length" [pageSize]="tamanio_pagina"
+        <mat-paginator id="pagina" [length]="listaVacacionDeparta.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
         <div class="d-flex justify-content-end" style="margin-right: 2%;">
