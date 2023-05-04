@@ -10,6 +10,7 @@ import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-ge
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
 
 @Component({
   selector: 'app-tiempo-autorizado',
@@ -41,6 +42,11 @@ export class TiempoAutorizadoComponent implements OnInit {
 
   idEmpleado: number;
 
+  ArrayAutorizacionTipos: any = [];
+  gerencia: boolean = false;
+  ocultarPre: boolean = true;
+  ocultarAu: boolean = true;
+
   constructor(
     private informacion: DatosGeneralesService,
     private realTime: RealTimeService,
@@ -50,6 +56,7 @@ export class TiempoAutorizadoComponent implements OnInit {
     public ventana: MatDialogRef<TiempoAutorizadoComponent>,
     public validar: ValidacionesService,
     public parametro: ParametrosService,
+    public restAutoriza: AutorizaDepartamentoService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
@@ -76,7 +83,37 @@ export class TiempoAutorizadoComponent implements OnInit {
     this.parametro.ListarDetalleParametros(25).subscribe(
       res => {
         this.formato_fecha = res[0].descripcion;
-      });
+      }
+    );
+
+    console.log('datos: ',this.data.auto.id_departamento);
+
+    this.restAutoriza.BuscarAutoridadUsuario(this.idEmpleado).subscribe(
+      (res) => {
+        this.ArrayAutorizacionTipos = res;
+        this.ArrayAutorizacionTipos.filter(x => {
+          if(x.id_departamento == 1 && x.estado == true){
+            this.gerencia = true;
+            if(x.autorizar == true){
+              this.ocultarAu = false;
+              this.ocultarPre = true;
+            }else if(x.preautorizar == true){
+              this.ocultarAu = true;
+              this.ocultarPre = false;
+            }
+          }
+          else if((this.gerencia == false) && (this.data.auto.id_departamento == x.id_departamento && x.estado == true)){
+            if(x.autorizar == true){
+              this.ocultarAu = false;
+              this.ocultarPre = true;
+            }else if(x.preautorizar == true){
+              this.ocultarAu = true;
+              this.ocultarPre = false;
+            }
+          }
+        });
+      }
+    );
   }
 
   BuscarHora() {

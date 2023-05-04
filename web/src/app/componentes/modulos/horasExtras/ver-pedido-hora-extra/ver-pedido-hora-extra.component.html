@@ -114,27 +114,27 @@
                             </div>
                         </div>
                     </div>
-                    <div *ngIf="habilitarActualizar">
+                    <div *ngIf="habilitarActualizar" style="margin-top: 15px;">
                         <div class="d-flex flex-wrap justify-content-around" *ngFor="let h of hora_extra">
                             <div class="d-flex flex-wrap justify-content-around" style="padding-bottom: 10px;">
-                                <button mat-button type="button" class="btn btn-sm"
+                                <button type="button" class="btn btn-sm"
                                     (click)="AbrirAprobacion(h, 'aprobar', a)">
-                                    <i id="iconos" class="fa fa-edit"></i>
+                                    <i id="iconos" class="fa fa-edit" style="color: rgb(71, 255, 111);"></i>
                                     Aprobar
                                 </button>
                             </div>
                             <div class="d-flex flex-wrap justify-content-around" style="padding-bottom: 10px;">
-                                <button mat-button type="button" class="btn btn-sm"
+                                <button type="button" class="btn btn-sm"
                                     (click)="AbrirAprobacion(h, 'editar', a)">
-                                    <i id="iconos" class="far fa-clock"></i>
+                                    <i id="iconos" class="far fa-clock" style="color: rgb(88, 210, 255);"></i>
                                     Actualizar Horas
                                 </button>
                             </div>
                             <div class="d-flex flex-wrap justify-content-around" style="padding-bottom: 10px;">
-                                <button mat-button type="submit" class="btn btn-sm"
+                                <button type="submit" class="btn btn-sm"
                                     (click)="AbrirAprobacion(h, 'observacion', a)" matSuffix matTooltipPosition="right"
                                     matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
-                                    <i id="iconos" class="far fa-comment"></i>
+                                    <i id="iconos" class="far fa-comment" style="color: rgb(215, 121, 255);"></i>
                                     Enviar Observación
                                 </button>
                             </div>

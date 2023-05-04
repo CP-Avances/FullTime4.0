@@ -358,7 +358,7 @@ export class MainNavComponent implements OnInit {
             children: [
               { name: 'Planificar Servicio', url: '/alimentacion', color: true },
               { name: 'Listar Planificación', url: '/listaPlanComida', color: true },
-              { name: 'Aprobación Múltiple', url: '/listaSolicitaComida', color: true },
+              { name: 'Aprobación Múltiple A', url: '/listaSolicitaComida', color: true },
             ]
           },
           {

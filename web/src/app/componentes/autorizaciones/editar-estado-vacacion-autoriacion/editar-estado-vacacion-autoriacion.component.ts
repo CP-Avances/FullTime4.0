@@ -138,6 +138,11 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
       id_documento: this.data.auto.id_documento + localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       estado: form.estadoF,
     }
+
+
+    console.log('aprobacion :) : ',aprobacion);
+    console.log('this.data.auto :) : ',this.data.auto);
+
     this.restA.ActualizarAprobacion(this.data.auto.id, aprobacion).subscribe(res => {
       this.EditarEstadoVacacion(this.data.auto.id_vacacion, form.estadoF);
       this.NotificarAprobacion(form.estadoF);
