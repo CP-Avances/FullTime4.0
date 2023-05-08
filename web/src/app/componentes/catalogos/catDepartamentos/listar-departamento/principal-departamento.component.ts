@@ -21,6 +21,7 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 
 import { RegistroDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/registro-departamento/registro-departamento.component';
 import { EditarDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/editar-departamento/editar-departamento.component';
+import { VerDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/ver-departamento/ver-departamento.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
 @Component({
@@ -37,6 +38,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   filtroEmpresaSuc = '';
   filtroDeparPadre = '';
   departamentos: any = [];
+  depainfo: any = [];
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   departamentoPadreF = new FormControl('');
@@ -112,12 +114,29 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.numero_pagina = e.pageIndex + 1
   }
 
+  niveles: number = 0;
+  depaSuperior: string = '';
   // METODO PARA BUSCAR DEPARTAMENTOS
   ListaDepartamentos() {
     this.departamentos = []
     this.rest.ConsultarDepartamentos().subscribe(datos => {
       this.departamentos = datos;
       this.OrdenarDatos(this.departamentos);
+      
+      /*console.log('lista Departamentos: ',this.departamentos);
+      this.departamentos.forEach(item => {
+        var id_departamento = item.id;
+        var id_establecimiento = item.id_sucursal;
+        this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(data => {
+          this.depainfo = data;
+
+          console.log('depainfo: ',this.depainfo );
+
+          this.niveles = this.depainfo[0].nivel;
+          return this.depaSuperior = this.depainfo[0].dep_nivel_nombre ;
+        })
+      });*/
+
     })
   }
 
@@ -130,9 +149,9 @@ export class PrincipalDepartamentoComponent implements OnInit {
   }
 
   // METODO PARA ABRIR VENTANA DE EDICION DE DEPARTAMENTO
-  AbrirVentanaEditarDepartamento(departamento: any): void {
-    this.ventana.open(EditarDepartamentoComponent,
-      { width: '600px', data: departamento }).afterClosed().subscribe(item => {
+  AbrirVentanaVerDepartamento(departamento: any): void {
+    this.ventana.open(VerDepartamentoComponent,
+      { width: '650px', data: departamento }).afterClosed().subscribe(item => {
         this.ListaDepartamentos();
       });
   }

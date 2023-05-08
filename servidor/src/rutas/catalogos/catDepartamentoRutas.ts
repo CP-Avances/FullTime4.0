@@ -14,6 +14,8 @@ class DepartamentoRutas {
         this.router.post('/', TokenValidation, DEPARTAMENTO_CONTROLADOR.CrearDepartamento);
         // BUSCAR DEPARTAMENTOS POR ID SUCURSAL
         this.router.get('/sucursal-departamento/:id_sucursal', TokenValidation, DEPARTAMENTO_CONTROLADOR.ObtenerDepartamentosSucursal);
+        // BUSCAR DEPARTAMENTO POR ID
+        this.router.get('/infodepartamento/:id', TokenValidation, DEPARTAMENTO_CONTROLADOR.ObtenerDepartamento);
         // BUSCAR DEPARTAMENTOS POR ID SUCURSAL Y EXCLUIR DEPARTAMENTO ACTUALIZADO
         this.router.get('/sucursal-departamento-edicion/:id_sucursal/:id', TokenValidation, DEPARTAMENTO_CONTROLADOR.ObtenerDepartamentosSucursal_);
         // ACTUALIZAR DEPARTAMENTO
@@ -28,8 +30,17 @@ class DepartamentoRutas {
         this.router.post('/xmlDownload/', TokenValidation, DEPARTAMENTO_CONTROLADOR.FileXML);
         // METODO PARA DESCARGAR ARCHIVO XML
         this.router.get('/download/:nameXML', DEPARTAMENTO_CONTROLADOR.downloadXML);
-
-
+        // REGISTRAR NIVELDEPARTAMENTO
+        this.router.post('/crearnivel', TokenValidation, DEPARTAMENTO_CONTROLADOR.crearNivelDepa);
+        // BUSCAR NIVEL DEPARTAMENTO POR ID_DEPARTAMENTO Y ID_SUCURSAL
+        this.router.get('/infoniveldepa/:id_departamento/:id_establecimiento', TokenValidation, DEPARTAMENTO_CONTROLADOR.ObtenerNivelesDepa);
+        // ACTUALIZAR NIVEL DEPARTAMENTO
+        this.router.put('/actualizanivel/:id', TokenValidation, DEPARTAMENTO_CONTROLADOR.ActualizarNivelDepartamento);
+        // METODO PARA ELIMINAR REGISTRO NIVEL DEPARTAMENTO 
+        this.router.delete('/eliminarniveldepa/:id', TokenValidation, DEPARTAMENTO_CONTROLADOR.EliminarRegistroNivelDepa);
+        // ACTUALIZAR NIVEL DEPARTAMENTO TABLA NIVEL_JERARQUICO
+        this.router.put('/nivelactualizar/:id', TokenValidation, DEPARTAMENTO_CONTROLADOR.ActualizarNivelDepa);
+        
 
 
 
