@@ -5,14 +5,8 @@ import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
 import { PageEvent } from '@angular/material/paginator';
-import { Router } from '@angular/router';
 
-import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
-import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
-
-import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
-import { RegistrarNivelDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/registro-nivel-departamento/registrar-nivel-departamento.component';
 
 interface Nivel {
   valor: number;
@@ -62,33 +56,17 @@ export class VerListadoNivelComponent implements OnInit {
   tipoAutorizacion: string;
 
   constructor(
-    private rest: DepartamentosService,
     public auto: AutorizaDepartamentoService,
-    private restS: SucursalService,
     private toastr: ToastrService,
-    private router: Router,
     public ventana: MatDialog,
     public ventanacerrar: MatDialogRef<VerListadoNivelComponent>,
     @Inject(MAT_DIALOG_DATA) public info: any
   ) { }
 
   datos: any;
-
   ngOnInit(): void {
-
     this.datos = this.info;
     this.CargarDatos();
-
-    /*if (this.info.establecimiento === true) {
-      this.Habilitar = false;
-      this.datos = this.info.data;
-    }
-    else {
-      this.datos = this.info;
-      this.Habilitar = true;
-      this.idSucursal.setValue(this.datos.id_sucursal);
-    }
-    */
 
   }
 
@@ -111,95 +89,9 @@ export class VerListadoNivelComponent implements OnInit {
     this.numero_pagina = e.pageIndex + 1
   }
 
-  // OBTENER LISTA DE DEPARTAMENTOS
-  ObtenerDepartamentos(form: any) {
-    this.empleados = [];
-    this.rest.BuscarDepartamentoSucursal_(parseInt(form.idSucursalForm), this.datos.id).subscribe(datos => {
-      this.empleados = datos;
-    });
-  }
-
-  // METODO PARA CAPTURAR DATOS DE FORMULARIO
-  ModificarDepartamento(form: any) {
-    var departamento = {
-      id_sucursal: form.idSucursalForm,
-      depa_padre: form.depaPadreForm,
-      nombre: form.nombreForm.toUpperCase(),
-      nivel: parseInt(form.nivelForm),
-    };
-
-    // VERIFICAR ID DE SUCURSAL
-    if (this.info.establecimiento === true) {
-      departamento.id_sucursal = this.datos.id_sucursal;
-    }
-
-    if (departamento.depa_padre === '') {
-      departamento.depa_padre = null;
-    }
-
-    if (this.empleados.length === 0) {
-      this.ActualizarDepartamento(departamento);
-    }
-    else {
-      this.GuardarDatos(departamento);
-    }
-  }
-
-
-  // METODO DE ALMACENAMIENTO DE DATOS VALIDANDO DUPLICADOS
-  contador: number = 0;
-  GuardarDatos(departamento: any) {
-    for (var i = 0; i <= this.empleados.length - 1; i++) {
-      if (this.empleados[i].nombre === departamento.nombre) {
-        this.contador = 1;
-      }
-    }
-    if (this.contador === 1) {
-      this.contador = 0;
-      this.toastr.error('Nombre de departamento ya se encuentra registrado.', '', {
-        timeOut: 6000,
-      });
-    }
-    else {
-      this.ActualizarDepartamento(departamento);
-    }
-  }
-
-  // METODO DE ACTUALIZACION DE REGISTRO EN BASE DE DATOS
-  ActualizarDepartamento(departamento: any) {
-    this.habilitarprogress = true;
-    this.rest.ActualizarDepartamento(this.datos.id, departamento).subscribe(response => {
-      this.habilitarprogress = false;
-      if (response.message === 'error') {
-        this.toastr.error('Existe un error en los datos.', '', {
-          timeOut: 6000,
-        });
-      }
-      else {
-        this.toastr.success('Operacion Exitosa.', 'Registro actualizado.', {
-          timeOut: 6000,
-        });
-        this.CerrarVentana();
-      }
-    });
-  }
-
   // METODO PARA CERRAR VENTANA
   CerrarVentana() {
     this.ventanacerrar.close();
   }
 
-  // ORDENAR LOS DATOS SEGÚN EL ID 
-  OrdenarDatos(array: any) {
-    function compare(a: any, b: any) {
-      if (a.id < b.id) {
-        return -1;
-      }
-      if (a.id > b.id) {
-        return 1;
-      }
-      return 0;
-    }
-    array.sort(compare);
-  }
 }
