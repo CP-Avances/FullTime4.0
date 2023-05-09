@@ -83,7 +83,7 @@ class AutorizaDepartamentoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_depa } = req.params;
             const EMPLEADOS = yield database_1.default.query(`
-            SELECT d.id_departamento, v.nombre, v.apellido, d.autorizar, d.preautorizar, d.estado, v.depa_trabaja 
+            SELECT d.id_departamento, v.nombre, v.apellido, d.autorizar, d.preautorizar, d.estado, v.depa_trabaja, v.cargo 
             FROM depa_autorizaciones AS d INNER JOIN VistaAutorizanCargo AS v ON d.id_departamento = v.id_depar AND d.id_empl_cargo = v.id_cargo 
             WHERE d.id_departamento = $1
             `, [id_depa]);

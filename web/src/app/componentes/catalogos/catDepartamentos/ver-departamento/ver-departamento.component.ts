@@ -12,7 +12,7 @@ import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { RegistrarNivelDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/registro-nivel-departamento/registrar-nivel-departamento.component';
-import { VerListadoNivelComponent } from 'src/app/componentes/catalogos/catDepartamentos/ver-listado-nivel/ver-listado-nivel.component';
+import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
 
 interface Nivel {
   valor: number;
@@ -71,8 +71,11 @@ export class VerDepartamentoComponent implements OnInit {
   idDepartamento: any;
   info: any = [];
 
+  mostrar: boolean = true;
+
   constructor(
     public rest: DepartamentosService,
+    public auto: AutorizaDepartamentoService,
     private restS: SucursalService,
     private toastr: ToastrService,
     private router: Router,
@@ -108,15 +111,18 @@ export class VerDepartamentoComponent implements OnInit {
 
   // METODO PARA IMPRIMIR DATOS EN FORMULARIO
   CargarDatos(info: any) {
+    this.habilitarprogress = true;
     this.departamentos = [];
     var id_departamento = info.id;
     var id_establecimiento = info.id_sucursal;
     this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
       this.departamentos = datos;
+      this.habilitarprogress = false;
     }, error => {
       this.toastr.error('No ha registrado niveles de autorizacion.', '', {
         timeOut: 6000,
       });
+      this.habilitarprogress = false;
     })
   }
 
@@ -328,15 +334,28 @@ export class VerDepartamentoComponent implements OnInit {
     );
   }
 
-  AbrirVentanaVerListdoNivel(departamento: any){
-    this.ventana.open(VerListadoNivelComponent, 
-      {width: '500px', data: departamento}).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.ListaDepartamentos();
-        }
-      }
-    );
+
+  empleados: any = [];
+  depa: string;
+  AbrirVentanaVerListadoEmpleados(departamento: any){
+    this.habilitarprogress = true;
+    var id_depa = departamento.id_dep_nivel;
+    this.depa = departamento.dep_nivel_nombre;
+    this.auto.BuscarListaEmpleadosAutorizan(id_depa).subscribe(datos => {
+      this.empleados = datos;
+      this.habilitarprogress =false;
+      this.mostrar = false;
+    }, error => {
+      this.mostrar = true;
+      this.habilitarprogress =false;
+      this.toastr.error('No hay usuarios que autoricen en este departamento.', '', {
+        timeOut: 4000,
+      });
+    })
+  }
+
+  CerrarTabla(){
+    this.mostrar = true;
   }
 
 }
