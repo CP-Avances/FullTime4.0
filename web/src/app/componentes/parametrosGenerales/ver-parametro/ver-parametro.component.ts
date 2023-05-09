@@ -59,6 +59,7 @@ export class VerParametroComponent implements OnInit {
     var cadena = this.router.url;
     var aux = cadena.split("/");
     this.idParametro = aux[3];
+    cadena = this.router.url;
   }
 
   ngOnInit(): void {

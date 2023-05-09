@@ -22,14 +22,11 @@ class DepartamentoRutas {
 
 
 
-
-
-
-
         
         this.router.get('/', AUTORIZA_DEPARTAMENTO_CONTROLADOR.ListarAutorizaDepartamento);
-
         this.router.get('/empleadosAutorizan/:id_depar', AUTORIZA_DEPARTAMENTO_CONTROLADOR.ObtenerQuienesAutorizan);
+        this.router.get('/listaempleadosAutorizan/:id_depa', AUTORIZA_DEPARTAMENTO_CONTROLADOR.ObtenerlistaEmpleadosAutorizan);
+        
 
     }
 }

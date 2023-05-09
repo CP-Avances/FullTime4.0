@@ -76,7 +76,22 @@ class AutorizaDepartamentoControlador {
     }
 
 
-
+    public async ObtenerlistaEmpleadosAutorizan(req: Request, res: Response): Promise<any> {
+        const { id_depa } = req.params;
+        const EMPLEADOS = await pool.query(
+            `
+            SELECT d.id_departamento, v.nombre, v.apellido, d.autorizar, d.preautorizar, d.estado, v.depa_trabaja 
+            FROM depa_autorizaciones AS d INNER JOIN VistaAutorizanCargo AS v ON d.id_departamento = v.id_depar AND d.id_empl_cargo = v.id_cargo 
+            WHERE d.id_departamento = $1
+            `
+        , [id_depa]);
+        if (EMPLEADOS.rowCount > 0) {
+            return res.jsonp(EMPLEADOS.rows)
+        }
+        else {
+            return res.status(404).jsonp({ text: 'Registros no encontrados' });
+        }
+    }
 
     public async ObtenerQuienesAutorizan(req: Request, res: Response): Promise<any> {
         const { id_depar } = req.params;

@@ -43,11 +43,7 @@ export class RegistroDepartamentoComponent implements OnInit {
 
   // ARREGLO DE NIVELES EXISTENTES
   niveles: Nivel[] = [
-    { valor: '1', nombre: '1' },
-    { valor: '2', nombre: '2' },
-    { valor: '3', nombre: '3' },
-    { valor: '4', nombre: '4' },
-    { valor: '5', nombre: '5' }
+    { valor: '1', nombre: '1' }
   ];
 
   /**

@@ -65,6 +65,7 @@ import { EditarRolComponent } from './componentes/catalogos/catRoles/editar-rol/
 import { EditarRegimenComponent } from './componentes/catalogos/catRegimen/editar-regimen/editar-regimen.component';
 import { EditarDepartamentoComponent } from './componentes/catalogos/catDepartamentos/editar-departamento/editar-departamento.component';
 import { VerDepartamentoComponent } from './componentes/catalogos/catDepartamentos/ver-departamento/ver-departamento.component';
+import { VerListadoNivelComponent } from './componentes/catalogos/catDepartamentos/ver-listado-nivel/ver-listado-nivel.component';
 import { RegistrarNivelDepartamentoComponent } from './componentes/catalogos/catDepartamentos/registro-nivel-departamento/registrar-nivel-departamento.component';
 import { EditarTipoPermisosComponent } from './componentes/catalogos/catTipoPermisos/editar-tipo-permisos/editar-tipo-permisos.component';
 import { PlanificacionMultipleComponent } from './componentes/horarios/planificacionHorario/planificacion-multiple/planificacion-multiple.component';
@@ -408,6 +409,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     EditarDepartamentoComponent,
     RegistrarNivelDepartamentoComponent,
     VerDepartamentoComponent,
+    VerListadoNivelComponent,
     EditarTipoPermisosComponent,
     PlanificacionMultipleComponent,
     VerHorarioDetalleComponent,

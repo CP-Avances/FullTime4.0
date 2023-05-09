@@ -62,7 +62,6 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
 
   constructor(
     private rest: DepartamentosService,
-    private restS: SucursalService,
     private toastr: ToastrService,
     private router: Router,
     public ventana: MatDialog,
@@ -125,12 +124,12 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
       this.habilitarprogress = false;
       if (response.message === 'error') {
         this.toastr.error('Existe un error en los datos.', '', {
-          timeOut: 6000,
+          timeOut: 3000,
         });
       }
       else {
         this.toastr.success('Operacion Exitosa.', 'Registro actualizado.', {
-          timeOut: 6000,
+          timeOut: 3000,
         });
         this.CerrarVentana();
       }
@@ -152,7 +151,7 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
     if (this.contador === 1) {
       this.contador = 0;
       this.toastr.error('Nombre de departamento o nivel ya se encuentra registrado.', '', {
-        timeOut: 6000,
+        timeOut: 3000,
       });
     }
     else {
@@ -161,20 +160,20 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
           this.habilitarprogress = false;
           if (response.message === 'error') {
             this.toastr.error('Existe un error en los datos.', '', {
-            timeOut: 6000,
+            timeOut: 3000,
             });
           }
           else {
             this.ActualizarDepartamento(departamento);
             this.toastr.success('Operacion Exitosa.', 'Registro Creado.', {
-              timeOut: 6000,
+              timeOut: 3000,
             });
           this.CerrarVentana();
           }
         });
       }else{
         this.toastr.error('Le hace falta registrar los niveles inferiores.', '', {
-          timeOut: 5000,
+          timeOut: 3000,
         });
       }
     }

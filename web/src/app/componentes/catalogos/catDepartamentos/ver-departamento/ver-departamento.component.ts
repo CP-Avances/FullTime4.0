@@ -12,6 +12,7 @@ import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { RegistrarNivelDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/registro-nivel-departamento/registrar-nivel-departamento.component';
+import { VerListadoNivelComponent } from 'src/app/componentes/catalogos/catDepartamentos/ver-listado-nivel/ver-listado-nivel.component';
 
 interface Nivel {
   valor: number;
@@ -67,35 +68,49 @@ export class VerDepartamentoComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  idDepartamento: any;
+  info: any = [];
+
   constructor(
-    private rest: DepartamentosService,
+    public rest: DepartamentosService,
     private restS: SucursalService,
     private toastr: ToastrService,
     private router: Router,
     public ventana: MatDialog,
-    public ventanacerrar: MatDialogRef<VerDepartamentoComponent>,
-    @Inject(MAT_DIALOG_DATA) public info: any
-  ) { }
+    //public ventanacerrar: MatDialogRef<VerDepartamentoComponent>,
+    //@Inject(MAT_DIALOG_DATA) public info: any
+  ) { 
+    var cadena = this.router.url;
+    var aux = cadena.split("/");
+    this.idDepartamento = parseInt(aux[2]);
+  }
 
-  datos: any;
+  datos: any = [];
 
   ngOnInit(): void {
-    if (this.info.establecimiento === true) {
-      this.Habilitar = false;
-      this.datos = this.info.data;
-    }
-    else {
-      this.datos = this.info;
-      this.Habilitar = true;
-      this.idSucursal.setValue(this.datos.id_sucursal);
-    }
-    this.CargarDatos();
+
+    this.rest.BuscarDepartamento(this.idDepartamento).subscribe(dato => {
+      this.info = dato[0];
+      if (this.info.establecimiento === true) {
+        this.Habilitar = false;
+        this.datos = this.info.data;
+      }
+      else {
+        this.datos = this.info;
+        this.Habilitar = true;
+        this.idSucursal.setValue(this.datos.id_sucursal);
+      }
+
+      this.CargarDatos(this.info);
+  
+    })
   }
 
   // METODO PARA IMPRIMIR DATOS EN FORMULARIO
-  CargarDatos() {
-    var id_departamento = this.info.id;
-    var id_establecimiento = this.info.id_sucursal;
+  CargarDatos(info: any) {
+    this.departamentos = [];
+    var id_departamento = info.id;
+    var id_establecimiento = info.id_sucursal;
     this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
       this.departamentos = datos;
     }, error => {
@@ -157,7 +172,7 @@ export class VerDepartamentoComponent implements OnInit {
     if (this.contador === 1) {
       this.contador = 0;
       this.toastr.error('Nombre de departamento ya se encuentra registrado.', '', {
-        timeOut: 6000,
+        timeOut: 4000,
       });
     }
     else {
@@ -172,12 +187,12 @@ export class VerDepartamentoComponent implements OnInit {
       this.habilitarprogress = false;
       if (response.message === 'error') {
         this.toastr.error('Existe un error en los datos.', '', {
-          timeOut: 6000,
+          timeOut: 4000,
         });
       }
       else {
         this.toastr.success('Operacion Exitosa.', 'Registro actualizado.', {
-          timeOut: 6000,
+          timeOut: 4000,
         });
         this.CerrarVentana();
       }
@@ -186,7 +201,7 @@ export class VerDepartamentoComponent implements OnInit {
 
   // METODO PARA CERRAR VENTANA
   CerrarVentana() {
-    this.ventanacerrar.close();
+    //this.ventanacerrar.close();
   }
 
   nuvalistaDepa: any = [];
@@ -196,7 +211,6 @@ export class VerDepartamentoComponent implements OnInit {
   Eliminar(id_dep: number, datos: any) {
     this.rest.EliminarRegistroNivelDepa(id_dep).subscribe(res => {
       var data = {nivel: 0};
-
       this.departamentos.forEach(item => {
         if(datos.nivel < item.nivel){
           data.nivel = item.nivel - 1;
@@ -205,7 +219,7 @@ export class VerDepartamentoComponent implements OnInit {
           this.rest.ActualizarNivelDepa(item.id, data).subscribe(res => {
             if (res.message === 'error') {
               this.toastr.error('No se pudo actualizar la tabla de Niveles de autorizacion .', '', {
-                timeOut: 6000,
+                timeOut: 4000,
               });
             }
           }) 
@@ -220,10 +234,15 @@ export class VerDepartamentoComponent implements OnInit {
         this.rest.ActualizarNivelDepartamento(this.info.id, cg_depa).subscribe(response => {
           if (response.message === 'error') {
             this.toastr.error('Problemas al actualizar la lista de departamentos.', '', {
-              timeOut: 6000,
+              timeOut: 4000,
             });
+          }else{
+            this.CargarDatos(this.info);
           }
         })
+
+      this.CargarDatos(this.info);
+
       }else if(this.departamentos.length === 1){
         var cg_depa = {
           depa_padre: this.depa_padre1,
@@ -232,8 +251,10 @@ export class VerDepartamentoComponent implements OnInit {
         this.rest.ActualizarNivelDepartamento(this.info.id, cg_depa).subscribe(response => {
           if (response.message === 'error') {
             this.toastr.error('Problemas al actualizar la lista de departamentos.', '', {
-              timeOut: 6000,
+              timeOut: 4000,
             });
+          }else{
+            this.CargarDatos(this.info);
           }
         })
       }else{
@@ -246,14 +267,16 @@ export class VerDepartamentoComponent implements OnInit {
         this.rest.ActualizarNivelDepartamento(this.info.id, cg_depa).subscribe(response => {
           if (response.message === 'error') {
             this.toastr.error('Problemas al actualizar la lista de departamentos.', '', {
-              timeOut: 6000,
+              timeOut: 4000,
             });
+          }else{
+            this.CargarDatos(this.info);
           }
         })
       }
       
       this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
+        timeOut: 4000,
       });
     });
    
@@ -265,9 +288,6 @@ export class VerDepartamentoComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Eliminar(datos.id, datos);
-          this.CerrarVentana();
-        } else {
-          this.router.navigate(['/departamento']);
         }
     });
   }
@@ -302,9 +322,21 @@ export class VerDepartamentoComponent implements OnInit {
         if (confirmado) {
           this.ListaDepartamentos();
         } else {
-          this.CargarDatos();
-          this.router.navigate(['/departamento']);
+          this.CargarDatos(this.info);
         }
-      });
+      }
+    );
   }
+
+  AbrirVentanaVerListdoNivel(departamento: any){
+    this.ventana.open(VerListadoNivelComponent, 
+      {width: '500px', data: departamento}).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.ListaDepartamentos();
+        }
+      }
+    );
+  }
+
 }
