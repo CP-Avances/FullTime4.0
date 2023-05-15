@@ -64,25 +64,27 @@ class DetalleCatalogoHorarioControlador {
 
     // METODO PARA REGISTRAR DETALLES
     public async CrearDetalleHorarios(req: Request, res: Response): Promise<void> {
-        const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia } = req.body;
+        const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues } = req.body;
         await pool.query(
             `
-            INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes,
+                min_despues) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
             `
-            , [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia]);
+            , [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues]);
         res.jsonp({ message: 'Registro guardado.' });
     }
 
     // METODO PARA ACTUALIZAR DETALLE DE HORARIO
     public async ActualizarDetalleHorarios(req: Request, res: Response): Promise<void> {
-        const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, id } = req.body;
+        const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues,
+            id } = req.body;
         await pool.query(
             `
             UPDATE deta_horarios SET orden = $1, hora = $2, minu_espera = $3, id_horario = $4,
-            tipo_accion = $5, segundo_dia = $6, tercer_dia = $7 WHERE id = $8
+            tipo_accion = $5, segundo_dia = $6, tercer_dia = $7, min_antes = $8, min_despues= $9 WHERE id = $10
             `
-            , [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, id]);
+            , [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, id]);
         res.jsonp({ message: 'Registro actualizado.' });
     }
 

@@ -3,6 +3,7 @@ import { QueryResult } from 'pg';
 import pool from '../../database';
 import excel from 'xlsx';
 import fs from 'fs';
+import path from 'path';
 const builder = require('xmlbuilder');
 
 class HorarioControlador {
@@ -54,18 +55,29 @@ class HorarioControlador {
 
   // GUARDAR DOCUMENTO DE HORARIO
   public async GuardarDocumentoHorario(req: Request, res: Response): Promise<void> {
-    let list: any = req.files;
-    let doc = list.uploads[0].path.split("\\")[1];
-    let { nombre } = req.params;
-    let id = req.params.id
+
+    let id = req.params.id;
+    let { archivo, codigo } = req.params;
+
+    // LEER DATOS DE IMAGEN
+    let documento = id + '_' + codigo + '_' + req.file?.originalname;
+    let separador = path.sep;
 
     await pool.query(
       `
-      UPDATE cg_horarios SET documento = $2, doc_nombre = $3 WHERE id = $1
+      UPDATE cg_horarios SET documento = $2 WHERE id = $1
       `
-      , [id, doc, nombre]);
+      , [id, documento]);
 
-    res.jsonp({ message: 'Documento Actualizado' });
+    res.jsonp({ message: 'Documento actualizado.' });
+
+    if (archivo != 'null' && archivo != '' && archivo != null) {
+      if (archivo != documento) {
+        let filePath = `servidor${separador}horarios${separador}${archivo}`
+        let direccionCompleta = __dirname.split("servidor")[0] + filePath;
+        fs.unlinkSync(direccionCompleta);
+      }
+    }
   }
 
   // METODO PARA ACTUALIZAR DATOS DE HORARIO
@@ -95,27 +107,30 @@ class HorarioControlador {
   // ELIMINAR DOCUMENTO HORARIO BASE DE DATOS - SERVIDOR
   public async EliminarDocumento(req: Request, res: Response): Promise<void> {
     let { documento, id } = req.body;
+    let separador = path.sep;
 
     await pool.query(
       `
-            UPDATE cg_horarios SET documento = null, doc_nombre = null WHERE id = $1
+            UPDATE cg_horarios SET documento = null WHERE id = $1
             `
       , [id]);
 
     if (documento != 'null' && documento != '' && documento != null) {
-      let filePath = `servidor\\horarios\\${documento}`
+      let filePath = `servidor${separador}horarios${separador}${documento}`
       let direccionCompleta = __dirname.split("servidor")[0] + filePath;
       fs.unlinkSync(direccionCompleta);
     }
 
-    res.jsonp({ message: 'Documento Actualizado' });
+    res.jsonp({ message: 'Documento actualizado.' });
   }
 
   // ELIMINAR DOCUMENTO HORARIO DEL SERVIDOR
   public async EliminarDocumentoServidor(req: Request, res: Response): Promise<void> {
     let { documento } = req.body;
+    let separador = path.sep;
+
     if (documento != 'null' && documento != '' && documento != null) {
-      let filePath = `servidor\\horarios\\${documento}`
+      let filePath = `servidor${separador}horarios${separador}${documento}`
       let direccionCompleta = __dirname.split("servidor")[0] + filePath;
       fs.unlinkSync(direccionCompleta);
     }
@@ -133,7 +148,7 @@ class HorarioControlador {
       return res.jsonp(HORARIOS.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
@@ -147,7 +162,9 @@ class HorarioControlador {
         `,
         [parseInt(id), nombre.toUpperCase(), codigo.toUpperCase()]);
 
-      if (HORARIOS.rowCount > 0) return res.status(200).jsonp({ message: 'El nombre de horario ya existe, ingresar un nuevo nombre.' });
+      if (HORARIOS.rowCount > 0) return res.status(200).jsonp({
+        message: 'El nombre de horario ya existe, ingresar un nuevo nombre.'
+      });
 
       return res.status(404).jsonp({ message: 'No existe horario. Continua.' })
     } catch (error) {
@@ -210,7 +227,7 @@ class HorarioControlador {
         , [hora_trabajo, id])
         .then((result: any) => { return result.rows })
 
-      if (respuesta.length === 0) return res.status(400).jsonp({ message: 'No Actualizado.' });
+      if (respuesta.length === 0) return res.status(400).jsonp({ message: 'No actualizado.' });
 
       return res.status(200).jsonp(respuesta)
 
@@ -222,7 +239,8 @@ class HorarioControlador {
   // METODO PARA BUSCAR DOCUMENTO
   public async ObtenerDocumento(req: Request, res: Response): Promise<any> {
     const docs = req.params.docs;
-    let filePath = `servidor\\horarios\\${docs}`
+    let separador = path.sep;
+    let filePath = `servidor${separador}horarios${separador}${docs}`
     res.sendFile(__dirname.split("servidor")[0] + filePath);
   }
 

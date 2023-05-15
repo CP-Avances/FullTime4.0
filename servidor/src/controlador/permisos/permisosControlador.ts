@@ -323,14 +323,12 @@ class PermisosControlador {
 
     // REGISTRAR DOCUMENTO DE RESPALDO DE PERMISO  
     public async GuardarDocumentoPermiso(req: Request, res: Response): Promise<any> {
-        console.log('rec ', req.file)
         // LEER DATOS DE IMAGEN
         let doc = req.file?.originalname;
         let { archivo } = req.params;
         let { documento } = req.params;
         let id = req.params.id
 
-        console.log('doc', doc, 'rec ', req.file)
         // ACTUALIZAR REGISTRO
         await pool.query(
             `

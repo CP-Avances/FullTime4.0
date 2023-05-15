@@ -3,6 +3,7 @@ import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
 import { Router } from '@angular/router';
@@ -205,6 +206,7 @@ export class EditarHorarioComponent implements OnInit {
         this.toastr.info('No ha seleccionado ningún archivo.', '', {
           timeOut: 6000,
         });
+        this.habilitarprogress = false;
       }
     }
     else {
@@ -227,9 +229,9 @@ export class EditarHorarioComponent implements OnInit {
     this.EliminarDocumentoServidor();
     this.rest.ActualizarHorario(this.data.horario.id, datos).subscribe(response => {
       this.RegistrarAuditoria(datos);
-      this.SubirRespaldo(this.data.horario.id, form);
+      this.SubirRespaldo(this.data.horario.id);
       this.habilitarprogress = false;
-      this.toastr.success('Operación Exitosa.', 'Registro actualizado.', {
+      this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
         timeOut: 6000,
       });
       if (datos.min_almuerzo === 0) {
@@ -253,7 +255,7 @@ export class EditarHorarioComponent implements OnInit {
     this.rest.ActualizarHorario(this.data.horario.id, datos).subscribe(response => {
       this.RegistrarAuditoria(datos);
       this.habilitarprogress = false;
-      this.toastr.success('Operación Exitosa.', 'Registro actualizado.', {
+      this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
         timeOut: 6000,
       });
       if (datos.min_almuerzo === 0) {
@@ -313,12 +315,12 @@ export class EditarHorarioComponent implements OnInit {
   }
 
   // METODO PARA GUARDAR DATOS DE ARCHIVO SELECCIONADO
-  SubirRespaldo(id: number, form: any) {
+  SubirRespaldo(id: number) {
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
-      formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    this.rest.SubirArchivo(formData, id, form.documentoForm).subscribe(res => {
+    this.rest.SubirArchivo(formData, id, this.data.horario.documento, this.data.horario.codigo).subscribe(res => {
       this.archivoForm.reset();
       this.nameFile = '';
     });
@@ -361,7 +363,6 @@ export class EditarHorarioComponent implements OnInit {
   acciones: boolean = false;
   LimpiarAcciones() {
     this.seleccion.reset();
-    this.isChecked = false;
     this.acciones = false;
     this.activar = false;
     this.RetirarArchivo();
@@ -453,6 +454,17 @@ export class EditarHorarioComponent implements OnInit {
   // METODO PARA CERRAR VENTANA
   CerrarVentana() {
     this.ventana.close();
+  }
+
+  // METODO PARA VER FORMULARIO DE ARCHIVO
+  VerificarArchivo(ob: MatCheckboxChange) {
+    if (ob.checked === true) {
+      this.isChecked = true;
+    }
+    else {
+      this.isChecked = false;
+      this.LimpiarAcciones();
+    }
   }
 
 }

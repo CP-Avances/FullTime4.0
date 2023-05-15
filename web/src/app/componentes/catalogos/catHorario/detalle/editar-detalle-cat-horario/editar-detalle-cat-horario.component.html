@@ -1,7 +1,8 @@
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        MODIFICAR DETALLE HORARIO</span>
+        MODIFICAR DETALLE HORARIO
+    </span>
     <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
 </div>
 <!-- Formulario Completo -->
@@ -86,12 +87,40 @@
                     </div>
                 </div>
             </div>
+            <div class="row" *ngIf="acciones">
+                <div class="col-md">
+                    <div class="d-flex flex-wrap justify-content-start">
+                        <mat-form-field>
+                            <mat-label>Minutos antes</mat-label>
+                            <input matInput placeholder="Ej: 60" [formControl]="min_antesF"
+                                (keypress)="IngresarSoloNumeros($event)" [required]="acciones">
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Registrar minutos de aproximación considerados antes de la hora.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="d-flex flex-wrap justify-content-start">
+                        <mat-form-field>
+                            <mat-label>Minutos despues</mat-label>
+                            <input matInput placeholder="Ej: 60" [formControl]="min_despuesF"
+                                (keypress)="IngresarSoloNumeros($event)" [required]="acciones">
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Registrar minutos de aproximación después de la hora.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </form>
 <div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 2%;">
-    <button id="btn-raised"  class="btn btn-sm" [disabled]="!formulario.valid" value="Guardar"
-    (click)="InsertarDetalleHorario(formulario.value)">Guardar</button>
+    <button id="btn-raised" class="btn btn-sm" [disabled]="!formulario.valid" value="Guardar"
+        (click)="InsertarDetalleHorario(formulario.value)">Guardar</button>
 </div>
 
 <div class="pantalla-progress" *ngIf="habilitarprogress">

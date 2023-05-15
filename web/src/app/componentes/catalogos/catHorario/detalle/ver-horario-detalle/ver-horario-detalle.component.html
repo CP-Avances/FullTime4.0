@@ -25,7 +25,7 @@
                             <label id="datosF">Horario nocturno:</label>
                             <label>{{h.nocturno.toString() | i18nSelect: booleanMap}}</label>
                         </div>
-                        <div *ngIf="h.doc_nombre != null && h.doc_nombre != ''"
+                        <div *ngIf="h.documento != null && h.documento != ''"
                             class="espacio d-flex justify-content-start">
                             <label id="datosF">Documento:</label>
                             <label>
@@ -33,7 +33,7 @@
                                     style="color:rgb(197, 95, 11); margin-left: 15px; text-align: center;" matSuffix
                                     matTooltipPosition="right" matTooltip="Dar click para ver o descargar el documento."
                                     href="{{hipervinculo}}/horario/documentos/{{h.documento}}" target="_blank">
-                                    <p>{{h.doc_nombre}}</p>
+                                    <p>{{h.documento}}</p>
                                 </a>
                             </label>
                         </div>
@@ -46,7 +46,8 @@
                     </i>
                     <mat-icon (click)="CalcularHorasTrabaja()" style="margin: 0px 10px; cursor: pointer; color: blue;"
                         matTooltip="Verificar que detalle de horario se encuentre acorde a los datos de horario registrados.">
-                        calculate</mat-icon>
+                        calculate
+                    </mat-icon>
                 </div>
             </div>
             <hr>
@@ -57,12 +58,17 @@
                         <table class="table table-hover table-sm">
                             <thead class="thead-light">
                                 <tr style="text-align: center;">
-                                    <th scope="col">Orden</th>
-                                    <th scope="col">Hora</th>
-                                    <th scope="col">Minutos espera</th>
-                                    <th scope="col">Acción</th>
-                                    <th scope="col">Otro día</th>
+                                    <th scope="col" rowspan="2">Orden</th>
+                                    <th scope="col" rowspan="2">Hora</th>
+                                    <th scope="col" rowspan="2">Minutos espera</th>
+                                    <th scope="col" rowspan="2">Acción</th>
+                                    <th scope="col" rowspan="2">Otro día</th>
+                                    <th scope="col" colspan="2">APROXIMACIÓN</th>
                                     <th scope="col">Acciones</th>
+                                </tr>
+                                <tr style="text-align: center;">
+                                    <th scope="col">Minutos antes</th>
+                                    <th scope="col">Minutos después</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -75,6 +81,8 @@
                                     </td>
                                     <td *ngIf="dh.segundo_dia === true">SI</td>
                                     <td *ngIf="dh.tercer_dia === true">SI</td>
+                                    <td>{{dh.min_antes}}</td>
+                                    <td>{{dh.min_despues}}</td>
                                     <td>
                                         <i id="editarI" (click)="AbrirVentanaEditarDetalle(dh)" matSuffix
                                             matTooltipPosition="right" matTooltip="Modificar datos de este registro."

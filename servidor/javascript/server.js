@@ -215,7 +215,7 @@ class Servidor {
             console.log('Servidor en el puerto', this.app.get('puerto'));
         });
         this.app.use((req, res, next) => {
-            res.header('Access-Control-Allow-Origin', '*:*');
+            res.header('Access-Control-Allow-Origin', '*');
             next();
         });
         io.on('connection', (socket) => {

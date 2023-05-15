@@ -30,7 +30,7 @@ export class EmplCargosComponent implements OnInit {
   // VARIABLES DE FORMULARIO
   idEmpleContrato = new FormControl('', [Validators.required]);
   idDepartamento = new FormControl('', [Validators.required]);
-  horaTrabaja = new FormControl('', [Validators.required]);
+  horaTrabaja = new FormControl('', [Validators.required, Validators.pattern("^[0-9]*(:[0-9][0-9])?$")]);
   fechaInicio = new FormControl('', Validators.required);
   fechaFinal = new FormControl('', Validators.required);
   idSucursal = new FormControl('', [Validators.required]);
@@ -157,7 +157,7 @@ export class EmplCargosComponent implements OnInit {
 
   // METODO PARA GUARDAR REGISTRO
   insertarEmpleadoCargo(form: any) {
-    let dataEmpleadoCargo = {
+    let cargo = {
       id_empl_contrato: this.datoEmpleado.idContrato,
       id_departamento: form.idDeparForm,
       hora_trabaja: form.horaTrabajaForm,
@@ -167,11 +167,26 @@ export class EmplCargosComponent implements OnInit {
       sueldo: form.sueldoForm,
       cargo: form.tipoForm
     }
-    if (form.tipoForm === undefined) {
-      this.IngresarTipoCargo(form, dataEmpleadoCargo);
+    // FORMATEAR HORAS
+    if (cargo.hora_trabaja.split(':').length === 1) {
+      if (parseInt(cargo.hora_trabaja) < 10) {
+        cargo.hora_trabaja = '0' + parseInt(cargo.hora_trabaja) + ':00:00'
+      }
+      else {
+        cargo.hora_trabaja = cargo.hora_trabaja + ':00:00'
+      }
     }
     else {
-      this.cargos.RegistrarCargo(dataEmpleadoCargo).subscribe(res => {
+      if (parseInt(cargo.hora_trabaja.split(':')[0]) < 10) {
+        cargo.hora_trabaja = '0' + parseInt(cargo.hora_trabaja.split(':')[0]) + ':' + cargo.hora_trabaja.split(':')[1] + ':00'
+      }
+    }
+
+    if (form.tipoForm === undefined) {
+      this.IngresarTipoCargo(form, cargo);
+    }
+    else {
+      this.cargos.RegistrarCargo(cargo).subscribe(res => {
         this.toastr.success('Operación Exitosa.', 'Registro guardado.', {
           timeOut: 6000,
         });
@@ -218,4 +233,32 @@ export class EmplCargosComponent implements OnInit {
     this.LimpiarCampos();
     this.ventana.close();
   }
+
+  // METODO PARA VALIDAR INGRESO DE HORAS
+  IngresarNumeroCaracter(evt: any) {
+    if (window.event) {
+      var keynum = evt.keyCode;
+    }
+    else {
+      keynum = evt.which;
+    }
+    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMÉRICO Y QUE TECLAS NO RECIBIRÁ.
+    if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6 || keynum == 58) {
+      return true;
+    }
+    else {
+      this.toastr.info('No se admite el ingreso de letras', 'Usar solo números', {
+        timeOut: 6000,
+      })
+      return false;
+    }
+  }
+
+  // MENSAJE QUE INDICA FORMATO DE INGRESO DE NUMERO DE HORAS
+  ObtenerMensajeErrorHoraTrabajo() {
+    if (this.horaTrabaja.hasError('pattern')) {
+      return 'Indicar horas y minutos. Ejemplo: 12:05';
+    }
+  }
+
 }

@@ -8,8 +8,10 @@
 <form [formGroup]="formulario">
     <div class="container" style="text-align: center;">
         <div class="nota">
-            <span>NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
-                Guardar.</span>
+            <span>
+                NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                Guardar.
+            </span>
         </div>
         <div class="row">
             <div class="col-md">
@@ -84,12 +86,40 @@
                     </div>
                 </div>
             </div>
+            <div class="row" *ngIf="acciones">
+                <div class="col-md">
+                    <div class="d-flex flex-wrap justify-content-start">
+                        <mat-form-field>
+                            <mat-label>Minutos antes</mat-label>
+                            <input matInput placeholder="Ej: 60" [formControl]="min_antesF"
+                                (keypress)="IngresarSoloNumeros($event)" [required]="acciones">
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Registrar minutos de aproximación considerados antes de la hora.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="d-flex flex-wrap justify-content-start">
+                        <mat-form-field>
+                            <mat-label>Minutos despues</mat-label>
+                            <input matInput placeholder="Ej: 60" [formControl]="min_despuesF"
+                                (keypress)="IngresarSoloNumeros($event)" [required]="acciones">
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Registrar minutos de aproximación después de la hora.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </form>
 <div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 2%;">
-    <button id="btn-raised"  class="btn btn-sm" [disabled]="!formulario.valid" value="Guardar"
-    (click)="InsertarDetalleHorario(formulario.value)">Guardar</button>
+    <button id="btn-raised" class="btn btn-sm" [disabled]="!formulario.valid" value="Guardar"
+        (click)="InsertarDetalleHorario(formulario.value)">Guardar</button>
 </div>
 
 <div class="pantalla-progress" *ngIf="habilitarprogress">

@@ -3,9 +3,34 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
-const catHorarioControlador_1 = __importDefault(require("../../controlador/catalogos/catHorarioControlador"));
 const verificarToken_1 = require("../../libs/verificarToken");
+const express_1 = require("express");
+const multer_1 = __importDefault(require("multer"));
+const path_1 = __importDefault(require("path"));
+const catHorarioControlador_1 = __importDefault(require("../../controlador/catalogos/catHorarioControlador"));
+const ObtenerRuta = function () {
+    var ruta = '';
+    let separador = path_1.default.sep;
+    for (var i = 0; i < __dirname.split(separador).length - 3; i++) {
+        if (ruta === '') {
+            ruta = __dirname.split(separador)[i];
+        }
+        else {
+            ruta = ruta + separador + __dirname.split(separador)[i];
+        }
+    }
+    return ruta + separador + 'horarios';
+};
+const storage = multer_1.default.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, ObtenerRuta());
+    },
+    filename: function (req, file, cb) {
+        let { id, codigo } = req.params;
+        cb(null, id + '_' + codigo + '_' + file.originalname);
+    }
+});
+const upload = (0, multer_1.default)({ storage: storage });
 const multipart = require('connect-multiparty');
 const multipartMiddleware = multipart({
     uploadDir: './plantillas',
@@ -24,7 +49,7 @@ class HorarioRutas {
         // BUSCAR HORARIO POR SU NOMBRE
         this.router.post('/buscar-horario/nombre', verificarToken_1.TokenValidation, catHorarioControlador_1.default.BuscarHorarioNombre);
         // CARGAR ARCHIVO DE RESPALDO
-        this.router.put('/:id/documento/:nombre', [verificarToken_1.TokenValidation, multipartMiddlewareD], catHorarioControlador_1.default.GuardarDocumentoHorario);
+        this.router.put('/:id/documento/:archivo/verificar/:codigo', [verificarToken_1.TokenValidation, upload.single('uploads')], catHorarioControlador_1.default.GuardarDocumentoHorario);
         // ACTUALIZAR DATOS DE HORARIO
         this.router.put('/editar/:id', verificarToken_1.TokenValidation, catHorarioControlador_1.default.EditarHorario);
         // ELIMINAR DOCUMENTO DE HORARIO BASE DE DATOS - SERVIDOR

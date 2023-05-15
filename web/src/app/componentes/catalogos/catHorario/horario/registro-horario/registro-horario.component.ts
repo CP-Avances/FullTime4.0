@@ -2,6 +2,7 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit } from '@angular/core';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ThemePalette } from '@angular/material/core';
@@ -133,8 +134,26 @@ export class RegistroHorarioComponent implements OnInit {
       this.habilitarprogress = false;
 
     }, error => {
-      this.GuardarDatos(horario, form);
+      this.VerificarArchivo(horario, form);
     });
+  }
+
+  // VERIFICAR QUE SE CARGO ARCHIVO
+  VerificarArchivo(datos: any, form: any) {
+    if (this.isChecked === true) {
+      if (form.documentoForm != '') {
+        this.GuardarDatos(datos, form);
+      }
+      else {
+        this.toastr.warning('Cargar documento como respaldo de creación de horario.', '', {
+          timeOut: 6000,
+        });
+        this.habilitarprogress = false;
+      }
+    }
+    else {
+      this.GuardarDatos(datos, form);
+    }
   }
 
 
@@ -142,12 +161,12 @@ export class RegistroHorarioComponent implements OnInit {
   GuardarDatos(datos: any, form: any) {
     this.rest.RegistrarHorario(datos).subscribe(response => {
       this.RegistrarAuditoria(datos);
-      this.toastr.success('Operación Exitosa.', 'Registro guardado.', {
+      this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       });
 
       if (this.isChecked === true && form.documentoForm != '') {
-        this.SubirRespaldo(response.id, form);
+        this.SubirRespaldo(response.id, response.codigo);
       }
 
       this.LimpiarCampos();
@@ -193,13 +212,13 @@ export class RegistroHorarioComponent implements OnInit {
   }
 
   // METODO PARA REGISTRAR RESPALDO DE CREACION DE HORARIO
-  SubirRespaldo(id: number, form: any) {
+  SubirRespaldo(id: number, codigo: any) {
     this.habilitarprogress = true;
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
-      formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    this.rest.SubirArchivo(formData, id, form.documentoForm).subscribe(res => {
+    this.rest.SubirArchivo(formData, id, null, codigo).subscribe(res => {
       this.habilitarprogress = false;
       this.archivoForm.reset();
       this.nameFile = '';
@@ -223,7 +242,7 @@ export class RegistroHorarioComponent implements OnInit {
     this.archivoForm.patchValue('');
   }
 
-  // METODO PARA VALIDAR INGRESO DE NÚMEROS DECIMALES
+  // METODO PARA VALIDAR INGRESO DE HORAS
   IngresarNumeroCaracter(evt: any) {
     if (window.event) {
       var keynum = evt.keyCode;
@@ -272,6 +291,16 @@ export class RegistroHorarioComponent implements OnInit {
     this.data_nueva = [];
     this.data_nueva = dataHorario;
     this.validar.Auditar('app-web', 'cg_horarios', '', this.data_nueva, 'INSERT');
+  }
+
+  // METODO PARA VER FORMULARIO DE ARCHIVO
+  ActivarArchivo(ob: MatCheckboxChange) {
+    if (ob.checked === true) {
+      this.isChecked = true;
+    }
+    else {
+      this.isChecked = false;
+    }
   }
 
 }

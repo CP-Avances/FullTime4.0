@@ -328,6 +328,34 @@ class EmpresaControlador {
         res.status(200).jsonp({ message: 'Registro actualizado.' })
     }
 
+    // METODO PARA ACTUALIZAR USO DE ACCIONES
+    public async ActualizarAccionesTimbres(req: Request, res: Response): Promise<void> {
+        try {
+            const { id, bool_acciones } = req.body;
+            await pool.query(
+                `
+                UPDATE cg_empresa SET acciones_timbres = $1 WHERE id = $2
+                `
+                , [bool_acciones, id]);
+            res.status(200).jsonp({
+                message: 'Empresa actualizada exitosamente',
+                title: 'Ingrese nuevamente al sistema'
+            });
+        } catch (error) {
+            res.status(404).jsonp(error)
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -418,18 +446,7 @@ class EmpresaControlador {
 
 
 
-    public async ActualizarAccionesTimbres(req: Request, res: Response): Promise<void> {
-        try {
-            const { id, bool_acciones } = req.body;
-            await pool.query('UPDATE cg_empresa SET acciones_timbres = $1 WHERE id = $2', [bool_acciones, id]);
-            res.status(200).jsonp({
-                message: 'Empresa actualizada exitosamente',
-                title: 'Ingrese nuevamente al sistema'
-            });
-        } catch (error) {
-            res.status(404).jsonp(error)
-        }
-    }
+
 
 }
 

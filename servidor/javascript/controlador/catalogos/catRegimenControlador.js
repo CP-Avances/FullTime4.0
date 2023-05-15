@@ -23,15 +23,15 @@ class RegimenControlador {
     CrearRegimen(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id_pais, descripcion, mes_periodo, dias_mes, trabajo_minimo_mes, trabajo_minimo_horas, continuidad_laboral, vacacion_dias_laboral, vacacion_dias_libre, vacacion_dias_calendario, acumular, dias_max_acumulacion, contar_feriados, vacacion_divisible, antiguedad, antiguedad_fija, anio_antiguedad, dias_antiguedad, antiguedad_variable, vacacion_dias_calendario_mes, vacacion_dias_laboral_mes, calendario_dias, laboral_dias, } = req.body;
+                const { id_pais, descripcion, mes_periodo, dias_mes, trabajo_minimo_mes, trabajo_minimo_horas, continuidad_laboral, vacacion_dias_laboral, vacacion_dias_libre, vacacion_dias_calendario, acumular, dias_max_acumulacion, contar_feriados, vacacion_divisible, antiguedad, antiguedad_fija, anio_antiguedad, dias_antiguedad, antiguedad_variable, vacacion_dias_calendario_mes, vacacion_dias_laboral_mes, calendario_dias, laboral_dias, meses_calculo } = req.body;
                 const response = yield database_1.default.query(`
         INSERT INTO cg_regimenes (id_pais, descripcion, mes_periodo, dias_mes, trabajo_minimo_mes, trabajo_minimo_horas,
           continuidad_laboral, vacacion_dias_laboral, vacacion_dias_libre, vacacion_dias_calendario, acumular, 
           dias_max_acumulacion, contar_feriados, vacacion_divisible, antiguedad, antiguedad_fija, anio_antiguedad, 
           dias_antiguedad, antiguedad_variable, vacacion_dias_calendario_mes, vacacion_dias_laboral_mes, calendario_dias, 
-          laboral_dias)
+          laboral_dias, meses_calculo)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, 
-          $23) RETURNING *
+          $23, $24) RETURNING *
         `, [
                     id_pais,
                     descripcion,
@@ -56,6 +56,7 @@ class RegimenControlador {
                     vacacion_dias_laboral_mes,
                     calendario_dias,
                     laboral_dias,
+                    meses_calculo
                 ]);
                 const [regimen] = response.rows;
                 if (regimen) {
@@ -73,15 +74,15 @@ class RegimenControlador {
     // ACTUALIZAR REGISTRO DE REGIMEN LABORAL
     ActualizarRegimen(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_pais, descripcion, mes_periodo, dias_mes, trabajo_minimo_mes, trabajo_minimo_horas, continuidad_laboral, vacacion_dias_laboral, vacacion_dias_libre, vacacion_dias_calendario, acumular, dias_max_acumulacion, contar_feriados, vacacion_divisible, antiguedad, antiguedad_fija, anio_antiguedad, dias_antiguedad, antiguedad_variable, vacacion_dias_calendario_mes, vacacion_dias_laboral_mes, calendario_dias, laboral_dias, id, } = req.body;
+            const { id_pais, descripcion, mes_periodo, dias_mes, trabajo_minimo_mes, trabajo_minimo_horas, continuidad_laboral, vacacion_dias_laboral, vacacion_dias_libre, vacacion_dias_calendario, acumular, dias_max_acumulacion, contar_feriados, vacacion_divisible, antiguedad, antiguedad_fija, anio_antiguedad, dias_antiguedad, antiguedad_variable, vacacion_dias_calendario_mes, vacacion_dias_laboral_mes, calendario_dias, laboral_dias, meses_calculo, id, } = req.body;
             yield database_1.default.query(`
       UPDATE cg_regimenes SET id_pais = $1, descripcion = $2, mes_periodo = $3, dias_mes = $4, trabajo_minimo_mes = $5, 
         trabajo_minimo_horas = $6, continuidad_laboral = $7, vacacion_dias_laboral = $8, vacacion_dias_libre = $9, 
         vacacion_dias_calendario = $10, acumular = $11, dias_max_acumulacion = $12, contar_feriados = $13, 
         vacacion_divisible = $14, antiguedad = $15, antiguedad_fija = $16, anio_antiguedad = $17, dias_antiguedad = $18, 
         antiguedad_variable = $19, vacacion_dias_calendario_mes = $20, vacacion_dias_laboral_mes = $21, calendario_dias = $22,
-        laboral_dias = $23 
-      WHERE id = $24
+        laboral_dias = $23, meses_calculo = $24 
+      WHERE id = $25
       `, [
                 id_pais,
                 descripcion,
@@ -106,6 +107,7 @@ class RegimenControlador {
                 vacacion_dias_laboral_mes,
                 calendario_dias,
                 laboral_dias,
+                meses_calculo,
                 id,
             ]);
             res.jsonp({ message: "Regimen guardado" });

@@ -49,6 +49,9 @@ class DepartamentoRutas {
         this.router.get('/pie-firma/codificado/:id_empresa', TokenValidation, EMPRESA_CONTROLADOR.VerPieCorreo);
         // METODO PARA ACTUALIZAR DATOS DE CORREO
         this.router.put('/credenciales/:id_empresa', TokenValidation, EMPRESA_CONTROLADOR.EditarPassword);
+        // METODO PARA ACTUALIZAR USO DE ACCIONES
+        this.router.put('/acciones-timbre', TokenValidation, EMPRESA_CONTROLADOR.ActualizarAccionesTimbres);
+
 
 
 
@@ -82,8 +85,6 @@ class DepartamentoRutas {
 
 
 
-
-        this.router.put('/acciones-timbre', TokenValidation, EMPRESA_CONTROLADOR.ActualizarAccionesTimbres);
 
 
 
