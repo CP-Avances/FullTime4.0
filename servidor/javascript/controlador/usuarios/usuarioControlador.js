@@ -53,9 +53,9 @@ class UsuarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
             const EMPLEADO = yield database_1.default.query(`
-      SELECT e.id, e.id_departamento, cg_departamentos.nombre FROM datos_actuales_empleado AS e 
+      SELECT e.id, e.id_departamento, e.id_contrato, cg_departamentos.nombre FROM datos_actuales_empleado AS e 
       INNER JOIN cg_departamentos ON e.id_departamento = cg_departamentos.id 
-      WHERE id_cargo = $1
+      WHERE id_contrato = $1
       `, [id_empleado]);
             if (EMPLEADO.rowCount > 0) {
                 return res.jsonp(EMPLEADO.rows);

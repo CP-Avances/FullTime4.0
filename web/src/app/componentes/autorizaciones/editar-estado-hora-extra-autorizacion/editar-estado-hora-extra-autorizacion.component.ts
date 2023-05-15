@@ -66,7 +66,7 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
       (res) => {
         this.ArrayAutorizacionTipos = res;
         this.ArrayAutorizacionTipos.filter(x => {
-          if(x.id_departamento == 1 && x.estado == true){
+          if(x.nom_depar == 'GERENCIA' && x.estado == true){
             this.gerencia = true;
             if(x.autorizar == true){
               this.estados = [

@@ -51,9 +51,9 @@ class UsuarioControlador {
     const { id_empleado } = req.params;
     const EMPLEADO = await pool.query(
       `
-      SELECT e.id, e.id_departamento, cg_departamentos.nombre FROM datos_actuales_empleado AS e 
+      SELECT e.id, e.id_departamento, e.id_contrato, cg_departamentos.nombre FROM datos_actuales_empleado AS e 
       INNER JOIN cg_departamentos ON e.id_departamento = cg_departamentos.id 
-      WHERE id_cargo = $1
+      WHERE id_contrato = $1
       `
       , [id_empleado]);
     if (EMPLEADO.rowCount > 0) {

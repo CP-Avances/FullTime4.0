@@ -192,8 +192,6 @@ class DatosGeneralesControlador {
         const { objeto, depa_user_loggin } = req.body;
 
         const permiso = objeto
-        console.log(permiso);
-
         const JefesDepartamentos = await pool.query(
             `
             SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc,

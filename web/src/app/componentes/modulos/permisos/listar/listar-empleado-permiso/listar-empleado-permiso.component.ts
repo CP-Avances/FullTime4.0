@@ -182,12 +182,16 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
       (res) => {
         this.permisos = res;
 
+        console.log('permisos: ',this.permisos)
+
         //Filtra la lista de Permisos para descartar las solicitudes del mismo usuario y almacena en una nueva lista
         this.listaPermisosFiltradas = this.permisos.filter((o) => {
           if (this.idEmpleado !== o.id_emple_solicita) {
             return this.listaPermisosFiltradas.push(o);
           }
         });
+
+        console.log('listaPermisosFiltradas: ',this.listaPermisosFiltradas)
        
         this.listaPermisosFiltradas.forEach((p) => {
           // TRATAMIENTO DE FECHAS Y HORAS EN FORMATO DD/MM/YYYYY
@@ -216,11 +220,15 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
         });
 
         let i = 1;
+
         this.listaPermisosFiltradas.filter(item => {
-          this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_empl_cargo).subscribe(
+          this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_contrato).subscribe(
             (usuaDep) => {
               this.ArrayAutorizacionTipos.filter(x => {
-                if((x.id_departamento == 1) && (x.estado == true)){
+
+                console.log('usuaDep: ',usuaDep, ' = ',usuaDep[0].id_departamento, ' == ',x.id_departamento);
+
+                if((x.nom_depar == 'GERENCIA') && (x.estado == true)){
                   this.gerencia = true;
                   if(item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)){
                     return this.permilista.push(item);
@@ -234,11 +242,16 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
                     return this.permilista.push(item);
                   }
                 }
+
               })
+
+              
 
               //Filtra la lista de autorizacion para almacenar en un array
               if(this.listaPermisosFiltradas.length == i){
                 this.listaPermisosDeparta = this.permilista;
+
+                console.log('listaPermisosFiltradas 1: ',this.listaPermisosDeparta)
 
                 if(Object.keys(this.listaPermisosDeparta).length == 0) {
                   this.validarMensaje1 = true;
@@ -253,6 +266,8 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
           );
 
         });
+
+        
 
       },
       (err) => {

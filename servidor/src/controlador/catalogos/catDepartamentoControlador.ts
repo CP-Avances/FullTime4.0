@@ -279,6 +279,7 @@ class DepartamentoControlador {
   // METODO PARA ELIMINAR REGISTRO DE NIVEL DE DEPARTAMENTO
   public async EliminarRegistroNivelDepa(req: Request, res: Response): Promise<void> {
     const id = req.params.id;
+    console.log('datos eliminar: ',id);
     await pool.query(
       `
       DELETE FROM nivel_jerarquicodep WHERE id = $1

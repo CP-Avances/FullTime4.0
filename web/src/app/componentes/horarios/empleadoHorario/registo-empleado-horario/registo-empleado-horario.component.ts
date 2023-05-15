@@ -146,6 +146,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
       this.toastr.warning('Por favor ingrese fechas de inicio y fin de actividades.', '', {
         timeOut: 6000,
       });
+
       this.formulario.patchValue({
         horarioForm: 0
       })
@@ -160,6 +161,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     let datosBusqueda = {
       id_empleado: this.datoEmpleado.idEmpleado
     }
+    
     // METODO PARA BUSCAR FECHA DE CONTRATO REGISTRADO EN FICHA DE EMPLEADO
     this.restE.BuscarFechaContrato(datosBusqueda).subscribe(response => {
       // VERIFICAR SI LAS FECHAS SON VALIDAS DE ACUERDO A LOS REGISTROS Y FECHAS INGRESADAS

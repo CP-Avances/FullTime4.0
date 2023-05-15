@@ -147,7 +147,7 @@ export class VerVacacionComponent implements OnInit {
       }else{
         this.usuarioDepa.ObtenerDepartamentoUsuarios(this.vacacion[0].id_empleado).subscribe((usuaDep) => {
           this.ArrayAutorizacionTipos.filter(x => {
-            if((x.id_departamento == 1) && (x.estado == true)){
+            if((x.nom_depar == 'GERENCIA') && (x.estado == true)){
               this.gerencia = true;
               if(this.vacacion[0].estado == 2 && x.preautorizar == true){
                 return this.ocultar = true;

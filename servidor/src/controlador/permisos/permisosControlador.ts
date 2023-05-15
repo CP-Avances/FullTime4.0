@@ -175,13 +175,14 @@ class PermisosControlador {
 
         const JefesDepartamentos = await pool.query(
             `
-            SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc,
+            SELECT n.id_departamento, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel, da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc,
                 cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato,
                 e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname , e.cedula, e.correo,
                 c.permiso_mail, c.permiso_noti
             FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-                sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-            WHERE da.id_departamento = $1 AND 
+                sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c, nivel_jerarquicodep AS n  
+            WHERE n.id_departamento = 9 AND 
+                da.id_departamento = $1 AND 
                 da.id_empl_cargo = ecr.id AND 
                 da.id_departamento = cg.id AND
                 da.estado = true AND 
@@ -739,7 +740,6 @@ class PermisosControlador {
 
 
 
-
     // ELIMINAR DOCUMENTO DE PERMISO DESDE APLICACION MOVIL
     public async EliminarPermisoMovil(req: Request, res: Response) {
         let { documento } = req.params;
@@ -783,7 +783,6 @@ class PermisosControlador {
             return res.status(404).jsonp({ text: 'No se encuentran registros.' });
         }
     }
-
 
 
 

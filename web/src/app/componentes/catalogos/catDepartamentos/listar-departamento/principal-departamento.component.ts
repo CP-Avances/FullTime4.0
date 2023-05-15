@@ -143,7 +143,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   // METODO PARA ABRIR VENTANA DE REGISTRO DE DEPARTAMENTO
   AbrirVentanaRegistrarDepartamento(): void {
     this.ventana.open(RegistroDepartamentoComponent,
-      { width: '600px' }).afterClosed().subscribe(item => {
+      { width: '500px' }).afterClosed().subscribe(item => {
         this.ListaDepartamentos();
       });
   }
@@ -166,9 +166,23 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.ListaDepartamentos();
   }
 
+
+  public departamentosNiveles: any = [];
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
-  Eliminar(id_dep: number) {
+  Eliminar(id_dep: number, id_sucursal: number, nivel: number) {
     this.rest.EliminarRegistro(id_dep).subscribe(res => {
+      this.departamentosNiveles = [];
+      var id_departamento = id_dep;
+      var id_establecimiento = id_sucursal;
+      if(nivel > 0){
+        this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
+          this.departamentosNiveles = datos;
+            this.departamentosNiveles.filter(item => {
+              this.rest.EliminarRegistroNivelDepa(item.id).subscribe({})
+            })
+        })
+      }
+
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -176,12 +190,13 @@ export class PrincipalDepartamentoComponent implements OnInit {
     });
   }
 
+
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.Eliminar(datos.id);
+          this.Eliminar(datos.id, datos.id_sucursal, datos.nivel);
         } else {
           this.router.navigate(['/departamento']);
         }

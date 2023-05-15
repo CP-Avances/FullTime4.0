@@ -199,7 +199,7 @@ export class ListarVacacionesComponent implements OnInit {
           this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_empl_cargo).subscribe(
             (usuaDep) => {
               this.ArrayAutorizacionTipos.filter(x => {
-                if(x.id_departamento == 1 && x.estado == true){
+                if(x.nom_depar == 'GERENCIA' && x.estado == true){
                   this.gerencia = true;
                   if(item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)){
                     return this.Vacacionlista.push(item);

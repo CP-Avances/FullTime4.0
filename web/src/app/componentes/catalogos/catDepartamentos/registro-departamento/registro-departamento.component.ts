@@ -24,9 +24,8 @@ export class RegistroDepartamentoComponent implements OnInit {
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   idSucursal = new FormControl('');
-  depaPadre = new FormControl(null);
   nombre = new FormControl('', Validators.required);
-  nivel = new FormControl('', Validators.required);
+
 
   // DATOS DEPARTAMENTO
   sucursales: any = [];
@@ -36,9 +35,7 @@ export class RegistroDepartamentoComponent implements OnInit {
   // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
   public formulario = new FormGroup({
     idSucursalForm: this.idSucursal,
-    depaPadreForm: this.depaPadre,
     nombreForm: this.nombre,
-    nivelForm: this.nivel,
   });
 
   // ARREGLO DE NIVELES EXISTENTES
@@ -102,9 +99,9 @@ export class RegistroDepartamentoComponent implements OnInit {
   InsertarDepartamento(form: any) {
     var departamento = {
       id_sucursal: form.idSucursalForm,
-      depa_padre: form.depaPadreForm,
+      depa_padre: null,
       nombre: form.nombreForm.toUpperCase(),
-      nivel: parseInt(form.nivelForm),
+      nivel: 0,
     };
 
     // VERIFICAR ID DE SUCURSAL

@@ -148,7 +148,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
       }else{
         this.usuarioDepa.ObtenerDepartamentoUsuarios(this.InfoPermiso[0].id_empleado).subscribe((usuaDep) => {
           this.ArrayAutorizacionTipos.filter(x => {
-            if((x.id_departamento == 1) && (x.estado == true)){
+            if((x.nom_depar == 'GERENCIA') && (x.estado == true)){
               this.gerencia = true;
               if((this.InfoPermiso[0].estado == 2 || this.InfoPermiso[0].estado == 1)&& x.autorizar == true){
                 return this.ocultar = false;

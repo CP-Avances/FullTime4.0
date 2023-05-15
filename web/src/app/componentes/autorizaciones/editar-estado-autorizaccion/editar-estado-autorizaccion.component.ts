@@ -56,11 +56,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('Data: ',this.data);
-    console.log(this.data.auto.id_documento);
-    console.log(this.data.permiso.id_empleado);
-    console.log(this.data.permiso.estado);
-
+   
     if (this.data.permiso.estado === 1) {
       this.toastr.info('Solicitud pendiente de aprobación.', '', {
         timeOut: 6000,
@@ -104,7 +100,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
         console.log('ArrayAutorizacionTipos: ',this.ArrayAutorizacionTipos);
 
         this.ArrayAutorizacionTipos.filter(x => {
-          if(x.id_departamento == 1 && x.estado == true){
+          if(x.nom_depar == 'GERENCIA' && x.estado == true){
             this.gerencia = true;
             if(x.autorizar == true){
               this.estados = [
@@ -210,8 +206,12 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
       var estado_p = 'Negado';
       var estado_c = 'Negada';
     }
+
+    console.log('Datos de Buscar jefe: ',datos);
+
     this.informacion.BuscarJefes(datos).subscribe(permiso => {
       console.log(permiso);
+      console.log('Datos de Buscar jefe permiso: ',permiso);
       permiso.EmpleadosSendNotiEmail.push(this.solInfo);
       this.EnviarCorreo(permiso, estado_p, estado_c);
       this.EnviarNotificacion(permiso, estado_p);
