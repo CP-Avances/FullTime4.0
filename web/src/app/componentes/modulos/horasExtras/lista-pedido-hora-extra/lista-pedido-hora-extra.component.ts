@@ -18,6 +18,8 @@ import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { HoraExtraAutorizacionesComponent } from 'src/app/componentes/autorizaciones/hora-extra-autorizaciones/hora-extra-autorizaciones.component';
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
+import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 export interface HoraExtraElemento {
   apellido: string;
@@ -76,6 +78,9 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
   get logoE(): string {return this.plantilla.logoBase64;}
   get frase(): string {return this.plantilla.marca_Agua;}
 
+  autorizacion: boolean = false;
+  preautorizacion: boolean = false;
+
   constructor(
     private plantilla: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
     public restEmpleado: EmpleadoService, // SERVICIO DATOS EMPLEADO
@@ -83,7 +88,9 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
     private ventana: MatDialog,
     private validar: ValidacionesService,
     public parametro: ParametrosService,
-    private funciones: MainNavService
+    private funciones: MainNavService,
+    public restAutoriza: AutorizaDepartamentoService,
+    public usuarioDepa: UsuarioService,
   ) { 
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -121,6 +128,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
+  ArrayAutorizacionTipos: any = []
   // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
@@ -130,12 +138,18 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
         this.obtenerHorasExtras(this.formato_fecha);
         this.obtenerHorasExtrasAutorizadas(this.formato_fecha);
         this.obtenerHorasExtrasObservacion(this.formato_fecha);
-      },
-      vacio => {
+    },
+    vacio => {
         this.obtenerHorasExtras(this.formato_fecha);
         this.obtenerHorasExtrasAutorizadas(this.formato_fecha);
         this.obtenerHorasExtrasObservacion(this.formato_fecha);
-      });
+    });
+
+    this.restAutoriza.BuscarAutoridadUsuario(this.idEmpleado).subscribe(
+      (res) => {
+        this.ArrayAutorizacionTipos = res;
+      }
+    );
   }
 
 
@@ -196,6 +210,9 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
 
   lista_pedidos: boolean = false;
   lista_pedidosFiltradas: any = [];
+  HorasExtraLista: any = [];
+  lista_HorasExtras: any = [];
+  gerencia: boolean = false;
   obtenerHorasExtras(formato_fecha: string) {
     var t1 = new Date();
     var tt = new Date();
@@ -209,13 +226,6 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
           return this.lista_pedidosFiltradas.push(o);
         }
       })
-
-      if (this.lista_pedidosFiltradas.length != 0) {
-        this.lista_pedidos = true;
-      }
-      else {
-        this.lista_pedidos = false;
-      }
 
       this.lista_pedidosFiltradas.forEach(data => {
 
@@ -245,9 +255,46 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
         data.fec_final = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
       })
 
-      if (Object.keys(this.lista_pedidosFiltradas).length == 0) {
-        this.validarMensaje1 = true;
-      }
+      let i = 1;
+      this.lista_pedidosFiltradas.filter(item => {
+        this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_empl_cargo).subscribe(
+            (usuaDep) => {
+              this.ArrayAutorizacionTipos.filter(x => {
+                if(x.nom_depar == 'GERENCIA' && x.estado == true){
+                  this.gerencia = true;
+                  if(item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)){
+                    return this.HorasExtraLista.push(item);
+                  }else if(item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)){
+                    return this.HorasExtraLista.push(item);
+                  }
+                }else if((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
+                  if(item.estado == 'Pendiente' && x.preautorizar == true){
+                    return this.HorasExtraLista.push(item);
+                  }else if(item.estado == 'Pre-autorizado' && x.autorizar == true){
+                    return this.HorasExtraLista.push(item);
+                  }
+                }
+              })
+
+            //Filtra la lista de autorizacion para almacenar en un array
+            if(this.lista_pedidosFiltradas.length == i){
+              this.lista_HorasExtras = this.HorasExtraLista;
+
+              if (Object.keys(this.lista_HorasExtras).length == 0) {
+                this.validarMensaje1 = true;
+              }
+
+              if (this.lista_HorasExtras.length != 0) {
+                this.lista_pedidos = true;
+              }
+              else {
+                this.lista_pedidos = false;
+              }
+            }
+            i = i+1;
+        });
+
+      });
 
     }, err => {
       this.validarMensaje1 = true;
@@ -349,7 +396,6 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
       if (Object.keys(this.listaHorasExtrasObservaFiltradas).length == 0) {
         this.validarMensaje2 = true;
       }
-      
       
     }, err => {
       this.validarMensaje2 = true;

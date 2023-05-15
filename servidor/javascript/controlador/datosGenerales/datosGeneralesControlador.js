@@ -183,7 +183,6 @@ class DatosGeneralesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { objeto, depa_user_loggin } = req.body;
             const permiso = objeto;
-            console.log(permiso);
             const JefesDepartamentos = yield database_1.default.query(`
             SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc,
                 cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato,

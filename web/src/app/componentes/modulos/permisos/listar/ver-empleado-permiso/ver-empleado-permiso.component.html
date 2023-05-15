@@ -107,7 +107,7 @@
                             </div>
 
                             <div *ngIf="!esconder" class="caja1 d-flex justify-content-start">
-                                <label id="datosF">La solicitud esta en estado: Pendiente <br></label>
+                                <label id="datosF">La solicitud esta en estado: Pendiente <br></label>&nbsp;&nbsp;
                                 <label id="datosF">La solicitud debe ser autorizada primero para descargar la informacion</label>
                             </div>
 
@@ -128,7 +128,7 @@
                         <div class="col">
                         </div>
                         <div class="col" style="text-align: right;">
-                            <i *ngIf="!habilitarActualizar" class="fas fa-edit" id='i-cursor'
+                            <i *ngIf="habilitarActualizar" class="fas fa-edit" id='i-cursor'
                                 style="color:green; text-align: center;" matSuffix matTooltipPosition="right"
                                 (click)="AbrirVentanaEditarAutorizacion(a)" matTooltip="Aprobación de la solicitud." [hidden] = "ocultar">
                                 <p>Estado</p>

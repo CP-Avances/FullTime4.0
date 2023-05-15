@@ -173,6 +173,7 @@ export class AutorizacionesComponent implements OnInit {
         })
       })
     }
+
   }
 
   resEstado: any = [];

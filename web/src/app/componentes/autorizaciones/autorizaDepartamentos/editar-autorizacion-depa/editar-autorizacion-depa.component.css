@@ -3,9 +3,9 @@
 }
 
 mat-radio-group {
-    width: 250px;
-    padding: 15px 20px 15px 20x;
-    margin-bottom: 10px;
+    width: 400px;
+    padding: 15px 10px 15px 10x;
+    margin-bottom: 2px;
 }
 
 mat-form-field {

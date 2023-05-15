@@ -170,13 +170,14 @@ class PermisosControlador {
             console.log(permiso);
             console.log(req.query);
             const JefesDepartamentos = yield database_1.default.query(`
-            SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc,
+            SELECT n.id_departamento, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel, da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc,
                 cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato,
                 e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname , e.cedula, e.correo,
                 c.permiso_mail, c.permiso_noti
             FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-                sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-            WHERE da.id_departamento = $1 AND 
+                sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c, nivel_jerarquicodep AS n  
+            WHERE n.id_departamento = 9 AND 
+                da.id_departamento = $1 AND 
                 da.id_empl_cargo = ecr.id AND 
                 da.id_departamento = cg.id AND
                 da.estado = true AND 
@@ -549,7 +550,8 @@ class PermisosControlador {
             const PERMISOS = yield database_1.default.query('SELECT p.id, p.fec_creacion, p.descripcion, p.fec_inicio, ' +
                 'p.documento, p.docu_nombre, p.fec_final, p.estado, p.id_empl_cargo, e.id AS id_emple_solicita, e.nombre, e.apellido, ' +
                 'e.cedula, cp.descripcion AS nom_permiso, ec.id AS id_contrato FROM permisos AS p, ' +
-                'empl_contratos AS ec, empleados AS e, cg_tipo_permisos AS cp WHERE p.id_empl_contrato = ec.id AND ' +
+                'empl_contratos AS ec, empleados AS e, cg_tipo_permisos AS cp ' +
+                'WHERE p.id_empl_contrato = ec.id AND ' +
                 'ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id  AND (p.estado = 1 OR p.estado = 2) ' +
                 'ORDER BY estado DESC, fec_creacion DESC');
             if (PERMISOS.rowCount > 0) {

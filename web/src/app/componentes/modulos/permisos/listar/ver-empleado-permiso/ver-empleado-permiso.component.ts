@@ -19,6 +19,8 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 
 import { EditarEstadoAutorizaccionComponent } from 'src/app/componentes/autorizaciones/editar-estado-autorizaccion/editar-estado-autorizaccion.component';
+import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
   selector: 'app-ver-empleado-permiso',
@@ -64,6 +66,8 @@ export class VerEmpleadoPermisoComponent implements OnInit {
     public restEmpre: EmpresaService, // SERVICIO DE DATOS DE EMPRESA
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     public restE: EmpleadoService, // SERVICIO DE DATOS DE EMPLEADO
+    public restAutoriza: AutorizaDepartamentoService, //SERVICIO DE DATOS DE AUTORIZACION POR EL EMPLEADO
+    public usuarioDepa: UsuarioService, //SERVICIO DE DATOS DE DEPARTAMENTO POR EL USUARIO DE LA SOLICITUD
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.id_permiso = this.router.url.split('/')[2];
@@ -81,7 +85,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
+  ArrayAutorizacionTipos: any = [];
   // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
@@ -92,7 +96,14 @@ export class VerEmpleadoPermisoComponent implements OnInit {
       },
       vacio => {
         this.BuscarHora(this.formato_fecha)
-      });
+      }
+    );
+
+    this.restAutoriza.BuscarAutoridadUsuario(this.idEmpleado).subscribe(
+      (res) => {
+        this.ArrayAutorizacionTipos = res;
+      }
+    );
   }
 
   BuscarHora(fecha: string) {
@@ -112,7 +123,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
   // CONTADOR DE REVISIONES DE SOLICITUD
   lectura: number = 1;
   cont: number;
-
+  gerencia: boolean = false;
   // METODO DE BUSQUEDA DE DATOS DE SOLICITUD Y AUTORIZACIÓN
   BuscarDatos(formato_fecha: string, formato_hora: string) {
     this.InfoPermiso = [];
@@ -135,11 +146,29 @@ export class VerEmpleadoPermisoComponent implements OnInit {
       if(this.idEmpleado == this.InfoPermiso[0].id_empleado){
         this.ocultar = true;
       }else{
-        this.ocultar = false;
+        this.usuarioDepa.ObtenerDepartamentoUsuarios(this.InfoPermiso[0].id_empleado).subscribe((usuaDep) => {
+          this.ArrayAutorizacionTipos.filter(x => {
+            if((x.nom_depar == 'GERENCIA') && (x.estado == true)){
+              this.gerencia = true;
+              if((this.InfoPermiso[0].estado == 2 || this.InfoPermiso[0].estado == 1)&& x.autorizar == true){
+                return this.ocultar = false;
+              }else if(this.InfoPermiso[0].estado == 2 && x.preautorizar == true){
+                return this.ocultar = false;
+              }else{
+                return this.ocultar = true;
+              }
+            }else if((this.gerencia == false) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
+              if(this.InfoPermiso[0].estado == 2 && x.autorizar == true){
+                return this.ocultar = false;
+              }else if(this.InfoPermiso[0].estado == 1 && x.preautorizar == true){
+                return this.ocultar = false;
+              }else{
+                return this.ocultar = true;
+              }
+            }
+          })
+        })
       }
-
-      console.log("Datos del Permiso: ",this.InfoPermiso);
-      console.log("Id Empleado: ",this.idEmpleado, " = Id de empleado solicita: ",this.InfoPermiso[0].id_empleado);
 
       if(this.InfoPermiso[0].estado > 1){
         this.esconder = true;
@@ -157,39 +186,39 @@ export class VerEmpleadoPermisoComponent implements OnInit {
     this.ObtenerSolicitud(this.id_permiso);
   }
 
-
+  estado_auto: any;
   ObtenerAutorizacion(id: number) {
     this.autorizacion = [];
     this.empleado_estado = [];
     this.lectura = 1;
     this.restA.BuscarAutorizacionPermiso(id).subscribe(res1 => {
       this.autorizacion = res1;
-
       // METODO PARA OBTENER EMPLEADOS Y ESTADOS
       var autorizaciones = this.autorizacion[0].id_documento.split(',');
       autorizaciones.map((obj: string) => {
         this.lectura = this.lectura + 1;
         if (obj != '') {
           let empleado_id = obj.split('_')[0];
-          var estado_auto = obj.split('_')[1];
+          this.estado_auto = obj.split('_')[1];
 
           // CAMBIAR DATO ESTADO INT A VARCHAR
-          if (estado_auto === '1') {
-            estado_auto = 'Pendiente';
+          if (this.estado_auto === '1') {
+            this.estado_auto = 'Pendiente';
           }
-          if (estado_auto === '2') {
-            estado_auto = 'Preautorización';
+          if (this.estado_auto === '2') {
+            this.estado_auto = 'Preautorizado';
           }
-          if (estado_auto === '3') {
-            estado_auto = 'Autorización';
+          if (this.estado_auto === '3') {
+            this.estado_auto = 'Autorizado';
           }
-          if (estado_auto === '4') {
-            estado_auto = 'Permiso Negado';
+          if (this.estado_auto === '4') {
+            this.estado_auto = 'Permiso Negado';
           }
+
           // CREAR ARRAY DE DATOS DE COLABORADORES
           var data = {
             id_empleado: empleado_id,
-            estado: estado_auto
+            estado: this.estado_auto
           }
           this.empleado_estado = this.empleado_estado.concat(data);
           // CUANDO TODOS LOS DATOS SE HAYAN REVISADO EJECUTAR METODO DE INFORMACIÓN DE AUTORIZACIÓN
@@ -200,10 +229,12 @@ export class VerEmpleadoPermisoComponent implements OnInit {
       })
       // TOMAR TAMAÑO DE ARREGLO DE COLABORADORES QUE REVIZARÓN SOLICITUD
       this.cont = autorizaciones.length - 1;
+      console.log("Datos de InfoPermiso[0].estado: ",this.autorizacion.length);
 
     }, error => {
       this.HabilitarAutorizacion = false;
     });
+  
   }
 
   // METODO PARA OBTENER EL LOGO DE LA EMPRESA
@@ -269,24 +300,27 @@ export class VerEmpleadoPermisoComponent implements OnInit {
         console.log('fecha inicio -- ' + fecha_inicio + ' fecha actual ' + this.fechaActual +
           ' fecha dato ' + this.datoSolicitud[0].fec_inicio.split('T')[0])
 
-        if (res[0].cambios === true) {
-          if (res[0].cambios === 0) {
-            this.habilitarActualizar = false;
-          }
-          else {
-            //var dias = fecha_inicio.diff(this.fechaActual, 'days');
-            var dias = moment(this.fechaActual).diff(fecha_inicio, 'days');
-            console.log('dias ----- ', dias + ' cambio ' + res[0].dias_cambio);
-            if (res[0].dias_cambio >= dias) {
+        if(this.InfoPermiso[0].estado > 2){
+          this.habilitarActualizar = false;
+        }else{
+          if (res[0].cambios === true) {
+            if (res[0].cambios === 0) {
               this.habilitarActualizar = false;
             }
             else {
-              this.habilitarActualizar = true;
+              //var dias = fecha_inicio.diff(this.fechaActual, 'days');
+              var dias = moment(this.fechaActual).diff(fecha_inicio, 'days');
+              console.log('dias ----- ', dias + ' cambio ' + res[0].dias_cambio);
+              if (res[0].dias_cambio >= dias) {
+                this.habilitarActualizar = false;
+              }
+              else {
+                this.habilitarActualizar = true;
+              }
             }
-          }
-        } else {
-          this.habilitarActualizar = false;
+          } 
         }
+
       });
     }, err => {
       return this.validar.RedireccionarMixto(err.error)
@@ -294,6 +328,8 @@ export class VerEmpleadoPermisoComponent implements OnInit {
   }
 
   AbrirVentanaEditarAutorizacion(autoriza: any): void {
+    console.log('autoriza: ',autoriza);
+    console.log('this.InfoPermiso: ',this.InfoPermiso[0]);
     this.ventana.open(EditarEstadoAutorizaccionComponent,
       { width: '350px', data: { auto: autoriza, permiso: this.InfoPermiso[0] } })
       .afterClosed().subscribe(item => {
@@ -315,6 +351,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
+    console.log('this.empleado_estado[this.cont - 1]: ',this.empleado_estado)
     return {
       // ENCABEZADO DE LA PÁGINA
       pageOrientation: 'landscape',
@@ -345,7 +382,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
         { text: this.datoSolicitud[0].nom_empresa.toUpperCase(), bold: true, fontSize: 20, alignment: 'center', margin: [0, 0, 0, 20] },
-        { text: 'SOLICITUD DE PERMISO', fontSize: 10, alignment: 'center', margin: [0, 0, 0, 20] },
+        { text: 'SOLICITUD DE PERMISO', fontSize: 10, alignment: 'center', margin: [0, 0, 0, 10] },
         this.SeleccionarMetodo(),
       ],
       styles: {
@@ -358,6 +395,8 @@ export class VerEmpleadoPermisoComponent implements OnInit {
   }
 
   SeleccionarMetodo() {
+    var contador = 0;
+    var contador2 = 0;
     let fec_creacion_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_creacion.split('T')[0], this.formato_fecha, this.validar.dia_completo)
     let fec_inicio_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_inicio.split('T')[0], this.formato_fecha, this.validar.dia_completo)
     let fec_final_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_final.split('T')[0], this.formato_fecha, this.validar.dia_completo)
@@ -409,44 +448,105 @@ export class VerEmpleadoPermisoComponent implements OnInit {
           }],
           [{
             columns: [
-              {
-                columns: [
-                  { width: '*', text: '' },
-                  {
-                    width: 'auto',
-                    layout: 'lightHorizontalLines',
-                    table: {
-                      widths: ['auto'],
-                      body: [
-                        [{ text: this.empleado_estado[this.cont - 1].estado.toUpperCase() + ' POR', style: 'tableHeaderA' },],
-                        [{ text: ' ', style: 'itemsTable', margin: [0, 20, 0, 20] },],
-                        [{ text: this.empleado_estado[this.cont - 1].nombre + '\n' + this.empleado_estado[this.cont - 1].cargo, style: 'itemsTable' },]
+                ...this.empleado_estado.map(obj => {
+                  contador = contador + 1
+                  if(contador < 4){
+                    return {
+                      columns: [
+                        { width: '*', text: '' },
+                        {
+                          width: 'auto',
+                          layout: 'lightHorizontalLines',
+                          table: {
+                            widths: ['auto'],
+                            body: [
+                              [{ text: obj.estado.toUpperCase() + ' POR', style: 'tableHeaderA'},],
+                              [{ text: ' ', style: 'itemsTable', margin: [0, 17, 0, 17] },],
+                              [{ text: obj.nombre + '\n' + obj.cargo, style: 'itemsTable' },]
+                            ]
+                          }
+                        },
+                        { width: '*', text: ''},
                       ]
                     }
-                  },
-                  { width: '*', text: '' },
-                ]
-              },
-              {
-                columns: [
-                  { width: '*', text: '' },
-                  {
-                    width: 'auto',
-                    layout: 'lightHorizontalLines',
-                    table: {
-                      widths: ['auto'],
-                      body: [
-                        [{ text: 'EMPLEADO', style: 'tableHeaderA' },],
-                        [{ text: ' ', style: 'itemsTable', margin: [0, 20, 0, 20] },],
-                        [{ text: this.datoSolicitud[0].nombre_emple + ' ' + this.datoSolicitud[0].apellido_emple + '\n' + this.datoSolicitud[0].cargo, style: 'itemsTable' },]
+                  }
+                }),
+
+                ...this.datoSolicitud.map(objSoli => {
+                  if(this.empleado_estado.length < 3){
+                    return {
+                      columns: [
+                        { width: '*', text: ''},
+                        {
+                          width: 'auto',
+                          layout: 'lightHorizontalLines',
+                          table: {
+                            widths: ['auto'],
+                            body: [
+                              [{ text: 'EMPLEADO', style: 'tableHeaderA' },],
+                              [{ text: ' ', style: 'itemsTable', margin: [0, 17, 0, 17] },],
+                              [{ text: objSoli.nombre_emple + ' ' + objSoli.apellido_emple + '\n' + objSoli.cargo, style: 'itemsTable' },]
+                            ]
+                          }
+                        },
+                        { width: '*', text: '' },
                       ]
                     }
-                  },
-                  { width: '*', text: '' },
-                ]
-              }
-            ]
+                  }
+                })
+              ],
           }],
+          [{
+            columns: [
+              ...this.empleado_estado.map(obj => {
+                contador2 = contador2 + 1;
+                if(contador2 > 3){
+                  return {
+                    columns: [
+                      { width: '*', text: '' },
+                      {
+                        width: 'auto',
+                        layout: 'lightHorizontalLines',
+                        table: {
+                          widths: ['auto'],
+                          body: [
+                            [{ text: obj.estado.toUpperCase() + ' POR', style: 'tableHeaderA'},],
+                            [{ text: ' ', style: 'itemsTable', margin: [0, 17, 0, 17] },],
+                            [{ text: obj.nombre + '\n' + obj.cargo, style: 'itemsTable' },]
+                          ]
+                        }
+                      },
+                      { width: '*', text: ''},
+                    ]
+                  }
+                }
+              }),
+
+              ...this.datoSolicitud.map(objsoli => {
+                if(this.empleado_estado.length > 2){
+                  return {
+                    columns: [
+                      { width: '*', text: ''},
+                      {
+                        width: 'auto',
+                        layout: 'lightHorizontalLines',
+                        table: {
+                          widths: ['auto'],
+                          body: [
+                            [{ text: 'EMPLEADO', style: 'tableHeaderA' },],
+                            [{ text: ' ', style: 'itemsTable', margin: [0, 17, 0, 17] },],
+                            [{ text: objsoli.nombre_emple + ' ' + objsoli.apellido_emple + '\n' + objsoli.cargo, style: 'itemsTable' },]
+                          ]
+                        }
+                      },
+                      { width: '*', text: '' },
+                    ]
+                  }
+                }
+              })
+            ]
+          }
+          ],
         ]
       },
       layout: {
@@ -456,7 +556,9 @@ export class VerEmpleadoPermisoComponent implements OnInit {
         paddingLeft: function (i: any, node: any) { return 40; },
         paddingRight: function (i: any, node: any) { return 40; },
         paddingTop: function (i: any, node: any) { return 10; },
-        paddingBottom: function (i: any, node: any) { return 10; }
+        paddingBottom: function (i: any, node: any) { return 10; },
+        marginTop: function (i: any, node: any) { return 12; },
+        marginBottom: function (i: any, node: any) { return 12; }
       }
     };
   }

@@ -30,6 +30,11 @@ export class DepartamentosService {
     return this.http.get(`${environment.url}/departamento/sucursal-departamento-edicion/${id_sucursal}/${id}`);
   }
 
+  // BUSCAR DEPARTAMENTOS POR ID SUCURSAL EXCLUYENDO REGISTRO A EDITAR
+  BuscarDepartamento(id: number) {
+    return this.http.get(`${environment.url}/departamento/infodepartamento/${id}`);
+  }
+
   // REGISTRAR ACTUALIZACION DE DEPARTAMENTO
   ActualizarDepartamento(idDepartamento: number, data: any) {
     return this.http.put(`${environment.url}/departamento/${idDepartamento}`, data).pipe(
@@ -58,14 +63,45 @@ export class DepartamentosService {
   }
 
 
+  // REGISTRAR NIVELDEPARTAMENTO
+  RegistrarNivelDepartamento(data: any) {
+    return this.http.post(`${environment.url}/departamento/crearnivel`, data).pipe(
+      catchError(data)
+    );
+  }
+
+  // METODO PARA BUSCAR NIVELDEPARTAMENTOS
+  ConsultarNivelDepartamento(id_departamento: number, id_establecimiento: number) {
+    return this.http.get(`${environment.url}/departamento/infoniveldepa/${id_departamento}/${id_establecimiento}`);
+  }
+
+  // REGISTRAR ACTUALIZACION DE NIVEL DEPARTAMENTO
+  ActualizarNivelDepartamento(idDepartamento: number, data: any) {
+    return this.http.put(`${environment.url}/departamento/actualizanivel/${idDepartamento}`, data).pipe(
+      catchError(data)
+    );
+  }
+
+  // REGISTRAR ACTUALIZACION DE NIVEL DEPARTAMENTO
+  ActualizarNivelDepa(id: number, data: any) {
+    return this.http.put(`${environment.url}/departamento/nivelactualizar/${id}`, data).pipe(
+      catchError(data)
+    );
+  }
+
+  // METODO PARA ELIMINAR REGISTRO NIVEL DEPARTAMENTO
+  EliminarRegistroNivelDepa(id: number) {
+    return this.http.delete(`${environment.url}/departamento/eliminarniveldepa/${id}`);
+  }
+
+  
+  
+
 
 
 
 
   // catalogo de departamentos
-
-
-
   ConsultarDepartamentoPorContrato(id_cargo: number) {
     return this.http.get(`${environment.url}/departamento/busqueda-cargo/${id_cargo}`);
   }

@@ -50,14 +50,14 @@ export class AutorizaDepartamentoService {
   }
 
 
-
-
-
   BuscarEmpleadosAutorizan(id: any) {
     return this.http.get(`${environment.url}/autorizaDepartamento/empleadosAutorizan/${id}`);
   }
 
-
+  BuscarListaEmpleadosAutorizan(id: any) {
+    console.log('id: ',id)
+    return this.http.get(`${environment.url}/autorizaDepartamento/listaempleadosAutorizan/${id}`);
+  }
 
 
 }

@@ -16,6 +16,11 @@ table {
     cursor: pointer;
 }
 
+.fa-eye{
+    color: rgb(3, 97, 169);
+    cursor: pointer;
+}
+
 td {
     padding-top: 10px;
     text-align: center;

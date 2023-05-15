@@ -92,8 +92,20 @@ export class RegistroAutorizacionDepaComponent implements OnInit {
       id_departamento: form.idDeparForm,
       id_empl_cargo: this.datoEmpleado.idCargo,
       id_empleado: this.datoEmpleado.idEmpleado,
-      estado: form.autorizarForm,
+      estado: true,
+      preautorizar: false,
+      autorizar: false,
     }
+
+    if(form.autorizarForm == 'preautorizar'){
+      autoriza.preautorizar = true;
+    }else if(form.autorizarForm == 'autorizar'){
+      autoriza.autorizar = true;
+    }else{
+      autoriza.preautorizar = false;
+      autoriza.autorizar = false;
+    }
+
     this.restAutoriza.IngresarAutorizaDepartamento(autoriza).subscribe(res => {
       this.toastr.success('Operación Exitosa.', 'Registro guardado.', {
         timeOut: 6000,

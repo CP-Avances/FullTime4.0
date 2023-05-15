@@ -48,18 +48,23 @@
                                     <mat-option *ngFor="let d of departamento" [value]="d.id">{{d.nombre}}</mat-option>
                                 </mat-select>
                             </mat-form-field>
+
                             <mat-radio-group aria-label="Select an option" [formControl]="autorizarF" required>
                                 <label class="d-flex justify-content-between"
                                     style="position: relative; left:10px; font-size: 15px; padding-top: 10px;">
-                                    <span>Autoriza *</span>
+                                    <span>Opciones *</span>
                                 </label>
-                                <mat-radio-button class="example-match" ngDefaultControl [(ngModel)]="selec1"
-                                    [checked]="selec1" [ngModelOptions]="{standalone: true}" value="true">
-                                    <label id="textoradiobtn">Si</label>
+                                <mat-radio-button class="example-match" ngDefaultControl
+                                    [checked]="selec3" value="noautorizar">
+                                    <label id="textoradiobtn">Ninguna</label>
                                 </mat-radio-button>
-                                <mat-radio-button class="example-match" ngDefaultControl [(ngModel)]="selec2"
-                                    [checked]="selec2" [ngModelOptions]="{standalone: true}" value="false">
-                                    <label id="textoradiobtn">No</label>
+                                <mat-radio-button class="example-match" ngDefaultControl
+                                    [checked]="selec1" value="preautorizar">
+                                    <label id="textoradiobtn">Pre-Autorizar</label>
+                                </mat-radio-button>
+                                <mat-radio-button class="example-match" ngDefaultControl
+                                    [checked]="selec2" value="autorizar">
+                                    <label id="textoradiobtn">Autorizar</label>
                                 </mat-radio-button>
                             </mat-radio-group>
                         </div>

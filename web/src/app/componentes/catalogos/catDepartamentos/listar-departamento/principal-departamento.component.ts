@@ -21,6 +21,7 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 
 import { RegistroDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/registro-departamento/registro-departamento.component';
 import { EditarDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/editar-departamento/editar-departamento.component';
+import { VerDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/ver-departamento/ver-departamento.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
 @Component({
@@ -37,6 +38,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   filtroEmpresaSuc = '';
   filtroDeparPadre = '';
   departamentos: any = [];
+  depainfo: any = [];
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   departamentoPadreF = new FormControl('');
@@ -112,27 +114,44 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.numero_pagina = e.pageIndex + 1
   }
 
+  niveles: number = 0;
+  depaSuperior: string = '';
   // METODO PARA BUSCAR DEPARTAMENTOS
   ListaDepartamentos() {
     this.departamentos = []
     this.rest.ConsultarDepartamentos().subscribe(datos => {
       this.departamentos = datos;
       this.OrdenarDatos(this.departamentos);
+      
+      /*console.log('lista Departamentos: ',this.departamentos);
+      this.departamentos.forEach(item => {
+        var id_departamento = item.id;
+        var id_establecimiento = item.id_sucursal;
+        this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(data => {
+          this.depainfo = data;
+
+          console.log('depainfo: ',this.depainfo );
+
+          this.niveles = this.depainfo[0].nivel;
+          return this.depaSuperior = this.depainfo[0].dep_nivel_nombre ;
+        })
+      });*/
+
     })
   }
 
   // METODO PARA ABRIR VENTANA DE REGISTRO DE DEPARTAMENTO
   AbrirVentanaRegistrarDepartamento(): void {
     this.ventana.open(RegistroDepartamentoComponent,
-      { width: '600px' }).afterClosed().subscribe(item => {
+      { width: '500px' }).afterClosed().subscribe(item => {
         this.ListaDepartamentos();
       });
   }
 
   // METODO PARA ABRIR VENTANA DE EDICION DE DEPARTAMENTO
-  AbrirVentanaEditarDepartamento(departamento: any): void {
-    this.ventana.open(EditarDepartamentoComponent,
-      { width: '600px', data: departamento }).afterClosed().subscribe(item => {
+  AbrirVentanaVerDepartamento(departamento: any): void {
+    this.ventana.open(VerDepartamentoComponent,
+      { width: '650px', data: departamento }).afterClosed().subscribe(item => {
         this.ListaDepartamentos();
       });
   }
@@ -147,9 +166,23 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.ListaDepartamentos();
   }
 
+
+  public departamentosNiveles: any = [];
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
-  Eliminar(id_dep: number) {
+  Eliminar(id_dep: number, id_sucursal: number, nivel: number) {
     this.rest.EliminarRegistro(id_dep).subscribe(res => {
+      this.departamentosNiveles = [];
+      var id_departamento = id_dep;
+      var id_establecimiento = id_sucursal;
+      if(nivel > 0){
+        this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
+          this.departamentosNiveles = datos;
+            this.departamentosNiveles.filter(item => {
+              this.rest.EliminarRegistroNivelDepa(item.id).subscribe({})
+            })
+        })
+      }
+
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -157,12 +190,13 @@ export class PrincipalDepartamentoComponent implements OnInit {
     });
   }
 
+
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.Eliminar(datos.id);
+          this.Eliminar(datos.id, datos.id_sucursal, datos.nivel);
         } else {
           this.router.navigate(['/departamento']);
         }

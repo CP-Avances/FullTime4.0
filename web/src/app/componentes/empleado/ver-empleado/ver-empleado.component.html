@@ -1667,7 +1667,7 @@
                         <div class="d-flex bd-highlight" id="titulo">
                             <span class="w-100 bd-highlight">AUTORIZACIÓN DEPARTAMENTOS</span>
                             <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                                (click)="AbrirVentanaAutorizar()">Añadir</button>
+                                (click)="AbrirVentanaAutorizar()">Crear</button>
                         </div>
                         <mat-card-content>
                             <div class="container" *ngFor="let autoD of autorizacionesTotales"
@@ -1682,23 +1682,24 @@
                                         </div>
                                         <div class="col-md">
                                             <div class="espacio d-flex justify-content-start">
-                                                <label id="datosF">Autoriza:</label>
+                                                <label id="datosF" *ngIf="autoD.preautorizar == false">Autoriza:</label>
+                                                <label id="datosF" *ngIf="autoD.preautorizar == true">Pre-Autoriza:</label>
                                                 <label *ngIf="autoD.estado == true">Sí</label>
                                                 <label *ngIf="autoD.estado == false">No</label>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div style="text-align: right;">
-                                        <i class="fas fa-edit" id="edit" (click)="AbrirEditarAutorizar(autoD)" matSuffix
-                                            matTooltipPosition="right"
-                                            matTooltip="Modificar los datos generales de este registro">
-                                            <p>Editar</p>
-                                        </i>
-                                        <i style="color:red; margin-left: 15px;"
-                                            (click)="ConfirmarDeleteAutorizacion(autoD)" class=" far fa-trash-alt"
-                                            matTooltipPosition="right" id="delete" matTooltip="Eliminar registro">
-                                            <p>Eliminar</p>
-                                        </i>
+                                        <div style="text-align: right;">
+                                            <i class="fas fa-edit" id="edit" (click)="AbrirEditarAutorizar(autoD)" matSuffix
+                                                matTooltipPosition="right"
+                                                matTooltip="Modificar los datos generales de este registro">
+                                                <p>Editar</p>
+                                            </i>
+                                            <i style="color:red; margin-left: 15px;"
+                                                (click)="ConfirmarDeleteAutorizacion(autoD)" class=" far fa-trash-alt"
+                                                matTooltipPosition="right" id="delete" matTooltip="Eliminar registro">
+                                                <p>Eliminar</p>
+                                            </i>
+                                        </div>
                                     </div>
                                 </div>
                                 <mat-divider style="margin-bottom: 10px;"></mat-divider>

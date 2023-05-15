@@ -30,7 +30,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let e of listaPermisosFiltradas | paginate:tamanio_pagina:numero_pagina">
+                    <tr *ngFor="let e of listaPermisosDeparta | paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionUno.toggle(e) : null" [checked]="selectionUno.isSelected(e)"
@@ -52,14 +52,14 @@
                                 style="color:rgb(197, 95, 11); margin-left: 15px;" matSuffix matTooltipPosition="right"
                                 matTooltip="Cambiar el estado del documentdo de autorazación"
                                 [routerLink]="['/ver-permiso',e.id]">
-                                <p>Autorizar</p>
+                                <p>Abrobar</p>
                             </i>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        <mat-paginator id="pagina" [length]="listaPermisosFiltradas.length" [pageSize]="tamanio_pagina"
+        <mat-paginator id="pagina" [length]="listaPermisosDeparta.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
         <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
@@ -85,6 +85,7 @@
         </div>
     </div>
 </div>
+
 <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="lista_autorizados">
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
@@ -154,6 +155,6 @@
 <div *ngIf="(validarMensaje1) && (validarMensaje2)" class="container"
     style="padding-bottom: 50px; text-align: center; padding-top: 20px;">
     <div class="mat-elevation-z8" style="color: rgb(158, 154, 154); padding: 2%;">
-        <h5> Por el Momento no tiene Solicitudes de Permisos para Aprobar </h5>
+        <h5> Por el Momento no tiene Solicitudes de Permisos por Aprobar </h5>
     </div>
 </div>

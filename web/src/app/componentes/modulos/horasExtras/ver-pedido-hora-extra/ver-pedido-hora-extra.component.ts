@@ -21,6 +21,8 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 import { HoraExtraAutorizacionesComponent } from 'src/app/componentes/autorizaciones/hora-extra-autorizaciones/hora-extra-autorizaciones.component';
 import { EditarEstadoHoraExtraAutorizacionComponent } from 'src/app/componentes/autorizaciones/editar-estado-hora-extra-autorizacion/editar-estado-hora-extra-autorizacion.component';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
   selector: 'app-ver-pedido-hora-extra',
@@ -61,6 +63,8 @@ export class VerPedidoHoraExtraComponent implements OnInit {
     private restE: EmpleadoService, // SERVICIO DE DATOS DE EMPLEADO
     public restEmpre: EmpresaService, // SERVICIOS DE DATOS EMPRESA
     public restGeneral: DatosGeneralesService, // SERVICIO DATOS GENERALES DE EMPLEADO
+    public restAutoriza: AutorizaDepartamentoService, //SERVICIO DE DATOS DE AUTORIZACION POR EL EMPLEADO
+    public usuarioDepa: UsuarioService, //SERVICIO DE DATOS DE DEPARTAMENTO POR EL USUARIO DE LA SOLICITUD
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.dataParams = this.router.routerState.snapshot.root.children[0].params;
@@ -81,17 +85,26 @@ export class VerPedidoHoraExtraComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
+  ArrayAutorizacionTipos: any = []
+  gerencia: boolean = false;
+
   // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-        this.BuscarHora(this.formato_fecha)
-      },
-      vacio => {
-        this.BuscarHora(this.formato_fecha)
-      });
+      this.formato_fecha = res[0].descripcion;
+      this.BuscarHora(this.formato_fecha)
+    },
+    vacio => {
+      this.BuscarHora(this.formato_fecha)
+    });
+
+    this.restAutoriza.BuscarAutoridadUsuario(this.idEmpleado).subscribe(
+      (res) => {
+        this.ArrayAutorizacionTipos = res;
+      }
+    );
   }
 
   BuscarHora(fecha: string) {
@@ -139,14 +152,42 @@ export class VerPedidoHoraExtraComponent implements OnInit {
 
       })
 
-      console.log('data horas .. ', this.hora_extra);
-
-      if(this.idEmpleado == this.id_usua_solicita){
+      if(this.hora_extra[0].estado > 2){
         this.habilitarActualizar = false;
+      }else{
+        this.habilitarActualizar = true;
+
+        if(this.idEmpleado == this.id_usua_solicita){
+          this.habilitarActualizar = false;
+        }else{
+          this.usuarioDepa.ObtenerDepartamentoUsuarios(this.id_usua_solicita).subscribe((usuaDep) => {
+            this.ArrayAutorizacionTipos.filter(x => {
+              if((x.nom_depar == 'GERENCIA') && (x.estado == true)){
+                this.gerencia = true;
+                if(this.hora_extra[0].estado == 2 && x.preautorizar == true){
+                  return this.habilitarActualizar = false;
+                }else {
+                  return this.habilitarActualizar = true;
+                }
+              }else if((this.gerencia == false) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
+                if(this.hora_extra[0].estado == 2 && x.autorizar == true){
+                  return this.habilitarActualizar = true;
+                }else if(this.hora_extra[0].estado == 1 && x.preautorizar == true){
+                  return this.habilitarActualizar = true;
+                }else{
+                  return this.habilitarActualizar = false;
+                }
+              }
+            })
+            console.log('this.habilitarActualizar = ',this.habilitarActualizar);
+          });
+        }
       }
 
       if(this.hora_extra[0].estado > 1){
         this.estado = true;
+      }else{
+        this.estado = false;
       }
 
       this.ObtenerAprobacion();
@@ -178,10 +219,10 @@ export class VerPedidoHoraExtraComponent implements OnInit {
             estado_auto = 'Pendiente';
           }
           if (estado_auto === '2') {
-            estado_auto = 'Preautorización';
+            estado_auto = 'Preautorizado';
           }
           if (estado_auto === '3') {
-            estado_auto = 'Autorización';
+            estado_auto = 'Autorizado';
           }
           if (estado_auto === '4') {
             estado_auto = 'Permiso Negado';
@@ -262,23 +303,29 @@ export class VerPedidoHoraExtraComponent implements OnInit {
       this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
         var fecha_inicio = moment(this.datoSolicitud[0].fec_inicio);
         // METODO PARA VER DÍAS DISPONIBLES DE AUTORIZACIÓN
-        if (res[0].cambios === true) {
-          if (res[0].cambios === 0) {
-            this.habilitarActualizar = false;
-          }
-          else {
-            var dias = fecha_inicio.diff(this.fechaActual, 'days');
-            if (dias >= res[0].dias_cambio) {
+        if(this.hora_extra[0].estado > 2){
+          this.habilitarActualizar = false;
+        }else{
+          if (res[0].cambios === true) {
+            if (res[0].cambios === 0) {
               this.habilitarActualizar = false;
             }
             else {
-              this.habilitarActualizar = true;
+              var dias = fecha_inicio.diff(this.fechaActual, 'days');
+              if (dias >= res[0].dias_cambio) {
+                this.habilitarActualizar = false;
+              }
+              else {
+                this.habilitarActualizar = true;
+              }
             }
           }
-        } else {
-          this.habilitarActualizar = true;
         }
-      });
+
+        console.log('this.habilitarActualizar 222 = ',this.habilitarActualizar);
+
+      }
+    );
     }, err => {
       return this.validar.RedireccionarMixto(err.error)
     })
@@ -367,8 +414,6 @@ export class VerPedidoHoraExtraComponent implements OnInit {
   }
 
   SeleccionarMetodo() {
-
-
     let fecha = this.validar.FormatearFecha(this.fechaActual, this.formato_fecha, this.validar.dia_completo);
     let fec_inicio_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_inicio, this.formato_fecha, this.validar.dia_completo);
     let fec_final_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_final, this.formato_fecha, this.validar.dia_completo);
@@ -433,8 +478,26 @@ export class VerPedidoHoraExtraComponent implements OnInit {
                     table: {
                       widths: ['auto'],
                       body: [
+                        [{ text: this.empleado_estado[0].estado.toUpperCase() + ' POR', style: 'tableHeaderA' },],
+                        [{ text: ' ', style: 'itemsTable', margin: [0, 10, 0, 10] },],
+                        [{ text: this.empleado_estado[0].nombre + '\n' + this.empleado_estado[0].cargo, style: 'itemsTable' },]
+                      ]
+                    }
+                  },
+                  { width: '*', text: '' },
+                ]
+              },
+              {
+                columns: [
+                  { width: '*', text: '' },
+                  {
+                    width: 'auto',
+                    layout: 'lightHorizontalLines',
+                    table: {
+                      widths: ['auto'],
+                      body: [
                         [{ text: this.empleado_estado[this.cont - 1].estado.toUpperCase() + ' POR', style: 'tableHeaderA' }],
-                        [{ text: ' ', style: 'itemsTable', margin: [0, 20, 0, 20] }],
+                        [{ text: ' ', style: 'itemsTable', margin: [0, 10, 0, 10] }],
                         [{ text: this.empleado_estado[this.cont - 1].nombre + '\n' + this.empleado_estado[this.cont - 1].cargo, style: 'itemsTable' }]
                       ]
                     }
@@ -452,7 +515,7 @@ export class VerPedidoHoraExtraComponent implements OnInit {
                       widths: ['auto'],
                       body: [
                         [{ text: 'EMPLEADO', style: 'tableHeaderA' },],
-                        [{ text: ' ', style: 'itemsTable', margin: [0, 20, 0, 20] }],
+                        [{ text: ' ', style: 'itemsTable', margin: [0, 10, 0, 10] }],
                         [{ text: this.datoSolicitud[0].nombre_emple + ' ' + this.datoSolicitud[0].apellido_emple + '\n' + this.datoSolicitud[0].cargo, style: 'itemsTable' }]
                       ]
                     }
