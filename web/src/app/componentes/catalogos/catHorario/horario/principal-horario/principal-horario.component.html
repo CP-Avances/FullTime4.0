@@ -108,12 +108,12 @@
                         <td>{{horario.hora_trabajo}}</td>
                         <td *ngIf="horario.nocturno == true">Sí</td>
                         <td *ngIf="horario.nocturno == false">No</td>
-                        <td *ngIf="horario.doc_nombre == '' || horario.doc_nombre == null"></td>
-                        <td *ngIf="horario.doc_nombre != '' && horario.doc_nombre != null"> <a class="fas fa-file-alt"
+                        <td *ngIf="horario.documento == null"></td>
+                        <td *ngIf="horario.documento != null"> <a class="fas fa-file-alt"
                                 style="color:rgb(197, 95, 11); margin-left: 15px; text-align: center;" matSuffix
                                 matTooltipPosition="right" matTooltip="Dar click para ver o descargar el documento."
                                 href="{{hipervinculo}}/horario/documentos/{{horario.documento}}" target="_blank">
-                                <p>{{horario.doc_nombre}}</p>
+                                <p>{{horario.documento}}</p>
                             </a>
                         </td>
                         <td class="d-flex justify-content-center">

@@ -66,6 +66,7 @@ export class EditarRegimenComponent implements OnInit {
   diasAdicionalesF = new FormControl('');
   vacaciones_dosF = new FormControl('');
   vacaciones_unoF = new FormControl('');
+  meses_calculoF = new FormControl('');
   desde_cuatroF = new FormControl('');
   hasta_cuatroF = new FormControl('');
   antiguedadF = new FormControl('');
@@ -146,6 +147,7 @@ export class EditarRegimenComponent implements OnInit {
       diasAdicionalesForm: this.diasAdicionalesF,
       vacaciones_dosForm: this.vacaciones_dosF,
       vacaciones_unoForm: this.vacaciones_unoF,
+      meses_calculoForm: this.meses_calculoF,
       desde_cuatroForm: this.desde_cuatroF,
       hasta_cuatroForm: this.hasta_cuatroF,
       antiguedadForm: this.antiguedadF,
@@ -357,6 +359,7 @@ export class EditarRegimenComponent implements OnInit {
     this.diasMesLaborableF.setValue(this.data.vacacion_dias_laboral_mes);
     this.dias_CalendarioF.setValue(this.data.calendario_dias);
     this.dias_LaborableF.setValue(this.data.laboral_dias);
+    this.meses_calculoF.setValue(this.data.meses_calculo);
     // ANTIGUEDAD DE VACACIONES
     if (this.data.antiguedad === true) {
       this.antiguedad = true;
@@ -756,7 +759,7 @@ export class EditarRegimenComponent implements OnInit {
   VerificarPeriodos(event: Event, opcion: number): void {
     var valor = event.target as HTMLInputElement;
 
-  console.log(valor.value);
+    console.log(valor.value);
     if (parseFloat(valor.value) >= 5) {
       if (opcion === 1) {
         this.mensaje1_ = false;
@@ -1268,17 +1271,25 @@ export class EditarRegimenComponent implements OnInit {
   // METODO PARA VALIDAR REALIZACION DE CALCULOS
   ValidarRequerido(event: MatCheckboxChange, form1: any, form2: any, form3: any) {
     if (event.checked === true) {
-      this.limpiar_calcular = true; // --------------------- Activar boton limpiar formulario (true)
-      this.CalcularDiasMeses(form1, form2);
-      if (form3.antiguedadActivaForm === true && form3.antiguedadForm === 'variable') {
-        if (this.correcto_antiguo === true) {
+      if (form3.meses_calculoForm != '') {
+        this.limpiar_calcular = true; // --------------------- Activar boton limpiar formulario (true)
+        this.CalcularDiasMeses(form1, form2, form3);
+        if (form3.antiguedadActivaForm === true && form3.antiguedadForm === 'variable') {
+          if (this.correcto_antiguo === true) {
+            this.activar_guardar = false;
+          } else {
+            this.activar_guardar = true;
+          }
+        }
+        else {
           this.activar_guardar = false;
-        } else {
-          this.activar_guardar = true;
         }
       }
       else {
-        this.activar_guardar = false;
+        this.calculoF.setValue(false);
+        this.toastr.warning('Registrar número de meses de periodo considerados en el cálculo.', '', {
+          timeOut: 6000
+        })
       }
     }
     else {
@@ -1287,14 +1298,13 @@ export class EditarRegimenComponent implements OnInit {
   }
 
   // METODO PARA CALCULAR VACACIONES GANADAS AL MES
-  CalcularDiasMeses(form1: any, form2: any) {
-    console.log('ver form ', form2.diasLaborablesForm, ' ', form1.mesesForm)
+  CalcularDiasMeses(form1: any, form2: any, form3: any) {
     // EJEMPLO:
     // 12 --> 11
     //  1 --> x
     // CALCULO DE DIAS GANADOS AL MES
-    var dias_laborables_mes = Number((parseFloat(form2.diasLaborablesForm) / parseFloat(form1.mesesForm)).toFixed(10));
-    var dias_calendario_mes = Number((parseFloat(form2.diasCalendarioForm) / parseFloat(form1.mesesForm)).toFixed(10));
+    var dias_laborables_mes = Number((parseFloat(form2.diasLaborablesForm) / parseFloat(form3.meses_calculoForm)).toFixed(10));
+    var dias_calendario_mes = Number((parseFloat(form2.diasCalendarioForm) / parseFloat(form3.meses_calculoForm)).toFixed(10));
 
     this.diasMesLaborableF.setValue(String(dias_laborables_mes));
     this.diasMesCalendarioF.setValue(String(dias_calendario_mes));
@@ -1414,6 +1424,7 @@ export class EditarRegimenComponent implements OnInit {
         vacacion_dias_laboral_mes: form3.diasMesLaborableForm,
         calendario_dias: form3.dias_CalendarioForm,
         laboral_dias: form3.dias_LaborableForm,
+        meses_calculo: form3.meses_calculoForm,
       };
 
       this.ValidarInformacion(form1, form2, form3, regimen);

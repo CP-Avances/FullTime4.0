@@ -23,8 +23,8 @@ export class HorarioService {
   }
 
   // CARGAR ARCHIVO DE RESPALDO
-  SubirArchivo(formData: any, id: number, nombre: string) {
-    return this.http.put(`${environment.url}/horario/${id}/documento/${nombre}`, formData)
+  SubirArchivo(formData: any, id: number, archivo: any, codigo: any) {
+    return this.http.put(`${environment.url}/horario/${id}/documento/${archivo}/verificar/${codigo}`, formData)
   }
 
   // ACTUALIZACION DE HORARIO
@@ -81,7 +81,7 @@ export class HorarioService {
 
 
 
-  
+
   // VERIFICAR DATOS DE LA PLANTILLA DE CATÁLOGO HORARIO Y CARGAR AL SISTEMA
   VerificarDatosHorario(formData) {
     return this.http.post<any>(`${environment.url}/horario/cargarHorario/verificarDatos/upload`, formData);

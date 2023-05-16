@@ -38,6 +38,11 @@ mat-form-field {
     padding: 0px 10px 0px 5px;
 }
 
+#periodo_calculo {
+    width: 170px;
+    padding: 0px 10px 0px 5px;
+}
+
 #Vacacion_periodo{
     width: 240px;
     padding: 0px 5px 0px 5px;

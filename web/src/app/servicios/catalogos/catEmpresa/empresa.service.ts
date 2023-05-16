@@ -83,6 +83,10 @@ export class EmpresaService {
     return this.http.put<any>(`${environment.url}/empresas/credenciales/${id_empresa}`, data);
   }
 
+  // ACTUALIZAR EMPRESA INDIAR USO DE ACCIONES
+  ActualizarAccionesTimbres(formData: any) {
+    return this.http.put<any>(`${environment.url}/empresas/acciones-timbre`, formData);
+  }
 
 
 
@@ -90,6 +94,7 @@ export class EmpresaService {
 
 
 
+  
 
   //Empresas
 
@@ -121,9 +126,7 @@ export class EmpresaService {
 
 
 
-  ActualizarAccionesTimbres(formData) {
-    return this.http.put<any>(`${environment.url}/empresas/acciones-timbre`, formData);
-  }
+
 
 
 

@@ -36,6 +36,7 @@ class RegimenControlador {
         vacacion_dias_laboral_mes,
         calendario_dias,
         laboral_dias,
+        meses_calculo
       } = req.body;
 
       const response: QueryResult = await pool.query(
@@ -44,9 +45,9 @@ class RegimenControlador {
           continuidad_laboral, vacacion_dias_laboral, vacacion_dias_libre, vacacion_dias_calendario, acumular, 
           dias_max_acumulacion, contar_feriados, vacacion_divisible, antiguedad, antiguedad_fija, anio_antiguedad, 
           dias_antiguedad, antiguedad_variable, vacacion_dias_calendario_mes, vacacion_dias_laboral_mes, calendario_dias, 
-          laboral_dias)
+          laboral_dias, meses_calculo)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, 
-          $23) RETURNING *
+          $23, $24) RETURNING *
         `
         , [
           id_pais,
@@ -72,6 +73,7 @@ class RegimenControlador {
           vacacion_dias_laboral_mes,
           calendario_dias,
           laboral_dias,
+          meses_calculo
         ]
       );
 
@@ -113,6 +115,7 @@ class RegimenControlador {
       vacacion_dias_laboral_mes,
       calendario_dias,
       laboral_dias,
+      meses_calculo,
       id,
     } = req.body;
 
@@ -123,8 +126,8 @@ class RegimenControlador {
         vacacion_dias_calendario = $10, acumular = $11, dias_max_acumulacion = $12, contar_feriados = $13, 
         vacacion_divisible = $14, antiguedad = $15, antiguedad_fija = $16, anio_antiguedad = $17, dias_antiguedad = $18, 
         antiguedad_variable = $19, vacacion_dias_calendario_mes = $20, vacacion_dias_laboral_mes = $21, calendario_dias = $22,
-        laboral_dias = $23 
-      WHERE id = $24
+        laboral_dias = $23, meses_calculo = $24 
+      WHERE id = $25
       `
       , [
         id_pais,
@@ -150,6 +153,7 @@ class RegimenControlador {
         vacacion_dias_laboral_mes,
         calendario_dias,
         laboral_dias,
+        meses_calculo,
         id,
       ]
     );
@@ -401,7 +405,7 @@ class RegimenControlador {
 
 
 
-  
+
   public async ListarRegimenSucursal(
     req: Request,
     res: Response

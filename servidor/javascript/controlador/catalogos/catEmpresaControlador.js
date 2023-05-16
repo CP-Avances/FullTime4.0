@@ -288,6 +288,24 @@ class EmpresaControlador {
             res.status(200).jsonp({ message: 'Registro actualizado.' });
         });
     }
+    // METODO PARA ACTUALIZAR USO DE ACCIONES
+    ActualizarAccionesTimbres(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id, bool_acciones } = req.body;
+                yield database_1.default.query(`
+                UPDATE cg_empresa SET acciones_timbres = $1 WHERE id = $2
+                `, [bool_acciones, id]);
+                res.status(200).jsonp({
+                    message: 'Empresa actualizada exitosamente',
+                    title: 'Ingrese nuevamente al sistema'
+                });
+            }
+            catch (error) {
+                res.status(404).jsonp(error);
+            }
+        });
+    }
     ListarEmpresa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const EMPRESA = yield database_1.default.query('SELECT id, nombre, ruc, direccion, telefono, correo, ' +
@@ -352,21 +370,6 @@ class EmpresaControlador {
             const id = req.params.id;
             yield database_1.default.query('DELETE FROM cg_empresa WHERE id = $1', [id]);
             res.jsonp({ message: 'Registro eliminado.' });
-        });
-    }
-    ActualizarAccionesTimbres(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { id, bool_acciones } = req.body;
-                yield database_1.default.query('UPDATE cg_empresa SET acciones_timbres = $1 WHERE id = $2', [bool_acciones, id]);
-                res.status(200).jsonp({
-                    message: 'Empresa actualizada exitosamente',
-                    title: 'Ingrese nuevamente al sistema'
-                });
-            }
-            catch (error) {
-                res.status(404).jsonp(error);
-            }
         });
     }
 }

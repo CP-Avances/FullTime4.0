@@ -118,6 +118,7 @@ export class VerHorarioDetalleComponent implements OnInit {
         if (result !== undefined) {
           this.datosHorario = result
         }
+        this.BuscarDatosHorario(this.idHorario);
         this.ListarDetalles(this.idHorario, this.formato_hora);
       });
   }

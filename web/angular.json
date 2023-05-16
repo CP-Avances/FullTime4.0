@@ -17,7 +17,8 @@
               "moment",
               "leaflet",
               "pdfmake",
-              "file-saver"
+              "file-saver",
+              "ts-md5/dist/md5"
            ],
             "outputPath": "dist/fulltimeweb",
             "index": "src/index.html",
