@@ -106,7 +106,7 @@ export class EditarHorarioEmpleadoComponent implements OnInit {
           })
           let datos_horario = [{
             id: hor.id,
-            nombre: '(' + this.hora_entrada + '-' + this.hora_salida + ') ' + hor.nombre
+            nombre: '(' + this.hora_entrada + '-' + this.hora_salida + ') ' + hor.codigo
           }]
           if (this.vista_horarios.length === 0) {
             this.vista_horarios = datos_horario;
@@ -116,7 +116,7 @@ export class EditarHorarioEmpleadoComponent implements OnInit {
         }, error => {
           let datos_horario = [{
             id: hor.id,
-            nombre: hor.nombre
+            nombre: hor.codigo
           }]
           if (this.vista_horarios.length === 0) {
             this.vista_horarios = datos_horario;
@@ -163,7 +163,7 @@ export class EditarHorarioEmpleadoComponent implements OnInit {
     this.restE.BuscarFechaContrato(datosBusqueda).subscribe(response => {
       // VERIFICAR SI LAS FECHAS SON VALIDAS DE ACUERDO A LOS REGISTROS Y FECHAS INGRESADAS
       if (Date.parse(response[0].fec_ingreso.split('T')[0]) < Date.parse(form.fechaInicioForm)) {
-        if (Date.parse(form.fechaInicioForm) < Date.parse(form.fechaFinalForm)) {
+        if (Date.parse(form.fechaInicioForm) <= Date.parse(form.fechaFinalForm)) {
           this.VerificarDuplicidad(form);
         }
         else {
@@ -309,7 +309,7 @@ export class EditarHorarioEmpleadoComponent implements OnInit {
         start = new Date(newDate);
       }
       var tipo: string = '';
-      
+
       this.fechasHorario.map(obj => {
         // DEFINICION DE TIPO DE DIA SEGUN HORARIO
         tipo = 'N'
@@ -373,8 +373,18 @@ export class EditarHorarioEmpleadoComponent implements OnInit {
         // COLOCAR DETALLE DE DIA SEGUN HORARIO
         this.detalles.map(element => {
           var accion = 0;
+          var nocturno: number = 0;
           if (element.tipo_accion === 'E') {
             accion = element.minu_espera;
+          }
+          if (element.segundo_dia === true) {
+            nocturno = 1;
+          }
+          else if (element.tercer_dia === true) {
+            nocturno = 2;
+          }
+          else {
+            nocturno = 0;
           }
           let plan = {
             fec_hora_horario: obj + ' ' + element.hora,
@@ -388,6 +398,14 @@ export class EditarHorarioEmpleadoComponent implements OnInit {
             estado: form.estadoForm,
             tipo: tipo,
           };
+          if (element.segundo_dia === true) {
+            plan.fec_horario = moment(obj).add(1, 'd').format('YYYY-MM-DD');
+            plan.fec_hora_horario = moment(obj).add(1, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
+          }
+          if (element.tercer_dia === true) {
+            plan.fec_horario = moment(obj).add(2, 'd').format('YYYY-MM-DD');
+            plan.fec_hora_horario = moment(obj).add(2, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
+          }
           this.restP.CrearPlanGeneral(plan).subscribe(res => {
           })
         })

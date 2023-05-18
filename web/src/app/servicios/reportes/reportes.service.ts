@@ -149,7 +149,7 @@ export class ReportesService {
   setFiltroNombreDep(arr) { this._filtroNombreDep = arr }
 
   // Filtro formulario del empleado 
-  private _filtroCodigo: number = 0;
+  private _filtroCodigo: any;
   private _filtroCedula: string = '';
   private _filtroNombreEmp: string = '';
 

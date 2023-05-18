@@ -8,12 +8,12 @@ import { FormControl, Validators, FormGroup } from '@angular/forms';
 
 // IMPORTACION DE SERVICIOS
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
+import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
-import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
 
 @Component({
   selector: 'app-registo-empleado-horario',
@@ -108,7 +108,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
           })
           let datos_horario = [{
             id: hor.id,
-            nombre: '(' + this.hora_entrada + '-' + this.hora_salida + ') ' + hor.nombre
+            nombre: '(' + this.hora_entrada + '-' + this.hora_salida + ') ' + hor.codigo
           }]
           if (this.vista_horarios.length === 0) {
             this.vista_horarios = datos_horario;
@@ -118,7 +118,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         }, error => {
           let datos_horario = [{
             id: hor.id,
-            nombre: hor.nombre
+            nombre: hor.codigo
           }]
           if (this.vista_horarios.length === 0) {
             this.vista_horarios = datos_horario;
@@ -161,12 +161,12 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     let datosBusqueda = {
       id_empleado: this.datoEmpleado.idEmpleado
     }
-    
+
     // METODO PARA BUSCAR FECHA DE CONTRATO REGISTRADO EN FICHA DE EMPLEADO
     this.restE.BuscarFechaContrato(datosBusqueda).subscribe(response => {
       // VERIFICAR SI LAS FECHAS SON VALIDAS DE ACUERDO A LOS REGISTROS Y FECHAS INGRESADAS
       if (Date.parse(response[0].fec_ingreso.split('T')[0]) < Date.parse(form.fechaInicioForm)) {
-        if (Date.parse(form.fechaInicioForm) < Date.parse(form.fechaFinalForm)) {
+        if (Date.parse(form.fechaInicioForm) <= Date.parse(form.fechaFinalForm)) {
           this.VerificarDuplicidad(form);
         }
         else {
@@ -369,6 +369,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
           else {
             nocturno = 0;
           }
+
           let plan = {
             tipo: tipo,
             estado: 1,
@@ -382,11 +383,20 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
             fec_hora_horario: obj + ' ' + element.hora,
             salida_otro_dia: nocturno,
           };
+          if (element.segundo_dia === true) {
+            plan.fec_horario = moment(obj).add(1, 'd').format('YYYY-MM-DD');
+            plan.fec_hora_horario = moment(obj).add(1, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
+          }
+          if (element.tercer_dia === true) {
+            plan.fec_horario = moment(obj).add(2, 'd').format('YYYY-MM-DD');
+            plan.fec_hora_horario = moment(obj).add(2, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
+          }
+          // REGISTRO DE PLAN GENERAL
           this.restP.CrearPlanGeneral(plan).subscribe(res => {
           })
         })
       })
-      this.toastr.success('Operación Exitosa.', 'Registro guardado.', {
+      this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       });
     });
@@ -441,9 +451,11 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         this.rest.VerificarHorariosExistentes(this.datoEmpleado.idEmpleado, fechas).subscribe(existe => {
           this.horariosEmpleado = existe;
           this.horariosEmpleado.map(h => {
+            console.log('ver horarios ', h)
             // SUMA DE HORAS DE CADA UNO DE LOS HORARIOS DEL EMPLEADO
             this.suma = moment(this.suma, 'HH:mm:ss').add(moment.duration(h.hora_trabajo)).format('HH:mm:ss');
           })
+          console.log(this.suma, 'ver suma')
           // SUMA DE HORAS TOTALES DE HORARIO CON HORAS DE HORARIO SELECCIONADO
           this.sumHoras = moment(this.suma, 'HH:mm:ss').add(moment.duration(hora_trabajo)).format('HH:mm:ss');
 

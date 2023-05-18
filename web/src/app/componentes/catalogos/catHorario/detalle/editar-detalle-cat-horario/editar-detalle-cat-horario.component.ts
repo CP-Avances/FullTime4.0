@@ -198,9 +198,10 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
       id: this.data.detalle.id
     };
     if (this.acciones === true) {
-      detalle.min_antes = form.min_antesForm;
-      detalle.min_despues = form.min_despuesForm;
+      detalle.min_antes = parseInt(form.min_antesForm);
+      detalle.min_despues = parseInt(form.min_despuesForm);
     }
+    console.log('ver datos de horario ', detalle)
     this.ValidarMinEspera(form, detalle);
     if (this.datosHorario[0].min_almuerzo === 0) {
       this.ValidarDetallesSinAlimentacion(detalle);

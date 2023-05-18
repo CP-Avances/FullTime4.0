@@ -1,4 +1,10 @@
-<div style="padding-top: 20px;">
+<!-- *** VENTANA DE APROBACIONES MULTIPLES *** -->
+<div style="padding-top: 20px;" *ngIf="asignar">
+    <app-horarios-multiples [seleccionados]="seleccionados">
+    </app-horarios-multiples>
+</div>
+
+<div style="padding-top: 20px;" *ngIf="seleccionar">
     <div id="titulo">PLANIFICACIÓN RANGO FECHAS</div>
     <mat-card class="example-card mat-elevation-z9">
         <mat-card-content>
@@ -10,7 +16,8 @@
                 <mat-radio-group class="d-flex flex-wrap justify-content-center" [formControl]="seleccion">
                     <mat-radio-button class="example-radio-button" *ngFor="let c of check" [value]="c.opcion"
                         (change)="BuscarPorTipo($event)">
-                        <label id="textoradiobtn">{{c.valor}}</label></mat-radio-button>
+                        <label id="textoradiobtn">{{c.valor}}</label>
+                    </mat-radio-button>
                 </mat-radio-group>
             </form>
             <!-- FORM PARA SUCURSALES -->
@@ -92,8 +99,8 @@
             </form>
 
             <div *ngIf="activar_boton" class="d-flex flex-wrap justify-content-center" style="padding-top: 15px;">
-                <button id="btn-raised"  class="btn btn-sm" (click)="GuardarRegistros(0)">Planificar</button>
-                <button id="btn-raised"  class="btn btn-sm" (click)="LimpiarFormulario()">Cancelar</button>
+                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0)">Planificar</button>
+                <button id="btn-raised" class="btn btn-sm" (click)="LimpiarFormulario()">Cancelar</button>
             </div>
 
             <hr>
@@ -140,8 +147,7 @@
                                 <td class="d-flex justify-content-center">
                                     <i (click)="GuardarRegistros(s.id)" id="plan" *ngIf="auto_individual"
                                         class="fas fa-calendar" matSuffix matTooltipPosition="right"
-                                        matTooltip="Abrir formulario de registro de horarios."
-                                        [ngStyle]="habilitado">
+                                        matTooltip="Abrir formulario de registro de horarios." [ngStyle]="habilitado">
                                         <p>Planificar</p>
                                     </i>
                                     <div *ngIf="!auto_individual" style="padding-bottom: 1%;">
@@ -185,6 +191,7 @@
                                         [aria-label]="checkboxLabelDep()">
                                     </mat-checkbox>
                                 </th>
+                                <th scope="col">Establecimiento</th>
                                 <th scope="col">Nombre</th>
                                 <th scope="col">Planificar</th>
                             </tr>
@@ -198,12 +205,12 @@
                                         [checked]="selectionDep.isSelected(d)" [aria-label]="checkboxLabelDep(d)">
                                     </mat-checkbox>
                                 </td>
+                                <td>{{d.establecimiento}}</td>
                                 <td>{{d.nombre}}</td>
                                 <td class="d-flex justify-content-center">
                                     <i (click)="GuardarRegistros(d.id)" id="plan" *ngIf="auto_individual"
                                         class="fa fa-calendar" matSuffix matTooltipPosition="right"
-                                        matTooltip="Abrir formulario de registro de horarios."
-                                        [ngStyle]="habilitado">
+                                        matTooltip="Abrir formulario de registro de horarios." [ngStyle]="habilitado">
                                         <p>Planificar</p>
                                     </i>
                                     <div *ngIf="!auto_individual" style="padding-bottom: 1%;">
@@ -268,8 +275,7 @@
                                 <td class="d-flex justify-content-center">
                                     <i (click)="PlanificarIndividual(e)" id="plan" *ngIf="auto_individual"
                                         class="fa fa-calendar" matSuffix matTooltipPosition="right"
-                                        matTooltip="Abrir formulario de registro de horarios."
-                                        [ngStyle]="habilitado">
+                                        matTooltip="Abrir formulario de registro de horarios." [ngStyle]="habilitado">
                                         <p>Planificar</p>
                                     </i>
                                     <div *ngIf="!auto_individual" style="padding-bottom: 1%;">
@@ -289,40 +295,4 @@
 
         </mat-card-content>
     </mat-card>
-
-    <div class="container" style="margin: 25px 0px 25px 0px; text-align: center;" *ngIf="no_asignados">
-        <div class="nota">
-            <span>NOTA: No se asigna horario a un colaborador cuando: 1. El horario a asignar ya se encuentra
-                registrado. 2. El número de horas del horario sobrepasa el número de horas establecidas en su
-                contrato. 3. El horario a asignar no se encuentra dentro de las fechas indicadas en su contrato.</span>
-        </div>
-        <div class="mat-elevation-z8" style="background: white;">
-            <div class="d-flex bd-highlight" id="titulo">
-                <span class="w-100 bd-highlight">
-                    LISTA DE EMPLEADOS SIN ASIGNACIÓN DE HORARIO <mat-icon (click)="CerrarTabla()" matSuffix
-                        matTooltipPosition="right" matTooltip="Cerrar la tabla." id="cerrar">
-                        close</mat-icon></span>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover table-sm">
-                    <thead class="thead-light">
-                        <tr style="text-align: center;">
-                            <th scope="col">Código</th>
-                            <th scope="col">Empleado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let e of empleados_sin_asignacion | paginate:tamanio_pagina_h:numero_pagina_h">
-                            <td>{{e.codigo}}</td>
-                            <td>{{e.nombre}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <mat-paginator id="pagina" [length]="empleados_sin_asignacion.length" [pageSize]="tamanio_pagina_h"
-                [pageSizeOptions]="pageSizeOptions_h" id="pagina" (page)="ManejarPaginaH($event)" showFirstLastButtons>
-            </mat-paginator>
-            <br>
-        </div>
-    </div>
 </div>

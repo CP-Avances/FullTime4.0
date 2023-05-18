@@ -6,9 +6,9 @@ p {
     padding: 5px 5px 5px 5px;
 }
 
-.mat-radio-button~.mat-radio-button {
+.mat-mdc-radio-button ~ .mat-mdc-radio-button {
     margin-left: 16px;
-}
+  }
 
 .btn {
     margin-left: 15px;

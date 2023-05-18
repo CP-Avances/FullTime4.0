@@ -1,13 +1,3 @@
-.mat-radio-button~.mat-radio-button {
-    margin-left: 20px;
-}
-
-mat-radio-group {
-    width: 400px;
-    padding: 15px 10px 15px 10x;
-    margin-bottom: 2px;
-}
-
 mat-form-field {
     width: 260px;
     padding: 10px 10px 0px 10px;
@@ -27,6 +17,18 @@ mat-form-field {
     font-size: 15px;
 }
 
+.contenedor {
+    display: flex;
+    flex-direction: column;
+    margin: 1rem auto;
+    max-width: 200px;
+    align-items: flex-start;
+}
+
+.radio-button {
+    margin: 0px 0px 10px;
+}
+
 .scrollbar {
     float: left;
     height: 450px;
@@ -40,12 +42,4 @@ mat-form-field {
 .scrollbar-primary::-webkit-scrollbar {
     width: 12px;
     background-color: #F5F5F5;
-}
-
-#textoradiobtn {
-    font-size: 14px;
-    margin: 12px 0px 0px 0px;
-    font-style: normal;
-    font-weight: 500;
-    letter-spacing: 0.1px;
 }

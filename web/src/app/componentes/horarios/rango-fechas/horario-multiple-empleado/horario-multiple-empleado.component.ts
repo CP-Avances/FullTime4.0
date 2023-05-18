@@ -5,19 +5,17 @@ import { ToastrService } from 'ngx-toastr';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
 import { Component, OnInit } from '@angular/core';
-import { Validators, FormControl, FormGroup } from '@angular/forms';
+import { Validators, FormControl } from '@angular/forms';
 
 // IMPORTAR PLANTILLA DE MODELO DE DATOS
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.model';
 
-// SERVICIOS FILTROS DE BUSQUEDA
-import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
-
 // IMPORTAR SERVICIOS
 import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 
 // IMPORTAR COMPONENTES
@@ -32,16 +30,9 @@ import { HorariosMultiplesComponent } from '../horarios-multiples/horarios-multi
 
 export class HorarioMultipleEmpleadoComponent implements OnInit {
 
-  //buscador !: FormGroup;
-
-  // VARIABLE USADA PARA ALMACENAR LISTA DE EMPLEADOS QUE NO SE ASIGNAN HORARIO
-  empleados_sin_asignacion: any = [];
-  no_asignados: boolean = false;
-
-  // ITEMS DE PAGINACION DE LA TABLA EMPLEADOS SIN HORARIO
-  numero_pagina_h: number = 1;
-  tamanio_pagina_h: number = 5;
-  pageSizeOptions_h = [5, 10, 20, 50];
+  // VARIABLES VISTA DE PANTALLAS
+  seleccionar: boolean = true;
+  asignar: boolean = false;
 
   idEmpleadoLogueado: any;
 
@@ -75,8 +66,8 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     public informacion: DatosGeneralesService, // SERVICIO DE DATOS INFORMATIVOS DE USUARIOS
     public restCargo: EmplCargosService,
     public restPerV: PeriodoVacacionesService, // SERVICIO DATOS PERIODO DE VACACIONES
-    public restR: ReportesService,
     public validar: ValidacionesService, // VARIABLE USADA PARA VALIDACIONES DE INGRESO DE LETRAS - NUMEROS
+    public restR: ReportesService,
     private toastr: ToastrService, // VARIABLE PARA MANEJO DE NOTIFICACIONES
     private ventana: MatDialog, // VARIABLE PARA MANEJO DE VENTANAS
   ) {
@@ -111,9 +102,11 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
       res.forEach(obj => {
         obj.departamentos.forEach(ele => {
+          console.log('ver data departamento ', ele)
           this.departamentos.push({
             id: ele.id_depa,
-            nombre: ele.name_dep
+            nombre: ele.name_dep,
+            establecimiento: ele.sucursal,
           })
         })
       })
@@ -425,7 +418,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   // METODO DE VALIDACION DE SELECCION MULTIPLE
   PlanificarMultiple(data: any) {
     if (data.length > 0) {
-      this.CerrarTabla();
       this.Planificar(data);
     }
     else {
@@ -436,20 +428,28 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   }
 
   // METODO PARA INGRESAR PLANIFICACION DE HORARIOS A VARIOS EMPLEADOS
+  seleccionados: any = [];
   Planificar(seleccionados: any) {
-    // VENTANA PARA INGRESAR DATOS DE HORARIOS MULTIPLES 
-    this.ventana.open(HorariosMultiplesComponent,
-      { width: '600px', data: { datos: seleccionados } })
-      .afterClosed().subscribe(item => {
-        this.auto_individual = true;
-        this.LimpiarFormulario();
-        if (item) {
-          if (item.length != 0) {
-            this.no_asignados = true;
-            this.empleados_sin_asignacion = item
+    if (seleccionados.length === 1) {
+      this.PlanificarIndividual(seleccionados[0]);
+    } else {
+      this.seleccionados = seleccionados;
+      this.seleccionar = false;
+      this.asignar = true;
+      // VENTANA PARA INGRESAR DATOS DE HORARIOS MULTIPLES 
+      /*this.ventana.open(HorariosMultiplesComponent,
+        { width: '600px', data: { datos: seleccionados } })
+        .afterClosed().subscribe(item => {
+          this.auto_individual = true;
+          this.LimpiarFormulario();
+          if (item) {
+            if (item.length != 0) {
+              this.no_asignados = true;
+              this.empleados_sin_asignacion = item
+            }
           }
-        }
-      });
+        });*/
+    }
   }
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
@@ -522,15 +522,5 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     return this.validar.IngresarSoloNumeros(evt);
   }
 
-  CerrarTabla() {
-    this.no_asignados = false;
-    this.empleados_sin_asignacion = [];
-  }
-
-  // METODO PARA MANEJO DE PAGINAS EN TABLAS DE EMPLEADOS SIN ASIGNACION
-  ManejarPaginaH(e: PageEvent) {
-    this.tamanio_pagina_h = e.pageSize;
-    this.numero_pagina_h = e.pageIndex + 1;
-  }
 
 }

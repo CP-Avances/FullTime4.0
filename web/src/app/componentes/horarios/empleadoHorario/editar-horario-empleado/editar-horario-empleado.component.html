@@ -1,7 +1,7 @@
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        MODIFICAR HORARIO
+        MODIFICAR ASIGNACION DE HORARIO
     </span>
     <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
 </div>
@@ -42,7 +42,8 @@
                         <mat-label>Seleccionar horario</mat-label>
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                             matTooltip="Lista de horarios cargados en el sistema.">
-                            help_outline</mat-icon>
+                            help_outline
+                        </mat-icon>
                         <mat-select [formControl]="horarioF" required>
                             <mat-option *ngFor="let h of vista_horarios" [value]="h.id" id="letra"
                                 (click)=VerificarIngresoFechas(formulario.value)>
@@ -108,6 +109,6 @@
     </mat-card-content>
 </form>
 <div class="d-flex flex-wrap justify-content-center" style="padding-top: 2%; margin-bottom: 2%;">
-    <button id="btn-raised"  class="btn btn-sm" (click)="InsertarEmpleadoHorario(formulario.value)"
+    <button id="btn-raised" class="btn btn-sm" (click)="InsertarEmpleadoHorario(formulario.value)"
         [disabled]="!formulario.valid">Guardar</button>
 </div>

@@ -2275,7 +2275,7 @@ export class VerEmpleadoComponent implements OnInit {
   AbrirVentanaAutorizar(): void {
     if (this.datoActual.id_cargo != undefined) {
       this.ventana.open(RegistroAutorizacionDepaComponent,
-        { width: '550px', data: { idEmpleado: this.idEmpleado, idCargo: this.datoActual.id_cargo } })
+        { width: '600px', data: { idEmpleado: this.idEmpleado, idCargo: this.datoActual.id_cargo } })
         .afterClosed().subscribe(item => {
           this.ObtenerAutorizaciones();
         });
@@ -2290,7 +2290,7 @@ export class VerEmpleadoComponent implements OnInit {
   // VENTANA PARA EDITAR AUTORIZACIONES DE DIFERENTES DEPARTAMENTOS 
   AbrirEditarAutorizar(datoSeleccionado: any): void {
     this.ventana.open(EditarAutorizacionDepaComponent,
-      { width: '550px', data: { idEmpleado: this.idEmpleado, datosAuto: datoSeleccionado } })
+      { width: '600px', data: { idEmpleado: this.idEmpleado, datosAuto: datoSeleccionado } })
       .afterClosed().subscribe(item => {
         this.ObtenerAutorizaciones();
       });

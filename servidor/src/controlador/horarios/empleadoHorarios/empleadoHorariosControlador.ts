@@ -11,7 +11,7 @@ class EmpleadoHorariosControlador {
         const { codigo } = req.params;
         const HORARIOS = await pool.query(
             `
-            SELECT eh.id, eh.id_empl_cargo, eh.id_hora, eh.fec_inicio, eh.fec_final,
+            SELECT eh.id, eh.id_empl_cargo, eh.fec_inicio, eh.fec_final,
                 eh.lunes, eh.martes, eh.miercoles, eh.jueves, eh.viernes, eh.sabado, eh.domingo, 
                 eh.id_horarios, eh.estado, eh.codigo, ch.nombre AS nom_horario
             FROM empl_horarios AS eh, cg_horarios AS ch
@@ -28,17 +28,40 @@ class EmpleadoHorariosControlador {
 
     // CREACION DE HORARIO
     public async CrearEmpleadoHorarios(req: Request, res: Response): Promise<void> {
-        const { id_empl_cargo, id_hora, fec_inicio, fec_final, lunes, martes, miercoles, jueves,
+        const { id_empl_cargo, fec_inicio, fec_final, lunes, martes, miercoles, jueves,
             viernes, sabado, domingo, id_horarios, estado, codigo } = req.body;
         await pool.query(
             `
-            INSERT INTO empl_horarios (id_empl_cargo, id_hora, fec_inicio, fec_final, 
+            INSERT INTO empl_horarios (id_empl_cargo, fec_inicio, fec_final, 
             lunes, martes, miercoles, jueves, viernes, sabado, domingo, id_horarios, estado, codigo) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
             `
-            , [id_empl_cargo, id_hora, fec_inicio, fec_final, lunes, martes, miercoles, jueves,
+            , [id_empl_cargo, fec_inicio, fec_final, lunes, martes, miercoles, jueves,
                 viernes, sabado, domingo, id_horarios, estado, codigo]);
         res.jsonp({ message: 'Registro guardado.' });
+    }
+
+    // ACTUALIZAR HORARIO ASIGNADO AL USUARIO
+    public async ActualizarEmpleadoHorarios(req: Request, res: Response): Promise<any> {
+        const { id_empl_cargo, fec_inicio, fec_final, lunes, martes, miercoles,
+            jueves, viernes, sabado, domingo, id_horarios, estado, id } = req.body;
+        try {
+            const [result] = await pool.query(
+                `
+                UPDATE empl_horarios SET id_empl_cargo = $1, fec_inicio = $2, fec_final = $3, lunes = $4, 
+                martes = $5, miercoles = $6, jueves = $7, viernes = $8, sabado = $9, domingo = $10, id_horarios = $11, 
+                estado = $12 WHERE id = $13 RETURNING *
+                `
+                , [id_empl_cargo, fec_inicio, fec_final, lunes, martes, miercoles, jueves, viernes, sabado,
+                    domingo, id_horarios, estado, id])
+                .then((result: any) => { return result.rows });
+
+            if (result === undefined) return res.status(404).jsonp({ message: 'Horario no actualizado.' })
+
+            return res.status(200).jsonp({ message: 'El horario del empleado se registró con éxito.' });
+        } catch (error) {
+            return res.status(500).jsonp({ message: 'Registros no encontrados.' });
+        }
     }
 
     // METODO PARA BUSCAR HORARIOS DEL EMPLEADO EN DETERMINADA FECHA
@@ -232,8 +255,8 @@ class EmpleadoHorariosControlador {
         }
     }
 
-     // METODO PARA BUSCAR HORAS DE ALIMENTACION EN EL MISMO DIA (MD)
-     public async ObtenerComidaHorarioHorasMD(req: Request, res: Response) {
+    // METODO PARA BUSCAR HORAS DE ALIMENTACION EN EL MISMO DIA (MD)
+    public async ObtenerComidaHorarioHorasMD(req: Request, res: Response) {
         let { codigo, fecha_inicio, hora_inicio, hora_final } = req.body;
 
         // CONSULTA DE HORARIO DEL USUARIO INGRESO = SALIDA
@@ -246,7 +269,7 @@ class EmpleadoHorariosControlador {
                 AND (($3 BETWEEN hora_inicio AND hora_final) OR ($4 BETWEEN hora_inicio AND hora_final))
             `
             , [codigo, fecha_inicio, hora_inicio, hora_final])
-            .then((result : any)=> { return result.rows });
+            .then((result: any) => { return result.rows });
 
         if (CASO_1.length === 0) {
 
@@ -304,7 +327,7 @@ class EmpleadoHorariosControlador {
 
 
 
-    
+
 
 
 
@@ -634,24 +657,7 @@ class EmpleadoHorariosControlador {
     }
 
 
-    public async ActualizarEmpleadoHorarios(req: Request, res: Response): Promise<any> {
-        const { id_empl_cargo, id_hora, fec_inicio, fec_final, lunes, martes, miercoles,
-            jueves, viernes, sabado, domingo, id_horarios, estado, id } = req.body;
-        try {
-            // console.log(req.body);
-            const [result] = await pool.query('UPDATE empl_horarios SET id_empl_cargo = $1, id_hora = $2, fec_inicio = $3, fec_final = $4, lunes = $5, martes = $6, miercoles = $7, jueves = $8, viernes = $9, sabado = $10, domingo = $11, id_horarios = $12, estado = $13 WHERE id = $14 RETURNING *',
-                [id_empl_cargo, id_hora, fec_inicio, fec_final, lunes, martes, miercoles, jueves, viernes, sabado, domingo, id_horarios, estado, id])
-                .then((result: any) => { return result.rows });
 
-            if (result === undefined) return res.status(404).jsonp({ message: 'Horario no actualizado' })
-
-            return res.status(200).jsonp({ message: 'El horario del empleado se registró con éxito' });
-        } catch (error) {
-            console.log(error);
-
-            return res.status(500).jsonp({ message: 'Registros no encontrados' });
-        }
-    }
 
     public async EliminarRegistros(req: Request, res: Response): Promise<void> {
         const id = req.params.id;

@@ -21,6 +21,8 @@ class EmpleadoHorariosRutas {
         this.router.get('/horarioCodigo/:codigo', TokenValidation, EMPLEADO_HORARIOS_CONTROLADOR.ListarHorarioUsuario);
         // METODO PARA REGISTRAR HORARIO DE USUARIO
         this.router.post('/', TokenValidation, EMPLEADO_HORARIOS_CONTROLADOR.CrearEmpleadoHorarios);
+        // METODO PARA ACTUALIZAR HORARIO DE USUARIO
+        this.router.put('/', TokenValidation, EMPLEADO_HORARIOS_CONTROLADOR.ActualizarEmpleadoHorarios);
         // METODO PARA BUSCAR HORARIOS EXISTENTES DEL USUARIO EN FECHAS DETERMINADAS
         this.router.post('/horarios-existentes/:empl_id', TokenValidation, EMPLEADO_HORARIOS_CONTROLADOR.VerificarHorariosExistentes);
         // METODO PARA BUSCAR HORARIOS EXISTENTES DEL USUARIO EN FECHAS DETERMINADAS ACTUALIZACION
@@ -50,7 +52,7 @@ class EmpleadoHorariosRutas {
 
 
         this.router.post('/cargaMultiple', [TokenValidation, multipartMiddleware], EMPLEADO_HORARIOS_CONTROLADOR.CargarMultiplesHorariosEmpleadosPlantilla);
-        this.router.put('/', TokenValidation, EMPLEADO_HORARIOS_CONTROLADOR.ActualizarEmpleadoHorarios);
+
         this.router.delete('/eliminar/:id', TokenValidation, EMPLEADO_HORARIOS_CONTROLADOR.EliminarRegistros);
         this.router.post('/fechas_horario/:id_empleado', TokenValidation, EMPLEADO_HORARIOS_CONTROLADOR.ObtenerHorariosEmpleadoFechas);
         this.router.post('/validarFechas/:empl_id', TokenValidation, EMPLEADO_HORARIOS_CONTROLADOR.VerificarFechasHorario);
