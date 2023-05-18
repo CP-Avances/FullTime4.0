@@ -175,21 +175,17 @@ class PermisosControlador {
 
         const JefesDepartamentos = await pool.query(
             `
-            SELECT n.id_departamento, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel, da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc,
-                cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato,
-                e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname , e.cedula, e.correo,
-                c.permiso_mail, c.permiso_noti
-            FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-                sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c, nivel_jerarquicodep AS n  
-            WHERE n.id_departamento = 9 AND 
-                da.id_departamento = $1 AND 
-                da.id_empl_cargo = ecr.id AND 
-                da.id_departamento = cg.id AND
-                da.estado = true AND 
-                cg.id_sucursal = s.id AND
-                ecr.id_empl_contrato = ecn.id AND
-                ecn.id_empleado = e.id AND
-                e.id = c.id_empleado
+            SELECT n.id_departamento, cg.nombre, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel,
+                da.estado, dae.id_contrato, da.id_empl_cargo, (dae.nombre || ' ' || dae.apellido) as fullname,
+                dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti 
+            FROM nivel_jerarquicodep AS n, depa_autorizaciones AS da, datos_actuales_empleado AS dae,
+                config_noti AS c, cg_departamentos AS cg
+            WHERE n.id_departamento = $1
+                AND da.id_departamento = n.id_dep_nivel
+                AND dae.id_cargo = da.id_empl_cargo
+                AND dae.id_contrato = c.id_empleado
+                AND cg.id = $1
+            ORDER BY nivel ASC
             `
             ,
             [depa_user_loggin]).then((result: any) => { return result.rows });
@@ -207,17 +203,21 @@ class PermisosControlador {
             do {
                 JefeDepaPadre = await pool.query(
                     `
-                    SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, 
-                    cg.nivel, s.id AS id_suc, cg.nombre AS departamento, s.nombre AS sucursal, 
-                    ecr.id AS cargo, ecn.id AS contrato, e.id AS empleado, 
-                    (e.nombre || ' ' || e.apellido) as fullname, e.cedula, e.correo, c.permiso_mail, 
-                    c.permiso_noti 
-                    FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-                    sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-                    WHERE da.id_departamento = $1 AND da.id_empl_cargo = ecr.id AND 
-                    da.id_departamento = cg.id AND 
-                    da.estado = true AND cg.id_sucursal = s.id AND ecr.id_empl_contrato = ecn.id AND 
-                    ecn.id_empleado = e.id AND e.id = c.id_empleado
+                    SELECT da.id AS id_depa_auto, n.id_departamento, n.departamento, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel, 
+                        n.id_establecimiento AS id_sucursal, s.nombre AS sucursal, 
+                        dae.id_cargo AS cargo, dae.id_contrato AS contrato, dae.id AS empleado, 
+                        (dae.nombre || ' ' || dae.apellido) as fullname, dae.cedula, dae.correo, 
+                        c.permiso_mail, c.permiso_noti 
+                    FROM depa_autorizaciones AS da, 
+                        nivel_jerarquicodep AS n, sucursales AS s, 
+                        datos_actuales_empleado AS dae, config_noti AS c, cg_departamentos AS cg 
+                    WHERE n.id_departamento = 9 
+                        AND cg.id = n.id_departamento 
+                        AND n.nivel = cg.nivel
+                        AND da.id_departamento = n.id_dep_nivel 
+                        AND s.id = n.id_establecimiento  
+                        AND dae.id = da.id_empleado 
+                        AND c.id_empleado = da.id_empleado
                     `
                     , [depa_padre]);
 
@@ -263,20 +263,17 @@ class PermisosControlador {
 
         const JefesDepartamentos = await pool.query(
             `
-            SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc,
-                cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato,
-                e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname , e.cedula, e.correo,
-                c.permiso_mail, c.permiso_noti
-            FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-                sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-            WHERE da.id_departamento = $1 AND 
-                da.id_empl_cargo = ecr.id AND 
-                da.id_departamento = cg.id AND
-                da.estado = true AND 
-                cg.id_sucursal = s.id AND
-                ecr.id_empl_contrato = ecn.id AND
-                ecn.id_empleado = e.id AND
-                e.id = c.id_empleado
+            SELECT n.id_departamento, cg.nombre, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel,
+                da.estado, dae.id_contrato, da.id_empl_cargo, (dae.nombre || ' ' || dae.apellido) as fullname,
+                dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti 
+            FROM nivel_jerarquicodep AS n, depa_autorizaciones AS da, datos_actuales_empleado AS dae,
+                config_noti AS c, cg_departamentos AS cg 
+            WHERE n.id_departamento = $1
+                AND da.id_departamento = n.id_dep_nivel
+                AND dae.id_cargo = da.id_empl_cargo
+                AND dae.id_contrato = c.id_empleado
+                AND cg.id = $1
+            ORDER BY nivel ASC
             `
             ,
             [depa_user_loggin]).then((result: any) => { return result.rows });
@@ -294,17 +291,21 @@ class PermisosControlador {
             do {
                 JefeDepaPadre = await pool.query(
                     `
-                    SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, 
-                        cg.nivel, s.id AS id_suc, cg.nombre AS departamento, s.nombre AS sucursal, 
-                        ecr.id AS cargo, ecn.id AS contrato, e.id AS empleado, 
-                        (e.nombre || ' ' || e.apellido) as fullname, e.cedula, e.correo, c.permiso_mail, 
-                        c.permiso_noti 
-                    FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-                        sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-                        WHERE da.id_departamento = $1 AND da.id_empl_cargo = ecr.id AND 
-                        da.id_departamento = cg.id AND 
-                        da.estado = true AND cg.id_sucursal = s.id AND ecr.id_empl_contrato = ecn.id AND 
-                        ecn.id_empleado = e.id AND e.id = c.id_empleado
+                    SELECT da.id AS id_depa_auto, n.id_departamento, n.departamento, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel, 
+                        n.id_establecimiento AS id_sucursal, s.nombre AS sucursal, 
+                        dae.id_cargo AS cargo, dae.id_contrato AS contrato, dae.id AS empleado, 
+                        (dae.nombre || ' ' || dae.apellido) as fullname, dae.cedula, dae.correo, 
+                        c.permiso_mail, c.permiso_noti 
+                    FROM depa_autorizaciones AS da, 
+                        nivel_jerarquicodep AS n, sucursales AS s, 
+                        datos_actuales_empleado AS dae, config_noti AS c, cg_departamentos AS cg 
+                    WHERE n.id_departamento = 9 
+                        AND cg.id = n.id_departamento 
+                        AND n.nivel = cg.nivel
+                        AND da.id_departamento = n.id_dep_nivel 
+                        AND s.id = n.id_establecimiento  
+                        AND dae.id = da.id_empleado 
+                        AND c.id_empleado = da.id_empleado
                     `
                     , [depa_padre]);
 
@@ -686,7 +687,9 @@ class PermisosControlador {
 
     public async ObtenerDatosSolicitud(req: Request, res: Response) {
         const id = req.params.id_emple_permiso;
-        const SOLICITUD = await pool.query('SELECT *FROM vista_datos_solicitud_permiso WHERE id_emple_permiso = $1', [id]);
+        console.log('dato id emple permiso: ',id);
+
+        const SOLICITUD = await pool.query('SELECT * FROM vista_datos_solicitud_permiso WHERE id_emple_permiso = $1', [id]);
         if (SOLICITUD.rowCount > 0) {
             return res.json(SOLICITUD.rows)
         }

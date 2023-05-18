@@ -66,16 +66,16 @@ export class EditarAutorizacionDepaComponent implements OnInit {
     this.restSucursales.BuscarSucursalEmpresa(this.datoEmpleado.datosAuto.id_empresa).subscribe(datos => {
       this.sucursales = datos;
     });
+
     this.restCatDepartamento.BuscarDepartamentoSucursal(this.datoEmpleado.datosAuto.id_sucursal).subscribe(datos => {
       this.departamento = datos;
     });
+    
     this.formulario.patchValue({
       idSucursalForm: this.datoEmpleado.datosAuto.id_sucursal,
       autorizarForm: this.datoEmpleado.datosAuto.estado,
       idDeparForm: this.datoEmpleado.datosAuto.id_departamento,
     })
-
-    console.log('this.datoEmpleado.datosAuto: ',this.datoEmpleado.datosAuto)
 
     if (this.datoEmpleado.datosAuto.estado === true) {
         if(this.datoEmpleado.datosAuto.autorizar == true && this.datoEmpleado.datosAuto.preautorizar == false){
@@ -138,14 +138,14 @@ export class EditarAutorizacionDepaComponent implements OnInit {
       estado: false,
       id: this.datoEmpleado.datosAuto.id
     }
-
     if(form.autorizarForm == 'preautorizar'){
       autorizarDepar.preautorizar = true;
       autorizarDepar.estado = true;
     }else if(form.autorizarForm == 'autorizar'){
       autorizarDepar.autorizar = true;
       autorizarDepar.estado = true;
-    }else{
+    }
+    else{
       autorizarDepar.preautorizar = false;
       autorizarDepar.autorizar = false;
       autorizarDepar.estado = false;

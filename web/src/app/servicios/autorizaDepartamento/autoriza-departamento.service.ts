@@ -14,8 +14,13 @@ export class AutorizaDepartamentoService {
 
 
   // METODO PARA BUSCAR USUARIO AUTORIZA
-  BuscarAutoridadUsuario(id: any) {
+  BuscarAutoridadEmpleado(id: any) {
     return this.http.get(`${environment.url}/autorizaDepartamento/autoriza/${id}`);
+  }
+
+  // METODO PARA BUSCAR USUARIO AUTORIZA
+  BuscarAutoridadUsuarioDepa(id: any) {
+    return this.http.get(`${environment.url}/autorizaDepartamento/autorizaUsuarioDepa/${id}`);
   }
 
   // METODO PARA REGISTRAR AUTORIZACION
@@ -25,13 +30,14 @@ export class AutorizaDepartamentoService {
 
   // METODO PARA ACTUALIZAR REGISTRO
   ActualizarDatos(datos: any) {
-    return this.http.put(`${environment.url}/autorizaDepartamento`, datos);
+    return this.http.put(`${environment.url}/autorizaDepartamento/actualizar`, datos);
   }
 
   // METODO PARA ELIMINAR REGISTRO
   EliminarRegistro(id: number) {
     return this.http.delete(`${environment.url}/autorizaDepartamento/eliminar/${id}`);
   }
+
 
 
 
@@ -55,8 +61,12 @@ export class AutorizaDepartamentoService {
   }
 
   BuscarListaEmpleadosAutorizan(id: any) {
-    console.log('id: ',id)
     return this.http.get(`${environment.url}/autorizaDepartamento/listaempleadosAutorizan/${id}`);
+  }
+
+  BuscarListaAutorizaDepa(id_depar: any) {
+    console.log('id departamento service: ',id_depar)
+    return this.http.get(`${environment.url}/autorizaDepartamento/listaDepaAutoriza/${id_depar}`);
   }
 
 

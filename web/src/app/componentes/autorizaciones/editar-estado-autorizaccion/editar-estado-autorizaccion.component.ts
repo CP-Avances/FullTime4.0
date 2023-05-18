@@ -93,11 +93,12 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
         this.formato_fecha = res[0].descripcion;
       });
 
-    this.restAutoriza.BuscarAutoridadUsuario(this.idEmpleadoIngresa).subscribe(
+    this.restAutoriza.BuscarAutoridadUsuarioDepa(this.idEmpleadoIngresa).subscribe(
       (res) => {
         this.ArrayAutorizacionTipos = res;
 
         console.log('ArrayAutorizacionTipos: ',this.ArrayAutorizacionTipos);
+        console.log('ArrayAutorizacionTipos: ',this.data);
 
         this.ArrayAutorizacionTipos.filter(x => {
           if(x.nom_depar == 'GERENCIA' && x.estado == true){

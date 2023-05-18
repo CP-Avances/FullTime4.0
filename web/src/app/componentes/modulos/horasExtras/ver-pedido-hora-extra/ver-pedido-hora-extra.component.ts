@@ -100,7 +100,7 @@ export class VerPedidoHoraExtraComponent implements OnInit {
       this.BuscarHora(this.formato_fecha)
     });
 
-    this.restAutoriza.BuscarAutoridadUsuario(this.idEmpleado).subscribe(
+    this.restAutoriza.BuscarAutoridadEmpleado(this.idEmpleado).subscribe(
       (res) => {
         this.ArrayAutorizacionTipos = res;
       }
@@ -179,7 +179,6 @@ export class VerPedidoHoraExtraComponent implements OnInit {
                 }
               }
             })
-            console.log('this.habilitarActualizar = ',this.habilitarActualizar);
           });
         }
       }
@@ -198,9 +197,12 @@ export class VerPedidoHoraExtraComponent implements OnInit {
     this.ObtenerSolicitud(this.dataParams.id);
   }
 
+  estado_auto: any;
+  listadoDepaAutoriza: any = []
   ObtenerAprobacion() {
     this.autorizacion = [];
     this.empleado_estado = [];
+    this.listadoDepaAutoriza = [];
     this.lectura = 1;
     // BUSQUEDA DE DATOS DE AUTORIZACIÓN
     this.restA.getUnaAutorizacionByHoraExtraRest(this.dataParams.id).subscribe(res1 => {
@@ -212,32 +214,58 @@ export class VerPedidoHoraExtraComponent implements OnInit {
         this.lectura = this.lectura + 1;
         if (obj != '') {
           let empleado_id = obj.split('_')[0];
-          var estado_auto = obj.split('_')[1];
+          this.estado_auto = obj.split('_')[1];
           // CAMBIAR DATO ESTADO INT A VARCHAR
           // CAMBIAR DATO ESTADO INT A VARCHAR
-          if (estado_auto === '1') {
-            estado_auto = 'Pendiente';
+          if (this.estado_auto === '1') {
+            this.estado_auto = 'Pendiente';
           }
-          if (estado_auto === '2') {
-            estado_auto = 'Preautorizado';
+          if (this.estado_auto === '2') {
+            this.estado_auto = 'Preautorizado';
           }
-          if (estado_auto === '3') {
-            estado_auto = 'Autorizado';
+          if (this.estado_auto === '3') {
+            this.estado_auto = 'Autorizado';
           }
-          if (estado_auto === '4') {
-            estado_auto = 'Permiso Negado';
+          if (this.estado_auto === '4') {
+            this.estado_auto = 'Permiso Negado';
           }
           // CREAR ARRAY DE DATOS DE COLABORADORES
           var data = {
             id_empleado: empleado_id,
-            estado: estado_auto
+            estado: this.estado_auto
           }
+
+          if((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')){
+            this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
+              this.listadoDepaAutoriza = res;
+              this.listadoDepaAutoriza.filter(item => {
+                if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
+                  return this.habilitarActualizar = true;
+                }else{
+                  return this.habilitarActualizar = false;
+                }
+              })
+            });
+          }else{
+            this.habilitarActualizar = false;
+          }
+
           this.empleado_estado = this.empleado_estado.concat(data);
           // CUANDO TODOS LOS DATOS SE HAYAN REVISADO EJECUTAR METODO DE INFORMACIÓN DE AUTORIZACIÓN
           if (this.lectura === autorizaciones.length) {
             this.VerInformacionAutoriza(this.empleado_estado);
           }
+        }else{
+          this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
+            this.listadoDepaAutoriza = res;
+            this.listadoDepaAutoriza.filter(item => {
+              if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
+                return this.habilitarActualizar = true;
+              } 
+            })
+          });
         }
+
       })
       // TOMAR TAMAÑO DE ARREGLO DE COLABORADORES QUE REVIZARÓN SOLICITUD
       this.cont = autorizaciones.length - 1;

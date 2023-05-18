@@ -145,7 +145,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
         this.obtenerHorasExtrasObservacion(this.formato_fecha);
     });
 
-    this.restAutoriza.BuscarAutoridadUsuario(this.idEmpleado).subscribe(
+    this.restAutoriza.BuscarAutoridadEmpleado(this.idEmpleado).subscribe(
       (res) => {
         this.ArrayAutorizacionTipos = res;
       }
@@ -260,17 +260,19 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
         this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_empl_cargo).subscribe(
             (usuaDep) => {
               this.ArrayAutorizacionTipos.filter(x => {
-                if(x.nom_depar == 'GERENCIA' && x.estado == true){
+                if((usuaDep[0].id_departamento == x.id_departamento && x.depa_pertenece == 11) && (x.estado == true)){
                   this.gerencia = true;
+                  i = i+1;
                   if(item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)){
                     return this.HorasExtraLista.push(item);
                   }else if(item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)){
                     return this.HorasExtraLista.push(item);
                   }
                 }else if((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
-                  if(item.estado == 'Pendiente' && x.preautorizar == true){
+                  i = i+1;
+                  if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true){
                     return this.HorasExtraLista.push(item);
-                  }else if(item.estado == 'Pre-autorizado' && x.autorizar == true){
+                  }else if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true){
                     return this.HorasExtraLista.push(item);
                   }
                 }
@@ -291,7 +293,6 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
                 this.lista_pedidos = false;
               }
             }
-            i = i+1;
         });
 
       });

@@ -88,7 +88,7 @@ export class TiempoAutorizadoComponent implements OnInit {
 
     console.log('datos: ',this.data.auto.id_departamento);
 
-    this.restAutoriza.BuscarAutoridadUsuario(this.idEmpleado).subscribe(
+    this.restAutoriza.BuscarAutoridadEmpleado(this.idEmpleado).subscribe(
       (res) => {
         this.ArrayAutorizacionTipos = res;
         this.ArrayAutorizacionTipos.filter(x => {

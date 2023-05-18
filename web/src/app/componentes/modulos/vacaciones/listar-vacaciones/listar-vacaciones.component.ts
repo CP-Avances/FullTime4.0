@@ -149,7 +149,7 @@ export class ListarVacacionesComponent implements OnInit {
         this.ObtenerListaVacacionesAutorizadas(this.formato_fecha);
       });
 
-    this.restAutoriza.BuscarAutoridadUsuario(this.idEmpleado).subscribe(
+    this.restAutoriza.BuscarAutoridadEmpleado(this.idEmpleado).subscribe(
       (res) => {
         this.ArrayAutorizacionTipos = res;
       },err => {
