@@ -196,7 +196,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
             id_empleado: empleado_id,
             estado: this.estado_auto
           }
-         
+        
           if((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')){
             this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
               this.listadoDepaAutoriza = res;
@@ -330,8 +330,6 @@ export class VerEmpleadoPermisoComponent implements OnInit {
   }
 
   AbrirVentanaEditarAutorizacion(autoriza: any): void {
-    console.log('autoriza: ',autoriza);
-    console.log('this.InfoPermiso: ',this.InfoPermiso[0]);
     this.ventana.open(EditarEstadoAutorizaccionComponent,
       { width: '350px', data: { auto: autoriza, permiso: this.InfoPermiso[0] } })
       .afterClosed().subscribe(item => {
@@ -352,8 +350,40 @@ export class VerEmpleadoPermisoComponent implements OnInit {
     }
   }
 
+  fila1firmas: any = [];
+  fila2firmas: any = [];
   getDocumentDefinicion() {
-    console.log('this.empleado_estado[this.cont - 1]: ',this.empleado_estado)
+    this.fila1firmas = [];
+    this.fila2firmas = [];
+
+    //Array de los datos del empleado para mostrar en la firma;
+    let firmaEmple = {
+      cargo: this.datoSolicitud[0].cargo,
+      departamento: "",
+      estado: "Empleado",
+      id_empleado: this.datoSolicitud[0].id_empl_contrato,
+      nombre: this.datoSolicitud[0].nombre_emple + ' ' + this.datoSolicitud[0].apellido_emple,
+    }
+
+    let cont1 = 1;
+    //Filtar el array empleado_estado para dividir en otros arrays para firmar
+      this.empleado_estado.filter(item =>{
+        if(cont1 < 4){
+          this.fila1firmas.push(item);
+          return cont1 = cont1 + 1;
+        }else{
+          this.fila2firmas.push(item);
+        }
+      });
+
+
+    if(this.fila2firmas.length == 0){
+      this.fila1firmas.push(firmaEmple);
+    }else{
+      this.fila2firmas.push(firmaEmple);
+    }
+
+
     return {
       // ENCABEZADO DE LA PÁGINA
       pageOrientation: 'landscape',
@@ -450,100 +480,49 @@ export class VerEmpleadoPermisoComponent implements OnInit {
           }],
           [{
             columns: [
-                ...this.empleado_estado.map(obj => {
-                  contador = contador + 1
-                  if(contador < 4){
-                    return {
-                      columns: [
-                        { width: '*', text: '' },
-                        {
-                          width: 'auto',
-                          layout: 'lightHorizontalLines',
-                          table: {
-                            widths: ['auto'],
-                            body: [
-                              [{ text: obj.estado.toUpperCase() + ' POR', style: 'tableHeaderA'},],
-                              [{ text: ' ', style: 'itemsTable', margin: [0, 17, 0, 17] },],
-                              [{ text: obj.nombre + '\n' + obj.cargo, style: 'itemsTable' },]
-                            ]
-                          }
-                        },
-                        { width: '*', text: ''},
-                      ]
-                    }
-                  }
-                }),
-
-                ...this.datoSolicitud.map(objSoli => {
-                  if(this.empleado_estado.length < 3){
-                    return {
-                      columns: [
-                        { width: '*', text: ''},
-                        {
-                          width: 'auto',
-                          layout: 'lightHorizontalLines',
-                          table: {
-                            widths: ['auto'],
-                            body: [
-                              [{ text: 'EMPLEADO', style: 'tableHeaderA' },],
-                              [{ text: ' ', style: 'itemsTable', margin: [0, 17, 0, 17] },],
-                              [{ text: objSoli.nombre_emple + ' ' + objSoli.apellido_emple + '\n' + objSoli.cargo, style: 'itemsTable' },]
-                            ]
-                          }
-                        },
-                        { width: '*', text: '' },
-                      ]
-                    }
-                  }
-                })
-              ],
+              ...this.fila1firmas.map(obj => {
+                return {
+                  columns: [
+                    { width: '*', text: '' },
+                    {
+                      width: 'auto',
+                      layout: 'lightHorizontalLines',
+                      table: {
+                        widths: ['auto'],
+                        body: [
+                          [{ text: obj.estado.toUpperCase(), style: 'tableHeaderA'},],
+                          [{ text: ' ', style: 'itemsTable', margin: [0, 17, 0, 17] },],
+                          [{ text: obj.nombre + '\n' + obj.cargo, style: 'itemsTable' },]
+                        ]
+                      }
+                    },
+                    { width: '*', text: ''},
+                  ]
+                } 
+              })
+            ],
           }],
+         
           [{
             columns: [
-              ...this.empleado_estado.map(obj => {
-                contador2 = contador2 + 1;
-                if(contador2 > 3){
-                  return {
-                    columns: [
-                      { width: '*', text: '' },
-                      {
-                        width: 'auto',
-                        layout: 'lightHorizontalLines',
-                        table: {
-                          widths: ['auto'],
-                          body: [
-                            [{ text: obj.estado.toUpperCase() + ' POR', style: 'tableHeaderA'},],
-                            [{ text: ' ', style: 'itemsTable', margin: [0, 17, 0, 17] },],
-                            [{ text: obj.nombre + '\n' + obj.cargo, style: 'itemsTable' },]
-                          ]
-                        }
-                      },
-                      { width: '*', text: ''},
-                    ]
-                  }
-                }
-              }),
-
-              ...this.datoSolicitud.map(objsoli => {
-                if(this.empleado_estado.length > 2){
-                  return {
-                    columns: [
-                      { width: '*', text: ''},
-                      {
-                        width: 'auto',
-                        layout: 'lightHorizontalLines',
-                        table: {
-                          widths: ['auto'],
-                          body: [
-                            [{ text: 'EMPLEADO', style: 'tableHeaderA' },],
-                            [{ text: ' ', style: 'itemsTable', margin: [0, 17, 0, 17] },],
-                            [{ text: objsoli.nombre_emple + ' ' + objsoli.apellido_emple + '\n' + objsoli.cargo, style: 'itemsTable' },]
-                          ]
-                        }
-                      },
-                      { width: '*', text: '' },
-                    ]
-                  }
+              ...this.fila2firmas.map(obje => {
+                return {
+                  columns: [
+                    { width: '*', text: '' },
+                    {
+                      width: 'auto',
+                      layout: 'lightHorizontalLines',
+                      table: {
+                        widths: ['auto'],
+                        body: [
+                          [{ text: obje.estado.toUpperCase(), style: 'tableHeaderA'},],
+                          [{ text: ' ', style: 'itemsTable', margin: [0, 17, 0, 17] },],
+                          [{ text: obje.nombre + '\n' + obje.cargo, style: 'itemsTable' },]
+                        ]
+                      }
+                    },
+                  { width: '*', text: ''},
+                  ]
                 }
               })
             ]
@@ -559,8 +538,6 @@ export class VerEmpleadoPermisoComponent implements OnInit {
         paddingRight: function (i: any, node: any) { return 40; },
         paddingTop: function (i: any, node: any) { return 10; },
         paddingBottom: function (i: any, node: any) { return 10; },
-        marginTop: function (i: any, node: any) { return 12; },
-        marginBottom: function (i: any, node: any) { return 12; }
       }
     };
   }

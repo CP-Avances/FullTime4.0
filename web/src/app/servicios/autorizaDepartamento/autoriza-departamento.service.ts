@@ -65,7 +65,6 @@ export class AutorizaDepartamentoService {
   }
 
   BuscarListaAutorizaDepa(id_depar: any) {
-    console.log('id departamento service: ',id_depar)
     return this.http.get(`${environment.url}/autorizaDepartamento/listaDepaAutoriza/${id_depar}`);
   }
 

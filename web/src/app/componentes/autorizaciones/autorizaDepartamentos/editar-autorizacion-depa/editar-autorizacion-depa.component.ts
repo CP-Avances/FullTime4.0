@@ -138,11 +138,26 @@ export class EditarAutorizacionDepaComponent implements OnInit {
       estado: false,
       id: this.datoEmpleado.datosAuto.id
     }
+
+    if(form.autorizarForm == 'noautorizar'){
+      this.selec2 = false;
+      this.selec1 = false;
+      this.selec3 = true;
+    }
+
     if(form.autorizarForm == 'preautorizar'){
       autorizarDepar.preautorizar = true;
       autorizarDepar.estado = true;
     }else if(form.autorizarForm == 'autorizar'){
       autorizarDepar.autorizar = true;
+      autorizarDepar.estado = true;
+    }else if(this.selec2 == true){
+      autorizarDepar.preautorizar = false;
+      autorizarDepar.autorizar = true;
+      autorizarDepar.estado = true;
+    }else if (this.selec1 == true){
+      autorizarDepar.autorizar = false;
+      autorizarDepar.preautorizar = true;
       autorizarDepar.estado = true;
     }
     else{

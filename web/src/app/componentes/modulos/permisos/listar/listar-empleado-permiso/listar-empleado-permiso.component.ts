@@ -216,7 +216,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
 
         });
 
-        let i = 1;
+        let i = 0;
         this.listaPermisosFiltradas.filter(item => {
           this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_contrato).subscribe(
             (usuaDep) => {

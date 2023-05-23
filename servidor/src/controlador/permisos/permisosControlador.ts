@@ -170,9 +170,6 @@ class PermisosControlador {
         if (!objetoPermiso) return res.status(404).jsonp({ message: 'Solicitud no registrada.' })
 
         const permiso = objetoPermiso
-        console.log(permiso);
-        console.log(req.query);
-
         const JefesDepartamentos = await pool.query(
             `
             SELECT n.id_departamento, cg.nombre, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel,
@@ -195,38 +192,18 @@ class PermisosControlador {
                 message: `Ups!!! algo salio mal. 
             Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.` });
 
-        const [obj] = JefesDepartamentos;
-        let depa_padre = obj.depa_padre;
-        let JefeDepaPadre;
+        const obj = JefesDepartamentos[JefesDepartamentos.length - 1];
+        let depa_padre = obj.id_dep_nivel;
+        console.log('obj: ',obj);
+        console.log('depa_padre: ',depa_padre);
+        var JefeDepaPadre: any = [];
 
         if (depa_padre !== null) {
-            do {
-                JefeDepaPadre = await pool.query(
-                    `
-                    SELECT da.id AS id_depa_auto, n.id_departamento, n.departamento, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel, 
-                        n.id_establecimiento AS id_sucursal, s.nombre AS sucursal, 
-                        dae.id_cargo AS cargo, dae.id_contrato AS contrato, dae.id AS empleado, 
-                        (dae.nombre || ' ' || dae.apellido) as fullname, dae.cedula, dae.correo, 
-                        c.permiso_mail, c.permiso_noti 
-                    FROM depa_autorizaciones AS da, 
-                        nivel_jerarquicodep AS n, sucursales AS s, 
-                        datos_actuales_empleado AS dae, config_noti AS c, cg_departamentos AS cg 
-                    WHERE n.id_departamento = 9 
-                        AND cg.id = n.id_departamento 
-                        AND n.nivel = cg.nivel
-                        AND da.id_departamento = n.id_dep_nivel 
-                        AND s.id = n.id_establecimiento  
-                        AND dae.id = da.id_empleado 
-                        AND c.id_empleado = da.id_empleado
-                    `
-                    , [depa_padre]);
+            JefesDepartamentos.filter((item: any) => {
+                JefeDepaPadre.push(item)
+                permiso.EmpleadosSendNotiEmail = JefesDepartamentos
+            })
 
-                depa_padre = JefeDepaPadre.rows[0].depa_padre;
-
-                JefesDepartamentos.push(JefeDepaPadre.rows[0]);
-
-            } while (depa_padre !== null);
-            permiso.EmpleadosSendNotiEmail = JefesDepartamentos
             return res.status(200).jsonp(permiso);
 
         } else {
