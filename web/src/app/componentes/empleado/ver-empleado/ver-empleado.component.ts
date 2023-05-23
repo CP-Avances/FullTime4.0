@@ -750,6 +750,8 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
 
+
+
   /** ** ***************************************************************************************** **
    ** ** **                  METODOS PARA MANEJO DE DATOS DE CARGO                              ** **
    ** ******************************************************************************************** **/
@@ -2266,8 +2268,9 @@ export class VerEmpleadoComponent implements OnInit {
   autorizacionesTotales: any = [];
   ObtenerAutorizaciones() {
     this.autorizacionesTotales = [];
-    this.restAutoridad.BuscarAutoridadUsuario(parseInt(this.idEmpleado)).subscribe(datos => {
+    this.restAutoridad.BuscarAutoridadEmpleado(parseInt(this.idEmpleado)).subscribe(datos => {
       this.autorizacionesTotales = datos;
+      console.log('depa autoriza: ',this.autorizacionesTotales[0]);
     })
   }
 

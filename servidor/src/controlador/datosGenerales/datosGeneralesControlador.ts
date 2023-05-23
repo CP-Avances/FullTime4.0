@@ -194,21 +194,20 @@ class DatosGeneralesControlador {
         const permiso = objeto
         const JefesDepartamentos = await pool.query(
             `
-            SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc,
-                cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato,
-                e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname , e.cedula, e.correo,
-                c.permiso_mail, c.permiso_noti, c.vaca_mail, c.vaca_noti, c.hora_extra_mail, 
-                c.hora_extra_noti, c.comida_mail, c.comida_noti
-            FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-                sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-            WHERE da.id_departamento = $1 AND 
-                da.id_empl_cargo = ecr.id AND 
-                da.id_departamento = cg.id AND
-                da.estado = true AND 
-                cg.id_sucursal = s.id AND
-                ecr.id_empl_contrato = ecn.id AND
-                ecn.id_empleado = e.id AND
-                e.id = c.id_empleado
+            SELECT da.id, da.estado, n.id_departamento as id_dep, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel, 
+                n.id_establecimiento AS id_suc, n.departamento, s.nombre AS sucursal, da.id_empl_cargo as cargo, 
+                dae.id_contrato as contrato, da.id_empleado AS empleado, (dae.nombre || ' ' || dae.apellido) as fullname,
+                dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti, c.vaca_mail, c.vaca_noti, c.hora_extra_mail, 
+                c.hora_extra_noti, c.comida_mail, c.comida_noti 
+            FROM nivel_jerarquicodep AS n, depa_autorizaciones AS da, datos_actuales_empleado AS dae,
+                config_noti AS c, cg_departamentos AS cg, sucursales AS s
+            WHERE n.id_departamento = $1
+                AND da.id_departamento = n.id_dep_nivel
+                AND dae.id_cargo = da.id_empl_cargo
+                AND dae.id_contrato = c.id_empleado
+                AND cg.id = $1
+                AND s.id = n.id_establecimiento
+            ORDER BY nivel ASC
             `
             ,
             [depa_user_loggin]).then((result: any) => { return result.rows });
@@ -218,34 +217,30 @@ class DatosGeneralesControlador {
                 message: `Ups!!! algo salio mal. 
             Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.` });
 
-        const [obj] = JefesDepartamentos;
-        let depa_padre = obj.depa_padre;
+        const obj = JefesDepartamentos[JefesDepartamentos.length - 1];
+        let depa_padre = obj.id_dep_nivel;
         let JefeDepaPadre;
 
         if (depa_padre !== null) {
-            do {
-                JefeDepaPadre = await pool.query(
-                    `
-                    SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, 
-                        cg.nivel, s.id AS id_suc, cg.nombre AS departamento, s.nombre AS sucursal, 
-                        ecr.id AS cargo, ecn.id AS contrato, e.id AS empleado, 
-                        (e.nombre || ' ' || e.apellido) as fullname, e.cedula, e.correo, c.permiso_mail, 
-                        c.permiso_noti, c.vaca_mail, c.vaca_noti, c.hora_extra_mail, 
-                        c.hora_extra_noti, c.comida_mail, c.comida_noti
-                    FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-                        sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-                    WHERE da.id_departamento = $1 AND da.id_empl_cargo = ecr.id AND 
-                        da.id_departamento = cg.id AND 
-                        da.estado = true AND cg.id_sucursal = s.id AND ecr.id_empl_contrato = ecn.id AND 
-                        ecn.id_empleado = e.id AND e.id = c.id_empleado
-                    `
-                    , [depa_padre]);
+            
+            /*JefeDepaPadre = await pool.query(
+                `
+                SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, 
+                    cg.nivel, s.id AS id_suc, cg.nombre AS departamento, s.nombre AS sucursal, 
+                    ecr.id AS cargo, ecn.id AS contrato, e.id AS empleado, 
+                    (e.nombre || ' ' || e.apellido) as fullname, e.cedula, e.correo, c.permiso_mail, 
+                    c.permiso_noti, c.vaca_mail, c.vaca_noti, c.hora_extra_mail, 
+                    c.hora_extra_noti, c.comida_mail, c.comida_noti
+                FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
+                    sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
+                WHERE da.id_departamento = $1 AND da.id_empl_cargo = ecr.id AND 
+                    da.id_departamento = cg.id AND 
+                    da.estado = true AND cg.id_sucursal = s.id AND ecr.id_empl_contrato = ecn.id AND 
+                    ecn.id_empleado = e.id AND e.id = c.id_empleado
+                `
+                , [depa_padre]);*/
+            //JefesDepartamentos.push(JefeDepaPadre.rows[0]);
 
-                depa_padre = JefeDepaPadre.rows[0].depa_padre;
-
-                JefesDepartamentos.push(JefeDepaPadre.rows[0]);
-
-            } while (depa_padre !== null);
             permiso.EmpleadosSendNotiEmail = JefesDepartamentos
             return res.status(200).jsonp(permiso);
 

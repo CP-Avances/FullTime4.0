@@ -52,7 +52,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
   habilitarActualizar: boolean = true;
   hipervinculo: string = environment.url
 
-  ocultar: boolean = false;
+  ocultar: boolean = true;
   esconder: boolean = false;
 
   constructor(
@@ -99,7 +99,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
       }
     );
 
-    this.restAutoriza.BuscarAutoridadUsuario(this.idEmpleado).subscribe(
+    this.restAutoriza.BuscarAutoridadUsuarioDepa(this.idEmpleado).subscribe(
       (res) => {
         this.ArrayAutorizacionTipos = res;
       }
@@ -143,33 +143,6 @@ export class VerEmpleadoPermisoComponent implements OnInit {
 
       })
 
-      if(this.idEmpleado == this.InfoPermiso[0].id_empleado){
-        this.ocultar = true;
-      }else{
-        this.usuarioDepa.ObtenerDepartamentoUsuarios(this.InfoPermiso[0].id_empleado).subscribe((usuaDep) => {
-          this.ArrayAutorizacionTipos.filter(x => {
-            if((x.nom_depar == 'GERENCIA') && (x.estado == true)){
-              this.gerencia = true;
-              if((this.InfoPermiso[0].estado == 2 || this.InfoPermiso[0].estado == 1)&& x.autorizar == true){
-                return this.ocultar = false;
-              }else if(this.InfoPermiso[0].estado == 2 && x.preautorizar == true){
-                return this.ocultar = false;
-              }else{
-                return this.ocultar = true;
-              }
-            }else if((this.gerencia == false) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
-              if(this.InfoPermiso[0].estado == 2 && x.autorizar == true){
-                return this.ocultar = false;
-              }else if(this.InfoPermiso[0].estado == 1 && x.preautorizar == true){
-                return this.ocultar = false;
-              }else{
-                return this.ocultar = true;
-              }
-            }
-          })
-        })
-      }
-
       if(this.InfoPermiso[0].estado > 1){
         this.esconder = true;
       }else{
@@ -182,14 +155,17 @@ export class VerEmpleadoPermisoComponent implements OnInit {
     }, err => {
       return this.validar.RedireccionarMixto(err.error)
     });
+
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerSolicitud(this.id_permiso);
   }
 
   estado_auto: any;
+  listadoDepaAutoriza: any = [];
   ObtenerAutorizacion(id: number) {
     this.autorizacion = [];
     this.empleado_estado = [];
+    this.listadoDepaAutoriza = [];
     this.lectura = 1;
     this.restA.BuscarAutorizacionPermiso(id).subscribe(res1 => {
       this.autorizacion = res1;
@@ -220,16 +196,42 @@ export class VerEmpleadoPermisoComponent implements OnInit {
             id_empleado: empleado_id,
             estado: this.estado_auto
           }
+        
+          if((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')){
+            this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
+              this.listadoDepaAutoriza = res;
+              this.listadoDepaAutoriza.filter(item => {
+                if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
+                  return this.ocultar = false;
+                }else{
+                  return this.ocultar = true;
+                }
+              })
+            });
+          }else{
+            this.ocultar = true;
+          }
+
           this.empleado_estado = this.empleado_estado.concat(data);
           // CUANDO TODOS LOS DATOS SE HAYAN REVISADO EJECUTAR METODO DE INFORMACIÓN DE AUTORIZACIÓN
           if (this.lectura === autorizaciones.length) {
             this.VerInformacionAutoriza(this.empleado_estado);
           }
+        }else{
+          this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
+            this.listadoDepaAutoriza = res;
+            this.listadoDepaAutoriza.filter(item => {
+              if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
+                return this.ocultar = false;
+              } 
+            })
+          });
         }
       })
+
+      
       // TOMAR TAMAÑO DE ARREGLO DE COLABORADORES QUE REVIZARÓN SOLICITUD
       this.cont = autorizaciones.length - 1;
-      console.log("Datos de InfoPermiso[0].estado: ",this.autorizacion.length);
 
     }, error => {
       this.HabilitarAutorizacion = false;
@@ -328,8 +330,6 @@ export class VerEmpleadoPermisoComponent implements OnInit {
   }
 
   AbrirVentanaEditarAutorizacion(autoriza: any): void {
-    console.log('autoriza: ',autoriza);
-    console.log('this.InfoPermiso: ',this.InfoPermiso[0]);
     this.ventana.open(EditarEstadoAutorizaccionComponent,
       { width: '350px', data: { auto: autoriza, permiso: this.InfoPermiso[0] } })
       .afterClosed().subscribe(item => {
@@ -350,8 +350,40 @@ export class VerEmpleadoPermisoComponent implements OnInit {
     }
   }
 
+  fila1firmas: any = [];
+  fila2firmas: any = [];
   getDocumentDefinicion() {
-    console.log('this.empleado_estado[this.cont - 1]: ',this.empleado_estado)
+    this.fila1firmas = [];
+    this.fila2firmas = [];
+
+    //Array de los datos del empleado para mostrar en la firma;
+    let firmaEmple = {
+      cargo: this.datoSolicitud[0].cargo,
+      departamento: "",
+      estado: "Empleado",
+      id_empleado: this.datoSolicitud[0].id_empl_contrato,
+      nombre: this.datoSolicitud[0].nombre_emple + ' ' + this.datoSolicitud[0].apellido_emple,
+    }
+
+    let cont1 = 1;
+    //Filtar el array empleado_estado para dividir en otros arrays para firmar
+      this.empleado_estado.filter(item =>{
+        if(cont1 < 4){
+          this.fila1firmas.push(item);
+          return cont1 = cont1 + 1;
+        }else{
+          this.fila2firmas.push(item);
+        }
+      });
+
+
+    if(this.fila2firmas.length == 0){
+      this.fila1firmas.push(firmaEmple);
+    }else{
+      this.fila2firmas.push(firmaEmple);
+    }
+
+
     return {
       // ENCABEZADO DE LA PÁGINA
       pageOrientation: 'landscape',
@@ -448,100 +480,49 @@ export class VerEmpleadoPermisoComponent implements OnInit {
           }],
           [{
             columns: [
-                ...this.empleado_estado.map(obj => {
-                  contador = contador + 1
-                  if(contador < 4){
-                    return {
-                      columns: [
-                        { width: '*', text: '' },
-                        {
-                          width: 'auto',
-                          layout: 'lightHorizontalLines',
-                          table: {
-                            widths: ['auto'],
-                            body: [
-                              [{ text: obj.estado.toUpperCase() + ' POR', style: 'tableHeaderA'},],
-                              [{ text: ' ', style: 'itemsTable', margin: [0, 17, 0, 17] },],
-                              [{ text: obj.nombre + '\n' + obj.cargo, style: 'itemsTable' },]
-                            ]
-                          }
-                        },
-                        { width: '*', text: ''},
-                      ]
-                    }
-                  }
-                }),
-
-                ...this.datoSolicitud.map(objSoli => {
-                  if(this.empleado_estado.length < 3){
-                    return {
-                      columns: [
-                        { width: '*', text: ''},
-                        {
-                          width: 'auto',
-                          layout: 'lightHorizontalLines',
-                          table: {
-                            widths: ['auto'],
-                            body: [
-                              [{ text: 'EMPLEADO', style: 'tableHeaderA' },],
-                              [{ text: ' ', style: 'itemsTable', margin: [0, 17, 0, 17] },],
-                              [{ text: objSoli.nombre_emple + ' ' + objSoli.apellido_emple + '\n' + objSoli.cargo, style: 'itemsTable' },]
-                            ]
-                          }
-                        },
-                        { width: '*', text: '' },
-                      ]
-                    }
-                  }
-                })
-              ],
+              ...this.fila1firmas.map(obj => {
+                return {
+                  columns: [
+                    { width: '*', text: '' },
+                    {
+                      width: 'auto',
+                      layout: 'lightHorizontalLines',
+                      table: {
+                        widths: ['auto'],
+                        body: [
+                          [{ text: obj.estado.toUpperCase(), style: 'tableHeaderA'},],
+                          [{ text: ' ', style: 'itemsTable', margin: [0, 17, 0, 17] },],
+                          [{ text: obj.nombre + '\n' + obj.cargo, style: 'itemsTable' },]
+                        ]
+                      }
+                    },
+                    { width: '*', text: ''},
+                  ]
+                } 
+              })
+            ],
           }],
+         
           [{
             columns: [
-              ...this.empleado_estado.map(obj => {
-                contador2 = contador2 + 1;
-                if(contador2 > 3){
-                  return {
-                    columns: [
-                      { width: '*', text: '' },
-                      {
-                        width: 'auto',
-                        layout: 'lightHorizontalLines',
-                        table: {
-                          widths: ['auto'],
-                          body: [
-                            [{ text: obj.estado.toUpperCase() + ' POR', style: 'tableHeaderA'},],
-                            [{ text: ' ', style: 'itemsTable', margin: [0, 17, 0, 17] },],
-                            [{ text: obj.nombre + '\n' + obj.cargo, style: 'itemsTable' },]
-                          ]
-                        }
-                      },
-                      { width: '*', text: ''},
-                    ]
-                  }
-                }
-              }),
-
-              ...this.datoSolicitud.map(objsoli => {
-                if(this.empleado_estado.length > 2){
-                  return {
-                    columns: [
-                      { width: '*', text: ''},
-                      {
-                        width: 'auto',
-                        layout: 'lightHorizontalLines',
-                        table: {
-                          widths: ['auto'],
-                          body: [
-                            [{ text: 'EMPLEADO', style: 'tableHeaderA' },],
-                            [{ text: ' ', style: 'itemsTable', margin: [0, 17, 0, 17] },],
-                            [{ text: objsoli.nombre_emple + ' ' + objsoli.apellido_emple + '\n' + objsoli.cargo, style: 'itemsTable' },]
-                          ]
-                        }
-                      },
-                      { width: '*', text: '' },
-                    ]
-                  }
+              ...this.fila2firmas.map(obje => {
+                return {
+                  columns: [
+                    { width: '*', text: '' },
+                    {
+                      width: 'auto',
+                      layout: 'lightHorizontalLines',
+                      table: {
+                        widths: ['auto'],
+                        body: [
+                          [{ text: obje.estado.toUpperCase(), style: 'tableHeaderA'},],
+                          [{ text: ' ', style: 'itemsTable', margin: [0, 17, 0, 17] },],
+                          [{ text: obje.nombre + '\n' + obje.cargo, style: 'itemsTable' },]
+                        ]
+                      }
+                    },
+                  { width: '*', text: ''},
+                  ]
                 }
               })
             ]
@@ -557,8 +538,6 @@ export class VerEmpleadoPermisoComponent implements OnInit {
         paddingRight: function (i: any, node: any) { return 40; },
         paddingTop: function (i: any, node: any) { return 10; },
         paddingBottom: function (i: any, node: any) { return 10; },
-        marginTop: function (i: any, node: any) { return 12; },
-        marginBottom: function (i: any, node: any) { return 12; }
       }
     };
   }

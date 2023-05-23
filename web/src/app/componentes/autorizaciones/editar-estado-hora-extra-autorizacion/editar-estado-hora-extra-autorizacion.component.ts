@@ -62,7 +62,7 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
     }
     this.tiempo();
 
-    this.restAutoriza.BuscarAutoridadUsuario(this.id_empleado_loggin).subscribe(
+    this.restAutoriza.BuscarAutoridadEmpleado(this.id_empleado_loggin).subscribe(
       (res) => {
         this.ArrayAutorizacionTipos = res;
         this.ArrayAutorizacionTipos.filter(x => {

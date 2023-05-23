@@ -46,7 +46,7 @@ export class AutorizaEmpleadoComponent implements OnInit {
       console.log("idCargo ", this.idCargo[0].id);
       for (let i = 0; i <= this.idCargo.length - 1; i++) {
         // revisar
-        this.restAutoridad.BuscarAutoridadUsuario(this.idCargo[i]['id']).subscribe(datos => {
+        this.restAutoridad.BuscarAutoridadEmpleado(this.idCargo[i]['id']).subscribe(datos => {
           this.autorizacionEmpleado = datos;
           if (this.autorizacionEmpleado.length === 0) {
             console.log("No se encuentran registros")

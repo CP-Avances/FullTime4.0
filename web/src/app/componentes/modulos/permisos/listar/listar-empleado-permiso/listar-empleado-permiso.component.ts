@@ -151,11 +151,12 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
       }
     );
 
-    this.restAutoriza.BuscarAutoridadUsuario(this.idEmpleado).subscribe(
+    this.restAutoriza.BuscarAutoridadUsuarioDepa(this.idEmpleado).subscribe(
       (res) => {
         this.ArrayAutorizacionTipos = res;
       }
     );
+
   }
 
   BuscarHora(fecha: string) {
@@ -181,9 +182,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     this.restP.obtenerAllPermisos().subscribe(
       (res) => {
         this.permisos = res;
-
-        console.log('permisos: ',this.permisos)
-
+      
         //Filtra la lista de Permisos para descartar las solicitudes del mismo usuario y almacena en una nueva lista
         this.listaPermisosFiltradas = this.permisos.filter((o) => {
           if (this.idEmpleado !== o.id_emple_solicita) {
@@ -191,8 +190,6 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
           }
         });
 
-        console.log('listaPermisosFiltradas: ',this.listaPermisosFiltradas)
-       
         this.listaPermisosFiltradas.forEach((p) => {
           // TRATAMIENTO DE FECHAS Y HORAS EN FORMATO DD/MM/YYYYY
           p.fec_creacion_ = this.validar.FormatearFecha(
@@ -219,39 +216,32 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
 
         });
 
-        let i = 1;
-
+        let i = 0;
         this.listaPermisosFiltradas.filter(item => {
           this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_contrato).subscribe(
             (usuaDep) => {
               this.ArrayAutorizacionTipos.filter(x => {
-
-                console.log('usuaDep: ',usuaDep, ' = ',usuaDep[0].id_departamento, ' == ',x.id_departamento);
-
-                if((x.nom_depar == 'GERENCIA') && (x.estado == true)){
+                if((usuaDep[0].id_departamento == x.id_departamento && x.depa_pertenece == 11) && (x.estado == true)){
                   this.gerencia = true;
+                  i = i+1;
                   if(item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)){
                     return this.permilista.push(item);
                   }else if(item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)){
                     return this.permilista.push(item);
                   }
                 }else if((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
-                  if(item.estado == 'Pendiente' && x.preautorizar == true){
+                  i = i+1;
+                  if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true){
                     return this.permilista.push(item);
-                  }else if(item.estado == 'Pre-autorizado' && x.autorizar == true){
+                  }else if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true){
                     return this.permilista.push(item);
                   }
                 }
-
               })
 
-              
-
               //Filtra la lista de autorizacion para almacenar en un array
-              if(this.listaPermisosFiltradas.length == i){
+              if(this.listaPermisosFiltradas.length === i){
                 this.listaPermisosDeparta = this.permilista;
-
-                console.log('listaPermisosFiltradas 1: ',this.listaPermisosDeparta)
 
                 if(Object.keys(this.listaPermisosDeparta).length == 0) {
                   this.validarMensaje1 = true;
@@ -261,14 +251,11 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
                   this.lista_permisos = true;
                 }
               }
-              i = i+1;
+              
             }
           );
 
         });
-
-        
-
       },
       (err) => {
         console.log("permisos ALL ", err.error);
