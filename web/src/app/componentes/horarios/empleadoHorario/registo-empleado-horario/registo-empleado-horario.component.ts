@@ -379,9 +379,9 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
             id_empl_cargo: this.datoEmpleado.idCargo,
             id_det_horario: element.id,
             maxi_min_espera: accion,
+            salida_otro_dia: nocturno,
             tipo_entr_salida: element.tipo_accion,
             fec_hora_horario: obj + ' ' + element.hora,
-            salida_otro_dia: nocturno,
           };
           if (element.segundo_dia === true) {
             plan.fec_horario = moment(obj).add(1, 'd').format('YYYY-MM-DD');

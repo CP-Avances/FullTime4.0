@@ -11,7 +11,8 @@
             <div class="container" style="text-align: center;">
                 <div class="nota">
                     <span>
-                        NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                        NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el
+                        botón
                         Guardar.
                     </span>
                 </div>
@@ -21,7 +22,7 @@
                             <mat-label>Fecha de inicio</mat-label>
                             <input matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa"
                                 [formControl]="fechaInicioF" min="1950-01-31" max="2050-01-31" required
-                                (click)="LimpiarHorario()" (dateInput)="LimpiarHorario()">
+                                (click)="LimpiarHorario()" (dateInput)="LimpiarHorario()" [disabled]="registrar">
                             <mat-datepicker-toggle matSuffix [for]="picker" id="i-cursor" matTooltipPosition="right"
                                 matTooltip="Seleccionar la fecha dando click en el ícono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
                             </mat-datepicker-toggle>
@@ -32,7 +33,7 @@
                             <mat-label>Fecha de finalización</mat-label>
                             <input matInput [matDatepicker]="picker2" placeholder="dd/mm/aaaa"
                                 [formControl]="fechaFinalF" required (click)="LimpiarHorario()"
-                                (dateInput)="LimpiarHorario()">
+                                (dateInput)="LimpiarHorario()" [disabled]="registrar">
                             <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor" matTooltipPosition="right"
                                 matTooltip="Seleccionar la fecha dando click en el ícono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
                             </mat-datepicker-toggle>
@@ -44,9 +45,9 @@
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Lista de horarios cargados en el sistema.">
                                 help_outline</mat-icon>
-                            <mat-select [formControl]="horarioF" required>
+                            <mat-select [formControl]="horarioF" required >
                                 <mat-option *ngFor="let h of vista_horarios" [value]="h.id" id="letra"
-                                    (click)=VerificarIngresoFechas(formulario.value)>
+                                    (click)=VerificarIngresoFechas(formulario.value) [disabled]="registrar">
                                     {{h.nombre}}
                                 </mat-option>
                             </mat-select>
@@ -61,32 +62,32 @@
                         <div class="container" style="text-align: center;">
                             <div class="row">
                                 <div class="col-sm" style="text-align: left;">
-                                    <mat-checkbox [formControl]="lunesF" [(ngModel)]="lunes">
+                                    <mat-checkbox [formControl]="lunesF" [(ngModel)]="lunes" [disabled]="registrar">
                                         <label id="textoradiobtn">Lunes</label>
                                     </mat-checkbox>
                                     <br>
-                                    <mat-checkbox [formControl]="martesF" [(ngModel)]="martes">
+                                    <mat-checkbox [formControl]="martesF" [(ngModel)]="martes" [disabled]="registrar">
                                         <label id="textoradiobtn">Martes</label>
                                     </mat-checkbox>
                                     <br>
-                                    <mat-checkbox [formControl]="miercolesF" [(ngModel)]="miercoles">
+                                    <mat-checkbox [formControl]="miercolesF" [(ngModel)]="miercoles" [disabled]="registrar">
                                         <label id="textoradiobtn">Miércoles</label>
                                     </mat-checkbox>
                                     <br>
-                                    <mat-checkbox [formControl]="juevesF" [(ngModel)]="jueves">
+                                    <mat-checkbox [formControl]="juevesF" [(ngModel)]="jueves" [disabled]="registrar">
                                         <label id="textoradiobtn">Jueves</label>
                                     </mat-checkbox>
                                 </div>
                                 <div class="col-sm" style="text-align: left;">
-                                    <mat-checkbox [formControl]="viernesF" [(ngModel)]="viernes">
+                                    <mat-checkbox [formControl]="viernesF" [(ngModel)]="viernes" [disabled]="registrar">
                                         <label id="textoradiobtn">Viernes</label>
                                     </mat-checkbox>
                                     <br>
-                                    <mat-checkbox [formControl]="sabadoF" [(ngModel)]="sabado">
+                                    <mat-checkbox [formControl]="sabadoF" [(ngModel)]="sabado" [disabled]="registrar">
                                         <label id="textoradiobtn">Sábado</label>
                                     </mat-checkbox>
                                     <br>
-                                    <mat-checkbox [formControl]="domingoF" [(ngModel)]="domingo">
+                                    <mat-checkbox [formControl]="domingoF" [(ngModel)]="domingo" [disabled]="registrar">
                                         <label id="textoradiobtn">Domingo</label>
                                     </mat-checkbox>
                                 </div>
@@ -97,15 +98,26 @@
             </div>
         </mat-card-content>
     </form>
-    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
-        <button id="btn-raised" class="btn btn-sm" (click)="VerificarDuplicidad(formulario.value)"
+    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;" *ngIf="validar">
+        <button id="btn-raised" class="btn btn-sm" (click)="ValidarSeleccionados(formulario.value)"
             [disabled]="!formulario.valid">
             Validar
+        </button>
+    </div>
+    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;" *ngIf="cancelar">
+        <button id="btn-raised" class="btn btn-sm" (click)="CerrarTabla()">
+            Cancelar
         </button>
     </div>
 </mat-card>
 <div style="margin: 25px 0px 25px 0px; text-align: center;" *ngIf="observaciones">
     <mat-card class="example-card mat-elevation-z8">
+        <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;"
+            *ngIf="guardar">
+            <button id="btn-raised" class="btn btn-sm" (click)="InsertarEmpleadoHorario(formulario.value)">
+                Guardar
+            </button>
+        </div>
         <div class="d-flex bd-highlight" id="titulo">
             <span class="w-100 bd-highlight">
                 LISTA DE EMPLEADOS SIN ASIGNACIÓN DE HORARIO
@@ -146,4 +158,13 @@
             </div>
         </div>
     </mat-card>
+</div>
+<div class="pantalla-progress" *ngIf="progreso">
+    <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
+    </mat-progress-spinner>
+</div>
+
+<div class="pantalla-progress" *ngIf="progreso_">
+    <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
+    </mat-progress-spinner>
 </div>

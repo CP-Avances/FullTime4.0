@@ -2,6 +2,7 @@
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { Component, OnInit, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 import * as moment from 'moment';
 
@@ -10,11 +11,12 @@ import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCat
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
+import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
+
 import { HorarioMultipleEmpleadoComponent } from '../horario-multiple-empleado/horario-multiple-empleado.component';
-import { PageEvent } from '@angular/material/paginator';
-import { ThisReceiver } from '@angular/compiler';
+import { ThemePalette } from '@angular/material/core';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-horarios-multiples',
@@ -25,6 +27,14 @@ import { ThisReceiver } from '@angular/compiler';
 export class HorariosMultiplesComponent implements OnInit {
 
   @Input() seleccionados: any;
+
+  // VARIABLES PROGRESS SPINNER
+
+  progreso: boolean = false;
+  progreso_: boolean = false;
+  color: ThemePalette = 'primary';
+  mode: ProgressSpinnerMode = 'indeterminate';
+  value = 10;
 
   // OPCIONES DE DIAS LIBRERIAS EN HORARIOS
   miercoles = false;
@@ -88,7 +98,13 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // VARIABLE USADA PARA ALMACENAR LISTA DE EMPLEADOS QUE NO SE ASIGNAN HORARIO
   empleados_sin_asignacion: any = [];
+
+  // VARIABLES DE ACTIVACION DE VISTA DE TABLA Y BOTONES
   observaciones: boolean = false;
+  guardar: boolean = false;
+  validar: boolean = true;
+  cancelar: boolean = false;
+  registrar: boolean = false;
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS ESPECIFICOS DE UN HORARIO
   detalles_horarios: any = [];
@@ -187,7 +203,6 @@ export class HorariosMultiplesComponent implements OnInit {
           'Dar click para verificar registro de detalle de horario.', {
           timeOut: 6000,
         }).onTap.subscribe(obj => {
-          //this.ventana.close();
           this.router.navigate(['/verHorario', id]);
         });
       }
@@ -199,12 +214,9 @@ export class HorariosMultiplesComponent implements OnInit {
     this.formulario.patchValue({ horarioForm: 0 });
   }
 
-  MensajeAlerta() {
-    this.toastr.warning(
-      'En la tabla podrá observar una lista de usuarios a los cuales no se logró asignar HORARIO.',
-      'Verificar la información.', {
-      timeOut: 6000,
-    })
+  // METODO DE LLAMADO DE FUNCIONES DE VALIDACION
+  ValidarSeleccionados(form: any) {
+    this.VerificarDuplicidad(form);
   }
 
   // MÉTODO PARA LEER LOS DATOS DE LA DATA ORIGINAL
@@ -224,21 +236,32 @@ export class HorariosMultiplesComponent implements OnInit {
         nombre: name,
         codigo: valor.codigo,
         id_cargo: valor.id_cargo,
+        hora_trabaja: valor.hora_trabaja,
       }
       this.datos = this.datos.concat(informacion);
     })
     return this.datos;
   }
 
+  // METODO PARA ACTIVAR O DESACTIVAR BOTONES
+  ControlarBotones(validar: boolean, cancelar: boolean, formulario: boolean) {
+    this.validar = validar;
+    this.cancelar = cancelar;
+    this.registrar = formulario;
+  }
+
   // VARIABLES DE ALMACENAMIENTO DE DATOS
+  usuarios_validos: any = [];
   invalidos: any = [];
   usuarios: any = [];
   validos: any = [];
   // METODO PARA VERIFICAR QUE LOS USUARIOS NO DUPLIQUEN SU ASIGNACION DE HORARIO
   VerificarDuplicidad(form: any) {
-    this.observaciones = false;
+    this.progreso = true;
     this.usuarios = [];
+    this.guardar = false;
     this.contador = 0;
+    this.observaciones = false;
     this.LeerDatos();
     let fechas = {
       fechaInicio: form.fechaInicioForm,
@@ -257,7 +280,9 @@ export class HorariosMultiplesComponent implements OnInit {
 
         if (this.contador === this.datos.length) {
           if (duplicados.length === this.datos.length) {
+            this.ControlarBotones(false, true, true);
             this.observaciones = true;
+            this.progreso = false;
             this.usuarios = this.usuarios.concat(duplicados);
           }
           else {
@@ -314,7 +339,9 @@ export class HorariosMultiplesComponent implements OnInit {
 
           if (this.cont2 === correctos.length) {
             if (sin_contrato.length === correctos.length) {
+              this.ControlarBotones(false, true, true);
               this.observaciones = true;
+              this.progreso = false;
               this.usuarios = this.usuarios.concat(sin_contrato);
             }
             else {
@@ -332,18 +359,20 @@ export class HorariosMultiplesComponent implements OnInit {
   horariosEmpleado: any = []
   cont3: number = 0;
   ValidarHorarioByHorasTrabaja(form: any, correctos: any) {
-    let problemas: any; //-----------------verificar
+    this.ControlarBotones(false, true, true);
     let horas_correctas = [];
     let horas_incorrectas = [];
-    let seg: any;
+    this.usuarios_validos = [];
+    this.cont3 = 0;
+
     const [obj_res] = this.horarios.filter(o => {
       return o.id === parseInt(form.horarioForm)
     })
+
     const { hora_trabajo } = obj_res;
 
     if (obj_res.detalle === true) {
       correctos.map(dh => {
-        seg = this.SegundosToStringTime(dh.hora_trabaja * 3600)
 
         // METODO PARA LECTURA DE HORARIOS DE EMPLEADO
         this.horariosEmpleado = [];
@@ -363,63 +392,73 @@ export class HorariosMultiplesComponent implements OnInit {
           this.sumHoras = moment(this.suma, 'HH:mm:ss').add(moment.duration(hora_trabajo)).format('HH:mm:ss');
 
           // METODO PARA COMPARAR HORAS DE TRABAJO CON HORAS DE CONTRATO
-          if (this.StringTimeToSegundosTime(this.sumHoras) <= this.StringTimeToSegundosTime(seg)) {
+          if (this.StringTimeToSegundosTime(this.sumHoras) <= this.StringTimeToSegundosTime(dh.hora_trabaja)) {
+            dh.observacion = 'OK';
             horas_correctas = horas_correctas.concat(dh);
             if (this.cont3 === correctos.length) {
-              this.InsertarEmpleadoHorario(form, horas_correctas, problemas);
+              // FINALIZACION DEL CICLO
+              this.observaciones = true;
+              this.progreso = false;
+              this.guardar = true;
+              this.usuarios = this.usuarios.concat(horas_incorrectas);
+              this.usuarios = this.usuarios.concat(horas_correctas);
+              this.usuarios_validos = this.usuarios_validos.concat(horas_correctas);
             }
           }
           else {
             dh.observacion = 'El número de horas de la planificación sobrepasa el número de horas establecidas en su contrato.'
             horas_incorrectas = horas_incorrectas.concat(dh);
-            this.usuarios = this.usuarios.concat(horas_incorrectas);
-            
+
             if (this.cont3 === correctos.length) {
               if (horas_incorrectas.length === correctos.length) {
-                this.MensajeAlerta();
-                //this.ventana.close(problemas);
+                this.observaciones = true;
+                this.progreso = false;
+                this.usuarios = this.usuarios.concat(horas_incorrectas);
               }
               else {
-                this.InsertarEmpleadoHorario(form, horas_correctas, problemas);
+                // FINALIZACION DEL CICLO
+                this.observaciones = true;
+                this.progreso = false;
+                this.guardar = true;
+                this.usuarios = this.usuarios.concat(horas_incorrectas);
+                this.usuarios = this.usuarios.concat(horas_correctas);
+                this.usuarios_validos = this.usuarios_validos.concat(horas_correctas);
               }
             }
           }
         }, error => {
           this.cont3 = this.cont3 + 1;
           // METODO PARA COMPARAR HORAS DE TRABAJO CON HORAS DE CONTRATO CUANDO NO EXISTEN HORARIOS EN LAS FECHAS INDICADAS
-          if (this.StringTimeToSegundosTime(hora_trabajo) === this.StringTimeToSegundosTime(seg)) {
+          if (this.StringTimeToSegundosTime(hora_trabajo) <= this.StringTimeToSegundosTime(dh.hora_trabaja)) {
+            dh.observacion = 'OK';
             horas_correctas = horas_correctas.concat(dh);
             if (this.cont3 === correctos.length) {
-              if (horas_incorrectas.length === correctos.length) {
-                this.MensajeAlerta();
-                //this.ventana.close(problemas);
-              }
-              else {
-                this.InsertarEmpleadoHorario(form, horas_correctas, problemas);
-              }
-            }
-          } else if (this.StringTimeToSegundosTime(hora_trabajo) < this.StringTimeToSegundosTime(seg)) {
-            horas_correctas = horas_correctas.concat(dh);
-            if (this.cont3 === correctos.length) {
-              if (horas_incorrectas.length === correctos.length) {
-                this.MensajeAlerta();
-                //this.ventana.close(problemas);
-              }
-              else {
-                this.InsertarEmpleadoHorario(form, horas_correctas, problemas);
-              }
+              // FINALIZACION DEL CICLO
+              this.observaciones = true;
+              this.progreso = false;
+              this.guardar = true;
+              this.usuarios = this.usuarios.concat(horas_incorrectas);
+              this.usuarios = this.usuarios.concat(horas_correctas);
+              this.usuarios_validos = this.usuarios_validos.concat(horas_correctas);
             }
           }
           else {
+            dh.observacion = 'El número de horas de la planificación sobrepasa el número de horas establecidas en su contrato.'
             horas_incorrectas = horas_incorrectas.concat(dh);
-            problemas = problemas.concat(dh);
             if (this.cont3 === correctos.length) {
               if (horas_incorrectas.length === correctos.length) {
-                this.MensajeAlerta();
-                //this.ventana.close(problemas);
+                this.observaciones = true;
+                this.progreso = false;
+                this.usuarios = this.usuarios.concat(horas_incorrectas);
               }
               else {
-                this.InsertarEmpleadoHorario(form, horas_correctas, problemas);
+                // FINALIZACION DEL CICLO
+                this.observaciones = true;
+                this.progreso = false;
+                this.guardar = true;
+                this.usuarios = this.usuarios.concat(horas_incorrectas);
+                this.usuarios = this.usuarios.concat(horas_correctas);
+                this.usuarios_validos = this.usuarios_validos.concat(horas_correctas);
               }
             }
           }
@@ -427,19 +466,12 @@ export class HorariosMultiplesComponent implements OnInit {
       })
     }
     else {
-      this.InsertarEmpleadoHorario(form, correctos, problemas);
+      this.observaciones = true;
+      this.progreso = false;
+      this.guardar = true;
+      this.usuarios = this.usuarios.concat(correctos);
+      this.usuarios_validos = this.usuarios_validos.concat(correctos);
     }
-  }
-
-  // METODO PARA FORMATEAR FECHAS
-  SegundosToStringTime(segundos: number) {
-    let h: string | number = Math.floor(segundos / 3600);
-    h = (h < 10) ? '0' + h : h;
-    let m: string | number = Math.floor((segundos / 60) % 60);
-    m = (m < 10) ? '0' + m : m;
-    let s: string | number = segundos % 60;
-    s = (s < 10) ? '0' + s : s;
-    return h + ':' + m + ':' + s;
   }
 
   // METODO PARA SUMAR HORAS
@@ -453,10 +485,11 @@ export class HorariosMultiplesComponent implements OnInit {
   // METODO PARA INGRESAR DATOS DE HORARIO
   contador: number = 0;
   cont4: number = 0;
-  InsertarEmpleadoHorario(form: any, correctos: any, problemas: any) {
+  InsertarEmpleadoHorario(form: any) {
+    this.progreso = true;
     this.cont4 = 0;
-    correctos.map(obj => {
-      let datosempleH = {
+    this.usuarios_validos.map(obj => {
+      let horario = {
         fec_inicio: form.fechaInicioForm,
         fec_final: form.fechaFinalForm,
         id_horarios: form.horarioForm,
@@ -471,30 +504,15 @@ export class HorariosMultiplesComponent implements OnInit {
         lunes: form.lunesForm,
         estado: 1,
       };
-      this.rest.IngresarEmpleadoHorarios(datosempleH).subscribe(response => {
-        this.IngresarPlanGeneral(form, obj);
-        this.cont4 = this.cont4 + 1;
-        if (this.cont4 === correctos.length) {
-          //this.ventana.close(problemas);
-          if (correctos.length === this.seleccionados.length) {
-            this.toastr.success(
-              'Operación Exitosa', 'Se asignó HORARIO a ' + correctos.length + ' colaboradores.', {
-              timeOut: 6000,
-            })
-          }
-          else {
-            this.toastr.success('En la tabla podrá observar una lista de usuarios a los cuales no se logró asignar HORARIO.',
-              'Se asignó HORARIO a ' + correctos.length + ' colaboradores.', {
-              timeOut: 6000,
-            })
-          }
-        }
-      });
+      console.log('ver datos de registro ', obj, ' data ', horario, ' tamaño array ', this.usuarios_validos.length)
+      this.RegistrarPlanificacion(form, obj.id, horario, this.usuarios_validos, obj);
     })
   }
 
-  // METODO PARA BUSCAR FERIADOS
-  BuscarFeriados(form: any, id_empleado: any) {
+  // METODO PARA REGISTRAR PLANIFICACION CON BUSQUEDA DE FERIADOS
+  RegistrarPlanificacion(form: any, id_empleado: any, informacion: any, data: any, valor: any) {
+
+    // METODO DE BUSQUEDA DE FERIADOS
     this.feriados = [];
     let datos = {
       fecha_inicio: form.fechaInicioForm,
@@ -504,11 +522,14 @@ export class HorariosMultiplesComponent implements OnInit {
     this.feriado.ListarFeriadosCiudad(datos).subscribe(data => {
       this.feriados = data;
     })
+
+    // METODO DE BUSQUEDA DE FECHAS DE RECUPERACION
+    this.BuscarFeriadosRecuperar(form, id_empleado, informacion, data, valor);
   }
 
   // METODO PARA BUSCAR FECHAS DE RECUPERACION DE FERIADOS
   recuperar: any = [];
-  BuscarFeriadosRecuperar(form: any, id_empleado: any) {
+  BuscarFeriadosRecuperar(form: any, id_empleado: any, informacion: any, data: any, valor: any) {
     this.recuperar = [];
     let datos = {
       fecha_inicio: form.fechaInicioForm,
@@ -518,14 +539,34 @@ export class HorariosMultiplesComponent implements OnInit {
     this.feriado.ListarFeriadosRecuperarCiudad(datos).subscribe(data => {
       this.recuperar = data;
     })
+
+    // METODO PARA GUARDAR DATOS
+    this.GuardarInformacion(informacion, form, data, valor);
   }
 
-  // METODO PARA INGRESAR PLANIFICACIÓN GENERAL
+  // METODO PARA REGISTRAR PLANIFICACION
+  GuardarInformacion(informacion: any, form: any, datos: any, valor: any) {
+    this.rest.IngresarEmpleadoHorarios(informacion).subscribe(response => {
+      this.IngresarPlanGeneral(form, valor);
+      this.cont4 = this.cont4 + 1;
+      if (this.cont4 === datos.length) {
+        this.progreso = false;
+        this.CerrarTabla();
+        this.toastr.success(
+          'Operación exitosa.', 'Se asignó la planificación horaria a ' + datos.length + ' colaboradores.', {
+          timeOut: 6000,
+        })
+      }
+    });
+  }
+
+  // METODO PARA INGRESAR PLANIFICACION GENERAL
   detalles: any = [];
   fechasHorario: any = [];
   inicioDate: any;
   finDate: any;
   IngresarPlanGeneral(form: any, dh: any) {
+    this.progreso_ = true;
     this.detalles = [];
     this.restD.ConsultarUnDetalleHorario(form.horarioForm).subscribe(res => {
       this.detalles = res;
@@ -535,7 +576,7 @@ export class HorariosMultiplesComponent implements OnInit {
       // INICIALIZAR DATOS DE FECHA
       var start = new Date(this.inicioDate);
       var end = new Date(this.finDate);
-      // LÓGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DÍA DEL PERIODO INDICADO
+      // LOGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DIAS DEL PERIODO INDICADO
       while (start <= end) {
         this.fechasHorario.push(moment(start).format('YYYY-MM-DD'));
         var newDate = start.setDate(start.getDate() + 1);
@@ -601,6 +642,7 @@ export class HorariosMultiplesComponent implements OnInit {
           }
         }
 
+        // COLOCAR DETALLE DE DIA SEGUN HORARIO
         this.detalles.map(element => {
           var accion = 0;
           var nocturno: number = 0;
@@ -617,15 +659,17 @@ export class HorariosMultiplesComponent implements OnInit {
             nocturno = 0;
           }
           let plan = {
-            estado: null,
-            fec_hora_horario: obj + ' ' + element.hora,
-            tipo_entr_salida: element.tipo_accion,
-            maxi_min_espera: accion,
-            id_det_horario: element.id,
-            id_empl_cargo: dh.id_cargo,
-            fec_horario: obj,
-            id_horario: form.horarioForm,
+            tipo: tipo,
+            estado: 1,
             codigo: dh.codigo,
+            id_horario: form.horarioForm,
+            fec_horario: obj,
+            id_empl_cargo: dh.id_cargo,
+            id_det_horario: element.id,
+            maxi_min_espera: accion,
+            salida_otro_dia: nocturno,
+            tipo_entr_salida: element.tipo_accion,
+            fec_hora_horario: obj + ' ' + element.hora,
           };
           if (element.segundo_dia === true) {
             plan.fec_horario = moment(obj).add(1, 'd').format('YYYY-MM-DD');
@@ -636,9 +680,9 @@ export class HorariosMultiplesComponent implements OnInit {
             plan.fec_hora_horario = moment(obj).add(2, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
           }
           this.restP.CrearPlanGeneral(plan).subscribe(res => {
+            this.progreso_= false;
           })
         })
-
       });
     });
   }
@@ -666,8 +710,10 @@ export class HorariosMultiplesComponent implements OnInit {
 
   CerrarTabla() {
     this.observaciones = false;
-    this.empleados_sin_asignacion = [];
+    this.ControlarBotones(true, false, false);
+    this.guardar = false;
   }
+
 
   // METODO PARA MANEJO DE PAGINAS EN TABLAS DE EMPLEADOS SIN ASIGNACION
   ManejarPaginaH(e: PageEvent) {
