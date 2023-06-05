@@ -9,6 +9,8 @@ import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartament
 import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { PermisosService } from 'src/app/servicios/permisos/permisos.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
+import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 interface Orden {
   valor: number
@@ -33,7 +35,7 @@ export class AutorizacionesComponent implements OnInit {
 
   // idDocumento = new FormControl('', Validators.required);
   orden = new FormControl(0, Validators.required);
-  estado = new FormControl(0, Validators.required);
+  estado = new FormControl('', Validators.required);
   idDepartamento = new FormControl('');
 
   public nuevaAutorizacionesForm = new FormGroup({
@@ -60,12 +62,12 @@ export class AutorizacionesComponent implements OnInit {
     { valor: 5 }
   ];
 
-  estados: Estado[] = [
-    //{ id: 1, nombre: 'Pendiente' },
-    { id: 2, nombre: 'Pre-autorizado' },
-    { id: 3, nombre: 'Autorizado' },
-    { id: 4, nombre: 'Negado' },
-  ];
+  estados: Estado[] = [];
+
+  public ArrayAutorizacionTipos: any = [];
+  public gerencia:boolean = false;
+  autorizaDirecto: boolean = false;
+  InfoListaAutoriza: any = []; 
 
   constructor(
     public restAutorizaciones: AutorizacionService,
@@ -76,16 +78,60 @@ export class AutorizacionesComponent implements OnInit {
     private restP: PermisosService,
     private realTime: RealTimeService,
     private toastr: ToastrService,
+    public restAutoriza: AutorizaDepartamentoService,
+    public usuarioDepa: UsuarioService,
     public dialogRef: MatDialogRef<AutorizacionesComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
   ngOnInit(): void {
     console.log(this.data, 'data', this.data.carga);
+    
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
     this.obtenerDepartamento();
     this.id_empleado_loggin = parseInt(localStorage.getItem('empleado') as string);
+
+    this.restAutoriza.BuscarAutoridadUsuarioDepa(this.id_empleado_loggin).subscribe(
+      (res) => {
+      this.ArrayAutorizacionTipos = res;
+      console.log('this.ArrayAutorizacionTipos: ',this.ArrayAutorizacionTipos);
+      this.ArrayAutorizacionTipos.filter(x => {
+        if(x.nombre == 'GERENCIA' && x.estado == true){
+          this.gerencia = true;
+          this.autorizaDirecto = false;
+          this.InfoListaAutoriza = x;
+          if(x.autorizar == true){
+            this.estados = [
+              { id: 3, nombre: 'Autorizado' },
+              { id: 4, nombre: 'Negado' }
+            ];
+          }else if(x.preautorizar == true){
+            this.estados = [
+              { id: 2, nombre: 'Pre-autorizado' },
+              { id: 4, nombre: 'Negado'}
+            ];
+          }
+        }
+        else if((this.gerencia == false) && (x.estado == true)){
+          this.autorizaDirecto = true;
+          this.InfoListaAutoriza = x;
+          if(x.autorizar == true){
+          this.estados = [
+            { id: 3, nombre: 'Autorizado' },
+            { id: 4, nombre: 'Negado' }
+          ];
+        }else if(x.preautorizar == true){
+          this.estados = [
+            { id: 2, nombre: 'Pre-autorizado' },
+            { id: 4, nombre: 'Negado'}
+          ];
+        }
+      }
+    });
+    }
+  );
+
   }
 
 
@@ -159,7 +205,7 @@ export class AutorizacionesComponent implements OnInit {
     if (this.data.carga === 'multiple') {
       this.nuevaAutorizacionesForm.patchValue({
         ordenF: 1,
-        estadoF: 2,
+        estadoF: '',
       });
       this.Habilitado = false;
     }
@@ -168,7 +214,7 @@ export class AutorizacionesComponent implements OnInit {
         this.departamentos = res;
         this.nuevaAutorizacionesForm.patchValue({
           ordenF: 1,
-          estadoF: 2,
+          estadoF: '',
           idDepartamentoF: this.departamentos[0].id_departamento
         })
       })

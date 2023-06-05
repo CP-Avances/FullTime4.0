@@ -147,9 +147,10 @@ export class ListarVacacionesComponent implements OnInit {
       vacio => {
         this.ObtenerListaVacaciones(this.formato_fecha);
         this.ObtenerListaVacacionesAutorizadas(this.formato_fecha);
-      });
+      }
+    );
 
-    this.restAutoriza.BuscarAutoridadEmpleado(this.idEmpleado).subscribe(
+    this.restAutoriza.BuscarAutoridadUsuarioDepa(this.idEmpleado).subscribe(
       (res) => {
         this.ArrayAutorizacionTipos = res;
       },err => {
@@ -182,24 +183,20 @@ export class ListarVacacionesComponent implements OnInit {
         else if (data.estado === 2) {
           data.estado = 'Pre-autorizado';
         }
-        else if (data.estado === 3) {
-          data.estado = 'Autorizado';
-        }
-        else if (data.estado === 4) {
-          data.estado = 'Negado';
-        }
+        
 
         data.fec_inicio_ = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado);
         data.fec_final_ = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
         data.fec_ingreso_ = this.validar.FormatearFecha(data.fec_ingreso, formato_fecha, this.validar.dia_abreviado);
       })
 
-      let i = 1;
+      let i = 0;
       this.listaVacacionesFiltrada.filter(item => {
-          this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_empl_cargo).subscribe(
+          this.usuarioDepa.ObtenerDepartamentoUsuarios(item.contrato_id).subscribe(
             (usuaDep) => {
+              i = i+1;
               this.ArrayAutorizacionTipos.filter(x => {
-                if(x.nom_depar == 'GERENCIA' && x.estado == true){
+                if((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)){
                   this.gerencia = true;
                   if(item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)){
                     return this.Vacacionlista.push(item);
@@ -207,9 +204,9 @@ export class ListarVacacionesComponent implements OnInit {
                     return this.Vacacionlista.push(item);
                   }
                 }else if((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
-                  if(item.estado == 'Pendiente' && x.preautorizar == true){
+                  if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true){
                     return this.Vacacionlista.push(item);
-                  }else if(item.estado == 'Pre-autorizado' && x.autorizar == true){
+                  }else if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true){
                     return this.Vacacionlista.push(item);
                   }
                 }
@@ -228,15 +225,16 @@ export class ListarVacacionesComponent implements OnInit {
                 }else {
                   this.lista_vacaciones = false;
                 }
-                return console.log('listaVacacionDeparta: ',this.listaVacacionDeparta)
               }
-              i = i+1;
+              
             }
           );
         });
 
     },err => {
+      console.log("Vacaciones ALL ", err.error);
       this.validarMensaje1 = true;
+      return this.validar.RedireccionarHomeAdmin(err.error)
     });
   }
 
@@ -244,6 +242,8 @@ export class ListarVacacionesComponent implements OnInit {
   ObtenerListaVacacionesAutorizadas(formato_fecha: string) {
     this.restV.ObtenerListaVacacionesAutorizadas().subscribe(res => {
       this.vacaciones_autorizadas = res;
+
+      console.log('vacaciones_autorizadas: ',this.vacaciones_autorizadas )
 
       //Filtra la lista de Vacaciones para descartar las solicitudes del mismo usuario y almacena en una nueva lista
       this.listaVacacionesFiltradaAutorizada = this.vacaciones_autorizadas.filter(o => {

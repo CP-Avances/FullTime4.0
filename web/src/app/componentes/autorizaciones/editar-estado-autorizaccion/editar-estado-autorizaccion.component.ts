@@ -26,7 +26,6 @@ interface Estado {
 export class EditarEstadoAutorizaccionComponent implements OnInit {
 
   estados: Estado[] = [];
-
   estado = new FormControl('', Validators.required);
 
   public estadoAutorizacionesForm = new FormGroup({
@@ -44,6 +43,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
   public estado_auto: any;
   public empleado_estado: any = [];
   public listaEnvioCorreo: any = [];
+  
   constructor(
     public restA: AutorizacionService,
     private restP: PermisosService,
@@ -67,7 +67,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
       })
     } else {
       this.estadoAutorizacionesForm.patchValue({
-        estadoF: this.data.auto.estado
+        estadoF: ''
       });
     }
 
@@ -85,7 +85,8 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
   /** **************************************************************************************** **
  ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
  ** **************************************************************************************** **/
-
+  autorizaDirecto: boolean = false;
+  InfoListaAutoriza: any = [];
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
   gerencia: boolean = false;
@@ -101,8 +102,10 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
       (res) => {
         this.ArrayAutorizacionTipos = res;
         this.ArrayAutorizacionTipos.filter(x => {
-          if(x.nom_depar == 'GERENCIA' && x.estado == true){
+          if(x.nombre == 'GERENCIA' && x.estado == true){
             this.gerencia = true;
+            this.autorizaDirecto = false;
+            this.InfoListaAutoriza = x;
             if(x.autorizar == true){
               this.estados = [
                 { id: 3, nombre: 'Autorizado' },
@@ -110,11 +113,14 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
               ];
             }else if(x.preautorizar == true){
               this.estados = [
-                { id: 2, nombre: 'Pre-autorizado' }
+                { id: 2, nombre: 'Pre-autorizado' },
+                { id: 4, nombre: 'Negado'}
               ];
             }
           }
           else if((this.gerencia == false) && (this.data.auto.id_departamento == x.id_departamento && x.estado == true)){
+            this.autorizaDirecto = true;
+            this.InfoListaAutoriza = x;
             if(x.autorizar == true){
               this.estados = [
                 { id: 3, nombre: 'Autorizado' },
@@ -122,10 +128,12 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
               ];
             }else if(x.preautorizar == true){
               this.estados = [
-                { id: 2, nombre: 'Pre-autorizado' }
+                { id: 2, nombre: 'Pre-autorizado' },
+                { id: 4, nombre: 'Negado'}
               ];
             }
           }
+
         });
       }
     );
@@ -209,6 +217,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
     }
 
     this.informacion.BuscarJefes(datos).subscribe(permiso => {
+      console.log('BuscarJefes permi: ',permiso);
       permiso.EmpleadosSendNotiEmail.push(this.solInfo);
       this.ConfiguracionCorreo(permiso, estado_p, estado_c);
       this.EnviarNotificacion(permiso, estado_p);
@@ -226,11 +235,12 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
    listadoDepaAutoriza: any = [];
    id_departamento: any;
   ConfiguracionCorreo(permiso: any, estado_p: string, estado_c: string) {
-    console.log('entra correo')
+    console.log('entro ha configuracion correo..')
     // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE PERMISO
     let solicitud = this.validar.FormatearFecha(permiso.fec_creacion, this.formato_fecha, this.validar.dia_completo);
     let desde = this.validar.FormatearFecha(permiso.fec_inicio, this.formato_fecha, this.validar.dia_completo);
     let hasta = this.validar.FormatearFecha(permiso.fec_final, this.formato_fecha, this.validar.dia_completo);
+    
     this.id_departamento = this.solInfo.id_dep;
     this.lectura = 1;
     this.restA.BuscarAutorizacionPermiso(this.data.permiso.id).subscribe(res1 => {
@@ -270,18 +280,25 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
                     return this.listaEnvioCorreo.push(item);
                   }
                 })
-                console.log('this.listaEnvioCorreo 1: ',this.listaEnvioCorreo)
                 this.EnviarCorreo(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
               });
             }else if(this.estado_auto > 2){
               this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
                 this.listadoDepaAutoriza = res;
                 this.listadoDepaAutoriza.filter(item => {
-                  if(item.nivel_padre === item.nivel){
+                  if((item.nivel_padre === this.InfoListaAutoriza.nivel) && (item.nivel_padre === item.nivel)){
+                    this.autorizaDirecto = false;
                     return this.listaEnvioCorreo.push(item);
+                  }else{
+                    this.autorizaDirecto = true;
                   }
                 })
-                console.log('this.listaEnvioCorreo 2: ',this.listaEnvioCorreo)
+
+                //Esta condicion es para enviar el correo a todos los usuraios que autorizan siempre y cuando la solicitud fue negada antes
+                if(this.autorizaDirecto === true){
+                  this.listaEnvioCorreo = this.listadoDepaAutoriza;
+                }
+
                 this.EnviarCorreo(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
               });
             }
@@ -294,7 +311,6 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
                 return this.listaEnvioCorreo.push(item);  
               }
             })
-            console.log('this.listaEnvioCorreo 3: ',this.listaEnvioCorreo)
             this.EnviarCorreo(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
           });
         }

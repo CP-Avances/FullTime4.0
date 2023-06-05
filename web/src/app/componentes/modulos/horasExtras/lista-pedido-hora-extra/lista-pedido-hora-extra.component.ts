@@ -145,7 +145,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
         this.obtenerHorasExtrasObservacion(this.formato_fecha);
     });
 
-    this.restAutoriza.BuscarAutoridadEmpleado(this.idEmpleado).subscribe(
+    this.restAutoriza.BuscarAutoridadUsuarioDepa(this.idEmpleado).subscribe(
       (res) => {
         this.ArrayAutorizacionTipos = res;
       }
@@ -196,13 +196,12 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
           tt.setHours(tt.getHours() + t1.getHours(), tt.getMinutes() + t1.getMinutes(), tt.getSeconds() + tt.getSeconds());
           horaT = (moment(tt).format('HH:mm:ss')).split(':');
           this.horasSumadas = (moment(tt).format('HH:mm:ss'));
-
         }
         else {
           break;
         }
       }
-      console.log(res);
+     
     }, err => {
       return this.validar.RedireccionarHomeAdmin(err.error)
     });
@@ -233,13 +232,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
           data.estado = 'Pendiente';
         }
         else if (data.estado === 2) {
-          data.estado = 'Pre-Autorizado';
-        }
-        else if (data.estado === 3) {
-          data.estado = 'Autorizado';
-        }
-        else if (data.estado === 4) {
-          data.estado = 'Negado';
+          data.estado = 'Pre-autorizado';
         }
 
         hora1 = (data.num_hora).split(":");
@@ -255,21 +248,20 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
         data.fec_final = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
       })
 
-      let i = 1;
+      let i = 0;
       this.lista_pedidosFiltradas.filter(item => {
-        this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_empl_cargo).subscribe(
+        this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_contrato).subscribe(
             (usuaDep) => {
+              i = i+1;
               this.ArrayAutorizacionTipos.filter(x => {
-                if((usuaDep[0].id_departamento == x.id_departamento && x.depa_pertenece == 11) && (x.estado == true)){
+                if((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)){
                   this.gerencia = true;
-                  i = i+1;
                   if(item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)){
                     return this.HorasExtraLista.push(item);
                   }else if(item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)){
                     return this.HorasExtraLista.push(item);
                   }
                 }else if((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
-                  i = i+1;
                   if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true){
                     return this.HorasExtraLista.push(item);
                   }else if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true){
@@ -298,6 +290,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
       });
 
     }, err => {
+      console.log("Horas_Extra ALL ", err.error);
       this.validarMensaje1 = true;
       return this.validar.RedireccionarHomeAdmin(err.error)
     });
