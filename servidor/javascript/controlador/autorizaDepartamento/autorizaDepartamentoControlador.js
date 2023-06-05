@@ -41,7 +41,7 @@ class AutorizaDepartamentoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
             const AUTORIZA = yield database_1.default.query(`
-            SELECT cd.id AS id_depa_confi, n.id_departamento, n.departamento AS depa_autoriza, da.estado, da.autorizar, da.preautorizar, 
+            SELECT cd.id AS id_depa_confi, n.id_departamento, n.departamento AS depa_autoriza, n.nivel, da.estado, da.autorizar, da.preautorizar, 
             da.id_empl_cargo, e.id_contrato, e.id_departamento AS depa_pertenece, cd.nombre, 
             ce.id AS id_empresa, ce.nombre AS nom_empresa, s.id AS id_sucursal, s.nombre AS nom_sucursal 
             FROM depa_autorizaciones AS da, cg_departamentos AS cd, cg_empresa AS ce, 
@@ -138,7 +138,8 @@ class AutorizaDepartamentoControlador {
             const EMPLEADOS = yield database_1.default.query(`
             SELECT n.id_departamento, cg.nombre, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel, cg.depa_padre, cg.nivel AS nivel_padre,
                 da.estado, dae.id_contrato, da.id_empl_cargo, (dae.nombre || ' ' || dae.apellido) as fullname, 
-                dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti 
+                dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti, c.vaca_mail, c.vaca_noti, c.hora_extra_mail, 
+                c.hora_extra_noti  
             FROM nivel_jerarquicodep AS n, depa_autorizaciones AS da, datos_actuales_empleado AS dae, 
                 config_noti AS c, cg_departamentos AS cg 
             WHERE n.id_departamento = $1 

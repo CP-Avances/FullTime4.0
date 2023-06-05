@@ -169,6 +169,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
     this.lectura = 1;
     this.restA.BuscarAutorizacionPermiso(id).subscribe(res1 => {
       this.autorizacion = res1;
+      console.log('autorizacion: ',this.autorizacion);
       // METODO PARA OBTENER EMPLEADOS Y ESTADOS
       var autorizaciones = this.autorizacion[0].id_documento.split(',');
       autorizaciones.map((obj: string) => {
@@ -198,6 +199,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
           }
         
           if((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')){
+            //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
             this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
               this.listadoDepaAutoriza = res;
               this.listadoDepaAutoriza.filter(item => {
@@ -212,12 +214,16 @@ export class VerEmpleadoPermisoComponent implements OnInit {
             this.ocultar = true;
           }
 
-          this.empleado_estado = this.empleado_estado.concat(data);
+          this.empleado_estado = this.empleado_estado.concat(data);     
+          console.log('this.empleado_estado: ',this.empleado_estado);     
           // CUANDO TODOS LOS DATOS SE HAYAN REVISADO EJECUTAR METODO DE INFORMACIÓN DE AUTORIZACIÓN
           if (this.lectura === autorizaciones.length) {
             this.VerInformacionAutoriza(this.empleado_estado);
+            console.log('this.empleado_estado: ',this.empleado_estado);
           }
+
         }else{
+          //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
           this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
             this.listadoDepaAutoriza = res;
             this.listadoDepaAutoriza.filter(item => {
@@ -412,14 +418,14 @@ export class VerEmpleadoPermisoComponent implements OnInit {
         }
       },
       content: [
-        { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: this.datoSolicitud[0].nom_empresa.toUpperCase(), bold: true, fontSize: 20, alignment: 'center', margin: [0, 0, 0, 20] },
+        { image: this.logo, width: 150, margin: [5, -27, 0, 2] },
+        { text: this.datoSolicitud[0].nom_empresa.toUpperCase(), bold: true, fontSize: 20, alignment: 'center', margin: [0, -2, 0, 10] },
         { text: 'SOLICITUD DE PERMISO', fontSize: 10, alignment: 'center', margin: [0, 0, 0, 10] },
         this.SeleccionarMetodo(),
       ],
       styles: {
         tableHeader: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color, },
-        tableHeaderA: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.s_color, margin: [20, 0, 20, 0], },
+        tableHeaderA: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.s_color, margin: [10, 0, 10, 0], },
         itemsTableD: { fontSize: 10, alignment: 'left', margin: [50, 5, 5, 5] },
         itemsTable: { fontSize: 10, alignment: 'center', }
       }
@@ -427,8 +433,6 @@ export class VerEmpleadoPermisoComponent implements OnInit {
   }
 
   SeleccionarMetodo() {
-    var contador = 0;
-    var contador2 = 0;
     let fec_creacion_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_creacion.split('T')[0], this.formato_fecha, this.validar.dia_completo)
     let fec_inicio_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_inicio.split('T')[0], this.formato_fecha, this.validar.dia_completo)
     let fec_final_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_final.split('T')[0], this.formato_fecha, this.validar.dia_completo)
@@ -491,7 +495,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
                         widths: ['auto'],
                         body: [
                           [{ text: obj.estado.toUpperCase(), style: 'tableHeaderA'},],
-                          [{ text: ' ', style: 'itemsTable', margin: [0, 17, 0, 17] },],
+                          [{ text: ' ', style: 'itemsTable', margin: [0, 15, 0, 15] },],
                           [{ text: obj.nombre + '\n' + obj.cargo, style: 'itemsTable' },]
                         ]
                       }
@@ -516,7 +520,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
                         widths: ['auto'],
                         body: [
                           [{ text: obje.estado.toUpperCase(), style: 'tableHeaderA'},],
-                          [{ text: ' ', style: 'itemsTable', margin: [0, 17, 0, 17] },],
+                          [{ text: ' ', style: 'itemsTable', margin: [0, 15, 0, 15] },],
                           [{ text: obje.nombre + '\n' + obje.cargo, style: 'itemsTable' },]
                         ]
                       }
@@ -536,8 +540,8 @@ export class VerEmpleadoPermisoComponent implements OnInit {
         },
         paddingLeft: function (i: any, node: any) { return 40; },
         paddingRight: function (i: any, node: any) { return 40; },
-        paddingTop: function (i: any, node: any) { return 10; },
-        paddingBottom: function (i: any, node: any) { return 10; },
+        paddingTop: function (i: any, node: any) { return 6; },
+        paddingBottom: function (i: any, node: any) { return 6; },
       }
     };
   }

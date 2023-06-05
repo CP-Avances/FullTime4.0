@@ -105,16 +105,16 @@
                             <div *ngIf="estado" class="caja1 d-flex justify-content-start">
                                 <label id="datosF">Descargar Solicitud:</label>
                                 <label>
-                                    <a id="iconos" (click)="GenerarPdf('download')" matSuffix matTooltipPosition="right"
+                                    <i id="iconos"  (click)="GenerarPdf('download')" matSuffix matTooltipPosition="right"
                                         matTooltip="Descargar Solicitud de Permiso en formato PDF">
                                         <label
-                                            style="font-size: 14px; color: red; font-weight: bold;">Solicitud.pdf</label>
-                                    </a>
+                                        style="font-size: 14px; color: red; font-weight: bold;">Solicitud.pdf</label>
+                                    </i>
                                 </label>
                             </div>
                         </div>
                     </div>
-                    <div *ngIf="habilitarActualizar" style="margin-top: 15px;">
+                    <div *ngIf="habilitarActualizar" style="margin-top: 15px;" [hidden] = "ocultar">
                         <div class="d-flex flex-wrap justify-content-around" *ngFor="let h of hora_extra">
                             <div class="d-flex flex-wrap justify-content-around" style="padding-bottom: 10px;">
                                 <button type="button" class="btn btn-sm"

@@ -62,11 +62,11 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
     }
     this.tiempo();
 
-    this.restAutoriza.BuscarAutoridadEmpleado(this.id_empleado_loggin).subscribe(
+    this.restAutoriza.BuscarAutoridadUsuarioDepa(this.id_empleado_loggin).subscribe(
       (res) => {
         this.ArrayAutorizacionTipos = res;
         this.ArrayAutorizacionTipos.filter(x => {
-          if(x.nom_depar == 'GERENCIA' && x.estado == true){
+          if(x.nombre == 'GERENCIA' && x.estado == true){
             this.gerencia = true;
             if(x.autorizar == true){
               this.estados = [
@@ -75,7 +75,8 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
               ];
             }else if(x.preautorizar == true){
               this.estados = [
-                { id: 2, nombre: 'Pre-autorizado' }
+                { id: 2, nombre: 'Pre-autorizado' },
+                { id: 4, nombre: 'Negado' }
               ];
             }
           }
@@ -87,7 +88,8 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
               ];
             }else if(x.preautorizar == true){
               this.estados = [
-                { id: 2, nombre: 'Pre-autorizado' }
+                { id: 2, nombre: 'Pre-autorizado' },
+                { id: 4, nombre: 'Negado' }
               ];
             }
           }

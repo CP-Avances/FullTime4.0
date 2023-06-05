@@ -41,7 +41,7 @@ class VacacionesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const VACACIONES = yield database_1.default.query(`
     SELECT v.fec_inicio, v.fec_final, v.fec_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado, 
-    v.id, v.id_peri_vacacion, v.id_empl_cargo, e.id AS id_empl_solicita, e.nombre, e.apellido 
+    v.id, v.id_peri_vacacion, v.id_empl_cargo, dc.contrato_id, e.id AS id_empl_solicita, e.nombre, e.apellido 
 	  FROM vacaciones AS v, datos_empleado_cargo AS dc, empleados AS e   
 	  WHERE dc.cargo_id = v.id_empl_cargo AND dc.empl_id = e.id  
 	  AND (v.estado = 1 OR v.estado = 2) ORDER BY id DESC

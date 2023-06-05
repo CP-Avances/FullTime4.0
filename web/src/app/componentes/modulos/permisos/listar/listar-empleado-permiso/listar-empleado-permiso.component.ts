@@ -220,23 +220,24 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
         this.listaPermisosFiltradas.filter(item => {
           this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_contrato).subscribe(
             (usuaDep) => {
+              i = i+1;
               this.ArrayAutorizacionTipos.filter(x => {
-                if((usuaDep[0].id_departamento == x.id_departamento && x.depa_pertenece == 11) && (x.estado == true)){
+                if((usuaDep[0].id_departamento == x.id_departamento && x.nombre == 'GERENCIA') && (x.estado == true)){
                   this.gerencia = true;
-                  i = i+1;
+                  
                   if(item.estado == 'Pendiente' && (x.autorizar == true || x.preautorizar == true)){
-                    return this.permilista.push(item);
+                    this.permilista.push(item);
                   }else if(item.estado == 'Pre-autorizado' && (x.autorizar == true || x.preautorizar == true)){
-                    return this.permilista.push(item);
+                    this.permilista.push(item);
                   }
                 }else if((this.gerencia != true) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
-                  i = i+1;
                   if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.preautorizar == true){
-                    return this.permilista.push(item);
+                    this.permilista.push(item);
                   }else if((item.estado == 'Pendiente' || item.estado == 'Pre-autorizado') && x.autorizar == true){
-                    return this.permilista.push(item);
+                    this.permilista.push(item);
                   }
                 }
+                
               })
 
               //Filtra la lista de autorizacion para almacenar en un array

@@ -119,7 +119,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
   constructor(
     private loginServise: LoginService,
-    private informacion_: DatosGeneralesService,
+    public informacion_: DatosGeneralesService,
     private tipoPermiso: TipoPermisosService,
     private realTime: RealTimeService,
     private toastr: ToastrService,
@@ -140,9 +140,9 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
     this.idEmpleadoIngresa = parseInt(localStorage.getItem('empleado') as string);
   }
 
+  public datosEmple: any = []
   ngOnInit(): void {
     this.datos = this.solicita_permiso[0];
-    console.log(this.datos)
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
     this.ObtenerInformacionEmpleado();
@@ -1402,17 +1402,19 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
    ** ***************************************************************************************** **/
 
   IngresarAutorizacion(permiso: any) {
+    console.log('this.departamento: ',this.departamento);
     // ARREGLO DE DATOS PARA INGRESAR UNA AUTORIZACION
     let newAutorizaciones = {
       orden: 1, // ORDEN DE LA AUTORIZACIÓN 
       estado: 1, // ESTADO PENDIENTE
-      id_departamento: parseInt(localStorage.getItem('departamento') as string),
+      id_departamento: this.departamento,
       id_permiso: permiso.id,
       id_vacacion: null,
       id_hora_extra: null,
       id_documento: '',
       id_plan_hora_extra: null,
     }
+    console.log('this.departamento: ',newAutorizaciones);
     this.restAutoriza.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
     })
   }
@@ -1424,6 +1426,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
 
   // METODO PARA OBTENER CONFIGURACION DE NOTIFICACIONES
   solInfo: any;
+  departamento: any;
   ObtenerInformacionEmpleado() {
     var estado: boolean;
     this.informacion_.ObtenerInfoConfiguracion(this.datos.id_empleado).subscribe(
@@ -1443,6 +1446,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
             correo: res.correo,
             fullname: res.fullname,
           }
+          this.departamento = res.id_departamento;
           if (this.datos.id_empleado != this.idEmpleadoIngresa) {
             this.nota = 'la solicitud';
             this.user = 'para ' + this.solInfo.fullname;
@@ -1457,7 +1461,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
             });
           this.CerrarVentana();
         }
-      })
+    })
   }
 
   // METODO PARA ABRIR CONFIGURACION DE NOTIFICACIONES
