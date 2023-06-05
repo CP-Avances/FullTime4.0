@@ -5,9 +5,9 @@
     height: 60px;
 }
 
-.mat-radio-button~.mat-radio-button {
+.mat-mdc-radio-button ~ .mat-mdc-radio-button {
     margin-left: 16px;
-}
+  }
 
 .mat-stepper-horizontal {
     margin-top: 8px;

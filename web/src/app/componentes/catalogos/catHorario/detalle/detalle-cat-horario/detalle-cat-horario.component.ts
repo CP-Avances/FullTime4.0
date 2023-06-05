@@ -10,6 +10,7 @@ import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCat
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { ComidasSolicitadasEmpleadoComponent } from 'src/app/componentes/rolEmpleado/comidas-empleado/comidas-solicitadas-empleado/comidas-solicitadas-empleado.component';
 
 const OPTIONS_HORARIOS = [
   { orden: 1, accion: 'E', view_option: 'Entrada' },
@@ -93,6 +94,7 @@ export class DetalleCatHorarioComponent implements OnInit {
       else {
         this.acciones = false;
       }
+      console.log('ver acciones', this.acciones)
     });
   }
 
@@ -154,13 +156,15 @@ export class DetalleCatHorarioComponent implements OnInit {
       minu_espera: form.minEsperaForm,
       tipo_accion: form.accionForm,
       segundo_dia: form.segundoForm,
-      min_antes: null,
-      min_despues: null,
+      min_antes: 0,
+      min_despues: 0,
     };
     if (this.acciones === true) {
-      detalle.min_antes = form.min_antesForm;
-      detalle.min_despues = form.min_despuesForm;
+      detalle.min_antes = parseInt(form.min_antesForm);
+      detalle.min_despues = parseInt(form.min_despuesForm);
     }
+
+    console.log('ver datos de horario ', detalle)
     this.ValidarMinEspera(form, detalle);
     if (this.datosHorario[0].min_almuerzo === 0) {
       this.ValidarDetallesSinAlimentacion(detalle);

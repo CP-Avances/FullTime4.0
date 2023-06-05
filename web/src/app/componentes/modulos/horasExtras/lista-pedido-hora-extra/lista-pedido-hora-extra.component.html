@@ -35,7 +35,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let h of lista_pedidosFiltradas | paginate:tamanio_pagina:numero_pagina">
+                    <tr *ngFor="let h of lista_HorasExtras | paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionUno.toggle(h) : null" [checked]="selectionUno.isSelected(h)"
@@ -68,7 +68,7 @@
         </div>
         <br>
         <div>
-            <mat-paginator id="pagina" [length]="lista_pedidosFiltradas.length" [pageSize]="tamanio_pagina"
+            <mat-paginator id="pagina" [length]="lista_HorasExtras.length" [pageSize]="tamanio_pagina"
                 [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)"
                 (click)="calcularHoraPaginacion()" showFirstLastButtons>
             </mat-paginator>
@@ -269,6 +269,6 @@
 
 <div *ngIf="(validarMensaje1) && (validarMensaje2) && (validarMensaje3)" class="container" style="padding-bottom: 50px; text-align: center; padding-top: 20px;" >
     <div class="mat-elevation-z8" style="color: rgb(158, 154, 154); padding: 2%;">
-        <h5> Por el Momento no tiene Solicitudes de Horas Extras para Aprobar </h5>
+        <h5> Por el Momento no tiene Solicitudes de Horas Extras por Aprobar </h5>
     </div>
 </div>

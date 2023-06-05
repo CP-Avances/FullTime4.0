@@ -99,8 +99,9 @@ class Servidor {
         this.app.set('puerto', process.env.PORT || 3001);
         this.app.use((0, morgan_1.default)('dev'));
         this.app.use((0, cors_1.default)());
-        this.app.use(express_1.default.json());
-        this.app.use(express_1.default.urlencoded({ extended: true }));
+        //this.app.use(express.json());
+        this.app.use(express_1.default.json({ limit: '50mb' }));
+        this.app.use(express_1.default.urlencoded({ limit: '50mb', extended: true }));
         this.app.use(express_1.default.raw({ type: 'image/*', limit: '2Mb' }));
         this.app.set('trust proxy', true);
         this.app.get('/', (req, res) => {

@@ -88,7 +88,8 @@
                                 </div>
                             </div>
                             <div style="text-align: right;">
-                                <i type="submit" id="edit" (click)="AbirVentanaEditarEmpleado(e)" matSuffix matTooltipPosition="right"
+                                <i type="submit" id="edit" (click)="AbirVentanaEditarEmpleado(e)" matSuffix
+                                    matTooltipPosition="right"
                                     matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
                                     <p>Editar</p>
                                 </i>
@@ -217,12 +218,15 @@
                                 </div>
                                 <div class="row" style="margin-top: 5px;">
                                     <div class="col" style="text-align: right;">
-                                        <i type="submit" id="edit" (click)="AbrirVentanaEditarTitulo(rte)" matSuffix matTooltipPosition="right"
-                                            matTooltip="Editar los datos generales de este registro." class="fas fa-edit">
+                                        <i type="submit" id="edit" (click)="AbrirVentanaEditarTitulo(rte)" matSuffix
+                                            matTooltipPosition="right"
+                                            matTooltip="Editar los datos generales de este registro."
+                                            class="fas fa-edit">
                                             <p>Editar</p>
                                         </i>
-                                        <i style="margin-left: 2%;" class="far fa-trash-alt" (click)="ConfirmarDeleteTitulo(rte.id)" matSuffix
-                                            matTooltipPosition="right" id="delete" matTooltip="Eliminar este registro">
+                                        <i style="margin-left: 2%;" class="far fa-trash-alt"
+                                            (click)="ConfirmarDeleteTitulo(rte.id)" matSuffix matTooltipPosition="right"
+                                            id="delete" matTooltip="Eliminar este registro">
                                             <p>Eliminar</p>
                                         </i>
                                     </div>
@@ -262,9 +266,10 @@
                                     </div>
                                 </div>
                                 <div class="row" style="margin-top: 5px;">
-                                    <div class="col" style="text-align: right;">  
-                                        <i  type="submit" style="margin-left: 2%;" class="far fa-trash-alt" (click)="ConfirmarDeleteDiscapacidad(d.id_empleado)" 
-                                            matSuffix matTooltipPosition="right" id="delete" matTooltip="Eliminar registro">
+                                    <div class="col" style="text-align: right;">
+                                        <i type="submit" style="margin-left: 2%;" class="far fa-trash-alt"
+                                            (click)="ConfirmarDeleteDiscapacidad(d.id_empleado)" matSuffix
+                                            matTooltipPosition="right" id="delete" matTooltip="Eliminar registro">
                                             <p>Eliminar</p>
                                         </i>
                                     </div>
@@ -331,7 +336,8 @@
 
                                         <i type="submit" id="edit" style="margin-right: 20px;"
                                             (click)="AbrirVentanaEditar(dv)" matSuffix matTooltipPosition="right"
-                                            matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
+                                            matTooltip="Modificar los datos generales de este registro"
+                                            class="fas fa-edit">
                                             <p>Editar</p>
                                         </i>
                                         <i class="fas fa-backspace" id="cancel" (click)="ConfirmarEliminarVacuna(dv)"
@@ -442,7 +448,8 @@
                                                 <p>{{ce.doc_nombre}}</p>
                                             </a>
                                             <ng-template #ContratoCargar>
-                                                <a mat-raised-button id="btndocumento" type="submit" (click)="AbrirVentanaEditarContrato(ce)">
+                                                <a mat-raised-button id="btndocumento" type="submit"
+                                                    (click)="AbrirVentanaEditarContrato(ce)">
                                                     Cargar Contrato de Trabajo
                                                 </a>
                                             </ng-template>
@@ -544,8 +551,9 @@
                                                 target="_blank">
                                                 <p>{{ce.doc_nombre}}</p>
                                             </a>
-                                            <a *ngIf="ce.doc_nombre === null || ce.doc_nombre === ''" mat-raised-button id="btndocumento"
-                                                type="submit" (click)="VerContratoEdicion(false); ObtenerIdContratoSeleccionado(ce.id)"
+                                            <a *ngIf="ce.doc_nombre === null || ce.doc_nombre === ''" mat-raised-button
+                                                id="btndocumento" type="submit"
+                                                (click)="VerContratoEdicion(false); ObtenerIdContratoSeleccionado(ce.id)"
                                                 [disabled]="!btnActualizarContrato">
                                                 Cargar Contrato de Trabajo
                                             </a>
@@ -553,9 +561,9 @@
                                     </div>
                                 </div>
                                 <div style="text-align: right;">
-                                    <i type="submit" id="cerrar" style="margin-right: 20px;"
-                                        (click)="LimpiarContrato()" matSuffix matTooltipPosition="right"
-                                        matTooltip="Cerrar Registro" class="fa fa-times-circle">
+                                    <i type="submit" id="cerrar" style="margin-right: 20px;" (click)="LimpiarContrato()"
+                                        matSuffix matTooltipPosition="right" matTooltip="Cerrar Registro"
+                                        class="fa fa-times-circle">
                                         <p>Cerrar</p>
                                     </i>
                                 </div>
@@ -637,9 +645,9 @@
                                     </div>
                                 </div>
                                 <div style="text-align: right;">
-                                     <i type="submit" id="edit" style="margin-right: 20px;" *ngIf="btnActualizarCargo"
-                                        (click)="VerCargoEdicion(false); ObtenerIdCargoSeleccionado(c.id)" 
-                                        matSuffix matTooltipPosition="right"
+                                    <i type="submit" id="edit" style="margin-right: 20px;" *ngIf="btnActualizarCargo"
+                                        (click)="VerCargoEdicion(false); ObtenerIdCargoSeleccionado(c.id)" matSuffix
+                                        matTooltipPosition="right"
                                         matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
                                         <p>Editar</p>
                                     </i>
@@ -747,7 +755,12 @@
             <h6 id="items" style="margin-top: 10%;">Horario</h6>
         </ng-template>
 
-        <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
+        <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="ventana_horario">
+            <app-registo-empleado-horario [data_horario]="data_horario">
+            </app-registo-empleado-horario>
+        </div>
+
+        <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="horarios_usuario">
             <div class="row">
                 <div class="col-md">
                     <div id="titulo">
@@ -767,11 +780,11 @@
                                     </form>
                                 </div>
                                 <div class="col-md" style="text-align: center;">
-                                    <a  type="submit" id="descargar" class="btn btn-sm" matSuffix
+                                    <a type="submit" id="descargar" class="btn btn-sm" matSuffix
                                         matTooltipPosition="right"
                                         matTooltip="Dar click para ver o descargar el documento"
                                         href="{{hipervinculo}}/plantillaD/documento/Horario Empleado.xlsx">
-                                        <span class="material-icons">cloud_download</span> 
+                                        <span class="material-icons">cloud_download</span>
                                         <br>
                                         Descargar plantilla horario usuarios
                                     </a>
@@ -782,13 +795,15 @@
                 </div>
             </div>
         </div>
-        <div class="container" style="padding-bottom: 50px; text-align: center;">
+        <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="horarios_usuario">
             <div class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="titulo">
                     <span class="w-100 bd-highlight">
                         LISTA DE HORARIOS DEL USUARIO</span>
                     <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                        (click)="AbrirVentanaEmplHorario()">Añadir</button>
+                        (click)="AbrirVentanaEmplHorario()">
+                        Añadir
+                    </button>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover table-sm ">
@@ -886,23 +901,22 @@
                                 <td>{{h.fec_final_}}</td>
                                 <td class="d-flex justify-content-center">
                                     <i *ngFor="let e of empleadoUno" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ver datos generales de la planificación" class="fas fa-eye"
-                                        id="ver" [routerLink]="['/verDetalles/', h.id, e.id]">
+                                        matTooltip="Ver datos generales de la planificación" class="fas fa-eye" id="ver"
+                                        [routerLink]="['/verDetalles/', h.id, e.id]">
                                         <p>Ver</p>
                                     </i>
-                                    <i class="fas fa-list-alt" id="detalle" (click)="AbrirVentanaDetallePlanHorario(h)" matSuffix 
-                                        matTooltipPosition="right"
+                                    <i class="fas fa-list-alt" id="detalle" (click)="AbrirVentanaDetallePlanHorario(h)"
+                                        matSuffix matTooltipPosition="right"
                                         matTooltip="Agregar Detalles de Planificación de Horario">
                                         <p>Detalle</p>
                                     </i>
-                                    <i class="fas fa-edit" id="edit" (click)="AbrirEditarHorarioRotativo(h)" matSuffix 
+                                    <i class="fas fa-edit" id="edit" (click)="AbrirEditarHorarioRotativo(h)" matSuffix
                                         matTooltipPosition="right"
                                         matTooltip="Modificar los datos generales de este registro">
                                         <p>Editar</p>
                                     </i>
-                                    <i class="fas fa-trash-alt" id="delete" (click)="ConfirmarHorarioRotativo(h)" matSuffix 
-                                        matTooltipPosition="right"
-                                        matTooltip="Eliminar registro">
+                                    <i class="fas fa-trash-alt" id="delete" (click)="ConfirmarHorarioRotativo(h)"
+                                        matSuffix matTooltipPosition="right" matTooltip="Eliminar registro">
                                         <p>Eliminar</p>
                                     </i>
                                 </td>
@@ -1205,8 +1219,7 @@
                         <mat-divider></mat-divider>
                     </div>
                     <mat-paginator id="pagina" [length]="vacaciones.length" [pageSize]="tamanio_pagina"
-                        [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)"
-                        showFirstLastButtons>
+                        [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
                     </mat-paginator>
                 </mat-card-content>
             </mat-card>
@@ -1609,9 +1622,8 @@
                                             matTooltip="Modificar los datos generales de este registro">
                                             <p>Editar</p>
                                         </i>
-                                        <i  class=" far fa-trash-alt" id="delete" (click)="ConfirmarDeleteProceso(e)"
-                                            matTooltipPosition="right" 
-                                            matTooltip="Eliminar registro">
+                                        <i class=" far fa-trash-alt" id="delete" (click)="ConfirmarDeleteProceso(e)"
+                                            matTooltipPosition="right" matTooltip="Eliminar registro">
                                             <p>Eliminar</p>
                                         </i>
                                     </div>
@@ -1667,7 +1679,7 @@
                         <div class="d-flex bd-highlight" id="titulo">
                             <span class="w-100 bd-highlight">AUTORIZACIÓN DEPARTAMENTOS</span>
                             <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                                (click)="AbrirVentanaAutorizar()">Añadir</button>
+                                (click)="AbrirVentanaAutorizar()">Crear</button>
                         </div>
                         <mat-card-content>
                             <div class="container" *ngFor="let autoD of autorizacionesTotales"
@@ -1682,23 +1694,25 @@
                                         </div>
                                         <div class="col-md">
                                             <div class="espacio d-flex justify-content-start">
-                                                <label id="datosF">Autoriza:</label>
+                                                <label id="datosF" *ngIf="autoD.preautorizar == false">Autoriza:</label>
+                                                <label id="datosF"
+                                                    *ngIf="autoD.preautorizar == true">Pre-Autoriza:</label>
                                                 <label *ngIf="autoD.estado == true">Sí</label>
                                                 <label *ngIf="autoD.estado == false">No</label>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div style="text-align: right;">
-                                        <i class="fas fa-edit" id="edit" (click)="AbrirEditarAutorizar(autoD)" matSuffix
-                                            matTooltipPosition="right"
-                                            matTooltip="Modificar los datos generales de este registro">
-                                            <p>Editar</p>
-                                        </i>
-                                        <i style="color:red; margin-left: 15px;"
-                                            (click)="ConfirmarDeleteAutorizacion(autoD)" class=" far fa-trash-alt"
-                                            matTooltipPosition="right" id="delete" matTooltip="Eliminar registro">
-                                            <p>Eliminar</p>
-                                        </i>
+                                        <div style="text-align: right;">
+                                            <i class="fas fa-edit" id="edit" (click)="AbrirEditarAutorizar(autoD)"
+                                                matSuffix matTooltipPosition="right"
+                                                matTooltip="Modificar los datos generales de este registro">
+                                                <p>Editar</p>
+                                            </i>
+                                            <i style="color:red; margin-left: 15px;"
+                                                (click)="ConfirmarDeleteAutorizacion(autoD)" class=" far fa-trash-alt"
+                                                matTooltipPosition="right" id="delete" matTooltip="Eliminar registro">
+                                                <p>Eliminar</p>
+                                            </i>
+                                        </div>
                                     </div>
                                 </div>
                                 <mat-divider style="margin-bottom: 10px;"></mat-divider>

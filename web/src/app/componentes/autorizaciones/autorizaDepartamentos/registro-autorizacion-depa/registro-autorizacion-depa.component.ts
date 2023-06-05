@@ -24,14 +24,12 @@ export class RegistroAutorizacionDepaComponent implements OnInit {
   idEmpresa: number;
 
   // VARIABLES DE FORMULARIO
-  nombreEmpleadoF = new FormControl('', [Validators.required]);
   idDepartamento = new FormControl('', [Validators.required]);
   idSucursal = new FormControl('', [Validators.required]);
   autorizarF = new FormControl('', [Validators.required]);
 
   // AGREGRA FORMULARIO A UN GRUPO
   public formulario = new FormGroup({
-    nombreEmpleadoForm: this.nombreEmpleadoF,
     idSucursalForm: this.idSucursal,
     autorizarForm: this.autorizarF,
     idDeparForm: this.idDepartamento,
@@ -54,14 +52,13 @@ export class RegistroAutorizacionDepaComponent implements OnInit {
     this.BuscarSucursales();
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
+  usuario: string = '';
   ObtenerEmpleados(idemploy: any) {
     this.empleados = [];
     this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
       this.empleados = data;
-      this.formulario.patchValue({
-        nombreEmpleadoForm: this.empleados[0].nombre + ' ' + this.empleados[0].apellido,
-      })
+      this.usuario = this.empleados[0].nombre + ' ' + this.empleados[0].apellido;
     })
   }
 
@@ -92,8 +89,20 @@ export class RegistroAutorizacionDepaComponent implements OnInit {
       id_departamento: form.idDeparForm,
       id_empl_cargo: this.datoEmpleado.idCargo,
       id_empleado: this.datoEmpleado.idEmpleado,
-      estado: form.autorizarForm,
+      estado: true,
+      preautorizar: false,
+      autorizar: false,
     }
+
+    if (form.autorizarForm == 'preautorizar') {
+      autoriza.preautorizar = true;
+    } else if (form.autorizarForm == 'autorizar') {
+      autoriza.autorizar = true;
+    } else {
+      autoriza.preautorizar = false;
+      autoriza.autorizar = false;
+    }
+
     this.restAutoriza.IngresarAutorizaDepartamento(autoriza).subscribe(res => {
       this.toastr.success('Operación Exitosa.', 'Registro guardado.', {
         timeOut: 6000,

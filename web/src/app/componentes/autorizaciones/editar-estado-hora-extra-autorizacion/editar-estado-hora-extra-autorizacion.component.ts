@@ -7,6 +7,7 @@ import * as moment from 'moment';
 import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
 import { PedHoraExtraService } from 'src/app/servicios/horaExtra/ped-hora-extra.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
+import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
 
 interface Estado {
   id: number,
@@ -21,11 +22,7 @@ interface Estado {
 
 export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
 
-  estados: Estado[] = [
-    { id: 2, nombre: 'Pre-autorizado' },
-    { id: 3, nombre: 'Autorizado' },
-    { id: 4, nombre: 'Negado' },
-  ];
+  estados: Estado[] = [];
 
   estado = new FormControl('', Validators.required);
 
@@ -37,12 +34,16 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
   FechaActual: any;
   NotifiRes: any;
 
+  ArrayAutorizacionTipos: any = [];
+  gerencia: boolean = false;
+
   constructor(
     private restA: AutorizacionService,
     private toastr: ToastrService,
     public restPH: PedHoraExtraService,
     private realTime: RealTimeService,
     public ventana: MatDialogRef<EditarEstadoHoraExtraAutorizacionComponent>,
+    public restAutoriza: AutorizaDepartamentoService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.id_empleado_loggin = parseInt(localStorage.getItem('empleado') as string);
@@ -60,6 +61,39 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
       });
     }
     this.tiempo();
+
+    this.restAutoriza.BuscarAutoridadEmpleado(this.id_empleado_loggin).subscribe(
+      (res) => {
+        this.ArrayAutorizacionTipos = res;
+        this.ArrayAutorizacionTipos.filter(x => {
+          if(x.nom_depar == 'GERENCIA' && x.estado == true){
+            this.gerencia = true;
+            if(x.autorizar == true){
+              this.estados = [
+                { id: 3, nombre: 'Autorizado' },
+                { id: 4, nombre: 'Negado' }
+              ];
+            }else if(x.preautorizar == true){
+              this.estados = [
+                { id: 2, nombre: 'Pre-autorizado' }
+              ];
+            }
+          }
+          else if((this.gerencia == false) && (this.data.auto.id_departamento == x.id_departamento && x.estado == true)){
+            if(x.autorizar == true){
+              this.estados = [
+                { id: 3, nombre: 'Autorizado' },
+                { id: 4, nombre: 'Negado' }
+              ];
+            }else if(x.preautorizar == true){
+              this.estados = [
+                { id: 2, nombre: 'Pre-autorizado' }
+              ];
+            }
+          }
+        });
+      }
+    );
   }
 
   tiempo() {

@@ -23,6 +23,13 @@ export class DatosGeneralesService {
     return this.http.get<any>(`${environment.url}/generalidades/informacion-general/${estado}`);
   }
 
+
+  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR
+  ObtenerInformacionCargo() {
+    const estado = 1; // 1 = activo 
+    return this.http.get<any>(`${environment.url}/generalidades/informacion-general-cargo/${estado}`);
+  }
+
   // METODO PARA LISTAR INFORMACION ACTUAL DE USUARIO
   ListarInformacionActual() {
     return this.http.get(`${environment.url}/generalidades/info_actual`);

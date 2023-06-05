@@ -151,7 +151,7 @@ export class EditarDetallePlanComponent implements OnInit {
         }
         let plan = {
           fec_hora_horario: moment(form.fechaForm).format('YYYY-MM-DD') + ' ' + element.hora,
-          maxi_min_espera: accion,
+          tolerancia: accion,
           estado: null,
           id_det_horario: element.id,
           fec_horario: form.fechaForm,

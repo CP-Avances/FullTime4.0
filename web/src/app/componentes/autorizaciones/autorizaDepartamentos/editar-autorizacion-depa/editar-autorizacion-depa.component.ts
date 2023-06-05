@@ -24,12 +24,16 @@ export class EditarAutorizacionDepaComponent implements OnInit {
 
   selec1: boolean = false;
   selec2: boolean = false;
+  selec3: boolean = false;
+
+  preautorizar: boolean = false;
+  autorizar: boolean = false
 
   // VARIABLES DE FORMULARIO
   nombreEmpleadoF = new FormControl('', [Validators.required]);
   idDepartamento = new FormControl('', [Validators.required]);
   idSucursal = new FormControl('', [Validators.required]);
-  autorizarF = new FormControl('', [Validators.required]);
+  autorizarF = new FormControl(false, [Validators.required]);
 
   // AGREGAR FORMULARIO A UN GRUPO
   public formulario = new FormGroup({
@@ -62,20 +66,34 @@ export class EditarAutorizacionDepaComponent implements OnInit {
     this.restSucursales.BuscarSucursalEmpresa(this.datoEmpleado.datosAuto.id_empresa).subscribe(datos => {
       this.sucursales = datos;
     });
+
     this.restCatDepartamento.BuscarDepartamentoSucursal(this.datoEmpleado.datosAuto.id_sucursal).subscribe(datos => {
       this.departamento = datos;
     });
+    
     this.formulario.patchValue({
       idSucursalForm: this.datoEmpleado.datosAuto.id_sucursal,
       autorizarForm: this.datoEmpleado.datosAuto.estado,
       idDeparForm: this.datoEmpleado.datosAuto.id_departamento,
     })
+
     if (this.datoEmpleado.datosAuto.estado === true) {
-      this.selec1 = true;
+        if(this.datoEmpleado.datosAuto.autorizar == true && this.datoEmpleado.datosAuto.preautorizar == false){
+          this.selec2 = true;
+          this.selec1 = false;
+        }else if(this.datoEmpleado.datosAuto.autorizar == false && this.datoEmpleado.datosAuto.preautorizar == true){
+          this.selec2 = false;
+          this.selec1 = true;
+        }else{
+          this.selec2 = false;
+          this.selec1 = false;
+          this.selec3 = true;
+        }
     }
     else {
-      this.selec2 = true;
+      this.selec3 = true;
     }
+
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO 
@@ -115,10 +133,41 @@ export class EditarAutorizacionDepaComponent implements OnInit {
     let autorizarDepar = {
       id_departamento: form.idDeparForm,
       id_empl_cargo: this.datoEmpleado.datosAuto.id_empl_cargo,
-      estado: form.autorizarForm,
+      preautorizar: false,
+      autorizar: false,
+      estado: false,
       id: this.datoEmpleado.datosAuto.id
     }
+
+    if(form.autorizarForm == 'noautorizar'){
+      this.selec2 = false;
+      this.selec1 = false;
+      this.selec3 = true;
+    }
+
+    if(form.autorizarForm == 'preautorizar'){
+      autorizarDepar.preautorizar = true;
+      autorizarDepar.estado = true;
+    }else if(form.autorizarForm == 'autorizar'){
+      autorizarDepar.autorizar = true;
+      autorizarDepar.estado = true;
+    }else if(this.selec2 == true){
+      autorizarDepar.preautorizar = false;
+      autorizarDepar.autorizar = true;
+      autorizarDepar.estado = true;
+    }else if (this.selec1 == true){
+      autorizarDepar.autorizar = false;
+      autorizarDepar.preautorizar = true;
+      autorizarDepar.estado = true;
+    }
+    else{
+      autorizarDepar.preautorizar = false;
+      autorizarDepar.autorizar = false;
+      autorizarDepar.estado = false;
+    }
+
     this.restAutoriza.ActualizarDatos(autorizarDepar).subscribe(res => {
+      console.log('res: ',res)
       this.toastr.success('Operación Exitosa.', 'Registro actualizado.', {
         timeOut: 6000,
       });

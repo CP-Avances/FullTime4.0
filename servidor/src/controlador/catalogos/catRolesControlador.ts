@@ -53,11 +53,14 @@ class RolesControlador {
     const { nombre } = req.body;
     await pool.query(
       `
-      INSERT INTO cg_roles (nombre) VALUES ($1)
-      `
+       INSERT INTO cg_roles (nombre) VALUES ($1)
+       `
       , [nombre]);
     res.jsonp({ message: 'Registro guardado.' });
+
   }
+
+
 
 
 

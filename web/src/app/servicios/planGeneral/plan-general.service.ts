@@ -13,7 +13,7 @@ export class PlanGeneralService {
 
   // METODO PARA CREAR PLAN GENERAL
   CrearPlanGeneral(datos: any) {
-    return this.http.post(`${environment.url}/planificacion_general/`, datos);
+    return this.http.post<any>(`${environment.url}/planificacion_general/`, datos);
   }
 
   // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL
@@ -22,8 +22,8 @@ export class PlanGeneralService {
   }
 
   // METODO PARA ELIMINAR REGISTROS
-  EliminarRegistro(id: number,) {
-    return this.http.delete(`${environment.url}/planificacion_general/eliminar/${id}`);
+  EliminarRegistro(data: any,) {
+    return this.http.post<any>(`${environment.url}/planificacion_general/eliminar`, data);
   }
 
   // METODO PARA BUSCAR HORARIO DEL USUARIO EN FECHAS ESPECIFICAS

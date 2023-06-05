@@ -171,7 +171,7 @@ export class ListaAppComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
-      this.check = this.restR.checkOptions(3);
+      this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
       this.check_dh = this.restR.checkOptions(3);
       this.BuscarInformacionHabilitados();
       this.BuscarInformacioDeshabilitados();
@@ -179,7 +179,7 @@ export class ListaAppComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    this.restR.GuardarCheckOpcion(0);
+    this.restR.GuardarCheckOpcion('');
     this.restR.DefaultFormCriterios();
     this.restR.DefaultValoresFiltros();
     this.habilitados = [];
@@ -294,7 +294,7 @@ export class ListaAppComponent implements OnInit {
         break;
     }
     this.restR.GuardarFormCriteriosBusqueda(this._booleanOptions_dh);
-    this.restR.GuardarCheckOpcion(this.opcion_dh)
+    //this.restR.GuardarCheckOpcion(this.opcion_dh)
   }
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
@@ -611,7 +611,7 @@ export class ListaAppComponent implements OnInit {
         break;
     }
     this.restR.GuardarFormCriteriosBusqueda(this._booleanOptions);
-    this.restR.GuardarCheckOpcion(this.opcion)
+    //this.restR.GuardarCheckOpcion(this.opcion)
 
   }
 

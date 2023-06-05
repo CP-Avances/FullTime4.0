@@ -1,28 +1,22 @@
 // IMPORTAR LIBRERIAS
-import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { ToastrService } from 'ngx-toastr';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
 import { Component, OnInit } from '@angular/core';
-import { Validators, FormControl, FormGroup } from '@angular/forms';
+import { Validators, FormControl } from '@angular/forms';
 
 // IMPORTAR PLANTILLA DE MODELO DE DATOS
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.model';
 
-// SERVICIOS FILTROS DE BUSQUEDA
-import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
-
 // IMPORTAR SERVICIOS
 import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 
-// IMPORTAR COMPONENTES
-import { RegistoEmpleadoHorarioComponent } from '../../empleadoHorario/registo-empleado-horario/registo-empleado-horario.component';
-import { HorariosMultiplesComponent } from '../horarios-multiples/horarios-multiples.component';
 
 @Component({
   selector: 'app-horario-multiple-empleado',
@@ -32,16 +26,10 @@ import { HorariosMultiplesComponent } from '../horarios-multiples/horarios-multi
 
 export class HorarioMultipleEmpleadoComponent implements OnInit {
 
-  //buscador !: FormGroup;
-
-  // VARIABLE USADA PARA ALMACENAR LISTA DE EMPLEADOS QUE NO SE ASIGNAN HORARIO
-  empleados_sin_asignacion: any = [];
-  no_asignados: boolean = false;
-
-  // ITEMS DE PAGINACION DE LA TABLA EMPLEADOS SIN HORARIO
-  numero_pagina_h: number = 1;
-  tamanio_pagina_h: number = 5;
-  pageSizeOptions_h = [5, 10, 20, 50];
+  // VARIABLES VISTA DE PANTALLAS
+  seleccionar: boolean = true;
+  asignar: boolean = false;
+  ventana_horario: boolean = false;
 
   idEmpleadoLogueado: any;
 
@@ -50,10 +38,10 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   cedula = new FormControl('', [Validators.minLength(2)]);
   nombre_emp = new FormControl('', [Validators.minLength(2)]);
   nombre_dep = new FormControl('', [Validators.minLength(2)]);
-  nombre_suc = new FormControl('', [Validators.minLength(2)]);
+  nombre_carg = new FormControl('', [Validators.minLength(2)]);
   seleccion = new FormControl('');
 
-  filtroNombreSuc_: string = '';
+  filtroNombreCarg_: string = '';
 
   filtroNombreDep_: string = '';
 
@@ -67,6 +55,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     bool_suc: false,
     bool_dep: false,
     bool_emp: false,
+    bool_cargo: false,
   };
 
   public check: checkOptions[];
@@ -75,25 +64,63 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     public informacion: DatosGeneralesService, // SERVICIO DE DATOS INFORMATIVOS DE USUARIOS
     public restCargo: EmplCargosService,
     public restPerV: PeriodoVacacionesService, // SERVICIO DATOS PERIODO DE VACACIONES
-    public restR: ReportesService,
     public validar: ValidacionesService, // VARIABLE USADA PARA VALIDACIONES DE INGRESO DE LETRAS - NUMEROS
+    public restR: ReportesService,
     private toastr: ToastrService, // VARIABLE PARA MANEJO DE NOTIFICACIONES
-    private ventana: MatDialog, // VARIABLE PARA MANEJO DE VENTANAS
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
-    this.check = this.restR.checkOptions(3);
+    this.check = this.restR.checkOptions([{ opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
     this.BuscarInformacion();
+    this.BuscarCargos();
   }
 
   // METODO PARA DESTRUIR PROCESOS
   ngOnDestroy() {
-    this.restR.GuardarCheckOpcion(0);
+    this.restR.GuardarCheckOpcion('');
     this.restR.DefaultFormCriterios();
     this.restR.DefaultValoresFiltros();
     this.origen = [];
+    this.origen_cargo = [];
+  }
+
+
+  // METODO PARA FILTRAR POR CARGOS
+  empleados_cargos: any = [];
+  origen_cargo: any = [];
+  cargos: any = [];
+  BuscarCargos() {
+
+    this.informacion.ObtenerInformacionCargo().subscribe((res: any[]) => {
+      this.origen_cargo = JSON.stringify(res);
+
+      res.forEach(obj => {
+        this.cargos.push({
+          id: obj.id_cargo,
+          nombre: obj.name_cargo
+        })
+      })
+
+      res.forEach(obj => {
+        obj.empleados.forEach(r => {
+
+          this.empleados_cargos.push({
+            id: r.id,
+            nombre: r.name_empleado,
+            codigo: r.codigo,
+            cedula: r.cedula,
+            correo: r.correo,
+            id_cargo: r.id_cargo,
+            id_contrato: r.id_contrato,
+            hora_trabaja: r.hora_trabaja
+          })
+        })
+      })
+    }, err => {
+      this.toastr.error(err.error.message)
+    })
   }
 
   // METODO PARA BUSCAR INFORMACION DE USUARIOS
@@ -113,7 +140,8 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
         obj.departamentos.forEach(ele => {
           this.departamentos.push({
             id: ele.id_depa,
-            nombre: ele.name_dep
+            nombre: ele.name_dep,
+            establecimiento: ele.sucursal,
           })
         })
       })
@@ -135,6 +163,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
           })
         })
       })
+
     }, err => {
       this.toastr.error(err.error.message)
     })
@@ -149,44 +178,37 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   }
 
   // METODO PARA MOSTRAR DATOS DE BUSQUEDA
-  opcion: number;
+  opcion: string;
   activar_boton: boolean = false;
   activar_seleccion: boolean = true;
   BuscarPorTipo(e: MatRadioChange) {
     this.opcion = e.value;
     this.activar_boton = true;
     switch (this.opcion) {
-      case 1:
-        this._booleanOptions.bool_suc = true;
-        this._booleanOptions.bool_dep = false;
-        this._booleanOptions.bool_emp = false;
-        this.activar_seleccion = true;
-        this.plan_multiple = false;
-        this.auto_individual = true;
+      case 'c':
+        this.ControlarOpciones(true, false, false);
+        this.ControlarBotones(true, false, true);
+        this.selectionEmp.clear();
+        this.selectionDep.clear();
         break;
-      case 2:
-        this._booleanOptions.bool_suc = false;
-        this._booleanOptions.bool_dep = true;
-        this._booleanOptions.bool_emp = false;
-        this.activar_seleccion = true;
-        this.plan_multiple = false;
-        this.auto_individual = true;
+      case 'd':
+        this.ControlarOpciones(false, true, false);
+        this.ControlarBotones(true, false, true);
+        this.selectionEmp.clear();
+        this.selectionCarg.clear();
         break;
-      case 3:
-        this._booleanOptions.bool_suc = false;
-        this._booleanOptions.bool_dep = false;
-        this._booleanOptions.bool_emp = true;
-        this.activar_seleccion = true;
-        this.plan_multiple = false;
-        this.auto_individual = true;
+      case 'e':
+        this.ControlarOpciones(false, false, true);
+        this.ControlarBotones(true, false, true);
+        this.selectionDep.clear();
+        this.selectionCarg.clear();
         break;
       default:
-        this._booleanOptions.bool_suc = false;
-        this._booleanOptions.bool_dep = false;
-        this._booleanOptions.bool_emp = false;
-        this.activar_seleccion = true;
-        this.plan_multiple = false;
-        this.auto_individual = true;
+        this.ControlarOpciones(false, false, false);
+        this.ControlarBotones(true, false, true);
+        this.selectionEmp.clear();
+        this.selectionDep.clear();
+        this.selectionCarg.clear();
         break;
     }
     this.restR.GuardarFormCriteriosBusqueda(this._booleanOptions);
@@ -194,10 +216,23 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
   }
 
+  // METODO PARA CONTROLAR VISTA DE BOTONES
+  ControlarBotones(seleccion: boolean, multiple: boolean, individual: boolean) {
+    this.activar_seleccion = seleccion;
+    this.plan_multiple = multiple;
+    this.auto_individual = individual;
+  }
+
+  ControlarOpciones(cargo: boolean, departamento: boolean, empleado: boolean,) {
+    this._booleanOptions.bool_cargo = cargo;
+    this._booleanOptions.bool_dep = departamento;
+    this._booleanOptions.bool_emp = empleado;
+  }
+
   // METODO PARA FILTRAR DATOS DE BUSQUEDA
   Filtrar(e: any, orden: number) {
     switch (orden) {
-      case 1: this.restR.setFiltroNombreSuc(e); break;
+      case 1: this.restR.setFiltroNombreCarg(e); break;
       case 2: this.restR.setFiltroNombreDep(e); break;
       case 3: this.restR.setFiltroCodigo(e); break;
       case 4: this.restR.setFiltroCedula(e); break;
@@ -214,14 +249,14 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   empleados: any = [];
   origen: any = [];
 
-  selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
+  selectionCarg = new SelectionModel<ITableEmpleados>(true, []);
   selectionDep = new SelectionModel<ITableEmpleados>(true, []);
   selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
 
-  // ITEMS DE PAGINACION DE LA TABLA SUCURSAL
-  pageSizeOptions_suc = [5, 10, 20, 50];
-  tamanio_pagina_suc: number = 5;
-  numero_pagina_suc: number = 1;
+  // ITEMS DE PAGINACION DE LA TABLA CARGO
+  pageSizeOptions_car = [5, 10, 20, 50];
+  tamanio_pagina_car: number = 5;
+  numero_pagina_car: number = 1;
 
   // ITEMS DE PAGINACION DE LA TABLA DEPARTAMENTO
   pageSizeOptions_dep = [5, 10, 20, 50];
@@ -233,7 +268,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   tamanio_pagina_emp: number = 5;
   numero_pagina_emp: number = 1;
 
-  get filtroNombreSuc() { return this.restR.filtroNombreSuc }
+  get filtroNombreCarg() { return this.restR.filtroNombreCarg }
 
   get filtroNombreDep() { return this.restR.filtroNombreDep }
 
@@ -249,24 +284,24 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
    ** ************************************************************************************** **/
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
-  isAllSelectedSuc() {
-    const numSelected = this.selectionSuc.selected.length;
-    return numSelected === this.sucursales.length
+  isAllSelectedCarg() {
+    const numSelected = this.selectionCarg.selected.length;
+    return numSelected === this.cargos.length
   }
 
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
-  masterToggleSuc() {
-    this.isAllSelectedSuc() ?
-      this.selectionSuc.clear() :
-      this.sucursales.forEach(row => this.selectionSuc.select(row));
+  masterToggleCarg() {
+    this.isAllSelectedCarg() ?
+      this.selectionCarg.clear() :
+      this.cargos.forEach(row => this.selectionCarg.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
-  checkboxLabelSuc(row?: ITableEmpleados): string {
+  checkboxLabelCarg(row?: ITableEmpleados): string {
     if (!row) {
-      return `${this.isAllSelectedSuc() ? 'select' : 'deselect'} all`;
+      return `${this.isAllSelectedCarg() ? 'select' : 'deselect'} all`;
     }
-    return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+    return `${this.selectionCarg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
@@ -312,30 +347,30 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   }
 
   ManejarPaginaResultados(e: PageEvent) {
-    if (this._booleanOptions.bool_suc === true) {
-      this.tamanio_pagina_suc = e.pageSize;
-      this.numero_pagina_suc = e.pageIndex + 1;
-    } else if (this._booleanOptions.bool_dep === true) {
+    if (this._booleanOptions.bool_cargo === true) {
+      this.tamanio_pagina_car = e.pageSize;
+      this.numero_pagina_car = e.pageIndex + 1;
+    }
+    else if (this._booleanOptions.bool_dep === true) {
       this.tamanio_pagina_dep = e.pageSize;
       this.numero_pagina_dep = e.pageIndex + 1;
-    } else if (this._booleanOptions.bool_emp === true) {
+    }
+    else if (this._booleanOptions.bool_emp === true) {
       this.tamanio_pagina_emp = e.pageSize;
       this.numero_pagina_emp = e.pageIndex + 1;
     }
   }
 
   // METODO PARA MOSTRAR DATOS DE SUCURSALES
-  ModelarSucursal(id: number) {
+  ModelarCargo(id: number) {
     let usuarios: any = [];
-    let respuesta = JSON.parse(this.origen)
+    let respuesta = JSON.parse(this.origen_cargo)
     if (id === 0) {
       respuesta.forEach((obj: any) => {
-        this.selectionSuc.selected.find(obj1 => {
-          if (obj.id_suc === obj1.id) {
-            obj.departamentos.forEach((obj2: any) => {
-              obj2.empleado.forEach((obj3: any) => {
-                usuarios.push(obj3)
-              })
+        this.selectionCarg.selected.find(obj1 => {
+          if (obj.id_cargo === obj1.id) {
+            obj.empleados.forEach((obj3: any) => {
+              usuarios.push(obj3)
             })
           }
         })
@@ -343,11 +378,9 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     }
     else {
       respuesta.forEach((obj: any) => {
-        if (obj.id_suc === id) {
-          obj.departamentos.forEach((obj2: any) => {
-            obj2.empleado.forEach((obj3: any) => {
-              usuarios.push(obj3)
-            })
+        if (obj.id_cargo === id) {
+          obj.empleados.forEach((obj3: any) => {
+            usuarios.push(obj3)
           })
         }
       })
@@ -409,23 +442,24 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
   // METODO PARA ABRI VENTANA DE ASIGNACION DE HORARIO
   idCargo: any;
+  data_horario: any = [];
   PlanificarIndividual(usuario: any): void {
-    this.ventana.open(RegistoEmpleadoHorarioComponent,
-      {
-        width: '600px', data: {
-          idEmpleado: usuario.id, idCargo: usuario.id_cargo,
-          horas_trabaja: usuario.hora_trabaja
-        }
-      }).afterClosed().subscribe(item => {
-        this.auto_individual = true;
-        this.LimpiarFormulario();
-      });
+    this.seleccionar = false;
+    this.ventana_horario = true;
+
+    this.data_horario = {
+      pagina: 'rango_fecha',
+      codigo: usuario.codigo,
+      idCargo: usuario.id_cargo,
+      idEmpleado: usuario.id,
+      horas_trabaja: usuario.hora_trabaja,
+    }
   }
 
   // METODO DE VALIDACION DE SELECCION MULTIPLE
   PlanificarMultiple(data: any) {
+    console.log('ver respuesta ', data)
     if (data.length > 0) {
-      this.CerrarTabla();
       this.Planificar(data);
     }
     else {
@@ -436,28 +470,36 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   }
 
   // METODO PARA INGRESAR PLANIFICACION DE HORARIOS A VARIOS EMPLEADOS
+  seleccionados: any = [];
   Planificar(seleccionados: any) {
-    // VENTANA PARA INGRESAR DATOS DE HORARIOS MULTIPLES 
-    this.ventana.open(HorariosMultiplesComponent,
-      { width: '600px', data: { datos: seleccionados } })
-      .afterClosed().subscribe(item => {
-        this.auto_individual = true;
-        this.LimpiarFormulario();
-        if (item) {
-          if (item.length != 0) {
-            this.no_asignados = true;
-            this.empleados_sin_asignacion = item
+    if (seleccionados.length === 1) {
+      this.PlanificarIndividual(seleccionados[0]);
+    } else {
+      this.seleccionados = seleccionados;
+      this.seleccionar = false;
+      this.asignar = true;
+      // VENTANA PARA INGRESAR DATOS DE HORARIOS MULTIPLES 
+      /*this.ventana.open(HorariosMultiplesComponent,
+        { width: '600px', data: { datos: seleccionados } })
+        .afterClosed().subscribe(item => {
+          this.auto_individual = true;
+          this.LimpiarFormulario();
+          if (item) {
+            if (item.length != 0) {
+              this.no_asignados = true;
+              this.empleados_sin_asignacion = item
+            }
           }
-        }
-      });
+        });*/
+    }
   }
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
   GuardarRegistros(id: number) {
-    if (this.opcion === 1) {
-      this.ModelarSucursal(id);
+    if (this.opcion === 'c') {
+      this.ModelarCargo(id);
     }
-    else if (this.opcion === 2) {
+    else if (this.opcion === 'd') {
       this.ModelarDepartamentos(id);
     }
     else {
@@ -467,15 +509,15 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
   // METODO PARA MOSTRAR METODOS DE CONSULTAS
   MostrarLista() {
-    if (this.opcion === 1) {
-      this.nombre_suc.reset();
+    if (this.opcion === 'c') {
+      this.nombre_carg.reset();
       this.Filtrar('', 1)
     }
-    else if (this.opcion === 2) {
+    else if (this.opcion === 'd') {
       this.nombre_dep.reset();
       this.Filtrar('', 2)
     }
-    else if (this.opcion === 3) {
+    else if (this.opcion === 'e') {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();
@@ -503,10 +545,10 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       this.selectionDep.clear();
     }
 
-    if (this._booleanOptions.bool_suc) {
-      this.nombre_suc.reset();
-      this._booleanOptions.bool_suc = false;
-      this.selectionSuc.clear();
+    if (this._booleanOptions.bool_cargo) {
+      this._booleanOptions.bool_cargo = false;
+      this.selectionCarg.deselect();
+      this.selectionCarg.clear();
     }
 
     this.seleccion.reset();
@@ -522,15 +564,5 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     return this.validar.IngresarSoloNumeros(evt);
   }
 
-  CerrarTabla() {
-    this.no_asignados = false;
-    this.empleados_sin_asignacion = [];
-  }
-
-  // METODO PARA MANEJO DE PAGINAS EN TABLAS DE EMPLEADOS SIN ASIGNACION
-  ManejarPaginaH(e: PageEvent) {
-    this.tamanio_pagina_h = e.pageSize;
-    this.numero_pagina_h = e.pageIndex + 1;
-  }
 
 }

@@ -205,7 +205,7 @@ class DetallePlanHorarioControlador {
                         accion = element.minu_espera;
                     }
                     var estado = null;
-                    yield database_1.default.query('INSERT INTO plan_general (fec_hora_horario, maxi_min_espera, estado, id_det_horario, ' +
+                    yield database_1.default.query('INSERT INTO plan_general (fec_hora_horario, tolerancia, estado, id_det_horario, ' +
                         'fec_horario, id_empl_cargo, tipo_entr_salida, codigo, id_horario) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)', [fecha_inicio_actividades + ' ' + element.hora, accion, estado, element.id,
                         fecha_inicio_actividades, CARGO.rows[0]['max'], element.tipo_accion, codigo, HORARIO.rows[0]['id']]);
                 }));

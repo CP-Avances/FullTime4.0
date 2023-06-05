@@ -15,6 +15,8 @@ class UsuarioRutas {
         this.router.post('/', TokenValidation, USUARIO_CONTROLADOR.CrearUsuario);
         // METODO DE BUSQUEDA DE DATOS DE USUARIO
         this.router.get('/datos/:id_empleado', TokenValidation, USUARIO_CONTROLADOR.ObtenerDatosUsuario);
+        // METODO DE BUSQUEDA DE DATOS DE USUARIO POR EL TIPO DE DEPARTAMENTO
+        this.router.get('/dato/:id_empleado', TokenValidation, USUARIO_CONTROLADOR.ObtenerDepartamentoUsuarios);
         // METODO PARA ACTUALIZAR DATOS DE USUARIO
         this.router.put('/actualizarDatos', TokenValidation, USUARIO_CONTROLADOR.ActualizarUsuario);
         // METODO PARA REGISTRAR ACCESOS AL SISTEMA

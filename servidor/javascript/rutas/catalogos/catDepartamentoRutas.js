@@ -16,6 +16,8 @@ class DepartamentoRutas {
         this.router.post('/', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.CrearDepartamento);
         // BUSCAR DEPARTAMENTOS POR ID SUCURSAL
         this.router.get('/sucursal-departamento/:id_sucursal', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ObtenerDepartamentosSucursal);
+        // BUSCAR DEPARTAMENTO POR ID
+        this.router.get('/infodepartamento/:id', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ObtenerDepartamento);
         // BUSCAR DEPARTAMENTOS POR ID SUCURSAL Y EXCLUIR DEPARTAMENTO ACTUALIZADO
         this.router.get('/sucursal-departamento-edicion/:id_sucursal/:id', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ObtenerDepartamentosSucursal_);
         // ACTUALIZAR DEPARTAMENTO
@@ -30,6 +32,16 @@ class DepartamentoRutas {
         this.router.post('/xmlDownload/', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.FileXML);
         // METODO PARA DESCARGAR ARCHIVO XML
         this.router.get('/download/:nameXML', catDepartamentoControlador_1.default.downloadXML);
+        // REGISTRAR NIVELDEPARTAMENTO
+        this.router.post('/crearnivel', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.crearNivelDepa);
+        // BUSCAR NIVEL DEPARTAMENTO POR ID_DEPARTAMENTO Y ID_SUCURSAL
+        this.router.get('/infoniveldepa/:id_departamento/:id_establecimiento', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ObtenerNivelesDepa);
+        // ACTUALIZAR NIVEL DEPARTAMENTO
+        this.router.put('/actualizanivel/:id', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ActualizarNivelDepartamento);
+        // METODO PARA ELIMINAR REGISTRO NIVEL DEPARTAMENTO 
+        this.router.delete('/eliminarniveldepa/:id', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.EliminarRegistroNivelDepa);
+        // ACTUALIZAR NIVEL DEPARTAMENTO TABLA NIVEL_JERARQUICO
+        this.router.put('/nivelactualizar/:id', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ActualizarNivelDepa);
         this.router.get('/nombreDepartamento', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ListarNombreDepartamentos);
         this.router.get('/idDepartamento/:nombre', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ListarIdDepartamentoNombre);
         this.router.get('/:id', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ObtenerUnDepartamento);

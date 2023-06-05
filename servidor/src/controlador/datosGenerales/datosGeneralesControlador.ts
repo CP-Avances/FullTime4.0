@@ -35,7 +35,7 @@ class DatosGeneralesControlador {
             `
             SELECT s.id AS id_suc, s.nombre AS name_suc, c.descripcion AS ciudad FROM sucursales AS s, 
                 ciudades AS c 
-            WHERE s.id_ciudad = c.id ORDER BY s.id
+            WHERE s.id_ciudad = c.id ORDER BY s.id ASC
             `
         ).then((result: any) => { return result.rows });
 
@@ -139,6 +139,91 @@ class DatosGeneralesControlador {
         return res.status(200).jsonp(respuesta);
     }
 
+
+    /**
+     * METODO DE CONSULTA DE DATOS GENERALES DE USUARIOS
+     * REALIZA UN ARRAY DE CARGOS Y EMPLEADOS DEPENDIENDO DEL ESTADO DEL 
+     * EMPLEADO SI BUSCA EMPLEADOS ACTIVOS O INACTIVOS. 
+     * @returns Retorna Array de [Cargos[empleados[]]]
+     **/
+
+    public async DatosGeneralesCargo(req: Request, res: Response) {
+        let estado = req.params.estado;
+
+        // CONSULTA DE BUSQUEDA DE CARGOS
+        let cargo = await pool.query(
+            `
+            SELECT tc.id AS id_cargo, tc.cargo AS name_cargo
+            FROM tipo_cargo AS tc 
+            ORDER BY tc.cargo ASC
+            `
+        ).then((result: any) => { return result.rows });
+
+        if (cargo.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+
+        // CONSULTA DE BUSQUEDA DE EMPLEADOS
+        let empleados = await Promise.all(cargo.map(async (empl: any) => {
+            if (estado === '1') {
+                empl.empleados = await pool.query(
+                    `
+                    SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
+                        e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo,
+                        co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
+                        d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
+                        s.nombre AS sucursal, ca.hora_trabaja
+                    FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
+                        tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s
+                    WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
+                        da.id = e.id) 
+                        AND tc.id = ca.cargo
+                        AND ca.cargo = $1
+                        AND ca.id_departamento = d.id
+                        AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
+                        da.id = e.id) 
+                        AND s.id = d.id_sucursal
+                        AND co.id_regimen = r.id AND e.estado = $2
+                    ORDER BY name_empleado ASC
+                    `
+                    , [empl.id_cargo, estado]
+
+                ).then((result: any) => { return result.rows });
+            }
+            else {
+                empl.empleados = await pool.query(
+                    `
+                    SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
+                        e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo,
+                        co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
+                        d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
+                        s.nombre AS sucursal, ca.fec_final, ca.hora_trabaja
+                    FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
+                        tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s
+                    WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
+                        da.id = e.id) 
+                        AND tc.id = ca.cargo
+                        AND ca.cargo = $1
+                        AND ca.id_departamento = d.id
+                        AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
+                        da.id = e.id) 
+                        AND s.id = d.id_sucursal
+                        AND co.id_regimen = r.id AND e.estado = $2
+                    ORDER BY name_empleado ASC
+                    `,
+                    [empl.id_cargo, estado])
+                    .then((result: any) => { return result.rows });
+            }
+            return empl;
+        }));
+
+        let respuesta = empleados.filter((obj: any) => {
+            return obj.empleados.length > 0
+        });
+
+        if (respuesta.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+
+        return res.status(200).jsonp(respuesta);
+    }
+
     // METODO PARA LISTAR DATOS ACTUALES DEL USUARIO
     public async ListarDatosActualesEmpleado(req: Request, res: Response) {
         const DATOS = await pool.query(
@@ -192,25 +277,22 @@ class DatosGeneralesControlador {
         const { objeto, depa_user_loggin } = req.body;
 
         const permiso = objeto
-        console.log(permiso);
-
         const JefesDepartamentos = await pool.query(
             `
-            SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc,
-                cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato,
-                e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname , e.cedula, e.correo,
-                c.permiso_mail, c.permiso_noti, c.vaca_mail, c.vaca_noti, c.hora_extra_mail, 
-                c.hora_extra_noti, c.comida_mail, c.comida_noti
-            FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-                sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-            WHERE da.id_departamento = $1 AND 
-                da.id_empl_cargo = ecr.id AND 
-                da.id_departamento = cg.id AND
-                da.estado = true AND 
-                cg.id_sucursal = s.id AND
-                ecr.id_empl_contrato = ecn.id AND
-                ecn.id_empleado = e.id AND
-                e.id = c.id_empleado
+            SELECT da.id, da.estado, n.id_departamento as id_dep, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel, 
+                n.id_establecimiento AS id_suc, n.departamento, s.nombre AS sucursal, da.id_empl_cargo as cargo, 
+                dae.id_contrato as contrato, da.id_empleado AS empleado, (dae.nombre || ' ' || dae.apellido) as fullname,
+                dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti, c.vaca_mail, c.vaca_noti, c.hora_extra_mail, 
+                c.hora_extra_noti, c.comida_mail, c.comida_noti 
+            FROM nivel_jerarquicodep AS n, depa_autorizaciones AS da, datos_actuales_empleado AS dae,
+                config_noti AS c, cg_departamentos AS cg, sucursales AS s
+            WHERE n.id_departamento = $1
+                AND da.id_departamento = n.id_dep_nivel
+                AND dae.id_cargo = da.id_empl_cargo
+                AND dae.id_contrato = c.id_empleado
+                AND cg.id = $1
+                AND s.id = n.id_establecimiento
+            ORDER BY nivel ASC
             `
             ,
             [depa_user_loggin]).then((result: any) => { return result.rows });
@@ -220,34 +302,30 @@ class DatosGeneralesControlador {
                 message: `Ups!!! algo salio mal. 
             Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.` });
 
-        const [obj] = JefesDepartamentos;
-        let depa_padre = obj.depa_padre;
+        const obj = JefesDepartamentos[JefesDepartamentos.length - 1];
+        let depa_padre = obj.id_dep_nivel;
         let JefeDepaPadre;
 
         if (depa_padre !== null) {
-            do {
-                JefeDepaPadre = await pool.query(
-                    `
-                    SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, 
-                        cg.nivel, s.id AS id_suc, cg.nombre AS departamento, s.nombre AS sucursal, 
-                        ecr.id AS cargo, ecn.id AS contrato, e.id AS empleado, 
-                        (e.nombre || ' ' || e.apellido) as fullname, e.cedula, e.correo, c.permiso_mail, 
-                        c.permiso_noti, c.vaca_mail, c.vaca_noti, c.hora_extra_mail, 
-                        c.hora_extra_noti, c.comida_mail, c.comida_noti
-                    FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-                        sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-                    WHERE da.id_departamento = $1 AND da.id_empl_cargo = ecr.id AND 
-                        da.id_departamento = cg.id AND 
-                        da.estado = true AND cg.id_sucursal = s.id AND ecr.id_empl_contrato = ecn.id AND 
-                        ecn.id_empleado = e.id AND e.id = c.id_empleado
-                    `
-                    , [depa_padre]);
 
-                depa_padre = JefeDepaPadre.rows[0].depa_padre;
+            /*JefeDepaPadre = await pool.query(
+                `
+                SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, 
+                    cg.nivel, s.id AS id_suc, cg.nombre AS departamento, s.nombre AS sucursal, 
+                    ecr.id AS cargo, ecn.id AS contrato, e.id AS empleado, 
+                    (e.nombre || ' ' || e.apellido) as fullname, e.cedula, e.correo, c.permiso_mail, 
+                    c.permiso_noti, c.vaca_mail, c.vaca_noti, c.hora_extra_mail, 
+                    c.hora_extra_noti, c.comida_mail, c.comida_noti
+                FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
+                    sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
+                WHERE da.id_departamento = $1 AND da.id_empl_cargo = ecr.id AND 
+                    da.id_departamento = cg.id AND 
+                    da.estado = true AND cg.id_sucursal = s.id AND ecr.id_empl_contrato = ecn.id AND 
+                    ecn.id_empleado = e.id AND e.id = c.id_empleado
+                `
+                , [depa_padre]);*/
+            //JefesDepartamentos.push(JefeDepaPadre.rows[0]);
 
-                JefesDepartamentos.push(JefeDepaPadre.rows[0]);
-
-            } while (depa_padre !== null);
             permiso.EmpleadosSendNotiEmail = JefesDepartamentos
             return res.status(200).jsonp(permiso);
 

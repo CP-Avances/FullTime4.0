@@ -18,6 +18,8 @@ import { EditarEstadoVacacionAutoriacionComponent } from 'src/app/componentes/au
 import { VacacionAutorizacionesComponent } from 'src/app/componentes/autorizaciones/vacacion-autorizaciones/vacacion-autorizaciones.component';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
   selector: 'app-ver-vacacion',
@@ -48,6 +50,9 @@ export class VerVacacionComponent implements OnInit {
   ocultar: boolean = false;
   estado: boolean = false;
 
+  ArrayAutorizacionTipos: any = []
+  gerencia: boolean = false;
+
   constructor(
     public restGeneral: DatosGeneralesService, // SERVICIO DE DATOS GENERALES DE EMPLEADO
     public restEmpre: EmpresaService, // SERVICIO DE DATOS DE EMPRESA
@@ -58,6 +63,8 @@ export class VerVacacionComponent implements OnInit {
     private restA: AutorizacionService, // SERVICIO DE DATOS DE AUTORIZACIÓN
     private restV: VacacionesService, // SERVICIO DE DATOS DE SOLICITUD DE VACACIONES
     private parametro: ParametrosService,
+    public restAutoriza: AutorizaDepartamentoService, //SERVICIO DE DATOS DE AUTORIZACION POR EL EMPLEADO
+    public usuarioDepa: UsuarioService, //SERVICIO DE DATOS DE DEPARTAMENTO POR EL USUARIO DE LA SOLICITUD
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.id_vacacion = this.router.url.split('/')[2];
@@ -93,6 +100,12 @@ export class VerVacacionComponent implements OnInit {
       vacio => {
         this.BuscarDatos(this.formato_fecha);
       });
+
+    this.restAutoriza.BuscarAutoridadEmpleado(this.idEmpleado).subscribe(
+      (res) => {
+        this.ArrayAutorizacionTipos = res;
+      }
+    );
   }
 
   // VARIABE DE ALMACENAMIENTO DE DATOS DE COLABORADORES QUE REVISARON SOLICITUD
@@ -106,9 +119,19 @@ export class VerVacacionComponent implements OnInit {
     // BUSQUEDA DE DATOS DE VACACIONES
     this.restV.ObtenerUnaVacacion(parseInt(this.id_vacacion)).subscribe(res => {
       this.vacacion = res;
-      console.log('ver data ... ', this.vacacion);
-
       this.id_solicitud = this.vacacion[0].id;
+
+      console.log('ver data ... ', this.vacacion);
+      console.log("vacacion[0].estado: ",this.vacacion[0].estado);
+      this.ObtenerAutorizacion(this.vacacion[0].id);
+
+      if(this.vacacion[0].estado > 1){
+        this.estado = true;
+      }else{
+        this.estado = false;
+      }
+
+      
 
       this.vacacion.forEach(v => {
         // TRATAMIENTO DE FECHAS Y HORAS 
@@ -119,17 +142,30 @@ export class VerVacacionComponent implements OnInit {
 
       if(this.idEmpleado == this.vacacion[0].id_empleado){
         this.ocultar = true;
+      }if(this.vacacion[0].estado >= 3){
+        return this.ocultar = true;
       }else{
-        this.ocultar = false;
+        this.usuarioDepa.ObtenerDepartamentoUsuarios(this.vacacion[0].id_empleado).subscribe((usuaDep) => {
+          this.ArrayAutorizacionTipos.filter(x => {
+            if((x.nom_depar == 'GERENCIA') && (x.estado == true)){
+              this.gerencia = true;
+              if(this.vacacion[0].estado == 2 && x.preautorizar == true){
+                return this.ocultar = true;
+              }else {
+                return this.ocultar = false;
+              }
+            }else if((this.gerencia == false) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
+              if(this.vacacion[0].estado == 2 && x.autorizar == true){
+                return this.ocultar = false;
+              }else if(this.vacacion[0].estado == 1 && x.preautorizar == true){
+                return this.ocultar = false;
+              }else{
+                return this.ocultar = true;
+              }
+            }
+          })
+        })
       }
-
-      if(this.vacacion[0].estado > 1){
-        this.estado = true;
-      }else{
-        this.estado = false;
-      }
-
-      this.ObtenerAutorizacion(this.vacacion[0].id);
     });
 
     this.ObtenerEmpleados(this.idEmpleado);
@@ -158,10 +194,10 @@ export class VerVacacionComponent implements OnInit {
             estado_auto = 'Pendiente';
           }
           if (estado_auto === '2') {
-            estado_auto = 'Preautorización';
+            estado_auto = 'Preautorizado';
           }
           if (estado_auto === '3') {
-            estado_auto = 'Autorización';
+            estado_auto = 'Autorizado';
           }
           if (estado_auto === '4') {
             estado_auto = 'Permiso Negado';
@@ -242,26 +278,25 @@ export class VerVacacionComponent implements OnInit {
         var fecha_inicio = moment(this.datoSolicitud[0].fec_inicio);
         // METODO PARA VER DÍAS DISPONIBLES DE AUTORIZACIÓN
         console.log(fecha_inicio.diff(this.fechaActual, 'days'), ' dias de diferencia ' + res[0].dias_cambio);
-        if (res[0].cambios === true) {
-          if (res[0].cambios === 0) {
-            this.habilitarActualizar = false;
-          }
-          else {
-            var dias = fecha_inicio.diff(this.fechaActual, 'days');
-            if (dias >= res[0].dias_cambio) {
-              this.habilitarActualizar = true;
-            }
-            else {
+        if(this.vacacion[0].estado > 2){
+          this.habilitarActualizar = false;
+        }else{
+          if (res[0].cambios === true) {
+            if (res[0].cambios === 0) {
               this.habilitarActualizar = false;
             }
+            else {
+              var dias = fecha_inicio.diff(this.fechaActual, 'days');
+              if (dias >= res[0].dias_cambio) {
+                this.habilitarActualizar = true;
+              }
+              else {
+                this.habilitarActualizar = false;
+              }
+            }
           }
-        } else {
-          this.habilitarActualizar = false;
         }
       });
-
-
-
     })
   }
 
@@ -391,7 +426,26 @@ export class VerVacacionComponent implements OnInit {
             ]
           }],
           [{
-            columns: [{
+            columns: [
+              {
+                columns: [
+                  { width: '*', text: '' },
+                  {
+                    width: 'auto',
+                    layout: 'lightHorizontalLines',
+                    table: {
+                      widths: ['auto'],
+                      body: [
+                        [{ text: this.empleado_estado[0].estado.toUpperCase() + ' POR', style: 'tableHeaderA' },],
+                        [{ text: ' ', style: 'itemsTable', margin: [0, 10, 0, 10] },],
+                        [{ text: this.empleado_estado[0].nombre + '\n' + this.empleado_estado[0].cargo, style: 'itemsTable' },]
+                      ]
+                    }
+                  },
+                  { width: '*', text: '' },
+                ]
+              },
+              {
               columns: [
                 { width: '*', text: '' },
                 {
@@ -401,15 +455,15 @@ export class VerVacacionComponent implements OnInit {
                     widths: ['auto'],
                     body: [
                       [{ text: this.empleado_estado[this.cont - 1].estado.toUpperCase() + ' POR', style: 'tableHeaderA' }],
-                      [{ text: ' ', style: 'itemsTable', margin: [0, 20, 0, 20] }],
+                      [{ text: ' ', style: 'itemsTable', margin: [0, 10, 0, 10] }],
                       [{ text: this.empleado_estado[this.cont - 1].nombre + '\n' + this.empleado_estado[this.cont - 1].cargo, style: 'itemsTable' }]
                     ]
                   }
                 },
                 { width: '*', text: '' },
               ]
-            },
-            {
+              },
+              {
               columns: [
                 { width: '*', text: '' },
                 {
@@ -419,14 +473,14 @@ export class VerVacacionComponent implements OnInit {
                     widths: ['auto'],
                     body: [
                       [{ text: 'EMPLEADO', style: 'tableHeaderA' }],
-                      [{ text: ' ', style: 'itemsTable', margin: [0, 20, 0, 20] }],
+                      [{ text: ' ', style: 'itemsTable', margin: [0, 10, 0, 10] }],
                       [{ text: this.datoSolicitud[0].nombre_emple + ' ' + this.datoSolicitud[0].apellido_emple + '\n' + this.datoSolicitud[0].cargo, style: 'itemsTable' }]
                     ]
                   }
                 },
                 { width: '*', text: '' },
               ]
-            }
+              }
             ]
           }],
         ]

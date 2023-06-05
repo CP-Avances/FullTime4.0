@@ -293,7 +293,7 @@ export class MainNavComponent implements OnInit {
             children: [
               { name: 'Configurar Permisos', url: '/verTipoPermiso', color: true },
               { name: 'Permisos Múltiples', url: '/permisosMultiples', color: true },
-              { name: 'Aprobación Múltiple', url: '/permisos-solicitados', color: true },
+              { name: 'Aprobación Múltiple P', url: '/permisos-solicitados', color: true },
             ]
           },
           {
@@ -313,7 +313,7 @@ export class MainNavComponent implements OnInit {
             subtitulo: true,
             color: true,
             children: [
-              { name: 'Aprobación Múltiple', url: '/vacaciones-solicitados', color: true },
+              { name: 'Aprobación Múltiple V', url: '/vacaciones-solicitados', color: true },
             ]
           },
           {
@@ -336,7 +336,7 @@ export class MainNavComponent implements OnInit {
               { name: 'Configurar HoraExtra', url: '/listaHorasExtras', color: true },
               { name: 'Planificar Hora Extra', url: '/planificaHoraExtra', color: true },
               { name: 'Listar Planificación', url: '/listadoPlanificaciones', color: true },
-              { name: 'Aprobación Múltiple.', url: '/horas-extras-solicitadas', color: true },
+              { name: 'Aprobación Múltiple H', url: '/horas-extras-solicitadas', color: true },
             ]
           },
           {
@@ -358,7 +358,7 @@ export class MainNavComponent implements OnInit {
             children: [
               { name: 'Planificar Servicio', url: '/alimentacion', color: true },
               { name: 'Listar Planificación', url: '/listaPlanComida', color: true },
-              { name: 'Aprobación Múltiple', url: '/listaSolicitaComida', color: true },
+              { name: 'Aprobación Múltiple A', url: '/listaSolicitaComida', color: true },
             ]
           },
           {

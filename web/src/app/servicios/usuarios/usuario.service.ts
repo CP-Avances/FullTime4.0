@@ -25,6 +25,10 @@ export class UsuarioService {
     return this.http.get(`${environment.url}/usuarios/datos/${id}`);
   }
 
+  ObtenerDepartamentoUsuarios(id: number){
+    return this.http.get(`${environment.url}/usuarios/dato/${id}`);
+  }
+
   // METODO PARA ACTUALIZAR REGISTRO DE USUARIO
   ActualizarDatos(data: any) {
     return this.http.put(`${environment.url}/usuarios/actualizarDatos`, data).pipe(

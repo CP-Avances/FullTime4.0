@@ -8,6 +8,7 @@ import * as moment from 'moment';
 import { VacacionesService } from 'src/app/servicios/vacaciones/vacaciones.service';
 import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
+import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
 
 interface Estado {
   id: number,
@@ -22,11 +23,7 @@ interface Estado {
 
 export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
 
-  estados: Estado[] = [
-    { id: 2, nombre: 'Pre-autorizado' },
-    { id: 3, nombre: 'Autorizado' },
-    { id: 4, nombre: 'Negado' },
-  ];
+  estados: Estado[] = [];
 
   // DATOS DEL EMPLEADO QUE INICIA SESION
   idEmpleadoIngresa: number;
@@ -41,6 +38,9 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
   FechaActual: any;
   NotifiRes: any;
 
+  ArrayAutorizacionTipos: any = [];
+  gerencia: boolean = false;
+
   constructor(
     private informacion: DatosGeneralesService,
     private realTime: RealTimeService,
@@ -48,6 +48,7 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
     private restA: AutorizacionService,
     private restV: VacacionesService,
     public ventana: MatDialogRef<EditarEstadoVacacionAutoriacionComponent>,
+    public restAutoriza: AutorizaDepartamentoService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.id_empleado_loggin = parseInt(localStorage.getItem('empleado') as string);
@@ -65,6 +66,39 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
         estadoF: this.data.auto.estado
       });
     }
+
+    this.restAutoriza.BuscarAutoridadEmpleado(this.id_empleado_loggin).subscribe(
+      (res) => {
+        this.ArrayAutorizacionTipos = res;
+        this.ArrayAutorizacionTipos.filter(x => {
+          if(x.nom_depar == 'GERENCIA' && x.estado == true){
+            this.gerencia = true;
+            if(x.autorizar == true){
+              this.estados = [
+                { id: 3, nombre: 'Autorizado' },
+                { id: 4, nombre: 'Negado' }
+              ];
+            }else if(x.preautorizar == true){
+              this.estados = [
+                { id: 2, nombre: 'Pre-autorizado' }
+              ];
+            }
+          }
+          else if((this.gerencia == false) && (this.data.auto.id_departamento == x.id_departamento && x.estado == true)){
+            if(x.autorizar == true){
+              this.estados = [
+                { id: 3, nombre: 'Autorizado' },
+                { id: 4, nombre: 'Negado' }
+              ];
+            }else if(x.preautorizar == true){
+              this.estados = [
+                { id: 2, nombre: 'Pre-autorizado' }
+              ];
+            }
+          }
+        });
+      }
+    );
 
     this.ObtenerTiempo();
     this.obtenerInformacionEmpleado();
@@ -104,6 +138,11 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
       id_documento: this.data.auto.id_documento + localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       estado: form.estadoF,
     }
+
+
+    console.log('aprobacion :) : ',aprobacion);
+    console.log('this.data.auto :) : ',this.data.auto);
+
     this.restA.ActualizarAprobacion(this.data.auto.id, aprobacion).subscribe(res => {
       this.EditarEstadoVacacion(this.data.auto.id_vacacion, form.estadoF);
       this.NotificarAprobacion(form.estadoF);

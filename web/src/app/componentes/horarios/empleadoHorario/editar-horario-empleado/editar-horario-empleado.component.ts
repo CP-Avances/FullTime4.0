@@ -1,7 +1,9 @@
 // IMPORTAR LIBRERIAS
 import * as moment from 'moment';
 import { Router } from '@angular/router';
+import { ThemePalette } from '@angular/material/core';
 import { ToastrService } from 'ngx-toastr';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
@@ -11,8 +13,8 @@ import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCat
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
+import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
 
 @Component({
   selector: 'app-editar-horario-empleado',
@@ -21,6 +23,12 @@ import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriado
 })
 
 export class EditarHorarioEmpleadoComponent implements OnInit {
+
+    // VARIABLES PROGRESS SPINNER
+    progreso: boolean = false;
+    color: ThemePalette = 'primary';
+    mode: ProgressSpinnerMode = 'indeterminate';
+    value = 10;
 
   // VARIABLES DE OPCIONES DE DIAS LIBRES
   lunes = false;
@@ -106,7 +114,7 @@ export class EditarHorarioEmpleadoComponent implements OnInit {
           })
           let datos_horario = [{
             id: hor.id,
-            nombre: '(' + this.hora_entrada + '-' + this.hora_salida + ') ' + hor.nombre
+            nombre: '(' + this.hora_entrada + '-' + this.hora_salida + ') ' + hor.codigo
           }]
           if (this.vista_horarios.length === 0) {
             this.vista_horarios = datos_horario;
@@ -116,7 +124,7 @@ export class EditarHorarioEmpleadoComponent implements OnInit {
         }, error => {
           let datos_horario = [{
             id: hor.id,
-            nombre: hor.nombre
+            nombre: hor.codigo
           }]
           if (this.vista_horarios.length === 0) {
             this.vista_horarios = datos_horario;
@@ -163,7 +171,7 @@ export class EditarHorarioEmpleadoComponent implements OnInit {
     this.restE.BuscarFechaContrato(datosBusqueda).subscribe(response => {
       // VERIFICAR SI LAS FECHAS SON VALIDAS DE ACUERDO A LOS REGISTROS Y FECHAS INGRESADAS
       if (Date.parse(response[0].fec_ingreso.split('T')[0]) < Date.parse(form.fechaInicioForm)) {
-        if (Date.parse(form.fechaInicioForm) < Date.parse(form.fechaFinalForm)) {
+        if (Date.parse(form.fechaInicioForm) <= Date.parse(form.fechaFinalForm)) {
           this.VerificarDuplicidad(form);
         }
         else {
@@ -242,6 +250,7 @@ export class EditarHorarioEmpleadoComponent implements OnInit {
 
   // METODO PARA GUARDAR REGISTROS
   InsertarEmpleadoHorario(form: any) {
+    this.progreso = true;
     let datosempleH = {
       id_empl_cargo: this.data.datosHorario.id_empl_cargo,
       id_horarios: form.horarioForm,
@@ -265,6 +274,7 @@ export class EditarHorarioEmpleadoComponent implements OnInit {
       this.EliminarPlanificacion();
       this.IngresarPlanGeneral(form);
       this.CerrarVentana();
+      this.progreso = false;
     });
   }
 
@@ -309,7 +319,7 @@ export class EditarHorarioEmpleadoComponent implements OnInit {
         start = new Date(newDate);
       }
       var tipo: string = '';
-      
+
       this.fechasHorario.map(obj => {
         // DEFINICION DE TIPO DE DIA SEGUN HORARIO
         tipo = 'N'
@@ -373,21 +383,40 @@ export class EditarHorarioEmpleadoComponent implements OnInit {
         // COLOCAR DETALLE DE DIA SEGUN HORARIO
         this.detalles.map(element => {
           var accion = 0;
+          var nocturno: number = 0;
           if (element.tipo_accion === 'E') {
             accion = element.minu_espera;
           }
+          if (element.segundo_dia === true) {
+            nocturno = 1;
+          }
+          else if (element.tercer_dia === true) {
+            nocturno = 2;
+          }
+          else {
+            nocturno = 0;
+          }
           let plan = {
-            fec_hora_horario: obj + ' ' + element.hora,
-            tipo_entr_salida: element.tipo_accion,
-            maxi_min_espera: accion,
-            id_det_horario: element.id,
-            id_empl_cargo: this.data.datosHorario.id_empl_cargo,
-            fec_horario: obj,
-            id_horario: form.horarioForm,
-            codigo: this.empleado[0].codigo,
+            tipo_dia: tipo,
             estado: form.estadoForm,
-            tipo: tipo,
+            codigo: this.empleado[0].codigo,
+            id_horario: form.horarioForm,
+            fec_horario: obj,
+            id_empl_cargo: this.data.datosHorario.id_empl_cargo,
+            id_det_horario: element.id,
+            tolerancia: accion,
+            salida_otro_dia: nocturno,
+            tipo_entr_salida: element.tipo_accion,
+            fec_hora_horario: obj + ' ' + element.hora,
           };
+          if (element.segundo_dia === true) {
+            plan.fec_horario = moment(obj).add(1, 'd').format('YYYY-MM-DD');
+            plan.fec_hora_horario = moment(obj).add(1, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
+          }
+          if (element.tercer_dia === true) {
+            plan.fec_horario = moment(obj).add(2, 'd').format('YYYY-MM-DD');
+            plan.fec_hora_horario = moment(obj).add(2, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
+          }
           this.restP.CrearPlanGeneral(plan).subscribe(res => {
           })
         })

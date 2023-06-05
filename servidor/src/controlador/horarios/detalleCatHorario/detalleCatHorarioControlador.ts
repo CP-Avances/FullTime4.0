@@ -81,11 +81,12 @@ class DetalleCatalogoHorarioControlador {
             id } = req.body;
         await pool.query(
             `
-            UPDATE deta_horarios SET orden = $1, hora = $2, minu_espera = $3, id_horario = $4,
-            tipo_accion = $5, segundo_dia = $6, tercer_dia = $7, min_antes = $8, min_despues= $9 WHERE id = $10
-            `
+                UPDATE deta_horarios SET orden = $1, hora = $2, minu_espera = $3, id_horario = $4,
+                tipo_accion = $5, segundo_dia = $6, tercer_dia = $7, min_antes = $8, min_despues= $9 WHERE id = $10
+                `
             , [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, id]);
         res.jsonp({ message: 'Registro actualizado.' });
+
     }
 
 

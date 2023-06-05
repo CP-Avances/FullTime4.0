@@ -17,7 +17,7 @@
             <div class="col-md">
                 <div class="d-flex flex-wrap justify-content-around">
                     <mat-form-field>
-                        <mat-label>Nombre de horario</mat-label>
+                        <mat-label>Descripción</mat-label>
                         <input matInput placeholder="Ej: Contabilidad" [formControl]="nombre" required>
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                             matTooltip="Ingresar un nombre de horario.">
@@ -85,11 +85,12 @@
                                             <mat-radio-group aria-labelledby="example-radio-group-label"
                                                 class="contenedor">
                                                 <mat-radio-button class="radio-button" value=1
-                                                    (click)="QuitarArchivo()">Retirar archivo
+                                                    (click)="QuitarArchivo()">
+                                                    Retirar archivo
                                                 </mat-radio-button>
                                                 <mat-radio-button class="radio-button" value=2
-                                                    (click)="ActivarArchivo()">Actualizar
-                                                    archivo
+                                                    (click)="ActivarArchivo()">
+                                                    Actualizar archivo
                                                 </mat-radio-button>
                                             </mat-radio-group>
                                         </div>
@@ -127,7 +128,9 @@
     </form>
     <div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 2%;">
         <button id="btn-raised" class="btn btn-sm" [disabled]="!formulario.valid"
-            (click)="ModificarHorario(formulario.value)" value="Guardar"> Guardar</button>
+            (click)="ModificarHorario(formulario.value)" value="Guardar">
+            Guardar
+        </button>
     </div>
 </div>
 

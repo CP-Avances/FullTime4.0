@@ -42,9 +42,9 @@ mat-panel-description { color: white; }
     margin-left: 10px;
 }
 
-.mat-radio-button~.mat-radio-button {
+.mat-mdc-radio-button ~ .mat-mdc-radio-button {
     margin-left: 16px;
-}
+  }
 
 #plan {
     color: rgb(52, 65, 84);

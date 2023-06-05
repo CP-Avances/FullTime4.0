@@ -143,15 +143,15 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     if (this.bool.bool_suc === false && this.bool.bool_dep === false &&
       this.bool.bool_emp === false && this.bool.bool_inc === false) return this.toastr.warning('Seleccionar criterio de búsqueda.')
     switch (this.opcion) {
-      case 1:
+      case 's':
         if (this.selectionSuc.selected.length === 0) return this.toastr.warning('Seleccionar sucursal o establecimiento.', '')
         this.ModelarSucursal(action);
         break;
-      case 2:
+      case 'd':
         if (this.selectionDep.selected.length === 0) return this.toastr.warning('Seleccionar departamento.', '')
         this.ModelarDepartamento(action);
         break;
-      case 3:
+      case 'e':
         if (this.selectionEmp.selected.length === 0) return this.toastr.warning('Seleccionar empleado.', '')
         this.ModelarTimbresIncompleto(action);
         break;
@@ -641,15 +641,15 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
   }
 
   MostrarLista() {
-    if (this.opcion === 1) {
+    if (this.opcion === 's') {
      /* this.nombre_suc.reset();
       this.Filtrar('', 1)*/
     }
-    else if (this.opcion === 2) {
+    else if (this.opcion === 'd') {
      /* this.nombre_dep.reset();
       this.Filtrar('', 2)*/
     }
-    else if (this.opcion === 3) {
+    else if (this.opcion === 'e') {
      /* this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();

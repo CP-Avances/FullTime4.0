@@ -24,6 +24,21 @@ class DepartamentoControlador {
   }
 
   // METODO PARA BUSCAR LISTA DE DEPARTAMENTOS POR ID SUCURSAL
+  public async ObtenerDepartamento(req: Request, res: Response): Promise<any> {
+    const { id } = req.params;
+    const DEPARTAMENTO = await pool.query(
+      `
+      SELECT * FROM cg_departamentos WHERE id = $1
+      `
+      , [id]);
+    if (DEPARTAMENTO.rowCount > 0) {
+      return res.jsonp(DEPARTAMENTO.rows)
+    }
+    res.status(404).jsonp({ text: 'El departamento no ha sido encontrado' });
+  }
+
+
+  // METODO PARA BUSCAR LISTA DE DEPARTAMENTOS POR ID SUCURSAL
   public async ObtenerDepartamentosSucursal(req: Request, res: Response): Promise<any> {
     const { id_sucursal } = req.params;
     const DEPARTAMENTO = await pool.query(
@@ -189,30 +204,89 @@ class DepartamentoControlador {
     res.sendFile(__dirname.split("servidor")[0] + filePath);
   }
 
+  //METODO PARA CREAR NIVELES JERARQUICOS POR DEPARTAMENTOS
+  public async crearNivelDepa(req: Request, res: Response): Promise<any>{
+    try {
+      const { id_departamento, departamento, nivel, dep_nivel, dep_nivel_nombre, id_establecimiento } = req.body;
+      await pool.query(
+        `
+        INSERT INTO nivel_jerarquicodep (departamento, id_departamento, nivel, dep_nivel_nombre, id_dep_nivel, id_establecimiento ) VALUES ($1, $2, $3, $4, $5, $6)
+        `
+        , [departamento, id_departamento, nivel, dep_nivel_nombre, dep_nivel, id_establecimiento]);
+
+      res.jsonp({ message: 'Registro guardado.' });
+    }
+    catch (error) {
+      return res.jsonp({ message: 'error' });
+    }
+  }
 
 
+  //METODO PARA BUSCAR NIVELES JERARQUICOS POR DEPARTAMENTO
+  public async ObtenerNivelesDepa(req: Request, res: Response): Promise<any>{
+    const { id_departamento, id_establecimiento } = req.params;
+    const NIVELESDEP = await pool.query(
+    `
+    SELECT * FROM nivel_jerarquicodep WHERE id_departamento = $1 AND id_establecimiento = $2 ORDER BY nivel DESC 
+    `
+    , [id_departamento, id_establecimiento]);
+      if (NIVELESDEP.rowCount > 0) {
+      return res.jsonp(NIVELESDEP.rows)
+    }
+    res.status(404).jsonp({ text: 'El departamento no ha sido encontrado' });
+  }
 
+  // ACTUALIZAR REGISTRO DE NIVEL DE DEPARTAMENTO DE TABLA NIVEL_JERARQUICO
+  public async ActualizarNivelDepa(req: Request, res: Response) {
+    try {
+      console.log('nivel: ',req);
+      const {nivel} = req.body;
+      const id = req.params.id;
 
+      console.log('nivel: ',nivel);
+      console.log('id: ',id);
+      await pool.query(
+        `
+        UPDATE nivel_jerarquicodep set nivel = $1 
+        WHERE id = $2
+        `
+        , [nivel, id]);
+      res.jsonp({ message: 'Registro actualizado.' });
+    }
+    catch (error) {
+      return res.jsonp({ message: 'error' });
+    }
+  }
 
+  // ACTUALIZAR REGISTRO  DE NIVEL DE DEPARTAMENTO
+  public async ActualizarNivelDepartamento(req: Request, res: Response) {
+    try {
+      const { depa_padre, nivel} = req.body;
+      const id = req.params.id;
+      await pool.query(
+        `
+        UPDATE cg_departamentos set depa_padre = $1, nivel = $2 
+        WHERE id = $3
+        `
+        , [depa_padre, nivel, id]);
+      res.jsonp({ message: 'Registro actualizado.' });
+    }
+    catch (error) {
+      return res.jsonp({ message: 'error' });
+    }
+  }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  // METODO PARA ELIMINAR REGISTRO DE NIVEL DE DEPARTAMENTO
+  public async EliminarRegistroNivelDepa(req: Request, res: Response): Promise<void> {
+    const id = req.params.id;
+    console.log('datos eliminar: ',id);
+    await pool.query(
+      `
+      DELETE FROM nivel_jerarquicodep WHERE id = $1
+      `
+      , [id]);
+    res.jsonp({ message: 'Registro eliminado.' });
+  }
 
 
 

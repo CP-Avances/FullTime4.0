@@ -97,12 +97,12 @@ export class ListaNotificacionComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.check = this.restR.checkOptions(3);
+        this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
         this.BuscarInformacion();
     }
 
     ngOnDestroy() {
-        this.restR.GuardarCheckOpcion(0);
+        this.restR.GuardarCheckOpcion('');
         this.restR.DefaultFormCriterios();
         this.restR.DefaultValoresFiltros();
         this.origen = [];
@@ -207,7 +207,7 @@ export class ListaNotificacionComponent implements OnInit {
                 break;
         }
         this.restR.GuardarFormCriteriosBusqueda(this._booleanOptions);
-        this.restR.GuardarCheckOpcion(this.opcion)
+        //this.restR.GuardarCheckOpcion(this.opcion)
 
     }
 
