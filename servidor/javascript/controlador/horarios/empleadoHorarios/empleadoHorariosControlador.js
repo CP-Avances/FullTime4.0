@@ -75,15 +75,13 @@ class EmpleadoHorariosControlador {
     VerificarHorariosExistentes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fechaInicio, fechaFinal } = req.body;
-            const { empl_id } = req.params;
+            const { codigo } = req.params;
             const HORARIO = yield database_1.default.query(`
-            SELECT ch.hora_trabajo, eh.fec_inicio, eh.fec_final 
-            FROM empl_horarios AS eh, empleados AS e, cg_horarios AS ch 
-            WHERE ($1 BETWEEN fec_inicio AND fec_final
-                OR $2 BETWEEN fec_inicio AND fec_final OR fec_inicio BETWEEN $1 AND $2 
-                OR fec_final BETWEEN $1 AND $2) AND eh.codigo = e.codigo::int AND e.estado = 1 
-                AND eh.id_horarios = ch.id AND e.id = $3
-            `, [fechaInicio, fechaFinal, empl_id]);
+            SELECT DISTINCT pg.id_horario, ch.hora_trabajo 
+            FROM plan_general AS pg, cg_horarios AS ch
+            WHERE pg.codigo = $3 AND pg.id_horario = ch.id AND
+                (fec_horario BETWEEN $1 AND $2)
+            `, [fechaInicio, fechaFinal, codigo]);
             if (HORARIO.rowCount > 0) {
                 return res.jsonp(HORARIO.rows);
             }
@@ -287,6 +285,24 @@ class EmpleadoHorariosControlador {
             }
             else {
                 return res.status(200).jsonp({ message: 'CASO_4', respuesta: CASO_4 });
+            }
+        });
+    }
+    // VERIFICAR EXISTENCIA DE PLANIFICACION 
+    VerificarFechasHorario(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { fechaInicio, fechaFinal, id_horario } = req.body;
+            const { codigo } = req.params;
+            const HORARIO = yield database_1.default.query(`
+            SELECT id FROM plan_general 
+            WHERE codigo = $3 AND id_horario = $4 AND
+                (fec_horario BETWEEN $1 AND $2) LIMIT 4
+            `, [fechaInicio, fechaFinal, codigo, id_horario]);
+            if (HORARIO.rowCount > 0) {
+                return res.jsonp(HORARIO.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registros no encontrados' });
             }
         });
     }
@@ -555,7 +571,7 @@ class EmpleadoHorariosControlador {
                             accion = element.minu_espera;
                         }
                         var estado = null;
-                        yield database_1.default.query('INSERT INTO plan_general (fec_hora_horario, maxi_min_espera, estado, id_det_horario, ' +
+                        yield database_1.default.query('INSERT INTO plan_general (fec_hora_horario, tolerancia, estado, id_det_horario, ' +
                             'fec_horario, id_empl_cargo, tipo_entr_salida, codigo, id_horario) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)', [obj + ' ' + element.hora, accion, estado, element.id,
                             obj, CARGO.rows[0]['max'], element.tipo_accion, codigo, HORARIO.rows[0]['id']]);
                     }));
@@ -606,23 +622,6 @@ class EmpleadoHorariosControlador {
                 'ON dec.cargo_id = eh.id_empl_cargo AND dec.codigo = $1 AND dec.estado_empl = 1 ' +
                 'AND (eh.fec_inicio BETWEEN $2 AND $3 OR ' +
                 'eh.fec_final BETWEEN $2 AND $3)', [id_empleado, fechaInicio, fechaFinal]);
-            if (HORARIO.rowCount > 0) {
-                return res.jsonp(HORARIO.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'Registros no encontrados' });
-            }
-        });
-    }
-    VerificarFechasHorario(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { fechaInicio, fechaFinal, id_horario } = req.body;
-            const { empl_id } = req.params;
-            const HORARIO = yield database_1.default.query('SELECT * FROM datos_empleado_cargo AS dc INNER JOIN ' +
-                '(SELECT * FROM empl_horarios WHERE ($1 BETWEEN fec_inicio AND fec_final ' +
-                'OR $2 BETWEEN fec_inicio AND fec_final OR fec_inicio BETWEEN $1 AND $2 ' +
-                'OR fec_final BETWEEN $1 AND $2) AND id_horarios = $4) AS h ' +
-                'ON h.id_empl_cargo = dc.cargo_id  AND dc.empl_id = $3 AND dc.estado_empl = 1', [fechaInicio, fechaFinal, empl_id, id_horario]);
             if (HORARIO.rowCount > 0) {
                 return res.jsonp(HORARIO.rows);
             }

@@ -12,8 +12,7 @@
                 <div class="nota">
                     <span>
                         NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el
-                        botón
-                        Guardar.
+                        botón Guardar.
                     </span>
                 </div>
                 <div class="row">
@@ -45,7 +44,7 @@
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Lista de horarios cargados en el sistema.">
                                 help_outline</mat-icon>
-                            <mat-select [formControl]="horarioF" required >
+                            <mat-select [formControl]="horarioF" required>
                                 <mat-option *ngFor="let h of vista_horarios" [value]="h.id" id="letra"
                                     (click)=VerificarIngresoFechas(formulario.value) [disabled]="registrar">
                                     {{h.nombre}}
@@ -70,7 +69,8 @@
                                         <label id="textoradiobtn">Martes</label>
                                     </mat-checkbox>
                                     <br>
-                                    <mat-checkbox [formControl]="miercolesF" [(ngModel)]="miercoles" [disabled]="registrar">
+                                    <mat-checkbox [formControl]="miercolesF" [(ngModel)]="miercoles"
+                                        [disabled]="registrar">
                                         <label id="textoradiobtn">Miércoles</label>
                                     </mat-checkbox>
                                     <br>
@@ -98,24 +98,29 @@
             </div>
         </mat-card-content>
     </form>
-    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;" *ngIf="validar">
+    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
         <button id="btn-raised" class="btn btn-sm" (click)="ValidarSeleccionados(formulario.value)"
-            [disabled]="!formulario.valid">
+            [disabled]="!formulario.valid" *ngIf="validar">
             Validar
         </button>
-    </div>
-    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;" *ngIf="cancelar">
-        <button id="btn-raised" class="btn btn-sm" (click)="CerrarTabla()">
+        <button id="btn-raised" class="btn btn-sm" *ngIf="btn_eliminar_todo"
+            (click)="EliminarRegistros(formulario.value, 1)">
+            Eliminar
+        </button>
+        <button id="btn-raised" class="btn btn-sm" (click)="CerrarTabla()" *ngIf="cancelar">
             Cancelar
         </button>
     </div>
 </mat-card>
 <div style="margin: 25px 0px 25px 0px; text-align: center;" *ngIf="observaciones">
     <mat-card class="example-card mat-elevation-z8">
-        <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;"
-            *ngIf="guardar">
-            <button id="btn-raised" class="btn btn-sm" (click)="InsertarEmpleadoHorario(formulario.value)">
+        <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
+            <button id="btn-raised" class="btn btn-sm" (click)="InsertarEmpleadoHorario()" *ngIf="guardar">
                 Guardar
+            </button>
+            <button id="btn-raised" class="btn btn-sm" *ngIf="btn_eliminar"
+                (click)="EliminarRegistros(formulario.value, 2)">
+                Eliminar
             </button>
         </div>
         <div class="d-flex bd-highlight" id="titulo">
@@ -163,7 +168,6 @@
     <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
     </mat-progress-spinner>
 </div>
-
 <div class="pantalla-progress" *ngIf="progreso_">
     <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
     </mat-progress-spinner>

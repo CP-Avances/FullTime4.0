@@ -64,8 +64,8 @@ class RolesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre } = req.body;
             yield database_1.default.query(`
-      INSERT INTO cg_roles (nombre) VALUES ($1)
-      `, [nombre]);
+       INSERT INTO cg_roles (nombre) VALUES ($1)
+       `, [nombre]);
             res.jsonp({ message: 'Registro guardado.' });
         });
     }

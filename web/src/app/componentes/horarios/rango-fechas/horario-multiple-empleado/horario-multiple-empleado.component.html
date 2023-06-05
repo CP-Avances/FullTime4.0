@@ -1,7 +1,13 @@
-<!-- *** VENTANA DE APROBACIONES MULTIPLES *** -->
+<!-- *** VENTANA DE REGISTRO DE MULTIPLES PLANIFICACIONES *** -->
 <div style="padding-top: 20px;" *ngIf="asignar">
     <app-horarios-multiples [seleccionados]="seleccionados">
     </app-horarios-multiples>
+</div>
+
+<!-- *** VENTANA DE REGISTRO INDIVDUAL DE PLANIFICACION *** -->
+<div style="padding-top: 20px;" *ngIf="ventana_horario">
+<app-registo-empleado-horario [data_horario]="data_horario">
+</app-registo-empleado-horario>
 </div>
 
 <div style="padding-top: 20px;" *ngIf="seleccionar">
@@ -20,18 +26,19 @@
                     </mat-radio-button>
                 </mat-radio-group>
             </form>
-            <!-- FORM PARA SUCURSALES -->
-            <form *ngIf="_booleanOptions.bool_suc">
+            <!-- FORM PARA CARGOS -->
+            <form *ngIf="_booleanOptions.bool_cargo">
                 <div class="d-flex flex-wrap justify-content-center">
                     <mat-form-field>
-                        <mat-label>Sucursal</mat-label>
-                        <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreSuc_"
-                            (input)="Filtrar(filtroNombreSuc_, 1)" [formControl]="nombre_suc" type="text"
+                        <mat-label>Cargo</mat-label>
+                        <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreCarg_"
+                            (input)="Filtrar(filtroNombreCarg_, 1)" [formControl]="nombre_carg" type="text"
                             (keypress)="IngresarSoloLetras($event)">
-                        <mat-error *ngIf="nombre_suc.invalid">
+                        <mat-error *ngIf="nombre_carg.invalid">
                             Indispensable ingresar dos letras
                         </mat-error>
-                        <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de sucursales por nombre.">
+                        <mat-icon matSuffix matTooltipPosition="right"
+                            matTooltip="Búsqueda de cargos por su descripción.">
                             help_outline
                         </mat-icon>
                     </mat-form-field>
@@ -104,11 +111,12 @@
             </div>
 
             <hr>
-            <!-- TABLA PARA SUCURSALES -->
-            <div *ngIf="_booleanOptions.bool_suc" class="mat-elevation-z8" style="background: white;">
+
+            <!-- TABLA PARA CARGOS -->
+            <div *ngIf="_booleanOptions.bool_cargo" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
                     <span class="w-100 bd-highlight">
-                        RESULTADO SUCURSALES
+                        RESULTADO CARGOS
                     </span>
                     <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
                         (click)="MostrarLista()">Mostrar lista</button>
@@ -124,29 +132,29 @@
                                         (click)="HabilitarSeleccion()">
                                         library_add_check
                                     </mat-icon>
-                                    <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterToggleSuc() : null"
-                                        [checked]="selectionSuc.hasValue() && isAllSelectedSuc()"
-                                        [indeterminate]="selectionSuc.hasValue() && !isAllSelectedSuc()"
-                                        [aria-label]="checkboxLabelSuc()">
+                                    <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterToggleCarg() : null"
+                                        [checked]="selectionCarg.hasValue() && isAllSelectedCarg()"
+                                        [indeterminate]="selectionCarg.hasValue() && !isAllSelectedCarg()"
+                                        [aria-label]="checkboxLabelCarg()">
                                     </mat-checkbox>
                                 </th>
-                                <th scope="col">Nombre</th>
+                                <th scope="col">Descripción</th>
                                 <th scope="col">Planificar</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr
-                                *ngFor="let s of sucursales | emplNombre: filtroNombreSuc | paginate:tamanio_pagina_suc:numero_pagina_suc">
+                                *ngFor="let c of cargos | emplNombre: filtroNombreCarg | paginate:tamanio_pagina_car:numero_pagina_car">
                                 <td>
                                     <mat-checkbox *ngIf="plan_multiple" (click)="$event.stopPropagation()"
-                                        (change)="$event ? selectionSuc.toggle(s) : null"
-                                        [checked]="selectionSuc.isSelected(s)" [aria-label]="checkboxLabelSuc(s)">
+                                        (change)="$event ? selectionCarg.toggle(c) : null"
+                                        [checked]="selectionCarg.isSelected(c)" [aria-label]="checkboxLabelCarg(c)">
                                     </mat-checkbox>
                                 </td>
-                                <td>{{s.nombre}}</td>
+                                <td>{{c.nombre}}</td>
                                 <td class="d-flex justify-content-center">
-                                    <i (click)="GuardarRegistros(s.id)" id="plan" *ngIf="auto_individual"
-                                        class="fas fa-calendar" matSuffix matTooltipPosition="right"
+                                    <i (click)="GuardarRegistros(c.id)" id="plan" *ngIf="auto_individual"
+                                        class="fa fa-calendar" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de horarios." [ngStyle]="habilitado">
                                         <p>Planificar</p>
                                     </i>
@@ -158,8 +166,8 @@
                         </tbody>
                     </table>
                 </div>
-                <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina_suc"
-                    [pageSizeOptions]="pageSizeOptions_suc" (page)="ManejarPaginaResultados($event)"
+                <mat-paginator id="pagina" [length]="cargos.length" [pageSize]="tamanio_pagina_car"
+                    [pageSizeOptions]="pageSizeOptions_car" (page)="ManejarPaginaResultados($event)"
                     showFirstLastButtons>
                 </mat-paginator>
                 <br>

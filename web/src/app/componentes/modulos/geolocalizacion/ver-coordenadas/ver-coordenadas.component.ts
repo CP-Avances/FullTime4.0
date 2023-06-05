@@ -241,7 +241,7 @@ export class VerCoordenadasComponent implements OnInit {
 
 
   ngOnDestroy() {
-    this.reporteService.GuardarCheckOpcion(0);
+    this.reporteService.GuardarCheckOpcion('');
     this.reporteService.DefaultFormCriterios();
     this.reporteService.DefaultValoresFiltros();
     console.log('Componenete destruido');
@@ -284,7 +284,7 @@ export class VerCoordenadasComponent implements OnInit {
         break;
     }
     this.reporteService.GuardarFormCriteriosBusqueda(this._booleanOptions);
-    this.reporteService.GuardarCheckOpcion(this.opcion)
+    //this.reporteService.GuardarCheckOpcion(this.opcion)
 
   }
 

@@ -35,7 +35,7 @@ class DatosGeneralesControlador {
             `
             SELECT s.id AS id_suc, s.nombre AS name_suc, c.descripcion AS ciudad FROM sucursales AS s, 
                 ciudades AS c 
-            WHERE s.id_ciudad = c.id ORDER BY s.id
+            WHERE s.id_ciudad = c.id ORDER BY s.id ASC
             `
         ).then((result: any) => { return result.rows });
 
@@ -139,6 +139,91 @@ class DatosGeneralesControlador {
         return res.status(200).jsonp(respuesta);
     }
 
+
+    /**
+     * METODO DE CONSULTA DE DATOS GENERALES DE USUARIOS
+     * REALIZA UN ARRAY DE CARGOS Y EMPLEADOS DEPENDIENDO DEL ESTADO DEL 
+     * EMPLEADO SI BUSCA EMPLEADOS ACTIVOS O INACTIVOS. 
+     * @returns Retorna Array de [Cargos[empleados[]]]
+     **/
+
+    public async DatosGeneralesCargo(req: Request, res: Response) {
+        let estado = req.params.estado;
+
+        // CONSULTA DE BUSQUEDA DE CARGOS
+        let cargo = await pool.query(
+            `
+            SELECT tc.id AS id_cargo, tc.cargo AS name_cargo
+            FROM tipo_cargo AS tc 
+            ORDER BY tc.cargo ASC
+            `
+        ).then((result: any) => { return result.rows });
+
+        if (cargo.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+
+        // CONSULTA DE BUSQUEDA DE EMPLEADOS
+        let empleados = await Promise.all(cargo.map(async (empl: any) => {
+            if (estado === '1') {
+                empl.empleados = await pool.query(
+                    `
+                    SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
+                        e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo,
+                        co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
+                        d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
+                        s.nombre AS sucursal, ca.hora_trabaja
+                    FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
+                        tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s
+                    WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
+                        da.id = e.id) 
+                        AND tc.id = ca.cargo
+                        AND ca.cargo = $1
+                        AND ca.id_departamento = d.id
+                        AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
+                        da.id = e.id) 
+                        AND s.id = d.id_sucursal
+                        AND co.id_regimen = r.id AND e.estado = $2
+                    ORDER BY name_empleado ASC
+                    `
+                    , [empl.id_cargo, estado]
+
+                ).then((result: any) => { return result.rows });
+            }
+            else {
+                empl.empleados = await pool.query(
+                    `
+                    SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
+                        e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo,
+                        co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
+                        d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
+                        s.nombre AS sucursal, ca.fec_final, ca.hora_trabaja
+                    FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
+                        tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s
+                    WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
+                        da.id = e.id) 
+                        AND tc.id = ca.cargo
+                        AND ca.cargo = $1
+                        AND ca.id_departamento = d.id
+                        AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
+                        da.id = e.id) 
+                        AND s.id = d.id_sucursal
+                        AND co.id_regimen = r.id AND e.estado = $2
+                    ORDER BY name_empleado ASC
+                    `,
+                    [empl.id_cargo, estado])
+                    .then((result: any) => { return result.rows });
+            }
+            return empl;
+        }));
+
+        let respuesta = empleados.filter((obj: any) => {
+            return obj.empleados.length > 0
+        });
+
+        if (respuesta.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+
+        return res.status(200).jsonp(respuesta);
+    }
+
     // METODO PARA LISTAR DATOS ACTUALES DEL USUARIO
     public async ListarDatosActualesEmpleado(req: Request, res: Response) {
         const DATOS = await pool.query(
@@ -222,7 +307,7 @@ class DatosGeneralesControlador {
         let JefeDepaPadre;
 
         if (depa_padre !== null) {
-            
+
             /*JefeDepaPadre = await pool.query(
                 `
                 SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, 

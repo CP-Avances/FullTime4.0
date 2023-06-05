@@ -839,18 +839,31 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   // VENTANA PARA REGISTRAR HORARIO 
+  horarios_usuario: boolean = true;
+  ventana_horario: boolean = false;
+  data_horario: any = [];
   AbrirVentanaEmplHorario(): void {
+    this.data_horario = [];
     if (this.datoActual.id_cargo != undefined) {
-      this.ventana.open(RegistoEmpleadoHorarioComponent,
-        {
-          width: '640px',
-          data: {
-            idEmpleado: this.idEmpleado, idCargo: this.datoActual.id_cargo,
-            horas_trabaja: this.cargoEmpleado[0].hora_trabaja
-          }
-        }).afterClosed().subscribe(item => {
-          this.ObtenerHorariosEmpleado(this.datoActual.codigo, this.formato_fecha);
-        });
+      this.horarios_usuario = false;
+      this.ventana_horario = true;
+      this.data_horario = {
+        pagina: 'ver_empleado',
+        codigo: this.datoActual.codigo,
+        idCargo: this.datoActual.id_cargo,
+        idEmpleado: this.idEmpleado,
+        horas_trabaja: this.cargoEmpleado[0].hora_trabaja,
+      }
+      /* this.ventana.open(RegistoEmpleadoHorarioComponent,
+         {
+           width: '640px',
+           data: {
+             idEmpleado: this.idEmpleado, idCargo: this.datoActual.id_cargo,
+             horas_trabaja: this.cargoEmpleado[0].hora_trabaja
+           }
+         }).afterClosed().subscribe(item => {
+           this.ObtenerHorariosEmpleado(this.datoActual.codigo, this.formato_fecha);
+         });*/
     }
     else {
       this.toastr.info('El usuario no tiene registrado un Cargo.', '', {
@@ -2270,7 +2283,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.autorizacionesTotales = [];
     this.restAutoridad.BuscarAutoridadEmpleado(parseInt(this.idEmpleado)).subscribe(datos => {
       this.autorizacionesTotales = datos;
-      console.log('depa autoriza: ',this.autorizacionesTotales[0]);
+      console.log('depa autoriza: ', this.autorizacionesTotales[0]);
     })
   }
 

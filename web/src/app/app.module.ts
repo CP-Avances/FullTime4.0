@@ -383,6 +383,8 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     RegistroDetallePlanHorarioComponent,
     RegistroAutorizacionDepaComponent,
     RegistroEmpleadoPermisoComponent,
+
+    
     RegistoEmpleadoHorarioComponent,
     DetalleCatHorarioComponent,
     NotiAutorizacionesComponent,
@@ -632,6 +634,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     PlantillaReportesService,
     VerEmpleadoComponent,
     PermisosMultiplesEmpleadosComponent,
+    HorarioMultipleEmpleadoComponent,
   ],
 
   bootstrap: [AppComponent]

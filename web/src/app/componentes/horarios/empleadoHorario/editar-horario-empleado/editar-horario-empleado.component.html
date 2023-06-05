@@ -1,7 +1,7 @@
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        MODIFICAR ASIGNACION DE HORARIO
+        MODIFICAR ASIGNACIÓN DE HORARIO
     </span>
     <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
 </div>
@@ -65,12 +65,13 @@
                         </mat-select>
                     </mat-form-field>
                 </div>
-                <div class="col-sm" style="text-align: left;">
-                    <label style="margin-right: 35px; font-size: 15px;">Seleccionar días libres *</label>
+                <div class="col-sm" style="text-align: left; padding-top: 20px;">
+                    <label style="margin-right: 35px; font-size: 15px; padding-top: 10px;">
+                        Marcar días libres*
+                    </label>
                     <div class="container" style="text-align: center;">
                         <div class="row">
                             <div class="col-sm" style="text-align: left;">
-                                <br>
                                 <mat-checkbox [formControl]="lunesF" [(ngModel)]="lunes">
                                     <label id="textoradiobtn">Lunes</label>
                                 </mat-checkbox>
@@ -88,7 +89,6 @@
                                 </mat-checkbox>
                             </div>
                             <div class="col-sm" style="text-align: left;">
-                                <br>
                                 <mat-checkbox [formControl]="viernesF" [(ngModel)]="viernes">
                                     <label id="textoradiobtn">Viernes</label>
                                 </mat-checkbox>
@@ -111,4 +111,8 @@
 <div class="d-flex flex-wrap justify-content-center" style="padding-top: 2%; margin-bottom: 2%;">
     <button id="btn-raised" class="btn btn-sm" (click)="InsertarEmpleadoHorario(formulario.value)"
         [disabled]="!formulario.valid">Guardar</button>
+</div>
+<div class="pantalla-progress" *ngIf="progreso">
+    <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
+    </mat-progress-spinner>
 </div>

@@ -120,13 +120,13 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
-      this.check = this.restR.checkOptions(3);
+      this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
       this.BuscarInformacion();
     }
   }
 
   ngOnDestroy() {
-    this.restR.GuardarCheckOpcion(0);
+    this.restR.GuardarCheckOpcion('');
     this.restR.DefaultFormCriterios();
     this.restR.DefaultValoresFiltros();
     this.origen = [];
@@ -189,14 +189,14 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
   }
 
   // METODO PARA MOSTRAR DATOS DE BUSQUEDA
-  opcion: number;
+  opcion: string;
   activar_boton: boolean = false;
   activar_seleccion: boolean = true;
   BuscarPorTipo(e: MatRadioChange) {
     this.opcion = e.value;
     this.activar_boton = true;
     switch (this.opcion) {
-      case 1:
+      case 's':
         this._booleanOptions.bool_suc = true;
         this._booleanOptions.bool_dep = false;
         this._booleanOptions.bool_emp = false;
@@ -204,7 +204,7 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
         this.plan_multiple = false;
         this.auto_individual = true;
         break;
-      case 2:
+      case 'd':
         this._booleanOptions.bool_suc = false;
         this._booleanOptions.bool_dep = true;
         this._booleanOptions.bool_emp = false;
@@ -212,7 +212,7 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
         this.plan_multiple = false;
         this.auto_individual = true;
         break;
-      case 3:
+      case 'e':
         this._booleanOptions.bool_suc = false;
         this._booleanOptions.bool_dep = false;
         this._booleanOptions.bool_emp = true;
@@ -466,10 +466,10 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
   GuardarRegistros(id: number) {
-    if (this.opcion === 1) {
+    if (this.opcion === 's') {
       this.ModelarSucursal(id);
     }
-    else if (this.opcion === 2) {
+    else if (this.opcion === 'd') {
       this.ModelarDepartamentos(id);
     }
     else {
@@ -508,15 +508,15 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
 
   // METODO PARA MOSTRAR LISTA DE DATOS
   MostrarLista() {
-    if (this.opcion === 1) {
+    if (this.opcion === 's') {
       this.nombre_suc.reset();
       this.Filtrar('', 1)
     }
-    else if (this.opcion === 2) {
+    else if (this.opcion === 'd') {
       this.nombre_dep.reset();
       this.Filtrar('', 2)
     }
-    else if (this.opcion === 3) {
+    else if (this.opcion === 'e') {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();

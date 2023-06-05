@@ -87,14 +87,14 @@ export class ComunicadosComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.check = this.restR.checkOptions(3);
+    this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
     this.BuscarDatos();
     this.BuscarParametro();
   }
 
   // METODO PARA CERARR PROCESOS
   ngOnDestroy() {
-    this.restR.GuardarCheckOpcion(0);
+    this.restR.GuardarCheckOpcion('');
     this.restR.DefaultFormCriterios();
     this.restR.DefaultValoresFiltros();
   }
@@ -178,7 +178,7 @@ export class ComunicadosComponent implements OnInit {
         break;
     }
     this.restR.GuardarFormCriteriosBusqueda(this._booleanOptions);
-    this.restR.GuardarCheckOpcion(this.opcion)
+    //this.restR.GuardarCheckOpcion(this.opcion)
   }
 
   // METODO PARA FILTRAR DATOS DE BUSQUEDA

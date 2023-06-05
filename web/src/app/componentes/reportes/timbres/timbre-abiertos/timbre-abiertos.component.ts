@@ -156,19 +156,19 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
       && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda')
     console.log('opcion:', this.opcion);
     switch (this.opcion) {
-      case 1:
+      case 's':
         if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione sucursal')
         this.ModelarSucursal(action);
         break;
-      case 2:
+      case 'd':
         if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione departamentos')
         this.ModelarDepartamento(action);
         break;
-      case 3:
+      case 'e':
         if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione empleados')
         this.ModelarEmpleados(action);
         break;
-      case 4:
+      case 't':
         if (this.selectionTab.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione empleados')
         this.ModelarTabulado(action);
         break;
@@ -1006,15 +1006,15 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
   }
 
   MostrarLista() {
-    if (this.opcion === 1) {
+    if (this.opcion === 's') {
       /*this.nombre_suc.reset();
       this.Filtrar('', 1)*/
     }
-    else if (this.opcion === 2) {
+    else if (this.opcion === 'd') {
      /* this.nombre_dep.reset();
       this.Filtrar('', 2)*/
     }
-    else if (this.opcion === 3) {
+    else if (this.opcion === 'e') {
       /*this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();

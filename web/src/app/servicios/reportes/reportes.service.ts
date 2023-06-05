@@ -60,18 +60,18 @@ export class ReportesService {
   /**
    * SERVICIOS CENTRALIZADOS RANGO DE FECHAS
    */
-  
+
   private _fechas: rango = {
     fec_inico: '',
     fec_final: ''
-  }; 
+  };
 
   get rangoFechas() {
     return this._fechas
   }
 
   guardarRangoFechas(inicio: string, final: string) {
-    this._fechas = { fec_inico: inicio, fec_final: final}
+    this._fechas = { fec_inico: inicio, fec_final: final }
   }
 
   /**
@@ -79,24 +79,33 @@ export class ReportesService {
    */
 
   private _check: checkOptions[] = [
-    {opcion: 1, valor: 'Sucursal'},
-    {opcion: 2, valor: 'Departamento'},
-    {opcion: 3, valor: 'Empleado'},
-    {opcion: 4, valor: 'Tabulado'},
-    {opcion: 5, valor: 'Incompletos'}
+    { opcion: 's', valor: 'Sucursal' },
+    { opcion: 'c', valor: 'Cargo' },
+    { opcion: 'd', valor: 'Departamento' },
+    { opcion: 'e', valor: 'Empleado' },
+    { opcion: 't', valor: 'Tabulado' },
+    { opcion: 'i', valor: 'Incompletos' },
   ];
 
-  checkOptions(num_items: number): checkOptions[] {
-    return [...this._check.slice(0,num_items)];
+  checkOptions(num_items: any): checkOptions[] {
+    let valores: any = []
+    this._check.forEach(obj => {
+      num_items.forEach(a => {
+        if (obj.opcion === a.opcion) {
+          valores = valores.concat(obj)
+        }
+      })
+    })
+    return valores;
   }
 
   /**
    * EL NUMERO DE LA OPCION ESCOGIDA YA SEA (SUCURSAL, DEPARTAMENTO, EMPLEADO, TABULADO ?, INCOMPLETO ?)
    */
 
-  private _opcion = 0;
+  private _opcion = '';
 
-  GuardarCheckOpcion(o: number): void {
+  GuardarCheckOpcion(o: string): void {
     this._opcion = o;
   }
 
@@ -112,25 +121,27 @@ export class ReportesService {
     bool_dep: false,
     bool_emp: false,
     bool_tab: false,
-    bool_inc: false
+    bool_inc: false,
+    bool_cargo: false,
   }
 
   GuardarFormCriteriosBusqueda(bool: FormCriteriosBusqueda): void {
     this._formCriteriosBusqueda = bool;
   }
-  
+
   get criteriosBusqueda() {
     return this._formCriteriosBusqueda
   }
 
   DefaultFormCriterios() {
     this._formCriteriosBusqueda.bool_suc = false;
-    this._formCriteriosBusqueda.bool_dep = false; 
+    this._formCriteriosBusqueda.bool_dep = false;
     this._formCriteriosBusqueda.bool_emp = false;
     this._formCriteriosBusqueda.bool_tab = false;
     this._formCriteriosBusqueda.bool_inc = false;
+    this._formCriteriosBusqueda.bool_cargo = false;
   }
-   
+
   /********************************
    * 
    * Get y Set filtros de los formularios componentes de reportes multiples
@@ -141,6 +152,14 @@ export class ReportesService {
 
   get filtroNombreSuc() { return this._filtroNombreSuc; }
   setFiltroNombreSuc(arr) { this._filtroNombreSuc = arr }
+
+
+  // FILTRO FORMULARIO NOMBRE DEL CARGO
+  private _filtroNombreCarg: string = '';
+
+  get filtroNombreCarg() { return this._filtroNombreCarg; }
+  setFiltroNombreCarg(arr) { this._filtroNombreCarg = arr }
+
 
   // Filtro formulario nombre de departamento
   private _filtroNombreDep: string = '';
@@ -165,7 +184,7 @@ export class ReportesService {
   // Filtro formulario de tabulacion
   private _filtroCodigo_tab: number = 0;
   private _filtroCedula_tab: string = '';
-  private _filtroNombreTab: string = ''; 
+  private _filtroNombreTab: string = '';
 
   get filtroCodigo_tab() { return this._filtroCodigo_tab; }
   setFiltroCodigo_tab(arr) { this._filtroCodigo_tab = arr; }
