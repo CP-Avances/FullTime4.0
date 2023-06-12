@@ -84,6 +84,8 @@ export class VerPedidoAccionComponent implements OnInit {
       this.datosPedido[0].fec_creacion_ = this.validar.FormatearFecha(this.datosPedido[0].fec_creacion, formato_fecha, this.validar.dia_completo);
       this.datosPedido[0].fec_rige_desde_ = this.validar.FormatearFecha(this.datosPedido[0].fec_rige_desde, formato_fecha, this.validar.dia_completo);
       this.datosPedido[0].fec_rige_hasta_ = this.validar.FormatearFecha(this.datosPedido[0].fec_rige_hasta, formato_fecha, this.validar.dia_completo);
+      this.datosPedido[0].primera_fecha_reemp_ = this.validar.FormatearFecha(this.datosPedido[0].primera_fecha_reemp, formato_fecha, this.validar.dia_completo);
+      this.datosPedido[0].fec_act_final_concurso_ = this.validar.FormatearFecha(this.datosPedido[0].fec_act_final_concurso, formato_fecha, this.validar.dia_completo);
       console.log('datos', this.datosPedido);
       this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].id_empleado).subscribe(data1 => {
         console.log('empleado', data1)

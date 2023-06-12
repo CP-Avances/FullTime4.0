@@ -58,11 +58,6 @@ export class EditarPedidoAccionComponent implements OnInit {
   vistaCargo: boolean = true;
 
   // INICIACIÓN DE CAMPOS DEL FORMULARIO
-  descripcionF = new FormControl("", [
-    Validators.pattern(
-      "[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{4,48}"
-    ),
-  ]);
   identificacionF = new FormControl("", [
     Validators.required,
     Validators.minLength(3),
@@ -104,19 +99,15 @@ export class EditarPedidoAccionComponent implements OnInit {
   public firstFormGroup = new FormGroup({
     identificacionForm: this.identificacionF,
     fechaForm: this.fechaF,
-  });
-  public secondFormGroup = new FormGroup({
-    idEmpleadoForm: this.idEmpleadoF,
-    fechaDesdeForm: this.fechaDesdeF,
-    fechaHastaForm: this.fechaHastaF,
-  });
-  public thirdFormGroup = new FormGroup({
     tipoDecretoForm: this.tipoDecretoF,
     otroDecretoForm: this.otroDecretoF,
     baseForm: this.baseF,
     accionForm: this.accionF,
   });
-  public fourthFormGroup = new FormGroup({
+  public secondFormGroup = new FormGroup({
+    idEmpleadoForm: this.idEmpleadoF,
+    fechaDesdeForm: this.fechaDesdeF,
+    fechaHastaForm: this.fechaHastaF,
     numPartidaForm: this.numPartidaF,
     tipoProcesoForm: this.tipoProcesoF,
     idCiudad: this.idCiudad,
@@ -124,28 +115,23 @@ export class EditarPedidoAccionComponent implements OnInit {
     otroCargoForm: this.otroCargoF,
     sueldoForm: this.sueldoF,
     numPropuestaForm: this.numPropuestaF,
-    descripcionForm: this.descripcionF,
     numPartidaIForm: this.numPartidaI,
   });
-  public fifthFormGroup = new FormGroup({
+  public thirdFormGroup = new FormGroup({
     actaForm: this.actaF,
     fechaActaForm: this.fechaActaF,
-  });
-  public sixthFormGroup = new FormGroup({
     idEmpleadoHForm: this.idEmpleadoHF,
     idEmpleadoGForm: this.idEmpleadoGF,
     idEmpleadoRForm: this.idEmpleadoRF,
     abrevHForm: this.abrevHF,
     abrevGForm: this.abrevGF,
   });
-  public seventhFormGroup = new FormGroup({
+  public fourthFormGroup = new FormGroup({
     funcionesReempForm: this.funcionesReemp,
     nombreReempForm: this.nombreReemp,
     puestoReempForm: this.puestoReemp,
     accionReempForm: this.accionReemp,
     fechaReempForm: this.fechaReemp,
-  });
-  public eighthFormGroup = new FormGroup({
     posesionNotificacionForm: this.notificacionesPosesiones,
     descripcionPForm: this.descripcionP,
   });
@@ -250,46 +236,37 @@ export class EditarPedidoAccionComponent implements OnInit {
               .subscribe((data5) => {
                 this.firstFormGroup.patchValue({
                   identificacionForm: this.datosPedido[0].identi_accion_p,
+                  tipoDecretoForm: this.datosPedido[0].decre_acue_resol,
+                  baseForm: this.datosPedido[0].adicion_legal,
+                  accionForm: this.datosPedido[0].tipo_accion,
                 });
                 this.secondFormGroup.patchValue({
                   idEmpleadoForm: data1[0].apellido + " " + data1[0].nombre,
                   fechaDesdeForm: this.datosPedido[0].fec_rige_desde,
                   fechaHastaForm: this.datosPedido[0].fec_rige_hasta,
-                });
-                this.thirdFormGroup.patchValue({
-                  tipoDecretoForm: this.datosPedido[0].decre_acue_resol,
-                  baseForm: this.datosPedido[0].adicion_legal,
-                  accionForm: this.datosPedido[0].tipo_accion,
-                });
-                this.fourthFormGroup.patchValue({
-                  numPropuestaForm: this.datosPedido[0].num_partida_propuesta,
-                  numPartidaIForm: this.datosPedido[0].num_partida_individual,
-                  tipoProcesoForm: this.datosPedido[0].proceso_propuesto,
-                  descripcionForm: this.datosPedido[0].descrip_partida,
                   numPartidaForm: this.datosPedido[0].num_partida,
+                  tipoProcesoForm: this.datosPedido[0].proceso_propuesto,
+                  idCiudad: data5[0].descripcion,
                   tipoCargoForm: this.datosPedido[0].cargo_propuesto,
                   sueldoForm: this.datosPedido[0].salario_propuesto,
-                  idCiudad: data5[0].descripcion,
+                  numPropuestaForm: this.datosPedido[0].num_partida_propuesta,
+                  numPartidaIForm: this.datosPedido[0].num_partida_individual,
                 });
-                this.fifthFormGroup.patchValue({
-                  fechaActaForm: this.datosPedido[0].fec_act_final_concurso,
+                this.thirdFormGroup.patchValue({
                   actaForm: this.datosPedido[0].act_final_concurso,
-                });
-                this.sixthFormGroup.patchValue({
+                  fechaActaForm: this.datosPedido[0].fec_act_final_concurso,
                   idEmpleadoHForm: data2[0].apellido + " " + data2[0].nombre,
                   idEmpleadoGForm: data3[0].apellido + " " + data3[0].nombre,
                   idEmpleadoRForm: data4[0].apellido + " " + data4[0].nombre,
                   abrevHForm: this.datosPedido[0].abrev_empl_uno,
                   abrevGForm: this.datosPedido[0].abrev_empl_dos,
                 });
-                this.seventhFormGroup.patchValue({
+                this.fourthFormGroup.patchValue({
                   funcionesReempForm:this.datosPedido[0].funciones_reemp,
                   nombreReempForm: this.datosPedido[0].nombre_reemp,
                   puestoReempForm: this.datosPedido[0].puesto_reemp,
                   accionReempForm: this.datosPedido[0].num_accion_reemp,
-                  fechaReempForm: this.datosPedido[0].primera_fecha_reemp,
-                });
-                this.eighthFormGroup.patchValue({
+                  fechaReempForm: this.datosPedido[0].primera_fecha_reemp,  
                   posesionNotificacionForm: this.datosPedido[0].posesion_notificacion,
                   descripcionPForm: this.datosPedido[0].descripcion_pose_noti,
                 });
@@ -309,7 +286,7 @@ export class EditarPedidoAccionComponent implements OnInit {
       .ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string))
       .subscribe((data) => {
         this.empresa = data;
-        this.fourthFormGroup.patchValue({
+        this.secondFormGroup.patchValue({
           numPartidaForm: this.empresa[0].num_partida,
         });
       });
@@ -338,7 +315,7 @@ export class EditarPedidoAccionComponent implements OnInit {
   estilo: any;
   IngresarOtro(form3) {
     if (form3.tipoDecretoForm === undefined) {
-      this.thirdFormGroup.patchValue({
+      this.firstFormGroup.patchValue({
         otroDecretoForm: "",
       });
       this.estilo = { visibility: "visible" };
@@ -352,7 +329,7 @@ export class EditarPedidoAccionComponent implements OnInit {
 
   // METODO PARA VER LISTA DE DECRETOS
   VerDecretos() {
-    this.thirdFormGroup.patchValue({
+    this.firstFormGroup.patchValue({
       otroDecretoForm: "",
     });
     this.estilo = { visibility: "hidden" };
@@ -389,7 +366,7 @@ export class EditarPedidoAccionComponent implements OnInit {
   estiloC: any;
   IngresarCargo(form4) {
     if (form4.tipoCargoForm === undefined) {
-      this.fourthFormGroup.patchValue({
+      this.secondFormGroup.patchValue({
         otroCargoForm: "",
       });
       this.estiloC = { visibility: "visible" };
@@ -407,7 +384,7 @@ export class EditarPedidoAccionComponent implements OnInit {
 
   // METODO PARA VER LISTA DE CARGOS PROPUESTO
   VerCargos() {
-    this.fourthFormGroup.patchValue({
+    this.secondFormGroup.patchValue({
       otroCargoForm: "",
     });
     this.estiloC = { visibility: "hidden" };
@@ -473,22 +450,22 @@ export class EditarPedidoAccionComponent implements OnInit {
   }
 
   // METODO PARA REALIZAR EL REGISTRO DE ACCIÓN DE PERSONAL
-  InsertarAccionPersonal(form1: any, form2: any, form3: any, form4: any, form5: any, form6: any, form7: any, form8: any) {
+  InsertarAccionPersonal(form1: any, form2: any, form3: any, form4: any) {
     // CAMBIO EL APELLIDO Y NOMBRE DE LOS EMPLEADOS SELECCIONADOS A LETRAS MAYÚSCULAS
     let datos1 = {
       informacion: form2.idEmpleadoForm.toUpperCase(),
     };
     let datos2 = {
-      informacion: form6.idEmpleadoHForm.toUpperCase(),
+      informacion: form3.idEmpleadoHForm.toUpperCase(),
     };
     let datos3 = {
-      informacion: form6.idEmpleadoGForm.toUpperCase(),
+      informacion: form3.idEmpleadoGForm.toUpperCase(),
     };
     let datos4 = {
-      informacion: form6.idEmpleadoRForm.toUpperCase(),
+      informacion: form3.idEmpleadoRForm.toUpperCase(),
     };
     let nombreCapitalizado = this.CapitalizarNombre(
-      form7.nombreReempForm.split(" ")
+      form4.nombreReempForm.split(" ")
     );
 
     // BUSQUEDA DE LOS DATOS DEL EMPLEADO QUE REALIZA EL PEDIDO DE ACCIÓN DE PERSONAL
@@ -503,61 +480,64 @@ export class EditarPedidoAccionComponent implements OnInit {
           this.restE.BuscarEmpleadoNombre(datos4).subscribe((empl4) => {
             var idEmpl_responsable = empl4[0].id;
             let idCiudadSeleccionada = this.ObtenerIdCiudadSeleccionada(
-              form4.idCiudad
+              form2.idCiudad
             );
             // INICIALIZAMOS EL ARRAY CON TODOS LOS DATOS DEL PEDIDO
-            let datosAccion: any = {
+            let datosAccion = {
               id_empleado: idEmpl_pedido,
               fec_creacion: form1.fechaForm,
               fec_rige_desde: String(
                 moment(form2.fechaDesdeForm, "YYYY/MM/DD").format("YYYY-MM-DD")
               ),
-              fec_rige_hasta: String(
+              fec_rige_hasta: form2.fechaHastaForm!==null ? (String(
                 moment(form2.fechaHastaForm, "YYYY/MM/DD").format("YYYY-MM-DD")
-              ),
+              )):null,
               identi_accion_p: form1.identificacionForm,
-              num_partida: form4.numPartidaForm,
-              decre_acue_resol: form3.tipoDecretoForm,
-              abrev_empl_uno: form6.abrevHForm,
+              num_partida: form2.numPartidaForm,
+              decre_acue_resol: form1.tipoDecretoForm,
+              abrev_empl_uno: form3.abrevHForm,
               firma_empl_uno: idEmpl_firmaH,
-              abrev_empl_dos: form6.abrevGForm,
+              abrev_empl_dos: form3.abrevGForm,
               firma_empl_dos: idEmpl_firmaG,
-              adicion_legal: form3.baseForm,
-              tipo_accion: form3.accionForm,
-              descrip_partida: form4.descripcionForm,
-              cargo_propuesto: form4.tipoCargoForm,
-              proceso_propuesto: form4.tipoProcesoForm,
-              num_partida_propuesta: form4.numPropuestaForm,
-              salario_propuesto: form4.sueldoForm,
+              adicion_legal: form1.baseForm,
+              tipo_accion: form1.accionForm,
+              cargo_propuesto: form2.tipoCargoForm,
+              proceso_propuesto: form2.tipoProcesoForm,
+              num_partida_propuesta: form2.numPropuestaForm,
+              salario_propuesto: form2.sueldoForm,
               id_ciudad: idCiudadSeleccionada,
               id_empl_responsable: idEmpl_responsable,
-              num_partida_individual: form4.numPartidaIForm,
-              act_final_concurso: form5.actaForm,
-              fec_act_final_concurso: String(
-                moment(form5.fechaActaForm, "YYYY/MM/DD").format("YYYY-MM-DD")
-              ),
+              num_partida_individual: form2.numPartidaIForm,
+              act_final_concurso: form3.actaForm,
+              fec_act_final_concurso: form3.fechaActaForm!==null ? (String(
+                moment(form3.fechaActaForm, "YYYY/MM/DD").format("YYYY-MM-DD")
+              )):null,
               nombre_reemp: nombreCapitalizado,
-              puesto_reemp: form7.puestoReempForm,
-              funciones_reemp: form7.funcionesReempForm,
-              num_accion_reemp: form7.accionReempForm,
-              primera_fecha_reemp: String(
-                moment(form7.fechaReempForm, "YYYY/MM/DD").format("YYYY-MM-DD")
-              ),
-              posesion_notificacion: form8.posesionNotificacionForm,
-              descripcion_pose_noti: form8.descripcionPForm,
+              puesto_reemp: form4.puestoReempForm,
+              funciones_reemp: form4.funcionesReempForm,
+              num_accion_reemp: form4.accionReempForm,
+              primera_fecha_reemp: form4.fechaReempForm !==null ? (String(
+                moment(form4.fechaReempForm, "YYYY/MM/DD").format("YYYY-MM-DD")
+              )):null,
+              posesion_notificacion: form4.posesionNotificacionForm,
+              descripcion_pose_noti: form4.descripcionPForm,
               id: parseInt(this.idPedido),
             };
             // VALIDAR QUE FECHAS SE ENCUENTREN BIEN INGRESADA
+            if(form4.fechaReempForm === "" || form4.fechaReempForm === null){
+              datosAccion.primera_fecha_reemp = null;
+            }
+
             if (form2.fechaHastaForm === "" || form2.fechaHastaForm === null) {
               datosAccion.fec_rige_hasta = null;
               console.log("informacion", datosAccion);
-              this.ValidacionesIngresos(form3, form4, datosAccion);
+              this.ValidacionesIngresos(form1, form2, datosAccion);
             } else {
               if (
                 Date.parse(form2.fechaDesdeForm) <
                 Date.parse(form2.fechaHastaForm)
               ) {
-                this.ValidacionesIngresos(form3, form4, datosAccion);
+                this.ValidacionesIngresos(form1, form2, datosAccion);
               } else {
                 this.toastr.info(
                   "Las fechas ingresadas no son las correctas.",
@@ -575,29 +555,29 @@ export class EditarPedidoAccionComponent implements OnInit {
   }
 
   // METODO PARA VERIFICAR LAS POSIBLES OPCIONES DE INGRESOS EN EL FORMULARIO
-  ValidacionesIngresos(form3,form4, datosAccion) {
+  ValidacionesIngresos(form1,form2, datosAccion) {
     // INGRESO DE DATOS DE ACUERDO A LO INGRESADO POR EL USUARIO
-    if (form3.tipoDecretoForm != undefined && form4.tipoCargoForm != undefined) {
+    if (form1.tipoDecretoForm != undefined && form2.tipoCargoForm != undefined) {
       console.log("INGRESA 1", datosAccion);
       this.GuardarDatos(datosAccion);
     } else if (
-      form3.tipoDecretoForm === undefined &&
-      form4.tipoCargoForm != undefined
+      form1.tipoDecretoForm === undefined &&
+      form2.tipoCargoForm != undefined
     ) {
       console.log("INGRESA 2", datosAccion);
-      this.IngresarNuevoDecreto(form3, form4, datosAccion, "1");
+      this.IngresarNuevoDecreto(form1, form2, datosAccion, "1");
     } else if (
-      form3.tipoDecretoForm != undefined &&
-      form4.tipoCargoForm === undefined
+      form1.tipoDecretoForm != undefined &&
+      form2.tipoCargoForm === undefined
     ) {
       console.log("INGRESA 3", datosAccion);
-      this.IngresarNuevoCargo(form4, datosAccion, "1");
+      this.IngresarNuevoCargo(form2, datosAccion, "1");
     } else if (
-      form3.tipoDecretoForm === undefined &&
-      form4.tipoCargoForm === undefined
+      form1.tipoDecretoForm === undefined &&
+      form2.tipoCargoForm === undefined
     ) {
       console.log("INGRESA 5", datosAccion);
-      this.IngresarNuevoDecreto(form3, form4, datosAccion, "2");
+      this.IngresarNuevoDecreto(form1, form2, datosAccion, "2");
     } else {
       console.log("INGRESA 9", datosAccion);
       this.GuardarDatos(datosAccion);
@@ -645,10 +625,10 @@ export class EditarPedidoAccionComponent implements OnInit {
   }
 
   // METODO PARA INGRESAR NUEVO TIPO DE DECRETO - ACUERDO - RESOLUCION
-  IngresarNuevoDecreto(form3, form4, datos: any, opcion: string) {
-    if (form3.otroDecretoForm != "") {
+  IngresarNuevoDecreto(form1, form2, datos: any, opcion: string) {
+    if (form1.otroDecretoForm != "") {
       let acuerdo = {
-        descripcion: form3.otroDecretoForm,
+        descripcion: form1.otroDecretoForm,
       };
       this.restAccion.IngresarDecreto(acuerdo).subscribe((resol) => {
         // BUSCAR ID DE ÚLTIMO REGISTRO DE DECRETOS - ACUERDOS - RESOLUCIÓN - OTROS
@@ -658,7 +638,7 @@ export class EditarPedidoAccionComponent implements OnInit {
           if (opcion === "1") {
             this.GuardarDatos(datos);
           } else if (opcion === "2" || opcion === "3") {
-            this.IngresarNuevoCargo(form4, datos, "1");
+            this.IngresarNuevoCargo(form2, datos, "1");
           }
           // else if (opcion === '3') {
           //   this.IngresarNuevoCargo(form, datos, '1');
@@ -680,10 +660,10 @@ export class EditarPedidoAccionComponent implements OnInit {
   }
 
   // METODO PARA INGRESAR NUEVO CARGO PROPUESTO
-  IngresarNuevoCargo(form4, datos: any, opcion: string) {
-    if (form4.otroCargoForm != "") {
+  IngresarNuevoCargo(form2, datos: any, opcion: string) {
+    if (form2.otroCargoForm != "") {
       let cargo = {
-        descripcion: form4.otroCargoForm,
+        descripcion: form2.otroCargoForm,
       };
       this.restAccion.IngresarCargoPropuesto(cargo).subscribe((resol) => {
         // BUSCAR ID DE ÚLTIMO REGISTRO DE CARGOS PROPUESTOS
@@ -730,11 +710,7 @@ export class EditarPedidoAccionComponent implements OnInit {
    }*/
 
   // METODOS PARA MOSTRAR MENSAJES DE ADVERTENCIA DE ERRORES AL USUARIO
-  ObtenerMensajeErrorDescripcion() {
-    if (this.descripcionF.hasError("pattern")) {
-      return "Ingrese información válida";
-    }
-  }
+
 
   /*  jefes: any = [];
     envios: any = [];
