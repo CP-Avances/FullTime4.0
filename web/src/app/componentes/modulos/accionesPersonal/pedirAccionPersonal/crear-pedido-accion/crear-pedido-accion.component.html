@@ -489,7 +489,7 @@
         <div style="text-align: center; margin-bottom: 3%;">
             <button id="btn-raised" class="btn btn-sm"
                 (click)="InsertarAccionPersonal(firstFormGroup.value,secondFormGroup.value,thirdFormGroup.value,fourthFormGroup.value)"
-                [disabled]="!fourthFormGroup.valid" value="Guardar">Guardar</button>
+                [disabled]="!firstFormGroup.valid || !secondFormGroup.valid || !thirdFormGroup.valid || !fourthFormGroup.valid" value="Guardar">Guardar</button>
             <button id="btn-raised" class="btn btn-sm" [routerLink]="['/listaPedidos/']"
                 value="Cancelar">Cancelar</button>
         </div>
