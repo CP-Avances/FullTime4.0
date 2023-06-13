@@ -11,7 +11,7 @@ export class DetalleCatHorariosService {
     private http: HttpClient,
   ) { }
 
-  // METODO PARA BUSCAR DETALLES DE UN HORARIO
+  // METODO PARA BUSCAR DETALLES DE UN HORARIO    --**VERIFICADO
   ConsultarUnDetalleHorario(id: number) {
     return this.http.get(`${environment.url}/detalleHorario/${id}`);
   }

@@ -23,12 +23,12 @@ export class EmpleadoHorariosService {
     return this.http.post(`${environment.url}/empleadoHorario`, datos);
   }
 
-  // METODO PARA VERIFICAR HORARIOS DUPLICADOS
+  // METODO PARA VERIFICAR HORARIOS DUPLICADOS  --**VERIFICADO
   VerificarDuplicidadHorarios(codigo: string, datos: any) {
     return this.http.post(`${environment.url}/empleadoHorario/validarFechas/${codigo}`, datos);
   }
 
-  // METODO PARA BUSCAR HORARIOS DE EMPLEADO EN UN RANGO DE FECHAS
+  // METODO PARA BUSCAR HORARIOS DE EMPLEADO EN UN RANGO DE FECHAS  --**VERIFICADO
   VerificarHorariosExistentes(codigo: string, datos: any) {
     return this.http.post(`${environment.url}/empleadoHorario/horarios-existentes/${codigo}`, datos);
   }

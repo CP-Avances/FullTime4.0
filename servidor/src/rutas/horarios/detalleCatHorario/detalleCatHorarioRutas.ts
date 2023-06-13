@@ -15,7 +15,7 @@ class PermisosRutas {
     }
 
     configuracion(): void {
-        // METODO PARA BUSCAR DETALLES DE UN HORARIO
+        // METODO PARA BUSCAR DETALLES DE UN HORARIO  --**VERIFICADO
         this.router.get('/:id_horario', TokenValidation, DETALLE_CATALOGO_HORARIO_CONTROLADOR.ListarUnDetalleHorario);
         // METODO PARA ELIMINAR REGISTRO
         this.router.delete('/eliminar/:id', TokenValidation, DETALLE_CATALOGO_HORARIO_CONTROLADOR.EliminarRegistros);
@@ -23,6 +23,7 @@ class PermisosRutas {
         this.router.post('/', TokenValidation, DETALLE_CATALOGO_HORARIO_CONTROLADOR.CrearDetalleHorarios);
         // METODO PARA ACTUALIZAR REGISTRO
         this.router.put('/', TokenValidation, DETALLE_CATALOGO_HORARIO_CONTROLADOR.ActualizarDetalleHorarios);
+
 
 
 

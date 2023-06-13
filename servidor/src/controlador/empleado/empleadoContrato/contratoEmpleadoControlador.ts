@@ -158,7 +158,7 @@ class ContratoEmpleadoControlador {
         }
     }
 
-    // METODO PARA BUSCAR FECHAS DE CONTRATOS
+    // METODO PARA BUSCAR FECHAS DE CONTRATOS    --**VERIFICADO
     public async EncontrarFechaContrato(req: Request, res: Response): Promise<any> {
         const { id_empleado } = req.body;
         const FECHA = await pool.query(
@@ -172,7 +172,7 @@ class ContratoEmpleadoControlador {
             return res.jsonp(FECHA.rows)
         }
         else {
-            return res.status(404).jsonp({ text: 'Registro no encontrado' });
+            return res.status(404).jsonp({ text: 'Registro no encontrado.' });
         }
     }
 

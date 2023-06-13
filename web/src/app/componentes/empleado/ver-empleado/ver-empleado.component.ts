@@ -829,12 +829,24 @@ export class VerEmpleadoComponent implements OnInit {
   horariosEmpleado: any = [];
   ObtenerHorariosEmpleado(codigo: number, formato_fecha: string) {
     this.horariosEmpleado = [];
-    this.restEmpleHorario.BuscarHorarioUsuario(codigo).subscribe(datos => {
+    /* this.restEmpleHorario.BuscarHorarioUsuario(codigo).subscribe(datos => {
+       this.horariosEmpleado = datos;
+       this.horariosEmpleado.forEach(data => {
+         data.fec_inicio_ = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado);
+         data.fec_final_ = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
+       })
+     })*/
+
+    let fec = {
+      fecha_inicio: '2023-05-01',
+      fecha_final: '2023-12-31',
+      //codigo: '\'35\',\'5008\''
+      codigo: '\'35\''
+    }
+
+    this.restPlanGeneral.BuscarPlanificacionHoraria(fec).subscribe(datos => {
       this.horariosEmpleado = datos;
-      this.horariosEmpleado.forEach(data => {
-        data.fec_inicio_ = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado);
-        data.fec_final_ = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
-      })
+      console.log('ver datos de planificacion ', datos)
     })
   }
 

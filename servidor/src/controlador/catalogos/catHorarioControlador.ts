@@ -138,11 +138,11 @@ class HorarioControlador {
     res.jsonp({ message: 'Documento Actualizado' });
   }
 
-  // BUSCAR LISTA DE CATALOGO HORARIOS
+  // BUSCAR LISTA DE CATALOGO HORARIOS  --**VERIFICADO
   public async ListarHorarios(req: Request, res: Response) {
     const HORARIOS = await pool.query(
       `
-      SELECT * FROM cg_horarios ORDER BY id
+      SELECT * FROM cg_horarios ORDER BY codigo ASC
       `);
     if (HORARIOS.rowCount > 0) {
       return res.jsonp(HORARIOS.rows)

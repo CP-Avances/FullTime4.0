@@ -126,7 +126,7 @@ class EmpleadoControlador {
             }
         });
     }
-    // BUSQUEDA DE UN SOLO EMPLEADO
+    // BUSQUEDA DE UN SOLO EMPLEADO  --**VERIFICADO
     BuscarEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;

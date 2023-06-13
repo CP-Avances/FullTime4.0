@@ -64,7 +64,7 @@ class EmpleadoHorariosControlador {
         }
     }
 
-    // METODO PARA BUSCAR HORARIOS DEL EMPLEADO EN DETERMINADA FECHA
+    // METODO PARA BUSCAR HORARIOS DEL EMPLEADO EN DETERMINADA FECHA  --**VERIFICADO
     public async VerificarHorariosExistentes(req: Request, res: Response): Promise<any> {
         const { fechaInicio, fechaFinal } = req.body;
         const { codigo } = req.params;
@@ -319,7 +319,7 @@ class EmpleadoHorariosControlador {
         }
     }
 
-    // VERIFICAR EXISTENCIA DE PLANIFICACION 
+    // VERIFICAR EXISTENCIA DE PLANIFICACION   --**VERIFICADO
     public async VerificarFechasHorario(req: Request, res: Response): Promise<any> {
         const { fechaInicio, fechaFinal, id_horario } = req.body;
         const { codigo } = req.params;

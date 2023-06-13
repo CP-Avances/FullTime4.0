@@ -63,7 +63,7 @@ class HorarioRutas {
         this.router.put('/eliminar_horario/base_servidor', [TokenValidation], HORARIO_CONTROLADOR.EliminarDocumento);
         // ELIMINAR DOCUMENTO DE HORARIOS DEL SERVIDOR
         this.router.put('/eliminar_horario/servidor', [TokenValidation], HORARIO_CONTROLADOR.EliminarDocumentoServidor);
-        // BUSCAR LISTA DE CATALOGO HORARIOS
+        // BUSCAR LISTA DE CATALOGO HORARIOS   --**VERIFICADO
         this.router.get('/', TokenValidation, HORARIO_CONTROLADOR.ListarHorarios);
         // OBTENER VISTA DE DOCUMENTOS
         this.router.get('/documentos/:docs', HORARIO_CONTROLADOR.ObtenerDocumento);

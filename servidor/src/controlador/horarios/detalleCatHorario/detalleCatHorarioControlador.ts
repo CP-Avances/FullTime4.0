@@ -5,7 +5,7 @@ import fs from 'fs';
 
 class DetalleCatalogoHorarioControlador {
 
-    // METODO PARA BUSCAR DETALLE DE UN HORARIO
+    // METODO PARA BUSCAR DETALLE DE UN HORARIO   --**VERIFICADO
     public async ListarUnDetalleHorario(req: Request, res: Response): Promise<any> {
         const { id_horario } = req.params;
         const HORARIO = await pool.query(

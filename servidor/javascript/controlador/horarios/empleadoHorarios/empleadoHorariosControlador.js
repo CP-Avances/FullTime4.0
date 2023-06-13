@@ -71,7 +71,7 @@ class EmpleadoHorariosControlador {
             }
         });
     }
-    // METODO PARA BUSCAR HORARIOS DEL EMPLEADO EN DETERMINADA FECHA
+    // METODO PARA BUSCAR HORARIOS DEL EMPLEADO EN DETERMINADA FECHA  --**VERIFICADO
     VerificarHorariosExistentes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fechaInicio, fechaFinal } = req.body;
@@ -288,7 +288,7 @@ class EmpleadoHorariosControlador {
             }
         });
     }
-    // VERIFICAR EXISTENCIA DE PLANIFICACION 
+    // VERIFICAR EXISTENCIA DE PLANIFICACION   --**VERIFICADO
     VerificarFechasHorario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fechaInicio, fechaFinal, id_horario } = req.body;

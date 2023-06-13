@@ -7,14 +7,14 @@ p {
     font-size: x-small;
 }
 
-#items{
+#items {
     font-size: 14px;
     margin-top: 8%;
     font-style: normal;
     font-weight: 900;
     letter-spacing: 1px;
     word-wrap: break-word;
-  }
+}
 
 .material-icons {
     margin-right: 8px;
@@ -60,7 +60,7 @@ mat-grid-tile:hover {
     padding-right: 5px;
 }
 
-label{
+label {
     font-size: 15px;
 }
 
@@ -93,7 +93,7 @@ label{
     text-align: center;
 }
 
-#detalle{
+#detalle {
     color: rgb(38, 0, 255);
     margin-right: 5px;
     cursor: pointer;
@@ -101,7 +101,7 @@ label{
     text-align: center;
 }
 
-#ver{
+#ver {
     color: indianred;
     margin-right: 5px;
     cursor: pointer;
@@ -259,10 +259,30 @@ td {
     text-align: center;
 }
 
-#btndocumento{
+#btndocumento {
     font-size: 12px;
     font-style: normal;
     font-weight: 500;
     letter-spacing: 0px;
     word-wrap: break-word;
+}
+
+#table_horario {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 12px;
+}
+
+#td_horarios{
+    border: 1px solid #ccc;
+    text-align: left;
+    padding: 8px;
+
+    text-align: center;
+    
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
   }
+

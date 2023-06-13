@@ -42,7 +42,7 @@ export class HorarioService {
     return this.http.put(`${environment.url}/horario/eliminar_horario/servidor`, datos)
   }
 
-  // BUSCAR LISTA DE CATALOGO DE HORARIOS
+  // BUSCAR LISTA DE CATALOGO DE HORARIOS         --** VERIFICADO
   BuscarListaHorarios() {
     return this.http.get(`${environment.url}/horario`);
   }

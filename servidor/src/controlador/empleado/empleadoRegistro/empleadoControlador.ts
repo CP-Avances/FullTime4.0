@@ -134,7 +134,7 @@ class EmpleadoControlador {
     }
   }
 
-  // BUSQUEDA DE UN SOLO EMPLEADO
+  // BUSQUEDA DE UN SOLO EMPLEADO  --**VERIFICADO
   public async BuscarEmpleado(req: Request, res: Response): Promise<any> {
     const { id } = req.params;
     const EMPLEADO = await pool.query(

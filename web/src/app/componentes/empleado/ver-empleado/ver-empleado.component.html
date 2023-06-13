@@ -806,44 +806,83 @@
                     </button>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-hover table-sm ">
+                    <table id="table_horario" class="table table-hover table-sm ">
                         <thead class="thead-light">
                             <tr style="text-align: center;">
-                                <th scope="col" rowspan="2">Horario</th>
-                                <th scope="col" rowspan="2">Inicio</th>
-                                <th scope="col" rowspan="2">Final</th>
-                                <th scope="col" colspan="7">Semana</th>
-                                <th scope="col" rowspan="2">Acciones</th>
+                                <th scope="col" id="td_horarios" rowspan="2">AÑO</th>
+                                <th scope="col" id="td_horarios" rowspan="2">MES</th>
+                                <th scope="col" id="td_horarios" colspan="31">DÍAS DEL MES</th>
                             </tr>
                             <tr style="text-align: center;">
-                                <th scope="col">Lu</th>
-                                <th scope="col">Mar</th>
-                                <th scope="col">Mi</th>
-                                <th scope="col">Ju</th>
-                                <th scope="col">Vi</th>
-                                <th scope="col">Sa</th>
-                                <th scope="col">Do</th>
+                                <th scope="col" id="td_horarios">01</th>
+                                <th scope="col" id="td_horarios">02</th>
+                                <th scope="col" id="td_horarios">03</th>
+                                <th scope="col" id="td_horarios">04</th>
+                                <th scope="col" id="td_horarios">05</th>
+                                <th scope="col" id="td_horarios">06</th>
+                                <th scope="col" id="td_horarios">07</th>
+                                <th scope="col" id="td_horarios">08</th>
+                                <th scope="col" id="td_horarios">09</th>
+                                <th scope="col" id="td_horarios">10</th>
+                                <th scope="col" id="td_horarios">11</th>
+                                <th scope="col" id="td_horarios">12</th>
+                                <th scope="col" id="td_horarios">13</th>
+                                <th scope="col" id="td_horarios">14</th>
+                                <th scope="col" id="td_horarios">15</th>
+                                <th scope="col" id="td_horarios">16</th>
+                                <th scope="col" id="td_horarios">17</th>
+                                <th scope="col" id="td_horarios">18</th>
+                                <th scope="col" id="td_horarios">19</th>
+                                <th scope="col" id="td_horarios">20</th>
+                                <th scope="col" id="td_horarios">21</th>
+                                <th scope="col" id="td_horarios">22</th>
+                                <th scope="col" id="td_horarios">23</th>
+                                <th scope="col" id="td_horarios">24</th>
+                                <th scope="col" id="td_horarios">25</th>
+                                <th scope="col" id="td_horarios">26</th>
+                                <th scope="col" id="td_horarios">27</th>
+                                <th scope="col" id="td_horarios">28</th>
+                                <th scope="col" id="td_horarios">29</th>
+                                <th scope="col" id="td_horarios">30</th>
+                                <th scope="col" id="td_horarios">31</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr *ngFor="let h of horariosEmpleado | paginate:tamanio_pagina:numero_pagina">
-                                <td>{{h.nom_horario}}</td>
-                                <td>{{h.fec_inicio_}}</td>
-                                <td>{{h.fec_final_}}</td>
-                                <td *ngIf="h.lunes == true">Libre</td>
-                                <td *ngIf="h.lunes == false">Normal</td>
-                                <td *ngIf="h.martes == true">Libre</td>
-                                <td *ngIf="h.martes == false">Normal</td>
-                                <td *ngIf="h.miercoles == true">Libre</td>
-                                <td *ngIf="h.miercoles == false">Normal</td>
-                                <td *ngIf="h.jueves == true">Libre</td>
-                                <td *ngIf="h.jueves == false">Normal</td>
-                                <td *ngIf="h.viernes == true">Libre</td>
-                                <td *ngIf="h.viernes == false">Normal</td>
-                                <td *ngIf="h.sabado == true">Libre</td>
-                                <td *ngIf="h.sabado == false">Normal</td>
-                                <td *ngIf="h.domingo == true">Libre</td>
-                                <td *ngIf="h.domingo == false">Normal</td>
+                                <td id="td_horarios">{{h.anio}}</td>
+                                <td id="td_horarios">{{h.mes}}</td>
+                                <td id="td_horarios">{{h.dia1}}</td>
+                                <td id="td_horarios">{{h.dia2}}</td>
+                                <td id="td_horarios">{{h.dia3}}</td>
+                                <td id="td_horarios">{{h.dia4}}</td>
+                                <td id="td_horarios">{{h.dia5}}</td>
+                                <td id="td_horarios">{{h.dia6}}</td>
+                                <td id="td_horarios">{{h.dia7}}</td>
+                                <td id="td_horarios">{{h.dia8}}</td>
+                                <td id="td_horarios">{{h.dia9}}</td>
+                                <td id="td_horarios">{{h.dia10}}</td>
+                                <td id="td_horarios">{{h.dia11}}</td>
+                                <td id="td_horarios">{{h.dia12}}</td>
+                                <td id="td_horarios">{{h.dia13}}</td>
+                                <td id="td_horarios">{{h.dia14}}</td>
+                                <td id="td_horarios">{{h.dia15}}</td>
+                                <td id="td_horarios">{{h.dia16}}</td>
+                                <td id="td_horarios">{{h.dia17}}</td>
+                                <td id="td_horarios">{{h.dia18}}</td>
+                                <td id="td_horarios">{{h.dia19}}</td>
+                                <td id="td_horarios">{{h.dia20}}</td>
+                                <td id="td_horarios">{{h.dia21}}</td>
+                                <td id="td_horarios">{{h.dia22}}</td>
+                                <td id="td_horarios">{{h.dia23}}</td>
+                                <td id="td_horarios">{{h.dia24}}</td>
+                                <td id="td_horarios">{{h.dia25}}</td>
+                                <td id="td_horarios">{{h.dia26}}</td>
+                                <td id="td_horarios">{{h.dia27}}</td>
+                                <td id="td_horarios">{{h.dia28}}</td>
+                                <td id="td_horarios">{{h.dia29}}</td>
+                                <td id="td_horarios">{{h.dia30}}</td>
+                                <td id="td_horarios">{{h.dia31}}</td>
+                                <!--
                                 <td>
                                     <i class="fas fa-edit" id="edit" (click)="AbrirEditarHorario(h)" matSuffix
                                         matTooltipPosition="right"
@@ -856,6 +895,7 @@
                                         <p>Eliminar</p>
                                     </i>
                                 </td>
+                                -->
                             </tr>
                         </tbody>
                     </table>
