@@ -355,6 +355,7 @@ export class ListarVacacionesComponent implements OnInit {
         this.BuscarParametro();
         this.auto_individual = true;
         this.selectionUno.clear();
+        this.btnCheckHabilitar = false;
       });
   }
 
