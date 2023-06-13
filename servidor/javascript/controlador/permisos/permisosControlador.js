@@ -532,10 +532,10 @@ class PermisosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const PERMISOS = yield database_1.default.query('SELECT p.id, p.fec_creacion, p.descripcion, p.fec_inicio, ' +
                 'p.documento, p.docu_nombre, p.fec_final, p.estado, p.id_empl_cargo, e.id AS id_emple_solicita, e.nombre, e.apellido, ' +
-                'e.cedula, cp.descripcion AS nom_permiso, ec.id AS id_contrato FROM permisos AS p, ' +
-                'empl_contratos AS ec, empleados AS e, cg_tipo_permisos AS cp ' +
+                'e.cedula, cp.descripcion AS nom_permiso, ec.id AS id_contrato, da.id_departamento AS id_depa FROM permisos AS p, ' +
+                'empl_contratos AS ec, empleados AS e, cg_tipo_permisos AS cp, datos_actuales_empleado AS da ' +
                 'WHERE p.id_empl_contrato = ec.id AND ' +
-                'ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id  AND (p.estado = 1 OR p.estado = 2) ' +
+                'ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id AND da.id_contrato = ec.id AND (p.estado = 1 OR p.estado = 2) ' +
                 'ORDER BY estado DESC, fec_creacion DESC');
             if (PERMISOS.rowCount > 0) {
                 return res.jsonp(PERMISOS.rows);

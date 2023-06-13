@@ -6,14 +6,13 @@
                 matTooltipPosition="right" matTooltip="Autorizar a todos los empleados su Solicitud de Horas Extras"
                 id="SelectCheck">library_add_check</mat-icon>
             <button *ngIf="btnCheckHabilitar" class="btn btn-primary" (click)="AutorizarHorasExtrasMultiple('pedido')"
-                style="float: left; margin-left: 5px;">Autorizar</button>
+                style="float: left; margin-left: 8px;">Autorizar</button>
             <span class="w-100 bd-highlight">
                 LISTA DE SOLICITUDES DE HORAS EXTRAS</span>
-            <button class="btn btn-sm" style="float: right; margin-right: 10px;" ngDefaultControl
+            <button class="btn btn-sm" style="float: right; margin-right: 6px;" ngDefaultControl
                 [(ngModel)]="totalHorasExtras" [ngModelOptions]="{standalone: true}">Horas Totales
                 {{totalHorasExtras}}</button>
         </div>
-
         <div class="table-responsive">
             <table class="table table-hover table-sm">
                 <thead class="thead-light">

@@ -38,7 +38,8 @@ export interface VacacionesElemento {
   id_empl_solicita: number;
   nombre: string,
   id_empl_cargo: number,
-  legalizado: boolean
+  legalizado: boolean,
+  id_departamento?: number
 }
 
 @Component({
@@ -301,7 +302,7 @@ export class ListarVacacionesComponent implements OnInit {
   // SI EL NÚMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NÚMERO TOTAL DE FILAS.
   isAllSelected() {
     const numSelected = this.selectionUno.selected.length;
-    const numRows = this.listaVacacionesFiltrada.length;
+    const numRows = this.listaVacacionDeparta.length;
     return numSelected === numRows;
   }
 
@@ -309,7 +310,7 @@ export class ListarVacacionesComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
-      this.listaVacacionesFiltrada.forEach(row => this.selectionUno.select(row));
+      this.listaVacacionDeparta.forEach(row => this.selectionUno.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACIÓN EN LA FILA PASADA
@@ -339,6 +340,7 @@ export class ListarVacacionesComponent implements OnInit {
         empleado: obj.nombre + ' ' + obj.apellido,
         id_emple_solicita: obj.id_empl_solicita,
         id_cargo: obj.id_empl_cargo,
+        id_depa: obj.id_departamento,
         estado: obj.estado,
       }
     })
@@ -407,7 +409,7 @@ export class ListarVacacionesComponent implements OnInit {
     if (opcion == "Vacaciones solicitadas") {
       sessionStorage.setItem(
         "VacacionesSolicitadas",
-        this.listaVacacionesFiltrada
+        this.listaVacacionDeparta
       );
     } else if (opcion == "Vacaciones autorizadas") {
       sessionStorage.setItem(
@@ -520,7 +522,7 @@ export class ListarVacacionesComponent implements OnInit {
 
   //Metodo seleccionar que lista de permisos mostrar (solicitados o autorizados)
   mostrarDatosPermisos(opcion: string) {
-      return (opcion == "Vacaciones solicitadas"?this.listaVacacionesFiltrada:this.listaVacacionesFiltradaAutorizada).map((obj) => {
+      return (opcion == "Vacaciones solicitadas"?this.listaVacacionDeparta:this.listaVacacionesFiltradaAutorizada).map((obj) => {
         return [
           { text: obj.nombre +' '+ obj.apellido, style: "itemsTable" },
           { text: obj.estado, style: "itemsTable" },
@@ -536,7 +538,7 @@ export class ListarVacacionesComponent implements OnInit {
    ** ************************************************************************************************* **/
 
    exportToExcel(opcion: string) {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Vacaciones solicitadas"?this.listaVacacionesFiltrada:this.listaVacacionesFiltradaAutorizada).map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Vacaciones solicitadas"?this.listaVacacionDeparta:this.listaVacacionesFiltradaAutorizada).map(obj => {
       return {
         Nombre: obj.nombre +' '+ obj.apellido,
         Estado: obj.estado,
@@ -546,7 +548,7 @@ export class ListarVacacionesComponent implements OnInit {
       }
     }));
     // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
-    const header = Object.keys(this.listaVacacionesFiltrada[0]); // NOMBRE DE CABECERAS DE COLUMNAS
+    const header = Object.keys(this.listaVacacionDeparta[0]); // NOMBRE DE CABECERAS DE COLUMNAS
     var wscols : any = [];
     for (var i = 0; i < header.length; i++) {  // CABECERAS AÑADIDAS CON ESPACIOS
       wscols.push({ wpx: 100 })
@@ -562,7 +564,7 @@ export class ListarVacacionesComponent implements OnInit {
    ** ************************************************************************************************** **/
 
    exportToCVS(opcion: string) {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Vacaciones solicitadas"?this.listaVacacionesFiltrada:this.listaVacacionesFiltradaAutorizada).map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Vacaciones solicitadas"?this.listaVacacionDeparta:this.listaVacacionesFiltradaAutorizada).map(obj => {
       return {
         Nombre: obj.nombre +' '+ obj.apellido,
         Estado: obj.estado,
@@ -585,7 +587,7 @@ export class ListarVacacionesComponent implements OnInit {
   exportToXML(opcion: String) {
     var objeto: any;
     var arregloVacaciones: any = [];
-    (opcion == "Vacaciones solicitadas"?this.listaVacacionesFiltrada:this.listaVacacionesFiltradaAutorizada).forEach(obj => {
+    (opcion == "Vacaciones solicitadas"?this.listaVacacionDeparta:this.listaVacacionesFiltradaAutorizada).forEach(obj => {
       objeto = {
         "lista_permisos": {
         '@id': obj.id,
