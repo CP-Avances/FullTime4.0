@@ -41,6 +41,7 @@ export interface PermisosElemento {
   nom_permiso: string;
   nombre: string;
   id_empl_cargo: number;
+  id_depa?: number;
 }
 
 @Component({
@@ -297,7 +298,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   // SI EL NÚMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NÚMERO TOTAL DE FILAS.
   isAllSelected() {
     const numSelected = this.selectionUno.selected.length;
-    const numRows = this.listaPermisosFiltradas.length;
+    const numRows = this.listaPermisosDeparta.length;
     return numSelected === numRows;
   }
 
@@ -305,7 +306,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   masterToggle() {
     this.isAllSelected()
       ? this.selectionUno.clear()
-      : this.listaPermisosFiltradas.forEach((row) =>
+      : this.listaPermisosDeparta.forEach((row) =>
           this.selectionUno.select(row)
         );
   }
@@ -340,6 +341,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
         id_contrato: obj.id_contrato,
         id_emple_solicita: obj.id_emple_solicita,
         id_cargo: obj.id_empl_cargo,
+        id_depa: obj.id_depa,
         estado: obj.estado,
       };
     });
@@ -449,7 +451,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     if (opcion == "Permisos solicitados") {
       sessionStorage.setItem(
         "PermisosSolicitados",
-        this.listaPermisosFiltradas
+        this.listaPermisosDeparta
       );
     } else if (opcion == "Permisos autorizados") {
       sessionStorage.setItem(
@@ -562,7 +564,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
 
   //Metodo seleccionar que lista de permisos mostrar (solicitados o autorizados)
   mostrarDatosPermisos(opcion: string) {
-      return (opcion == "Permisos solicitados"?this.listaPermisosFiltradas:this.listaPermisosAutorizadosFiltrados).map((obj) => {
+      return (opcion == "Permisos solicitados"?this.listaPermisosDeparta:this.listaPermisosAutorizadosFiltrados).map((obj) => {
         return [
           { text: obj.nombre +' '+ obj.apellido, style: "itemsTable" },
           { text: obj.estado, style: "itemsTable" },
@@ -578,7 +580,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
    ** ************************************************************************************************* **/
 
    exportToExcel(opcion: string) {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Permisos solicitados"?this.listaPermisosFiltradas:this.listaPermisosAutorizadosFiltrados).map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Permisos solicitados"?this.listaPermisosDeparta:this.listaPermisosAutorizadosFiltrados).map(obj => {
       return {
         Nombre: obj.nombre +' '+ obj.apellido,
         Estado: obj.estado,
@@ -589,7 +591,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
       }
     }));
     // METODO PARA DEFINIR TAMAÑO DE LAS COLUMNAS DEL REPORTE
-    const header = Object.keys(this.listaPermisosFiltradas[0]); // NOMBRE DE CABECERAS DE COLUMNAS
+    const header = Object.keys(this.listaPermisosDeparta[0]); // NOMBRE DE CABECERAS DE COLUMNAS
     var wscols: any = [];
     for (var i = 0; i < header.length; i++) {  // CABECERAS AÑADIDAS CON ESPACIOS
       wscols.push({ wpx: 100 })
@@ -605,7 +607,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
    ** ************************************************************************************************** **/
 
    exportToCVS(opcion: string) {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Permisos solicitados"?this.listaPermisosFiltradas:this.listaPermisosAutorizadosFiltrados).map(obj => {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Permisos solicitados"?this.listaPermisosDeparta:this.listaPermisosAutorizadosFiltrados).map(obj => {
       return {
         Nombre: obj.nombre +' '+ obj.apellido,
         Estado: obj.estado,
@@ -629,7 +631,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   exportToXML(opcion: String) {
     var objeto: any;
     var arregloPermisos: any = [];
-    (opcion == "Permisos solicitados"?this.listaPermisosFiltradas:this.listaPermisosAutorizadosFiltrados).forEach(obj => {
+    (opcion == "Permisos solicitados"?this.listaPermisosDeparta:this.listaPermisosAutorizadosFiltrados).forEach(obj => {
       objeto = {
         "lista_permisos": {
         '@id': obj.id,
