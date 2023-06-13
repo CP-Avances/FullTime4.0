@@ -9,6 +9,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling'
 import { AppComponent } from './app.component';
 import { ToastrModule } from 'ngx-toastr';
 import { FormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
 
 // COMPONENTES ADMINISTRADOR
 import { VistaRolesComponent } from './componentes/catalogos/catRoles/vista-roles/vista-roles.component';
@@ -590,6 +591,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     SocketIoModule.forRoot(config),
     FontAwesomeModule,
     FormsModule,
+    MatCardModule,
     //ImageUploadModule.forRoot(),
     ScrollingModule,
     //JwPaginationModule,
