@@ -642,19 +642,27 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
         return this.validar.RedireccionarHomeAdmin(err.error)
       })
     }
-    this.AbrirAutorizaciones(EmpleadosSeleccionados, 'multiple');
+    this.AbrirAutorizaciones(EmpleadosSeleccionados, 'multiple', lista);
   }
 
 
   // AUTORIZACIÓN DE HORAS EXTRAS PLANIFICADAS
-  AbrirAutorizaciones(datosHoraExtra, forma: string) {
+  AbrirAutorizaciones(datosHoraExtra, forma: string, lista: string) {
     this.ventana.open(HoraExtraAutorizacionesComponent,
       { width: '600px', data: { datosHora: datosHoraExtra, carga: forma } })
       .afterClosed()
       .subscribe(items => {
         this.BuscarParametro();
-        this.auto_individual = true;
-        this.selectionUno.clear();
+        if (lista === 'pedido') {
+          this.auto_individual = true;
+          this.selectionUno.clear();
+          this.btnCheckHabilitar = false;
+        }
+        else if (lista === 'observacion') {
+          this.observa_individual = true;
+          this.selectionUnoObserva.clear();
+          this.btnCheckHabilitarObserva = false;
+        }
       }
     );
   }

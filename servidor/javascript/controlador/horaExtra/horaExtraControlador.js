@@ -40,9 +40,9 @@ class HorasExtrasPedidasControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const HORAS_EXTRAS_PEDIDAS = yield database_1.default.query('SELECT h.id, h.fec_inicio, h.fec_final, h.estado, ' +
                 'h.fec_solicita, h.descripcion, h.num_hora, h.tiempo_autorizado, e.id AS id_usua_solicita, h.id_empl_cargo, ' +
-                'e.nombre, e.apellido, contrato.id AS id_contrato FROM hora_extr_pedidos AS h, empleados AS e, ' +
-                'empl_contratos As contrato, empl_cargos AS cargo WHERE h.id_usua_solicita = e.id AND ' +
-                '(h.estado = 1 OR h.estado = 2) AND ' +
+                'e.nombre, e.apellido, contrato.id AS id_contrato, da.id_departamento FROM hora_extr_pedidos AS h, empleados AS e, ' +
+                'empl_contratos As contrato, empl_cargos AS cargo, datos_actuales_empleado AS da WHERE h.id_usua_solicita = e.id AND ' +
+                '(h.estado = 1 OR h.estado = 2) AND da.id_contrato = contrato.id AND ' +
                 'contrato.id = cargo.id_empl_contrato AND cargo.id = h.id_empl_cargo AND h.observacion = true');
             if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
                 return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows);
