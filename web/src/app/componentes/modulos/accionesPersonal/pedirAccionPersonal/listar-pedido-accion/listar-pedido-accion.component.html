@@ -72,7 +72,7 @@
                         <td>{{a.fecDesde_}}</td>
                         <td>{{a.fecHasta_}}</td>
                         <td>{{a.num_partida}}</td>
-                        <td class="d-flex justify-content-center">
+                        <td class="d-flex justify-content-center" style="margin-right: 1rem;">
                             <i matSuffix matTooltipPosition="right" matTooltip="Ver datos generales de este registro."
                                 class="fas fa-eye" id="t-ver" [routerLink]="['/verAccion/',a.id]">
                                 <p>Ver</p>
@@ -82,10 +82,15 @@
                                 [routerLink]="['/editarPedido/',a.id]">
                                 <p>Editar</p>
                             </i>
-                            <i (click)="MostrarInformacion(a.id)" id="pdf" class="fas fa-file-pdf" matSuffix
+                            <i (click)="MostrarInformacion(a.id, 'pdf')" id="pdf" class="fas fa-file-pdf" matSuffix
                                 matTooltipPosition="right"
                                 matTooltip="Ver pedido de Acción de Personal en formato PDF.">
                                 <p>PDF</p>
+                            </i>
+                            <i (click)="MostrarInformacion(a.id, 'excel')" id="excel" class="fas fa-file-excel" matSuffix
+                                matTooltipPosition="right"
+                                matTooltip="Ver pedido de Acción de Personal en formato EXCEL.">
+                                <p>XLSL</p>
                             </i>
                         </td>
                     </tr>

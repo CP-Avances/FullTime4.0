@@ -1,20 +1,43 @@
 <div class="container" *ngFor="let d of datosPedido" style="padding-top: 15px;">
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
-            <span>ACCIÓN DE PERSONAL</span>
+            <span></span>
         </div>
         <mat-card-content>
             <div class="d-flex justify-content-around">
                 <div class="container" style="padding-top: 15px;">
                     <div class="row">
                         <div class="col-sm">
+                            <div class="subtitulo">
+                                <span>ACCIÓN DE PERSONAL</span>
+                            </div>
                             <label class="col-sm col-form-label"><b>Identificación:</b>
                                 {{d.identi_accion_p.toUpperCase()}}
                             </label>
-                        </div>
-                        <div class="col-sm">
                             <label class="col-sm col-form-label"><b>Fecha Registro:</b>
                                 {{d.fec_creacion_}}
+                            </label>
+                            <div class="subtitulo">
+                                <span>DECRETO-ACUERDO-RESOLUCIÓN</span>
+                            </div>
+                            <label class="col-sm col-form-label"><b>Decreto, acuerdo o resolución:</b>
+                                {{decreto.toUpperCase()}}
+                            </label>
+                        </div>
+                        <div class="col-sm">
+                            <div class="subtitulo">
+                                <span>TIPO DE ACCIÓN</span>
+                            </div>
+                            <label class="col-sm col-form-label"><b>Tipo de acción personal:</b>
+                                {{d.tipo.toUpperCase()}}
+                            </label>
+                            <div class="subtitulo">
+                                <span>EXPLICACIÓN (Base legal del tipo de acción y su adición)</span>
+                            </div>
+                            <label class="col-sm col-form-label"
+                                *ngIf="d.adicion_legal != null && d.adicion_legal != ''">
+                                <b>Adicción legal:</b>
+                                {{d.adicion_legal}}
                             </label>
                         </div>
                         <div style="text-align: right;">
@@ -30,131 +53,59 @@
     </mat-card>
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
-            <span>DATOS DEL EMPLEADO</span>
+            <span></span>
         </div>
         <mat-card-content>
             <div class="d-flex justify-content-around">
                 <div class="container" style="padding-top: 15px;">
                     <div class="row">
                         <div class="col-sm">
+                            <div class="subtitulo">
+                                <span>DATOS DEL EMPLEADO</span>
+                            </div>
                             <label class="col-sm col-form-label"><b>Empleado:</b>
                                 {{datoEmpleado.toUpperCase()}}
                             </label>
-                            <br>
                             <label class="col-sm col-form-label"><b>Cédula:</b> {{cedula}}</label>
-                            <br>
                             <label class="col-sm col-form-label"><b>Departamento:</b>
                                 {{departamentoE.toUpperCase()}}</label>
-                            <br>
                             <label class="col-sm col-form-label"><b>Cargo:</b> {{cargo.toUpperCase()}}</label>
-                        </div>
-                        <div class="col-sm">
                             <label class="col-sm col-form-label"><b>Remuneración mensual:</b> $ {{sueldo}}</label>
-                            <br>
                             <label class="col-sm col-form-label"><b>Rige desde:</b>
                                 {{d.fec_rige_desde_}}
                             </label>
-                            <br>
                             <label class="col-sm col-form-label"><b>Rige hasta:</b>
                                 {{d.fec_rige_desde_}}
                             </label>
-                            <br>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </mat-card-content>
-    </mat-card>
-    <mat-card class="example-card mat-elevation-z8">
-        <div id="titulo">
-            <span>DECRETO-ACUERDO-RESOLUCIÓN</span>
-        </div>
-        <mat-card-content>
-            <label class="col-sm col-form-label"><b>Decreto, acuerdo o resolución:</b>
-                {{decreto.toUpperCase()}}
-            </label>
-            <br>
-        </mat-card-content>
-    </mat-card>
-    <mat-card class="example-card mat-elevation-z8">
-        <div id="titulo">
-            <span>EXPLICACIÓN</span>
-        </div>
-        <mat-card-content>
-            <br *ngIf="d.adicion_legal != null && d.adicion_legal != ''">
-            <label class="col-sm col-form-label" *ngIf="d.adicion_legal != null && d.adicion_legal != ''"><b>Adicón
-                    legal:</b>
-                {{d.adicion_legal}}</label>
-            <br>
-        </mat-card-content>
-    </mat-card>
-    <mat-card class="example-card mat-elevation-z8">
-        <div id="titulo">
-            <span>TIPO DE ACCIÓN</span>
-        </div>
-        <mat-card-content>
-            <label class="col-sm col-form-label"><b>Tipo de acción personal:</b>
-                {{d.tipo.toUpperCase()}}
-            </label>
-        </mat-card-content>
-    </mat-card>
-    <mat-card class="example-card mat-elevation-z8">
-        <div id="titulo">
-            <span>SITUACIÓN ACTUAL</span>
-        </div>
-        <mat-card-content>
-            <div class="d-flex justify-content-around">
-                <div class="container" style="padding-top: 15px;">
-                    <div class="row">
-                        <div class="col-sm">
+                            <div class="subtitulo">
+                                <span>SITUACIÓN ACTUAL (Datos tomados desde la ficha del empleado)</span>
+                            </div>
                             <label class="col-sm col-form-label"><b>Número partida:</b>
                                 {{d.num_partida}}
                             </label>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </mat-card-content>
-    </mat-card>
-    <mat-card class="example-card mat-elevation-z8">
-        <div id="titulo">
-            <span>SITUACIÓN PROPUESTA</span>
-        </div>
-        <mat-card-content>
-            <div class="d-flex justify-content-around">
-                <div class="container" style="padding-top: 15px;">
-                    <div class="row">
                         <div class="col-sm">
+                            <div class="subtitulo">
+                                <span>SITUACIÓN PROPUESTA</span>
+                            </div>
                             <label class="col-sm col-form-label"><b>Proceso propuesto:</b>
                                 {{proceso.toUpperCase()}}
                             </label>
-                            <br>
                             <label class="col-sm col-form-label"><b>Ciudad:</b>
                                 {{ciudad.toUpperCase()}}
                             </label>
-                            <br>
                             <label class="col-sm col-form-label"><b>Cargo propuesto:</b>
                                 {{cargop.toUpperCase()}}
                             </label>
-                            <br>
                             <label class="col-sm col-form-label"><b>Salario propuesto:</b>
                                 {{d.salario_propuesto}}
                             </label>
-                            <br>
-                        </div>
-                        <div class="col-sm">
                             <label class="col-sm col-form-label"><b>Número partida propuesta:</b>
                                 {{d.num_partida_propuesta}}
                             </label>
-                            <br>
-                            <label class="col-sm col-form-label"><b>Descripción:</b>
-                                {{d.descrip_partida}}
-                            </label>
-                            <br>
                             <label class="col-sm col-form-label"><b>Número partida individual:</b>
                                 {{d.num_partida_individual}}
                             </label>
-                            <br>
                         </div>
                     </div>
                 </div>
@@ -163,43 +114,44 @@
     </mat-card>
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
-            <span>ACTA FINAL DEL CONCURSO</span>
+            <span></span>
         </div>
         <mat-card-content>
             <div class="d-flex justify-content-around">
                 <div class="container" style="padding-top: 15px;">
                     <div class="row">
                         <div class="col-sm">
+                            <div class="subtitulo">
+                                <span>ACTA FINAL DEL CONCURSO</span>
+                            </div>
                             <label class="col-sm col-form-label"><b>Acta final del concurso No.:</b>
                                 {{d.act_final_concurso}}
                             </label>
-                        </div>
-                        <div class="col-sm">
-                            <label class="col-sm col-form-label"><b>Acta final del concurso No.:</b>
-                                {{d.fec_act_final_concurso}}
+                            <label class="col-sm col-form-label"><b>Fecha:</b>
+                                {{d.fec_act_final_concurso_}}
                             </label>
                         </div>
                     </div>
-                </div>
-            </div>
-        </mat-card-content>
-    </mat-card>
-    <mat-card class="example-card mat-elevation-z8">
-        <div id="titulo">
-            <span>REGISTRO Y CONTROL</span>
-        </div>
-        <mat-card-content>
-            <div class="d-flex justify-content-around">
-                <div class="container" style="padding-top: 15px;">
                     <div class="row">
                         <div class="col-sm">
-                            <label class="col-sm col-form-label"><b>Firman:</b>
-                                <br><br><b>{{cargoH.toUpperCase()}} {{d.abrev_empl_uno}}</b> {{datoEmpleadoH.toUpperCase()}}
-                                <br><br><b>{{cargoG.toUpperCase()}} {{d.abrev_empl_dos}}</b>{{datoEmpleadoG.toUpperCase()}}
+                            <div class="subtitulo">
+                                <span>PROCESO DE RECURSOS HUMANOS</span>
+                            </div>
+                            <label class="col-sm col-form-label"><b>Firman:</b></label>
+                            <label class="col-sm col-form-label">
+                                {{d.abrev_empl_uno}} {{datoEmpleadoH.toUpperCase()}} <br>
+                                {{cargoH.toUpperCase()}}
                             </label>
-                            <br>
+                            <label class="col-sm col-form-label">
+                                {{d.abrev_empl_dos}} {{datoEmpleadoG.toUpperCase()}} <br>
+                                {{cargoG.toUpperCase()}}
+                            </label>
                         </div>
+
                         <div class="col-sm">
+                            <div class="subtitulo">
+                                <span>REGISTRO Y CONTROL</span>
+                            </div>
                             <label class="col-sm col-form-label"><b>Responsable:</b>
                                 {{datoEmpleadoR.toUpperCase()}}
                             </label>
@@ -211,49 +163,39 @@
     </mat-card>
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
-            <span>LA PERSONA REEMPLAZA A</span>
+            <span></span>
         </div>
         <mat-card-content>
             <div class="d-flex justify-content-around">
                 <div class="container" style="padding-top: 15px;">
                     <div class="row">
+                        <div class="subtitulo">
+                            <span>LA PERSONA REEMPLAZA A</span>
+                        </div>
                         <div class="col-sm">
                             <label class="col-sm col-form-label"><b>Nombre:</b>
                                 {{d.nombre_reemp}}
                             </label>
-                            <br>
                             <label class="col-sm col-form-label"><b>Puesto:</b>
                                 {{d.puesto_reemp}}
                             </label>
-                            <br>
                             <label class="col-sm col-form-label"><b>Funciones:</b>
                                 {{d.funciones_reemp}}
                             </label>
-                            <br>
                         </div>
                         <div class="col-sm">
                             <label class="col-sm col-form-label"><b>Número de acción:</b>
                                 {{d.num_accion_reemp}}
                             </label>
-                            <br>
                             <label class="col-sm col-form-label"><b>Primera fecha:</b>
-                                {{d.primera_fecha_reemp}}
+                                {{d.primera_fecha_reemp_}}
                             </label>
-                            <br>
                         </div>
                     </div>
-                </div>
-            </div>
-        </mat-card-content>
-    </mat-card>
-    <mat-card class="example-card mat-elevation-z8">
-        <div id="titulo">
-            <span>POSESIÓN/NOTIFICACIÓN</span>
-        </div>
-        <mat-card-content>
-            <div class="d-flex justify-content-around">
-                <div class="container" style="padding-top: 15px;">
                     <div class="row">
+                        <div class="subtitulo">
+                            <span>POSESIÓN/NOTIFICACIÓN</span>
+                        </div>
                         <div class="col-sm">
                             <label class="col-sm col-form-label"><b>Posesión/Notificación:</b>
                                 {{d.posesion_notificacion}}
@@ -263,16 +205,12 @@
                             <label class="col-sm col-form-label"><b>Descripción:</b>
                                 {{d.descripcion_pose_noti}}
                             </label>
-                            <br>
-                            <br>
                         </div>
                     </div>
                 </div>
             </div>
             <input type="submit" class="btn btn-sm" [routerLink]="['/listaPedidos/']"
-            value="Ir a lista de acciones de personal">
-            <br>
-            <br>
+                value="Ir a lista de acciones de personal">
         </mat-card-content>
     </mat-card>
 </div>

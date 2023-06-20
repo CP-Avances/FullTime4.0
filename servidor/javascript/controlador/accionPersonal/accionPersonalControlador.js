@@ -198,17 +198,17 @@ class AccionPersonalControlador {
     /** TABLA ACCION_PERSONAL_EMPLEADO */
     CrearPedidoAccionPersonal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida, decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal, tipo_accion, descrip_partida, cargo_propuesto, proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti } = req.body;
+            const { id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida, decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal, tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti } = req.body;
             yield database_1.default.query('INSERT INTO accion_personal_empleado (id_empleado, fec_creacion, fec_rige_desde, ' +
                 'fec_rige_hasta, identi_accion_p, num_partida, decre_acue_resol, abrev_empl_uno, firma_empl_uno, ' +
-                'abrev_empl_dos, firma_empl_dos, adicion_legal, tipo_accion, descrip_partida, cargo_propuesto, ' +
+                'abrev_empl_dos, firma_empl_dos, adicion_legal, tipo_accion, cargo_propuesto, ' +
                 'proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad, id_empl_responsable, ' +
                 'num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp, puesto_reemp, ' +
                 'funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti) ' +
                 'VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, ' +
-                '$20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30)', [id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida,
+                '$20, $21, $22, $23, $24, $25, $26, $27, $28, $29)', [id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida,
                 decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal,
-                tipo_accion, descrip_partida, cargo_propuesto, proceso_propuesto, num_partida_propuesta,
+                tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta,
                 salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso,
                 nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti]);
             res.jsonp({ message: 'Registro realizado con éxito' });
@@ -216,18 +216,18 @@ class AccionPersonalControlador {
     }
     ActualizarPedidoAccionPersonal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida, decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal, tipo_accion, descrip_partida, cargo_propuesto, proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, id } = req.body;
+            const { id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida, decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal, tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, id } = req.body;
             yield database_1.default.query('UPDATE accion_personal_empleado SET id_empleado = $1, fec_creacion = $2, ' +
                 'fec_rige_desde = $3, fec_rige_hasta = $4, identi_accion_p = $5, num_partida = $6, ' +
                 'decre_acue_resol = $7, abrev_empl_uno = $8, firma_empl_uno = $9, abrev_empl_dos = $10, ' +
-                'firma_empl_dos = $11, adicion_legal = $12, tipo_accion = $13, descrip_partida = $14, ' +
-                'cargo_propuesto = $15, proceso_propuesto = $16, num_partida_propuesta = $17, ' +
-                'salario_propuesto = $18, id_ciudad = $19, id_empl_responsable = $20, num_partida_individual = $21,' +
-                'act_final_concurso = $22, fec_act_final_concurso = $23, nombre_reemp = $24, puesto_reemp = $25, ' +
-                'funciones_reemp = $26, num_accion_reemp = $27, primera_fecha_reemp = $28, posesion_notificacion = $29, ' +
-                'descripcion_pose_noti = $30 WHERE id = $31', [id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida,
+                'firma_empl_dos = $11, adicion_legal = $12, tipo_accion = $13, ' +
+                'cargo_propuesto = $14, proceso_propuesto = $15, num_partida_propuesta = $16, ' +
+                'salario_propuesto = $17, id_ciudad = $18, id_empl_responsable = $19, num_partida_individual = $20,' +
+                'act_final_concurso = $21, fec_act_final_concurso = $22, nombre_reemp = $23, puesto_reemp = $24, ' +
+                'funciones_reemp = $25, num_accion_reemp = $26, primera_fecha_reemp = $27, posesion_notificacion = $28, ' +
+                'descripcion_pose_noti = $29 WHERE id = $30', [id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida,
                 decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal,
-                tipo_accion, descrip_partida, cargo_propuesto, proceso_propuesto, num_partida_propuesta,
+                tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta,
                 salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso,
                 fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp,
                 primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, id]);
@@ -280,7 +280,7 @@ class AccionPersonalControlador {
             const ACCION = yield database_1.default.query('SELECT ap.id, ap.id_empleado, ap.fec_creacion, ap.fec_rige_desde, ' +
                 'ap.fec_rige_hasta, ap.identi_accion_p, ap.num_partida, ap.decre_acue_resol, ap.abrev_empl_uno, ' +
                 'ap.firma_empl_uno, ap.abrev_empl_dos, ap.firma_empl_dos, ap.adicion_legal, ap.tipo_accion, ' +
-                'ap.descrip_partida, ap.cargo_propuesto, ap.proceso_propuesto, ap.num_partida_propuesta, ' +
+                'ap.cargo_propuesto, ap.proceso_propuesto, ap.num_partida_propuesta, ' +
                 'ap.salario_propuesto, ap.id_ciudad, ap.id_empl_responsable, ap.num_partida_individual, ' +
                 'ap.act_final_concurso, ap.fec_act_final_concurso, ap.nombre_reemp, ap.puesto_reemp, ' +
                 'ap.funciones_reemp, ap.num_accion_reemp, ap.primera_fecha_reemp, ap.posesion_notificacion, ' +
@@ -300,7 +300,7 @@ class AccionPersonalControlador {
             const ACCION = yield database_1.default.query('SELECT ap.id, ap.id_empleado, ap.fec_creacion, ap.fec_rige_desde, ' +
                 'ap.fec_rige_hasta, ap.identi_accion_p, ap.num_partida, ap.decre_acue_resol, ap.abrev_empl_uno, ' +
                 'ap.firma_empl_uno, ap.abrev_empl_dos, ap.firma_empl_dos, ap.adicion_legal, ap.tipo_accion, ' +
-                'ap.descrip_partida, ap.cargo_propuesto, ap.proceso_propuesto, ap.num_partida_propuesta, ' +
+                'ap.cargo_propuesto, ap.proceso_propuesto, ap.num_partida_propuesta, ' +
                 'ap.salario_propuesto, ap.id_ciudad, ap.id_empl_responsable, ap.num_partida_individual, ' +
                 'ap.act_final_concurso, ap.fec_act_final_concurso, ap.nombre_reemp, ap.puesto_reemp, ' +
                 'ap.funciones_reemp, ap.num_accion_reemp, ap.primera_fecha_reemp, ap.posesion_notificacion, ' +
