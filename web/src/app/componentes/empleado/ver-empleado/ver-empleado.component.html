@@ -760,49 +760,126 @@
             </app-registo-empleado-horario>
         </div>
 
-        <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="horarios_usuario">
-            <div class="row">
-                <div class="col-md">
-                    <div id="titulo">
-                        <h5>ASIGNACIÓN DE HORARIO LABORAL</h5>
-                    </div>
-                    <mat-card class="example-card mat-elevation-z9" id="carta1">
-                        <div style="display: flex; padding: 3%; margin: auto;">
-                            <div class="row">
-                                <div class="col-md" style="text-align: center;">
-                                    <form method="post" enctype="multipart/form-data">
-                                        <input (change)="FileChangeHorario($event)" type="file"
-                                            [formControl]="archivoHorarioForm" id="file"
-                                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                        <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
-                                            matTooltip="Presionar para cargar plantilla con nombre Horario Empleado">Subir
-                                            horario</label>
-                                    </form>
-                                </div>
-                                <div class="col-md" style="text-align: center;">
-                                    <a type="submit" id="descargar" class="btn btn-sm" matSuffix
-                                        matTooltipPosition="right"
-                                        matTooltip="Dar click para ver o descargar el documento"
-                                        href="{{hipervinculo}}/plantillaD/documento/Horario Empleado.xlsx">
-                                        <span class="material-icons">cloud_download</span>
-                                        <br>
-                                        Descargar plantilla horario usuarios
-                                    </a>
-                                </div>
+        <div class="container" style="padding-bottom: 25px; padding-top: 15px;" *ngIf="horarios_usuario">
+            <mat-card class="example-card mat-elevation-z8">
+                <div id="resultados">
+                    <span>BÚSQUEDA RANGO FECHAS</span>
+                </div>
+                <mat-card-content>
+
+                    <div class="row">
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Mes inicio</mat-label>
+                                    <input matInput [matDatepicker]="fec1" [formControl]="fechaInicialF"
+                                        placeholder="MM/YYYY">
+                                    <mat-datepicker-toggle matIconSuffix [for]="fec1"></mat-datepicker-toggle>
+                                    <mat-datepicker #fec1 startView="year"
+                                        (monthSelected)="FormatearFecha($event, fec1, 1)" touchUi>
+                                    </mat-datepicker>
+                                </mat-form-field>
                             </div>
                         </div>
-                    </mat-card>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Mes final</mat-label>
+                                    <input matInput [matDatepicker]="fec2" [formControl]="fechaFinalF"
+                                        placeholder="MM/YYYY">
+                                    <mat-datepicker-toggle matIconSuffix [for]="fec2"
+                                        [disabled]="fecHorario"></mat-datepicker-toggle>
+                                    <mat-datepicker #fec2 startView="year"
+                                        (monthSelected)="FormatearFecha($event, fec2, 2)" touchUi>
+                                    </mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+
+                </mat-card-content>
+            </mat-card>
+        </div>
+
+        <!-- *********************** TABLA DE DETALLES DE HORARIOS Y DEFINICIONES ******************************* -->
+        <div *ngIf="horarios_usuario">
+            <div class="container" style="padding-bottom: 25px;" *ngIf="ver_acciones">
+                <div class="row">
+                    <div class="col-md">
+                        <div class="mat-elevation-z8" style="background: white;">
+                            <div class="d-flex bd-highlight" id="resultados">
+                                <span class="w-100 bd-highlight">
+                                    DETALLE DE HORARIOS
+                                </span>
+                            </div>
+                            <div class="table-responsive" style="text-align: center;">
+                                <table id="table_acciones" class="table table-hover table-sm" style="margin: 0 auto;">
+                                    <thead class="thead-light">
+                                        <tr style="text-align: center;">
+                                            <th scope="col" id="td_horarios">HORARIO</th>
+                                            <th scope="col" id="td_horarios">ENTRADA (E)</th>
+                                            <th scope="col" id="td_horarios">INICIO ALIMENTACIÓN (I/A)</th>
+                                            <th scope="col" id="td_horarios">FIN ALIMENTACIÓN (F/A)</th>
+                                            <th scope="col" id="td_horarios">SALIDA (S)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let d of detalle_acciones | paginate:tamanio_pagina:numero_pagina">
+                                            <td id="td_horarios">{{d.horario}}</td>
+                                            <td id="td_horarios">{{d.entrada}}</td>
+                                            <td id="td_horarios">{{d.inicio_comida}}</td>
+                                            <td id="td_horarios">{{d.fin_comida}}</td>
+                                            <td id="td_horarios">{{d.salida}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="mat-elevation-z8" style="background: white;">
+                            <div class="d-flex bd-highlight" id="resultados">
+                                <span class="w-100 bd-highlight">
+                                    DEFINICIONES
+                                </span>
+                                <mat-icon class="float-right" id="cerrar_"
+                                    (click)="CerrarDetalles()">highlight_off</mat-icon>
+                            </div>
+                            <div class="table-responsive" style="text-align: center;">
+                                <table id="table_acciones" class="table table-hover table-sm" style="margin: 0 auto;">
+                                    <thead class="thead-light">
+                                        <tr style="text-align: center;">
+                                            <th scope="col" id="td_horarios">NOMENCLATURA</th>
+                                            <th scope="col" id="td_horarios">DESCRIPCIÓN</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let n of nomenclatura | paginate:tamanio_pagina:numero_pagina">
+                                            <td id="td_horarios">{{n.nombre}}</td>
+                                            <td id="td_horarios">{{n.descripcion}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="horarios_usuario">
+        <!-- *********************** TABLA DE LISTA DE HORARIOS ASIGNADOS AL USUARIO ******************************* -->
+        <div class="container" style="padding-bottom: 25px;" *ngIf="horarios_usuario">
             <div class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="titulo">
+                    <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+                        (click)="BuscarHorarioPeriodo()">
+                        Buscar
+                    </button>
                     <span class="w-100 bd-highlight">
-                        LISTA DE HORARIOS DEL USUARIO</span>
+                        LISTA DE HORARIOS DEL USUARIO
+                    </span>
                     <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                        (click)="AbrirVentanaEmplHorario()">
-                        Añadir
+                        (click)="AbrirPlanificarHorario()">
+                        Planificar
                     </button>
                 </div>
                 <div class="table-responsive">
@@ -900,10 +977,53 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="d-flex flex-wrap justify-content-around" style="margin-top: 1%;" *ngIf="ver_detalle">
+                    <button id="btn-raised" class="btn btn-sm" (click)="ObtenerDetallesPlanificacion()">
+                        Detalle Planificación
+                    </button>
+                </div>
                 <mat-paginator id="pagina" [length]="horariosEmpleado.length" [pageSize]="tamanio_pagina"
-                    [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+                    [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
                 </mat-paginator>
                 <br>
+            </div>
+        </div>
+
+
+        <div class="container" style="padding-bottom: 25px; text-align: center;" *ngIf="horarios_usuario">
+            <div class="row">
+                <div class="col-md">
+                    <div id="resultados">
+                        <h5>ASIGNACIÓN DE HORARIO LABORAL</h5>
+                    </div>
+                    <mat-card class="example-card mat-elevation-z9" id="carta1">
+                        <div style="display: flex; padding: 3%; margin: auto;">
+                            <div class="row">
+                                <div class="col-md" style="text-align: center;">
+                                    <form method="post" enctype="multipart/form-data">
+                                        <input (change)="FileChangeHorario($event)" type="file"
+                                            [formControl]="archivoHorarioForm" id="file"
+                                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                        <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
+                                            matTooltip="Presionar para cargar plantilla con nombre Horario Empleado">
+                                            Subir horario
+                                        </label>
+                                    </form>
+                                </div>
+                                <div class="col-md" style="text-align: center;">
+                                    <a type="submit" id="descargar" class="btn btn-sm" matSuffix
+                                        matTooltipPosition="right"
+                                        matTooltip="Dar click para ver o descargar el documento"
+                                        href="{{hipervinculo}}/plantillaD/documento/Horario Empleado.xlsx">
+                                        <span class="material-icons">cloud_download</span>
+                                        <br>
+                                        Descargar plantilla horario usuarios
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </mat-card>
+                </div>
             </div>
         </div>
     </mat-tab>

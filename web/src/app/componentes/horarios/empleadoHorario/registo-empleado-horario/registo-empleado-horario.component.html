@@ -115,7 +115,7 @@
                 Guardar
             </button>
             <button id="btn-raised" class="btn btn-sm" (click)="EliminarPlanificacion(formulario.value)"
-                *ngIf="btn_eliminar">
+                [disabled]="!formulario.valid" *ngIf="btn_eliminar">
                 Eliminar
             </button>
         </div>

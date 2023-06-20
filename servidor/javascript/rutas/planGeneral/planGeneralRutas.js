@@ -22,6 +22,8 @@ class DepartamentoRutas {
         this.router.post('/horario-general-fechas', verificarToken_1.TokenValidation, planGeneralControlador_1.default.BuscarHorarioFechas);
         // METODO PARA LISTAR PLANIFICACION DE USUARIOS  --**VERIFICADO
         this.router.post('/horario-general-planificacion', verificarToken_1.TokenValidation, planGeneralControlador_1.default.ListarPlanificacionHoraria);
+        // METODO PARA LISTAR DETALLE DE HORARIOS DE LOS USUARIOS  --**VERIFICADO
+        this.router.post('/horario-general-detalle', verificarToken_1.TokenValidation, planGeneralControlador_1.default.ListarDetalleHorarios);
         this.router.post('/buscar_fecha/plan', verificarToken_1.TokenValidation, planGeneralControlador_1.default.BuscarFecha);
     }
 }

@@ -49,7 +49,6 @@ import { EditarVacacionesEmpleadoComponent } from 'src/app/componentes/rolEmplea
 import { RegistroAutorizacionDepaComponent } from 'src/app/componentes/autorizaciones/autorizaDepartamentos/registro-autorizacion-depa/registro-autorizacion-depa.component';
 import { EditarPeriodoVacacionesComponent } from '../../modulos/vacaciones/periodoVacaciones/editar-periodo-vacaciones/editar-periodo-vacaciones.component';
 import { EditarAutorizacionDepaComponent } from 'src/app/componentes/autorizaciones/autorizaDepartamentos/editar-autorizacion-depa/editar-autorizacion-depa.component';
-import { RegistoEmpleadoHorarioComponent } from 'src/app/componentes/horarios/empleadoHorario/registo-empleado-horario/registo-empleado-horario.component';
 import { RegistrarEmpleProcesoComponent } from '../../modulos/accionesPersonal/procesos/registrar-emple-proceso/registrar-emple-proceso.component';
 import { EditarEmpleadoProcesoComponent } from '../../modulos/accionesPersonal/procesos/editar-empleado-proceso/editar-empleado-proceso.component';
 import { EditarSolicitudComidaComponent } from '../../modulos/alimentacion/editar-solicitud-comida/editar-solicitud-comida.component';
@@ -82,6 +81,8 @@ import { EmplCargosComponent } from 'src/app/componentes/empleado/cargo/empl-car
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { LoginService } from 'src/app/servicios/login/login.service';
 import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
+import { MatDatepicker } from '@angular/material/datepicker';
+import { default as _rollupMoment, Moment } from 'moment';
 
 @Component({
   selector: 'app-ver-empleado',
@@ -293,7 +294,7 @@ export class VerEmpleadoComponent implements OnInit {
       // LLAMADO A DATOS DE USUARIO
       this.ObtenerContratoEmpleado(this.datoActual.id_contrato, formato_fecha);
       this.ObtenerCargoEmpleado(this.datoActual.id_cargo, formato_fecha);
-      this.ObtenerHorariosEmpleado(this.datoActual.codigo, formato_fecha);
+      //this.ObtenerHorariosEmpleado(this.datoActual.codigo, formato_fecha);------------------------------------------------
       this.ObtenerHorarioRotativo(this.datoActual.codigo, formato_fecha);
     }, vacio => {
       this.BuscarContratoActual(formato_fecha);
@@ -756,6 +757,7 @@ export class VerEmpleadoComponent implements OnInit {
    ** ** **                  METODOS PARA MANEJO DE DATOS DE CARGO                              ** **
    ** ******************************************************************************************** **/
 
+
   // METODO PARA OBTENER LOS DATOS DEL CARGO DEL EMPLEADO 
   cargoEmpleado: any = [];
   ObtenerCargoEmpleado(id_cargo: number, formato_fecha: string) {
@@ -825,36 +827,223 @@ export class VerEmpleadoComponent implements OnInit {
    ** **              METODOS PARA MANEJAR HORARIOS FIJOS DEL USUARIO                        ** ** 
    ** ***************************************************************************************** **/
 
+  // FECHAS DE BUSQUEDA
+  fechaInicialF = new FormControl();
+  fechaFinalF = new FormControl();
+
+  fecHorario: boolean = true;
+
+  // METODO PARA MOSTRAR FECHA SELECCIONADA
+  FormatearFecha(fecha: Moment, datepicker: MatDatepicker<Moment>, opcion: number) {
+    const ctrlValue = fecha;
+    if (opcion === 1) {
+      if (this.fechaFinalF.value) {
+        this.ValidarFechas(ctrlValue, this.fechaFinalF.value, this.fechaInicialF, ctrlValue, opcion);
+      }
+      else {
+        let inicio = moment(ctrlValue).format('01/MM/YYYY');
+        this.fechaInicialF.setValue(moment(inicio, 'DD/MM/YYYY'));
+      }
+      this.fecHorario = false;
+    }
+    else {
+      this.ValidarFechas(this.fechaInicialF.value, ctrlValue, this.fechaFinalF, ctrlValue, opcion);
+    }
+    datepicker.close();
+  }
+
+  // METODO PARA VALIDAR EL INGRESO DE LAS FECHAS
+  ValidarFechas(fec_inicio: any, fec_fin: any, formulario: any, valor: any, opcion: number) {
+    // FORMATO DE FECHA PERMITIDO PARA COMPARARLAS
+    let inicio = moment(fec_inicio).format('01/MM/YYYY');
+    let final = moment(fec_fin).daysInMonth() + moment(fec_fin).format('/MM/YYYY');
+    let feci = moment(inicio, 'DD/MM/YYYY').format('YYYY/MM/DD');
+    let fecf = moment(final, 'DD/MM/YYYY').format('YYYY/MM/DD');
+    // VERIFICAR SI LAS FECHAS ESTAN INGRESDAS DE FORMA CORRECTA
+    if (Date.parse(feci) <= Date.parse(fecf)) {
+      if (opcion === 1) {
+        formulario.setValue(moment(inicio, 'DD/MM/YYYY'));
+      }
+      else {
+        formulario.setValue(moment(final, 'DD/MM/YYYY'));
+      }
+    }
+    else {
+      this.toastr.warning('La fecha no se registro. Ups la fecha no es correcta.!!!', 'VERIFICAR', {
+        timeOut: 6000,
+      });
+    }
+  }
+
+  // METODO PARA SELECCIONAR TIPO DE BUSQUEDA
+  BuscarHorarioPeriodo() {
+    if (this.fechaInicialF.value != null && this.fechaFinalF.value != null) {
+      this.ObtenerHorariosEmpleado(this.fechaInicialF.value, this.fechaFinalF.value, 1);
+    }
+    else {
+      let inicio = moment().format('YYYY/MM/01');
+      let final = moment().format('YYYY/MM/') + moment().daysInMonth();
+      this.ObtenerHorariosEmpleado(inicio, final, 2);
+    }
+  }
+
   // METODO PARA MOSTRAR DATOS DE HORARIO 
   horariosEmpleado: any = [];
-  ObtenerHorariosEmpleado(codigo: number, formato_fecha: string) {
+  mes_inicio: any = '';
+  mes_fin: any = '';
+  ObtenerHorariosEmpleado(fec_inicio: any, fec_final: any, opcion: number) {
     this.horariosEmpleado = [];
-    /* this.restEmpleHorario.BuscarHorarioUsuario(codigo).subscribe(datos => {
-       this.horariosEmpleado = datos;
-       this.horariosEmpleado.forEach(data => {
-         data.fec_inicio_ = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado);
-         data.fec_final_ = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
-       })
-     })*/
-
-    let fec = {
-      fecha_inicio: '2023-05-01',
-      fecha_final: '2023-12-31',
-      //codigo: '\'35\',\'5008\''
-      codigo: '\'35\''
+    if (opcion === 1) {
+      this.mes_inicio = fec_inicio.format("YYYY-MM-DD");
+      this.mes_fin = fec_final.format("YYYY-MM-DD");
+    }
+    else {
+      this.mes_inicio = fec_inicio;
+      this.mes_fin = fec_final;
     }
 
-    this.restPlanGeneral.BuscarPlanificacionHoraria(fec).subscribe(datos => {
-      this.horariosEmpleado = datos;
-      console.log('ver datos de planificacion ', datos)
+    let busqueda = {
+      fecha_inicio: this.mes_inicio,
+      fecha_final: this.mes_fin,
+      //codigo: '\'35\',\'5008\'',
+      codigo: '\'' + this.datoActual.codigo + '\''
+    }
+    console.log('VER busqueda ', busqueda)
+    this.restPlanGeneral.BuscarPlanificacionHoraria(busqueda).subscribe(datos => {
+      if (datos.message === 'OK') {
+        this.horariosEmpleado = datos.data;
+        this.ver_detalle = true;
+      }
+      else {
+        this.toastr.info('Ups no se han encontrado registros!!!', 'No existe planificación.', {
+          timeOut: 6000,
+        });
+        this.ver_detalle = false;
+      }
     })
+  }
+
+  // METODO PARA OBTENER DETALLE DE PLANIFICACION
+  ver_detalle: boolean = false;
+  ver_acciones: boolean = false;
+  detalles: any = [];
+  detalle_acciones: any = [];
+  // ACCIONES DE HORARIOS
+  entrada: '';
+  salida: '';
+  inicio_comida = '';
+  fin_comida = '';
+  ObtenerDetallesPlanificacion() {
+    this.detalles = [];
+    // DATOS DE BUSQUEDA DE DETALLES DE PLANIFICACION
+    let busqueda = {
+      fecha_inicio: this.mes_inicio,
+      fecha_final: this.mes_fin,
+      codigo: '\'' + this.datoActual.codigo + '\''
+    }
+    let codigo_horario = '';
+    let tipos: any = [];
+    let accion = '';
+    // VARIABLES AUXILIARES
+    let aux_h = '';
+    let aux_a = '';
+    // BUSQUEDA DE DETALLES DE PLANIFICACIONES
+    this.restPlanGeneral.BuscarDetallePlanificacion(busqueda).subscribe(datos => {
+      if (datos.message === 'OK') {
+        this.ver_acciones = true;
+        this.detalle_acciones = [];
+        this.detalles = datos.data;
+
+        datos.data.forEach(obj => {
+          if (aux_h === '') {
+            accion = obj.tipo_accion + ': ' + obj.hora;
+            this.ValidarAcciones(obj);
+          }
+          else if (obj.id_horario === aux_h) {
+            if (obj.tipo_accion != aux_a) {
+              accion = accion + ' , ' + obj.tipo_accion + ': ' + obj.hora
+              codigo_horario = obj.codigo_dia
+              this.ValidarAcciones(obj);
+            }
+          }
+          else {
+            // CONCATENAR VALORES ANTERIORES
+            tipos = [{
+              acciones: accion,
+              horario: codigo_horario,
+              entrada: this.entrada,
+              inicio_comida: this.inicio_comida,
+              fin_comida: this.fin_comida,
+              salida: this.salida,
+            }]
+            this.detalle_acciones = this.detalle_acciones.concat(tipos);
+            // LIMPIAR VALORES
+            accion = obj.tipo_accion + ': ' + obj.hora;
+            codigo_horario = obj.codigo_dia;
+            this.entrada = '';
+            this.salida = '';
+            this.inicio_comida = '';
+            this.fin_comida = '';
+            this.ValidarAcciones(obj);
+          }
+          // ASIGNAR VALORES A VARIABLES AUXILIARES
+          aux_h = obj.id_horario;
+          aux_a = obj.tipo_accion;
+        })
+        // AL FINALIZAR EL CICLO CONCATENAR VALORES
+        tipos = [{
+          acciones: accion,
+          horario: codigo_horario,
+          entrada: this.entrada,
+          inicio_comida: this.inicio_comida,
+          fin_comida: this.fin_comida,
+          salida: this.salida,
+        }]
+        this.detalle_acciones = this.detalle_acciones.concat(tipos);
+      }
+      else {
+        this.toastr.info('Ups no se han encontrado registros!!!', 'No existe detalle de planificación.', {
+          timeOut: 6000,
+        });
+      }
+    })
+  }
+
+  // CONDICIONES DE ACCIONES EN HORARIO ASIGNADO
+  ValidarAcciones(obj: any) {
+    if (obj.tipo_accion === 'E') {
+      return this.entrada = obj.hora;
+    }
+    if (obj.tipo_accion === 'S') {
+      return this.salida = obj.hora;
+    }
+    if (obj.tipo_accion === 'I/A') {
+      return this.inicio_comida = obj.hora;
+    }
+    if (obj.tipo_accion === 'F/A') {
+      return this.fin_comida = obj.hora;
+    }
+  }
+
+  // ARREGLO DE DATOS DE HORARIOS
+  nomenclatura = [
+    { nombre: 'L', descripcion: 'LIBRE' },
+    { nombre: 'FD', descripcion: 'FERIADO' },
+    { nombre: 'P', descripcion: 'PERMISO' },
+    { nombre: 'V', descripcion: 'VACACION' },
+    { nombre: '-', descripcion: 'SIN PLANIFICACION' }
+  ]
+
+  // OCULTAR DETALLE DE HORARIOS
+  CerrarDetalles() {
+    this.ver_acciones = false;
   }
 
   // VENTANA PARA REGISTRAR HORARIO 
   horarios_usuario: boolean = true;
   ventana_horario: boolean = false;
   data_horario: any = [];
-  AbrirVentanaEmplHorario(): void {
+  AbrirPlanificarHorario(): void {
     this.data_horario = [];
     if (this.datoActual.id_cargo != undefined) {
       this.horarios_usuario = false;
@@ -866,16 +1055,6 @@ export class VerEmpleadoComponent implements OnInit {
         idEmpleado: this.idEmpleado,
         horas_trabaja: this.cargoEmpleado[0].hora_trabaja,
       }
-      /* this.ventana.open(RegistoEmpleadoHorarioComponent,
-         {
-           width: '640px',
-           data: {
-             idEmpleado: this.idEmpleado, idCargo: this.datoActual.id_cargo,
-             horas_trabaja: this.cargoEmpleado[0].hora_trabaja
-           }
-         }).afterClosed().subscribe(item => {
-           this.ObtenerHorariosEmpleado(this.datoActual.codigo, this.formato_fecha);
-         });*/
     }
     else {
       this.toastr.info('El usuario no tiene registrado un Cargo.', '', {
@@ -884,45 +1063,6 @@ export class VerEmpleadoComponent implements OnInit {
     }
   }
 
-  // VENTANA PARA EDITAR HORARIO DEL EMPLEADO 
-  AbrirEditarHorario(datoSeleccionado: any): void {
-    this.ventana.open(EditarHorarioEmpleadoComponent,
-      {
-        width: '640px',
-        data: {
-          idEmpleado: this.idEmpleado, datosHorario: datoSeleccionado,
-          horas_trabaja: this.cargoEmpleado[0].hora_trabaja
-        }
-      })
-      .afterClosed().subscribe(item => {
-        console.log(item);
-        this.ObtenerHorariosEmpleado(this.datoActual.codigo, this.formato_fecha);
-      });
-
-  }
-
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO HORARIO
-  EliminarHorario(id_horario: number) {
-    this.restEmpleHorario.EliminarRegistro(id_horario).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ObtenerHorariosEmpleado(this.datoActual.codigo, this.formato_fecha);
-    });
-  }
-
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
-  ConfirmarDeleteHorario(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.EliminarPlanGeneral(datos.fec_inicio, datos.fec_final, datos.id_horarios, datos.codigo)
-          this.EliminarHorario(datos.id);
-        } else {
-          this.router.navigate(['/verEmpleado/', this.idEmpleado]);
-        }
-      });
-  }
 
   /** ********************************************************************************************* **
    ** **                     CARGAR HORARIOS DEL EMPLEADO CON PLANTILLA                          ** **
@@ -1003,7 +1143,7 @@ export class VerEmpleadoComponent implements OnInit {
                 this.toastr.success('Operación Exitosa', 'Plantilla de Horario importada.', {
                   timeOut: 6000,
                 });
-                this.ObtenerHorariosEmpleado(this.datoActual.codigo, this.formato_fecha);
+                // this.ObtenerHorariosEmpleado(this.datoActual.codigo, this.formato_fecha);-------------------------------
                 //this.actualizar = false;
                 //window.location.reload(this.actualizar);
                 this.archivoHorarioForm.reset();

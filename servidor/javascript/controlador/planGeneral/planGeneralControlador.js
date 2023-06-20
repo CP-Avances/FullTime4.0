@@ -39,15 +39,12 @@ class PlanGeneralControlador {
                     try {
                         if (error) {
                             errores = errores + 1;
-                            console.log("contador errores" + errores);
                             if (iterar === req.body.length && errores > 0) {
                                 return res.status(200).jsonp({ message: 'error' });
                             }
                         }
                         else {
                             cont = cont + 1;
-                            //console.log("Rows " + JSON.stringify(results.rows));
-                            console.log("contador " + cont);
                             if (iterar === req.body.length && cont === req.body.length) {
                                 return res.status(200).jsonp({ message: 'OK' });
                             }
@@ -67,7 +64,6 @@ class PlanGeneralControlador {
     BuscarFechas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fec_inicio, fec_final, id_horario, codigo } = req.body;
-            console.log('imgresa con ', req.body);
             const FECHAS = yield database_1.default.query(`
             SELECT id FROM plan_general WHERE 
             (fec_horario BETWEEN $1 AND $2) AND id_horario = $3 AND codigo = $4
@@ -90,7 +86,6 @@ class PlanGeneralControlador {
             errores = 0;
             iterar = 0;
             cont = 0;
-            console.log('entra ', req.body.length);
             for (var i = 0; i < req.body.length; i++) {
                 database_1.default.query(`
                 DELETE FROM plan_general WHERE id = $1
@@ -99,15 +94,12 @@ class PlanGeneralControlador {
                     try {
                         if (error) {
                             errores = errores + 1;
-                            console.log("contador errores" + errores);
                             if (iterar === req.body.length && errores > 0) {
                                 return res.status(200).jsonp({ message: 'error' });
                             }
                         }
                         else {
                             cont = cont + 1;
-                            //console.log("Rows " + JSON.stringify(results.rows));
-                            console.log("contador " + cont);
                             if (iterar === req.body.length && cont === req.body.length) {
                                 return res.status(200).jsonp({ message: 'OK' });
                             }
@@ -146,7 +138,7 @@ class PlanGeneralControlador {
             }
         });
     }
-    // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO
+    // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO   --**VERIFICADO
     ListarPlanificacionHoraria(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -196,10 +188,36 @@ class PlanGeneralControlador {
                     "GROUP BY codigo_e, nombre_e, anio, mes " +
                     "ORDER BY 1,3,4", [fecha_inicio, fecha_final]);
                 if (HORARIO.rowCount > 0) {
-                    return res.jsonp(HORARIO.rows);
+                    return res.jsonp({ message: 'OK', data: HORARIO.rows });
                 }
                 else {
-                    return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+                    return res.jsonp({ message: 'vacio' });
+                }
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error', error: error });
+            }
+        });
+    }
+    // METODO PARA LISTAR DETALLE DE HORARIOS POR USUARIOS              --**VERIFICADO
+    ListarDetalleHorarios(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { fecha_inicio, fecha_final, codigo } = req.body;
+                const HORARIO = yield database_1.default.query("SELECT p_g.codigo AS codigo_e, horario.codigo AS codigo_dia, horario.nombre AS nombre, " +
+                    "dh.hora, dh.tipo_accion, dh.id_horario, dh.id AS detalle " +
+                    "FROM plan_general p_g " +
+                    "INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
+                    "INNER JOIN cg_horarios horario ON horario.id = p_g.id_horario " +
+                    "INNER JOIN deta_horarios dh ON dh.id = p_g.id_det_horario " +
+                    "WHERE fec_horario BETWEEN $1 AND $2 AND NOT tipo_dia = 'L' " +
+                    "GROUP BY codigo_e, codigo_dia, tipo_dia, horario.nombre, dh.id_horario, dh.hora, dh.tipo_accion, dh.id " +
+                    "ORDER BY p_g.codigo, dh.id_horario, dh.hora ASC", [fecha_inicio, fecha_final]);
+                if (HORARIO.rowCount > 0) {
+                    return res.jsonp({ message: 'OK', data: HORARIO.rows });
+                }
+                else {
+                    return res.jsonp({ message: 'vacio' });
                 }
             }
             catch (error) {

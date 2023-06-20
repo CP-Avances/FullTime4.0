@@ -34,14 +34,11 @@ class PlanGeneralControlador {
                     try {
                         if (error) {
                             errores = errores + 1;
-                            console.log("contador errores" + errores);
                             if (iterar === req.body.length && errores > 0) {
                                 return res.status(200).jsonp({ message: 'error' });
                             }
                         } else {
                             cont = cont + 1;
-                            //console.log("Rows " + JSON.stringify(results.rows));
-                            console.log("contador " + cont);
                             if (iterar === req.body.length && cont === req.body.length) {
                                 return res.status(200).jsonp({ message: 'OK' });
                             }
@@ -60,9 +57,6 @@ class PlanGeneralControlador {
     // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   --**VERIFICADO
     public async BuscarFechas(req: Request, res: Response) {
         const { fec_inicio, fec_final, id_horario, codigo } = req.body;
-
-        console.log('imgresa con ', req.body)
-
         const FECHAS = await pool.query(
             `
             SELECT id FROM plan_general WHERE 
@@ -89,8 +83,6 @@ class PlanGeneralControlador {
         iterar = 0;
         cont = 0;
 
-        console.log('entra ', req.body.length)
-
         for (var i = 0; i < req.body.length; i++) {
 
             pool.query(
@@ -105,14 +97,11 @@ class PlanGeneralControlador {
                     try {
                         if (error) {
                             errores = errores + 1;
-                            console.log("contador errores" + errores);
                             if (iterar === req.body.length && errores > 0) {
                                 return res.status(200).jsonp({ message: 'error' });
                             }
                         } else {
                             cont = cont + 1;
-                            //console.log("Rows " + JSON.stringify(results.rows));
-                            console.log("contador " + cont);
                             if (iterar === req.body.length && cont === req.body.length) {
                                 return res.status(200).jsonp({ message: 'OK' });
                             }
@@ -126,7 +115,6 @@ class PlanGeneralControlador {
                     }
                 });
         }
-
     }
 
     // METODO PARA BUSCAR PLANIFICACION EN UN RANGO DE FECHAS
@@ -155,7 +143,7 @@ class PlanGeneralControlador {
     }
 
 
-    // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO
+    // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO   --**VERIFICADO
     public async ListarPlanificacionHoraria(req: Request, res: Response) {
         try {
             const { fecha_inicio, fecha_final, codigo } = req.body;
@@ -208,16 +196,67 @@ class PlanGeneralControlador {
                 , [fecha_inicio, fecha_final]);
 
             if (HORARIO.rowCount > 0) {
-                return res.jsonp(HORARIO.rows)
+                return res.jsonp({ message: 'OK', data: HORARIO.rows })
             }
             else {
-                return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+                return res.jsonp({ message: 'vacio' });
             }
         }
         catch (error) {
             return res.jsonp({ message: 'error', error: error });
         }
     }
+
+
+    // METODO PARA LISTAR DETALLE DE HORARIOS POR USUARIOS              --**VERIFICADO
+    public async ListarDetalleHorarios(req: Request, res: Response) {
+        try {
+            const { fecha_inicio, fecha_final, codigo } = req.body;
+
+            const HORARIO = await pool.query(
+                "SELECT p_g.codigo AS codigo_e, horario.codigo AS codigo_dia, horario.nombre AS nombre, " +
+                "dh.hora, dh.tipo_accion, dh.id_horario, dh.id AS detalle " +
+                "FROM plan_general p_g " +
+                "INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
+                "INNER JOIN cg_horarios horario ON horario.id = p_g.id_horario " +
+                "INNER JOIN deta_horarios dh ON dh.id = p_g.id_det_horario " +
+                "WHERE fec_horario BETWEEN $1 AND $2 AND NOT tipo_dia = 'L' " +
+                "GROUP BY codigo_e, codigo_dia, tipo_dia, horario.nombre, dh.id_horario, dh.hora, dh.tipo_accion, dh.id " +
+                "ORDER BY p_g.codigo, dh.id_horario, dh.hora ASC"
+                , [fecha_inicio, fecha_final]);
+
+            if (HORARIO.rowCount > 0) {
+                return res.jsonp({ message: 'OK', data: HORARIO.rows })
+            }
+            else {
+                return res.jsonp({ message: 'vacio' });
+            }
+        }
+        catch (error) {
+            return res.jsonp({ message: 'error', error: error });
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

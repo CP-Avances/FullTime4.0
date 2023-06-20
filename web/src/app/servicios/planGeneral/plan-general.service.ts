@@ -31,11 +31,17 @@ export class PlanGeneralService {
     return this.http.post(`${environment.url}/planificacion_general/horario-general-fechas`, datos);
   }
 
-
-  // METODO PARA LISTAR PLANIFICACIONES DEL USUARIO
+  // METODO PARA LISTAR PLANIFICACIONES DEL USUARIO --**VERIFICADO
   BuscarPlanificacionHoraria(datos: any) {
-    return this.http.post(`${environment.url}/planificacion_general/horario-general-planificacion`, datos);
+    return this.http.post<any>(`${environment.url}/planificacion_general/horario-general-planificacion`, datos);
   }
+
+  // METODO PARA LISTAR PLANIFICACIONES DEL USUARIO --**VERIFICADO
+  BuscarDetallePlanificacion(datos: any) {
+    return this.http.post<any>(`${environment.url}/planificacion_general/horario-general-detalle`, datos);
+  }
+
+
 
 
 
