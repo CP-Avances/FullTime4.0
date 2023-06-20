@@ -546,7 +546,7 @@ export class ListarPedidoAccionComponent implements OnInit {
 
   //METODO PARA MOSTRAR EL TIPO DE DECRETO-ACUERDO-RESOLUCION
   ObtenerDecreto() {
-    this.decreto = ["", "", "", ""];
+    this.decreto = ["", "", "", "_______________", "", "white"];
     let decretoTexto: string = "";
     if (this.datosPedido[0].decre_acue_resol!==null) {
       try {
@@ -567,6 +567,8 @@ export class ListarPedidoAccionComponent implements OnInit {
                 break;
               default:
                 this.decreto[3] = texto;
+                this.decreto[4] = "X";
+                this.decreto[5] = "black";
                 break;
             }
           });
@@ -698,83 +700,87 @@ export class ListarPedidoAccionComponent implements OnInit {
               table: {
                 body: [
                   [
-                    // {
-                      // text: [
-                        { text: "DECRETO: ", style: "itemsTable_c",
-                          margin: [5,5,0,0]},
-                        {
-                          border: [true,true,true,true],
-                          
-                          table:{
-                            widths: [7],
-                            heights: [9],
-                            body: [
-                              [ {text: `${this.decreto[0]}`,style: "itemsTable_e",alignment: 'center',},]
-                            ]
-                          },
-                          layout: {
-                            defaultBorder: true,
-                          },
+                    { text: "DECRETO: ", style: "itemsTable_c",
+                      margin: [5,5,0,0]},
+                    {
+                      border: [true,true,true,true],
+                      table:{
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [ {text: `${this.decreto[0]}`,style: "itemsTable_e",alignment: 'center',},]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                      },
+                    },
+                    { text: "ACUERDO: ", style: "itemsTable_c",
+                      margin: [50,5,0,0]},
+                    {
+                      border: [true,true,true,true],
+                      table:{
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [ {text: `${this.decreto[1]}`,style: "itemsTable_e",alignment: 'center',},]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                      },
+                    },
+                    { text: "RESOLUCIÓN: ", style: "itemsTable_c",margin: [50,5,0,0]},
+                    {
+                      border: [true,true,true,true],
+                      table:{
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [ {text: `${this.decreto[2]}`,style: "itemsTable_e",alignment: 'center',},]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true
+                      },
+                    },
+                    { text: "OTRO: ", style: "itemsTable_c",margin: [50,5,0,0]},
+                    {
+                      border: [false,false,false,false],
+                      
+                      table:{
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [ {text: `${this.decreto[4]}`,style: "itemsTable_e",alignment: 'center'},]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                    {
+                      border: [false,false,false,true],
+                      table:{
+                        heights: [9],
+                        body: [
+                          [{text: `${this.decreto[3]}`, style: "itemsTable_c", color: this.decreto[5]},],
+                        ]
+                      },
+                      layout: {
+                        hLineWidth: function (i, node) {
+                          if (i === node.table.body.length) {
+                            return 1; // Grosor del borde inferior
+                          } else {
+                            return 0; // Sin bordes en las demás líneas
+                          }
                         },
-                        {
-                          text: "---------------------------",
-                          color: "white",
-                          style: "itemsTable",
+                        vLineWidth: function (i) {
+                          return 0; // Sin bordes verticales
                         },
-                        { text: "ACUERDO: ", style: "itemsTable_c",
-                          margin: [5,5,0,0]},
-                        {
-                          border: [true,true,true,true],
-                          table:{
-                            widths: [7],
-                            heights: [9],
-                            body: [
-                              [ {text: `${this.decreto[1]}`,style: "itemsTable_e",alignment: 'center',},]
-                            ]
-                          },
-                          layout: {
-                            defaultBorder: true,
-                          },
-                        },
-                        {
-                          text: "---------------------------",
-                          color: "white",
-                          style: "itemsTable",
-                        },
-                        { text: "RESOLUCIÓN: ", style: "itemsTable_e",margin: [5,5,0,0]},
-                        {
-                          border: [true,true,true,true],
-                          table:{
-                            widths: [7],
-                            heights: [9],
-                            body: [
-                              [ {text: `${this.decreto[2]}`,style: "itemsTable_c",alignment: 'center',},]
-                            ]
-                          },
-                          layout: {
-                            defaultBorder: true
-                          },
-                        },
-                        {
-                          text: "---------------------------",
-                          color: "white",
-                          style: "itemsTable",
-                        },
-                        { text: "OTRO: ", style: "itemsTable_c"},
-                        {
-                          border: [false,false,false,true],
-                          table:{
-                            heights: [9],
-                            body: [
-                              [{text: `${this.decreto[3]}`},],
-                              // [{text: "---------------------", color: "white"}]
-                            ]
-                          },
-                          layout: "lightHorizontalLines",
-                        },
-                      // ],
-                      // margin: [10, 6, 0, 0],
-                    // },
+                      },
+                    },
                   ],
                 ],
               },
@@ -3749,6 +3755,9 @@ export class ListarPedidoAccionComponent implements OnInit {
       "DD MMMM YYYY");
     let fecha2 = moment(this.datosPedido[0].fec_rige_desde).format(
       "dddd DD MMMM YYYY");
+    let fecha3 = moment(this.datosPedido[0].fec_act_final_concurso).format("DD MMMM YYYY");
+    let fecha4 = moment(this.datosPedido[0].fec_creacion).format("DD MMMM YYYY");
+    let fecha5 = moment(this.datosPedido[0].primera_fecha_reemp).format("DD MMMM YYYY");
     let nombreEmpleado = this.empleado_1[0].nombre.toUpperCase();
     let apellidoEmpleado = this.empleado_1[0].apellido.toUpperCase();
 
@@ -3857,7 +3866,7 @@ export class ListarPedidoAccionComponent implements OnInit {
     xlsx.utils.sheet_add_aoa(worksheet, 
       [[
         `ACTA FINAL DEL CONCURSO\n\n
-        No. ${this.datosPedido[0].act_final_concurso}   Fecha: ${moment(this.datosPedido[0].fec_act_final_concurso).format("DD MMMM YYYY")}\n\n\n
+        No. ${this.datosPedido[0].act_final_concurso}   Fecha: ${fecha3}\n\n\n
         `
       ]], {origin: 'C44'});
     xlsx.utils.sheet_add_aoa(worksheet, 
@@ -3881,7 +3890,7 @@ export class ListarPedidoAccionComponent implements OnInit {
     xlsx.utils.sheet_add_aoa(worksheet, 
       [[
         `RECURSOS HUMANOS\n\n
-        No. ${this.datosPedido[0].identi_accion_p}  Fecha: ${moment(this.datosPedido[0].fec_creacion).format("DD MMMM YYYY")}\n\n\n
+        No. ${this.datosPedido[0].identi_accion_p}  Fecha: ${fecha4}\n\n\n
         `
       ]], {origin: 'C57'});
     xlsx.utils.sheet_add_aoa(worksheet, 
@@ -3904,7 +3913,7 @@ export class ListarPedidoAccionComponent implements OnInit {
         LA PERSONA REEMPLAZA A:  ${this.datosPedido[0].nombre_reemp.toUpperCase()}       EN EL PUESTO DE:  ${this.datosPedido[0].puesto_reemp.toUpperCase()}\n
         QUIEN CESE EN FUNCIONES POR:   ___________________________________________________________________________\n
         ACCIÓN DE PERSONAL REGISTRADA CON No.   ${this.datosPedido[0].num_accion_reemp}   FECHA:
-        ${moment(this.datosPedido[0].primera_fecha_reemp).format("DD MMMM YYYY")}\n\n\n\n\n
+        ${fecha5}\n\n\n\n\n
         FILIACIÓN AL COLEGIO DE PROFESIONALES DE:   _______________________________________________________________\n\n\n\n\n
         No. ____________________________________________                   FECHA:   _________________________________________\n\n\n\n
         `
