@@ -178,7 +178,7 @@ export class AutorizacionesComponent implements OnInit {
           this.id_depart = this.nuevoAutorizacionTipos[0].id_departamento;
           //this.obtenerAutorizacion();
         }
-        /*
+        
         this.nuevoAutorizacionTipos.filter(x => {
           
           if(x.nombre == 'GERENCIA' && x.estado == true){
@@ -214,22 +214,21 @@ export class AutorizacionesComponent implements OnInit {
             ];
           }
         }
-        });*/
+        });
       }
     });
   }
 
   departamentoChange: any = [];
   ChangeDepa(e: any) {
-    console.log('e: ',e);
     if (e != null && e != undefined) {
       const [departamento] = this.ArrayAutorizacionTipos.filter(o => {
         return o.id_departamento === e
       })
       this.departamentoChange = departamento;
       this.id_depart = this.departamentoChange.id_departamento;
-      //this.BuscarTipoAutorizacion();
-      //this.obtenerAutorizacion();
+      this.BuscarTipoAutorizacion();
+      this.obtenerAutorizacion();
     }
   }
 
@@ -329,6 +328,8 @@ export class AutorizacionesComponent implements OnInit {
                       this.restAutoriza.BuscarListaAutorizaDepa(autorizacion[0].id_departamento).subscribe(
                         res => {
                           this.listadoDepaAutoriza = res;
+
+                          console.log('this.listadoDepaAutoriza: ',this.listadoDepaAutoriza);
                           this.listadoDepaAutoriza.filter(valor => {
                             if((this.id_empleado_loggin == valor.id_contrato) && (autorizaciones.length ==  valor.nivel)){
                               this.listafiltrada.push(o);
@@ -362,6 +363,7 @@ export class AutorizacionesComponent implements OnInit {
                               this.ocultar = false;
                             }
                           }
+
                         }
                       );
                     }

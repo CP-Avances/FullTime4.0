@@ -136,17 +136,17 @@ class AutorizaDepartamentoControlador {
         const { id_depar } = req.params;
         const EMPLEADOS = await pool.query(
             `
-            SELECT n.id_departamento, cg.nombre, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel, cg.depa_padre, cg.nivel AS nivel_padre,
+            SELECT n.id_departamento, cg.nombre, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel,
                 da.estado, dae.id_contrato, da.id_empl_cargo, (dae.nombre || ' ' || dae.apellido) as fullname, 
                 dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti, c.vaca_mail, c.vaca_noti, c.hora_extra_mail, 
                 c.hora_extra_noti  
             FROM nivel_jerarquicodep AS n, depa_autorizaciones AS da, datos_actuales_empleado AS dae, 
                 config_noti AS c, cg_departamentos AS cg 
-            WHERE n.id_departamento = $1 
+            WHERE n.id_departamento = $1
                 AND da.id_departamento = n.id_dep_nivel 
                 AND dae.id_cargo = da.id_empl_cargo 
                 AND dae.id_contrato = c.id_empleado 
-                AND cg.id = $1 
+                AND cg.id = $1
             ORDER BY nivel ASC
             `
             , [id_depar]);
