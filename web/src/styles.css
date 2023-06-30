@@ -240,4 +240,10 @@ mat-divider {
     background: rgba(131, 131, 131, 0.609);
 }
 
+/* ESPACIO ENTRE LA NOTA EL FORMULARIO */
+
+#espacio {
+    padding-top: 15px
+}
+
 @import "~leaflet/dist/leaflet.css";

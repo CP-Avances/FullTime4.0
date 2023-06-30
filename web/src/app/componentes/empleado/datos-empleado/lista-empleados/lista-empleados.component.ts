@@ -400,7 +400,7 @@ export class ListaEmpleadosComponent implements OnInit {
           } else {
             this.rest.subirArchivoExcel_Automatico(datosArchivo).subscribe(datos_archivo => {
               console.log('plantilla 3', datos_archivo);
-              this.toastr.success('Operación Exitosa', 'Plantilla de Empleados importada.', {
+              this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
                 timeOut: 6000,
               });
               window.location.reload();
@@ -438,7 +438,7 @@ export class ListaEmpleadosComponent implements OnInit {
           } else {
             this.rest.subirArchivoExcel_Manual(datosArchivo).subscribe(datos_archivo => {
               console.log('plantilla 3', datos_archivo);
-              this.toastr.success('Operación Exitosa', 'Plantilla de Empleados importada.', {
+              this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
                 timeOut: 6000,
               });
               window.location.reload();

@@ -6,7 +6,7 @@
     <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
 </div>
 <div class="container" style="text-align: center">
-    <div class="nota">
+    <div class="nota" id="espacio">
         <span>
             NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
             Guardar.
@@ -126,7 +126,7 @@
             </div>
         </div>
     </form>
-    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 2%;">
+    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 10px; margin-bottom: 2%;">
         <button id="btn-raised" class="btn btn-sm" [disabled]="!formulario.valid"
             (click)="ModificarHorario(formulario.value)" value="Guardar">
             Guardar

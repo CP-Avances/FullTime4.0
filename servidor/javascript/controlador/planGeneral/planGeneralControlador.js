@@ -186,7 +186,7 @@ class PlanGeneralControlador {
                     "ORDER BY p_g.codigo,anio, mes , dia, p_g.id_horario " +
                     ") AS datos " +
                     "GROUP BY codigo_e, nombre_e, anio, mes " +
-                    "ORDER BY 1,3,4", [fecha_inicio, fecha_final]);
+                    "ORDER BY 3,4,1", [fecha_inicio, fecha_final]);
                 if (HORARIO.rowCount > 0) {
                     return res.jsonp({ message: 'OK', data: HORARIO.rows });
                 }
@@ -204,15 +204,15 @@ class PlanGeneralControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { fecha_inicio, fecha_final, codigo } = req.body;
-                const HORARIO = yield database_1.default.query("SELECT p_g.codigo AS codigo_e, horario.codigo AS codigo_dia, horario.nombre AS nombre, " +
+                const HORARIO = yield database_1.default.query("SELECT horario.codigo AS codigo_dia, horario.nombre AS nombre, " +
                     "dh.hora, dh.tipo_accion, dh.id_horario, dh.id AS detalle " +
                     "FROM plan_general p_g " +
                     "INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
                     "INNER JOIN cg_horarios horario ON horario.id = p_g.id_horario " +
                     "INNER JOIN deta_horarios dh ON dh.id = p_g.id_det_horario " +
                     "WHERE fec_horario BETWEEN $1 AND $2 AND NOT tipo_dia = 'L' " +
-                    "GROUP BY codigo_e, codigo_dia, tipo_dia, horario.nombre, dh.id_horario, dh.hora, dh.tipo_accion, dh.id " +
-                    "ORDER BY p_g.codigo, dh.id_horario, dh.hora ASC", [fecha_inicio, fecha_final]);
+                    "GROUP BY codigo_dia, tipo_dia, horario.nombre, dh.id_horario, dh.hora, dh.tipo_accion, dh.id " +
+                    "ORDER BY dh.id_horario, dh.hora ASC", [fecha_inicio, fecha_final]);
                 if (HORARIO.rowCount > 0) {
                     return res.jsonp({ message: 'OK', data: HORARIO.rows });
                 }

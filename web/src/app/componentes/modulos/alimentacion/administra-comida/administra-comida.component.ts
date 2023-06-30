@@ -78,7 +78,7 @@ export class AdministraComidaComponent implements OnInit {
       id_empleado: this.datoEmpleado.idEmpleado
     }
     this.restU.RegistrarAdminComida(control).subscribe(res => {
-      this.toastr.success('Operación Exitosa.', 'Registro guardado.', {
+      this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       });
       this.CerrarVentana();

@@ -96,7 +96,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
         codigo: this.empleado[0].codigo
       };
       this.rest.RegistrarPlanHorario(datosPlanHorario).subscribe(response => {
-        this.toastr.success('Operación Exitosa', 'Planificación de Horario registrado', {
+        this.toastr.success('Operación exitosa.', 'Planificación de Horario registrado', {
           timeOut: 6000,
         });
         this.CerrarVentanaPlanHorario();

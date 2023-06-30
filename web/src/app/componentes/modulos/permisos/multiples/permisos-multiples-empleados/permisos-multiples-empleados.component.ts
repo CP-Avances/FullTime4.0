@@ -486,7 +486,7 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
       this.nombre_emp.reset();
 
       this._booleanOptions.bool_emp = false;
-
+      this.selectionEmp.deselect();
       this.selectionEmp.clear();
     }
 
@@ -494,11 +494,13 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
       this.nombre_dep.reset();
       this._booleanOptions.bool_dep = false;
       this.selectionDep.clear();
+      this.selectionDep.deselect();
     }
 
     if (this._booleanOptions.bool_suc) {
       this.nombre_suc.reset();
       this._booleanOptions.bool_suc = false;
+      this.selectionSuc.deselect();
       this.selectionSuc.clear();
     }
 

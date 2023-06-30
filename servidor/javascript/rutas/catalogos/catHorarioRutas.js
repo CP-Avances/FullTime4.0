@@ -48,7 +48,7 @@ class HorarioRutas {
         this.router.post('/', verificarToken_1.TokenValidation, catHorarioControlador_1.default.CrearHorario);
         // BUSCAR HORARIO POR SU NOMBRE
         this.router.post('/buscar-horario/nombre', verificarToken_1.TokenValidation, catHorarioControlador_1.default.BuscarHorarioNombre);
-        // CARGAR ARCHIVO DE RESPALDO
+        // CARGAR ARCHIVO DE RESPALDO  **//VERIFICADO
         this.router.put('/:id/documento/:archivo/verificar/:codigo', [verificarToken_1.TokenValidation, upload.single('uploads')], catHorarioControlador_1.default.GuardarDocumentoHorario);
         // ACTUALIZAR DATOS DE HORARIO
         this.router.put('/editar/:id', verificarToken_1.TokenValidation, catHorarioControlador_1.default.EditarHorario);

@@ -13,7 +13,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { MainNavService } from '../../../administracionGeneral/main-nav/main-nav.service';
 
 // IMPORTAR COMPONENTES
-import { RegistrarTimbreComponent } from '../../../timbre-web/registrar-timbre/registrar-timbre.component';
+import { RegistrarTimbreComponent } from '../../../timbres/registrar-timbre/registrar-timbre.component';
 
 @Component({
   selector: 'app-timbre-web',

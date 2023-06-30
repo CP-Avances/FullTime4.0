@@ -1,12 +1,16 @@
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+
+import { ListarRelojesComponent } from '../listar-relojes/listar-relojes.component';
+import { VerDipositivoComponent } from '../ver-dipositivo/ver-dipositivo.component';
+import { RelojesComponent } from '../relojes/relojes.component';
 
 @Component({
   selector: 'app-editar-reloj',
@@ -15,6 +19,9 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 })
 
 export class EditarRelojComponent implements OnInit {
+
+  @Input() idReloj: number;
+  @Input() pagina: string;
 
   // CONTROL DE FORMULARIOS
   isLinear = true;
@@ -26,8 +33,8 @@ export class EditarRelojComponent implements OnInit {
   datosReloj: any = [];
   sucursales: any = [];
   departamento: any = [];
-  idReloj: number;
   activarCampo: boolean = false;
+  ver_editar: boolean = true;
 
   // VARIABLES DE SELECCION DE FUNCIONES
   selec1 = false;
@@ -46,7 +53,7 @@ export class EditarRelojComponent implements OnInit {
 
   // SEGUNDO FORMULARIO
   macF = new FormControl('');
-  marcaF = new FormControl('', [Validators.minLength(4)]);
+  marcaF = new FormControl('', [Validators.minLength(2)]);
   serieF = new FormControl('', Validators.minLength(4));
   modeloF = new FormControl('', [Validators.minLength(3)]);
   puertoF = new FormControl('', [Validators.required, Validators.pattern('[0-9]{4}')]);
@@ -62,12 +69,10 @@ export class EditarRelojComponent implements OnInit {
     private toastr: ToastrService,
     private rest: RelojesService,
     public router: Router,
-  ) {
-    // OBTENER ID DE REGISTRO
-    var cadena = this.router.url;
-    var aux = cadena.split("/");
-    this.idReloj = parseInt(aux[2]);
-  }
+    public componentel: ListarRelojesComponent,
+    public componentev: VerDipositivoComponent,
+    public componenter: RelojesComponent,
+  ) { }
 
   ngOnInit(): void {
     this.FiltrarSucursales();
@@ -139,7 +144,7 @@ export class EditarRelojComponent implements OnInit {
     })
   }
 
-// METODO PARA BUSCAR DEPARTAMENTOS
+  // METODO PARA BUSCAR DEPARTAMENTOS
   BuscarDatos(id_sucursal: number) {
     this.departamento = [];
     this.restCatDepartamento.BuscarDepartamentoSucursal(id_sucursal).subscribe(datos => {
@@ -199,10 +204,10 @@ export class EditarRelojComponent implements OnInit {
 
     this.rest.ActualizarDispositivo(datosReloj).subscribe(response => {
       if (response.message === 'actualizado') {
-        this.toastr.success('Operación Exitosa.', 'Registro actualizado.', {
+        this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
           timeOut: 6000,
         });
-        this.router.navigate(['/verDispositivos/', this.idReloj]);
+        this.CerrarVentana();
       }
       else {
         this.toastr.error(
@@ -275,8 +280,28 @@ export class EditarRelojComponent implements OnInit {
     this.segundoFormulario.reset();
   }
 
+  // METODO PARA CERRAR FORMULARIO
+  ver_datos: boolean = false;
+  pagina_: string = '';
+  reloj_id: number;
   CerrarVentana() {
     this.LimpiarCampos();
+    if (this.pagina === 'editar-reloj') {
+      this.ver_datos = true;
+      this.ver_editar = false;
+      this.pagina_ = 'listar-relojes';
+      this.reloj_id = this.idReloj;
+    }
+    else if (this.pagina === 'ver-editar-listar' || this.pagina === 'ver-editar-registrar') {
+      this.componentev.ver_datos = true;
+      this.componentev.ver_editar = false;
+      this.componentev.idReloj = this.idReloj;
+      this.componentev.CargarDatosReloj();
+      if (this.pagina === 'ver-editar-listar') {
+        this.componentev.pagina = 'listar-relojes';
+      }
+    }
+
   }
 
 }

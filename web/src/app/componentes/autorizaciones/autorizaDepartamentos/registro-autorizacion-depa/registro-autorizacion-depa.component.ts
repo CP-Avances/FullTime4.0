@@ -104,7 +104,7 @@ export class RegistroAutorizacionDepaComponent implements OnInit {
     }
 
     this.restAutoriza.IngresarAutorizaDepartamento(autoriza).subscribe(res => {
-      this.toastr.success('Operación Exitosa.', 'Registro guardado.', {
+      this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       });
       this.CerrarVentana();

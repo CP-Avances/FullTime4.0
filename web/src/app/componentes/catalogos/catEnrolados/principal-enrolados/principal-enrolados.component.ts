@@ -249,7 +249,7 @@ export class PrincipalEnroladosComponent implements OnInit {
       formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
     }
     this.rest.subirArchivoExcel(formData).subscribe(res => {
-      this.toastr.success('Operación Exitosa', 'Plantilla de Enrolados importada.', {
+      this.toastr.success('Operación exitosa.', 'Plantilla de Enrolados importada.', {
         timeOut: 6000,
       });
       this.getEnrolados();

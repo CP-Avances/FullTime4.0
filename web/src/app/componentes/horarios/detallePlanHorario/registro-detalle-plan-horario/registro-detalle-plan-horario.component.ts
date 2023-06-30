@@ -177,7 +177,7 @@ export class RegistroDetallePlanHorarioComponent implements OnInit {
         this.restP.CrearPlanGeneral(plan).subscribe(res => {
         })
       })
-      this.toastr.success('Operación Exitosa', 'Detalle de Planificación de Horario registrado', {
+      this.toastr.success('Operación exitosa.', 'Detalle de Planificación de Horario registrado', {
         timeOut: 6000,
       });
     });

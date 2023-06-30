@@ -23,11 +23,22 @@ export class DatosGeneralesService {
     return this.http.get<any>(`${environment.url}/generalidades/informacion-general/${estado}`);
   }
 
-
-  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR
+  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR CARGOS
   ObtenerInformacionCargo() {
     const estado = 1; // 1 = activo 
     return this.http.get<any>(`${environment.url}/generalidades/informacion-general-cargo/${estado}`);
+  }
+
+  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR COMUNICADOS
+  ObtenerInformacionComunicados() {
+    const estado = 1; // 1 = activo 
+    return this.http.get<any>(`${environment.url}/generalidades/datos_generales_comunicados/${estado}`);
+  }
+
+  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR COMUNICADOS
+  ObtenerCargosComunicados() {
+    const estado = 1; // 1 = activo 
+    return this.http.get<any>(`${environment.url}/generalidades/datos_cargos_comunicados/${estado}`);
   }
 
   // METODO PARA LISTAR INFORMACION ACTUAL DE USUARIO

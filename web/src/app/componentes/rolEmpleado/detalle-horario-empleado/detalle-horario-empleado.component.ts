@@ -195,7 +195,7 @@ export class DetalleHorarioEmpleadoComponent implements OnInit {
       console.log('ver', this.archivoSubido[i])
     }
     this.restDP.subirArchivoExcel(parseInt(this.idPlanH), formData).subscribe(res => {
-      this.toastr.success('Operación Exitosa', 'Plantilla de Horario importada.', {
+      this.toastr.success('Operación exitosa.', 'Plantilla de Horario importada.', {
         timeOut: 6000,
       });
       this.ListarDetalles(this.idPlanH, this.formato_fecha);

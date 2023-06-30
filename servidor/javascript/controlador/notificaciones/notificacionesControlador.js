@@ -17,6 +17,30 @@ const database_1 = __importDefault(require("../../database"));
 const settingsMail_1 = require("../../libs/settingsMail");
 const path_1 = __importDefault(require("path"));
 class NotificacionTiempoRealControlador {
+    // METODO PARA ELIMINAR NOTIFICACIONES DE PERMISOS - VACACIONES - HORAS EXTRAS  --**VERIFICACION
+    EliminarMultiplesNotificaciones(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const arregloNotificaciones = req.body;
+            let contador = 0;
+            console.log('VER IDS', arregloNotificaciones);
+            if (arregloNotificaciones.length > 0) {
+                contador = 0;
+                arregloNotificaciones.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
+                    yield database_1.default.query('DELETE FROM realtime_noti WHERE id = $1', [obj])
+                        .then((result) => {
+                        contador = contador + 1;
+                        if (contador === arregloNotificaciones.length) {
+                            return res.jsonp({ message: 'OK' });
+                        }
+                        console.log(result.command, 'REALTIME ELIMINADO ====>', obj);
+                    });
+                }));
+            }
+            else {
+                return res.jsonp({ message: 'error' });
+            }
+        });
+    }
     // METODO PARA LISTAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES
     ObtenerConfigEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -139,22 +163,6 @@ class NotificacionTiempoRealControlador {
             const { visto } = req.body;
             yield database_1.default.query('UPDATE realtime_noti SET visto = $1 WHERE id = $2', [visto, id]);
             res.jsonp({ message: 'Vista modificado' });
-        });
-    }
-    EliminarMultiplesNotificaciones(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const arrayIdsRealtimeNotificaciones = req.body;
-            console.log(arrayIdsRealtimeNotificaciones);
-            if (arrayIdsRealtimeNotificaciones.length > 0) {
-                arrayIdsRealtimeNotificaciones.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
-                    yield database_1.default.query('DELETE FROM realtime_noti WHERE id = $1', [obj])
-                        .then((result) => {
-                        console.log(result.command, 'REALTIME ELIMINADO ====>', obj);
-                    });
-                }));
-                return res.jsonp({ message: 'Todos las notificaciones seleccionadas han sido eliminadas' });
-            }
-            return res.jsonp({ message: 'No seleccionó ninguna notificación' });
         });
     }
     /** *********************************************************************************************** **

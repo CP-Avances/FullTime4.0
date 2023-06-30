@@ -1343,7 +1343,7 @@ export class PermisosMultiplesComponent implements OnInit {
   //MENSAJE DE REGISTRO DE SOLICITUD DE PERMISO
   MostrarMensaje() {
     if (this.contador === this.data.datos.length) {
-      this.toastr.success('Operación Exitosa', this.contador + ' Permisos registrados', {
+      this.toastr.success('Operación exitosa.', this.contador + ' Permisos registrados', {
         timeOut: 6000,
       });
     }

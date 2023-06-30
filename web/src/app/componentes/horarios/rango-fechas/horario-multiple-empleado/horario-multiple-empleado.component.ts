@@ -14,9 +14,9 @@ import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.mode
 import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-
 
 @Component({
   selector: 'app-horario-multiple-empleado',
@@ -30,6 +30,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   seleccionar: boolean = true;
   asignar: boolean = false;
   ventana_horario: boolean = false;
+  ventana_busqueda: boolean = false;
 
   idEmpleadoLogueado: any;
 
@@ -38,6 +39,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   cedula = new FormControl('', [Validators.minLength(2)]);
   nombre_emp = new FormControl('', [Validators.minLength(2)]);
   nombre_dep = new FormControl('', [Validators.minLength(2)]);
+  nombre_suc = new FormControl('', [Validators.minLength(2)]);
   nombre_carg = new FormControl('', [Validators.minLength(2)]);
   seleccion = new FormControl('');
 
@@ -45,14 +47,13 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
   filtroNombreDep_: string = '';
 
-  filtroCodigo_: number;
+  filtroCodigo_: any;
   filtroCedula_: string = '';
   filtroNombreEmp_: string = '';
 
-  habilitado: any;
+  filtroNombreSuc_: string = '';
 
   public _booleanOptions: FormCriteriosBusqueda = {
-    bool_suc: false,
     bool_dep: false,
     bool_emp: false,
     bool_cargo: false,
@@ -66,6 +67,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     public restPerV: PeriodoVacacionesService, // SERVICIO DATOS PERIODO DE VACACIONES
     public validar: ValidacionesService, // VARIABLE USADA PARA VALIDACIONES DE INGRESO DE LETRAS - NUMEROS
     public restR: ReportesService,
+    public plan: PlanGeneralService,
     private toastr: ToastrService, // VARIABLE PARA MANEJO DE NOTIFICACIONES
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
@@ -92,7 +94,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   origen_cargo: any = [];
   cargos: any = [];
   BuscarCargos() {
-
     this.informacion.ObtenerInformacionCargo().subscribe((res: any[]) => {
       this.origen_cargo = JSON.stringify(res);
 
@@ -105,7 +106,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
       res.forEach(obj => {
         obj.empleados.forEach(r => {
-
           this.empleados_cargos.push({
             id: r.id,
             nombre: r.name_empleado,
@@ -140,8 +140,8 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
         obj.departamentos.forEach(ele => {
           this.departamentos.push({
             id: ele.id_depa,
-            nombre: ele.name_dep,
-            establecimiento: ele.sucursal,
+            departamento: ele.name_dep,
+            nombre: ele.sucursal,
           })
         })
       })
@@ -171,8 +171,10 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
   // METODO PARA ACTIVAR SELECCION MULTIPLE
   plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
   HabilitarSeleccion() {
     this.plan_multiple = true;
+    this.plan_multiple_ = true;
     this.auto_individual = false;
     this.activar_seleccion = false;
   }
@@ -184,31 +186,23 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   BuscarPorTipo(e: MatRadioChange) {
     this.opcion = e.value;
     this.activar_boton = true;
+    this.MostrarLista();
     switch (this.opcion) {
       case 'c':
         this.ControlarOpciones(true, false, false);
         this.ControlarBotones(true, false, true);
-        this.selectionEmp.clear();
-        this.selectionDep.clear();
         break;
       case 'd':
         this.ControlarOpciones(false, true, false);
         this.ControlarBotones(true, false, true);
-        this.selectionEmp.clear();
-        this.selectionCarg.clear();
         break;
       case 'e':
         this.ControlarOpciones(false, false, true);
         this.ControlarBotones(true, false, true);
-        this.selectionDep.clear();
-        this.selectionCarg.clear();
         break;
       default:
         this.ControlarOpciones(false, false, false);
         this.ControlarBotones(true, false, true);
-        this.selectionEmp.clear();
-        this.selectionDep.clear();
-        this.selectionCarg.clear();
         break;
     }
     this.restR.GuardarFormCriteriosBusqueda(this._booleanOptions);
@@ -220,6 +214,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   ControlarBotones(seleccion: boolean, multiple: boolean, individual: boolean) {
     this.activar_seleccion = seleccion;
     this.plan_multiple = multiple;
+    this.plan_multiple_ = multiple;
     this.auto_individual = individual;
   }
 
@@ -231,14 +226,41 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
   // METODO PARA FILTRAR DATOS DE BUSQUEDA
   Filtrar(e: any, orden: number) {
+    this.ControlarFiltrado(e);
     switch (orden) {
       case 1: this.restR.setFiltroNombreCarg(e); break;
       case 2: this.restR.setFiltroNombreDep(e); break;
       case 3: this.restR.setFiltroCodigo(e); break;
       case 4: this.restR.setFiltroCedula(e); break;
       case 5: this.restR.setFiltroNombreEmp(e); break;
+      case 6: this.restR.setFiltroNombreSuc(e); break;
       default:
         break;
+    }
+  }
+
+  // METODO PARA CONTROLAR FILTROS DE BUSQUEDA
+  ControlarFiltrado(e: any) {
+    if (e === '') {
+      if (this.plan_multiple === true) {
+        this.activar_seleccion = false;
+      }
+      else {
+        if (this.activar_seleccion === false) {
+          this.plan_multiple = true;
+          this.auto_individual = false;
+        }
+      }
+    }
+    else {
+      if (this.activar_seleccion === true) {
+        this.activar_seleccion = false;
+        this.plan_multiple_ = true;
+        this.auto_individual = false;
+      }
+      else {
+        this.plan_multiple = false;
+      }
     }
   }
 
@@ -268,13 +290,15 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   tamanio_pagina_emp: number = 5;
   numero_pagina_emp: number = 1;
 
-  get filtroNombreCarg() { return this.restR.filtroNombreCarg }
+  get filtroNombreCarg() { return this.restR.filtroNombreCarg };
 
-  get filtroNombreDep() { return this.restR.filtroNombreDep }
+  get filtroNombreDep() { return this.restR.filtroNombreDep };
 
   get filtroNombreEmp() { return this.restR.filtroNombreEmp };
   get filtroCodigo() { return this.restR.filtroCodigo };
   get filtroCedula() { return this.restR.filtroCedula };
+
+  get filtroNombreSuc() { return this.restR.filtroNombreSuc };
 
   // HABILITAR O DESHABILITAR EL ICONO DE AUTORIZACION INDIVIDUAL
   auto_individual: boolean = true;
@@ -361,8 +385,8 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     }
   }
 
-  // METODO PARA MOSTRAR DATOS DE SUCURSALES
-  ModelarCargo(id: number) {
+  // METODO PARA MOSTRAR DATOS DE CARGOS
+  ModelarCargo(id: number, tipo: string) {
     let usuarios: any = [];
     let respuesta = JSON.parse(this.origen_cargo)
     if (id === 0) {
@@ -385,12 +409,16 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
         }
       })
     }
-
-    this.PlanificarMultiple(usuarios);
+    if (tipo === 'p') {
+      this.PlanificarMultiple(usuarios);
+    }
+    else {
+      this.VerPlanificacion(usuarios);
+    }
   }
 
   // METODO PARA MOSTRAR DATOS DE DEPARTAMENTOS
-  ModelarDepartamentos(id: number) {
+  ModelarDepartamentos(id: number, tipo: string) {
     let usuarios: any = [];
     let respuesta = JSON.parse(this.origen)
 
@@ -419,11 +447,16 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       })
     }
 
-    this.PlanificarMultiple(usuarios);
+    if (tipo === 'p') {
+      this.PlanificarMultiple(usuarios);
+    }
+    else {
+      this.VerPlanificacion(usuarios);
+    }
   }
 
   // METODO PARA MOSTRAR DATOS DE EMPLEADOS
-  ModelarEmpleados() {
+  ModelarEmpleados(tipo: string) {
     let respuesta: any = [];
     this.empleados.forEach((obj: any) => {
       this.selectionEmp.selected.find(obj1 => {
@@ -432,7 +465,13 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
         }
       })
     })
-    this.PlanificarMultiple(respuesta);
+
+    if (tipo === 'p') {
+      this.PlanificarMultiple(respuesta);
+    }
+    else {
+      this.VerPlanificacion(respuesta);
+    }
   }
 
 
@@ -443,22 +482,25 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   // METODO PARA ABRI VENTANA DE ASIGNACION DE HORARIO
   idCargo: any;
   data_horario: any = [];
-  PlanificarIndividual(usuario: any): void {
-    this.seleccionar = false;
-    this.ventana_horario = true;
-
-    this.data_horario = {
-      pagina: 'rango_fecha',
-      codigo: usuario.codigo,
-      idCargo: usuario.id_cargo,
-      idEmpleado: usuario.id,
-      horas_trabaja: usuario.hora_trabaja,
+  PlanificarIndividual(usuario: any, tipo: string): void {
+    if (tipo === 'p') {
+      this.seleccionar = false;
+      this.ventana_horario = true;
+      this.data_horario = {
+        pagina: 'rango_fecha',
+        codigo: usuario.codigo,
+        idCargo: usuario.id_cargo,
+        idEmpleado: usuario.id,
+        horas_trabaja: usuario.hora_trabaja,
+      }
+    }
+    else {
+      this.VerPlanificacion([usuario]);
     }
   }
 
   // METODO DE VALIDACION DE SELECCION MULTIPLE
   PlanificarMultiple(data: any) {
-    console.log('ver respuesta ', data)
     if (data.length > 0) {
       this.Planificar(data);
     }
@@ -473,37 +515,24 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   seleccionados: any = [];
   Planificar(seleccionados: any) {
     if (seleccionados.length === 1) {
-      this.PlanificarIndividual(seleccionados[0]);
+      this.PlanificarIndividual(seleccionados[0], 'p');
     } else {
       this.seleccionados = seleccionados;
       this.seleccionar = false;
       this.asignar = true;
-      // VENTANA PARA INGRESAR DATOS DE HORARIOS MULTIPLES 
-      /*this.ventana.open(HorariosMultiplesComponent,
-        { width: '600px', data: { datos: seleccionados } })
-        .afterClosed().subscribe(item => {
-          this.auto_individual = true;
-          this.LimpiarFormulario();
-          if (item) {
-            if (item.length != 0) {
-              this.no_asignados = true;
-              this.empleados_sin_asignacion = item
-            }
-          }
-        });*/
     }
   }
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
-  GuardarRegistros(id: number) {
+  GuardarRegistros(id: number, tipo: string) {
     if (this.opcion === 'c') {
-      this.ModelarCargo(id);
+      this.ModelarCargo(id, tipo);
     }
     else if (this.opcion === 'd') {
-      this.ModelarDepartamentos(id);
+      this.ModelarDepartamentos(id, tipo);
     }
     else {
-      this.ModelarEmpleados();
+      this.ModelarEmpleados(tipo);
     }
   }
 
@@ -511,16 +540,30 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   MostrarLista() {
     if (this.opcion === 'c') {
       this.nombre_carg.reset();
+      this.filtroNombreCarg_ = '';
+      this.selectionEmp.clear();
+      this.selectionDep.clear();
       this.Filtrar('', 1)
     }
     else if (this.opcion === 'd') {
       this.nombre_dep.reset();
+      this.filtroNombreDep_ = '';
+      this.nombre_suc.reset();
+      this.filtroNombreSuc_ = '';
+      this.selectionEmp.clear();
+      this.selectionCarg.clear();
       this.Filtrar('', 2)
+      this.Filtrar('', 6)
     }
     else if (this.opcion === 'e') {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();
+      this.filtroCodigo_ = '';
+      this.filtroCedula_ = '';
+      this.filtroNombreEmp_ = '';
+      this.selectionDep.clear();
+      this.selectionCarg.clear();
       this.Filtrar('', 3)
       this.Filtrar('', 4)
       this.Filtrar('', 5)
@@ -534,15 +577,17 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();
-
       this._booleanOptions.bool_emp = false;
+      this.selectionEmp.deselect();
       this.selectionEmp.clear();
     }
 
     if (this._booleanOptions.bool_dep) {
       this.nombre_dep.reset();
+      this.nombre_suc.reset();
       this._booleanOptions.bool_dep = false;
       this.selectionDep.clear();
+      this.selectionDep.deselect();
     }
 
     if (this._booleanOptions.bool_cargo) {
@@ -564,5 +609,19 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     return this.validar.IngresarSoloNumeros(evt);
   }
 
+  // METODO PARA VER PLANIFICACION
+  resultados: any = [];
+  VerPlanificacion(data: any) {
+    if (data.length > 0) {
+      this.resultados = data;
+      this.seleccionar = false;
+      this.ventana_busqueda = true;
+    }
+    else {
+      this.toastr.warning('No ha seleccionado usuarios.', '', {
+        timeOut: 6000,
+      });
+    }
+  }
 
 }

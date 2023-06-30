@@ -209,7 +209,7 @@ export class RegistrarCiudadComponent implements OnInit {
   // GUARDAR DATOS DE CIUDAD EN BASE DE DATOS
   GuardarDatos(ciudad: any) {
     this.rest.RegistrarCiudad(ciudad).subscribe(response => {
-      this.toastr.success('Operación Exitosa.', 'Registro guardado.', {
+      this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       });
       this.CerrarVentana();

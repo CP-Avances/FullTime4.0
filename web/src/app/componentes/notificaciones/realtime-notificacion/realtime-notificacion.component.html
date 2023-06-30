@@ -3,46 +3,42 @@
         <div class="col">
             <div class="d-flex bd-highlight" id="titulo">
                 <span class="w-100 bd-highlight">
-                    CRÍTERIOS DE BÚSQUEDA</span>
+                    CRÍTERIOS DE BÚSQUEDA
+                </span>
             </div>
             <mat-card class="example-card mat-elevation-z9">
-                <form [formGroup]="buscador">
-                    <div class="d-flex flex-wrap justify-content-center">
-                        <mat-form-field>
-                            <mat-label>Buscar por usuario</mat-label>
-                            <input matInput placeholder="Ej: " [(ngModel)]="filtroTimbreEmpl"
-                                [formControl]="nom_empleado" (keypress)="IngresarSoloLetras($event)">
-                            <mat-error *ngIf="nom_empleado.invalid">Indispensable ingresar más de dos letras
-                            </mat-error>
-                            <mat-icon matSuffix matTooltipPosition="right" id="i-cursor"
-                                matTooltip="Búsqueda por el nombre del usuario">
-                                help_outline</mat-icon>
-                        </mat-form-field>
-                        <mat-form-field>
-                            <mat-label>Buscar por estado</mat-label>
-                            <input matInput placeholder="Ej: " [(ngModel)]="filtroTimbreEsta" [formControl]="estado"
-                                type="text" (keypress)="IngresarSoloLetras($event)">
-                            <mat-error *ngIf="estado.invalid">Indispensable ingresar más de dos letras
-                            </mat-error>
-                            <mat-icon matSuffix matTooltipPosition="right" id="i-cursor"
-                                matTooltip="Búsqueda por estado de la solicitud">
-                                help_outline</mat-icon>
-                        </mat-form-field>
-                        <mat-form-field>
-                            <mat-label>Buscar por fecha</mat-label>
-                            <input matInput placeholder="Ej: " [(ngModel)]="filtroTimbreFech" [formControl]="fecha"
-                                type="text">
-                            <mat-error *ngIf="fecha.invalid">Indispensable ingresar más de dos letras
-                            </mat-error>
-                            <mat-icon matSuffix matTooltipPosition="right" id="i-cursor"
-                                matTooltip="Búsqueda por fecha de la solicitud">
-                                help_outline</mat-icon>
-                        </mat-form-field>
-                    </div>
-                </form>
-                <div class="d-flex justify-content-around">
-                    <button mat-button type="submit" class="btn btn-sm" id="boton" (click)="limpiarCampos()">Mostrar
-                        lista</button>
+                <div class="d-flex flex-wrap justify-content-center">
+                    <mat-form-field>
+                        <mat-label>Buscar por usuario</mat-label>
+                        <input matInput [(ngModel)]="filtroTimbreEmpl" [formControl]="nom_empleado"
+                            (keypress)="IngresarSoloLetras($event)">
+                        <mat-icon matSuffix matTooltipPosition="right" id="i-cursor"
+                            matTooltip="Búsqueda por el nombre del usuario.">
+                            help_outline
+                        </mat-icon>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Buscar por estado</mat-label>
+                        <input matInput [(ngModel)]="filtroTimbreEsta" [formControl]="estado" type="text"
+                            (keypress)="IngresarSoloLetras($event)">
+                        <mat-icon matSuffix matTooltipPosition="right" id="i-cursor"
+                            matTooltip="Búsqueda por estado de la solicitud.">
+                            help_outline
+                        </mat-icon>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Buscar por fecha</mat-label>
+                        <input matInput [(ngModel)]="filtroTimbreFech" [formControl]="fecha" type="text">
+                        <mat-icon matSuffix matTooltipPosition="right" id="i-cursor"
+                            matTooltip="Búsqueda por fecha de la solicitud.">
+                            help_outline
+                        </mat-icon>
+                    </mat-form-field>
+                </div>
+                <div class="d-flex justify-content-around" style="padding-bottom: 10px;">
+                    <button type="submit" class="btn btn-sm" id="boton" (click)="LimpiarCampos()">
+                        Mostrar lista
+                    </button>
                 </div>
             </mat-card>
         </div>
@@ -54,11 +50,16 @@
             <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
                 matTooltipPosition="right"
                 matTooltip="Activa o desactiva selección múltiple para desactivar empleados masivamente"
-                id="SelectCheck">library_add_check</mat-icon>
+                id="SelectCheck">
+                library_add_check
+            </mat-icon>
             <button *ngIf="btnCheckHabilitar" class="btn btn-primary" style="float: left; margin-left: 10px;"
-                (click)="Deshabilitar(2)">Confirmar</button>
+                (click)="EliminarNotificaciones(2)">
+                Confirmar
+            </button>
             <span class="w-100 bd-highlight">
-                LISTA DE TODAS LAS NOTIFICACIONES</span>
+                LISTA DE TODAS LAS NOTIFICACIONES
+            </span>
         </div>
         <table class="table table-hover table-sm ">
             <thead class="thead-light">
@@ -93,16 +94,16 @@
                     <td>
                         <a *ngIf="n.id_vacaciones === null && n.id_hora_extra === null"
                             [routerLink]="['/ver-permiso/', n.id_permiso]" (click)="CambiarVistaNotificacion(n.id)">
-                            permiso
+                            Permiso
                         </a>
                         <a *ngIf="n.id_permiso === null && n.id_hora_extra === null"
                             [routerLink]="['/ver-vacacion/', n.id_vacaciones]" (click)="CambiarVistaNotificacion(n.id)">
-                            vacación
+                            Vacación
                         </a>
                         <a *ngIf="n.id_permiso === null && n.id_vacaciones === null"
                             [routerLink]="['/ver-hora-extra/', n.id_hora_extra]"
                             (click)="CambiarVistaNotificacion(n.id)">
-                            hora extra
+                            Hora extra
                         </a>
                     </td>
                 </tr>

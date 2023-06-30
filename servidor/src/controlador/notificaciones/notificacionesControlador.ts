@@ -10,6 +10,43 @@ import { QueryResult } from 'pg';
 
 class NotificacionTiempoRealControlador {
 
+  // METODO PARA ELIMINAR NOTIFICACIONES DE PERMISOS - VACACIONES - HORAS EXTRAS  --**VERIFICACION
+  public async EliminarMultiplesNotificaciones(req: Request, res: Response): Promise<any> {
+    const arregloNotificaciones = req.body;
+    let contador: number = 0;
+
+    console.log('VER IDS', arregloNotificaciones);
+
+    if (arregloNotificaciones.length > 0) {
+      contador = 0;
+      arregloNotificaciones.forEach(async (obj: number) => {
+        await pool.query('DELETE FROM realtime_noti WHERE id = $1', [obj])
+          .then((result: any) => {
+            contador = contador + 1;
+            if (contador === arregloNotificaciones.length) {
+              return res.jsonp({ message: 'OK' });
+            }
+            console.log(result.command, 'REALTIME ELIMINADO ====>', obj);
+          });
+      });
+    }
+    else {
+      return res.jsonp({ message: 'error' });
+    }
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
 
   // METODO PARA LISTAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES
   public async ObtenerConfigEmpleado(req: Request, res: Response): Promise<any> {
@@ -162,21 +199,7 @@ class NotificacionTiempoRealControlador {
     res.jsonp({ message: 'Vista modificado' });
   }
 
-  public async EliminarMultiplesNotificaciones(req: Request, res: Response): Promise<any> {
-    const arrayIdsRealtimeNotificaciones = req.body;
-    console.log(arrayIdsRealtimeNotificaciones);
 
-    if (arrayIdsRealtimeNotificaciones.length > 0) {
-      arrayIdsRealtimeNotificaciones.forEach(async (obj: number) => {
-        await pool.query('DELETE FROM realtime_noti WHERE id = $1', [obj])
-          .then((result: any) => {
-            console.log(result.command, 'REALTIME ELIMINADO ====>', obj);
-          });
-      });
-      return res.jsonp({ message: 'Todos las notificaciones seleccionadas han sido eliminadas' });
-    }
-    return res.jsonp({ message: 'No seleccionó ninguna notificación' });
-  }
 
   /** *********************************************************************************************** **
    **                         METODOS PARA LA TABLA DE CONFIG_NOTI                                    **

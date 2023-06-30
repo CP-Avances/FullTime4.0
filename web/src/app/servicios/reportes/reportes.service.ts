@@ -168,7 +168,7 @@ export class ReportesService {
   setFiltroNombreDep(arr) { this._filtroNombreDep = arr }
 
   // Filtro formulario del empleado 
-  private _filtroCodigo: any;
+  private _filtroCodigo: string = '';
   private _filtroCedula: string = '';
   private _filtroNombreEmp: string = '';
 
@@ -219,7 +219,7 @@ export class ReportesService {
     this._filtroCedula = '';
     this._filtroCedula_tab = '';
     this._filtroCedula_inc = '';
-    this._filtroCodigo = 0;
+    this._filtroCodigo = '';
     this._filtroCodigo_tab = 0;
     this._filtroCodigo_inc = 0;
   }

@@ -1,4 +1,4 @@
-.btn{
+.btn {
     background-color: rgb(80, 87, 97);
     color: white;
     margin: 5px 10px 5px 10px;
@@ -49,20 +49,17 @@ mat-form-field {
 }
 
 label {
-    font-size: 16px;
+    font-size: 14px;
     font-style: normal;
     letter-spacing: 0.2px;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
-mat-label{
-    font-size: 14px;
-}
-
-.mat-radio-button {
+mat-label {
     font-size: 14px;
 }
 
 #letras {
-    font-size: 15px;
+    font-size: 12px;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
 }
-

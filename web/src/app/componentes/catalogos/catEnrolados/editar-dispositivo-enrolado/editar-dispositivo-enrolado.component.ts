@@ -89,7 +89,7 @@ export class EditarDispositivoEnroladoComponent implements OnInit {
     }, error => {
       this.habilitarprogress = true;
       this.rest.ActualizarDatos(buscarReloj).subscribe(response => {
-        this.toastr.success('Operación Exitosa', 'Empleado enrolado agregado al dispositivo', {
+        this.toastr.success('Operación exitosa.', 'Empleado enrolado agregado al dispositivo', {
           timeOut: 6000,
         });
         this.CerrarVentanaAsignarReloj();

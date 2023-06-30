@@ -306,7 +306,7 @@ export class EditarSolicitudComidaComponent implements OnInit {
       this.EnviarCorreo(alimentacion);
       this.NotificarPlanificacion(alimentacion);
 
-      this.toastr.success('Operación Exitosa', 'Servicio de Alimentación Actualizado.', {
+      this.toastr.success('Operación exitosa.', 'Servicio de Alimentación Actualizado.', {
         timeOut: 6000,
       })
       this.CerrarRegistroPlanificacion();

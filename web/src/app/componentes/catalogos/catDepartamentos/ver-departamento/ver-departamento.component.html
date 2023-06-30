@@ -1,86 +1,97 @@
-<div id="titulo">
-    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        NIVELES DE AUTORIZACIÓN 
-    </span>
-    <button (click)=" AbrirVentanaRegistrarNivelDep()" class="btn btn-outline-light btn-sm" 
-        style="float: right; margin-right: 10px; margin-top: -5px;">Añadir</button>
-</div>
-
-<div class="container" style="padding: 10px; text-align: center; margin-top: 5px; margin-bottom: 10px;">
-    <div class="mat-elevation-z8" style="background: white;">
-        <div id="resultados">DEPARTAMENTO {{datos.nombre}}
-            
+<div style="padding-top: 20px;">
+    <div id="titulo">
+        <button style="float: left; margin-left: 10px; margin-top: -5px;" class="btn btn-outline-light btn-sm"
+            (click)="VerDepartamentos()">
+            Atras
+        </button>
+        <span>
+            NIVELES DE AUTORIZACIÓN
+        </span>
+        <button (click)=" AbrirRegistrarNiveles()" class="btn btn-outline-light btn-sm"
+            style="float: right; margin-right: 10px; margin-top: -5px;">
+            Añadir
+        </button>
+    </div>
+    <div class="container" style="padding: 10px; text-align: center; margin-top: 10px; margin-bottom: 10px;">
+        <div class="mat-elevation-z8" style="background: white;">
+            <div id="resultados">
+                <span>
+                    DEPARTAMENTO {{info.nombre}} - ESTABLECIMIENTO {{nombre_sucursal}}
+                </span>
+                <mat-icon class="float-right" id="cerrar" (click)="CargarDatos(info)" matTooltipPosition="right"
+                    matTooltip="Actualización de niveles de aprobación.">autorenew</mat-icon>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col">Nivel jerárquico</th>
+                            <th scope="col">Establecimiento</th>
+                            <th scope="col">Departamento</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let departamento of departamentos">
+                            <td>{{departamento.nivel}}</td>
+                            <td>{{departamento.suc_nivel}}</td>
+                            <td>{{departamento.dep_nivel_nombre}}</td>
+                            <td class="d-flex justify-content-center">
+                                <i (click)="AbrirVentanaVerListadoEmpleados(departamento)" id="t-detalles"
+                                    class="fa fa-user-circle" matSuffix matTooltipPosition="right"
+                                    matTooltip="Visualizar personal con permisos de autorización.">
+                                    <p>Autorización</p>
+                                </i>
+                                <i (click)="ConfirmarDelete(departamento)" class="far fa-trash-alt" id="t-eliminar"
+                                    matSuffix matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                    <p>Eliminar</p>
+                                </i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div class="table-responsive">
-            <table class="table table-hover table-sm">
-                <thead class="thead-light">
-                    <tr>
-                        <th scope="col">Nive Jerárquico</th>
-                        <th scope="col">Departamento</th>
-                        <th scope="col">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
-                        *ngFor="let departamento of departamentos">
-                        <td>{{departamento.nivel}}</td>
-                        <td>{{departamento.dep_nivel_nombre}}</td>
-                        <td class="d-flex justify-content-center">
-                            <i (click)="AbrirVentanaVerListadoEmpleados(departamento)"
-                                class="fas fa-eye" matSuffix matTooltipPosition="right"
-                                matTooltip="Visualiza los datos generales de este registro.">
-                                <p>Ver</p>
-                            </i>
-                            <i (click)="ConfirmarDelete(departamento)" class="far fa-trash-alt" id="t-eliminar"
-                                matSuffix matTooltipPosition="right" matTooltip="Eliminar este registro.">
-                                <p>Eliminar</p>
-                            </i>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+    </div>
+
+    <div [hidden]="mostrar" class="container"
+        style="padding: 10px; text-align: center; margin-top: 5px; margin-bottom: 10px;">
+        <div class="mat-elevation-z8" style="background: white;">
+            <div id="resultados">
+                LISTA DE USUARIOS QUE AUTORIZAN EN {{depa}}
+                <mat-icon class="float-right" id="cerrar" (click)="CerrarTabla()">highlight_off</mat-icon>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col">Usuarios</th>
+                            <th scope="col">Cargo</th>
+                            <th scope="col">Tipo de aprobación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let empleado of empleados">
+                            <td>{{empleado.nombre}} {{empleado.apellido}}</td>
+                            <td>{{empleado.cargo}}</td>
+                            <td>
+                                <span *ngIf="empleado.estado === true && empleado.autorizar === true">
+                                    Autoriza
+                                </span>
+                                <span *ngIf="empleado.estado === true && empleado.preautorizar === true">
+                                    Pre-autoriza
+                                </span>
+                                <span *ngIf="empleado.estado === false">
+                                    Se le ha quitado la autorizacion
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
-
-<div [hidden] = "mostrar" class="container" style="padding: 10px; text-align: center; margin-top: 5px; margin-bottom: 10px;">
-    <div class="mat-elevation-z8" style="background: white;">
-        <div id="resultados">
-            LISTA DE USUARIOS QUE AUTORIZAN - {{depa}}
-            <mat-icon class="float-right" id="cerrar" (click)="CerrarTabla()">highlight_off</mat-icon>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-hover table-sm">
-                <thead class="thead-light">
-                    <tr>
-                        <th scope="col">Usuarios</th>
-                        <th scope="col">Cargo</th>
-                        <th scope="col">Tipo de Autorizacion</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
-                        *ngFor="let empleado of empleados">
-                        <td>{{empleado.nombre}} {{empleado.apellido}}</td>
-                        <td>{{empleado.cargo}}</td>
-                        <td>
-                            <span *ngIf="empleado.estado === true && empleado.autorizar === true">
-                                Autoriza
-                            </span>
-                            <span *ngIf="empleado.estado === true && empleado.preautorizar === true">
-                                Pre-autoriza
-                            </span>
-                            <span *ngIf="empleado.estado === false">
-                                Se le ha quitado la autorizacion
-                            </span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
 <div class="pantalla-progress" *ngIf="habilitarprogress">
     <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
     </mat-progress-spinner>

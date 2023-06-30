@@ -22,7 +22,7 @@ export class HorarioService {
     return this.http.post(`${environment.url}/horario/buscar-horario/nombre`, datos);
   }
 
-  // CARGAR ARCHIVO DE RESPALDO
+  // CARGAR ARCHIVO DE RESPALDO   --**VERIFICADO
   SubirArchivo(formData: any, id: number, archivo: any, codigo: any) {
     return this.http.put(`${environment.url}/horario/${id}/documento/${archivo}/verificar/${codigo}`, formData)
   }

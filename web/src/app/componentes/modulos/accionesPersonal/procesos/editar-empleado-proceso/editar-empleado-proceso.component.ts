@@ -101,7 +101,7 @@ export class EditarEmpleadoProcesoComponent implements OnInit {
     };
     console.log("datos cambiados", datosProceso);
     this.restP.ActualizarUnProceso(datosProceso).subscribe(response => {
-      this.toastr.success('Operación Exitosa', 'Proceso del Empleado actualizado', {
+      this.toastr.success('Operación exitosa.', 'Proceso del Empleado actualizado', {
         timeOut: 6000,
       })
       this.CerrarVentanaRegistroProceso();

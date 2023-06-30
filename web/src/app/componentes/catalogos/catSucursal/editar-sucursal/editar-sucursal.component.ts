@@ -268,7 +268,7 @@ export class EditarSucursalComponent implements OnInit {
   // METODO PARA ACTUALIZAR REGISTRO
   ActualizarSucursal(sucursal: any) {
     this.restSucursal.ActualizarSucursal(sucursal).subscribe(response => {
-      this.toastr.success('Operación Exitosa.', 'Registro actualizado.', {
+      this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
         timeOut: 6000,
       });
       this.habilitarprogress === false;

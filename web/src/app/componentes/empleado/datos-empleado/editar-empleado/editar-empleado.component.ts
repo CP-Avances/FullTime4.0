@@ -251,7 +251,7 @@ export class EditarEmpleadoComponent implements OnInit {
         this.contador = 1;
       }
       else {
-        this.toastr.success('Operacion Exitosa.', 'Empleado Actualizado.', {
+        this.toastr.success('Operación exitosa.', 'Empleado Actualizado.', {
           timeOut: 6000,
         });
         this.ActualizarCodigo(form1.codigoForm);

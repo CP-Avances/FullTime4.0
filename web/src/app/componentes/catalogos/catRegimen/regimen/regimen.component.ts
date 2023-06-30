@@ -1,5 +1,5 @@
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatRadioChange } from '@angular/material/radio';
 import { startWith, map } from 'rxjs/operators';
@@ -7,8 +7,8 @@ import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 
-import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.service';
 import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
+import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.service';
 
 @Component({
   selector: 'app-regimen',
@@ -16,7 +16,7 @@ import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/prov
   styleUrls: ['./regimen.component.css'],
 })
 
-export class RegimenComponent implements OnInit {
+export class RegimenComponent implements AfterViewInit, OnInit {
 
   // CONTROL DE FORMULARIOS
   isLinear = true;
@@ -86,6 +86,7 @@ export class RegimenComponent implements OnInit {
     private pais: ProvinciaService,
     private toastr: ToastrService,
     private formulario: FormBuilder,
+    public cambio: ChangeDetectorRef,
     public router: Router,
   ) { }
 
@@ -93,6 +94,10 @@ export class RegimenComponent implements OnInit {
     this.ObtenerPaises();
     this.ObtenerRegimen();
     this.ValidarFormulario();
+  }
+
+  ngAfterViewInit() {
+    this.cambio.detectChanges();
   }
 
 
@@ -1295,7 +1300,7 @@ export class RegimenComponent implements OnInit {
       }
       // REGISTROS GUARDADO
       else {
-        this.toastr.success('Operación Exitosa. Registro guardado.', '', {
+        this.toastr.success('Operación exitosa. Registro guardado.', '', {
           timeOut: 6000,
         });
         // VALIDAR INGRESO DE DATOS DE PERIODO DE VACACIONES

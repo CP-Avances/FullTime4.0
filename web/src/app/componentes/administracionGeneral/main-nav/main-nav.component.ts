@@ -224,7 +224,7 @@ export class MainNavComponent implements OnInit {
             subtitulo: true,
             icono: 'widgets',
             children: [
-              { name: nombre, url: '/vistaEmpresa/' + localStorage.getItem('empresa') as string, color: true },
+              { name: nombre, url: '/vistaEmpresa', color: true },
               { name: 'Parámetros', url: '/parametros', color: true },
               { name: 'Correo', url: '/configurarCorreo/' + localStorage.getItem('empresa') as string, color: true },
               { name: 'Roles', url: '/roles', color: true },

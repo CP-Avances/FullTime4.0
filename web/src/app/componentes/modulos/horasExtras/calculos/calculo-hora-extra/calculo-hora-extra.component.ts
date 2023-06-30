@@ -108,7 +108,7 @@ export class CalculoHoraExtraComponent implements OnInit {
 
   IngresarDatos(datos) {
     /* this.rest.RegistrarTipoPermiso(datos).subscribe(res => {
-       this.toastr.success('Operación Exitosa', 'Tipo Permiso guardado', {
+       this.toastr.success('Operación exitosa.', 'Tipo Permiso guardado', {
         timeOut: 6000,
       });
        window.location.reload();

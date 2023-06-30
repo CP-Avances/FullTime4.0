@@ -9,11 +9,6 @@ import { Router } from '@angular/router';
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 
-interface Nivel {
-  valor: number;
-  nombre: string
-}
-
 @Component({
   selector: 'app-editar-departamento',
   templateUrl: './editar-departamento.component.html',
@@ -24,9 +19,7 @@ export class EditarDepartamentoComponent implements OnInit {
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   idSucursal = new FormControl('');
-  depaPadre = new FormControl('');
   nombre = new FormControl('', Validators.required);
-  nivel = new FormControl('', Validators.required);
 
   // DATOS DEPARTAMENTO
   sucursales: any = [];
@@ -35,20 +28,9 @@ export class EditarDepartamentoComponent implements OnInit {
 
   // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
   public formulario = new FormGroup({
-    nivelForm: this.nivel,
     nombreForm: this.nombre,
-    depaPadreForm: this.depaPadre,
     idSucursalForm: this.idSucursal,
   });
-
-  // ARREGLO DE NIVELES EXISTENTES
-  niveles: Nivel[] = [
-    { valor: 1, nombre: '1' },
-    { valor: 2, nombre: '2' },
-    { valor: 3, nombre: '3' },
-    { valor: 4, nombre: '4' },
-    { valor: 5, nombre: '5' }
-  ];
 
   /**
    * VARIABLES PROGRESS SPINNEr
@@ -70,13 +52,11 @@ export class EditarDepartamentoComponent implements OnInit {
   datos: any;
 
   ngOnInit(): void {
-    console.log(this.info);
+    this.datos = this.info.data;
     if (this.info.establecimiento === true) {
       this.Habilitar = false;
-      this.datos = this.info.data;
     }
     else {
-      this.datos = this.info;
       this.Habilitar = true;
       this.FiltrarSucursales();
       this.idSucursal.setValue(this.datos.id_sucursal);
@@ -87,14 +67,9 @@ export class EditarDepartamentoComponent implements OnInit {
   // METODO PARA IMPRIMIR DATOS EN FORMULARIO
   CargarDatos() {
     this.nombre.setValue(this.datos.nombre);
-    this.nivel.setValue(this.datos.nivel);
-    this.rest.BuscarDepartamentoSucursal_(this.datos.id_sucursal, this.datos.id).subscribe(datos => {
+    this.departamentos = [];
+    this.rest.BuscarDepartamentoSucursal_(parseInt(this.datos.id_sucursal), this.datos.id).subscribe(datos => {
       this.departamentos = datos;
-      this.departamentos.forEach(obj => {
-        if (obj.nombre === this.datos.departamento_padre) {
-          this.depaPadre.setValue(obj.id);
-        }
-      })
     });
   }
 
@@ -125,18 +100,12 @@ export class EditarDepartamentoComponent implements OnInit {
   ModificarDepartamento(form: any) {
     var departamento = {
       id_sucursal: form.idSucursalForm,
-      depa_padre: form.depaPadreForm,
       nombre: form.nombreForm.toUpperCase(),
-      nivel: parseInt(form.nivelForm),
     };
 
     // VERIFICAR ID DE SUCURSAL
     if (this.info.establecimiento === true) {
       departamento.id_sucursal = this.datos.id_sucursal;
-    }
-
-    if (departamento.depa_padre === '') {
-      departamento.depa_padre = null;
     }
 
     if (this.departamentos.length === 0) {
@@ -158,7 +127,7 @@ export class EditarDepartamentoComponent implements OnInit {
     }
     if (this.contador === 1) {
       this.contador = 0;
-      this.toastr.error('Nombre de departamento ya se encuentra registrado.', '', {
+      this.toastr.error('Nombre de departamento ya se encuentra registrado.', 'Ups!!! algo ha salido mal.', {
         timeOut: 6000,
       });
     }
@@ -167,7 +136,7 @@ export class EditarDepartamentoComponent implements OnInit {
     }
   }
 
-  // METODO DE ACTUALIZACION DE REGISTRO EN BASE DE DATOS
+  // METODO DE ACTUALIZACION DE REGISTRO EN BASE DE DATOS  
   ActualizarDepartamento(departamento: any) {
     this.habilitarprogress = true;
     this.rest.ActualizarDepartamento(this.datos.id, departamento).subscribe(response => {
@@ -178,7 +147,8 @@ export class EditarDepartamentoComponent implements OnInit {
         });
       }
       else {
-        this.toastr.success('Operacion Exitosa.', 'Registro actualizado.', {
+        this.ActulizarNombreNiveles(departamento);
+        this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
           timeOut: 6000,
         });
         this.CerrarVentana();
@@ -191,4 +161,13 @@ export class EditarDepartamentoComponent implements OnInit {
     this.ventana.close();
   }
 
+  // METODO PARA ACTUALIZAR NOMBRES DE DEPARTAMENTOS EN NIVELES DE APROBACION
+  ActulizarNombreNiveles(departamento: any) {
+    let data = {
+      departamento: departamento.nombre,
+      id_departamento: this.datos.id
+    }
+    this.rest.ActualizarNombreNivel(data).subscribe(response => {
+    });
+  }
 }

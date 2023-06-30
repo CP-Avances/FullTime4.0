@@ -46,7 +46,7 @@ export class TipoComidasComponent implements OnInit {
 
   GuardarDatos(datos: any) {
     this.rest.CrearNuevoTipoComida(datos).subscribe(response => {
-      this.toastr.success('Operación Exitosa', 'Menú registrado', {
+      this.toastr.success('Operación exitosa.', 'Menú registrado', {
         timeOut: 6000,
       })
       this.rest.ObtenerUltimoId().subscribe(ultimo => {

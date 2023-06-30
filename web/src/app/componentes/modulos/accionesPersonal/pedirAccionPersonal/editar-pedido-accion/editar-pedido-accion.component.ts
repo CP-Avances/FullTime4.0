@@ -614,7 +614,7 @@ export class EditarPedidoAccionComponent implements OnInit {
     console.log("DATOS FINALES", datosAccion);
     this.restAccion.ActualizarPedidoAccion(datosAccion).subscribe((res) => {
       this.toastr.success(
-        "Operación Exitosa",
+        "Operación exitosa.",
         "Acción de Personal Registrada",
         {
           timeOut: 6000,
@@ -702,7 +702,7 @@ export class EditarPedidoAccionComponent implements OnInit {
      };
      this.restPlan.CrearSolicitudComida(datosPlanComida).subscribe(response => {
        this.EnviarNotificaciones(form.fechaPlanificacionForm);
-       this.toastr.success('Operación Exitosa', 'Servicio de Alimentación Registrado.', {
+       this.toastr.success('Operación exitosa.', 'Servicio de Alimentación Registrado.', {
          timeOut: 6000,
        })
        this.CerrarRegistroPlanificacion();

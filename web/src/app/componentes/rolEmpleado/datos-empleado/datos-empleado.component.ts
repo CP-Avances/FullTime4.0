@@ -215,7 +215,7 @@ export class DatosEmpleadoComponent implements OnInit {
       console.log("iamge", formData);
     }
     this.restEmpleado.SubirImagen(formData, parseInt(this.idEmpleado)).subscribe(res => {
-      this.toastr.success('Operación Exitosa', 'imagen subida.', {
+      this.toastr.success('Operación exitosa.', 'imagen subida.', {
         timeOut: 6000,
       });
       this.VerEmpleado(this.formato_fecha);

@@ -168,7 +168,7 @@ export class EditarAutorizacionDepaComponent implements OnInit {
 
     this.restAutoriza.ActualizarDatos(autorizarDepar).subscribe(res => {
       console.log('res: ',res)
-      this.toastr.success('Operación Exitosa.', 'Registro actualizado.', {
+      this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
         timeOut: 6000,
       });
       this.CerrarVentana();

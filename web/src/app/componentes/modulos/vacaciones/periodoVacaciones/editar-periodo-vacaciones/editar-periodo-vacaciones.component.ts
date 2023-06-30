@@ -132,7 +132,7 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
       min_vacaciones: form.minVacacionForm,
     };
     this.restV.ActualizarPeriodoV(datosPerVacaciones).subscribe(response => {
-      this.toastr.success('Operación Exitosa', 'Período de Vacaciones actualizado', {
+      this.toastr.success('Operación exitosa.', 'Período de Vacaciones actualizado', {
         timeOut: 6000,
       })
       this.CerrarVentanaRegistroPerVacaciones();

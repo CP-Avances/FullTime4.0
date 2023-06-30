@@ -187,7 +187,7 @@ export class EmplCargosComponent implements OnInit {
     }
     else {
       this.cargos.RegistrarCargo(cargo).subscribe(res => {
-        this.toastr.success('Operación Exitosa.', 'Registro guardado.', {
+        this.toastr.success('Operación exitosa.', 'Registro guardado.', {
           timeOut: 6000,
         });
         this.CerrarVentana();
@@ -204,7 +204,7 @@ export class EmplCargosComponent implements OnInit {
       this.cargos.CrearTipoCargo(tipo_cargo).subscribe(res => {
         datos.cargo = res.id;
         this.cargos.RegistrarCargo(datos).subscribe(res => {
-          this.toastr.success('Operación Exitosa.', 'Registro guardado.', {
+          this.toastr.success('Operación exitosa.', 'Registro guardado.', {
             timeOut: 6000,
           });
           this.CerrarVentana();

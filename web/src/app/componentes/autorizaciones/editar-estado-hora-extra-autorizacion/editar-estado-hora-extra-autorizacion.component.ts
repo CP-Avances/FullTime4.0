@@ -116,7 +116,7 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
     this.restA.PutEstadoAutoHoraExtra(this.data.autorizacion[0].id_hora_extra, newAutorizaciones).subscribe(res => {
       this.resAutorizacion = [res];
       console.log(this.resAutorizacion);
-      this.toastr.success('Operación exitosa', 'Estado Actualizado', {
+      this.toastr.success('Operación exitosa.', 'Estado Actualizado', {
         timeOut: 6000,
       });
       this.EditarEstadoHoraExtra(form);

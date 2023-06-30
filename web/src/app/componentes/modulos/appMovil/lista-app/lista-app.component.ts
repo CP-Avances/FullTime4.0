@@ -853,18 +853,21 @@ export class ListaAppComponent implements OnInit {
         this.cedula.reset();
         this.nombre_emp.reset();
         this._booleanOptions.bool_emp = false;
+        this.selectionEmp.deselect();
         this.selectionEmp.clear();
       }
 
       if (this._booleanOptions.bool_dep) {
         this.nombre_dep.reset();
         this._booleanOptions.bool_dep = false;
+        this.selectionDep.deselect();
         this.selectionDep.clear();
       }
 
       if (this._booleanOptions.bool_suc) {
         this.nombre_suc.reset();
         this._booleanOptions.bool_suc = false;
+        this.selectionSuc.deselect();
         this.selectionSuc.clear();
       }
 

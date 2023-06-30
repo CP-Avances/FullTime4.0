@@ -16,8 +16,7 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 @Component({
   selector: 'app-editar-empresa',
   templateUrl: './editar-empresa.component.html',
-  styleUrls: ['./editar-empresa.component.css'],
-  //encapsulation: ViewEncapsulation.None
+  styleUrls: ['./editar-empresa.component.css']
 })
 
 export class EditarEmpresaComponent implements OnInit {

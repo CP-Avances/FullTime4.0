@@ -755,7 +755,7 @@
             <h6 id="items" style="margin-top: 10%;">Horario</h6>
         </ng-template>
 
-        <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="ventana_horario">
+        <div class="container" style="padding-top: 15px; padding-bottom: 15px;" *ngIf="ventana_horario">
             <app-registo-empleado-horario [data_horario]="data_horario">
             </app-registo-empleado-horario>
         </div>
@@ -766,8 +766,13 @@
                     <span>BÚSQUEDA RANGO FECHAS</span>
                 </div>
                 <mat-card-content>
-
                     <div class="row">
+                        <div class="nota" style="margin-left: 15px; padding-top: 15px;">
+                            <span>
+                                NOTA: Al presionar Buscar se visualizará la planificación del mes actual. Para una
+                                búsqueda personalizada ingresar mes de inicio y fin de periodo.
+                            </span>
+                        </div>
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-center">
                                 <mat-form-field>
@@ -823,17 +828,31 @@
                                             <th scope="col" id="td_horarios">SALIDA (S)</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <tr *ngFor="let d of detalle_acciones | paginate:tamanio_pagina:numero_pagina">
+                                    <tbody *ngIf="paginar">
+                                        <tr
+                                            *ngFor="let d of detalle_acciones | paginate:tamanio_paginaD:numero_paginaD">
                                             <td id="td_horarios">{{d.horario}}</td>
-                                            <td id="td_horarios">{{d.entrada}}</td>
+                                            <td id="td_horarios">{{d.entrada_}}</td>
                                             <td id="td_horarios">{{d.inicio_comida}}</td>
                                             <td id="td_horarios">{{d.fin_comida}}</td>
-                                            <td id="td_horarios">{{d.salida}}</td>
+                                            <td id="td_horarios">{{d.salida_}}</td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody *ngIf="!paginar">
+                                        <tr *ngFor="let d of detalle_acciones">
+                                            <td id="td_horarios">{{d.horario}}</td>
+                                            <td id="td_horarios">{{d.entrada_}}</td>
+                                            <td id="td_horarios">{{d.inicio_comida}}</td>
+                                            <td id="td_horarios">{{d.fin_comida}}</td>
+                                            <td id="td_horarios">{{d.salida_}}</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
+                            <mat-paginator *ngIf="paginar" id="pagina" [length]="detalle_acciones.length"
+                                [pageSize]="tamanio_paginaD" [pageSizeOptions]="pageSizeOptionsD"
+                                (page)="ManejarPaginaDetalles($event)" showFirstLastButtons>
+                            </mat-paginator>
                         </div>
                     </div>
                     <div class="col-md">

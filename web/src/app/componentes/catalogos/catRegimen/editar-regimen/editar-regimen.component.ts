@@ -1,5 +1,5 @@
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ChangeDetectorRef, AfterContentChecked } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatRadioChange } from '@angular/material/radio';
 import { startWith, map } from 'rxjs/operators';
@@ -16,7 +16,7 @@ import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/prov
   styleUrls: ['./editar-regimen.component.css']
 })
 
-export class EditarRegimenComponent implements OnInit {
+export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterContentChecked {
 
   // CONTROL DE FORMULARIOS
   isLinear = true;
@@ -92,6 +92,7 @@ export class EditarRegimenComponent implements OnInit {
     private pais: ProvinciaService,
     private toastr: ToastrService,
     private formulario: FormBuilder,
+    public cambio: ChangeDetectorRef,
     public router: Router,
   ) {
     // OBTENER ID DE REGISTRO
@@ -107,6 +108,13 @@ export class EditarRegimenComponent implements OnInit {
     this.ObtenerRegimenEditar();
   }
 
+  ngAfterViewInit() {
+    this.cambio.detectChanges();
+  }
+
+  ngAfterContentChecked(): void {
+    this.cambio.detectChanges();
+  }
 
   // VALIDACIONES DE FORMULARIO
   ValidarFormulario() {
@@ -1467,7 +1475,7 @@ export class EditarRegimenComponent implements OnInit {
   // METODO PARA GUARDAR DATOS DE REGISTRO DE REGIMEN EN BASE DE DATOS
   FuncionInsertarDatos(regimen: any, form2: any, form3: any) {
     this.rest.ActualizarRegimen(regimen).subscribe(registro => {
-      this.toastr.success('Operación Exitosa. Registro guardado.', '', {
+      this.toastr.success('Operación exitosa. Registro guardado.', '', {
         timeOut: 6000,
       });
       // VALIDAR INGRESO DE DATOS DE PERIODO DE VACACIONES

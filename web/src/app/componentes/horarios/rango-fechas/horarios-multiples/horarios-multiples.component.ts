@@ -18,6 +18,7 @@ import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.
 
 // IMPORTAR COMPONENTES
 import { HorarioMultipleEmpleadoComponent } from '../horario-multiple-empleado/horario-multiple-empleado.component';
+import { BuscarPlanificacionComponent } from '../buscar-planificacion/buscar-planificacion.component';
 
 @Component({
   selector: 'app-horarios-multiples',
@@ -28,6 +29,7 @@ import { HorarioMultipleEmpleadoComponent } from '../horario-multiple-empleado/h
 export class HorariosMultiplesComponent implements OnInit {
 
   @Input() seleccionados: any;
+  @Input() pagina: any;
 
   // VARIABLES PROGRESS SPINNER
   progreso: boolean = false;
@@ -83,8 +85,9 @@ export class HorariosMultiplesComponent implements OnInit {
     public restD: DetalleCatHorariosService, // SERVICIO DE DATOS DE DETALLES DE HORARIOS
     public router: Router, // VARIABLE USADA PARA NAVEGACIÓN ENTRE PÁGINAS
     public feriado: FeriadosService,
-    private toastr: ToastrService, // VARIABLE USADA PARA MOSTRAR NOTIFICACIONES
     private componente: HorarioMultipleEmpleadoComponent,
+    private toastr: ToastrService, // VARIABLE USADA PARA MOSTRAR NOTIFICACIONES
+    private buscar: BuscarPlanificacionComponent,
   ) { }
 
   ngOnInit(): void {
@@ -217,7 +220,6 @@ export class HorariosMultiplesComponent implements OnInit {
   ConsulatarDetalleHorario(form: any) {
     this.detalles = [];
     this.restD.ConsultarUnDetalleHorario(form.horarioForm).subscribe(res => {
-      //console.log('ingresa consulta detalle ', res)
       this.detalles = res;
     })
   }
@@ -295,7 +297,7 @@ export class HorariosMultiplesComponent implements OnInit {
         this.usuarios_invalidos = this.usuarios_invalidos.concat(dh);
 
         if (this.contador === this.datos.length) {
-          //--console.log('imprime 1 ', this.contador)
+
           if (duplicados.length === this.datos.length) {
             this.ControlarBotones(false, true, true, false, true);
             this.observaciones = true;
@@ -313,7 +315,6 @@ export class HorariosMultiplesComponent implements OnInit {
         correctos = correctos.concat(dh);
 
         if (this.contador === this.datos.length) {
-          //--console.log('imprime 1 ', this.contador)
           this.VerificarContrato(form, correctos);
         }
       });
@@ -343,7 +344,6 @@ export class HorariosMultiplesComponent implements OnInit {
           contrato = contrato.concat(dh);
 
           if (this.cont2 === correctos.length) {
-            //--console.log('imprime 2', this.cont2)
             this.ValidarHorarioByHorasTrabaja(form, contrato);
           }
         }
@@ -355,7 +355,7 @@ export class HorariosMultiplesComponent implements OnInit {
           this.usuarios_invalidos = this.usuarios_invalidos.concat(dh);
 
           if (this.cont2 === correctos.length) {
-            //--console.log('imprime 2', this.cont2)
+
             if (sin_contrato.length === correctos.length) {
               this.ControlarBotones(false, true, true, false, true);
               this.observaciones = true;
@@ -385,20 +385,14 @@ export class HorariosMultiplesComponent implements OnInit {
     })
 
     const { hora_trabajo } = obj_res;
-
     this.cont3 = 0;
-
     correctos.map(dh => {
-
       // METODO PARA LECTURA DE HORARIOS DE EMPLEADO
       this.horariosEmpleado = [];
       let fechas = {
         fechaInicio: form.fechaInicioForm,
         fechaFinal: form.fechaFinalForm,
       };
-      /*      console.log('contador ...... ', this.cont3)
-            console.log('codigo......... ', dh.codigo)
-            console.log('data horario... ', this.horariosEmpleado)*/
 
       this.rest.VerificarHorariosExistentes(dh.codigo, fechas).subscribe(existe => {
         this.suma = '00:00:00';
@@ -407,27 +401,12 @@ export class HorariosMultiplesComponent implements OnInit {
 
         this.horariosEmpleado = existe;
 
-        /*  console.log('contador ******* ', this.cont3)
-          console.log('codigo ********* ', dh.codigo)
-          console.log('data horario *** ', this.horariosEmpleado)*/
-
         this.horariosEmpleado.map(h => {
           // SUMA DE HORAS DE CADA UNO DE LOS HORARIOS DEL EMPLEADO
           this.suma = moment(this.suma, 'HH:mm:ss').add(moment.duration(h.hora_trabajo)).format('HH:mm:ss');
         })
         // SUMA DE HORAS TOTALES DE HORARIO CON HORAS DE HORARIO SELECCIONADO
         this.sumHoras = moment(this.suma, 'HH:mm:ss').add(moment.duration(hora_trabajo)).format('HH:mm:ss');
-
-
-        /* console.log('hora trabajo ', hora_trabajo);
- 
-         console.log('sumas ', this.suma);
- 
-         console.log('sumas totales ', this.sumHoras)
- 
-         console.log('valor sumas totales ', this.StringTimeToSegundosTime(this.sumHoras))
- 
-         console.log(' valor dh.hora_trabaja ', this.StringTimeToSegundosTime(dh.hora_trabaja))*/
 
         // METODO PARA COMPARAR HORAS DE TRABAJO CON HORAS DE CONTRATO
         if (this.StringTimeToSegundosTime(this.sumHoras) <= this.StringTimeToSegundosTime(dh.hora_trabaja)) {
@@ -440,7 +419,6 @@ export class HorariosMultiplesComponent implements OnInit {
             this.usuarios_validos = this.usuarios_validos.concat(horas_correctas);
             // CREACION DE LA DATA DE PLANIFICACION GENERAL
             this.CrearData(form);
-            //--console.log('imprime 3')
           }
         }
         else {
@@ -461,7 +439,6 @@ export class HorariosMultiplesComponent implements OnInit {
               this.usuarios_validos = this.usuarios_validos.concat(horas_correctas);
               // CREACION DE LA DATA DE PLANIFICACION GENERAL
               this.CrearData(form);
-              //--console.log('imprime 3')
             }
           }
         }
@@ -478,7 +455,6 @@ export class HorariosMultiplesComponent implements OnInit {
             this.usuarios_validos = this.usuarios_validos.concat(horas_correctas);
             // CREACION DE LA DATA DE PLANIFICACION GENERAL
             this.CrearData(form);
-            //--console.log('imprime 3')
           }
         }
         else {
@@ -498,7 +474,6 @@ export class HorariosMultiplesComponent implements OnInit {
               this.usuarios_validos = this.usuarios_validos.concat(horas_correctas);
               // CREACION DE LA DATA DE PLANIFICACION GENERAL
               this.CrearData(form);
-              //--console.log('imprime 3')
             }
           }
         }
@@ -541,7 +516,6 @@ export class HorariosMultiplesComponent implements OnInit {
       this.empl_horario = this.empl_horario.concat(horario);
       this.RegistrarPlanificacion(form, obj, this.validos);
     })
-    // console.log('empl_horario ', this.empl_horario)
   }
 
   // METODO PARA REGISTRAR PLANIFICACION CON BUSQUEDA DE FERIADOS
@@ -730,13 +704,10 @@ export class HorariosMultiplesComponent implements OnInit {
         this.plan_general = this.plan_general.concat(plan);
       }
     });
-    //--console.log('validos ', validos)
     if (validos === this.usuarios_validos.length) {
-      //--console.log('ver data de plan general ', this.plan_general.length);
       this.ValidarLimites();
     }
   }
-
 
   // METODO PARA VALIDAR LIMITE DE REGISTROS
   ValidarLimites() {
@@ -765,7 +736,6 @@ export class HorariosMultiplesComponent implements OnInit {
   // METODO PARA REGISTRAR PLANIFICACION
   GuardarInformacion() {
     this.restP.CrearPlanGeneral(this.plan_general).subscribe(res => {
-      //--console.log('res ', res)
       if (res.message === 'OK') {
         this.progreso = false;
         this.toastr.success(
@@ -795,18 +765,28 @@ export class HorariosMultiplesComponent implements OnInit {
   // METODO PARA CERRAR VENTANA
   CerrarVentana() {
     this.LimpiarCampos();
-    this.componente.asignar = false;
-    this.componente.seleccionar = true;
+    if (this.pagina === 'buscar') {
+      this.buscar.asignar_multiple = false;
+      this.buscar.buscar_fechas = true;
+      this.buscar.multiple = true;
+      this.buscar.auto_individual = true;
+    }
+    else {
+      this.componente.asignar = false;
+      this.componente.seleccionar = true;
+    }
   }
 
   // METODO PARA CERRAR LA TABLA
   CerrarTabla() {
-    this.LimpiarCampos();
     this.observaciones = false;
     this.ControlarBotones(true, false, false, true, false);
     this.guardar = false;
-  }
 
+    if (this.pagina === 'buscar') {
+      this.buscar.buscar_fechas = true;
+    }
+  }
 
   // METODO PARA MANEJO DE PAGINAS EN TABLAS DE EMPLEADOS SIN ASIGNACION
   ManejarPaginaH(e: PageEvent) {
@@ -818,7 +798,6 @@ export class HorariosMultiplesComponent implements OnInit {
   eliminar: any = [];
   contar_eliminar: number = 0;
   EliminarPlanificacion(form: any, datos: any, opcion: number) {
-    //--console.log('ver data ', datos)
     this.eliminar = [];
     this.contar_eliminar = 0;
     datos.forEach(obj => {
@@ -828,8 +807,6 @@ export class HorariosMultiplesComponent implements OnInit {
         fec_inicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
         id_horario: form.horarioForm,
       };
-
-      //--console.log('ver fechas ', plan_fecha)
       this.restP.BuscarFechas(plan_fecha).subscribe(res => {
         this.contar_eliminar = this.contar_eliminar + 1;
         // METODO PARA ALMACENAR TODAS LAS FECHAS A ELIMINARSE
@@ -860,11 +837,9 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA BORRAR REGISTROS DE LA BASE DE DATOS
   BorrarDatos(opcion: number) {
-    //--console.log('arreglos eliminar ', this.eliminar)
     this.progreso = true;
     // METODO PARA ELIMINAR DE LA BASE DE DATOS
     this.restP.EliminarRegistro(this.eliminar).subscribe(datos_ => {
-      //--console.log('ver eliminar ', datos_)
       if (datos_.message === 'OK') {
         this.progreso = false;
         this.toastr.error('Operación exitosa.', 'Registros eliminados.', {
@@ -896,7 +871,6 @@ export class HorariosMultiplesComponent implements OnInit {
       this.EliminarPlanificacion(form, this.datos, opcion);
     }
     else {
-      //--console.log('invalidos ', this.usuarios_invalidos)
       // OPCION 2 ELIMINAR SOLO REGISTROS INVALIDOS
       this.EliminarPlanificacion(form, this.usuarios_invalidos, opcion);
     }

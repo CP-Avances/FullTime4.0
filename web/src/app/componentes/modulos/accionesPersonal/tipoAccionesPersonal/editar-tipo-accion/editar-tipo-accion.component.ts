@@ -109,7 +109,7 @@ export class EditarTipoAccionComponent implements OnInit {
       })
     } else {
       this.rest.ActualizarDatos(datosAccion).subscribe(response => {
-        this.toastr.success('Operación Exitosa', '', {
+        this.toastr.success('Operación exitosa.', '', {
           timeOut: 6000,
         })
         this.CerrarVentanaRegistro();

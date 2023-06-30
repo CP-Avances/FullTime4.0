@@ -493,7 +493,7 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
     if (this.data.carga === 'multiple') {
       console.log('arreglo', this.listafiltrada.length);
       if (this.contador === this.listafiltrada.length) {
-        this.toastr.success('Operación Exitosa', 'Se autorizo un total de ' + this.listafiltrada.length + ' solicitudes de horas extras.', {
+        this.toastr.success('Operación exitosa.', 'Se autorizo un total de ' + this.listafiltrada.length + ' solicitudes de horas extras.', {
           timeOut: 6000,
         });
         console.log('idpermiso', 'entra');

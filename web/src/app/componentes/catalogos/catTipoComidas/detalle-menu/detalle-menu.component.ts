@@ -45,7 +45,7 @@ export class DetalleMenuComponent implements OnInit {
       id_menu: this.data.menu.id,
     };
     this.rest.CrearDetalleMenu(datosMenu).subscribe(response => {
-      this.toastr.success('Operación Exitosa', 'Detalle de menú registrado', {
+      this.toastr.success('Operación exitosa.', 'Detalle de menú registrado', {
         timeOut: 6000,
       })
       if (this.data.vista === 'lista') {

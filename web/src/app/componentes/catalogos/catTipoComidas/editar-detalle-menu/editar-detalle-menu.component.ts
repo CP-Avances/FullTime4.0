@@ -43,7 +43,7 @@ export class EditarDetalleMenuComponent implements OnInit {
       id: this.data.id_detalle,
     };
     this.rest.ActualizarDetalleMenu(datosTipoComida).subscribe(response => {
-      this.toastr.success('Operación Exitosa', 'Detalle del Menú actualizado', {
+      this.toastr.success('Operación exitosa.', 'Detalle del Menú actualizado', {
         timeOut: 6000,
       })
       this.Salir();

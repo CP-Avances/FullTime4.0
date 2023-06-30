@@ -82,7 +82,7 @@ export class CrearTipoaccionComponent implements OnInit {
       })
     } else {
       this.rest.IngresarTipoAccionPersonal(datosAccion).subscribe(response => {
-        this.toastr.success('Operación Exitosa', '', {
+        this.toastr.success('Operación exitosa.', '', {
           timeOut: 6000,
         })
         this.CerrarVentanaRegistro();

@@ -91,7 +91,7 @@ export class RegistrarEmpleProcesoComponent implements OnInit {
       id: form.idProcesoForm,
     };
     this.restP.RegistrarEmpleProcesos(datosProceso).subscribe(response => {
-      this.toastr.success('Operación Exitosa', 'Período de Procesos del Empleado registrados', {
+      this.toastr.success('Operación exitosa.', 'Período de Procesos del Empleado registrados', {
         timeOut: 6000,
       })
       this.CerrarVentanaRegistroProceso();

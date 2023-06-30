@@ -534,7 +534,7 @@ export class EditarHoraExtraEmpleadoComponent implements OnInit {
   GuardarDatos(datos: any) {
     this.restHE.EditarHoraExtra(parseInt(this.datos.id), datos).subscribe(horaExtra => {
       console.log('ver horaE ---- ', horaExtra)
-      this.toastr.success('Operación Exitosa', 'Hora extra solicitada', {
+      this.toastr.success('Operación exitosa.', 'Hora extra solicitada', {
         timeOut: 6000,
       });
       horaExtra.EmpleadosSendNotiEmail.push(this.solInfo);

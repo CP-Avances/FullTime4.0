@@ -11,6 +11,16 @@ class TimbresRutas {
 
     configuracion(): void {
 
+        // METODO PARA ELIMINAR NOTIFICACIONES DE AVISOS  --**VERIFICADO
+        this.router.put('/eliminar-multiples/avisos', TokenValidation, TIMBRES_CONTROLADOR.EliminarMultiplesAvisos);
+
+
+
+
+
+
+
+
         // METODO PARA BUSCAR MARCACIONES
         this.router.get('/', TokenValidation, TIMBRES_CONTROLADOR.ObtenerTimbres);
         // METODO PARA REGISTRAR TIMBRES PERSONALES
@@ -35,7 +45,7 @@ class TimbresRutas {
 
         this.router.get('/noti-timbres/avisos/:id_empleado', TokenValidation, TIMBRES_CONTROLADOR.ObtenerAvisosTimbresEmpleado);
         this.router.put('/noti-timbres/vista/:id_noti_timbre', TokenValidation, TIMBRES_CONTROLADOR.ActualizarVista);
-        this.router.put('/eliminar-multiples/avisos', TokenValidation, TIMBRES_CONTROLADOR.EliminarMultiplesAvisos);
+
 
 
 

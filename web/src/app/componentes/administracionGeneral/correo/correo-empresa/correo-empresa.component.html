@@ -7,15 +7,15 @@
 </div>
 <form [formGroup]="formulario">
     <div class="container" style="text-align: center">
-        <div class="nota">
+        <div class="nota" id="espacio">
             <span>
                 NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
                 Guardar.
             </span>
         </div>
         <div class="row">
-            <div class="col-m">
-                <mat-form-field>
+            <div class="col-md">
+                <mat-form-field class="correo">
                     <mat-label>Correo notificaciones*</mat-label>
                     <input matInput placeholder="casapazmino@gmail.com" [formControl]="emailF">
                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
@@ -24,8 +24,7 @@
                     </mat-icon>
                     <mat-error *ngIf="emailF.invalid">Ingresar una dirección de correo válida.</mat-error>
                 </mat-form-field>
-
-                <mat-form-field class="servidor">
+                <mat-form-field class="correo">
                     <mat-label>Servidor de correo*</mat-label>
                     <input matInput placeholder="smpt.gmail.com" [formControl]="servidorF">
                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
@@ -33,7 +32,7 @@
                         create
                     </mat-icon>
                 </mat-form-field>
-                <mat-form-field class="puerto">
+                <mat-form-field class="correo">
                     <mat-label>Puerto de salida*</mat-label>
                     <input matInput placeholder="465" [formControl]="puertoF" (keypress)="IngresarSoloNumeros($event)">
                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
@@ -41,8 +40,9 @@
                         create
                     </mat-icon>
                 </mat-form-field>
-
-                <mat-form-field class="contrasena">
+            </div>
+            <div class="col-md">
+                <mat-form-field>
                     <mat-label>Contraseña*</mat-label>
                     <input matInput [type]="hide ? 'password' : 'text'" [formControl]="passwordF"
                         (keydown)="ValidacionContrasenia($event)">
@@ -52,7 +52,7 @@
                     </button>
                     <mat-error *ngIf="passwordF.invalid">Escriba una contraseña.</mat-error>
                 </mat-form-field>
-                <mat-form-field class="contrasena">
+                <mat-form-field>
                     <mat-label>Confirmar contraseña*</mat-label>
                     <input matInput [type]="hide1 ? 'password' : 'text'" [formControl]="password_confirmF"
                         (keydown)="ValidacionConfirmarContrasenia($event)">
@@ -68,7 +68,9 @@
 </form>
 <div class="d-flex flex-wrap justify-content-center" style="padding-top: 15px; margin-bottom: 3%;">
     <button id="btn-raised" class="btn btn-sm" [disabled]="btnDisableGuardar" value="Guardar"
-        (click)="GuardarConfiguracion(formulario.value)">Guardar</button>
+        (click)="GuardarConfiguracion(formulario.value)">
+        Guardar
+    </button>
 </div>
 <div class="pantalla-progress" *ngIf="habilitarprogress">
     <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">

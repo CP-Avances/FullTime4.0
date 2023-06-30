@@ -412,7 +412,7 @@ export class VacacionAutorizacionesComponent implements OnInit {
     if (this.data.carga === 'multiple') {
       console.log('arreglo', this.listafiltrada.length);
       if (this.contador === this.listafiltrada.length) {
-        this.toastr.success('Operación Exitosa', 'Se autorizo un total de ' + this.listafiltrada.length + ' solicitudes de vacaciones.', {
+        this.toastr.success('Operación exitosa.', 'Se autorizo un total de ' + this.listafiltrada.length + ' solicitudes de vacaciones.', {
           timeOut: 6000,
         });
         console.log('idpermiso', 'entra');

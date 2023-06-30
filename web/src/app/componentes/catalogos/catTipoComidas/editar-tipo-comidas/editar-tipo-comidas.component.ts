@@ -47,7 +47,7 @@ export class EditarTipoComidasComponent implements OnInit {
 
   GuardarDatos(datos: any) {
     this.rest.ActualizarUnAlmuerzo(datos).subscribe(response => {
-      this.toastr.success('Operación Exitosa', 'Menú actualizado', {
+      this.toastr.success('Operación exitosa.', 'Menú actualizado', {
         timeOut: 6000,
       })
       this.Salir();

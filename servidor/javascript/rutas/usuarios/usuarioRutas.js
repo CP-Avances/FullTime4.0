@@ -25,6 +25,8 @@ class UsuarioRutas {
         this.router.put('/admin/comida', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.RegistrarAdminComida);
         // METODO PARA REGISTRAR FRASE DE SEGURIDAD
         this.router.put('/frase', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ActualizarFrase);
+        // METODO PARA BUSCAR DATOS DE USUARIOS Y CARGOS TIMBRE WEB
+        this.router.get('/lista-web-cargos/:estado/activo/:habilitado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.UsuariosTimbreWebCargos);
         // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB
         this.router.get('/lista-web/:estado/activo/:habilitado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.UsuariosTimbreWeb);
         // METODO PARA ACTUALIZAR ESTADO DE TIMBRE WEB

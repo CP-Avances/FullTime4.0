@@ -35,19 +35,19 @@ export class DepartamentosService {
     return this.http.get(`${environment.url}/departamento/infodepartamento/${id}`);
   }
 
-  // REGISTRAR ACTUALIZACION DE DEPARTAMENTO
+  // REGISTRAR ACTUALIZACION DE DEPARTAMENTO  --**VERIFICADO
   ActualizarDepartamento(idDepartamento: number, data: any) {
     return this.http.put(`${environment.url}/departamento/${idDepartamento}`, data).pipe(
       catchError(data)
     );
   }
 
-  // METODO PARA LISTAR INFORMACION DE DEPARTAMENTOS POR ID DE SUCURSAL
+  // METODO PARA LISTAR INFORMACION DE DEPARTAMENTOS POR ID DE SUCURSAL   --**VERIFICADO
   BuscarInformacionDepartamento(id_sucursal: number) {
     return this.http.get(`${environment.url}/departamento/buscar/datosDepartamento/${id_sucursal}`);
   }
 
-  // METODO PARA BUSCAR DEPARTAMENTOS
+  // METODO PARA BUSCAR DEPARTAMENTOS   --**VERIFICADO
   ConsultarDepartamentos() {
     return this.http.get(`${environment.url}/departamento`);
   }
@@ -63,39 +63,36 @@ export class DepartamentosService {
   }
 
 
-  // REGISTRAR NIVELDEPARTAMENTO
+  // REGISTRAR NIVELDEPARTAMENTO  --**VERIFICADO
   RegistrarNivelDepartamento(data: any) {
     return this.http.post(`${environment.url}/departamento/crearnivel`, data).pipe(
       catchError(data)
     );
   }
 
-  // METODO PARA BUSCAR NIVELDEPARTAMENTOS
+  // METODO PARA BUSCAR NIVELDEPARTAMENTOS   --**VERIFICADO
   ConsultarNivelDepartamento(id_departamento: number, id_establecimiento: number) {
     return this.http.get(`${environment.url}/departamento/infoniveldepa/${id_departamento}/${id_establecimiento}`);
   }
 
-  // REGISTRAR ACTUALIZACION DE NIVEL DEPARTAMENTO
-  ActualizarNivelDepartamento(idDepartamento: number, data: any) {
-    return this.http.put(`${environment.url}/departamento/actualizanivel/${idDepartamento}`, data).pipe(
-      catchError(data)
-    );
-  }
-
-  // REGISTRAR ACTUALIZACION DE NIVEL DEPARTAMENTO
+  // REGISTRAR ACTUALIZACION DE NIVEL DEPARTAMENTO    --**VERIFICADO
   ActualizarNivelDepa(id: number, data: any) {
     return this.http.put(`${environment.url}/departamento/nivelactualizar/${id}`, data).pipe(
       catchError(data)
     );
   }
 
-  // METODO PARA ELIMINAR REGISTRO NIVEL DEPARTAMENTO
+  // METODO PARA ELIMINAR REGISTRO NIVEL DEPARTAMENTO   --**VERIFICADO
   EliminarRegistroNivelDepa(id: number) {
     return this.http.delete(`${environment.url}/departamento/eliminarniveldepa/${id}`);
   }
 
-  
-  
+  // REGISTRAR NIVELDEPARTAMENTO  --**VERIFICADO
+  ActualizarNombreNivel(data: any) {
+    return this.http.post(`${environment.url}/departamento/actualizarNombrenivel`, data).pipe(
+      catchError(data)
+    );
+  }
 
 
 

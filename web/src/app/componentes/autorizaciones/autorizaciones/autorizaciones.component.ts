@@ -462,7 +462,7 @@ export class AutorizacionesComponent implements OnInit {
     if (this.data.carga === 'multiple') {
       console.log('arreglo', this.data.datosPermiso.length);
       if (this.contador === this.data.datosPermiso.length) {
-        this.toastr.success('Operación Exitosa', 'Se autorizo un total de ' + this.data.datosPermiso.length + ' permisos.', {
+        this.toastr.success('Operación exitosa.', 'Se autorizo un total de ' + this.data.datosPermiso.length + ' permisos.', {
           timeOut: 6000,
         });
         console.log('idpermiso', 'entra');

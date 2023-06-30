@@ -129,7 +129,7 @@ export class RegistrarPeriodoVComponent implements OnInit {
       codigo: parseInt(this.empleados[0].codigo)
     };
     this.restV.CrearPerVacaciones(datosPerVacaciones).subscribe(response => {
-      this.toastr.success('Operación Exitosa', 'Período de Vacaciones registrado', {
+      this.toastr.success('Operación exitosa.', 'Período de Vacaciones registrado', {
         timeOut: 6000,
       })
       this.CerrarVentanaRegistroPerVacaciones();

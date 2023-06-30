@@ -233,7 +233,7 @@ export class SolicitaComidaComponent implements OnInit {
         alimentacion.EmpleadosSendNotiEmail.push(this.solInfo);
         this.EnviarCorreo(alimentacion);
         this.NotificarPlanificacion(alimentacion);
-        this.toastr.success('Operación Exitosa', 'Solicitud registrada.', {
+        this.toastr.success('Operación exitosa.', 'Solicitud registrada.', {
           timeOut: 6000,
         });
         this.CerrarRegistroPlanificacion();

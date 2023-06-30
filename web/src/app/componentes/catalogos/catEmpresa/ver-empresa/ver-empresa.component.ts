@@ -31,7 +31,7 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 
 export class VerEmpresaComponent implements OnInit {
 
-  idEmpresa: string;
+  idEmpresa: number;
   datosEmpresa: any = [];
   datosSucursales: any = [];
 
@@ -82,9 +82,7 @@ export class VerEmpresaComponent implements OnInit {
     public restE: EmpleadoService,
     private toastr: ToastrService,
   ) {
-    var cadena = this.router.url;
-    var aux = cadena.split("/");
-    this.idEmpresa = aux[2];
+    this.idEmpresa = parseInt(localStorage.getItem('empresa') as string,)
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
 
@@ -104,7 +102,7 @@ export class VerEmpresaComponent implements OnInit {
   nombre_establecimiento: any;
   CargarDatosEmpresa() {
     this.datosEmpresa = [];
-    this.empresa.ConsultarDatosEmpresa(parseInt(this.idEmpresa)).subscribe(datos => {
+    this.empresa.ConsultarDatosEmpresa(this.idEmpresa).subscribe(datos => {
       this.datosEmpresa = datos;
       this.p_color = this.datosEmpresa[0].color_p;
       this.s_color = this.datosEmpresa[0].color_s;
@@ -141,7 +139,7 @@ export class VerEmpresaComponent implements OnInit {
 
   // METODO PARA OBTENER LOGOTIPO DE EMPRESA
   ObtenerLogotipo() {
-    this.empresa.LogoEmpresaImagenBase64(this.idEmpresa).subscribe(res => {
+    this.empresa.LogoEmpresaImagenBase64(String(this.idEmpresa)).subscribe(res => {
       if (res.imagen === 0) {
         this.imagen_default = true
       }
@@ -176,7 +174,7 @@ export class VerEmpresaComponent implements OnInit {
 
   // VENTANA DE REGISTRO DE ESTABLECIMIENTO
   AbrirVentanaRegistrarSucursal() {
-    this.ventana.open(RegistrarSucursalesComponent, { width: '650px', data: parseInt(this.idEmpresa) })
+    this.ventana.open(RegistrarSucursalesComponent, { width: '650px', data: this.idEmpresa })
       .afterClosed().subscribe((items: any) => {
         this.ObtenerSucursal();
       });
@@ -199,7 +197,7 @@ export class VerEmpresaComponent implements OnInit {
   // METODO PARA EDITAR LOGO DE EMPRESA
   EditarLogo() {
     this.ventana.open(LogosComponent, {
-      width: '500px', data: { empresa: parseInt(this.idEmpresa), pagina: 'empresa' }
+      width: '500px', data: { empresa: this.idEmpresa, pagina: 'empresa' }
     }).afterClosed()
       .subscribe((res: any) => {
         this.ObtenerLogotipo();
@@ -247,7 +245,7 @@ export class VerEmpresaComponent implements OnInit {
       id: this.datosEmpresa[0].id
     }
     this.empresa.ActualizarColores(datos).subscribe(data => {
-      this.toastr.success('Colores de reportes configurados.', '', {
+      this.toastr.success('Operación exitosa.', 'Colores de reportes configurados.', {
         timeOut: 6000,
       });
       this.ObtenerColores();

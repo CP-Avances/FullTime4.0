@@ -36,6 +36,7 @@ export class PrincipalHorarioComponent implements OnInit {
 
   // ALMACENAMIENTO DE DATOS Y BUSQUEDA
   horarios: any = [];
+  ver_horarios: boolean = true;
 
   // FILTROS
   filtroNombreHorario = '';
@@ -142,7 +143,12 @@ export class PrincipalHorarioComponent implements OnInit {
     this.ventana.open(DetalleCatHorarioComponent,
       { width: '610px', data: { datosHorario: datosSeleccionados, actualizar: false } })
       .afterClosed().subscribe(items => {
-        this.ObtenerHorarios();
+        if (items) {
+          this.ver_horarios = false;
+          this.ver_detalles = true;
+          this.pagina = 'lista-horarios';
+          this.horario_id = items;
+        }
       });
   }
 
@@ -186,6 +192,18 @@ export class PrincipalHorarioComponent implements OnInit {
         }
       });
   }
+
+  // METODO PARA VISUALIZAR PANTALLA DE HORARIOS Y DETALLES
+  ver_detalles: boolean = false;
+  horario_id: number;
+  pagina: string;
+  VerDetallesHorario(id: number) {
+    this.horario_id = id;
+    this.ver_horarios = false;
+    this.ver_detalles = true;
+    this.pagina = 'lista-horarios';
+  }
+
 
 
   /** ************************************************************************************************* ** 
@@ -246,7 +264,7 @@ export class PrincipalHorarioComponent implements OnInit {
           }
           else {
             this.rest.CargarHorariosMultiples(formData).subscribe(res => {
-              this.toastr.success('Operación Exitosa', 'Plantilla de Horario importada.', {
+              this.toastr.success('Operación exitosa.', 'Plantilla de Horario importada.', {
                 timeOut: 6000,
               });
               this.archivo1Form.reset();
@@ -307,7 +325,7 @@ export class PrincipalHorarioComponent implements OnInit {
       }
       else {
         this.restD.CargarPlantillaDetalles(formData).subscribe(res => {
-          this.toastr.success('Operación Exitosa', 'Plantilla de Detalle de Horario importada.', {
+          this.toastr.success('Operación exitosa.', 'Plantilla de Detalle de Horario importada.', {
             timeOut: 6000,
           });
           this.archivo2Form.reset();
@@ -409,8 +427,8 @@ export class PrincipalHorarioComponent implements OnInit {
                   { text: obj.nombre, style: 'itemsTable' },
                   { text: obj.min_almuerzo, style: 'itemsTableC' },
                   { text: obj.hora_trabajo, style: 'itemsTableC' },
-                  { text: obj.noturno==true?'Sí':'No', style: 'itemsTableC' },
-                  { text: obj.detalle==true?'Sí':'No', style: 'itemsTableC' },
+                  { text: obj.noturno == true ? 'Sí' : 'No', style: 'itemsTableC' },
+                  { text: obj.detalle == true ? 'Sí' : 'No', style: 'itemsTableC' },
                   { text: obj.doc_nombre, style: 'itemsTableC' },
                 ];
               })

@@ -69,7 +69,7 @@ export class PlanificacionMultipleComponent implements OnInit {
       console.log("toda la data", formData)
     }
     this.rest.CargaMultiple(formData).subscribe(res => {
-      this.toastr.success('Operación Exitosa', 'Plantilla de Horario importada.', {
+      this.toastr.success('Operación exitosa.', 'Plantilla de Horario importada.', {
         timeOut: 6000,
       });
       this.archivoHorarioForm.reset();
@@ -114,7 +114,7 @@ export class PlanificacionMultipleComponent implements OnInit {
       console.log("toda la data", formData)
     }
     this.restP.CargarHorarioFijoVarios(formData).subscribe(res => {
-      this.toastr.success('Operación Exitosa', 'Plantilla de Horario importada.', {
+      this.toastr.success('Operación exitosa.', 'Plantilla de Horario importada.', {
         timeOut: 6000,
       });
       this.archivoHorarioFijoForm.reset();
@@ -183,7 +183,7 @@ export class PlanificacionMultipleComponent implements OnInit {
           }
           else {
             this.restV.CargarPeriodosMultiples(formData).subscribe(res => {
-              this.toastr.success('Operación Exitosa', 'Plantilla de Horario importada.', {
+              this.toastr.success('Operación exitosa.', 'Plantilla de Horario importada.', {
                 timeOut: 6000,
               });
               this.archivoVacacionForm.reset();
@@ -232,7 +232,7 @@ export class PlanificacionMultipleComponent implements OnInit {
       console.log("toda la data", formData)
     }
     this.restP.CargarArchivoExcel(formData).subscribe(res => {
-      this.toastr.success('Operación Exitosa', 'Plantilla de Horario importada.', {
+      this.toastr.success('Operación exitosa.', 'Plantilla de Horario importada.', {
         timeOut: 6000,
       });
       this.archivoPruebaForm.reset();

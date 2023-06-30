@@ -13,7 +13,7 @@
 
             <!-- CONTENIDO DISPOSITIVOS REGISTRADOS -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="dispositivos">
-                <div class="nota">
+                <div class="nota" id="espacio">
                     <span>
                         NOTA: Definir el número de dispositivos que pueden usar los usuarios para registrar sus timbres
                         en la aplicación móvil.
@@ -23,7 +23,7 @@
 
             <!-- CONTENIDO TOLERANCIA DE UBICACION -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="ubicacion">
-                <div class="nota">
+                <div class="nota" id="espacio">
                     <span>
                         NOTA: El usuario podrá realizar su marcación o timbre dentro del perímetro definido.
                     </span>
@@ -32,7 +32,7 @@
 
             <!-- CONTENIDO LIMITE DE CORREOS -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="limite_correo">
-                <div class="nota">
+                <div class="nota" id="espacio">
                     <span>
                         NOTA: El sistema solo permitirá enviar el número límite definido de mensajes por correo
                         electrónico.
@@ -42,7 +42,7 @@
 
             <!-- CONTENIDO DE SELECCION DE FORMATO DE FECHAS -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="formato_fecha">
-                <div class="nota">
+                <div class="nota" id="espacio">
                     <span>
                         NOTA: Seleccionar el tipo de formato de fecha con el cual se va a trabajar en el
                         sistema.
@@ -74,7 +74,7 @@
             </div>
             <!-- CONTENIDO DE SELECCION DE FORMATO DE HORAS -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="formato_hora">
-                <div class="nota">
+                <div class="nota" id="espacio">
                     <span>
                         NOTA: Seleccionar el tipo de formato de hora con el cual se va a trabajar en el
                         sistema.
@@ -99,7 +99,7 @@
             </div>
             <!-- CONTENIDO DE SELECCION DE TIPO DE CARGA DE VACACIONES -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="carga">
-                <div class="nota">
+                <div class="nota" id="espacio">
                     <span>NOTA: Seleccionar el tipo de carga de días de vacaciones.</span>
                 </div>
                 <div class="row">
@@ -123,6 +123,8 @@
                                 </div>
                             </mat-radio-group>
                         </div>
+                    </div>
+                    <div class="col-md">
                         <div class="contenedor d-flex flex-wrap justify-content-start">
                             <mat-radio-group aria-label="Select an option" [(ngModel)]="seleccion">
                                 <div class="d-flex flex-wrap justify-content-start">
@@ -147,7 +149,7 @@
             </div>
             <!-- CONTENIDO DE SELECCION DE TIPO DE DESCARGA DE KARDEX DE VACACIONES -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="kardex">
-                <div class="nota">
+                <div class="nota" id="espacio">
                     <span>NOTA: Seleccionar el tipo de descarga de Kardex de vacaciones.</span>
                 </div>
                 <div class="row">
@@ -177,7 +179,7 @@
             </div>
             <!-- CONTENIDO HABILITAR OPCIONES FORMATO LABORAL - CALENDARIO -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="laboral_calendario">
-                <div class="nota">
+                <div class="nota" id="espacio">
                     <span>NOTA: Seleccionar tipo de formato laboral o calendario para visualización de datos.</span>
                 </div>
                 <div class="row">

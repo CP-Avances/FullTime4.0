@@ -42,7 +42,7 @@ export const ListarDocumentos = async function (nombre_carpeta: string) {
                         id: doc.id,
                         file: obj,
                         extencion: obj.split('.')[1],
-                        nombre: doc.doc_nombre
+                        nombre: doc.documento
                     }
                     archivos = archivos.concat(datos);
                 }
@@ -137,16 +137,12 @@ export const ListarHorarios = async function (nombre_carpeta: string) {
 
     let Lista_Archivos: any = fs.readdirSync(ruta);
 
-    console.log('horarios.. ', Lista_Archivos)
-
     // CONSULTA DE BUSQUEDA DE DOCUMENTOS
     let documentos = await pool.query(
         `
         SELECT * FROM cg_horarios WHERE documento NOTNULL ORDER BY id
         `
     ).then(result => { return result.rows });
-
-    console.log('horarios base .. ', documentos)
 
     if (documentos.length != 0) {
         documentos.forEach((doc: any) => {
@@ -156,7 +152,7 @@ export const ListarHorarios = async function (nombre_carpeta: string) {
                         id: doc.id,
                         file: obj,
                         extencion: obj.split('.')[1],
-                        nombre: doc.doc_nombre
+                        nombre: doc.documento
                     }
                     archivos = archivos.concat(datos);
                 }

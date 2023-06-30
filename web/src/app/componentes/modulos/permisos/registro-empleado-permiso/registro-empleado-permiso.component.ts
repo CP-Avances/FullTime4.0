@@ -20,7 +20,7 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
 
-import { SettingsComponent } from 'src/app/componentes/administracionGeneral/preferecias/settings/settings.component';
+import { SettingsComponent } from 'src/app/componentes/administracionGeneral/configuracion-notificaciones/settings/settings.component';
 import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
 import { PermisosMultiplesEmpleadosComponent } from '../multiples/permisos-multiples-empleados/permisos-multiples-empleados.component';
 
@@ -1315,7 +1315,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
   // VALIDACIONES DE DATOS DE SOLICITUD
   GuardarDatos(datos: any, form: any) {
     this.restP.IngresarEmpleadoPermisos(datos).subscribe(permiso => {
-      this.toastr.success('Operación exitosa', 'Permiso registrado.', {
+      this.toastr.success('Operación exitosa.', 'Permiso registrado.', {
         timeOut: 6000,
       });
       permiso.EmpleadosSendNotiEmail.push(this.solInfo);

@@ -101,15 +101,18 @@ class AutorizaDepartamentoControlador {
     }
 
 
-    public async ObtenerlistaEmpleadosAutorizan(req: Request, res: Response): Promise<any> {
+    // METODO PARA OBTENER LISTA DE USUARIOS QUE APRUEBAN SOLICITUDES     --**VERIFICADO
+    public async ObtenerlistaEmpleadosAutorizan(req: Request, res: Response): Promise<any> { 
         const { id_depa } = req.params;
         const EMPLEADOS = await pool.query(
             `
             SELECT d.id_departamento, v.nombre, v.apellido, d.autorizar, d.preautorizar, d.estado, v.depa_trabaja, v.cargo 
-            FROM depa_autorizaciones AS d INNER JOIN VistaAutorizanCargo AS v ON d.id_departamento = v.id_depar AND d.id_empl_cargo = v.id_cargo 
+            FROM depa_autorizaciones AS d 
+            INNER JOIN VistaAutorizanCargo AS v ON d.id_departamento = v.id_depar 
+                AND d.id_empl_cargo = v.id_cargo 
             WHERE d.id_departamento = $1
             `
-        , [id_depa]);
+            , [id_depa]);
         if (EMPLEADOS.rowCount > 0) {
             return res.jsonp(EMPLEADOS.rows)
         }
@@ -131,7 +134,7 @@ class AutorizaDepartamentoControlador {
 
     public async ObtenerListaAutorizaDepa(req: Request, res: Response): Promise<any> {
         const { id_depar } = req.params;
-        const EMPLEADOS = await pool.query( 
+        const EMPLEADOS = await pool.query(
             `
             SELECT n.id_departamento, cg.nombre, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel, cg.depa_padre, cg.nivel AS nivel_padre,
                 da.estado, dae.id_contrato, da.id_empl_cargo, (dae.nombre || ' ' || dae.apellido) as fullname, 

@@ -3,7 +3,6 @@
         <div id="titulo">
             <span>INFORMACIÓN DE EMPRESA</span>
         </div>
-
         <!-- ****************************** PRIMER FORMULARIO ******************************************* -->
         <mat-horizontal-stepper [linear]="isLinear" #stepper>
             <mat-step [stepControl]="primerFormulario">
@@ -17,8 +16,10 @@
                     <span>Información general</span>
                 </div>
                 <div class="nota">
-                    <span>Por favor llenar todos los campos obligatorios (*) del formulario y dar click en Siguiente
-                        para continuar.</span>
+                    <span>
+                        Por favor llenar todos los campos obligatorios (*) del formulario y dar click en Siguiente
+                        para continuar.
+                    </span>
                 </div>
                 <form [formGroup]="primerFormulario">
                     <div class="row">
@@ -29,7 +30,8 @@
                                     <input matInput placeholder="Empresa" [formControl]="nombreF" required>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar nombe de identificación de la entidad.">
-                                        help_outline</mat-icon>
+                                        help_outline
+                                    </mat-icon>
                                 </mat-form-field>
                                 <mat-form-field>
                                     <mat-label>RUC</mat-label>
@@ -62,7 +64,8 @@
                                         required>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar número de contacto empresarial.">
-                                        help_outline</mat-icon>
+                                        help_outline
+                                    </mat-icon>
                                 </mat-form-field>
                                 <mat-form-field>
                                     <mat-label>Dirección</mat-label>
@@ -173,7 +176,7 @@
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-start">
                                 <label style="padding-top: 10px; position: relative; left:10px;">
-                                    Establecimientos *:
+                                    Establecimientos*:
                                 </label>
                             </div>
                             <div class="d-flex flex-wrap justify-content-start">
@@ -193,14 +196,15 @@
                                     </div>
                                     <div class="d-flex flex-wrap justify-content-start"
                                         style="position: relative; left: 20px;">
-                                        <mat-radio-button (change)="SeleccionarTipo($event)" value="Otros">Otro
+                                        <mat-radio-button (change)="SeleccionarTipo($event)" value="Otros">
+                                            Otro
                                         </mat-radio-button>
                                     </div>
                                 </mat-radio-group>
                             </div>
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field *ngIf="HabilitarOtroE" id="campos">
-                                    <mat-label id="letras">Nombre establecimiento *</mat-label>
+                                    <mat-label id="letras">Nombre establecimiento*</mat-label>
                                     <input matInput placeholder="Ingresar nombre" [formControl]="otroE">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar el nombre del establecimiento.">
@@ -212,7 +216,7 @@
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-start">
                                 <label style="padding-top: 10px; position: relative; left:10px;">
-                                    Autorizaciones solicitudes *:
+                                    Autorizaciones solicitudes*:
                                 </label>
                             </div>
                             <div class="d-flex flex-wrap justify-content-start">
@@ -236,7 +240,7 @@
                             </div>
                             <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field *ngIf="habilitarDias" id="campos">
-                                    <mat-label id="letras">No. días previos a la fecha *</mat-label>
+                                    <mat-label id="letras">No. días previos a la fecha*</mat-label>
                                     <input (keypress)="IngresarSoloNumeros($event)" matInput
                                         placeholder="Días previos a la fecha" [formControl]="dias_cambioF">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
@@ -247,14 +251,20 @@
                             </div>
                         </div>
                     </div>
+                    <div style="text-align: center; padding-top: 10px;">
+                        <button matStepperPrevious class="btn btn-sm float-left" id="btn-raised">
+                            Atrás
+                        </button>
+                        <button class="btn btn-sm" id="btn-raised"
+                            (click)="InsertarEmpresa(primerFormulario.value, segundoFormulario.value)"
+                            [disabled]="!segundoFormulario.valid">
+                            Guardar
+                        </button>
+                        <button (click)="Salir()" class="btn btn-sm float-right" id="btn-raised">
+                            Cancelar
+                        </button>
+                    </div>
                 </form>
-                <div style="text-align: center; padding-top: 25px;">
-                    <button matStepperPrevious class="btn btn-sm float-left" id="btn-raised">Atrás</button>
-                    <button class="btn btn-sm" id="btn-raised"
-                        (click)="InsertarEmpresa(primerFormulario.value, segundoFormulario.value)"
-                        [disabled]="!segundoFormulario.valid"> Guardar </button>
-                    <button (click)="Salir()" class="btn btn-sm float-right" id="btn-raised">Cancelar</button>
-                </div>
             </mat-step>
         </mat-horizontal-stepper>
     </mat-card>

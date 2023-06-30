@@ -122,21 +122,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.rest.ConsultarDepartamentos().subscribe(datos => {
       this.departamentos = datos;
       this.OrdenarDatos(this.departamentos);
-      
-      /*console.log('lista Departamentos: ',this.departamentos);
-      this.departamentos.forEach(item => {
-        var id_departamento = item.id;
-        var id_establecimiento = item.id_sucursal;
-        this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(data => {
-          this.depainfo = data;
-
-          console.log('depainfo: ',this.depainfo );
-
-          this.niveles = this.depainfo[0].nivel;
-          return this.depaSuperior = this.depainfo[0].dep_nivel_nombre ;
-        })
-      });*/
-
     })
   }
 
@@ -144,6 +129,15 @@ export class PrincipalDepartamentoComponent implements OnInit {
   AbrirVentanaRegistrarDepartamento(): void {
     this.ventana.open(RegistroDepartamentoComponent,
       { width: '500px' }).afterClosed().subscribe(item => {
+        this.ListaDepartamentos();
+      });
+  }
+
+  // VENTANA PARA EDITAR DATOS DE DEPARTAMENTO 
+  AbrirEditarDepartamento(departamento: any): void {
+    this.ventana.open(EditarDepartamentoComponent,
+      { width: '400px', data: { data: departamento, establecimiento: false } })
+      .afterClosed().subscribe(item => {
         this.ListaDepartamentos();
       });
   }
@@ -174,15 +168,14 @@ export class PrincipalDepartamentoComponent implements OnInit {
       this.departamentosNiveles = [];
       var id_departamento = id_dep;
       var id_establecimiento = id_sucursal;
-      if(nivel > 0){
+      if (nivel > 0) {
         this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
           this.departamentosNiveles = datos;
-            this.departamentosNiveles.filter(item => {
-              this.rest.EliminarRegistroNivelDepa(item.id).subscribe({})
-            })
+          this.departamentosNiveles.filter(item => {
+            this.rest.EliminarRegistroNivelDepa(item.id).subscribe({})
+          })
         })
       }
-
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -203,13 +196,13 @@ export class PrincipalDepartamentoComponent implements OnInit {
       });
   }
 
-  // ORDENAR LOS DATOS SEGÚN EL ID 
+  // ORDENAR LOS DATOS SEGUN EL ID 
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
-      if (a.id < b.id) {
+      if (a.nomsucursal < b.nomsucursal) {
         return -1;
       }
-      if (a.id > b.id) {
+      if (a.nomsucursal > b.nomsucursal) {
         return 1;
       }
       return 0;
@@ -217,6 +210,18 @@ export class PrincipalDepartamentoComponent implements OnInit {
     array.sort(compare);
   }
 
+
+  // METODO PARA NAVEGAR A PANTALLA DE NIVELES
+  data_id: number = 0;
+  ver_nivel: boolean = false;
+  ver_departamentos: boolean = true;
+  pagina: string = '';
+  VerNiveles(id: number) {
+    this.data_id = id;
+    this.pagina = 'ver-departamento';
+    this.ver_nivel = true;
+    this.ver_departamentos = false;
+  }
 
 
   /** ************************************************************************************************** ** 

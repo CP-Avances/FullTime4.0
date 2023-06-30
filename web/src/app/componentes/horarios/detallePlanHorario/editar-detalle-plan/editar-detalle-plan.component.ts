@@ -113,7 +113,7 @@ export class EditarDetallePlanComponent implements OnInit {
 
   ActualizarDetallePlan(datos, form) {
     this.rest.ActualizarRegistro(datos).subscribe(response => {
-      this.toastr.success('Operación Exitosa', 'Detalle de Planificación de Horario actualizado', {
+      this.toastr.success('Operación exitosa.', 'Detalle de Planificación de Horario actualizado', {
         timeOut: 6000,
       });
       this.EliminarPlanificacion();

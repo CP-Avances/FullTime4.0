@@ -106,9 +106,13 @@
             </div>
             <div class="d-flex flex-wrap justify-content-between">
                 <button id="btn-raised" class="btn btn-sm float-left" (click)="AbrirVentanaDetalles(h)"
-                    value="Registrar detalle">Registrar detalle</button>
-                <button id="btn-raised" class="btn btn-sm float-right" [routerLink]="['/horario/']"
-                    value="Ir a lista de horarios">Ir a lista de horarios</button>
+                    value="Registrar detalle">
+                    Registrar detalle
+                </button>
+                <button id="btn-raised" class="btn btn-sm float-right" (click)="VerHorarios()"
+                    value="Ir a lista de horarios">
+                    Ir a lista de horarios
+                </button>
             </div>
         </mat-card-content>
     </mat-card>

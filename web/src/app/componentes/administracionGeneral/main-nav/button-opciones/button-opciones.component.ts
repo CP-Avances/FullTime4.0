@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { LoginService } from 'src/app/servicios/login/login.service';
 
 import { AccionesTimbresComponent } from 'src/app/componentes/administracionGeneral/preferecias/acciones-timbres/acciones-timbres.component';
-import { SettingsComponent } from "src/app/componentes/administracionGeneral/preferecias/settings/settings.component";
+import { SettingsComponent } from "src/app/componentes/administracionGeneral/configuracion-notificaciones/settings/settings.component";
 import { AyudaComponent } from '../../preferecias/ayuda/ayuda.component';
 
 @Component({

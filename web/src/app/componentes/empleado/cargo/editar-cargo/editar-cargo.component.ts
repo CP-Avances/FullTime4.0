@@ -204,7 +204,7 @@ export class EditarCargoComponent implements OnInit {
       this.restEmplCargos.ActualizarContratoEmpleado(this.idSelectCargo, this.id_empl_contrato, cargo).subscribe(res => {
         this.verEmpleado.ObtenerCargoEmpleado(this.idSelectCargo, this.verEmpleado.formato_fecha);
         this.Cancelar();
-        this.toastr.success('Operación Exitosa.', 'Registro actualizado.', {
+        this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
           timeOut: 6000,
         });
       });
@@ -248,7 +248,7 @@ export class EditarCargoComponent implements OnInit {
         this.restEmplCargos.ActualizarContratoEmpleado(this.idSelectCargo, this.id_empl_contrato, datos).subscribe(res => {
           this.verEmpleado.ObtenerCargoEmpleado(this.idSelectCargo, this.verEmpleado.formato_fecha);
           this.Cancelar();
-          this.toastr.success('Operación Exitosa.', 'Registro actualizado.', {
+          this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
             timeOut: 6000,
           });
         });

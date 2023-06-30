@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BIRTHDAY_CONTROLADOR = void 0;
 const database_1 = __importDefault(require("../../database"));
+const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 class BirthdayControlador {
     // METODO PARA CONSULTAR MENSAJE DE CUMPLEAÑOS
@@ -45,12 +46,14 @@ class BirthdayControlador {
             res.jsonp([{ message: 'Registro guardado.', id: idMessageGuardado }]);
         });
     }
-    // METODO PARA CARGAR MENSAJE DE CUMPLEAÑOS
+    // METODO PARA CARGAR MENSAJE DE CUMPLEAÑOS    --**VERIFICADO
     CrearImagenEmpleado(req, res) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            let list = req.files;
-            let imagen = list.uploads[0].path.split("\\")[1];
+            let imagen = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+            ;
             let id = req.params.id_empresa;
+            let separador = path_1.default.sep;
             const unEmpleado = yield database_1.default.query(`
             SELECT * FROM message_birthday WHERE id = $1
             `, [id]);
@@ -58,26 +61,26 @@ class BirthdayControlador {
                 unEmpleado.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
                     if (obj.img != null) {
                         try {
-                            let filePath = `servidor\\cumpleanios\\${obj.img}`;
+                            let filePath = `servidor${separador}cumpleanios${separador}${obj.img}`;
                             let direccionCompleta = __dirname.split("servidor")[0] + filePath;
                             fs_1.default.unlinkSync(direccionCompleta);
                             yield database_1.default.query(`
                             UPDATE message_birthday SET img = $2 WHERE id = $1
                             `, [id, imagen]);
-                            res.jsonp({ message: 'Imagen Actualizada.' });
+                            res.jsonp({ message: 'Imagen actualizada.' });
                         }
                         catch (error) {
                             yield database_1.default.query(`
                             UPDATE message_birthday SET img = $2 WHERE id = $1
                             `, [id, imagen]);
-                            res.jsonp({ message: 'Imagen Actualizada.' });
+                            res.jsonp({ message: 'Imagen actualizada.' });
                         }
                     }
                     else {
                         yield database_1.default.query(`
                         UPDATE message_birthday SET img = $2 WHERE id = $1
                         `, [id, imagen]);
-                        res.jsonp({ message: 'Imagen Actualizada.' });
+                        res.jsonp({ message: 'Imagen actualizada.' });
                     }
                 }));
             }

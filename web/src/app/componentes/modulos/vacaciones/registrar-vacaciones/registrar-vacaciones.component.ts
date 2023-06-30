@@ -308,7 +308,7 @@ export class RegistrarVacacionesComponent implements OnInit {
       this.IngresarAutorizacion(vacacion);
       this.EnviarNotificacion(vacacion);
       this.EnviarCorreoEmpleados(vacacion);
-      this.toastr.success('Operación Exitosa', 'Solicitud registrada.', {
+      this.toastr.success('Operación exitosa.', 'Solicitud registrada.', {
         timeOut: 6000,
       })
       this.CerrarVentanaRegistroVacaciones();

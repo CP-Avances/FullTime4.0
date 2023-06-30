@@ -99,7 +99,7 @@ export class ConfiguracionComponent implements OnInit {
 
   // METODO PARA CONFIGURAR CORREO ELECTRONICO
   ConfigurarCorreoElectronico(info_empresa: any) {
-    this.ventana.open(CorreoEmpresaComponent, { width: '450px', data: info_empresa }).afterClosed()
+    this.ventana.open(CorreoEmpresaComponent, { width: '650px', data: info_empresa }).afterClosed()
       .subscribe(res => {
         if (res) {
           if (res.actualizar === true) {

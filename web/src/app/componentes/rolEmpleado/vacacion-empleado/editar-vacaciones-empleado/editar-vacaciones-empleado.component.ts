@@ -289,7 +289,7 @@ export class EditarVacacionesEmpleadoComponent implements OnInit {
     };
     console.log(datosVacaciones);
     this.restV.EditarVacacion(this.dato.info.id, datosVacaciones).subscribe(vacaciones => {
-      this.toastr.success('Operación Exitosa', 'Vacaciones del Empleado registradas', {
+      this.toastr.success('Operación exitosa.', 'Vacaciones del Empleado registradas', {
         timeOut: 6000,
       })
       vacaciones.EmpleadosSendNotiEmail.push(this.solInfo);

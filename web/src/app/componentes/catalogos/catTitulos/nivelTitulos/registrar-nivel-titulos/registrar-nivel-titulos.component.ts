@@ -35,7 +35,7 @@ export class RegistrarNivelTitulosComponent implements OnInit {
       nombre: form.nombreForm,
     };
     this.nivel.RegistrarNivel(nivel).subscribe(response => {
-      this.toastr.success('Operación Exitosa.', 'Registro guardado.', {
+      this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       });
       this.CerrarVentana();

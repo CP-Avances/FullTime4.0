@@ -490,7 +490,7 @@ export class PedidoHoraExtraComponent implements OnInit {
           this.IngresarAutorizacion(horaExtra);
           this.EnviarNotificacion(horaExtra);
           this.EnviarCorreo(horaExtra);
-          this.toastr.success('Operación Exitosa', 'Hora extra solicitada', {
+          this.toastr.success('Operación exitosa.', 'Hora extra solicitada', {
             timeOut: 6000,
           });
           this.ventana.close();
@@ -514,7 +514,7 @@ export class PedidoHoraExtraComponent implements OnInit {
         this.IngresarAutorizacion(horaExtra);
         this.EnviarNotificacion(horaExtra);
         this.EnviarCorreo(horaExtra);
-        this.toastr.success('Operación Exitosa', 'Hora extra solicitada', {
+        this.toastr.success('Operación exitosa.', 'Hora extra solicitada', {
           timeOut: 6000,
         });
         this.ventana.close();

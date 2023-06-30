@@ -87,7 +87,7 @@ export class TipoSeguridadComponent implements OnInit {
     this.habilitarprogress = true;
     this.rest.ActualizarSeguridad(datos).subscribe(response => {
       this.LimpiarCampos();
-      this.toastr.success('Operación Exitosa.', 'Datos de Empresa registrados.', {
+      this.toastr.success('Operación exitosa.', 'Datos de seguridad registrados.', {
         timeOut: 6000,
       })
       this.habilitarprogress = false

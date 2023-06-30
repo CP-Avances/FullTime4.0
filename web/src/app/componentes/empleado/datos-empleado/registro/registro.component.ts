@@ -231,7 +231,7 @@ export class RegistroComponent implements OnInit {
       else {
         this.ActualizarCodigo(form1.codigoForm);
         this.VerDatos(id);
-        this.toastr.success('Operacion Exitosa.', 'Registro guardado.', {
+        this.toastr.success('Operación exitosa.', 'Registro guardado.', {
           timeOut: 6000,
         });
         this.LimpiarCampos();

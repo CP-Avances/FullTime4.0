@@ -52,7 +52,6 @@ import { EditarAutorizacionDepaComponent } from 'src/app/componentes/autorizacio
 import { RegistrarEmpleProcesoComponent } from '../../modulos/accionesPersonal/procesos/registrar-emple-proceso/registrar-emple-proceso.component';
 import { EditarEmpleadoProcesoComponent } from '../../modulos/accionesPersonal/procesos/editar-empleado-proceso/editar-empleado-proceso.component';
 import { EditarSolicitudComidaComponent } from '../../modulos/alimentacion/editar-solicitud-comida/editar-solicitud-comida.component';
-import { EditarHorarioEmpleadoComponent } from 'src/app/componentes/horarios/empleadoHorario/editar-horario-empleado/editar-horario-empleado.component';
 import { PlanificacionComidasComponent } from '../../modulos/alimentacion/planificacion-comidas/planificacion-comidas.component';
 import { RegistroPlanHorarioComponent } from 'src/app/componentes/horarios/planificacionHorario/registro-plan-horario/registro-plan-horario.component';
 import { EditarPlanHoraExtraComponent } from '../../modulos/horasExtras/planificacionHoraExtra/editar-plan-hora-extra/editar-plan-hora-extra.component';
@@ -280,7 +279,6 @@ export class VerEmpleadoComponent implements OnInit {
     }
   }
 
-
   /** **************************************************************************************** **
    ** **                       METODOS GENERALES DEL SISTEMA                                ** ** 
    ** **************************************************************************************** **/
@@ -409,6 +407,9 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
 
+
+
+
   /** ********************************************************************************************* **
    ** **                            PARA LA SUBIR LA IMAGEN DEL EMPLEADO                         ** **                                 *
    ** ********************************************************************************************* **/
@@ -450,7 +451,7 @@ export class VerEmpleadoComponent implements OnInit {
       formData.append("image[]", this.archivoSubido[i], this.archivoSubido[i].name);
     }
     this.restEmpleado.SubirImagen(formData, parseInt(this.idEmpleado)).subscribe(res => {
-      this.toastr.success('Operación Exitosa.', 'Imagen registrada.', {
+      this.toastr.success('Operación exitosa.', 'Imagen registrada.', {
         timeOut: 6000,
       });
       this.VerEmpleado(this.formato_fecha);
@@ -466,6 +467,10 @@ export class VerEmpleadoComponent implements OnInit {
     localStorage.removeItem('iniciales');
     localStorage.removeItem('view_imagen');
   }
+
+
+
+
 
 
   /** ********************************************************************************************* **
@@ -830,7 +835,6 @@ export class VerEmpleadoComponent implements OnInit {
   // FECHAS DE BUSQUEDA
   fechaInicialF = new FormControl();
   fechaFinalF = new FormControl();
-
   fecHorario: boolean = true;
 
   // METODO PARA MOSTRAR FECHA SELECCIONADA
@@ -838,7 +842,7 @@ export class VerEmpleadoComponent implements OnInit {
     const ctrlValue = fecha;
     if (opcion === 1) {
       if (this.fechaFinalF.value) {
-        this.ValidarFechas(ctrlValue, this.fechaFinalF.value, this.fechaInicialF, ctrlValue, opcion);
+        this.ValidarFechas(ctrlValue, this.fechaFinalF.value, this.fechaInicialF, opcion);
       }
       else {
         let inicio = moment(ctrlValue).format('01/MM/YYYY');
@@ -847,13 +851,13 @@ export class VerEmpleadoComponent implements OnInit {
       this.fecHorario = false;
     }
     else {
-      this.ValidarFechas(this.fechaInicialF.value, ctrlValue, this.fechaFinalF, ctrlValue, opcion);
+      this.ValidarFechas(this.fechaInicialF.value, ctrlValue, this.fechaFinalF, opcion);
     }
     datepicker.close();
   }
 
   // METODO PARA VALIDAR EL INGRESO DE LAS FECHAS
-  ValidarFechas(fec_inicio: any, fec_fin: any, formulario: any, valor: any, opcion: number) {
+  ValidarFechas(fec_inicio: any, fec_fin: any, formulario: any, opcion: number) {
     // FORMATO DE FECHA PERMITIDO PARA COMPARARLAS
     let inicio = moment(fec_inicio).format('01/MM/YYYY');
     let final = moment(fec_fin).daysInMonth() + moment(fec_fin).format('/MM/YYYY');
@@ -905,20 +909,19 @@ export class VerEmpleadoComponent implements OnInit {
     let busqueda = {
       fecha_inicio: this.mes_inicio,
       fecha_final: this.mes_fin,
-      //codigo: '\'35\',\'5008\'',
       codigo: '\'' + this.datoActual.codigo + '\''
     }
-    console.log('VER busqueda ', busqueda)
     this.restPlanGeneral.BuscarPlanificacionHoraria(busqueda).subscribe(datos => {
       if (datos.message === 'OK') {
         this.horariosEmpleado = datos.data;
         this.ver_detalle = true;
+        this.ver_acciones = false;
       }
       else {
         this.toastr.info('Ups no se han encontrado registros!!!', 'No existe planificación.', {
           timeOut: 6000,
         });
-        this.ver_detalle = false;
+        this.ver_acciones = false;
       }
     })
   }
@@ -926,6 +929,7 @@ export class VerEmpleadoComponent implements OnInit {
   // METODO PARA OBTENER DETALLE DE PLANIFICACION
   ver_detalle: boolean = false;
   ver_acciones: boolean = false;
+  paginar: boolean = false;
   detalles: any = [];
   detalle_acciones: any = [];
   // ACCIONES DE HORARIOS
@@ -1000,6 +1004,25 @@ export class VerEmpleadoComponent implements OnInit {
           salida: this.salida,
         }]
         this.detalle_acciones = this.detalle_acciones.concat(tipos);
+
+        this.detalle_acciones.forEach(detalle => {
+          detalle.entrada_ = this.validar.FormatearHora(detalle.entrada, this.formato_hora);
+          if (detalle.inicio_comida != '') {
+            detalle.inicio_comida = this.validar.FormatearHora(detalle.inicio_comida, this.formato_hora);
+          }
+          if (detalle.fin_comida != '') {
+            detalle.fin_comida = this.validar.FormatearHora(detalle.fin_comida, this.formato_hora);
+          }
+          detalle.salida_ = this.validar.FormatearHora(detalle.salida, this.formato_hora);
+        })
+
+        // METODO PARA VER PAGINACION
+        if (this.detalle_acciones.length > 8) {
+          this.paginar = true;
+        }
+        else {
+          this.paginar = false;
+        }
       }
       else {
         this.toastr.info('Ups no se han encontrado registros!!!', 'No existe detalle de planificación.', {
@@ -1046,8 +1069,12 @@ export class VerEmpleadoComponent implements OnInit {
   AbrirPlanificarHorario(): void {
     this.data_horario = [];
     if (this.datoActual.id_cargo != undefined) {
-      this.horarios_usuario = false;
-      this.ventana_horario = true;
+      if(this.horariosEmpleado.length > 0){
+        this.ventana_horario = true;
+      }
+      else {
+        this.horarios_usuario = false;
+      }
       this.data_horario = {
         pagina: 'ver_empleado',
         codigo: this.datoActual.codigo,
@@ -1061,6 +1088,18 @@ export class VerEmpleadoComponent implements OnInit {
         timeOut: 6000,
       })
     }
+  }
+
+
+  // ITEMS DE PAGINACION DE LA TABLA 
+  pageSizeOptionsD = [5, 10, 20, 50];
+  tamanio_paginaD: number = 5;
+  numero_paginaD: number = 1;
+
+  // EVENTO PARA MOSTRAR NÚMERO DE FILAS EN TABLA
+  ManejarPaginaDetalles(e: PageEvent) {
+    this.numero_paginaD = e.pageIndex + 1;
+    this.tamanio_paginaD = e.pageSize;
   }
 
 
@@ -1140,7 +1179,7 @@ export class VerEmpleadoComponent implements OnInit {
             this.restEmpleHorario.SubirArchivoExcel(formData, parseInt(this.idEmpleado), parseInt(this.empleadoUno[0].codigo)).subscribe(resC => {
 
               this.restEmpleHorario.CreaPlanificacion(formData, parseInt(this.idEmpleado), parseInt(this.empleadoUno[0].codigo)).subscribe(resP => {
-                this.toastr.success('Operación Exitosa', 'Plantilla de Horario importada.', {
+                this.toastr.success('Operación exitosa.', 'Plantilla de Horario importada.', {
                   timeOut: 6000,
                 });
                 // this.ObtenerHorariosEmpleado(this.datoActual.codigo, this.formato_fecha);-------------------------------

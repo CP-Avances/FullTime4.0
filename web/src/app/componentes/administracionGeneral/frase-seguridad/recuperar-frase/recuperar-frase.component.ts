@@ -53,7 +53,7 @@ export class RecuperarFraseComponent implements OnInit {
         });
       } else {
         this.router.navigate(['/login']);
-        this.toastr.success('Operación exitosa', this.mensaje.message, {
+        this.toastr.success('Operación exitosa.', this.mensaje.message, {
           timeOut: 6000,
         });
       }

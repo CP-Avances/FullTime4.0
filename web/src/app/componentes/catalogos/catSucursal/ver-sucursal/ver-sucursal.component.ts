@@ -72,10 +72,10 @@ export class VerSucursalComponent implements OnInit {
   // ORDENAR LOS DATOS SEGÚN EL ID 
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
-      if (a.id < b.id) {
+      if (a.nombre < b.nombre) {
         return -1;
       }
-      if (a.id > b.id) {
+      if (a.nombre > b.nombre) {
         return 1;
       }
       return 0;
@@ -95,7 +95,7 @@ export class VerSucursalComponent implements OnInit {
   // VENTANA PARA EDITAR DATOS DE DEPARTAMENTO 
   AbrirVentanaEditarDepartamento(departamento: any): void {
     this.ventana.open(EditarDepartamentoComponent,
-      { width: '600px', data: { data: departamento, establecimiento: true } })
+      { width: '400px', data: { data: departamento, establecimiento: true } })
       .afterClosed().subscribe(item => {
         this.ListaDepartamentos();
       });
@@ -130,6 +130,18 @@ export class VerSucursalComponent implements OnInit {
           this.router.navigate(['/vistaSucursales/', this.idSucursal]);
         }
       });
+  }
+
+  // METODO PARA NAVEGAR A PANTALLA DE NIVELES
+  data_id: number = 0;
+  ver_nivel: boolean = false;
+  ver_sucursal: boolean = true;
+  pagina: string = '';
+  VerNiveles(id: number) {
+    this.data_id = id;
+    this.pagina = 'sucursal';
+    this.ver_nivel = true;
+    this.ver_sucursal = false;
   }
 
 }

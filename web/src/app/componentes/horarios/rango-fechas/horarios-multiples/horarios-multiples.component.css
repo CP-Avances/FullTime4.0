@@ -26,3 +26,8 @@ mat-progress-spinner {
     background: transparent;
     z-index: 100;
 }
+
+#campos {
+    width: 160px;
+    padding: 0px 10px 0px 10px;
+}

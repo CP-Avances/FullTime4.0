@@ -14,7 +14,7 @@ import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
+import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 
 export interface EmpleadoElemento {
   comunicado_mail: boolean;
@@ -34,22 +34,14 @@ export interface EmpleadoElemento {
 
 export class ComunicadosComponent implements OnInit {
 
-  buscador !: FormGroup;
-
   // FORMULARIO FILTROS DE BUSQUEDA
   codigo = new FormControl('');
   cedula = new FormControl('', [Validators.minLength(2)]);
-  seleccion = new FormControl('');
   nombre_emp = new FormControl('', [Validators.minLength(2)]);
   nombre_dep = new FormControl('', [Validators.minLength(2)]);
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
-
-  // METODO PARA FILTROS
-  filtroNombreSuc_: string = '';
-  filtroNombreDep_: string = '';
-  filtroCodigo_: number;
-  filtroCedula_: string = '';
-  filtroNombreEmp_: string = '';
+  nombre_carg = new FormControl('', [Validators.minLength(2)]);
+  seleccion = new FormControl('');
 
   idEmpleado: number;
   comunicados: any = [];
@@ -58,9 +50,62 @@ export class ComunicadosComponent implements OnInit {
     bool_suc: false,
     bool_dep: false,
     bool_emp: false,
+    bool_cargo: false,
   };
 
   public check: checkOptions[];
+
+  // ITEMS DE PAGINACION DE LA TABLA SUCURSAL
+  pageSizeOptions_suc = [5, 10, 20, 50];
+  tamanio_pagina_suc: number = 5;
+  numero_pagina_suc: number = 1;
+
+  // ITEMS DE PAGINACION DE LA TABLA DEPARTAMENTO
+  pageSizeOptions_dep = [5, 10, 20, 50];
+  tamanio_pagina_dep: number = 5;
+  numero_pagina_dep: number = 1;
+
+  // ITEMS DE PAGINACION DE LA TABLA EMPLEADOS
+  pageSizeOptions_emp = [5, 10, 20, 50];
+  tamanio_pagina_emp: number = 5;
+  numero_pagina_emp: number = 1;
+
+  // ITEMS DE PAGINACION DE LA TABLA CARGO
+  pageSizeOptions_car = [5, 10, 20, 50];
+  tamanio_pagina_car: number = 5;
+  numero_pagina_car: number = 1;
+
+  // FILTROS SUCURSALES
+  filtroNombreSuc_: string = '';
+  get filtroNombreSuc() { return this.restR.filtroNombreSuc }
+
+  // FILTROS DEPARTAMENTOS
+  filtroNombreDep_: string = '';
+  get filtroNombreDep() { return this.restR.filtroNombreDep }
+
+  // FILTROS EMPLEADO
+  filtroCodigo_: any;
+  filtroCedula_: string = '';
+  filtroNombreEmp_: string = '';
+  get filtroNombreEmp() { return this.restR.filtroNombreEmp };
+  get filtroCodigo() { return this.restR.filtroCodigo };
+  get filtroCedula() { return this.restR.filtroCedula };
+
+  // FILTRO CARGO
+  filtroNombreCarg_: string = '';
+  get filtroNombreCarg() { return this.restR.filtroNombreCarg };
+
+  // MODELO DE SELECCION DE DATOS
+  selectionCarg = new SelectionModel<ITableEmpleados>(true, []);
+  selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
+  selectionDep = new SelectionModel<ITableEmpleados>(true, []);
+  selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
+
+  // METODO DE VARIABLES DE ALMACENAMIENTO
+  departamentos: any = [];
+  sucursales: any = [];
+  respuesta: any = [];
+  empleados: any = [];
 
   // FORMULARIO DE MENSAJE DE COMUNICADO
   tituloF = new FormControl('', [Validators.required]);
@@ -72,12 +117,12 @@ export class ComunicadosComponent implements OnInit {
   })
 
   constructor(
-    private toastr: ToastrService,
+    private informacion: DatosGeneralesService,
     private realTime: RealTimeService,
     private validar: ValidacionesService,
+    private toastr: ToastrService,
     private restR: ReportesService,
     private restP: ParametrosService,
-    private data: ReportesAsistenciasService,
   ) {
     var item = localStorage.getItem('empleado');
     if (item) {
@@ -85,10 +130,10 @@ export class ComunicadosComponent implements OnInit {
     }
   }
 
-
   ngOnInit(): void {
-    this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
+    this.check = this.restR.checkOptions([{ opcion: 'c' }, { opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
     this.BuscarDatos();
+    this.BuscarCargos();
     this.BuscarParametro();
   }
 
@@ -97,18 +142,50 @@ export class ComunicadosComponent implements OnInit {
     this.restR.GuardarCheckOpcion('');
     this.restR.DefaultFormCriterios();
     this.restR.DefaultValoresFiltros();
+    this.comunicados = [];
+    this.origen_cargo = [];
   }
 
-  // METODO DE VARIABLES DE ALMACENAMIENTO
-  departamentos: any = [];
-  sucursales: any = [];
-  respuesta: any = [];
-  empleados: any = [];
+  // METODO PARA FILTRAR POR CARGOS
+  empleados_cargos: any = [];
+  origen_cargo: any = [];
+  cargos: any = [];
+  BuscarCargos() {
+    this.origen_cargo = [];
+    this.informacion.ObtenerCargosComunicados().subscribe((res: any[]) => {
+      this.origen_cargo = JSON.stringify(res);
+
+      res.forEach(obj => {
+        this.cargos.push({
+          id: obj.id_cargo,
+          nombre: obj.name_cargo,
+        })
+      })
+
+      res.forEach(obj => {
+        obj.empleados.forEach(r => {
+          if (r.comunicado_mail === true || r.comunicado_noti === true) {
+            this.empleados_cargos.push({
+              id: r.id,
+              nombre: r.name_empleado,
+              codigo: r.codigo,
+              cedula: r.cedula,
+              correo: r.correo,
+              comunicado_mail: r.comunicado_mail,
+              comunicado_noti: r.comunicado_noti
+            })
+          }
+        })
+      })
+    }, err => {
+      this.toastr.error(err.error.message)
+    })
+  }
 
   // METODO PARA CARGAR DATOS DE USUARIO
   BuscarDatos() {
     this.comunicados = [];
-    this.data.DatosGeneralesUsuarios().subscribe((res: any[]) => {
+    this.informacion.ObtenerInformacionComunicados().subscribe((res: any[]) => {
       this.comunicados = JSON.stringify(res);
 
       res.forEach(obj => {
@@ -122,7 +199,8 @@ export class ComunicadosComponent implements OnInit {
         obj.departamentos.forEach(ele => {
           this.departamentos.push({
             id: ele.id_depa,
-            nombre: ele.name_dep
+            departamento: ele.name_dep,
+            nombre: ele.sucursal
           })
         })
       })
@@ -131,7 +209,6 @@ export class ComunicadosComponent implements OnInit {
         obj.departamentos.forEach(ele => {
           ele.empleado.forEach(r => {
             if (r.comunicado_mail === true || r.comunicado_noti === true) {
-
               let elemento = {
                 id: r.id,
                 nombre: r.name_empleado,
@@ -152,78 +229,103 @@ export class ComunicadosComponent implements OnInit {
   }
 
   // METODO PARA MOSTRAR OPCIONES DE SELECCION
-  opcion: number;
+  opcion: string;
   BuscarPorTipo(e: MatRadioChange) {
     this.opcion = e.value;
+    this.MostrarLista();
     switch (this.opcion) {
-      case 1:
-        this._booleanOptions.bool_suc = true;
-        this._booleanOptions.bool_dep = false;
-        this._booleanOptions.bool_emp = false;
+      case 's':
+        this.ControlarOpciones(true, false, false, false);
+        this.ControlarBotones(true, false);
         break;
-      case 2:
-        this._booleanOptions.bool_suc = false;
-        this._booleanOptions.bool_dep = true;
-        this._booleanOptions.bool_emp = false;
+      case 'c':
+        this.ControlarOpciones(false, true, false, false);
+        this.ControlarBotones(true, false);
         break;
-      case 3:
-        this._booleanOptions.bool_suc = false;
-        this._booleanOptions.bool_dep = false;
-        this._booleanOptions.bool_emp = true;
+      case 'd':
+        this.ControlarOpciones(false, false, true, false);
+        this.ControlarBotones(true, false);
+        break;
+      case 'e':
+        this.ControlarOpciones(false, false, false, true);
+        this.ControlarBotones(true, false);
         break;
       default:
-        this._booleanOptions.bool_suc = false;
-        this._booleanOptions.bool_dep = false;
-        this._booleanOptions.bool_emp = false;
+        this.ControlarOpciones(false, false, false, false);
+        this.ControlarBotones(true, false);
         break;
     }
     this.restR.GuardarFormCriteriosBusqueda(this._booleanOptions);
-    //this.restR.GuardarCheckOpcion(this.opcion)
+    this.restR.GuardarCheckOpcion(this.opcion)
+  }
+
+  // METODO PARA CONTROLAR VISUALIZACION DE OPCIONES
+  ControlarOpciones(sucursal: boolean, cargo: boolean, departamento: boolean, empleado: boolean) {
+    this._booleanOptions.bool_suc = sucursal;
+    this._booleanOptions.bool_cargo = cargo;
+    this._booleanOptions.bool_dep = departamento;
+    this._booleanOptions.bool_emp = empleado;
+  }
+
+  // METODO PARA CONTROLAR VISTA DE BOTONES
+  ControlarBotones(seleccion: boolean, multiple: boolean) {
+    this.activar_seleccion = seleccion;
+    this.multiple = multiple;
+    this.multiple_ = multiple;
   }
 
   // METODO PARA FILTRAR DATOS DE BUSQUEDA
   Filtrar(e: any, orden: number) {
+    this.ControlarFiltrado(e);
     switch (orden) {
       case 1: this.restR.setFiltroNombreSuc(e); break;
-      case 2: this.restR.setFiltroNombreDep(e); break;
-      case 3: this.restR.setFiltroCodigo(e); break;
-      case 4: this.restR.setFiltroCedula(e); break;
-      case 5: this.restR.setFiltroNombreEmp(e); break;
+      case 2: this.restR.setFiltroNombreCarg(e); break;
+      case 3: this.restR.setFiltroNombreDep(e); break;
+      case 4: this.restR.setFiltroCodigo(e); break;
+      case 5: this.restR.setFiltroCedula(e); break;
+      case 6: this.restR.setFiltroNombreEmp(e); break;
       default:
         break;
     }
   }
 
-  // ITEMS DE PAGINACION DE LA TABLA SUCURSAL
-  pageSizeOptions_suc = [5, 10, 20, 50];
-  tamanio_pagina_suc: number = 5;
-  numero_pagina_suc: number = 1;
+  // METODO PARA ACTIVAR SELECCION MULTIPLE
+  multiple: boolean = false;
+  multiple_: boolean = false;
+  HabilitarSeleccion() {
+    this.multiple = true;
+    this.multiple_ = true;
+    this.activar_seleccion = false;
+  }
 
-  // ITEMS DE PAGINACION DE LA TABLA DEPARTAMENTO
-  pageSizeOptions_dep = [5, 10, 20, 50];
-  tamanio_pagina_dep: number = 5;
-  numero_pagina_dep: number = 1;
-
-  // ITEMS DE PAGINACION DE LA TABLA EMPLEADOS
-  pageSizeOptions_emp = [5, 10, 20, 50];
-  tamanio_pagina_emp: number = 5;
-  numero_pagina_emp: number = 1;
-
-  // BUSQUEDA DE DATOS CON FILTROS
-  get filtroNombreSuc() { return this.restR.filtroNombreSuc }
-  get filtroNombreDep() { return this.restR.filtroNombreDep }
-  get filtroNombreEmp() { return this.restR.filtroNombreEmp };
-  get filtroCodigo() { return this.restR.filtroCodigo };
-  get filtroCedula() { return this.restR.filtroCedula };
+  // METODO PARA CONTROLAR FILTROS DE BUSQUEDA
+  activar_seleccion: boolean = true;
+  ControlarFiltrado(e: any) {
+    if (e === '') {
+      if (this.multiple === true) {
+        this.activar_seleccion = false;
+      }
+      else {
+        if (this.activar_seleccion === false) {
+          this.multiple = true;
+        }
+      }
+    }
+    else {
+      if (this.activar_seleccion === true) {
+        this.activar_seleccion = false;
+        this.multiple_ = true;
+      }
+      else {
+        this.multiple = false;
+      }
+    }
+  }
 
 
   /** ************************************************************************************** **
    ** **                   METODOS DE SELECCION DE DATOS DE USUARIOS                      ** **
    ** ************************************************************************************** **/
-
-  selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
-  selectionDep = new SelectionModel<ITableEmpleados>(true, []);
-  selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
   isAllSelectedSuc() {
@@ -244,6 +346,27 @@ export class ComunicadosComponent implements OnInit {
       return `${this.isAllSelectedSuc() ? 'select' : 'deselect'} all`;
     }
     return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  isAllSelectedCarg() {
+    const numSelected = this.selectionCarg.selected.length;
+    return numSelected === this.cargos.length
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  masterToggleCarg() {
+    this.isAllSelectedCarg() ?
+      this.selectionCarg.clear() :
+      this.cargos.forEach(row => this.selectionCarg.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelCarg(row?: ITableEmpleados): string {
+    if (!row) {
+      return `${this.isAllSelectedCarg() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selectionCarg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
@@ -300,6 +423,10 @@ export class ComunicadosComponent implements OnInit {
       this.tamanio_pagina_emp = e.pageSize;
       this.numero_pagina_emp = e.pageIndex + 1;
     }
+    else if (this._booleanOptions.bool_cargo === true) {
+      this.tamanio_pagina_car = e.pageSize;
+      this.numero_pagina_car = e.pageIndex + 1;
+    }
   }
 
   // METODO PARA MOSTRAR DATOS DE SUCURSAL
@@ -350,6 +477,24 @@ export class ComunicadosComponent implements OnInit {
             })
           }
         })
+      })
+    })
+    this.EnviarNotificaciones(usuarios, form);
+  }
+
+  // METODO PARA MOSTRAR DATOS DE CARGOS
+  ModelarCargo(form: any) {
+    let usuarios: any = [];
+    let respuesta = JSON.parse(this.origen_cargo)
+    respuesta.forEach((obj: any) => {
+      this.selectionCarg.selected.find(obj1 => {
+        if (obj.id_cargo === obj1.id) {
+          obj.empleados.forEach((obj3: any) => {
+            if (obj3.comunicado_mail === true || obj3.comunicado_noti === true) {
+              usuarios.push(obj3);
+            }
+          })
+        }
       })
     })
     this.EnviarNotificaciones(usuarios, form);
@@ -432,10 +577,13 @@ export class ComunicadosComponent implements OnInit {
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
   GuardarRegistros(form: any) {
-    if (this.opcion === 1) {
+    if (this.opcion === 's') {
       this.ModelarSucursal(form);
     }
-    else if (this.opcion === 2) {
+    else if (this.opcion === 'c') {
+      this.ModelarCargo(form);
+    }
+    else if (this.opcion === 'd') {
       this.ModelarDepartamentos(form);
     }
     else {
@@ -446,43 +594,77 @@ export class ComunicadosComponent implements OnInit {
   // METODO PARA LIMPIAR FORMULARIOS
   LimpiarFormulario() {
     this.comunicadoForm.reset();
-    if (this._booleanOptions.bool_emp === true || this._booleanOptions.bool_tab === true ||
-      this._booleanOptions.bool_inc === true) {
+    if (this._booleanOptions.bool_emp) {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();
       this._booleanOptions.bool_emp = false;
-      this._booleanOptions.bool_tab = false;
-      this._booleanOptions.bool_inc = false;
+      this.selectionEmp.deselect();
+      this.selectionEmp.clear();
     }
     if (this._booleanOptions.bool_dep) {
       this.nombre_dep.reset();
+      this.nombre_suc.reset();
       this._booleanOptions.bool_dep = false;
+      this.selectionDep.deselect();
+      this.selectionDep.clear();
     }
     if (this._booleanOptions.bool_suc) {
       this.nombre_suc.reset();
       this._booleanOptions.bool_suc = false;
+      this.selectionSuc.deselect();
+      this.selectionSuc.clear();
+    }
+    if (this._booleanOptions.bool_cargo) {
+      this._booleanOptions.bool_cargo = false;
+      this.selectionCarg.deselect();
+      this.selectionCarg.clear();
     }
     this.seleccion.reset();
   }
 
   // METODO PARA MOSTRAR LISTA DE DATOS
   MostrarLista() {
-    if (this.opcion === 1) {
+    if (this.opcion === 's') {
       this.nombre_suc.reset();
+      this.filtroNombreSuc_ = '';
+      this.selectionDep.clear();
+      this.selectionCarg.clear();
+      this.selectionEmp.clear();
       this.Filtrar('', 1)
     }
-    else if (this.opcion === 2) {
-      this.nombre_dep.reset();
+    else if (this.opcion === 'c') {
+      this.nombre_carg.reset();
+      this.filtroNombreCarg_ = '';
+      this.selectionEmp.clear();
+      this.selectionDep.clear();
+      this.selectionSuc.clear();
       this.Filtrar('', 2)
     }
-    else if (this.opcion === 3) {
+    else if (this.opcion === 'd') {
+      this.nombre_dep.reset();
+      this.filtroNombreDep_ = '';
+      this.nombre_suc.reset();
+      this.filtroNombreSuc_ = '';
+      this.selectionEmp.clear();
+      this.selectionCarg.clear();
+      this.selectionSuc.clear();
+      this.Filtrar('', 1)
+      this.Filtrar('', 3)
+    }
+    else if (this.opcion === 'e') {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();
-      this.Filtrar('', 3)
+      this.filtroCodigo_ = '';
+      this.filtroCedula_ = '';
+      this.filtroNombreEmp_ = '';
+      this.selectionDep.clear();
+      this.selectionCarg.clear();
+      this.selectionSuc.clear();
       this.Filtrar('', 4)
       this.Filtrar('', 5)
+      this.Filtrar('', 6)
     }
   }
 
