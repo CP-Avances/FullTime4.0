@@ -20,8 +20,18 @@ class DepartamentoRutas {
         this.router.get('/sucursal-departamento-edicion/:id_sucursal/:id', TokenValidation, DEPARTAMENTO_CONTROLADOR.ObtenerDepartamentosSucursal_);
         // ACTUALIZAR DEPARTAMENTO  --**VERIFICADO
         this.router.put('/:id', TokenValidation, DEPARTAMENTO_CONTROLADOR.ActualizarDepartamento);
+
+
+
+
         // LISTAR DEPARTAMENTOS    --**VERIFICADO
         this.router.get('/', TokenValidation, DEPARTAMENTO_CONTROLADOR.ListarDepartamentos);
+       // LISTAR DEPARTAMENTOS
+        this.router.get('/listarDepartamentos', TokenValidation, DEPARTAMENTO_CONTROLADOR.ListarDepartamentos);
+
+
+
+        
         // METODO PARA LISTAR INFORMACION DE DEPARTAMENTOS POR ID DE SUCURSAL
         this.router.get('/buscar/datosDepartamento/:id_sucursal', TokenValidation, DEPARTAMENTO_CONTROLADOR.ListarDepartamentosSucursal);
         // METODO PARA ELIMINAR REGISTRO

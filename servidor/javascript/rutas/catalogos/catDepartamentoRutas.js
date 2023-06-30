@@ -24,6 +24,8 @@ class DepartamentoRutas {
         this.router.put('/:id', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ActualizarDepartamento);
         // LISTAR DEPARTAMENTOS    --**VERIFICADO
         this.router.get('/', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ListarDepartamentos);
+        // LISTAR DEPARTAMENTOS
+        this.router.get('/listarDepartamentos', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ListarDepartamentos);
         // METODO PARA LISTAR INFORMACION DE DEPARTAMENTOS POR ID DE SUCURSAL
         this.router.get('/buscar/datosDepartamento/:id_sucursal', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ListarDepartamentosSucursal);
         // METODO PARA ELIMINAR REGISTRO

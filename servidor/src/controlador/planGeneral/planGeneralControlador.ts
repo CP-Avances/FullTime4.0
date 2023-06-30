@@ -147,7 +147,6 @@ class PlanGeneralControlador {
     public async ListarPlanificacionHoraria(req: Request, res: Response) {
         try {
             const { fecha_inicio, fecha_final, codigo } = req.body;
-
             const HORARIO = await pool.query(
                 "SELECT codigo_e, nombre_e, anio, mes, " +
                 "CASE WHEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') ELSE '-' END AS dia1, " +
@@ -185,7 +184,7 @@ class PlanGeneralControlador {
                 "SELECT p_g.codigo AS codigo_e, CONCAT(empleado.apellido, ' ', empleado.nombre) AS nombre_e, EXTRACT('year' FROM fec_horario) AS anio, EXTRACT('month' FROM fec_horario) AS mes, " +
                 "EXTRACT('day' FROM fec_horario) AS dia, CASE WHEN tipo_dia = 'L' THEN tipo_dia ELSE horario.codigo END AS codigo_dia " +
                 "FROM plan_general p_g " +
-                "INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
+                "INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN ("+codigo+") " +
                 "INNER JOIN cg_horarios horario ON horario.id = p_g.id_horario " +
                 "WHERE fec_horario BETWEEN $1 AND $2 " +
                 "GROUP BY codigo_e, nombre_e, anio, mes, dia, codigo_dia, p_g.id_horario " +

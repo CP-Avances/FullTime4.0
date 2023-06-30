@@ -29,9 +29,18 @@ td { padding-top: 10px; text-align: center;  }
 
 table { width: 100%; font-size: 14px; }
 
-
-
 #SelectCheck {
     cursor: pointer;
     margin-left: 10px;
 }
+
+mat-form-field.input-tables {
+    background: transparent;
+    font-size: 14px;
+    text-align: center;
+    outline: none;
+    fill: none;
+    height: 65px;
+}
+
+.departamento { width: 130px; }

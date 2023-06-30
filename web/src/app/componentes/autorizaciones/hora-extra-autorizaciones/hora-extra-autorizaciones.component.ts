@@ -56,11 +56,11 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
 
   public ArrayAutorizacionTipos: any = [];
   public nuevoAutorizacionTipos: any = [];
-  public gerencia:boolean = false;
+  public gerencia: boolean = false;
   autorizaDirecto: boolean = false;
   InfoListaAutoriza: any = [];
-  id_depart: any; 
-  
+  id_depart: any;
+
   oculDepa: boolean = true;
   ocultar: boolean = true;
 
@@ -83,70 +83,70 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
     this.tiempo();
     this.BuscarTipoAutorizacion();
 
-    if(this.data.datosHora.length == 0 ){
+    if (this.data.datosHora.length == 0) {
       this.toastr.error("No ha seleccionado solicitudes para aprobar");
     }
   }
 
-  BuscarTipoAutorizacion(){
+  BuscarTipoAutorizacion() {
     this.ArrayAutorizacionTipos = [];
     this.nuevoAutorizacionTipos = [];
     var i = 0;
     this.restAutoriza.BuscarAutoridadUsuarioDepa(this.id_empleado_loggin).subscribe(
       (res) => {
-      this.ArrayAutorizacionTipos = res;
-      this.nuevoAutorizacionTipos = this.ArrayAutorizacionTipos.filter(item => {
-        i += 1;
-        return item.estado == true
-      });
-
-      if(i == this.ArrayAutorizacionTipos.length){
-        if(this.nuevoAutorizacionTipos.length < 2){
-          this.oculDepa = true;
-          this.id_depart = this.nuevoAutorizacionTipos[0].id_departamento;
-          this.obtenerAutorizacion();
-        }else{
-          this.oculDepa = false;
-        }
-
-        this.nuevoAutorizacionTipos.filter(x => {
-          if(x.nombre == 'GERENCIA' && x.estado == true){
-            console.log('entro en gerencia');
-            this.gerencia = true;
-            this.autorizaDirecto = false;
-            this.InfoListaAutoriza = x;
-            if(x.autorizar == true){
-              this.estados = [
-                { id: 3, nombre: 'Autorizado' },
-                { id: 4, nombre: 'Negado' }
-              ];
-            }else if(x.preautorizar == true){
-              this.estados = [
-                { id: 2, nombre: 'Pre-autorizado' },
-                { id: 4, nombre: 'Negado'}
-              ];
-            }
-          }
-          else if((this.gerencia == false) && (x.estado == true) && (x.id_departamento == this.id_depart)){
-            console.log('esta fuera de gerencia');
-            this.autorizaDirecto = true;
-            this.InfoListaAutoriza = x;
-            if(x.autorizar == true){
-            this.estados = [
-              { id: 3, nombre: 'Autorizado' },
-              { id: 4, nombre: 'Negado' }
-            ];
-          }else if(x.preautorizar == true){
-            this.estados = [
-              { id: 2, nombre: 'Pre-autorizado' },
-              { id: 4, nombre: 'Negado'}
-            ];
-          }
-        }
+        this.ArrayAutorizacionTipos = res;
+        this.nuevoAutorizacionTipos = this.ArrayAutorizacionTipos.filter(item => {
+          i += 1;
+          return item.estado == true
         });
 
-      }
-    });
+        if (i == this.ArrayAutorizacionTipos.length) {
+          if (this.nuevoAutorizacionTipos.length < 2) {
+            this.oculDepa = true;
+            this.id_depart = this.nuevoAutorizacionTipos[0].id_departamento;
+            this.obtenerAutorizacion();
+          } else {
+            this.oculDepa = false;
+          }
+
+          this.nuevoAutorizacionTipos.filter(x => {
+            if (x.nombre == 'GERENCIA' && x.estado == true) {
+              console.log('entro en gerencia');
+              this.gerencia = true;
+              this.autorizaDirecto = false;
+              this.InfoListaAutoriza = x;
+              if (x.autorizar == true) {
+                this.estados = [
+                  { id: 3, nombre: 'Autorizado' },
+                  { id: 4, nombre: 'Negado' }
+                ];
+              } else if (x.preautorizar == true) {
+                this.estados = [
+                  { id: 2, nombre: 'Pre-autorizado' },
+                  { id: 4, nombre: 'Negado' }
+                ];
+              }
+            }
+            else if ((this.gerencia == false) && (x.estado == true) && (x.id_departamento == this.id_depart)) {
+              console.log('esta fuera de gerencia');
+              this.autorizaDirecto = true;
+              this.InfoListaAutoriza = x;
+              if (x.autorizar == true) {
+                this.estados = [
+                  { id: 3, nombre: 'Autorizado' },
+                  { id: 4, nombre: 'Negado' }
+                ];
+              } else if (x.preautorizar == true) {
+                this.estados = [
+                  { id: 2, nombre: 'Pre-autorizado' },
+                  { id: 4, nombre: 'Negado' }
+                ];
+              }
+            }
+          });
+
+        }
+      });
   }
 
   departamentoChange: any = [];
@@ -170,20 +170,20 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
   mensaje: any;
   listafiltrada: any = [];
   ListaHorasExtras: any = [];
-  obtenerAutorizacion(){
-    if(this.data.carga === 'multiple'){
+  obtenerAutorizacion() {
+    if (this.data.carga === 'multiple') {
       var contador = 0;
       this.ListaHorasExtras = [];
       this.listafiltrada = [];
       this.mensaje = '';
       this.ListaHorasExtras = this.data.datosHora.filter(i => {
         contador += 1;
-        return i.id_depa == this.id_depart;    
+        return i.id_depa == this.id_depart;
       })
 
       this.cont = 0;
-      if(this.data.datosHora.length == contador){
-        if(this.ListaHorasExtras.length != 0){
+      if (this.data.datosHora.length == contador) {
+        if (this.ListaHorasExtras.length != 0) {
           this.ListaHorasExtras.forEach(o => {
             this.cont = this.cont + 1;
             this.restAutorizaciones.getUnaAutorizacionByHoraExtraRest(o.id).subscribe(
@@ -194,7 +194,7 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
                   if (obj != '') {
                     let empleado_id = obj.split('_')[0];
                     this.estado_auto = obj.split('_')[1];
-    
+
                     // CAMBIAR DATO ESTADO INT A VARCHAR
                     if (this.estado_auto === '1') {
                       this.estado_auto = 'Pendiente';
@@ -202,37 +202,36 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
                     if (this.estado_auto === '2') {
                       this.estado_auto = 'Preautorizado';
                     }
-                    if((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')){
+                    if ((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')) {
                       //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
                       this.restAutoriza.BuscarListaAutorizaDepa(autorizacion[0].id_departamento).subscribe(res => {
                         this.listadoDepaAutoriza = res;
                         this.listadoDepaAutoriza.filter(item => {
                           this.nivel_padre = item.nivel_padre;
-                          if((this.id_empleado_loggin == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
+                          if ((this.id_empleado_loggin == item.id_contrato) && (autorizaciones.length == item.nivel)) {
                             this.listafiltrada.push(o);
                             return this.ocultar = false;
                           }
                         })
-  
-                        if(this.ListaHorasExtras.length == this.cont){
-                          if(this.listafiltrada.length == 0){
-                            this.mensaje = 'Las solicitudes seleccionadas del departamento de '+this.departamentoChange.depa_autoriza+' no corresponde a su nivel de aprobación';
+
+                        if (this.ListaHorasExtras.length == this.cont) {
+                          if (this.listafiltrada.length == 0) {
+                            this.mensaje = 'Las solicitudes seleccionadas del departamento de ' + this.departamentoChange.depa_autoriza + ' no corresponde a su nivel de aprobación';
                             this.ocultar = true;
                             return
-                          }else{
+                          } else {
 
-                             //Listado para eliminar el usuario duplicado
+                            //Listado para eliminar el usuario duplicado
                             var ListaSinDuplicadosPendie: any = [];
                             var cont = 0;
-                            this.listafiltrada.forEach(function(elemento, indice, array) {
+                            this.listafiltrada.forEach(function (elemento, indice, array) {
                               cont = cont + 1;
-                              if(ListaSinDuplicadosPendie.find(p=>p.id == elemento.id) == undefined)
-                              {
+                              if (ListaSinDuplicadosPendie.find(p => p.id == elemento.id) == undefined) {
                                 ListaSinDuplicadosPendie.push(elemento);
                               }
                             });
 
-                            if(this.listafiltrada.length == cont){
+                            if (this.listafiltrada.length == cont) {
                               this.listafiltrada = [];
                               this.listafiltrada = ListaSinDuplicadosPendie;
                             }
@@ -240,64 +239,63 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
                             this.ocultar = false;
                           }
                         }
-    
+
                       });
-                    }else{
+                    } else {
                       this.ocultar = true;
                     }
-    
-                  }else{
-                    if(autorizaciones.length < 2){
+
+                  } else {
+                    if (autorizaciones.length < 2) {
                       //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
                       this.restAutoriza.BuscarListaAutorizaDepa(autorizacion[0].id_departamento).subscribe(res => {
-                      this.listadoDepaAutoriza = res;
-                      this.listadoDepaAutoriza.filter(item => {
-                        if((this.id_empleado_loggin == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
-                          this.listafiltrada.push(o);
-                          return this.ocultar = false;
-                        }
-                      })
-  
-                      if(this.ListaHorasExtras.length == this.cont){
-                        if(this.listafiltrada.length == 0){
-                          this.mensaje = 'Las solicitudes seleccionadas del departamento de '+this.departamentoChange.depa_autoriza+' no corresponde a su nivel de aprobación';
-                          this.ocultar = true;
-                          return
-                        }else{
-
-                          //Listado para eliminar el usuario duplicado
-                          var ListaSinDuplicadosPendie: any = [];
-                          var cont = 0;
-                          this.listafiltrada.forEach(function(elemento, indice, array) {
-                            cont = cont + 1;
-                            if(ListaSinDuplicadosPendie.find(p=>p.id == elemento.id) == undefined)
-                            {
-                              ListaSinDuplicadosPendie.push(elemento);
-                            }
-                          });
-
-                          if(this.listafiltrada.length == cont){
-                            this.listafiltrada = [];
-                            this.listafiltrada = ListaSinDuplicadosPendie;
+                        this.listadoDepaAutoriza = res;
+                        this.listadoDepaAutoriza.filter(item => {
+                          if ((this.id_empleado_loggin == item.id_contrato) && (autorizaciones.length == item.nivel)) {
+                            this.listafiltrada.push(o);
+                            return this.ocultar = false;
                           }
+                        })
 
-                          this.ocultar = false;
+                        if (this.ListaHorasExtras.length == this.cont) {
+                          if (this.listafiltrada.length == 0) {
+                            this.mensaje = 'Las solicitudes seleccionadas del departamento de ' + this.departamentoChange.depa_autoriza + ' no corresponde a su nivel de aprobación';
+                            this.ocultar = true;
+                            return
+                          } else {
+
+                            //Listado para eliminar el usuario duplicado
+                            var ListaSinDuplicadosPendie: any = [];
+                            var cont = 0;
+                            this.listafiltrada.forEach(function (elemento, indice, array) {
+                              cont = cont + 1;
+                              if (ListaSinDuplicadosPendie.find(p => p.id == elemento.id) == undefined) {
+                                ListaSinDuplicadosPendie.push(elemento);
+                              }
+                            });
+
+                            if (this.listafiltrada.length == cont) {
+                              this.listafiltrada = [];
+                              this.listafiltrada = ListaSinDuplicadosPendie;
+                            }
+
+                            this.ocultar = false;
+                          }
                         }
-                      }
-                    });
+                      });
                     }
                   }
                 });
               }
             );
           })
-        }else{
-          this.mensaje = 'No hay solicitudes seleccionadas del departamento de '+this.departamentoChange.depa_autoriza;
+        } else {
+          this.mensaje = 'No hay solicitudes seleccionadas del departamento de ' + this.departamentoChange.depa_autoriza;
           this.ocultar = true;
           return
         }
-      }else{
-        this.mensaje = 'No ha seleccionado solicitudes del departamento de '+this.departamentoChange.depa_autoriza;
+      } else {
+        this.mensaje = 'No ha seleccionado solicitudes del departamento de ' + this.departamentoChange.depa_autoriza;
         this.ocultar = true;
         return
       }

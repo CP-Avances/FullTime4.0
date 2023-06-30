@@ -1,8 +1,10 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { PageEvent } from "@angular/material/paginator";
 import * as moment from 'moment';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { ThemePalette } from '@angular/material/core';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 
 import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
@@ -11,6 +13,11 @@ import { PermisosService } from 'src/app/servicios/permisos/permisos.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+
+import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
+
+// IMPORTAR COMPONENTES
+import { ListarEmpleadoPermisoComponent } from '../../modulos/permisos/listar/listar-empleado-permiso/listar-empleado-permiso.component';
 
 interface Orden {
   valor: number
@@ -33,6 +40,10 @@ interface Documento {
 })
 export class AutorizacionesComponent implements OnInit {
 
+  @Input() data: any = [];
+  @Input() filtroDepa: any = [];
+
+
   // idDocumento = new FormControl('', Validators.required);
   orden = new FormControl(0, Validators.required);
   estado = new FormControl('', Validators.required);
@@ -54,14 +65,6 @@ export class AutorizacionesComponent implements OnInit {
   FechaActual: any;
   NotifiRes: any;
 
-  ordenes: Orden[] = [
-    { valor: 1 },
-    { valor: 2 },
-    { valor: 3 },
-    { valor: 4 },
-    { valor: 5 }
-  ];
-
   estados: Estado[] = [];
 
   public ArrayAutorizacionTipos: any = [];
@@ -74,10 +77,20 @@ export class AutorizacionesComponent implements OnInit {
   oculDepa: boolean = true;
   ocultar: boolean = true;
 
+  // ITEMS DE PAGINACIÓN DE LA TABLA
+  tamanio_pagina: number = 5;
+  numero_pagina: number = 1;
+  pageSizeOptions = [5, 10, 20, 50];
+
+  habilitarprogress: boolean = false;
+  color: ThemePalette = 'primary';
+  mode: ProgressSpinnerMode = 'indeterminate';
+  value = 10;
+
   constructor(
     public restAutorizaciones: AutorizacionService,
-    // public restNotiAutorizaciones: NotiAutorizacionesService,
-    // public restNotificaciones: NotificacionesService,
+    //public restNotiAutorizaciones: NotiAutorizacionesService,
+    //public restNotificaciones: NotificacionesService,
     public restDepartamento: DepartamentosService,
     public restCargo: EmplCargosService,
     private restP: PermisosService,
@@ -85,23 +98,64 @@ export class AutorizacionesComponent implements OnInit {
     private toastr: ToastrService,
     public restAutoriza: AutorizaDepartamentoService,
     public usuarioDepa: UsuarioService,
-    public dialogRef: MatDialogRef<AutorizacionesComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    private componente: ListarEmpleadoPermisoComponent,
+    private plangeneral: PlanGeneralService,
   ) { }
 
+  
   ngOnInit(): void {
     console.log(this.data, 'data', this.data.carga);
-    
-    var f = moment();
-    this.FechaActual = f.format('YYYY-MM-DD');
-    this.obtenerDepartamento();
-    this.id_empleado_loggin = parseInt(localStorage.getItem('empleado') as string);
-    this.BuscarTipoAutorizacion();
 
-    if(this.data.datosPermiso.length == 0 ){
-      this.toastr.error("No ha seleccionado solicitudes para aprobar");
+    if(this.filtroDepa != '' && this.filtroDepa != undefined){
+      this.id_depart = this.data.datosPermiso[0].id_depa;
+      this.obtenerAutorizacion();
+      this.ocultar = false;
+
+    }else{
+      var ListaConteoDepa: any = [];
+      this.data.datosPermiso.forEach(function(elemento, indice, array) {
+        if(ListaConteoDepa.find(p => p.nombre_depa == elemento.nombre_depa) == undefined){
+          ListaConteoDepa.push(elemento);
+        }
+      });
+
+      if(ListaConteoDepa.length < 2){
+        this.id_depart = this.data.datosPermiso[0].id_depa;
+        this.ocultar = false;
+        this.oculDepa = true;
+        //this.obtenerAutorizacion();
+      }else{
+        this.oculDepa = false;
+        this.ocultar = true;
+      }
     }
 
+    var f = moment();
+    this.FechaActual = f.format('YYYY-MM-DD');
+    //this.obtenerDepartamento();
+    this.id_empleado_loggin = parseInt(localStorage.getItem('empleado') as string);
+    this.BuscarTipoAutorizacion();
+  }
+
+  obtenerDepartamento() {
+    if (this.data.carga === 'multiple') {
+      this.nuevaAutorizacionesForm.patchValue({
+        ordenF: 1,
+        estadoF: '',
+      });
+      this.Habilitado = true;
+    }
+
+    else if (this.data.carga === undefined) {
+      this.restDepartamento.ConsultarDepartamentoPorContrato(this.data.id_empl_cargo).subscribe(res => {
+        this.departamentos = res;
+        /*this.nuevaAutorizacionesForm.patchValue({
+          ordenF: 1,
+          estadoF: '',
+          idDepartamentoF: this.departamentos[0].id_departamento
+        })*/
+      })
+    }
   }
 
   BuscarTipoAutorizacion(){
@@ -121,11 +175,10 @@ export class AutorizacionesComponent implements OnInit {
           this.oculDepa = true;
           this.id_depart = this.nuevoAutorizacionTipos[0].id_departamento;
           this.obtenerAutorizacion();
-        }else{
-          this.oculDepa = false;
         }
 
         this.nuevoAutorizacionTipos.filter(x => {
+          
           if(x.nombre == 'GERENCIA' && x.estado == true){
             console.log('entro en gerencia');
             this.gerencia = true;
@@ -160,7 +213,6 @@ export class AutorizacionesComponent implements OnInit {
           }
         }
         });
-
       }
     });
   }
@@ -178,6 +230,9 @@ export class AutorizacionesComponent implements OnInit {
     }
   }
 
+  /***********************************************************************************************************
+   ** METODOS PARA VALIDAR LAS SOLICITUDES Y FILTRAR LAS SOLICITUDES QUE LE CORRESPONDEN AL USUARIO APROBAR **
+   ***********************************************************************************************************/
   lectura: number = 0;
   estado_auto: any;
   listadoDepaAutoriza: any = [];
@@ -187,11 +242,13 @@ export class AutorizacionesComponent implements OnInit {
   listafiltrada: any = [];
   ListaPermisos: any = [];
   obtenerAutorizacion(){
+    this.habilitarprogress = true;
     if(this.data.carga === 'multiple'){
       var contador = 0;
       this.ListaPermisos = [];
       this.listafiltrada = [];
       this.mensaje = '';
+
       this.ListaPermisos = this.data.datosPermiso.filter(i => {
         contador += 1;
         return i.id_depa == this.id_depart;    
@@ -200,6 +257,7 @@ export class AutorizacionesComponent implements OnInit {
       this.cont = 0;
       if(this.data.datosPermiso.length == contador){
         if(this.ListaPermisos.length != 0){
+          
           this.ListaPermisos.forEach(o => {
             this.cont = this.cont + 1;
             this.restAutorizaciones.BuscarAutorizacionPermiso(o.id).subscribe(
@@ -208,9 +266,7 @@ export class AutorizacionesComponent implements OnInit {
                 autorizaciones.map((obj: string) => {
                   this.lectura = this.lectura + 1;
                   if (obj != '') {
-                    let empleado_id = obj.split('_')[0];
                     this.estado_auto = obj.split('_')[1];
-    
                     // CAMBIAR DATO ESTADO INT A VARCHAR
                     if (this.estado_auto === '1') {
                       this.estado_auto = 'Pendiente';
@@ -227,18 +283,19 @@ export class AutorizacionesComponent implements OnInit {
                           this.nivel_padre = item.nivel_padre;
                           if((this.id_empleado_loggin == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
                             this.listafiltrada.push(o);
+                            this.obtenerPlanificacionHoraria(o.fecha_inicio, o.fecha_final, o.codigo, o);
                             return this.ocultar = false;
                           }
                         })
   
                         if(this.ListaPermisos.length == this.cont){
+                          this.habilitarprogress = false;
                           if(this.listafiltrada.length == 0){
                             this.mensaje = 'Las solicitudes seleccionadas del departamento de '+this.departamentoChange.depa_autoriza+' no corresponde a su nivel de aprobación';
                             this.ocultar = true;
                             return
                           }else{
-
-                             //Listado para eliminar el usuario duplicado
+                            //Listado para eliminar el usuario duplicado
                             var ListaSinDuplicadosPendie: any = [];
                             var cont = 0;
                             this.listafiltrada.forEach(function(elemento, indice, array) {
@@ -253,67 +310,78 @@ export class AutorizacionesComponent implements OnInit {
                               this.listafiltrada = [];
                               this.listafiltrada = ListaSinDuplicadosPendie;
                             }
-
                             this.ocultar = false;
                           }
                         }
     
                       });
                     }else{
+                      this.habilitarprogress = false;
                       this.ocultar = true;
                     }
     
                   }else{
                     if(autorizaciones.length < 2){
                       //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
-                      this.restAutoriza.BuscarListaAutorizaDepa(autorizacion[0].id_departamento).subscribe(res => {
-                      this.listadoDepaAutoriza = res;
-                      this.listadoDepaAutoriza.filter(item => {
-                        if((this.id_empleado_loggin == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
-                          this.listafiltrada.push(o);
-                          return this.ocultar = false;
-                        }
-                      })
-  
-                      if(this.ListaPermisos.length == this.cont){
-                        if(this.listafiltrada.length == 0){
-                          this.mensaje = 'Las solicitudes seleccionadas del departamento de '+this.departamentoChange.depa_autoriza+' no corresponde a su nivel de aprobación';
-                          this.ocultar = true;
-                          return
-                        }else{
-
-                          //Listado para eliminar el usuario duplicado
-                          var ListaSinDuplicadosPendie: any = [];
-                          var cont = 0;
-                          this.listafiltrada.forEach(function(elemento, indice, array) {
-                            cont = cont + 1;
-                            if(ListaSinDuplicadosPendie.find(p=>p.id == elemento.id) == undefined)
-                            {
-                              ListaSinDuplicadosPendie.push(elemento);
+                      this.restAutoriza.BuscarListaAutorizaDepa(autorizacion[0].id_departamento).subscribe(
+                        res => {
+                          this.listadoDepaAutoriza = res;
+                          this.listadoDepaAutoriza.filter(valor => {
+                            if((this.id_empleado_loggin == valor.id_contrato) && (autorizaciones.length ==  valor.nivel)){
+                              this.listafiltrada.push(o);
+                              this.obtenerPlanificacionHoraria(o.fecha_inicio, o.fecha_final, o.codigo, o);
+                              return this.ocultar = false;
                             }
                           });
+  
+                          if(this.ListaPermisos.length == this.cont){
+                            this.habilitarprogress = false;
+                            if(this.listafiltrada.length == 0){
+                              this.mensaje = 'Las solicitudes seleccionadas del departamento de '+this.departamentoChange.depa_autoriza+' no corresponde a su nivel de aprobación';
+                              this.ocultar = true;
+                              return
+                            }else{
+                              //Listado para eliminar el usuario duplicado
+                              var ListaSinDuplicadosPendie: any = [];
+                              var cont = 0;
+                              this.listafiltrada.forEach(function(elemento, indice, array) {
+                                cont = cont + 1;
+                                if(ListaSinDuplicadosPendie.find(p=>p.id == elemento.id) == undefined){
+                                  ListaSinDuplicadosPendie.push(elemento);
+                                }
+                              });
 
-                          if(this.listafiltrada.length == cont){
-                            this.listafiltrada = [];
-                            this.listafiltrada = ListaSinDuplicadosPendie;
+                              if(this.listafiltrada.length == cont){
+                                this.listafiltrada = [];
+                                this.listafiltrada = ListaSinDuplicadosPendie;
+                              }
+
+                              this.ocultar = false;
+                            }
                           }
-
-                          this.ocultar = false;
                         }
-                      }
-                    });
+                      );
                     }
                   }
                 });
+              },error => {
+                this.habilitarprogress = false;
+                o.observacion = 'La solicitud tiene problemas con el registro de autorización';
+                o.aprobar = 'SI'
               }
-            );
+            )
           })
+
+         
+
         }else{
+          this.habilitarprogress = false;
           this.mensaje = 'No hay solicitudes seleccionadas del departamento de '+this.departamentoChange.depa_autoriza;
           this.ocultar = true;
           return
         }
       }else{
+        this.habilitarprogress = false;
         this.mensaje = 'No ha seleccionado solicitudes del departamento de '+this.departamentoChange.depa_autoriza;
         this.ocultar = true;
         return
@@ -321,38 +389,96 @@ export class AutorizacionesComponent implements OnInit {
     }
   }
 
+  listahoratio: any = [];
+  i: number = 0;
+  obtenerPlanificacionHoraria(fecha_i: any, fehca_f: any, codigo: any, solicitud: any){
+    var datos = {
+      fecha_inicio: fecha_i, 
+      fecha_final: fehca_f, 
+      codigo: '\''+codigo+'\''
+    }
+
+    console.log('codigo: ',codigo);
+
+    this.i = 0;
+    this.plangeneral.BuscarPlanificacionHoraria(datos).subscribe(res => {
+      this.listahoratio = res;
+      console.log('this.listahoratio: ',this.listahoratio);
+      this.listahoratio.forEach(item => {
+        if(item[this.i] == '-'){
+          solicitud.observacion = 'No tiene registrado un horario en ese dia';
+          solicitud.aprobar = 'NO';
+        }else{
+          solicitud.observacion = 'Sin novedad';
+          solicitud.aprobar = 'SI';
+        }
+        this.i += 1;
+      })
+    },error => {
+      solicitud.observacion = 'No tiene registrado una planificacion';
+      solicitud.aprobar = 'NO';
+    });
+  }
+
+
+  /***********************************************************************************************************
+   ******************   METODOS PARA INSERTA Y ENVIAR LA APROBACION DE LA SOLICITUD   ************************
+   ***********************************************************************************************************/
   resAutorizacion: any = [];
   idNotifica: any = [];
-  contador: number = 1;
+  total: number = 0;
+  //Este array permite que se filtre la lista de permisos para quitar los permisos que 
+  //si tienen la novedad de no aprobar que no se envien.
+  NuevaListaAprobada: any = [];
+  a: number;
+  no_aprobar: number;
   insertarAutorizacion(form) {
-    if (this.data.carga === 'multiple') {
-      this.listafiltrada.map(obj => {
-        if (obj.estado === 'Pre-autorizado') {
-          this.restP.BuscarDatosAutorizacion(obj.id).subscribe(data => {
-            var documento = data[0].empleado_estado;
-            this.restDepartamento.ConsultarDepartamentoPorContrato(obj.id_cargo).subscribe(res => {
-              this.departamentos = res;
-              this.ActualizarDatos(form, documento, obj.id, this.departamentos[0].id_departamento, obj.id_emple_solicita);
-            })
-          }, err => {
-            const { access, message } = err.error.message;
-            if (access === false) {
-              this.toastr.error(message)
-              this.dialogRef.close();
+    this.a = 0;
+    this.no_aprobar = 0;
+    this.NuevaListaAprobada = this.listafiltrada.filter(valor => {
+      this.a += 1; 
+      if(valor.aprobar == 'NO' || valor.aprobar == 'no'){ this.no_aprobar += 1}
+      return valor.aprobar == 'SI' || valor.aprobar == 'si';
+    });
+
+    if(this.listafiltrada.length == this.a ){
+      if(this.NuevaListaAprobada.length == 0){
+        this.toastr.error("No se han podido aprobar las solicitudes debido a que tiene observaciones que no permiten enviar");
+      }else{
+        if(this.no_aprobar > 0){
+          this.toastr.error("Algunas solicitudes que no se enviaron debido algun problema, revisar la observacion de la solicitud");
+        }
+
+        if (this.data.carga === 'multiple') {
+          this.NuevaListaAprobada.map(obj => {
+            if (obj.estado === 'Pre-autorizado') {
+              this.restP.BuscarDatosAutorizacion(obj.id).subscribe(data => {
+                var documento = data[0].empleado_estado;
+                this.restDepartamento.ConsultarDepartamentoPorContrato(obj.id_cargo).subscribe(res => {
+                  this.departamentos = res;
+                  this.ActualizarDatos(form, documento, obj.id, this.departamentos[0].id_departamento, obj.id_emple_solicita);
+                })
+              }, err => {
+                const { access, message } = err.error.message;
+                if (access === false) {
+                  this.toastr.error(message)
+                }
+              })
             }
+            else {
+              console.log('idpermiso', obj.id);
+              this.restDepartamento.ConsultarDepartamentoPorContrato(obj.id_cargo).subscribe(res => {
+                this.departamentos = res;
+                this.IngresarDatos(form, obj.id, this.departamentos[0].id_departamento, obj.id_emple_solicita);
+              })
+            }
+            
           })
         }
-        else {
-          console.log('idpermiso', obj.id);
-          this.restDepartamento.ConsultarDepartamentoPorContrato(obj.id_cargo).subscribe(res => {
-            this.departamentos = res;
-            this.IngresarDatos(form, obj.id, this.departamentos[0].id_departamento, obj.id_emple_solicita);
-          })
+        else if (this.data.carga === undefined) {
+          this.IngresarDatos(form, this.data.id, form.idDepartamentoF, this.data.id_emple_solicita);
         }
-      })
-    }
-    else if (this.data.carga === undefined) {
-      this.IngresarDatos(form, this.data.id, form.idDepartamentoF, this.data.id_emple_solicita);
+      }
     }
   }
 
@@ -368,9 +494,11 @@ export class AutorizacionesComponent implements OnInit {
       id_documento: localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       id_plan_hora_extra: null,
     }
+    
     this.restAutorizaciones.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
       this.EditarEstadoPermiso(id_permiso, id_departamento, empleado_solicita, form.estadoF);
-    }, error => { })
+    })
+
   }
 
   ActualizarDatos(form, documento, id_permiso: number, id_departamento: number, empleado_solicita: number) {
@@ -380,30 +508,11 @@ export class AutorizacionesComponent implements OnInit {
       estado: form.estadoF,
       id_permiso: id_permiso,
     }
+    
     this.restAutorizaciones.PutEstadoAutoPermisoMultiple(newAutorizacionesM).subscribe(resA => {
       this.EditarEstadoPermiso(id_permiso, id_departamento, empleado_solicita, form.estadoF);
     })
-  }
 
-  obtenerDepartamento() {
-    if (this.data.carga === 'multiple') {
-      this.nuevaAutorizacionesForm.patchValue({
-        ordenF: 1,
-        estadoF: '',
-      });
-      this.Habilitado = true;
-    }
-
-    else if (this.data.carga === undefined) {
-      this.restDepartamento.ConsultarDepartamentoPorContrato(this.data.id_empl_cargo).subscribe(res => {
-        this.departamentos = res;
-        this.nuevaAutorizacionesForm.patchValue({
-          ordenF: 1,
-          estadoF: '',
-          idDepartamentoF: this.departamentos[0].id_departamento
-        })
-      })
-    }
   }
 
   resEstado: any = [];
@@ -419,15 +528,14 @@ export class AutorizacionesComponent implements OnInit {
     var estado_letras: string = '';
     if (estado_permiso === 1) {
       estado_letras = 'Pendiente';
-    }
-    else if (estado_permiso === 2) {
+    }else if (estado_permiso === 2) {
       estado_letras = 'Pre-autorizado';
-    } else if (estado_permiso === 3) {
+    }else if (estado_permiso === 3) {
       estado_letras = 'Autorizado';
-    }
-    else if (estado_permiso === 4) {
+    }else if (estado_permiso === 4) {
       estado_letras = 'Negado';
     }
+    
     this.restP.ActualizarEstado(id_permiso, datosPermiso).subscribe(respo => {
       this.resEstado = [respo];
       var f = new Date();
@@ -454,33 +562,40 @@ export class AutorizacionesComponent implements OnInit {
       const { access, message } = err.error.message;
       if (access === false) {
         this.toastr.error(message)
-        this.dialogRef.close();
+       // this.dialogRef.close();
       }
     });
-    console.log('contador', this.contador);
-    this.contador = this.contador + 1;
+
+    this.total += 1;
     if (this.data.carga === 'multiple') {
-      console.log('arreglo', this.data.datosPermiso.length);
-      if (this.contador === this.data.datosPermiso.length) {
-        this.toastr.success('Operación exitosa.', 'Se autorizo un total de ' + this.data.datosPermiso.length + ' permisos.', {
+      if (this.total === this.NuevaListaAprobada.length) {
+        this.toastr.success('Operación exitosa.', 'Se autorizo un total de ' + this.NuevaListaAprobada.length + ' permisos.', {
           timeOut: 6000,
         });
-        console.log('idpermiso', 'entra');
-        this.dialogRef.close();
       }
     }
-    else {
-      this.dialogRef.close();
-    }
   }
+
 
   limpiarCampos() {
     this.nuevaAutorizacionesForm.reset();
   }
 
+  formato_fecha: string = "DD/MM/YYYY";
   CerrarVentanaRegistroNoti() {
     this.limpiarCampos();
-    this.dialogRef.close();
+    this.componente.multiple = false;
+    this.componente.lista_permisos = true;
+    this.componente.lista_autorizados = true;
+    this.componente.filtroDepa = undefined;
+    this.componente.filtroUsuario = undefined;
+    this.componente.filtroEstado = undefined;
+    this.componente.BuscarHora(this.formato_fecha);
+  }
+
+  ManejarPagina(e: PageEvent) {
+    this.tamanio_pagina = e.pageSize;
+    this.numero_pagina = e.pageIndex + 1;
   }
 
 }

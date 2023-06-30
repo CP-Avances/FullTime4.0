@@ -640,6 +640,8 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     ListarRelojesComponent,
     VerDipositivoComponent,
     RelojesComponent,
+    AutorizacionesComponent,
+
   ],
 
   bootstrap: [AppComponent]
