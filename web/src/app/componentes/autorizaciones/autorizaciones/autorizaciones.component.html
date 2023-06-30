@@ -17,7 +17,7 @@
                                 matTooltip="Lista de departamentos">
                                 help_outline</mat-icon>
                             <mat-select [formControl]="idDepartamento">
-                                <mat-option *ngFor="let d of nuevoAutorizacionTipos" [value]="d.id_depa_confi" (click)="ChangeDepa(d.id_depa_confi)">
+                                <mat-option *ngFor="let d of nuevoAutorizacionTipos" [value]="d.id_departamento" (click)="ChangeDepa(d.id_departamento)">
                                     {{d.depa_autoriza}}
                                 </mat-option>
                             </mat-select>

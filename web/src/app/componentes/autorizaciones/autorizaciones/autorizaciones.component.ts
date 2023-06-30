@@ -108,7 +108,7 @@ export class AutorizacionesComponent implements OnInit {
 
     if(this.filtroDepa != '' && this.filtroDepa != undefined){
       this.id_depart = this.data.datosPermiso[0].id_depa;
-      this.obtenerAutorizacion();
+      //this.obtenerAutorizacion();
       this.ocultar = false;
 
     }else{
@@ -132,7 +132,7 @@ export class AutorizacionesComponent implements OnInit {
 
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
-    //this.obtenerDepartamento();
+    this.obtenerDepartamento();
     this.id_empleado_loggin = parseInt(localStorage.getItem('empleado') as string);
     this.BuscarTipoAutorizacion();
   }
@@ -149,11 +149,11 @@ export class AutorizacionesComponent implements OnInit {
     else if (this.data.carga === undefined) {
       this.restDepartamento.ConsultarDepartamentoPorContrato(this.data.id_empl_cargo).subscribe(res => {
         this.departamentos = res;
-        /*this.nuevaAutorizacionesForm.patchValue({
+        this.nuevaAutorizacionesForm.patchValue({
           ordenF: 1,
           estadoF: '',
           idDepartamentoF: this.departamentos[0].id_departamento
-        })*/
+        })
       })
     }
   }
@@ -170,13 +170,15 @@ export class AutorizacionesComponent implements OnInit {
         return item.estado == true
       });
 
+      console.log('this.nuevoAutorizacionTipos: ',this.nuevoAutorizacionTipos);
+
       if(i == this.ArrayAutorizacionTipos.length){
         if(this.nuevoAutorizacionTipos.length < 2){
           this.oculDepa = true;
           this.id_depart = this.nuevoAutorizacionTipos[0].id_departamento;
-          this.obtenerAutorizacion();
+          //this.obtenerAutorizacion();
         }
-
+        /*
         this.nuevoAutorizacionTipos.filter(x => {
           
           if(x.nombre == 'GERENCIA' && x.estado == true){
@@ -212,21 +214,22 @@ export class AutorizacionesComponent implements OnInit {
             ];
           }
         }
-        });
+        });*/
       }
     });
   }
 
   departamentoChange: any = [];
   ChangeDepa(e: any) {
+    console.log('e: ',e);
     if (e != null && e != undefined) {
       const [departamento] = this.ArrayAutorizacionTipos.filter(o => {
-        return o.id_depa_confi === e
+        return o.id_departamento === e
       })
       this.departamentoChange = departamento;
       this.id_depart = this.departamentoChange.id_departamento;
-      this.BuscarTipoAutorizacion();
-      this.obtenerAutorizacion();
+      //this.BuscarTipoAutorizacion();
+      //this.obtenerAutorizacion();
     }
   }
 
