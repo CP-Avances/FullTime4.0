@@ -1,4 +1,5 @@
 // IMPORTACION DE LIBRERIAS
+import { FormControl } from '@angular/forms';
 import { Component, OnInit } from "@angular/core";
 import { SelectionModel } from "@angular/cdk/collections";
 import { environment } from 'src/environments/environment';
@@ -24,6 +25,10 @@ import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/emp
 import { MainNavService } from "src/app/componentes/administracionGeneral/main-nav/main-nav.service";
 import { AutorizaDepartamentoService } from "src/app/servicios/autorizaDepartamento/autoriza-departamento.service";
 import { UsuarioService } from "src/app/servicios/usuarios/usuario.service";
+import { ToastrService } from 'ngx-toastr';
+import { EmplDepaPipe } from 'src/app/filtros/empleado/nombreDepartamento/empl-depa.pipe';
+import { EmplUsuarioPipe } from 'src/app/filtros/empleado/filtroEmpUsuario/empl-usuario.pipe';
+import { EmplEstadoPipe } from 'src/app/filtros/empleado/filtroEmpEstado/empl-estado.pipe';
 
 export interface PermisosElemento {
   apellido: string;
@@ -37,11 +42,13 @@ export interface PermisosElemento {
   fec_inicio: string;
   id: number;
   id_contrato: number;
+  codigo: any;
   id_emple_solicita: number;
   nom_permiso: string;
   nombre: string;
   id_empl_cargo: number;
   id_depa?: number;
+  depa_nombre?: any;
 }
 
 @Component({
@@ -74,6 +81,24 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   numero_pagina_autorizado: number = 1;
   pageSizeOptions_autorizado = [5, 10, 20, 50];
 
+  // VARIABLES USADAS EN BUSQUEDA DE FILTRO DE DATOS
+  Depata: any = new FormControl('');
+  Usuario: any = new FormControl('');
+  Estado: any = new FormControl('');
+  filtroDepa: any;
+  filtroUsuario: any;
+  filtroEstado: any;
+
+  //VARIABLES DE FILTRO DE LA TABLA DE AUTORIZADOS O NEGADOS
+  AutoriDepata: any = new FormControl('');
+  AutoriUsuario: any = new FormControl('');
+  AutoriEstado: any = new FormControl('');
+  AutorifiltroDepa: any;
+  AutorifiltroUsuario: any;
+  AutorifiltroEstado: any;
+
+
+
   idEmpleado: number;
   empleado: any = []; // VARIABLE DE ALMACENAMIENTO DE DATOS DE EMPLEADO
 
@@ -89,6 +114,11 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   preautorizacion: boolean = false;
   id_departa: any = [];
 
+  multiple: boolean = false;
+  datos: any = [];
+
+  UsuariosNombres: any = [];
+
   constructor(
     private plantilla: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
     private validar: ValidacionesService,
@@ -99,6 +129,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     public restEmpleado: EmpleadoService,
     public restAutoriza: AutorizaDepartamentoService,
     public usuarioDepa: UsuarioService,
+    private toastr: ToastrService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem("empleado") as string);
   }
@@ -216,7 +247,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
           }
 
         });
-
+     
         let i = 0;
         this.listaPermisosFiltradas.filter(item => {
           this.usuarioDepa.ObtenerDepartamentoUsuarios(item.id_contrato).subscribe(
@@ -243,14 +274,31 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
 
               //Filtra la lista de autorizacion para almacenar en un array
               if(this.listaPermisosFiltradas.length === i){
-                this.listaPermisosDeparta = this.permilista;
 
-                if(Object.keys(this.listaPermisosDeparta).length == 0) {
-                  this.validarMensaje1 = true;
-                }
-      
-                if(this.listaPermisosDeparta.length != 0) {
-                  this.lista_permisos = true;
+                //Listado para eliminar el usuario duplicado
+                var ListaSinDuplicadosPendie: any = [];
+                var cont = 0;
+                this.permilista.forEach(function(elemento, indice, array) {
+                  cont = cont + 1;
+                  if(ListaSinDuplicadosPendie.find(p=>p.id == elemento.id) == undefined)
+                  {
+                    ListaSinDuplicadosPendie.push(elemento);
+                  }
+                });
+
+                if(this.permilista.length == cont){
+                  this.listaPermisosDeparta = [];
+                  this.listaPermisosDeparta = ListaSinDuplicadosPendie;
+
+                  if(Object.keys(this.listaPermisosDeparta).length == 0) {
+                    this.validarMensaje1 = true;
+                  }
+        
+                  if(this.listaPermisosDeparta.length != 0) {
+                    this.lista_permisos = true;
+                  }
+
+
                 }
               }
               
@@ -298,17 +346,41 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   // SI EL NÚMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NÚMERO TOTAL DE FILAS.
   isAllSelected() {
     const numSelected = this.selectionUno.selected.length;
-    const numRows = this.listaPermisosDeparta.length;
-    return numSelected === numRows;
+    return numSelected === this.listaPermisosDeparta.length;
   }
 
+  listafiltro: any = [];
+  reserva: any;
   // SELECCIONA TODAS LAS FILAS SI NO ESTÁN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCIÓN CLARA.
   masterToggle() {
+    this.listafiltro = [];
+    this.listafiltro = this.listaPermisosDeparta;
+
+    if(this.filtroDepa != undefined && this.filtroDepa != null && this.filtroDepa != ''){
+      this.listafiltro = new EmplDepaPipe().transform(this.listafiltro, this.filtroDepa);
+    }
+    if(this.filtroUsuario != undefined && this.filtroUsuario != null && this.filtroUsuario != ''){
+      this.listafiltro = new EmplUsuarioPipe().transform(this.listafiltro, this.filtroUsuario);
+    }
+    if(this.filtroEstado != undefined && this.filtroEstado != null && this.filtroEstado != ''){
+      this.listafiltro = new EmplEstadoPipe().transform(this.listafiltro, this.filtroEstado);
+    }
+    
     this.isAllSelected()
       ? this.selectionUno.clear()
-      : this.listaPermisosDeparta.forEach((row) =>
-          this.selectionUno.select(row)
-        );
+      : this.filtrar(this.listafiltro);
+  }
+
+  filtrar(listafiltro: any){
+    this.listaPermisosDeparta = listafiltro;
+    this.listaPermisosDeparta.forEach(row => this.selectionUno.select(row));
+  }
+
+  limpiarFiltro(){
+    this.filtroDepa = undefined;
+    this.filtroUsuario = undefined;
+    this.filtroEstado = undefined;
+    this.obtenerPermisos(this.formato_fecha, this.formato_hora);
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACIÓN EN LA FILA PASADA
@@ -342,26 +414,38 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
         id_emple_solicita: obj.id_emple_solicita,
         id_cargo: obj.id_empl_cargo,
         id_depa: obj.id_depa,
+        nombre_depa: obj.depa_nombre,
         estado: obj.estado,
+        fecha_inicio: moment(obj.fec_inicio).format('YYYY-MM-DD'),
+        fecha_final: moment(obj.fec_final).format('YYYY-MM-DD'),
+        codigo: obj.codigo,
+        observacion:'',
+        aprobar: '',
       };
     });
     this.AbrirAutorizaciones(EmpleadosSeleccionados, "multiple");
   }
 
+  lis: any = [];
   // AUTORIZACIÓN DE PERMISOS
   AbrirAutorizaciones(datos_permiso, forma: string) {
-    this.ventana
-      .open(AutorizacionesComponent, {
-        width: "600px",
-        data: { datosPermiso: datos_permiso, carga: forma },
-      })
-      .afterClosed()
-      .subscribe((items) => {
-        this.BuscarParametro();
-        this.auto_individual = true;
-        this.selectionUno.clear();
-        this.btnCheckHabilitar = false;
-      });
+    if(datos_permiso.length != 0){
+      this.multiple = true;
+      this.lista_permisos = false;
+      this.lista_autorizados = false;
+      this.auto_individual = true;
+      this.btnCheckHabilitar = false;
+      var datosPermiso = { datosPermiso: datos_permiso, carga: forma }
+      this.datos = datosPermiso;
+      this.selectionUno.clear();
+    }else{
+      this.toastr.error("No ha seleccionado solicitudes para aprobar");
+    }
+  }
+
+  // METODO PARA VALIDAR INGRESO DE LETRAS
+  IngresarSoloLetras(e: any) {
+    return this.validar.IngresarSoloLetras(e);
   }
 
   // LISTA DE PERMISOS QUE HAN SIDO AUTORIZADOS O NEGADOS
@@ -414,6 +498,8 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
           this.validarMensaje2 = true;
         }
 
+        console.log('listaPermisosAutorizadosFiltrados: ',this.listaPermisosAutorizadosFiltrados);
+
         if (this.listaPermisosAutorizadosFiltrados.length != 0) {
           this.lista_autorizados = true;
         }
@@ -423,6 +509,13 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
         return this.validar.RedireccionarHomeAdmin(err.error);
       }
     );
+  }
+
+  limpiarFiltroAutorizados(){
+    this.AutorifiltroDepa = undefined;
+    this.AutorifiltroUsuario = undefined;
+    this.AutorifiltroEstado = undefined;
+    this.ObtenerPermisosAutorizados(this.formato_fecha, this.formato_hora);
   }
 
   /** ************************************************************************************************* **

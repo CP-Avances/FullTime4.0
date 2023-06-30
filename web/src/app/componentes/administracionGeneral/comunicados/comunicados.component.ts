@@ -152,7 +152,7 @@ export class ComunicadosComponent implements OnInit {
   }
 
   // METODO PARA MOSTRAR OPCIONES DE SELECCION
-  opcion: number;
+  opcion: any;
   BuscarPorTipo(e: MatRadioChange) {
     this.opcion = e.value;
     switch (this.opcion) {

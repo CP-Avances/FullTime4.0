@@ -49,7 +49,7 @@ export class DepartamentosService {
 
   // METODO PARA BUSCAR DEPARTAMENTOS
   ConsultarDepartamentos() {
-    return this.http.get(`${environment.url}/departamento`);
+    return this.http.get(`${environment.url}/departamento/listarDepartamentos`);
   }
 
   // METODO PARA ELIMINAR REGISTRO

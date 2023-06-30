@@ -29,6 +29,9 @@ import { EmplCodigoPipe } from './empleado/filtroEmpCod/empl-codigo.pipe';
 import { EmplCedulaPipe } from './empleado/filtroEmpCed/empl-cedula.pipe';
 import { EmplNombrePipe } from './empleado/filtroEmpNom/empl-nombre.pipe';
 import { EmplApellidoPipe } from './empleado/filtroEmpApe/empl-apellido.pipe';
+import { EmplDepaPipe } from './empleado/nombreDepartamento/empl-depa.pipe';
+import { EmplEstadoPipe } from './empleado/filtroEmpEstado/empl-estado.pipe';
+import { EmplUsuarioPipe } from './empleado/filtroEmpUsuario/empl-usuario.pipe';
 import { FitroNivelPipe } from './catTitulos/filtroNivel/fitro-nivel.pipe';
 import { SucEmpresaPipe } from './sucursales/filtroSucEmpresa/suc-empresa.pipe';
 import { FiltroEmpresaRPipe } from './catRelojes/filtroEmpresa/filtro-empresa-r.pipe';
@@ -76,6 +79,9 @@ import { FiltroProvinciaPipe } from './catProvincias/filtro-provincia/filtro-pro
     EmplCedulaPipe,
     EmplNombrePipe,
     EmplApellidoPipe,
+    EmplDepaPipe,
+    EmplEstadoPipe,
+    EmplUsuarioPipe,
     FitroNivelPipe,
     SucNombrePipe,
     SucCiudadPipe,
@@ -126,6 +132,9 @@ import { FiltroProvinciaPipe } from './catProvincias/filtro-provincia/filtro-pro
     EmplCedulaPipe,
     EmplNombrePipe,
     EmplApellidoPipe,
+    EmplDepaPipe,
+    EmplEstadoPipe,
+    EmplUsuarioPipe,
     FitroNivelPipe,
     SucNombrePipe,
     SucCiudadPipe,

@@ -123,8 +123,8 @@ export class PrincipalDepartamentoComponent implements OnInit {
       this.departamentos = datos;
       this.OrdenarDatos(this.departamentos);
       
-      /*console.log('lista Departamentos: ',this.departamentos);
-      this.departamentos.forEach(item => {
+      console.log('lista Departamentos: ',this.departamentos);
+      /*this.departamentos.forEach(item => {
         var id_departamento = item.id;
         var id_establecimiento = item.id_sucursal;
         this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(data => {
