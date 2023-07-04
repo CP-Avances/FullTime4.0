@@ -288,6 +288,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
 
                 if(this.permilista.length == cont){
                   this.listaPermisosDeparta = [];
+                  ListaSinDuplicadosPendie.sort((a, b) => b.id - a.id);
                   this.listaPermisosDeparta = ListaSinDuplicadosPendie;
 
                   if(Object.keys(this.listaPermisosDeparta).length == 0) {
@@ -318,6 +319,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
 
   permisosTotales: any;
   EditarPermiso(id, id_empl) {
+    console.log('id: ',id,' - id_empl: ',id_empl)
     // METODO PARA IMPRIMIR DATOS DEL PERMISO
     this.permisosTotales = [];
     this.restP.ObtenerUnPermisoEditar(id).subscribe(
@@ -325,7 +327,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
         this.permisosTotales = datos;
         this.ventana
           .open(EditarPermisoEmpleadoComponent, {
-            width: "700px",
+            width: "450px",
             data: {
               dataPermiso: this.permisosTotales[0],
               id_empleado: parseInt(id_empl),
@@ -497,8 +499,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
         if (Object.keys(this.listaPermisosAutorizadosFiltrados).length == 0) {
           this.validarMensaje2 = true;
         }
-
-        console.log('listaPermisosAutorizadosFiltrados: ',this.listaPermisosAutorizadosFiltrados);
+        this.listaPermisosAutorizadosFiltrados.sort((a, b) => b.id - a.id);
 
         if (this.listaPermisosAutorizadosFiltrados.length != 0) {
           this.lista_autorizados = true;
@@ -632,9 +633,11 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
         {
           width: "auto",
           table: {
-            widths: ["auto", "auto", "auto", "auto", "auto"],
+            widths: ["auto", "auto", "auto", "auto", "auto", "auto", "auto"],
             body: [
               [
+                { text: "Permiso", style: "tableHeader" },
+                { text: "Departamento", style: "tableHeader" },
                 { text: "Empleado", style: "tableHeader" },
                 { text: "Estado", style: "tableHeader" },
                 { text: "Tipo permiso", style: "tableHeader" },
@@ -660,6 +663,8 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   mostrarDatosPermisos(opcion: string) {
       return (opcion == "Permisos solicitados"?this.listaPermisosDeparta:this.listaPermisosAutorizadosFiltrados).map((obj) => {
         return [
+          { text: obj.id, style: "itemsTable" },
+          { text: obj.id, style: "itemsTable" },
           { text: obj.nombre +' '+ obj.apellido, style: "itemsTable" },
           { text: obj.estado, style: "itemsTable" },
           { text: obj.nom_permiso, style: "itemsTable" },
@@ -676,6 +681,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
    exportToExcel(opcion: string) {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Permisos solicitados"?this.listaPermisosDeparta:this.listaPermisosAutorizadosFiltrados).map(obj => {
       return {
+        Permiso: obj.id,
         Nombre: obj.nombre +' '+ obj.apellido,
         Estado: obj.estado,
         Tipo_Permiso: obj.nom_permiso,
@@ -703,6 +709,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
    exportToCVS(opcion: string) {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Permisos solicitados"?this.listaPermisosDeparta:this.listaPermisosAutorizadosFiltrados).map(obj => {
       return {
+        Permiso: obj.id,
         Nombre: obj.nombre +' '+ obj.apellido,
         Estado: obj.estado,
         Tipo_Permiso: obj.nom_permiso,

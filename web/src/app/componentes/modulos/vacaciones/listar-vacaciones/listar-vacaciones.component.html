@@ -8,6 +8,8 @@
                 style="float: left; margin-left: 10px;">Autorizar</button>
             <span class="w-100 bd-highlight">
                 LISTA DE VACACIONES SOLICITADAS POR USUARIO</span>
+            <button *ngIf="filtroDepa || filtroUsuario || filtroEstado" class="btn btn-primary" (click)="limpiarFiltro()"
+                style="float: right; margin-right: 10px;">Limpiar</button>
         </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm ">
@@ -20,6 +22,7 @@
                                 [aria-label]="checkboxLabel()">
                             </mat-checkbox>
                         </th>
+                        <th scope="col">Departamento</th>
                         <th scope="col">Empleado</th>
                         <th scope="col">Estado</th>
                         <th scope="col">Fecha Inicio</th>
@@ -29,14 +32,45 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let v of listaVacacionDeparta | paginate:tamanio_pagina:numero_pagina">
+                    <tr>
+                        <td></td>
+                        <td>
+                            <mat-form-field class="input-tables departamento">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroDepa" [formControl]="Depata"
+                                type="text" (keypress)="IngresarSoloLetras($event)">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field class="input-tables departamento">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroUsuario" [formControl]="Usuario"
+                                type="text" (keypress)="IngresarSoloLetras($event)">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field class="input-tables departamento">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroEstado" [formControl]="Estado"
+                                type="text" (keypress)="IngresarSoloLetras($event)">
+                            </mat-form-field>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                matTooltip="Filtro de solicitudes pendientes y pre-autorizados.">
+                                help_outline
+                            </mat-icon>
+                        </td>
+                    </tr>
+                    <tr *ngFor="let v of listaVacacionDeparta | empleDepa: filtroDepa | emplUsuario: filtroUsuario | emplEstado: filtroEstado | paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionUno.toggle(v) : null" [checked]="selectionUno.isSelected(v)"
                                 [aria-label]="checkboxLabel(v)">
                             </mat-checkbox>
                         </td>
-                        <td>{{v.nombre}} {{v.apellido}}</td>
+                        <td>{{v.depa_nombre}}</td>
+                        <td>{{v.fullname}}</td>
                         <td>{{v.estado}}</td>
                         <td>{{v.fec_inicio_}}</td>
                         <td>{{v.fec_final_}}</td>
@@ -86,11 +120,17 @@
 </div>
 <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="lista_autoriza">
     <div class="mat-elevation-z8" style="background: white;">
-        <div id="titulo">LISTA DE VACACIONES AUTORIZADAS</div>
+        <div class="d-flex bd-highlight" id="titulo">
+            <span class="w-100 bd-highlight">
+                LISTA DE VACACIONES AUTORIZADAS</span>
+            <button *ngIf="AutorifiltroDepa || AutorifiltroUsuario || AutorifiltroEstado" class="btn btn-primary" (click)="limpiarFiltroAutorizados()"
+                style="float: right; margin-right: 10px;">Limpiar</button>
+        </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm ">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
+                        <th scope="col">Departamento</th>
                         <th scope="col">Empleado</th>
                         <th scope="col">Estado</th>
                         <th scope="col">Fecha Inicio</th>
@@ -100,8 +140,38 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let v of listaVacacionesFiltradaAutorizada  | paginate:tamanio_pagina_auto:numero_pagina_auto">
-                        <td>{{v.nombre}} {{v.apellido}}</td>
+                    <tr>
+                        <td>
+                            <mat-form-field class="input-tables departamento">
+                                <input matInput placeholder="Buscar" [(ngModel)]="AutorifiltroDepa" [formControl]="AutoriDepata"
+                                type="text" (keypress)="IngresarSoloLetras($event)">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field class="input-tables departamento">
+                                <input matInput placeholder="Buscar" [(ngModel)]="AutorifiltroUsuario" [formControl]="AutoriUsuario"
+                                type="text" (keypress)="IngresarSoloLetras($event)">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field class="input-tables departamento">
+                                <input matInput placeholder="Buscar" [(ngModel)]="AutorifiltroEstado" [formControl]="AutoriEstado"
+                                type="text" (keypress)="IngresarSoloLetras($event)">
+                            </mat-form-field>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                matTooltip="Filtro de solicitudes autorizados y negados.">
+                                help_outline
+                            </mat-icon>
+                        </td>
+                    </tr>
+                    <tr *ngFor="let v of listaVacacionesFiltradaAutorizada | empleDepa: AutorifiltroDepa | emplUsuario: AutorifiltroUsuario | emplEstado: AutorifiltroEstado | paginate:tamanio_pagina_auto:numero_pagina_auto">
+                        <td>{{v.depa_nombre}}</td>
+                        <td>{{v.fullname}}</td>
                         <td>{{v.estado}}</td>
                         <td>{{v.fec_inicio_}}</td>
                         <td>{{v.fec_final_}}</td>

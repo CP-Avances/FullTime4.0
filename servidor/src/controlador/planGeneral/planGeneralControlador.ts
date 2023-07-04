@@ -198,7 +198,7 @@ class PlanGeneralControlador {
                 return res.jsonp({ message: 'OK', data: HORARIO.rows })
             }
             else {
-                return res.jsonp({ message: 'vacio' });
+                return res.jsonp({ message: 'vacio', data: HORARIO.rows });
             }
         }
         catch (error) {

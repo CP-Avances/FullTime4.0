@@ -749,7 +749,7 @@ class PermisosControlador {
             `
             SELECT p.id, p.fec_creacion, p.descripcion, p.fec_inicio, p.dia, p.hora_salida, p.hora_ingreso, 
             p.hora_numero, p.documento, p.docu_nombre, p.fec_final, p.estado, p.id_empl_cargo, e.nombre, 
-            e.apellido, e.cedula, e.id AS id_empleado, cp.id AS id_tipo_permiso, 
+            e.apellido, e.cedula, e.id AS id_empleado, e.codigo, cp.id AS id_tipo_permiso, 
             cp.descripcion AS nom_permiso, ec.id AS id_contrato 
             FROM permisos AS p, empl_contratos AS ec, empleados AS e, cg_tipo_permisos AS cp 
             WHERE p.id = $1 AND p.id_empl_contrato = ec.id AND ec.id_empleado = e.id AND 

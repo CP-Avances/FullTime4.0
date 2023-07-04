@@ -1,7 +1,8 @@
 // IMPORTACION LIBRERIAS 
 import { FormControl, Validators, FormGroup } from '@angular/forms';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Inject } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import * as moment from 'moment';
 
@@ -122,6 +123,8 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     public parametro: ParametrosService,
     public componente: VerEmpleadoComponent,
     public planificar: PlanGeneralService,
+    public ventana: MatDialogRef<EditarPermisoEmpleadoComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     // LEER ID DE USUARIO QUE INICIA SESION
     var item = localStorage.getItem('empleado');
@@ -132,7 +135,16 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
 
   info: any = [];
   ngOnInit(): void {
-    this.info = this.solicita_permiso;
+    if(this.solicita_permiso == undefined){
+      this.info = this.data.dataPermiso;
+    }else{
+      this.info = this.solicita_permiso;
+    }
+
+    if(this.id_empleado == undefined){
+      this.id_empleado = this.data.id_empleado;
+    }
+
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
     this.num = this.info.num_permiso
@@ -248,25 +260,20 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     let datos = {
       fecha_inicio: moment(this.info.fec_inicio).format('YYYY-MM-DD'),
       fecha_final: moment(this.info.fec_final).format('YYYY-MM-DD'),
-      id_empleado: parseInt(this.empleado.id)
+      id_empleado: this.id_empleado
     }
     this.feriado.ListarFeriadosCiudad(datos).subscribe(data => {
       this.feriados = data;
-      this.LeerRecuperacionFeriadosPermiso();
+      this.LeerRecuperacionFeriadosPermiso(datos);
     }, vacio => {
-      this.LeerRecuperacionFeriadosPermiso();
+      this.LeerRecuperacionFeriadosPermiso(datos);
     })
   }
 
 
   // BUSCAR FERIADOS RECUPERACION FECHAS DEL PERMISO
-  LeerRecuperacionFeriadosPermiso() {
+  LeerRecuperacionFeriadosPermiso(datos: any) {
     this.recuperar = [];
-    let datos = {
-      fecha_inicio: moment(this.info.fec_inicio).format('YYYY-MM-DD'),
-      fecha_final: moment(this.info.fec_final).format('YYYY-MM-DD'),
-      id_empleado: parseInt(this.empleado.id)
-    }
     this.feriado.ListarFeriadosRecuperarCiudad(datos).subscribe(data => {
       this.recuperar = data;
       this.BuscarRegistroFechasHorario();
@@ -283,6 +290,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       fecha_final: moment(this.info.fec_final).format('YYYY-MM-DD'),
       codigo: this.empleado.codigo
     }
+
     this.planificar.BuscarHorarioFechas(datos).subscribe(data => {
       this.horario = data;
       this.ContarDiasSolicitados();
@@ -1367,6 +1375,9 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     var total_libres = 0;
     var total_laborables = 0;
 
+    console.log('this.contar_laborables: ',this.contar_laborables);
+    console.log('this.contar_recuperables: ',this.contar_recuperables);
+
     if (this.datosPermiso.contar_feriados === true) {
       total_laborables = this.contar_laborables + this.contar_feriados;
       total_libres = this.contar_libres;
@@ -1819,7 +1830,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     this.componente.formulario_editar_permiso = false;
     this.componente.solicitudes_permiso = true;
     this.componente.ObtenerPermisos(this.componente.formato_fecha, this.componente.formato_hora);
-    close();
+    this.ventana.close(true);
   }
 
   // METODO PARA FORMATEAR HORAS
