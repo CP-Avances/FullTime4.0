@@ -506,6 +506,129 @@ class NotificacionTiempoRealControlador {
 
   }
 
+
+  /** ***************************************************************************************** **
+   ** **                      MANEJO DE ENVIO DE CORREOS DE SOLICITUDES                      ** ** 
+   ** ***************************************************************************************** **/
+
+  // METODO PARA ENVIO DE CORREO ELECTRONICO DE COMUNICADOS MEDIANTE SISTEMA WEB
+  public async EnviarCorreoSolicitudes(req: Request, res: Response): Promise<void> {
+
+    var tiempo = fechaHora();
+    var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
+    var hora = await FormatearHora(tiempo.hora);
+
+    const path_folder = path.resolve('logos');
+
+    var datos = await Credenciales(req.id_empresa);
+
+    //const { id_envia, correo, mensaje, asunto} = req.body;
+    const array = req.body
+
+    //console.log('id_envia: ',id_envia);
+    //console.log('correo: ',correo);
+    //console.log('mensaje: ',mensaje);
+    //console.log('asunto: ',asunto);
+    console.log('permisos: ',array);
+
+    /*
+    if (datos === 'ok') {
+
+      const USUARIO_ENVIA = await pool.query(
+        `
+        SELECT e.id, e.correo, e.nombre, e.apellido, e.cedula,
+          tc.cargo, d.nombre AS departamento 
+        FROM datos_actuales_empleado AS e, empl_cargos AS ec, tipo_cargo AS tc, cg_departamentos AS d 
+        WHERE e.id = $1 AND ec.id = e.id_cargo AND tc.id = ec.cargo AND d.id = ec.id_departamento
+        `
+        , [id_envia]);
+
+      let data = {
+        to: correo,
+        from: email,
+        subject: asunto,
+        html: `<body>
+                <div style="text-align: center;">
+                  <img width="25%" height="25%" src="cid:cabeceraf"/>
+                </div>
+                <br>
+                <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                  El presente correo es para informar el siguiente comunicado: <br>  
+                </p>
+                <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
+                  <b>Empresa:</b> ${nombre}<br>
+                  <b>Asunto:</b> ${asunto} <br>
+                  <b>Colaborador que envía:</b> ${USUARIO_ENVIA.rows[0].nombre} ${USUARIO_ENVIA.rows[0].apellido} <br>
+                  <b>Cargo:</b> ${USUARIO_ENVIA.rows[0].cargo} <br>
+                  <b>Departamento:</b> ${USUARIO_ENVIA.rows[0].departamento} <br>
+                  <b>Generado mediante:</b> Sistema Web <br>
+                  <b>Fecha de envío:</b> ${fecha} <br> 
+                  <b>Hora de envío:</b> ${hora} <br><br>                  
+                  <b>Mensaje:</b> 
+                    <table class="table table-hover table-sm">
+                      <thead class="thead-light">
+                        <tr style="text-align: center;">
+                          <th scope="col">Permiso #</th>
+                          <th scope="col">Departamento</th>
+                          <th scope="col">Empleado</th>
+                          <th scope="col">Estado</th>
+                          <th scope="col">Aprobar</th>
+                          <th scope="col">Observación</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let dato of solicitudes>
+                          <td>{{dato.id}}</td>
+                          <td>{{dato.nombre_depa}}</td>
+                          <td>{{dato.empleado}}</td>
+                          <td>{{dato.estado}}</td>
+                          <td>
+                            <p *ngIf="dato.aprobar == 'NO'" style="color: rgb(189, 8, 8);">{{dato.aprobar}}</p>
+                            <p *ngIf="dato.aprobar == 'SI'" style="color: rgb(3, 146, 53);">{{dato.aprobar}}</p>
+                          </td>
+                        <td>{{dato.observacion}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  <br><br>
+                </p>
+                <p style="font-family: Arial; font-size:12px; line-height: 1em;">
+                  <b>Gracias por la atención</b><br>
+                  <b>Saludos cordiales,</b> <br><br>
+                </p>
+                <img src="cid:pief" width="50%" height="50%"/>
+            </body>
+            `,
+        attachments: [
+          {
+            filename: 'cabecera_firma.jpg',
+            path: `${path_folder}/${cabecera_firma}`,
+            cid: 'cabeceraf' // VALOR cid COLOCARSE IGUAL EN LA ETIQUETA img src DEL HTML.
+          },
+          {
+            filename: 'pie_firma.jpg',
+            path: `${path_folder}/${pie_firma}`,
+            cid: 'pief' // VALOR cid COLOCARSE IGUAL EN LA ETIQUETA img src DEL HTML.
+          }]
+      };
+
+      var corr = enviarMail(servidor, parseInt(puerto));
+      corr.sendMail(data, function (error: any, info: any) {
+        if (error) {
+          corr.close();
+          return res.jsonp({ message: 'error' });
+        } else {
+          corr.close();
+          return res.jsonp({ message: 'ok' });
+        }
+      });
+
+    } else {
+      res.jsonp({ message: 'Ups! algo salio mal!!! No fue posible enviar correo electrónico.' });
+    }*/
+  }
+
+
 }
 
 export const NOTIFICACION_TIEMPO_REAL_CONTROLADOR = new NotificacionTiempoRealControlador();

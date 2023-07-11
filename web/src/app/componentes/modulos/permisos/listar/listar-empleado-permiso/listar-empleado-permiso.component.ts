@@ -49,6 +49,7 @@ export interface PermisosElemento {
   id_empl_cargo: number;
   id_depa?: number;
   depa_nombre?: any;
+  correo?: any
 }
 
 @Component({
@@ -216,7 +217,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
         this.permisos = res;
       
         //Filtra la lista de Permisos para descartar las solicitudes del mismo usuario y almacena en una nueva lista
-        this.listaPermisosFiltradas = this.permisos.filter((o) => {
+        this.permisos.filter((o) => {
           if (this.idEmpleado !== o.id_emple_solicita) {
             return this.listaPermisosFiltradas.push(o);
           }
@@ -290,6 +291,8 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
                   this.listaPermisosDeparta = [];
                   ListaSinDuplicadosPendie.sort((a, b) => b.id - a.id);
                   this.listaPermisosDeparta = ListaSinDuplicadosPendie;
+
+                  console.log('listaPermisosDeparta: ',this.listaPermisosDeparta)
 
                   if(Object.keys(this.listaPermisosDeparta).length == 0) {
                     this.validarMensaje1 = true;
@@ -412,6 +415,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
       return {
         id: obj.id,
         empleado: obj.nombre + " " + obj.apellido,
+        correo: obj.correo,
         id_contrato: obj.id_contrato,
         id_emple_solicita: obj.id_emple_solicita,
         id_cargo: obj.id_empl_cargo,
@@ -464,7 +468,6 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
         this.permisosAutorizados = res;
 
         //Filtra la lista de Horas Extras para descartar las solicitudes del mismo usuario y almacena en una nueva lista
-        this.listaPermisosAutorizadosFiltrados =
           this.permisosAutorizados.filter((o) => {
             if (this.idEmpleado !== o.id_emple_solicita) {
               return this.listaPermisosAutorizadosFiltrados.push(o);
@@ -526,6 +529,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   // METODO PARA CREAR ARCHIVO PDF
   generarPdf(action = "open", opcion: string) {
     const documentDefinition = this.getDocumentDefinicion(opcion);
+
     switch (action) {
       case "open":
         pdfMake.createPdf(documentDefinition).open();
@@ -664,7 +668,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
       return (opcion == "Permisos solicitados"?this.listaPermisosDeparta:this.listaPermisosAutorizadosFiltrados).map((obj) => {
         return [
           { text: obj.id, style: "itemsTable" },
-          { text: obj.id, style: "itemsTable" },
+          { text: obj.depa_nombre, style: "itemsTable" },
           { text: obj.nombre +' '+ obj.apellido, style: "itemsTable" },
           { text: obj.estado, style: "itemsTable" },
           { text: obj.nom_permiso, style: "itemsTable" },
@@ -682,6 +686,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Permisos solicitados"?this.listaPermisosDeparta:this.listaPermisosAutorizadosFiltrados).map(obj => {
       return {
         Permiso: obj.id,
+        Departamento: obj.depa_nombre,
         Nombre: obj.nombre +' '+ obj.apellido,
         Estado: obj.estado,
         Tipo_Permiso: obj.nom_permiso,
@@ -710,6 +715,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet((opcion == "Permisos solicitados"?this.listaPermisosDeparta:this.listaPermisosAutorizadosFiltrados).map(obj => {
       return {
         Permiso: obj.id,
+        Departamento: obj.depa_nombre,
         Nombre: obj.nombre +' '+ obj.apellido,
         Estado: obj.estado,
         Tipo_Permiso: obj.nom_permiso,
@@ -735,7 +741,8 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     (opcion == "Permisos solicitados"?this.listaPermisosDeparta:this.listaPermisosAutorizadosFiltrados).forEach(obj => {
       objeto = {
         "lista_permisos": {
-        '@id': obj.id,
+        "@id": obj.id,
+        "Departamento": obj.depa_nombre,
         "nombre": obj.nombre +' '+ obj.apellido,
         "estado": obj.estado,
         "tipo_permiso": obj.nom_permiso,

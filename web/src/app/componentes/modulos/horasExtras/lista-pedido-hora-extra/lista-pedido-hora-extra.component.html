@@ -24,6 +24,7 @@
                                 [aria-label]="checkboxLabel()">
                             </mat-checkbox>
                         </th>
+                        <th scope="col">Departamento</th>
                         <th scope="col">Empleado</th>
                         <th scope="col">Estado</th>
                         <th scope="col">Descripcion</th>
@@ -34,14 +35,46 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let h of lista_HorasExtras | paginate:tamanio_pagina:numero_pagina">
+                    <tr>
+                        <td></td>
+                        <td>
+                            <mat-form-field class="input-tables departamento">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroDepa" [formControl]="Depata"
+                                type="text" (keypress)="IngresarSoloLetras($event)">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field class="input-tables departamento">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroUsuario" [formControl]="Usuario"
+                                type="text" (keypress)="IngresarSoloLetras($event)">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field class="input-tables departamento">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroEstado" [formControl]="Estado"
+                                type="text" (keypress)="IngresarSoloLetras($event)">
+                            </mat-form-field>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                matTooltip="Filtro de solicitudes pendientes y pre-autorizados.">
+                                help_outline
+                            </mat-icon>
+                        </td>
+                    </tr>
+                    <tr *ngFor="let h of lista_HorasExtras | empleDepa: filtroDepa | emplUsuario: filtroUsuario | emplEstado: filtroEstado | paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionUno.toggle(h) : null" [checked]="selectionUno.isSelected(h)"
                                 [aria-label]="checkboxLabel(h)">
                             </mat-checkbox>
                         </td>
-                        <td>{{h.nombre}} {{h.apellido}}</td>
+                        <td>{{h.depa_nombre}}</td>
+                        <td>{{h.fullname}}</td>
                         <td>{{h.estado}}</td>
                         <td>{{h.descripcion}}</td>
                         <td>{{h.fec_inicio}}</td>

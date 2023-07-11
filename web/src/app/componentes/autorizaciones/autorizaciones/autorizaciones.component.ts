@@ -18,6 +18,8 @@ import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.s
 
 // IMPORTAR COMPONENTES
 import { ListarEmpleadoPermisoComponent } from '../../modulos/permisos/listar/listar-empleado-permiso/listar-empleado-permiso.component';
+import { MatSelect } from '@angular/material/select';
+import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 
 interface Orden {
   valor: number
@@ -100,6 +102,8 @@ export class AutorizacionesComponent implements OnInit {
     public usuarioDepa: UsuarioService,
     private componente: ListarEmpleadoPermisoComponent,
     private plangeneral: PlanGeneralService,
+    public informacion: DatosGeneralesService,
+    public configNoti: RealTimeService,
   ) { }
 
   
@@ -179,7 +183,6 @@ export class AutorizacionesComponent implements OnInit {
         }
         
         this.nuevoAutorizacionTipos.forEach(x => {
-          
           if(x.nombre == 'GERENCIA' && x.estado == true){
             console.log('entro en gerencia');
             this.gerencia = true;
@@ -219,12 +222,14 @@ export class AutorizacionesComponent implements OnInit {
   }
 
   departamentoChange: any = [];
-  ChangeDepa(e: any) {
+  ChangeDepa(e: any, select: MatSelect) {
     if (e != null && e != undefined) {
+      select.value = null;
+      select.defaultTabIndex = 0;
       const [departamento] = this.ArrayAutorizacionTipos.filter(o => {
         return o.id_departamento === e
       })
-      this.estados = [];
+      this.listafiltrada = [];
       this.departamentoChange = departamento;
       this.id_depart = this.departamentoChange.id_departamento;
       this.BuscarTipoAutorizacion();
@@ -243,8 +248,17 @@ export class AutorizacionesComponent implements OnInit {
   mensaje: any;
   listafiltrada: any = [];
   ListaPermisos: any = [];
+
+  //Variables para el metodo de conteo y lista de correos de las solicitudes
+  cont_correo: number = 0;
+  info_correo: string = '';
+  listaCorreosEnviar: any = [];
+  num: number = 0; 
   obtenerAutorizacion(){
     this.habilitarprogress = true;
+    this.cont_correo = 0;
+    this.info_correo = '';
+    this.listaCorreosEnviar = [];
     if(this.data.carga === 'multiple'){
       var contador = 0;
       this.ListaPermisos = [];
@@ -259,7 +273,8 @@ export class AutorizacionesComponent implements OnInit {
       this.cont = 0;
       if(this.data.datosPermiso.length == contador){
         if(this.ListaPermisos.length != 0){
-          
+          this.listadoDepaAutoriza = [];
+          this.lectura = 1;
           this.ListaPermisos.forEach(o => {
             this.cont = this.cont + 1;
             this.restAutorizaciones.BuscarAutorizacionPermiso(o.id).subscribe(
@@ -283,8 +298,10 @@ export class AutorizacionesComponent implements OnInit {
                         this.listadoDepaAutoriza = res;
                         this.listadoDepaAutoriza.forEach(item => {
                           if((this.id_empleado_loggin == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
-                            this.listafiltrada.push(o);
+                            console.log('entro en preautorizado');
                             this.obtenerPlanificacionHoraria(o.fecha_inicio, o.fecha_final, o.codigo, o);
+                            this.listafiltrada.push(o);
+                            this.ConfiguracionCorreo(o);
                             return this.ocultar = false;
                           }
                         })
@@ -331,13 +348,14 @@ export class AutorizacionesComponent implements OnInit {
                           this.listadoDepaAutoriza = res; 
                           this.listadoDepaAutoriza.forEach(valor => {
                             if((this.id_empleado_loggin == valor.id_contrato) && (autorizaciones.length ==  valor.nivel)){
-                              this.listafiltrada.push(o);
+                              console.log('entro en pendientes');
                               this.obtenerPlanificacionHoraria(o.fecha_inicio, o.fecha_final, o.codigo, o);
+                              this.listafiltrada.push(o);
+                              this.ConfiguracionCorreo(o);
                               return this.ocultar = false;
                             }
                           });
 
-                          
                           if(this.ListaPermisos.length == this.cont){
                             this.habilitarprogress = false;
                             if(this.listafiltrada.length == 0){
@@ -366,17 +384,20 @@ export class AutorizacionesComponent implements OnInit {
                           }
                         }
                       );
-                      
                     }
                   }
                 });
               },error => {
                 this.habilitarprogress = false;
                 o.observacion = 'La solicitud tiene problemas con el registro de autorización';
-                o.aprobar = 'SI'
+                o.aprobar = 'SI';
+                this.listafiltrada.push(o);
+                this.ConfiguracionCorreo(o);
               }
             )
           })
+
+          return 
         }else{
           this.habilitarprogress = false;
           this.mensaje = 'No hay solicitudes seleccionadas del departamento de '+this.departamentoChange.depa_autoriza;
@@ -406,22 +427,15 @@ export class AutorizacionesComponent implements OnInit {
       this.listahorario = res;
       if(this.listahorario.data.length == 0){
         solicitud.observacion = 'No tiene registrado una planificacion';
-        solicitud.aprobar = 'NO';
+        return solicitud.aprobar = 'NO';
       }else{
-        this.listahorario.data.forEach(item => {
-          if(item[this.i] == '-'){
-            solicitud.observacion = 'No tiene registrado un horario en ese dia';
-            solicitud.aprobar = 'NO';
-          }else{
-            solicitud.observacion = 'Sin novedad';
-            solicitud.aprobar = 'SI';
-          }
-          this.i += 1;
-        })
+        solicitud.observacion = 'Sin novedad';
+        return solicitud.aprobar = 'SI';
       }
+
     },error => {
       solicitud.observacion = 'No tiene registrado una planificacion';
-      solicitud.aprobar = 'NO';
+      return solicitud.aprobar = 'NO';
     });
 
   }
@@ -447,6 +461,16 @@ export class AutorizacionesComponent implements OnInit {
       return valor.aprobar == 'SI' || valor.aprobar == 'si';
     });
 
+    var datos = {
+      depa_user_loggin: this.id_depart,
+      objeto: this.data.datosPermiso,
+    }
+
+    this.FiltroCorreos(this.listaCorreosEnviar);
+    console.log('this.listaCorreosEnviar: ',this.listaCorreosEnviar);
+    console.log('this.info_correo: ',this.info_correo);
+
+    /*
     if(this.listafiltrada.length == this.a ){
       if(this.NuevaListaAprobada.length == 0){
         this.toastr.error("No se han podido aprobar las solicitudes debido a que tiene observaciones que no permiten enviar");
@@ -454,7 +478,7 @@ export class AutorizacionesComponent implements OnInit {
         if(this.no_aprobar > 0){
           this.toastr.error("Algunas solicitudes no se enviaron debido algun problema, revisar la observacion de la solicitud");
         }
-
+        
         if (this.data.carga === 'multiple') {
           this.NuevaListaAprobada.map(obj => {
             if (obj.estado === 'Pre-autorizado') {
@@ -473,19 +497,28 @@ export class AutorizacionesComponent implements OnInit {
             }
             else {
               console.log('idpermiso', obj.id);
-              this.restDepartamento.ConsultarDepartamentoPorContrato(obj.id_cargo).subscribe(res => {
-                this.departamentos = res;
-                this.IngresarDatos(form, obj.id, this.departamentos[0].id_departamento, obj.id_emple_solicita);
+              this.restP.BuscarDatosAutorizacion(obj.id).subscribe(data => {
+                var documento = data[0].empleado_estado;
+                this.restDepartamento.ConsultarDepartamentoPorContrato(obj.id_cargo).subscribe(res => {
+                  this.departamentos = res;
+                  this.ActualizarDatos(form, documento, obj.id, this.departamentos[0].id_departamento, obj.id_emple_solicita);
+                })
+              }, err => {
+                this.toastr.error("No existe autorizacion en el permiso "+obj.id);
+                this.restDepartamento.ConsultarDepartamentoPorContrato(obj.id_cargo).subscribe(res => {
+                  this.departamentos = res;
+                  this.IngresarDatos(form, obj.id, this.departamentos[0].id_departamento, obj.id_emple_solicita);
+                })
               })
             }
-            
           })
+
         }
         else if (this.data.carga === undefined) {
           this.IngresarDatos(form, this.data.id, form.idDepartamentoF, this.data.id_emple_solicita);
-        }
+        } 
       }
-    }
+    }*/
   }
 
   IngresarDatos(form, id_permiso: number, id_departamento: number, empleado_solicita: number) {
@@ -500,11 +533,15 @@ export class AutorizacionesComponent implements OnInit {
       id_documento: localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       id_plan_hora_extra: null,
     }
+    console.log('newAutorizaciones: ',newAutorizaciones);
     
+    this.EditarEstadoPermiso(id_permiso, id_departamento, empleado_solicita, form.estadoF);
+    
+    /*
     this.restAutorizaciones.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
       this.EditarEstadoPermiso(id_permiso, id_departamento, empleado_solicita, form.estadoF);
     })
-
+    */
   }
 
   ActualizarDatos(form, documento, id_permiso: number, id_departamento: number, empleado_solicita: number) {
@@ -514,11 +551,14 @@ export class AutorizacionesComponent implements OnInit {
       estado: form.estadoF,
       id_permiso: id_permiso,
     }
+
+    this.EditarEstadoPermiso(id_permiso, id_departamento, empleado_solicita, form.estadoF);
     
+    /*
     this.restAutorizaciones.PutEstadoAutoPermisoMultiple(newAutorizacionesM).subscribe(resA => {
       this.EditarEstadoPermiso(id_permiso, id_departamento, empleado_solicita, form.estadoF);
     })
-
+    */
   }
 
   resEstado: any = [];
@@ -541,7 +581,22 @@ export class AutorizacionesComponent implements OnInit {
     }else if (estado_permiso === 4) {
       estado_letras = 'Negado';
     }
-    
+
+    var f = new Date();
+      let notificacion = {
+        id: null,
+        id_send_empl: this.id_empleado_loggin,
+        id_receives_empl: id_empleado,
+        id_receives_depa: id_departamento,
+        estado: estado_letras,
+        create_at: `${this.FechaActual}T${f.toLocaleTimeString()}.000Z`,
+        id_permiso: id_permiso,
+        id_vacaciones: null,
+        id_hora_extra: null
+      }
+
+      
+    /*
     this.restP.ActualizarEstado(id_permiso, datosPermiso).subscribe(respo => {
       this.resEstado = [respo];
       var f = new Date();
@@ -568,9 +623,10 @@ export class AutorizacionesComponent implements OnInit {
       const { access, message } = err.error.message;
       if (access === false) {
         this.toastr.error(message)
-       // this.dialogRef.close();
+        //this.dialogRef.close();
       }
     });
+    */
 
     this.total += 1;
     if (this.data.carga === 'multiple') {
@@ -578,11 +634,102 @@ export class AutorizacionesComponent implements OnInit {
         this.toastr.success('Operación exitosa.', 'Se autorizo un total de ' + this.NuevaListaAprobada.length + ' permisos.', {
           timeOut: 6000,
         });
-        this.CerrarVentanaRegistroNoti();
+        //this.CerrarVentanaRegistroNoti();
       }
     }
   }
 
+  ConfiguracionCorreo(solicitud: any){
+    console.log('entro aqui en configuracion correo');
+    this.configNoti.ObtenerConfiguracionEmpleado(solicitud.id_contrato).subscribe(res_config => {
+      if(res_config[0].permiso_mail == true){
+        this.listaCorreosEnviar.push(solicitud);
+      }
+    })
+
+    /*
+    var nuevalista: any = [];
+    permisos.forEach(function(elemento, indice, array) {
+      if(nuevalista.find(p=>p.id_emple_solicita == elemento.id_emple_solicita) == undefined)
+      {
+        return nuevalista.push(elemento);
+      }
+    });
+
+    this.ContarCorreos(nuevalista);*/
+  }
+
+  // METODO PARA CONTAR NUMERO DE CORREOS A ENVIARSE
+  FiltroCorreos(permisos: any) {
+    var nuevalista: any = [];
+    permisos.forEach(function(elemento, indice, array) {
+      if(nuevalista.find(p=>p.id_emple_solicita == elemento.id_emple_solicita) == undefined)
+      {
+        return nuevalista.push(elemento);
+      }
+    }); 
+
+    nuevalista.forEach(solicitud => {
+      this.cont_correo = this.cont_correo + 1;
+      if (this.info_correo === '') {
+        this.info_correo = solicitud.correo;
+      }
+      else {
+        this.info_correo = this.info_correo + ', ' + solicitud.correo;
+      }
+    });
+    
+    this.listaCorreosEnviar = nuevalista;
+    this.EnviarCorreo(this.info_correo, this.listafiltrada);
+
+    /*
+    data.filter(solicitud => {
+      this.configNoti.ObtenerConfiguracionEmpleado(solicitud.id_contrato).subscribe(res_config => {
+        if(res_config[0].permiso_mail == true){
+          this.cont_correo = this.cont_correo + 1;
+          if (this.info_correo === '') {
+            this.info_correo = solicitud.correo;
+          }
+          else {
+            this.info_correo = this.info_correo + ', ' + solicitud.correo;
+          }
+          this.listaCorreosEnviar.push(solicitud);
+        }
+      })
+      this.num += 1;
+    });*/
+
+  }
+
+  // METODO USADO PARA ENVIAR COMUNICADO POR CORREO
+  EnviarCorreo(correos: any, permisos: any) {
+
+    var datosEnvia: any [];
+
+    let datosCorreo = {
+      id_envia: this.id_empleado_loggin,
+      mensaje: 'Listado de Solicitudes',
+      correo: correos,
+      asunto: 'Aprobacion multiple de solicitudes',
+    }
+
+    datosEnvia = permisos.concat(datosCorreo);
+    
+    this.realTime.EnviarCorreoMultiple(datosCorreo, permisos).subscribe(envio => {
+      /*
+      if (envio.message === 'ok') {
+        this.toastr.success('Mensaje enviado exitosamente.', '', {
+          timeOut: 6000,
+        });
+      }
+      else {
+        this.toastr.warning('Ups !!! algo salio mal', 'No fue posible enviar correo electrónico.', {
+          timeOut: 6000,
+        });
+      }*/
+    });
+    
+  }
 
   limpiarCampos() {
     this.nuevaAutorizacionesForm.reset();
