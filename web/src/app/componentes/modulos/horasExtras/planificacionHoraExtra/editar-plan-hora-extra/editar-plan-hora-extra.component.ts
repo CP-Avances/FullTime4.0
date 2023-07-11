@@ -1,17 +1,18 @@
 import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { Validators, FormGroup, FormControl } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import * as moment from 'moment';
 
 import { PlanHoraExtraService } from 'src/app/servicios/planHoraExtra/plan-hora-extra.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+
+import { ListaPlanificacionesComponent } from '../lista-planificaciones/lista-planificaciones.component';
 
 @Component({
   selector: 'app-editar-plan-hora-extra',
@@ -27,6 +28,9 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 
 export class EditarPlanHoraExtraComponent implements OnInit {
 
+  @Input() data: any;
+  @Input() pagina: string = '';
+
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   fechaSolicitudF = new FormControl('', [Validators.required]);
   descripcionF = new FormControl('', [Validators.required]);
@@ -36,7 +40,7 @@ export class EditarPlanHoraExtraComponent implements OnInit {
   horaFinF = new FormControl('', [Validators.required]);
   horasF = new FormControl('', [Validators.required]);
 
-  public PedirHoraExtraForm = new FormGroup({
+  public formulario = new FormGroup({
     fechaSolicitudForm: this.fechaSolicitudF,
     descripcionForm: this.descripcionF,
     fechaInicioForm: this.fechaInicioF,
@@ -55,12 +59,11 @@ export class EditarPlanHoraExtraComponent implements OnInit {
     private toastr: ToastrService,
     private restP: ParametrosService,
     public restEmpleado: EmpleadoService,
+    public componentel: ListaPlanificacionesComponent,
     public restCargo: EmplCargosService,
     public parametro: ParametrosService,
-    public ventana: MatDialogRef<EditarPlanHoraExtraComponent>,
     public validar: ValidacionesService,
     public aviso: RealTimeService,
-    @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
   ngOnInit(): void {
@@ -84,7 +87,7 @@ export class EditarPlanHoraExtraComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarFecha() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
@@ -108,7 +111,7 @@ export class EditarPlanHoraExtraComponent implements OnInit {
     } else {
       this.leer_datos = this.data.planifica[0];
     }
-    this.PedirHoraExtraForm.patchValue({
+    this.formulario.patchValue({
       fechaSolicitudForm: this.FechaActual,
       descripcionForm: this.leer_datos.descripcion,
       fechaInicioForm: this.leer_datos.fecha_desde,
@@ -206,7 +209,7 @@ export class EditarPlanHoraExtraComponent implements OnInit {
             this.toastr.warning('Ups algo salio mal !!!', 'Proceso no registrado.', {
               timeOut: 6000,
             });
-            this.CerrarVentana(plan.id);
+            this.CerrarVentana(1, plan.id);
           }
         })
       });
@@ -264,7 +267,7 @@ export class EditarPlanHoraExtraComponent implements OnInit {
     this.toastr.success('Se registra planificación a ' + contador + ' colaboradores.', 'Planificación de Horas Extras.', {
       timeOut: 6000,
     });
-    this.CerrarVentana(id_plan);
+    this.CerrarVentana(2, id_plan);
   }
 
   // CREAR PLANIFICACIÓN DE UN SOLO USUARIO
@@ -279,13 +282,13 @@ export class EditarPlanHoraExtraComponent implements OnInit {
         this.toastr.success('', 'Planificación de Horas Extras registrada.', {
           timeOut: 6000,
         });
-        this.CerrarVentana(plan.id);
+        this.CerrarVentana(2, plan.id);
       }
       else {
         this.toastr.warning('Ups algo salio mal !!!', 'Proceso no registrado.', {
           timeOut: 6000,
         });
-        this.CerrarVentana(plan.id);
+        this.CerrarVentana(1, plan.id);
       }
     })
   }
@@ -294,7 +297,7 @@ export class EditarPlanHoraExtraComponent implements OnInit {
   // METODO PARA CALCULAR HORAS SOLICITADAS
   CalcularTiempo(form: any) {
     // LIMPIAR CAMPO NÚMERO DE HORAS
-    this.PedirHoraExtraForm.patchValue({ horasForm: '' })
+    this.formulario.patchValue({ horasForm: '' })
 
     // VALIDAR HORAS INGRESDAS
     if (form.horaInicioForm != '' && form.horaFinForm != '') {
@@ -315,7 +318,7 @@ export class EditarPlanHoraExtraComponent implements OnInit {
       }
       // COLOCAR FORMATO DE HORAS EN FORMULARIO
       var tiempoTotal: string = horas + ':' + minutos;
-      this.PedirHoraExtraForm.patchValue({ horasForm: tiempoTotal })
+      this.formulario.patchValue({ horasForm: tiempoTotal })
     }
     else {
       this.toastr.info('Debe ingresar la hora de inicio y la hora de fin de actividades.', 'VERIFICAR', {
@@ -407,55 +410,32 @@ export class EditarPlanHoraExtraComponent implements OnInit {
     })
   }
 
-  IngresarSoloLetras(e) {
-    let key = e.keyCode || e.which;
-    let tecla = String.fromCharCode(key).toString();
-    // SE DEFINE TODO EL ABECEDARIO QUE SE VA A USAR.
-    let letras = "áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-    // ES LA VALIDACIÓN DEL KEYCODES, QUE TECLAS RECIBE EL CAMPO DE TEXTO.
-    let especiales = [8, 37, 39, 46, 6, 13];
-    let tecla_especial = false
-    for (var i in especiales) {
-      if (key == especiales[i]) {
-        tecla_especial = true;
-        break;
-      }
-    }
-    if (letras.indexOf(tecla) == -1 && !tecla_especial) {
-      this.toastr.info('No se admite datos numéricos', 'Usar solo letras', {
-        timeOut: 6000,
-      })
-      return false;
-    }
-  }
-
-  IngresarSoloNumeros(evt) {
-    if (window.event) {
-      var keynum = evt.keyCode;
-    }
-    else {
-      keynum = evt.which;
-    }
-    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMÉRICO Y QUE TECLAS NO RECIBIRÁ.
-    if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6) {
-      return true;
-    }
-    else {
-      this.toastr.info('No se admite el ingreso de letras', 'Usar solo números', {
-        timeOut: 6000,
-      })
-      return false;
-    }
-  }
-
+  // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampoHoras() {
-    this.PedirHoraExtraForm.patchValue({ horasForm: '' })
+    this.formulario.patchValue({ horasForm: '' })
   }
 
-  CerrarVentana(id_plan: number) {
-    this.PedirHoraExtraForm.reset();
-    this.ventana.close(id_plan);
+  // METODO PARA CERRAR VENTANA
+  CerrarVentana(opcion: number, id_plan: number) {
+    this.formulario.reset();
+    this.componentel.ver_form_editar = false;
+    if (opcion === 1 && this.pagina === 'lista-planificaciones') {
+      this.componentel.ver_listas = true;
+    }
+    else if (opcion === 2 && this.pagina === 'lista-planificaciones') {
+      this.componentel.ver_listas = true;
+      this.componentel.VerificarPlanificacion(id_plan, '1', true, false);
+    }
   }
 
+  // METODO PARA INGRESAR SOLO LETRAS
+  IngresarSoloLetras(e: any) {
+    return this.validar.IngresarSoloLetras(e);
+  }
+
+  // METODO PARA INGRESAR SOLO NUMEROS
+  IngresarSoloNumeros(evt: any) {
+    return this.validar.IngresarSoloNumeros(evt);
+  }
 
 }

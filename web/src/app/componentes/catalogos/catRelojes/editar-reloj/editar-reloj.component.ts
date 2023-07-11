@@ -212,7 +212,7 @@ export class EditarRelojComponent implements OnInit {
       else {
         this.toastr.error(
           'Verificar que el código de reloj y la ip del dispositivo no se encuentren registrados.',
-          'Operación Fallida', {
+          'Ups!!! algo salio mal.', {
           timeOut: 6000,
         })
       }
@@ -241,7 +241,7 @@ export class EditarRelojComponent implements OnInit {
     else {
       keynum = evt.which;
     }
-    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMÉRICO Y QUE TECLAS NO RECIBIRÁ.
+    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
     if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6 || keynum == 46) {
       return true;
     }

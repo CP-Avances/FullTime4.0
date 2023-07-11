@@ -14,7 +14,7 @@ export class HorasExtrasService {
   // catalogo de horas extras
 
   postHoraExtraRest(data: any) {
-    return this.http.post(`${environment.url}/horasExtras`, data);
+    return this.http.post<any>(`${environment.url}/horasExtras`, data);
   }
 
   ListarHorasExtras() {

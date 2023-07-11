@@ -201,8 +201,9 @@ export class BuscarPlanificacionComponent {
   data_horario: any = [];
   ventana_horario_individual: boolean = false;
   PlanificarIndividual(usuario: any): void {
+    console.log('ver usuario ', usuario, ' ver resultados ', this.resultados)
     for (var i = 0; i < this.resultados.length; i++) {
-      if (this.resultados[i].codigo === usuario.codigo_e) {
+      if (this.resultados[i].codigo === usuario.codigo || this.resultados[i].codigo === usuario.codigo_e) {
         this.data_horario = {
           pagina: 'busqueda',
           codigo: this.resultados[i].codigo,
@@ -227,6 +228,7 @@ export class BuscarPlanificacionComponent {
   asignar_multiple: boolean = false;
   // METODO DE VALIDACION DE SELECCION MULTIPLE
   PlanificarMultiple() {
+    console.log('ver resultados ', this.resultados.length)
     this.auto_individual = false;
     this.multiple = false;
     this.buscar_fechas = false;

@@ -1,136 +1,138 @@
-<div id="titulo">
-    <span>
-        ASIGNAR HORARIO
-    </span>
-    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()" *ngIf="cerrar_ventana">highlight_off</mat-icon>
-</div>
-<mat-card class="example-card mat-elevation-z8">
-    <div>
-        <!-- FORMULARIO COMPLETO -->
-        <form [formGroup]="formulario">
-            <mat-card-content>
-                <div class="d-flex flex-wrap justify-content-between" style="padding-top: 1%; margin-bottom: 1%;"
-                    *ngIf="btn_nuevo === true || btn_resetear === true">
-                    <button id="btn-raised" class="float-left btn btn-sm" (click)="CrearNuevoRegistro()"
-                        *ngIf="btn_nuevo">
-                        Nuevo
-                    </button>
-                    <button id="btn-raised" class="float-right btn btn-sm" (click)="LimpiarCampos()"
-                        *ngIf="btn_resetear">
-                        Resetear
-                    </button>
-                </div>
-                <div class="container" style="text-align: center;">
-                    <div class="nota">
-                        <span>
-                            NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el
-                            botón Guardar.
-                        </span>
+<!--  *********************** PANTALLA ASIGNAR HORARIOS ********************************* -->
+    <div id="titulo">
+        <span>
+            ASIGNAR HORARIO
+        </span>
+        <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()"
+            *ngIf="cerrar_ventana">highlight_off</mat-icon>
+    </div>
+    <mat-card class="example-card mat-elevation-z8">
+        <div>
+            <!-- FORMULARIO COMPLETO -->
+            <form [formGroup]="formulario">
+                <mat-card-content>
+                    <div class="d-flex flex-wrap justify-content-between" style="padding-top: 1%; margin-bottom: 1%;"
+                        *ngIf="btn_nuevo === true || btn_resetear === true">
+                        <button id="btn-raised" class="float-left btn btn-sm" (click)="CrearNuevoRegistro()"
+                            *ngIf="btn_nuevo">
+                            Nuevo
+                        </button>
+                        <button id="btn-raised" class="float-right btn btn-sm" (click)="LimpiarCampos()"
+                            *ngIf="btn_resetear">
+                            Resetear
+                        </button>
                     </div>
-                    <div class="row">
-                        <div class="col-sm">
-                            <div class="row">
-                                <div class="col-md d-flex flex-wrap justify-content-start">
-                                    <mat-form-field id="campos">
-                                        <mat-label>Fecha desde</mat-label>
-                                        <input matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa"
-                                            [formControl]="fechaInicioF" min="1950-01-31" max="2050-01-31" required
-                                            (click)="LimpiarHorario()" (dateInput)="LimpiarHorario()">
-                                        <mat-datepicker-toggle matSuffix [for]="picker" id="i-cursor"
-                                            matTooltipPosition="right"
-                                            matTooltip="Seleccionar la fecha dando click en el ícono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
-                                        </mat-datepicker-toggle>
-                                        <mat-datepicker touchUi #picker></mat-datepicker>
-                                    </mat-form-field>
-                                </div>
-                                <div class="col-md d-flex flex-wrap justify-content-start">
-                                    <mat-form-field id="campos">
-                                        <mat-label>Fecha hasta</mat-label>
-                                        <input matInput [matDatepicker]="picker2" placeholder="dd/mm/aaaa"
-                                            [formControl]="fechaFinalF" required (click)="LimpiarHorario()"
-                                            (dateInput)="LimpiarHorario()">
-                                        <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor"
-                                            matTooltipPosition="right"
-                                            matTooltip="Seleccionar la fecha dando click en el ícono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
-                                        </mat-datepicker-toggle>
-                                        <mat-datepicker touchUi #picker2></mat-datepicker>
-                                    </mat-form-field>
-                                </div>
-                                <div class="d-flex flex-wrap justify-content-start" style="margin-left: 15px;">
-                                    <mat-form-field>
-                                        <mat-label>Seleccionar horario</mat-label>
-                                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                            matTooltip="Lista de horarios cargados en el sistema.">
-                                            help_outline
-                                        </mat-icon>
-                                        <mat-select [formControl]="horarioF" required>
-                                            <mat-option *ngFor="let h of vista_horarios" [value]="h.id" id="letra"
-                                                (click)=VerificarIngresoFechas(formulario.value)>
-                                                {{h.nombre}}
-                                            </mat-option>
-                                        </mat-select>
-                                    </mat-form-field>
-                                </div>
-                            </div>
+                    <div class="container" style="text-align: center;">
+                        <div class="nota">
+                            <span>
+                                NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el
+                                botón Guardar.
+                            </span>
                         </div>
-                        <div class="col-sm" style="text-align: left; padding-top: 5px;">
-                            <label style="margin-right: 35px; font-size: 15px; padding-top: 10px;">
-                                Marcar días no laborables o libres*
-                            </label>
-                            <div class="container" style="text-align: center;">
+                        <div class="row">
+                            <div class="col-sm">
                                 <div class="row">
-                                    <div class="col-sm" style="text-align: left;">
-                                        <mat-checkbox [formControl]="lunesF" [(ngModel)]="lunes">
-                                            <label id="textoradiobtn">Lunes</label>
-                                        </mat-checkbox>
-                                        <br>
-                                        <mat-checkbox [formControl]="martesF" [(ngModel)]="martes">
-                                            <label id="textoradiobtn">Martes</label>
-                                        </mat-checkbox>
+                                    <div class="col-md d-flex flex-wrap justify-content-start">
+                                        <mat-form-field id="campos">
+                                            <mat-label>Fecha desde</mat-label>
+                                            <input matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa"
+                                                [formControl]="fechaInicioF" min="1950-01-31" max="2050-01-31" required
+                                                (click)="LimpiarHorario()" (dateInput)="LimpiarHorario()">
+                                            <mat-datepicker-toggle matSuffix [for]="picker" id="i-cursor"
+                                                matTooltipPosition="right"
+                                                matTooltip="Seleccionar la fecha dando click en el ícono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                                            </mat-datepicker-toggle>
+                                            <mat-datepicker touchUi #picker></mat-datepicker>
+                                        </mat-form-field>
                                     </div>
-                                    <div class="col-sm" style="text-align: left;">
-                                        <mat-checkbox [formControl]="miercolesF" [(ngModel)]="miercoles">
-                                            <label id="textoradiobtn">Miércoles</label>
-                                        </mat-checkbox>
-                                        <br>
-                                        <mat-checkbox [formControl]="juevesF" [(ngModel)]="jueves">
-                                            <label id="textoradiobtn">Jueves</label>
-                                        </mat-checkbox>
+                                    <div class="col-md d-flex flex-wrap justify-content-start">
+                                        <mat-form-field id="campos">
+                                            <mat-label>Fecha hasta</mat-label>
+                                            <input matInput [matDatepicker]="picker2" placeholder="dd/mm/aaaa"
+                                                [formControl]="fechaFinalF" required (click)="LimpiarHorario()"
+                                                (dateInput)="LimpiarHorario()">
+                                            <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor"
+                                                matTooltipPosition="right"
+                                                matTooltip="Seleccionar la fecha dando click en el ícono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                                            </mat-datepicker-toggle>
+                                            <mat-datepicker touchUi #picker2></mat-datepicker>
+                                        </mat-form-field>
                                     </div>
-                                    <div class="col-sm" style="text-align: left;">
-                                        <mat-checkbox [formControl]="viernesF" [(ngModel)]="viernes">
-                                            <label id="textoradiobtn">Viernes</label>
-                                        </mat-checkbox>
+                                    <div class="d-flex flex-wrap justify-content-start" style="margin-left: 15px;">
+                                        <mat-form-field>
+                                            <mat-label>Seleccionar horario</mat-label>
+                                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                                matTooltip="Lista de horarios cargados en el sistema.">
+                                                help_outline
+                                            </mat-icon>
+                                            <mat-select [formControl]="horarioF" required>
+                                                <mat-option *ngFor="let h of vista_horarios" [value]="h.id" id="letra"
+                                                    (click)=VerificarIngresoFechas(formulario.value)>
+                                                    {{h.nombre}}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
                                     </div>
-                                    <div class="col-sm" style="text-align: left;">
-                                        <mat-checkbox [formControl]="sabadoF" [(ngModel)]="sabado">
-                                            <label id="textoradiobtn">Sábado</label>
-                                        </mat-checkbox>
-                                        <br>
-                                        <mat-checkbox [formControl]="domingoF" [(ngModel)]="domingo">
-                                            <label id="textoradiobtn">Domingo</label>
-                                        </mat-checkbox>
+                                </div>
+                            </div>
+                            <div class="col-sm" style="text-align: left; padding-top: 5px;">
+                                <label style="margin-right: 35px; font-size: 15px; padding-top: 10px;">
+                                    Marcar días no laborables o libres*
+                                </label>
+                                <div class="container" style="text-align: center;">
+                                    <div class="row">
+                                        <div class="col-sm" style="text-align: left;">
+                                            <mat-checkbox [formControl]="lunesF" [(ngModel)]="lunes">
+                                                <label id="textoradiobtn">Lunes</label>
+                                            </mat-checkbox>
+                                            <br>
+                                            <mat-checkbox [formControl]="martesF" [(ngModel)]="martes">
+                                                <label id="textoradiobtn">Martes</label>
+                                            </mat-checkbox>
+                                        </div>
+                                        <div class="col-sm" style="text-align: left;">
+                                            <mat-checkbox [formControl]="miercolesF" [(ngModel)]="miercoles">
+                                                <label id="textoradiobtn">Miércoles</label>
+                                            </mat-checkbox>
+                                            <br>
+                                            <mat-checkbox [formControl]="juevesF" [(ngModel)]="jueves">
+                                                <label id="textoradiobtn">Jueves</label>
+                                            </mat-checkbox>
+                                        </div>
+                                        <div class="col-sm" style="text-align: left;">
+                                            <mat-checkbox [formControl]="viernesF" [(ngModel)]="viernes">
+                                                <label id="textoradiobtn">Viernes</label>
+                                            </mat-checkbox>
+                                        </div>
+                                        <div class="col-sm" style="text-align: left;">
+                                            <mat-checkbox [formControl]="sabadoF" [(ngModel)]="sabado">
+                                                <label id="textoradiobtn">Sábado</label>
+                                            </mat-checkbox>
+                                            <br>
+                                            <mat-checkbox [formControl]="domingoF" [(ngModel)]="domingo">
+                                                <label id="textoradiobtn">Domingo</label>
+                                            </mat-checkbox>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="d-flex flex-wrap justify-content-center">
-                    <button id="btn-raised" class="btn btn-sm" (click)="CrearPlanGeneral(formulario.value)"
-                        [disabled]="!formulario.valid" *ngIf="btn_guardar">
-                        Guardar
-                    </button>
-                    <button id="btn-raised" class="btn btn-sm" (click)="EliminarPlanificacion(formulario.value)"
-                        [disabled]="!formulario.valid" *ngIf="btn_eliminar">
-                        Eliminar
-                    </button>
-                </div>
-            </mat-card-content>
-        </form>
-    </div>
-    <div class="pantalla-progress" *ngIf="progreso">
-        <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
-        </mat-progress-spinner>
-    </div>
-</mat-card>
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <button id="btn-raised" class="btn btn-sm" (click)="CrearPlanGeneral(formulario.value)"
+                            [disabled]="!formulario.valid" *ngIf="btn_guardar">
+                            Guardar
+                        </button>
+                        <button id="btn-raised" class="btn btn-sm" (click)="EliminarPlanificacion(formulario.value)"
+                            [disabled]="!formulario.valid" *ngIf="btn_eliminar">
+                            Eliminar
+                        </button>
+                    </div>
+                </mat-card-content>
+            </form>
+        </div>
+        <div class="pantalla-progress" *ngIf="progreso">
+            <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
+            </mat-progress-spinner>
+        </div>
+    </mat-card>

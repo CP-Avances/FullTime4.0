@@ -1,41 +1,38 @@
 // IMPORTACION DE LIBRERIAS
-import { environment } from 'src/environments/environment';
-import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
+import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
 import * as moment from 'moment';
 
+import * as xlsx from 'xlsx';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as xlsx from 'xlsx';
 import * as FileSaver from 'file-saver';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-/** VENTANA PARA EDITAR TIPO DE ACCIONES DE PERSONAL */
-import { EditarTipoAccionComponent } from '../editar-tipo-accion/editar-tipo-accion.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { AccionPersonalService } from 'src/app/servicios/accionPersonal/accion-personal.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { CrearTipoaccionComponent } from '../crear-tipoaccion/crear-tipoaccion.component';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
-
 
 @Component({
   selector: 'app-listar-tipo-accion',
   templateUrl: './listar-tipo-accion.component.html',
   styleUrls: ['./listar-tipo-accion.component.css']
 })
+
 export class ListarTipoAccionComponent implements OnInit {
 
   filtroNombre = '';
 
-  // items de paginacion de la tabla
+  // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
@@ -43,10 +40,10 @@ export class ListarTipoAccionComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number;
 
-  // Control de campos y validaciones del formulario
+  // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreF = new FormControl('', [Validators.minLength(2)]);
 
-  // Asignación de validaciones a inputs del formulario
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public BuscarTipoAccionForm = new FormGroup({
     nombreForm: this.nombreF,
   });
@@ -54,14 +51,14 @@ export class ListarTipoAccionComponent implements OnInit {
   get habilitarAccion(): boolean { return this.funciones.accionesPersonal; }
 
   constructor(
-    private rest: AccionPersonalService,
-    public restE: EmpleadoService,
     public restEmpre: EmpresaService,
-    public vistaTipoPermiso: MatDialog,
+    public ventana: MatDialog,
+    public restE: EmpleadoService,
+    private rest: AccionPersonalService,
     private toastr: ToastrService,
     private router: Router,
-    private funciones: MainNavService,
     private validar: ValidacionesService,
+    private funciones: MainNavService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -84,7 +81,7 @@ export class ListarTipoAccionComponent implements OnInit {
     }
   }
 
-  // METODO para ver la información del empleado 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -92,7 +89,7 @@ export class ListarTipoAccionComponent implements OnInit {
     })
   }
 
-  // METODO para obtener el logo de la empresa
+  // METODO PARA OBTENER EL LOGO DE LA EMPRESA
   logo: any = String;
   ObtenerLogo() {
     this.restEmpre.LogoEmpresaImagenBase64(localStorage.getItem('empresa') as string).subscribe(res => {
@@ -112,44 +109,22 @@ export class ListarTipoAccionComponent implements OnInit {
     });
   }
 
+  // METODO PARA MANEJAR PAGINACION
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
     this.numero_pagina = e.pageIndex + 1;
   }
 
+  // METODO PARA OBTENER TIPOS DE ACCIONES
   tipo_acciones: any = [];
   ObtenerTipoAccionesPersonal() {
     this.rest.ConsultarTipoAccionPersonal().subscribe(datos => {
       this.tipo_acciones = datos;
-
-      console.log('acciones', this.tipo_acciones)
     });
   }
 
-  LimpiarCampos() {
-    this.BuscarTipoAccionForm.setValue({
-      nombreForm: '',
-    });
-    this.ObtenerTipoAccionesPersonal();
-  }
-
-  AbrirVentanaCrearTipoAccion(): void {
-    const DIALOG_REF = this.vistaTipoPermiso.open(CrearTipoaccionComponent,
-      { width: '600px' }).afterClosed().subscribe(item => {
-        this.ObtenerTipoAccionesPersonal();
-      });
-  }
-
-  AbrirVentanaEditarTipoAccion(datos: any): void {
-    const DIALOG_REF = this.vistaTipoPermiso.open(EditarTipoAccionComponent,
-      { width: '650px', data: datos }).afterClosed().subscribe(item => {
-        this.ObtenerTipoAccionesPersonal();
-      });
-  }
-
-  /** FUNCION para eliminar registro seleccionado */
+  // FUNCION PARA ELIMINAR REGISTROS
   Eliminar(id_accion: number) {
-    //console.log("probando id", id_prov)
     this.rest.EliminarRegistro(id_accion).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
@@ -158,9 +133,9 @@ export class ListarTipoAccionComponent implements OnInit {
     });
   }
 
-  /** FUNCION para confirmar si se elimina o no un registro */
+  // FUNCION PARA CONFIRMAR ELIMINAR REGISTROS
   ConfirmarDelete(datos: any) {
-    this.vistaTipoPermiso.open(MetodosComponent, { width: '450px' }).afterClosed()
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Eliminar(datos.id);
@@ -168,6 +143,43 @@ export class ListarTipoAccionComponent implements OnInit {
           this.router.navigate(['/acciones-personal']);
         }
       });
+  }
+
+  // METODO PARA LIMPIAR FORMULARIO
+  LimpiarCampos() {
+    this.BuscarTipoAccionForm.setValue({
+      nombreForm: '',
+    });
+    this.ObtenerTipoAccionesPersonal();
+  }
+
+
+  // METODO PARA ABRIR EL FORMULARIO REGISTRAR
+  ver_registrar: boolean = false;
+  ver_lista: boolean = true;
+  AbrirRegistrar() {
+    this.ver_registrar = true;
+    this.ver_lista = false;
+  }
+
+  // METODO PARA ABRIR EL FORMULARIO EDITAR
+  ver_editar: boolean = false;
+  accion: any;
+  pagina: string = '';
+  AbrirEditar(datos: any) {
+    this.ver_lista = false;
+    this.ver_editar = true;
+    this.accion = datos;
+    this.pagina = 'listar-tipos-acciones';
+  }
+
+  // METODO PARA ABRIR DATOS DE TIPO DE ACCION
+  ver_datos: boolean = false;
+  accion_id: number;
+  AbrirDatosAccion(id: number) {
+    this.ver_lista = false;
+    this.ver_datos = true;
+    this.accion_id = id;
   }
 
   /****************************************************************************************************** 
@@ -190,14 +202,14 @@ export class ListarTipoAccionComponent implements OnInit {
     sessionStorage.setItem('TipoPermisos', this.tipo_acciones);
     return {
 
-      // Encabezado de la página
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
-      // Pie de página
+      // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-   var f = moment();
+        var f = moment();
         fecha = f.format('YYYY-MM-DD');
         hora = f.format('HH:mm:ss');
         return {
@@ -249,7 +261,7 @@ export class ListarTipoAccionComponent implements OnInit {
                   { text: obj.nombre, style: 'itemsTable' },
                   { text: obj.descripcion, style: 'itemsTable' },
                   { text: obj.base_legal, style: 'itemsTable' },
-                  { text: (obj.tipo_permiso==true?'Permiso':obj.tipo_vacacion==true?'Vacación':'Situación propuesta'), style: 'itemsTable' },
+                  { text: (obj.tipo_permiso == true ? 'Permiso' : obj.tipo_vacacion == true ? 'Vacación' : 'Situación propuesta'), style: 'itemsTable' },
                 ];
               })
             ]
@@ -266,9 +278,9 @@ export class ListarTipoAccionComponent implements OnInit {
     };
   }
 
-  /****************************************************************************************************** 
-   *                                       METODO PARA EXPORTAR A EXCEL
-   ******************************************************************************************************/
+  /** ************************************************************************************************** ** 
+   ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
+   ** ************************************************************************************************** **/
   exportToExcel() {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tipo_acciones);
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
@@ -276,9 +288,9 @@ export class ListarTipoAccionComponent implements OnInit {
     xlsx.writeFile(wb, "TipoAccionesPersonalEXCEL" + new Date().getTime() + '.xlsx');
   }
 
-  /****************************************************************************************************** 
-   *                                        METODO PARA EXPORTAR A CSV 
-   ******************************************************************************************************/
+  /** ************************************************************************************************** ** 
+   ** **                                   METODO PARA EXPORTAR A CSV                                 ** **
+   ** ************************************************************************************************** **/
 
   exportToCVS() {
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tipo_acciones);
@@ -287,9 +299,9 @@ export class ListarTipoAccionComponent implements OnInit {
     FileSaver.saveAs(data, "TipoAccionesPersonalCSV" + new Date().getTime() + '.csv');
   }
 
-  /* ****************************************************************************************************
-   *                                 PARA LA EXPORTACIÓN DE ARCHIVOS XML
-   * ****************************************************************************************************/
+  /** ************************************************************************************************* **
+   ** **                            PARA LA EXPORTACION DE ARCHIVOS XML                               ** **
+   ** ************************************************************************************************* **/
 
   urlxml: string;
   data: any = [];
@@ -300,17 +312,16 @@ export class ListarTipoAccionComponent implements OnInit {
       objeto = {
         "tipo_accion_personal": {
           '@id': obj.id,
-          "nombre":obj.nombre,
+          "nombre": obj.nombre,
           "descripcion": obj.descripcion,
-          "base_legal":obj.base_legal,
-          "tipo_permiso": obj.tipo_permiso==true?'Permiso':obj.tipo_vacacion==true?'Vacación':'Situación propuesta'
+          "base_legal": obj.base_legal,
+          "tipo_permiso": obj.tipo_permiso == true ? 'Permiso' : obj.tipo_vacacion == true ? 'Vacación' : 'Situación propuesta'
         }
       }
       arregloTipoAcciones.push(objeto)
     });
     this.rest.CrearXML(arregloTipoAcciones).subscribe(res => {
       this.data = res;
-      console.log("prueba data", res)
       this.urlxml = `${environment.url}/departamento/download/` + this.data.name;
       window.open(this.urlxml, "_blank");
     });

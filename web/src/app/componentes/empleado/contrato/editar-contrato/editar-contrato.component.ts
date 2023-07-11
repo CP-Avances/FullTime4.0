@@ -301,7 +301,7 @@ export class EditarContratoComponent implements OnInit {
         timeOut: 6000,
       });
     }, error => {
-      this.toastr.error('Operación Fallida', 'Ups!!! algo salio mal.', {
+      this.toastr.error('Ups!!! algo salio mal.', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
       })
     });

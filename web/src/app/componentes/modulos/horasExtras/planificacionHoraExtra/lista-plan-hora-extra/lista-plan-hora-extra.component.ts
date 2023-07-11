@@ -1,15 +1,17 @@
+import { FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { SelectionModel } from '@angular/cdk/collections';
-import { ToastrService } from 'ngx-toastr';
 import * as moment from 'moment';
 
+import { SelectionModel } from '@angular/cdk/collections';
+
 import { PlanHoraExtraService } from 'src/app/servicios/planHoraExtra/plan-hora-extra.service';
-import { PlanHoraExtraAutorizaComponent } from 'src/app/componentes/autorizaciones/plan-hora-extra-autoriza/plan-hora-extra-autoriza.component';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+
 import { TiempoAutorizadoComponent } from '../../tiempo-autorizado/tiempo-autorizado.component';
+import { PlanHoraExtraAutorizaComponent } from 'src/app/componentes/autorizaciones/plan-hora-extra-autoriza/plan-hora-extra-autoriza.component';
 
 export interface HoraExtraPlanElemento {
   apellido: string;
@@ -42,8 +44,6 @@ export interface HoraExtraPlanElemento {
 
 export class ListaPlanHoraExtraComponent implements OnInit {
 
-  buscador !: FormGroup;
-
   horas_extras_plan: any = [];
   horas_extras_plan_observacion: any = [];
   selectionUno = new SelectionModel<HoraExtraPlanElemento>(true, []);
@@ -55,15 +55,15 @@ export class ListaPlanHoraExtraComponent implements OnInit {
   filtroCedulaO: '';
   filtroEmpleado = '';
 
-  // HABILITAR O DESHABILITAR EL ICONO DE AUTORIZACIÓN INDIVIDUAL
+  // HABILITAR O DESHABILITAR EL ICONO DE AUTORIZACION INDIVIDUAL
   auto_individual: boolean = true;
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA
+  // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA OBSERVACION
+  // ITEMS DE PAGINACION DE LA TABLA OBSERVACION
   tamanio_pagina_O: number = 5;
   numero_pagina_O: number = 1;
   pageSizeOptions_O = [5, 10, 20, 50];
@@ -77,9 +77,9 @@ export class ListaPlanHoraExtraComponent implements OnInit {
   HabilitarPlan: boolean = true;
 
   constructor(
-    private restHEP: PlanHoraExtraService,
     public toastr: ToastrService,
-    private vistaFlotante: MatDialog,
+    private restHEP: PlanHoraExtraService,
+    private ventana: MatDialog,
     private validacionesService: ValidacionesService
   ) { }
 
@@ -184,21 +184,21 @@ export class ListaPlanHoraExtraComponent implements OnInit {
   }
 
   // SELECCIÓN DE DATOS EN LA LISTA DE PLANIFICACIONES
-  /** Si el número de elementos seleccionados coincide con el número total de filas. */
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelected() {
     const numSelected = this.selectionUno.selected.length;
     const numRows = this.horas_extras_plan.length;
     return numSelected === numRows;
   }
 
-  // Selecciona todas las filas si no están todas seleccionadas; de lo contrario, selección clara. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
       this.horas_extras_plan.forEach(row => this.selectionUno.select(row));
   }
 
-  // La etiqueta de la casilla de verificación en la fila pasada
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
   checkboxLabel(row?: HoraExtraPlanElemento): string {
     if (!row) {
       return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
@@ -313,21 +313,21 @@ export class ListaPlanHoraExtraComponent implements OnInit {
 
   // SELECCIONAR DATOS DE LA LISTA CON OBSERVACIONES
   selectionDos = new SelectionModel<HoraExtraPlanElemento>(true, []);
-  /** Si el número de elementos seleccionados coincide con el número total de filas. */
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedO() {
     const numSelected = this.selectionDos.selected.length;
     const numRows = this.horas_extras_plan_observacion.length;
     return numSelected === numRows;
   }
 
-  /** Selecciona todas las filas si no están todas seleccionadas; de lo contrario, selección clara. */
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleO() {
     this.isAllSelectedO() ?
       this.selectionDos.clear() :
       this.horas_extras_plan_observacion.forEach(row => this.selectionDos.select(row));
   }
 
-  /** La etiqueta de la casilla de verificación en la fila pasada*/
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelO(row?: HoraExtraPlanElemento): string {
     if (!row) {
       return `${this.isAllSelectedO() ? 'select' : 'deselect'} all`;
@@ -355,7 +355,7 @@ export class ListaPlanHoraExtraComponent implements OnInit {
       hora: num_hora,
       id_empl_solicita: id_solicita
     }
-    this.vistaFlotante.open(TiempoAutorizadoComponent, {
+    this.ventana.open(TiempoAutorizadoComponent, {
       width: '300px',
       data: { horas_calculadas: h, pagina: 'plan_hora_extra' }
     }).afterClosed().subscribe(items => {
@@ -370,7 +370,7 @@ export class ListaPlanHoraExtraComponent implements OnInit {
 
   // Autorización individual de horas extras planificadas
   AbrirAutorizaciones(datosHoraExtra, forma: string) {
-    this.vistaFlotante.open(PlanHoraExtraAutorizaComponent,
+    this.ventana.open(PlanHoraExtraAutorizaComponent,
       { width: '300px', data: { datosHora: datosHoraExtra, carga: forma } }).afterClosed().subscribe(items => {
         /* this.obtenerPlanHorasExtras();
           this.obtenerPlanHorasExtrasObservacion();
@@ -393,7 +393,7 @@ export class ListaPlanHoraExtraComponent implements OnInit {
     else if (lista === 'observacion') {
       dato = this.selectionDos;
     }
-    let EmpleadosSeleccionados;
+    let EmpleadosSeleccionados: any;
     EmpleadosSeleccionados = dato.selected.map(obj => {
       return {
         id_plan_extra: obj.id_plan_extra,
@@ -423,7 +423,7 @@ export class ListaPlanHoraExtraComponent implements OnInit {
     this.filtroEmpleado = '';
   }
 
-  // METODO para ingresar solo números
+  // METODO PARA INGRESAR SOLO NUMEROS
   IngresarSoloNumeros(evt) {
     return this.validacionesService.IngresarSoloNumeros(evt)
   }

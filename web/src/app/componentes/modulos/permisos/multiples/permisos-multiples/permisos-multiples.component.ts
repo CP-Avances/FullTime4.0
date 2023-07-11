@@ -1162,7 +1162,7 @@ export class PermisosMultiplesComponent implements OnInit {
   }
 
   // METODO PARA VALIDAR DATOS DE SOLICITUD DE PERMISO
-  ValidarPermiso(form) {
+  ValidarPermiso(form: any) {
 
     this.InsertarPermiso(form);
 
@@ -1171,7 +1171,7 @@ export class PermisosMultiplesComponent implements OnInit {
 
   // METODO INGRESO DE DATOS DE PERMISO
   contador: number = 0;
-  InsertarPermiso(form) {
+  InsertarPermiso(form: any) {
     this.contador = 0;
     // LECTURA DE DATOS DE USUARIOS SELECCIONADOS
     this.data.datos.map(obj => {

@@ -2,6 +2,7 @@
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
             <span>INFORMACIÓN DE EMPRESA</span>
+            <mat-icon class="float-right" id="cerrar" (click)="Salir(1)">highlight_off</mat-icon>
         </div>
         <!-- ****************************** PRIMER FORMULARIO ******************************************* -->
         <mat-horizontal-stepper [linear]="isLinear" #stepper>
@@ -92,7 +93,6 @@
                     </div>
                 </form>
                 <div style="text-align: center; padding-top: 25px;">
-                    <button (click)="Salir()" class="btn btn-sm float-left" id="btn-raised">Cancelar</button>
                     <button matStepperNext class="btn btn-sm float-right" id="btn-raised"
                         [disabled]="!primerFormulario.valid">Siguiente</button>
                 </div>
@@ -259,9 +259,6 @@
                             (click)="InsertarEmpresa(primerFormulario.value, segundoFormulario.value)"
                             [disabled]="!segundoFormulario.valid">
                             Guardar
-                        </button>
-                        <button (click)="Salir()" class="btn btn-sm float-right" id="btn-raised">
-                            Cancelar
                         </button>
                     </div>
                 </form>

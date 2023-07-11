@@ -246,4 +246,27 @@ mat-divider {
     padding-top: 15px
 }
 
+
+/* ESTILOS BARRA DE PROGRESO */
+
+.progress {
+    margin: 250px auto auto auto;
+    opacity: 1
+}
+
+.pantalla-progress {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    background: #ffff;
+    opacity: 0.8;
+}
+
+mat-progress-spinner {
+    background: transparent;
+    z-index: 100;
+}
+
 @import "~leaflet/dist/leaflet.css";

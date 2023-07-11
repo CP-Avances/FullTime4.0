@@ -4,8 +4,8 @@ import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 import * as moment from 'moment';
 
-import { EditarSolicitudComidaComponent } from 'src/app/componentes/modulos/alimentacion/editar-solicitud-comida/editar-solicitud-comida.component';
-import { SolicitaComidaComponent } from 'src/app/componentes/modulos/alimentacion/solicita-comida/solicita-comida.component';
+import { EditarSolicitudComidaComponent } from 'src/app/componentes/modulos/alimentacion/solicitar-comida/editar-solicitud-comida/editar-solicitud-comida.component';
+import { SolicitaComidaComponent } from 'src/app/componentes/modulos/alimentacion/solicitar-comida/solicita-comida/solicita-comida.component';
 import { CancelarComidaComponent } from '../cancelar-comida/cancelar-comida.component';
 
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
@@ -24,7 +24,7 @@ export class ComidasSolicitadasEmpleadoComponent implements OnInit {
   idEmpleado: string = ''; // VARIABLE QUE ALMACENA ID DEL EMPLEADO QUE INICIA SESIÓN
   FechaActual: string = '';
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA 
+  // ITEMS DE PAGINACION DE LA TABLA 
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
@@ -63,7 +63,7 @@ export class ComidasSolicitadasEmpleadoComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(

@@ -24,7 +24,7 @@ export class VerSucursalComponent implements OnInit {
   datosSucursal: any = [];
   datosDepartamentos: any = [];
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA
+  // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];

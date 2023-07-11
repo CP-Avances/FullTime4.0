@@ -44,20 +44,52 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   seleccion = new FormControl('');
 
   filtroNombreCarg_: string = '';
+  get filtroNombreCarg() { return this.restR.filtroNombreCarg };
 
   filtroNombreDep_: string = '';
+  get filtroNombreDep() { return this.restR.filtroNombreDep };
 
   filtroCodigo_: any;
   filtroCedula_: string = '';
   filtroNombreEmp_: string = '';
+  get filtroNombreEmp() { return this.restR.filtroNombreEmp };
+  get filtroCodigo() { return this.restR.filtroCodigo };
+  get filtroCedula() { return this.restR.filtroCedula };
 
   filtroNombreSuc_: string = '';
+  get filtroNombreSuc() { return this.restR.filtroNombreSuc };
 
   public _booleanOptions: FormCriteriosBusqueda = {
     bool_dep: false,
     bool_emp: false,
     bool_cargo: false,
   };
+
+  // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA
+  departamentos: any = [];
+  sucursales: any = [];
+  respuesta: any[];
+  empleados: any = [];
+  origen: any = [];
+
+  selectionCarg = new SelectionModel<ITableEmpleados>(true, []);
+  selectionDep = new SelectionModel<ITableEmpleados>(true, []);
+  selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
+
+  // ITEMS DE PAGINACION DE LA TABLA CARGO
+  pageSizeOptions_car = [5, 10, 20, 50];
+  tamanio_pagina_car: number = 5;
+  numero_pagina_car: number = 1;
+
+  // ITEMS DE PAGINACION DE LA TABLA DEPARTAMENTO
+  pageSizeOptions_dep = [5, 10, 20, 50];
+  tamanio_pagina_dep: number = 5;
+  numero_pagina_dep: number = 1;
+
+  // ITEMS DE PAGINACION DE LA TABLA EMPLEADOS
+  pageSizeOptions_emp = [5, 10, 20, 50];
+  tamanio_pagina_emp: number = 5;
+  numero_pagina_emp: number = 1;
 
   public check: checkOptions[];
 
@@ -87,7 +119,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     this.origen = [];
     this.origen_cargo = [];
   }
-
 
   // METODO PARA FILTRAR POR CARGOS
   empleados_cargos: any = [];
@@ -264,42 +295,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     }
   }
 
-  // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA
-  departamentos: any = [];
-  sucursales: any = [];
-  respuesta: any[];
-  empleados: any = [];
-  origen: any = [];
-
-  selectionCarg = new SelectionModel<ITableEmpleados>(true, []);
-  selectionDep = new SelectionModel<ITableEmpleados>(true, []);
-  selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
-
-  // ITEMS DE PAGINACION DE LA TABLA CARGO
-  pageSizeOptions_car = [5, 10, 20, 50];
-  tamanio_pagina_car: number = 5;
-  numero_pagina_car: number = 1;
-
-  // ITEMS DE PAGINACION DE LA TABLA DEPARTAMENTO
-  pageSizeOptions_dep = [5, 10, 20, 50];
-  tamanio_pagina_dep: number = 5;
-  numero_pagina_dep: number = 1;
-
-  // ITEMS DE PAGINACION DE LA TABLA EMPLEADOS
-  pageSizeOptions_emp = [5, 10, 20, 50];
-  tamanio_pagina_emp: number = 5;
-  numero_pagina_emp: number = 1;
-
-  get filtroNombreCarg() { return this.restR.filtroNombreCarg };
-
-  get filtroNombreDep() { return this.restR.filtroNombreDep };
-
-  get filtroNombreEmp() { return this.restR.filtroNombreEmp };
-  get filtroCodigo() { return this.restR.filtroCodigo };
-  get filtroCedula() { return this.restR.filtroCedula };
-
-  get filtroNombreSuc() { return this.restR.filtroNombreSuc };
-
   // HABILITAR O DESHABILITAR EL ICONO DE AUTORIZACION INDIVIDUAL
   auto_individual: boolean = true;
 
@@ -370,6 +365,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
+  // EVENTO DE PAGINACION DE TABLAS
   ManejarPaginaResultados(e: PageEvent) {
     if (this._booleanOptions.bool_cargo === true) {
       this.tamanio_pagina_car = e.pageSize;
@@ -622,6 +618,16 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
         timeOut: 6000,
       });
     }
+  }
+
+  // METODO PARA VER PANTALLA DETALLE HORARIO
+  ver_horario: boolean = false;
+  horario_id: number;
+  pagina: string = '';
+  VerDetalleHorario(id: number) {
+    this.ver_horario = true;
+    this.horario_id = id;
+    this.pagina = 'planificar';
   }
 
 }

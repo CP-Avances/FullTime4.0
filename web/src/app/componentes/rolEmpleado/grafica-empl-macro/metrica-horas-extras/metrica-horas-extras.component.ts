@@ -90,7 +90,7 @@ export class MetricaHorasExtrasComponent implements OnInit {
     this.f_final_req = f_f.toJSON().split('T')[0]
   }
 
-  ValidarRangofechas(form) {
+  ValidarRangofechas(form: any) {
     var f_i = new Date(form.fec_inicio)
     var f_f = new Date(form.fec_final)
 

@@ -20,10 +20,14 @@ class ParametrosControlador {
     // METODO PARA LISTAR PARAMETROS GENERALES
     ListarParametros(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            /**
+              SELECT tp.id, tp.descripcion, dtp.descripcion AS detalle
+                FROM tipo_parametro AS tp, detalle_tipo_parametro AS dtp
+                WHERE tp.id = dtp.id_tipo_parametro
+             */
             const PARAMETRO = yield database_1.default.query(`
-            SELECT tp.id, tp.descripcion, dtp.descripcion AS detalle
-            FROM tipo_parametro AS tp, detalle_tipo_parametro AS dtp
-            WHERE tp.id = dtp.id_tipo_parametro
+            SELECT tp.id, tp.descripcion
+            FROM tipo_parametro AS tp
             `);
             if (PARAMETRO.rowCount > 0) {
                 return res.jsonp(PARAMETRO.rows);
@@ -130,10 +134,16 @@ class ParametrosControlador {
     IngresarTipoParametro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { descripcion } = req.body;
-            yield database_1.default.query(`
-            INSERT INTO tipo_parametro (descripcion) VALUES ($1)
+            const response = yield database_1.default.query(`
+            INSERT INTO tipo_parametro (descripcion) VALUES ($1) RETURNING *
             `, [descripcion]);
-            res.jsonp({ message: 'Registro exitoso.' });
+            const [parametro] = response.rows;
+            if (parametro) {
+                return res.status(200).jsonp({ message: 'OK', respuesta: parametro });
+            }
+            else {
+                return res.status(404).jsonp({ message: 'error' });
+            }
         });
     }
     // METODO PARA COMPARAR COORDENADAS

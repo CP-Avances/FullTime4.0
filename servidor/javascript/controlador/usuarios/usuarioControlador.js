@@ -273,18 +273,18 @@ class UsuarioControlador {
             let habilitado = req.params.habilitado;
             // CONSULTA DE BUSQUEDA DE SUCURSALES
             let suc = yield database_1.default.query(`
-        SELECT s.id AS id_suc, s.nombre AS name_suc, c.descripcion AS ciudad FROM sucursales AS s, 
-          ciudades AS c 
-        WHERE s.id_ciudad = c.id ORDER BY s.id
+      SELECT s.id AS id_suc, s.nombre AS name_suc, c.descripcion AS ciudad FROM sucursales AS s, 
+        ciudades AS c 
+      WHERE s.id_ciudad = c.id ORDER BY s.id
       `).then((result) => { return result.rows; });
             if (suc.length === 0)
                 return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
             // CONSULTA DE BUSQUEDA DE DEPARTAMENTOS
             let departamentos = yield Promise.all(suc.map((dep) => __awaiter(this, void 0, void 0, function* () {
                 dep.departamentos = yield database_1.default.query(`
-          SELECT d.id as id_depa, d.nombre as name_dep, s.nombre AS sucursal
-          FROM cg_departamentos AS d, sucursales AS s
-          WHERE d.id_sucursal = $1 AND d.id_sucursal = s.id
+        SELECT d.id as id_depa, d.nombre as name_dep, s.nombre AS sucursal
+        FROM cg_departamentos AS d, sucursales AS s
+        WHERE d.id_sucursal = $1 AND d.id_sucursal = s.id
         `, [dep.id_suc]).then((result) => {
                     return result.rows;
                 });
@@ -299,12 +299,12 @@ class UsuarioControlador {
             let lista = yield Promise.all(depa.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.departamentos = yield Promise.all(obj.departamentos.map((empl) => __awaiter(this, void 0, void 0, function* () {
                     empl.empleado = yield database_1.default.query(`
-            SELECT DISTINCT e.id, (e.nombre || ' ' || e.apellido) AS nombre, e.cedula, e.codigo, u.usuario, 
-              u.app_habilita, u.id AS userid, d.nombre AS departamento
-            FROM usuarios AS u, datos_actuales_empleado AS e, cg_departamentos AS d
-            WHERE e.id = u.id_empleado AND d.id = e.id_departamento AND e.id_departamento = $1 AND e.estado = $2
-              AND u.app_habilita = $3
-            ORDER BY nombre
+          SELECT DISTINCT e.id, (e.nombre || ' ' || e.apellido) AS nombre, e.cedula, e.codigo, u.usuario, 
+            u.app_habilita, u.id AS userid, d.nombre AS departamento
+          FROM usuarios AS u, datos_actuales_empleado AS e, cg_departamentos AS d
+          WHERE e.id = u.id_empleado AND d.id = e.id_departamento AND e.id_departamento = $1 AND e.estado = $2
+            AND u.app_habilita = $3
+          ORDER BY nombre
           `, [empl.id_depa, estado, habilitado])
                         .then((result) => { return result.rows; });
                     return empl;
@@ -325,6 +325,55 @@ class UsuarioControlador {
             if (respuesta.length === 0)
                 return res.status(404)
                     .jsonp({ message: 'No se han encontrado registros.' });
+            return res.status(200).jsonp(respuesta);
+        });
+    }
+    /**
+     * METODO DE CONSULTA DE DATOS GENERALES DE USUARIOS QUE USAN TIMBRE MOVIL
+     * REALIZA UN ARRAY DE CARGOS Y EMPLEADOS DEPENDIENDO DEL ESTADO DEL
+     * EMPLEADO SI BUSCA EMPLEADOS ACTIVOS O INACTIVOS.
+     * @returns Retorna Array de [Cargos[empleados[]]]
+     **/
+    UsuariosTimbreMovilCargos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let estado = req.params.estado;
+            let habilitado = req.params.habilitado;
+            // CONSULTA DE BUSQUEDA DE CARGOS
+            let cargo = yield database_1.default.query(`
+      SELECT tc.id AS id_cargo, tc.cargo AS name_cargo
+      FROM tipo_cargo AS tc 
+      ORDER BY tc.cargo ASC
+      `).then((result) => { return result.rows; });
+            if (cargo.length === 0)
+                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+            // CONSULTA DE BUSQUEDA DE EMPLEADOS
+            let empleados = yield Promise.all(cargo.map((empl) => __awaiter(this, void 0, void 0, function* () {
+                empl.empleados = yield database_1.default.query(`
+        SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) nombre, e.codigo, 
+          e.cedula, tc.cargo, r.descripcion AS regimen, d.nombre AS departamento, 
+          s.nombre AS sucursal, u.usuario, u.app_habilita, u.id AS userid
+        FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
+          tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s, usuarios AS u
+        WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
+          da.id = e.id) 
+          AND tc.id = ca.cargo
+          AND ca.cargo = $1
+          AND ca.id_departamento = d.id
+          AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
+          da.id = e.id) 
+          AND s.id = d.id_sucursal
+          AND co.id_regimen = r.id AND e.estado = $2
+          AND e.id = u.id_empleado
+          AND u.app_habilita = $3
+        ORDER BY nombre ASC
+        `, [empl.id_cargo, estado, habilitado]).then((result) => { return result.rows; });
+                return empl;
+            })));
+            let respuesta = empleados.filter((obj) => {
+                return obj.empleados.length > 0;
+            });
+            if (respuesta.length === 0)
+                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
             return res.status(200).jsonp(respuesta);
         });
     }

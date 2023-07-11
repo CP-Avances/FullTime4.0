@@ -37,17 +37,17 @@ export class CrearParametroComponent implements OnInit {
       descripcion: form.descripcionForm
     };
     this.rest.IngresarTipoParametro(datos).subscribe(response => {
-      this.toastr.success('Nuevo parámetro registrado exitosamente.',
+      this.toastr.success('Registro guardado exitosamente.',
         '', {
         timeOut: 2000,
       })
-      this.CerrarVentana();
+      this.CerrarVentana(response.respuesta.id);
     });
   }
 
   // METODO PARA CERRAR VENTANA
-  CerrarVentana() {
-    this.ventana.close();
+  CerrarVentana(id: number) {
+    this.ventana.close(id);
   }
 
 }

@@ -50,23 +50,17 @@ export class EditarParametroComponent implements OnInit {
       descripcion: form.descripcionForm
     };
     this.rest.ActualizarTipoParametro(datos).subscribe(response => {
-      this.toastr.success('Nuevo parámetro registrado exitosamente.',
+      this.toastr.success('Registro actualizado exitosamente.',
         '', {
         timeOut: 2000,
       })
-      if (this.data.actualizar === true) {
-        this.CerrarVentana();
-      }
-      else {
-        this.CerrarVentana();
-        this.router.navigate(['/mostrar/parametros', this.data.parametros.id]);
-      }
+      this.CerrarVentana(this.data.parametros.id);
     });
   }
 
   // METODO PARA CERRAR VENTANA
-  CerrarVentana() {
-    this.ventana.close();
+  CerrarVentana(id: number) {
+    this.ventana.close(id);
   }
 
 }

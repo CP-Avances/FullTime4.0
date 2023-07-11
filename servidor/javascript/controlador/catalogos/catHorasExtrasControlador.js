@@ -43,8 +43,18 @@ class HorasExtrasControlador {
     CrearHoraExtra(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion } = req.body;
-            yield database_1.default.query('INSERT INTO cg_hora_extras ( descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)', [descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion]);
-            res.jsonp({ message: 'Hora extra guardada' });
+            const response = yield database_1.default.query(`
+      INSERT INTO cg_hora_extras ( descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, 
+        tipo_dia, codigo, incl_almuerzo, tipo_funcion ) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *
+      `, [descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion]);
+            const [HORA] = response.rows;
+            if (HORA) {
+                return res.status(200).jsonp(HORA);
+            }
+            else {
+                return res.status(404).jsonp({ message: "error" });
+            }
         });
     }
     EliminarRegistros(req, res) {

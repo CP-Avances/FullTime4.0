@@ -177,7 +177,8 @@ class PlanGeneralControlador {
                     "CASE WHEN STRING_AGG(CASE WHEN dia = 31 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 31 THEN codigo_dia end,', ') ELSE '-' END AS dia31 " +
                     "FROM ( " +
                     "SELECT p_g.codigo AS codigo_e, CONCAT(empleado.apellido, ' ', empleado.nombre) AS nombre_e, EXTRACT('year' FROM fec_horario) AS anio, EXTRACT('month' FROM fec_horario) AS mes, " +
-                    "EXTRACT('day' FROM fec_horario) AS dia, CASE WHEN tipo_dia = 'L' THEN tipo_dia ELSE horario.codigo END AS codigo_dia " +
+                    "EXTRACT('day' FROM fec_horario) AS dia, " +
+                    "CASE WHEN (tipo_dia = 'L' OR tipo_dia = 'FD') THEN tipo_dia ELSE horario.codigo END AS codigo_dia " +
                     "FROM plan_general p_g " +
                     "INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
                     "INNER JOIN cg_horarios horario ON horario.id = p_g.id_horario " +
@@ -210,7 +211,7 @@ class PlanGeneralControlador {
                     "INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
                     "INNER JOIN cg_horarios horario ON horario.id = p_g.id_horario " +
                     "INNER JOIN deta_horarios dh ON dh.id = p_g.id_det_horario " +
-                    "WHERE fec_horario BETWEEN $1 AND $2 AND NOT tipo_dia = 'L' " +
+                    "WHERE fec_horario BETWEEN $1 AND $2 AND NOT (tipo_dia = 'L' OR tipo_dia = 'FD') " +
                     "GROUP BY codigo_dia, tipo_dia, horario.nombre, dh.id_horario, dh.hora, dh.tipo_accion, dh.id " +
                     "ORDER BY dh.id_horario, dh.hora ASC", [fecha_inicio, fecha_final]);
                 if (HORARIO.rowCount > 0) {

@@ -1,76 +1,95 @@
-<div id="titulo">
-    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
-    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        PLANIFICACIÓN DE HORAS EXTRAS</span>
-    <mat-icon class="float-right" id="cerrar" (click)="ventana.close()">highlight_off</mat-icon>
-</div>
-<div class="scrollbar scrollbar-primary">
-    <div class="nota">
-        <span>NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
-            Guardar.</span>
+<div class="container" style="padding-top: 20px;">
+    <div id="titulo">
+        <span>
+            PLANIFICACIÓN DE HORAS EXTRAS
+        </span>
+        <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
     </div>
-    <form [formGroup]="PedirHoraExtraForm">
-        <div class="d-flex flex-wrap justify-content-around">
-            <mat-form-field>
-                <mat-label>Fecha de Planificación</mat-label>
-                <input matInput [matDatepicker]="picker1" [formControl]="fechaSolicitudF" required [disabled]="true">
-                <mat-datepicker-toggle matSuffix [for]="picker1" id="i-cursor" matTooltipPosition="right"
-                    matTooltip="Fecha de creación del registro.">
-                </mat-datepicker-toggle>
-                <mat-datepicker touchUi #picker1></mat-datepicker>
-            </mat-form-field>
-            <mat-form-field>
-                <mat-label>Descripción</mat-label>
-                <input matInput [formControl]="descripcionF">
-                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                    matTooltip="Descripción de la planificación.">
-                    help_outline</mat-icon>
-            </mat-form-field>
-            <mat-form-field>
-                <mat-label>Fecha Inicio Actividades</mat-label>
-                <input matInput [matDatepicker]="picker2" [formControl]="fechaInicioF" required>
-                <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor" matTooltipPosition="right"
-                    matTooltip="Fecha de inicio de actividades. Puede escribir la fecha con formato  día/mes/año. Ejemplo: 12/04/1993">
-                </mat-datepicker-toggle>
-                <mat-datepicker touchUi #picker2></mat-datepicker>
-            </mat-form-field>
-            <mat-form-field>
-                <mat-label>Fecha Fin Actividades</mat-label>
-                <input matInput [matDatepicker]="picker3" [formControl]="fechaFinF" required>
-                <mat-datepicker-toggle matSuffix [for]="picker3" id="i-cursor" matTooltipPosition="right"
-                    matTooltip="Fecha de finalización de actividades. Puede escribir la fecha con formato  día/mes/año. Ejemplo: 12/04/1993">
-                </mat-datepicker-toggle>
-                <mat-datepicker touchUi #picker3></mat-datepicker>
-            </mat-form-field>
-            <mat-form-field>
-                <mat-label>Hora de Inicio</mat-label>
-                <input matInput [formControl]="horaInicioF" type="time" (keypress)="IngresarSoloNumeros($event)"
-                    (click)="LimpiarCampoHoras()">
-                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                    matTooltip="Hora en la que inicia actividades.">
-                    help_outline</mat-icon>
-            </mat-form-field>
-            <mat-form-field>
-                <mat-label>Hora de Finalización</mat-label>
-                <input matInput [formControl]="horaFinF" type="time" (keypress)="IngresarSoloNumeros($event)"
-                    (click)="LimpiarCampoHoras()">
-                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                    matTooltip="Hora en la que finaliza las actividades.">
-                    help_outline</mat-icon>
-            </mat-form-field>
-            <mat-form-field>
-                <mat-label>Número de horas y minutos</mat-label>
-                <input matInput [formControl]="horasF" type="time" (keypress)="IngresarSoloNumeros($event)" readonly>
-                <mat-icon (click)="CalcularTiempo(PedirHoraExtraForm.value)" id="i-cursor" matSuffix
-                    matTooltipPosition="right" matTooltip="Dar click para calcular total de horas extras."
-                    style="color:blue">
-                    touch_app</mat-icon>
-            </mat-form-field>
+    <mat-card class="example-card mat-elevation-z9">
+        <div class="nota" id="espacio" style="margin-left: 20px;">
+            <span>
+                NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                Guardar.
+            </span>
         </div>
-    </form>
-    <br>
-    <div class="d-flex justify-content-center">
-        <button id="btn-raised"  class="btn btn-sm" (click)="ValidarProceso(PedirHoraExtraForm.value)"
-            [disabled]="!PedirHoraExtraForm.valid">Guardar</button>
-    </div>
+        <form [formGroup]="formulario">
+            <div class="row">
+                <div class="col-md">
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <mat-form-field>
+                            <mat-label>Fecha planificación</mat-label>
+                            <input matInput [matDatepicker]="picker1" [formControl]="fechaSolicitudF" required
+                                [disabled]="true">
+                            <mat-datepicker-toggle matSuffix [for]="picker1" id="i-cursor" matTooltipPosition="right"
+                                matTooltip="Fecha de creación del registro.">
+                            </mat-datepicker-toggle>
+                            <mat-datepicker touchUi #picker1></mat-datepicker>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label>Descripción</mat-label>
+                            <input matInput [formControl]="descripcionF">
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Descripción de la planificación.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label>Fecha desde</mat-label>
+                            <input matInput [matDatepicker]="picker2" [formControl]="fechaInicioF" required>
+                            <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor" matTooltipPosition="right"
+                                matTooltip="Fecha de inicio de actividades. Puede escribir la fecha con formato  día/mes/año. Ejemplo: 12/04/1993">
+                            </mat-datepicker-toggle>
+                            <mat-datepicker touchUi #picker2></mat-datepicker>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label>Fecha hasta</mat-label>
+                            <input matInput [matDatepicker]="picker3" [formControl]="fechaFinF" required>
+                            <mat-datepicker-toggle matSuffix [for]="picker3" id="i-cursor" matTooltipPosition="right"
+                                matTooltip="Fecha de finalización de actividades. Puede escribir la fecha con formato  día/mes/año. Ejemplo: 12/04/1993">
+                            </mat-datepicker-toggle>
+                            <mat-datepicker touchUi #picker3></mat-datepicker>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <mat-form-field>
+                            <mat-label>Hora desde</mat-label>
+                            <input matInput [formControl]="horaInicioF" type="time"
+                                (keypress)="IngresarSoloNumeros($event)" (click)="LimpiarCampoHoras()">
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Hora en la que inicia actividades.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label>Hora hasta</mat-label>
+                            <input matInput [formControl]="horaFinF" type="time"
+                                (keypress)="IngresarSoloNumeros($event)" (click)="LimpiarCampoHoras()">
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Hora en la que finaliza las actividades.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label>Número de horas y minutos</mat-label>
+                            <input matInput [formControl]="horasF" type="time" (keypress)="IngresarSoloNumeros($event)"
+                                readonly>
+                            <mat-icon (click)="CalcularTiempo(formulario.value)" id="i-cursor" matSuffix
+                                matTooltipPosition="right" matTooltip="Dar click para calcular total de horas extras."
+                                style="color:blue">
+                                touch_app
+                            </mat-icon>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="d-flex justify-content-center">
+            <button id="btn-raised" class="btn btn-sm" (click)="ValidarProceso(formulario.value)"
+                [disabled]="!formulario.valid">
+                Guardar
+            </button>
+        </div>
+    </mat-card>
 </div>

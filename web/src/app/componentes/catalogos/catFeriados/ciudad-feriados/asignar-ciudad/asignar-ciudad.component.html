@@ -88,8 +88,8 @@
                 <div class="d-flex flex-wrap justify-content-start" *ngIf="!Habilitar">
                     <div class="modal-body" style="margin-left: 60px; padding-top: 15px;">
                         <div class="container-fluid">
-                            <input class="form-check-input" type="checkbox" id="seleccionar"
-                                (change)="$event.target ? AgregarTodos() : QuitarTodos()">
+                            <input class="form-check-input" type="checkbox" id="seleccionar" [(ngModel)]="isChecked"
+                                (change)="SeleccionarTodas(isChecked)" [ngModelOptions]="{standalone: true}">
                             <label class="form-check-label" for="inlineCheckbox1"
                                 style="margin-left: 10px; font-size: 14px; color: blue; font-weight: bold;">
                                 Todas
@@ -98,8 +98,7 @@
                                 <div class="col-md-6 col-lg-6 col-6" style="text-align:left; padding-bottom: 10px;"
                                     *ngFor="let n of nombreCiudades; index as i">
                                     <input class="form-check-input" type="checkbox" name="ciudadesSeleccionadas"
-                                        id="ciudadesSeleccionadas{{i}}"
-                                        (change)="$event.target  ? AgregarCiudad(n) : QuitarCiudad(n)">
+                                        id="ciudadesSeleccionadas{{i}}" (change)="SeleccionarIndividual($event, n)">
                                     <label style="margin-left: 10px; font-size: 14px;" class="form-check-label"
                                         for="inlineCheckbox1">
                                         {{n.descripcion}}

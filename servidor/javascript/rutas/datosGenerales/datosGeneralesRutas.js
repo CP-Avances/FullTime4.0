@@ -31,6 +31,10 @@ class CiudadRutas {
         this.router.get('/datos_generales_comunicados/:estado', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.DatosGeneralesComunicados);
         // LISTA DATOS (CARGOS-EMPLEADOS) ACTIVOS O INACTIVOS QUE TIENEN CONFIGURADO COMUNICADOS
         this.router.get('/datos_cargos_comunicados/:estado', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.DatosCargoComunicados);
+        // METODO DE ACCESO A CONSULTA DE DATOS DE COLABORADORES ASIGNADOS UBICACION
+        this.router.post('/informacion-general-ubicacion/:estado', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.DatosGeneralesUbicacion);
+        // METODO DE ACCESO A CONSULTA DE DATOS DE CRAGOS Y COLABORADORES ASIGNADOS A UBICACIONES
+        this.router.post('/informacion-general-ubicacion-cargo/:estado', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.DatosGeneralesCargoUbicacion);
         /** INICIO RUTAS PARA ACCEDER A CONSULTAS PARA FILTRAR INFORMACIÓN */
         this.router.get('/filtros/sucursal/:id', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.ListarEmpleadoSucursal);
         this.router.get('/filtros/sucursal/departamento/:id_sucursal/:id_departamento', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.ListarEmpleadoSucuDepa);

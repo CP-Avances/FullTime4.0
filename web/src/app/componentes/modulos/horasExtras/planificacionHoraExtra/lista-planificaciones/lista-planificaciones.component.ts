@@ -1,31 +1,31 @@
 // IMPORTACION DE LIBRERIAS
 import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
-import { environment } from 'src/environments/environment';
 import { ToastrService } from 'ngx-toastr';
+import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import * as FileSaver from "file-saver";
-import * as moment from "moment";
+
 import * as xlsx from "xlsx";
+import * as moment from "moment";
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as FileSaver from "file-saver";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTACION DE COMPONENTES
+import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
 import { PlanHoraExtraService } from 'src/app/servicios/planHoraExtra/plan-hora-extra.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
-
-// IMPORTACION DE SERVICIOS
-import { EditarPlanHoraExtraComponent } from '../editar-plan-hora-extra/editar-plan-hora-extra.component';
-import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
-import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 
-// EXPORTACIÓN DE DATOS A SER LEIDOS EN COMPONENTE DE EMPLEADOS PLANIFICACIÓN
+// IMPORTACION DE SERVICIOS
+import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+
+// EXPORTACION DE DATOS A SER LEIDOS EN COMPONENTE DE EMPLEADOS PLANIFICACION
 export interface PlanificacionHE {
   descripcion: string;
   hora_inicio: string;
@@ -49,48 +49,48 @@ export interface PlanificacionHE {
 
 export class ListaPlanificacionesComponent implements OnInit {
 
-  // ITEMS DE PAGINACIÓN DE LA LISTA DE PLANIFICACIONES
+  // ITEMS DE PAGINACION DE LA LISTA DE PLANIFICACIONES
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA DE LA LISTA DE EMPLEADOS CON PLANIFICACIÓN SELECCIONADA
+  // ITEMS DE PAGINACION DE LA TABLA DE LA LISTA DE EMPLEADOS CON PLANIFICACION SELECCIONADA
   pageSizeOptions_empleado = [5, 10, 20, 50];
   tamanio_pagina_empleado: number = 5;
   numero_pagina_empleado: number = 1;
 
-  // ALMACENAMIENTO DE DATOS DE PLANIFICACIÓN
+  // ALMACENAMIENTO DE DATOS DE PLANIFICACION
   listaPlan: any = [];
 
   // VARIABLE PARA GURDAR DATOS SELECCIONADOS DE LISTA DE PLANIFICACIONES
   selectionUno = new SelectionModel<PlanificacionHE>(true, []);
 
-  // VARIABLE PARA MOSTRAR U OCULTAR ÍCONO DE EDICIÓN O ELIMINACIÓN DE PLANIFICACIÓN
+  // VARIABLE PARA MOSTRAR U OCULTAR ICONO DE EDICION O ELIMINACION DE PLANIFICACION
   ver_icono: boolean = true; // ÍCONO ELIMINAR - EDITAR LISTA PLANIFICACIONES
   ver_editar: boolean = true; // ÍCONO EDITAR LISTA PLANIFICACIONES EMPLEADO
   ver_eliminar: boolean = true; // ÍCONO ELIMINAR LISTA PLANIFICACIONES EMPLEADO
 
-  idEmpleadoLogueado: number; // VARIABLE PARA ALMACENAR ID DE EMPLEADO QUE INICIA SESIÓN
+  idEmpleadoLogueado: number; // VARIABLE PARA ALMACENAR ID DE EMPLEADO QUE INICIA SESION
   empleado: any = []; // VARIABLE DE ALMACENAMIENTO DE DATOS DE EMPLEADO
 
   get habilitarHorasE(): boolean { return this.funciones.horasExtras; }
 
-    // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
-    get s_color(): string {return this.plantilla.color_Secundary;}
-    get p_color(): string {return this.plantilla.color_Primary;}
-    get logoE(): string {return this.plantilla.logoBase64;}
-    get frase(): string {return this.plantilla.marca_Agua;}
+  // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
+  get s_color(): string { return this.plantilla.color_Secundary; }
+  get p_color(): string { return this.plantilla.color_Primary; }
+  get logoE(): string { return this.plantilla.logoBase64; }
+  get frase(): string { return this.plantilla.marca_Agua; }
 
   constructor(
-    private plantilla: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
+    public restEmpleado: EmpleadoService,
     public restPlan: PlanHoraExtraService,
     public ventana: MatDialog,
     public aviso: RealTimeService,
+    private plantilla: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
     private parametro: ParametrosService,
-    private toastr: ToastrService,
-    private validar: ValidacionesService,
     private funciones: MainNavService,
-    public restEmpleado: EmpleadoService
+    private validar: ValidacionesService,
+    private toastr: ToastrService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -115,20 +115,21 @@ export class ListaPlanificacionesComponent implements OnInit {
     }
   }
 
-   // METODO PARA VER LA INFORMACIÓN DEL EMPLEADO
-   ObtenerEmpleados(idemploy: any) {
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
+  ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restEmpleado.BuscarUnEmpleado(idemploy).subscribe((data) => {
       this.empleado = data;
     });
   }
 
+  // METODO PARA MANEJAR PAGINACION
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
     this.numero_pagina = e.pageIndex + 1;
   }
 
-  // METODO PARA MOSTRAR FILAS DETERMINADAS EN TABLA DE EMPLEADOS CON PLANIFICACIÓN
+  // METODO PARA MOSTRAR FILAS DETERMINADAS EN TABLA DE EMPLEADOS CON PLANIFICACION
   ManejarPaginaEmpleados(e: PageEvent) {
     this.tamanio_pagina_empleado = e.pageSize;
     this.numero_pagina_empleado = e.pageIndex + 1;
@@ -141,7 +142,7 @@ export class ListaPlanificacionesComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarFecha() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
@@ -232,19 +233,22 @@ export class ListaPlanificacionesComponent implements OnInit {
   }
 
   AbrirEditarPlan(datoSeleccionado: any, forma: any) {
-
-    this.ventana.open(EditarPlanHoraExtraComponent, {
-      width: '600px',
-      data: { planifica: datoSeleccionado, modo: forma }
-    })
-      .afterClosed().subscribe(id_plan => {
-        this.VerificarPlanificacion(id_plan, '1', true, false);
-        this.botonSeleccion = false;
-        this.botonEditar = false;
-        this.botonEliminar = false;
-        //this.ver_editar = true;
-        this.selectionUno.clear();
-      });
+    /*
+        this.ventana.open(EditarPlanHoraExtraComponent, {
+          width: '600px',
+          data: { planifica: datoSeleccionado, modo: forma }
+        })
+          .afterClosed().subscribe(id_plan => {
+            this.VerificarPlanificacion(id_plan, '1', true, false);
+            this.botonSeleccion = false;
+            this.botonEditar = false;
+            this.botonEliminar = false;
+            //this.ver_editar = true;
+            this.selectionUno.clear();
+          });
+          */
+    let data = { planifica: datoSeleccionado, modo: forma };
+    this.VerFormularioEditar(data);
   }
 
   // METODO PARA LEER TODOS LOS DATOS SELECCIONADOS Y EDITAR
@@ -263,7 +267,7 @@ export class ListaPlanificacionesComponent implements OnInit {
     }
   }
 
-  // VERIFICAR SI LA PLANIFICACIÓN TIENE DATOS DE EMPLEADOS
+  // VERIFICAR SI LA PLANIFICACION TIENE DATOS DE EMPLEADOS
   VerificarPlanificacion(id: number, accion: any, editar: any, eliminar: any) {
     this.restPlan.BuscarPlanEmpleados(id).subscribe(res => {
       this.lista_empleados = true;
@@ -296,7 +300,7 @@ export class ListaPlanificacionesComponent implements OnInit {
       });
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO DE PLANIFICACIÓN
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO DE PLANIFICACION
   EliminarPlanEmpleado(id_plan: number, id_empleado: number, datos: any) {
 
     // LECTURA DE DATOS DE USUARIO
@@ -365,7 +369,7 @@ export class ListaPlanificacionesComponent implements OnInit {
       });
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO DE PLANIFICACIÓN
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO DE PLANIFICACION
   EliminarPlanMultiple(datos: any, id_plan: number) {
     var usuario = '';
 
@@ -406,7 +410,7 @@ export class ListaPlanificacionesComponent implements OnInit {
     })
   }
 
-  // METODO PARA HABILITAR O DESHABILITAR EL BOTÓN EDITAR O ELIMINAR
+  // METODO PARA HABILITAR O DESHABILITAR EL BOTON EDITAR O ELIMINAR
   botonSeleccion: boolean = false;
   botonEditar: boolean = false;
   botonEliminar: boolean = false;
@@ -437,21 +441,21 @@ export class ListaPlanificacionesComponent implements OnInit {
     }
   }
 
-  // SI EL NÚMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NÚMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
   isAllSelected() {
     const numSelected = this.selectionUno.selected.length;
     const numRows = this.planEmpleados.length;
     return numSelected === numRows;
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTÁN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCIÓN CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
       this.planEmpleados.forEach(row => this.selectionUno.select(row));
   }
 
-  // LA ETIQUETA DE LA CASILLA DE VERIFICACIÓN EN LA FILA PASADA
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
   checkboxLabel(row?: PlanificacionHE): string {
     if (!row) {
       return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
@@ -459,7 +463,7 @@ export class ListaPlanificacionesComponent implements OnInit {
     return `${this.selectionUno.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // METODO PARA CERRAR TABLA DE LISTA DE EMPLEADOS CON PLANIFICACIÓN SELECCIONADA
+  // METODO PARA CERRAR TABLA DE LISTA DE EMPLEADOS CON PLANIFICACION SELECCIONADA
   CerrarTabla() {
     this.lista_empleados = false;
     this.ver_icono = true;
@@ -477,7 +481,7 @@ export class ListaPlanificacionesComponent implements OnInit {
     let mensaje = {
       id_empl_envia: this.idEmpleadoLogueado,
       id_empl_recive: recibe,
-      tipo: 10, // PLANIFICACIÓN DE HORAS EXTRAS
+      tipo: 10, // PLANIFICACION DE HORAS EXTRAS
       mensaje: 'Planificación de horas extras eliminada desde ' +
         desde + ' hasta ' +
         hasta + ' horario de ' + h_inicio + ' a ' + h_fin,
@@ -487,7 +491,7 @@ export class ListaPlanificacionesComponent implements OnInit {
     });
   }
 
-  // METODO DE ENVIO DE CORREO DE PLANIFICACIÓN DE HORAS EXTRAS
+  // METODO DE ENVIO DE CORREO DE PLANIFICACION DE HORAS EXTRAS
   EnviarCorreo(datos: any, cuenta_correo: any, usuario: any, desde: any, hasta: any, h_inicio: any, h_fin: any) {
 
     // DATOS DE ESTRUCTURA DEL CORREO
@@ -506,7 +510,7 @@ export class ListaPlanificacionesComponent implements OnInit {
       fin: h_fin,
     }
 
-    // METODO ENVIO DE CORREO DE PLANIFICACIÓN DE HE
+    // METODO ENVIO DE CORREO DE PLANIFICACION DE HE
     this.restPlan.EnviarCorreoPlanificacion(DataCorreo).subscribe(res => {
       if (res.message === 'ok') {
         this.toastr.success('Correo de planificación enviado exitosamente.', '', {
@@ -555,8 +559,20 @@ export class ListaPlanificacionesComponent implements OnInit {
     })
   }
 
+  // METODO PARA VER FORMULARIO EDITAR
+  ver_listas: boolean = true;
+  ver_form_editar: boolean = false;
+  datos_editar: any;
+  pagina: string = '';
+  VerFormularioEditar(datos: any) {
+    this.ver_listas = false;
+    this.ver_form_editar = true;
+    this.datos_editar = datos;
+    this.pagina = 'lista-planificaciones';
+  }
+
   /** ************************************************************************************************* **
-   ** **                            PARA LA EXPORTACIÓN DE ARCHIVOS PDF                              ** **
+   ** **                            PARA LA EXPORTACION DE ARCHIVOS PDF                              ** **
    ** ************************************************************************************************* **/
 
   // METODO PARA CREAR ARCHIVO PDF
@@ -581,7 +597,7 @@ export class ListaPlanificacionesComponent implements OnInit {
   getDocumentDefinicion() {
     sessionStorage.setItem("PlanificacionesHE", this.listaPlan);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       watermark: {
         text: this.frase,
         color: "blue",
@@ -600,7 +616,7 @@ export class ListaPlanificacionesComponent implements OnInit {
         opacity: 0.3,
         alignment: "right",
       },
-      // PIE DE LA PÁGINA
+      // PIE DE LA PAGINA
       footer: function (
         currentPage: any,
         pageCount: any,
@@ -693,11 +709,11 @@ export class ListaPlanificacionesComponent implements OnInit {
   }
 
 
-   /** ************************************************************************************************* **
-   ** **                             PARA LA EXPORTACIÓN DE ARCHIVOS EXCEL                           ** **
-   ** ************************************************************************************************* **/
+  /** ************************************************************************************************* **
+  ** **                             PARA LA EXPORTACION DE ARCHIVOS EXCEL                           ** **
+  ** ************************************************************************************************* **/
 
-   exportToExcel() {
+  exportToExcel() {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaPlan.map(obj => {
       return {
         Descripcion: obj.descripcion,
@@ -720,11 +736,11 @@ export class ListaPlanificacionesComponent implements OnInit {
     xlsx.writeFile(wb, 'PlanificacionesHorasEXCEL' + new Date().getTime() + '.xlsx');
   }
 
-   /** ************************************************************************************************** ** 
-   ** **                                     METODO PARA EXPORTAR A CSV                               ** **
-   ** ************************************************************************************************** **/
+  /** ************************************************************************************************** ** 
+  ** **                                     METODO PARA EXPORTAR A CSV                               ** **
+  ** ************************************************************************************************** **/
 
-   exportToCVS() {
+  exportToCVS() {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.listaPlan.map(obj => {
       return {
         Descripcion: obj.descripcion,
@@ -737,7 +753,7 @@ export class ListaPlanificacionesComponent implements OnInit {
     }));
     const csvDataC = xlsx.utils.sheet_to_csv(wsr);
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, 'PlanificacionesHorasCSV'  + new Date().getTime() + '.csv');
+    FileSaver.saveAs(data, 'PlanificacionesHorasCSV' + new Date().getTime() + '.csv');
   }
 
   /** ************************************************************************************************* **
@@ -752,13 +768,13 @@ export class ListaPlanificacionesComponent implements OnInit {
     this.listaPlan.forEach(obj => {
       objeto = {
         "lista_planificaciones": {
-        '@id': obj.id,
-        "descripcion": obj.descripcion,
-        "fecha_inicio": obj.fecha_desde_,
-        "fecha_fin": obj.fecha_hasta_,
-        "hora_inicio": obj.hora_inicio_,
-        "hora_fin": obj.hora_fin_,
-        "horas_totales": obj.horas_totales,
+          '@id': obj.id,
+          "descripcion": obj.descripcion,
+          "fecha_inicio": obj.fecha_desde_,
+          "fecha_fin": obj.fecha_hasta_,
+          "hora_inicio": obj.hora_inicio_,
+          "hora_fin": obj.hora_fin_,
+          "horas_totales": obj.horas_totales,
         }
       }
       arregloPlanificacion.push(objeto)

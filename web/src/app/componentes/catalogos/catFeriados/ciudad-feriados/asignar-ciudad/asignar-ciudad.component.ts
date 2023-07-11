@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 import { CiudadFeriadosService } from 'src/app/servicios/ciudadFeriados/ciudad-feriados.service';
 import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
+
 import { ListarCiudadFeriadosComponent } from '../listar-ciudad-feriados/listar-ciudad-feriados.component';
 import { ListarFeriadosComponent } from '../../feriados/listar-feriados/listar-feriados.component';
 
@@ -196,12 +197,7 @@ export class AsignarCiudadComponent implements OnInit {
 
   // AGREGAR DATOS MULTIPLES DE CIUDADES DE LA PROVINCIA INDICADA
   AgregarTodos() {
-    if (this.ciudadesSeleccionadas.length === 0) {
-      this.ciudadesSeleccionadas = this.nombreCiudades;
-    }
-    else {
-      this.ciudadesSeleccionadas = this.ciudadesSeleccionadas.concat(this.nombreCiudades);
-    }
+    this.ciudadesSeleccionadas = this.nombreCiudades;
     for (var i = 0; i <= this.nombreCiudades.length - 1; i++) {
       (<HTMLInputElement>document.getElementById('ciudadesSeleccionadas' + i)).checked = true;
     }
@@ -217,8 +213,35 @@ export class AsignarCiudadComponent implements OnInit {
     }
   }
 
+  // METODO PARA VERIFICAR SELECCION DE OPCION "Todas"
+  isChecked: boolean = false;
+  SeleccionarTodas(event: any) {
+    if (event === true) {
+      this.AgregarTodos();
+    }
+    else {
+      this.QuitarTodos();
+    }
+  }
+
+  // METODO PARA VERIFICAR SELECCION DE CIUDADES
+  isChecked_: boolean = false;
+  SeleccionarIndividual(event: any, valor: any) {
+    const target = event.target as HTMLInputElement;
+    if (target.checked === true) {
+      this.AgregarCiudad(valor);
+    }
+    else {
+      this.QuitarCiudad(valor);
+    }
+  }
+
   // METODO PARA ASIGNAR CIUDADES A FERIADO
+  contador: number = 0;
+  ingresar: number = 0;
   InsertarFeriadoCiudad() {
+    this.ingresar = 0;
+    this.contador = 0;
     // VALIDAR SI SE HA SELECCIONADO CIUDADES
     if (this.ciudadesSeleccionadas.length != 0) {
       this.habilitarprogress = true;
@@ -231,30 +254,43 @@ export class AsignarCiudadComponent implements OnInit {
         // BUSCAR ID DE CIUDADES EXISTENTES
         this.ciudadFeriados = [];
         this.restF.BuscarIdCiudad(buscarCiudad).subscribe(datos => {
+          this.contador = this.contador + 1;
           this.ciudadFeriados = datos;
           this.habilitarprogress = false;
-          this.toastr.info('Se le recuerda que ' + obj.descripcion + ' ya fue asignada a este Feriado.', '', {
-            timeOut: 6000,
+          this.VerMensaje();
+          this.toastr.info('Se indica que ' + obj.descripcion + ' ya fue asignada a este Feriado.', '', {
+            timeOut: 7000,
           })
         }, error => {
           this.habilitarprogress = false;
           this.restF.CrearCiudadFeriado(buscarCiudad).subscribe(response => {
-            this.toastr.success('Operación exitosa.', 'Ciudad asignada a Feriado.', {
-              timeOut: 1000,
-            });
+            this.contador = this.contador + 1;
+            this.ingresar = this.ingresar + 1;
+            this.VerMensaje();
           }, error => {
-            this.toastr.error('Operación Fallida.', 'Ups!!! algo salio mal.', {
+            this.contador = this.contador + 1;
+            this.VerMensaje();
+            this.toastr.error('Ups!!! algo salio mal..', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
           });
         });
       });
-      this.CerrarVentana(2);
     }
     else {
-      this.toastr.info('No ha seleccionado CIUDADES.', 'Ups!!! algo salio mal.', {
+      this.toastr.warning('No ha seleccionado CIUDADES.', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
       })
+    }
+  }
+
+  // MOSTRAR MENSAJE DE REGISTRO
+  VerMensaje() {
+    if (this.contador === this.ciudadesSeleccionadas.length) {
+      this.toastr.success('Operación exitosa.', 'Se ha asignado ' + this.ingresar + ' ciudades a este feriado.', {
+        timeOut: 1000,
+      });
+      this.CerrarVentana(2);
     }
   }
 

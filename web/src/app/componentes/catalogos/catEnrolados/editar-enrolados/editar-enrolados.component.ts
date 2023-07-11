@@ -37,7 +37,7 @@ export class EditarEnroladosComponent implements OnInit {
   selec1 = false;
   selec2 = false;
 
-  // asignar los campos en un formulario en grupo
+  // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
   public nuevoEnroladoForm = new FormGroup({
     enroladoId_UsuarioForm: this.id_usuario,
     enroladoNombreForm: this.nombre,
@@ -49,7 +49,7 @@ export class EditarEnroladosComponent implements OnInit {
   });
 
   /**
-   * Variables progress spinner
+   * VARIABLES PROGRESS SPINNER
    */
   color: ThemePalette = 'primary';
   mode: ProgressSpinnerMode = 'indeterminate';
@@ -95,7 +95,7 @@ export class EditarEnroladosComponent implements OnInit {
     }
   }
 
-  insertarEnrolado(form) {
+  insertarEnrolado(form: any) {
     this.habilitarprogress = true;
     let dataEnrolado = {
       id: this.data.datosEnrolado.id,
@@ -108,7 +108,7 @@ export class EditarEnroladosComponent implements OnInit {
       codigo: form.codigoForm
     };
     this.rest.ActualizarUnEnrolado(dataEnrolado).subscribe(response => {
-      this.toastr.success('Operacion Exitosa', ' Datos de Usuario Enrolado actualizados', {
+      this.toastr.success('Operacion exitosa.', ' Datos de Usuario Enrolado actualizados', {
         timeOut: 6000,
       });
         this.habilitarprogress = false;
@@ -155,7 +155,7 @@ export class EditarEnroladosComponent implements OnInit {
     else {
       keynum = evt.which;
     }
-    // Comprobamos si se encuentra en el rango numérico y que teclas no recibirá.
+    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
     if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6) {
       return true;
     }

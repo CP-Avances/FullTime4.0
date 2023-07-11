@@ -1,6 +1,6 @@
 <!--  **************************** LISTA DE FERIADOS *********************************  -->
 <div *ngIf="ver_lista">
-    <div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;">
+    <div class="container" style="padding-bottom: 10px; padding-top: 20px;">
         <div class="row">
             <div class="col-md">
                 <div id="titulo">
@@ -155,3 +155,8 @@
 <!--  **************************** PANTALLA LISTA DE CIUDADES *********************************  -->
 <app-listar-ciudad-feriados *ngIf="ver_ciudades" [pagina_]="pagina" [idFeriado]="feriado_id">
 </app-listar-ciudad-feriados>
+
+<!--  **************************** PANTALLA REGISTRAR CIUDADES *********************************  -->
+<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;">
+    <app-registrar-feriados *ngIf="ver_registrar"></app-registrar-feriados>
+</div>

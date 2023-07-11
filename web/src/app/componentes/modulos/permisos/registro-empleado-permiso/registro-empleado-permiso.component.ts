@@ -20,9 +20,9 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
 import { LoginService } from 'src/app/servicios/login/login.service';
 
-import { SettingsComponent } from 'src/app/componentes/administracionGeneral/configuracion-notificaciones/settings/settings.component';
-import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
 import { PermisosMultiplesEmpleadosComponent } from '../multiples/permisos-multiples-empleados/permisos-multiples-empleados.component';
+import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
+import { SettingsComponent } from 'src/app/componentes/administracionGeneral/configuracion-notificaciones/settings/settings.component';
 
 interface opcionesDiasHoras {
   valor: string;
@@ -160,7 +160,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(

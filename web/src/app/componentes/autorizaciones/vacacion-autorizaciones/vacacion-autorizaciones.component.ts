@@ -306,7 +306,7 @@ export class VacacionAutorizacionesComponent implements OnInit {
   }
 
 
-  insertarAutorizacion(form) {
+  insertarAutorizacion(form: any) {
     if (this.data.carga === 'multiple') {
       this.listafiltrada.map(obj => {
         if (obj.estado === 'Pre-autorizado') {

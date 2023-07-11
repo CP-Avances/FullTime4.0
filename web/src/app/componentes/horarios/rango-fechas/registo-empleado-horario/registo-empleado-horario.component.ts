@@ -284,7 +284,13 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         'Dar click para verificar registro de detalle de horario.', {
         timeOut: 6000,
       }).onTap.subscribe(obj => {
-        this.router.navigate(['/verHorario', id]);
+        if(this.data_horario.pagina === 'ver_empleado'){
+          this.router.navigate(['/horario/']);
+        }
+        else {
+          this.componente.ventana_horario = false;
+          this.componente.VerDetalleHorario(id);
+        }
       });
     }
     else {
@@ -464,7 +470,10 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
 
       // BUSCAR FERIADOS 
       if (this.feriados.length != 0) {
+        console.log('ingresa feriados ', this.feriados)
         for (let i = 0; i < this.feriados.length; i++) {
+          console.log('fecha feriados ', moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
+          console.log('obj ', obj)
           if (moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
             tipo = 'FD';
             tipo_dia = 'FD';

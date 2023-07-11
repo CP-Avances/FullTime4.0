@@ -1,11 +1,13 @@
+<!--
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
         REGISTRAR HORARIO</span>
     <mat-icon class="float-right" id="cerrar" (click)="CerrarVentanaPlanHorario()">highlight_off</mat-icon>
-</div>
+</div> -->
 <!-- Formulario Completo -->
-<form [formGroup]="PlanHorarioForm">
+<!--
+    <form [formGroup]="PlanHorarioForm">
     <mat-card-content>
         <div class="container" style="text-align: center;">
             <div class="nota">
@@ -40,4 +42,142 @@
 <div class="d-flex flex-wrap justify-content-center" style="padding-top: 2%; margin-bottom: 2%;">
     <button id="btn-raised"  class="btn btn-sm" [disabled]="!PlanHorarioForm.valid"
         (click)="ValidarDatosPlanHorario(PlanHorarioForm.value)" value="Guardar">Guardar</button>
+</div>
+-->
+<div class="container" style="padding-top: 15px; padding-bottom: 25px;">
+
+    <div id="titulo">
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+            REGISTRAR HORARIO
+        </span>
+        <mat-icon class="float-right" id="cerrar">highlight_off</mat-icon>
+    </div>
+
+    <mat-card class="mat-elevation-z8">
+        <div class="table-responsive" style="padding-top: 15px;">
+            <table class="table table-hover table-sm">
+
+
+
+
+                <thead class="thead-light">
+
+
+
+
+                    <tr>
+
+
+
+
+                        <th>Nombre</th>
+
+
+
+
+                        <th>Edad</th>
+
+
+
+
+                        <th>País</th>
+
+
+
+                        <th>Acciones</th>
+
+
+
+
+
+
+                    </tr>
+
+
+
+
+                </thead>
+
+
+
+
+                <tbody>
+
+
+
+
+                    <tr *ngFor="let persona of personas; let i = index">
+
+
+
+
+                        <td>
+
+
+
+
+                            <input type="text" [(ngModel)]="persona.nombre" [disabled]="!persona.editando" />
+
+
+
+                        </td>
+
+
+
+
+                        <td>
+
+
+
+                            <input type="number" [(ngModel)]="persona.edad" [disabled]="!persona.editando" />
+
+
+
+
+                        </td>
+
+
+
+
+                        <td>
+
+                            <input type="text" [(ngModel)]="persona.pais" [disabled]="!persona.editando" />
+
+
+                        </td>
+
+
+                        <td>
+
+
+                            <button (click)="editarPersona(i)" [disabled]="persona.editando">Editar</button>
+
+
+
+
+                            <button (click)="guardarCambios(i)" [disabled]="!persona.editando">Guardar</button>
+
+
+
+
+                        </td>
+
+
+
+                    </tr>
+
+
+
+
+                </tbody>
+
+
+            </table>
+        </div>
+        <button (click)="agregarFila()">Agregar fila</button>
+
+        <br>
+
+
+    </mat-card>
 </div>

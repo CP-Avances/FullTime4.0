@@ -1,0 +1,26 @@
+#dias {
+    font-size: 13px;
+}
+
+#calculo {
+    font-size: 11px;
+}
+
+#fecVaca {
+    font-size: 14px;
+}
+
+.btn {
+    margin-left: 15px;
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
+
+
+mat-form-field {
+    padding: 10px 10px 0px 10px;
+}
+
+.caja {
+    padding: 10px 10px 0px 10px;
+}

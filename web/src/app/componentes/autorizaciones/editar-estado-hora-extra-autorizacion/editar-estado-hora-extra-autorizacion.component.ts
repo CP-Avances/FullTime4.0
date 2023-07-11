@@ -105,7 +105,7 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
 
   resAutorizacion: any = [];
   idNoti: any = [];
-  ActualizarEstadoAutorizacion(form) {
+  ActualizarEstadoAutorizacion(form: any) {
     let newAutorizaciones = {
       id_documento: this.data.autorizacion[0].id_documento + localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       estado: form.estadoF,
@@ -130,7 +130,7 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
   }
 
   resEstado: any = [];
-  EditarEstadoHoraExtra(form) {
+  EditarEstadoHoraExtra(form: any) {
     let datosHorasExtras = {
       estado: form.estadoF,
       id_hora_extra: this.data.autorizacion[0].id_hora_extra,

@@ -1,12 +1,12 @@
-// SECCIÓN DE LIBRERIAS
+// SECCION DE LIBRERIAS
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Component, OnInit, Inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
-// SECCIÓN SERVICIOS
-import { EmplLeafletComponent } from 'src/app/componentes/modulos/geolocalizacion/empl-leaflet/empl-leaflet.component';
+// SECCION SERVICIOS
 import { EmpleadoUbicacionService } from 'src/app/servicios/empleadoUbicacion/empleado-ubicacion.service';
+import { EmplLeafletComponent } from 'src/app/componentes/modulos/geolocalizacion/empl-leaflet/empl-leaflet.component';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 
 @Component({
@@ -30,12 +30,12 @@ export class EditarCoordenadasComponent implements OnInit {
   });
 
   constructor(
-    private rest: EmpleadoUbicacionService,
     private toastr: ToastrService,
+    private rest: EmpleadoUbicacionService,
+    public restP: ParametrosService,
+    public ventanas: MatDialog,
     public ventanap: MatDialogRef<EditarCoordenadasComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    public ventanas: MatDialog,
-    public restP: ParametrosService
   ) { }
 
   ngOnInit(): void {
@@ -44,10 +44,10 @@ export class EditarCoordenadasComponent implements OnInit {
     this.BuscarParametro();
   }
 
-  // METODO PARA OBTENER RANGO DE PERÍMETRO
+  // METODO PARA OBTENER RANGO DE PERIMETRO
   rango: any;
   BuscarParametro() {
-    // id_tipo_parametro PARA RANGO DE UBICACIÓN = 22
+    // id_tipo_parametro PARA RANGO DE UBICACION = 22
     let datos: any = [];
     this.restP.ListarDetalleParametros(22).subscribe(
       res => {
@@ -61,6 +61,15 @@ export class EditarCoordenadasComponent implements OnInit {
       });
   }
 
+  // METODO PARA CONSULTAR TODAS LAS COORDENDAS REGISTRADAS
+  coordenadas: any = [];
+  ConsultarCoordenadas() {
+    this.rest.ListarCoordenadasEspecificas(this.data.ubicacion.id).subscribe(response => {
+      this.coordenadas = response;
+    });
+  }
+
+  // METODO PARA MOSTRAR DATOS DEL REGISTRO
   MostrarDatos() {
     this.CoordenadasForm.patchValue({
       latitudForm: this.data.ubicacion.latitud,
@@ -83,26 +92,19 @@ export class EditarCoordenadasComponent implements OnInit {
           '', {
           timeOut: 2000,
         })
-        this.CerrarVentana();
+        this.ventanap.close(this.data.ubicacion.id);
       });
     }
     else {
       this.toastr.error('Por favor ingresar coordenadas de ubicación.',
-        '', {
+        'Ups!!! algo salio mal.', {
         timeOut: 2000,
       })
     }
-
   }
 
-  coordenadas: any = [];
-  ConsultarCoordenadas() {
-    this.rest.ListarCoordenadasEspecificas(this.data.ubicacion.id).subscribe(response => {
-      this.coordenadas = response;
-    });
-  }
-
-  VerificarDatos(form) {
+  // METODO PARA VERIFICAR DATOS DE UBICACION
+  VerificarDatos(form: any) {
     this.cont = 0;
     if (this.coordenadas.length != 0) {
       let informacion = {
@@ -123,6 +125,7 @@ export class EditarCoordenadasComponent implements OnInit {
     }
   }
 
+  // METODO PARA COMPARAR COORDENADAS
   cont: number = 0;
   contDuplicado: number = 0;
   CompararCoordenadas(informacion: any, form: any, data: any) {
@@ -131,8 +134,8 @@ export class EditarCoordenadasComponent implements OnInit {
         if (res[0].verificar === 'ok') {
           this.contDuplicado = this.contDuplicado + 1;
           if (this.contDuplicado === 1) {
-            this.toastr.info('El perímetro ingresado ya se encuentra registrado.',
-              'VERIFICAR LA INFORMACIÓN.', {
+            this.toastr.warning('El perímetro ingresado ya se encuentra registrado.',
+              'Ups!!! algo salio mal.', {
               timeOut: 4000,
             })
           }
@@ -146,22 +149,24 @@ export class EditarCoordenadasComponent implements OnInit {
       });
   }
 
-
   // METODO PARA CERRAR VENTANA
   CerrarVentana() {
     this.ventanap.close();
   }
 
+  // METODO PARA LLER COORDENADAS DEL MAPA
   TomarCoordenadasMapa() {
-    this.ventanas.open(EmplLeafletComponent, { width: '500px', height: '500px' }).afterClosed().subscribe((res: any) => {
-      console.log(res);
-      if (res.message === true) {
-        this.CoordenadasForm.patchValue({
-          latitudForm: res.latlng.lat,
-          longitudForm: res.latlng.lng,
-        })
-      }
-    });
+    this.ventanas.open(EmplLeafletComponent, { width: '500px', height: '500px' }).afterClosed()
+      .subscribe((res: any) => {
+        if (res) {
+          if (res.message === true) {
+            this.CoordenadasForm.patchValue({
+              latitudForm: res.latlng.lat,
+              longitudForm: res.latlng.lng,
+            })
+          }
+        }
+      });
   }
 
 }

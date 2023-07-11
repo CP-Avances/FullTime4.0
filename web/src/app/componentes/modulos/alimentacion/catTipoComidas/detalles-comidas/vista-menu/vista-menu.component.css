@@ -1,0 +1,47 @@
+p {
+    font-size: x-small;
+    text-align: center;
+}
+
+td {
+    padding-top: 10px;
+    text-align: center;
+}
+
+hr {
+    background-color: black;
+}
+
+.btn {
+    margin-left: 15px;
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
+
+#editarI {
+    color: green;
+    margin-left: 25px;
+    cursor: pointer;
+}
+
+#editarF {
+    color: green;
+    cursor: pointer;
+    text-align: center;
+    margin-left: 15px;
+}
+
+#datosF {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+table {
+    width: 100%;
+    font-size: 14px;
+}
+
+label {
+    font-size: 14px;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}

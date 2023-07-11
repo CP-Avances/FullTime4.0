@@ -74,9 +74,17 @@ class TipoComidasControlador {
     CrearTipoComidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre, tipo_comida, hora_inicio, hora_fin } = req.body;
-            yield database_1.default.query('INSERT INTO cg_tipo_comidas (nombre, tipo_comida, hora_inicio, hora_fin) ' +
-                'VALUES ($1, $2, $3, $4)', [nombre, tipo_comida, hora_inicio, hora_fin]);
-            res.jsonp({ message: 'Tipo de comida registrada' });
+            const response = yield database_1.default.query(`
+            INSERT INTO cg_tipo_comidas (nombre, tipo_comida, hora_inicio, hora_fin)
+            VALUES ($1, $2, $3, $4) RETURNING *
+            `, [nombre, tipo_comida, hora_inicio, hora_fin]);
+            const [tipos_comida] = response.rows;
+            if (!tipos_comida) {
+                return res.status(404).jsonp({ message: 'error' });
+            }
+            else {
+                return res.status(200).jsonp({ message: 'OK', info: tipos_comida });
+            }
         });
     }
     ActualizarComida(req, res) {

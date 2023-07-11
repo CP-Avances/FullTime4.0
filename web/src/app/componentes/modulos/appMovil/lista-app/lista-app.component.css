@@ -54,3 +54,13 @@ p {
     text-align: center;
     cursor: pointer;
 }
+
+.inactivo {
+    background-color: rgb(117, 123, 133);
+    color: white;
+}
+
+.activo {
+    background-color: rgb(42, 82, 151);
+    color: white;
+}

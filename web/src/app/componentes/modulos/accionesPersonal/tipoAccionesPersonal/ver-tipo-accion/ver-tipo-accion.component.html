@@ -23,13 +23,13 @@
                     </div>
                 </div>
                 <div style="text-align: right;">
-                    <i id="editarF" (click)="EditarDatosTipoAccion(a)" matSuffix matTooltipPosition="right"
+                    <i id="editarF" (click)="AbrirEditar(a)" matSuffix matTooltipPosition="right"
                         matTooltip="Modificar datos de este registro" class="fas fa-edit">
                         <p>Editar</p>
                     </i>
                 </div>
             </div>
-            <input type="submit" class="btn btn-sm" [routerLink]="['/acciones-personal/']"
+            <input type="submit" class="btn btn-sm" (click)="VerListaAcciones()"
                 value="Ir a lista tipos acción personal">
         </mat-card-content>
     </mat-card>

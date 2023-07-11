@@ -19,6 +19,12 @@
 
 #fec { font-size: 13px; }
 
-
-
+table {
+    width: 100%;
+    font-size: 14px;
+}
+th {
+    padding-top: 10px;
+    text-align: center;
+}
 mat-form-field {padding: 10px 10px 0px 10px;}

@@ -47,7 +47,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
   filtroCedula: '';
   filtroCargo: '';
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA
+  // ITEMS DE PAGINACION DE LA TABLA
   numero_pagina: number = 1;
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
@@ -80,7 +80,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
     // this.VerPedidosHorasExtras();
   }
 
-  // METODO para ver la información del empleado 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
   ObtenerEmpleadoLogueado(idemploy: any) {
     this.empleadoLogueado = [];
     this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -88,7 +88,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
     })
   }
 
-  // METODO para obtener el logo de la empresa
+  // METODO PARA OBTENER EL LOGO DE LA EMPRESA
   logo: any = String;
   ObtenerLogo() {
     this.restEmpre.LogoEmpresaImagenBase64(localStorage.getItem('empresa') as string).subscribe(res => {
@@ -141,7 +141,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
     this.validar.IngresarSoloLetras(e);
   }
 
-  // METODO PARA INGRESAR SOLO NÚMEROS
+  // METODO PARA INGRESAR SOLO NUMEROS
   IngresarSoloNumeros(evt) {
     this.validar.IngresarSoloNumeros(evt);
   }
@@ -249,7 +249,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
   }
 
   /* ****************************************************************************************************
-   *                               PARA LA EXPORTACIÓN DE ARCHIVOS PDF SOLICITUDES
+   *                               PARA LA EXPORTACION DE ARCHIVOS PDF SOLICITUDES
    * ****************************************************************************************************/
 
   generarPdf(action = 'open', forma: string, solicitudHoras) {
@@ -272,11 +272,11 @@ export class ReporteHorasPedidasComponent implements OnInit {
   GenerarArchivoSolicitudes(solicitudHoras) {
     sessionStorage.setItem('Administrador', this.empleadoLogueado);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
-      // PIE DE PÁGINA
+      // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         // OBTENER FECHA Y HORA ACTUAL
         var f = moment();
@@ -370,7 +370,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
   }
 
   /* ****************************************************************************************************
-   *                               PARA LA EXPORTACIÓN DE ARCHIVOS EXCEL SOLICITUDES
+   *                               PARA LA EXPORTACION DE ARCHIVOS EXCEL SOLICITUDES
    * ****************************************************************************************************/
 
   GenerarExcel(forma: string, datos: any) {
@@ -411,17 +411,17 @@ export class ReporteHorasPedidasComponent implements OnInit {
   }
 
   /* ****************************************************************************************************
-   *                               PARA LA EXPORTACIÓN DE ARCHIVOS PDF SOLICITUDES AUTORIZADAS
+   *                               PARA LA EXPORTACION DE ARCHIVOS PDF SOLICITUDES AUTORIZADAS
    * ****************************************************************************************************/
 
   GenerarSolicitudesAprobadas(horasAutorizadas) {
     sessionStorage.setItem('Administrador', this.empleadoLogueado);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
-      // PIE DE PÁGINA
+      // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         // OBTENER FECHA Y HORA ACTUAL
         var f = moment();
@@ -519,7 +519,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
   }
 
   /* ****************************************************************************************************
-   *                               PARA LA EXPORTACIÓN DE ARCHIVOS EXCEL SOLICITUDES AUTORIZADAS
+   *                               PARA LA EXPORTACION DE ARCHIVOS EXCEL SOLICITUDES AUTORIZADAS
    * ****************************************************************************************************/
 
   ExportarExcelSolicitudesAutorizadas(datos) {
@@ -578,11 +578,11 @@ export class ReporteHorasPedidasComponent implements OnInit {
   GenerarSolicitudEmpleado(id_seleccionado: number) {
     sessionStorage.setItem('Administrador', this.empleadoLogueado);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
-      // PIE DE PÁGINA
+      // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         // OBTENER FECHA Y HORA ACTUAL
         var f = moment();
@@ -735,7 +735,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
   }
 
   /* ****************************************************************************************************
-   *                               PARA LA EXPORTACIÓN DE ARCHIVOS EXCEL SOLICITUDES 
+   *                               PARA LA EXPORTACION DE ARCHIVOS EXCEL SOLICITUDES 
    * ****************************************************************************************************/
 
   GenerarExcelEmpleado(forma: string, id_seleccionado) {
@@ -809,11 +809,11 @@ export class ReporteHorasPedidasComponent implements OnInit {
   GenerarSolicitudAutorizaEmpleado(id_seleccionado: number) {
     sessionStorage.setItem('Administrador', this.empleadoLogueado);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
-      // PIE DE PÁGINA
+      // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         // OBTENER FECHA Y HORA ACTUAL
         var f = moment();
@@ -971,7 +971,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
   }
 
   /* ****************************************************************************************************
-   *                               PARA LA EXPORTACIÓN DE ARCHIVOS EXCEL SOLICITUDES AUTORIZADAS
+   *                               PARA LA EXPORTACION DE ARCHIVOS EXCEL SOLICITUDES AUTORIZADAS
    * ****************************************************************************************************/
 
   GenerarExcelSolicitudAutorizadaEmpleado(id_seleccionado) {

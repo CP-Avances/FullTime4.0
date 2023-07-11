@@ -32,9 +32,7 @@ export class ConfiguracionComponent implements OnInit {
     public router: Router,
     public ventana: MatDialog,
   ) {
-    var cadena = this.router.url;
-    var aux = cadena.split("/");
-    this.idEmpresa = aux[2];
+    this.idEmpresa = localStorage.getItem('empresa') as string;
   }
 
   ngOnInit(): void {

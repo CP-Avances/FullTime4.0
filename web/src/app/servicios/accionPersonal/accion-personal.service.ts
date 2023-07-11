@@ -17,7 +17,7 @@ export class AccionPersonalService {
   }
 
   IngresarTipoAccionPersonal(datos: any) {
-    return this.http.post(`${environment.url}/accionPersonal`, datos);
+    return this.http.post<any>(`${environment.url}/accionPersonal`, datos);
   }
 
   BuscarTipoAccionPersonalId(id: any) {
@@ -42,7 +42,7 @@ export class AccionPersonalService {
   }
 
   IngresarTipoAccion(datos: any) {
-    return this.http.post(`${environment.url}/accionPersonal/accion/tipo`, datos);
+    return this.http.post<any>(`${environment.url}/accionPersonal/accion/tipo`, datos);
   }
 
   BuscarIdTipoAccion() {

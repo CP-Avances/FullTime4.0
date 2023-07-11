@@ -13,7 +13,6 @@ import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTACION DE COMPONENTES
-import { RegistrarFeriadosComponent } from 'src/app/componentes/catalogos/catFeriados/feriados/registrar-feriados/registrar-feriados.component';
 import { EditarFeriadosComponent } from 'src/app/componentes/catalogos/catFeriados/feriados/editar-feriados/editar-feriados.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
@@ -94,7 +93,7 @@ export class ListarFeriadosComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
@@ -144,12 +143,10 @@ export class ListarFeriadosComponent implements OnInit {
   }
 
   // METODO PARA REGISTRAR FERIADO
+  ver_registrar: boolean = false;
   AbrirVentanaRegistrarFeriado(): void {
-    this.ventana.open(RegistrarFeriadosComponent, { width: '350px' }).afterClosed().subscribe(items => {
-      if (items == true) {
-        this.BuscarParametro();
-      }
-    });
+    this.ver_lista = false;
+    this.ver_registrar = true;
   }
 
   // METODO PARA EDITAR FERIADOS
@@ -387,10 +384,10 @@ export class ListarFeriadosComponent implements OnInit {
   GetDocumentDefinicion() {
     sessionStorage.setItem('Feriados', this.feriados);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por: ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
-      // PIE DE PÁGINA
+      // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');

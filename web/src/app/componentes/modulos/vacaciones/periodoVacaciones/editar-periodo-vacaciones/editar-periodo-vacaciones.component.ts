@@ -29,7 +29,7 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
   selec1 = false;
   selec2 = false;
 
-  // Control de campos y validaciones del formulario
+  // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreEmpleadoF = new FormControl('', [Validators.required]);
   descripcionF = new FormControl('', [Validators.required, Validators.minLength(4)]);
   diaVacacionF = new FormControl('', [Validators.required]);
@@ -41,7 +41,7 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
   fechaInicioF = new FormControl('', [Validators.required]);
   diaPerdidoF = new FormControl('', [Validators.required]);
 
-  // Asignación de validaciones a inputs del formulario
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public PerVacacionesForm = new FormGroup({
     nombreEmpleadoForm: this.nombreEmpleadoF,
     descripcionForm: this.descripcionF,
@@ -68,7 +68,7 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
     this.ImprimirDatos();
   }
 
-  // METODO para ver la información del empleado 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
   ObtenerEmpleados(idemploy: any) {
     this.empleados = [];
     this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -101,7 +101,7 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
     }
   }
 
-  ValidarDatosPerVacacion(form) {
+  ValidarDatosPerVacacion(form: any) {
     if (form.fechaFinForm === '') {
       form.fechaFinForm = null;
       this.ActualizarPerVacacion(form);
@@ -117,7 +117,7 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
     }
   }
 
-  ActualizarPerVacacion(form) {
+  ActualizarPerVacacion(form: any) {
     let datosPerVacaciones = {
       id: this.data.datosPeriodo.id,
       id_empl_contrato: this.data.datosPeriodo.id_empl_contrato,
@@ -137,7 +137,7 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
       })
       this.CerrarVentanaRegistroPerVacaciones();
     }, error => {
-      this.toastr.error('Operación Fallida', 'Período de Vacaciones no fue actualizado', {
+      this.toastr.error('Ups!!! algo salio mal.', 'Período de Vacaciones no fue actualizado', {
         timeOut: 6000,
       })
     });
@@ -166,7 +166,7 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
     else {
       keynum = evt.which;
     }
-    // Comprobamos si se encuentra en el rango numérico y que teclas no recibirá.
+    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
     if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6) {
       return true;
     }

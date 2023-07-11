@@ -501,7 +501,7 @@ export class ListaWebComponent implements OnInit {
     this.RegistrarMultiple(respuesta, 1);
   }
 
-  // MOSTRAR DATOS DE EMPRESA
+  // MOSTRAR DATOS DE USUARIOS
   MostrarLista_DH() {
     if (this.opcion_dh === 's') {
       this.nombre_suc_dh.reset();
@@ -801,6 +801,7 @@ export class ListaWebComponent implements OnInit {
     this.opcion = e.value;
     this.activar_boton = true;
     this.activar_deshabilitados = false;
+    this.MostrarLista();
     switch (this.opcion) {
       case 's':
         this.ControlarOpciones(true, false, false, false);
@@ -1231,7 +1232,7 @@ export class ListaWebComponent implements OnInit {
     }
   }
 
-  // MOSTRAR DATOS DE EMPRESA
+  // MOSTRAR DATOS DE USUARIO
   MostrarLista() {
     if (this.opcion === 's') {
       this.nombre_suc.reset();

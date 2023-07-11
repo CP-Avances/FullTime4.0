@@ -1,13 +1,17 @@
 <div class="container" *ngFor="let d of datosPedido" style="padding-top: 15px;">
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
-            <span></span>
+            <span>DATOS GENERALES</span>
+            <button id="btn-raised" class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                (click)="AbrirEditar(d.id)">
+                Editar
+            </button>
         </div>
         <mat-card-content>
-            <div class="d-flex justify-content-around">
-                <div class="container" style="padding-top: 15px;">
+            <div class="container" style="padding-top: 5px;">
+                <div class="container" style="padding-top: 20px;">
                     <div class="row">
-                        <div class="col-sm">
+                        <div class="col-sm" id="verticalLine">
                             <div class="subtitulo">
                                 <span>ACCIÓN DE PERSONAL</span>
                             </div>
@@ -17,6 +21,18 @@
                             <label class="col-sm col-form-label"><b>Fecha Registro:</b>
                                 {{d.fec_creacion_}}
                             </label>
+                        </div>
+                        <div class="col-sm" id="verticalLine">
+                            <div class="subtitulo">
+                                <span>TIPO DE ACCIÓN</span>
+                            </div>
+                            <label class="col-sm col-form-label"><b>Tipo de acción personal:</b>
+                                {{d.tipo.toUpperCase()}}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md" id="verticalLine">
                             <div class="subtitulo">
                                 <span>DECRETO-ACUERDO-RESOLUCIÓN</span>
                             </div>
@@ -24,13 +40,7 @@
                                 {{decreto.toUpperCase()}}
                             </label>
                         </div>
-                        <div class="col-sm">
-                            <div class="subtitulo">
-                                <span>TIPO DE ACCIÓN</span>
-                            </div>
-                            <label class="col-sm col-form-label"><b>Tipo de acción personal:</b>
-                                {{d.tipo.toUpperCase()}}
-                            </label>
+                        <div class="col-md" id="verticalLine">
                             <div class="subtitulo">
                                 <span>EXPLICACIÓN (Base legal del tipo de acción y su adición)</span>
                             </div>
@@ -40,26 +50,16 @@
                                 {{d.adicion_legal}}
                             </label>
                         </div>
-                        <div style="text-align: right;">
-                            <i id="editarF" [routerLink]="['/editarPedido/',d.id]" matSuffix matTooltipPosition="right"
-                                matTooltip="Modificar datos de este registro" class="fas fa-edit">
-                                <p>Editar</p>
-                            </i>
-                        </div>
                     </div>
                 </div>
             </div>
-        </mat-card-content>
-    </mat-card>
-    <mat-card class="example-card mat-elevation-z8">
-        <div id="titulo">
-            <span></span>
-        </div>
-        <mat-card-content>
-            <div class="d-flex justify-content-around">
+            <div class="container" style="padding-top: 30px;">
+                <div id="titulo">
+                    <span></span>
+                </div>
                 <div class="container" style="padding-top: 15px;">
                     <div class="row">
-                        <div class="col-sm">
+                        <div class="col-sm" id="verticalLine">
                             <div class="subtitulo">
                                 <span>DATOS DEL EMPLEADO</span>
                             </div>
@@ -84,7 +84,7 @@
                                 {{d.num_partida}}
                             </label>
                         </div>
-                        <div class="col-sm">
+                        <div class="col-sm" id="verticalLine">
                             <div class="subtitulo">
                                 <span>SITUACIÓN PROPUESTA</span>
                             </div>
@@ -110,17 +110,14 @@
                     </div>
                 </div>
             </div>
-        </mat-card-content>
-    </mat-card>
-    <mat-card class="example-card mat-elevation-z8">
-        <div id="titulo">
-            <span></span>
-        </div>
-        <mat-card-content>
-            <div class="d-flex justify-content-around">
+
+            <div class="container" style="padding-top: 30px;">
+                <div id="titulo">
+                    <span></span>
+                </div>
                 <div class="container" style="padding-top: 15px;">
                     <div class="row">
-                        <div class="col-sm">
+                        <div class="col-sm" id="verticalLine">
                             <div class="subtitulo">
                                 <span>ACTA FINAL DEL CONCURSO</span>
                             </div>
@@ -133,22 +130,22 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm">
+                        <div class="col-sm" id="verticalLine">
                             <div class="subtitulo">
                                 <span>PROCESO DE RECURSOS HUMANOS</span>
                             </div>
                             <label class="col-sm col-form-label"><b>Firman:</b></label>
                             <label class="col-sm col-form-label">
-                                {{d.abrev_empl_uno}} {{datoEmpleadoH.toUpperCase()}} <br>
-                                {{cargoH.toUpperCase()}}
+                                {{d.abrev_empl_uno.toUpperCase()}}. {{datoEmpleadoH.toUpperCase()}} <br>
+                                <b>{{cargoH.toUpperCase()}}</b>
                             </label>
                             <label class="col-sm col-form-label">
-                                {{d.abrev_empl_dos}} {{datoEmpleadoG.toUpperCase()}} <br>
-                                {{cargoG.toUpperCase()}}
+                                {{d.abrev_empl_dos.toUpperCase()}}. {{datoEmpleadoG.toUpperCase()}} <br>
+                                <b>{{cargoG.toUpperCase()}}</b>
                             </label>
                         </div>
 
-                        <div class="col-sm">
+                        <div class="col-sm" id="verticalLine">
                             <div class="subtitulo">
                                 <span>REGISTRO Y CONTROL</span>
                             </div>
@@ -159,20 +156,16 @@
                     </div>
                 </div>
             </div>
-        </mat-card-content>
-    </mat-card>
-    <mat-card class="example-card mat-elevation-z8">
-        <div id="titulo">
-            <span></span>
-        </div>
-        <mat-card-content>
-            <div class="d-flex justify-content-around">
+            <div class="container" style="padding-top: 30px;">
+                <div id="titulo">
+                    <span></span>
+                </div>
                 <div class="container" style="padding-top: 15px;">
                     <div class="row">
-                        <div class="subtitulo">
-                            <span>LA PERSONA REEMPLAZA A</span>
-                        </div>
-                        <div class="col-sm">
+                        <div class="col-sm" id="verticalLine">
+                            <div class="subtitulo">
+                                <span>LA PERSONA REEMPLAZA A</span>
+                            </div>
                             <label class="col-sm col-form-label"><b>Nombre:</b>
                                 {{d.nombre_reemp}}
                             </label>
@@ -182,8 +175,6 @@
                             <label class="col-sm col-form-label"><b>Funciones:</b>
                                 {{d.funciones_reemp}}
                             </label>
-                        </div>
-                        <div class="col-sm">
                             <label class="col-sm col-form-label"><b>Número de acción:</b>
                                 {{d.num_accion_reemp}}
                             </label>
@@ -191,26 +182,28 @@
                                 {{d.primera_fecha_reemp_}}
                             </label>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="subtitulo">
-                            <span>POSESIÓN/NOTIFICACIÓN</span>
-                        </div>
-                        <div class="col-sm">
-                            <label class="col-sm col-form-label"><b>Posesión/Notificación:</b>
-                                {{d.posesion_notificacion}}
-                            </label>
-                        </div>
-                        <div class="col-sm">
-                            <label class="col-sm col-form-label"><b>Descripción:</b>
-                                {{d.descripcion_pose_noti}}
-                            </label>
+                        <div class="col-sm" id="verticalLine">
+                            <div class="subtitulo">
+                                <span>POSESIÓN/NOTIFICACIÓN</span>
+                            </div>
+                            <div class="col-sm">
+                                <label class="col-sm col-form-label"><b>Posesión/Notificación:</b>
+                                    {{d.posesion_notificacion}}
+                                </label>
+                            </div>
+                            <div class="col-sm">
+                                <label class="col-sm col-form-label"><b>Descripción:</b>
+                                    {{d.descripcion_pose_noti}}
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <input type="submit" class="btn btn-sm" [routerLink]="['/listaPedidos/']"
-                value="Ir a lista de acciones de personal">
+            <div style="padding-top: 5px; text-align: right;">
+                <input type="submit" class="btn btn-sm float-right" (click)="VerListaPedidos()"
+                    value="Ir a lista de acciones de personal">
+            </div>
         </mat-card-content>
     </mat-card>
 </div>

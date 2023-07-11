@@ -45,21 +45,21 @@ import { ScriptService } from 'src/app/servicios/empleado/script.service';
 
 // IMPORTAR COMPONENTES
 import { RegistroDetallePlanHorarioComponent } from 'src/app/componentes/horarios/detallePlanHorario/registro-detalle-plan-horario/registro-detalle-plan-horario.component';
-import { EditarVacacionesEmpleadoComponent } from 'src/app/componentes/rolEmpleado/vacacion-empleado/editar-vacaciones-empleado/editar-vacaciones-empleado.component';
+import { EditarVacacionesEmpleadoComponent } from 'src/app/componentes/modulos/vacaciones/editar-vacaciones-empleado/editar-vacaciones-empleado.component';
 import { RegistroAutorizacionDepaComponent } from 'src/app/componentes/autorizaciones/autorizaDepartamentos/registro-autorizacion-depa/registro-autorizacion-depa.component';
 import { EditarPeriodoVacacionesComponent } from '../../modulos/vacaciones/periodoVacaciones/editar-periodo-vacaciones/editar-periodo-vacaciones.component';
 import { EditarAutorizacionDepaComponent } from 'src/app/componentes/autorizaciones/autorizaDepartamentos/editar-autorizacion-depa/editar-autorizacion-depa.component';
 import { RegistrarEmpleProcesoComponent } from '../../modulos/accionesPersonal/procesos/registrar-emple-proceso/registrar-emple-proceso.component';
 import { EditarEmpleadoProcesoComponent } from '../../modulos/accionesPersonal/procesos/editar-empleado-proceso/editar-empleado-proceso.component';
-import { EditarSolicitudComidaComponent } from '../../modulos/alimentacion/editar-solicitud-comida/editar-solicitud-comida.component';
-import { PlanificacionComidasComponent } from '../../modulos/alimentacion/planificacion-comidas/planificacion-comidas.component';
+import { EditarSolicitudComidaComponent } from '../../modulos/alimentacion/solicitar-comida/editar-solicitud-comida/editar-solicitud-comida.component';
+import { PlanificacionComidasComponent } from '../../modulos/alimentacion/planifica-comida/planificacion-comidas/planificacion-comidas.component';
 import { RegistroPlanHorarioComponent } from 'src/app/componentes/horarios/planificacionHorario/registro-plan-horario/registro-plan-horario.component';
 import { EditarPlanHoraExtraComponent } from '../../modulos/horasExtras/planificacionHoraExtra/editar-plan-hora-extra/editar-plan-hora-extra.component';
 import { RegistrarVacacionesComponent } from '../../modulos/vacaciones/registrar-vacaciones/registrar-vacaciones.component';
 import { EditarPlanificacionComponent } from 'src/app/componentes/horarios/planificacionHorario/editar-planificacion/editar-planificacion.component';
 import { CancelarVacacionesComponent } from 'src/app/componentes/rolEmpleado/vacacion-empleado/cancelar-vacaciones/cancelar-vacaciones.component';
 import { RegistrarPeriodoVComponent } from '../../modulos/vacaciones/periodoVacaciones/registrar-periodo-v/registrar-periodo-v.component';
-import { EditarPlanComidasComponent } from '../../modulos/alimentacion/editar-plan-comidas/editar-plan-comidas.component';
+import { EditarPlanComidasComponent } from '../../modulos/alimentacion/planifica-comida/editar-plan-comidas/editar-plan-comidas.component';
 import { CancelarHoraExtraComponent } from 'src/app/componentes/rolEmpleado/horasExtras-empleado/cancelar-hora-extra/cancelar-hora-extra.component';
 import { CambiarContrasenaComponent } from '../../iniciarSesion/contrasenia/cambiar-contrasena/cambiar-contrasena.component';
 import { AdministraComidaComponent } from '../../modulos/alimentacion/administra-comida/administra-comida.component';
@@ -109,7 +109,7 @@ export class VerEmpleadoComponent implements OnInit {
   hipervinculo: string = environment.url; // VARIABLE DE MANEJO DE RUTAS CON URL
   FechaActual: any; // VARIBLE PARA ALMACENAR LA FECHA DEL DÍA DE HOY
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA 
+  // ITEMS DE PAGINACION DE LA TABLA 
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
@@ -228,7 +228,7 @@ export class VerEmpleadoComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
@@ -299,7 +299,7 @@ export class VerEmpleadoComponent implements OnInit {
     });
   }
 
-  // METODO PARA VER LA INFORMACIÓN DEL EMPLEADO QUE INICIA SESION
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO QUE INICIA SESION
   ObtenerEmpleadoLogueado(idemploy: any) {
     this.empleadoLogueado = [];
     this.restEmpleado.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -789,7 +789,7 @@ export class VerEmpleadoComponent implements OnInit {
     fechaICargoForm: this.fechaICargo,
   });
   cargoSeleccionado: any = [];
-  ObtenerCargoSeleccionado(form) {
+  ObtenerCargoSeleccionado(form: any) {
     this.cargoSeleccionado = [];
     this.restCargo.BuscarCargoID(form.fechaICargoForm).subscribe(datos => {
       this.cargoSeleccionado = datos;
@@ -1069,12 +1069,9 @@ export class VerEmpleadoComponent implements OnInit {
   AbrirPlanificarHorario(): void {
     this.data_horario = [];
     if (this.datoActual.id_cargo != undefined) {
-      if(this.horariosEmpleado.length > 0){
         this.ventana_horario = true;
-      }
-      else {
         this.horarios_usuario = false;
-      }
+
       this.data_horario = {
         pagina: 'ver_empleado',
         codigo: this.datoActual.codigo,
@@ -1090,7 +1087,6 @@ export class VerEmpleadoComponent implements OnInit {
     }
   }
 
-
   // ITEMS DE PAGINACION DE LA TABLA 
   pageSizeOptionsD = [5, 10, 20, 50];
   tamanio_paginaD: number = 5;
@@ -1101,7 +1097,6 @@ export class VerEmpleadoComponent implements OnInit {
     this.numero_paginaD = e.pageIndex + 1;
     this.tamanio_paginaD = e.pageSize;
   }
-
 
   /** ********************************************************************************************* **
    ** **                     CARGAR HORARIOS DEL EMPLEADO CON PLANTILLA                          ** **
@@ -1218,18 +1213,32 @@ export class VerEmpleadoComponent implements OnInit {
     })
   }
 
+  rotativo: any = []
+  ver_rotativo: boolean = false;
+  ver_no_rotativo: boolean = true;
   // VENTANA PARA REGISTRAR PLANIFICACIÓN DE HORARIOS DEL EMPLEADO 
   AbrirVentanaHorarioRotativo(): void {
     if (this.datoActual.id_cargo != undefined) {
+      this.rotativo = {
+        idEmpleado: this.idEmpleado, 
+        idCargo: this.datoActual.id_cargo
+      }
+this.ver_no_rotativo = false;
+this.ver_rotativo = true;
+
+      /*
       this.ventana.open(RegistroPlanHorarioComponent,
         {
-          width: '300px', data: {
+          width: '800px', data: {
             idEmpleado: this.idEmpleado, idCargo: this.datoActual.id_cargo
           }
         })
         .afterClosed().subscribe(item => {
           this.ObtenerHorarioRotativo(this.datoActual.codigo, this.formato_fecha);
         });
+
+
+        */
     }
     else {
       this.toastr.info('El usuario no tiene registrado un Cargo.', '', {
@@ -2621,11 +2630,11 @@ export class VerEmpleadoComponent implements OnInit {
   GetDocumentDefinicion() {
     sessionStorage.setItem('profile', this.empleadoUno);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase_m, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
-      // PIE DE PÁGINA
+      // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
@@ -2743,7 +2752,7 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   /** ******************************************************************************************* **
-   ** **                          PARA LA EXPORTACIÓN DE ARCHIVOS EXCEL                        ** **                           *
+   ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                        ** **                           *
    ** ******************************************************************************************* **/
 
   ExportToExcel() {
@@ -2760,7 +2769,7 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   /** ******************************************************************************************* **
-   ** **                          PARA LA EXPORTACIÓN DE ARCHIVOS CSV                          ** **                                *
+   ** **                          PARA LA EXPORTACION DE ARCHIVOS CSV                          ** **                                *
    ** ******************************************************************************************* **/
 
   ExportToCVS() {

@@ -43,7 +43,7 @@ export class EditarRolComponent implements OnInit {
   contador: number = 0;
   roles: any = [];
   data_nueva: any = [];
-  InsertarRol(form) {
+  InsertarRol(form: any) {
     this.contador = 0;
     this.roles = [];
     let dataRol = {
@@ -60,7 +60,7 @@ export class EditarRolComponent implements OnInit {
       })
       if (this.contador === 0) {
         this.rest.ActualizarRol(dataRol).subscribe(response => {
-          this.toastr.success('Operacion Exitosa', 'Rol actualizado', {
+          this.toastr.success('Operacion exitosa.', 'Rol actualizado', {
             timeOut: 6000,
           });
           this.validar.Auditar('app-web', 'cg_roles', this.data.datosRol, this.data_nueva, 'UPDATE');

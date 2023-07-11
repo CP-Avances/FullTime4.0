@@ -473,7 +473,6 @@ export class ListaNotificacionComponent implements OnInit {
     ModelarDepartamentos(id: number) {
         let usuarios: any = [];
         let respuesta = JSON.parse(this.origen)
-
         if (id === 0) {
             respuesta.forEach((obj: any) => {
                 obj.departamentos.forEach((obj1: any) => {
@@ -498,7 +497,6 @@ export class ListaNotificacionComponent implements OnInit {
                 })
             })
         }
-
         this.RegistrarMultiple(usuarios);
     }
 

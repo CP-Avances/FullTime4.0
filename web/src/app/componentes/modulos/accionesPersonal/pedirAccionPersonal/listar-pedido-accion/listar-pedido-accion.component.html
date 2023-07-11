@@ -1,125 +1,135 @@
-<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;">
-    <div class="row">
-        <div class="col-md">
-            <div id="titulo">
-                <span>PEDIDOS DE ACCIONES DE PERSONAL</span>
-            </div>
-            <mat-card class="example-card mat-elevation-z9">
-                <div class="d-flex justify-content-around" style="margin-top: 1%; margin-bottom: 2%;">
-                    <button id="btn-raised"  class="btn btn-sm" [routerLink]="['/pedidoAccion']"
-                        matSuffix matTooltipPosition="right"
-                        matTooltip="Dar clic para realizar un pedido de acción de personal.">Registrar pedido acción
-                        personal</button>
-                    <button id="btn-raised"  class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
-                        matTooltipPosition="right"
-                        matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">Mostrar
-                        lista</button>
+<!--  **************************** LISTA DE PEDIDOS DE ACCIONES DE PERSONAL  ********************************  -->
+<div *ngIf="ver_lista">
+    <div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;">
+        <div class="row">
+            <div class="col-md">
+                <div id="titulo">
+                    <span>PEDIDOS DE ACCIONES DE PERSONAL</span>
                 </div>
-            </mat-card>
+                <mat-card class="example-card mat-elevation-z9">
+                    <div class="d-flex justify-content-around" style="margin-top: 1%; margin-bottom: 2%;">
+                        <button id="btn-raised" class="btn btn-sm" [routerLink]="['/pedidoAccion']" matSuffix
+                            matTooltipPosition="right"
+                            matTooltip="Dar clic para realizar un pedido de acción de personal.">
+                            Registrar pedido acción personal
+                        </button>
+                        <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
+                            matTooltipPosition="right"
+                            matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
+                            Mostrar lista
+                        </button>
+                    </div>
+                </mat-card>
+            </div>
+        </div>
+    </div>
+    <div class="container" style="padding-bottom: 50px; text-align: center;">
+        <div class="mat-elevation-z8" style="background: white;">
+            <div id="titulo">LISTA DE PEDIDOS DE ACCIONES DE PERSONAL</div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="thead-light">
+                        <tr style="text-align: center;">
+                            <th scope="col">Apellido</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Fecha de creación</th>
+                            <th scope="col">Rige desde</th>
+                            <th scope="col">Rige hasta</th>
+                            <th scope="col">Número de partida</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <mat-form-field id="t-inputs" style="width: 125px;">
+                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroApellido"
+                                        [formControl]="apellido" type="text" (keypress)="IngresarSoloLetras($event)">
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-form-field id="t-inputs" style="width: 125px;">
+                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroNombre"
+                                        [formControl]="nombre" type="text" (keypress)="IngresarSoloLetras($event)">
+                                </mat-form-field>
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <mat-icon id="iemple" matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de datos de acuerdo a las columnas de la tabla.">
+                                    help_outline
+                                </mat-icon>
+                            </td>
+                        </tr>
+                        <tr
+                            *ngFor="let a of listaPedidos  | emplNombre: filtroNombre | emplApellido: filtroApellido  | paginate:tamanio_pagina:numero_pagina">
+                            <td>{{a.apellido}}</td>
+                            <td>{{a.nombre}}</td>
+                            <td>{{a.fecCreacion_}}</td>
+                            <td>{{a.fecDesde_}}</td>
+                            <td>{{a.fecHasta_}}</td>
+                            <td>{{a.num_partida}}</td>
+                            <td class="justify-content-center" style="margin-right: 1rem;">
+                                <i matSuffix matTooltipPosition="right"
+                                    matTooltip="Ver datos generales de este registro." class="fas fa-eye" id="t-ver"
+                                    (click)="VerDatosPedidos(a.id)">
+                                    <p>Ver</p>
+                                </i>
+                                <i class="fas fa-edit" id="t-editar" matSuffix matTooltipPosition="right"
+                                    matTooltip="Modificar los datos generales de este registro."
+                                    (click)="AbrirEditar(a.id)">
+                                    <p>Editar</p>
+                                </i>
+                                <i (click)="MostrarInformacion(a.id, 'pdf')" id="pdf_" class="fas fa-file-pdf" matSuffix
+                                    matTooltipPosition="right"
+                                    matTooltip="Ver pedido de Acción de Personal en formato PDF.">
+                                    <p>PDF</p>
+                                </i>
+                                <i (click)="MostrarInformacion(a.id, 'excel')" id="excel_" class="fas fa-file-excel"
+                                    matSuffix matTooltipPosition="right"
+                                    matTooltip="Ver pedido de Acción de Personal en formato EXCEL.">
+                                    <p>XLSL</p>
+                                </i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <mat-paginator id="pagina" [length]="listaPedidos.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+            </mat-paginator>
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px">
+                <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                    matTooltipPosition="right"
+                    matTooltip="Descargar Lista de pedidos de acciones de personal en formato PDF.">
+                    <p>PDF</p>
+                </i>
+                <i (click)="ExportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de pedidos de acciones de personal en formato EXCEL.">
+                    <p>XLSL</p>
+                </i>
+                <i (click)="ExportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de pedidos de acciones de personal en formato CSV.">
+                    <p>CSV</p>
+                </i>
+                <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de pedidos de acciones de personal en formato XML.">
+                    <p>XML</p>
+                </i>
+            </div>
+            <div class="d-flex justify-content-end"
+                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                <p> Reporte de pedidos de acciones de personal. </p>
+            </div>
         </div>
     </div>
 </div>
-<div class="container" style="padding-bottom: 50px; text-align: center;">
-    <div class="mat-elevation-z8" style="background: white;">
-        <div id="titulo">LISTA DE PEDIDOS DE ACCIONES DE PERSONAL</div>
-        <div class="table-responsive">
-            <table class="table table-hover table-sm">
-                <thead class="thead-light">
-                    <tr style="text-align: center;">
-                        <th scope="col">Código</th>
-                        <th scope="col">Apellido</th>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Fecha de creación</th>
-                        <th scope="col">Rige desde</th>
-                        <th scope="col">Rige hasta</th>
-                        <th scope="col">Numero de partida</th>
-                        <th scope="col">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            
-                        </td>
-                        <td>
-                            <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroApellido"
-                                    [formControl]="apellido" type="text" (keypress)="IngresarSoloLetras($event)">
-                            </mat-form-field>
-                        </td>
-                        <td>
-                            <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombre" [formControl]="nombre"
-                                    type="text" (keypress)="IngresarSoloLetras($event)">
-                            </mat-form-field>
-                        </td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                            <mat-icon id="iemple" matSuffix matTooltipPosition="right"
-                                matTooltip="Búsqueda de datos de acuerdo a las columnas de la tabla.">
-                                help_outline</mat-icon>
-                        </td>
-                    </tr>
-                    <tr
-                        *ngFor="let a of listaPedidos  | emplNombre: filtroNombre | emplApellido: filtroApellido  | paginate:tamanio_pagina:numero_pagina">
-                        <th scope="row">{{a.id}}</th>
-                        <td>{{a.apellido}}</td>
-                        <td>{{a.nombre}}</td>
-                        <td>{{a.fecCreacion_}}</td>
-                        <td>{{a.fecDesde_}}</td>
-                        <td>{{a.fecHasta_}}</td>
-                        <td>{{a.num_partida}}</td>
-                        <td class="d-flex justify-content-center" style="margin-right: 1rem;">
-                            <i matSuffix matTooltipPosition="right" matTooltip="Ver datos generales de este registro."
-                                class="fas fa-eye" id="t-ver" [routerLink]="['/verAccion/',a.id]">
-                                <p>Ver</p>
-                            </i>
-                            <i class="fas fa-edit" id="t-editar" matSuffix matTooltipPosition="right"
-                                matTooltip="Modificar los datos generales de este registro."
-                                [routerLink]="['/editarPedido/',a.id]">
-                                <p>Editar</p>
-                            </i>
-                            <i (click)="MostrarInformacion(a.id, 'pdf')" id="pdf" class="fas fa-file-pdf" matSuffix
-                                matTooltipPosition="right"
-                                matTooltip="Ver pedido de Acción de Personal en formato PDF.">
-                                <p>PDF</p>
-                            </i>
-                            <i (click)="MostrarInformacion(a.id, 'excel')" id="excel" class="fas fa-file-excel" matSuffix
-                                matTooltipPosition="right"
-                                matTooltip="Ver pedido de Acción de Personal en formato EXCEL.">
-                                <p>XLSL</p>
-                            </i>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <mat-paginator id="pagina" [length]="listaPedidos.length" [pageSize]="tamanio_pagina"
-            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
-        </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px">
-            <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de pedidos de acciones de personal en formato PDF.">
-                <p>PDF</p>
-            </i>
-            <i (click)="ExportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de pedidos de acciones de personal en formato EXCEL.">
-                <p>XLSL</p>
-            </i>
-            <i (click)="ExportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de pedidos de acciones de personal en formato CSV.">
-                <p>CSV</p>
-            </i>
-            <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de pedidos de acciones de personal en formato XML.">
-                <p>XML</p>
-            </i>
-        </div>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
-            <p> Reporte de pedidos de acciones de personal. </p>
-        </div>
-    </div>
-</div>
+
+<!--  **************************** PANTALLA DE DATOS DE PEDIDO DE ACCIONES DE PERSONAL  ********************************  -->
+<app-ver-pedido-accion *ngIf="ver_datos" [idPedido]="pedido_id"></app-ver-pedido-accion>
+
+<!--  **************************** PANTALLA EDITAR DATOS DE PEDIDO DE ACCIONES DE PERSONAL  ********************************  -->
+<app-editar-pedido-accion *ngIf="ver_editar" [idPedido]="pedido_id" [pagina]="pagina"></app-editar-pedido-accion>

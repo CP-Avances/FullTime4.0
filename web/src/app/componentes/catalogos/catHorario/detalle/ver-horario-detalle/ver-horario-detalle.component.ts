@@ -12,9 +12,10 @@ import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.
 
 import { EditarDetalleCatHorarioComponent } from 'src/app/componentes/catalogos/catHorario/detalle/editar-detalle-cat-horario/editar-detalle-cat-horario.component';
 import { DetalleCatHorarioComponent } from 'src/app/componentes/catalogos/catHorario/detalle/detalle-cat-horario/detalle-cat-horario.component';
+import { PrincipalHorarioComponent } from '../../horario/principal-horario/principal-horario.component';
 import { EditarHorarioComponent } from 'src/app/componentes/catalogos/catHorario/horario/editar-horario/editar-horario.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
-import { PrincipalHorarioComponent } from '../../horario/principal-horario/principal-horario.component';
+import { HorarioMultipleEmpleadoComponent } from 'src/app/componentes/horarios/rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
 
 @Component({
   selector: 'app-ver-horario-detalle',
@@ -47,6 +48,7 @@ export class VerHorarioDetalleComponent implements OnInit {
     public validar: ValidacionesService,
     public parametro: ParametrosService,
     public componente: PrincipalHorarioComponent,
+    public componentep: HorarioMultipleEmpleadoComponent,
   ) { }
 
   ngOnInit(): void {
@@ -151,8 +153,6 @@ export class VerHorarioDetalleComponent implements OnInit {
           this.EliminarDetalle(datos.id);
           let horasT = this.datosHorario[0].hora_trabajo.split(':')[0] + ':' + this.datosHorario[0].hora_trabajo.split(':')[1];
           this.ActualizarHorario(this.datosHorario[0].id, horasT, false);
-        } else {
-          this.router.navigate(['/verHorario/', this.idHorario]);
         }
       });
   }
@@ -450,6 +450,10 @@ export class VerHorarioDetalleComponent implements OnInit {
         this.toastr.success('Horas totales de trabajo son correctas.', 'Verificación exitosa.', {
           timeOut: 6000
         });
+        if (this.pagina === 'planificar') {
+          this.componentep.ver_horario = false;
+          this.componentep.seleccionar = true;
+        }
       }
     }, err => {
       this.toastr.error(err.message)
@@ -458,9 +462,14 @@ export class VerHorarioDetalleComponent implements OnInit {
 
   // METODO PARA VISUALIZAR LISTA DE HORARIOS
   VerHorarios() {
-    this.componente.ver_horarios = true;
-    this.componente.ver_detalles = false;
-    this.componente.ObtenerHorarios();
+    if (this.pagina === 'planificar') {
+      this.router.navigate(['/horario']);
+    } else {
+      this.componente.ver_horarios = true;
+      this.componente.ver_detalles = false;
+      this.componente.ObtenerHorarios();
+    }
+
   }
 
 }

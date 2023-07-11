@@ -9,10 +9,9 @@
             <span class="w-100 bd-highlight">
                 LISTA DISPOSITIVOS MÓVILES REGISTRADOS
             </span>
-            <button *ngIf="multiple" class="btn btn-outline-light btn-sm" matSuffix
-                matTooltipPosition="right"
-                matTooltip="Elimina los dispositivos seleccionados."
-                style="float: right; margin-right: 10px;" (click)="AbrirVentanaEliminar(1)">
+            <button *ngIf="multiple" class="btn btn-outline-light btn-sm" matSuffix matTooltipPosition="right"
+                matTooltip="Elimina los dispositivos seleccionados." style="float: right; margin-right: 10px;"
+                (click)="AbrirVentanaEliminar(1)">
                 Eliminar Dispositivo
             </button>
         </div>
@@ -81,12 +80,12 @@
                         <td>{{d.cedula}}</td>
                         <td>{{d.id_dispositivo}}</td>
                         <td>{{d.modelo_dispositivo}}</td>
-                        <td class="d-flex justify-content-center">
+                        <td class="justify-content-center">
                             <div style="height: 100%;">
                                 <i (click)="AbrirVentanaEliminar(d)" *ngIf="individual" class="far fa-trash-alt"
                                     id="t-eliminar" matSuffix matTooltipPosition="right"
                                     matTooltip="Eliminar registro de dispositivo.">
-                                <p>Eliminar</p>
+                                    <p>Eliminar</p>
                                 </i>
                             </div>
                         </td>

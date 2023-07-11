@@ -1,21 +1,23 @@
-/** IMPORTACION DE LIBRERIAS */
-import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter,} from "@angular/material-moment-adapter";
-import {
-  DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE,} from "@angular/material/core";
+// IMPORTACION DE LIBRERIAS
+import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter, } from "@angular/material-moment-adapter";
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, } from "@angular/material/core";
 import { FormControl, Validators, FormGroup } from "@angular/forms";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Input } from "@angular/core";
 import { startWith, map } from "rxjs/operators";
 import { ToastrService } from "ngx-toastr";
 import { Observable } from "rxjs";
+import { Router } from "@angular/router";
 import * as moment from "moment";
 
-/** IMPORTACION DE SERVICIOS */
+// IMPORTACION DE SERVICIOS 
+import { AccionPersonalService } from "src/app/servicios/accionPersonal/accion-personal.service";
+import { ValidacionesService } from "src/app/servicios/validaciones/validaciones.service";
 import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
 import { EmpresaService } from "src/app/servicios/catalogos/catEmpresa/empresa.service";
-import { AccionPersonalService } from "src/app/servicios/accionPersonal/accion-personal.service";
-import { Router } from "@angular/router";
 import { ProcesoService } from "src/app/servicios/catalogos/catProcesos/proceso.service";
 import { CiudadService } from "src/app/servicios/ciudad/ciudad.service";
+
+import { ListarPedidoAccionComponent } from "../listar-pedido-accion/listar-pedido-accion.component";
 
 @Component({
   selector: "app-editar-pedido-accion",
@@ -33,7 +35,9 @@ import { CiudadService } from "src/app/servicios/ciudad/ciudad.service";
   ],
 })
 export class EditarPedidoAccionComponent implements OnInit {
-  idPedido: string = "";
+
+  @Input() idPedido: number;
+  @Input() pagina: string = '';
 
   // FILTRO DE NOMBRES DE LOS EMPLEADOS
   filtroNombreH: Observable<any[]>;
@@ -49,15 +53,15 @@ export class EditarPedidoAccionComponent implements OnInit {
   filtroCiudad: Observable<any[]>;
   seleccionarCiudad: any;
 
-  // EVENTOS RELACIONADOS A SELECCIÓN E INGRESO DE ACUERDOS - DECRETOS - RESOLUCIONES
+  // EVENTOS RELACIONADOS A SELECCION E INGRESO DE ACUERDOS - DECRETOS - RESOLUCIONES
   ingresoAcuerdo: boolean = false;
   vistaAcuerdo: boolean = true;
 
-  // EVENTOS REALCIONADOS A SELECCIÓN E INGRESO DE CARGOS PROPUESTOS
+  // EVENTOS REALCIONADOS A SELECCION E INGRESO DE CARGOS PROPUESTOS
   ingresoCargo: boolean = false;
   vistaCargo: boolean = true;
 
-  // INICIACIÓN DE CAMPOS DEL FORMULARIO
+  // INICIACION DE CAMPOS DEL FORMULARIO
   identificacionF = new FormControl("", [
     Validators.required,
     Validators.minLength(3),
@@ -136,7 +140,7 @@ export class EditarPedidoAccionComponent implements OnInit {
     descripcionPForm: this.descripcionP,
   });
 
-  // INICIACIÓN DE VARIABLES
+  // INICIACION DE VARIABLES
   idEmpleadoLogueado: any;
   empleados: any = [];
   ciudades: any = [];
@@ -144,30 +148,29 @@ export class EditarPedidoAccionComponent implements OnInit {
   FechaActual: any;
 
   constructor(
-    public router: Router,
-    public restAccion: AccionPersonalService,
     public restProcesos: ProcesoService,
     public restEmpresa: EmpresaService,
-    private toastr: ToastrService,
+    public componentel: ListarPedidoAccionComponent,
+    public restAccion: AccionPersonalService,
+    public validar: ValidacionesService,
+    public router: Router,
     public restE: EmpleadoService,
-    public restC: CiudadService
+    public restC: CiudadService,
+    private toastr: ToastrService,
   ) {
-    var cadena = this.router.url;
-    var aux = cadena.split("/");
-    this.idPedido = aux[2];
     this.idEmpleadoLogueado = parseInt(localStorage.getItem("empleado") as string);
     this.departamento = parseInt(localStorage.getItem("departamento") as string);
   }
 
   ngOnInit(): void {
     this.CargarInformacion();
-    // INICIALIZACÓN DE FECHA Y MOSTRAR EN FORMULARIO
+    // INICIALIZACION DE FECHA Y MOSTRAR EN FORMULARIO
     var f = moment();
     this.FechaActual = f.format("YYYY-MM-DD");
     this.firstFormGroup.patchValue({
       fechaForm: this.FechaActual,
     });
-    // INVOCACIÓN A LOS METODOS PARA CARGAR DATOS
+    // INVOCACION A LOS METODOS PARA CARGAR DATOS
     this.ObtenerTiposAccion();
     this.ObtenerEmpleados();
     this.ObtenerDecretos();
@@ -176,7 +179,7 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.ObtenerCargos();
     this.MostrarDatos();
 
-    // DATOS VACIOS INDICAR LA OPCIÓN OTRO
+    // DATOS VACIOS INDICAR LA OPCION OTRO
     this.decretos[this.decretos.length] = { descripcion: "OTRO" };
     this.cargos[this.cargos.length] = { descripcion: "OTRO" };
 
@@ -203,7 +206,7 @@ export class EditarPedidoAccionComponent implements OnInit {
     );
   }
 
-  // METODO PARA BUSQUEDA DE NOMBRES SEGÚN LO INGRESADO POR EL USUARIO
+  // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
   private _filtrarEmpleado(value: string): any {
     if (value != null) {
       const filterValue = value.toUpperCase();
@@ -213,7 +216,7 @@ export class EditarPedidoAccionComponent implements OnInit {
     }
   }
 
-  // METODO PARA BUSQUEDA DE NOMBRES SEGÚN LO INGRESADO POR EL USUARIO
+  // METODO PARA BUSQUEDA DE NOMBRES SEGUN LO INGRESADO POR EL USUARIO
   private _filtrarCiudad(value: string): any {
     if (value != null) {
       const filterValue = value.toUpperCase();
@@ -225,57 +228,62 @@ export class EditarPedidoAccionComponent implements OnInit {
 
   datosPedido: any = [];
   CargarInformacion() {
-    this.restAccion.BuscarDatosPedidoId(parseInt(this.idPedido))
-    .subscribe((data) => {this.datosPedido = data; 
-      console.log("datos", this.datosPedido);
-      this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].id_empleado)
-      .subscribe((data1) => {this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empl_uno)
-        .subscribe((data2) => {this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empl_dos)
-          .subscribe((data3) => {this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].id_empl_responsable)
-            .subscribe((data4) => {this.restAccion.BuscarDatosPedidoCiudades(this.datosPedido[0].id_ciudad)
-              .subscribe((data5) => {
-                this.firstFormGroup.patchValue({
-                  identificacionForm: this.datosPedido[0].identi_accion_p,
-                  tipoDecretoForm: this.datosPedido[0].decre_acue_resol,
-                  baseForm: this.datosPedido[0].adicion_legal,
-                  accionForm: this.datosPedido[0].tipo_accion,
-                });
-                this.secondFormGroup.patchValue({
-                  idEmpleadoForm: data1[0].apellido + " " + data1[0].nombre,
-                  fechaDesdeForm: this.datosPedido[0].fec_rige_desde,
-                  fechaHastaForm: this.datosPedido[0].fec_rige_hasta,
-                  numPartidaForm: this.datosPedido[0].num_partida,
-                  tipoProcesoForm: this.datosPedido[0].proceso_propuesto,
-                  idCiudad: data5[0].descripcion,
-                  tipoCargoForm: this.datosPedido[0].cargo_propuesto,
-                  sueldoForm: this.datosPedido[0].salario_propuesto,
-                  numPropuestaForm: this.datosPedido[0].num_partida_propuesta,
-                  numPartidaIForm: this.datosPedido[0].num_partida_individual,
-                });
-                this.thirdFormGroup.patchValue({
-                  actaForm: this.datosPedido[0].act_final_concurso,
-                  fechaActaForm: this.datosPedido[0].fec_act_final_concurso,
-                  idEmpleadoHForm: data2[0].apellido + " " + data2[0].nombre,
-                  idEmpleadoGForm: data3[0].apellido + " " + data3[0].nombre,
-                  idEmpleadoRForm: data4[0].apellido + " " + data4[0].nombre,
-                  abrevHForm: this.datosPedido[0].abrev_empl_uno,
-                  abrevGForm: this.datosPedido[0].abrev_empl_dos,
-                });
-                this.fourthFormGroup.patchValue({
-                  funcionesReempForm:this.datosPedido[0].funciones_reemp,
-                  nombreReempForm: this.datosPedido[0].nombre_reemp,
-                  puestoReempForm: this.datosPedido[0].puesto_reemp,
-                  accionReempForm: this.datosPedido[0].num_accion_reemp,
-                  fechaReempForm: this.datosPedido[0].primera_fecha_reemp,  
-                  posesionNotificacionForm: this.datosPedido[0].posesion_notificacion,
-                  descripcionPForm: this.datosPedido[0].descripcion_pose_noti,
-                });
+    this.restAccion.BuscarDatosPedidoId(this.idPedido)
+      .subscribe((data) => {
+        this.datosPedido = data;
+        console.log("datos", this.datosPedido);
+        this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].id_empleado)
+          .subscribe((data1) => {
+            this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empl_uno)
+              .subscribe((data2) => {
+                this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].firma_empl_dos)
+                  .subscribe((data3) => {
+                    this.restAccion.BuscarDatosPedidoEmpleados(this.datosPedido[0].id_empl_responsable)
+                      .subscribe((data4) => {
+                        this.restAccion.BuscarDatosPedidoCiudades(this.datosPedido[0].id_ciudad)
+                          .subscribe((data5) => {
+                            this.firstFormGroup.patchValue({
+                              identificacionForm: this.datosPedido[0].identi_accion_p,
+                              tipoDecretoForm: this.datosPedido[0].decre_acue_resol,
+                              baseForm: this.datosPedido[0].adicion_legal,
+                              accionForm: this.datosPedido[0].tipo_accion,
+                            });
+                            this.secondFormGroup.patchValue({
+                              idEmpleadoForm: data1[0].apellido + " " + data1[0].nombre,
+                              fechaDesdeForm: this.datosPedido[0].fec_rige_desde,
+                              fechaHastaForm: this.datosPedido[0].fec_rige_hasta,
+                              numPartidaForm: this.datosPedido[0].num_partida,
+                              tipoProcesoForm: this.datosPedido[0].proceso_propuesto,
+                              idCiudad: data5[0].descripcion,
+                              tipoCargoForm: this.datosPedido[0].cargo_propuesto,
+                              sueldoForm: this.datosPedido[0].salario_propuesto,
+                              numPropuestaForm: this.datosPedido[0].num_partida_propuesta,
+                              numPartidaIForm: this.datosPedido[0].num_partida_individual,
+                            });
+                            this.thirdFormGroup.patchValue({
+                              actaForm: this.datosPedido[0].act_final_concurso,
+                              fechaActaForm: this.datosPedido[0].fec_act_final_concurso,
+                              idEmpleadoHForm: data2[0].apellido + " " + data2[0].nombre,
+                              idEmpleadoGForm: data3[0].apellido + " " + data3[0].nombre,
+                              idEmpleadoRForm: data4[0].apellido + " " + data4[0].nombre,
+                              abrevHForm: this.datosPedido[0].abrev_empl_uno,
+                              abrevGForm: this.datosPedido[0].abrev_empl_dos,
+                            });
+                            this.fourthFormGroup.patchValue({
+                              funcionesReempForm: this.datosPedido[0].funciones_reemp,
+                              nombreReempForm: this.datosPedido[0].nombre_reemp,
+                              puestoReempForm: this.datosPedido[0].puesto_reemp,
+                              accionReempForm: this.datosPedido[0].num_accion_reemp,
+                              fechaReempForm: this.datosPedido[0].primera_fecha_reemp,
+                              posesionNotificacionForm: this.datosPedido[0].posesion_notificacion,
+                              descripcionPForm: this.datosPedido[0].descripcion_pose_noti,
+                            });
+                          });
+                      });
+                  });
               });
-            });
           });
-        });
       });
-    });
   }
 
   // BUSQUEDA DE DATOS DE EMPRESA
@@ -312,15 +320,13 @@ export class EditarPedidoAccionComponent implements OnInit {
   }
 
   // METODO PARA ACTIVAR FORMULARIO NOMBRE DE OTRA OPCIÓN
-  estilo: any;
-  IngresarOtro(form3) {
+  IngresarOtro(form3: any) {
     if (form3.tipoDecretoForm === undefined) {
       this.firstFormGroup.patchValue({
         otroDecretoForm: "",
       });
-      this.estilo = { visibility: "visible" };
       this.ingresoAcuerdo = true;
-      this.toastr.info("Ingresar nombre de un nuevo tipo de proceso", "", {
+      this.toastr.info("Ingresar nombre de un nuevo tipo de proceso.", "", {
         timeOut: 6000,
       });
       this.vistaAcuerdo = false;
@@ -332,7 +338,6 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.firstFormGroup.patchValue({
       otroDecretoForm: "",
     });
-    this.estilo = { visibility: "hidden" };
     this.ingresoAcuerdo = false;
     this.vistaAcuerdo = true;
   }
@@ -356,20 +361,18 @@ export class EditarPedidoAccionComponent implements OnInit {
     });
   }
 
-  //Lista de Posesiones y notificaciones
+  // LISTA DE POSESIONES Y NOTIFICACIONES
   posesiones_notificaciones: any = [
     { nombre: "POSESIÓN DEL CARGO" },
     { nombre: "NOTIFICACIÓN" },
   ];
 
   // METODO PARA ACTIVAR FORMULARIO DE INGRESO DE UN NUEVO TIPO DE CARGO PROPUESTO
-  estiloC: any;
-  IngresarCargo(form4) {
+  IngresarCargo(form4: any) {
     if (form4.tipoCargoForm === undefined) {
       this.secondFormGroup.patchValue({
         otroCargoForm: "",
       });
-      this.estiloC = { visibility: "visible" };
       this.ingresoCargo = true;
       this.toastr.info(
         "Ingresar nombre de un nuevo tipo de cargo o puesto propuesto.",
@@ -387,7 +390,6 @@ export class EditarPedidoAccionComponent implements OnInit {
     this.secondFormGroup.patchValue({
       otroCargoForm: "",
     });
-    this.estiloC = { visibility: "hidden" };
     this.ingresoCargo = false;
     this.vistaCargo = true;
   }
@@ -489,9 +491,9 @@ export class EditarPedidoAccionComponent implements OnInit {
               fec_rige_desde: String(
                 moment(form2.fechaDesdeForm, "YYYY/MM/DD").format("YYYY-MM-DD")
               ),
-              fec_rige_hasta: form2.fechaHastaForm!==null ? (String(
+              fec_rige_hasta: form2.fechaHastaForm !== null ? (String(
                 moment(form2.fechaHastaForm, "YYYY/MM/DD").format("YYYY-MM-DD")
-              )):null,
+              )) : null,
               identi_accion_p: form1.identificacionForm,
               num_partida: form2.numPartidaForm,
               decre_acue_resol: form1.tipoDecretoForm,
@@ -509,22 +511,22 @@ export class EditarPedidoAccionComponent implements OnInit {
               id_empl_responsable: idEmpl_responsable,
               num_partida_individual: form2.numPartidaIForm,
               act_final_concurso: form3.actaForm,
-              fec_act_final_concurso: form3.fechaActaForm!==null ? (String(
+              fec_act_final_concurso: form3.fechaActaForm !== null ? (String(
                 moment(form3.fechaActaForm, "YYYY/MM/DD").format("YYYY-MM-DD")
-              )):null,
+              )) : null,
               nombre_reemp: nombreCapitalizado,
               puesto_reemp: form4.puestoReempForm,
               funciones_reemp: form4.funcionesReempForm,
               num_accion_reemp: form4.accionReempForm,
-              primera_fecha_reemp: form4.fechaReempForm !==null ? (String(
+              primera_fecha_reemp: form4.fechaReempForm !== null ? (String(
                 moment(form4.fechaReempForm, "YYYY/MM/DD").format("YYYY-MM-DD")
-              )):null,
+              )) : null,
               posesion_notificacion: form4.posesionNotificacionForm,
               descripcion_pose_noti: form4.descripcionPForm,
-              id: parseInt(this.idPedido),
+              id: this.idPedido,
             };
             // VALIDAR QUE FECHAS SE ENCUENTREN BIEN INGRESADA
-            if(form4.fechaReempForm === "" || form4.fechaReempForm === null){
+            if (form4.fechaReempForm === "" || form4.fechaReempForm === null) {
               datosAccion.primera_fecha_reemp = null;
             }
 
@@ -555,7 +557,7 @@ export class EditarPedidoAccionComponent implements OnInit {
   }
 
   // METODO PARA VERIFICAR LAS POSIBLES OPCIONES DE INGRESOS EN EL FORMULARIO
-  ValidacionesIngresos(form1,form2, datosAccion) {
+  ValidacionesIngresos(form1: any, form2: any, datosAccion: any) {
     // INGRESO DE DATOS DE ACUERDO A LO INGRESADO POR EL USUARIO
     if (form1.tipoDecretoForm != undefined && form2.tipoCargoForm != undefined) {
       console.log("INGRESA 1", datosAccion);
@@ -620,18 +622,18 @@ export class EditarPedidoAccionComponent implements OnInit {
           timeOut: 6000,
         }
       );
-      this.router.navigate(["/verAccion/", parseInt(this.idPedido)]);
+      this.CerrarVentana(2, this.idPedido);
     });
   }
 
   // METODO PARA INGRESAR NUEVO TIPO DE DECRETO - ACUERDO - RESOLUCION
-  IngresarNuevoDecreto(form1, form2, datos: any, opcion: string) {
+  IngresarNuevoDecreto(form1: any, form2: any, datos: any, opcion: string) {
     if (form1.otroDecretoForm != "") {
       let acuerdo = {
         descripcion: form1.otroDecretoForm,
       };
       this.restAccion.IngresarDecreto(acuerdo).subscribe((resol) => {
-        // BUSCAR ID DE ÚLTIMO REGISTRO DE DECRETOS - ACUERDOS - RESOLUCIÓN - OTROS
+        // BUSCAR ID DE ULTIMO REGISTRO DE DECRETOS - ACUERDOS - RESOLUCION - OTROS
         this.restAccion.BuscarIdDecreto().subscribe((max) => {
           datos.decre_acue_resol = max[0].id;
           // INGRESAR PEDIDO DE ACCION DE PERSONAL
@@ -660,13 +662,13 @@ export class EditarPedidoAccionComponent implements OnInit {
   }
 
   // METODO PARA INGRESAR NUEVO CARGO PROPUESTO
-  IngresarNuevoCargo(form2, datos: any, opcion: string) {
+  IngresarNuevoCargo(form2: any, datos: any, opcion: string) {
     if (form2.otroCargoForm != "") {
       let cargo = {
         descripcion: form2.otroCargoForm,
       };
       this.restAccion.IngresarCargoPropuesto(cargo).subscribe((resol) => {
-        // BUSCAR ID DE ÚLTIMO REGISTRO DE CARGOS PROPUESTOS
+        // BUSCAR ID DE ULTIMO REGISTRO DE CARGOS PROPUESTOS
         this.restAccion.BuscarIdCargoPropuesto().subscribe((max) => {
           datos.cargo_propuesto = max[0].id;
           // INGRESAR PEDIDO DE ACCION DE PERSONAL
@@ -688,115 +690,30 @@ export class EditarPedidoAccionComponent implements OnInit {
     }
   }
 
-  /* contador: number = 0;
-   InsertarPlanificacion(form) {
-     let datosPlanComida = {
-       id_empleado: this.data.idEmpleado,
-       fecha: form.fechaForm,
-       id_comida: form.platosForm,
-       observacion: form.observacionForm,
-       fec_comida: form.fechaPlanificacionForm,
-       hora_inicio: form.horaInicioForm,
-       hora_fin: form.horaFinForm,
-       extra: form.extraForm
-     };
-     this.restPlan.CrearSolicitudComida(datosPlanComida).subscribe(response => {
-       this.EnviarNotificaciones(form.fechaPlanificacionForm);
-       this.toastr.success('Operación exitosa.', 'Servicio de Alimentación Registrado.', {
-         timeOut: 6000,
-       })
-       this.CerrarRegistroPlanificacion();
-     });
-   }*/
-
-  // METODOS PARA MOSTRAR MENSAJES DE ADVERTENCIA DE ERRORES AL USUARIO
-
-
-  /*  jefes: any = [];
-    envios: any = [];
-    EnviarNotificaciones(fecha) {
-      this.restPlan.obtenerJefes(this.departamento).subscribe(data => {
-        this.jefes = [];
-        this.jefes = data;
-        this.jefes.map(obj => {
-          let datosCorreo = {
-            id_usua_solicita: this.data.idEmpleado,
-            correo: obj.correo,
-            comida_mail: obj.comida_mail,
-            comida_noti: obj.comida_noti
-          }
-          this.restPlan.EnviarCorreo(datosCorreo).subscribe(envio => {
-            this.envios = [];
-            this.envios = envio;
-            console.log('datos envio', this.envios.notificacion);
-            if (this.envios.notificacion === true) {
-              this.NotificarPlanificacion(this.data.idEmpleado, obj.empleado, fecha);
-            }
-          });
-        })
-      });
-    }
-  
-    NotificarPlanificacion(empleado_envia: any, empleado_recive: any, fecha) {
-      let mensaje = {
-        id_empl_envia: empleado_envia,
-        id_empl_recive: empleado_recive,
-        mensaje: 'Solicitó Alimentación ' + ' para ' + moment(fecha).format('YYYY-MM-DD')
-      }
-      console.log(mensaje);
-      this.restPlan.EnviarMensajePlanComida(mensaje).subscribe(res => {
-        console.log(res.message);
-      })
-    }*/
-
   // METODO PARA INGRESAR SOLO LETRAS
-  IngresarSoloLetras(e) {
-    let key = e.keyCode || e.which;
-    let tecla = String.fromCharCode(key).toString();
-    // SE DEFINE TODO EL ABECEDARIO QUE SE VA A USAR.
-    let letras =
-      " áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-    // ES LA VALIDACIÓN DEL KEYCODES, QUE TECLAS RECIBE EL CAMPO TEXTO.
-    let especiales = [8, 37, 39, 46, 6, 13];
-    let tecla_especial = false;
-    for (var i in especiales) {
-      if (key == especiales[i]) {
-        tecla_especial = true;
-        break;
-      }
-    }
-    if (letras.indexOf(tecla) == -1 && !tecla_especial) {
-      this.toastr.info("No se admite datos numéricos", "Usar solo letras", {
-        timeOut: 6000,
-      });
-      return false;
-    }
+  IngresarSoloLetras(e: any) {
+    return this.validar.IngresarSoloLetras(e);
   }
 
-  // METODO PARA INGRESAR SOLO NÚMEROS
-  IngresarSoloNumeros(evt) {
-    if (window.event) {
-      var keynum = evt.keyCode;
-    } else {
-      keynum = evt.which;
+  // METODO PARA INGRESAR SOLO NUMEROS
+  IngresarSoloNumeros(evt: any) {
+    return this.validar.IngresarSoloNumeros(evt);
+  }
+
+  // METODO PARA CERRAR VENTANA
+  CerrarVentana(opcion: number, datos: any) {
+    this.componentel.ver_editar = false;
+    if (opcion === 1 && this.pagina === 'listar-pedido') {
+      this.componentel.ver_lista = true;
     }
-    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMÉRICO Y QUE TECLAS NO RECIBIRÁ.
-    if (
-      (keynum > 47 && keynum < 58) ||
-      keynum == 8 ||
-      keynum == 13 ||
-      keynum == 6
-    ) {
-      return true;
-    } else {
-      this.toastr.info(
-        "No se admite el ingreso de letras",
-        "Usar solo números",
-        {
-          timeOut: 6000,
-        }
-      );
-      return false;
+    else if (opcion === 2 && this.pagina === 'listar-pedido') {
+      this.componentel.VerDatosPedidos(datos);
+    }
+    else if (opcion === 1 && this.pagina === 'datos-pedido') {
+      this.componentel.ver_datos = true;
+    }
+    else if (opcion === 2 && this.pagina === 'datos-pedido') {
+      this.componentel.VerDatosPedidos(datos);
     }
   }
 }

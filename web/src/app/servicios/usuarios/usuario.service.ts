@@ -78,6 +78,12 @@ export class UsuarioService {
     return this.http.get<any>(`${environment.url}/usuarios/lista-app-movil/${estado}/activo/${habilitado}`);
   }
 
+    // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
+    UsuariosTimbreMovilCargos(habilitado: boolean) {
+      const estado = 1; // 1 = activo 
+      return this.http.get<any>(`${environment.url}/usuarios/lista-app-movil-cargos/${estado}/activo/${habilitado}`);
+    }
+
   // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL
   ActualizarEstadoTimbreMovil(data: any) {
     return this.http.put<any>(`${environment.url}/usuarios/lista-app-movil/`, data);

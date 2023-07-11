@@ -72,7 +72,7 @@ export class ReporteTimbresComponent implements OnInit {
   filtroCedula: '';
   filtroCargo: '';
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA
+  // ITEMS DE PAGINACION DE LA TABLA
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
@@ -129,7 +129,7 @@ export class ReporteTimbresComponent implements OnInit {
     this.ListarRegimen();
   }
 
-  // METODO PARA VER LA INFORMACIÓN DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
   ObtenerEmpleadoLogueado(idemploy: any) {
     this.empleadoLogueado = [];
     this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -158,7 +158,7 @@ export class ReporteTimbresComponent implements OnInit {
     });
   }
 
-  // EVENTO PARA MANEJAR LA PÁGINACIÓN
+  // EVENTO PARA MANEJAR LA PAGINACION
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
     this.numero_pagina = e.pageIndex + 1;
@@ -563,7 +563,7 @@ export class ReporteTimbresComponent implements OnInit {
   }
 
   /* ****************************************************************************************************
-   *                               PARA LA EXPORTACIÓN DE ARCHIVOS PDF
+   *                               PARA LA EXPORTACION DE ARCHIVOS PDF
    * ****************************************************************************************************/
 
   generarPdf(action = 'open', id_seleccionado, form) {
@@ -585,12 +585,12 @@ export class ReporteTimbresComponent implements OnInit {
 
     return {
 
-      // Encabezado de la página
+      // ENCABEZADO DE LA PAGINA
       //pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
-      // Pie de la página
+      // PIE DE LA PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
@@ -785,12 +785,12 @@ export class ReporteTimbresComponent implements OnInit {
 
     return {
 
-      // Encabezado de la página
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
-      // Pie de la página
+      // PIE DE LA PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
@@ -1069,7 +1069,7 @@ export class ReporteTimbresComponent implements OnInit {
   }
 
 
-  FiltrarSucursal(form) {
+  FiltrarSucursal(form: any) {
     this.departamentos = [];
     this.restDepa.BuscarDepartamentoSucursal(form.sucursalForm).subscribe(res => {
       this.departamentos = res;
@@ -1089,7 +1089,7 @@ export class ReporteTimbresComponent implements OnInit {
     this.LimpiarCampos1();
   }
 
-  FiltrarRegimen(form) {
+  FiltrarRegimen(form: any) {
     this.cargos = [];
     this.restCargo.ObtenerCargoRegimen(form.laboralForm).subscribe(res => {
       this.cargos = res;
@@ -1105,7 +1105,7 @@ export class ReporteTimbresComponent implements OnInit {
     this.LimpiarCampos2();
   }
 
-  FiltrarDepartamento(form) {
+  FiltrarDepartamento(form: any) {
     this.cargos = [];
     this.restCargo.ObtenerCargoDepartamento(form.depaForm).subscribe(res => {
       this.cargos = res;
@@ -1117,7 +1117,7 @@ export class ReporteTimbresComponent implements OnInit {
     this.LimpiarCampos3();
   }
 
-  VerInformacionSucursal(form) {
+  VerInformacionSucursal(form: any) {
     this.datosEmpleado = [];
     this.restD.VerDatosSucursal(form.sucursalForm).subscribe(res => {
       this.datosEmpleado = res;
@@ -1128,7 +1128,7 @@ export class ReporteTimbresComponent implements OnInit {
     });
   }
 
-  VerInformacionSucuDepa(form) {
+  VerInformacionSucuDepa(form: any) {
     this.datosEmpleado = [];
     this.restD.VerDatosSucuDepa(form.sucursalForm, form.depaForm).subscribe(res => {
       this.datosEmpleado = res;
@@ -1139,7 +1139,7 @@ export class ReporteTimbresComponent implements OnInit {
     });
   }
 
-  VerInformacionSucuDepaRegimen(form) {
+  VerInformacionSucuDepaRegimen(form: any) {
     this.datosEmpleado = [];
     this.restD.VerDatosSucuDepaRegimen(form.sucursalForm, form.depaForm, form.laboralForm).subscribe(res => {
       this.datosEmpleado = res;
@@ -1150,7 +1150,7 @@ export class ReporteTimbresComponent implements OnInit {
     });
   }
 
-  VerInformacionSucuCargo(form) {
+  VerInformacionSucuCargo(form: any) {
     this.datosEmpleado = [];
     this.restD.VerDatosSucuCargo(form.sucursalForm, form.cargosForm).subscribe(res => {
       this.datosEmpleado = res;
@@ -1161,7 +1161,7 @@ export class ReporteTimbresComponent implements OnInit {
     });
   }
 
-  VerInformacionSucuRegimen(form) {
+  VerInformacionSucuRegimen(form: any) {
     this.datosEmpleado = [];
     this.restD.VerDatosSucuRegimen(form.sucursalForm, form.laboralForm).subscribe(res => {
       this.datosEmpleado = res;
@@ -1172,7 +1172,7 @@ export class ReporteTimbresComponent implements OnInit {
     });
   }
 
-  VerInformacionSucuRegimenCargo(form) {
+  VerInformacionSucuRegimenCargo(form: any) {
     this.datosEmpleado = [];
     this.restD.VerDatosSucuRegimenCargo(form.sucursalForm, form.laboralForm, form.cargosForm).subscribe(res => {
       this.datosEmpleado = res;
@@ -1183,7 +1183,7 @@ export class ReporteTimbresComponent implements OnInit {
     });
   }
 
-  VerInformacionSucuDepaCargo(form) {
+  VerInformacionSucuDepaCargo(form: any) {
     this.datosEmpleado = [];
     this.restD.VerDatosSucuDepaCargo(form.sucursalForm, form.depaForm, form.cargosForm).subscribe(res => {
       this.datosEmpleado = res;
@@ -1194,7 +1194,7 @@ export class ReporteTimbresComponent implements OnInit {
     });
   }
 
-  VerInformacionSucuDepaCargoRegimen(form) {
+  VerInformacionSucuDepaCargoRegimen(form: any) {
     this.datosEmpleado = [];
     this.restD.VerDatosSucuRegimenDepartamentoCargo(form.sucursalForm, form.depaForm, form.laboralForm, form.cargosForm).subscribe(res => {
       this.datosEmpleado = res;
@@ -1205,7 +1205,7 @@ export class ReporteTimbresComponent implements OnInit {
     });
   }
 
-  VerInformacionDepartamento(form) {
+  VerInformacionDepartamento(form: any) {
     this.datosEmpleado = [];
     this.restD.VerDatosDepartamento(form.depaForm).subscribe(res => {
       this.datosEmpleado = res;
@@ -1216,7 +1216,7 @@ export class ReporteTimbresComponent implements OnInit {
     });
   }
 
-  VerInformacionDepaCargo(form) {
+  VerInformacionDepaCargo(form: any) {
     this.datosEmpleado = [];
     this.restD.VerDatosDepaCargo(form.depaForm, form.cargosForm).subscribe(res => {
       this.datosEmpleado = res;
@@ -1227,7 +1227,7 @@ export class ReporteTimbresComponent implements OnInit {
     });
   }
 
-  VerInformacionDepaRegimen(form) {
+  VerInformacionDepaRegimen(form: any) {
     this.datosEmpleado = [];
     this.restD.VerDatosDepaRegimen(form.depaForm, form.laboralForm).subscribe(res => {
       this.datosEmpleado = res;
@@ -1238,7 +1238,7 @@ export class ReporteTimbresComponent implements OnInit {
     });
   }
 
-  VerInformacionDepaRegimenCargo(form) {
+  VerInformacionDepaRegimenCargo(form: any) {
     this.datosEmpleado = [];
     this.restD.VerDatosDepaRegimenCargo(form.depaForm, form.laboralForm, form.cargosForm).subscribe(res => {
       this.datosEmpleado = res;
@@ -1249,7 +1249,7 @@ export class ReporteTimbresComponent implements OnInit {
     });
   }
 
-  VerInformacionRegimen(form) {
+  VerInformacionRegimen(form: any) {
     this.datosEmpleado = [];
     this.restD.VerDatosRegimen(form.laboralForm).subscribe(res => {
       this.datosEmpleado = res;
@@ -1260,7 +1260,7 @@ export class ReporteTimbresComponent implements OnInit {
     });
   }
 
-  VerInformacionRegimenCargo(form) {
+  VerInformacionRegimenCargo(form: any) {
     this.datosEmpleado = [];
     this.restD.VerDatosRegimenCargo(form.laboralForm, form.cargosForm).subscribe(res => {
       this.datosEmpleado = res;
@@ -1271,7 +1271,7 @@ export class ReporteTimbresComponent implements OnInit {
     });
   }
 
-  VerInformacionCargo(form) {
+  VerInformacionCargo(form: any) {
     this.datosEmpleado = [];
     this.restD.VerDatosCargo(form.cargosForm).subscribe(res => {
       this.datosEmpleado = res;
@@ -1282,7 +1282,7 @@ export class ReporteTimbresComponent implements OnInit {
     });
   }
 
-  VerificarBusquedas(form) {
+  VerificarBusquedas(form: any) {
     console.log('form', form.depaForm, form.sucursalForm, form.cargosForm, form.laboralForm)
     if (form.sucursalForm === '' && form.depaForm === '' &&
       form.laboralForm === '' && form.cargosForm === '') {

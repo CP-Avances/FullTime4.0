@@ -49,7 +49,7 @@ export class ConfirmarContraseniaComponent implements OnInit {
   }
 
   // NETODO PARA CAMBIAR CONTRASEÑA
-  EnviarContraseniaConfirmacion(form) {
+  EnviarContraseniaConfirmacion(form: any) {
 
     // CIFRADO DE CONTRASEÑA
     const md5 = new Md5();

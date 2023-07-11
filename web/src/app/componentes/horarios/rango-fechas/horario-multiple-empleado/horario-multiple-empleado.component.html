@@ -16,6 +16,10 @@
     </app-buscar-planificacion>
 </div>
 
+
+<!--  *********************** PANTALLA DETALLE DE HORARIOS ********************************* -->
+<app-ver-horario-detalle *ngIf="ver_horario" [idHorario]="horario_id" [pagina]="pagina"></app-ver-horario-detalle>
+
 <div style="padding-top: 20px;" *ngIf="seleccionar">
     <div id="titulo">PLANIFICACIÓN RANGO FECHAS</div>
     <mat-card class="example-card mat-elevation-z9">

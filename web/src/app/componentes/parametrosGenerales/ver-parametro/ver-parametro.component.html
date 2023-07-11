@@ -207,7 +207,7 @@
                     <div class="col-md"></div>
                 </div>
             </div>
-            <div class="container" style="padding-bottom: 25px; text-align: center;">
+            <div class="container" style="padding-bottom: 25px; text-align: center; padding-top: 5px;">
                 <div class="mat-elevation-z8" style="background: white;">
                     <div id="resultados">DETALLES DE PARÁMETRO GENERAL</div>
                     <div class="table-responsive">
@@ -242,12 +242,14 @@
                     </mat-paginator>
                 </div>
             </div>
-            <button id="btn-raised" class="btn btn-sm" [routerLink]="['/parametros/']"
+            <button id="btn-raised" class="btn btn-sm float-right" (click)="VerListaParametro()"
                 value="Lista parámetros generales">
                 Lista parámetros generales
             </button>
             <button mat-raised-button id="btn-raised" *ngIf="formato" type="submit" (click)="AbrirVentanaDetalles(tp)"
-                value="Registrar detalle">Registrar detalle</button>
+                value="Registrar detalle">
+                Registrar detalle
+            </button>
         </mat-card-content>
     </mat-card>
 </div>

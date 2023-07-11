@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { QueryResult } from 'pg';
 import pool from '../../../database';
 import fs from 'fs';
 
@@ -11,12 +12,20 @@ class UbicacionControlador {
      ** ************************************************************************************************ **/
 
     // CREAR REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
-    public async RegistrarCoordenadas(req: Request, res: Response): Promise<void> {
+    public async RegistrarCoordenadas(req: Request, res: Response) {
         const { latitud, longitud, descripcion } = req.body;
-        await pool.query('INSERT INTO cg_ubicaciones (latitud, longitud, descripcion) ' +
-            'VALUES ($1, $2, $3)',
+        const response: QueryResult = await pool.query('INSERT INTO cg_ubicaciones (latitud, longitud, descripcion) ' +
+            'VALUES ($1, $2, $3) RETURNING *',
             [latitud, longitud, descripcion]);
-        res.jsonp({ message: 'Registro guardado.' });
+
+        const [coordenadas] = response.rows;
+
+        if (coordenadas) {
+            return res.status(200).jsonp({ message: 'OK', respuesta: coordenadas })
+        }
+        else {
+            return res.status(404).jsonp({ message: 'error' })
+        }
     }
 
     // ACTUALIZAR REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN
@@ -157,14 +166,14 @@ class UbicacionControlador {
         fs.writeFile(`xmlDownload/${filename}`, xml, function (err) {
         });
         res.jsonp({ text: 'XML creado', name: filename });
-      }
-    
-      // METODO PARA DESCARGAR ARCHIVO XML
-      public async downloadXML(req: Request, res: Response): Promise<any> {
+    }
+
+    // METODO PARA DESCARGAR ARCHIVO XML
+    public async downloadXML(req: Request, res: Response): Promise<any> {
         const name = req.params.nameXML;
         let filePath = `servidor\\xmlDownload\\${name}`
         res.sendFile(__dirname.split("servidor")[0] + filePath);
-      }
+    }
 
 }
 

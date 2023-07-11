@@ -42,7 +42,7 @@ export class VerDepartamentoComponent implements OnInit {
   departamentos: any = [];
   Habilitar: boolean = false;
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA
+  // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 6;
   numero_pagina: number = 1;
   pageSizeOptions = [6, 10, 20, 50];
@@ -65,7 +65,7 @@ export class VerDepartamentoComponent implements OnInit {
   ];
 
   /**
-   * VARIABLES PROGRESS SPINNEr
+   * VARIABLES PROGRESS SPINNER
    */
   habilitarprogress: boolean = false;
   color: ThemePalette = 'primary';

@@ -1,90 +1,102 @@
-<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;">
-    <div id="titulo">
-        <span>PARÁMETROS GENERALES</span>
+<!--  ****************************  LISTA DE PARAMETROS  ****************************** -->
+<div *ngIf="ver_lista">
+    <div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;">
+        <div id="titulo">
+            <span>PARÁMETROS GENERALES</span>
+        </div>
+        <mat-card class="example-card mat-elevation-z9">
+            <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
+                <button id="btn-raised" class="btn btn-sm" (click)="CrearParametro()">
+                    Crear parámetro
+                </button>
+                <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
+                    matTooltipPosition="right"
+                    matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
+                    Mostrar lista
+                </button>
+            </div>
+        </mat-card>
     </div>
-    <mat-card class="example-card mat-elevation-z9">
-        <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-            <button id="btn-raised" class="btn btn-sm" (click)="CrearParametro()"> Crear parámetro </button>
-            <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix matTooltipPosition="right"
-                matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
-                Mostrar lista
-            </button>
-        </div>
-    </mat-card>
-</div>
-<div class="container" style="padding-bottom: 50px; text-align: center;">
-    <div class="mat-elevation-z8" style="background: white;">
-        <div id="resultados">RESULTADO DE BÚSQUEDA</div>
-        <div class="table-responsive">
-            <table class="table table-hover table-sm">
-                <thead class="thead-light">
-                    <tr style="text-align: center;">
-                        <th scope="col">Parámetro</th>
-                        <th scope="col">Descripción</th>
-                        <th scope="col">Acción</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td></td>
-                        <td>
-                            <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" minlength="2" [formControl]="descripcionF"
-                                    [(ngModel)]="filtroDescripcion">
-                            </mat-form-field>
-                        </td>
-                        <td>
-                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
-                                matTooltip="Búsqueda de parámetros por su descripción.">
-                                help_outline
-                            </mat-icon>
-                        </td>
-                    </tr>
-                    <tr
-                        *ngFor="let tp of parametros | filtroNombre: filtroDescripcion | paginate:tamanio_pagina:numero_pagina">
-                        <th style="padding-top: 10px; text-align: center;" scope="row">{{tp.id}}</th>
-                        <td style="padding-top: 10px; text-align: center;">{{tp.descripcion}}</td>
-                        <td style="padding-top: 10px; text-align: center;" class="d-flex justify-content-center">
-                            <i matSuffix matTooltipPosition="right" matTooltip="Ver datos generales de este registro."
-                                class="fas fa-eye" id="t-ver" [routerLink]="['/mostrar/parametros/', tp.id]">
-                                <p>Ver</p>
-                            </i>
-                            <i id="t-editar" class="fas fa-edit" matSuffix matTooltipPosition="right"
-                                (click)="AbrirEditar(tp)" matTooltip="Modificar los datos generales de este registro.">
-                                <p>Editar</p>
-                            </i>
-                            <i (click)="ConfirmarDelete(tp)" id="t-eliminar" class="far fa-trash-alt" matSuffix
-                                matTooltipPosition="right" matTooltip="Eliminar este registro.">
-                                <p>Eliminar</p>
-                            </i>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <mat-paginator id="pagina" [length]="parametros.length" [pageSize]="tamanio_pagina"
-            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
-        </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
-            <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Tipo de Permisos en formato PDF.">
-                <p>PDF</p>
-            </i>
-            <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Tipo de Permisos en formato EXCEL.">
-                <p>XLSL</p>
-            </i>
-            <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Tipo de Permisos en formato CSV.">
-                <p>CSV</p>
-            </i>
-            <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Tipo de Permisos en formato XML.">
-                <p>XML</p>
-            </i>
-        </div>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
-            <p> Reporte de parámetros generales. </p>
+    <div class="container" style="padding-bottom: 50px; text-align: center;">
+        <div class="mat-elevation-z8" style="background: white;">
+            <div id="resultados">RESULTADO DE BÚSQUEDA</div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="thead-light">
+                        <tr style="text-align: center;">
+                            <th scope="col">Parámetro</th>
+                            <th scope="col">Descripción</th>
+                            <th scope="col">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <mat-form-field id="t-inputs">
+                                    <input matInput placeholder="Buscar" minlength="2" [formControl]="descripcionF"
+                                        [(ngModel)]="filtroDescripcion">
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de parámetros por su descripción.">
+                                    help_outline
+                                </mat-icon>
+                            </td>
+                        </tr>
+                        <tr
+                            *ngFor="let tp of parametros | filtroNombre: filtroDescripcion | paginate:tamanio_pagina:numero_pagina">
+                            <th style="padding-top: 10px; text-align: center;" scope="row">{{tp.id}}</th>
+                            <td style="padding-top: 10px; text-align: center;">{{tp.descripcion}}</td>
+                            <td style="padding-top: 10px; text-align: center;" class="justify-content-center">
+                                <i matSuffix matTooltipPosition="right"
+                                    matTooltip="Ver datos generales de este registro." class="fas fa-eye" id="t-ver"
+                                    (click)="VerDetalleParametro(tp.id)">
+                                    <p>Ver</p>
+                                </i>
+                                <i id="t-editar" class="fas fa-edit" matSuffix matTooltipPosition="right"
+                                    (click)="AbrirEditar(tp)"
+                                    matTooltip="Modificar los datos generales de este registro.">
+                                    <p>Editar</p>
+                                </i>
+                                <i (click)="ConfirmarDelete(tp)" id="t-eliminar" class="far fa-trash-alt" matSuffix
+                                    matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                    <p>Eliminar</p>
+                                </i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <mat-paginator id="pagina" [length]="parametros.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+            </mat-paginator>
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+                <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                    matTooltipPosition="right" matTooltip="Descargar Lista de Tipo de Permisos en formato PDF.">
+                    <p>PDF</p>
+                </i>
+                <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Tipo de Permisos en formato EXCEL.">
+                    <p>XLSL</p>
+                </i>
+                <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Tipo de Permisos en formato CSV.">
+                    <p>CSV</p>
+                </i>
+                <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Tipo de Permisos en formato XML.">
+                    <p>XML</p>
+                </i>
+            </div>
+            <div class="d-flex justify-content-end"
+                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                <p> Reporte de parámetros generales. </p>
+            </div>
         </div>
     </div>
 </div>
+
+<!--  ****************************  DETALLE DE PARAMETROS  ****************************** -->
+<app-ver-parametro *ngIf="ver_detalle" [idParametro]="parametro_id"></app-ver-parametro>

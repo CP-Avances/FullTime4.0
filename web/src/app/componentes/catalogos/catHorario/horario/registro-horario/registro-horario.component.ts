@@ -172,11 +172,10 @@ export class RegistroHorarioComponent implements OnInit {
       this.LimpiarCampos();
 
       if (datos.detalle === true) {
-        this.router.navigate(['/verHorario', response.id]);
-        this.ventana.close();
+        this.ventana.close(response.id);
       }
       else {
-        this.ventana.close();
+        this.ventana.close(0);
       }
 
     }, error => {
@@ -186,7 +185,6 @@ export class RegistroHorarioComponent implements OnInit {
       })
     });
   }
-
 
   /** ********************************************************************************************* **
    ** **                             METODO PARA SUBIR ARCHIVO                                   ** **
@@ -250,7 +248,7 @@ export class RegistroHorarioComponent implements OnInit {
     else {
       keynum = evt.which;
     }
-    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMÉRICO Y QUE TECLAS NO RECIBIRÁ.
+    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
     if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6 || keynum == 58) {
       return true;
     }
@@ -283,7 +281,7 @@ export class RegistroHorarioComponent implements OnInit {
   // METODO PARA CERRAR VENTANA
   CerrarVentana() {
     this.LimpiarCampos();
-    this.ventana.close();
+    this.ventana.close('cv');
   }
 
   // METODO PARA AUDITAR CATÁLOGO HORARIOS

@@ -1,7 +1,7 @@
 import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.model';
-import { Validators, FormControl, FormGroup } from '@angular/forms';
+import { Validators, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
@@ -15,13 +15,12 @@ import * as moment from 'moment';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 moment.locale('es');
 
+import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 
 import { ITableEmpleados } from 'src/app/model/reportes.model';
-import { PlanHoraExtraComponent } from '../plan-hora-extra/plan-hora-extra.component';
-import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 
 @Component({
   selector: 'app-lista-emple-plan-hora-e',
@@ -37,32 +36,71 @@ import { MainNavService } from 'src/app/componentes/administracionGeneral/main-n
 
 export class ListaEmplePlanHoraEComponent implements OnInit {
 
-  buscador !: FormGroup;
-
   codigo = new FormControl('');
   cedula = new FormControl('', [Validators.minLength(2)]);
   nombre_emp = new FormControl('', [Validators.minLength(2)]);
   nombre_dep = new FormControl('', [Validators.minLength(2)]);
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
+  nombre_carg = new FormControl('', [Validators.minLength(2)]);
   seleccion = new FormControl('');
 
   filtroNombreSuc_: string = '';
+  get filtroNombreSuc() { return this.restR.filtroNombreSuc }
+
+  filtroNombreCarg_: string = '';
+  get filtroNombreCarg() { return this.restR.filtroNombreCarg };
 
   filtroNombreDep_: string = '';
+  get filtroNombreDep() { return this.restR.filtroNombreDep }
 
-  filtroCodigo_: number;
+  filtroCodigo_: any;
   filtroCedula_: string = '';
   filtroNombreEmp_: string = '';
+  get filtroNombreEmp() { return this.restR.filtroNombreEmp };
+  get filtroCodigo() { return this.restR.filtroCodigo };
+  get filtroCedula() { return this.restR.filtroCedula };
 
-  habilitado: any;
+  // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA
+  departamentos: any = [];
+  sucursales: any = [];
+  respuesta: any[];
+  empleados: any = [];
+  origen: any = [];
+
+  selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
+  selectionCarg = new SelectionModel<ITableEmpleados>(true, []);
+  selectionDep = new SelectionModel<ITableEmpleados>(true, []);
+  selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
+
+  // ITEMS DE PAGINACION DE LA TABLA SUCURSAL
+  pageSizeOptions_suc = [5, 10, 20, 50];
+  tamanio_pagina_suc: number = 5;
+  numero_pagina_suc: number = 1;
+
+  // ITEMS DE PAGINACION DE LA TABLA CARGO
+  pageSizeOptions_car = [5, 10, 20, 50];
+  tamanio_pagina_car: number = 5;
+  numero_pagina_car: number = 1;
+
+  // ITEMS DE PAGINACION DE LA TABLA DEPARTAMENTO
+  pageSizeOptions_dep = [5, 10, 20, 50];
+  tamanio_pagina_dep: number = 5;
+  numero_pagina_dep: number = 1;
+
+  // ITEMS DE PAGINACION DE LA TABLA EMPLEADOS
+  pageSizeOptions_emp = [5, 10, 20, 50];
+  tamanio_pagina_emp: number = 5;
+  numero_pagina_emp: number = 1;
 
   public _booleanOptions: FormCriteriosBusqueda = {
     bool_suc: false,
     bool_dep: false,
     bool_emp: false,
+    bool_cargo: false,
   };
 
   public check: checkOptions[];
+  habilitado: any;
 
   get habilitarHorasE(): boolean { return this.funciones.horasExtras; }
 
@@ -88,18 +126,56 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
-      this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
+      this.check = this.restR.checkOptions([{ opcion: 'c' }, { opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
       this.BuscarInformacion();
+      this.BuscarCargos();
     }
   }
 
+  // METODO PARA DESTRUIR PROCESOS
   ngOnDestroy() {
     this.restR.GuardarCheckOpcion('');
     this.restR.DefaultFormCriterios();
     this.restR.DefaultValoresFiltros();
     this.origen = [];
+    this.origen_cargo = [];
   }
 
+  // METODO PARA FILTRAR POR CARGOS
+  empleados_cargos: any = [];
+  origen_cargo: any = [];
+  cargos: any = [];
+  BuscarCargos() {
+    this.informacion.ObtenerInformacionCargo().subscribe((res: any[]) => {
+      this.origen_cargo = JSON.stringify(res);
+
+      res.forEach(obj => {
+        this.cargos.push({
+          id: obj.id_cargo,
+          nombre: obj.name_cargo
+        })
+      })
+
+      res.forEach(obj => {
+        obj.empleados.forEach(r => {
+          this.empleados_cargos.push({
+            id: r.id,
+            nombre: r.name_empleado,
+            codigo: r.codigo,
+            cedula: r.cedula,
+            correo: r.correo,
+            id_cargo: r.id_cargo,
+            id_contrato: r.id_contrato,
+            hora_trabaja: r.hora_trabaja
+          })
+        })
+      })
+    }, err => {
+      this.toastr.error(err.error.message)
+    })
+  }
+
+  // METODO PARA BUSCAR INFORMACION DE USUARIOS
   BuscarInformacion() {
     this.origen = [];
     this.informacion.ObtenerInformacion().subscribe((res: any[]) => {
@@ -116,7 +192,8 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
         obj.departamentos.forEach(ele => {
           this.departamentos.push({
             id: ele.id_depa,
-            nombre: ele.name_dep
+            departamento: ele.name_dep,
+            nombre: ele.sucursal
           })
         })
       })
@@ -137,127 +214,129 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
           })
         })
       })
-      console.log('SUCURSALES', this.sucursales);
-      console.log('DEPARTAMENTOS', this.departamentos);
-      console.log('EMPLEADOS', this.empleados);
-
     }, err => {
       this.toastr.error(err.error.message)
     })
   }
 
+  // METODO PARA ACTIVAR SELECCION MULTIPLE
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
   // METODO PARA MOSTRAR DATOS DE BUSQUEDA
-  opcion: number;
+  opcion: string;
   activar_boton: boolean = false;
   activar_seleccion: boolean = true;
   BuscarPorTipo(e: MatRadioChange) {
-    console.log('CHECK ', e.value);
     this.opcion = e.value;
     this.activar_boton = true;
+    this.MostrarLista();
     switch (this.opcion) {
-      case 1:
-        this._booleanOptions.bool_suc = true;
-        this._booleanOptions.bool_dep = false;
-        this._booleanOptions.bool_emp = false;
-        this.activar_seleccion = true;
-        this.plan_multiple = false;
-        this.auto_individual = true;
+      case 's':
+        this.ControlarOpciones(true, false, false, false);
+        this.ControlarBotones(true, false, true);
         break;
-      case 2:
-        this._booleanOptions.bool_suc = false;
-        this._booleanOptions.bool_dep = true;
-        this._booleanOptions.bool_emp = false;
-        this.activar_seleccion = true;
-        this.plan_multiple = false;
-        this.auto_individual = true;
+      case 'c':
+        this.ControlarOpciones(false, true, false, false);
+        this.ControlarBotones(true, false, true);
         break;
-      case 3:
-        this._booleanOptions.bool_suc = false;
-        this._booleanOptions.bool_dep = false;
-        this._booleanOptions.bool_emp = true;
-        this.activar_seleccion = true;
-        this.plan_multiple = false;
-        this.auto_individual = true;
+      case 'd':
+        this.ControlarOpciones(false, false, true, false);
+        this.ControlarBotones(true, false, true);
+        break;
+      case 'e':
+        this.ControlarOpciones(false, false, false, true);
+        this.ControlarBotones(true, false, true);
         break;
       default:
-        this._booleanOptions.bool_suc = false;
-        this._booleanOptions.bool_dep = false;
-        this._booleanOptions.bool_emp = false;
-        this.activar_seleccion = true;
-        this.plan_multiple = false;
-        this.auto_individual = true;
+        this.ControlarOpciones(false, false, false, false);
+        this.ControlarBotones(true, false, true);
         break;
     }
     this.restR.GuardarFormCriteriosBusqueda(this._booleanOptions);
-    //this.restR.GuardarCheckOpcion(this.opcion)
+    this.restR.GuardarCheckOpcion(this.opcion)
+  }
 
+  // METODO PARA CONTROLAR OPCIONES DE BUSQUEDA
+  ControlarOpciones(sucursal: boolean, cargo: boolean, departamento: boolean, empleado: boolean,) {
+    this._booleanOptions.bool_suc = sucursal;
+    this._booleanOptions.bool_cargo = cargo;
+    this._booleanOptions.bool_dep = departamento;
+    this._booleanOptions.bool_emp = empleado;
+  }
+
+  // METODO PARA CONTROLAR VISTA DE BOTONES
+  ControlarBotones(seleccion: boolean, multiple: boolean, individual: boolean) {
+    this.activar_seleccion = seleccion;
+    this.plan_multiple = multiple;
+    this.plan_multiple_ = multiple;
+    this.auto_individual = individual;
   }
 
   // METODO PARA FILTRAR DATOS DE BUSQUEDA
-  Filtrar(e, orden: number) {
+  Filtrar(e: any, orden: number) {
+    this.ControlarFiltrado(e);
     switch (orden) {
       case 1: this.restR.setFiltroNombreSuc(e); break;
-      case 2: this.restR.setFiltroNombreDep(e); break;
-      case 3: this.restR.setFiltroCodigo(e); break;
-      case 4: this.restR.setFiltroCedula(e); break;
-      case 5: this.restR.setFiltroNombreEmp(e); break;
+      case 2: this.restR.setFiltroNombreCarg(e); break;
+      case 3: this.restR.setFiltroNombreDep(e); break;
+      case 4: this.restR.setFiltroCodigo(e); break;
+      case 5: this.restR.setFiltroCedula(e); break;
+      case 6: this.restR.setFiltroNombreEmp(e); break;
       default:
         break;
     }
   }
 
-  departamentos: any = [];
-  sucursales: any = [];
-  respuesta: any[];
-  empleados: any = [];
-  origen: any = [];
-
-  selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
-  selectionDep = new SelectionModel<ITableEmpleados>(true, []);
-  selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
-
-  // ITEMS DE PAGINACIÓN DE LA TABLA SUCURSAL
-  pageSizeOptions_suc = [5, 10, 20, 50];
-  tamanio_pagina_suc: number = 5;
-  numero_pagina_suc: number = 1;
-
-  // ITEMS DE PAGINACIÓN DE LA TABLA DEPARTAMENTO
-  pageSizeOptions_dep = [5, 10, 20, 50];
-  tamanio_pagina_dep: number = 5;
-  numero_pagina_dep: number = 1;
-
-  // ITEMS DE PAGINACIÓN DE LA TABLA EMPLEADOS
-  pageSizeOptions_emp = [5, 10, 20, 50];
-  tamanio_pagina_emp: number = 5;
-  numero_pagina_emp: number = 1;
-
-  get filtroNombreSuc() { return this.restR.filtroNombreSuc }
-
-  get filtroNombreDep() { return this.restR.filtroNombreDep }
-
-  get filtroNombreEmp() { return this.restR.filtroNombreEmp };
-  get filtroCodigo() { return this.restR.filtroCodigo };
-  get filtroCedula() { return this.restR.filtroCedula };
-
+  // METODO PARA CONTROLAR FILTROS DE BUSQUEDA
+  ControlarFiltrado(e: any) {
+    if (e === '') {
+      if (this.plan_multiple === true) {
+        this.activar_seleccion = false;
+      }
+      else {
+        if (this.activar_seleccion === false) {
+          this.plan_multiple = true;
+          this.auto_individual = false;
+        }
+      }
+    }
+    else {
+      if (this.activar_seleccion === true) {
+        this.activar_seleccion = false;
+        this.plan_multiple_ = true;
+        this.auto_individual = false;
+      }
+      else {
+        this.plan_multiple = false;
+      }
+    }
+  }
 
   /** ************************************************************************************** **
    ** **                   METODOS DE SELECCION DE DATOS DE USUARIOS                      ** **
    ** ************************************************************************************** **/
 
-  // SI EL NÚMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NÚMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
   isAllSelectedSuc() {
     const numSelected = this.selectionSuc.selected.length;
     return numSelected === this.sucursales.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTÁN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCIÓN CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
   masterToggleSuc() {
     this.isAllSelectedSuc() ?
       this.selectionSuc.clear() :
       this.sucursales.forEach(row => this.selectionSuc.select(row));
   }
 
-  // LA ETIQUETA DE LA CASILLA DE VERIFICACIÓN EN LA FILA PASADA
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
   checkboxLabelSuc(row?: ITableEmpleados): string {
     if (!row) {
       return `${this.isAllSelectedSuc() ? 'select' : 'deselect'} all`;
@@ -265,20 +344,41 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NÚMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NÚMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  isAllSelectedCarg() {
+    const numSelected = this.selectionCarg.selected.length;
+    return numSelected === this.cargos.length
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  masterToggleCarg() {
+    this.isAllSelectedCarg() ?
+      this.selectionCarg.clear() :
+      this.cargos.forEach(row => this.selectionCarg.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelCarg(row?: ITableEmpleados): string {
+    if (!row) {
+      return `${this.isAllSelectedCarg() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selectionCarg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
   isAllSelectedDep() {
     const numSelected = this.selectionDep.selected.length;
     return numSelected === this.departamentos.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTÁN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCIÓN CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionDep.clear() :
       this.departamentos.forEach(row => this.selectionDep.select(row));
   }
 
-  // LA ETIQUETA DE LA CASILLA DE VERIFICACIÓN EN LA FILA PASADA
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
   checkboxLabelDep(row?: ITableEmpleados): string {
     if (!row) {
       return `${this.isAllSelectedDep() ? 'select' : 'deselect'} all`;
@@ -286,20 +386,20 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     return `${this.selectionDep.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NÚMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NÚMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
   isAllSelectedEmp() {
     const numSelected = this.selectionEmp.selected.length;
     return numSelected === this.empleados.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTÁN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCIÓN CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :
       this.empleados.forEach(row => this.selectionEmp.select(row));
   }
 
-  // LA ETIQUETA DE LA CASILLA DE VERIFICACIÓN EN LA FILA PASADA
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
   checkboxLabelEmp(row?: ITableEmpleados): string {
     if (!row) {
       return `${this.isAllSelectedEmp() ? 'select' : 'deselect'} all`;
@@ -307,19 +407,27 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
+  // EVENTO DE PAGINACION DE TABLAS
   ManejarPaginaResultados(e: PageEvent) {
     if (this._booleanOptions.bool_suc === true) {
       this.tamanio_pagina_suc = e.pageSize;
       this.numero_pagina_suc = e.pageIndex + 1;
-    } else if (this._booleanOptions.bool_dep === true) {
+    }
+    else if (this._booleanOptions.bool_dep === true) {
       this.tamanio_pagina_dep = e.pageSize;
       this.numero_pagina_dep = e.pageIndex + 1;
-    } else if (this._booleanOptions.bool_emp === true) {
+    }
+    else if (this._booleanOptions.bool_emp === true) {
       this.tamanio_pagina_emp = e.pageSize;
       this.numero_pagina_emp = e.pageIndex + 1;
     }
+    else if (this._booleanOptions.bool_cargo === true) {
+      this.tamanio_pagina_car = e.pageSize;
+      this.numero_pagina_car = e.pageIndex + 1;
+    }
   }
 
+  // METODO PARA MOSTRAR DATOS DE SUCURSALES
   ModelarSucursal(id: number) {
     let usuarios: any = [];
     let respuesta = JSON.parse(this.origen)
@@ -351,6 +459,34 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     this.PlanificarMultiple(usuarios);
   }
 
+  // METODO PARA MOSTRAR DATOS DE CARGOS
+  ModelarCargo(id: number) {
+    let usuarios: any = [];
+    let respuesta = JSON.parse(this.origen_cargo)
+    if (id === 0) {
+      respuesta.forEach((obj: any) => {
+        this.selectionCarg.selected.find(obj1 => {
+          if (obj.id_cargo === obj1.id) {
+            obj.empleados.forEach((obj3: any) => {
+              usuarios.push(obj3)
+            })
+          }
+        })
+      })
+    }
+    else {
+      respuesta.forEach((obj: any) => {
+        if (obj.id_cargo === id) {
+          obj.empleados.forEach((obj3: any) => {
+            usuarios.push(obj3)
+          })
+        }
+      })
+    }
+    this.PlanificarMultiple(usuarios);
+  }
+
+  // METODO PARA MOSTRAR DATOS DE DEPARTAMENTOS
   ModelarDepartamentos(id: number) {
     let usuarios: any = [];
     let respuesta = JSON.parse(this.origen)
@@ -383,6 +519,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     this.PlanificarMultiple(usuarios);
   }
 
+  // METODO PARA MOSTRAR DATOS DE EMPLEADOS
   ModelarEmpleados() {
     let respuesta: any = [];
     this.empleados.forEach((obj: any) => {
@@ -395,11 +532,13 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     this.PlanificarMultiple(respuesta);
   }
 
-  // HABILITAR O DESHABILITAR EL ICONO DE AUTORIZACIÓN INDIVIDUAL
+  // HABILITAR O DESHABILITAR EL ICONO DE AUTORIZACION INDIVIDUAL
   auto_individual: boolean = true;
 
   // METODO PARA ABRIR FORMULARIO DE INGRESO DE PLANIFICACION DE HE
   Planificar(seleccionados: any) {
+    this.VerPlanificar(seleccionados);
+    /*
     this.ventana.open(
       PlanHoraExtraComponent,
       {
@@ -410,6 +549,8 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
         this.auto_individual = true;
         this.LimpiarFormulario();
       });
+      */
+
   }
 
   // METODO DE VALIDACION DE SELECCION MULTIPLE
@@ -426,10 +567,13 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
   GuardarRegistros(id: number) {
-    if (this.opcion === 1) {
+    if (this.opcion === 's') {
       this.ModelarSucursal(id);
     }
-    else if (this.opcion === 2) {
+    else if (this.opcion === 'c') {
+      this.ModelarCargo(id);
+    }
+    else if (this.opcion === 'd') {
       this.ModelarDepartamentos(id);
     }
     else {
@@ -439,8 +583,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
 
   // METODO PARA LIMPIAR FORMULARIOS
   LimpiarFormulario() {
-    if (this._booleanOptions.bool_emp === true) {
-
+    if (this._booleanOptions.bool_emp) {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();
@@ -452,6 +595,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
 
     if (this._booleanOptions.bool_dep) {
       this.nombre_dep.reset();
+      this.nombre_suc.reset();
       this._booleanOptions.bool_dep = false;
       this.selectionDep.deselect();
       this.selectionDep.clear();
@@ -464,45 +608,78 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
       this.selectionSuc.clear();
     }
 
+    if (this._booleanOptions.bool_cargo) {
+      this._booleanOptions.bool_cargo = false;
+      this.selectionCarg.deselect();
+      this.selectionCarg.clear();
+    }
+
     this.seleccion.reset();
     this.activar_boton = false;
   }
 
+  // METODO PARA MOSTRAR LISTA DE DATOS
   MostrarLista() {
-    if (this.opcion === 1) {
+    if (this.opcion === 's') {
       this.nombre_suc.reset();
+      this.filtroNombreSuc_ = '';
+      this.selectionDep.clear();
+      this.selectionCarg.clear();
+      this.selectionEmp.clear();
       this.Filtrar('', 1)
     }
-    else if (this.opcion === 2) {
-      this.nombre_dep.reset();
+    else if (this.opcion === 'c') {
+      this.nombre_carg.reset();
+      this.filtroNombreCarg_ = '';
+      this.selectionEmp.clear();
+      this.selectionDep.clear();
+      this.selectionSuc.clear();
       this.Filtrar('', 2)
     }
-    else if (this.opcion === 3) {
+    else if (this.opcion === 'd') {
+      this.nombre_dep.reset();
+      this.filtroNombreDep_ = '';
+      this.nombre_suc.reset();
+      this.filtroNombreSuc_ = '';
+      this.selectionEmp.clear();
+      this.selectionCarg.clear();
+      this.selectionSuc.clear();
+      this.Filtrar('', 1)
+      this.Filtrar('', 3)
+    }
+    else if (this.opcion === 'e') {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();
-      this.Filtrar('', 3)
+      this.filtroCodigo_ = '';
+      this.filtroCedula_ = '';
+      this.filtroNombreEmp_ = '';
+      this.selectionDep.clear();
+      this.selectionCarg.clear();
+      this.selectionSuc.clear();
       this.Filtrar('', 4)
       this.Filtrar('', 5)
+      this.Filtrar('', 6)
     }
   }
 
-  // METODO PARA ACTIVAR SELECCION MULTIPLE
-  plan_multiple: boolean = false;
-  HabilitarSeleccion() {
-    this.plan_multiple = true;
-    this.auto_individual = false;
-    this.activar_seleccion = false;
+  // METODO PARA VISUALIZAR FORMULARIO PLANIFICACION
+  ver_busqueda: boolean = true;
+  ver_planificar: boolean = false;
+  seleccion_usuarios: any;
+  VerPlanificar(seleccionados: any) {
+    this.ver_busqueda = false;
+    this.ver_planificar = true;
+    this.seleccion_usuarios = seleccionados;
   }
 
-  // VALIDACIONES DE INGRESO DE LETRAS DE 
-  IngresarSoloLetras(e) {
-    this.validar.IngresarSoloLetras(e);
+  // VALIDACIONES DE INGRESO DE LETRAS 
+  IngresarSoloLetras(e: any) {
+    return this.validar.IngresarSoloLetras(e);
   }
 
-  IngresarSoloNumeros(evt) {
-    this.validar.IngresarSoloNumeros(evt)
+  IngresarSoloNumeros(evt: any) {
+    return this.validar.IngresarSoloNumeros(evt);
   }
-
 
 }

@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { QueryResult } from 'pg';
 import pool from '../../database';
 
 class CiudadFeriadoControlador {
@@ -68,14 +69,27 @@ class CiudadFeriadoControlador {
     }
 
     // METODO PARA ASIGNAR CIUDADES A FERIADO
-    public async AsignarCiudadFeriado(req: Request, res: Response): Promise<void> {
-        const { id_feriado, id_ciudad } = req.body;
-        await pool.query(
-            `
-            INSERT INTO ciud_feriados (id_feriado, id_ciudad) VALUES ($1, $2)
-            `
-            , [id_feriado, id_ciudad]);
-        res.jsonp({ message: 'Ciudad asignada a feriado' });
+    public async AsignarCiudadFeriado(req: Request, res: Response) {
+        try {
+            const { id_feriado, id_ciudad } = req.body;
+            const response: QueryResult = await pool.query(
+                `
+                INSERT INTO ciud_feriados (id_feriado, id_ciudad) VALUES ($1, $2) RETURNING *
+                `
+                , [id_feriado, id_ciudad]);
+    
+            const [feriado] = response.rows;
+    
+            if (feriado) {
+                return res.status(200).jsonp({ message: 'OK', reloj: feriado })
+            }
+            else {
+                return res.status(404).jsonp({ message: 'error' })
+            }
+        } catch (error) {
+            return res.status(500).jsonp({ message: 'error' })
+        }
+
     }
 
     // METODO PARA ACTUALIZAR REGISTRO

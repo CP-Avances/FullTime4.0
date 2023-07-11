@@ -1,10 +1,10 @@
-import { Component, OnInit, Inject } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, OnInit, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
 import { AccionPersonalService } from 'src/app/servicios/accionPersonal/accion-personal.service';
-import { ProcesoService } from 'src/app/servicios/catalogos/catProcesos/proceso.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { ListarTipoAccionComponent } from '../listar-tipo-accion/listar-tipo-accion.component';
 
 @Component({
   selector: 'app-editar-tipo-accion',
@@ -14,6 +14,9 @@ import { ProcesoService } from 'src/app/servicios/catalogos/catProcesos/proceso.
 
 export class EditarTipoAccionComponent implements OnInit {
 
+  @Input() data: any;
+  @Input() pagina: any;
+
   selec1: boolean = false;
   selec2: boolean = false;
   selec3: boolean = false;
@@ -22,15 +25,15 @@ export class EditarTipoAccionComponent implements OnInit {
   ingresoTipo: boolean = false;
   vistaTipo: boolean = true;
 
-  // Control de campos y validaciones del formulario
+  // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   otroTipoF = new FormControl('', [Validators.minLength(3)]);
   descripcionF = new FormControl('', [Validators.required]);
   baseLegalF = new FormControl('', [Validators.required]);
   tipoAccionF = new FormControl('');
   tipoF = new FormControl('');
 
-  // Asignación de validaciones a inputs del formulario
-  public AccionesForm = new FormGroup({
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
+  public formulario = new FormGroup({
     descripcionForm: this.descripcionF,
     baseLegalForm: this.baseLegalF,
     tipoForm: this.tipoF,
@@ -41,23 +44,23 @@ export class EditarTipoAccionComponent implements OnInit {
   constructor(
     private rest: AccionPersonalService,
     private toastr: ToastrService,
-    public dialogRef: MatDialogRef<EditarTipoAccionComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    public validar: ValidacionesService,
+    public componentel: ListarTipoAccionComponent,
   ) { }
 
   ngOnInit(): void {
     this.ObtenerTiposAccionPersonal();
     this.ObtenerTiposAccion();
-    // DATOS VACIOS INDICAR LA OPCIÓN OTRO
     this.tipos[this.tipos.length] = { descripcion: "OTRO" };
     this.CargarDatos();
   }
 
+  // METODO PARA MOSTRAR DATOS
   CargarDatos() {
     this.selec1 = false;
     this.selec2 = false;
     this.selec3 = false;
-    this.AccionesForm.patchValue({
+    this.formulario.patchValue({
       tipoAccionForm: this.data.id_tipo,
       descripcionForm: this.data.descripcion,
       baseLegalForm: this.data.base_legal,
@@ -76,7 +79,8 @@ export class EditarTipoAccionComponent implements OnInit {
     }
   }
 
-  InsertarAccion(form) {
+  // METODO PARA CAPTURAR DATOS DEL FORMULARIO
+  InsertarAccion(form: any) {
     let datosAccion = {
       id_tipo: form.tipoAccionForm,
       descripcion: form.descripcionForm,
@@ -94,8 +98,9 @@ export class EditarTipoAccionComponent implements OnInit {
     }
   }
 
+  // METODO PARA GUARDAR DATOS
   contador: number = 0;
-  GuardarInformacion(datosAccion) {
+  GuardarInformacion(datosAccion: any) {
     this.contador = 0;
     this.tipos_acciones.map(obj => {
       if (obj.id_tipo === datosAccion.id_tipo) {
@@ -104,18 +109,18 @@ export class EditarTipoAccionComponent implements OnInit {
     });
     if (this.contador != 0) {
       this.toastr.error('El tipo de acción de personal seleccionado ya se encuentra registrado.',
-        'Operación Fallida', {
+        'Ups!!! algo salio mal.', {
         timeOut: 6000,
       })
     } else {
       this.rest.ActualizarDatos(datosAccion).subscribe(response => {
-        this.toastr.success('Operación exitosa.', '', {
+        this.toastr.success('Operación exitosa.', 'Registro guardado.', {
           timeOut: 6000,
         })
-        this.CerrarVentanaRegistro();
+        this.CerrarVentana(2, this.data.id);
       }, error => {
         this.toastr.error('Revisar los datos',
-          'Operación Fallida', {
+          'Ups!!! algo salio mal.', {
           timeOut: 6000,
         })
       });
@@ -131,46 +136,49 @@ export class EditarTipoAccionComponent implements OnInit {
     })
   }
 
-  IngresarSoloNumeros(evt) {
-    if (window.event) {
-      var keynum = evt.keyCode;
-    }
-    else {
-      keynum = evt.which;
-    }
-    // Comprobamos si se encuentra en el rango numérico y que teclas no recibirá.
-    if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6) {
-      return true;
-    }
-    else {
-      this.toastr.info('No se admite el ingreso de letras', 'Usar solo números', {
-        timeOut: 6000,
-      })
-      return false;
-    }
+  // METODO PARA VALIDAR INGRESO DE NUMEROS
+  IngresarSoloNumeros(evt: any) {
+    return this.validar.IngresarSoloNumeros(evt);
   }
 
+  // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
-    this.AccionesForm.reset();
+    this.formulario.reset();
   }
 
-  CerrarVentanaRegistro() {
+  // METODO PARA CERRAR VENTANA
+  CerrarVentana(opcion: number, datos: any) {
     this.LimpiarCampos();
-    this.dialogRef.close();
+    this.componentel.ver_editar = false;
+    if (opcion === 1 && this.pagina === 'listar-tipos-acciones') {
+      this.componentel.ver_lista = true;
+    }
+    else if (opcion === 2 && this.pagina === 'listar-tipos-acciones') {
+      this.componentel.AbrirDatosAccion(datos);
+    }
+    else if (opcion === 1 && this.pagina === 'datos-tipo-accion') {
+      this.componentel.ver_datos = true;
+    }
+    else if (opcion === 2 && this.pagina === 'datos-tipo-accion') {
+      this.componentel.AbrirDatosAccion(datos);
+    }
   }
 
+  // METODO PARA CAMBIAR ESTADO PERMISOS
   CambiarEstadosPermisos() {
     this.selec2 = false;
     this.selec3 = false;
     this.selec1 = true;
   }
 
+  // METODO PARA CAMBIAR ESTADO VACACIONES
   CambiarEstadosVacaciones() {
     this.selec1 = false;
     this.selec3 = false;
     this.selec2 = true;
   }
 
+  // METODO PARA CAMBIAR ESTADO SITUACION PROPUESTA
   CambiarEstadosSituacion() {
     this.selec1 = false;
     this.selec2 = false;
@@ -188,13 +196,12 @@ export class EditarTipoAccionComponent implements OnInit {
   }
 
   // METODO PARA ACTIVAR FORMULARIO DE INGRESO DE UN NUEVO TIPO_ACCION
-  estiloT: any;
-  IngresarTipoAccion(form) {
+  IngresarTipoAccion(form: any) {
     if (form.tipoAccionForm === undefined) {
-      this.AccionesForm.patchValue({
+      this.formulario.patchValue({
         otroTipoForm: '',
       });
-      this.estiloT = { 'visibility': 'visible' }; this.ingresoTipo = true;
+      this.ingresoTipo = true;
       this.toastr.info('Ingresar nombre de un nuevo tipo de acción personal.', '', {
         timeOut: 6000,
       })
@@ -204,15 +211,15 @@ export class EditarTipoAccionComponent implements OnInit {
 
   // METODO PARA VER LA LISTA DE TIPOS_ACCION
   VerTiposAccion() {
-    this.AccionesForm.patchValue({
+    this.formulario.patchValue({
       otroTipoForm: '',
     });
-    this.estiloT = { 'visibility': 'hidden' }; this.ingresoTipo = false;
+    this.ingresoTipo = false;
     this.vistaTipo = true;
   }
 
   // METODO PARA INGRESAR NUEVO PROCESO PROPUESTO
-  IngresarNuevoTipo(form, datos: any) {
+  IngresarNuevoTipo(form: any, datos: any) {
     if (form.otroTipoForm != '') {
       let tipo = {
         descripcion: form.otroTipoForm
@@ -220,14 +227,15 @@ export class EditarTipoAccionComponent implements OnInit {
       this.VerificarDuplicidad(form, tipo, datos);
     }
     else {
-      this.toastr.info('Ingresar una nueva opción o seleccionar una de la lista', 'Verificar datos', {
+      this.toastr.info('Ingresar una nueva opción o seleccionar una de la lista.', 'Verificar datos.', {
         timeOut: 6000,
       });
     }
   }
 
+  // METODO PARA VERIFICAR DUPLICIDAD
   contar: number = 0;
-  VerificarDuplicidad(form, tipo, datos) {
+  VerificarDuplicidad(form: any, tipo: any, datos: any) {
     this.contar = 0;
     this.tipos.map(obj => {
       if (obj.descripcion.toUpperCase() === form.otroTipoForm.toUpperCase()) {
@@ -236,17 +244,14 @@ export class EditarTipoAccionComponent implements OnInit {
     });
     if (this.contar != 0) {
       this.toastr.error('El nombre de tipo de acción personal ingresado ya se encuentra dentro de la lista de tipos de acciones de personal.',
-        'Operación Fallida', {
+        'Ups!!! algo salio mal.', {
         timeOut: 6000,
       })
     } else {
       this.rest.IngresarTipoAccion(tipo).subscribe(resol => {
-        // BUSCAR ID DE ÚLTIMO REGISTRO DE TIPO_ACCION
-        this.rest.BuscarIdTipoAccion().subscribe(max => {
-          datos.id_tipo = max[0].id;
-          // INGRESAR DATOS DE REGISTRO LEGAL DE TIPO DE ACCIONES DE PERSONAL
-          this.GuardarInformacion(datos);
-        });
+        datos.id_tipo = resol.id;
+        // INGRESAR DATOS DE REGISTRO LEGAL DE TIPO DE ACCIONES DE PERSONAL
+        this.GuardarInformacion(datos);
       });
     }
   }

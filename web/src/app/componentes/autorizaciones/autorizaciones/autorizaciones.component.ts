@@ -77,7 +77,7 @@ export class AutorizacionesComponent implements OnInit {
   oculDepa: boolean = true;
   ocultar: boolean = true;
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA
+  // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
@@ -437,7 +437,7 @@ export class AutorizacionesComponent implements OnInit {
   NuevaListaAprobada: any = [];
   a: number;
   no_aprobar: number;
-  insertarAutorizacion(form) {
+  insertarAutorizacion(form: any) {
     this.a = 0;
     this.no_aprobar = 0;
     this.NuevaListaAprobada = this.listafiltrada.filter(valor => {

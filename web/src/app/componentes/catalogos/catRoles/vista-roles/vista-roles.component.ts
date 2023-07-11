@@ -37,7 +37,7 @@ export class VistaRolesComponent implements OnInit {
   empleado: any = []; // VARIABLE DE ALMACENAMIENTO DE DATOS DE EMPLEADO
   roles: any = []; // VARIABLE DE ALMACENAMIENTO DE DATOS DE ROLES
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA
+  // ITEMS DE PAGINACION DE LA TABLA
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
@@ -75,7 +75,7 @@ export class VistaRolesComponent implements OnInit {
     this.tamanio_pagina = e.pageSize;
   }
 
-  // METODO PARA VER LA INFORMACIÓN DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -158,7 +158,7 @@ export class VistaRolesComponent implements OnInit {
   }
 
   /** ************************************************************************************************* **
-   ** **                            PARA LA EXPORTACIÓN DE ARCHIVOS PDF                              ** **
+   ** **                            PARA LA EXPORTACION DE ARCHIVOS PDF                              ** **
    ** ************************************************************************************************* **/
 
   // METODO PARA CREAR ARCHIVO PDF
@@ -177,10 +177,10 @@ export class VistaRolesComponent implements OnInit {
   GetDocumentDefinicion() {
     sessionStorage.setItem('Roles', this.roles);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por: ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
-      // PIE DE LA PÁGINA
+      // PIE DE LA PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
@@ -247,7 +247,7 @@ export class VistaRolesComponent implements OnInit {
   }
 
   /** ************************************************************************************************* **
-   ** **                             PARA LA EXPORTACIÓN DE ARCHIVOS EXCEL                           ** **
+   ** **                             PARA LA EXPORTACION DE ARCHIVOS EXCEL                           ** **
    ** ************************************************************************************************* **/
 
   ExportToExcel() {

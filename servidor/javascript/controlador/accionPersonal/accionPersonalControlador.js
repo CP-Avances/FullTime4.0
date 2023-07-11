@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ACCION_PERSONAL_CONTROLADOR = void 0;
-const database_1 = __importDefault(require("../../database"));
 const ImagenCodificacion_1 = require("../../libs/ImagenCodificacion");
+const database_1 = __importDefault(require("../../database"));
 const fs_1 = __importDefault(require("fs"));
 const builder = require('xmlbuilder');
 class AccionPersonalControlador {
@@ -33,8 +33,32 @@ class AccionPersonalControlador {
     CrearTipoAccion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { descripcion } = req.body;
-            yield database_1.default.query('INSERT INTO tipo_accion (descripcion) VALUES($1)', [descripcion]);
-            res.jsonp({ message: 'Registro guardado' });
+            const response = yield database_1.default.query(`
+            INSERT INTO tipo_accion (descripcion) VALUES($1) RETURNING *
+            `, [descripcion]);
+            const [tipo] = response.rows;
+            if (tipo) {
+                return res.status(200).jsonp(tipo);
+            }
+            else {
+                return res.status(404).jsonp({ message: 'error' });
+            }
+        });
+    }
+    CrearTipoAccionPersonal(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta } = req.body;
+            const response = yield database_1.default.query(`
+            INSERT INTO tipo_accion_personal (id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, 
+                tipo_situacion_propuesta) VALUES($1, $2, $3, $4, $5, $6) RETURNING*
+            `, [id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta]);
+            const [tipo] = response.rows;
+            if (tipo) {
+                return res.status(200).jsonp(tipo);
+            }
+            else {
+                return res.status(404).jsonp({ message: 'error' });
+            }
         });
     }
     EncontrarUltimoTipoAccion(req, res) {
@@ -156,14 +180,6 @@ class AccionPersonalControlador {
             else {
                 return res.status(404).jsonp({ text: 'No se encuentran registros' });
             }
-        });
-    }
-    CrearTipoAccionPersonal(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta } = req.body;
-            yield database_1.default.query('INSERT INTO tipo_accion_personal (id_tipo, descripcion, base_legal, tipo_permiso, ' +
-                'tipo_vacacion, tipo_situacion_propuesta) VALUES($1, $2, $3, $4, $5, $6)', [id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta]);
-            res.jsonp({ message: 'Autorización se registró con éxito' });
         });
     }
     EncontrarTipoAccionPersonalId(req, res) {

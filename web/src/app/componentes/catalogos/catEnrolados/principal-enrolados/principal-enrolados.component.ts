@@ -48,7 +48,7 @@ export class PrincipalEnroladosComponent implements OnInit {
 
   confirmacion = false;
 
-  // Items de paginación de la tabla
+  // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
@@ -81,7 +81,7 @@ export class PrincipalEnroladosComponent implements OnInit {
     this.ObtenerColores();
   }
 
-  // METODO para ver la información del empleado 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -89,7 +89,7 @@ export class PrincipalEnroladosComponent implements OnInit {
     })
   }
 
-  // METODO para obtener el logo de la empresa
+  // METODO PARA OBTENER EL LOGO DE LA EMPRESA
   logo: any = String;
   ObtenerLogo() {
     this.restEmpre.LogoEmpresaImagenBase64(localStorage.getItem('empresa') as string).subscribe(res => {
@@ -142,7 +142,7 @@ export class PrincipalEnroladosComponent implements OnInit {
    * ELIMAR REGISTRO ENROLADO Y ENROLADOS-DISPOSITIVO 
    * **********************************************************************************/
 
-  /** FUNCION para eliminar registro seleccionado */
+  // FUNCION PARA ELIMINAR REGISTROS
   Eliminar(id_enrolado: number) {
     //console.log("probando id", id_enrolado)
     this.rest.EliminarRegistro(id_enrolado).subscribe(res => {
@@ -153,7 +153,7 @@ export class PrincipalEnroladosComponent implements OnInit {
     });
   }
 
-  /** FUNCION para confirmar si se elimina o no un registro */
+  // FUNCION PARA CONFIRMAR ELIMINAR REGISTROS
   ConfirmarDelete(datos): void {
     this.vistaRegistrarDatos.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -194,7 +194,7 @@ export class PrincipalEnroladosComponent implements OnInit {
     else {
       keynum = evt.which;
     }
-    // Comprobamos si se encuentra en el rango numérico y que teclas no recibirá.
+    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
     if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6) {
       return true;
     }
@@ -279,12 +279,12 @@ export class PrincipalEnroladosComponent implements OnInit {
     sessionStorage.setItem('Enrolados', this.enrolados);
     return {
 
-      // Encabezado de la página
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
-      // Pie de página
+      // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
@@ -360,9 +360,9 @@ export class PrincipalEnroladosComponent implements OnInit {
     };
   }
 
-  /****************************************************************************************************** 
-   *                                       METODO PARA EXPORTAR A EXCEL
-   ******************************************************************************************************/
+  /** ************************************************************************************************** ** 
+   ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
+   ** ************************************************************************************************** **/
   exportToExcel() {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.enrolados);
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
@@ -370,9 +370,9 @@ export class PrincipalEnroladosComponent implements OnInit {
     xlsx.writeFile(wb, "Departamentos" + new Date().getTime() + '.xlsx');
   }
 
-  /****************************************************************************************************** 
-   *                                        METODO PARA EXPORTAR A CSV 
-   ******************************************************************************************************/
+  /** ************************************************************************************************** ** 
+   ** **                                   METODO PARA EXPORTAR A CSV                                 ** **
+   ** ************************************************************************************************** **/
 
   exportToCVS() {
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.enrolados);
@@ -381,9 +381,9 @@ export class PrincipalEnroladosComponent implements OnInit {
     FileSaver.saveAs(data, "DepartamentosCSV" + new Date().getTime() + '.csv');
   }
 
-  /* ****************************************************************************************************
-   *                                 PARA LA EXPORTACIÓN DE ARCHIVOS XML
-   * ****************************************************************************************************/
+  /** ************************************************************************************************* **
+   ** **                            PARA LA EXPORTACION DE ARCHIVOS XML                               ** **
+   ** ************************************************************************************************* **/
 
   urlxml: string;
   data: any = [];

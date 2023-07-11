@@ -302,7 +302,7 @@ export class HoraExtraAutorizacionesComponent implements OnInit {
     }
   }
 
-  insertarAutorizacion(form) {
+  insertarAutorizacion(form: any) {
     if (this.data.carga === 'individual') {
       if (this.data.pedido_hora.estado === 2 || this.data.pedido_hora.estado === 3 || this.data.pedido_hora.estado === 4) {
         this.restH.BuscarDatosAutorizacion(this.data.pedido_hora.id).subscribe(data => {

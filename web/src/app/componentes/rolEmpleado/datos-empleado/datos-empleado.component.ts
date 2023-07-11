@@ -50,7 +50,7 @@ export class DatosEmpleadoComponent implements OnInit {
   btnDisc = 'Añadir';
   editar: string = '';
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA 
+  // ITEMS DE PAGINACION DE LA TABLA 
   numero_pagina: number = 1;
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
@@ -100,7 +100,7 @@ export class DatosEmpleadoComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
@@ -445,11 +445,11 @@ export class DatosEmpleadoComponent implements OnInit {
   GetDocumentDefinicion() {
     sessionStorage.setItem('profile', this.empleadoUno);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
-      // PIE DE PÁGINA
+      // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
@@ -567,7 +567,7 @@ export class DatosEmpleadoComponent implements OnInit {
   }
 
   /** ******************************************************************************************* **
-   ** **                          PARA LA EXPORTACIÓN DE ARCHIVOS EXCEL                        ** **                           *
+   ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                        ** **                           *
    ** ******************************************************************************************* **/
 
   ExportToExcel() {
@@ -584,7 +584,7 @@ export class DatosEmpleadoComponent implements OnInit {
   }
 
   /** ******************************************************************************************* **
-   ** **                          PARA LA EXPORTACIÓN DE ARCHIVOS CSV                          ** **                                *
+   ** **                          PARA LA EXPORTACION DE ARCHIVOS CSV                          ** **                                *
    ** ******************************************************************************************* **/
 
   ExportToCVS() {

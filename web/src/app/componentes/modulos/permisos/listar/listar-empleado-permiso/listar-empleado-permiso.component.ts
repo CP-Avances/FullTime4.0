@@ -68,15 +68,15 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   validarMensaje1: boolean = false;
   validarMensaje2: boolean = false;
 
-  // HABILITAR O DESHABILITAR EL ICONO DE AUTORIZACIÓN INDIVIDUAL
+  // HABILITAR O DESHABILITAR EL ICONO DE AUTORIZACION INDIVIDUAL
   auto_individual: boolean = true;
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA
+  // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA AUTORIZADOS
+  // ITEMS DE PAGINACION DE LA TABLA AUTORIZADOS
   tamanio_pagina_autorizado: number = 5;
   numero_pagina_autorizado: number = 1;
   pageSizeOptions_autorizado = [5, 10, 20, 50];
@@ -149,7 +149,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     }
   }
 
-  // METODO PARA VER LA INFORMACIÓN DEL EMPLEADO
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restEmpleado.BuscarUnEmpleado(idemploy).subscribe((data) => {
@@ -170,7 +170,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   formato_hora: string = "HH:mm:ss";
 
   ArrayAutorizacionTipos: any = []
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
@@ -343,7 +343,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     );
   }
 
-  // SI EL NÚMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NÚMERO TOTAL DE FILAS.
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelected() {
     const numSelected = this.selectionUno.selected.length;
     return numSelected === this.listaPermisosDeparta.length;
@@ -351,7 +351,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
 
   listafiltro: any = [];
   reserva: any;
-  // SELECCIONA TODAS LAS FILAS SI NO ESTÁN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCIÓN CLARA.
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggle() {
     this.listafiltro = [];
     this.listafiltro = this.listaPermisosDeparta;
@@ -383,7 +383,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     this.obtenerPermisos(this.formato_fecha, this.formato_hora);
   }
 
-  // LA ETIQUETA DE LA CASILLA DE VERIFICACIÓN EN LA FILA PASADA
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
   checkboxLabel(row?: PermisosElemento): string {
     if (!row) {
       return `${this.isAllSelected() ? "select" : "deselect"} all`;
@@ -405,7 +405,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   }
 
   AutorizarPermisosMultiple() {
-    let EmpleadosSeleccionados;
+    let EmpleadosSeleccionados: any;
     EmpleadosSeleccionados = this.selectionUno.selected.map((obj) => {
       return {
         id: obj.id,
@@ -519,7 +519,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   }
 
   /** ************************************************************************************************* **
-   ** **                            PARA LA EXPORTACIÓN DE ARCHIVOS PDF                              ** **
+   ** **                            PARA LA EXPORTACION DE ARCHIVOS PDF                              ** **
    ** ************************************************************************************************* **/
 
   // METODO PARA CREAR ARCHIVO PDF
@@ -555,7 +555,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     }
 
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       watermark: {
         text: this.frase,
         color: "blue",
@@ -574,7 +574,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
         opacity: 0.3,
         alignment: "right",
       },
-      // PIE DE LA PÁGINA
+      // PIE DE LA PAGINA
       footer: function (
         currentPage: any,
         pageCount: any,
@@ -670,7 +670,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   }
 
    /** ************************************************************************************************* **
-   ** **                             PARA LA EXPORTACIÓN DE ARCHIVOS EXCEL                           ** **
+   ** **                             PARA LA EXPORTACION DE ARCHIVOS EXCEL                           ** **
    ** ************************************************************************************************* **/
 
    exportToExcel(opcion: string) {

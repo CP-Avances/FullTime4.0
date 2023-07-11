@@ -1,5 +1,5 @@
 // SECCIÓN DE LIBRERIAS
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { MatRadioChange } from '@angular/material/radio';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
@@ -13,6 +13,7 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
 import { EditarParametroComponent } from '../editar-parametro/editar-parametro.component';
 import { CrearDetalleParametroComponent } from '../crear-detalle-parametro/crear-detalle-parametro.component';
 import { EditarDetalleParametroComponent } from '../editar-detalle-parametro/editar-detalle-parametro.component';
+import { ListarParametroComponent } from '../listar-parametro/listar-parametro.component';
 
 @Component({
   selector: 'app-ver-parametro',
@@ -28,11 +29,12 @@ export class VerParametroComponent implements OnInit {
   formatoI: string = 'rgb(80, 87, 97)';
   formatoE: string = 'rgb(80, 87, 97)';
 
+  @Input() idParametro: string;
+
   parametros: any = [];
-  idParametro: string;
   datosDetalle: any = [];
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA
+  // ITEMS DE PAGINACION DE LA TABLA
   numero_pagina: number = 1;
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
@@ -55,12 +57,8 @@ export class VerParametroComponent implements OnInit {
     public parametro: ParametrosService,
     public ventana: MatDialog,
     public router: Router,
-  ) {
-    var cadena = this.router.url;
-    var aux = cadena.split("/");
-    this.idParametro = aux[3];
-    cadena = this.router.url;
-  }
+    public componentel: ListarParametroComponent,
+  ) { }
 
   ngOnInit(): void {
     this.BuscarParametros(this.idParametro);
@@ -103,13 +101,13 @@ export class VerParametroComponent implements OnInit {
     }
   }
 
-  // METODO PARA MANEJAR PAGINACIÓN DE TABLAS
+  // METODO PARA MANEJAR PAGINACION DE TABLAS
   ManejarPagina(e: PageEvent) {
     this.numero_pagina = e.pageIndex + 1
     this.tamanio_pagina = e.pageSize;
   }
 
-  // METODO PARA BUSCAR DATOS TIPO PARÁMETRO
+  // METODO PARA BUSCAR DATOS TIPO PARAMETRO
   BuscarParametros(id: any) {
     this.parametros = [];
     this.parametro.ListarUnParametro(id).subscribe(data => {
@@ -118,7 +116,7 @@ export class VerParametroComponent implements OnInit {
   }
 
   id_detalle: number;
-  // METODO PARA BUSCAR DETALLES DE PARAMÉTRO GENERAL
+  // METODO PARA BUSCAR DETALLES DE PARAMETRO GENERAL
   ListarDetalles(id: any) {
     this.datosDetalle = [];
     this.parametro.ListarDetalleParametros(id).subscribe(datos => {
@@ -154,7 +152,7 @@ export class VerParametroComponent implements OnInit {
     })
   }
 
-  // METODO PARA INGRESAR DETALLE DE PARÁMETRO
+  // METODO PARA INGRESAR DETALLE DE PARAMETRO
   AbrirVentanaDetalles(datos: any): void {
     this.ventana.open(CrearDetalleParametroComponent,
       { width: '400px', data: { parametros: datos, actualizar: true } })
@@ -164,17 +162,20 @@ export class VerParametroComponent implements OnInit {
       });
   }
 
-  // METODO PARA EDITAR PARÁMETRO
+  // METODO PARA EDITAR PARAMETRO
   AbrirVentanaEditar(datos: any): void {
     this.ventana.open(EditarParametroComponent,
       { width: '400px', data: { parametros: datos, actualizar: true } })
-      .afterClosed().subscribe(result => {
-        this.BuscarParametros(this.idParametro);
-        this.ListarDetalles(this.idParametro);
+      .afterClosed().subscribe(item => {
+        if (item) {
+          if (item > 0) {
+            this.BuscarParametros(this.idParametro);
+          }
+        }
       });
   }
 
-  // METODO PARA EDITAR DETALLE DE PARÁMETRO
+  // METODO PARA EDITAR DETALLE DE PARAMETRO
   AbrirVentanaEditarDetalle(datos: any): void {
     this.ventana.open(EditarDetalleParametroComponent,
       { width: '400px', data: { parametros: datos } }).
@@ -184,7 +185,7 @@ export class VerParametroComponent implements OnInit {
       });
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACIÓN
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACION
   EliminarDetalle(id_detalle: number) {
     this.parametro.EliminarDetalleParametro(id_detalle).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
@@ -202,10 +203,15 @@ export class VerParametroComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.EliminarDetalle(datos.id_detalle);
-        } else {
-          this.router.navigate(['/mostrar/parametros/', this.idParametro]);
         }
       });
+  }
+
+  // METODO PARA VER LISTA PARAMETROS
+  VerListaParametro() {
+    this.componentel.ver_lista = true;
+    this.componentel.ver_detalle = false;
+    this.componentel.ObtenerParametros();
   }
 
   /** ******************************************************************************************* **

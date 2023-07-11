@@ -22,9 +22,6 @@
                         <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreSuc_"
                             (input)="Filtrar(filtroNombreSuc_, 1)" [formControl]="nombre_suc" type="text"
                             (keypress)="IngresarSoloLetras($event)">
-                        <mat-error *ngIf="nombre_suc.invalid">
-                            Indispensable ingresar dos letras
-                        </mat-error>
                         <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de sucursales por nombre.">
                             help_outline
                         </mat-icon>

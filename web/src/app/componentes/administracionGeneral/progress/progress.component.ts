@@ -11,7 +11,7 @@ export class ProgressComponent implements OnInit {
 
   recargar = false;
   /**
-   * Variables progress spinner
+   * VARIABLES PROGRESS SPINNER
    */
   color: ThemePalette = 'primary';
   mode: ProgressSpinnerMode = 'indeterminate';

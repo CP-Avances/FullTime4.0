@@ -146,7 +146,7 @@ export class AuditoriaComponent implements OnInit {
   }
 
   /* ****************************************************************************************************
-  *                               PARA LA EXPORTACIÓN DE ARCHIVOS PDF 
+  *                               PARA LA EXPORTACION DE ARCHIVOS PDF 
   * ****************************************************************************************************/
 
   GenerarPdf(action = 'open', datos: any) {

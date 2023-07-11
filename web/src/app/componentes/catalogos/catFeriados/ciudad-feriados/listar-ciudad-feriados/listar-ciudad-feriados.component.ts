@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
@@ -13,6 +14,12 @@ import { EditarFeriadosComponent } from 'src/app/componentes/catalogos/catFeriad
 import { ListarFeriadosComponent } from '../../feriados/listar-feriados/listar-feriados.component';
 import { EditarCiudadComponent } from 'src/app/componentes/catalogos/catFeriados/ciudad-feriados/editar-ciudad/editar-ciudad.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+import { ThemePalette } from '@angular/material/core';
+
+export interface Feriado {
+  idciudad_asignada: number
+}
 
 @Component({
   selector: 'app-listar-ciudad-feriados',
@@ -29,10 +36,16 @@ export class ListarCiudadFeriadosComponent implements OnInit {
   datosFeriado: any = [];
   datosCiudades: any = [];
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA
+  // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
+
+    // VARIABLES PROGRESS SPINNER
+    habilitarprogress: boolean = false;
+    mode: ProgressSpinnerMode = 'indeterminate';
+    color: ThemePalette = 'primary';
+    value = 10;
 
   constructor(
     public router: Router,
@@ -56,7 +69,7 @@ export class ListarCiudadFeriadosComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
@@ -90,7 +103,7 @@ export class ListarCiudadFeriadosComponent implements OnInit {
   }
 
   // METODO PARA BUSCAR FERIADOS - CIUDADES
-  ListarCiudadesFeriados(idFeriado: any) {
+  ListarCiudadesFeriados(idFeriado: number) {
     this.datosCiudades = [];
     this.restF.BuscarCiudadesFeriado(idFeriado).subscribe(datos => {
       this.datosCiudades = datos;
@@ -115,6 +128,31 @@ export class ListarCiudadFeriadosComponent implements OnInit {
       });
   }
 
+  // METODO PARA VERIFICAR ELIMINACION DE REGISTROS
+  eliminar: number = 0;
+  VerificarEliminar(opcion: number, datos: any) {
+    this.eliminar = 0;
+    if (opcion === 1) {
+      this.Eliminar(datos.idciudad_asignada);
+    }
+    else {
+      this.habilitarprogress = true;
+      datos.forEach(obj => {
+        this.restF.EliminarRegistro(obj.idciudad_asignada).subscribe(res => {
+          this.eliminar = this.eliminar + 1;
+          if (this.eliminar === datos.length) {
+            this.toastr.error('Registro eliminado.', '', {
+              timeOut: 6000,
+            });
+            this.habilitarprogress = false;
+            this.ListarCiudadesFeriados(this.idFeriado);
+            this.HabilitarSeleccion();
+          }
+        });
+      })
+    }
+  }
+
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_ciudad_asignada: number) {
     this.restF.EliminarRegistro(id_ciudad_asignada).subscribe(res => {
@@ -126,13 +164,30 @@ export class ListarCiudadFeriadosComponent implements OnInit {
   }
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDelete(datos: any) {
+  ConfirmarDelete(datos: any, opcion: number) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.Eliminar(datos.idciudad_asignada);
+          this.VerificarEliminar(opcion, datos);
         }
       });
+  }
+
+  // METODO PARA CONFIRMAR TIPO DE ELIMINACION
+  ConfirmarProceso(datos: any, opcion: number) {
+    if (opcion === 1) {
+      this.ConfirmarDelete(datos, opcion);
+    }
+    else {
+      if (datos.length > 0) {
+        this.ConfirmarDelete(datos, opcion);
+      }
+      else {
+        this.toastr.warning('Ups!!! algo ha salido mal.', 'No ha seleccionado registros.', {
+          timeOut: 6000,
+        });
+      }
+    }
   }
 
   // METODO PARA VISUALIZAR COMPONENTE DE ASIGNACION DE CIUDADES
@@ -152,5 +207,45 @@ export class ListarCiudadFeriadosComponent implements OnInit {
     this.componentef.ver_ciudades = false;
     this.componentef.ver_lista = true;
   }
+
+  // METODO PARA HABILITAR SELECCION MULTIPLE
+  btnCheckHabilitar: boolean = false;
+  auto_individual: boolean = true;
+  HabilitarSeleccion() {
+    if (this.btnCheckHabilitar === false) {
+      this.btnCheckHabilitar = true;
+      this.auto_individual = false;
+    } else if (this.btnCheckHabilitar === true) {
+      this.btnCheckHabilitar = false;
+      this.auto_individual = true;
+      this.selection.clear();
+    }
+  }
+
+  selection = new SelectionModel<Feriado>(true, []);
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelected() {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.datosCiudades.length;
+    return numSelected === numRows;
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  masterToggle() {
+    this.isAllSelected() ?
+      this.selection.clear() :
+      this.datosCiudades.forEach(row => this.selection.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabel(row?: Feriado): string {
+    if (!row) {
+      return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.idciudad_asignada + 1}`;
+  }
+
+
 
 }

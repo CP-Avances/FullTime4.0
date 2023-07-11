@@ -170,15 +170,12 @@
                                     </mat-checkbox>
                                 </td>
                                 <td>{{s.nombre}}</td>
-                                <td class="d-flex justify-content-center">
+                                <td class="justify-content-center">
                                     <i (click)="GuardarRegistros(s.id)" id="plan" *ngIf="individual"
                                         class="fa fa-envelope" matSuffix matTooltipPosition="right"
                                         matTooltip="Configurar recepción de notificaciones.">
                                         <p>Configurar</p>
                                     </i>
-                                    <div *ngIf="!individual" style="padding-bottom: 1%;">
-                                        <br><br>
-                                    </div>
                                 </td>
                             </tr>
                         </tbody>
@@ -302,9 +299,6 @@
                                         matTooltip="Configurar recepción de notificaciones.">
                                         <p>Configurar</p>
                                     </i>
-                                    <div *ngIf="!individual" style="padding-bottom: 1%;">
-                                        <br><br>
-                                    </div>
                                 </td>
                             </tr>
                         </tbody>

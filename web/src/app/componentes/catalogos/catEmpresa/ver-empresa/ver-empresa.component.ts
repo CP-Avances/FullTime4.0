@@ -158,8 +158,11 @@ export class VerEmpresaComponent implements OnInit {
   }
 
   // VENTANA PARA EDITAR DATOS DE EMPRESA 
+  ver_informacion: boolean = true;
+  ver_editar: boolean = false;
   EditarDatosEmpresa(): void {
-    this.router.navigate(['/informacionEmpresa', this.idEmpresa])
+    this.ver_editar = true;
+    this.ver_informacion = false;
   }
 
   // VENTANA DE EDICION DE ESTABLECIMIENTOS

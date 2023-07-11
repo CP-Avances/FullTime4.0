@@ -77,17 +77,17 @@ class TipoPermisosControlador {
     Editar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const { descripcion, tipo_descuento, num_dia_maximo, num_dia_ingreso, gene_justificacion, fec_validar, acce_empleado, legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha, documento, contar_feriados, correo_crear, correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, correo_legalizar } = req.body;
+            const { descripcion, tipo_descuento, num_dia_maximo, num_dia_ingreso, gene_justificacion, fec_validar, acce_empleado, legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha_inicio, documento, contar_feriados, correo_crear, correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, correo_legalizar, fecha_fin } = req.body;
             yield database_1.default.query(`
       UPDATE cg_tipo_permisos SET descripcion = $1, tipo_descuento = $2, num_dia_maximo = $3, num_dia_ingreso = $4, 
         gene_justificacion = $5, fec_validar = $6, acce_empleado = $7, legalizar = $8, almu_incluir = $9, 
-        num_dia_justifica = $10, num_hora_maximo = $11, fecha = $12, documento = $13, contar_feriados = $14, 
+        num_dia_justifica = $10, num_hora_maximo = $11, fecha_inicio = $12, documento = $13, contar_feriados = $14, 
         correo_crear = $15, correo_editar = $16, correo_eliminar = $17, correo_preautorizar = $18, correo_autorizar = $19, 
-        correo_negar = $20, correo_legalizar = $21
-      WHERE id = $22
+        correo_negar = $20, correo_legalizar = $21, fecha_fin = $22
+      WHERE id = $23
       `, [descripcion, tipo_descuento, num_dia_maximo, num_dia_ingreso, gene_justificacion, fec_validar, acce_empleado,
-                legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha, documento, contar_feriados, correo_crear,
-                correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, correo_legalizar, id]);
+                legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha_inicio, documento, contar_feriados, correo_crear,
+                correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, correo_legalizar, fecha_fin, id]);
             res.jsonp({ message: 'Registro actualizado.' });
         });
     }
@@ -95,15 +95,17 @@ class TipoPermisosControlador {
     Crear(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { descripcion, tipo_descuento, num_dia_maximo, num_dia_ingreso, gene_justificacion, fec_validar, acce_empleado, legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha, documento, contar_feriados, correo_crear, correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, correo_legalizar } = req.body;
+                const { descripcion, tipo_descuento, num_dia_maximo, num_dia_ingreso, gene_justificacion, fec_validar, acce_empleado, legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha_inicio, documento, contar_feriados, correo_crear, correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, correo_legalizar, fecha_fin } = req.body;
                 const response = yield database_1.default.query(`
-        INSERT INTO cg_tipo_permisos (descripcion, tipo_descuento, num_dia_maximo, num_dia_ingreso, gene_justificacion, fec_validar,
-           acce_empleado, legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha, documento, contar_feriados, correo_crear,
-           correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, correo_legalizar)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21) RETURNING *
+        INSERT INTO cg_tipo_permisos (descripcion, tipo_descuento, num_dia_maximo, num_dia_ingreso, gene_justificacion, 
+          fec_validar, acce_empleado, legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha_inicio, documento,
+           contar_feriados, correo_crear, correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, 
+           correo_legalizar, fecha_fin)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22) RETURNING *
         `, [descripcion, tipo_descuento, num_dia_maximo, num_dia_ingreso, gene_justificacion, fec_validar,
-                    acce_empleado, legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha, documento, contar_feriados, correo_crear,
-                    correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, correo_legalizar]);
+                    acce_empleado, legalizar, almu_incluir, num_dia_justifica, num_hora_maximo, fecha_inicio, documento, contar_feriados,
+                    correo_crear, correo_editar, correo_eliminar, correo_preautorizar, correo_autorizar, correo_negar, correo_legalizar,
+                    fecha_fin]);
                 const [tipo] = response.rows;
                 if (tipo) {
                     return res.status(200).jsonp(tipo);

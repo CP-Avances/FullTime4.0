@@ -274,8 +274,15 @@ class PlanComidasControlador {
     CrearTipoComidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre } = req.body;
-            yield database_1.default.query('INSERT INTO tipo_comida (nombre) VALUES ($1)', [nombre]);
-            res.jsonp({ message: 'Tipo comida ha sido guardado con éxito' });
+            const response = yield database_1.default.query('INSERT INTO tipo_comida (nombre) VALUES ($1) RETURNING *', [nombre]);
+            const [tipo] = response.rows;
+            if (tipo) {
+                return res.status(200).jsonp(tipo);
+            }
+            else {
+                return res.status(404).jsonp({ message: "error" });
+            }
+            ;
         });
     }
     VerUltimoTipoComidas(req, res) {

@@ -208,7 +208,8 @@ export class HorariosMultiplesComponent implements OnInit {
         'Dar click para verificar registro de detalle de horario.', {
         timeOut: 6000,
       }).onTap.subscribe(obj => {
-        this.router.navigate(['/verHorario', id]);
+        this.componente.asignar = false;
+        this.componente.VerDetalleHorario(id);
       });
     }
     else {

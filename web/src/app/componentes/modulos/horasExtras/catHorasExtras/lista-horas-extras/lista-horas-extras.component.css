@@ -1,0 +1,14 @@
+.btn {
+    margin-left: 15px;
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
+
+p {
+    font-size: x-small;
+}
+
+table {
+    width: 100%;
+    font-size: 14px;
+}

@@ -48,7 +48,7 @@ export class OlvidarFraseComponent implements OnInit {
 
   // METODO PARA ENVIAR CORREO ELECTRONICO
   respuesta: any = [];
-  EnviarCorreoConfirmacion(form) {
+  EnviarCorreoConfirmacion(form: any) {
     let dataPass = {
       correo: form.usuarioF,
       url_page: this.cadena

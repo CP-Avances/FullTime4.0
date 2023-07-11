@@ -33,7 +33,7 @@ export class EditarDepartamentoComponent implements OnInit {
   });
 
   /**
-   * VARIABLES PROGRESS SPINNEr
+   * VARIABLES PROGRESS SPINNER
    */
   habilitarprogress: boolean = false;
   color: ThemePalette = 'primary';

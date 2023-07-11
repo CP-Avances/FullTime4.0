@@ -11,7 +11,7 @@ import { TipoPermisosService } from 'src/app/servicios/catalogos/catTipoPermisos
 })
 export class RegistrarAsistenciaComponent implements OnInit {
 
-      // Control de campos y validaciones del formulario
+      // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
       fechaHoraHF = new FormControl('', [Validators.required]);
       fechaHoraTF = new FormControl('', [Validators.required]);
       accionF = new FormControl('', [Validators.required]);

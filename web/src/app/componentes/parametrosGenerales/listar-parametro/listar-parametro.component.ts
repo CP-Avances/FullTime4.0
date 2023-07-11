@@ -18,7 +18,6 @@ import { EditarParametroComponent } from '../editar-parametro/editar-parametro.c
 import { CrearParametroComponent } from '../crear-parametro/crear-parametro.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
-import { TipoPermisosService } from 'src/app/servicios/catalogos/catTipoPermisos/tipo-permisos.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
@@ -34,7 +33,7 @@ export class ListarParametroComponent implements OnInit {
   tipoPermiso: any = [];
   filtroDescripcion = '';
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA
+  // ITEMS DE PAGINACION DE LA TABLA
   numero_pagina: number = 1;
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
@@ -45,7 +44,7 @@ export class ListarParametroComponent implements OnInit {
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   descripcionF = new FormControl('', [Validators.minLength(2)]);
 
-  // ASIGNACIÓN DE VALIDACIONES A INPUTS DEL FORMULARIO
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public formulario = new FormGroup({
     descripcionForm: this.descripcionF,
   });
@@ -69,7 +68,7 @@ export class ListarParametroComponent implements OnInit {
     this.ObtenerLogo();
   }
 
-  // METODO PARA VER LA INFORMACIÓN DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -124,7 +123,11 @@ export class ListarParametroComponent implements OnInit {
   CrearParametro(): void {
     this.ventana.open(CrearParametroComponent,
       { width: '400px' }).afterClosed().subscribe(item => {
-        this.ObtenerParametros();
+        if (item) {
+          if (item > 0) {
+            this.VerDetalleParametro(item);
+          }
+        }
       });
   }
 
@@ -132,7 +135,11 @@ export class ListarParametroComponent implements OnInit {
   AbrirEditar(datos: any): void {
     this.ventana.open(EditarParametroComponent,
       { width: '400px', data: { parametros: datos, actualizar: false } }).afterClosed().subscribe(item => {
-        this.ObtenerParametros();
+        if (item) {
+          if (item > 0) {
+            this.VerDetalleParametro(item);
+          }
+        }
       });
   }
 
@@ -145,7 +152,7 @@ export class ListarParametroComponent implements OnInit {
         });
       }
       else {
-        this.toastr.warning('Registro eliminado.', '', {
+        this.toastr.error('Registro eliminado.', '', {
           timeOut: 6000,
         });
         this.ObtenerParametros();
@@ -163,6 +170,16 @@ export class ListarParametroComponent implements OnInit {
           this.router.navigate(['/parametros']);
         }
       });
+  }
+
+  // METODO PARA VER DETALLE DE PARAMETROS
+  ver_lista: boolean = true;
+  ver_detalle: boolean = false;
+  parametro_id: string
+  VerDetalleParametro(id: number) {
+    this.ver_detalle = true;
+    this.ver_lista = false;
+    this.parametro_id = String(id);
   }
 
 
@@ -187,12 +204,12 @@ export class ListarParametroComponent implements OnInit {
     sessionStorage.setItem('Parametros', this.parametros);
     return {
 
-      // Encabezado de la página
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'portrait',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
-      // Pie de página
+      // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
@@ -259,9 +276,9 @@ export class ListarParametroComponent implements OnInit {
     };
   }
 
-  /****************************************************************************************************** 
-   *                                       METODO PARA EXPORTAR A EXCEL
-   ******************************************************************************************************/
+  /** ************************************************************************************************** ** 
+   ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
+   ** ************************************************************************************************** **/
   exportToExcel() {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.parametros);
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
@@ -269,9 +286,9 @@ export class ListarParametroComponent implements OnInit {
     xlsx.writeFile(wb, "ParametrosGeneralesEXCEL" + new Date().getTime() + '.xlsx');
   }
 
-  /****************************************************************************************************** 
-   *                                        METODO PARA EXPORTAR A CSV 
-   ******************************************************************************************************/
+  /** ************************************************************************************************** ** 
+   ** **                                   METODO PARA EXPORTAR A CSV                                 ** **
+   ** ************************************************************************************************** **/
 
   exportToCVS() {
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.parametros);
@@ -280,9 +297,9 @@ export class ListarParametroComponent implements OnInit {
     FileSaver.saveAs(data, "ParametrosGeneralesCSV" + new Date().getTime() + '.csv');
   }
 
-  /* ****************************************************************************************************
-   *                                 PARA LA EXPORTACIÓN DE ARCHIVOS XML
-   * ****************************************************************************************************/
+  /** ************************************************************************************************* **
+   ** **                            PARA LA EXPORTACION DE ARCHIVOS XML                               ** **
+   ** ************************************************************************************************* **/
 
   urlxml: string;
   data: any = [];

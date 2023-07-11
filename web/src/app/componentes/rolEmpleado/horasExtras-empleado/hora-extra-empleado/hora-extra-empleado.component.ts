@@ -7,7 +7,7 @@ import { EditarHoraExtraEmpleadoComponent } from '../editar-hora-extra-empleado/
 import { CancelarHoraExtraComponent } from '../cancelar-hora-extra/cancelar-hora-extra.component';
 import { PedHoraExtraService } from 'src/app/servicios/horaExtra/ped-hora-extra.service';
 import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
-import { PedidoHoraExtraComponent } from 'src/app/componentes/modulos/horasExtras/pedido-hora-extra/pedido-hora-extra.component';
+import { PedidoHoraExtraComponent } from 'src/app/componentes/modulos/horasExtras/solicitar-hora-extra/pedido-hora-extra/pedido-hora-extra.component';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { environment } from 'src/environments/environment';
@@ -21,7 +21,7 @@ import { environment } from 'src/environments/environment';
 export class HoraExtraEmpleadoComponent implements OnInit {
 
   idEmpleado: number;
-  // ITEMS DE PAGINACIÓN DE LA TABLA 
+  // ITEMS DE PAGINACION DE LA TABLA 
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
@@ -49,7 +49,7 @@ export class HoraExtraEmpleadoComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
