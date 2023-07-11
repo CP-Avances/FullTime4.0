@@ -134,6 +134,9 @@
                                 <p>Estado</p>
                             </i>
                         </div>
+                        <label *ngIf="mensaje != '' && mensaje != undefined" style="color:rgb(192, 55, 17); text-align: right; font-size: small;">
+                            {{mensaje}}
+                        </label>
                     </div>
                 </div>
             </mat-card-content>

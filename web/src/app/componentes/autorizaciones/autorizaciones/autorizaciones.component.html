@@ -17,7 +17,7 @@
                                 matTooltip="Lista de departamentos">
                                 help_outline</mat-icon>
                             <mat-select [formControl]="idDepartamento">
-                                <mat-option *ngFor="let d of nuevoAutorizacionTipos" [value]="d.id_departamento" (click)="ChangeDepa(d.id_departamento)">
+                                <mat-option *ngFor="let d of nuevoAutorizacionTipos" [value]="d.id_departamento" (click)="ChangeDepa(d.id_departamento, estadoL)">
                                     {{d.depa_autoriza}}
                                 </mat-option>
                             </mat-select>
@@ -29,7 +29,7 @@
                             <mat-icon id="notifica" matSuffix  matTooltipPosition="right"
                                 matTooltip="Lista de estados">
                                 help_outline</mat-icon>
-                            <mat-select [formControl]="estado" required>
+                            <mat-select #estadoL [formControl]="estado" required>
                                 <mat-option *ngFor="let e of estados" [value]="e.id" >
                                     {{e.nombre}}
                                 </mat-option>
@@ -64,7 +64,7 @@
                         <th scope="col">Departamento</th>
                         <th scope="col">Empleado</th>
                         <th scope="col">Estado</th>
-                        <th scope="col">APROBAR</th>
+                        <th scope="col">Aprobar</th>
                         <th scope="col">Observación</th>
                     </tr>
                 </thead>
@@ -95,9 +95,4 @@
 </div>
 
 
-<!--
-<mat-paginator id="pagina" [length]="data.datosPermiso.length" [pageSize]="tamanio_pagina"
-    [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
-</mat-paginator>
--->
 

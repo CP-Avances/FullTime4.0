@@ -21,6 +21,7 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 import { EditarEstadoAutorizaccionComponent } from 'src/app/componentes/autorizaciones/editar-estado-autorizaccion/editar-estado-autorizaccion.component';
 import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 
 @Component({
   selector: 'app-ver-empleado-permiso',
@@ -68,6 +69,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
     public restE: EmpleadoService, // SERVICIO DE DATOS DE EMPLEADO
     public restAutoriza: AutorizaDepartamentoService, //SERVICIO DE DATOS DE AUTORIZACION POR EL EMPLEADO
     public usuarioDepa: UsuarioService, //SERVICIO DE DATOS DE DEPARTAMENTO POR EL USUARIO DE LA SOLICITUD
+    private plangeneral: PlanGeneralService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.id_permiso = this.router.url.split('/')[2];
@@ -202,9 +204,9 @@ export class VerEmpleadoPermisoComponent implements OnInit {
             //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
             this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
               this.listadoDepaAutoriza = res;
-              this.listadoDepaAutoriza.filter(item => {
+              this.listadoDepaAutoriza.forEach(item => {
                 if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
-                  return this.ocultar = false;
+                  this.obtenerPlanificacionHoraria(this.InfoPermiso[0].fec_inicio, this.InfoPermiso[0].fec_final, this.InfoPermiso[0].codigo);
                 }else{
                   return this.ocultar = true;
                 }
@@ -215,11 +217,9 @@ export class VerEmpleadoPermisoComponent implements OnInit {
           }
 
           this.empleado_estado = this.empleado_estado.concat(data);     
-          console.log('this.empleado_estado: ',this.empleado_estado);     
           // CUANDO TODOS LOS DATOS SE HAYAN REVISADO EJECUTAR METODO DE INFORMACIÓN DE AUTORIZACIÓN
           if (this.lectura === autorizaciones.length) {
             this.VerInformacionAutoriza(this.empleado_estado);
-            console.log('this.empleado_estado: ',this.empleado_estado);
           }
 
         }else{
@@ -228,14 +228,14 @@ export class VerEmpleadoPermisoComponent implements OnInit {
             this.listadoDepaAutoriza = res;
             this.listadoDepaAutoriza.filter(item => {
               if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
-                return this.ocultar = false;
+                console.log('Info Permiso 1: ',this.InfoPermiso);
+                this.obtenerPlanificacionHoraria(this.InfoPermiso[0].fec_inicio, this.InfoPermiso[0].fec_final, this.InfoPermiso[0].codigo);
               } 
             })
           });
         }
       })
 
-      
       // TOMAR TAMAÑO DE ARREGLO DE COLABORADORES QUE REVIZARÓN SOLICITUD
       this.cont = autorizaciones.length - 1;
 
@@ -243,6 +243,33 @@ export class VerEmpleadoPermisoComponent implements OnInit {
       this.HabilitarAutorizacion = false;
     });
   
+  }
+
+  listahorario: any = [];
+  mensaje: string = '';
+  dia: any;
+  obtenerPlanificacionHoraria(fecha_i: any, fehca_f: any, codigo: any){
+    this.mensaje = '';
+    var datos = {
+      fecha_inicio: fecha_i, 
+      fecha_final: fehca_f, 
+      codigo: '\''+codigo+'\''
+    }
+
+    this.plangeneral.BuscarPlanificacionHoraria(datos).subscribe(res => {
+      this.listahorario = res;
+      if(this.listahorario.data.length == 0){
+        this.mensaje = 'No tiene registrado la planificacion horaria en esas fechas';
+        return this.ocultar = true;
+      }else{
+        this.mensaje = '';
+        return this.ocultar = false;
+      }
+    },error => {
+      this.mensaje = 'Problemas con validar su planificacion horaria en esas fechas';
+      return this.ocultar = true;
+    });
+
   }
 
   // METODO PARA OBTENER EL LOGO DE LA EMPRESA

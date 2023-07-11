@@ -1,6 +1,6 @@
 <!--  ***************  VER LISTA DE SOLICITUDES DE VACACIONES  **************************  -->
 <div *ngIf="ver_listas">
-    <div class="container" style="padding-bottom: 25px; text-align: center; padding-top: 20px;"
+    <div class="container" style="padding-bottom: 25px; text-align: center; padding-top: 15px;"
         *ngIf="lista_vacaciones">
         <div class="mat-elevation-z8" style="background: white;">
             <div class="d-flex bd-highlight" id="titulo">
@@ -16,6 +16,10 @@
                 <span class="w-100 bd-highlight">
                     LISTA DE VACACIONES SOLICITADAS POR USUARIO
                 </span>
+                <button *ngIf="filtroDepa || filtroUsuario || filtroEstado" class="btn btn-primary"
+                    (click)="limpiarFiltro()" style="float: right; margin-right: 10px;">
+                    Limpiar
+                </button>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover table-sm ">
@@ -28,35 +32,68 @@
                                     [aria-label]="checkboxLabel()">
                                 </mat-checkbox>
                             </th>
+                            <th scope="col">Departamento</th>
                             <th scope="col">Empleado</th>
                             <th scope="col">Estado</th>
-                            <th scope="col">Fecha desde</th>
-                            <th scope="col">Fecha hasta</th>
-                            <th scope="col">Fecha ingreso</th>
+                            <th scope="col">Fecha Inicio</th>
+                            <th scope="col">Fecha Final</th>
+                            <th scope="col">Fecha Ingreso</th>
                             <th scope="col">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let v of listaVacacionDeparta | paginate:tamanio_pagina:numero_pagina">
+                        <tr>
+                            <td></td>
+                            <td>
+                                <mat-form-field class="input-tables departamento">
+                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroDepa" [formControl]="Depata"
+                                        type="text" (keypress)="IngresarSoloLetras($event)">
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-form-field class="input-tables departamento">
+                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroUsuario"
+                                        [formControl]="Usuario" type="text" (keypress)="IngresarSoloLetras($event)">
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-form-field class="input-tables departamento">
+                                    <input matInput placeholder="Buscar" [(ngModel)]="filtroEstado"
+                                        [formControl]="Estado" type="text" (keypress)="IngresarSoloLetras($event)">
+                                </mat-form-field>
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Filtro de solicitudes pendientes y pre-autorizados.">
+                                    help_outline
+                                </mat-icon>
+                            </td>
+                        </tr>
+                        <tr
+                            *ngFor="let v of listaVacacionDeparta | empleDepa: filtroDepa | emplUsuario: filtroUsuario | emplEstado: filtroEstado | paginate:tamanio_pagina:numero_pagina">
                             <td>
                                 <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
                                     (change)="$event ? selectionUno.toggle(v) : null"
                                     [checked]="selectionUno.isSelected(v)" [aria-label]="checkboxLabel(v)">
                                 </mat-checkbox>
                             </td>
-                            <td>{{v.nombre}} {{v.apellido}}</td>
+                            <td>{{v.depa_nombre}}</td>
+                            <td>{{v.fullname}}</td>
                             <td>{{v.estado}}</td>
                             <td>{{v.fec_inicio_}}</td>
                             <td>{{v.fec_final_}}</td>
                             <td>{{v.fec_ingreso_}}</td>
-                            <td class="d-flex justify-content-center">
-                                <i class="fas fa-edit" id="edit" style="margin-right: 20px;"
+                            <td class="justify-content-center">
+                                <i class="fas fa-edit" id="edit" style="margin-right: 5px;"
                                     (click)="EditarVacaciones(v.id)" matSuffix matTooltipPosition="right"
                                     matTooltip="Modificar los datos generales de este registro">
                                     <p>Editar</p>
                                 </i>
                                 <i *ngIf="auto_individual" class="fas fa-file-alt"
-                                    style="color:rgb(197, 95, 11); margin-left: 15px;" matSuffix
+                                    style="color:rgb(197, 95, 11); margin-left: 5px;" matSuffix
                                     matTooltipPosition="right"
                                     matTooltip="Cambiar el estado del documentdo de autorazación"
                                     [routerLink]="['/ver-vacacion',v.id]" [hidden]="ocultar">
@@ -96,28 +133,68 @@
     </div>
     <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="lista_autoriza">
         <div class="mat-elevation-z8" style="background: white;">
-            <div id="titulo">LISTA DE VACACIONES AUTORIZADAS</div>
+            <div class="d-flex bd-highlight" id="titulo">
+                <span class="w-100 bd-highlight">
+                    LISTA DE VACACIONES AUTORIZADAS
+                </span>
+                <button *ngIf="AutorifiltroDepa || AutorifiltroUsuario || AutorifiltroEstado" class="btn btn-primary"
+                    (click)="limpiarFiltroAutorizados()" style="float: right; margin-right: 10px;">Limpiar</button>
+            </div>
             <div class="table-responsive">
                 <table class="table table-hover table-sm ">
                     <thead class="thead-light">
                         <tr style="text-align: center;">
+                            <th scope="col">Departamento</th>
                             <th scope="col">Empleado</th>
                             <th scope="col">Estado</th>
-                            <th scope="col">Fecha desde</th>
-                            <th scope="col">Fecha hasta</th>
-                            <th scope="col">Fecha ingreso</th>
+                            <th scope="col">Fecha Inicio</th>
+                            <th scope="col">Fecha Final</th>
+                            <th scope="col">Fecha Ingreso</th>
                             <th scope="col">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
+                        <tr>
+                            <td>
+                                <mat-form-field class="input-tables departamento">
+                                    <input matInput placeholder="Buscar" [(ngModel)]="AutorifiltroDepa"
+                                        [formControl]="AutoriDepata" type="text"
+                                        (keypress)="IngresarSoloLetras($event)">
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-form-field class="input-tables departamento">
+                                    <input matInput placeholder="Buscar" [(ngModel)]="AutorifiltroUsuario"
+                                        [formControl]="AutoriUsuario" type="text"
+                                        (keypress)="IngresarSoloLetras($event)">
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-form-field class="input-tables departamento">
+                                    <input matInput placeholder="Buscar" [(ngModel)]="AutorifiltroEstado"
+                                        [formControl]="AutoriEstado" type="text"
+                                        (keypress)="IngresarSoloLetras($event)">
+                                </mat-form-field>
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Filtro de solicitudes autorizados y negados.">
+                                    help_outline
+                                </mat-icon>
+                            </td>
+                        </tr>
                         <tr
-                            *ngFor="let v of listaVacacionesFiltradaAutorizada  | paginate:tamanio_pagina_auto:numero_pagina_auto">
-                            <td>{{v.nombre}} {{v.apellido}}</td>
+                            *ngFor="let v of listaVacacionesFiltradaAutorizada | empleDepa: AutorifiltroDepa | emplUsuario: AutorifiltroUsuario | emplEstado: AutorifiltroEstado | paginate:tamanio_pagina_auto:numero_pagina_auto">
+                            <td>{{v.depa_nombre}}</td>
+                            <td>{{v.fullname}}</td>
                             <td>{{v.estado}}</td>
                             <td>{{v.fec_inicio_}}</td>
                             <td>{{v.fec_final_}}</td>
                             <td>{{v.fec_ingreso_}}</td>
-                            <td class="d-flex justify-content-center">
+                            <td class="justify-content-center">
                                 <a class="fas fa-file-alt" style="color:rgb(197, 95, 11); margin-left: 15px;" matSuffix
                                     matTooltipPosition="right"
                                     matTooltip="Cambiar el estado del documento de autorización"
@@ -129,43 +206,16 @@
                     </tbody>
                 </table>
             </div>
-            <mat-paginator id="pagina" [length]="listaVacacionesFiltradaAutorizada.length"
-                [pageSize]="tamanio_pagina_auto" [pageSizeOptions]="pageSizeOptions_auto" id="pagina"
-                (page)="ManejarPaginaAutorizadas($event)" showFirstLastButtons>
-            </mat-paginator>
-            <div class="d-flex justify-content-end" style="margin-right: 2%;">
-                <i (click)="generarPdf('download','Vacaciones autorizadas')" id="pdf" class="fas fa-file-pdf" matSuffix
-                    matTooltipPosition="right" matTooltip="Descargar Lista de vacaciones autorizadas en formato PDF.">
-                    <p>PDF</p>
-                </i>
-                <i (click)="exportToExcel('Vacaciones autorizadas')" id="excel" class="fas fa-file-excel" matSuffix
-                    matTooltipPosition="right" matTooltip="Descargar Lista de vacaciones autorizadas en formato EXCEL.">
-                    <p>XLSL</p>
-                </i>
-                <i (click)="exportToCVS('Vacaciones autorizadas')" id="csv" class="fas fa-file-csv" matSuffix
-                    matTooltipPosition="right" matTooltip="Descargar Lista de vacaciones autorizadas en formato CSV.">
-                    <p>CSV</p>
-                </i>
-                <i (click)="exportToXML('Vacaciones autorizadas')" id="xml" class="fas fa-file-code" matSuffix
-                    matTooltipPosition="right" matTooltip="Descargar Lista de vacaciones autorizadas en formato XML.">
-                    <p>XML</p>
-                </i>
-            </div>
-            <div class="d-flex justify-content-end"
-                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
-                <p> Reporte de vacaciones autorizadas. </p>
-            </div>
         </div>
-    </div>
 
-    <div *ngIf="(validarMensaje1) && (validarMensaje2)" class="container"
-        style="padding-bottom: 50px; text-align: center; padding-top: 20px;">
-        <div class="mat-elevation-z8" style="color: rgb(158, 154, 154); padding: 2%;">
-            <h5> Por el momento no tiene solicitudes de vacaciones por aprobar. </h5>
+        <div *ngIf="(validarMensaje1) && (validarMensaje2)" class="container"
+            style="padding-bottom: 50px; text-align: center; padding-top: 20px;">
+            <div class="mat-elevation-z8" style="color: rgb(158, 154, 154); padding: 2%;">
+                <h5> Por el momento no tiene solicitudes de vacaciones por aprobar. </h5>
+            </div>
         </div>
     </div>
 </div>
-
 <!--  ****************  VER FORMULARIO EDITAR SOLICITUDES DE VACACIONES  **************************  -->
 <app-editar-vacaciones-empleado *ngIf="ver_form_editar" [pagina]=" pagina" [dato]="usuarios_editar">
 </app-editar-vacaciones-empleado>

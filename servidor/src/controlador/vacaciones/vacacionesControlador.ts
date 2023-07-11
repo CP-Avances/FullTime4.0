@@ -35,11 +35,12 @@ class VacacionesControlador {
       `
       SELECT v.fec_inicio, v.fec_final, v.fec_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado, 
         v.id, v.id_peri_vacacion, v.id_empl_cargo, dc.contrato_id, e.id AS id_empl_solicita, da.id_departamento, 
-	      e.nombre, e.apellido
-      FROM vacaciones AS v, datos_empleado_cargo AS dc, empleados AS e, datos_actuales_empleado AS da   
+	      e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, da.codigo, depa.nombre AS depa_nombre
+      FROM vacaciones AS v, datos_empleado_cargo AS dc, empleados AS e, datos_actuales_empleado AS da, cg_departamentos AS depa   
       WHERE dc.cargo_id = v.id_empl_cargo 
 	      AND dc.empl_id = e.id  
 	      AND da.id_contrato = dc.contrato_id
+        AND depa.id = da.id_departamento
 	      AND (v.estado = 1 OR v.estado = 2) 
       ORDER BY id DESC
       `
@@ -56,9 +57,10 @@ class VacacionesControlador {
   public async ListarVacacionesAutorizadas(req: Request, res: Response) {
     const VACACIONES = await pool.query(`
     SELECT v.fec_inicio, v.fec_final, v.fec_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado, 
-    v.id, v.id_peri_vacacion, v.id_empl_cargo, e.id AS id_empl_solicita, e.nombre, e.apellido 
-	  FROM vacaciones AS v, datos_empleado_cargo AS dc, empleados AS e   
-	  WHERE dc.cargo_id = v.id_empl_cargo AND dc.empl_id = e.id  
+    v.id, v.id_peri_vacacion, v.id_empl_cargo, e.id AS id_empl_solicita, e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, 
+    dc.codigo, depa.nombre AS depa_nombre 
+	  FROM vacaciones AS v, datos_empleado_cargo AS dc, empleados AS e, cg_departamentos AS depa   
+	  WHERE dc.cargo_id = v.id_empl_cargo AND dc.empl_id = e.id  AND depa.id = dc.id_departamento
 	  AND (v.estado = 3 OR v.estado = 4) ORDER BY id DESC
     `);
     if (VACACIONES.rowCount > 0) {

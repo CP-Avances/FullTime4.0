@@ -15,7 +15,7 @@
             <span class="w-100 bd-highlight">
                 LISTA DE PERMISOS SOLICITADOS POR USUARIO</span>
             <button *ngIf="filtroDepa || filtroUsuario || filtroEstado" class="btn btn-primary" (click)="limpiarFiltro()"
-                style="float: left; margin-left: 10px;">Limpiar</button>
+                style="float: right; margin-right: 10px;">Limpiar</button>
         </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
@@ -83,13 +83,13 @@
                         <td>{{e.fec_inicio_}}</td>
                         <td>{{e.fec_final_}}</td>
                         <td class="d-flex justify-content-center">
-                            <i class="fas fa-edit" id="edit" style="margin-right: 20px;"
+                            <i class="fas fa-edit" id="edit" style="margin-right: 5px;"
                                 (click)="EditarPermiso(e.id, e.id_emple_solicita)" matSuffix matTooltipPosition="right"
                                 matTooltip="Modificar los datos generales de este registro">
                                 <p>Editar</p>
                             </i>
                             <i *ngIf="auto_individual" class="fas fa-file-alt"
-                                style="color:rgb(197, 95, 11); margin-left: 15px;" matSuffix matTooltipPosition="right"
+                                style="color:rgb(197, 95, 11); margin-left: 5px;" matSuffix matTooltipPosition="right"
                                 matTooltip="Cambiar el estado del documentdo de autorazación"
                                 [routerLink]="['/ver-permiso',e.id]">
                                 <p>Abrobar</p>
@@ -133,7 +133,7 @@
                 LISTA DE PERMISOS AUTORIZADOS O NEGADOS
             </span>
             <button *ngIf="AutorifiltroDepa || AutorifiltroUsuario || AutorifiltroEstado" class="btn btn-primary" (click)="limpiarFiltroAutorizados()"
-                style="float: left; margin-left: 10px;">Limpiar</button>
+                style="float: right; margin-right: 10px;">Limpiar</button>
         </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
@@ -173,7 +173,7 @@
                         <td></td>
                         <td>
                             <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
-                                matTooltip="Filtro de solicitudes pendientes y pre-autorizados.">
+                                matTooltip="Filtro de solicitudes autorizados y negados.">
                                 help_outline
                             </mat-icon>
                         </td>

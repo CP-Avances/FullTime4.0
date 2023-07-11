@@ -31,9 +31,20 @@ table { width: 100%; font-size: 14px; }
 
 
 
-mat-form-field { padding: 10px 15px 0px 15px;}
+mat-form-field { padding: 5px 5px 0px 5px;}
 
 #SelectCheck {
     cursor: pointer;
     margin-left: 10px;
 }
+
+mat-form-field.input-tables {
+    background: transparent;
+    font-size: 14px;
+    text-align: center;
+    outline: none;
+    fill: none;
+    height: 65px;
+}
+
+.departamento { width: 130px; }

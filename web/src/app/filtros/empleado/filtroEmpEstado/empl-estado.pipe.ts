@@ -16,8 +16,7 @@ export class EmplEstadoPipe implements PipeTransform {
         RESULTADO_BUSQUEDAS.push(resultados);
       }
     };
-    console.log('resultado: ',RESULTADO_BUSQUEDAS);
-    
+        
     return RESULTADO_BUSQUEDAS;
   }
 

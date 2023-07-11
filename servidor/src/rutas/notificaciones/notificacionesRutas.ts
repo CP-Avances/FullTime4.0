@@ -52,7 +52,12 @@ class NotificacionTiempoRealRutas {
         this.router.get('/one/:id', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.ObtenerUnaNotificacion);
 
 
-
+        /** *************************************************************************************** **
+         ** **                    MANEJO DE DATOS DE CORREOS MULTIPLE                                ** ** 
+         ** *************************************************************************************** **/
+        // METODO PARA ENVIAR CORREO DE COMUNICADOS
+        this.router.post('/mail-multiple/', TokenValidation, NOTIFICACION_TIEMPO_REAL_CONTROLADOR.EnviarCorreoSolicitudes);
+        
 
 
 

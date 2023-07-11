@@ -300,6 +300,8 @@ class PermisosControlador {
         }
     }
 
+
+
     // REGISTRAR DOCUMENTO DE RESPALDO DE PERMISO  
     public async GuardarDocumentoPermiso(req: Request, res: Response): Promise<any> {
         // LEER DATOS DE IMAGEN
@@ -588,7 +590,7 @@ class PermisosControlador {
     public async ListarEstadosPermisos(req: Request, res: Response) {
         const PERMISOS = await pool.query('SELECT p.id, p.fec_creacion, p.descripcion, p.fec_inicio, ' +
             'p.documento, p.docu_nombre, p.fec_final, p.estado, p.id_empl_cargo, e.id AS id_emple_solicita, e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, ' +
-            'e.cedula, cp.descripcion AS nom_permiso, ec.id AS id_contrato, da.id_departamento AS id_depa, da.codigo, depa.nombre AS depa_nombre FROM permisos AS p, ' +
+            'e.cedula, da.correo, cp.descripcion AS nom_permiso, ec.id AS id_contrato, da.id_departamento AS id_depa, da.codigo, depa.nombre AS depa_nombre FROM permisos AS p, ' +
             'empl_contratos AS ec, empleados AS e, cg_tipo_permisos AS cp, datos_actuales_empleado AS da, cg_departamentos AS depa ' +
             'WHERE p.id_empl_contrato = ec.id AND ' +
             'ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id AND da.id_contrato = ec.id AND depa.id = da.id_departamento AND (p.estado = 1 OR p.estado = 2) ' +
@@ -711,15 +713,6 @@ class PermisosControlador {
      ** **                             METODOS PARA REGISTRO DE PERMISOS                               ** ** 
      ** ************************************************************************************************* **/
 
-
-
-
-
-
-
-
-
-
     // ELIMINAR DOCUMENTO DE PERMISO DESDE APLICACION MOVIL
     public async EliminarPermisoMovil(req: Request, res: Response) {
         let { documento } = req.params;
@@ -749,7 +742,7 @@ class PermisosControlador {
             `
             SELECT p.id, p.fec_creacion, p.descripcion, p.fec_inicio, p.dia, p.hora_salida, p.hora_ingreso, 
             p.hora_numero, p.documento, p.docu_nombre, p.fec_final, p.estado, p.id_empl_cargo, e.nombre, 
-            e.apellido, e.cedula, e.id AS id_empleado, cp.id AS id_tipo_permiso, 
+            e.apellido, e.cedula, e.id AS id_empleado, e.codigo, cp.id AS id_tipo_permiso, 
             cp.descripcion AS nom_permiso, ec.id AS id_contrato 
             FROM permisos AS p, empl_contratos AS ec, empleados AS e, cg_tipo_permisos AS cp 
             WHERE p.id = $1 AND p.id_empl_contrato = ec.id AND ec.id_empleado = e.id AND 

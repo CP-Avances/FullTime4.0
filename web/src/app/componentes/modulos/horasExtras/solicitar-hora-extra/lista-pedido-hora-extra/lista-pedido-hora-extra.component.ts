@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
+import { FormControl } from '@angular/forms';
 import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -21,6 +22,11 @@ import { MainNavService } from 'src/app/componentes/administracionGeneral/main-n
 import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
+//PIPES DE FILTROS
+import { EmplDepaPipe } from 'src/app/filtros/empleado/nombreDepartamento/empl-depa.pipe';
+import { EmplUsuarioPipe } from 'src/app/filtros/empleado/filtroEmpUsuario/empl-usuario.pipe';
+import { EmplEstadoPipe } from 'src/app/filtros/empleado/filtroEmpEstado/empl-estado.pipe';
+
 export interface HoraExtraElemento {
   apellido: string;
   descripcion: string;
@@ -34,6 +40,7 @@ export interface HoraExtraElemento {
   id_empl_cargo: number;
   id_contrato: number;
   id_usua_solicita: number;
+  depa_nombre?: any;
 }
 
 @Component({
@@ -69,6 +76,22 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
   pageSizeOptions = [5, 10, 20, 50];
 
   inicioFor = 0;
+
+  // VARIABLES USADAS EN BUSQUEDA DE FILTRO DE DATOS
+  Depata: any = new FormControl('');
+  Usuario: any = new FormControl('');
+  Estado: any = new FormControl('');
+  filtroDepa: any;
+  filtroUsuario: any;
+  filtroEstado: any;
+
+  //VARIABLES DE FILTRO DE LA TABLA DE AUTORIZADOS O NEGADOS
+  AutoriDepata: any = new FormControl('');
+  AutoriUsuario: any = new FormControl('');
+  AutoriEstado: any = new FormControl('');
+  AutorifiltroDepa: any;
+  AutorifiltroUsuario: any;
+  AutorifiltroEstado: any;
 
   get habilitarHorasE(): boolean { return this.funciones.horasExtras; }
 
@@ -276,6 +299,8 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
             if(this.lista_pedidosFiltradas.length == i){
               this.lista_HorasExtras = this.HorasExtraLista;
 
+              console.log('this.lista_HorasExtras: ',this.lista_HorasExtras);
+
               if (Object.keys(this.lista_HorasExtras).length == 0) {
                 this.validarMensaje1 = true;
               }
@@ -329,6 +354,11 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
       this.btnCheckHabilitar = false;
       this.auto_individual = true;
     }
+  }
+
+  // METODO PARA VALIDAR INGRESO DE LETRAS
+  IngresarSoloLetras(e: any) {
+    return this.validar.IngresarSoloLetras(e);
   }
 
   /** *********************************************************************************************** **
@@ -485,7 +515,6 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
           tt.setHours(tt.getHours() + t1.getHours(), tt.getMinutes() + t1.getMinutes(), tt.getSeconds() + tt.getSeconds());
           horaT = (moment(tt).format('HH:mm:ss')).split(':');
           this.horasSumadas_observacion = (moment(tt).format('HH:mm:ss'));
-          console.log('jcneuhrfu', this.horasSumadas_observacion)
         }
         else {
           break;
@@ -545,8 +574,10 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
     this.restHE.ListaAllHoraExtraAutorizada().subscribe(res => {
       this.pedido_hora_autoriza = res;
 
+      console.log('this.pedido_hora_autoriza: ',this.pedido_hora_autoriza);
+
       //Filtra la lista de Horas Extras Autorizadas para descartar las solicitudes del mismo usuario y almacena en una nueva lista
-      this.listaHorasExtrasAutorizadasFiltradas = this.pedido_hora_autoriza.filter(o => {
+      this.pedido_hora_autoriza.filter(o => {
         if(this.idEmpleado !== o.id_usua_solicita){
           return this.listaHorasExtrasAutorizadasFiltradas.push(o);
         }
@@ -585,12 +616,12 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
           this.total_horas_autorizadas = (moment(tt).format('HH:mm:ss'));
         }
 
-        console.log("horas totales autorizadas: ",this.total_horas_autorizadas);
-
         data.fec_inicio = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado);
         data.fec_final = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
 
       })
+
+      console.log('this.listaHorasExtrasAutorizadasFiltradas: ',this.listaHorasExtrasAutorizadasFiltradas)
 
       if (Object.keys(this.listaHorasExtrasAutorizadasFiltradas).length == 0) {
         this.validarMensaje3 = true;
