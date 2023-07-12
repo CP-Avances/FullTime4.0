@@ -50,7 +50,7 @@
                         <tr
                             *ngFor="let ta of tipo_acciones | nombre:filtroNombre | paginate:tamanio_pagina:numero_pagina">
                             <td id="centrar">{{ta.nombre}}</td>
-                            <td id="centrar" class="d-flex justify-content-center">
+                            <td id="centrar" class="justify-content-center">
                                 <i matSuffix matTooltipPosition="right"
                                     matTooltip="Ver datos generales de este registro." class="fas fa-eye" id="t-ver"
                                     (click)="AbrirDatosAccion(ta.id)">

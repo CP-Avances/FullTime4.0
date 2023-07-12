@@ -3,7 +3,15 @@
     <div class="container" *ngFor="let f of datosFeriado" style="padding-top: 15px;">
         <mat-card class="example-card mat-elevation-z8">
             <div id="titulo">
+                <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+                    (click)="CerrarPantalla()">
+                    Listar feriados
+                </button>
                 <span>{{f.descripcion.toUpperCase()}}</span>
+                <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                    (click)="AbrirVentanaEditarFeriado(f)">
+                    Editar
+                </button>
             </div>
             <mat-card-content>
                 <div class="container" style="padding-top: 15px;">
@@ -20,12 +28,6 @@
                                 <label>{{f.fec_recuperacion_}}</label>
                             </div>
                         </div>
-                    </div>
-                    <div style="text-align: right;">
-                        <i id="editarF" (click)="AbrirVentanaEditarFeriado(f)" matSuffix matTooltipPosition="right"
-                            matTooltip="Modificar datos de este registro" class="fas fa-edit">
-                            <p>Editar</p>
-                        </i>
                     </div>
                 </div>
                 <hr>
@@ -101,10 +103,6 @@
                     <button id="btn-raised" class="btn btn-sm float-right" (click)="VerAsignarCiudad(f.id)"
                         value="Asignar ciudad">
                         Asignar ciudad
-                    </button>
-                    <button id="btn-raised" class="btn btn-sm float-left" value="Ir a lista de feriados"
-                        (click)="CerrarPantalla()">
-                        Ir a lista de feriados
                     </button>
                 </div>
             </mat-card-content>

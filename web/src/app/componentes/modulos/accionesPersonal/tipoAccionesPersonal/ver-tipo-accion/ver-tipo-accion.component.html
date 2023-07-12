@@ -1,7 +1,15 @@
 <div class="container" *ngFor="let a of datosTipos" style="padding-top: 15px;">
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
+            <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+                (click)="VerListaAcciones()">
+                Listar tipo acción personal
+            </button>
             <span>{{a.nombre.toUpperCase()}}</span>
+            <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                (click)="AbrirEditar(a)">
+                Editar
+            </button>
         </div>
         <mat-card-content>
             <div class="container" style="padding-top: 15px;">
@@ -15,22 +23,17 @@
                             {{a.base_legal}}</label>
                         <br>
                         <label *ngIf="a.tipo_permiso === true" class="col-sm col-form-label"><b>Tipo:</b>
-                            Permiso</label>
+                            Permiso
+                        </label>
                         <label *ngIf="a.tipo_vacacion === true" class="col-sm col-form-label"><b>Tipo:</b>
-                            Vacación</label>
+                            Vacación
+                        </label>
                         <label *ngIf="a.tipo_situacion_propuesta === true" class="col-sm col-form-label"><b>Tipo:</b>
-                            Situación Propuesta</label>
+                            Situación Propuesta
+                        </label>
                     </div>
                 </div>
-                <div style="text-align: right;">
-                    <i id="editarF" (click)="AbrirEditar(a)" matSuffix matTooltipPosition="right"
-                        matTooltip="Modificar datos de este registro" class="fas fa-edit">
-                        <p>Editar</p>
-                    </i>
-                </div>
             </div>
-            <input type="submit" class="btn btn-sm" (click)="VerListaAcciones()"
-                value="Ir a lista tipos acción personal">
         </mat-card-content>
     </mat-card>
 </div>

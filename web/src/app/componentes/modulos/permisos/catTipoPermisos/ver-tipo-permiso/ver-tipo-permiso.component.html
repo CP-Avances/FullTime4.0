@@ -1,6 +1,10 @@
 <div class="container" *ngFor="let p of datosPermiso" style="padding-top: 15px;">
         <mat-card class="example-card mat-elevation-z8">
                 <div id="titulo">
+                        <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+                                (click)="VerListaPermisos()">
+                                Listar tipo permisos
+                        </button>
                         <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
                                 (click)="VerFormularioEditar(p.id)">
                                 Editar
@@ -163,10 +167,6 @@
                                         </div>
                                 </div>
                         </div>
-                        <button id="btn-raised" class="btn btn-sm float-right" value="Ir a lista tipo de permisos"
-                                (click)="VerListaPermisos()">
-                                Ir a lista tipo de permisos
-                        </button>
                 </mat-card-content>
         </mat-card>
 </div>

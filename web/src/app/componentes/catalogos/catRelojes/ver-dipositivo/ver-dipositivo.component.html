@@ -3,6 +3,10 @@
     <div class="container" *ngFor="let r of datosReloj" style="padding-top: 20px;">
         <mat-card class="example-card mat-elevation-z8">
             <div class="d-flex bd-highlight" id="titulo">
+                <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+                    (click)="VerListaReloj()">
+                    Listar dispositivos
+                </button>
                 <span class="w-100 bd-highlight">
                     DISPOSITIVO {{r.nombre.toUpperCase()}}
                 </span>
@@ -119,10 +123,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div style="padding-top: 25px; text-align: right;">
-                    <input type="submit" class="btn btn-sm" (click)="VerListaReloj()"
-                        value="Ir a lista de dispositivos">
                 </div>
             </mat-card-content>
         </mat-card>

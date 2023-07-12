@@ -1,33 +1,57 @@
-.empresasL { 
-    font-size: 20px; 
-    text-align: center; 
-    background: rgb(52,65,84); 
-    color: white; 
-    padding-top: 10px; 
-    padding-bottom: 6px; 
-}
-#resultadosEmpre { 
-    font-size: 17px; 
-    text-align: center; 
-    background: rgb(52,65,84); 
-    color: white; 
-    padding-top: 10px; 
-    padding-bottom: 6px; 
+.empresasL {
+    font-size: 20px;
+    text-align: center;
+    background: rgb(52, 65, 84);
+    color: white;
+    padding-top: 10px;
+    padding-bottom: 6px;
 }
 
-#permisoSuc { cursor: pointer; }
+#resultadosEmpre {
+    font-size: 17px;
+    text-align: center;
+    background: rgb(52, 65, 84);
+    color: white;
+    padding-top: 10px;
+    padding-bottom: 6px;
+}
 
-.btn { margin-left: 20px; background-color: rgb(80,87,97); color: white; }
+#permisoSuc {
+    cursor: pointer;
+}
 
-p { font-size: x-small; }
+.btn {
+    margin-left: 20px;
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
 
-td { padding-top: 10px; text-align: center;  }
+p {
+    font-size: x-small;
+}
 
-.fas { color:green; margin-right: 15px; cursor: pointer; }
+td {
+    padding-top: 10px;
+    text-align: center;
+    vertical-align: middle;
+}
 
-.far { color:red; margin-right: 15px; cursor: pointer; }
+.fas {
+    color: green;
+    margin-right: 15px;
+    cursor: pointer;
+}
 
-table { width: 100%; font-size: 14px; }
+.far {
+    color: red;
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+table {
+    width: 100%;
+    font-size: 14px;
+}
 
 #SelectCheck {
     cursor: pointer;
@@ -43,4 +67,6 @@ mat-form-field.input-tables {
     height: 65px;
 }
 
-.departamento { width: 130px; }
+.departamento {
+    width: 130px;
+}

@@ -99,7 +99,8 @@
                             <td>
                                 <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de horario por el nombre.">
-                                    help_outline</mat-icon>
+                                    help_outline
+                                </mat-icon>
                             </td>
                         </tr>
                         <tr
@@ -112,7 +113,7 @@
                             <td *ngIf="horario.nocturno == false">No</td>
                             <td *ngIf="horario.documento == null"></td>
                             <td *ngIf="horario.documento != null"> <a class="fas fa-file-alt"
-                                    style="color:rgb(197, 95, 11); margin-left: 15px; text-align: center;" matSuffix
+                                    style="color:rgb(197, 95, 11); margin-left: 15px; text-align: center; text-decoration: none;" matSuffix
                                     matTooltipPosition="right" matTooltip="Dar click para ver o descargar el documento."
                                     href="{{hipervinculo}}/horario/documentos/{{horario.documento}}" target="_blank">
                                     <p>{{horario.documento}}</p>

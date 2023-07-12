@@ -1,14 +1,20 @@
-<app-ver-departamento [id_departamento]="data_id" [pagina]="pagina" *ngIf="ver_nivel">
-</app-ver-departamento>
-
+<!--  **********************  VER LISTA DE DEPARTAMENTOS POR SUCURSALES  **************************** -->
 <div class="div" *ngIf="ver_sucursal">
-    <div class="container" *ngFor="let s of datosSucursal" style="padding-top: 15px;">
+    <div class="container" *ngFor="let s of datosSucursal" style="padding-top: 20px;">
         <mat-card class="example-card mat-elevation-z8">
             <div id="titulo">
+                <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+                    (click)="VerSucursales()">
+                    Listar establecimientos
+                </button>
                 <span>{{s.nombre.toUpperCase()}}</span>
+                <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                    (click)="EditarDatosSucursal(s)">
+                    Editar
+                </button>
             </div>
             <mat-card-content>
-                <div class="container" style="padding-top: 15px;">
+                <div class="container" style="padding-top: 20px;">
                     <div class="row">
                         <div class="col-md">
                             <div class="caja d-flex justify-content-start">
@@ -23,21 +29,16 @@
                             </div>
                         </div>
                     </div>
-                    <div style="text-align: right;">
-                        <i id="editarF" (click)="EditarDatosSucursal(s)" matSuffix matTooltipPosition="right"
-                            matTooltip="Modificar datos de este registro" class="fas fa-edit">
-                            <p>Editar</p>
-                        </i>
-                    </div>
-                    <div style="text-align: center;">
-                        <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarDepartamento()"
-                            value="Crear departamento">Crear
-                            departamento</button>
-                    </div>
                 </div>
                 <hr>
-                <div class="container table-responsive" style="padding-bottom: 50px;">
-                    <div id="resultados">LISTA DE DEPARTAMENTOS</div>
+                <div class="container table-responsive" style="padding-bottom: 25px; padding-top: 10px;">
+                    <div id="titulo">
+                        <span>LISTA DE DEPARTAMENTOS</span>
+                        <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                            (click)="AbrirVentanaRegistrarDepartamento()">
+                            Crear departamento
+                        </button>
+                    </div>
                     <table class="mat-elevation-z8 table table-hover table-sm">
                         <thead class="thead-light">
                             <tr style="text-align: center;">
@@ -58,13 +59,12 @@
                                         matTooltip="Registrar niveles de autorización." (click)="VerNiveles(d.id)">
                                         <p>Niveles</p>
                                     </i>
-                                    <i id="editarI" (click)="AbrirVentanaEditarDepartamento(d)" matSuffix
+                                    <i id="t-editar" (click)="AbrirVentanaEditarDepartamento(d)" matSuffix
                                         matTooltipPosition="right" matTooltip="Modificar datos de este registro."
                                         class="fas fa-edit">
                                         <p>Editar</p>
                                     </i>
-                                    <i class="far fa-trash-alt" (click)="ConfirmarDelete(d)"
-                                        style="color:red; margin-left: 15px;" id="i-cursor" matSuffix
+                                    <i class="far fa-trash-alt" (click)="ConfirmarDelete(d)" id="t-eliminar" matSuffix
                                         matTooltipPosition="right" matTooltip="Eliminar registro.">
                                         <p>Eliminar</p>
                                     </i>
@@ -76,12 +76,12 @@
                         [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)"
                         showFirstLastButtons>
                     </mat-paginator>
-                    <button id="btn-raised" class="btn btn-sm" [routerLink]="['/sucursales/']"
-                        value="Ir a lista de establecimientos">
-                        Ir a lista de establecimientos
-                    </button>
                 </div>
             </mat-card-content>
         </mat-card>
     </div>
 </div>
+
+<!--  **********************  DATOS DE NIVELES DE APROBACION  **************************** -->
+<app-ver-departamento [id_departamento]="data_id" [pagina]="pagina" *ngIf="ver_nivel">
+</app-ver-departamento>

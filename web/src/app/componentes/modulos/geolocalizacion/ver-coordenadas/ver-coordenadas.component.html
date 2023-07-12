@@ -6,6 +6,10 @@
                 Atras
             </button>
             <span>DATOS GENERALES</span>
+            <button id="btn-raised" class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                (click)="AbrirVentanaEditar(c)">
+                Editar
+            </button>
         </div>
         <mat-card-content>
             <div class="container" style="padding-top: 15px;">
@@ -25,12 +29,6 @@
                         <label id="datosF" class="col-form-label">Longitud:</label>
                         <label class="col-form-label">{{c.longitud}}</label>
                     </div>
-                </div>
-                <div style="text-align: right;">
-                    <i id="editarF" (click)="AbrirVentanaEditar(c)" matSuffix matTooltipPosition="right"
-                        matTooltip="Modificar datos de este registro." class="fas fa-edit">
-                        <p>Editar</p>
-                    </i>
                 </div>
             </div>
 

@@ -39,12 +39,12 @@ class SucursalControlador {
             const response = yield database_1.default.query(`
       INSERT INTO sucursales (nombre, id_ciudad, id_empresa) VALUES ($1, $2, $3) RETURNING *
       `, [nombre, id_ciudad, id_empresa]);
-            const [regimen] = response.rows;
-            if (regimen) {
-                return res.status(200).jsonp(regimen);
+            const [sucursal] = response.rows;
+            if (sucursal) {
+                return res.status(200).jsonp(sucursal);
             }
             else {
-                return res.status(404).jsonp({ message: 'mal_registro' });
+                return res.status(404).jsonp({ message: 'error' });
             }
         });
     }

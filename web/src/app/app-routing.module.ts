@@ -252,7 +252,6 @@ const routes: Routes = [
   { path: 'vistaEmpresa', component: VerEmpresaComponent, canActivate: [AuthGuard], data: { roles: 1 } },
 
   // ACCESO A RUTAS ESTABLECIMIENTOS
-  { path: 'vistaSucursales/:id', component: VerSucursalComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'sucursales', component: ListaSucursalesComponent, canActivate: [AuthGuard], data: { roles: 1 } },
 
   // ACCESO A RUTAS DE FERIADOS
@@ -282,7 +281,6 @@ const routes: Routes = [
 
   // ACCESO A RUTAS DE DEPARTAMENTOS
   { path: 'departamento', component: PrincipalDepartamentoComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'departamento/:id', component: VerDepartamentoComponent, canActivate: [AuthGuard], data: { roles: 1 } },
 
   // ACCESO A RUTAS DE CODIGO
   { path: 'codigo', component: ConfigurarCodigoComponent, canActivate: [AuthGuard], data: { roles: 1 } },

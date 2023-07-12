@@ -6,11 +6,12 @@ import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import * as FileSaver from 'file-saver';
-import * as moment from 'moment';
+
 import * as xlsx from 'xlsx';
+import * as moment from 'moment';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR COMPONENTES

@@ -7,7 +7,7 @@ p {
 }
 
 .mat-mdc-radio-button ~ .mat-mdc-radio-button {
-    margin-left: 16px;
+    margin-left: 20px;
   }
 
 .btn {

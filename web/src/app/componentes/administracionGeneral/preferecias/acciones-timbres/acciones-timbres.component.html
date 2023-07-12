@@ -5,10 +5,9 @@
     </span>
     <mat-icon class="float-right" id="cerrar" (click)="this.ventana.close()">highlight_off</mat-icon>
 </div>
-<div class="container">
+<div class="container" style="padding-top: 15px;">
     <small>
-        Si utiliza relojes con timbres de 6 o 3 acciones de click en <strong>Si</strong>. <br>
-        Si utiliza relojes con timbres sin acciones de click en <strong>No</strong>.
+        Indicar si los equipos biométricos trabajan o no con 3 o 6 acciones.
     </small>
     <hr>
     <form class="example-form" [formGroup]="formGroup" ngNativeValidate>
@@ -16,16 +15,21 @@
             <div class="caja">
                 <div class="d-flex flex-wrap justify-content-start">
                     <mat-radio-group aria-label="Select an option" formControlName="acciones_timbres" required>
-                        <label class="d-flex justify-content-start">
-                            <p>RELOJ CON ACCIONES (6 o 3)</p>
+                        <label class="d-flex justify-content-center">
                             <mat-icon matSuffix matTooltipPosition="right"
                                 matTooltip="Ayuda a identificar si los reportes deben tomar en cuenta los timbres con acciones o sin acciones.">
                                 help_outline
                             </mat-icon>
+                            <p style="margin-left: 15px;">RELOJ CON ACCIONES (3 o 6)</p>
+
                         </label>
                         <div class="d-flex justify-content-center">
-                            <mat-radio-button [value]="true">Si</mat-radio-button>
-                            <mat-radio-button [value]="false">No</mat-radio-button>
+                            <mat-radio-button [value]="true">
+                                <label id="textoradiobtn">Si</label>
+                            </mat-radio-button>
+                            <mat-radio-button [value]="false">
+                                <label id="textoradiobtn">No</label>
+                            </mat-radio-button>
                         </div>
                     </mat-radio-group>
                 </div>

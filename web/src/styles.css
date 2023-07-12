@@ -87,8 +87,7 @@ body {
 /* ESTILO ÍCONO DE AYUDA EN BUSQUEDAS DE TABLAS */
 #i-ayuda {
     cursor: pointer;
-    padding-top: 3px;
-    margin-bottom: 1%;
+    vertical-align: middle;
 }
 
 /* ESTILOS DE ÍCONOS DE ACCIONES DE TABLAS */
@@ -120,7 +119,7 @@ body {
     color: red;
     cursor: pointer;
     margin-right: 5px;
-    margin-left: 10px;
+    margin-left: 15px;
     text-align: center;
 }
 

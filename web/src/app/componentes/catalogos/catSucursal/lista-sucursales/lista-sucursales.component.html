@@ -1,101 +1,110 @@
-<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;">
-    <div id="titulo">
-        <span>ESTABLECIMIENTOS</span>
+<!--  ********************  VER LISTA DE SUCURSALES  ************************  -->
+<div *ngIf="ver_lista">
+    <div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;">
+        <div id="titulo">
+            <span>ESTABLECIMIENTOS</span>
+        </div>
+        <mat-card class="example-card mat-elevation-z9">
+            <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
+                <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrar()">
+                    Crear establecimiento
+                </button>
+                <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampoBuscar()" matSuffix
+                    matTooltipPosition="right"
+                    matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
+                    Mostrar lista
+                </button>
+            </div>
+        </mat-card>
     </div>
-    <mat-card class="example-card mat-elevation-z9">
-        <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-            <button id="btn-raised"  class="btn btn-sm" (click)="AbrirVentanaRegistrarSucursal()">
-                Crear establecimiento
-            </button>
-            <button id="btn-raised"  class="btn btn-sm" (click)="LimpiarCampoBuscar()" matSuffix
-                matTooltipPosition="right"
-                matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
-                Mostrar lista
-            </button>
-        </div>
-    </mat-card>
-</div>
-<div class="container" style="padding-bottom: 50px; text-align: center;">
-    <div class="mat-elevation-z8" style="background: white;">
-        <div id="resultados">RESULTADO DE BÚSQUEDA</div>
-        <div class="table-responsive">
-            <table class="table table-hover table-sm ">
-                <thead class="thead-light">
-                    <tr style="text-align: center;">
-                        <th scope="col">Empresa</th>
-                        <th scope="col">Establecimiento</th>
-                        <th scope="col">Ciudad</th>
-                        <th scope="col">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td></td>
-                        <td>
-                            <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [formControl]="buscarNombre"
-                                    [(ngModel)]="filtroNombreSuc">
-                            </mat-form-field>
-                        </td>
-                        <td>
-                            <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" (keypress)="IngresarSoloLetras($event)"
-                                    [formControl]="buscarCiudad" [(ngModel)]="filtroCiudadSuc">
-                            </mat-form-field>
-                        </td>
-                        <td>
-                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
-                                matTooltip="Búsqueda de establecimientos de acuerdo a la columna de la tabla.">
-                                help_outline
-                            </mat-icon>
-                        </td>
-                    </tr>
-                    <tr
-                        *ngFor="let s of sucursales | sucCiudad: filtroCiudadSuc | sucNombre: filtroNombreSuc | paginate:tamanio_pagina:numero_pagina">
-                        <td>{{s.nomempresa}}</td>
-                        <td>{{s.nombre}}</td>
-                        <td>{{s.descripcion}}</td>
-                        <td class="d-flex justify-content-center">
-                            <i matSuffix matTooltipPosition="right" matTooltip="Ver lista de departamentos del establecimiento."
-                                class="fa fa-building" id="ver" [routerLink]="['/vistaSucursales/', s.id]">
-                                <p>Departamento</p>
-                            </i>
-                            <i id="t-editar" class="fas fa-edit" (click)="AbrirVentanaEditar(s)" matSuffix
-                                matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro.">
-                                <p>Editar</p>
-                            </i>
-                            <i (click)="ConfirmarDelete(s)" id="t-eliminar" class="far fa-trash-alt" matSuffix
-                                matTooltipPosition="right" matTooltip="Eliminar este registro.">
-                                <p>Eliminar</p>
-                            </i>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina"
-            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
-        </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
-            <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Sucursales en formato PDF.">
-                <p>PDF</p>
-            </i>
-            <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Sucursales en formato EXCEL.">
-                <p>XLSL</p>
-            </i>
-            <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Sucursales en formato CSV.">
-                <p>CSV</p>
-            </i>
-            <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Sucursales en formato XML.">
-                <p>XML</p>
-            </i>
-        </div>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
-            <p> Reporte de establecimientos. </p>
+    <div class="container" style="padding-bottom: 50px; text-align: center;">
+        <div class="mat-elevation-z8" style="background: white;">
+            <div id="resultados">RESULTADO DE BÚSQUEDA</div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm ">
+                    <thead class="thead-light">
+                        <tr style="text-align: center;">
+                            <th scope="col">Empresa</th>
+                            <th scope="col">Establecimiento</th>
+                            <th scope="col">Ciudad</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <mat-form-field id="t-inputs">
+                                    <input matInput placeholder="Buscar" [formControl]="buscarNombre"
+                                        [(ngModel)]="filtroNombreSuc">
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-form-field id="t-inputs">
+                                    <input matInput placeholder="Buscar" (keypress)="IngresarSoloLetras($event)"
+                                        [formControl]="buscarCiudad" [(ngModel)]="filtroCiudadSuc">
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de establecimientos de acuerdo a la columna de la tabla.">
+                                    help_outline
+                                </mat-icon>
+                            </td>
+                        </tr>
+                        <tr
+                            *ngFor="let s of sucursales | sucCiudad: filtroCiudadSuc | sucNombre: filtroNombreSuc | paginate:tamanio_pagina:numero_pagina">
+                            <td>{{s.nomempresa}}</td>
+                            <td>{{s.nombre}}</td>
+                            <td>{{s.descripcion}}</td>
+                            <td class="justify-content-center">
+                                <i matSuffix matTooltipPosition="right"
+                                    matTooltip="Ver lista de departamentos del establecimiento." class="fa fa-building"
+                                    id="ver" (click)="VerDepartamentos(s.id)">
+                                    <p>Departamento</p>
+                                </i>
+                                <i id="t-editar" class="fas fa-edit" (click)="AbrirVentanaEditar(s)" matSuffix
+                                    matTooltipPosition="right"
+                                    matTooltip="Modificar los datos generales de este registro.">
+                                    <p>Editar</p>
+                                </i>
+                                <i (click)="ConfirmarDelete(s)" id="t-eliminar" class="far fa-trash-alt" matSuffix
+                                    matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                    <p>Eliminar</p>
+                                </i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+            </mat-paginator>
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+                <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                    matTooltipPosition="right" matTooltip="Descargar Lista de Sucursales en formato PDF.">
+                    <p>PDF</p>
+                </i>
+                <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Sucursales en formato EXCEL.">
+                    <p>XLSL</p>
+                </i>
+                <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Sucursales en formato CSV.">
+                    <p>CSV</p>
+                </i>
+                <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Sucursales en formato XML.">
+                    <p>XML</p>
+                </i>
+            </div>
+            <div class="d-flex justify-content-end"
+                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                <p> Reporte de establecimientos. </p>
+            </div>
         </div>
     </div>
 </div>
+
+<!--  ********************  VER DEPARTAMETOS DE SUCURSALES  ************************  -->
+<app-ver-sucursal *ngIf="ver_departamentos" [idSucursal]="sucursal_id" [pagina_]="pagina"></app-ver-sucursal>

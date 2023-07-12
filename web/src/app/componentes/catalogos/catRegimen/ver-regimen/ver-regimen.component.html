@@ -1,6 +1,10 @@
 <div class="container" style="padding-top: 15px;">
     <mat-card class="example-card mat-elevation-z8">
         <div class="d-flex bd-highlight" id="titulo">
+            <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+                (click)="VerListaRegimen()">
+                Listar régimen laboral
+            </button>
             <span class="w-100 bd-highlight">
                 {{regimen.descripcion}}
             </span>
@@ -199,12 +203,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div style="padding-top: 25px; text-align: right;">
-                <button (click)="VerListaRegimen()" class="btn btn-sm">
-                    Ir a lista régimen laboral
-                </button>
             </div>
         </mat-card-content>
     </mat-card>

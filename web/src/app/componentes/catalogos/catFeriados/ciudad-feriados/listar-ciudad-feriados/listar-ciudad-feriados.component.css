@@ -23,12 +23,6 @@ hr {
     cursor: pointer;
 }
 
-#editarF {
-    color: green;
-    cursor: pointer;
-    text-align: center;
-}
-
 #datosF {
     padding-right: 5px;
     font-weight: bold;

@@ -755,7 +755,7 @@
             <h6 id="items" style="margin-top: 10%;">Horario</h6>
         </ng-template>
 
-         <!-- ************** PANTALLA DE REGISTRO DE HORARIO  ************************* -->
+        <!-- ************** PANTALLA DE REGISTRO DE HORARIO  ************************* -->
         <div class="container" style="padding-top: 15px; padding-bottom: 15px;" *ngIf="ventana_horario">
             <app-registo-empleado-horario [data_horario]="data_horario">
             </app-registo-empleado-horario>
@@ -862,8 +862,9 @@
                                 <span class="w-100 bd-highlight">
                                     DEFINICIONES
                                 </span>
-                                <mat-icon class="float-right" id="cerrar_"
-                                    (click)="CerrarDetalles()">highlight_off</mat-icon>
+                                <mat-icon class="float-right" id="cerrar_" (click)="CerrarDetalles()">
+                                    highlight_off
+                                </mat-icon>
                             </div>
                             <div class="table-responsive" style="text-align: center;">
                                 <table id="table_acciones" class="table table-hover table-sm" style="margin: 0 auto;">

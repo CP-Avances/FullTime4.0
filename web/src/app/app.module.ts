@@ -649,6 +649,8 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     PlanComidasComponent,
     ListaHorasExtrasComponent,
     VistaElementosComponent,
+    ListaSucursalesComponent,
+    VerEmpresaComponent,
   ],
 
   bootstrap: [AppComponent]

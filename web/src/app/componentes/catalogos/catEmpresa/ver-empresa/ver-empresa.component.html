@@ -197,7 +197,7 @@
                                         <td>
                                             <i matSuffix matTooltipPosition="right"
                                                 matTooltip="Registrar departamentos." class="fa fa-building" id="ver"
-                                                [routerLink]="['/vistaSucursales/', ds.id]">
+                                                (click)="VerDepartamentos(ds.id)">
                                                 <p>Departamento</p>
                                             </i>
                                             <i id="t-editar" (click)="AbrirVentanaEditarSucursal(ds)" matSuffix
@@ -227,3 +227,6 @@
 
 <!--  *********************  EDITAR INFORMACION GENERAL DE EMPRESA  *************************  -->
 <app-editar-empresa *ngIf="ver_editar" [idEmpresa]="idEmpresa"></app-editar-empresa>
+
+<!--  ********************  VER DEPARTAMETOS DE SUCURSALES  ************************  -->
+<app-ver-sucursal *ngIf="ver_departamentos" [idSucursal]="sucursal_id" [pagina_]="pagina"></app-ver-sucursal>

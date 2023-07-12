@@ -180,7 +180,7 @@
                             <td></td>
                             <td></td>
                             <td>
-                                <mat-icon matSuffix matTooltipPosition="right"
+                                <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
                                     matTooltip="Filtro de solicitudes autorizados y negados.">
                                     help_outline
                                 </mat-icon>
@@ -195,7 +195,7 @@
                             <td>{{v.fec_final_}}</td>
                             <td>{{v.fec_ingreso_}}</td>
                             <td class="justify-content-center">
-                                <a class="fas fa-file-alt" style="color:rgb(197, 95, 11); margin-left: 15px;" matSuffix
+                                <a class="fas fa-file-alt" style="color:rgb(197, 95, 11); margin-left: 15px; text-decoration: none;" matSuffix
                                     matTooltipPosition="right"
                                     matTooltip="Cambiar el estado del documento de autorización"
                                     [routerLink]="['/ver-vacacion',v.id]">

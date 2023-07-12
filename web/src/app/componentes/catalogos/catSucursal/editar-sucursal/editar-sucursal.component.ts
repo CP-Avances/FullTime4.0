@@ -278,11 +278,11 @@ export class EditarSucursalComponent implements OnInit {
 
   // METODO PARA CERRAR VENTANA
   CerrarVentana() {
-    this.ventana.close({ actualizar: true });
+    this.ventana.close(this.data.id);
   }
 
   Salir() {
-    this.ventana.close({ actualizar: false });
+    this.ventana.close(0);
   }
 
   // METODOS PARA LIMPIAR FORMULARIO SEGUN SELECCION

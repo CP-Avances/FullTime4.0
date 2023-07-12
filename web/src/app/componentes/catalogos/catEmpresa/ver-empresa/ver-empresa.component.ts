@@ -169,8 +169,10 @@ export class VerEmpresaComponent implements OnInit {
   AbrirVentanaEditarSucursal(datosSeleccionados: any): void {
     this.ventana.open(EditarSucursalComponent, { width: '650px', data: datosSeleccionados })
       .afterClosed().subscribe((items: any) => {
-        if (items.actualizar === true) {
-          this.ObtenerSucursal();
+        if (items) {
+          if (items > 0) {
+            this.VerDepartamentos(items);
+          }
         }
       });
   }
@@ -179,7 +181,11 @@ export class VerEmpresaComponent implements OnInit {
   AbrirVentanaRegistrarSucursal() {
     this.ventana.open(RegistrarSucursalesComponent, { width: '650px', data: this.idEmpresa })
       .afterClosed().subscribe((items: any) => {
-        this.ObtenerSucursal();
+        if (items) {
+          if (items > 0) {
+            this.VerDepartamentos(items);
+          }
+        }
       });
   }
 
@@ -223,8 +229,6 @@ export class VerEmpresaComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Eliminar(datos.id);
-        } else {
-          this.router.navigate(['/vistaEmpresa/', this.idEmpresa]);
         }
       });
   }
@@ -274,6 +278,17 @@ export class VerEmpresaComponent implements OnInit {
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
       this.empleado = data;
     })
+  }
+
+  // METODO PARA VER DATOS DE DEPARTAMENTOS
+  ver_departamentos: boolean = false;
+  pagina: string = '';
+  sucursal_id: number;
+  VerDepartamentos(id: number) {
+    this.ver_departamentos = true;
+    this.ver_informacion = false;
+    this.sucursal_id = id;
+    this.pagina = 'datos-empresa';
   }
 
   /** ************************************************************************************************** ** 
