@@ -522,16 +522,16 @@ class NotificacionTiempoRealControlador {
 
     var datos = await Credenciales(req.id_empresa);
 
-    //const { id_envia, correo, mensaje, asunto} = req.body;
-    const array = req.body
+    const { id_envia, correo, mensaje, asunto} = req.body.datosCorreo;
+    const solicitudes = req.body.solicitudes;
 
-    //console.log('id_envia: ',id_envia);
-    //console.log('correo: ',correo);
-    //console.log('mensaje: ',mensaje);
-    //console.log('asunto: ',asunto);
-    console.log('permisos: ',array);
+    console.log('id_envia: ',id_envia);
+    console.log('correo: ',correo);
+    console.log('mensaje: ',mensaje);
+    console.log('asunto: ',asunto);
+    console.log('datos: ',solicitudes);
 
-    /*
+    console.log('datos: ',datos);
     if (datos === 'ok') {
 
       const USUARIO_ENVIA = await pool.query(
@@ -625,7 +625,7 @@ class NotificacionTiempoRealControlador {
 
     } else {
       res.jsonp({ message: 'Ups! algo salio mal!!! No fue posible enviar correo electrónico.' });
-    }*/
+    }
   }
 
 

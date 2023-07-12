@@ -646,17 +646,6 @@ export class AutorizacionesComponent implements OnInit {
         this.listaCorreosEnviar.push(solicitud);
       }
     })
-
-    /*
-    var nuevalista: any = [];
-    permisos.forEach(function(elemento, indice, array) {
-      if(nuevalista.find(p=>p.id_emple_solicita == elemento.id_emple_solicita) == undefined)
-      {
-        return nuevalista.push(elemento);
-      }
-    });
-
-    this.ContarCorreos(nuevalista);*/
   }
 
   // METODO PARA CONTAR NUMERO DE CORREOS A ENVIARSE
@@ -682,30 +671,10 @@ export class AutorizacionesComponent implements OnInit {
     this.listaCorreosEnviar = nuevalista;
     this.EnviarCorreo(this.info_correo, this.listafiltrada);
 
-    /*
-    data.filter(solicitud => {
-      this.configNoti.ObtenerConfiguracionEmpleado(solicitud.id_contrato).subscribe(res_config => {
-        if(res_config[0].permiso_mail == true){
-          this.cont_correo = this.cont_correo + 1;
-          if (this.info_correo === '') {
-            this.info_correo = solicitud.correo;
-          }
-          else {
-            this.info_correo = this.info_correo + ', ' + solicitud.correo;
-          }
-          this.listaCorreosEnviar.push(solicitud);
-        }
-      })
-      this.num += 1;
-    });*/
-
   }
 
   // METODO USADO PARA ENVIAR COMUNICADO POR CORREO
   EnviarCorreo(correos: any, permisos: any) {
-
-    var datosEnvia: any [];
-
     let datosCorreo = {
       id_envia: this.id_empleado_loggin,
       mensaje: 'Listado de Solicitudes',
@@ -713,10 +682,14 @@ export class AutorizacionesComponent implements OnInit {
       asunto: 'Aprobacion multiple de solicitudes',
     }
 
-    datosEnvia = permisos.concat(datosCorreo);
+    var datosEnvia: any = {
+      datosCorreo: datosCorreo,
+      solicitudes: permisos
+    };
+
+    console.log('datosEnvia: ',datosEnvia);
     
-    this.realTime.EnviarCorreoMultiple(datosCorreo, permisos).subscribe(envio => {
-      /*
+    this.realTime.EnviarCorreoMultiple(datosEnvia).subscribe(envio => {
       if (envio.message === 'ok') {
         this.toastr.success('Mensaje enviado exitosamente.', '', {
           timeOut: 6000,
@@ -726,7 +699,7 @@ export class AutorizacionesComponent implements OnInit {
         this.toastr.warning('Ups !!! algo salio mal', 'No fue posible enviar correo electrónico.', {
           timeOut: 6000,
         });
-      }*/
+      }
     });
     
   }
