@@ -77,10 +77,9 @@ export class RealTimeService {
   }
 
   // METODO PARA ENVIO DE CORREO MULTIPLE
-  EnviarCorreoMultiple(datos: any, permisos: any []) {
+  EnviarCorreoMultiple(datos: any) {
     console.log('datos: ',datos);
-    console.log('permisos: ',permisos);
-    return this.http.post<any>(`${environment.url}/noti-real-time/mail-multiple`, permisos);
+    return this.http.post<any>(`${environment.url}/noti-real-time/mail-multiple`, datos);
   }
 
 
