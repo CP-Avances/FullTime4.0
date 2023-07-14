@@ -1,0 +1,165 @@
+<div class="container" style="padding-top: 15px;">
+    <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo">
+            <span>CONFIGURAR HORA EXTRA</span>
+        </div>
+        <mat-horizontal-stepper [linear]="isLinear" #stepper>
+            <mat-step [stepControl]="primeroFormGroup">
+                <ng-template matStepLabel>
+                    <mat-icon id="seccion_horaE" matSuffix matTooltipPosition="right"
+                        matTooltip="Sección 1: Configuraciones Generales">timer
+                    </mat-icon>
+                </ng-template>
+                <div class="subtitulo">
+                    <span>Configuraciones Generales</span>
+                </div>
+                <br>
+                <div class="nota">
+                    <span>Por favor llenar todos los campos obligatorios (*) del formulario y dar click en Siguiente
+                        para continuar.</span>
+                </div>
+                <form [formGroup]="primeroFormGroup">
+                    <div class="d-flex flex-wrap justify-content-between">
+                        <mat-form-field>
+                            <mat-label id="horaExtra">Nombre de la hora Extra</mat-label>
+                            <input matInput placeholder="Ej: " formControlName="descripcionForm" required>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Ingresar un nombre con el que se va a identificar la nueva configuración de hora extra">
+                                help_outline</mat-icon>
+                            <mat-error *ngIf="descripcion.invalid">{{obtenerMensajeErrorDescripcion()}}
+                            </mat-error>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label id="tipoRecargo">Seleccionar tipo recargo *</mat-label>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Seleccione el tipo de recargo que tendrá la hora extra">
+                                help_outline</mat-icon>
+                            <mat-select formControlName="tipoDescuentoForm">
+                                <mat-option *ngFor="let d of descuentos" [value]="d.value">
+                                    {{d.viewValue}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div class="caja">
+                            <mat-label class="float-left" style="font-size: 13px;">Porcentaje de recargo *</mat-label>
+                            <mat-icon class="float-right" id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Indique el valor porcentual que tendrá la hora extra">
+                                help_outline</mat-icon>
+                            <br><br>
+                            <mat-slider showTickMarks discrete tickInterval="25" min="0" max="100"
+                                [formControl]="recaPorcentaje" [displayWith]= "formatLabel" required>
+                                <input matSliderThumb>
+                            </mat-slider>
+                        </div>
+                        <mat-form-field>
+                            <mat-label>Tipo de jornada</mat-label>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Seleccionar la jornada de trabajo en la que se considerará la hora extra">
+                                help_outline</mat-icon>
+                            <mat-select formControlName="horaJornadaForm" required>
+                                <mat-option *ngFor="let h of horario" [value]="h.value">
+                                    {{h.viewValue}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <input matInput type="time" placeholder="Hora de Inicio" formControlName="horaInicioForm"
+                                required>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Ingresar la hora desde la cual se va a considerar hora extra">
+                                alarm</mat-icon>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <input matInput type="time" placeholder="Hora de Finalización"
+                                formControlName="horaFinalForm" required>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Ingresar la hora en la que finaliza la jornada laboral">
+                                alarm_on</mat-icon>
+                        </mat-form-field>
+                    </div>
+                </form>
+                <div>
+                    <button id="btn-raised" class="btn btn-sm float-left" [routerLink]="['/listaHorasExtras']">Lista de horas extras
+                    </button>
+                    <button id="btn-raised"  class="btn btn-sm" (click)="stepper.reset()">Cancelar</button>
+                    <button id="btn-raised" matStepperNext class="btn btn-sm float-right">Siguiente</button>
+                </div>
+            </mat-step>
+            <mat-step [stepControl]="segundoFormGroup">
+                <form [formGroup]="segundoFormGroup">
+                    <ng-template matStepLabel>
+                        <mat-icon id="seccion_horaE" matSuffix matTooltipPosition="right"
+                            matTooltip="Sección 2: Configuraciones Generales">timer
+                        </mat-icon>
+                    </ng-template>
+                    <div class="subtitulo">
+                        <span>Configuraciones Generales</span>
+                    </div>
+                    <br>
+                    <div class="nota">
+                        <span>Por favor llenar todos los campos obligatorios (*) del formulario y dar click en
+                            Guardar.</span>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-between">
+                        <mat-form-field>
+                            <mat-label>Función del reloj</mat-label>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Seleccionar función del dispositivo">
+                                help_outline</mat-icon>
+                            <mat-select formControlName="tipoFuncionForm">
+                                <mat-option *ngFor="let t of tipoFuncionAlg" [value]="t.value">
+                                    {{t.viewValue}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label id="codigoP">Código programacion</mat-label>
+                            <mat-select formControlName="codigoForm" required>
+                                <mat-option *ngFor="let t of tipoFuncionAlg" [value]="t.value">
+                                    {{t.viewValue}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label>Tipo de día</mat-label>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Seleccionar el tipo de día en los que se podrá realizar horas extras">
+                                help_outline</mat-icon>
+                            <mat-select formControlName="tipoDiaForm" required>
+                                <mat-option *ngFor="let d of dia" [value]="d.value">
+                                    {{d.viewValue}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-radio-group aria-label="Select an option" formControlName="inclAlmuerzoForm" required>
+                            <label class="d-flex justify-content-start">
+                                <span>Incluye Almuerzo *</span>
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                    matTooltip="Indicar si dentro de las horas extras realizadas se podrá incluir hora de almuerzo">
+                                    help_outline</mat-icon>
+                            </label>
+                            <div class="d-flex justify-content-around">
+                                <mat-radio-button value="true">Si</mat-radio-button>
+                                <mat-radio-button value="false">No</mat-radio-button>
+                            </div>
+                        </mat-radio-group>
+                    </div>
+                </form>
+                <div>
+                    <button id="btn-raised" class="btn btn-sm float-left" [routerLink]="['/listaHorasExtras']">Lista de horas extras
+                    </button>
+                    <button id="btn-raised"  class="btn btn-sm" matStepperPrevious>Atrás</button>
+                    <button id="btn-raised"  class="btn btn-sm"
+                        (click)="insertarHoraExtra(primeroFormGroup.value, segundoFormGroup.value); stepper.reset()"
+                        [disabled]="!segundoFormGroup.valid" id="iconoG">Guardar
+                    </button>
+                    <button id="btn-raised" (click)="stepper.reset()" class="btn btn-sm float-right">Cancelar</button>
+                </div>
+            </mat-step>
+        </mat-horizontal-stepper>
+    </mat-card>
+</div>
+<div class="pantalla-progress" *ngIf="habilitarprogress">
+    <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
+    </mat-progress-spinner>
+</div>

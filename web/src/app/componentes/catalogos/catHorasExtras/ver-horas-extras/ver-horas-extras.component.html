@@ -1,0 +1,43 @@
+<div class="container" *ngFor="let he of datosHoraExtra" style="padding-top: 20px;">
+    <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo">
+            <span>{{he.descripcion.toUpperCase()}}</span>
+        </div>
+        <mat-card-content>
+            <div class="container" style="padding-top: 15px;">
+                <div class="row">
+                    <div class="col" id="verticalLine">
+                        <label class="col-sm col-form-label"><b>Tipo de Recargo:</b>
+                            {{he.tipo_descuento}}
+                        </label>
+                        <br>
+                        <label class="col-sm col-form-label"><b>Recargo Porcentual:</b> {{he.reca_porcentaje}}</label>
+                        <br>
+                        <label class="col-sm col-form-label"><b>Jornada:</b> {{he.hora_jornada}}</label>
+                    </div>
+                    <br>
+                    <div class="col" id="verticalLine">
+                        <label class="col-sm col-form-label"><b>Hora Inicio:</b> {{he.hora_inicio_}}</label>
+                        <br>
+                        <label class="col-sm col-form-label"><b>Hora Final:</b> {{he.hora_final_}}</label>
+                        <br>
+                        <label class="col-sm col-form-label"><b>Tipo de día:</b> {{he.tipo_dia}}</label>
+                        <br>
+                        <label class="col-sm col-form-label" *ngIf="he.incl_almuerzo == true"><b>Incluye Almuerzo:</b>
+                            Sí</label>
+                        <label class="col-sm col-form-label" *ngIf="he.incl_almuerzo == false"><b>Incluye Almuerzo:</b>
+                            No</label>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <i id="t-editar" (click)="EditarDatos(he)" matSuffix matTooltipPosition="right"
+                        matTooltip="Modificar datos de este registro" class="fas fa-edit">
+                        <p>Editar</p>
+                    </i>
+                </div>
+            </div>
+            <input type="submit" class="btn btn-sm" [routerLink]="['/listaHorasExtras/']"
+                value="Ir a lista de horas extras">
+        </mat-card-content>
+    </mat-card>
+</div>

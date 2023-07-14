@@ -1,0 +1,125 @@
+<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;">
+    <div class="row">
+        <div class="col-md">
+            <div id="titulo">
+                <span>TIPO DE PERMISOS</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9">
+                <div class="d-flex justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
+                    <button id="btn-raised"  class="btn btn-sm" [routerLink]="['/tipoPermisos']">
+                        Crear tipo permiso
+                    </button>
+                    <button id="btn-raised"  class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
+                        matTooltipPosition="right"
+                        matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
+                        Mostrar lista
+                    </button>
+                </div>
+            </mat-card>
+        </div>
+    </div>
+</div>
+<div class="container" style="padding-bottom: 50px; text-align: center;">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="resultados">LISTA DE TIPO DE PERMISOS</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col" rowspan="2">Descripción</th>
+                        <th scope="col" colspan="2">TIEMPO MÁXIMO</th>
+                        <th scope="col" rowspan="2">Días creación</th>
+                        <th scope="col" rowspan="2">Días justificación</th>
+                        <th scope="col" rowspan="2">Cargar documento</th>
+                        <th scope="col" rowspan="2">Descuento</th>
+                        <th scope="col" rowspan="2">Incluye alimentación</th>
+                        <th scope="col" rowspan="2">Acceso usuario</th>
+                        <th scope="col" rowspan="2">Acción</th>
+                    </tr>
+                    <tr>
+                        <th scope="col">Días</th>
+                        <th scope="col">Horas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" minlength="2" [formControl]="nombreF"
+                                    [(ngModel)]="filtroDescripcion">
+                            </mat-form-field>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda del permiso por el nombre.">
+                                help_outline</mat-icon>
+                        </td>
+                    </tr>
+                    <tr
+                        *ngFor="let tp of tipoPermiso | filtroNombre: filtroDescripcion | paginate:tamanio_pagina:numero_pagina">
+                        <td>{{tp.descripcion}}</td>
+                        <td>{{tp.num_dia_maximo}}</td>
+                        <td>{{tp.num_hora_maximo}}</td>
+                        <td>{{tp.num_dia_ingreso}}</td>
+                        <td>{{tp.num_dia_justifica}}</td>
+                        <td *ngIf="tp.documento === false">Opcional</td>
+                        <td *ngIf="tp.documento === true">Requerido</td>
+                        <td *ngIf="tp.tipo_descuento === '1'">Vacaciones</td>
+                        <td *ngIf="tp.tipo_descuento === '2'">Ninguno</td>
+                        <td *ngIf="tp.almu_incluir === false">No</td>
+                        <td *ngIf="tp.almu_incluir === true">Si</td>
+                        <td *ngIf="tp.acce_empleado === 1">Si</td>
+                        <td *ngIf="tp.acce_empleado === 2">No</td>
+                        <td class="d-flex justify-content-center">
+                            <i matSuffix matTooltipPosition="right" matTooltip="Ver datos generales de este registro."
+                                class="fas fa-eye" id="t-ver" [routerLink]="['/vistaPermiso/', tp.id]">
+                                <p>Ver</p>
+                            </i>
+                            <i id="t-editar" class="fas fa-edit" matSuffix matTooltipPosition="right"
+                                [routerLink]="['/editarTipoPermiso/', tp.id]"
+                                matTooltip="Modificar los datos generales de este registro.">
+                                <p>Editar</p>
+                            </i>
+                            <i (click)="ConfirmarDelete(tp)" id="t-eliminar" class="far fa-trash-alt" matSuffix
+                                matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                <p>Eliminar</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="tipoPermiso.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+            <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Tipo de Permisos en formato PDF.">
+                <p>PDF</p>
+            </i>
+            <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Tipo de Permisos en formato EXCEL.">
+                <p>XLSL</p>
+            </i>
+            <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Tipo de Permisos en formato CSV.">
+                <p>CSV</p>
+            </i>
+            <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Tipo de Permisos en formato XML.">
+                <p>XML</p>
+            </i>
+        </div>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+            <p> Reporte de tipos de permisos. </p>
+        </div>
+    </div>
+</div>

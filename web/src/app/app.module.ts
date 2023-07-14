@@ -10,8 +10,6 @@ import { ToastrModule } from 'ngx-toastr';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 
-import { FullCalendarModule } from '@fullcalendar/angular';
-
 // COMPONENTES ADMINISTRADOR
 import { VistaRolesComponent } from './componentes/catalogos/catRoles/vista-roles/vista-roles.component';
 import { LoginComponent } from './componentes/iniciarSesion/login/login.component';
@@ -599,7 +597,6 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     MatDatepickerModule,
     MatNativeDateModule,
     ReportesModule,
-    FullCalendarModule
   ],
   providers: [
     AuthGuard,

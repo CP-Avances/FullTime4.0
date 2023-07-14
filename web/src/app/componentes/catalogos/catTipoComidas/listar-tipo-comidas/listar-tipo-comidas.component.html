@@ -1,0 +1,110 @@
+<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;">
+    <div class="row">
+        <div class="col-md">
+            <div id="titulo">
+                <span>ALIMENTACIÓN</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9">
+                <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
+                    <button id="btn-raised"  class="btn btn-sm" (click)="AbrirVentanaRegistrarTipoComidas()">
+                        Crear nuevo menú </button>
+                    <button id="btn-raised"  class="btn btn-sm" (click)="LimpiarCampos()"
+                        matSuffix matTooltipPosition="right"
+                        matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
+                        Mostrar lista
+                    </button>
+                </div>
+            </mat-card>
+        </div>
+    </div>
+</div>
+<div class="container" style="padding-bottom: 50px; text-align: center;">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="resultados">LISTA DE SERVICIOS DE ALIMENTACIÓN</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Tipo de Servicio</th>
+                        <th scope="col">Menú</th>
+                        <th scope="col">Hora Inicio</th>
+                        <th scope="col">Hora Fin</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" minlength="1" [formControl]="tipoF"
+                                    [(ngModel)]="filtroTipo">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" minlength="2" [formControl]="nombreF"
+                                    [(ngModel)]="filtroNombre">
+                            </mat-form-field>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda de datos de acuerdo a la columna de la tabla.">
+                                help_outline</mat-icon>
+                        </td>
+                    </tr>
+                    <tr
+                        *ngFor="let comida of tipoComidas | filtrosNombres: filtroNombre | tipo: filtroTipo | paginate:tamanio_pagina:numero_pagina">
+                        <td id="centrar">{{comida.tipo}}</td>
+                        <td id="centrar">{{comida.nombre}}</td>
+                        <td id="centrar">{{comida.horaInicio}}</td>
+                        <td id="centrar">{{comida.horaFin}}</td>
+                        <td class="d-flex justify-content-center align-self-center">
+                            <i matSuffix matTooltipPosition="right" matTooltip="Ver datos generales de este registro."
+                                class="fas fa-eye" id="t-ver" [routerLink]="['/verMenu/', comida.id]">
+                                <p>Ver</p>
+                            </i>
+                            <i matSuffix matTooltipPosition="right" matTooltip="Agregar Detalles de Menú."
+                                class="far fa-list-alt" id="t-detalles" (click)="AbrirVentanaDetalles(comida)">
+                                <p>Detalle</p>
+                            </i>
+                            <i class="fas fa-edit" (click)="AbrirVentanaEditar(comida)" id="t-editar" matSuffix
+                                matTooltipPosition="right" matTooltip="Editar los datos generales de este registro.">
+                                <p>Editar</p>
+                            </i>
+                            <i (click)="ConfirmarDelete(comida)" class="far fa-trash-alt" id="t-eliminar" matSuffix
+                                matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                <p>Eliminar</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="tipoComidas.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+            <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Comidas en formato PDF.">
+                <p>PDF</p>
+            </i>
+            <i (click)="ExportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Comidas en formato EXCEL.">
+                <p>XLSL</p>
+            </i>
+            <i (click)="ExportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Comidas en formato CSV.">
+                <p>CSV</p>
+            </i>
+            <i (click)="ExportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Comidas en formato XML.">
+                <p>XML</p>
+            </i>
+        </div>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+            <p> Reporte de servicios de alimentación. </p>
+        </div>
+    </div>
+</div>

@@ -44,10 +44,6 @@ class NotificacionTiempoRealControlador {
 
 
 
-
-
-
-
   // METODO PARA LISTAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES
   public async ObtenerConfigEmpleado(req: Request, res: Response): Promise<any> {
     const id_empleado = req.params.id;
@@ -514,24 +510,28 @@ class NotificacionTiempoRealControlador {
   // METODO PARA ENVIO DE CORREO ELECTRONICO DE COMUNICADOS MEDIANTE SISTEMA WEB
   public async EnviarCorreoSolicitudes(req: Request, res: Response): Promise<void> {
 
+    var tablaHTML = '';
     var tiempo = fechaHora();
     var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
     var hora = await FormatearHora(tiempo.hora);
+    var dispositivo = ''
 
     const path_folder = path.resolve('logos');
-
-    var datos = await Credenciales(req.id_empresa);
 
     const { id_envia, correo, mensaje, asunto} = req.body.datosCorreo;
     const solicitudes = req.body.solicitudes;
 
-    console.log('id_envia: ',id_envia);
-    console.log('correo: ',correo);
-    console.log('mensaje: ',mensaje);
-    console.log('asunto: ',asunto);
-    console.log('datos: ',solicitudes);
-
-    console.log('datos: ',datos);
+    console.log('req.body.movil: ',req.body.movil);
+    if(req.body.movil === true){
+      dispositivo = 'Aprobado desde aplicación móvil';
+      var datos = await Credenciales(req.body.id_empresa);
+      tablaHTML = await generarTablaHTMLMovil(solicitudes);
+    }else{
+      dispositivo = 'Aprobado desde la aplicacion web';
+      var datos = await Credenciales(req.id_empresa);
+      tablaHTML = await generarTablaHTMLWeb(solicitudes);
+    }
+    
     if (datos === 'ok') {
 
       const USUARIO_ENVIA = await pool.query(
@@ -564,40 +564,19 @@ class NotificacionTiempoRealControlador {
                   <b>Generado mediante:</b> Sistema Web <br>
                   <b>Fecha de envío:</b> ${fecha} <br> 
                   <b>Hora de envío:</b> ${hora} <br><br>                  
-                  <b>Mensaje:</b> 
-                    <table class="table table-hover table-sm">
-                      <thead class="thead-light">
-                        <tr style="text-align: center;">
-                          <th scope="col">Permiso #</th>
-                          <th scope="col">Departamento</th>
-                          <th scope="col">Empleado</th>
-                          <th scope="col">Estado</th>
-                          <th scope="col">Aprobar</th>
-                          <th scope="col">Observación</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr *ngFor="let dato of solicitudes>
-                          <td>{{dato.id}}</td>
-                          <td>{{dato.nombre_depa}}</td>
-                          <td>{{dato.empleado}}</td>
-                          <td>{{dato.estado}}</td>
-                          <td>
-                            <p *ngIf="dato.aprobar == 'NO'" style="color: rgb(189, 8, 8);">{{dato.aprobar}}</p>
-                            <p *ngIf="dato.aprobar == 'SI'" style="color: rgb(3, 146, 53);">{{dato.aprobar}}</p>
-                          </td>
-                        <td>{{dato.observacion}}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  <br><br>
+                  <b>Mensaje:</b> ${dispositivo} 
                 </p>
+                <div style="font-family: Arial; font-size:15px; margin: auto; text-align: center;">
+                  <p><b>LISTADO DE PERMISOS</b></p>
+                  ${tablaHTML}
+                  <br><br>
+                </div>
                 <p style="font-family: Arial; font-size:12px; line-height: 1em;">
                   <b>Gracias por la atención</b><br>
                   <b>Saludos cordiales,</b> <br><br>
                 </p>
                 <img src="cid:pief" width="50%" height="50%"/>
-            </body>
+              </body>
             `,
         attachments: [
           {
@@ -628,8 +607,66 @@ class NotificacionTiempoRealControlador {
     }
   }
 
-
 }
+
+const generarTablaHTMLWeb = async function (datos: any []): Promise<string> {
+  let tablaHtml = "<table style='border-collapse: collapse; width: 100%;'>";
+  tablaHtml += "<tr style='background-color: #f2f2f2; text-align: center; font-size: 14px;'>";
+  tablaHtml += "<th scope='col'>Permiso</th><th scope='col'>Departamento</th><th scope='col'>Empleado</th><th scope='col'>Aprobado</th><th scope='col'>Estado</th><th scope='col'>Observación</th>";
+  tablaHtml += "</tr>";
+
+    for(const dato of datos){
+      let colorText = "black";
+
+      if(dato.aprobar === "SI"){
+        colorText = "green";
+      }else if(dato.aprobar === "NO"){
+        colorText = "red";
+      }
+
+      tablaHtml += "<tr style='text-align: center; font-size: 14px;'>"
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.id}</td>`;
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.nombre_depa}</td>`;
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.empleado}</td>`;
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px; color: ${colorText};'>${dato.aprobar}</td>`;
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.estado}</td>`
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.observacion}</td>`;
+      tablaHtml += "<tr>"
+    }
+
+    tablaHtml += "</table>"
+    return tablaHtml;
+};
+
+const generarTablaHTMLMovil = async function (datos: any []): Promise<string> {
+  let tablaHtml = "<table style='border-collapse: collapse; width: 100%;'>";
+  tablaHtml += "<tr style='background-color: #f2f2f2; text-align: center; font-size: 14px;'>";
+  tablaHtml += "<th scope='col'>Permiso</th><th scope='col'>Departamento</th><th scope='col'>Empleado</th><th scope='col'>Aprobado</th><th scope='col'>Estado</th><th scope='col'>Observación</th>";
+  tablaHtml += "</tr>";
+
+    for(const dato of datos){
+      let colorText = "black";
+
+      if(dato.aprobacion === "SI"){
+        colorText = "green";
+      }else if(dato.aprobacion === "NO"){
+        colorText = "red";
+      }
+
+      tablaHtml += "<tr style='text-align: center; font-size: 14px;'>"
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.id}</td>`;
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.nombre_depa}</td>`;
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.nempleado}</td>`;
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px; color: ${colorText};'>${dato.aprobacion}</td>`;
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.estado}</td>`
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.observacion}</td>`;
+      tablaHtml += "<tr>"
+    }
+
+    tablaHtml += "</table>"
+    return tablaHtml;
+};
+
 
 export const NOTIFICACION_TIEMPO_REAL_CONTROLADOR = new NotificacionTiempoRealControlador();
 
