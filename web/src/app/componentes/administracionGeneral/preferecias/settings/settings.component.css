@@ -1,0 +1,37 @@
+.example-form mat-slide-toggle {
+    margin: 0px 0px 25px 0px;
+    display: block;
+}
+
+p {
+    font-weight: bold;
+}
+
+.caja {
+    padding: 0 5px 0 5px;
+}
+
+mat-slide-toggle {
+    padding: 0 10px 0 10px;
+}
+
+.btn {
+    margin-left: 15px;
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
+
+.scrollbar {
+    float: left;
+    height: 460px;
+    width: 100%;
+    background: #fff;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    margin-bottom: 25px;
+}
+
+.scrollbar-primary::-webkit-scrollbar {
+    width: 12px;
+    background-color: #F5F5F5;
+}

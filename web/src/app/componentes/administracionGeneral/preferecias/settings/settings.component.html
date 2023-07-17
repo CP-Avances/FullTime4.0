@@ -1,0 +1,54 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        HABILITAR NOTIFICACIONES</span>
+    <mat-icon class="float-right" id="cerrar" (click)="this.dialogRef.close()">highlight_off</mat-icon>
+</div>
+<div class="scrollbar scrollbar-primary">
+    <form class="example-form" [formGroup]="formGroup" ngNativeValidate>
+        <br>
+        <div class="d-flex flex-wrap" style="margin-left: 3%;">
+            <div class="caja">
+                <p>PERMISOS</p>
+                <div class="d-flex flex-wrap justify-content-start">
+                    <mat-slide-toggle formControlName="permisoMail">Correo </mat-slide-toggle>
+                    <mat-slide-toggle formControlName="permisoNoti">Notificaciones</mat-slide-toggle>
+                </div>
+            </div>
+            <div class="caja">
+                <p>VACACIONES</p>
+                <div class="d-flex flex-wrap justify-content-start">
+                    <mat-slide-toggle formControlName="vacaMail">Correo </mat-slide-toggle>
+                    <mat-slide-toggle formControlName="vacaNoti">Notificaciones</mat-slide-toggle>
+                </div>
+            </div>
+            <div class="caja">
+                <p>HORAS EXTRAS</p>
+                <div class="d-flex flex-wrap justify-content-start">
+                    <mat-slide-toggle formControlName="horaExtraMail">Correo </mat-slide-toggle>
+                    <mat-slide-toggle formControlName="horaExtraNoti">Notificaciones</mat-slide-toggle>
+                </div>
+            </div>
+            <div class="caja">
+                <p>ALIMENTACIÓN</p>
+                <div class="d-flex flex-wrap justify-content-start">
+                    <mat-slide-toggle formControlName="comidaMail">Correo </mat-slide-toggle>
+                    <mat-slide-toggle formControlName="comidaNoti">Notificaciones</mat-slide-toggle>
+                </div>
+            </div>
+            <div class="caja">
+                <p>COMUNICADOS</p>
+                <div class="d-flex flex-wrap justify-content-start">
+                    <mat-slide-toggle formControlName="comunicadoMail">Correo </mat-slide-toggle>
+                    <mat-slide-toggle formControlName="comunicadoNoti">Notificaciones</mat-slide-toggle>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 2%; margin-bottom: 3%;">
+        <button *ngIf="btnActualizar" id="btn-raised"  class="btn btn-sm" (click)="ActualizarConfiguracion(formGroup.value)">
+            Guardar
+        </button>
+        <button *ngIf="btnCrear" id="btn-raised"  class="btn btn-sm" (click)="CrearConfiguracion(formGroup.value)">Guardar</button>
+    </div>
+</div>
