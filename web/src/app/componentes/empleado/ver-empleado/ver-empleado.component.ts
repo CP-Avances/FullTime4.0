@@ -1069,8 +1069,8 @@ export class VerEmpleadoComponent implements OnInit {
   AbrirPlanificarHorario(): void {
     this.data_horario = [];
     if (this.datoActual.id_cargo != undefined) {
-        this.ventana_horario = true;
-        this.horarios_usuario = false;
+      this.ventana_horario = true;
+      this.horarios_usuario = false;
 
       this.data_horario = {
         pagina: 'ver_empleado',
@@ -1214,31 +1214,21 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   rotativo: any = []
-  ver_rotativo: boolean = false;
-  ver_no_rotativo: boolean = true;
-  // VENTANA PARA REGISTRAR PLANIFICACIÓN DE HORARIOS DEL EMPLEADO 
+  registrar_rotativo: boolean = false;
+  ver_rotativo: boolean = true;
+  pagina_rotativo: string = '';
+  // VENTANA PARA REGISTRAR PLANIFICACION DE HORARIOS DEL EMPLEADO 
   AbrirVentanaHorarioRotativo(): void {
     if (this.datoActual.id_cargo != undefined) {
+      this.pagina_rotativo = 'ver-empleado';
       this.rotativo = {
-        idEmpleado: this.idEmpleado, 
-        idCargo: this.datoActual.id_cargo
+        idCargo: this.datoActual.id_cargo,
+        pagina: this.pagina_rotativo,
+        idEmpleado: this.idEmpleado,
+        horas_trabaja: this.cargoEmpleado[0].hora_trabaja,
       }
-this.ver_no_rotativo = false;
-this.ver_rotativo = true;
-
-      /*
-      this.ventana.open(RegistroPlanHorarioComponent,
-        {
-          width: '800px', data: {
-            idEmpleado: this.idEmpleado, idCargo: this.datoActual.id_cargo
-          }
-        })
-        .afterClosed().subscribe(item => {
-          this.ObtenerHorarioRotativo(this.datoActual.codigo, this.formato_fecha);
-        });
-
-
-        */
+      this.ver_rotativo = false;
+      this.registrar_rotativo = true;
     }
     else {
       this.toastr.info('El usuario no tiene registrado un Cargo.', '', {

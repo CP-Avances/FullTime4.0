@@ -1,183 +1,199 @@
-<!--
-<div id="titulo">
-    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
-    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        REGISTRAR HORARIO</span>
-    <mat-icon class="float-right" id="cerrar" (click)="CerrarVentanaPlanHorario()">highlight_off</mat-icon>
-</div> -->
-<!-- Formulario Completo -->
-<!--
-    <form [formGroup]="PlanHorarioForm">
-    <mat-card-content>
-        <div class="container" style="text-align: center;">
-            <div class="nota">
-                <span>NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
-                    Guardar.</span>
-            </div>
-            <div class="d-flex flex-wrap justify-content-around">
-                <mat-form-field>
-                    <mat-label id="fec">Fecha inicio de actividades</mat-label>
-                    <input matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa" [formControl]="fechaIngresoF"
-                        required>
-                    <mat-datepicker-toggle matSuffix [for]="picker" matSuffix id="i-cursor" matSuffix
-                        matTooltipPosition="right"
-                        matTooltip="Ingresar la fecha de inicio de actividades. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
-                    </mat-datepicker-toggle>
-                    <mat-datepicker touchUi #picker></mat-datepicker>
-                </mat-form-field>
-                <mat-form-field>
-                    <mat-label id="fec">Fecha fin de actividades</mat-label>
-                    <input matInput [matDatepicker]="picker2" placeholder="dd/mm/aaaa" [formControl]="fechaSalidaF"
-                        required>
-                    <mat-datepicker-toggle matSuffix [for]="picker2" matSuffix id="i-cursor" matSuffix
-                        matTooltipPosition="right"
-                        matTooltip="Ingresar la fecha de finalización de actividades. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
-                    </mat-datepicker-toggle>
-                    <mat-datepicker touchUi #picker2></mat-datepicker>
-                </mat-form-field>
-            </div>
+<div class="container" style="padding-bottom: 25px; padding-top: 20px;">
+    <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo">
+            <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+                (click)="GenerarCalendario()">
+                Generar calendario
+            </button>
+            <span>CALENDARIO RANGO FECHAS</span>
+            <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">
+                highlight_off
+            </mat-icon>
         </div>
-    </mat-card-content>
-</form>
-<div class="d-flex flex-wrap justify-content-center" style="padding-top: 2%; margin-bottom: 2%;">
-    <button id="btn-raised"  class="btn btn-sm" [disabled]="!PlanHorarioForm.valid"
-        (click)="ValidarDatosPlanHorario(PlanHorarioForm.value)" value="Guardar">Guardar</button>
-</div>
--->
-<div class="container" style="padding-top: 15px; padding-bottom: 25px;">
-
-    <div id="titulo">
-        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-            REGISTRAR HORARIO
-        </span>
-        <mat-icon class="float-right" id="cerrar">highlight_off</mat-icon>
-    </div>
-
-    <mat-card class="mat-elevation-z8">
-        <div class="table-responsive" style="padding-top: 15px;">
-            <table class="table table-hover table-sm">
-
-
-
-
-                <thead class="thead-light">
-
-
-
-
-                    <tr>
-
-
-
-
-                        <th>Nombre</th>
-
-
-
-
-                        <th>Edad</th>
-
-
-
-
-                        <th>País</th>
-
-
-
-                        <th>Acciones</th>
-
-
-
-
-
-
-                    </tr>
-
-
-
-
-                </thead>
-
-
-
-
-                <tbody>
-
-
-
-
-                    <tr *ngFor="let persona of personas; let i = index">
-
-
-
-
-                        <td>
-
-
-
-
-                            <input type="text" [(ngModel)]="persona.nombre" [disabled]="!persona.editando" />
-
-
-
-                        </td>
-
-
-
-
-                        <td>
-
-
-
-                            <input type="number" [(ngModel)]="persona.edad" [disabled]="!persona.editando" />
-
-
-
-
-                        </td>
-
-
-
-
-                        <td>
-
-                            <input type="text" [(ngModel)]="persona.pais" [disabled]="!persona.editando" />
-
-
-                        </td>
-
-
-                        <td>
-
-
-                            <button (click)="editarPersona(i)" [disabled]="persona.editando">Editar</button>
-
-
-
-
-                            <button (click)="guardarCambios(i)" [disabled]="!persona.editando">Guardar</button>
-
-
-
-
-                        </td>
-
-
-
-                    </tr>
-
-
-
-
-                </tbody>
-
-
-            </table>
-        </div>
-        <button (click)="agregarFila()">Agregar fila</button>
-
-        <br>
-
-
+        <mat-card-content>
+            <div class="row">
+                <div class="nota" style="margin-left: 15px; padding-top: 15px;">
+                    <span>
+                        NOTA: Al presionar Generar calendario se visualizará todos los días del mes actual. Para generar
+                        un calendario de manera personalizada ingresar mes de inicio y fin de periodo.
+                    </span>
+                </div>
+                <div class="col-md">
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <mat-form-field>
+                            <mat-label>Mes inicio</mat-label>
+                            <input matInput [matDatepicker]="fec1" [formControl]="fechaInicialF"
+                                placeholder="DD/MM/YYYY">
+                            <mat-datepicker-toggle matIconSuffix [for]="fec1"></mat-datepicker-toggle>
+                            <mat-datepicker #fec1 startView="year" (monthSelected)="FormatearFecha($event, fec1, 1)"
+                                touchUi>
+                            </mat-datepicker>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <mat-form-field>
+                            <mat-label>Mes final</mat-label>
+                            <input matInput [matDatepicker]="fec2" [formControl]="fechaFinalF" placeholder="DD/MM/YYYY">
+                            <mat-datepicker-toggle matIconSuffix [for]="fec2"
+                                [disabled]="fecHorario"></mat-datepicker-toggle>
+                            <mat-datepicker #fec2 startView="year" (monthSelected)="FormatearFecha($event, fec2, 2)"
+                                touchUi>
+                            </mat-datepicker>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="table-responsive" style="text-align: center;  padding-top: 10px; padding-bottom: 20px;">
+
+                <div class="row" style="margin-left: 15px; padding-bottom: 15px;">
+                    <div class="col-md">
+                        <div *ngIf="ver_icono">
+                            <div class="d-flex bd-highlight" id="resultados">
+                                <span class="w-100 bd-highlight">
+                                    DEFINICIONES
+                                </span>
+                            </div>
+                            <div class="table-responsive" style="text-align: center;">
+                                <table id="table_definiciones" class="table table-hover table-sm"
+                                    style="margin: 0 auto;">
+                                    <tbody>
+                                        <tr>
+                                            <td id="td_horarios">
+                                                <mat-icon id="seleccionar_">
+                                                    add_circle
+                                                </mat-icon>
+                                            </td>
+                                            <td id="td_horarios">Agregar horario.</td>
+                                        </tr>
+                                        <tr>
+                                            <td id="td_horarios">
+                                                <i class="fa fa-stop-circle-o" aria-hidden="true" id="libre_">
+                                                    <p>Libre</p>
+                                                </i>
+                                            </td>
+                                            <td id="td_horarios">Día libre o no laborable.</td>
+                                        </tr>
+                                        <tr>
+                                            <td id="td_horarios">
+                                                <i class="fa fa-trash" aria-hidden="true" id="libre_eliminar_">
+                                                    <p>Libre</p>
+                                                </i>
+                                            </td>
+                                            <td id="td_horarios">Eliminar día libre o no laborable.</td>
+                                        </tr>
+                                        <tr>
+                                            <td id="td_horarios">
+                                                <mat-icon id="seleccionar_">
+                                                    delete_forever
+                                                </mat-icon>
+                                            </td>
+                                            <td id="td_horarios">Eliminar horario.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="container" style="padding-bottom: 25px;" *ngIf="ver_acciones">
+                            <div class="mat-elevation-z8" style="background: white;">
+                                <div class="d-flex bd-highlight" id="resultados">
+                                    <span class="w-100 bd-highlight">
+                                        DETALLE DE HORARIO
+                                    </span>
+                                </div>
+                                <div class="table-responsive" style="text-align: center;">
+                                    <table id="table_acciones" class="table table-hover table-sm"
+                                        style="margin: 0 auto;">
+                                        <thead class="thead-light">
+                                            <tr style="text-align: center;">
+                                                <th scope="col" id="td_horarios">HORARIO</th>
+                                                <th scope="col" id="td_horarios">ENTRADA (E)</th>
+                                                <th scope="col" id="td_horarios">INICIO ALIMENTACIÓN (I/A)</th>
+                                                <th scope="col" id="td_horarios">FIN ALIMENTACIÓN (F/A)</th>
+                                                <th scope="col" id="td_horarios">SALIDA (S)</th>
+                                                <th scope="col" id="td_horarios">MIN. ALIMENTACIÓN</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr
+                                                *ngFor="let d of detalle_acciones | paginate:tamanio_paginaD:numero_paginaD">
+                                                <td id="td_horarios">{{d.horario}}</td>
+                                                <td id="td_horarios">{{d.entrada_}}</td>
+                                                <td id="td_horarios">{{d.inicio_comida}}</td>
+                                                <td id="td_horarios">{{d.fin_comida}}</td>
+                                                <td id="td_horarios">{{d.salida_}}</td>
+                                                <td id="td_horarios">{{d.almuerzo}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr *ngIf="ver_icono">
+                <div>
+                    <button class="btn btn-sm" style="float: right; margin-right: 10px;" (click)="VerificarHorario()">
+                        Verificar
+                    </button>
+                </div>
+                <div class="d-flex flex-wrap justify-content-center" *ngIf="ver_horario">
+                    <mat-form-field>
+                        <mat-label>Seleccionar horario</mat-label>
+                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                            matTooltip="Lista de horarios cargados en el sistema.">
+                            help_outline
+                        </mat-icon>
+                        <mat-select [formControl]="horarioF" required>
+                            <mat-option *ngFor="let h of vista_horarios" [value]="h.codigo" id="letra"
+                                (click)="ValidarHorario()">
+                                {{h.nombre}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+                <div class="contenedor">
+                    <div class="bordes" *ngFor="let d of fechas_mes; index as i"
+                        [ngStyle]="{'background-color':CambiarColores(d.mes)}">
+                        <mat-icon *ngIf="ver_icono" class="float-left" id="seleccionar" (click)="IngresarHorario(i)">
+                            add_circle
+                        </mat-icon>
+                        <i class="fa fa-stop-circle-o center" aria-hidden="true" *ngIf="ver_icono" id="libre"
+                            (click)="IngresarLibre(i)">
+                            <p>Libre</p>
+                        </i>
+                        <mat-icon *ngIf="ver_icono" class="float-right" id="seleccionar" (click)="EliminarHorario(i)">
+                            delete_forever
+                        </mat-icon>
+                        <br *ngIf="ver_icono">
+                        <br>
+                        <span class="fuente"><b>{{d.formato}}</b></span><br>
+                        <span class="fuente">{{d.dia}}</span><br>
+                        <input class="entrada" type="text" [(ngModel)]="valor" readonly /><br>
+                        <span class="fuente_feriado"><b>{{d.observacion}}</b></span><br>
+                        <span class="fuente" *ngFor="let h of d.horarios">
+                            <b *ngIf="d.tipo_dia === 'N'">{{h.horario}}</b><br>
+                            <div class="row" *ngIf="d.tipo_dia === 'L'">
+                                <div class="col-3">
+                                    <i class="fa fa-trash" aria-hidden="true" id="libre_eliminar_"
+                                        (click)="EliminarLibre(i)">
+                                        <p>Libre</p>
+                                    </i>
+                                </div>
+                                <div class="col-9">
+                                    <span class="fuente" style="color:red"><b>DIA LIBRE</b></span>
+                                </div>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </mat-card-content>
     </mat-card>
 </div>

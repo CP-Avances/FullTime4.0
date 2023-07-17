@@ -779,7 +779,7 @@
                                 <mat-form-field>
                                     <mat-label>Mes inicio</mat-label>
                                     <input matInput [matDatepicker]="fec1" [formControl]="fechaInicialF"
-                                        placeholder="MM/YYYY">
+                                        placeholder="DD/MM/YYYY">
                                     <mat-datepicker-toggle matIconSuffix [for]="fec1"></mat-datepicker-toggle>
                                     <mat-datepicker #fec1 startView="year"
                                         (monthSelected)="FormatearFecha($event, fec1, 1)" touchUi>
@@ -792,7 +792,7 @@
                                 <mat-form-field>
                                     <mat-label>Mes final</mat-label>
                                     <input matInput [matDatepicker]="fec2" [formControl]="fechaFinalF"
-                                        placeholder="MM/YYYY">
+                                        placeholder="DD/MM/YYYY">
                                     <mat-datepicker-toggle matIconSuffix [for]="fec2"
                                         [disabled]="fecHorario"></mat-datepicker-toggle>
                                     <mat-datepicker #fec2 startView="year"
@@ -981,20 +981,6 @@
                                 <td id="td_horarios">{{h.dia29}}</td>
                                 <td id="td_horarios">{{h.dia30}}</td>
                                 <td id="td_horarios">{{h.dia31}}</td>
-                                <!--
-                                <td>
-                                    <i class="fas fa-edit" id="edit" (click)="AbrirEditarHorario(h)" matSuffix
-                                        matTooltipPosition="right"
-                                        matTooltip="Modificar los datos generales de este registro">
-                                        <p>Editar</p>
-                                    </i>
-                                    <i class="far fa-trash-alt" (click)="ConfirmarDeleteHorario(h)"
-                                        style="color:red; margin-left: 15px;" matSuffix matTooltipPosition="right"
-                                        matTooltip="Eliminar registro">
-                                        <p>Eliminar</p>
-                                    </i>
-                                </td>
-                                -->
                             </tr>
                         </tbody>
                     </table>
@@ -1049,7 +1035,7 @@
         </div>
     </mat-tab>
 
-    <!-- PLANIFICACION DE HORARIOS DEL EMPLEADO Y DETALLE PLANIFICACION HORARIO -->
+    <!-- HORARIOS ROTATIVOS DEL EMPLEADO Y DETALLE PLANIFICACION HORARIO -->
     <mat-tab>
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">today</mat-icon>
@@ -1057,7 +1043,7 @@
         </ng-template>
 
 
-        <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="ver_no_rotativo">
+        <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="ver_rotativo">
             <mat-card class="mat-elevation-z8">
                 <div class="d-flex bd-highlight" id="titulo">
                     <div class="w-100 bd-highlight">
@@ -1065,7 +1051,9 @@
                     </div>
                     <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
                         <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                            (click)="AbrirVentanaHorarioRotativo()">{{btnTitulo}}</button>
+                            (click)="AbrirVentanaHorarioRotativo()">
+                            Planificar
+                        </button>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -1113,7 +1101,7 @@
             </mat-card>
         </div>
 
-        <app-registro-plan-horario *ngIf="ver_rotativo" [datoEmpleado]="rotativo"></app-registro-plan-horario>
+        <app-registro-plan-horario *ngIf="registrar_rotativo" [datoEmpleado]="rotativo"></app-registro-plan-horario>
 
     </mat-tab>
 
