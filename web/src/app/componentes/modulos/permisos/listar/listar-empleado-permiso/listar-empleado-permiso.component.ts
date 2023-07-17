@@ -463,6 +463,8 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
   permisosAutorizados: any = [];
   public listaPermisosAutorizadosFiltrados: any = [];
   ObtenerPermisosAutorizados(fecha: string, hora: string) {
+    this.permisosAutorizados = [];
+    this.listaPermisosAutorizadosFiltrados = [];
     this.restP.BuscarPermisosAutorizados().subscribe(
       (res) => {
         this.permisosAutorizados = res;

@@ -1,8 +1,10 @@
 <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngFor="let p of InfoPermiso">
     <div class="container" style="padding-bottom: 15px;">
         <mat-card class="mat-elevation-z8">
-            <div id="titulo">
-                <h5>INFORMACIÓN DEL PERMISO</h5>
+            <div class="d-flex bd-highlight" id="titulo">
+                <span class="w-100 bd-highlight">
+                    INFORMACIÓN DEL PERMISO</span>
+                <mat-icon class="float-right" id="cerrar" (click) = "cerrarVentana()">highlight_off</mat-icon>
             </div>
             <mat-card-content>
                 <div class="container" style="padding-top: 15px;">

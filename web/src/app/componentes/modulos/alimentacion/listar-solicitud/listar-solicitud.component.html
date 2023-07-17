@@ -1,0 +1,249 @@
+<!-- TABLA CON LISTA DE SOLICITUDES DE SERVICIO DE ALIMENTACIÓN PENDIENTES -->
+<br>
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="lista_solicitados">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
+                matTooltipPosition="right"
+                matTooltip="Autorizar a todos los empleados su solicitud de servicio de alimentación." id="SelectCheck">
+                library_add_check</mat-icon>
+            <button *ngIf="btnCheckHabilitar" class="btn btn-primary" (click)="AutorizarSolicitudMultiple()"
+                style="float: left; margin-left: 10px;">Autorizar</button>
+            <span class="w-100 bd-highlight">
+                LISTA DE SERVICIOS DE ALIMENTACIÓN SOLICITADOS</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th>
+                            <mat-checkbox *ngIf="btnCheckHabilitar" (change)="$event ? masterToggle() : null"
+                                [checked]="selectionUno.hasValue() && isAllSelected()"
+                                [indeterminate]="selectionUno.hasValue() && !isAllSelected()"
+                                [aria-label]="checkboxLabel()">
+                            </mat-checkbox>
+                        </th>
+                        <th scope="col">Empleado</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Fecha Comida</th>
+                        <th scope="col">Hora Inicio</th>
+                        <th scope="col">Hora Final</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let e of lista_solicitudes_filtradas | paginate:tamanio_pagina:numero_pagina">
+                        <td>
+                            <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionUno.toggle(e) : null" [checked]="selectionUno.isSelected(e)"
+                                [aria-label]="checkboxLabel(e)">
+                            </mat-checkbox>
+                        </td>
+                        <td>{{e.nombre}} {{e.apellido}}</td>
+                        <td>Solicitado</td>
+                        <td>{{e.fec_comida_}}</td>
+                        <td>{{e.hora_inicio_}}</td>
+                        <td>{{e.hora_fin_}}</td>
+                        <td class="d-flex justify-content-center">
+                            <i *ngIf="auto_individual" class="fas fa-edit" (click)="VentanaEditarPlanComida(e)"
+                                matSuffix matTooltipPosition="right"
+                                matTooltip="Modificar los datos generales de este registro">
+                                <p>Editar</p>
+                            </i>
+                            <i *ngIf="auto_individual" class="fas fa-file-alt" id="individual" matSuffix
+                                matTooltipPosition="right"
+                                matTooltip="Cambiar el estado de la solicitud de servicio de alimentación."
+                                (click)="AbrirAutorizaciones(e, 'individual')">
+                                <p>Autorizar</p>
+                            </i>
+                            <div *ngIf="!auto_individual" style="padding-bottom: 1%;">
+                                <br><br>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="lista_solicitudes_filtradas.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+            <i (click)="generarPdf('download','Servicios de alimentación solicitados')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de servicios de alimentación solicitados en formato PDF.">
+                <p>PDF</p>
+            </i>
+            <i (click)="exportToExcel('Servicios de alimentación solicitados')" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de servicios de alimentación solicitados en formato EXCEL.">
+                <p>XLSL</p>
+            </i>
+            <i (click)="exportToCVS('Servicios de alimentación solicitados')" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de servicios de alimentación solicitados en formato CSV.">
+                <p>CSV</p>
+            </i>
+            <i (click)="exportToXML('Servicios de alimentación solicitados')" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de servicios de alimentación solicitados en formato XML.">
+                <p>XML</p>
+            </i>
+        </div>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+            <p> Reporte de servicios de alimentación solicitados. </p>
+        </div>
+    </div>
+</div>
+<!-- TABLA CON LISTA DE SOLICITUDES DE SERVICIO DE ALIMENTACIÓN AUTORIZADAS O NEGADAS -->
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="lista_autorizados">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccionEstado()" matSuffix
+                matTooltipPosition="right"
+                matTooltip="Autorizar a todos los empleados su solicitud de servicio de alimentación." id="SelectCheck">
+                library_add_check</mat-icon>
+            <button *ngIf="btnCheckHabilitar_Estado" class="btn btn-primary"
+                (click)="AutorizarSolicitudMultipleEstado()" style="float: left; margin-left: 10px;">Autorizar</button>
+            <span class="w-100 bd-highlight">
+                LISTA DE SERVICIOS DE ALIMENTACIÓN APROBADOS</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th>
+                            <mat-checkbox *ngIf="btnCheckHabilitar_Estado"
+                                (change)="$event ? masterToggleEstado() : null"
+                                [checked]="selectionUnoEstado.hasValue() && isAllSelectedEstado()"
+                                [indeterminate]="selectionUnoEstado.hasValue() && !isAllSelectedEstado()"
+                                [aria-label]="checkboxLabelEstado()">
+                            </mat-checkbox>
+                        </th>
+                        <th scope="col">Empleado</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Fecha Comida</th>
+                        <th scope="col">Hora Inicio</th>
+                        <th scope="col">Hora Final</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let e of solicitudesAutorizadas_filtradas | paginate:tamanio_pagina_autorizado:numero_pagina_autorizado">
+                        <td>
+                            <mat-checkbox *ngIf="btnCheckHabilitar_Estado" (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionUnoEstado.toggle(e) : null"
+                                [checked]="selectionUnoEstado.isSelected(e)" [aria-label]="checkboxLabelEstado(e)">
+                            </mat-checkbox>
+                        </td>
+                        <td>{{e.nombre}} {{e.apellido}}</td>
+                        <td>{{e.aprobada}}</td>
+                        <td>{{e.fec_comida_}}</td>
+                        <td>{{e.hora_inicio_}}</td>
+                        <td>{{e.hora_fin_}}</td>
+                        <td class="d-flex justify-content-center">
+                            <i *ngIf="auto_individual_estado && e.aprobada === 'NEGADO'" class="fas fa-edit"
+                                (click)="VentanaEditarPlanComida(e)" matSuffix matTooltipPosition="right"
+                                matTooltip="Modificar los datos generales de este registro">
+                                <p>Editar</p>
+                            </i>
+                            <i *ngIf="auto_individual_estado" class="fas fa-file-alt"
+                                style="color:rgb(197, 95, 11); margin-left: 15px;" matSuffix matTooltipPosition="right"
+                                matTooltip="Cambiar el estado de la solicitud de servicio de alimentación."
+                                (click)="AbrirAutorizaciones(e, 'individual')">
+                                <p>Actualizar</p>
+                            </i>
+                            <div *ngIf="!auto_individual_estado" style="padding-bottom: 1%;">
+                                <br><br>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="solicitudesAutorizadas_filtradas.length" [pageSize]="tamanio_pagina_autorizado"
+            [pageSizeOptions]="pageSizeOptions_autorizado" id="pagina" (page)="ManejarPaginaAutorizados($event)"
+            showFirstLastButtons>
+        </mat-paginator>
+        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+            <i (click)="generarPdf('download','Servicios de alimentación aprobados')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de servicios de alimentación aprobados en formato PDF.">
+                <p>PDF</p>
+            </i>
+            <i (click)="exportToExcel('Servicios de alimentación aprobados')" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de servicios de alimentación aprobados en formato EXCEL.">
+                <p>XLSL</p>
+            </i>
+            <i (click)="exportToCVS('Servicios de alimentación aprobados')" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de servicios de alimentación aprobados en formato CSV.">
+                <p>CSV</p>
+            </i>
+            <i (click)="exportToXML('Servicios de alimentación aprobados')" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de servicios de alimentación aprobados en formato XML.">
+                <p>XML</p>
+            </i>
+        </div>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+            <p> Reporte de servicios de alimentación aprobados. </p>
+        </div>
+    </div>
+</div>
+<!-- TABLA CON LISTA DE SOLICITUDES DE SERVICIO DE ALIMENTACIÓN EXPIRADAS -->
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="lista_expirados">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <span class="w-100 bd-highlight">
+                LISTA DE SERVICIOS DE ALIMENTACIÓN FINALIZADOS</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Empleado</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Fecha Comida</th>
+                        <th scope="col">Hora Inicio</th>
+                        <th scope="col">Hora Final</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let e of solicitudesExpiradas_filtradas | paginate:tamanio_pagina_expirada:numero_pagina_expirada">
+                        <td>{{e.nombre}} {{e.apellido}}</td>
+                        <td>{{e.aprobada}}</td>
+                        <td>{{e.fec_comida_}}</td>
+                        <td>{{e.hora_inicio_}}</td>
+                        <td>{{e.hora_fin_}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="solicitudesExpiradas_filtradas.length" [pageSize]="tamanio_pagina_expirada"
+            [pageSizeOptions]="pageSizeOptions_expirada" id="pagina" (page)="ManejarPaginaExpiradas($event)"
+            showFirstLastButtons>
+        </mat-paginator>
+        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+            <i (click)="generarPdf('download','Servicios de alimentación finalizados')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de servicios de alimentación finalizados en formato PDF.">
+                <p>PDF</p>
+            </i>
+            <i (click)="exportToExcel('Servicios de alimentación finalizados')" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de servicios de alimentación finalizados en formato EXCEL.">
+                <p>XLSL</p>
+            </i>
+            <i (click)="exportToCVS('Servicios de alimentación finalizados')" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de servicios de alimentación finalizados en formato CSV.">
+                <p>CSV</p>
+            </i>
+            <i (click)="exportToXML('Servicios de alimentación finalizados')" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de servicios de alimentación finalizados en formato XML.">
+                <p>XML</p>
+            </i>
+        </div>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+            <p> Reporte de servicios de alimentación finalizados. </p>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="(validarMensaje1) && (validarMensaje2) && (validarMensaje3)" class="container" style="padding-bottom: 50px; text-align: center; padding-top: 20px;" >
+    <div class="mat-elevation-z8" style="color: rgb(158, 154, 154); padding: 2%;">
+        <h5> Por el Momento no tiene Solicitudes de Alimentacion para Aprobar </h5>
+    </div>
+</div>

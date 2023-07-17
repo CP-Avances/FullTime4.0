@@ -1,0 +1,50 @@
+mat-slider { width: 100%; }
+
+.caja { width: 300px;padding: 10px 5px 0px 10px; }
+
+.btn { background-color: rgb(80,87,97); color: white; margin: 5px 10px 5px 10px;} 
+
+mat-form-field {width: 300px; padding: 10px 5px 0px 10px;}
+
+mat-radio-group { width: 210px; padding: 15px 20px 15px 20x; margin-bottom: 10px;}
+
+#horaExtra { font-size: small; }
+
+#codigoP { font-size: small; }
+
+#tipoRecargo { font-size: small; }
+
+#iconoG { margin-left: 15px; }
+
+.mat-radio-button ~ .mat-radio-button { margin-left: 16px; }
+
+.subtitulo { 
+  position: relative; 
+  float: left; 
+  font-size: 19px; 
+  font-weight: bold; 
+  text-align: center; 
+  color: rgb(0, 0, 0);
+}
+
+#seccion_horaE { color: rgba(8, 10, 124, 0.828); }
+
+.progress {
+  margin: 250px auto auto auto;
+  opacity: 1
+}
+
+.pantalla-progress {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background: #ffff;
+  opacity: 0.8;
+}
+
+mat-progress-spinner {
+  background: transparent;
+  z-index: 100;
+}

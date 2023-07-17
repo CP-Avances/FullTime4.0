@@ -203,13 +203,10 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
       estado: form.estadoF,
     }
 
-    this.NotificarAprobacion(form.estadoF);
-
-    /*
     this.restA.ActualizarAprobacion(this.data.auto.id, aprobacion).subscribe(res => {
       this.EditarEstadoPermiso(this.data.auto.id_permiso, form.estadoF);
       this.NotificarAprobacion(form.estadoF);
-    })*/
+    })
     
   }
 
@@ -250,7 +247,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
       this.toastr.success('', 'Proceso realizado exitosamente.', {
         timeOut: 6000,
       });
-      //this.ventana.close(true);
+      this.ventana.close(true);
     });
   }
 

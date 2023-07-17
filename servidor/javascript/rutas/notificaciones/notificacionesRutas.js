@@ -34,8 +34,10 @@ class NotificacionTiempoRealRutas {
         /** *************************************************************************************** **
          ** **                    MANEJO DE DATOS DE CORREOS MULTIPLE                                ** **
          ** *************************************************************************************** **/
-        // METODO PARA ENVIAR CORREO DE COMUNICADOS
+        // METODO PARA ENVIAR CORREO DE APROBACION MULTIPLE
         this.router.post('/mail-multiple/', verificarToken_1.TokenValidation, notificacionesControlador_1.default.EnviarCorreoSolicitudes);
+        // METODO PARA ENVIAR CORREO DE APROBACION MULTIPLE DESDE LA APLICACION  MÓVIL
+        this.router.post('/mail-multiple-movil/', notificacionesControlador_1.default.EnviarCorreoSolicitudes);
         /** *************************************************************************************** **
          ** **                    MANEJO DE DATOS DE COMUNICADOS                                 ** **
          ** *************************************************************************************** **/
