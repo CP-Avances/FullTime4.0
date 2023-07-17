@@ -50,6 +50,9 @@ async function ListaTimbresDiarioToEmpleado(hoy: any) {
 }
 
 async function GenerarHorarioEmpleado(id_cargo: number, inicio: Date, final: Date) {
+
+
+
     /*let horarioAnual = await pool.query('SELECT id_horarios, fec_inicio, fec_final, domingo, lunes, martes, miercoles, jueves, viernes, sabado ' +
         'FROM empl_horarios WHERE estado = 1 AND id_empl_cargo = $1 AND CAST(fec_inicio AS VARCHAR) like $2 || \'%\' ORDER BY fec_inicio ASC',
         [id_cargo, inicio.toJSON().split('-')[0]])
@@ -71,7 +74,13 @@ async function GenerarHorarioEmpleado(id_cargo: number, inicio: Date, final: Dat
          });
  */
 
-    let horarioAnual = await pool.query('SELECT id_horarios, fec_inicio, fec_final, domingo, lunes, ' +
+
+
+
+/*
+
+
+  let horarioAnual = await pool.query('SELECT id_horarios, fec_inicio, fec_final, domingo, lunes, ' +
         'martes, miercoles, jueves, viernes, sabado ' +
         'FROM empl_horarios WHERE estado = 1 AND id_empl_cargo = $1 ' +
         'AND (CAST(fec_inicio AS VARCHAR) BETWEEN $2 AND $3 ' +
@@ -88,6 +97,7 @@ async function GenerarHorarioEmpleado(id_cargo: number, inicio: Date, final: Dat
 
     // console.log(horarioAnual);
     if (horarioAnual.length === 0) return { message: 'No tienen asignado horario' }
+    */
 
     /* if (horarioAnual.length === 1) { // referencia a horario anual
  
@@ -108,6 +118,9 @@ async function GenerarHorarioEmpleado(id_cargo: number, inicio: Date, final: Dat
          }
      }*/
 
+
+     /*
+
     let horarioMensual = horarioAnual.filter(obj => {
         console.log('entra a revisar mensual 1', obj.fec_inicio.toJSON().split('T')[0], ' ', inicio.toJSON().split('T')[0] + ' ' + final.toJSON().split('T')[0])
         console.log('entra a revisar mensual 2', obj.fec_final.toJSON().split('T')[0], ' ')
@@ -117,6 +130,8 @@ async function GenerarHorarioEmpleado(id_cargo: number, inicio: Date, final: Dat
     console.log(' ver mensual resultado .....................', horarioMensual);
 
     if (horarioMensual.length === 0) return { message: 'No tiene asignado horario' }
+
+    */
 
     /*  if (horarioMensual.length === 1) { //referencia a un horario mensual
           var fecha1 = moment(horarioMensual[0].fec_inicio.toJSON().split("T")[0]);
@@ -131,7 +146,7 @@ async function GenerarHorarioEmpleado(id_cargo: number, inicio: Date, final: Dat
           }
       }*/
 
-    console.log('*************************');
+ /*   console.log('*************************');
     console.log('LLEGO A SEMANAL');
     console.log('*************************');
     let EstadosHorarioSemanal: any = [];
@@ -146,8 +161,8 @@ async function GenerarHorarioEmpleado(id_cargo: number, inicio: Date, final: Dat
         var fecha = new Date(obj.fec_iterada);
         return (fecha >= inicio && fecha <= final)
     });
-
-
+*/
+return []
 }
 
 function HorarioConEstado(estados: any[0], inicio: Date, final: Date) {
@@ -202,7 +217,7 @@ async function UltimoCargoContrato(id_empleado: number, desde: Date, hasta: Date
             return result.rows;
         })*/
 
-
+/*
     let horarios = await pool.query('SELECT ho.id_empl_cargo AS id_cargo, CAST(ho.fec_inicio AS VARCHAR), ' +
         'CAST(ho.fec_final AS VARCHAR), ho.id_horarios, ho.codigo ' +
         'FROM empl_contratos AS co, empl_cargos AS ca, empl_horarios AS ho ' +
@@ -222,6 +237,7 @@ async function UltimoCargoContrato(id_empleado: number, desde: Date, hasta: Date
 
     //console.log('ver resultado', arrSinDuplicaciones)
     return arrSinDuplicaciones
+    */
 }
 
 async function ListaTimbresDiario(hoy: any, codigo: number, bool: boolean, id_horarios: number, IhorarioLaboral: any, empleado: any) {
@@ -636,7 +652,7 @@ async function MetodoModelarDetalleAsistencia(codigo: number, desde: Date, hasta
 
     let horarios = await GenerarHorarioEmpleado(id_cargo, desde, hasta);
     // console.log('horarios===***************************************************************',horarios);
-    if (horarios.message) return horarios;
+    //if (horarios.message) return horarios;
 
     let arr: any[] = await Promise.all(horarios.map(async (obj: any) => {
         return await ListaTimbresDiario(obj.fec_iterada, codigo, obj.boolena_fecha, obj.id_horarios, IhorarioLaboral, empleado)
@@ -889,7 +905,7 @@ async function MetodoModelarDetalleAsistenciaSinAccion(codigo: number, desde: Da
 
     let horarios = await GenerarHorarioEmpleado(id_cargo, desde, hasta);
     // console.log('horarios===',horarios);
-    if (horarios.message) return horarios;
+    //if (horarios.message) return horarios;
 
     let arr: any[] = await Promise.all(horarios.map(async (obj: any) => {
 

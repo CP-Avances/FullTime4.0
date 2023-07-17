@@ -18,82 +18,96 @@ const moment_1 = __importDefault(require("moment"));
 const FECHA_FERIADOS = [];
 const generarTimbres = function (id_empleado) {
     return __awaiter(this, void 0, void 0, function* () {
-        // pool.query('SELECT co.id_empleado AS empleado, co.id AS contrato, ca.id AS cargo, ho.fec_inicio, ho.fec_final,' + 
-        //     'ho.lunes, ho.martes, ho.miercoles, ho.jueves, ho.viernes, ho.sabado, ho.domingo, ho.id_horarios' +
-        //     'FROM empl_contratos AS co, empl_cargos AS ca, empl_horarios AS ho' +
-        //     'WHERE co.id_empleado = $1 AND co.id = ca.id_empl_contrato AND ho.id_empl_cargo = ca.id AND ho.estado = 1',[id_empleado])
-        let horarios = yield database_1.default.query('SELECT ho.fec_inicio, ho.fec_final, ho.lunes, ho.martes, ho.miercoles, ho.jueves, ho.viernes, ho.sabado, ho.domingo, ho.id_horarios ' +
-            'FROM empl_contratos AS co, empl_cargos AS ca, empl_horarios AS ho ' +
-            'WHERE co.id_empleado = $1 AND co.id = ca.id_empl_contrato AND ho.id_empl_cargo = ca.id AND ho.estado = 1 ORDER BY ho.fec_inicio ASC', [id_empleado])
-            .then(result => {
-            return result.rows;
-        });
-        let Ids_horarios = [...new Set(horarios.map(obj => {
-                return obj.id_horarios;
-            }))];
-        console.log(Ids_horarios);
-        let detaHorarios = yield Promise.all(Ids_horarios.map((obj) => __awaiter(this, void 0, void 0, function* () {
-            return {
-                id_horario: obj,
-                datos: yield database_1.default.query('SELECT orden, hora FROM deta_horarios WHERE id_horario = $1 ORDER BY orden, hora', [obj])
+        /*
+            // pool.query('SELECT co.id_empleado AS empleado, co.id AS contrato, ca.id AS cargo, ho.fec_inicio, ho.fec_final,' +
+            //     'ho.lunes, ho.martes, ho.miercoles, ho.jueves, ho.viernes, ho.sabado, ho.domingo, ho.id_horarios' +
+            //     'FROM empl_contratos AS co, empl_cargos AS ca, empl_horarios AS ho' +
+            //     'WHERE co.id_empleado = $1 AND co.id = ca.id_empl_contrato AND ho.id_empl_cargo = ca.id AND ho.estado = 1',[id_empleado])
+            let horarios = await pool.query(
+                'SELECT ho.fec_inicio, ho.fec_final, ho.lunes, ho.martes, ho.miercoles, ho.jueves, ho.viernes, ho.sabado, ho.domingo, ho.id_horarios ' +
+                'FROM empl_contratos AS co, empl_cargos AS ca, empl_horarios AS ho ' +
+                'WHERE co.id_empleado = $1 AND co.id = ca.id_empl_contrato AND ho.id_empl_cargo = ca.id AND ho.estado = 1 ORDER BY ho.fec_inicio ASC',[id_empleado])
+                .then(result => {
+                    return result.rows
+                });
+        
+            let Ids_horarios = [... new Set(
+                    horarios.map(obj => {
+                        return obj.id_horarios;
+                    })
+                )]
+        
+            console.log(Ids_horarios);
+        
+            let detaHorarios: any[] = await Promise.all(Ids_horarios.map(async(obj): Promise<any> => {
+                return {
+                    id_horario: obj,
+                    datos: await pool.query('SELECT orden, hora FROM deta_horarios WHERE id_horario = $1 ORDER BY orden, hora',[obj])
                     .then(result => {
-                    return result.rows.map(obj => { return obj; });
-                })
-            };
-        })));
-        detaHorarios.forEach(obj => {
-            console.log(obj);
-        });
-        let arregloTotal = [];
-        horarios.forEach(obj => {
-            DiasByEstado(obj).forEach(ele => {
-                arregloTotal.push(ele);
-            });
-        });
-        arregloTotal.forEach((obj) => {
-            detaHorarios.forEach(ele => {
-                if (ele.id_horario === obj.id_horario) {
-                    ele.datos.forEach((itera) => __awaiter(this, void 0, void 0, function* () {
-                        let fecha = obj.fecha + 'T' + '00:00:00';
-                        var f = new Date(fecha);
-                        var min_aleatoria = Math.floor((Math.random() * 59) + 0);
-                        f.setUTCHours(itera.hora.split(':')[0]);
-                        f.setUTCMinutes(min_aleatoria);
-                        let accion;
-                        let observacion;
-                        let latitud = '-0.928755';
-                        let longitud = '-78.606327';
-                        let tecla_funcion;
-                        switch (itera.orden) {
-                            case 1:
-                                f.setUTCHours(f.getUTCHours() - 1);
-                                accion = 'EoS';
-                                observacion = 'Entrada';
-                                tecla_funcion = 0;
-                                break;
-                            case 2:
-                                accion = 'AES';
-                                observacion = 'Salida Almuerzo';
-                                tecla_funcion = 1;
-                                break;
-                            case 3:
-                                accion = 'AES';
-                                observacion = 'Entrada Almuerzo';
-                                tecla_funcion = 1;
-                                break;
-                            default: //es orden 4
-                                accion = 'EoS';
-                                observacion = 'Salida';
-                                tecla_funcion = 0;
-                                break;
-                        }
-                        console.log('accion:', accion, f.toJSON());
-                        yield database_1.default.query('INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_empleado, id_reloj)' +
-                            'values($1,$2,$3,$4,$5,$6,$7,$8)', [f.toJSON(), accion, tecla_funcion, observacion, latitud, longitud, id_empleado, 3]);
-                    }));
+                        return result.rows.map(obj => { return obj })
+                    })
                 }
+            }))
+            detaHorarios.forEach(obj => {
+                console.log(obj);
+            })
+            let arregloTotal: any = [];
+        
+            horarios.forEach(obj => {
+                DiasByEstado(obj).forEach(ele => {
+                    arregloTotal.push(ele)
+                });
+            })
+        
+            arregloTotal.forEach((obj:any) => {
+                detaHorarios.forEach(ele => {
+                    if (ele.id_horario === obj.id_horario) {
+                        ele.datos.forEach(async(itera:any) => {
+                            let fecha = obj.fecha + 'T' + '00:00:00'
+                            var f = new Date(fecha)
+                            var min_aleatoria = Math.floor((Math.random() * 59) + 0)
+                            
+                            f.setUTCHours(itera.hora.split(':')[0])
+                            f.setUTCMinutes(min_aleatoria)
+        
+                            let accion: string;
+                            let observacion: string;
+                            let latitud = '-0.928755'
+                            let longitud =  '-78.606327'
+                            let tecla_funcion: number;
+                            switch (itera.orden) {
+                                case 1:
+                                    f.setUTCHours(f.getUTCHours() - 1)
+                                    accion = 'EoS';
+                                    observacion = 'Entrada';
+                                    tecla_funcion = 0;
+                                    break;
+                                case 2:
+                                    accion = 'AES';
+                                    observacion = 'Salida Almuerzo';
+                                    tecla_funcion = 1;
+                                    break;
+                                case 3:
+                                    accion = 'AES';
+                                    observacion = 'Entrada Almuerzo';
+                                    tecla_funcion = 1;
+                                    break;
+                                default: //es orden 4
+                                    accion = 'EoS';
+                                    observacion = 'Salida';
+                                    tecla_funcion = 0;
+                                    break;
+                            }
+                            console.log('accion:', accion,f.toJSON());
+        
+                            await pool.query('INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_empleado, id_reloj)' +
+                            'values($1,$2,$3,$4,$5,$6,$7,$8)', [f.toJSON(), accion, tecla_funcion , observacion, latitud, longitud, id_empleado, 3])
+                        });
+                    }
+                })
             });
-        });
+            
+            */
     });
 };
 exports.generarTimbres = generarTimbres;

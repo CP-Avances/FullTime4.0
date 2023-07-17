@@ -55,6 +55,8 @@ class CargaMultipleControlador {
         fs.unlinkSync(filePath);
     }
 
+
+// **************** verificar empl_horario
     public async CargarHorarioMultiplesEmpleados(req: Request, res: Response): Promise<void> {
         let list: any = req.files;
         let cadena = list.uploads[0].path;

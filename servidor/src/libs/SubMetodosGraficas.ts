@@ -13,7 +13,7 @@ export const BuscarTimbresByFecha = async function (fec_inicio: string, fec_fina
 }
 
 export const BuscarHorariosActivos = async function (fec_inicio: string, fec_final: string) {
-    
+    /*
     let lista_horarios = await pool.query('SELECT * FROM empl_horarios WHERE CAST(fec_inicio AS VARCHAR) between $1 || \'%\' AND $2 || \'%\' ORDER BY fec_inicio ASC',[ fec_inicio, fec_final])
         .then(res => {
             return res.rows;
@@ -28,7 +28,8 @@ export const BuscarHorariosActivos = async function (fec_inicio: string, fec_fin
 
     lista_horarios = [];
     
-    return array
+    return array*/
+    return []
 }
 
 export const BuscarTimbresByCodigo_Fecha = async function (codigo: number, horario: any[]) {
@@ -195,7 +196,7 @@ export const BuscarTimbresEntradas = async function (fec_inicio: string, fec_fin
 }
 
 export const BuscarTimbresEntradasSinAcciones = async function (fec_inicio: string, fec_final: string) {
-    
+    /*
     const orden = 1;
     
     const horarioEntrada = await pool.query('SELECT eh.codigo, dt.hora, dt.minu_espera, CAST(eh.fec_inicio AS VARCHAR), CAST(eh.fec_final AS VARCHAR), '+
@@ -258,16 +259,17 @@ export const BuscarTimbresEntradasSinAcciones = async function (fec_inicio: stri
         }
     })
 
-    return nuevo
+    return nuevo*/
+    return []
 }
 
 export const BuscarTimbresEntradaSinAccionModelado = async function (fec_inicio: string, fec_final: string): Promise <TimbreJornadaSA[]> {
-    
+    /*
     let codigos = await pool.query('SELECT Distinct id_empleado FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) between $1 || \'%\' AND $2 || \'%\' ORDER BY id_empleado ASC ',[ fec_inicio, fec_final])
         .then(res => {
             return res.rows;
         })
-        
+    
     let nuevo = await Promise.all(codigos.map(async(obj) => {
         return pool.query('SELECT eh.codigo, dh.hora, dh.orden, dh.id_horario, CAST(eh.fec_inicio AS VARCHAR), CAST(eh.fec_final AS VARCHAR) FROM empl_horarios AS eh, cg_horarios AS h, deta_horarios AS dh ' + 
         'WHERE eh.codigo = $1 AND h.id = eh.id_horarios AND dh.id_horario = h.id AND CAST(eh.fec_inicio AS VARCHAR) between $2 || \'%\' AND $3 || \'%\' ' + 
@@ -326,6 +328,7 @@ export const BuscarTimbresEntradaSinAccionModelado = async function (fec_inicio:
         }
         
         return res
+
     }))
     
     let arr_respuesta: Array<TimbreJornadaSA> = []
@@ -456,11 +459,14 @@ export const BuscarTimbresEntradaSinAccionModelado = async function (fec_inicio:
     res_timbre = [];
     array = [];
     
-    return arr_respuesta    
+    return arr_respuesta   
+    
+    */
+return []
 }
 
 export const BuscarTimbresEoSModelado = async function (fec_inicio: string, fec_final: string) {
-    var fec_aux = new Date(fec_inicio)
+  /*  var fec_aux = new Date(fec_inicio)
 
     var fecha1 = moment(fec_inicio);
     var fecha2 = moment(fec_final);
@@ -514,10 +520,14 @@ export const BuscarTimbresEoSModelado = async function (fec_inicio: string, fec_
     });
 
     return nuevo
+ 
+   */
+
+    return []
 }
 
 export const ModelarAtrasos = async function (obj: any, fec_inicio: string, fec_final: string) {
-    // console.log(obj);
+   /* // console.log(obj);
     try {
         let array = await pool.query('SELECT dh.hora, dh.minu_espera FROM empl_horarios AS eh, cg_horarios AS h, deta_horarios AS dh ' + 
         'WHERE eh.codigo = $1 AND h.id = eh.id_horarios AND dh.id_horario = h.id AND CAST(eh.fec_inicio AS VARCHAR) between $2 || \'%\' AND $3 || \'%\' ' + 
@@ -549,11 +559,13 @@ export const ModelarAtrasos = async function (obj: any, fec_inicio: string, fec_
         }
     }
 
+    */
+
 }
 
 export const ModelarTiempoJornada = async function (obj: any, fec_inicio: string, fec_final: string) {
     // console.log(obj);
-    
+  /*  
     let array = await pool.query('SELECT dh.hora, dh.orden FROM empl_horarios AS eh, cg_horarios AS h, deta_horarios AS dh ' + 
     'WHERE eh.codigo = $1 AND h.id = eh.id_horarios AND dh.id_horario = h.id AND CAST(eh.fec_inicio AS VARCHAR) between $2 || \'%\' AND $3 || \'%\' ' + 
     'AND CAST(eh.fec_final AS VARCHAR) between $2 || \'%\' AND $3 || \'%\' AND dh.orden in (1, 4) ',[obj.id_empleado, fec_inicio, fec_final])
@@ -578,10 +590,13 @@ export const ModelarTiempoJornada = async function (obj: any, fec_inicio: string
             retraso: retraso
         }
     })[0]
+
+    */
 }
 
 export const ModelarSalidasAnticipadas = async function (fec_inicio: string, fec_final: string) {
-    // console.log(obj);
+  
+  /*  // console.log(obj);
     let timbres = await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR), id_empleado FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) between $1 || \'%\' AND $2 || \'%\' AND accion in (\'EoS\', \'S\') ORDER BY fec_hora_timbre ASC',[ fec_inicio, fec_final])
         .then(res => {
             return res.rows;
@@ -617,11 +632,12 @@ export const ModelarSalidasAnticipadas = async function (fec_inicio: string, fec
     })
     nuevo = [];
     return array
+    */
 }
 
 export const ModelarSalidasAnticipadasSinAcciones = async function (fec_inicio: string, fec_final: string): Promise <TimbreJornadaSA[]> {
     // console.log(obj);
-
+/*
     let codigos = await pool.query('SELECT Distinct id_empleado FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) between $1 || \'%\' AND $2 || \'%\' ORDER BY id_empleado ASC ',[ fec_inicio, fec_final])
         .then(res => {
             return res.rows;
@@ -771,6 +787,8 @@ export const ModelarSalidasAnticipadasSinAcciones = async function (fec_inicio: 
     array = [];
     
     return arr_respuesta 
+    */
+   return []
 }
 
 /**
@@ -936,7 +954,7 @@ export const Empleado_Atrasos_ModelarDatos = async function(codigo: string | num
 }
 
 export const Empleado_Atrasos_ModelarDatos_SinAcciones = async function(codigo: string | number, fec_desde: Date, fec_hasta: Date) {
-    
+    /*
     const orden = 1;
     
     const horarioEntrada = await pool.query('SELECT dt.hora, dt.minu_espera, CAST(eh.fec_inicio AS VARCHAR), CAST(eh.fec_final AS VARCHAR), '+
@@ -992,6 +1010,7 @@ export const Empleado_Atrasos_ModelarDatos_SinAcciones = async function(codigo: 
     })    
 
     return nuevo
+    */
 }
 
 export const SegundosToHHMM = function (dato: number) {

@@ -33,6 +33,7 @@ class EmpresaControlador {
                 return result.rows[0];
             });
 
+            console.log('ver registro empresa ', file_name)
         if (file_name.logo === null) {
             file_name.logo = 'logo_reportes.png';
         }

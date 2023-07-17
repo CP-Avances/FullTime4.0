@@ -756,6 +756,8 @@ const REPORTE_A_CONTROLADOR = new ReportesAsistenciaControlador();
 export default REPORTE_A_CONTROLADOR
 
 const AtrasosTimbresSinAccion = async function (fec_inicio: string, fec_final: string, codigo: string | number): Promise<any> {
+  
+  /*
     const orden = 1;
     // console.log('ATRASOS - TIMBRES SIN ACCION: ', fec_inicio, fec_final, codigo );
     let horarioEntrada = await pool.query('SELECT dt.hora, dt.minu_espera, CAST(eh.fec_inicio AS VARCHAR), CAST(eh.fec_final AS VARCHAR), ' +
@@ -816,6 +818,8 @@ const AtrasosTimbresSinAccion = async function (fec_inicio: string, fec_final: s
     })
     // console.log('Este es el resul: ',nuevo);
     return nuevo
+    */
+   return []
 }
 
 const BuscarTimbresEoSReporte = async function (fec_inicio: string, fec_final: string, codigo: string | number) {
@@ -826,7 +830,7 @@ const BuscarTimbresEoSReporte = async function (fec_inicio: string, fec_final: s
 }
 
 const BuscarTimbresSinAccionesDeEntrada = async function (fec_inicio: string, fec_final: string, codigo: string | number) {
-
+/*
     const orden = 1;
     let horarioEntrada = await pool.query('SELECT dt.hora, dt.minu_espera, CAST(eh.fec_inicio AS VARCHAR), CAST(eh.fec_final AS VARCHAR), ' +
         'eh.lunes, eh.martes, eh.miercoles, eh.jueves, eh.viernes, eh.sabado, eh.domingo ' +
@@ -869,7 +873,9 @@ const BuscarTimbresSinAccionesDeEntrada = async function (fec_inicio: string, fe
         })
     })
 
-    return nuevo
+    return nuevo*/
+
+    return []
 }
 
 const BuscarTimbres = async function (fec_inicio: string, fec_final: string, codigo: string | number) {

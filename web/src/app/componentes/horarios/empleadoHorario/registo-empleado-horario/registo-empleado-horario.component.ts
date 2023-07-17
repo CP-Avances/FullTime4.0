@@ -575,7 +575,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     // METODO PARA AUDITAR PLANIFICACION HORARIA
     this.data_nueva = [];
     this.data_nueva = planifica;
-    this.validar.Auditar('app-web', 'empl_horarios', '', this.data_nueva, 'INSERT');
+   // this.validar.Auditar('app-web', 'empl_horarios', '', this.data_nueva, 'INSERT');
   }
 
   // METODO PARA LIMPIAR FORMULARIO
