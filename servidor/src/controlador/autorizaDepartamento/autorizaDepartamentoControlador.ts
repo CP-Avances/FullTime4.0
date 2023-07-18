@@ -39,7 +39,7 @@ class AutorizaDepartamentoControlador {
             AND cd.id_sucursal = s.id 
             AND ce.id = s.id_empresa 
             AND da.id_empleado = $1 
-            AND e.id_contrato = da.id_empleado
+            AND e.id_cargo = da.id_empl_cargo
             AND n.id_dep_nivel = cd.id
             `
             , [id_empleado]);

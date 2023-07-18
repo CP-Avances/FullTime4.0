@@ -112,9 +112,6 @@ export class VerEmpresaComponent implements OnInit {
       else {
         this.nombre_establecimiento = this.datosEmpresa[0].establecimiento;
       }
-      if (this.datosEmpresa[0].logo != null) {
-        this.ObtenerLogotipo();
-      }
       if (this.datosEmpresa[0].cambios === true) {
         if (this.datosEmpresa[0].dias_cambio === 0) {
           this.cambiosTodos = false;
@@ -134,6 +131,7 @@ export class VerEmpresaComponent implements OnInit {
       }
 
       this.ObtenerColores();
+      this.ObtenerLogotipo();
     });
   }
 

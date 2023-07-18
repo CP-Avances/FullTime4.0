@@ -1818,85 +1818,91 @@
     <mat-tab *ngIf="autorizar">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">supervisor_account</mat-icon>
-            <h6 id="items"> Autorización</h6>
+            <h6 id="items">Autorización</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
-            <div class="row" *ngIf="HabilitarAlimentacion">
-                <div class="col-md">
-                    <mat-card class="mat-elevation-z8">
-                        <div class="d-flex bd-highlight" id="titulo">
-                            <span class="w-100 bd-highlight">ADMINISTRAR MÓDULO ALIMENTACIÓN</span>
-                            <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                                (click)="AbrirVentanaAdminComida()">Añadir</button>
+            <div *ngIf="HabilitarAlimentacion">
+                <mat-card class="mat-elevation-z8">
+                    <div class="d-flex bd-highlight" id="titulo">
+                        <span class="w-100 bd-highlight">ADMINISTRAR MÓDULO ALIMENTACIÓN</span>
+                        <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                            (click)="AbrirVentanaAdminComida()">Añadir</button>
+                    </div>
+                    <mat-card-content>
+                        <div class="nota" style="margin-left: 10px; padding-top: 20px;">
+                            <span>
+                                NOTA: La configuración realizada será usada para permitir la administración o
+                                acceso al módulo de alimentación.
+                            </span>
                         </div>
-                        <mat-card-content>
-                            <div class="container" *ngFor="let ac of administra_comida" style="padding-top: 15px;">
-                                <div class="d-flex flex-wrap justify-content-between" style="margin-bottom: 10px;">
-                                    <div class="d-flex justify-content-start">
-                                        <label id="datosF">Administra Módulo de Alimentación:</label>
-                                        <label *ngIf="ac.admin_comida == true">Sí</label>
-                                        <label *ngIf="ac.admin_comida == false">No</label>
-                                        <label *ngIf="ac.admin_comida == null">No</label>
-                                    </div>
+                        <div class="container" *ngFor="let ac of administra_comida" style="padding-top: 15px;">
+                            <div class="d-flex flex-wrap justify-content-between" style="margin-bottom: 10px;">
+                                <div class="d-flex justify-content-start">
+                                    <label id="datosF">Administra módulo de alimentación:</label>
+                                    <label *ngIf="ac.admin_comida == true">Sí</label>
+                                    <label *ngIf="ac.admin_comida == false">No</label>
+                                    <label *ngIf="ac.admin_comida == null">No</label>
                                 </div>
-                                <mat-divider></mat-divider>
                             </div>
-                        </mat-card-content>
-                    </mat-card>
-                </div>
+                            <mat-divider></mat-divider>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
             </div>
             <br *ngIf="HabilitarAlimentacion">
-            <div class="row" *ngIf="HabilitarPermisos">
-                <div class="col-md">
-                    <mat-card class="mat-elevation-z8">
-                        <div class="d-flex bd-highlight" id="titulo">
-                            <span class="w-100 bd-highlight">AUTORIZACIÓN DEPARTAMENTOS</span>
-                            <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                                (click)="AbrirVentanaAutorizar()">Crear</button>
-                        </div>
-                        <mat-card-content>
-                            <div class="container" *ngFor="let autoD of autorizacionesTotales"
-                                style="padding-top: 15px;">
-                                <div class="container">
-                                    <div class="row">
-                                        <div class="col-md">
-                                            <div class="espacio d-flex justify-content-start">
-                                                <label id="datosF">Departamento de:</label>
-                                                <label>{{autoD.nom_depar}}</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md">
-                                            <div class="espacio d-flex justify-content-start">
-                                                <label id="datosF" *ngIf="autoD.preautorizar == false">Autoriza:</label>
-                                                <label id="datosF"
-                                                    *ngIf="autoD.preautorizar == true">Pre-Autoriza:</label>
-                                                <label *ngIf="autoD.estado == true">Sí</label>
-                                                <label *ngIf="autoD.estado == false">No</label>
-                                            </div>
-                                        </div>
-                                        <div style="text-align: right;">
-                                            <i class="fas fa-edit" id="edit" (click)="AbrirEditarAutorizar(autoD)"
-                                                matSuffix matTooltipPosition="right"
-                                                matTooltip="Modificar los datos generales de este registro">
-                                                <p>Editar</p>
-                                            </i>
-                                            <i style="color:red; margin-left: 15px;"
-                                                (click)="ConfirmarDeleteAutorizacion(autoD)" class=" far fa-trash-alt"
-                                                matTooltipPosition="right" id="delete" matTooltip="Eliminar registro">
-                                                <p>Eliminar</p>
-                                            </i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <mat-divider style="margin-bottom: 10px;"></mat-divider>
+
+            <div *ngIf="aprobacion">
+                <mat-card class="mat-elevation-z8">
+                    <div class="d-flex bd-highlight" id="titulo">
+                        <span class="w-100 bd-highlight">AUTORIZACIÓN DEPARTAMENTOS</span>
+                        <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                            (click)="AbrirVentanaAutorizar()">Crear</button>
+                    </div>
+                    <mat-card-content>
+                        <div class="container" style="padding-top: 15px;">
+                            <div class="nota" id="espacio">
+                                <span>
+                                    NOTA: La configuración realizada será usada en aprobaciones de permisos, vacaciones
+                                    u horas extras.
+                                </span>
                             </div>
-                        </mat-card-content>
-                    </mat-card>
-                </div>
+                            <div class="table-responsive" style="padding-top: 10px;">
+                                <table class="table table-hover table-sm">
+                                    <thead class="thead-light">
+                                        <tr style="text-align: center;">
+                                            <th scope="col">Departamento</th>
+                                            <th scope="col">Proceso</th>
+                                            <th scope="col">Configurar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let autoD of autorizacionesTotales">
+                                            <td>{{autoD.nom_depar}}</td>
+                                            <td *ngIf="autoD.preautorizar == false">Autorizar</td>
+                                            <td *ngIf="autoD.preautorizar == true">Preautorizar</td>
+                                            <td class="justify-content-center">
+                                                <i class="fas fa-edit" id="edit" (click)="AbrirEditarAutorizar(autoD)"
+                                                    matSuffix matTooltipPosition="right"
+                                                    matTooltip="Modificar los datos generales de este registro">
+                                                    <p>Editar</p>
+                                                </i>
+                                                <i style="color:red; margin-left: 15px;"
+                                                    (click)="ConfirmarDeleteAutorizacion(autoD)"
+                                                    class=" far fa-trash-alt" matTooltipPosition="right" id="delete"
+                                                    matTooltip="Eliminar registro">
+                                                    <p>Eliminar</p>
+                                                </i>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
             </div>
         </div>
     </mat-tab>
-
 
 
 </mat-tab-group>

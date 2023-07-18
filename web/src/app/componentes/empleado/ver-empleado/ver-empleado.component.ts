@@ -191,6 +191,7 @@ export class VerEmpleadoComponent implements OnInit {
   HabilitarAccion: boolean = false;
   HabilitarHorasE: boolean = false;
   autorizar: boolean = false;
+  aprobacion: boolean = false;
 
   VerFuncionalidades() {
     this.restF.ListarFunciones().subscribe(datos => {
@@ -198,6 +199,7 @@ export class VerEmpleadoComponent implements OnInit {
         if (this.idEmpleadoLogueado === parseInt(this.idEmpleado)) {
           this.HabilitarHorasE = true;
         }
+        this.VerRegistroAutorizar();
       }
       if (datos[0].accion_personal === true) {
         this.HabilitarAccion = true;
@@ -205,20 +207,27 @@ export class VerEmpleadoComponent implements OnInit {
       if (datos[0].alimentacion === true) {
         this.HabilitarAlimentacion = true;
         this.autorizar = true;
-        // FUNCIONES DE AUTORIZACIONES
-        this.ObtenerAutorizaciones();
         this.VerAdminComida();
       }
       if (datos[0].permisos === true) {
         this.HabilitarPermisos = true;
-        this.autorizar = true;
+        this.VerRegistroAutorizar();
       }
       if (datos[0].vacaciones === true) {
         this.habilitarVacaciones = true;
+        this.VerRegistroAutorizar();
       }
       // METODOS DE CONSULTAS GENERALES
       this.BuscarParametro();
     })
+  }
+
+  // METODO PARA VER REGISTRO DE PERSONAL QUE APRUEBA SOLICITUDES
+  VerRegistroAutorizar() {
+    this.autorizar = true;
+    this.aprobacion = true;
+    // FUNCIONES DE AUTORIZACIONES
+    this.ObtenerAutorizaciones();
   }
 
   /** **************************************************************************************** **

@@ -13,7 +13,7 @@ mat-form-field.input-tables {
 }
 
 .codigo { width: 75px; }
-.cedula { width: 145px;}
+.cedula { width: 150px;}
 
 p {
     font-size: x-small;
@@ -21,7 +21,7 @@ p {
 
 table {
     width: 100%;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 tr {

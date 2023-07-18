@@ -48,8 +48,18 @@ export class RegistroAutorizacionDepaComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.ObtenerAutorizaciones();
     this.ObtenerEmpleados(this.datoEmpleado.idEmpleado);
     this.BuscarSucursales();
+  }
+
+  // METODO PARA MOSTRAR DATOS DE AUTORIDAD DEPARTAMENTOS 
+  autorizaciones: any = [];
+  ObtenerAutorizaciones() {
+    this.autorizaciones = [];
+    this.restAutoriza.BuscarAutoridadEmpleado(this.datoEmpleado.idEmpleado).subscribe(datos => {
+      this.autorizaciones = datos;
+    })
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
@@ -88,21 +98,43 @@ export class RegistroAutorizacionDepaComponent implements OnInit {
     let autoriza = {
       id_departamento: form.idDeparForm,
       id_empl_cargo: this.datoEmpleado.idCargo,
-      id_empleado: this.datoEmpleado.idEmpleado,
-      estado: true,
       preautorizar: false,
+      id_empleado: this.datoEmpleado.idEmpleado,
       autorizar: false,
+      estado: true,
     }
 
     if (form.autorizarForm == 'preautorizar') {
       autoriza.preautorizar = true;
-    } else if (form.autorizarForm == 'autorizar') {
+    }
+    else if (form.autorizarForm == 'autorizar') {
       autoriza.autorizar = true;
-    } else {
+    }
+    else {
       autoriza.preautorizar = false;
       autoriza.autorizar = false;
     }
 
+    let verificador = 0;
+    if (this.autorizaciones.length > 0) {
+      for (var i = 0; i < this.autorizaciones.length; i++) {
+        if (this.autorizaciones[i].id_departamento === autoriza.id_departamento) {
+          verificador = 1;
+        }
+      }
+    }
+
+    if (verificador === 0) {
+      this.GuardarDatos(autoriza);
+    } else {
+      this.toastr.error('Ups!!! algo salio mal.', 'Departamento ya se encuentra configurado.', {
+        timeOut: 6000,
+      });
+    }
+  }
+
+  // METODO PARA GUARDAR EN BASE DE DATOS
+  GuardarDatos(autoriza: any) {
     this.restAutoriza.IngresarAutorizaDepartamento(autoriza).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,

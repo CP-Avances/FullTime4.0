@@ -29,7 +29,7 @@
                     <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
-                                <mat-label id="fuente">Seleccionar sucursal</mat-label>
+                                <mat-label>Seleccionar sucursal</mat-label>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Seleccionar una de las sucursales existentes en la entidad.">
                                     help_outline
@@ -40,7 +40,7 @@
                                 </mat-select>
                             </mat-form-field>
                             <mat-form-field>
-                                <mat-label id="fuente">Departamento</mat-label>
+                                <mat-label>Departamento</mat-label>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Seleccionar el departamento en el que realizará alguna aprobación de solicitudes.">
                                     help_outline</mat-icon>
@@ -59,10 +59,10 @@
                                     <span>Opciones de aprobación*</span>
                                 </label>
                                 <mat-radio-button class="radio-button" value="preautorizar">
-                                    Pre-autorizar
+                                    <label id="textoradiobtn">Pre-autorizar</label>
                                 </mat-radio-button>
                                 <mat-radio-button class="radio-button" value="autorizar">
-                                    Autorizar
+                                    <label id="textoradiobtn">Autorizar</label>
                                 </mat-radio-button>
                             </mat-radio-group>
                         </div>
@@ -73,6 +73,8 @@
     </form>
     <div class="d-flex flex-wrap justify-content-center" style="margin-bottom: 3%;">
         <button id="btn-raised" class="btn btn-sm" (click)="InsertarAutorizacion(formulario.value)"
-            [disabled]="!formulario.valid">Guardar</button>
+            [disabled]="!formulario.valid">
+            Guardar
+        </button>
     </div>
 </div>

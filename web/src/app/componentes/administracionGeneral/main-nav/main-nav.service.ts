@@ -82,9 +82,9 @@ export class MainNavService {
     const { accion_personal, alimentacion, hora_extra, permisos, reportes, vacaciones,
       geolocalizacion, app_movil, timbre_web } = value
     this.setAccionesPersonal(accion_personal);
-    this.setGeolocalizacion(vacaciones);
+    this.setGeolocalizacion(geolocalizacion);
     this.setAlimentacion(alimentacion);
-    this.setVacaciones(geolocalizacion);
+    this.setVacaciones(vacaciones);
     this.setHoraExtra(hora_extra);
     this.setTimbreWeb(timbre_web);
     this.setPermisos(permisos);
