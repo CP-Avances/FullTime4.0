@@ -297,7 +297,7 @@ export class AutorizacionesComponent implements OnInit {
                       this.restAutoriza.BuscarListaAutorizaDepa(autorizacion[0].id_departamento).subscribe(res => {
                         this.listadoDepaAutoriza = res;
                         this.listadoDepaAutoriza.forEach(item => {
-                          if((this.id_empleado_loggin == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
+                          if((this.id_empleado_loggin == item.id_empleado) && (autorizaciones.length ==  item.nivel)){
                             this.obtenerPlanificacionHoraria(o.fecha_inicio, o.fecha_final, o.codigo, o);
                             this.listafiltrada.push(o);
                             this.ConfiguracionCorreo(o);
@@ -346,7 +346,7 @@ export class AutorizacionesComponent implements OnInit {
                         res => {
                           this.listadoDepaAutoriza = res; 
                           this.listadoDepaAutoriza.forEach(valor => {
-                            if((this.id_empleado_loggin == valor.id_contrato) && (autorizaciones.length ==  valor.nivel)){
+                            if((this.id_empleado_loggin == valor.id_empleado) && (autorizaciones.length ==  valor.nivel)){
                               this.obtenerPlanificacionHoraria(o.fecha_inicio, o.fecha_final, o.codigo, o);
                               this.listafiltrada.push(o);
                               this.ConfiguracionCorreo(o);

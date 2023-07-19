@@ -667,8 +667,10 @@ class PermisosControlador {
             var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
             const path_folder = path_1.default.resolve('logos');
             var datos = yield (0, settingsMail_1.Credenciales)(parseInt(req.params.id_empresa));
+            console.log('datos: ', datos);
             if (datos === 'ok') {
                 const { id_empl_contrato, id_dep, correo, id_suc, desde, hasta, h_inicio, h_fin, observacion, estado_p, solicitud, tipo_permiso, dias_permiso, horas_permiso, solicitado_por, asunto, tipo_solicitud, proceso } = req.body;
+                console.log('req.body: ', req.body);
                 const correoInfoPidePermiso = yield database_1.default.query('SELECT e.id, e.correo, e.nombre, e.apellido, ' +
                     'e.cedula, ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, ' +
                     'd.nombre AS departamento ' +
@@ -678,7 +680,7 @@ class PermisosControlador {
                     '(SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id ) = ecr.id ' +
                     'AND tc.id = ecr.cargo AND d.id = ecr.id_departamento ORDER BY cargo DESC', [id_empl_contrato]);
                 // codigo para enviar notificacion o correo al jefe de su propio departamento, independientemente del nivel.
-                // && obj.id_dep === correoInfoPidePermiso.rows[0].id_departamento && obj.id_suc === correoInfoPidePermiso.rows[0].id_sucursal
+                //&& obj.id_dep === correoInfoPidePermiso.rows[0].id_departamento && obj.id_suc === correoInfoPidePermiso.rows[0].id_sucursal
                 let data = {
                     to: correo,
                     from: settingsMail_1.email,

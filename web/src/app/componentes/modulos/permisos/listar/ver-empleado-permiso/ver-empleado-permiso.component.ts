@@ -205,7 +205,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
             this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
               this.listadoDepaAutoriza = res;
               this.listadoDepaAutoriza.forEach(item => {
-                if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
+                if((this.idEmpleado == item.id_empleado) && (autorizaciones.length ==  item.nivel)){
                   this.obtenerPlanificacionHoraria(this.InfoPermiso[0].fec_inicio, this.InfoPermiso[0].fec_final, this.InfoPermiso[0].codigo);
                 }else{
                   return this.ocultar = true;
@@ -226,11 +226,12 @@ export class VerEmpleadoPermisoComponent implements OnInit {
           //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
           this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
             this.listadoDepaAutoriza = res;
-            this.listadoDepaAutoriza.filter(item => {
-              if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
-                console.log('Info Permiso 1: ',this.InfoPermiso);
+            this.listadoDepaAutoriza.forEach(item => {
+              if((this.idEmpleado == item.id_empleado) && (autorizaciones.length ==  item.nivel)){
                 this.obtenerPlanificacionHoraria(this.InfoPermiso[0].fec_inicio, this.InfoPermiso[0].fec_final, this.InfoPermiso[0].codigo);
-              } 
+              }else{
+                return this.ocultar = true;
+              }
             })
           });
         }
@@ -258,6 +259,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
 
     this.plangeneral.BuscarPlanificacionHoraria(datos).subscribe(res => {
       this.listahorario = res;
+      console.log('this.listahorario: ',this.listahorario);
       if(this.listahorario.data.length == 0){
         this.mensaje = 'No tiene registrado la planificacion horaria en esas fechas';
         return this.ocultar = true;
