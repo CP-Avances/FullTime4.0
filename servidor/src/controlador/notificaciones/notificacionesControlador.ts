@@ -458,6 +458,7 @@ class NotificacionTiempoRealControlador {
       var corr = enviarMail(servidor, parseInt(puerto));
       corr.sendMail(data, function (error: any, info: any) {
         if (error) {
+          console.log('error: ', error)
           corr.close();
           return res.jsonp({ message: 'error' });
         } else {

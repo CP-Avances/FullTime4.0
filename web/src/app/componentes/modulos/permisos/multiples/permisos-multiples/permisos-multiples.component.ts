@@ -259,11 +259,12 @@ export class PermisosMultiplesComponent implements OnInit {
       var salida = String(moment(fecha, "YYYY/MM/DD").format("YYYY-MM-DD"));
 
       // VALIDAR SI EXISTE RESTRICCION DE FECHAS
-      if (this.datosPermiso.fecha != '' && this.datosPermiso.fecha != null) {
-        var fecha_negada = this.datosPermiso.fecha.split('T')[0];
+      if (this.datosPermiso.fec_validar === true) {
+        var fecha_negada_inicio = this.datosPermiso.fecha_inicio.split('T')[0];
+        var fecha_negada_fin = this.datosPermiso.fecha_fin.split('T')[0];
 
         // VALIDAR FECHAS SIMILARES CON LA SOLICITUD
-        if (Date.parse(salida) === Date.parse(fecha_negada)) {
+        if (Date.parse(salida) >= Date.parse(fecha_negada_inicio) && Date.parse(salida) <= Date.parse(fecha_negada_fin)) {
           this.toastr.info('En la fecha ingresada no es posible otorgar este tipo de permiso.', 'VERIFICAR', {
             timeOut: 6000,
           });
@@ -320,7 +321,23 @@ export class PermisosMultiplesComponent implements OnInit {
 
         // VERIFICAR QUE LA FECHA INGRESADA SEA CORRECTA
         if (Date.parse(inicio) <= Date.parse(fin)) {
-          this.ValidarConfiguracionDias();
+
+          if (this.datosPermiso.fec_validar === true) {
+            var fecha_negada_inicio = this.datosPermiso.fecha_inicio.split('T')[0];
+            var fecha_negada_fin = this.datosPermiso.fecha_fin.split('T')[0];
+  
+            // VERIFICACION DE FECHA NO VALIDA CON LA SALIDA DE PERMISO
+            if ((Date.parse(fecha_negada_inicio) >= Date.parse(inicio) && Date.parse(fecha_negada_inicio) <= Date.parse(fin)) ||
+              (Date.parse(fecha_negada_fin) >= Date.parse(inicio) && Date.parse(fecha_negada_fin) <= Date.parse(fin))) {
+              this.toastr.warning('En la fecha ingresada no es posible otorgar este tipo de permiso.', 'VERIFICAR', {
+                timeOut: 4000,
+              });
+              this.fechaFinalF.setValue('');
+            }
+            else {
+              this.ValidarConfiguracionDias(); 
+            }
+          }
         }
         else {
           this.toastr.warning('Las fechas ingresadas no son correctas.', 'VERIFICAR', {

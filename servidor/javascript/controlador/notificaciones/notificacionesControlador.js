@@ -383,6 +383,7 @@ class NotificacionTiempoRealControlador {
                 var corr = (0, settingsMail_1.enviarMail)(settingsMail_1.servidor, parseInt(settingsMail_1.puerto));
                 corr.sendMail(data, function (error, info) {
                     if (error) {
+                        console.log('error: ', error);
                         corr.close();
                         return res.jsonp({ message: 'error' });
                     }

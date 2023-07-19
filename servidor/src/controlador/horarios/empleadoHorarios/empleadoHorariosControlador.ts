@@ -112,6 +112,9 @@ class EmpleadoHorariosControlador {
 
         // CONSULTA DE HORARIOS FIJOS DEL EMPLEADO
         let fijo = await pool.query(
+
+
+            
             `
             SELECT eh.fec_inicio, eh.fec_final, ec.hora_trabaja
             FROM empl_horarios AS eh, empl_cargos AS ec

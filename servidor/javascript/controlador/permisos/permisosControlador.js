@@ -176,27 +176,17 @@ class PermisosControlador {
             WHERE n.id_departamento = $1
                 AND da.id_departamento = n.id_dep_nivel
                 AND dae.id_cargo = da.id_empl_cargo
-                AND dae.id_contrato = c.id_empleado
-                AND cg.id = $1
+                AND dae.id = c.id_empleado
+                AND cg.id = n.id_departamento
             ORDER BY nivel ASC
             `, [depa_user_loggin]).then((result) => { return result.rows; });
-            if (JefesDepartamentos.length === 0)
+            if (JefesDepartamentos.length === 0) {
                 return res.status(400)
                     .jsonp({
                     message: `Ups!!! algo salio mal. 
-            Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.`
+            Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.`,
+                    permiso: permiso
                 });
-            const obj = JefesDepartamentos[JefesDepartamentos.length - 1];
-            let depa_padre = obj.id_dep_nivel;
-            console.log('obj: ', obj);
-            console.log('depa_padre: ', depa_padre);
-            var JefeDepaPadre = [];
-            if (depa_padre !== null) {
-                JefesDepartamentos.filter((item) => {
-                    JefeDepaPadre.push(item);
-                    permiso.EmpleadosSendNotiEmail = JefesDepartamentos;
-                });
-                return res.status(200).jsonp(permiso);
             }
             else {
                 permiso.EmpleadosSendNotiEmail = JefesDepartamentos;
@@ -231,43 +221,17 @@ class PermisosControlador {
             WHERE n.id_departamento = $1
                 AND da.id_departamento = n.id_dep_nivel
                 AND dae.id_cargo = da.id_empl_cargo
-                AND dae.id_contrato = c.id_empleado
-                AND cg.id = $1
+                AND dae.id = c.id_empleado
+                AND cg.id = n.id_departamento
             ORDER BY nivel ASC
             `, [depa_user_loggin]).then((result) => { return result.rows; });
-            if (JefesDepartamentos.length === 0)
+            if (JefesDepartamentos.length === 0) {
                 return res.status(400)
                     .jsonp({
                     message: `Ups!!! algo salio mal. 
-            Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.`
+                Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.`,
+                    permiso: permiso
                 });
-            const [obj] = JefesDepartamentos;
-            let depa_padre = obj.depa_padre;
-            let JefeDepaPadre;
-            if (depa_padre !== null) {
-                do {
-                    JefeDepaPadre = yield database_1.default.query(`
-                    SELECT da.id AS id_depa_auto, n.id_departamento, n.departamento, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel, 
-                        n.id_establecimiento AS id_sucursal, s.nombre AS sucursal, 
-                        dae.id_cargo AS cargo, dae.id_contrato AS contrato, dae.id AS empleado, 
-                        (dae.nombre || ' ' || dae.apellido) as fullname, dae.cedula, dae.correo, 
-                        c.permiso_mail, c.permiso_noti 
-                    FROM depa_autorizaciones AS da, 
-                        nivel_jerarquicodep AS n, sucursales AS s, 
-                        datos_actuales_empleado AS dae, config_noti AS c, cg_departamentos AS cg 
-                    WHERE n.id_departamento = 9 
-                        AND cg.id = n.id_departamento 
-                        AND n.nivel = cg.nivel
-                        AND da.id_departamento = n.id_dep_nivel 
-                        AND s.id = n.id_establecimiento  
-                        AND dae.id = da.id_empleado 
-                        AND c.id_empleado = da.id_empleado
-                    `, [depa_padre]);
-                    depa_padre = JefeDepaPadre.rows[0].depa_padre;
-                    JefesDepartamentos.push(JefeDepaPadre.rows[0]);
-                } while (depa_padre !== null);
-                permiso.EmpleadosSendNotiEmail = JefesDepartamentos;
-                return res.status(200).jsonp(permiso);
             }
             else {
                 permiso.EmpleadosSendNotiEmail = JefesDepartamentos;

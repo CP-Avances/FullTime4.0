@@ -72,11 +72,7 @@ const enviarMail = function (servidor, puerto) {
         seguridad = false;
     }
     const transporter = nodemailer_1.default.createTransport({
-        pool: true,
-        maxConnections: 2,
-        maxMessages: Infinity,
-        //rateLimit: 14, // 14 emails/second max
-        //rateDelta: 1000,
+        //pool: true,
         host: servidor,
         port: puerto,
         secure: seguridad,

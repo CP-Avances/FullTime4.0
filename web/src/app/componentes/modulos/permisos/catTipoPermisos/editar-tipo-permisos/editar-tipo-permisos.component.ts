@@ -292,8 +292,8 @@ export class EditarTipoPermisosComponent implements OnInit {
 
 
   // METODO PARA VERIFICAR QUE NO ESTE VACIO EL CAMPO FECHA
-  VerificarIngresoFecha(form2: any, datos: any) {
-    if (form2.fecValidarForm === 'true') {
+  VerificarIngresoFecha(datos: any) {
+    if (this.calendario === true) {
       if (this.rango.value.start === '' || this.rango.value.end === '') {
         this.toastr.info('Ingresar fecha en la que no podrá solicitar permisos.', 'Verificar Fecha.', {
           timeOut: 6000,
@@ -330,7 +330,7 @@ export class EditarTipoPermisosComponent implements OnInit {
       // FORMULARIO DOS
       documento: form2.documentoForm,
       legalizar: form2.legalizarForm,
-      fec_validar: form2.fecValidarForm,
+      fec_validar: this.calendario,
       almu_incluir: form2.almuIncluirForm,
       contar_feriados: form2.feriadosForm,
       num_dia_justifica: form2.numDiaJustificaForm,
@@ -348,8 +348,10 @@ export class EditarTipoPermisosComponent implements OnInit {
       correo_legalizar: form3.correo_legalizarForm,
     }
 
+    console.log('ver data a registrar ', permiso)
+
     if (this.tipoPermiso.descripcion.toUpperCase() === permiso.descripcion.toUpperCase()) {
-      this.VerificarIngresoFecha(form2, permiso);
+      this.VerificarIngresoFecha(permiso);
     }
     else {
       this.permisos.forEach(obj => {
@@ -358,7 +360,7 @@ export class EditarTipoPermisosComponent implements OnInit {
         }
       })
       if (this.contador === 0) {
-        this.VerificarIngresoFecha(form2, permiso);
+        this.VerificarIngresoFecha(permiso);
       }
       else {
         this.toastr.warning('Tipo de permiso ya se encuentra registrado.', 'Ups!!! algo salio mal.', {

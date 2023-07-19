@@ -121,10 +121,10 @@ class PlanGeneralControlador {
             try {
                 const { fecha_inicio, fecha_final, codigo } = req.body;
                 const HORARIO = yield database_1.default.query(`
-                SELECT DISTINCT (fec_horario), tipo_dia
-                FROM plan_general 
-                WHERE codigo::varchar = $3 AND fec_horario BETWEEN $1 AND $2
-                ORDER BY fec_horario ASC
+                SELECT DISTINCT (pg.fec_horario), pg.tipo_dia, c.hora_trabaja
+                FROM plan_general AS pg, empl_cargos AS c
+                WHERE pg.codigo::varchar = $3 AND c.id = pg.id_empl_cargo AND pg.fec_horario BETWEEN $1 AND $2
+                ORDER BY pg.fec_horario ASC
                 `, [fecha_inicio, fecha_final, codigo]);
                 if (HORARIO.rowCount > 0) {
                     return res.jsonp(HORARIO.rows);
