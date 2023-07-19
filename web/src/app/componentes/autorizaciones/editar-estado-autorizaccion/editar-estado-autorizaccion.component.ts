@@ -432,25 +432,24 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
       h_fin = '';
     }
 
-    let notificacion = {
-      id_receives_empl: '',
-      id_receives_depa: '',
-      id_vacaciones: null,
-      id_hora_extra: null,
-      id_send_empl: this.idEmpleadoIngresa,
-      id_permiso: permiso.id,
-      estado: estado_p,
-      tipo: 2,
-      mensaje: 'Ha ' + estado_p.toLowerCase() + ' la solicitud de permiso para ' +
-        this.solInfo.fullname + ' desde ' +
-        desde + ' ' + h_inicio + ' hasta ' +
-        hasta + ' ' + h_fin,
-    }
-
     //ForEach para enviar la notificacion a cada usuario dentro de la nueva lista filtrada
     permiso.EmpleadosSendNotiEmail.forEach(e => {
-      notificacion.id_receives_depa = e.id_dep;
-      notificacion.id_receives_empl = e.empleado;
+
+      let notificacion = {
+        id_receives_depa: e.id_dep,
+        id_receives_empl: e.empleado,
+        id_vacaciones: null,
+        id_hora_extra: null,
+        id_send_empl: this.idEmpleadoIngresa,
+        id_permiso: permiso.id,
+        estado: estado_p,
+        tipo: 2,
+        mensaje: 'Ha ' + estado_p.toLowerCase() + ' la solicitud de permiso para ' +
+          this.solInfo.fullname + ' desde ' +
+          desde + ' ' + h_inicio + ' hasta ' +
+          hasta + ' ' + h_fin,
+      }
+
       if (e.permiso_noti) {
         this.realTime.IngresarNotificacionEmpleado(notificacion).subscribe(
           resp => {
