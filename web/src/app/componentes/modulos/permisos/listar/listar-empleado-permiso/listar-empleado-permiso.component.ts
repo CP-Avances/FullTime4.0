@@ -506,6 +506,8 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
         }
         this.listaPermisosAutorizadosFiltrados.sort((a, b) => b.id - a.id);
 
+        console.log('listaPermisosAutorizadosFiltrados: ',this.listaPermisosAutorizadosFiltrados);
+
         if (this.listaPermisosAutorizadosFiltrados.length != 0) {
           this.lista_autorizados = true;
         }

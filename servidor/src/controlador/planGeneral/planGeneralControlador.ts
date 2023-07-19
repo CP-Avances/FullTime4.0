@@ -185,7 +185,7 @@ class PlanGeneralControlador {
                 "EXTRACT('day' FROM fec_horario) AS dia, " +
                 "CASE WHEN (tipo_dia = 'L' OR tipo_dia = 'FD') THEN tipo_dia ELSE horario.codigo END AS codigo_dia " +
                 "FROM plan_general p_g " +
-                "INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
+                "INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN ("+codigo+") " +
                 "INNER JOIN cg_horarios horario ON horario.id = p_g.id_horario " +
                 "WHERE fec_horario BETWEEN $1 AND $2 " +
                 "GROUP BY codigo_e, nombre_e, anio, mes, dia, codigo_dia, p_g.id_horario " +
