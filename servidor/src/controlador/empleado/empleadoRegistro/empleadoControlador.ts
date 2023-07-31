@@ -1,12 +1,29 @@
-// SECCIÓN LIBRERIAS
-import { EstadoHorarioPeriVacacion } from '../../../libs/MetodosHorario'
+// SECCION LIBRERIAS
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import { Md5 } from 'ts-md5';
 import excel from 'xlsx';
 import pool from '../../../database';
+import path from 'path';
 import fs from 'fs';
 const builder = require('xmlbuilder');
+
+const ObtenerRuta = function (codigo: any, cedula: any) {
+  var ruta = '';
+  let separador = path.sep;
+  for (var i = 0; i < __dirname.split(separador).length - 4; i++) {
+    if (ruta === '') {
+      ruta = __dirname.split(separador)[i];
+    }
+    else {
+      ruta = ruta + separador + __dirname.split(separador)[i];
+    }
+  }
+  return ruta + separador + 'permisos' + separador + codigo + '_' + cedula;
+}
+
+
+
 
 class EmpleadoControlador {
 
@@ -100,10 +117,21 @@ class EmpleadoControlador {
       const [empleado] = response.rows;
 
       if (empleado) {
-        return res.status(200).jsonp(empleado)
+
+        // RUTA DE LA CARPETA PRINCIPAL PERMISOS
+        const nuevaCarpeta = ObtenerRuta(codigo, cedula);
+
+        // METODO MKDIR PARA CREAR LA CARPETA
+        fs.mkdir(nuevaCarpeta, { recursive: true }, (err: any) => {
+          if (err) {
+            console.error('Error al crear la carpeta:', err);
+          } else {
+            return res.status(200).jsonp(empleado)
+          }
+        });
       }
       else {
-        return res.status(404).jsonp({ message: 'Empleado guardado.' })
+        return res.status(404).jsonp({ message: 'error' })
       }
     }
     catch (error) {
@@ -127,7 +155,24 @@ class EmpleadoControlador {
         , [id, cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
           domicilio, telefono, id_nacionalidad, codigo]);
 
-      res.jsonp({ message: 'Empleado Actualizado' });
+      // RUTA DE LA CARPETA PERMISOS DEL USUARIO
+      const carpeta = ObtenerRuta(codigo, cedula);
+
+      // VERIFICACION DE EXISTENCIA CARPETA DE USUARIO
+      fs.access(carpeta, fs.constants.F_OK, (err) => {
+        if (err) {
+          // METODO MKDIR PARA CREAR LA CARPETA
+          fs.mkdir(carpeta, { recursive: true }, (err: any) => {
+            if (err) {
+              res.jsonp({ message: 'Ups!!! no fue posible crear el directorio del usuario.' });
+            } else {
+              res.jsonp({ message: 'Registro actualizado.' });
+            }
+          });
+        } else {
+          res.jsonp({ message: 'Registro actualizado.' });
+        }
+      });
     }
     catch (error) {
       return res.jsonp({ message: 'error' });
@@ -551,7 +596,7 @@ class EmpleadoControlador {
     try {
       await pool.query('UPDATE ubicacion SET t_latitud = $1, t_longitud = $2, h_latitud = $3, ' +
         'h_longitud = $4 WHERE id_empl = $5', [t_lat, t_lng, h_lat, h_lng, id])
-        .then((result: any ) => {
+        .then((result: any) => {
           console.log(result);
         })
 
@@ -1098,7 +1143,7 @@ class EmpleadoControlador {
         'fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo) VALUES ' +
         '($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)', [cedula, apellidoE, nombreE,
         id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
-         domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo]);
+        domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo]);
 
       // Obtener el id del empleado ingresado
       const oneEmpley = await pool.query('SELECT id FROM empleados WHERE cedula = $1', [cedula]);

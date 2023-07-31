@@ -107,7 +107,7 @@ export class CancelarPermisoComponent implements OnInit {
 
   AceptarAdvertencia() {
     var correo = 0;
-    this.restP.EliminarPermiso(this.data.info.id, this.data.info.documento).subscribe(res => {
+    this.restP.EliminarPermiso(this.data.info.id, this.data.info.documento, this.data.info.codigo).subscribe(res => {
       console.log(res);
 
       // VALIDAR ENVIO DE CORREO SEGUN CONFIGURACION

@@ -530,11 +530,12 @@ export class HorariosMultiplesComponent implements OnInit {
     }
     this.feriado.ListarFeriadosCiudad(datos).subscribe(data => {
       this.feriados = data;
+      // METODO DE BUSQUEDA DE FECHAS DE RECUPERACION
+      this.BuscarFeriadosRecuperar(form, valor, validos);
+    }, vacio => {
+      // METODO DE BUSQUEDA DE FECHAS DE RECUPERACION
+      this.BuscarFeriadosRecuperar(form, valor, validos);
     })
-
-    // METODO DE BUSQUEDA DE FECHAS DE RECUPERACION
-    this.BuscarFeriadosRecuperar(form, valor, validos);
-
   }
 
   // METODO PARA BUSCAR FECHAS DE RECUPERACION DE FERIADOS
@@ -548,10 +549,12 @@ export class HorariosMultiplesComponent implements OnInit {
     }
     this.feriado.ListarFeriadosRecuperarCiudad(datos).subscribe(data => {
       this.recuperar = data;
+      // METODO PARA CREAR PLANIFICACION GENERAL
+      this.CrearPlanGeneral(form, valor, validos);
+    }, vacio => {
+      // METODO PARA CREAR PLANIFICACION GENERAL
+      this.CrearPlanGeneral(form, valor, validos);
     })
-
-    // METODO PARA CREAR PLANIFICACION GENERAL
-    this.CrearPlanGeneral(form, valor, validos);
   }
 
   // METODO PARA INGRESAR PLANIFICACION GENERAL
@@ -574,53 +577,62 @@ export class HorariosMultiplesComponent implements OnInit {
     }
 
     var tipo: any = null;
+    var origen: string = '';
     var tipo_dia: string = '';
     this.fechasHorario.map(obj => {
 
       // DEFINICION DE TIPO DE DIA SEGUN HORARIO
       tipo_dia = 'N';
+      origen = 'N';
       tipo = null;
       var day = moment(obj).day();
       if (moment.weekdays(day) === 'lunes') {
         if (form.lunesForm === true) {
           tipo = 'L';
           tipo_dia = 'L';
+          origen = 'L';
         }
       }
       if (moment.weekdays(day) === 'martes') {
         if (form.martesForm === true) {
           tipo = 'L';
           tipo_dia = 'L';
+          origen = 'L';
         }
       }
       if (moment.weekdays(day) === 'miércoles') {
         if (form.miercolesForm === true) {
           tipo = 'L';
           tipo_dia = 'L';
+          origen = 'L';
         }
       }
       if (moment.weekdays(day) === 'jueves') {
         if (form.juevesForm === true) {
           tipo = 'L';
           tipo_dia = 'L';
+          origen = 'L';
         }
       }
       if (moment.weekdays(day) === 'viernes') {
         if (form.viernesForm === true) {
           tipo = 'L';
           tipo_dia = 'L';
+          origen = 'L';
         }
       }
       if (moment.weekdays(day) === 'sábado') {
         if (form.sabadoForm === true) {
           tipo = 'L';
           tipo_dia = 'L';
+          origen = 'L';
         }
       }
       if (moment.weekdays(day) === 'domingo') {
         if (form.domingoForm === true) {
           tipo = 'L';
           tipo_dia = 'L';
+          origen = 'L';
         }
       }
       // BUSCAR FERIADOS 
@@ -638,7 +650,8 @@ export class HorariosMultiplesComponent implements OnInit {
       if (this.recuperar.length != 0) {
         for (let j = 0; j < this.recuperar.length; j++) {
           if (moment(this.recuperar[j].fec_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
-            tipo = 'N';
+            tipo = 'REC';
+            tipo_dia = 'REC';
             break;
           }
         }
@@ -669,6 +682,7 @@ export class HorariosMultiplesComponent implements OnInit {
             id_horario: form.horarioForm,
             min_despues: element.min_despues,
             fec_horario: obj,
+            estado_origen: origen,
             estado_timbre: tipo,
             id_empl_cargo: dh.id_cargo,
             id_det_horario: element.id,
@@ -695,6 +709,7 @@ export class HorariosMultiplesComponent implements OnInit {
           id_horario: form.horarioForm,
           min_despues: 0,
           fec_horario: obj,
+          estado_origen: origen,
           estado_timbre: tipo,
           id_empl_cargo: dh.id_cargo,
           id_det_horario: null,

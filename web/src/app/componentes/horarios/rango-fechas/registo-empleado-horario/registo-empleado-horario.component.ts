@@ -419,58 +419,68 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     }
 
     var tipo: any = null;
+    var origen: string = '';
     var tipo_dia: string = '';
     this.fechasHorario.map(obj => {
       // DEFINICION DE TIPO DE DIA SEGUN HORARIO
       tipo_dia = 'N';
+      origen = 'N';
       tipo = null;
       var day = moment(obj).day();
       if (moment.weekdays(day) === 'lunes') {
         if (form.lunesForm === true) {
           tipo = 'L';
           tipo_dia = 'L';
+          origen = 'L';
         }
       }
       if (moment.weekdays(day) === 'martes') {
         if (form.martesForm === true) {
           tipo = 'L';
           tipo_dia = 'L';
+          origen = 'L';
         }
       }
       if (moment.weekdays(day) === 'miércoles') {
         if (form.miercolesForm === true) {
           tipo = 'L';
           tipo_dia = 'L';
+          origen = 'L';
         }
       }
       if (moment.weekdays(day) === 'jueves') {
         if (form.juevesForm === true) {
           tipo = 'L';
           tipo_dia = 'L';
+          origen = 'L';
         }
       }
       if (moment.weekdays(day) === 'viernes') {
         if (form.viernesForm === true) {
           tipo = 'L';
           tipo_dia = 'L';
+          origen = 'L';
         }
       }
       if (moment.weekdays(day) === 'sábado') {
         if (form.sabadoForm === true) {
           tipo = 'L';
           tipo_dia = 'L';
+          origen = 'L';
         }
       }
       if (moment.weekdays(day) === 'domingo') {
         if (form.domingoForm === true) {
           tipo = 'L';
           tipo_dia = 'L';
+          origen = 'L';
         }
       }
 
+      console.log('ingresa feriados ', this.feriados)
+      
       // BUSCAR FERIADOS 
       if (this.feriados.length != 0) {
-        console.log('ingresa feriados ', this.feriados)
         for (let i = 0; i < this.feriados.length; i++) {
           console.log('fecha feriados ', moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
           console.log('obj ', obj)
@@ -486,7 +496,8 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
       if (this.recuperar.length != 0) {
         for (let j = 0; j < this.recuperar.length; j++) {
           if (moment(this.recuperar[j].fec_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
-            tipo_dia = 'N';
+            tipo = 'REC';
+            tipo_dia = 'REC';
             break;
           }
         }
@@ -519,6 +530,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
             id_horario: form.horarioForm,
             min_despues: element.min_despues,
             fec_horario: obj,
+            estado_origen: origen,
             estado_timbre: tipo,
             id_empl_cargo: this.data_horario.idCargo,
             id_det_horario: element.id,
@@ -545,6 +557,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
           id_horario: form.horarioForm,
           min_despues: 0,
           fec_horario: obj,
+          estado_origen: origen,
           estado_timbre: tipo,
           id_empl_cargo: this.data_horario.idCargo,
           id_det_horario: null,

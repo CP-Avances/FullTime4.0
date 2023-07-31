@@ -135,13 +135,13 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
 
   info: any = [];
   ngOnInit(): void {
-    if(this.solicita_permiso == undefined){
+    if (this.solicita_permiso == undefined) {
       this.info = this.data.dataPermiso;
-    }else{
+    } else {
       this.info = this.solicita_permiso;
     }
 
-    if(this.id_empleado == undefined){
+    if (this.id_empleado == undefined) {
       this.id_empleado = this.data.id_empleado;
     }
 
@@ -1375,8 +1375,8 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     var total_libres = 0;
     var total_laborables = 0;
 
-    console.log('this.contar_laborables: ',this.contar_laborables);
-    console.log('this.contar_recuperables: ',this.contar_recuperables);
+    console.log('this.contar_laborables: ', this.contar_laborables);
+    console.log('this.contar_recuperables: ', this.contar_recuperables);
 
     if (this.datosPermiso.contar_feriados === true) {
       total_laborables = this.contar_laborables + this.contar_feriados;
@@ -1517,12 +1517,12 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
   }
 
   // CARGAR DOCUMENTO
-  SubirRespaldo(id: number, form: any) {
+  SubirRespaldo(id: number, codigo: any) {
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
-      formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    this.restP.SubirArchivoRespaldo(formData, id, form.nombreCertificadoForm, this.info.documento).subscribe(res => {
+    this.restP.SubirArchivoRespaldo(formData, id, codigo, this.info.documento).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Documento registrado.', {
         timeOut: 6000,
       });
@@ -1570,7 +1570,8 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
   EliminarDocumentoBDD() {
     let datos = {
       archivo: this.info.documento,
-      id: this.info.id
+      id: this.info.id,
+      codigo: this.empleado.codigo,
     }
     this.restP.EliminarDocumentoPermiso(datos).subscribe(res => {
     });

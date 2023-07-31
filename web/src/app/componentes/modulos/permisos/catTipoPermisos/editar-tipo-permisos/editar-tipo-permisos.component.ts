@@ -93,6 +93,7 @@ export class EditarTipoPermisosComponent implements OnInit {
       numDiaMaximoForm: [''],
       numHoraMaximoForm: [''],
       numDiaIngresoForm: ['', Validators.required],
+      numDiasAtrasForm: ['', Validators.required],
       tipoDescuentoForm: ['', Validators.required],
     });
     this.segundoFormGroup = this._formBuilder.group({
@@ -152,7 +153,8 @@ export class EditarTipoPermisosComponent implements OnInit {
     // PRIMER FORMULARIO
     this.primeroFormGroup.patchValue({
       descripcionForm: this.tipoPermiso.descripcion,
-      numDiaIngresoForm: this.tipoPermiso.num_dia_ingreso,
+      numDiaIngresoForm: this.tipoPermiso.num_dia_anticipo,
+      numDiasAtrasForm: this.tipoPermiso.num_dia_anterior,
       numDiaMaximoForm: this.tipoPermiso.num_dia_maximo,
       numHoraMaximoForm: this.tipoPermiso.num_hora_maximo,
       tipoDescuentoForm: this.tipoPermiso.tipo_descuento,
@@ -324,7 +326,8 @@ export class EditarTipoPermisosComponent implements OnInit {
       acce_empleado: form1.acceEmpleadoForm,
       num_dia_maximo: form1.numDiaMaximoForm,
       tipo_descuento: form1.tipoDescuentoForm,
-      num_dia_ingreso: form1.numDiaIngresoForm,
+      num_dia_anticipo: form1.numDiaIngresoForm,
+      num_dia_anterior: form1.numDiasAtrasForm,
       num_hora_maximo: form1.numHoraMaximoForm,
 
       // FORMULARIO DOS

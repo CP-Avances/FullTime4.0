@@ -41,6 +41,16 @@
                                     help_outline
                                 </mat-icon>
                             </mat-form-field>
+                            <br>
+                            <mat-form-field>
+                                <mat-label id="fuente">Días posteriores (años anteriores)</mat-label>
+                                <input matInput placeholder="Ej: 2" (keypress)="IngresarSoloNumeros($event)"
+                                    formControlName="numDiasAtrasForm" required>
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                    matTooltip="Ingresar número de días posteriores a la fecha actual en la que se podrá cargar solicitudes.">
+                                    help_outline
+                                </mat-icon>
+                            </mat-form-field>
                         </div>
                         <div class="col">
                             <mat-form-field>

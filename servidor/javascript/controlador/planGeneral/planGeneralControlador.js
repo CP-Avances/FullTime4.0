@@ -29,12 +29,12 @@ class PlanGeneralControlador {
                 database_1.default.query(`
                 INSERT INTO plan_general (fec_hora_horario, tolerancia, estado_timbre, id_det_horario,
                     fec_horario, id_empl_cargo, tipo_entr_salida, codigo, id_horario, tipo_dia, salida_otro_dia,
-                    min_antes, min_despues) 
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *
+                    min_antes, min_despues, estado_origen) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
                 `, [req.body[i].fec_hora_horario, req.body[i].tolerancia, req.body[i].estado_timbre,
                     req.body[i].id_det_horario, req.body[i].fec_horario, req.body[i].id_empl_cargo,
                     req.body[i].tipo_entr_salida, req.body[i].codigo, req.body[i].id_horario, req.body[i].tipo_dia,
-                    req.body[i].salida_otro_dia, req.body[i].min_antes, req.body[i].min_despues], (error) => {
+                    req.body[i].salida_otro_dia, req.body[i].min_antes, req.body[i].min_despues, req.body[i].estado_origen], (error) => {
                     iterar = iterar + 1;
                     try {
                         if (error) {
@@ -119,13 +119,16 @@ class PlanGeneralControlador {
     BuscarHorarioFechas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { fecha_inicio, fecha_final, codigo } = req.body;
+                const { codigo, lista_fechas } = req.body;
                 const HORARIO = yield database_1.default.query(`
-                SELECT DISTINCT (pg.fec_horario), pg.tipo_dia, c.hora_trabaja
-                FROM plan_general AS pg, empl_cargos AS c
-                WHERE pg.codigo::varchar = $3 AND c.id = pg.id_empl_cargo AND pg.fec_horario BETWEEN $1 AND $2
+                SELECT DISTINCT(pg.fec_horario), pg.tipo_dia, c.hora_trabaja, pg.tipo_entr_salida, pg.codigo,
+                pg.estado_origen 
+                FROM plan_general AS pg, empl_cargos AS c 
+                WHERE pg.fec_horario IN(${lista_fechas}) 
+                AND pg.codigo:: varchar = $1 AND c.id = pg.id_empl_cargo 
+                AND(pg.tipo_entr_salida = 'E' OR pg.tipo_entr_salida = 'S') 
                 ORDER BY pg.fec_horario ASC
-                `, [fecha_inicio, fecha_final, codigo]);
+                `, [codigo]);
                 if (HORARIO.rowCount > 0) {
                     return res.jsonp(HORARIO.rows);
                 }
@@ -178,7 +181,7 @@ class PlanGeneralControlador {
                     "FROM ( " +
                     "SELECT p_g.codigo AS codigo_e, CONCAT(empleado.apellido, ' ', empleado.nombre) AS nombre_e, EXTRACT('year' FROM fec_horario) AS anio, EXTRACT('month' FROM fec_horario) AS mes, " +
                     "EXTRACT('day' FROM fec_horario) AS dia, " +
-                    "CASE WHEN (tipo_dia = 'L' OR tipo_dia = 'FD') THEN tipo_dia ELSE horario.codigo END AS codigo_dia " +
+                    "CASE WHEN (tipo_dia = 'L' OR tipo_dia = 'FD' OR tipo_dia = 'REC') THEN tipo_dia ELSE horario.codigo END AS codigo_dia " +
                     "FROM plan_general p_g " +
                     "INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
                     "INNER JOIN cg_horarios horario ON horario.id = p_g.id_horario " +

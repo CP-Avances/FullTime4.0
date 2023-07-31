@@ -100,7 +100,7 @@ import { AuditoriaComponent } from './componentes/reportes/auditoria/auditoria.c
 import { SolicitudVacacionComponent } from './componentes/reportes/vacaciones/solicitud-vacacion/solicitud-vacacion.component';
 import { TimbreSistemaComponent } from './componentes/reportes/timbres/timbre-sistema/timbre-sistema.component';
 import { TimbreVirtualComponent } from './componentes/reportes/timbres/timbre-virtual/timbre-virtual.component';
-import { ListarParametroComponent } from './componentes/parametrosGenerales/listar-parametro/listar-parametro.component';
+import { ListarParametroComponent } from './componentes/administracionGeneral/parametrizacion/parametros/listar-parametro/listar-parametro.component';
 import { ListarCoordenadasComponent } from './componentes/modulos/geolocalizacion/listar-coordenadas/listar-coordenadas.component';
 import { ComunicadosComponent } from './componentes/administracionGeneral/comunicados/comunicados.component';
 import { VerBirthdayComponent } from './componentes/administracionGeneral/birthday/ver-birthday/ver-birthday.component';

@@ -111,6 +111,7 @@ export class TipoPermisosComponent implements OnInit {
       numDiaMaximoForm: [''],
       numHoraMaximoForm: [''],
       numDiaIngresoForm: ['', Validators.required],
+      numDiasAtrasForm: ['', Validators.required],
       tipoDescuentoForm: ['', Validators.required],
     });
     this.segundoFormGroup = this._formBuilder.group({
@@ -304,7 +305,8 @@ export class TipoPermisosComponent implements OnInit {
       acce_empleado: form1.acceEmpleadoForm,
       tipo_descuento: form1.tipoDescuentoForm,
       num_dia_maximo: form1.numDiaMaximoForm,
-      num_dia_ingreso: form1.numDiaIngresoForm,
+      num_dia_anticipo: form1.numDiaIngresoForm,
+      num_dia_anterior: form1.numDiasAtrasForm,
       num_hora_maximo: form1.numHoraMaximoForm,
 
       // FORMULARIO DOS

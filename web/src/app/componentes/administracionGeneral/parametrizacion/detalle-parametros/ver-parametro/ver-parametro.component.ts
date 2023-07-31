@@ -4,16 +4,15 @@ import { MatRadioChange } from '@angular/material/radio';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { Router } from '@angular/router';
 
 // SECCIÓN DE SERVICIOS
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
-import { EditarParametroComponent } from '../editar-parametro/editar-parametro.component';
+import { EditarParametroComponent } from '../../parametros/editar-parametro/editar-parametro.component';
+import { ListarParametroComponent } from '../../parametros/listar-parametro/listar-parametro.component';
 import { CrearDetalleParametroComponent } from '../crear-detalle-parametro/crear-detalle-parametro.component';
 import { EditarDetalleParametroComponent } from '../editar-detalle-parametro/editar-detalle-parametro.component';
-import { ListarParametroComponent } from '../listar-parametro/listar-parametro.component';
 
 @Component({
   selector: 'app-ver-parametro',
@@ -54,9 +53,8 @@ export class VerParametroComponent implements OnInit {
 
   constructor(
     private toastr: ToastrService,
-    public parametro: ParametrosService,
     public ventana: MatDialog,
-    public router: Router,
+    public parametro: ParametrosService,
     public componentel: ListarParametroComponent,
   ) { }
 

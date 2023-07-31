@@ -220,12 +220,12 @@ import { RecuperarFraseComponent } from './componentes/administracionGeneral/fra
 
 import { OlvidarFraseComponent } from './componentes/administracionGeneral/frase-seguridad/olvidar-frase/olvidar-frase.component';
 import { TipoVacunaComponent } from './componentes/empleado/vacunacion/tipo-vacuna/tipo-vacuna.component';
-import { CrearParametroComponent } from './componentes/parametrosGenerales/crear-parametro/crear-parametro.component';
-import { ListarParametroComponent } from './componentes/parametrosGenerales/listar-parametro/listar-parametro.component';
-import { EditarParametroComponent } from './componentes/parametrosGenerales/editar-parametro/editar-parametro.component';
-import { VerParametroComponent } from './componentes/parametrosGenerales/ver-parametro/ver-parametro.component';
-import { CrearDetalleParametroComponent } from './componentes/parametrosGenerales/crear-detalle-parametro/crear-detalle-parametro.component';
-import { EditarDetalleParametroComponent } from './componentes/parametrosGenerales/editar-detalle-parametro/editar-detalle-parametro.component';
+import { CrearParametroComponent } from './componentes/administracionGeneral/parametrizacion/parametros/crear-parametro/crear-parametro.component';
+import { ListarParametroComponent } from './componentes/administracionGeneral/parametrizacion/parametros/listar-parametro/listar-parametro.component';
+import { EditarParametroComponent } from './componentes/administracionGeneral/parametrizacion/parametros/editar-parametro/editar-parametro.component';
+import { VerParametroComponent } from './componentes/administracionGeneral/parametrizacion/detalle-parametros/ver-parametro/ver-parametro.component';
+import { CrearDetalleParametroComponent } from './componentes/administracionGeneral/parametrizacion/detalle-parametros/crear-detalle-parametro/crear-detalle-parametro.component';
+import { EditarDetalleParametroComponent } from './componentes/administracionGeneral/parametrizacion/detalle-parametros/editar-detalle-parametro/editar-detalle-parametro.component';
 import { CrearCoordenadasComponent } from './componentes/modulos/geolocalizacion/crear-coordenadas/crear-coordenadas.component';
 import { ListarCoordenadasComponent } from './componentes/modulos/geolocalizacion/listar-coordenadas/listar-coordenadas.component';
 import { EditarCoordenadasComponent } from './componentes/modulos/geolocalizacion/editar-coordenadas/editar-coordenadas.component';

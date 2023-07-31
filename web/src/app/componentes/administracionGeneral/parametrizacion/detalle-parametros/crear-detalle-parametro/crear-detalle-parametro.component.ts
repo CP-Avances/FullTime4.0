@@ -3,7 +3,6 @@ import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { Router } from '@angular/router';
 
 // SECCIÓN SERVICIOS
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
@@ -27,26 +26,28 @@ export class CrearDetalleParametroComponent implements OnInit {
   constructor(
     private rest: ParametrosService,
     private toastr: ToastrService,
-    private router: Router,
     public ventana: MatDialogRef<CrearDetalleParametroComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
   nota: string = '';
-
+  especificacion: string = '';
   ngOnInit(): void {
 
     if (this.data.parametros.id === 22) {
       this.nota = 'NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón ' +
-        'Guardar. Rango de perímetro en metros.'
+        'Guardar.'
+      this.especificacion = 'Rango de perímetro en metros.';
     }
     else if (this.data.parametros.id === 24) {
       this.nota = 'NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón ' +
-        'Guardar. Ingrese el número máximo de correos permitidos.'
+        'Guardar.'
+      this.especificacion = 'Ingrese el número máximo de correos permitidos.';
     }
     else {
       this.nota = 'NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón ' +
         'Guardar.'
+        this.especificacion = '';
     }
   }
 

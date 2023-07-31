@@ -746,9 +746,11 @@ class DatosGeneralesControlador {
 
     // METODO PARA BUSCAR INFORMACION DE CONFIGURACIONES DE PERMISOS
     public async BuscarConfigEmpleado(req: Request, res: Response): Promise<Response> {
+
         try {
 
             const { id_empleado } = req.params;
+            console.log('***************', id_empleado)
 
             const response: QueryResult = await pool.query(
                 `

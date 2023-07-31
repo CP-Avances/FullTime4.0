@@ -20,7 +20,8 @@
                     <span>
                         <b>INFORMACIÓN DEL PERMISO:</b> &nbsp;&nbsp; <i>{{informacion1}}</i> &nbsp;&nbsp;
                         <i>{{informacion2}}</i> <br>
-                        <i>{{informacion3}}</i>
+                        <i>{{informacion4}}</i> <br>
+                        <i>{{informacion3}}</i> <br>
                     </span>
                 </div>
                 <div>
@@ -45,7 +46,7 @@
                                 <mat-form-field style="width: 200px;">
                                     <mat-label>Solicitud por:</mat-label>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Indicar si va a realizar una solicitud de permiso por días o una soliictud de permiso por horas.">
+                                        matTooltip="Indicar si va a realizar una solicitud de permiso por días o una solicitud de permiso por horas.">
                                         help_outline
                                     </mat-icon>
                                     <mat-select [formControl]="solicitarF" required>
@@ -118,7 +119,7 @@
                                 style="position: relative; left: 10px; padding-top: 20px;">
                                 <mat-checkbox disabled labelPosition="before" [checked]="legalizado" matSuffix
                                     matTooltipPosition="right"
-                                    matTooltip="De acuerdo a la configuración del tipo de permiso se indicará si la solitud deberá ser o no legalizada.">
+                                    matTooltip="De acuerdo a la configuración del tipo de permiso se indicará si la solicitud deberá ser o no legalizada.">
                                     <span id="color_fuente">Legalizado</span>
                                 </mat-checkbox>
                             </div>

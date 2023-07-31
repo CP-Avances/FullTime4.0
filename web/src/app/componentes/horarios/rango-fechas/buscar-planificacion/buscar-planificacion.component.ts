@@ -375,9 +375,10 @@ export class BuscarPlanificacionComponent {
   nomenclatura = [
     { nombre: 'L', descripcion: 'LIBRE' },
     { nombre: 'FD', descripcion: 'FERIADO' },
+    { nombre: 'REC', descripcion: 'RECUPERACIÓN' },
     { nombre: 'P', descripcion: 'PERMISO' },
     { nombre: 'V', descripcion: 'VACACION' },
-    { nombre: '-', descripcion: 'SIN PLANIFICACION' }
+    { nombre: '-', descripcion: 'SIN PLANIFICACIÓN' }
   ]
 
   // OCULTAR DETALLE DE HORARIOS

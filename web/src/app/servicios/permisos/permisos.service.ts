@@ -69,9 +69,17 @@ export class PermisosService {
   }
 
   // SUBIR RESPALDOS DE PERMISOS
-  SubirArchivoRespaldo(formData: any, id: number, documento: string, archivo: any) {
-    return this.http.put(`${environment.url}/empleadoPermiso/${id}/documento/${documento}/archivo/${archivo}`, formData)
+  SubirArchivoRespaldo(formData: any, id: number, codigo: any, archivo: any) {
+    return this.http.put(`${environment.url}/empleadoPermiso/${id}/archivo/${archivo}/validar/${codigo}`, formData)
   }
+
+
+
+
+
+
+
+
 
   // METODO DE BUSQUEDA DE PERMISOS POR ID DE EMPLEADO
   BuscarPermisoEmpleado(id_empleado: any) {
@@ -84,8 +92,8 @@ export class PermisosService {
   }
 
   // METODO PARA ELIMINAR PERMISOS
-  EliminarPermiso(id_permiso: number, doc: string) {
-    return this.http.delete<any>(`${environment.url}/empleadoPermiso/eliminar/${id_permiso}/${doc}`);
+  EliminarPermiso(id_permiso: number, doc: string, codigo: number) {
+    return this.http.delete<any>(`${environment.url}/empleadoPermiso/eliminar/${id_permiso}/${doc}/verificar/${codigo}`);
   }
 
   // METODO PARA CREAR ARCHIVO XML

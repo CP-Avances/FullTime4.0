@@ -664,6 +664,7 @@ class DatosGeneralesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { id_empleado } = req.params;
+                console.log('***************', id_empleado);
                 const response = yield database_1.default.query(`
                 SELECT da.id_departamento,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, 
                     da.cedula, da.correo, CAST (da.codigo AS INTEGER), da.estado, da.id_sucursal, 
