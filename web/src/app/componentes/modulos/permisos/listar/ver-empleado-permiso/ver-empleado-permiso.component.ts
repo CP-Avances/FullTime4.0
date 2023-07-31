@@ -241,6 +241,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
       this.cont = autorizaciones.length - 1;
 
     }, error => {
+      this.ocultar = false;
       this.HabilitarAutorizacion = false;
     });
   
