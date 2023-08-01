@@ -1124,7 +1124,9 @@
                     </div>
                     <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
                         <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                            (click)="AbrirVentanaPermiso()">{{btnTitulo}}</button>
+                            (click)="AbrirVentanaPermiso()">
+                            {{btnTitulo}}
+                        </button>
                     </div>
                 </div>
                 <div class="d-flex justify-content-center" style="padding-top: 10px; padding-bottom: 10px;">
@@ -1204,7 +1206,8 @@
                                     <label id="datosF">Horas permiso:</label>
                                     <label>{{pt.hora_numero}}</label>
                                 </div>
-                                <div class="espacio d-flex justify-content-start" *ngIf="pt.documento != null">
+                                <div class="espacio d-flex justify-content-start"
+                                    *ngIf="pt.documento != null && pt.documento != ''">
                                     <label id="datosF">Documento:</label>
                                     <a matSuffix matTooltipPosition="right"
                                         matTooltip="Dar click para descargar contrato de trabajo"
