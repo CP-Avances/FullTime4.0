@@ -106,7 +106,10 @@ export class PermisosService {
     return this.http.post<any>(`${environment.url}/empleadoPermiso/mail-noti`, datos);
   }
 
-
+  // METODO PARA ENVIAR NOTIFICACION DE PERMISOS
+  EnviarCorreoWebMultiple(datos: any) {
+    return this.http.post<any>(`${environment.url}/empleadoPermiso/mail-noti/solicitud-multiple`, datos);
+  }
 
 
 

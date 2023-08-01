@@ -157,6 +157,9 @@ export class ButtonAvisosComponent implements OnInit {
       if (data.tipo === 2) {
         this.router.navigate(['/listaSolicitaComida']);
       }
+      if (data.tipo === 7) {
+        this.router.navigate(['/permisos-solicitados']);
+      }
       if (data.tipo === 20) {
         this.router.navigate(['/listaPlanComidas']);
       }

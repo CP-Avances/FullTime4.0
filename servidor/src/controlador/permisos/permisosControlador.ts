@@ -204,7 +204,7 @@ class PermisosControlador {
             `
             SELECT n.id_departamento, cg.nombre, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel,
                 da.estado, dae.id_contrato, da.id_empl_cargo, (dae.nombre || ' ' || dae.apellido) as fullname,
-                dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti 
+                dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti, dae.id AS id_aprueba 
             FROM nivel_jerarquicodep AS n, depa_autorizaciones AS da, datos_actuales_empleado AS dae,
                 config_noti AS c, cg_departamentos AS cg
             WHERE n.id_departamento = $1
@@ -581,8 +581,11 @@ class PermisosControlador {
      ** *         METODO PARA ENVIO DE CORREO ELECTRONICO DE SOLICITUDES DE PERMISOS                * ** 
      ** ********************************************************************************************* **/
 
-    // METODO PARA ENVIAR CORREO ELECTRÓNICO DESDE APLICACIÓN WEB
+    // METODO PARA ENVIAR CORREO ELECTRONICO DESDE APLICACION WEB
     public async EnviarCorreoWebMultiple(req: Request, res: Response): Promise<void> {
+
+        const usuarios = req.body.usuarios;
+        var razon: string = '';
 
         var tiempo = fechaHora();
         var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
@@ -594,55 +597,75 @@ class PermisosControlador {
 
         if (datos === 'ok') {
 
-            const { id_empl_contrato, id_dep, correo, id_suc, desde, hasta, h_inicio, h_fin,
-                observacion, estado_p, solicitud, tipo_permiso, dias_permiso, horas_permiso,
-                solicitado_por, id, asunto, tipo_solicitud, proceso } = req.body;
+            const { correo, desde, hasta, h_inicio, h_fin, observacion, estado_p, solicitud, tipo_permiso,
+                asunto, tipo_solicitud, proceso, usuario_solicita, tipo } = req.body;
 
+            var tablaHTML = await generarTablaHTMLWeb(usuarios, tipo);
 
-            var url = `${process.env.URL_DOMAIN}/ver-permiso`;
+            if (observacion != '' && observacion != undefined) {
+                razon = observacion;
+            }
+            else {
+                razon = '...'
+            }
+
+            const solicita = await pool.query(
+                `
+                SELECT de.id, (de.nombre ||' '|| de.apellido) AS empleado, de.cedula, tc.cargo AS tipo_cargo, 
+                    d.nombre AS departamento     
+                FROM datos_actuales_empleado AS de, empl_cargos AS ec, tipo_cargo AS tc, 
+                    cg_departamentos AS d 
+                WHERE de.id = $1 AND d.id = de.id_departamento AND ec.id = de.id_cargo AND ec.cargo = tc.id
+                `
+                , [usuario_solicita]);
 
             let data = {
                 to: correo,
                 from: email,
                 subject: asunto,
-                html: `
-                        <body>
-                            <div style="text-align: center;">
-                                <img width="25%" height="25%" src="cid:cabeceraf"/>
-                            </div>
-                            <br>
-                            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                                El presente correo es para informar que se ha ${proceso} la siguiente solicitud de permiso: <br>  
-                            </p>
-                            <h3 style="font-family: Arial; text-align: center;">REGISTRO MULTIPLE DE PERMISO</h3>
-                            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                                <b>Empresa:</b> ${nombre} <br>   
-                                <b>Asunto:</b> ${asunto} <br> 
-                                <b>${tipo_solicitud}:</b> ${solicitado_por} <br><br>
-                                <b>Generado mediante:</b> Aplicación Web <br>
-                                <b>Fecha de envío:</b> ${fecha} <br> 
-                                <b>Hora de envío:</b> ${hora} <br><br> 
-                            </p>
-                            <h3 style="font-family: Arial; text-align: center;">INFORMACIÓN DE LA SOLICITUD</h3>
-                            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                                <b>Motivo:</b> ${tipo_permiso} <br>   
-                                <b>Fecha de Solicitud:</b> ${solicitud} <br> 
-                                <b>Desde:</b> ${desde} ${h_inicio} <br>
-                                <b>Hasta:</b> ${hasta} ${h_fin} <br>
-                                <b>Observación:</b> ${observacion} <br>
-                                <b>Días permiso:</b> ${dias_permiso} <br>
-                                <b>Horas permiso:</b> ${horas_permiso} <br>
-                                <b>Estado:</b> ${estado_p} <br><br>
-                                <a href="${url}/${id}">Dar clic en el siguiente enlace para revisar solicitud de permiso.</a> <br><br>
-                            </p>
-                            <h3 style="font-family: Arial; text-align: center;">INFORMACIÓN DE LA SOLICITUD</h3>
-                            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
-                                <b>Gracias por la atención</b><br>
-                                <b>Saludos cordiales,</b> <br><br>
-                            </p>
+                html:
+                    `
+                    <body>
+                        <div style="text-align: center;">
+                             <img width="25%" height="25%" src="cid:cabeceraf"/>
+                        </div>
+                        <br>
+                        <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                            El presente correo es para informar que se ha ${proceso} la siguiente solicitud de permiso: <br>  
+                        </p>
+                        <h3 style="font-family: Arial; text-align: center;">REGISTRO MULTIPLE DE PERMISO</h3>
+                        <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                            <b>Empresa:</b> ${nombre} <br>   
+                            <b>Asunto:</b> ${asunto} <br> 
+                            <b>${tipo_solicitud}:</b> ${solicita.rows[0].empleado} <br>
+                            <b>Número de Cédula:</b> ${solicita.rows[0].cedula} <br>
+                            <b>Cargo:</b> ${solicita.rows[0].tipo_cargo} <br>
+                            <b>Departamento:</b> ${solicita.rows[0].departamento} <br>
+                            <b>Generado mediante:</b> Aplicación Web <br>
+                            <b>Fecha de envío:</b> ${fecha} <br> 
+                            <b>Hora de envío:</b> ${hora} <br><br> 
+                        </p>
+                        <h3 style="font-family: Arial; text-align: center;">INFORMACIÓN DE LA SOLICITUD</h3>
+                        <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                            <b>Motivo:</b> ${tipo_permiso} <br>   
+                            <b>Fecha de Solicitud:</b> ${solicitud} <br> 
+                            <b>Desde:</b> ${desde} ${h_inicio} <br>
+                            <b>Hasta:</b> ${hasta} ${h_fin} <br>
+                            <b>Observación:</b> ${razon} <br>
+                            <b>Estado:</b> ${estado_p} <br><br>
+                        </p>
+                        <div style="font-family: Arial; font-size:15px; margin: auto; text-align: center;">
+                            <h3 style="font-family: Arial; text-align: center;">LISTA DE USUARIOS CON PERMISO</h3>
+                            ${tablaHTML}
+                            <br><br>
+                        </div>
+                        <p style="font-family: Arial; font-size:12px; line-height: 1em;">
+                            <b>Gracias por la atención</b><br>
+                            <b>Saludos cordiales,</b> <br><br>
+                        </p>
                             <img src="cid:pief" width="50%" height="50%"/>
                         </body>
-                    `,
+                       `,
                 attachments: [
                     {
                         filename: 'cabecera_firma.jpg',
@@ -673,8 +696,6 @@ class PermisosControlador {
             res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
         }
     }
-
-
 
 
 
@@ -975,7 +996,64 @@ class PermisosControlador {
     }
 
 
+
 }
+
+// METODO PARA CREAR TABLA DE USUARIOS
+const generarTablaHTMLWeb = async function (datos: any[], tipo: any): Promise<string> {
+
+    let tablaHtml = "<table style='border-collapse: collapse; width: 100%;'>";
+    console.log('ver tipo ---------- ', tipo)
+    if (tipo === 'Dias') {
+        tablaHtml += "<tr style='background-color: #f2f2f2; text-align: center; font-size: 14px;'>";
+        tablaHtml += "<th scope='col'>Código</th>";
+        tablaHtml += "<th scope='col'>Usuario</th>";
+        tablaHtml += "<th scope='col'>Cédula</th>";
+        tablaHtml += "<th scope='col'>Departamento</th>";
+        tablaHtml += "<th scope='col'>Permiso</th>";
+        tablaHtml += `<th scope='col'>Días permiso</th>`;
+        tablaHtml += "<th scope='col'>Solicitud</th>";
+        tablaHtml += "</tr>";
+
+        for (const dato of datos) {
+            tablaHtml += "<tr style='text-align: center; font-size: 14px;'>"
+            tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.codigo}</td>`;
+            tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.empleado}</td>`;
+            tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.cedula}</td>`;
+            tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.departamento}</td>`;
+            tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.id_permiso}</td>`;
+            tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.dias_laborables}</td>`;
+            tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.estado}</td>`
+            tablaHtml += "<tr>"
+        }
+    }
+    else {
+        tablaHtml += "<tr style='background-color: #f2f2f2; text-align: center; font-size: 14px;'>";
+        tablaHtml += "<th scope='col'>Código</th>";
+        tablaHtml += "<th scope='col'>Usuario</th>";
+        tablaHtml += "<th scope='col'>Cédula</th>";
+        tablaHtml += "<th scope='col'>Departamento</th>";
+        tablaHtml += "<th scope='col'>Permiso</th>";
+        tablaHtml += `<th scope='col'>Horas permiso</th>`
+        tablaHtml += "<th scope='col'>Solicitud</th>";
+        tablaHtml += "</tr>";
+
+        for (const dato of datos) {
+            tablaHtml += "<tr style='text-align: center; font-size: 14px;'>"
+            tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.codigo}</td>`;
+            tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.empleado}</td>`;
+            tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.cedula}</td>`;
+            tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.departamento}</td>`;
+            tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.id_permiso}</td>`;
+            tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.tiempo_solicitado}</td>`;
+            tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.estado}</td>`
+            tablaHtml += "<tr>"
+        }
+    }
+
+    tablaHtml += "</table>"
+    return tablaHtml;
+};
 
 export const PERMISOS_CONTROLADOR = new PermisosControlador();
 

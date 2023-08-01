@@ -148,7 +148,7 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
   BuscarCargos() {
     this.informacion.ObtenerInformacionCargo().subscribe((res: any[]) => {
       this.origen_cargo = JSON.stringify(res);
-
+      //console.log('ver res cargo ', res)
       res.forEach(obj => {
         this.cargos.push({
           id: obj.id_cargo,
@@ -166,7 +166,8 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
             correo: r.correo,
             id_cargo: r.id_cargo,
             id_contrato: r.id_contrato,
-            hora_trabaja: r.hora_trabaja
+            hora_trabaja: r.hora_trabaja,
+            name_departamento: r.departamento,
           })
         })
       })
@@ -180,7 +181,7 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
     this.origen = [];
     this.informacion.ObtenerInformacion().subscribe((res: any[]) => {
       this.origen = JSON.stringify(res);
-
+      //console.log('ver departamento--- ', res)
       res.forEach(obj => {
         this.sucursales.push({
           id: obj.id_suc,
@@ -209,6 +210,8 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
               correo: r.correo,
               id_cargo: r.id_cargo,
               id_contrato: r.id_contrato,
+              hora_trabaja: r.hora_trabaja,
+              name_departamento: r.departamento,
             }
             this.empleados.push(elemento)
           })

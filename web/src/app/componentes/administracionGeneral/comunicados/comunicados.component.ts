@@ -568,7 +568,7 @@ export class ComunicadosComponent implements OnInit {
       id_empl_envia: empleado_envia,
       id_empl_recive: empleado_recive,
       mensaje: form.tituloForm + '; ' + form.mensajeForm,
-      tipo: 6,  // ES EL TIPO DE NOTIFICACIÓN - COMUNICADOS
+      tipo: 6,  // ES EL TIPO DE NOTIFICACION - COMUNICADOS
     }
     this.realTime.EnviarMensajeGeneral(mensaje).subscribe(res => {
       this.realTime.RecibirNuevosAvisos(res.respuesta);
