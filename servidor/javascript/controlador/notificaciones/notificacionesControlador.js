@@ -521,7 +521,7 @@ const generarTablaHTMLWeb = function (datos) {
     return __awaiter(this, void 0, void 0, function* () {
         let tablaHtml = "<table style='border-collapse: collapse; width: 100%;'>";
         tablaHtml += "<tr style='background-color: #f2f2f2; text-align: center; font-size: 14px;'>";
-        tablaHtml += "<th scope='col'>Permiso</th><th scope='col'>Departamento</th><th scope='col'>Empleado</th><th scope='col'>Aprobado</th><th scope='col'>Estado</th><th scope='col'>Observación</th>";
+        tablaHtml += "<th scope='col'>Permiso</th><th scope='col'>Departamento</th><th scope='col'>Cédula</th><th scope='col'>Empleado</th><th scope='col'>Aprobado</th><th scope='col'>Estado</th><th scope='col'>Observación</th>";
         tablaHtml += "</tr>";
         for (const dato of datos) {
             let colorText = "black";
@@ -534,6 +534,7 @@ const generarTablaHTMLWeb = function (datos) {
             tablaHtml += "<tr style='text-align: center; font-size: 14px;'>";
             tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.id}</td>`;
             tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.nombre_depa}</td>`;
+            tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.cedula}</td>`;
             tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.empleado}</td>`;
             tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px; color: ${colorText};'>${dato.aprobar}</td>`;
             tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.estado}</td>`;
@@ -548,7 +549,7 @@ const generarTablaHTMLMovil = function (datos) {
     return __awaiter(this, void 0, void 0, function* () {
         let tablaHtml = "<table style='border-collapse: collapse; width: 100%;'>";
         tablaHtml += "<tr style='background-color: #f2f2f2; text-align: center; font-size: 14px;'>";
-        tablaHtml += "<th scope='col'>Permiso</th><th scope='col'>Departamento</th><th scope='col'>Empleado</th><th scope='col'>Aprobado</th><th scope='col'>Estado</th><th scope='col'>Observación</th>";
+        tablaHtml += "<th scope='col'>Permiso</th><th scope='col'>Departamento</th><th scope='col'>Cédula</th><th scope='col'>Empleado</th><th scope='col'>Aprobado</th><th scope='col'>Estado</th><th scope='col'>Observación</th>";
         tablaHtml += "</tr>";
         for (const dato of datos) {
             let colorText = "black";
@@ -561,6 +562,7 @@ const generarTablaHTMLMovil = function (datos) {
             tablaHtml += "<tr style='text-align: center; font-size: 14px;'>";
             tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.id}</td>`;
             tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.nombre_depa}</td>`;
+            tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.cedula}</td>`;
             tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.nempleado}</td>`;
             tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px; color: ${colorText};'>${dato.aprobacion}</td>`;
             tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.estado}</td>`;

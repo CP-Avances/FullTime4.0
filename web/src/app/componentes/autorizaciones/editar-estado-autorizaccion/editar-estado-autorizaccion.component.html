@@ -15,7 +15,7 @@
             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Lista de estados">
                 help_outline</mat-icon>
             <mat-select [formControl]="estado" required>
-                <mat-option *ngFor="let e of estados" [value]="e.id">
+                <mat-option *ngFor="let e of estados" [value]="e.id" (click)="ObtenerListaNotiCorreo(e.id)">
                     {{e.nombre}}
                 </mat-option>
             </mat-select>

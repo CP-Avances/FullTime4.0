@@ -196,6 +196,106 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
     });
   }
 
+  /** ************************************************************************************************************************************** **
+    ** **  METODO PARA FILTAR Y OBTENER EL LISTADO DE JEFES DE ACUERDO AL ORDE DE AUTORIZACION POR DEPA PARA RECIBIR NOTI Y CORREOS  ** ** 
+  ** *************************************************************************************************************************************** **/
+  ObtenerListaNotiCorreo(estado){
+     // CAPTURANDO ESTADO DE LA SOLICITUD DE PERMISO
+     if (estado === 2) {
+      var estado_p = 'Preautorizado';
+    }
+    else if (estado === 3) {
+      var estado_p = 'Autorizado';
+    }
+    else if (estado === 4) {
+      var estado_p = 'Negado';
+    }
+
+    this.listaEnvioCorreo = [];
+    this.id_departamento = this.solInfo.id_departamento;
+    this.lectura = 1;
+    this.restA.BuscarAutorizacionPermiso(this.data.permiso.id).subscribe(res1 => {
+      this.autorizacion = res1;
+      // METODO PARA OBTENER EMPLEADOS Y ESTADOS
+      var autorizaciones = this.autorizacion[0].id_documento.split(',');
+      autorizaciones.map((obj: string) => {
+        this.lectura = this.lectura + 1;
+        if (obj != '') {
+          let empleado_id = obj.split('_')[0];
+          this.estado_auto = obj.split('_')[1];
+
+          // CREAR ARRAY DE DATOS DE COLABORADORES
+          var data = {
+            id_empleado: empleado_id,
+            estado: this.estado_auto
+          }
+
+          this.empleado_estado = this.empleado_estado.concat(data);
+          // CUANDO TODOS LOS DATOS SE HAYAN REVISADO EJECUTAR METODO DE INFORMACIÓN DE AUTORIZACIÓN
+          if (this.lectura === autorizaciones.length) {
+            if((estado_p === 'Preautorizado')){
+              this.listadoDepaAutoriza.forEach(item => {
+                //Condición para descartar los usuarios que no les corresponda recibir la notificación y el correo
+                if((item.nivel === autorizaciones.length) && (item.nivel === this.FilDepartamentosAprueban.length)){
+                  this.listaEnvioCorreo.push(item);
+                }else if((item.nivel === autorizaciones.length) || (item.nivel === (autorizaciones.length + 1))){
+                  this.listaEnvioCorreo.push(item);
+                }
+              });
+
+              console.log('this.listaEnvioCorreo PRE: ',this.listaEnvioCorreo);
+              
+            }else if(estado_p === 'Autorizado' || estado_p === 'Negado'){
+              if(estado_p === 'Autorizado'){
+                this.listadoDepaAutoriza.forEach(item => {
+                  //Condición para descartar los usuarios que no les corresponda recibir la notificación y el correo
+                  if((item.nivel === this.InfoListaAutoriza.nivel) && (item.nivel === this.FilDepartamentosAprueban.length)){
+                    this.listaEnvioCorreo.push(item);
+                  }else if((item.nivel === this.InfoListaAutoriza.nivel) || (item.nivel === autorizaciones.length + 1)){
+                    this.listaEnvioCorreo.push(item);
+                  }
+                });
+              }else{
+                //Esta condicion es para enviar el correo a todos los usuraios que autorizan siempre y cuando la solicitud fue negada
+                this.listaEnvioCorreo = this.listadoDepaAutoriza;
+              }
+              
+              console.log('this.listaEnvioCorreo AUTO - Nega: ',this.listaEnvioCorreo);  
+            }
+          }
+        }else if(autorizaciones.length < 2){
+          if(estado_p === 'Negado'){
+            //Esta condicion es para enviar el correo a todos los usuraios que autorizan siempre y cuando la solicitud fue negada antes
+            this.listaEnvioCorreo = this.listadoDepaAutoriza;
+          }else{
+            this.listadoDepaAutoriza.filter(item => {
+              if(item.nivel < 3 ){
+                this.listaEnvioCorreo.push(item);  
+              }
+            });
+          }
+          
+          console.log('this.listaEnvioCorreo PEND: ',this.listaEnvioCorreo);
+        }
+      })
+    }, error => {
+      //Este proceso es similar al de un permisos con autorizacion en pendiente, esto porque si no existe una autorizacion igualmente la debe crear.
+      //Entonces se crea una lista para enviar la notificacion y correo a los jefes.
+      if(estado_p === 'Negado'){
+        //Esta condicion es para enviar el correo a todos los usuraios que autorizan siempre y cuando la solicitud fue negada antes
+        this.listaEnvioCorreo = this.listadoDepaAutoriza;
+      }else{
+        this.listadoDepaAutoriza.filter(item => {
+          if(item.nivel < 3 ){
+            this.listaEnvioCorreo.push(item);  
+          }
+        });
+      }
+
+      console.log('this.listaEnvioCorreo PEND-SIN-AUTORI: ',this.listaEnvioCorreo);
+    });   
+  }
+
   // METODO DE APROBACION DE SOLICITUD DE PERMISO
   ActualizarEstadoAprobacion(form: any) {
     let aprobacion = {
@@ -203,13 +303,10 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
       estado: form.estadoF,
     }
 
-    this.NotificarAprobacion(form.estadoF);
-
-    /*
     this.restA.ActualizarAprobacion(this.data.auto.id, aprobacion).subscribe(res => {
       this.EditarEstadoPermiso(this.data.auto.id_permiso, form.estadoF);
       this.NotificarAprobacion(form.estadoF);
-    })*/
+    })
     
   }
 
@@ -245,7 +342,6 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
     }
 
     this.informacion.BuscarJefes(datos).subscribe(permiso => {
-      //permiso.EmpleadosSendNotiEmail.push(this.solInfo);
       this.ConfiguracionCorreoyNotifi(permiso, estado_p, estado_c);
       this.toastr.success('', 'Proceso realizado exitosamente.', {
         timeOut: 6000,
@@ -265,81 +361,13 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
     let solicitud = this.validar.FormatearFecha(permiso.fec_creacion, this.formato_fecha, this.validar.dia_completo);
     let desde = this.validar.FormatearFecha(permiso.fec_inicio, this.formato_fecha, this.validar.dia_completo);
     let hasta = this.validar.FormatearFecha(permiso.fec_final, this.formato_fecha, this.validar.dia_completo);
+
+    // METODO PARA OBTENER NOMBRE DEL HORAS EN EL CUAL SE REALIZA LA SOLICITUD DE PERMISO
+    let h_inicio = this.validar.FormatearHora(permiso.hora_salida, this.formato_hora);
+    let h_fin = this.validar.FormatearHora(permiso.hora_ingreso, this.formato_hora);
     
-    this.listaEnvioCorreo = [];
-    this.id_departamento = this.solInfo.id_departamento;
-    this.lectura = 1;
-    this.restA.BuscarAutorizacionPermiso(this.data.permiso.id).subscribe(res1 => {
-      this.autorizacion = res1;
-      // METODO PARA OBTENER EMPLEADOS Y ESTADOS
-      var autorizaciones = this.autorizacion[0].id_documento.split(',');
-      autorizaciones.map((obj: string) => {
-        this.lectura = this.lectura + 1;
-        if (obj != '') {
-          let empleado_id = obj.split('_')[0];
-          this.estado_auto = obj.split('_')[1];
-
-          // CREAR ARRAY DE DATOS DE COLABORADORES
-          var data = {
-            id_empleado: empleado_id,
-            estado: this.estado_auto
-          }
-
-          this.empleado_estado = this.empleado_estado.concat(data);
-          // CUANDO TODOS LOS DATOS SE HAYAN REVISADO EJECUTAR METODO DE INFORMACIÓN DE AUTORIZACIÓN
-          if (this.lectura === autorizaciones.length) {
-            if((estado_p === 'Preautorizado')){
-              this.listadoDepaAutoriza.forEach(item => {
-                console.log(item.nivel === autorizaciones.length,' || ',item.nivel, ' === ',(autorizaciones.length + 1))
-                if((item.nivel === autorizaciones.length) && (item.nivel === this.FilDepartamentosAprueban.length)){
-                  return this.listaEnvioCorreo.push(item);
-                }else if((item.nivel === autorizaciones.length) || (item.nivel === (autorizaciones.length + 1))){
-                  return this.listaEnvioCorreo.push(item);
-                }
-              });
-
-              console.log('this.listaEnvioCorreo PRE: ',this.listaEnvioCorreo);
-              this.EnviarNotificacion(permiso, this.listaEnvioCorreo, estado_p);
-              this.EnviarCorreo(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
-              
-            }else if(estado_p === 'Autorizado' || estado_p === 'Negado'){
-              if(estado_p === 'Autorizado'){
-                this.listadoDepaAutoriza.forEach(item => {
-                  if((item.nivel === this.InfoListaAutoriza.nivel) && (item.nivel === this.FilDepartamentosAprueban.length)){
-                    return this.listaEnvioCorreo.push(item);
-                  }else if((item.nivel === this.InfoListaAutoriza.nivel) || (item.nivel === autorizaciones.length + 1)){
-                    return this.listaEnvioCorreo.push(item);
-                  }
-                });
-              }else{
-                //Esta condicion es para enviar el correo a todos los usuraios que autorizan siempre y cuando la solicitud fue negada antes
-                this.listaEnvioCorreo = this.listadoDepaAutoriza;
-              }
-              
-              console.log('this.listaEnvioCorreo AUTO - Nega: ',this.listaEnvioCorreo);
-              this.EnviarNotificacion(permiso, this.listaEnvioCorreo, estado_p);
-              this.EnviarCorreo(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
-              
-            }
-          }
-        }else if(autorizaciones.length < 2){
-          if(estado_p === 'Negado'){
-            //Esta condicion es para enviar el correo a todos los usuraios que autorizan siempre y cuando la solicitud fue negada antes
-            this.listaEnvioCorreo = this.listadoDepaAutoriza;
-          }else{
-            this.listadoDepaAutoriza.filter(item => {
-              if(item.nivel < 3 ){
-                return this.listaEnvioCorreo.push(item);  
-              }
-            });
-          }
-          
-          console.log('this.listaEnvioCorreo PEND: ',this.listaEnvioCorreo);
-          this.EnviarNotificacion(permiso, this.listaEnvioCorreo, estado_p);
-          this.EnviarCorreo(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
-        }
-      })
-    });   
+    this.EnviarNotificacion(permiso, this.listaEnvioCorreo, estado_p, desde, hasta, h_inicio, h_fin);
+    this.EnviarCorreo(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
 
   }
 
@@ -347,10 +375,8 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
     var cont = 0;
     var correo_usuarios = '';
     permiso.EmpleadosSendNotiEmail = listaEnvioCorreo;
-    permiso.EmpleadosSendNotiEmail.push(this.solInfo);
     console.log('nueva lista C: ',permiso.EmpleadosSendNotiEmail);
 
-    
     // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
     permiso.EmpleadosSendNotiEmail.forEach(e => {
 
@@ -415,20 +441,14 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
         }
       }
     })
-    
   }
 
-  EnviarNotificacion(permiso: any, listaEnvioCorreo: any, estado_p: string) {
+  EnviarNotificacion(permiso: any, listaEnvioCorreo: any, estado_p: string, desde: any, hasta: any, h_inicio: any, h_fin: any) {
     permiso.EmpleadosSendNotiEmail = listaEnvioCorreo;
+    permiso.EmpleadosSendNotiEmail.push(this.solInfo);
     console.log('nueva lista N: ',permiso.EmpleadosSendNotiEmail);
 
-    // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE PERMISO
-    let desde = this.validar.FormatearFecha(permiso.fec_inicio, this.formato_fecha, this.validar.dia_completo);
-    let hasta = this.validar.FormatearFecha(permiso.fec_final, this.formato_fecha, this.validar.dia_completo);
-
-    let h_inicio = this.validar.FormatearHora(permiso.hora_salida, this.formato_hora);
-    let h_fin = this.validar.FormatearHora(permiso.hora_ingreso, this.formato_hora);
-
+    
     if (h_inicio === '00:00') {
       h_inicio = '';
     }

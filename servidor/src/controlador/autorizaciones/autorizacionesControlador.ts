@@ -69,9 +69,6 @@ class AutorizacionesControlador {
 
 
 
-
-
-
     public async ActualizarEstadoAutorizacionPermiso(req: Request, res: Response): Promise<void> {
         const { id_documento, estado, id_permiso } = req.body;
 

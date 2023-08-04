@@ -415,6 +415,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
       return {
         id: obj.id,
         empleado: obj.nombre + " " + obj.apellido,
+        cedula: obj.cedula,
         correo: obj.correo,
         id_contrato: obj.id_contrato,
         id_emple_solicita: obj.id_emple_solicita,
