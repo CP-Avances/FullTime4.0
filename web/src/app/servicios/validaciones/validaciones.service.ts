@@ -141,15 +141,15 @@ export class ValidacionesService {
 
   FormatearFecha(fecha: string, formato: string, dia: string) {
     if (dia === 'ddd') {
-      let valor = moment(fecha).format(dia).charAt(0).toUpperCase() +
-        moment(fecha).format(dia).slice(1) +
-        ' ' + moment(fecha).format(formato);
+      let valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
+        moment(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
+        ' ' + moment(fecha, 'YYYY/MM/DD').format(formato);
       return valor;
     }
     else {
-      let valor = moment(fecha).format(dia).charAt(0).toUpperCase() +
-        moment(fecha).format(dia).slice(1) +
-        ', ' + moment(fecha).format(formato);
+      let valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
+        moment(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
+        ', ' + moment(fecha, 'YYYY/MM/DD').format(formato);
       return valor;
     }
   }

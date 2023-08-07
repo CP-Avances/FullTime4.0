@@ -141,7 +141,7 @@ import { HorasPlanificadasEmpleadoComponent } from './componentes/rolEmpleado/ho
 import { ComidasSolicitadasEmpleadoComponent } from './componentes/rolEmpleado/comidas-empleado/comidas-solicitadas-empleado/comidas-solicitadas-empleado.component';
 import { ListaWebComponent } from './componentes/modulos/timbreWeb/lista-web/lista-web.component';
 import { RegistroDispositivosComponent } from './componentes/modulos/appMovil/registro-dispositivos/registro-dispositivos.component';
-import { VistaElementosComponent } from './componentes/modulos/permisos/catTipoPermisos/listarTipoPermisos/vista-elementos.component';
+import { VistaElementosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/listarTipoPermisos/vista-elementos.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },

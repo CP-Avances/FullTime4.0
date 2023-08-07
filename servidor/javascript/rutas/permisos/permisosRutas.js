@@ -110,6 +110,8 @@ class PermisosRutas {
         this.router.get('/documentos/:docs/visualizar/:codigo', permisosControlador_1.default.ObtenerDocumentoPermiso);
         // ENVIAR CORREO MEDIANTE APLICACION WEB
         this.router.post('/mail-noti/', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EnviarCorreoWeb);
+        // ENVIAR CORREO EDICION MEDIANTE APLICACION WEB
+        this.router.post('/mail-noti-editar/', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EnviarCorreoWebEditar);
         // ENVIAR CORREO MEDIANTE APLICACION WEB SOLICITUDES MULTIPLES
         this.router.post('/mail-noti/solicitud-multiple', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EnviarCorreoWebMultiple);
         this.router.get('/', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.ListarPermisos);
@@ -133,6 +135,8 @@ class PermisosRutas {
         this.router.delete('/eliminar-movil/:documento/validar:codigo', permisosControlador_1.default.EliminarPermisoMovil);
         // ENVIAR CORREO MEDIANTE APLICACION MOVIL
         this.router.post('/mail-noti-permiso-movil/:id_empresa', permisosControlador_1.default.EnviarCorreoPermisoMovil);
+        // ENVIAR CORREO EDICION MEDIANTE APLICACION MOVIL
+        this.router.post('/mail-noti-permiso-editar-movil/:id_empresa', permisosControlador_1.default.EnviarCorreoPermisoEditarMovil);
     }
 }
 const PERMISOS_RUTAS = new PermisosRutas();

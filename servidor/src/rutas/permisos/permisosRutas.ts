@@ -123,6 +123,8 @@ class PermisosRutas {
         this.router.get('/documentos/:docs/visualizar/:codigo', PERMISOS_CONTROLADOR.ObtenerDocumentoPermiso);
         // ENVIAR CORREO MEDIANTE APLICACION WEB
         this.router.post('/mail-noti/', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.EnviarCorreoWeb);
+        // ENVIAR CORREO EDICION MEDIANTE APLICACION WEB
+        this.router.post('/mail-noti-editar/', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.EnviarCorreoWebEditar);
         // ENVIAR CORREO MEDIANTE APLICACION WEB SOLICITUDES MULTIPLES
         this.router.post('/mail-noti/solicitud-multiple', [TokenValidation, ModuloPermisosValidation], PERMISOS_CONTROLADOR.EnviarCorreoWebMultiple);
 
@@ -169,7 +171,8 @@ class PermisosRutas {
 
         // ENVIAR CORREO MEDIANTE APLICACION MOVIL
         this.router.post('/mail-noti-permiso-movil/:id_empresa', PERMISOS_CONTROLADOR.EnviarCorreoPermisoMovil);
-
+        // ENVIAR CORREO EDICION MEDIANTE APLICACION MOVIL
+        this.router.post('/mail-noti-permiso-editar-movil/:id_empresa', PERMISOS_CONTROLADOR.EnviarCorreoPermisoEditarMovil);
 
     }
 }

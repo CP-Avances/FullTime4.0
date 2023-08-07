@@ -1,75 +1,84 @@
-// IMPORTACION LIBRERIAS 
-import { FormControl, Validators, FormGroup } from '@angular/forms';
-import { Component, OnInit, Input, Inject } from '@angular/core';
-import { MatCheckboxChange } from '@angular/material/checkbox';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+// IMPORTAR LIBRERIAS
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Component, OnInit, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { MatDialog } from '@angular/material/dialog';
 import * as moment from 'moment';
 
-// IMPORTACION DE SERVICIOS 
-import { LoginService } from 'src/app/servicios/login/login.service';
-import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
-import { PermisosService } from 'src/app/servicios/permisos/permisos.service';
-import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
+// INVOCACION DE SERVICIOS
+import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
+import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
+import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { TipoPermisosService } from 'src/app/servicios/catalogos/catTipoPermisos/tipo-permisos.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
-import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
+import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion.service';
+import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
+import { PermisosService } from 'src/app/servicios/permisos/permisos.service';
+import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
+import { LoginService } from 'src/app/servicios/login/login.service';
 
-// CREACION DE LISTA DE OPCIONES DE SOLICITUD DE PERMISO 
+import { PermisosMultiplesEmpleadosComponent } from '../../multiples/permisos-multiples-empleados/permisos-multiples-empleados.component';
+import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
+import { SettingsComponent } from 'src/app/componentes/administracionGeneral/configuracion-notificaciones/settings/settings.component';
+
 interface opcionesDiasHoras {
   valor: string;
   nombre: string
 }
 
 @Component({
-  selector: 'app-editar-permiso-empleado',
-  templateUrl: './editar-permiso-empleado.component.html',
-  styleUrls: ['./editar-permiso-empleado.component.css'],
+  selector: 'app-registro-empleado-permiso',
+  templateUrl: './registro-empleado-permiso.component.html',
+  styleUrls: ['./registro-empleado-permiso.component.css'],
+
 })
 
-export class EditarPermisoEmpleadoComponent implements OnInit {
+export class RegistroEmpleadoPermisoComponent implements OnInit {
 
   @Input() solicita_permiso: any;
-  @Input() id_empleado: any;
+
+  // VARIABLES DE ALMACENAMIENTO
+  datos: any = [];
+  permiso: any = [];
 
   // DATOS DEL EMPLEADO QUE INICIA SESION
-  idEmpleadoIngresa: number = 0;
-  nota = 'su solicitud';
+  idEmpleadoIngresa: number;
+  nota = 'una solicitud';
   user = '';
+  codigo: number;
 
-  datoNumPermiso: any = []; // ARREGLOS PARA GUARDAR ÚLTIMO NÚMERO DE PERMISOS REGISTRADO POR EMPLEADO
-  tipoPermisos: any = []; // ARREGLOS PARA SELECCIONAR EL TIPO DE PERMISO DE ACUERDO AL PEDIDO EMPLEADO / ADMINISTRADOR
-  datosPermiso: any = []; // ARREGLOS PARA GUARDAR DATOS DEL PERMISO SELECCIONADO
-  permiso: any = []; // ARREGLO PARA GUARDAR LISTA DE PERMISOS REGISTRADOS
+  // USADO PARA IMPRIMIR DATOS
+  datosPermiso: any = [];
+  numero_permiso: any = [];
+  tipoPermisos: any = [];
 
-  // OPCIONES DE SOLICITUD DE PERMISOS
   diasHoras: opcionesDiasHoras[] = [
     { valor: 'Dias', nombre: 'Dias' },
     { valor: 'Horas', nombre: 'Horas' },
   ];
 
-  num: number = 0; // VARIABLE QUEALMACENA EL NUMERO DE PERMISO SOLICITADO
-  Tdias = 0; // VARIABLE QUE ALMACENA EL TOTAL DE DÍAS DE PERMISO
-  Thoras: any; // VARIABLE QUE ALMACENA EL TOTAL DE HORAS DE PERMISO
-  isChecked: boolean = false; // VARIABLE QUE INDICA SI SE VA A ACTUALIZAR EL ARCHIVO 
+  // TOTAL DE DIAS SEGUN EL TIPO DE PERMISO
+  Tdias = 0;
+  // TOTAL DE HORAS SEGUN EL TIPO DE PERMISO
+  Thoras: any;
 
-  configuracion_permiso: string = ''; // VARIABLE QUE INDICA QUE TIPO DE PERMISOS SELECCIONO EL EMPLEADO
-  horasTrabajo: any = []; // VARIABLE QUE ALMACENA EL TOTAL DE HORAS QUE TRABAJA EL EMPLEADO
-  FechaActual: any; // VARIABLE QUE INIDCA LA FECHA ACTUAL EN LA QUE SE REGISTRA O PIDE EL PERMISO
+  // NUMERO DEL PERMISO
+  num: number;
+  configuracion_permiso: string;
+  // VARIABLE PARA GUARDAR FECHA ACTUAL TOMADA DEL SISTEMA
+  FechaActual: any;
+  horasTrabajo: any = [];
 
-  // EVENTOS PARA ACTIVAR O DESACTIVAR INGRESO DE DIAS- HORAS - DIAS/HORAS SEGUN SELECCIÓN DEL USUARIO
-  habilitarDias: boolean = true;
+  // VARIABLES PARA OCULTAR O VISIBILIZAR INGRESO DE DATOS DIAS, HORAS, DIAS LIBRES
+  habilitarDias: boolean = false;
 
   // INFORMACION DEL PERMISO
   informacion1: string = '';
-  informacion2: string = '';
   informacion3: string = '';
+  informacion4: string = '';
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   horas_alimentacionF = new FormControl('');
@@ -110,50 +119,37 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
 
   constructor(
     private loginServise: LoginService,
-    private informacion_: DatosGeneralesService,
     private tipoPermiso: TipoPermisosService,
     private realTime: RealTimeService,
     private toastr: ToastrService,
     private restP: PermisosService,
     private restH: EmpleadoHorariosService,
-    private restE: EmpleadoService,
-    public validar: ValidacionesService,
+    public restE: EmpleadoService,
     public feriado: FeriadosService,
+    public ventana: MatDialog,
+    public validar: ValidacionesService,
     public restPerV: PeriodoVacacionesService,
     public parametro: ParametrosService,
-    public componente: VerEmpleadoComponent,
+    public informacion_: DatosGeneralesService,
+    public componente1: VerEmpleadoComponent,
+    public componente2: PermisosMultiplesEmpleadosComponent,
     public planificar: PlanGeneralService,
-    public ventana: MatDialogRef<EditarPermisoEmpleadoComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    public restAutoriza: AutorizacionService,
+
   ) {
-    // LEER ID DE USUARIO QUE INICIA SESION
-    var item = localStorage.getItem('empleado');
-    if (item) {
-      this.idEmpleadoIngresa = parseInt(item);
-    }
+    this.idEmpleadoIngresa = parseInt(localStorage.getItem('empleado') as string);
   }
 
-  info: any = [];
+  public datosEmple: any = []
   ngOnInit(): void {
-    if (this.solicita_permiso == undefined) {
-      this.info = this.data.dataPermiso;
-    } else {
-      this.info = this.solicita_permiso;
-    }
-
-    if (this.id_empleado == undefined) {
-      this.id_empleado = this.data.id_empleado;
-    }
-
+    this.datos = this.solicita_permiso[0];
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
-    this.num = this.info.num_permiso
     this.ObtenerInformacionEmpleado();
+    this.ImprimirNumeroPermiso();
     this.ObtenerTiposPermiso();
     this.ObtenerEmpleado();
     this.BuscarParametro();
-    this.ObtenerDatos();
-    this.MostrarDatos();
     this.BuscarHora();
   }
 
@@ -181,16 +177,16 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       });
   }
 
-  // METODO PARA OBTENER DATOS DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
   empleado: any = [];
   ObtenerEmpleado() {
     this.empleado = [];
-    this.restE.BuscarUnEmpleado(this.id_empleado).subscribe(data => {
+    this.restE.BuscarUnEmpleado(parseInt(this.datos.id_empleado)).subscribe(data => {
       this.empleado = data[0];
     })
   }
 
-  // METODO PARA MOSTRAR LISTA DE PERMISOS DE ACUERDO AL ROL 
+  // BUSQUEDA DE TIPOS DE PERMISOS DE ACUERDO AL ROL DEL USUARIO
   ObtenerTiposPermiso() {
     this.tipoPermisos = [];
     let rol = this.loginServise.getRol();
@@ -205,153 +201,6 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     }
   }
 
-  // METODO PARA OBTENER DATOS DEL USUARIO
-  actuales: any = [];
-  ObtenerDatos() {
-    this.actuales = [];
-    this.informacion_.ObtenerDatosActuales(this.id_empleado).subscribe((datos: any) => {
-      this.actuales = datos[0];
-    });
-  }
-
-  // METODO PARA IMPRIMIR EN EL FORMULARIO LA INFORMACION DEL PERMISO SOLICITADO 
-  documento: boolean = false;
-  documento_editar: boolean = false;
-  MostrarDatos() {
-    this.dSalida = String(moment(this.info.fec_inicio).format('YYYY-MM-DD'));
-    this.dIngreso = String(moment(this.info.fec_final).format('YYYY-MM-DD'));
-
-    this.formulario.patchValue({
-      horasIngresoForm: this.info.hora_ingreso,
-      fechaInicioForm: String(moment(this.info.fec_inicio).format('YYYY-MM-DD')),
-      descripcionForm: this.info.descripcion,
-      horaSalidaForm: this.info.hora_salida,
-      fechaFinalForm: String(moment(this.info.fec_final).format('YYYY-MM-DD')),
-      idPermisoForm: this.info.id_tipo_permiso,
-      diaLibreForm: this.info.dia_libre,
-      horasForm: this.info.hora_numero,
-      diasForm: this.info.dia,
-    });
-    if (this.info.dia === 0) {
-      this.habilitarDias = false;
-      this.activar_hora = true;
-      this.configuracion_permiso = 'Horas';
-      this.solicitarF.setValue('Horas');
-      if (this.dSalida != this.dIngreso) {
-        this.especialF.setValue(true);
-      }
-    }
-    else if (this.info.hora_numero === '00:00:00') {
-      this.habilitarDias = true;
-      this.activar_hora = false;
-      this.configuracion_permiso = 'Dias';
-      this.solicitarF.setValue('Dias');
-      this.LeerFeriadosPermiso();
-    }
-
-    // MOSTRAR INFORMACION DEL PERMISO
-    this.BuscarTipoPermiso();
-  }
-
-
-  // BUSCAR FERIADOS FECHAS DEL PERMISO
-  LeerFeriadosPermiso() {
-    this.feriados = [];
-    let datos = {
-      fecha_inicio: moment(this.info.fec_inicio).format('YYYY-MM-DD'),
-      fecha_final: moment(this.info.fec_final).format('YYYY-MM-DD'),
-      id_empleado: this.id_empleado
-    }
-    this.feriado.ListarFeriadosCiudad(datos).subscribe(data => {
-      this.feriados = data;
-      this.LeerRecuperacionFeriadosPermiso(datos);
-    }, vacio => {
-      this.LeerRecuperacionFeriadosPermiso(datos);
-    })
-  }
-
-
-  // BUSCAR FERIADOS RECUPERACION FECHAS DEL PERMISO
-  LeerRecuperacionFeriadosPermiso(datos: any) {
-    this.recuperar = [];
-    this.feriado.ListarFeriadosRecuperarCiudad(datos).subscribe(data => {
-      this.recuperar = data;
-      this.BuscarRegistroFechasHorario();
-    }, vacio => {
-      this.BuscarRegistroFechasHorario();
-    })
-  }
-
-  // METODO PARA BUSCAR FECHAS DE UNA PLANIFICACION HORARIA
-  BuscarRegistroFechasHorario() {
-    this.horario = [];
-    let datos = {
-      fecha_inicio: moment(this.info.fec_inicio).format('YYYY-MM-DD'),
-      fecha_final: moment(this.info.fec_final).format('YYYY-MM-DD'),
-      codigo: this.empleado.codigo
-    }
-
-    this.planificar.BuscarHorarioFechas(datos).subscribe(data => {
-      this.horario = data;
-      this.ContarDiasSolicitados();
-    }, vacio => {
-      this.ContarDiasSolicitados();
-    })
-  }
-
-  // METODO PARA IMPRIMIR DATOS DE TIPO DE PERMISO CREADO
-  BuscarTipoPermiso() {
-    this.datosPermiso = [];
-    this.tipoPermiso.BuscarUnTipoPermiso(this.info.id_tipo_permiso).subscribe((datos: any) => {
-
-      // VARIABLES GLOBALES SETEADAS EN 0
-      this.Tdias = 0;
-      this.Thoras = 0;
-
-      // ALMACENAMIENTO DE DATOS DE PERMISO
-      this.informacion = true;
-      this.datosPermiso = datos[0];
-
-      // PERMISO LEGALIZADO
-      this.legalizado = this.datosPermiso.legalizar;
-
-      // SOLICITUD POR HORAS
-      if (this.datosPermiso.num_dia_maximo === 0) {
-        this.informacion2 = '';
-        this.informacion1 = `Horas máximas de permiso: ${this.datosPermiso.num_hora_maximo}`;
-        this.Thoras = this.datosPermiso.num_hora_maximo;
-        this.configuracion_permiso = 'Horas';
-      }
-      // SOLICITUD POR DIAS
-      else if (this.datosPermiso.num_hora_maximo === '00:00:00') {
-        this.informacion2 = '';
-        this.informacion1 = `Días máximos de permiso: ${this.datosPermiso.num_dia_maximo}`;
-        this.Tdias = this.datosPermiso.num_dia_maximo;
-        this.configuracion_permiso = 'Dias';
-      }
-
-      // MENSAJE DESCUENTO ALIMENTACION
-      if (this.datosPermiso.almu_incluir === true) {
-        this.informacion3 = `Aplica descuento de minutos de alimentación si el permisos solicitado se encuentra dentro del horario de alimentación.`;
-      }
-      else {
-        this.informacion3 = '';
-      }
-
-      // DOCUMENTO CARGADO EN EL SISTEMA
-      if (this.info.docu_nombre != null && this.info.docu_nombre != '') {
-        this.documento_editar = true;
-        this.documento = false;
-      }
-      else {
-        this.documento = true;
-        this.documento_editar = false;
-        // DOCUMENTO REQUERIDO
-        this.certificado = this.datosPermiso.documento;
-      }
-    })
-  }
-
   // IMPRIMIR DATOS DEL TIPO DE PERMISO SELECCIONADO
   activar_comida: boolean = false;
   activar_hora: boolean = false;
@@ -361,7 +210,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
   ImprimirDatos(form: any) {
     this.LimpiarComida(false);
     this.datosPermiso = [];
-    this.tipoPermiso.BuscarUnTipoPermiso(form.idPermisoForm).subscribe((datos: any) => {
+    this.tipoPermiso.BuscarUnTipoPermiso(form.idPermisoForm).subscribe(datos => {
       console.log('datos de tipo de permisos ', datos)
       // VARIABLES GLOBALES SETEADAS EN 0
       this.Tdias = 0;
@@ -380,8 +229,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       // SOLICITUD POR HORAS
       if (this.datosPermiso.num_dia_maximo === 0) {
         this.LimpiarFormulario('');
-        this.informacion2 = '';
-        this.informacion1 = `Horas máximas de permiso: ${this.datosPermiso.num_hora_maximo}`;
+        this.informacion1 = `Horas máximas de permiso: ${this.datosPermiso.num_hora_maximo} horas.`;
         this.habilitarDias = false;
         this.activar_hora = true;
         this.formulario.patchValue({
@@ -393,8 +241,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       // SOLICITUD POR DIAS
       else if (this.datosPermiso.num_hora_maximo === '00:00:00') {
         this.LimpiarFormulario('00:00');
-        this.informacion2 = '';
-        this.informacion1 = `Días máximos de permiso: ${this.datosPermiso.num_dia_maximo}`;
+        this.informacion1 = `Días máximos de permiso: ${this.datosPermiso.num_dia_maximo} días.`;
         this.habilitarDias = true;
         this.activar_hora = false;
         this.formulario.patchValue({
@@ -414,18 +261,21 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
 
       // MENSAJE DESCUENTO ALIMENTACION
       if (this.datosPermiso.almu_incluir === true) {
-        this.informacion3 = `Aplica descuento de minutos de alimentación si el permisos solicitado se encuentra dentro del horario de alimentación.`;
+        this.informacion3 = `Aplica descuento de minutos de alimentación si el permiso es solicitado por horas y se encuentra dentro del horario de alimentación.`;
       }
       else {
         this.informacion3 = '';
       }
+
+      // MENSAJE DIAS PREVIOS DE SOLICITUD
+      this.informacion4 = `Número de días previos para cargar solicitud: ${this.datosPermiso.num_dia_anticipo} días.`;
     })
   }
 
   // METODO PARA BUSCAR PERIODO DE VACACIONES
   periodo_vacaciones: number = 0;
   BuscarPeriodoVacaciones() {
-    this.restPerV.BuscarIDPerVacaciones(this.id_empleado).subscribe((datos: any) => {
+    this.restPerV.BuscarIDPerVacaciones(parseInt(this.datos.id_empleado)).subscribe(datos => {
       this.periodo_vacaciones = datos[0].id;
     }, error => {
       this.toastr.info('No tiene registrado un periodo de vacaciones.',
@@ -434,6 +284,20 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       });
       this.formulario.reset();
     });
+  }
+
+  // METODO PARA IMPRIMIR NUMERO DE PERMISO
+  ImprimirNumeroPermiso() {
+    this.numero_permiso = [];
+    this.restP.BuscarNumPermiso(this.datos.id_empleado).subscribe(datos => {
+      this.numero_permiso = datos[0];
+      if (this.numero_permiso.max === null) {
+        this.num = 1;
+      }
+      else {
+        this.num = this.numero_permiso.max + 1;
+      }
+    })
   }
 
   // ACTIVAR FORMULARIO DE ACUERDO A SELECCION DE TIPO 
@@ -455,14 +319,14 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
   dSalida: any;
   ValidarFechaSalida(event: any, form: any) {
 
+    this.LimpiarComida(false);
+
     // LIMPIAR CAMPOS DE FECHAS
     if (form.solicitarForm === 'Dias') {
       this.LimpiarInformacion('00:00');
-      this.LimpiarComida(false);
     }
     else if (form.solicitarForm === 'Horas') {
       this.LimpiarInformacion('');
-      this.LimpiarComida(false);
     }
 
     // VALIDACION DE SELECCION DE TIPO DE PERMISOS
@@ -475,16 +339,23 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       var inicio = String(moment(fecha, "YYYY/MM/DD").format("YYYY-MM-DD"));
 
       // VERIFICACION DE RESTRICCION DE FECHAS
-      if (this.datosPermiso.fecha != '' && this.datosPermiso.fecha != null) {
-        var fecha_negada = this.datosPermiso.fecha.split('T')[0];
+      if (this.datosPermiso.fec_validar === true) {
+        var fecha_negada_inicio = this.datosPermiso.fecha_inicio.split('T')[0];
+        var fecha_negada_fin = this.datosPermiso.fecha_fin.split('T')[0];
 
         // VERIFICACION DE FECHA NO VALIDA CON LA SALIDA DE PERMISO
-        if (Date.parse(inicio) === Date.parse(fecha_negada)) {
+        if (Date.parse(inicio) >= Date.parse(fecha_negada_inicio) && Date.parse(inicio) <= Date.parse(fecha_negada_fin)) {
           this.toastr.warning('En la fecha ingresada no es posible otorgar este tipo de permiso.', 'VERIFICAR', {
             timeOut: 4000,
           });
           this.fechaInicioF.setValue('');
         }
+        else {
+          this.ValidarRestricionesFechas(inicio);
+        }
+      }
+      else {
+        this.ValidarRestricionesFechas(inicio);
       }
     }
     else {
@@ -492,6 +363,51 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
         timeOut: 4000,
       });
       this.fechaInicioF.setValue('');
+    }
+  }
+
+  // METODO DE TRATAMIENTO DE CONFIGURACIONES DE FECHAS DE TIPO DE PERMISOS
+  ValidarRestricionesFechas(inicio: any) {
+    if (moment(inicio).format('YYYY') < moment(this.FechaActual).format('YYYY')) {
+      this.ValidarAñosAnteriores(inicio);
+    }
+    else {
+      this.ValidarDiasPrevios(inicio);
+    }
+  }
+
+  // METODO PARA VALIDAR FECHAS DE AÑOS PASADOS
+  ValidarAñosAnteriores(inicio: any) {
+    var mes_inicial = moment().format('YYYY/01/01');
+    var dias = this.datosPermiso.num_dia_anterior;
+    if (dias > 0) {
+      var restar = moment(mes_inicial, 'YYYY/MM/DD').subtract(dias, 'days').format('YYYY/MM/DD');
+
+      if (Date.parse(inicio) >= Date.parse(restar)) {
+      }
+      else {
+        this.toastr.warning('Ups!!! ha superado el limite de días permitidos para cargar solicitudes.', '', {
+          timeOut: 4000,
+        });
+        this.fechaInicioF.setValue('');
+      }
+    }
+  }
+
+  // METODO PARA VALIDAR DIAS PREVIOS DE PERMISO
+  ValidarDiasPrevios(inicio: any) {
+    var dias = this.datosPermiso.num_dia_anticipo;
+    var restar = moment(inicio, 'YYYY/MM/DD').subtract(dias, 'days').format('YYYY/MM/DD');
+    if (dias > 0) {
+      if (Date.parse(this.FechaActual) <= Date.parse(restar)) {
+      }
+      else {
+        this.toastr.warning('Ups!!! el permiso debio ser solicitado con ' + this.datosPermiso.num_dia_anticipo + ' días previos.',
+          '', {
+          timeOut: 4000,
+        });
+        this.fechaInicioF.setValue('');
+      }
     }
   }
 
@@ -509,7 +425,6 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       }
     }
   }
-
 
   // METODO PARA VALIDAR FECHA DE FINALIZACION DE PERMISO
   dIngreso: any;
@@ -534,79 +449,28 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       }
       // SI FECHAS INGRESADAS CORRECTAMENTE
       else {
-        // BUSCAR FECHAS HORARIO
-        this.BuscarFechasHorario(form);
 
-        // BUSQUEDA DE FERIADOS 
-        this.BuscarFeriados(form);
-        this.BuscarFeriadosRecuperar(form);
+        // VERIFICACION DE RESTRICCION DE FECHAS
+        if (this.datosPermiso.fec_validar === true) {
+          var fecha_negada_inicio = this.datosPermiso.fecha_inicio.split('T')[0];
+          var fecha_negada_fin = this.datosPermiso.fecha_fin.split('T')[0];
 
-        // PERMISO SOLICITADO POR DIAS
-        if (form.solicitarForm === 'Dias') {
-          this.horas = [];
-          // BUSQUEDA DE PLANIFICACION DEL USUARIO
-          let datosFechas = {
-            codigo: this.empleado.codigo,
-            fecha_inicio: form.fechaInicioForm,
-            fecha_final: form.fechaFinalForm,
-          }
-          this.restH.BuscarHorarioDias(datosFechas).subscribe((horas: any) => {
-            this.horas = horas[0];
-            console.log('horas horario ', this.horas)
-            // METODO PARA BUSCAR PERMISOS SOLICITADOS POR DIAS
-            let solicitud = {
-              fec_inicio: inicio,
-              fec_final: final,
-              codigo: this.empleado.codigo,
-              id: this.info.id
-            }
-            this.restP.BuscarPermisosSolicitadosTotalesEditar(solicitud).subscribe(solicitados => {
-              // EXISTEN REGISTROS DE PERMISOS POR DIAS
-              if (solicitados.length != 0) {
-                this.toastr.info('En las fechas ingresadas existe una solicitud de permiso en estado PENDIENTE o APROBADA.',
-                  'VERIFICAR SOLICITUD DE PERMISO.', {
-                  timeOut: 6000,
-                });
-                this.fechaInicioF.setValue('');
-                this.LimpiarInformacion('00:00');
-                // NO EXISTEN PERMISOS SOLICITADOS POR DIAS
-              } else {
-                this.ValidarConfiguracionDias();
-              }
-            })
-          }, error => {
-            this.toastr.warning('No tiene asignada una planificación horaria en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
-              timeOut: 6000,
+          // VERIFICACION DE FECHA NO VALIDA CON LA SALIDA DE PERMISO
+          if ((Date.parse(fecha_negada_inicio) >= Date.parse(inicio) && Date.parse(fecha_negada_inicio) <= Date.parse(final)) ||
+            (Date.parse(fecha_negada_fin) >= Date.parse(inicio) && Date.parse(fecha_negada_fin) <= Date.parse(final))) {
+            this.toastr.warning('En la fecha ingresada no es posible otorgar este tipo de permiso.', 'VERIFICAR', {
+              timeOut: 4000,
             });
-            this.fechaInicioF.setValue('');
-            this.LimpiarInformacion('00:00');
-          });
-        }
-        else if (form.solicitarForm === 'Horas') {
-          this.LimpiarComida(false);
-          // METODO PARA BUSCAR PERMISOS SOLICITADOS POR DIAS
-          let solicitud = {
-            fec_inicio: inicio,
-            fec_final: final,
-            codigo: this.empleado.codigo,
-            id: this.info.id
+            this.fechaFinalF.setValue('');
           }
-          this.restP.BuscarPermisosSolicitadosDiasEditar(solicitud).subscribe(solicitados => {
-            // EXISTEN REGISTROS DE PERMISOS POR DIAS
-            if (solicitados.length != 0) {
-              this.toastr.info('En las fechas ingresadas existe una solicitud de permiso en estado PENDIENTE o APROBADA.',
-                'VERIFICAR SOLICITUD DE PERMISO.', {
-                timeOut: 6000,
-              });
-              this.fechaInicioF.setValue('');
-              this.LimpiarInformacion('00:00');
-              this.LimpiarComida(false);
-
-              // NO EXISTEN PERMISOS SOLICITADOS POR DIAS
-            } else {
-              this.ImprimirFecha(form);
-            }
-          })
+          else {
+            // BUSQUEDA DE FERIADOS 
+            this.BuscarFeriados(form);
+          }
+        }
+        else {
+          // BUSQUEDA DE FERIADOS 
+          this.BuscarFeriados(form);
         }
       }
     }
@@ -618,48 +482,6 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       this.LimpiarInformacion('');
       this.LimpiarComida(false);
     }
-  }
-
-  // METODO PARA BUSCAR FERIADOS
-  feriados: any = [];
-  BuscarFeriados(form: any) {
-    this.feriados = [];
-    let datos = {
-      fecha_inicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
-      fecha_final: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
-      id_empleado: parseInt(this.empleado.id)
-    }
-    this.feriado.ListarFeriadosCiudad(datos).subscribe(data => {
-      this.feriados = data;
-    })
-  }
-
-  // METODO PARA BUSCAR FECHAS DE RECUPERACION DE FERIADOS
-  recuperar: any = [];
-  BuscarFeriadosRecuperar(form: any) {
-    this.recuperar = [];
-    let datos = {
-      fecha_inicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
-      fecha_final: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
-      id_empleado: parseInt(this.empleado.id)
-    }
-    this.feriado.ListarFeriadosRecuperarCiudad(datos).subscribe(data => {
-      this.recuperar = data;
-    })
-  }
-
-  // METODO PARA BUSCAR FECHAS DE UNA PLANIFICACION HORARIA
-  horario: any = [];
-  BuscarFechasHorario(form: any) {
-    this.horario = [];
-    let datos = {
-      fecha_inicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
-      fecha_final: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
-      codigo: this.empleado.codigo
-    }
-    this.planificar.BuscarHorarioFechas(datos).subscribe(data => {
-      this.horario = data;
-    })
   }
 
   // METODO PARA VALIDAR QUE SE INGRESE DIAS - HORAS DE SOLICITUD DE PERMISOS
@@ -683,7 +505,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     else if (this.configuracion_permiso === 'Horas') {
       this.toastr.warning
         (`No puede solicitar días de permiso. 
-            Las horas de permiso que puede solicitar deben ser menores o iguales a: ${String(this.Thoras)} horas.`,
+          Las horas de permiso que puede solicitar deben ser menores o iguales a: ${String(this.Thoras)} horas.`,
           'Este tipo de permiso esta configurado por horas.', {
           timeOut: 6000,
         })
@@ -728,10 +550,10 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
           fec_final: fecha_final,
           hora_inicio: hora_inicio_,
           hora_final: hora_final_,
-          codigo: this.empleado.codigo,
-          id: this.info.id
+          codigo: this.empleado.codigo
         }
-        this.restP.BuscarPermisosSolicitadosHorasEditar(solicitud).subscribe(solicitados => {
+        console.log('ver data ', solicitud)
+        this.restP.BuscarPermisosSolicitadosHoras(solicitud).subscribe(solicitados => {
           // EXISTEN REGISTROS DE PERMISOS POR HORAS
           if (solicitados.length != 0) {
             this.toastr.info('En las fechas ingresadas existe una solicitud de permiso en estado PENDIENTE o APROBADA.',
@@ -773,23 +595,28 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     }
     // BUSQUEDA DE HORARIOS EN UN DIA Y HORAS
     this.restH.BuscarHorarioHorasMD(horario).subscribe(informacion => {
-      console.log('informacion', informacion)
+      console.log('informacion ----- ', informacion)
       datos = informacion.respuesta;
       // HORARIOS CON FINALIZACION DE JORNADA EN UN MISMO DIA
       if (informacion.message === 'CASO_1') {
         for (let i = 0; i < datos.length; i++) {
-          if (hora_inicio_ >= datos[i].hora_inicio && hora_final_ <= datos[i].hora_final) {
-            verificador = 1;
-            if (this.datosPermiso.almu_incluir === true) {
-              this.VerificarFechasIgualesComida(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i]);
-            }
-            else {
-              this.CalcularHoras(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, 0);
-            }
-            break;
+          if (datos[i].tipo_dia_entrada === 'L') {
+            verificador = 3;
           }
           else {
-            verificador = 2;
+            if (hora_inicio_ >= datos[i].hora_inicio && hora_final_ <= datos[i].hora_final) {
+              verificador = 1;
+              if (this.datosPermiso.almu_incluir === true) {
+                this.VerificarFechasIgualesComida(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i]);
+              }
+              else {
+                this.CalcularHoras(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, 0);
+              }
+              break;
+            }
+            else {
+              verificador = 2;
+            }
           }
         }
       }
@@ -813,6 +640,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
               else {
                 // LA HORA FINAL ES <= '23:59:00' Y LA HORA FINAL ES > QUE LA HORA DE INICIO
                 if (hora_final_ <= '23:59:00' && hora_final_ > datos[i].hora_inicio) {
+                  // EN EL CASO DE SER NECESARIO VERIFICAR DIA LIBRE * COLOCAR AQUI
                   verificador = 1;
                   if (this.datosPermiso.almu_incluir === true) {
                     this.VerificarFechasIgualesComida(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i]);
@@ -851,6 +679,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
                 else {
                   // LA HORA DE INICIO DEBE SER >= 00:01:00 Y LA HORA DE INICIO DEBE SER < QUE LA HORA DE SALIDA DEL USUARIO
                   if (hora_inicio_ >= '00:01:00' && hora_inicio_ < datos[i].hora_final) {
+                    // EN EL CASO DE SER NECESARIO VERIFICAR DIA LIBRE * COLOCAR AQUI
                     verificador = 1;
                     if (this.datosPermiso.almu_incluir === true) {
                       this.VerificarFechasIgualesComida(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i]);
@@ -888,6 +717,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
               // CONDICIONES QUE DEBEN CUMPLIR
               // LA HORA FINAL ES 24:00:00 (HORA DE FINALIZACION DE DIA)
               if (hora_final_ === '00:00:00') {
+                // EN EL CASO DE SER NECESARIO VERIFICAR DIA LIBRE * COLOCAR AQUI
                 verificador = 1;
                 this.CalcularHoras(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, 0);
                 break;
@@ -895,6 +725,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
               else {
                 // LA HORA FINAL ES <= '23:59:00' Y LA HORA FINAL ES > QUE LA HORA DE INICIO
                 if (hora_final_ <= '23:59:00' && hora_final_ > datos[i].hora_inicio) {
+                  // EN EL CASO DE SER NECESARIO VERIFICAR DIA LIBRE * COLOCAR AQUI
                   verificador = 1;
                   this.CalcularHoras(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, 0);
                   break;
@@ -916,6 +747,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
               // CONDICIONES QUE SE DEBE CUMPLIR
               // SI LA HORA DE INICIO ES 00:00:00 (INICIO DE UN NUEVO DIA)
               if (hora_inicio_ === '00:00:00') {
+                // EN EL CASO DE SER NECESARIO VERIFICAR DIA LIBRE * COLOCAR AQUI
                 verificador = 1;
                 this.CalcularHoras(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, 0);
                 break;
@@ -923,6 +755,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
               else {
                 // LA HORA DE INICIO DEBE SER >= 00:01:00 Y LA HORA DE INICIO DEBE SER < QUE LA HORA DE SALIDA DEL USUARIO
                 if (hora_inicio_ >= '00:01:00' && hora_inicio_ < datos[i].hora_final) {
+                  // EN EL CASO DE SER NECESARIO VERIFICAR DIA LIBRE * COLOCAR AQUI
                   verificador = 1;
                   this.CalcularHoras(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, 0);
                   break;
@@ -937,6 +770,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
             }
           }
           else if (intermedio === fecha_inicio) {
+            // EN EL CASO DE SER NECESARIO VERIFICAR DIA LIBRE * COLOCAR AQUI
             verificador = 1;
             this.CalcularHoras(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, 0);
             break;
@@ -948,6 +782,10 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       if (verificador === 2) {
         this.EmitirMensajeError();
       }
+      else if (verificador === 3) {
+        this.EmitirMensajeErrorLibre();
+      }
+
     }, vacio => {
       this.EmitirMensajeError();
     })
@@ -973,7 +811,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
           if (hora_inicio_ >= datos[i].hora_inicio && hora_final_ <= datos[i].hora_final) {
             verificador = 1;
             if (this.datosPermiso.almu_incluir === true) {
-              this.VerificarFechasDiferentesComida(form, datos[i], fecha_inicio, fecha_final, hora_inicio_, hora_final_);
+              this.VerificarFechasDiferentesComida(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_);
             }
             else {
               this.CalcularHoras(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, 0);
@@ -1059,6 +897,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
               ((hora_inicio_ <= datos[i].hora_inicio || hora_inicio_ >= datos[i].hora_inicio) &&
                 hora_inicio_ >= horario_.hora_inicio)) {
               console.log('entra if entrada = fecha_inicio')
+              verificador = 1;
               this.CalcularHoras(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i].min_almuerzo);
               break;
             }
@@ -1074,6 +913,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
                 ((hora_final_ >= datos[i].hora_final || hora_final_ <= datos[i].hora_final) &&
                   hora_final_ <= horario_.hora_final)) {
                 console.log('entra if salida = fecha_inicio')
+                verificador = 1;
                 this.CalcularHoras(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i].min_almuerzo);
                 break;
               }
@@ -1095,7 +935,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
   }
 
   // METODO PARA LEER DATOS DE HORAS - ALIMENTACION EN DIAS DIFERENTES
-  VerificarFechasDiferentesComida(form: any, horario_: any, fecha_inicio: any, fecha_final: any, hora_inicio_: any, hora_final_: any) {
+  VerificarFechasDiferentesComida(form: any, fecha_inicio: any, fecha_final: any, hora_inicio_: any, hora_final_: any) {
     let datos_: any = [];
     let verificador = 0;
     // METODO PARA BUSCAR PERMISOS SOLICITADOS POR DIAS
@@ -1141,10 +981,9 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       fec_final: fecha_final,
       hora_inicio: form.horaSalidaForm,
       hora_final: form.horasIngresoForm,
-      codigo: this.empleado.codigo,
-      id: this.info.id
+      codigo: this.empleado.codigo
     }
-    this.restP.BuscarPermisosSolicitadosHorasEditar(solicitud).subscribe(solicitados => {
+    this.restP.BuscarPermisosSolicitadosHoras(solicitud).subscribe(solicitados => {
       if (solicitados.message != 'error') {
         // EXISTEN REGISTROS DE PERMISOS POR HORAS
         if (solicitados.length != 0) {
@@ -1257,7 +1096,16 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
 
   // MENSAJE PARA MOSTRAR QUE NO SE ENCUENTRA PLANIFICACION
   EmitirMensajeError() {
-    this.toastr.warning('No tiene asignada una planificación horaria en las fechas y horas ingresadas.', 'Ups!!! algo salio mal.', {
+    this.toastr.warning('No tiene asignada una planificación horaria en las horas ingresadas.', 'Ups!!! algo salio mal.', {
+      timeOut: 6000,
+    });
+    this.fechaInicioF.setValue('');
+    this.LimpiarInformacion('');
+  }
+
+  // MENSAJE PARA MOSTRAR QUE EL DIA SELECCIONADO ES LIBRE
+  EmitirMensajeErrorLibre() {
+    this.toastr.warning('El día registrado esta configurado como día libre.', 'Ups!!! algo salio mal.', {
       timeOut: 6000,
     });
     this.fechaInicioF.setValue('');
@@ -1293,7 +1141,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     if (this.configuracion_permiso === 'Dias') {
       this.toastr.warning(
         `Si solicita un permiso por horas recuerde que estás deben ser menores a ${hora_empleado} horas.
-              Podría solicitar el permiso por días, máximo hasta ${String(this.Tdias)} dias de permiso.`,
+            Podría solicitar el permiso por días, máximo hasta ${String(this.Tdias)} dias de permiso.`,
         `Ha solicitado ${valor} horas de permiso.`, {
         timeOut: 6000,
       });
@@ -1307,6 +1155,188 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       });
       this.LimpiarInformacion('');
     }
+  }
+
+  // METODO PARA BUSCAR FERIADOS
+  feriados: any = [];
+  BuscarFeriados(form: any) {
+    this.feriados = [];
+    let datos = {
+      fecha_inicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
+      fecha_final: moment(form.fechaFinalForm).format('YYYY-MM-DD'),
+      id_empleado: parseInt(this.empleado.id)
+    }
+    if (form.solicitarForm === 'Horas' && form.especialForm === false) {
+      datos.fecha_final = moment(form.fechaInicioForm).format('YYYY-MM-DD');
+    }
+    this.feriado.ListarFeriadosCiudad(datos).subscribe(data => {
+      this.feriados = data;
+      console.log('feriados ver ***** ', this.feriados)
+      this.BuscarFeriadosRecuperar(form, datos);
+    }, vacio => {
+      this.BuscarFeriadosRecuperar(form, datos);
+    })
+  }
+
+  // METODO PARA BUSCAR FECHAS DE RECUPERACION DE FERIADOS
+  recuperar: any = [];
+  BuscarFeriadosRecuperar(form: any, busqueda: any) {
+    this.recuperar = [];
+    this.feriado.ListarFeriadosRecuperarCiudad(busqueda).subscribe(data => {
+      this.recuperar = data;
+      console.log('recuperar feriados ver ***** ', this.recuperar)
+      // REVISAR DATOS
+      this.RevisarTipoSolicitud(form);
+    }, vacio => {
+      // REVISAR DATOS
+      this.RevisarTipoSolicitud(form);
+    })
+  }
+
+  // METODO PARA REVISAR DATOS SEGUN TIPO DE SOLICITUD
+  RevisarTipoSolicitud(form: any) {
+    if (form.solicitarForm === 'Dias') {
+      // BUSCAR FECHAS HORARIO
+      this.BuscarFechasHorario(form);
+    }
+    else {
+      //console.log('ingresa horas ----------------------- ')
+      this.LimpiarComida(false);
+
+      // VERIFICAR SI EL DIA SELECCIONADO ES UN FERIADO
+      if (this.feriados.length > 0) {
+
+        if (form.especialForm === false) {
+          this.toastr.warning(
+            `No es posible registrar una solicitud de permiso en un día configurado como feriado.`,
+            `Ups!!!`, {
+            timeOut: 6000,
+          });
+          this.LimpiarInformacion('');
+        }
+        else {
+          this.BuscarDatosHoras(form);
+        }
+      }
+      else {
+        this.BuscarDatosHoras(form);
+      }
+    }
+  }
+
+  // METODO PARA BUSCAR FECHAS DE UNA PLANIFICACION HORARIA
+  horario: any = [];
+  // VARIABLES DE GESTION DE FECHAS
+  fechasHorario: any;
+  totalFechas: any = [];
+  BuscarFechasHorario(form: any) {
+    this.horario = [];
+    let inicio = moment(form.fechaInicioForm).format('YYYY-MM-DD');
+    let inicio_ = moment(form.fechaInicioForm).format('YYYY-MM-DD');
+    let final = moment(form.fechaFinalForm).format('YYYY-MM-DD');
+
+    this.fechasHorario = '';
+    this.totalFechas = [];
+    // LOGICA PARA OBTENER CADA UNA DE LAS FECHAS INGRESADAS
+    while (inicio_ <= final) {
+      if (this.fechasHorario === '') {
+        this.fechasHorario = '\'' + inicio_ + '\'';
+      }
+      else {
+        this.fechasHorario = this.fechasHorario + ', \'' + inicio_ + '\'';
+      }
+      this.totalFechas.push(inicio_);
+      var newDate = moment(inicio_).add(1, 'd').format('YYYY-MM-DD')
+      inicio_ = newDate;
+    }
+
+    let datos = {
+      lista_fechas: this.fechasHorario,
+      codigo: this.empleado.codigo
+    }
+
+    this.planificar.BuscarHorarioFechas(datos).subscribe(data => {
+      console.log('ingresa a consultar horarios ----------------------- ', data)
+      this.horario = data;
+
+      if (this.horario.length === (this.totalFechas.length * 2)) {
+        // PERMISO SOLICITADO POR DIAS
+        this.horas = [];
+        this.horas = data[0];
+
+        // METODO PARA BUSCAR PERMISOS SOLICITADOS POR DIAS
+        let solicitud = {
+          fec_inicio: inicio,
+          fec_final: final,
+          codigo: this.empleado.codigo
+        }
+
+        this.restP.BuscarPermisosSolicitadosTotales(solicitud).subscribe(solicitados => {
+          // EXISTEN REGISTROS DE PERMISOS POR DIAS
+          if (solicitados.length != 0) {
+            this.toastr.info('En las fechas ingresadas existe una solicitud de permiso en estado PENDIENTE o APROBADA.',
+              'VERIFICAR SOLICITUD DE PERMISO.', {
+              timeOut: 6000,
+            });
+            this.fechaInicioF.setValue('');
+            this.LimpiarInformacion('00:00');
+            // NO EXISTEN PERMISOS SOLICITADOS POR DIAS
+          } else {
+            this.ValidarConfiguracionDias();
+          }
+        })
+      }
+      else {
+        this.toastr.warning('No tiene asignada una planificación horaria en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
+          timeOut: 6000,
+        });
+        this.fechaInicioF.setValue('');
+        this.LimpiarInformacion('00:00');
+      }
+    }, error => {
+      this.toastr.warning('No tiene asignada una planificación horaria en las fechas ingresadas.', 'Ups!!! algo salio mal.', {
+        timeOut: 6000,
+      });
+      this.fechaInicioF.setValue('');
+      this.LimpiarInformacion('00:00');
+    });
+  }
+
+  // METODO PARA VERIFICAR DATOS DE PERMISOS EN HORAS
+  BuscarDatosHoras(form: any) {
+
+    let inicio = moment(form.fechaInicioForm).format('YYYY-MM-DD');
+    let final = '';
+    // SI CASO ESPECIAL SELECCIONADO
+    if (form.especialForm === true) {
+      // SUMAR UN DIA A LA FECHA
+      final = moment(form.fechaInicioForm, 'YYYY-MM-DD').add(1, 'days').format('YYYY-MM-DD');
+    } else {
+      // MENTENER FECHA IGUAL
+      final = moment(form.fechaInicioForm).format('YYYY-MM-DD');
+    }
+
+    // METODO PARA BUSCAR PERMISOS SOLICITADOS POR DIAS
+    let solicitud = {
+      fec_inicio: inicio,
+      fec_final: final,
+      codigo: this.empleado.codigo
+    }
+    this.restP.BuscarPermisosSolicitadosDias(solicitud).subscribe(solicitados => {
+      // EXISTEN REGISTROS DE PERMISOS POR DIAS
+      if (solicitados.length != 0) {
+        this.toastr.info('En las fechas ingresadas existe una solicitud de permiso en estado PENDIENTE o APROBADA.',
+          'VERIFICAR SOLICITUD DE PERMISO.', {
+          timeOut: 6000,
+        });
+        this.fechaInicioF.setValue('');
+        this.LimpiarInformacion('00:00');
+        this.LimpiarComida(false);
+        // NO EXISTEN PERMISOS SOLICITADOS POR DIAS
+      } else {
+        this.ImprimirFecha(form);
+      }
+    })
   }
 
   // CONTAR DIAS DE FERIADO EXISTENTES
@@ -1323,21 +1353,21 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     this.contar_recuperables = 0;
 
     this.fechas_solicitud = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO 
-    var inicio = String(moment(this.dSalida, "YYYY/MM/DD").format("YYYY-MM-DD"));
-    var fin = String(moment(this.dIngreso, "YYYY/MM/DD").format("YYYY-MM-DD"));
-    // INICIALIZAR DATOS DE FECHA
-    var start = new Date(inicio);
-    var end = new Date(fin);
+    var inicio = moment(this.dSalida, "YYYY/MM/DD").format("YYYY-MM-DD");
+    var fin = moment(this.dIngreso, "YYYY/MM/DD").format("YYYY-MM-DD");
+
     // LOGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DIA DEL PERIODO INDICADO
-    while (start <= end) {
-      this.fechas_solicitud.push(moment(start).format('YYYY-MM-DD'));
-      var newDate = start.setDate(start.getDate() + 1);
-      start = new Date(newDate);
+    while (inicio <= fin) {
+      this.fechas_solicitud.push(inicio);
+      var newDate = moment(inicio).add(1, 'd').format('YYYY-MM-DD')
+      inicio = newDate;
     }
+    //console.log('fechas form ---- ', this.fechas_solicitud)
+    //console.log('feriados form ---- ', this.feriados)
 
     // BUSCAR FERIADOS 
     if (this.feriados.length != 0) {
-      this.fechas_solicitud.map((obj: any) => {
+      this.fechas_solicitud.map(obj => {
         for (let i = 0; i < this.feriados.length; i++) {
           if (moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
             this.contar_feriados = this.contar_feriados + 1;
@@ -1346,10 +1376,11 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
         }
       })
     }
+    //console.log('ver feriados ', this.contar_feriados)
 
     // BUSCAR FECHAS DE RECUPERACION DE FERIADOS
     if (this.recuperar.length != 0) {
-      this.fechas_solicitud.map((obj: any) => {
+      this.fechas_solicitud.map(obj => {
         for (let j = 0; j < this.recuperar.length; j++) {
           if (moment(this.recuperar[j].fec_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
             this.contar_recuperables = this.contar_recuperables + 1;
@@ -1359,13 +1390,12 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       })
     }
 
-
     if (this.horario.length != 0) {
       for (let k = 0; k < this.horario.length; k++) {
-        if (this.horario[k].tipo === 'L') {
+        if (this.horario[k].estado_origen === 'L' && this.horario[k].tipo_entr_salida === 'E') {
           this.contar_libres = this.contar_libres + 1;
         }
-        if (this.horario[k].tipo === 'N') {
+        if (this.horario[k].estado_origen === 'N' && this.horario[k].tipo_entr_salida === 'E') {
           this.contar_laborables = this.contar_laborables + 1;
         }
       }
@@ -1375,16 +1405,25 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     var total_libres = 0;
     var total_laborables = 0;
 
-    console.log('this.contar_laborables: ', this.contar_laborables);
-    console.log('this.contar_recuperables: ', this.contar_recuperables);
+    if (this.feriados.length > 0) {
+      var libre = this.contar_libres - this.contar_recuperables;
+      var laborable = this.contar_laborables + this.contar_recuperables;
 
-    if (this.datosPermiso.contar_feriados === true) {
-      total_laborables = this.contar_laborables + this.contar_feriados;
-      total_libres = this.contar_libres;
+      //console.log('ver LIBRES T-- ', libre)
+      //console.log('ver LABORABLES T -- ', laborable)
+
+      if (this.datosPermiso.contar_feriados === false) {
+        total_libres = libre + this.contar_feriados;
+        total_laborables = laborable - this.contar_feriados;
+      }
+      else {
+        total_libres = libre;
+        total_laborables = laborable;
+      }
     }
     else {
-      total_libres = this.contar_libres + this.contar_feriados;
-      total_laborables = this.contar_laborables + this.contar_recuperables;
+      total_libres = this.contar_libres;
+      total_laborables = this.contar_laborables;
     }
 
     this.diaLaboralF.setValue(total_laborables);
@@ -1405,62 +1444,31 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
    ** **                    TRATAMIENTO DE DATOS DE REGISTRO DE PERMISO               ** ** 
    ** ********************************************************************************** **/
 
-  // METODO PARA CAPTURAR DATOS DE PERMISO
+  // GUARDAR DATOS DE PERMISO
   InsertarPermiso(form: any) {
     let datosPermiso = {
-      depa_user_loggin: parseInt(this.actuales.id_departamento),
+      id_empl_contrato: this.datos.id_contrato,
+      id_peri_vacacion: this.periodo_vacaciones,
+      depa_user_loggin: this.solInfo.id_dep,
       id_tipo_permiso: form.idPermisoForm,
+      id_empl_cargo: this.datos.id_cargo,
+      fec_creacion: this.FechaActual,
       hora_ingreso: form.horasIngresoForm,
       descripcion: form.descripcionForm,
       hora_numero: form.horasForm,
       num_permiso: this.num,
       hora_salida: form.horaSalidaForm,
-      fec_inicio: String(moment(form.fechaInicioForm).format('YYYY-MM-DD')),
-      fec_final: String(moment(form.fechaFinalForm).format('YYYY-MM-DD')),
+      legalizado: this.legalizado,
+      fec_inicio: form.fechaInicioForm,
+      fec_final: form.fechaFinalForm,
       dia_libre: form.diaLibreForm,
+      codigo: parseInt(this.empleado.codigo),
+      estado: 1,
       dia: parseInt(form.diasForm),
     }
     this.CambiarValoresDiasHoras(form, datosPermiso);
-    if (this.documento_editar === true && this.eliminar === false && this.editar === false) {
-      this.ActualizarRegistro(datosPermiso);
-      this.CerrarVentana();
-    }
-    else if (this.editar === true) {
-      if (this.archivoSubido != undefined) {
-        this.ActualizarRegistro(datosPermiso);
-        this.SubirRespaldo(this.info.id, form);
-        this.CerrarVentana();
-      } else {
-        this.toastr.warning('Debe cargar un documento.', '', {
-          timeOut: 6000,
-        });
-      }
-    }
-    else if (this.eliminar === true) {
-      this.ActualizarRegistro(datosPermiso);
-      this.EliminarDocumentoBDD();
-      this.CerrarVentana();
-    }
-    else if (this.documento === true) {
-      if (this.certificado === true) {
-        if (this.archivoSubido != undefined) {
-          this.ActualizarRegistro(datosPermiso);
-          this.SubirRespaldo(this.info.id, form);
-          this.CerrarVentana();
-        } else {
-          this.toastr.warning('Debe cargar un documento.', '', {
-            timeOut: 6000,
-          });
-        }
-      }
-      else {
-        this.ActualizarRegistro(datosPermiso);
-        if (this.archivoSubido != undefined) {
-          this.SubirRespaldo(this.info.id, form);
-        }
-        this.CerrarVentana();
-      }
-    }
+    this.CambiarValorDiaLibre(datosPermiso, form);
+    console.log(datosPermiso);
   }
 
   // SETEAR VALORES DE DIAS Y HORAS
@@ -1472,22 +1480,45 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     }
     else if (form.solicitarForm === 'Horas') {
       datos.dia = 0;
-      datos.dia_libre = 0;
     }
   }
 
-  // METODO PARA ACTUALIZAR REGISTRO
-  ActualizarRegistro(datos: any) {
-    this.restP.EditarPermiso(this.info.id, datos).subscribe(permiso => {
-      this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
+  // SETEAR VALOR DE DIAS LIBRES
+  CambiarValorDiaLibre(datos: any, form: any) {
+    if (datos.dia_libre === '') {
+      datos.dia_libre = 0;
+      this.GuardarDatos(datos, form);
+    }
+    else {
+      this.GuardarDatos(datos, form);
+    }
+  }
+
+  // VALIDACIONES DE DATOS DE SOLICITUD
+  GuardarDatos(datos: any, form: any) {
+    this.restP.IngresarEmpleadoPermisos(datos).subscribe(permiso => {
+      console.log('ver datos permiso ', permiso)
+      this.toastr.success('Operación exitosa.', 'Permiso registrado.', {
         timeOut: 6000,
       });
-      if (this.datosPermiso.correo_editar === true) {
-        permiso.EmpleadosSendNotiEmail.push(this.solInfo);
-        this.EnviarCorreo(permiso);
+      permiso.EmpleadosSendNotiEmail.push(this.solInfo);
+      this.ImprimirNumeroPermiso();
+      if (this.datosPermiso.documento === true) {
+        this.SubirRespaldo(permiso, permiso.codigo);
+      }
+      else {
+        if (this.archivoSubido != undefined) {
+          this.SubirRespaldo(permiso, permiso.codigo);
+        }
+      }
+      this.IngresarAutorizacion(permiso);
+      if (this.datosPermiso.correo_crear === true) {
+        this.EnviarCorreoPermiso(permiso);
         this.EnviarNotificacion(permiso);
       }
+      this.CerrarVentana();
     });
+
   }
 
 
@@ -1496,8 +1527,8 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
    ** ********************************************************************************** **/
 
   // SELECCIONAR ARCHIVO
-  nameFile: string = '';
-  archivoSubido: Array<File> = [];
+  nameFile: string;
+  archivoSubido: Array<File>;
 
   fileChange(element: any) {
     this.archivoSubido = element.target.files;
@@ -1517,12 +1548,13 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
   }
 
   // CARGAR DOCUMENTO
-  SubirRespaldo(id: number, codigo: any) {
+  SubirRespaldo(permiso: any, codigo: any) {
+    var id = permiso.id;
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    this.restP.SubirArchivoRespaldo(formData, id, codigo, this.info.documento).subscribe(res => {
+    this.restP.SubirArchivoRespaldo(formData, id, codigo, null).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Documento registrado.', {
         timeOut: 6000,
       });
@@ -1547,76 +1579,87 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     this.archivoForm.patchValue('');
   }
 
-  // METODO PARA ACTUALIZAR DEL REGISTRO EL ARCHIVO
-  editar: boolean = false;
-  EditarArchivo(evento: MatCheckboxChange) {
-    this.editar = evento.checked
-    this.eliminar = false;
-    this.documento = true;
-  }
 
-  // METODO PARA ELIMINAR DEL REGISTRO EL ARCHIVO
-  eliminar: boolean = false;
-  EliminarArchivo(evento: MatCheckboxChange) {
-    this.eliminar = evento.checked
-    this.editar = false;
-    this.documento = false;
-    // DOCUMENTO REQUERIDO
-    this.certificado = this.datosPermiso.documento;
-  }
+  /** ***************************************************************************************** **
+   ** **                   INGRESO DE REGISTRO DE AUTORIZACION DE PERMISO                    ** **
+   ** ***************************************************************************************** **/
 
-
-  // CARGAR DOCUMENTO
-  EliminarDocumentoBDD() {
-    let datos = {
-      archivo: this.info.documento,
-      id: this.info.id,
-      codigo: this.empleado.codigo,
+  IngresarAutorizacion(permiso: any) {
+    //console.log('this.departamento: ', this.departamento);
+    // ARREGLO DE DATOS PARA INGRESAR UNA AUTORIZACION
+    let newAutorizaciones = {
+      orden: 1, // ORDEN DE LA AUTORIZACIÓN 
+      estado: 1, // ESTADO PENDIENTE
+      id_departamento: this.departamento,
+      id_permiso: permiso.id,
+      id_vacacion: null,
+      id_hora_extra: null,
+      id_documento: '',
+      id_plan_hora_extra: null,
     }
-    this.restP.EliminarDocumentoPermiso(datos).subscribe(res => {
-    });
+    //console.log('this.departamento: ', newAutorizaciones);
+    this.restAutoriza.postAutorizacionesRest(newAutorizaciones).subscribe(res => {
+    })
   }
 
 
-  /** ******************************************************************************************* **
-   ** **                   METODO DE ENVIO DE NOTIFICACIONES DE PERMISOS                       ** **
-   ** ******************************************************************************************* **/
+  /** *************************************************************************************** ** 
+   ** **                   METODOS ENVIO DE NOTIFICACIONES DE PERMISOS                     ** ** 
+   ** *************************************************************************************** **/
 
   // METODO PARA OBTENER CONFIGURACION DE NOTIFICACIONES
   solInfo: any;
+  departamento: any;
   ObtenerInformacionEmpleado() {
     var estado: boolean;
-    this.informacion_.ObtenerInfoConfiguracion(this.id_empleado).subscribe(
+    this.informacion_.ObtenerInfoConfiguracion(this.datos.id_empleado).subscribe(
       res => {
-        if (res.estado === 1) {
-          estado = true;
+        if (res) {
+          if (res.estado === 1) {
+            estado = true;
+          }
+          this.solInfo = [];
+          this.solInfo = {
+            permiso_mail: res.permiso_mail,
+            permiso_noti: res.permiso_noti,
+            empleado: res.id_empleado,
+            id_dep: res.id_departamento,
+            id_suc: res.id_sucursal,
+            estado: estado,
+            correo: res.correo,
+            fullname: res.fullname,
+          }
+          this.departamento = res.id_departamento;
+          if (this.datos.id_empleado != this.idEmpleadoIngresa) {
+            this.nota = 'la solicitud';
+            this.user = 'para ' + this.solInfo.fullname;
+          }
         }
-        this.solInfo = [];
-        this.solInfo = {
-          permiso_mail: res.permiso_mail,
-          permiso_noti: res.permiso_noti,
-          empleado: res.id_empleado,
-          id_dep: res.id_departamento,
-          id_suc: res.id_sucursal,
-          estado: estado,
-          correo: res.correo,
-          fullname: res.fullname,
-        }
-        if (this.id_empleado != this.idEmpleadoIngresa) {
-          this.nota = 'la solicitud';
-          this.user = 'para ' + this.solInfo.fullname;
+        else {
+          this.toastr.info(
+            'De clic aquí para configurar envio y recepción de notficaciones y avisos al correo electrónico.',
+            'Faltan ajustes del sistema.',
+            { timeOut: 9000 }).onTap.subscribe(items => {
+              this.ConfigurarNotificaciones();
+            });
+          this.CerrarVentana();
         }
       })
   }
 
-  // METODO PARA ENVIAR CORREO ELECTRONICO
-  EnviarCorreo(permiso: any) {
+  // METODO PARA ABRIR CONFIGURACION DE NOTIFICACIONES
+  ConfigurarNotificaciones() {
+    const id_empleado = parseInt(this.datos.id_empleado);
+    this.ventana.open(SettingsComponent, { width: '350px', data: { id_empleado } });
+  }
 
-    console.log('entra correo')
+  // METODO PARA ENVIAR CORREO ELECTRONICO
+  EnviarCorreoPermiso(permiso: any) {
+
     var cont = 0;
     var correo_usuarios = '';
 
-    // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE PERMISO
+    // METODO PARA OBTENER NOMBRE DEL DIA EN EL CUAL SE REALIZA LA SOLICITUD DE PERMISO
     let solicitud = this.validar.FormatearFecha(permiso.fec_creacion, this.formato_fecha, this.validar.dia_completo);
     let desde = this.validar.FormatearFecha(permiso.fec_inicio, this.formato_fecha, this.validar.dia_completo);
     let hasta = this.validar.FormatearFecha(permiso.fec_final, this.formato_fecha, this.validar.dia_completo);
@@ -1625,29 +1668,18 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     if (permiso.estado === 1) {
       var estado_p = 'Pendiente de autorización';
     }
-    else if (permiso.estado === 2) {
-      var estado_p = 'Preautorizada';
-    }
-    else if (permiso.estado === 3) {
-      var estado_p = 'Autorizada';
-    }
-    else if (permiso.estado === 1) {
-      var estado_p = 'Negada';
-    }
 
     // LEYENDO DATOS DE TIPO DE PERMISO
     var tipo_permiso = '';
-    this.tipoPermisos.filter((o: any) => {
+    this.tipoPermisos.filter(o => {
       if (o.id === permiso.id_tipo_permiso) {
         tipo_permiso = o.descripcion
       }
       return tipo_permiso;
     })
 
-    // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
-    permiso.EmpleadosSendNotiEmail.forEach((e: any) => {
-
-      console.log('for each', e)
+    // VERIFICACION QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
+    permiso.EmpleadosSendNotiEmail.forEach(e => {
 
       // LECTURA DE DATOS LEIDOS
       cont = cont + 1;
@@ -1663,47 +1695,41 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
           }
         }
       }
-
-      console.log('contadores', permiso.EmpleadosSendNotiEmail.length + ' cont ' + cont)
-
+      console.log('ver correos ', correo_usuarios)
       if (cont === permiso.EmpleadosSendNotiEmail.length) {
 
-        console.log('data entra correo usuarios', correo_usuarios)
-
         let datosPermisoCreado = {
+          tipo_solicitud: 'Permiso solicitado por',
+          id_empl_contrato: permiso.id_empl_contrato,
+          horas_permiso: permiso.hora_numero,
+          tipo_permiso: tipo_permiso,
+          dias_permiso: permiso.dia,
+          observacion: permiso.descripcion,
           solicitud: solicitud,
           desde: desde,
           hasta: hasta,
           h_inicio: this.validar.FormatearHora(permiso.hora_salida, this.formato_hora),
           h_fin: this.validar.FormatearHora(permiso.hora_ingreso, this.formato_hora),
-          id_empl_contrato: permiso.id_empl_contrato,
-          tipo_solicitud: 'Permiso actualizado por',
-          horas_permiso: permiso.hora_numero,
-          observacion: permiso.descripcion,
-          tipo_permiso: tipo_permiso,
-          dias_permiso: permiso.dia,
           estado_p: estado_p,
-          proceso: 'actualizado',
+          proceso: 'creado',
           id_dep: e.id_dep,
           id_suc: e.id_suc,
           correo: correo_usuarios,
-          asunto: 'ACTUALIZACION DE SOLICITUD DE PERMISO',
+          asunto: 'SOLICITUD DE PERMISO',
           id: permiso.id,
           solicitado_por: localStorage.getItem('fullname_print'),
         }
         if (correo_usuarios != '') {
-          console.log('data entra enviar correo')
 
           this.restP.EnviarCorreoWeb(datosPermisoCreado).subscribe(
             resp => {
-              console.log('data entra enviar correo', resp)
               if (resp.message === 'ok') {
                 this.toastr.success('Correo de solicitud enviado exitosamente.', '', {
                   timeOut: 6000,
                 });
               }
               else {
-                this.toastr.warning('Ups algo salio mal !!!', 'No fue posible enviar correo de solicitud.', {
+                this.toastr.warning('Ups!!! algo salio mal.', 'No fue posible enviar correo de solicitud.', {
                   timeOut: 6000,
                 });
               }
@@ -1738,15 +1764,15 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     }
 
     let notificacion = {
-      id_send_empl: this.idEmpleadoIngresa,
       id_receives_empl: '',
       id_receives_depa: '',
-      estado: 'Pendiente',
-      id_permiso: permiso.id,
       id_vacaciones: null,
       id_hora_extra: null,
+      id_send_empl: this.idEmpleadoIngresa,
+      id_permiso: permiso.id,
       tipo: 1,
-      mensaje: 'Ha actualizado ' + this.nota + ' de permiso ' + this.user + ' desde ' +
+      estado: 'Pendiente',
+      mensaje: 'Ha realizado ' + this.nota + ' de permiso ' + this.user + ' desde ' +
         desde + ' ' + h_inicio + ' hasta ' +
         hasta + ' ' + h_fin,
     }
@@ -1755,15 +1781,15 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     var allNotificaciones: any = [];
     // CICLO POR CADA ELEMENTO DEL CATALOGO
     permiso.EmpleadosSendNotiEmail.forEach(function (elemento: any, indice: any, array: any) {
-      // Discriminación de elementos iguales
-      if (allNotificaciones.find((p: any) => p.fullname == elemento.fullname) == undefined) {
+      // DISCRIMINACION DE ELEMENTOS IGUALES
+      if (allNotificaciones.find(p => p.fullname == elemento.fullname) == undefined) {
         // NUEVA LISTA DE EMPLEADOS QUE RECIBEN LA NOTIFICACION
         allNotificaciones.push(elemento);
       }
     });
 
     // FOREACH PARA ENVIAR LA NOTIFICACION A CADA USUARIO DENTRO DE LA NUEVA LISTA FILTRADA
-    allNotificaciones.forEach((e: any) => {
+    allNotificaciones.forEach(e => {
       notificacion.id_receives_depa = e.id_dep;
       notificacion.id_receives_empl = e.empleado;
       if (e.permiso_noti) {
@@ -1778,7 +1804,6 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
           },
         )
       }
-
     })
 
   }
@@ -1787,6 +1812,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
    ** **                    LIMPIAR CAMPOS DEL FORMULARIO                            ** **             
    ** ********************************************************************************* **/
 
+  // LIMPIAR CAMPOS DEL FORMULARIO
   LimpiarCampos() {
     this.formulario.reset();
   }
@@ -1828,10 +1854,21 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
   // CERRAR VENTANA DE REGISTRO
   CerrarVentana() {
     this.LimpiarCampos();
-    this.componente.formulario_editar_permiso = false;
-    this.componente.solicitudes_permiso = true;
-    this.componente.ObtenerPermisos(this.componente.formato_fecha, this.componente.formato_hora);
-    this.ventana.close(true);
+    if (this.datos.ventana === 'empleado') {
+      this.componente1.formulario_permiso = false;
+      this.componente1.solicitudes_permiso = true;
+      this.componente1.ObtenerPermisos(this.componente1.formato_fecha, this.componente1.formato_hora);
+    }
+    else {
+      this.componente2.activar_busqueda = true;
+      this.componente2.permiso_individual = false;
+    }
+  }
+
+  // VALIDACIONES INGRESAR SOLO NUMEROS
+  IngresarSoloNumeros(evt: any) {
+    this.horasF.setValue('');
+    return this.validar.IngresarSoloNumeros(evt);
   }
 
   // METODO PARA FORMATEAR HORAS
@@ -1845,9 +1882,4 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     return h + ':' + m + ':' + s;
   }
 
-  // VALIDACIONES INGRESAR SOLO NUMEROS
-  IngresarSoloNumeros(evt: any) {
-    this.horasF.setValue('');
-    return this.validar.IngresarSoloNumeros(evt);
-  }
 }

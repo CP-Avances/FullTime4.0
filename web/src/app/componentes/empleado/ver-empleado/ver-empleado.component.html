@@ -1112,11 +1112,15 @@
             <h6 id="items">Permisos</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
+
+            <!--  *************** REGISTRO DE PERMISOS  **********************  -->
             <app-registro-empleado-permiso [solicita_permiso]="solicita_permiso" *ngIf="formulario_permiso">
             </app-registro-empleado-permiso>
-            <app-editar-permiso-empleado [solicita_permiso]="solicita_permiso" [id_empleado]="empleado_permiso"
-                *ngIf="formulario_editar_permiso">
+
+            <!--  *************** EDICION DE PERMISOS  **********************  -->
+            <app-editar-permiso-empleado [solicita_permiso]="solicita_permiso" *ngIf="formulario_editar_permiso">
             </app-editar-permiso-empleado>
+
             <mat-card class="mat-elevation-z8" *ngIf="solicitudes_permiso">
                 <div class="d-flex bd-highlight" id="titulo">
                     <div class="w-100 bd-highlight">
@@ -1141,7 +1145,7 @@
                     <i class="fa fa-refresh" id="listar" style="padding-top: 10px;" (click)="LimpiarCamposPermisos()"
                         matSuffix matTooltipPosition="right"
                         matTooltip="Modificar los datos generales de este registro">
-                        <p>Mostrar lista</p>
+                        <p>Actualizar y <br> mostrar lista</p>
                     </i>
                 </div>
                 <mat-divider style="margin-bottom: 10px;"></mat-divider>

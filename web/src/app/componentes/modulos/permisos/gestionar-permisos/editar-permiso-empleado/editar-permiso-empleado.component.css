@@ -80,6 +80,10 @@ mat-label {
 #color_fuente {
     color: rgb(8, 8, 8);
     font-size: 13px;
+    margin: 12px 0px 0px 0px;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: 0.1px;
 }
 
 #formulario {

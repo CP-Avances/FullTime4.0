@@ -237,7 +237,6 @@ import { VerBirthdayComponent } from './componentes/administracionGeneral/birthd
 import { ConfiguracionComponent } from './componentes/administracionGeneral/correo/configuracion/configuracion.component';
 import { ListaNotificacionComponent } from './componentes/administracionGeneral/configuracion-notificaciones/multiple/lista-empleados/listaNotificacion.component';
 import { ConfiguracionNotificacionComponent } from './componentes/administracionGeneral/configuracion-notificaciones/multiple/configuracion/configuracionNotificacion.component';
-import { EditarPermisoEmpleadoComponent } from './componentes/rolEmpleado/permisos-empleado/editar-permiso-empleado/editar-permiso-empleado.component';
 import { CancelarPermisoComponent } from './componentes/rolEmpleado/permisos-empleado/cancelar-permiso/cancelar-permiso.component';
 import { CancelarVacacionesComponent } from './componentes/rolEmpleado/vacacion-empleado/cancelar-vacaciones/cancelar-vacaciones.component';
 import { EditarVacacionesEmpleadoComponent } from './componentes/modulos/vacaciones/editar-vacaciones-empleado/editar-vacaciones-empleado.component';
@@ -258,7 +257,7 @@ import { ListarCiudadComponent } from './componentes/catalogos/catCiudad/listar-
 import { RegistrarPeriodoVComponent } from './componentes/modulos/vacaciones/periodoVacaciones/registrar-periodo-v/registrar-periodo-v.component';
 import { RegistrarEmpleProcesoComponent } from './componentes/modulos/accionesPersonal/procesos/registrar-emple-proceso/registrar-emple-proceso.component';
 import { RegistrarVacacionesComponent } from './componentes/modulos/vacaciones/registrar-vacaciones/registrar-vacaciones.component';
-import { RegistroEmpleadoPermisoComponent } from './componentes/modulos/permisos/registro-empleado-permiso/registro-empleado-permiso.component';
+import { RegistroEmpleadoPermisoComponent } from './componentes/modulos/permisos/gestionar-permisos/registro-empleado-permiso/registro-empleado-permiso.component';
 import { EditarEmpleadoProcesoComponent } from './componentes/modulos/accionesPersonal/procesos/editar-empleado-proceso/editar-empleado-proceso.component';
 import { ListarEmpleadoPermisoComponent } from './componentes/modulos/permisos/listar/listar-empleado-permiso/listar-empleado-permiso.component';
 import { EditarPeriodoVacacionesComponent } from './componentes/modulos/vacaciones/periodoVacaciones/editar-periodo-vacaciones/editar-periodo-vacaciones.component';
@@ -316,10 +315,11 @@ import { ComidasSolicitadasEmpleadoComponent } from './componentes/rolEmpleado/c
 import { BrowserModule } from '@angular/platform-browser';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { BuscarPlanificacionComponent } from './componentes/horarios/rango-fechas/buscar-planificacion/buscar-planificacion.component';
-import { TipoPermisosComponent } from './componentes/modulos/permisos/catTipoPermisos/tipo-permisos/tipo-permisos.component';
-import { VistaElementosComponent } from './componentes/modulos/permisos/catTipoPermisos/listarTipoPermisos/vista-elementos.component';
-import { EditarTipoPermisosComponent } from './componentes/modulos/permisos/catTipoPermisos/editar-tipo-permisos/editar-tipo-permisos.component';
-import { VerTipoPermisoComponent } from './componentes/modulos/permisos/catTipoPermisos/ver-tipo-permiso/ver-tipo-permiso.component';
+import { TipoPermisosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/tipo-permisos/tipo-permisos.component';
+import { VistaElementosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/listarTipoPermisos/vista-elementos.component';
+import { EditarTipoPermisosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/editar-tipo-permisos/editar-tipo-permisos.component';
+import { VerTipoPermisoComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/ver-tipo-permiso/ver-tipo-permiso.component';
+import { EditarPermisoEmpleadoComponent } from './componentes/modulos/permisos/gestionar-permisos/editar-permiso-empleado/editar-permiso-empleado.component';
 
 const config: SocketIoConfig = { url: environment.url, options: {} };
 

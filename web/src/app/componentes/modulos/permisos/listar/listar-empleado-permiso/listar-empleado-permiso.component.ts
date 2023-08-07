@@ -12,9 +12,6 @@ import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-// IMPORTACION DE COMPONENTES
-import { EditarPermisoEmpleadoComponent } from "src/app/componentes/rolEmpleado/permisos-empleado/editar-permiso-empleado/editar-permiso-empleado.component";
-import { AutorizacionesComponent } from "src/app/componentes/autorizaciones/autorizaciones/autorizaciones.component";
 
 // IMPORTACION DE SERVICIOS
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
@@ -29,6 +26,7 @@ import { ToastrService } from 'ngx-toastr';
 import { EmplDepaPipe } from 'src/app/filtros/empleado/nombreDepartamento/empl-depa.pipe';
 import { EmplUsuarioPipe } from 'src/app/filtros/empleado/filtroEmpUsuario/empl-usuario.pipe';
 import { EmplEstadoPipe } from 'src/app/filtros/empleado/filtroEmpEstado/empl-estado.pipe';
+import { EditarPermisoEmpleadoComponent } from '../../gestionar-permisos/editar-permiso-empleado/editar-permiso-empleado.component';
 
 export interface PermisosElemento {
   apellido: string;

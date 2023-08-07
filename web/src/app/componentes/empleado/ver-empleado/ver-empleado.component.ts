@@ -1345,6 +1345,7 @@ export class VerEmpleadoComponent implements OnInit {
   permisosTotales: any = [];
   ObtenerPermisos(formato_fecha: string, formato_hora: string) {
     this.permisosTotales = [];
+    this.permisosTotales.splice(0, this.permisosTotales.length);
     this.restPermiso.BuscarPermisoEmpleado(parseInt(this.idEmpleado)).subscribe(datos => {
       this.permisosTotales = datos;
       this.permisosTotales.forEach(p => {
@@ -1389,13 +1390,17 @@ export class VerEmpleadoComponent implements OnInit {
 
   // METODO EDICION DE PERMISOS
   formulario_editar_permiso: boolean = false;
-  empleado_permiso: number = 0;
   EditarPermiso(permisos: any) {
     this.formulario_editar_permiso = true;
     this.solicitudes_permiso = false;
     this.solicita_permiso = [];
-    this.solicita_permiso = permisos;
-    this.empleado_permiso = parseInt(this.idEmpleado);
+    this.solicita_permiso = [
+      {
+        id_empleado: parseInt(this.idEmpleado),
+        permiso: permisos,
+        ventana: 'empleado'
+      }
+    ]
   }
 
   // METODO PARA ELIMINAR PERMISOS DEL USUARIO
