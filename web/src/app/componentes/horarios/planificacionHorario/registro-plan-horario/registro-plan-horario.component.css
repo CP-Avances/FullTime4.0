@@ -49,9 +49,13 @@ mat-form-field {
     font-size: 13px;
 }
 
+.fuente_pequeño {
+    font-size: 10px;
+}
+
 .fuente_feriado {
     font-size: 13px;
-    color: red;
+    color: rgb(17, 87, 3);
 }
 
 #seleccionar {
@@ -74,7 +78,7 @@ mat-form-field {
 #table_definiciones {
     border-collapse: collapse;
     width: 100%;
-    font-size: 12px;
+    font-size: 10px;
 }
 
 #td_horarios {
@@ -101,7 +105,7 @@ p {
     color: rgb(225, 34, 34);
     cursor: pointer;
     margin-right: 2%;
-    font-size: 18px;
+    font-size: 10px;
 }
 
 #libre_ {

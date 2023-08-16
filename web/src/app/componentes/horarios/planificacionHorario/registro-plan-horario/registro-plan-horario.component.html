@@ -62,6 +62,34 @@
                                     <tbody>
                                         <tr>
                                             <td id="td_horarios">
+                                                Jornada
+                                            </td>
+                                            <td id="td_horarios">Horas de trabajo registradas en su contrato.</td>
+                                        </tr>
+                                        <tr>
+                                            <td id="td_horarios" style="color: red">
+                                                ***
+                                            </td>
+                                            <td id="td_horarios">
+                                                Indica que ya existe una planificación horaria registrada.
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td id="td_horarios"
+                                                [ngStyle]="{'text-decoration':EstiloSubrayado('Horario ya existe.')}">
+                                                Horario
+                                            </td>
+                                            <td id="td_horarios">Horario duplicado (ya existe).</td>
+                                        </tr>
+                                        <tr>
+                                            <td id="td_horarios" style="color: red">
+                                                Jornada superada
+                                            </td>
+                                            <td id="td_horarios">Suma de horas de horarios existentes y seleccionados.
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td id="td_horarios">
                                                 <mat-icon id="seleccionar_">
                                                     add_circle
                                                 </mat-icon>
@@ -137,9 +165,14 @@
                 </div>
 
                 <hr *ngIf="ver_icono">
-                <div>
+                <div *ngIf="ver_horario_">
                     <button class="btn btn-sm" style="float: right; margin-right: 10px;" (click)="VerificarHorario()">
                         Verificar
+                    </button>
+                </div>
+                <div *ngIf="ver_guardar">
+                    <button class="btn btn-sm" style="float: right; margin-right: 10px;" (click)="GuardarDatos()">
+                        Guardar
                     </button>
                 </div>
                 <div class="d-flex flex-wrap justify-content-center" *ngIf="ver_horario">
@@ -171,25 +204,46 @@
                         <mat-icon *ngIf="ver_icono" class="float-right" id="seleccionar" (click)="EliminarHorario(i)">
                             delete_forever
                         </mat-icon>
-                        <br *ngIf="ver_icono">
-                        <br>
-                        <span class="fuente"><b>{{d.formato}}</b></span><br>
-                        <span class="fuente">{{d.dia}}</span><br>
+                        <span class="fuente_pequeño"><b>Jornada: {{datoEmpleado.horas_trabaja}}</b></span><br>
+                        <span class="fuente">
+                            <b>{{d.formato}}</b>
+                        </span><br>
+                        <span class="fuente">
+                            {{d.dia}}
+                            <b *ngIf="d.horarios_existentes === '***'" style="color: red;">
+                                {{d.horarios_existentes}}
+                            </b>
+                        </span><br>
                         <input class="entrada" type="text" [(ngModel)]="valor" readonly /><br>
                         <span class="fuente_feriado"><b>{{d.observacion}}</b></span><br>
                         <span class="fuente" *ngFor="let h of d.horarios">
-                            <b *ngIf="d.tipo_dia === 'N'">{{h.horario}}</b><br>
+                            <b *ngIf="d.tipo_dia === 'N'" [ngStyle]="{'text-decoration':EstiloSubrayado(h.verificar)}">
+                                <span class="fuente_pequeño">({{h.hora_trabajo}})</span>
+                                {{h.horario}}
+                            </b>
+                            <b *ngIf="d.tipo_dia === 'FD'">
+                                <span class="fuente_pequeño">({{h.hora_trabajo}})</span>
+                                {{h.horario}}
+                            </b>
+                            <span *ngIf="d.horas_validas === 'OK'" style="font-size: 10px; padding-left: 5px;"
+                                [ngStyle]="{'color':CambiarColores(h.verificar)}">
+                                <b>{{h.verificar}}</b>
+                            </span>
+                            <br *ngIf="d.horas_validas === 'OK'">
                             <div class="row" *ngIf="d.tipo_dia === 'L'">
                                 <div class="col-3">
-                                    <i class="fa fa-trash" aria-hidden="true" id="libre_eliminar_"
+                                    <i class="fa fa-trash" aria-hidden="true" id="libre_eliminar"
                                         (click)="EliminarLibre(i)">
-                                        <p>Libre</p>
+                                        <p style="font-size: 8px;">Libre</p>
                                     </i>
                                 </div>
                                 <div class="col-9">
-                                    <span class="fuente" style="color:red"><b>DIA LIBRE</b></span>
+                                    <span class="fuente" style="color:green"><b>DIA LIBRE</b></span>
                                 </div>
                             </div>
+                        </span>
+                        <span class="fuente_pequeño" style="color:red" *ngIf="d.horas_validas != 'OK'">
+                            <b>{{d.horas_validas}}</b>
                         </span>
                     </div>
                 </div>

@@ -1233,6 +1233,7 @@ export class VerEmpleadoComponent implements OnInit {
       this.pagina_rotativo = 'ver-empleado';
       this.rotativo = {
         idCargo: this.datoActual.id_cargo,
+        codigo: this.datoActual.codigo,
         pagina: this.pagina_rotativo,
         idEmpleado: this.idEmpleado,
         horas_trabaja: this.cargoEmpleado[0].hora_trabaja,

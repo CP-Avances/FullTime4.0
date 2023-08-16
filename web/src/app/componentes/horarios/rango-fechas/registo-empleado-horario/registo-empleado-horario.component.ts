@@ -335,7 +335,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         // METODO PARA COMPARAR HORAS DE TRABAJO CON HORAS DE CONTRATO CUANDO NO EXISTEN HORARIOS EN LAS FECHAS INDICADAS
         if (this.StringTimeToSegundosTime(hora_trabajo) === this.StringTimeToSegundosTime(seg)) {
           this.ConsultarDetalleHorario(form);
-          return this.toastr.info('Al resgitrar la planificación cumplirá con un total de: ' + hora_trabajo + ' horas.', '',
+          return this.toastr.info('Al registrar la planificación cumplirá con un total de: ' + hora_trabajo + ' horas.', '',
             {
               timeOut: 2000,
             });
@@ -477,13 +477,13 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         }
       }
 
-      console.log('ingresa feriados ', this.feriados)
+      //console.log('ingresa feriados ', this.feriados)
       
       // BUSCAR FERIADOS 
       if (this.feriados.length != 0) {
         for (let i = 0; i < this.feriados.length; i++) {
-          console.log('fecha feriados ', moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
-          console.log('obj ', obj)
+          //console.log('fecha feriados ', moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
+          //console.log('obj ', obj)
           if (moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
             tipo = 'FD';
             tipo_dia = 'FD';
