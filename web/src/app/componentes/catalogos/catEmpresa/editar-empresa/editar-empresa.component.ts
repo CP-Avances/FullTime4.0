@@ -1,7 +1,7 @@
 // IMPORTAR LIBRERIAS
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
+import { Component, Input, OnInit } from '@angular/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { Component, OnInit } from '@angular/core';
 import { MatRadioChange } from '@angular/material/radio';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
@@ -11,13 +11,13 @@ import { Router } from '@angular/router';
 // IMPORTAR SERVICIOS
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { VerEmpresaComponent } from '../ver-empresa/ver-empresa.component';
 
 
 @Component({
   selector: 'app-editar-empresa',
   templateUrl: './editar-empresa.component.html',
-  styleUrls: ['./editar-empresa.component.css'],
-  //encapsulation: ViewEncapsulation.None
+  styleUrls: ['./editar-empresa.component.css']
 })
 
 export class EditarEmpresaComponent implements OnInit {
@@ -51,19 +51,16 @@ export class EditarEmpresaComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
-  idEmpresa: string;
+  @Input() idEmpresa: number;
+
   constructor(
-    private rest: EmpresaService,
+    private formulario: FormBuilder,
     private toastr: ToastrService,
     private router: Router,
-    private formulario: FormBuilder,
+    private rest: EmpresaService,
     public validar: ValidacionesService,
-  ) {
-    var cadena = this.router.url;
-    var aux = cadena.split("/");
-    this.idEmpresa = aux[2];
-
-  }
+    public componentei: VerEmpresaComponent,
+  ) { }
 
   // VARIABLES USADAS PARA MOSTRAR U OCULTAR OPCIONES
   HabilitarOtroE: boolean = false;
@@ -101,7 +98,7 @@ export class EditarEmpresaComponent implements OnInit {
   data: any = [];
   CargarDatosEmpresa() {
     this.data = [];
-    this.rest.ConsultarDatosEmpresa(parseInt(this.idEmpresa)).subscribe(datos => {
+    this.rest.ConsultarDatosEmpresa(this.idEmpresa).subscribe(datos => {
       this.data = datos[0];
       console.log('datos ', this.data)
       this.ImprimirDatos();
@@ -219,7 +216,7 @@ export class EditarEmpresaComponent implements OnInit {
   GuardarDatos(datos: any) {
     this.rest.ActualizarEmpresa(datos).subscribe(response => {
       this.habilitarprogress === false;
-      this.Salir();
+      this.Salir(2);
       this.toastr.success('Operación exitosa.', 'Datos actualizados.', {
         timeOut: 6000,
       })
@@ -285,8 +282,12 @@ export class EditarEmpresaComponent implements OnInit {
   }
 
   // METODO PARA CERRAR VENTANA DE EDICION DE DATOS
-  Salir() {
-    this.router.navigate(['/vistaEmpresa', this.idEmpresa])
+  Salir(opcion: number) {
+    this.componentei.ver_informacion = true;
+    this.componentei.ver_editar = false;
+    if (opcion === 2) {
+      this.componentei.CargarDatosEmpresa();
+    }
   }
 
 }

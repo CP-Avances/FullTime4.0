@@ -25,6 +25,7 @@ class DepartamentoRutas {
 
         this.router.get('/', AUTORIZA_DEPARTAMENTO_CONTROLADOR.ListarAutorizaDepartamento);
         this.router.get('/empleadosAutorizan/:id_depar', AUTORIZA_DEPARTAMENTO_CONTROLADOR.ObtenerQuienesAutorizan);
+        // METODO PARA LISTAR USUARIOS QUE APRUEBAN EN UN DEPARTAMENTO   --** VERIFICADO
         this.router.get('/listaempleadosAutorizan/:id_depa', AUTORIZA_DEPARTAMENTO_CONTROLADOR.ObtenerlistaEmpleadosAutorizan);
         this.router.get('/listaDepaAutoriza/:id_depar', AUTORIZA_DEPARTAMENTO_CONTROLADOR.ObtenerListaAutorizaDepa);
         

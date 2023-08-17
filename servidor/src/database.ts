@@ -1,4 +1,4 @@
-//Conexión con la base de datos PostgreSQL
+// CONEXIÓN CON LA BASE DE DATOS POSTGRESQL
 
 import Pool from 'pg-pool';
 

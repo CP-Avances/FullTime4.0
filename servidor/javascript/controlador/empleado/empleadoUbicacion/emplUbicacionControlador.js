@@ -24,9 +24,15 @@ class UbicacionControlador {
     RegistrarCoordenadas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { latitud, longitud, descripcion } = req.body;
-            yield database_1.default.query('INSERT INTO cg_ubicaciones (latitud, longitud, descripcion) ' +
-                'VALUES ($1, $2, $3)', [latitud, longitud, descripcion]);
-            res.jsonp({ message: 'Registro guardado.' });
+            const response = yield database_1.default.query('INSERT INTO cg_ubicaciones (latitud, longitud, descripcion) ' +
+                'VALUES ($1, $2, $3) RETURNING *', [latitud, longitud, descripcion]);
+            const [coordenadas] = response.rows;
+            if (coordenadas) {
+                return res.status(200).jsonp({ message: 'OK', respuesta: coordenadas });
+            }
+            else {
+                return res.status(404).jsonp({ message: 'error' });
+            }
         });
     }
     // ACTUALIZAR REGISTRO DE COORDENADAS GENERALES DE UBICACIÓN

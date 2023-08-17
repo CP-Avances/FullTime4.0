@@ -1,4 +1,5 @@
-<div class="container" style="padding-top: 15px;">
+<!--  ******************************** PANTALLA FORMULARIO EDITAR DATOS *********************************** -->
+<div class="container" style="padding-top: 15px;" *ngIf="ver_editar">
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
             <span>MODIFICAR DATOS DE DISPOSITIVO</span>
@@ -219,11 +220,17 @@
                 <div style="text-align: center; padding-top: 25px;">
                     <button matStepperPrevious class="btn btn-sm float-left">Atrás</button>
                     <button (click)="InsertarReloj(primerFormulario.value, segundoFormulario.value)"
-                        [disabled]="!segundoFormulario.valid" class="btn btn-sm">Guardar
+                        [disabled]="!segundoFormulario.valid" class="btn btn-sm">
+                        Guardar
                     </button>
-                    <button (click)="CerrarVentana()" class="btn btn-sm float-right">Cancelar</button>
+                    <button (click)="CerrarVentana()" class="btn btn-sm float-right">
+                        Cancelar
+                    </button>
                 </div>
             </mat-step>
         </mat-horizontal-stepper>
     </mat-card>
 </div>
+
+<!--  ******************************** PANTALLA DATOS DE RELOJ *********************************** -->
+<app-ver-dipositivo *ngIf="ver_datos" [idReloj]="reloj_id" [pagina]="pagina_"></app-ver-dipositivo>

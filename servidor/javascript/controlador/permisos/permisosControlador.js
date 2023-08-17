@@ -17,7 +17,28 @@ const settingsMail_1 = require("../../libs/settingsMail");
 const fs_1 = __importDefault(require("fs"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
+const moment_1 = __importDefault(require("moment"));
+moment_1.default.locale('es');
 const builder = require('xmlbuilder');
+// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO
+const ObtenerRuta = function (codigo) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var ruta = '';
+        let separador = path_1.default.sep;
+        const usuario = yield database_1.default.query(`
+        SELECT cedula FROM empleados WHERE codigo = $1
+        `, [codigo]);
+        for (var i = 0; i < __dirname.split(separador).length - 3; i++) {
+            if (ruta === '') {
+                ruta = __dirname.split(separador)[i];
+            }
+            else {
+                ruta = ruta + separador + __dirname.split(separador)[i];
+            }
+        }
+        return ruta + separador + 'permisos' + separador + codigo + '_' + usuario.rows[0].cedula;
+    });
+};
 class PermisosControlador {
     // METODO PARA BUSCAR NUEMRO DE PERMISO
     ObtenerNumPermiso(req, res) {
@@ -40,6 +61,7 @@ class PermisosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { fec_inicio, fec_final, codigo } = req.body;
+                console.log('ingresa ', fec_inicio, ' ', fec_final, ' ', codigo);
                 const PERMISO = yield database_1.default.query(`
                     SELECT id FROM permisos 
                         WHERE ((fec_inicio::date BETWEEN $1 AND $2) OR (fec_final::date BETWEEN $1 AND $2)) 
@@ -170,33 +192,23 @@ class PermisosControlador {
             const JefesDepartamentos = yield database_1.default.query(`
             SELECT n.id_departamento, cg.nombre, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel,
                 da.estado, dae.id_contrato, da.id_empl_cargo, (dae.nombre || ' ' || dae.apellido) as fullname,
-                dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti 
+                dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti, dae.id AS id_aprueba 
             FROM nivel_jerarquicodep AS n, depa_autorizaciones AS da, datos_actuales_empleado AS dae,
                 config_noti AS c, cg_departamentos AS cg
             WHERE n.id_departamento = $1
                 AND da.id_departamento = n.id_dep_nivel
                 AND dae.id_cargo = da.id_empl_cargo
-                AND dae.id_contrato = c.id_empleado
-                AND cg.id = $1
+                AND dae.id = c.id_empleado
+                AND cg.id = n.id_departamento
             ORDER BY nivel ASC
             `, [depa_user_loggin]).then((result) => { return result.rows; });
-            if (JefesDepartamentos.length === 0)
+            if (JefesDepartamentos.length === 0) {
                 return res.status(400)
                     .jsonp({
                     message: `Ups!!! algo salio mal. 
-            Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.`
+            Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.`,
+                    permiso: permiso
                 });
-            const obj = JefesDepartamentos[JefesDepartamentos.length - 1];
-            let depa_padre = obj.id_dep_nivel;
-            console.log('obj: ', obj);
-            console.log('depa_padre: ', depa_padre);
-            var JefeDepaPadre = [];
-            if (depa_padre !== null) {
-                JefesDepartamentos.filter((item) => {
-                    JefeDepaPadre.push(item);
-                    permiso.EmpleadosSendNotiEmail = JefesDepartamentos;
-                });
-                return res.status(200).jsonp(permiso);
             }
             else {
                 permiso.EmpleadosSendNotiEmail = JefesDepartamentos;
@@ -208,14 +220,15 @@ class PermisosControlador {
     EditarPermiso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const { descripcion, fec_inicio, fec_final, dia, dia_libre, id_tipo_permiso, hora_numero, num_permiso, hora_salida, hora_ingreso, depa_user_loggin } = req.body;
+            const { descripcion, fec_inicio, fec_final, dia, dia_libre, id_tipo_permiso, hora_numero, num_permiso, hora_salida, hora_ingreso, depa_user_loggin, id_peri_vacacion, fec_edicion } = req.body;
             console.log('entra ver permiso');
             const response = yield database_1.default.query(`
                     UPDATE permisos SET descripcion = $1, fec_inicio = $2, fec_final = $3, dia = $4, dia_libre = $5, 
-                    id_tipo_permiso = $6, hora_numero = $7, num_permiso = $8, hora_salida = $9, hora_ingreso = $10 
-                    WHERE id = $11 RETURNING *
+                    id_tipo_permiso = $6, hora_numero = $7, num_permiso = $8, hora_salida = $9, hora_ingreso = $10,
+                    id_peri_vacacion = $11, fec_edicion = $12
+                    WHERE id = $13 RETURNING *
                 `, [descripcion, fec_inicio, fec_final, dia, dia_libre, id_tipo_permiso, hora_numero, num_permiso,
-                hora_salida, hora_ingreso, id]);
+                hora_salida, hora_ingreso, id_peri_vacacion, fec_edicion, id]);
             const [objetoPermiso] = response.rows;
             if (!objetoPermiso)
                 return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
@@ -231,43 +244,17 @@ class PermisosControlador {
             WHERE n.id_departamento = $1
                 AND da.id_departamento = n.id_dep_nivel
                 AND dae.id_cargo = da.id_empl_cargo
-                AND dae.id_contrato = c.id_empleado
-                AND cg.id = $1
+                AND dae.id = c.id_empleado
+                AND cg.id = n.id_departamento
             ORDER BY nivel ASC
             `, [depa_user_loggin]).then((result) => { return result.rows; });
-            if (JefesDepartamentos.length === 0)
+            if (JefesDepartamentos.length === 0) {
                 return res.status(400)
                     .jsonp({
                     message: `Ups!!! algo salio mal. 
-            Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.`
+                Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.`,
+                    permiso: permiso
                 });
-            const [obj] = JefesDepartamentos;
-            let depa_padre = obj.depa_padre;
-            let JefeDepaPadre;
-            if (depa_padre !== null) {
-                do {
-                    JefeDepaPadre = yield database_1.default.query(`
-                    SELECT da.id AS id_depa_auto, n.id_departamento, n.departamento, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel, 
-                        n.id_establecimiento AS id_sucursal, s.nombre AS sucursal, 
-                        dae.id_cargo AS cargo, dae.id_contrato AS contrato, dae.id AS empleado, 
-                        (dae.nombre || ' ' || dae.apellido) as fullname, dae.cedula, dae.correo, 
-                        c.permiso_mail, c.permiso_noti 
-                    FROM depa_autorizaciones AS da, 
-                        nivel_jerarquicodep AS n, sucursales AS s, 
-                        datos_actuales_empleado AS dae, config_noti AS c, cg_departamentos AS cg 
-                    WHERE n.id_departamento = 9 
-                        AND cg.id = n.id_departamento 
-                        AND n.nivel = cg.nivel
-                        AND da.id_departamento = n.id_dep_nivel 
-                        AND s.id = n.id_establecimiento  
-                        AND dae.id = da.id_empleado 
-                        AND c.id_empleado = da.id_empleado
-                    `, [depa_padre]);
-                    depa_padre = JefeDepaPadre.rows[0].depa_padre;
-                    JefesDepartamentos.push(JefeDepaPadre.rows[0]);
-                } while (depa_padre !== null);
-                permiso.EmpleadosSendNotiEmail = JefesDepartamentos;
-                return res.status(200).jsonp(permiso);
             }
             else {
                 permiso.EmpleadosSendNotiEmail = JefesDepartamentos;
@@ -279,21 +266,28 @@ class PermisosControlador {
     GuardarDocumentoPermiso(req, res) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            // FECHA DEL SISTEMA
+            var fecha = (0, moment_1.default)();
+            var anio = fecha.format('YYYY');
+            var mes = fecha.format('MM');
+            var dia = fecha.format('DD');
             // LEER DATOS DE IMAGEN
-            let doc = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
-            let { archivo } = req.params;
-            let { documento } = req.params;
             let id = req.params.id;
+            let { archivo, codigo } = req.params;
+            const permiso = yield database_1.default.query(`
+            SELECT num_permiso FROM permisos WHERE id = $1
+            `, [id]);
+            let documento = permiso.rows[0].num_permiso + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
+            let separador = path_1.default.sep;
             // ACTUALIZAR REGISTRO
             yield database_1.default.query(`
-            UPDATE permisos SET documento = $2, docu_nombre = $3 WHERE id = $1
-            `, [id, doc, documento]);
-            res.jsonp({ message: 'Documento Actualizado' });
+             UPDATE permisos SET documento = $2 WHERE id = $1
+             `, [id, documento]);
+            res.jsonp({ message: 'Documento actualizado.' });
             if (archivo != 'null' && archivo != '' && archivo != null) {
-                if (archivo != doc) {
-                    let filePath = `servidor\\permisos\\${archivo}`;
-                    let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-                    fs_1.default.unlinkSync(direccionCompleta);
+                if (archivo != documento) {
+                    let ruta = (yield ObtenerRuta(codigo)) + separador + archivo;
+                    fs_1.default.unlinkSync(ruta);
                 }
             }
         });
@@ -301,16 +295,16 @@ class PermisosControlador {
     // ELIMINAR DOCUMENTO DE RESPALDO DE PERMISO  
     EliminarDocumentoPermiso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id, archivo } = req.body;
+            const { id, archivo, codigo } = req.body;
+            let separador = path_1.default.sep;
             // ACTUALIZAR REGISTRO
             yield database_1.default.query(`
-            UPDATE permisos SET documento = null, docu_nombre = null WHERE id = $1
+            UPDATE permisos SET documento = null WHERE id = $1
             `, [id]);
             res.jsonp({ message: 'Documento eliminado.' });
             if (archivo != 'null' && archivo != '' && archivo != null) {
-                let filePath = `servidor\\permisos\\${archivo}`;
-                let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-                fs_1.default.unlinkSync(direccionCompleta);
+                let ruta = (yield ObtenerRuta(codigo)) + separador + archivo;
+                fs_1.default.unlinkSync(ruta);
             }
         });
     }
@@ -323,7 +317,7 @@ class PermisosControlador {
                 SELECT p.id, p.fec_creacion, p.descripcion, p.fec_inicio,
                     p.fec_final, p.dia, p.hora_numero, p.legalizado, p.estado, p.dia_libre, 
                     p.id_tipo_permiso, p.id_empl_contrato, p.id_peri_vacacion, p.num_permiso, 
-                    p.documento, p.docu_nombre, p.hora_salida, p.hora_ingreso, p.codigo, 
+                    p.documento, p.hora_salida, p.hora_ingreso, p.codigo, 
                     t.descripcion AS nom_permiso, t.tipo_descuento 
                 FROM permisos AS p, cg_tipo_permisos AS t, empleados AS e
                 WHERE p.id_tipo_permiso = t.id AND p.codigo::varchar = e.codigo AND e.id = $1 
@@ -362,7 +356,8 @@ class PermisosControlador {
     // METODO PARA ELIMINAR PERMISO
     EliminarPermiso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let { id_permiso, doc } = req.params;
+            let { id_permiso, doc, codigo } = req.params;
+            let separador = path_1.default.sep;
             yield database_1.default.query(`
             DELETE FROM realtime_noti where id_permiso = $1
             `, [id_permiso]);
@@ -374,9 +369,8 @@ class PermisosControlador {
             `, [id_permiso]);
             if (doc != 'null' && doc != '' && doc != null) {
                 console.log(id_permiso, doc, ' entra ');
-                let filePath = `servidor\\permisos\\${doc}`;
-                let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-                fs_1.default.unlinkSync(direccionCompleta);
+                let ruta = (yield ObtenerRuta(codigo)) + separador + doc;
+                fs_1.default.unlinkSync(ruta);
             }
             const [objetoPermiso] = response.rows;
             if (objetoPermiso) {
@@ -410,14 +404,17 @@ class PermisosControlador {
     ObtenerDocumentoPermiso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const docs = req.params.docs;
-            let filePath = `servidor\\permisos\\${docs}`;
-            res.sendFile(__dirname.split("servidor")[0] + filePath);
+            const { codigo } = req.params;
+            // TRATAMIENTO DE RUTAS
+            let separador = path_1.default.sep;
+            let ruta = (yield ObtenerRuta(codigo)) + separador + docs;
+            res.sendFile(ruta);
         });
     }
     /** ********************************************************************************************* **
      ** *         METODO PARA ENVIO DE CORREO ELECTRONICO DE SOLICITUDES DE PERMISOS                * **
      ** ********************************************************************************************* **/
-    // METODO PARA ENVIAR CORREO ELECTRÓNICO DESDE APLICACIÓN WEB
+    // METODO PARA ENVIAR CORREO ELECTRONICO DESDE APLICACION WEB
     EnviarCorreoWeb(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var tiempo = (0, settingsMail_1.fechaHora)();
@@ -458,7 +455,7 @@ class PermisosControlador {
                                 <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
                                 <b>Asunto:</b> ${asunto} <br> 
                                 <b>Colaborador que envía:</b> ${correoInfoPidePermiso.rows[0].nombre} ${correoInfoPidePermiso.rows[0].apellido} <br>
-                                <b>Número de Cédula:</b> ${correoInfoPidePermiso.rows[0].cedula} <br>
+                                <b>Número de cédula:</b> ${correoInfoPidePermiso.rows[0].cedula} <br>
                                 <b>Cargo:</b> ${correoInfoPidePermiso.rows[0].tipo_cargo} <br>
                                 <b>Departamento:</b> ${correoInfoPidePermiso.rows[0].departamento} <br>
                                 <b>Generado mediante:</b> Aplicación Web <br>
@@ -468,7 +465,7 @@ class PermisosControlador {
                             <h3 style="font-family: Arial; text-align: center;">INFORMACIÓN DE LA SOLICITUD</h3>
                                 <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
                                     <b>Motivo:</b> ${tipo_permiso} <br>   
-                                    <b>Fecha de Solicitud:</b> ${solicitud} <br> 
+                                    <b>Registro de solicitud:</b> ${solicitud} <br> 
                                     <b>Desde:</b> ${desde} ${h_inicio} <br>
                                     <b>Hasta:</b> ${hasta} ${h_fin} <br>
                                     <b>Observación:</b> ${observacion} <br>
@@ -478,13 +475,290 @@ class PermisosControlador {
                                     <b>${tipo_solicitud}:</b> ${solicitado_por} <br><br>
                                     <a href="${url}/${id}">Dar clic en el siguiente enlace para revisar solicitud de permiso.</a> <br><br>
                                 </p>
+                            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
+                                <b>Gracias por la atención</b><br>
+                                <b>Saludos cordiales,</b> <br><br>
+                            </p>
+                            <img src="cid:pief" width="50%" height="50%"/>
+                        </body>
+                    `,
+                    attachments: [
+                        {
+                            filename: 'cabecera_firma.jpg',
+                            path: `${path_folder}/${settingsMail_1.cabecera_firma}`,
+                            cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
+                        },
+                        {
+                            filename: 'pie_firma.jpg',
+                            path: `${path_folder}/${settingsMail_1.pie_firma}`,
+                            cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
+                        }
+                    ]
+                };
+                var corr = (0, settingsMail_1.enviarMail)(settingsMail_1.servidor, parseInt(settingsMail_1.puerto));
+                corr.sendMail(data, function (error, info) {
+                    if (error) {
+                        console.log('Email error: ' + error);
+                        corr.close();
+                        return res.jsonp({ message: 'error' });
+                    }
+                    else {
+                        console.log('Email sent: ' + info.response);
+                        corr.close();
+                        return res.jsonp({ message: 'ok' });
+                    }
+                });
+            }
+            else {
+                res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+            }
+        });
+    }
+    // METODO PARA ENVIAR CORREO ELECTRONICO PARA EDITAR PERMISOS DESDE APLICACION WEB
+    EnviarCorreoWebEditar(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var tiempo = (0, settingsMail_1.fechaHora)();
+            var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
+            var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
+            const path_folder = path_1.default.resolve('logos');
+            var datos = yield (0, settingsMail_1.Credenciales)(req.id_empresa);
+            if (datos === 'ok') {
+                const { id_empl_contrato, id_dep, correo, id_suc, desde, hasta, h_inicio, h_fin, observacion, estado_p, solicitud, tipo_permiso, dias_permiso, horas_permiso, solicitado_por, id, asunto, tipo_solicitud, proceso, adesde, ahasta, ah_inicio, ah_fin, aobservacion, aestado_p, asolicitud, atipo_permiso, adias_permiso, ahoras_permiso } = req.body;
+                const correoInfoPidePermiso = yield database_1.default.query(`
+                    SELECT e.id, e.correo, e.nombre, e.apellido, 
+                        e.cedula, ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, 
+                        d.nombre AS departamento 
+                    FROM empl_contratos AS ecn, empleados AS e, empl_cargos AS ecr, tipo_cargo AS tc, 
+                        cg_departamentos AS d 
+                    WHERE ecn.id = $1 AND ecn.id_empleado = e.id AND 
+                        (SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id ) = ecr.id 
+                        AND tc.id = ecr.cargo AND d.id = ecr.id_departamento ORDER BY cargo DESC
+                    `, [id_empl_contrato]);
+                // codigo para enviar notificacion o correo al jefe de su propio departamento, independientemente del nivel.
+                // && obj.id_dep === correoInfoPidePermiso.rows[0].id_departamento && obj.id_suc === correoInfoPidePermiso.rows[0].id_sucursal
+                var url = `${process.env.URL_DOMAIN}/ver-permiso`;
+                let data = {
+                    to: correo,
+                    from: settingsMail_1.email,
+                    subject: asunto,
+                    html: `
+                            <body>
+                                <div style="text-align: center;">
+                                    <img width="25%" height="25%" src="cid:cabeceraf"/>
+                                </div>
+                                <br>
+                                <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                                    El presente correo es para informar que se ha ${proceso} la siguiente solicitud de permiso: <br>  
+                                </p>
+                                <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
+                                <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                                    <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
+                                    <b>Asunto:</b> ${asunto} <br> 
+                                    <b>Colaborador que envía:</b> ${correoInfoPidePermiso.rows[0].nombre} ${correoInfoPidePermiso.rows[0].apellido} <br>
+                                    <b>Número de cédula:</b> ${correoInfoPidePermiso.rows[0].cedula} <br>
+                                    <b>Cargo:</b> ${correoInfoPidePermiso.rows[0].tipo_cargo} <br>
+                                    <b>Departamento:</b> ${correoInfoPidePermiso.rows[0].departamento} <br>
+                                    <b>Generado mediante:</b> Aplicación Web <br>
+                                    <b>Fecha de envío:</b> ${fecha} <br> 
+                                    <b>Hora de envío:</b> ${hora} <br><br> 
+                                </p>
+                                <h3 style="font-family: Arial; text-align: center;">INFORMACIÓN DE LA SOLICITUD</h3>
+                                <table style='width: 100%;'>
+                                    <tr style='font-family: Arial; font-size:14px;'>
+                                        <th scope='col' style="text-align: left; border-right: 1px solid #000;">INFORMACIÓN ANTERIOR <br><br></th>
+                                        <th scope='col' style="text-align: left;">INFORMACIÓN ACTUAL <br><br></th>
+                                    </tr>
+    
+                                    <tr style="font-family: Arial; font-size:12px; line-height: 1em; text-align: left;">
+                                        <td style="text-align: left; border-right: 1px solid #000; color:gray;">
+                                            <b>Motivo:</b> ${atipo_permiso} <br>     
+                                        </td>
+                                        <td style="text-align: left; color:rgb(11, 22, 121);">
+                                            <b>Motivo:</b> ${tipo_permiso} <br>
+                                        </td>
+                                    </tr>
+    
+                                    <tr style="font-family: Arial; font-size:12px; line-height: 1em; text-align: left;">
+                                        <td style="text-align: left; border-right: 1px solid #000; color:gray;">
+                                            <b>Registro de solicitud:</b> ${asolicitud} <br> 
+                                        </td>
+                                        <td style="text-align: left; color:rgb(11, 22, 121);">
+                                            <b>Registro de solicitud:</b> ${solicitud} <br> 
+                                        </td>
+                                    </tr>
+    
+                                    <tr style="font-family: Arial; font-size:12px; line-height: 1em; text-align: left;">
+                                        <td style="text-align: left; border-right: 1px solid #000; color:gray;">
+                                            <b>Desde:</b> ${adesde} ${ah_inicio} <br> 
+                                        </td>
+                                        <td style="text-align: left; color:rgb(11, 22, 121);">
+                                            <b>Desde:</b> ${desde} ${h_inicio} <br>  
+                                        </td>
+                                    </tr>
+    
+                                    <tr style="font-family: Arial; font-size:12px; line-height: 1em; text-align: left;">
+                                        <td style="text-align: left; border-right: 1px solid #000; color:gray;">
+                                            <b>Hasta:</b> ${ahasta} ${ah_fin} <br>
+                                        </td>
+                                        <td style="text-align: left; color:rgb(11, 22, 121);">
+                                            <b>Hasta:</b> ${hasta} ${h_fin} <br>  
+                                        </td>
+                                    </tr>
+    
+                                    <tr style="font-family: Arial; font-size:12px; line-height: 1em; text-align: left;">
+                                        <td style="text-align: left; border-right: 1px solid #000; color:gray;">
+                                            <b>Observación:</b> ${aobservacion} <br>
+                                        </td>
+                                        <td style="text-align: left; color:rgb(11, 22, 121);">
+                                            <b>Observación:</b> ${observacion} <br> 
+                                        </td>
+                                    </tr>
+    
+                                    <tr style="font-family: Arial; font-size:12px; line-height: 1em; text-align: left;">
+                                        <td style="text-align: left; border-right: 1px solid #000; color:gray;">
+                                            <b>Días permiso:</b> ${adias_permiso} <br>
+                                        </td>
+                                        <td style="text-align: left; color:rgb(11, 22, 121);">
+                                            <b>Días permiso:</b> ${dias_permiso} <br>
+                                        </td>
+                                    </tr>
+    
+                                    <tr style="font-family: Arial; font-size:12px; line-height: 1em; text-align: left;">
+                                        <td style="text-align: left; border-right: 1px solid #000; color:gray;">
+                                            <b>Horas permiso:</b> ${ahoras_permiso} <br>
+                                        </td>
+                                        <td style="text-align: left; color:rgb(11, 22, 121);">
+                                            <b>Horas permiso:</b> ${horas_permiso} <br>
+                                        </td>
+                                    </tr>
+    
+                                    <tr style="font-family: Arial; font-size:12px; line-height: 1em; text-align: left;">
+                                        <td style="text-align: left; border-right: 1px solid #000; color:gray;">
+                                            <b>Estado:</b> ${aestado_p} <br><br>
+                                        </td>
+                                        <td style="text-align: left; color:rgb(11, 22, 121);">
+                                            <b>Estado:</b> ${estado_p} <br><br>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                                    <b>${tipo_solicitud}:</b> ${solicitado_por} <br><br>
+                                    <a href="${url}/${id}">Dar clic en el siguiente enlace para revisar solicitud de permiso.</a> <br><br>
+                                </p>
                                 <p style="font-family: Arial; font-size:12px; line-height: 1em;">
                                     <b>Gracias por la atención</b><br>
                                     <b>Saludos cordiales,</b> <br><br>
                                 </p>
                                 <img src="cid:pief" width="50%" height="50%"/>
+                            </body>
+                        `,
+                    attachments: [
+                        {
+                            filename: 'cabecera_firma.jpg',
+                            path: `${path_folder}/${settingsMail_1.cabecera_firma}`,
+                            cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
+                        },
+                        {
+                            filename: 'pie_firma.jpg',
+                            path: `${path_folder}/${settingsMail_1.pie_firma}`,
+                            cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
+                        }
+                    ]
+                };
+                var corr = (0, settingsMail_1.enviarMail)(settingsMail_1.servidor, parseInt(settingsMail_1.puerto));
+                corr.sendMail(data, function (error, info) {
+                    if (error) {
+                        console.log('Email error: ' + error);
+                        corr.close();
+                        return res.jsonp({ message: 'error' });
+                    }
+                    else {
+                        console.log('Email sent: ' + info.response);
+                        corr.close();
+                        return res.jsonp({ message: 'ok' });
+                    }
+                });
+            }
+            else {
+                res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
+            }
+        });
+    }
+    /** ********************************************************************************************* **
+     ** *         METODO PARA ENVIO DE CORREO ELECTRONICO DE SOLICITUDES DE PERMISOS                * **
+     ** ********************************************************************************************* **/
+    // METODO PARA ENVIAR CORREO ELECTRONICO DESDE APLICACION WEB
+    EnviarCorreoWebMultiple(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const usuarios = req.body.usuarios;
+            var razon = '';
+            var tiempo = (0, settingsMail_1.fechaHora)();
+            var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
+            var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
+            const path_folder = path_1.default.resolve('logos');
+            var datos = yield (0, settingsMail_1.Credenciales)(req.id_empresa);
+            if (datos === 'ok') {
+                const { correo, desde, hasta, h_inicio, h_fin, observacion, estado_p, solicitud, tipo_permiso, asunto, tipo_solicitud, proceso, usuario_solicita, tipo } = req.body;
+                var tablaHTML = yield generarTablaHTMLWeb(usuarios, tipo);
+                if (observacion != '' && observacion != undefined) {
+                    razon = observacion;
+                }
+                else {
+                    razon = '...';
+                }
+                const solicita = yield database_1.default.query(`
+                SELECT de.id, (de.nombre ||' '|| de.apellido) AS empleado, de.cedula, tc.cargo AS tipo_cargo, 
+                    d.nombre AS departamento     
+                FROM datos_actuales_empleado AS de, empl_cargos AS ec, tipo_cargo AS tc, 
+                    cg_departamentos AS d 
+                WHERE de.id = $1 AND d.id = de.id_departamento AND ec.id = de.id_cargo AND ec.cargo = tc.id
+                `, [usuario_solicita]);
+                let data = {
+                    to: correo,
+                    from: settingsMail_1.email,
+                    subject: asunto,
+                    html: `
+                    <body>
+                        <div style="text-align: center;">
+                             <img width="25%" height="25%" src="cid:cabeceraf"/>
+                        </div>
+                        <br>
+                        <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                            El presente correo es para informar que se ha ${proceso} la siguiente solicitud de permiso: <br>  
+                        </p>
+                        <h3 style="font-family: Arial; text-align: center;">REGISTRO MULTIPLE DE PERMISO</h3>
+                        <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                            <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
+                            <b>Asunto:</b> ${asunto} <br> 
+                            <b>${tipo_solicitud}:</b> ${solicita.rows[0].empleado} <br>
+                            <b>Número de cédula:</b> ${solicita.rows[0].cedula} <br>
+                            <b>Cargo:</b> ${solicita.rows[0].tipo_cargo} <br>
+                            <b>Departamento:</b> ${solicita.rows[0].departamento} <br>
+                            <b>Generado mediante:</b> Aplicación Web <br>
+                            <b>Fecha de envío:</b> ${fecha} <br> 
+                            <b>Hora de envío:</b> ${hora} <br><br> 
+                        </p>
+                        <h3 style="font-family: Arial; text-align: center;">INFORMACIÓN DE LA SOLICITUD</h3>
+                        <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                            <b>Motivo:</b> ${tipo_permiso} <br>   
+                            <b>Registro de solicitud:</b> ${solicitud} <br> 
+                            <b>Desde:</b> ${desde} ${h_inicio} <br>
+                            <b>Hasta:</b> ${hasta} ${h_fin} <br>
+                            <b>Observación:</b> ${razon} <br>
+                            <b>Estado:</b> ${estado_p} <br><br>
+                        </p>
+                        <div style="font-family: Arial; font-size:15px; margin: auto; text-align: center;">
+                            <h3 style="font-family: Arial; text-align: center;">LISTA DE USUARIOS CON PERMISO</h3>
+                            ${tablaHTML}
+                            <br><br>
+                        </div>
+                        <p style="font-family: Arial; font-size:12px; line-height: 1em;">
+                            <b>Gracias por la atención</b><br>
+                            <b>Saludos cordiales,</b> <br><br>
+                        </p>
+                            <img src="cid:pief" width="50%" height="50%"/>
                         </body>
-                    `,
+                       `,
                     attachments: [
                         {
                             filename: 'cabecera_firma.jpg',
@@ -531,11 +805,11 @@ class PermisosControlador {
     ListarEstadosPermisos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const PERMISOS = yield database_1.default.query('SELECT p.id, p.fec_creacion, p.descripcion, p.fec_inicio, ' +
-                'p.documento, p.docu_nombre, p.fec_final, p.estado, p.id_empl_cargo, e.id AS id_emple_solicita, e.nombre, e.apellido, ' +
-                'e.cedula, cp.descripcion AS nom_permiso, ec.id AS id_contrato FROM permisos AS p, ' +
-                'empl_contratos AS ec, empleados AS e, cg_tipo_permisos AS cp ' +
+                'p.documento, p.fec_final, p.estado, p.id_empl_cargo, e.id AS id_emple_solicita, e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, ' +
+                'e.cedula, da.correo, cp.descripcion AS nom_permiso, ec.id AS id_contrato, da.id_departamento AS id_depa, da.codigo, depa.nombre AS depa_nombre FROM permisos AS p, ' +
+                'empl_contratos AS ec, empleados AS e, cg_tipo_permisos AS cp, datos_actuales_empleado AS da, cg_departamentos AS depa ' +
                 'WHERE p.id_empl_contrato = ec.id AND ' +
-                'ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id  AND (p.estado = 1 OR p.estado = 2) ' +
+                'ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id AND da.id_contrato = ec.id AND depa.id = da.id_departamento AND (p.estado = 1 OR p.estado = 2) ' +
                 'ORDER BY estado DESC, fec_creacion DESC');
             if (PERMISOS.rowCount > 0) {
                 return res.jsonp(PERMISOS.rows);
@@ -548,10 +822,11 @@ class PermisosControlador {
     ListarPermisosAutorizados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const PERMISOS = yield database_1.default.query('SELECT p.id, p.fec_creacion, p.descripcion, p.fec_inicio, ' +
-                'p.documento, p.docu_nombre, p.fec_final, p.estado, p.id_empl_cargo, e.id AS id_emple_solicita, e.nombre, e.apellido, ' +
-                'e.cedula, cp.descripcion AS nom_permiso, ec.id AS id_contrato FROM permisos AS p, ' +
-                'empl_contratos AS ec, empleados AS e, cg_tipo_permisos AS cp WHERE p.id_empl_contrato = ec.id AND ' +
-                'ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id  AND (p.estado = 3 OR p.estado = 4) ' +
+                'p.documento,  p.fec_final, p.estado, p.id_empl_cargo, e.id AS id_emple_solicita, e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, ' +
+                'e.cedula, cp.descripcion AS nom_permiso, ec.id AS id_contrato, da.id_departamento AS id_depa, da.codigo, depa.nombre AS depa_nombre FROM permisos AS p, ' +
+                'empl_contratos AS ec, empleados AS e, cg_tipo_permisos AS cp, datos_actuales_empleado AS da, cg_departamentos AS depa ' +
+                'WHERE p.id_empl_contrato = ec.id AND ' +
+                'ec.id_empleado = e.id AND p.id_tipo_permiso = cp.id AND da.id_contrato = ec.id AND depa.id = da.id_departamento AND (p.estado = 3 OR p.estado = 4) ' +
                 'ORDER BY estado ASC, fec_creacion DESC');
             if (PERMISOS.rowCount > 0) {
                 return res.jsonp(PERMISOS.rows);
@@ -579,7 +854,7 @@ class PermisosControlador {
                 const { id_empl_contrato } = req.params;
                 const PERMISO = yield database_1.default.query('SELECT p.id, p.fec_creacion, p.descripcion, p.fec_inicio, ' +
                     'p.fec_final, p.dia, p.hora_numero, p.legalizado, p.estado, p.dia_libre, p.id_tipo_permiso, ' +
-                    'p.id_empl_contrato, p.id_peri_vacacion, p.num_permiso, p.documento, p.docu_nombre, ' +
+                    'p.id_empl_contrato, p.id_peri_vacacion, p.num_permiso, p.documento,  ' +
                     't.descripcion AS nom_permiso FROM permisos AS p, cg_tipo_permisos AS t ' +
                     'WHERE p.id_tipo_permiso = t.id AND p.id_empl_contrato = $1', [id_empl_contrato]);
                 return res.jsonp(PERMISO.rows);
@@ -595,7 +870,7 @@ class PermisosControlador {
                 const { id } = req.params;
                 const PERMISO = yield database_1.default.query('SELECT p.id, p.fec_creacion, p.descripcion, p.fec_inicio, ' +
                     'p.fec_final, p.dia, p.hora_numero, p.legalizado, p.estado, p.dia_libre, p.id_tipo_permiso, ' +
-                    'p.id_empl_contrato, p.id_peri_vacacion, p.num_permiso, p.documento, p.docu_nombre, ' +
+                    'p.id_empl_contrato, p.id_peri_vacacion, p.num_permiso, p.documento, ' +
                     'p.hora_salida, p.hora_ingreso, p.codigo, ' +
                     't.descripcion AS nom_permiso FROM permisos AS p, cg_tipo_permisos AS t ' +
                     'WHERE p.id_tipo_permiso = t.id AND p.id = $1 ORDER BY p.num_permiso DESC', [id]);
@@ -654,11 +929,11 @@ class PermisosControlador {
     // ELIMINAR DOCUMENTO DE PERMISO DESDE APLICACION MOVIL
     EliminarPermisoMovil(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let { documento } = req.params;
+            let { documento, codigo } = req.params;
+            let separador = path_1.default.sep;
             if (documento != 'null' && documento != '' && documento != null) {
-                let filePath = `servidor\\permisos\\${documento}`;
-                let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-                fs_1.default.unlinkSync(direccionCompleta);
+                let ruta = (yield ObtenerRuta(codigo)) + separador + documento;
+                fs_1.default.unlinkSync(ruta);
             }
             res.jsonp({ message: 'ok' });
         });
@@ -679,8 +954,8 @@ class PermisosControlador {
             const id = req.params.id_permiso;
             const PERMISOS = yield database_1.default.query(`
             SELECT p.id, p.fec_creacion, p.descripcion, p.fec_inicio, p.dia, p.hora_salida, p.hora_ingreso, 
-            p.hora_numero, p.documento, p.docu_nombre, p.fec_final, p.estado, p.id_empl_cargo, e.nombre, 
-            e.apellido, e.cedula, e.id AS id_empleado, cp.id AS id_tipo_permiso, 
+            p.hora_numero, p.documento, p.fec_final, p.estado, p.id_empl_cargo, e.nombre, 
+            e.apellido, e.cedula, e.id AS id_empleado, e.codigo, cp.id AS id_tipo_permiso, 
             cp.descripcion AS nom_permiso, ec.id AS id_contrato 
             FROM permisos AS p, empl_contratos AS ec, empleados AS e, cg_tipo_permisos AS cp 
             WHERE p.id = $1 AND p.id_empl_contrato = ec.id AND ec.id_empleado = e.id AND 
@@ -694,7 +969,7 @@ class PermisosControlador {
             }
         });
     }
-    // ENVIO DE CORREO AL CREAR UN PERMISO MEDIANTE APLICACIÓN MÓVIL
+    // ENVIO DE CORREO AL CREAR UN PERMISO MEDIANTE APLICACION MOVIL
     EnviarCorreoPermisoMovil(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var tiempo = (0, settingsMail_1.fechaHora)();
@@ -702,8 +977,10 @@ class PermisosControlador {
             var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
             const path_folder = path_1.default.resolve('logos');
             var datos = yield (0, settingsMail_1.Credenciales)(parseInt(req.params.id_empresa));
+            console.log('datos: ', datos);
             if (datos === 'ok') {
                 const { id_empl_contrato, id_dep, correo, id_suc, desde, hasta, h_inicio, h_fin, observacion, estado_p, solicitud, tipo_permiso, dias_permiso, horas_permiso, solicitado_por, asunto, tipo_solicitud, proceso } = req.body;
+                console.log('req.body: ', req.body);
                 const correoInfoPidePermiso = yield database_1.default.query('SELECT e.id, e.correo, e.nombre, e.apellido, ' +
                     'e.cedula, ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, ' +
                     'd.nombre AS departamento ' +
@@ -713,50 +990,218 @@ class PermisosControlador {
                     '(SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id ) = ecr.id ' +
                     'AND tc.id = ecr.cargo AND d.id = ecr.id_departamento ORDER BY cargo DESC', [id_empl_contrato]);
                 // codigo para enviar notificacion o correo al jefe de su propio departamento, independientemente del nivel.
-                // && obj.id_dep === correoInfoPidePermiso.rows[0].id_departamento && obj.id_suc === correoInfoPidePermiso.rows[0].id_sucursal
+                //&& obj.id_dep === correoInfoPidePermiso.rows[0].id_departamento && obj.id_suc === correoInfoPidePermiso.rows[0].id_sucursal
                 let data = {
                     to: correo,
                     from: settingsMail_1.email,
                     subject: asunto,
                     html: `
-                           <body>
-                               <div style="text-align: center;">
-                                   <img width="25%" height="25%" src="cid:cabeceraf"/>
-                               </div>
-                               <br>
-                               <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                                   El presente correo es para informar que se ha ${proceso} la siguiente solicitud de permiso: <br>  
-                               </p>
-                               <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
-                               <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                                   <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
-                                   <b>Asunto:</b> ${asunto} <br> 
-                                   <b>Colaborador que envía:</b> ${correoInfoPidePermiso.rows[0].nombre} ${correoInfoPidePermiso.rows[0].apellido} <br>
-                                   <b>Número de Cédula:</b> ${correoInfoPidePermiso.rows[0].cedula} <br>
-                                   <b>Cargo:</b> ${correoInfoPidePermiso.rows[0].tipo_cargo} <br>
-                                   <b>Departamento:</b> ${correoInfoPidePermiso.rows[0].departamento} <br>
-                                   <b>Generado mediante:</b> Aplicación Móvil <br>
-                                   <b>Fecha de envío:</b> ${fecha} <br> 
-                                   <b>Hora de envío:</b> ${hora} <br><br> 
-                               </p>
-                               <h3 style="font-family: Arial; text-align: center;">INFORMACIÓN DE LA SOLICITUD</h3>
-                               <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                                   <b>Motivo:</b> ${tipo_permiso} <br>   
-                                   <b>Fecha de Solicitud:</b> ${solicitud} <br> 
-                                   <b>Desde:</b> ${desde} ${h_inicio} <br>
-                                   <b>Hasta:</b> ${hasta} ${h_fin} <br>
-                                   <b>Observación:</b> ${observacion} <br>
-                                   <b>Días permiso:</b> ${dias_permiso} <br>
-                                   <b>Horas permiso:</b> ${horas_permiso} <br>
-                                   <b>Estado:</b> ${estado_p} <br><br>
-                                   <b>${tipo_solicitud}:</b> ${solicitado_por} <br><br>
-                               </p>
-                               <p style="font-family: Arial; font-size:12px; line-height: 1em;">
-                                   <b>Gracias por la atención</b><br>
-                                   <b>Saludos cordiales,</b> <br><br>
-                               </p>
-                               <img src="cid:pief" width="50%" height="50%"/>
-                            </body>
+                    <body>
+                        <div style="text-align: center;">
+                            <img width="25%" height="25%" src="cid:cabeceraf"/>
+                        </div>
+                        <br>
+                        <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                            El presente correo es para informar que se ha ${proceso} la siguiente solicitud de permiso: <br>  
+                        </p>
+                        <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
+                        <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                            <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
+                            <b>Asunto:</b> ${asunto} <br> 
+                            <b>Colaborador que envía:</b> ${correoInfoPidePermiso.rows[0].nombre} ${correoInfoPidePermiso.rows[0].apellido} <br>
+                            <b>Número de cédula:</b> ${correoInfoPidePermiso.rows[0].cedula} <br>
+                            <b>Cargo:</b> ${correoInfoPidePermiso.rows[0].tipo_cargo} <br>
+                            <b>Departamento:</b> ${correoInfoPidePermiso.rows[0].departamento} <br>
+                            <b>Generado mediante:</b> Aplicación Móvil <br>
+                            <b>Fecha de envío:</b> ${fecha} <br> 
+                            <b>Hora de envío:</b> ${hora} <br><br> 
+                         </p>
+                        <h3 style="font-family: Arial; text-align: center;">INFORMACIÓN DE LA SOLICITUD</h3>
+                        <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                            <b>Motivo:</b> ${tipo_permiso} <br>   
+                            <b>Registro de solicitud:</b> ${solicitud} <br> 
+                            <b>Desde:</b> ${desde} ${h_inicio} <br>
+                            <b>Hasta:</b> ${hasta} ${h_fin} <br>
+                            <b>Observación:</b> ${observacion} <br>
+                            <b>Días permiso:</b> ${dias_permiso} <br>
+                            <b>Horas permiso:</b> ${horas_permiso} <br>
+                            <b>Estado:</b> ${estado_p} <br><br>
+                            <b>${tipo_solicitud}:</b> ${solicitado_por} <br><br>
+                        </p>
+                        <p style="font-family: Arial; font-size:12px; line-height: 1em;">
+                            <b>Gracias por la atención</b><br>
+                            <b>Saludos cordiales,</b> <br><br>
+                        </p>
+                        <img src="cid:pief" width="50%" height="50%"/>
+                    </body>
+                    `,
+                    attachments: [
+                        {
+                            filename: 'cabecera_firma.jpg',
+                            path: `${path_folder}/${settingsMail_1.cabecera_firma}`,
+                            cid: 'cabeceraf' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
+                        },
+                        {
+                            filename: 'pie_firma.jpg',
+                            path: `${path_folder}/${settingsMail_1.pie_firma}`,
+                            cid: 'pief' //COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
+                        }
+                    ]
+                };
+                var corr = (0, settingsMail_1.enviarMail)(settingsMail_1.servidor, parseInt(settingsMail_1.puerto));
+                corr.sendMail(data, function (error, info) {
+                    if (error) {
+                        corr.close();
+                        console.log('Email error: ' + error);
+                        return res.jsonp({ message: 'error' });
+                    }
+                    else {
+                        corr.close();
+                        console.log('Email sent: ' + info.response);
+                        return res.jsonp({ message: 'ok' });
+                    }
+                });
+            }
+            else {
+                res.jsonp({ message: 'Ups! algo salio mal!!! No fue posible enviar correo electrónico.' + datos });
+            }
+        });
+    }
+    // ENVIO DE CORREO AL CREAR UN PERMISO MEDIANTE APLICACION MOVIL
+    EnviarCorreoPermisoEditarMovil(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var tiempo = (0, settingsMail_1.fechaHora)();
+            var fecha = yield (0, settingsMail_1.FormatearFecha)(tiempo.fecha_formato, settingsMail_1.dia_completo);
+            var hora = yield (0, settingsMail_1.FormatearHora)(tiempo.hora);
+            const path_folder = path_1.default.resolve('logos');
+            var datos = yield (0, settingsMail_1.Credenciales)(parseInt(req.params.id_empresa));
+            console.log('datos: ', datos);
+            if (datos === 'ok') {
+                const { id_empl_contrato, id_dep, correo, id_suc, desde, hasta, h_inicio, h_fin, observacion, estado_p, solicitud, tipo_permiso, dias_permiso, horas_permiso, solicitado_por, asunto, tipo_solicitud, proceso, adesde, ahasta, ah_inicio, ah_fin, aobservacion, aestado_p, asolicitud, atipo_permiso, adias_permiso, ahoras_permiso } = req.body;
+                console.log('req.body: ', req.body);
+                const correoInfoPidePermiso = yield database_1.default.query('SELECT e.id, e.correo, e.nombre, e.apellido, ' +
+                    'e.cedula, ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, ' +
+                    'd.nombre AS departamento ' +
+                    'FROM empl_contratos AS ecn, empleados AS e, empl_cargos AS ecr, tipo_cargo AS tc, ' +
+                    'cg_departamentos AS d ' +
+                    'WHERE ecn.id = $1 AND ecn.id_empleado = e.id AND ' +
+                    '(SELECT MAX(cargo_id) AS cargo FROM datos_empleado_cargo WHERE empl_id = e.id ) = ecr.id ' +
+                    'AND tc.id = ecr.cargo AND d.id = ecr.id_departamento ORDER BY cargo DESC', [id_empl_contrato]);
+                // codigo para enviar notificacion o correo al jefe de su propio departamento, independientemente del nivel.
+                //&& obj.id_dep === correoInfoPidePermiso.rows[0].id_departamento && obj.id_suc === correoInfoPidePermiso.rows[0].id_sucursal
+                let data = {
+                    to: correo,
+                    from: settingsMail_1.email,
+                    subject: asunto,
+                    html: `
+                        <body>
+                            <div style="text-align: center;">
+                                <img width="25%" height="25%" src="cid:cabeceraf"/>
+                            </div>
+                            <br>
+                            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                                El presente correo es para informar que se ha ${proceso} la siguiente solicitud de permiso: <br>  
+                            </p>
+                            <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
+                            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                                <b>Empresa:</b> ${settingsMail_1.nombre} <br>   
+                                <b>Asunto:</b> ${asunto} <br> 
+                                <b>Colaborador que envía:</b> ${correoInfoPidePermiso.rows[0].nombre} ${correoInfoPidePermiso.rows[0].apellido} <br>
+                                <b>Número de cédula:</b> ${correoInfoPidePermiso.rows[0].cedula} <br>
+                                <b>Cargo:</b> ${correoInfoPidePermiso.rows[0].tipo_cargo} <br>
+                                <b>Departamento:</b> ${correoInfoPidePermiso.rows[0].departamento} <br>
+                                <b>Generado mediante:</b> Aplicación Móvil <br>
+                                <b>Fecha de envío:</b> ${fecha} <br> 
+                                <b>Hora de envío:</b> ${hora} <br><br> 
+                             </p>
+                             <h3 style="font-family: Arial; text-align: center;">INFORMACIÓN DE LA SOLICITUD</h3>
+                             <table style='width: 100%;'>
+                                 <tr style='font-family: Arial; font-size:14px;'>
+                                     <th scope='col' style="text-align: left; border-right: 1px solid #000;">INFORMACIÓN ANTERIOR <br><br></th>
+                                     <th scope='col' style="text-align: left;">INFORMACIÓN ACTUAL <br><br></th>
+                                 </tr>
+ 
+                                 <tr style="font-family: Arial; font-size:12px; line-height: 1em; text-align: left;">
+                                     <td style="text-align: left; border-right: 1px solid #000; color:gray;">
+                                         <b>Motivo:</b> ${atipo_permiso} <br>     
+                                     </td>
+                                     <td style="text-align: left; color:rgb(11, 22, 121);">
+                                         <b>Motivo:</b> ${tipo_permiso} <br>
+                                     </td>
+                                 </tr>
+ 
+                                 <tr style="font-family: Arial; font-size:12px; line-height: 1em; text-align: left;">
+                                     <td style="text-align: left; border-right: 1px solid #000; color:gray;">
+                                         <b>Registro de solicitud:</b> ${asolicitud} <br> 
+                                     </td>
+                                     <td style="text-align: left; color:rgb(11, 22, 121);">
+                                         <b>Registro de solicitud:</b> ${solicitud} <br> 
+                                     </td>
+                                 </tr>
+ 
+                                 <tr style="font-family: Arial; font-size:12px; line-height: 1em; text-align: left;">
+                                     <td style="text-align: left; border-right: 1px solid #000; color:gray;">
+                                         <b>Desde:</b> ${adesde} ${ah_inicio} <br> 
+                                     </td>
+                                     <td style="text-align: left; color:rgb(11, 22, 121);">
+                                         <b>Desde:</b> ${desde} ${h_inicio} <br>  
+                                     </td>
+                                 </tr>
+ 
+                                 <tr style="font-family: Arial; font-size:12px; line-height: 1em; text-align: left;">
+                                     <td style="text-align: left; border-right: 1px solid #000; color:gray;">
+                                         <b>Hasta:</b> ${ahasta} ${ah_fin} <br>
+                                     </td>
+                                     <td style="text-align: left; color:rgb(11, 22, 121);">
+                                         <b>Hasta:</b> ${hasta} ${h_fin} <br>  
+                                     </td>
+                                 </tr>
+ 
+                                 <tr style="font-family: Arial; font-size:12px; line-height: 1em; text-align: left;">
+                                     <td style="text-align: left; border-right: 1px solid #000; color:gray;">
+                                         <b>Observación:</b> ${aobservacion} <br>
+                                     </td>
+                                     <td style="text-align: left; color:rgb(11, 22, 121);">
+                                         <b>Observación:</b> ${observacion} <br> 
+                                     </td>
+                                 </tr>
+ 
+                                 <tr style="font-family: Arial; font-size:12px; line-height: 1em; text-align: left;">
+                                     <td style="text-align: left; border-right: 1px solid #000; color:gray;">
+                                         <b>Días permiso:</b> ${adias_permiso} <br>
+                                     </td>
+                                     <td style="text-align: left; color:rgb(11, 22, 121);">
+                                         <b>Días permiso:</b> ${dias_permiso} <br>
+                                     </td>
+                                 </tr>
+ 
+                                 <tr style="font-family: Arial; font-size:12px; line-height: 1em; text-align: left;">
+                                     <td style="text-align: left; border-right: 1px solid #000; color:gray;">
+                                         <b>Horas permiso:</b> ${ahoras_permiso} <br>
+                                     </td>
+                                     <td style="text-align: left; color:rgb(11, 22, 121);">
+                                         <b>Horas permiso:</b> ${horas_permiso} <br>
+                                     </td>
+                                 </tr>
+ 
+                                 <tr style="font-family: Arial; font-size:12px; line-height: 1em; text-align: left;">
+                                     <td style="text-align: left; border-right: 1px solid #000; color:gray;">
+                                         <b>Estado:</b> ${aestado_p} <br><br>
+                                     </td>
+                                     <td style="text-align: left; color:rgb(11, 22, 121);">
+                                         <b>Estado:</b> ${estado_p} <br><br>
+                                     </td>
+                                 </tr>
+                             </table>
+                            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                                <b>${tipo_solicitud}:</b> ${solicitado_por} <br><br>
+                            </p>
+                            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
+                                <b>Gracias por la atención</b><br>
+                                <b>Saludos cordiales,</b> <br><br>
+                            </p>
+                            <img src="cid:pief" width="50%" height="50%"/>
+                        </body>
                         `,
                     attachments: [
                         {
@@ -791,5 +1236,58 @@ class PermisosControlador {
         });
     }
 }
+// METODO PARA CREAR TABLA DE USUARIOS
+const generarTablaHTMLWeb = function (datos, tipo) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let tablaHtml = "<table style='border-collapse: collapse; width: 100%;'>";
+        console.log('ver tipo ---------- ', tipo);
+        if (tipo === 'Dias') {
+            tablaHtml += "<tr style='background-color: #f2f2f2; text-align: center; font-size: 14px;'>";
+            tablaHtml += "<th scope='col'>Código</th>";
+            tablaHtml += "<th scope='col'>Usuario</th>";
+            tablaHtml += "<th scope='col'>Cédula</th>";
+            tablaHtml += "<th scope='col'>Departamento</th>";
+            tablaHtml += "<th scope='col'>Permiso</th>";
+            tablaHtml += `<th scope='col'>Días permiso</th>`;
+            tablaHtml += "<th scope='col'>Solicitud</th>";
+            tablaHtml += "</tr>";
+            for (const dato of datos) {
+                tablaHtml += "<tr style='text-align: center; font-size: 14px;'>";
+                tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.codigo}</td>`;
+                tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.empleado}</td>`;
+                tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.cedula}</td>`;
+                tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.departamento}</td>`;
+                tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.id_permiso}</td>`;
+                tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.dias_laborables}</td>`;
+                tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.estado}</td>`;
+                tablaHtml += "<tr>";
+            }
+        }
+        else {
+            tablaHtml += "<tr style='background-color: #f2f2f2; text-align: center; font-size: 14px;'>";
+            tablaHtml += "<th scope='col'>Código</th>";
+            tablaHtml += "<th scope='col'>Usuario</th>";
+            tablaHtml += "<th scope='col'>Cédula</th>";
+            tablaHtml += "<th scope='col'>Departamento</th>";
+            tablaHtml += "<th scope='col'>Permiso</th>";
+            tablaHtml += `<th scope='col'>Horas permiso</th>`;
+            tablaHtml += "<th scope='col'>Solicitud</th>";
+            tablaHtml += "</tr>";
+            for (const dato of datos) {
+                tablaHtml += "<tr style='text-align: center; font-size: 14px;'>";
+                tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.codigo}</td>`;
+                tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.empleado}</td>`;
+                tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.cedula}</td>`;
+                tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.departamento}</td>`;
+                tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.id_permiso}</td>`;
+                tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.tiempo_solicitado}</td>`;
+                tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.estado}</td>`;
+                tablaHtml += "<tr>";
+            }
+        }
+        tablaHtml += "</table>";
+        return tablaHtml;
+    });
+};
 exports.PERMISOS_CONTROLADOR = new PermisosControlador();
 exports.default = exports.PERMISOS_CONTROLADOR;

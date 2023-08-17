@@ -40,7 +40,7 @@ export class EmpleadoUbicacionService {
    ** ***************************************************************************************** **/
 
   RegistrarCoordenadas(data: any) {
-    return this.http.post(`${environment.url}/ubicacion`, data);
+    return this.http.post<any>(`${environment.url}/ubicacion`, data);
   }
 
   ActualizarCoordenadas(data: any) {

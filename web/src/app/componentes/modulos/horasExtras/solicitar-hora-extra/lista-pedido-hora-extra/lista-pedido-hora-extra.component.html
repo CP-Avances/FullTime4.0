@@ -1,0 +1,337 @@
+<!--******************** LISTA DE SOLICITUDES DE HORAS EXTRAS PENDIENTES O PREAUTORIZADAS ********************-->
+<div class="container" style="padding-bottom: 25px; text-align: center; padding-top: 15px;" *ngIf="lista_pedidos">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
+                matTooltipPosition="right" matTooltip="Autorizar a todos los empleados su Solicitud de Horas Extras"
+                id="SelectCheck">
+                library_add_check
+            </mat-icon>
+            <button *ngIf="btnCheckHabilitar" class="btn btn-primary" (click)="AutorizarHorasExtrasMultiple('pedido')"
+                style="float: left; margin-left: 8px;">
+                Autorizar
+            </button>
+            <span class="w-100 bd-highlight">
+                LISTA DE SOLICITUDES DE HORAS EXTRAS
+            </span>
+            <button class="btn btn-sm" style="float: right; margin-right: 6px;" ngDefaultControl
+                [(ngModel)]="totalHorasExtras" [ngModelOptions]="{standalone: true}">
+                Horas Totales {{totalHorasExtras}}
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th>
+                            <mat-checkbox *ngIf="btnCheckHabilitar" (change)="$event ? masterToggle() : null"
+                                [checked]="selectionUno.hasValue() && isAllSelected()"
+                                [indeterminate]="selectionUno.hasValue() && !isAllSelected()"
+                                [aria-label]="checkboxLabel()">
+                            </mat-checkbox>
+                        </th>
+                        <th scope="col">Departamento</th>
+                        <th scope="col">Empleado</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Descripcion</th>
+                        <th scope="col">Fecha Inicio</th>
+                        <th scope="col">Fecha Final</th>
+                        <th scope="col">Horas</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <mat-form-field class="input-tables departamento">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroDepa" [formControl]="Depata"
+                                    type="text" (keypress)="IngresarSoloLetras($event)">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field class="input-tables departamento">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroUsuario" [formControl]="Usuario"
+                                    type="text" (keypress)="IngresarSoloLetras($event)">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field class="input-tables departamento">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroEstado" [formControl]="Estado"
+                                    type="text" (keypress)="IngresarSoloLetras($event)">
+                            </mat-form-field>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                matTooltip="Filtro de solicitudes pendientes y pre-autorizados.">
+                                help_outline
+                            </mat-icon>
+                        </td>
+                    </tr>
+                    <tr
+                        *ngFor="let h of lista_HorasExtras | empleDepa: filtroDepa | emplUsuario: filtroUsuario | emplEstado: filtroEstado | paginate:tamanio_pagina:numero_pagina">
+                        <td>
+                            <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionUno.toggle(h) : null" [checked]="selectionUno.isSelected(h)"
+                                [aria-label]="checkboxLabel(h)">
+                            </mat-checkbox>
+                        </td>
+                        <td>{{h.depa_nombre}}</td>
+                        <td>{{h.fullname}}</td>
+                        <td>{{h.estado}}</td>
+                        <td>{{h.descripcion}}</td>
+                        <td>{{h.fec_inicio}}</td>
+                        <td>{{h.fec_final}}</td>
+                        <td>{{h.num_hora}}</td>
+                        <td class="justify-content-center">
+                            <a *ngIf="auto_individual" class="fas fa-file-alt"
+                                style="color:rgb(197, 95, 11); margin-left: 15px; text-decoration: none;" matSuffix
+                                matTooltipPosition="right" matTooltip="Cambiar el estado del documento de autorización"
+                                [routerLink]="['/ver-hora-extra', h.id]">
+                                <p>Autorizar</p>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <div class="float-right">
+            <button mat-raised-button id="btn-raised" class="btn_horas" type="submit" ngDefaultControl
+                [(ngModel)]="horasSumadas" style="margin-right: 10px;" [ngModelOptions]="{standalone: true}">
+                Sub-total Horas {{horasSumadas}}
+            </button>
+        </div>
+        <br>
+        <div>
+            <mat-paginator id="pagina" [length]="lista_HorasExtras.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" (click)="calcularHoraPaginacion()"
+                showFirstLastButtons>
+            </mat-paginator>
+        </div>
+
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+            <i (click)="generarPdf('download','Solicitudes de horas extras')" id="pdf" class="fas fa-file-pdf" matSuffix
+                matTooltipPosition="right" matTooltip="Descargar Lista de solicitudes de horas extras en formato PDF.">
+                <p>PDF</p>
+            </i>
+            <i (click)="exportToExcel('Solicitudes de horas extras')" id="excel" class="fas fa-file-excel" matSuffix
+                matTooltipPosition="right"
+                matTooltip="Descargar Lista de solicitudes de horas extras en formato EXCEL.">
+                <p>XLSL</p>
+            </i>
+            <i (click)="exportToCVS('Solicitudes de horas extras')" id="csv" class="fas fa-file-csv" matSuffix
+                matTooltipPosition="right" matTooltip="Descargar Lista de solicitudes de horas extras en formato CSV.">
+                <p>CSV</p>
+            </i>
+            <i (click)="exportToXML('Solicitudes de horas extras')" id="xml" class="fas fa-file-code" matSuffix
+                matTooltipPosition="right" matTooltip="Descargar Lista de solicitudes de horas extras en formato XML.">
+                <p>XML</p>
+            </i>
+        </div>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+            <p> Reporte de solicitudes de horas extras. </p>
+        </div>
+    </div>
+</div>
+
+<!--************************** LISTA DE SOLICITUDES DE HORAS EXTRAS CON OBSERVACIONES **************************-->
+<div class="container" style="padding-bottom: 25px; text-align: center;" *ngIf="lista_observacion">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccionObserva()" matSuffix
+                matTooltipPosition="right" matTooltip="Autorizar a todos los empleados su Solicitud de Horas Extras"
+                id="SelectCheck">
+                library_add_check
+            </mat-icon>
+            <button *ngIf="btnCheckHabilitarObserva" class="btn btn-primary"
+                (click)="AutorizarHorasExtrasMultiple('observacion')" style="float: left; margin-left: 10px;">
+                Autorizar
+            </button>
+            <span class="w-100 bd-highlight">
+                LISTA DE SOLICITUDES DE HORAS EXTRAS CON OBSERVACIONES
+            </span>
+            <button class="btn btn-sm" style="float: right; margin-right: 10px;" ngDefaultControl
+                [(ngModel)]="total_horas_observacion" [ngModelOptions]="{standalone: true}">
+                Horas Totales {{total_horas_observacion}}
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th>
+                            <mat-checkbox *ngIf="btnCheckHabilitarObserva"
+                                (change)="$event ? masterToggleObserva() : null"
+                                [checked]="selectionUnoObserva.hasValue() && isAllSelectedObserva()"
+                                [indeterminate]="selectionUnoObserva.hasValue() && !isAllSelectedObserva()"
+                                [aria-label]="checkboxLabelObserva()">
+                            </mat-checkbox>
+                        </th>
+                        <th scope="col">Empleado</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Descripcion</th>
+                        <th scope="col">Fecha Inicio</th>
+                        <th scope="col">Fecha Final</th>
+                        <th scope="col">Horas</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let h of listaHorasExtrasObservaFiltradas | paginate:tamanio_pagina_observacion:numero_pagina_observacion">
+                        <td>
+                            <mat-checkbox *ngIf="btnCheckHabilitarObserva" (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionUnoObserva.toggle(h) : null"
+                                [checked]="selectionUnoObserva.isSelected(h)" [aria-label]="checkboxLabelObserva(h)">
+                            </mat-checkbox>
+                        </td>
+                        <td>{{h.nombre}} {{h.apellido}}</td>
+                        <td>{{h.estado}}</td>
+                        <td>{{h.descripcion}}</td>
+                        <td>{{h.fec_inicio}}</td>
+                        <td>{{h.fec_final}}</td>
+                        <td>{{h.num_hora}}</td>
+                        <td class="justify-content-center">
+                            <a *ngIf="observa_individual" class="fas fa-file-alt"
+                                style="color:rgb(197, 95, 11); margin-left: 15px; text-decoration: none;" matSuffix
+                                matTooltipPosition="right" matTooltip="Cambiar el estado del documento de autorización"
+                                [routerLink]="['/ver-hora-extra', h.id]">
+                                <p>Autorizar</p>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <div class="float-right">
+            <button mat-raised-button id="btn-raised" class="btn_horas" type="submit" ngDefaultControl
+                [(ngModel)]="horasSumadas_observacion" style="margin-right: 10px;"
+                [ngModelOptions]="{standalone: true}">
+                Sub-total Horas {{horasSumadas_observacion}}
+            </button>
+        </div>
+        <br>
+        <mat-paginator id="pagina" [length]="listaHorasExtrasObservaFiltradas.length"
+            [pageSize]="tamanio_pagina_observacion" [pageSizeOptions]="pageSizeOptions_observacion" id="pagina"
+            (page)="ManejarPaginaObservacion($event)" (click)="calcularHoraPaginacionObservacion()"
+            showFirstLastButtons>
+        </mat-paginator>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+            <i (click)="generarPdf('download','Solicitudes de horas extras con observaciones')" id="pdf"
+                class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de solicitudes de horas extras con observaciones en formato PDF.">
+                <p>PDF</p>
+            </i>
+            <i (click)="exportToExcel('Solicitudes de horas extras con observaciones')" id="excel"
+                class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de solicitudes de horas extras con observaciones en formato EXCEL.">
+                <p>XLSL</p>
+            </i>
+            <i (click)="exportToCVS('Solicitudes de horas extras con observaciones')" id="csv" class="fas fa-file-csv"
+                matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de solicitudes de horas extras con observaciones en formato CSV.">
+                <p>CSV</p>
+            </i>
+            <i (click)="exportToXML('Solicitudes de horas extras con observaciones')" id="xml" class="fas fa-file-code"
+                matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de solicitudes de horas extras con observaciones en formato XML.">
+                <p>XML</p>
+            </i>
+        </div>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+            <p> Reporte de solicitudes de horas extras con observaciones. </p>
+        </div>
+    </div>
+</div>
+
+<!--************************** LISTA DE SOLICITUDES DE HORAS EXTRAS AUTORIZADAS O NEGADAS *************************-->
+<div class="container" style="padding-bottom: 25px; text-align: center;" *ngIf="lista_autorizacion">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <span class="w-100 bd-highlight">
+                LISTA DE HORAS EXTRAS SOLICITADAS AUTORIZADAS O NEGADAS
+            </span>
+            <button class="btn btn-sm" style="float: right; margin-right: 10px;" ngDefaultControl
+                [(ngModel)]="total_horas_autorizadas" [ngModelOptions]="{standalone: true}">
+                Horas Totales Autorizadas {{total_horas_autorizadas}}
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Empleado</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Descripcion</th>
+                        <th scope="col">Fecha Inicio</th>
+                        <th scope="col">Fecha Final</th>
+                        <th scope="col">Horas</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let h of listaHorasExtrasAutorizadasFiltradas | paginate:tamanio_pagina_auto:numero_pagina_auto">
+                        <td>{{h.nombre}} {{h.apellido}}</td>
+                        <td>{{h.estado}}</td>
+                        <td>{{h.descripcion}}</td>
+                        <td>{{h.fec_inicio}}</td>
+                        <td>{{h.fec_final}}</td>
+                        <td>{{h.tiempo_autorizado}}</td>
+                        <td class="justify-content-center">
+                            <i *ngIf="auto_individual" class="fas fa-file-alt"
+                                style="color:rgb(197, 95, 11); margin-left: 15px;" matSuffix matTooltipPosition="right"
+                                matTooltip="Descargar documento solicitud hora extra."
+                                [routerLink]="['/ver-hora-extra', h.id]">
+                                <p>Documento</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <mat-paginator id="pagina" [length]="listaHorasExtrasAutorizadasFiltradas.length"
+            [pageSize]="tamanio_pagina_auto" [pageSizeOptions]="pageSizeOptions_auto" id="pagina"
+            (page)="ManejarPaginaAutorizadas($event)" showFirstLastButtons>
+        </mat-paginator>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+            <i (click)="generarPdf('download','Horas extras autorizadas o negadas')" id="pdf" class="fas fa-file-pdf"
+                matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de horas extras autorizadas o negadas en formato PDF.">
+                <p>PDF</p>
+            </i>
+            <i (click)="exportToExcel('Horas extras autorizadas o negadas')" id="excel" class="fas fa-file-excel"
+                matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de horas extras autorizadas o negadas en formato EXCEL.">
+                <p>XLSL</p>
+            </i>
+            <i (click)="exportToCVS('Horas extras autorizadas o negadas')" id="csv" class="fas fa-file-csv" matSuffix
+                matTooltipPosition="right"
+                matTooltip="Descargar Lista de horas extras autorizadas o negadas en formato CSV.">
+                <p>CSV</p>
+            </i>
+            <i (click)="exportToXML('Horas extras autorizadas o negadas')" id="xml" class="fas fa-file-code" matSuffix
+                matTooltipPosition="right"
+                matTooltip="Descargar Lista de horas extras autorizadas o negadas en formato XML.">
+                <p>XML</p>
+            </i>
+        </div>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+            <p> Reporte de horas extras autorizadas o negadas. </p>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="(validarMensaje1) && (validarMensaje2) && (validarMensaje3)" class="container"
+    style="padding-bottom: 50px; text-align: center; padding-top: 20px;">
+    <div class="mat-elevation-z8" style="color: rgb(158, 154, 154); padding: 2%;">
+        <h5> Por el momento no tiene solicitudes de horas extras por aprobar. </h5>
+    </div>
+</div>

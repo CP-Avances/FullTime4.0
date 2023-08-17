@@ -1,13 +1,14 @@
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        REGISTRAR DETALLE HORARIO</span>
+        REGISTRAR DETALLE HORARIO
+    </span>
     <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
 </div>
 <!-- FORMULARIO COMPLETO -->
 <form [formGroup]="formulario">
     <div class="container" style="text-align: center;">
-        <div class="nota">
+        <div class="nota" id="espacio">
             <span>
                 NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
                 Guardar.
@@ -116,12 +117,11 @@
             </div>
         </div>
     </div>
+    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 10px; margin-bottom: 2%;">
+        <button id="btn-raised" class="btn btn-sm" [disabled]="!formulario.valid" value="Guardar"
+            (click)="InsertarDetalleHorario(formulario.value)">Guardar</button>
+    </div>
 </form>
-<div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 2%;">
-    <button id="btn-raised" class="btn btn-sm" [disabled]="!formulario.valid" value="Guardar"
-        (click)="InsertarDetalleHorario(formulario.value)">Guardar</button>
-</div>
-
 <div class="pantalla-progress" *ngIf="habilitarprogress">
     <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
     </mat-progress-spinner>

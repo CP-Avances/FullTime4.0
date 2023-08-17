@@ -21,7 +21,7 @@ export class PlanificacionComidasEmpleadoComponent implements OnInit {
   idEmpleado: string = ''; // VARIABLE QUE ALMACENA ID DEL EMPLEADO QUE INICIA SESION
   FechaActual: string = '';
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA 
+  // ITEMS DE PAGINACION DE LA TABLA 
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
@@ -59,7 +59,7 @@ export class PlanificacionComidasEmpleadoComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(

@@ -47,6 +47,12 @@ export class TiempoAutorizadoComponent implements OnInit {
   ocultarPre: boolean = true;
   ocultarAu: boolean = true;
 
+  public autorizacion: any []
+  public lectura: any;
+  public estado_auto: any;
+  public empleado_estado: any = [];
+  public listaEnvioCorreo: any = [];
+
   constructor(
     private informacion: DatosGeneralesService,
     private realTime: RealTimeService,
@@ -63,7 +69,6 @@ export class TiempoAutorizadoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('data de la hora', this.data);
     this.obtenerInformacionEmpleado();
     this.MostrarProceso();
     this.BuscarParametro();
@@ -76,8 +81,9 @@ export class TiempoAutorizadoComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
-
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  autorizaDirecto: boolean = false;
+  InfoListaAutoriza: any = [];
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
@@ -86,14 +92,20 @@ export class TiempoAutorizadoComponent implements OnInit {
       }
     );
 
-    console.log('datos: ',this.data.auto.id_departamento);
+    this.restAutoriza.BuscarAutoridadUsuarioDepa(this.idEmpleado).subscribe(
+      (res) => {
+        this.ArrayAutorizacionTipos = res;
+      }
+    );
 
-    this.restAutoriza.BuscarAutoridadEmpleado(this.idEmpleado).subscribe(
+    this.restAutoriza.BuscarAutoridadUsuarioDepa(this.idEmpleado).subscribe(
       (res) => {
         this.ArrayAutorizacionTipos = res;
         this.ArrayAutorizacionTipos.filter(x => {
-          if(x.id_departamento == 1 && x.estado == true){
+          if(x.nombre == 'GERENCIA' && x.estado == true){
             this.gerencia = true;
+            this.autorizaDirecto = false;
+            this.InfoListaAutoriza = x;
             if(x.autorizar == true){
               this.ocultarAu = false;
               this.ocultarPre = true;
@@ -103,6 +115,8 @@ export class TiempoAutorizadoComponent implements OnInit {
             }
           }
           else if((this.gerencia == false) && (this.data.auto.id_departamento == x.id_departamento && x.estado == true)){
+            this.autorizaDirecto = true;
+            this.InfoListaAutoriza = x;
             if(x.autorizar == true){
               this.ocultarAu = false;
               this.ocultarPre = true;
@@ -226,10 +240,11 @@ export class TiempoAutorizadoComponent implements OnInit {
       var estado_c = 'Negada';
       var estado_n = 'negadas';
     }
+
+
     this.informacion.BuscarJefes(datos).subscribe(horaExtra => {
-      console.log(horaExtra);
       horaExtra.EmpleadosSendNotiEmail.push(this.solInfo);
-      this.EnviarCorreo(horaExtra, estado_h, estado_c, valor, estado_n);
+      this.ConfiguracionCorreo(horaExtra, estado_h, estado_c, valor, estado_n);
       this.EnviarNotificacion(horaExtra, estado_h, valor, estado_n);
       this.toastr.success('', 'Proceso realizado exitosamente.', {
         timeOut: 6000,
@@ -256,20 +271,107 @@ export class TiempoAutorizadoComponent implements OnInit {
   /** ******************************************************************************************* **
    ** **                METODO DE ENVIO DE NOTIFICACIONES DE HORAS EXTRAS                      ** **
    ** ******************************************************************************************* **/
-
+   listadoDepaAutoriza: any = [];
+   id_departamento: any;
   // METODO PARA ENVIAR NOTIFICACIONES DE CORREO
-  EnviarCorreo(horaExtra: any, estado_h: string, estado_c: string, valor: any, estado_n: string) {
-
+  ConfiguracionCorreo(horaExtra: any, estado_h: string, estado_c: string, valor: any, estado_n: string) {
     console.log('ver horas extras ....   ', horaExtra)
-
-    var cont = 0;
-    var correo_usuarios = '';
-
     // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE HORA EXTRA
     let solicitud = this.validar.FormatearFecha(horaExtra.fec_solicita, this.formato_fecha, this.validar.dia_completo);
     let desde = this.validar.FormatearFecha(horaExtra.fec_inicio, this.formato_fecha, this.validar.dia_completo);
     let hasta = this.validar.FormatearFecha(horaExtra.fec_final, this.formato_fecha, this.validar.dia_completo);
 
+    this.id_departamento = this.solInfo.id_dep;
+    this.lectura = 1;
+    this.restA.getUnaAutorizacionByHoraExtraRest(this.data.horaExtra.id).subscribe(res1 => {
+      this.autorizacion = res1;
+      console.log('this.autorizacion: ',this.autorizacion);
+      // METODO PARA OBTENER EMPLEADOS Y ESTADOS
+      var autorizaciones = this.autorizacion[0].id_documento.split(',');
+      autorizaciones.map((obj: string) => {
+        this.lectura = this.lectura + 1;
+        if (obj != '') {
+          let empleado_id = obj.split('_')[0];
+          this.estado_auto = obj.split('_')[1];
+
+          // CREAR ARRAY DE DATOS DE COLABORADORES
+          var data = {
+            id_empleado: empleado_id,
+            estado: this.estado_auto
+          }
+
+          // CAMBIAR DATO ESTADO INT A VARCHAR
+          if (this.estado_auto === '1') {
+            this.estado_auto = 'Pendiente';
+          }
+          if (this.estado_auto === '2') {
+            this.estado_auto = 'Preautorizado';
+          }
+
+          this.empleado_estado = this.empleado_estado.concat(data);
+          // CUANDO TODOS LOS DATOS SE HAYAN REVISADO EJECUTAR METODO DE INFORMACIÓN DE AUTORIZACIÓN
+          if (this.lectura === autorizaciones.length) {
+            if((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')){
+              this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
+                this.listadoDepaAutoriza = res;
+                this.listadoDepaAutoriza.filter(item => {
+                  if((item.nivel === autorizaciones.length) && (item.nivel_padre === item.nivel)){
+                    return this.listaEnvioCorreo.push(item);
+                  }else if((item.nivel === autorizaciones.length || item.nivel === (autorizaciones.length - 1))){
+                    return this.listaEnvioCorreo.push(item);
+                  }
+                })
+                console.log('this.listaEnvioCorreo1: ',this.listaEnvioCorreo);
+                this.EnviarCorreo(horaExtra, this.listaEnvioCorreo, estado_h, estado_c, solicitud, desde, hasta, valor, estado_n);
+              });
+            }else if(this.estado_auto > 2){
+              this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
+                this.listadoDepaAutoriza = res;
+                this.listadoDepaAutoriza.filter(item => {
+                  if((item.nivel_padre === this.InfoListaAutoriza.nivel) && (item.nivel_padre === item.nivel)){
+                    this.autorizaDirecto = false;
+                    return this.listaEnvioCorreo.push(item);
+                  }else{
+                    this.autorizaDirecto = true;
+                  }
+                })
+
+                //Esta condicion es para enviar el correo a todos los usuraios que autorizan siempre y cuando la solicitud fue negada antes
+                if(this.autorizaDirecto === true){
+                  this.listaEnvioCorreo = this.listadoDepaAutoriza;
+                }
+
+                console.log('this.listaEnvioCorreo2: ',this.listaEnvioCorreo);
+                this.EnviarCorreo(horaExtra, this.listaEnvioCorreo, estado_h, estado_c, solicitud, desde, hasta, valor, estado_n);
+              });
+            }
+          }
+
+        }else if(autorizaciones.length == 1){
+          this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
+            this.listadoDepaAutoriza = res;
+            this.listadoDepaAutoriza.filter(item => {
+              if(item.nivel < 3 ){
+                return this.listaEnvioCorreo.push(item);  
+              }
+            })
+            console.log('this.listaEnvioCorreo3: ',this.listaEnvioCorreo);
+            this.EnviarCorreo(horaExtra, this.listaEnvioCorreo, estado_h, estado_c, solicitud, desde, hasta, valor, estado_n);
+          });
+        }
+      })
+    });
+
+  }
+
+  EnviarCorreo(horaExtra: any, listaEnvioCorreo: any, estado_h: string, estado_c: string, solicitud: any, desde: any, hasta: any, valor: any, estado_n: any){
+    var cont = 0;
+    var correo_usuarios = '';
+    horaExtra.EmpleadosSendNotiEmail = listaEnvioCorreo;
+    horaExtra.EmpleadosSendNotiEmail.push(this.solInfo);
+    console.log('nueva lista hora extra: ',horaExtra.EmpleadosSendNotiEmail);
+
+    // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
     horaExtra.EmpleadosSendNotiEmail.forEach(e => {
 
       // LECTURA DE DATOS LEIDOS
@@ -334,7 +436,8 @@ export class TiempoAutorizadoComponent implements OnInit {
 
       }
     })
-  }
+  }  
+
 
   // METODO PARA ENVIAR NOTIIFICACIONES AL SISTEMA
   EnviarNotificacion(horaExtra: any, estado_h: string, valor: any, estado_n: string) {
@@ -377,7 +480,6 @@ export class TiempoAutorizadoComponent implements OnInit {
       if (e.hora_extra_noti) {
         this.realTime.EnviarMensajeGeneral(mensaje).subscribe(
           resp => {
-            console.log('ver data de notificacion', resp.respuesta)
             this.realTime.RecibirNuevosAvisos(resp.respuesta);
             // this.restPH.EnviarNotificacionRealTime(resp.respuesta);
           },
@@ -496,7 +598,7 @@ export class TiempoAutorizadoComponent implements OnInit {
     else {
       keynum = evt.which;
     }
-    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMÉRICO Y QUE TECLAS NO RECIBIRÁ.
+    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
     if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6) {
       return true;
     }

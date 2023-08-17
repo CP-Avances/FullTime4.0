@@ -400,7 +400,7 @@ export class ListaEmpleadosComponent implements OnInit {
           } else {
             this.rest.subirArchivoExcel_Automatico(datosArchivo).subscribe(datos_archivo => {
               console.log('plantilla 3', datos_archivo);
-              this.toastr.success('Operación Exitosa', 'Plantilla de Empleados importada.', {
+              this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
                 timeOut: 6000,
               });
               window.location.reload();
@@ -438,7 +438,7 @@ export class ListaEmpleadosComponent implements OnInit {
           } else {
             this.rest.subirArchivoExcel_Manual(datosArchivo).subscribe(datos_archivo => {
               console.log('plantilla 3', datos_archivo);
-              this.toastr.success('Operación Exitosa', 'Plantilla de Empleados importada.', {
+              this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
                 timeOut: 6000,
               });
               window.location.reload();
@@ -495,11 +495,11 @@ export class ListaEmpleadosComponent implements OnInit {
   GetDocumentDefinicion(numero: any) {
     sessionStorage.setItem('Empleados', this.empleado);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoD[0].nombre + ' ' + this.empleadoD[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
-      // PIE DE LA PÁGINA
+      // PIE DE LA PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');

@@ -74,7 +74,7 @@ export class AlimentosInvitadosComponent implements OnInit {
     this.ObtenerColores();
   }
 
-  // METODO PARA VER LA INFORMACIÓN DEL EMPLEADO QUE INICIA SESIÓN
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO QUE INICIA SESIÓN
   ObtenerEmpleadoLogueado(idemploy: any) {
     this.empleadoLogueado = [];
     this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -156,7 +156,7 @@ export class AlimentosInvitadosComponent implements OnInit {
   }
 
   /* ****************************************************************************************************
-   *                               PARA LA EXPORTACIÓN DE ARCHIVOS PDF
+   *                               PARA LA EXPORTACION DE ARCHIVOS PDF
    * ****************************************************************************************************/
 
   generarPdf(action = 'open') {
@@ -185,11 +185,11 @@ export class AlimentosInvitadosComponent implements OnInit {
   getDocumentDefinicion() {
     sessionStorage.setItem('Administrador', this.empleadoLogueado);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
-      // PIE DE LA PÁGINA
+      // PIE DE LA PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
@@ -389,11 +389,11 @@ export class AlimentosInvitadosComponent implements OnInit {
   GenerarSinRegistros() {
     sessionStorage.setItem('Administrador', this.empleadoLogueado);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
-      // PIE DE LA PÁGINA
+      // PIE DE LA PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var h = new Date();
         var f = moment();
@@ -434,7 +434,7 @@ export class AlimentosInvitadosComponent implements OnInit {
   /****************************************************************************************************** 
      *                                       METODO PARA EXPORTAR A EXCEL
      ******************************************************************************************************/
-  exportToExcelAlimentacion(form) {
+  exportToExcelAlimentacion(form: any) {
     var j = 0;
     const wsp: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.invitados.map(obj => {
       return {

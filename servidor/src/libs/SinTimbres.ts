@@ -147,6 +147,7 @@ async function RegistrarNotificacion(id_empleado: number, num_dia: number, fecha
     if (IdUltimoCargo === undefined) return 'Sin cargo'
 
     let horario;
+    /*
     switch (num_dia) {
         case 0: //DOMINGO
             horario = await pool.query('SELECT domingo FROM empl_horarios WHERE id_empl_cargo = $1 AND estado = 1 ORDER BY fec_inicio DESC LIMIT 1', [IdUltimoCargo.id_cargo])
@@ -217,7 +218,8 @@ async function RegistrarNotificacion(id_empleado: number, num_dia: number, fecha
                         return dias_Horario
                     })[0];
                 });
-    }
+                
+    }*/
 
     if (horario === undefined) return 'Sin Horario';
 

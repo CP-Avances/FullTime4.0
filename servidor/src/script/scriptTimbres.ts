@@ -3,7 +3,7 @@ import moment from 'moment';
 const FECHA_FERIADOS: any = [];
 
 export const generarTimbres = async function(id_empleado: number) {
-
+/*
     // pool.query('SELECT co.id_empleado AS empleado, co.id AS contrato, ca.id AS cargo, ho.fec_inicio, ho.fec_final,' + 
     //     'ho.lunes, ho.martes, ho.miercoles, ho.jueves, ho.viernes, ho.sabado, ho.domingo, ho.id_horarios' +
     //     'FROM empl_contratos AS co, empl_cargos AS ca, empl_horarios AS ho' +
@@ -92,7 +92,7 @@ export const generarTimbres = async function(id_empleado: number) {
         })
     });
     
-    
+    */
 
 }
 

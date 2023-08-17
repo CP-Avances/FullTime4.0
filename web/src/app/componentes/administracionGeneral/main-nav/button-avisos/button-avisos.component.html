@@ -1,6 +1,8 @@
 <button mat-mini-fab style="margin-right: 8px;" [matMenuTriggerFor]="timbre" (click)="numeroTimbres()">
     <mat-icon id="iconos-navegador" [matBadgeHidden]="estadoTimbres" matBadge="{{num_timbre_false}}"
-        matBadgeColor="warn" style="margin-left: 8px; margin-right: 8px;" matSuffix matTooltip="Avisos Generales">report</mat-icon>
+        matBadgeColor="warn" style="margin-left: 8px; margin-right: 8px;" matSuffix matTooltip="Avisos Generales">
+        report
+    </mat-icon>
 </button>
 <mat-menu #timbre="matMenu" style="margin-right: 10px; height: 100px;">
     <div class="container" style="text-align: center;">
@@ -136,7 +138,7 @@
                 </a>
             </div>
 
-            <!-- AVISOS YA VISTOS NOTIFICACIÓN DE SOLICITUD DE ALIMENTACION-->
+            <!-- AVISOS YA VISTOS NOTIFICACION DE SOLICITUD DE ALIMENTACION-->
             <div *ngIf="n.visto === true && n.tipo === 1" style="background: rgb(226, 226, 226)">
                 <a mat-menu-item type="submit" class="noti_menu">
                     <ul style="list-style: none; margin-left: -6%;" (click)="ActualizarVista(n)">
@@ -565,13 +567,58 @@
                         <li style="font-size: 12px; margin-top: 3%;">
                             <b>Enviado por:</b> {{n.empleado}}
                         </li>
-                        <li style="font-size: 12px; margin-top: 1%;">
-                            <b>Comunicado:</b> {{n.descripcion.split(';')[0]
-                            }}
+                        <li style="font-size: 11px; margin-top: 1%;">
+                            <b>Comunicado:</b>
+                            {{n.descripcion.split('.')[0]}}. {{n.descripcion.split('.')[1]}}.
+                        </li>
+                        <li style="font-size: 11px; margin-top: 1%;">
+                            {{n.descripcion.split('.')[2]}}.
                         </li>
                         <li style="font-size: 12px; margin-top: 1%;">
                             <b>Fecha:</b> {{n.fecha_}}
                             <b>&nbsp;&nbsp;Hora:</b> {{n.hora_}}
+                        </li>
+                    </ul>
+                    <mat-divider class="divider"></mat-divider>
+                </a>
+            </div>
+
+
+            <!-- NOTIFICACION DE PERMISOS MULTIPLES -->
+            <div *ngIf="n.visto === false && n.tipo === 7" style="background: rgb(172, 251, 254)">
+                <a mat-menu-item type="submit" class="noti_menu">
+                    <ul style="list-style: none; margin-left: -6%;" (click)="ActualizarVista(n)">
+                        <li style="font-size: 12px; margin-top: 3%;">
+                            <b>Colaborador:</b> {{n.empleado}}
+                        </li>
+                        <li style="font-size: 11px; margin-top: 1%;">
+                            <b>Comunicado:</b>
+                            {{n.descripcion.split('.')[0]}}. {{n.descripcion.split('.')[1]}}.
+                        </li>
+                        <li style="font-size: 11px; margin-top: 1%;">
+                            {{n.descripcion.split('.')[2]}}.
+                        </li>
+                        <li style="font-size: 11px; margin-top: 1%;">
+                            <b>Fecha:</b> {{n.fecha_}}
+                            <b>&nbsp;&nbsp;Hora:</b> {{n.hora_}}
+                        </li>
+                    </ul>
+                    <mat-divider class="divider"></mat-divider>
+                </a>
+            </div>
+
+            <!-- AVISOS YA VISTOS NOTIFICACION DE PERMISOS MULTIPLES -->
+            <div *ngIf="n.visto === true && n.tipo === 7" style="background: rgb(226, 226, 226)">
+                <a mat-menu-item type="submit" class="noti_menu">
+                    <ul style="list-style: none; margin-left: -6%;" (click)="ActualizarVista(n)">
+                        <li style="font-size: 12px; margin-top: 3%;">
+                            <b>Colaborador:</b> {{n.empleado}}
+                        </li>
+                        <li style="font-size: 11px; margin-top: 1%;">
+                            <b>Comunicado:</b>
+                        </li>
+                        <li style="font-size: 11px; margin-top: 1%;">
+                            {{n.descripcion}}
                         </li>
                     </ul>
                     <mat-divider class="divider"></mat-divider>

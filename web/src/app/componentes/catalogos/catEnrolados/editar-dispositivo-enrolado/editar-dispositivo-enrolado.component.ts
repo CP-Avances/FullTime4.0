@@ -21,16 +21,16 @@ export class EditarDispositivoEnroladoComponent implements OnInit {
   actualizarPagina: boolean = false;
 
 
-  // Control de los campos del formulario
+  // CONTROL DE LOS CAMPOS DEL FORMULARIO
   dispositivoF = new FormControl('', [Validators.required]);
 
-  // Asignar los campos en un formulario en grupo
+  // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
   public asignarRelojForm = new FormGroup({
     dispositivoForm: this.dispositivoF,
   });
   
   /**
-   * Variables progress spinner
+   * VARIABLES PROGRESS SPINNER
    */
   color: ThemePalette = 'primary';
   mode: ProgressSpinnerMode = 'indeterminate';
@@ -69,7 +69,7 @@ export class EditarDispositivoEnroladoComponent implements OnInit {
     })
   }
 
-  InsertarEnroladoReloj(form) {
+  InsertarEnroladoReloj(form: any) {
     this.habilitarprogress = true;
     var idEnrolado = this.data.enroladoid;
     var nombreReloj = form.dispositivoForm;
@@ -89,14 +89,14 @@ export class EditarDispositivoEnroladoComponent implements OnInit {
     }, error => {
       this.habilitarprogress = true;
       this.rest.ActualizarDatos(buscarReloj).subscribe(response => {
-        this.toastr.success('Operación Exitosa', 'Empleado enrolado agregado al dispositivo', {
+        this.toastr.success('Operación exitosa.', 'Empleado enrolado agregado al dispositivo', {
           timeOut: 6000,
         });
         this.CerrarVentanaAsignarReloj();
         this.habilitarprogress = false;
       }, error => {
         this.habilitarprogress = false;
-        this.toastr.error('Operación Fallida', 'Empleado enrolado no fue agregado al dispositivo', {
+        this.toastr.error('Ups!!! algo salio mal.', 'Empleado enrolado no fue agregado al dispositivo', {
           timeOut: 6000,
         })
       });

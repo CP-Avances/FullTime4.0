@@ -9,3 +9,7 @@ mat-form-field { padding: 10px 15px 0px 15px;}
 table { width: 100%; font-size: 14px;}
 
 #centrar { padding-top: 10px; text-align: center }
+
+td{
+    vertical-align: middle;
+}

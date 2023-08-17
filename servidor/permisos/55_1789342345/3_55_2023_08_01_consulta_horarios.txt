@@ -1,0 +1,57 @@
+select codigo_e, nombre_e, anio, mes, 
+case when string_agg(case when dia = 1 then codigo_dia end,',') is not null then string_agg(case when dia = 1 then codigo_dia end,',') else '-SP' end as dia1,
+case when string_agg(case when dia = 2 then codigo_dia end,',') is not null then string_agg(case when dia = 2 then codigo_dia end,',') else '-SP' end as dia2,
+case when string_agg(case when dia = 3 then codigo_dia end,',') is not null then string_agg(case when dia = 3 then codigo_dia end,',') else '-SP' end as dia3,
+case when string_agg(case when dia = 4 then codigo_dia end,',') is not null then string_agg(case when dia = 4 then codigo_dia end,',') else '-SP' end as dia4,
+case when string_agg(case when dia = 5 then codigo_dia end,',') is not null then string_agg(case when dia = 5 then codigo_dia end,',') else '-SP' end as dia5,
+case when string_agg(case when dia = 6 then codigo_dia end,',') is not null then string_agg(case when dia = 6 then codigo_dia end,',') else '-SP' end as dia6,
+case when string_agg(case when dia = 7 then codigo_dia end,',') is not null then string_agg(case when dia = 7 then codigo_dia end,',') else '-SP' end as dia7,
+case when string_agg(case when dia = 8 then codigo_dia end,',') is not null then string_agg(case when dia = 8 then codigo_dia end,',') else '-SP' end as dia8,
+case when string_agg(case when dia = 9 then codigo_dia end,',') is not null then string_agg(case when dia = 9 then codigo_dia end,',') else '-SP' end as dia9,
+case when string_agg(case when dia = 10 then codigo_dia end,',') is not null then string_agg(case when dia = 10 then codigo_dia end,',') else '-SP' end as dia10,
+case when string_agg(case when dia = 11 then codigo_dia end,',') is not null then string_agg(case when dia = 11 then codigo_dia end,',') else '-SP' end as dia11,
+case when string_agg(case when dia = 12 then codigo_dia end,',') is not null then string_agg(case when dia = 12 then codigo_dia end,',') else '-SP' end as dia12,
+case when string_agg(case when dia = 13 then codigo_dia end,',') is not null then string_agg(case when dia = 13 then codigo_dia end,',') else '-SP' end as dia13,
+case when string_agg(case when dia = 14 then codigo_dia end,',') is not null then string_agg(case when dia = 14 then codigo_dia end,',') else '-SP' end as dia14,
+case when string_agg(case when dia = 15 then codigo_dia end,',') is not null then string_agg(case when dia = 15 then codigo_dia end,',') else '-SP' end as dia15,
+case when string_agg(case when dia = 16 then codigo_dia end,',') is not null then string_agg(case when dia = 16 then codigo_dia end,',') else '-SP' end as dia16,
+case when string_agg(case when dia = 17 then codigo_dia end,',') is not null then string_agg(case when dia = 17 then codigo_dia end,',') else '-SP' end as dia17,
+case when string_agg(case when dia = 18 then codigo_dia end,',') is not null then string_agg(case when dia = 18 then codigo_dia end,',') else '-SP' end as dia18,
+case when string_agg(case when dia = 19 then codigo_dia end,',') is not null then string_agg(case when dia = 19 then codigo_dia end,',') else '-SP' end as dia19,
+case when string_agg(case when dia = 20 then codigo_dia end,',') is not null then string_agg(case when dia = 20 then codigo_dia end,',') else '-SP' end as dia20,
+case when string_agg(case when dia = 21 then codigo_dia end,',') is not null then string_agg(case when dia = 21 then codigo_dia end,',') else '-SP' end as dia21,
+case when string_agg(case when dia = 22 then codigo_dia end,',') is not null then string_agg(case when dia = 22 then codigo_dia end,',') else '-SP' end as dia22,
+case when string_agg(case when dia = 23 then codigo_dia end,',') is not null then string_agg(case when dia = 23 then codigo_dia end,',') else '-SP' end as dia23,
+case when string_agg(case when dia = 24 then codigo_dia end,',') is not null then string_agg(case when dia = 24 then codigo_dia end,',') else '-SP' end as dia24,
+case when string_agg(case when dia = 25 then codigo_dia end,',') is not null then string_agg(case when dia = 25 then codigo_dia end,',') else '-SP' end as dia25,
+case when string_agg(case when dia = 26 then codigo_dia end,',') is not null then string_agg(case when dia = 26 then codigo_dia end,',') else '-SP' end as dia26,
+case when string_agg(case when dia = 27 then codigo_dia end,',') is not null then string_agg(case when dia = 27 then codigo_dia end,',') else '-SP' end as dia27,
+case when string_agg(case when dia = 28 then codigo_dia end,',') is not null then string_agg(case when dia = 28 then codigo_dia end,',') else '-SP' end as dia28,
+case when string_agg(case when dia = 29 then codigo_dia end,',') is not null then string_agg(case when dia = 29 then codigo_dia end,',') else '-SP' end as dia29,
+case when string_agg(case when dia = 30 then codigo_dia end,',') is not null then string_agg(case when dia = 30 then codigo_dia end,',') else '-SP' end as dia30,
+case when string_agg(case when dia = 31 then codigo_dia end,',') is not null then string_agg(case when dia = 31 then codigo_dia end,',') else '-SP' end as dia31
+from (
+select p_g.codigo as codigo_e, CONCAT(empleado.apellido, ' ', empleado.nombre) as nombre_e, extract('year' from fec_horario) as anio, extract('month' from fec_horario) as mes, 
+	extract('day' from fec_horario) as dia, case when tipo_dia = 'L' THEN tipo_dia else horario.codigo end as codigo_dia
+from plan_general p_g
+INNER JOIN empleados empleado on empleado.codigo = p_g.codigo and p_g.codigo in ('1','35','55','5008')
+INNER JOIN cg_horarios horario on horario.id = p_g.id_horario
+where fec_horario BETWEEN '2023-05-01' and '2024-12-31'
+group by codigo_e, nombre_e, anio, mes, dia, codigo_dia, p_g.id_horario
+order by p_g.codigo,anio, mes , dia, p_g.id_horario
+) as datos
+group by codigo_e, nombre_e, anio, mes
+order by 1,3,4
+
+
+
+
+
+select p_g.codigo as codigo_e,  
+	 case when tipo_dia = 'L' THEN tipo_dia else horario.codigo end as codigo_dia
+from plan_general p_g
+INNER JOIN empleados empleado on empleado.codigo = p_g.codigo and p_g.codigo in ('35')
+INNER JOIN cg_horarios horario on horario.id = p_g.id_horario
+where fec_horario BETWEEN '2023-05-01' and '2024-12-31'
+group by codigo_e, codigo_dia
+order by p_g.codigo

@@ -14,8 +14,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
 
-import { RegistoEmpleadoHorarioComponent } from 'src/app/componentes/horarios/empleadoHorario/registo-empleado-horario/registo-empleado-horario.component';
-import { EditarHorarioEmpleadoComponent } from 'src/app/componentes/horarios/empleadoHorario/editar-horario-empleado/editar-horario-empleado.component';
+import { RegistoEmpleadoHorarioComponent } from 'src/app/componentes/horarios/rango-fechas/registo-empleado-horario/registo-empleado-horario.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { environment } from '../../../../environments/environment';
 
@@ -29,7 +28,7 @@ export class HorariosEmpleadoComponent implements OnInit {
 
   idEmpleado: string;
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA 
+  // ITEMS DE PAGINACION DE LA TABLA 
   numero_pagina: number = 1;
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
@@ -78,7 +77,7 @@ export class HorariosEmpleadoComponent implements OnInit {
     this.numero_pagina = e.pageIndex + 1;
   }
 
-  // METODO para ver la información del empleado 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
   empleado: any = [];
   ObtenerEmpleado() {
     this.empleado = [];
@@ -94,7 +93,7 @@ export class HorariosEmpleadoComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
@@ -150,22 +149,7 @@ export class HorariosEmpleadoComponent implements OnInit {
     }
   }
 
-  // VENTANA PARA EDITAR HORARIO DEL EMPLEADO 
-  AbrirEditarHorario(datoSeleccionado: any): void {
-    this.ventana.open(EditarHorarioEmpleadoComponent,
-      {
-        width: '600px',
-        data: {
-          idEmpleado: this.idEmpleado, datosHorario: datoSeleccionado,
-          horas_trabaja: this.cargoEmpleado[0].hora_trabaja
-        }
-      })
-      .afterClosed().subscribe(item => {
-        console.log(item);
-        this.ObtenerHorariosEmpleado(this.datoActual.codigo, this.formato_fecha);
-      });
 
-  }
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO HORARIO
   EliminarHorario(id_horario: number) {
@@ -285,7 +269,7 @@ export class HorariosEmpleadoComponent implements OnInit {
             this.restEmpleHorario.SubirArchivoExcel(formData, parseInt(this.idEmpleado), parseInt(this.empleado[0].codigo)).subscribe(resC => {
 
               this.restEmpleHorario.CreaPlanificacion(formData, parseInt(this.idEmpleado), parseInt(this.empleado[0].codigo)).subscribe(resP => {
-                this.toastr.success('Operación Exitosa', 'Plantilla de Horario importada.', {
+                this.toastr.success('Operación exitosa.', 'Plantilla de Horario importada.', {
                   timeOut: 6000,
                 });
                 this.ObtenerHorariosEmpleado(this.datoActual.codigo, this.formato_fecha);

@@ -2,14 +2,6 @@
 
 .button {margin: 5px 10px 5px 10px;}
 
-mat-form-field {width: 250px; padding: 10px 10px 0px 10px;}
-
-#letras { font-size: 13px; }
-
-mat-label{
-    font-size: 15px;
-}
-
 .progress {
     margin: 250px auto auto auto;
     opacity: 1
@@ -35,16 +27,6 @@ table {
     font-size: 14px;
 }
 
-.fas {
-    color: green;
-    cursor: pointer;
-}
-
-.fa-eye{
-    color: rgb(3, 97, 169);
-    cursor: pointer;
-}
-
 td {
     padding-top: 10px;
     text-align: center;
@@ -58,11 +40,8 @@ tr {
     text-align: center;
 }
 
-#resultados_dh {
+#cerrar {
     color: white;
-    font-size: 16px;
-    text-align: center;
-    background: rgb(3, 50, 120);
-    padding-top: 10px;
-    padding-bottom: 6px;
+    cursor: pointer;
+    margin-right: 2%;
 }

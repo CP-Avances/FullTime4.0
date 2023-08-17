@@ -43,7 +43,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
   filtroCedula: '';
   filtroEmpleado = '';
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA
+  // ITEMS DE PAGINACION DE LA TABLA
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
@@ -166,7 +166,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
   f_final_req: string = '';
   habilitar: boolean = false;
   estilo: any = { 'visibility': 'hidden' };
-  ValidarRangofechas(form) {
+  ValidarRangofechas(form: any) {
     var f_i = new Date(form.fec_inicio)
     var f_f = new Date(form.fec_final)
 
@@ -233,7 +233,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
     this.MensajeInicio()
   }
   /* ****************************************************************************************************
-  *                               PARA LA EXPORTACIÓN DE ARCHIVOS PDF 
+  *                               PARA LA EXPORTACION DE ARCHIVOS PDF 
   * ****************************************************************************************************/
 
   generarPdf(action = 'open', pdf: number) {
@@ -1088,9 +1088,9 @@ export class AsistenciaConsolidadoComponent implements OnInit {
     })
   }
 
-  /****************************************************************************************************** 
-   *                                       METODO PARA EXPORTAR A EXCEL
-   ******************************************************************************************************/
+  /** ************************************************************************************************** ** 
+   ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
+   ** ************************************************************************************************** **/
   exportToExcelAsistencia(id_empleado: number) {
     this.asistencia = [];
     this.restKardex.ReporteAsistenciaDetalleConsolidado(id_empleado, '2021-08-01', '2021-08-31').subscribe(res => {

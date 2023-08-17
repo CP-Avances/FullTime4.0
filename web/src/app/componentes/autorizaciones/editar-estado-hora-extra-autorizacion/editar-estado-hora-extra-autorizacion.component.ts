@@ -62,11 +62,11 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
     }
     this.tiempo();
 
-    this.restAutoriza.BuscarAutoridadEmpleado(this.id_empleado_loggin).subscribe(
+    this.restAutoriza.BuscarAutoridadUsuarioDepa(this.id_empleado_loggin).subscribe(
       (res) => {
         this.ArrayAutorizacionTipos = res;
         this.ArrayAutorizacionTipos.filter(x => {
-          if(x.nom_depar == 'GERENCIA' && x.estado == true){
+          if(x.nombre == 'GERENCIA' && x.estado == true){
             this.gerencia = true;
             if(x.autorizar == true){
               this.estados = [
@@ -75,7 +75,8 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
               ];
             }else if(x.preautorizar == true){
               this.estados = [
-                { id: 2, nombre: 'Pre-autorizado' }
+                { id: 2, nombre: 'Pre-autorizado' },
+                { id: 4, nombre: 'Negado' }
               ];
             }
           }
@@ -87,7 +88,8 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
               ];
             }else if(x.preautorizar == true){
               this.estados = [
-                { id: 2, nombre: 'Pre-autorizado' }
+                { id: 2, nombre: 'Pre-autorizado' },
+                { id: 4, nombre: 'Negado' }
               ];
             }
           }
@@ -103,7 +105,7 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
 
   resAutorizacion: any = [];
   idNoti: any = [];
-  ActualizarEstadoAutorizacion(form) {
+  ActualizarEstadoAutorizacion(form: any) {
     let newAutorizaciones = {
       id_documento: this.data.autorizacion[0].id_documento + localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       estado: form.estadoF,
@@ -114,7 +116,7 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
     this.restA.PutEstadoAutoHoraExtra(this.data.autorizacion[0].id_hora_extra, newAutorizaciones).subscribe(res => {
       this.resAutorizacion = [res];
       console.log(this.resAutorizacion);
-      this.toastr.success('Operación exitosa', 'Estado Actualizado', {
+      this.toastr.success('Operación exitosa.', 'Estado Actualizado', {
         timeOut: 6000,
       });
       this.EditarEstadoHoraExtra(form);
@@ -128,7 +130,7 @@ export class EditarEstadoHoraExtraAutorizacionComponent implements OnInit {
   }
 
   resEstado: any = [];
-  EditarEstadoHoraExtra(form) {
+  EditarEstadoHoraExtra(form: any) {
     let datosHorasExtras = {
       estado: form.estadoF,
       id_hora_extra: this.data.autorizacion[0].id_hora_extra,

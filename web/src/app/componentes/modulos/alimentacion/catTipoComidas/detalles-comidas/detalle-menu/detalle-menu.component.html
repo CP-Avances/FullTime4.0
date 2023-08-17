@@ -1,0 +1,52 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        REGISTRAR DETALLE
+    </span>
+    <mat-icon class="float-right" id="cerrar" (click)="Salir(1)">highlight_off</mat-icon>
+</div>
+<!-- Formulario Completo -->
+<form [formGroup]="formulario">
+    <div class="container" style="text-align: center">
+        <div class="nota" id="espacio">
+            <span>
+                NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                Guardar.
+            </span>
+        </div>
+        <div class="d-flex flex-wrap justify-content-center">
+            <mat-form-field>
+                <mat-label>Nombre del plato</mat-label>
+                <input matInput placeholder="Nombre del plato" [formControl]="nombreF" required>
+                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                    matTooltip="Ingresar nombre del nuevo plato.">
+                    help_outline
+                </mat-icon>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Valor</mat-label>
+                <input matInput placeholder="Ingresar valor del almuerzo" [formControl]="valorF"
+                    (keypress)="IngresarNumeroDecimal($event)" required>
+                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                    matTooltip="Ingresar el costo de este plato.">
+                    help_outline
+                </mat-icon>
+                <mat-error *ngIf="valorF.invalid">{{ObtenerMensajeErrorDecimales()}}</mat-error>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Observación</mat-label>
+                <input matInput placeholder="Ingresar una observación" [formControl]="observacionF">
+                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                    matTooltip="Ingresar una observación o descripción del plato.">
+                    help_outline
+                </mat-icon>
+            </mat-form-field>
+        </div>
+    </div>
+</form>
+<div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
+    <button id="btn-raised" class="btn btn-sm" (click)="InsertarDetalle(formulario.value)"
+        [disabled]="!formulario.valid">
+        Guardar
+    </button>
+</div>

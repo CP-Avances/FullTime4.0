@@ -31,7 +31,7 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 
 export class VerEmpresaComponent implements OnInit {
 
-  idEmpresa: string;
+  idEmpresa: number;
   datosEmpresa: any = [];
   datosSucursales: any = [];
 
@@ -82,9 +82,7 @@ export class VerEmpresaComponent implements OnInit {
     public restE: EmpleadoService,
     private toastr: ToastrService,
   ) {
-    var cadena = this.router.url;
-    var aux = cadena.split("/");
-    this.idEmpresa = aux[2];
+    this.idEmpresa = parseInt(localStorage.getItem('empresa') as string,)
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
 
@@ -104,7 +102,7 @@ export class VerEmpresaComponent implements OnInit {
   nombre_establecimiento: any;
   CargarDatosEmpresa() {
     this.datosEmpresa = [];
-    this.empresa.ConsultarDatosEmpresa(parseInt(this.idEmpresa)).subscribe(datos => {
+    this.empresa.ConsultarDatosEmpresa(this.idEmpresa).subscribe(datos => {
       this.datosEmpresa = datos;
       this.p_color = this.datosEmpresa[0].color_p;
       this.s_color = this.datosEmpresa[0].color_s;
@@ -113,9 +111,6 @@ export class VerEmpresaComponent implements OnInit {
       }
       else {
         this.nombre_establecimiento = this.datosEmpresa[0].establecimiento;
-      }
-      if (this.datosEmpresa[0].logo != null) {
-        this.ObtenerLogotipo();
       }
       if (this.datosEmpresa[0].cambios === true) {
         if (this.datosEmpresa[0].dias_cambio === 0) {
@@ -136,12 +131,13 @@ export class VerEmpresaComponent implements OnInit {
       }
 
       this.ObtenerColores();
+      this.ObtenerLogotipo();
     });
   }
 
   // METODO PARA OBTENER LOGOTIPO DE EMPRESA
   ObtenerLogotipo() {
-    this.empresa.LogoEmpresaImagenBase64(this.idEmpresa).subscribe(res => {
+    this.empresa.LogoEmpresaImagenBase64(String(this.idEmpresa)).subscribe(res => {
       if (res.imagen === 0) {
         this.imagen_default = true
       }
@@ -160,25 +156,34 @@ export class VerEmpresaComponent implements OnInit {
   }
 
   // VENTANA PARA EDITAR DATOS DE EMPRESA 
+  ver_informacion: boolean = true;
+  ver_editar: boolean = false;
   EditarDatosEmpresa(): void {
-    this.router.navigate(['/informacionEmpresa', this.idEmpresa])
+    this.ver_editar = true;
+    this.ver_informacion = false;
   }
 
   // VENTANA DE EDICION DE ESTABLECIMIENTOS
   AbrirVentanaEditarSucursal(datosSeleccionados: any): void {
     this.ventana.open(EditarSucursalComponent, { width: '650px', data: datosSeleccionados })
       .afterClosed().subscribe((items: any) => {
-        if (items.actualizar === true) {
-          this.ObtenerSucursal();
+        if (items) {
+          if (items > 0) {
+            this.VerDepartamentos(items);
+          }
         }
       });
   }
 
   // VENTANA DE REGISTRO DE ESTABLECIMIENTO
   AbrirVentanaRegistrarSucursal() {
-    this.ventana.open(RegistrarSucursalesComponent, { width: '650px', data: parseInt(this.idEmpresa) })
+    this.ventana.open(RegistrarSucursalesComponent, { width: '650px', data: this.idEmpresa })
       .afterClosed().subscribe((items: any) => {
-        this.ObtenerSucursal();
+        if (items) {
+          if (items > 0) {
+            this.VerDepartamentos(items);
+          }
+        }
       });
   }
 
@@ -199,7 +204,7 @@ export class VerEmpresaComponent implements OnInit {
   // METODO PARA EDITAR LOGO DE EMPRESA
   EditarLogo() {
     this.ventana.open(LogosComponent, {
-      width: '500px', data: { empresa: parseInt(this.idEmpresa), pagina: 'empresa' }
+      width: '500px', data: { empresa: this.idEmpresa, pagina: 'empresa' }
     }).afterClosed()
       .subscribe((res: any) => {
         this.ObtenerLogotipo();
@@ -222,8 +227,6 @@ export class VerEmpresaComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Eliminar(datos.id);
-        } else {
-          this.router.navigate(['/vistaEmpresa/', this.idEmpresa]);
         }
       });
   }
@@ -247,7 +250,7 @@ export class VerEmpresaComponent implements OnInit {
       id: this.datosEmpresa[0].id
     }
     this.empresa.ActualizarColores(datos).subscribe(data => {
-      this.toastr.success('Colores de reportes configurados.', '', {
+      this.toastr.success('Operación exitosa.', 'Colores de reportes configurados.', {
         timeOut: 6000,
       });
       this.ObtenerColores();
@@ -273,6 +276,17 @@ export class VerEmpresaComponent implements OnInit {
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
       this.empleado = data;
     })
+  }
+
+  // METODO PARA VER DATOS DE DEPARTAMENTOS
+  ver_departamentos: boolean = false;
+  pagina: string = '';
+  sucursal_id: number;
+  VerDepartamentos(id: number) {
+    this.ver_departamentos = true;
+    this.ver_informacion = false;
+    this.sucursal_id = id;
+    this.pagina = 'datos-empresa';
   }
 
   /** ************************************************************************************************** ** 

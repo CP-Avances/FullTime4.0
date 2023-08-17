@@ -6,6 +6,7 @@ import { environment } from "src/environments/environment";
 import { PageEvent } from "@angular/material/paginator";
 import { MatDialog } from "@angular/material/dialog";
 import { Router } from "@angular/router";
+
 import * as FileSaver from "file-saver";
 import * as moment from "moment";
 import * as xlsx from "xlsx";
@@ -26,11 +27,12 @@ import { RegimenService } from "src/app/servicios/catalogos/catRegimen/regimen.s
   templateUrl: "./listar-regimen.component.html",
   styleUrls: ["./listar-regimen.component.css"],
 })
+
 export class ListarRegimenComponent implements OnInit {
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   descripcionF = new FormControl("");
 
-  // ASIGNACIÓN DE VALIDACIONES A INPUTS DEL FORMULARIO
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public formulario = new FormGroup({
     descripcionForm: this.descripcionF,
   });
@@ -77,7 +79,7 @@ export class ListarRegimenComponent implements OnInit {
     this.ObtenerRegimen();
   }
 
-  // METODO PARA VER LA INFORMACIÓN DEL EMPLEADO
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe((data) => {
@@ -122,7 +124,7 @@ export class ListarRegimenComponent implements OnInit {
   }
 
   /** ********************************************************************************* **
-   ** **          VENTANAS PARA REGISTRAR Y EDITAR DATOS DE UN RÉGIMEN LABORAL       ** **
+   ** **          VENTANAS PARA REGISTRAR Y EDITAR DATOS DE UN REGIMEN LABORAL       ** **
    ** ********************************************************************************* **/
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
@@ -149,8 +151,35 @@ export class ListarRegimenComponent implements OnInit {
       });
   }
 
+  // METODO PARA ABRIR FORMULARIO REGISTRAR
+  ver_lista: boolean = true;
+  ver_registrar: boolean = false;
+  AbrirRegistrar() {
+    this.ver_lista = false;
+    this.ver_registrar = true;
+  }
+
+  // METODO PARA VER DATOS DE REGIMEN LABORAL
+  ver_datos: boolean = false;
+  regimen_id: number;
+  VerDatosRegimen(id: number) {
+    this.ver_lista = false;
+    this.ver_datos = true;
+    this.regimen_id = id;
+  }
+
+  // METODO PARA ABRIR FORMULARIO EDITAR
+  ver_editar: boolean = false;
+  pagina: string = '';
+  AbrirEditar(id: number) {
+    this.ver_lista = false;
+    this.ver_editar = true;
+    this.pagina = 'lista-regimen';
+    this.regimen_id = id;
+  }
+
   /** ************************************************************************************************* **
-   ** **                               PARA LA EXPORTACIÓN DE ARCHIVOS PDF                           ** **
+   ** **                               PARA LA EXPORTACION DE ARCHIVOS PDF                           ** **
    ** ************************************************************************************************* **/
 
   // METODO PARA GENERAR ARCHIVO PDF
@@ -177,7 +206,7 @@ export class ListarRegimenComponent implements OnInit {
   GetDocumentDefinicion() {
     sessionStorage.setItem("Regimen", this.regimen);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: "landscape",
       watermark: {
         text: this.frase,
@@ -197,7 +226,7 @@ export class ListarRegimenComponent implements OnInit {
         opacity: 0.3,
         alignment: "right",
       },
-      // PIE DE PÁGINA
+      // PIE DE PAGINA
       footer: function (
         currentPage: any,
         pageCount: any,
@@ -311,7 +340,7 @@ export class ListarRegimenComponent implements OnInit {
   }
 
   /** ************************************************************************************************* **
-   ** **                             PARA LA EXPORTACIÓN DE ARCHIVOS EXCEL                           ** **
+   ** **                             PARA LA EXPORTACION DE ARCHIVOS EXCEL                           ** **
    ** ************************************************************************************************* **/
 
   ExportToExcel() {
@@ -354,7 +383,7 @@ export class ListarRegimenComponent implements OnInit {
   }
 
   /** ************************************************************************************************* **
-   ** **                            PARA LA EXPORTACIÓN DE ARCHIVOS XML                              ** **
+   ** **                            PARA LA EXPORTACION DE ARCHIVOS XML                               ** **
    ** ************************************************************************************************* **/
 
   urlxml: string;

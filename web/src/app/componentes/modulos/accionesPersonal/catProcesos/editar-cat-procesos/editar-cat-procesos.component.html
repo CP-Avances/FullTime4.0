@@ -1,0 +1,57 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        MODIFICAR PROCESOS</span>
+    <mat-icon class="float-right" id="cerrar" (click)="Salir()">highlight_off</mat-icon>
+</div>
+<div style="text-align: center">
+    <form [formGroup]="nuevoProcesoForm">
+        <mat-card-content>
+            <div class="container">
+                <div class="nota">
+                    <span>NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el
+                        botón
+                        Guardar.</span>
+                </div>
+                <mat-form-field>
+                    <mat-label>Nombre de proceso</mat-label>
+                    <input matInput placeholder="Ej: Emergencia" [formControl]="nombre"
+                        (keypress)="IngresarSoloLetras($event)" required>
+                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                        matTooltip="Ingresar nombre con el que se va a identificar el nuevo proceso">
+                        help_outline</mat-icon>
+                    <mat-error *ngIf="nombre.invalid">{{ObtenerMensajeErrorNombre()}}</mat-error>
+                </mat-form-field>
+                <br>
+                <mat-form-field>
+                    <mat-label>Proceso Padre</mat-label>
+                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                        matTooltip="Seleccionar uno de los procesos listados, el mismo que figurar como proceso superior al nuevo proceso creado">
+                        help_outline</mat-icon>
+                    <mat-select [formControl]="procesoPadre" [(ngModel)]="seleccionarProceso" required>
+                        <mat-option [value]="0">Ningún proceso</mat-option>
+                        <mat-option *ngFor="let p of procesos" [value]="p.nombre">
+                            {{p.nombre}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <br>
+                <mat-form-field>
+                    <mat-label>Nivel</mat-label>
+                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                        matTooltip="Seleccionar el nivel del nuevo proceso">
+                        help_outline</mat-icon>
+                    <mat-select [formControl]="nivel" [(ngModel)]="seleccionarNivel" required>
+                        <mat-option *ngFor="let n of niveles" [value]="n.nombre">
+                            {{n.valor}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </mat-card-content>
+    </form>
+    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
+        <button id="btn-raised"  class="btn btn-sm" (click)="EditarProceso(nuevoProcesoForm.value)"
+            [disabled]="!nuevoProcesoForm.valid">Guardar</button>
+    </div>
+</div>

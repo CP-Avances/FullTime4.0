@@ -2,6 +2,7 @@
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
             <span>REGISTRAR REGIMEN LABORAL</span>
+            <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana(1, 0)">highlight_off</mat-icon>
         </div>
 
         <!-- ****************************** PRIMER FORMULARIO ******************************************* -->
@@ -128,11 +129,11 @@
                         </div>
                     </div>
                 </form>
-                <div class="d-flex flex-wrap justify-content-between">
-                    <button id="btn-raised" class="btn btn-sm float-left"
-                        [routerLink]="['/listarRegimen']">Atrás</button>
+                <div class="d-flex flex-wrap justify-content-between float-right">
                     <button id="btn-raised" matStepperNext class="btn btn-sm float-right"
-                        [disabled]="!primerFormulario.valid">Siguiente</button>
+                        [disabled]="!primerFormulario.valid">
+                        Siguiente
+                    </button>
                 </div>
             </mat-step>
 
@@ -302,9 +303,12 @@
                     </div>
                 </form>
                 <div>
-                    <button class="btn btn-sm" id="btn-raised" matStepperPrevious>Atrás</button>
-                    <button id="btn-raised" matStepperNext class="btn btn-sm float-right"
-                        [disabled]="siguiente">Siguiente</button>
+                    <button class="btn btn-sm" id="btn-raised" matStepperPrevious>
+                        Atrás
+                    </button>
+                    <button id="btn-raised" matStepperNext class="btn btn-sm float-right" [disabled]="siguiente">
+                        Siguiente
+                    </button>
                 </div>
             </mat-step>
 
@@ -582,13 +586,10 @@
                     </div>
                     <div style="text-align: center;">
                         <button id="btn-raised" matStepperPrevious class="btn btn-sm float-left">Atrás</button>
-                        <button id="btn-raised" class="btn btn-sm"
-                            (click)="VerificarRegistro(primerFormulario.value, segundoFormulario.value, tercerFormulario.value)"
-                            [disabled]="activar_guardar">
+                        <button id="btn-raised" class="btn btn-sm float-right" (click)="VerificarRegistro(primerFormulario.value, segundoFormulario.value,
+                            tercerFormulario.value)" [disabled]="activar_guardar">
                             Guardar
                         </button>
-                        <button id="btn-raised" (click)="CerrarVentana()"
-                            class="btn btn-sm float-right">Cancelar</button>
                     </div>
                 </form>
             </mat-step>

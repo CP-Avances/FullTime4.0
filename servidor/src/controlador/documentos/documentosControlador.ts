@@ -1,6 +1,7 @@
 import { DescargarArchivo, listaCarpetas, ListarContratos, ListarDocumentos, ListarHorarios, ListarPermisos, VerCarpeta } from '../../libs/listarArchivos';
 import { Request, Response } from 'express';
 import pool from '../../database';
+import path from 'path';
 import fs from 'fs';
 export var carpeta: any;
 
@@ -60,27 +61,26 @@ class DocumentosControlador {
         let { id, documento } = req.params;
         await pool.query(
             `
-                DELETE FROM documentacion WHERE id = $1
-                `
+            DELETE FROM documentacion WHERE id = $1
+            `
             , [id]);
-        let filePath = `servidor\\documentacion\\${documento}`
+
+        let separador = path.sep;
+        let filePath = `servidor${separador}documentacion${separador}${documento}`
         let direccionCompleta = __dirname.split("servidor")[0] + filePath;
         fs.unlinkSync(direccionCompleta);
 
         res.jsonp({ message: 'Registro eliminado.' });
     }
 
-    // METODO PARA REGISTRAR UN DOCUMENTO
+    // METODO PARA REGISTRAR UN DOCUMENTO    --**VERIFICADO
     public async CrearDocumento(req: Request, res: Response): Promise<void> {
-        let list: any = req.files;
-        let documento = list.uploads[0].path.split("\\")[1];
-        console.log('ver path ... ', list.uploads[0].path)
-        let { doc_nombre } = req.params;
+        let documento = req.file?.originalname;
         await pool.query(
             `
-            INSERT INTO documentacion (documento, doc_nombre) VALUES ($1, $2)
+            INSERT INTO documentacion (documento) VALUES ($1)
             `
-            , [documento, doc_nombre]);
+            , [documento]);
         res.jsonp({ message: 'Registro guardado.' });
     }
 

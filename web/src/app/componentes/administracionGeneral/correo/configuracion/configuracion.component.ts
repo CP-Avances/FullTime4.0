@@ -32,9 +32,7 @@ export class ConfiguracionComponent implements OnInit {
     public router: Router,
     public ventana: MatDialog,
   ) {
-    var cadena = this.router.url;
-    var aux = cadena.split("/");
-    this.idEmpresa = aux[2];
+    this.idEmpresa = localStorage.getItem('empresa') as string;
   }
 
   ngOnInit(): void {
@@ -99,7 +97,7 @@ export class ConfiguracionComponent implements OnInit {
 
   // METODO PARA CONFIGURAR CORREO ELECTRONICO
   ConfigurarCorreoElectronico(info_empresa: any) {
-    this.ventana.open(CorreoEmpresaComponent, { width: '450px', data: info_empresa }).afterClosed()
+    this.ventana.open(CorreoEmpresaComponent, { width: '650px', data: info_empresa }).afterClosed()
       .subscribe(res => {
         if (res) {
           if (res.actualizar === true) {

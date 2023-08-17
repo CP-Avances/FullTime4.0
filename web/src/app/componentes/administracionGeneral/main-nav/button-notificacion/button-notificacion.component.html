@@ -1,7 +1,8 @@
 <button mat-mini-fab style="margin-right: 8px;" [matMenuTriggerFor]="menu" (click)="numeroNotificacion()">
     <mat-icon id="iconos-navegador" [matBadgeHidden]="estadoNotificacion" matBadge="{{num_noti_false}}"
         matBadgeColor="warn" style="margin-left: 8px;" matSuffix matTooltipPosition="right" matTooltip="Notificaciones">
-        notifications</mat-icon>
+        notifications
+    </mat-icon>
 </button>
 <mat-menu #menu="matMenu" style="margin-right: 10px; height: 100px;">
     <div class="container" style="text-align: center;">

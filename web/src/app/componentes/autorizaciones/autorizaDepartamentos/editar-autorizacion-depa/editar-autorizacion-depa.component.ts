@@ -30,14 +30,12 @@ export class EditarAutorizacionDepaComponent implements OnInit {
   autorizar: boolean = false
 
   // VARIABLES DE FORMULARIO
-  nombreEmpleadoF = new FormControl('', [Validators.required]);
   idDepartamento = new FormControl('', [Validators.required]);
   idSucursal = new FormControl('', [Validators.required]);
   autorizarF = new FormControl(false, [Validators.required]);
 
   // AGREGAR FORMULARIO A UN GRUPO
   public formulario = new FormGroup({
-    nombreEmpleadoForm: this.nombreEmpleadoF,
     idSucursalForm: this.idSucursal,
     autorizarForm: this.autorizarF,
     idDeparForm: this.idDepartamento,
@@ -56,9 +54,19 @@ export class EditarAutorizacionDepaComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.ObtenerAutorizaciones();
     this.BuscarSucursales();
     this.ObtenerEmpleados(this.datoEmpleado.idEmpleado);
     this.CargarDatos();
+  }
+
+  // METODO PARA MOSTRAR DATOS DE AUTORIDAD DEPARTAMENTOS 
+  autorizaciones: any = [];
+  ObtenerAutorizaciones() {
+    this.autorizaciones = [];
+    this.restAutoriza.BuscarAutoridadEmpleado(this.datoEmpleado.idEmpleado).subscribe(datos => {
+      this.autorizaciones = datos;
+    })
   }
 
   // METODO PARA IMPRIMIR DATOS EN FORMULARIO
@@ -70,7 +78,7 @@ export class EditarAutorizacionDepaComponent implements OnInit {
     this.restCatDepartamento.BuscarDepartamentoSucursal(this.datoEmpleado.datosAuto.id_sucursal).subscribe(datos => {
       this.departamento = datos;
     });
-    
+
     this.formulario.patchValue({
       idSucursalForm: this.datoEmpleado.datosAuto.id_sucursal,
       autorizarForm: this.datoEmpleado.datosAuto.estado,
@@ -78,17 +86,17 @@ export class EditarAutorizacionDepaComponent implements OnInit {
     })
 
     if (this.datoEmpleado.datosAuto.estado === true) {
-        if(this.datoEmpleado.datosAuto.autorizar == true && this.datoEmpleado.datosAuto.preautorizar == false){
-          this.selec2 = true;
-          this.selec1 = false;
-        }else if(this.datoEmpleado.datosAuto.autorizar == false && this.datoEmpleado.datosAuto.preautorizar == true){
-          this.selec2 = false;
-          this.selec1 = true;
-        }else{
-          this.selec2 = false;
-          this.selec1 = false;
-          this.selec3 = true;
-        }
+      if (this.datoEmpleado.datosAuto.autorizar == true && this.datoEmpleado.datosAuto.preautorizar == false) {
+        this.selec2 = true;
+        this.selec1 = false;
+      } else if (this.datoEmpleado.datosAuto.autorizar == false && this.datoEmpleado.datosAuto.preautorizar == true) {
+        this.selec2 = false;
+        this.selec1 = true;
+      } else {
+        this.selec2 = false;
+        this.selec1 = false;
+        this.selec3 = true;
+      }
     }
     else {
       this.selec3 = true;
@@ -96,14 +104,13 @@ export class EditarAutorizacionDepaComponent implements OnInit {
 
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
+  usuario: string = '';
   ObtenerEmpleados(idemploy: any) {
     this.empleados = [];
     this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
       this.empleados = data;
-      this.formulario.patchValue({
-        nombreEmpleadoForm: this.empleados[0].nombre + ' ' + this.empleados[0].apellido,
-      })
+      this.usuario = this.empleados[0].nombre + ' ' + this.empleados[0].apellido;
     })
   }
 
@@ -130,7 +137,7 @@ export class EditarAutorizacionDepaComponent implements OnInit {
 
   // METODO PARA REGISTRAR AUTORIZACION
   InsertarAutorizacion(form: any) {
-    let autorizarDepar = {
+    let autoriza = {
       id_departamento: form.idDeparForm,
       id_empl_cargo: this.datoEmpleado.datosAuto.id_empl_cargo,
       preautorizar: false,
@@ -139,36 +146,62 @@ export class EditarAutorizacionDepaComponent implements OnInit {
       id: this.datoEmpleado.datosAuto.id
     }
 
-    if(form.autorizarForm == 'noautorizar'){
+    if (form.autorizarForm == 'noautorizar') {
       this.selec2 = false;
       this.selec1 = false;
       this.selec3 = true;
     }
 
-    if(form.autorizarForm == 'preautorizar'){
-      autorizarDepar.preautorizar = true;
-      autorizarDepar.estado = true;
-    }else if(form.autorizarForm == 'autorizar'){
-      autorizarDepar.autorizar = true;
-      autorizarDepar.estado = true;
-    }else if(this.selec2 == true){
-      autorizarDepar.preautorizar = false;
-      autorizarDepar.autorizar = true;
-      autorizarDepar.estado = true;
-    }else if (this.selec1 == true){
-      autorizarDepar.autorizar = false;
-      autorizarDepar.preautorizar = true;
-      autorizarDepar.estado = true;
+    if (form.autorizarForm == 'preautorizar') {
+      autoriza.preautorizar = true;
+      autoriza.estado = true;
     }
-    else{
-      autorizarDepar.preautorizar = false;
-      autorizarDepar.autorizar = false;
-      autorizarDepar.estado = false;
+    else if (form.autorizarForm == 'autorizar') {
+      autoriza.autorizar = true;
+      autoriza.estado = true;
+    }
+    else if (this.selec2 == true) {
+      autoriza.preautorizar = false;
+      autoriza.autorizar = true;
+      autoriza.estado = true;
+    }
+    else if (this.selec1 == true) {
+      autoriza.autorizar = false;
+      autoriza.preautorizar = true;
+      autoriza.estado = true;
+    }
+    else {
+      autoriza.preautorizar = false;
+      autoriza.autorizar = false;
+      autoriza.estado = false;
     }
 
+
+    if (autoriza.id_departamento === this.datoEmpleado.datosAuto.id_departamento) {
+      this.GuardarDatos(autoriza);
+    }
+    else {
+      let verificador = 0;
+      for (var i = 0; i < this.autorizaciones.length; i++) {
+        if (this.autorizaciones[i].id_departamento === autoriza.id_departamento) {
+          verificador = 1;
+        }
+      }
+      if (verificador === 0) {
+        this.GuardarDatos(autoriza);
+      } else {
+        this.toastr.error('Ups!!! algo salio mal.', 'Departamento ya se encuentra configurado.', {
+          timeOut: 6000,
+        });
+      }
+    }
+  }
+
+
+  // METODO PARA GUARDAR DATOS EN BASE DE DATOS
+  GuardarDatos(autorizarDepar: any) {
     this.restAutoriza.ActualizarDatos(autorizarDepar).subscribe(res => {
-      console.log('res: ',res)
-      this.toastr.success('Operación Exitosa.', 'Registro actualizado.', {
+      this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
         timeOut: 6000,
       });
       this.CerrarVentana();

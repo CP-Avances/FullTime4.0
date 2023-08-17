@@ -1,14 +1,15 @@
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatRadioChange } from '@angular/material/radio';
 import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
-import { Router } from '@angular/router';
 
-import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.service';
 import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
+import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.service';
+
+import { ListarRegimenComponent } from '../listar-regimen/listar-regimen.component';
 
 @Component({
   selector: 'app-regimen',
@@ -16,7 +17,7 @@ import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/prov
   styleUrls: ['./regimen.component.css'],
 })
 
-export class RegimenComponent implements OnInit {
+export class RegimenComponent implements AfterViewInit, OnInit {
 
   // CONTROL DE FORMULARIOS
   isLinear = true;
@@ -86,13 +87,18 @@ export class RegimenComponent implements OnInit {
     private pais: ProvinciaService,
     private toastr: ToastrService,
     private formulario: FormBuilder,
-    public router: Router,
+    public cambio: ChangeDetectorRef,
+    public componentl: ListarRegimenComponent,
   ) { }
 
   ngOnInit(): void {
     this.ObtenerPaises();
     this.ObtenerRegimen();
     this.ValidarFormulario();
+  }
+
+  ngAfterViewInit() {
+    this.cambio.detectChanges();
   }
 
 
@@ -1295,7 +1301,7 @@ export class RegimenComponent implements OnInit {
       }
       // REGISTROS GUARDADO
       else {
-        this.toastr.success('Operación Exitosa. Registro guardado.', '', {
+        this.toastr.success('Operación exitosa. Registro guardado.', '', {
           timeOut: 6000,
         });
         // VALIDAR INGRESO DE DATOS DE PERIODO DE VACACIONES
@@ -1306,7 +1312,7 @@ export class RegimenComponent implements OnInit {
         if (this.correcto_antiguo === true) {
           this.LeerDatosAntiguedad(form3, registro.id);
         }
-        this.CerrarVentana();
+        this.CerrarVentana(2, registro.id);
       }
     }, error => {
       this.toastr.error('Ups!!! algo salio mal.', '', {
@@ -1415,7 +1421,7 @@ export class RegimenComponent implements OnInit {
       keynum = evt.which;
     }
 
-    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMÉRICO Y QUE TECLAS NO RECIBIRÁ.
+    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
     if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6 || keynum == 46) {
       return true;
     }
@@ -1433,8 +1439,14 @@ export class RegimenComponent implements OnInit {
   }
 
   // CERRAR VENTANA DE REGISTRO
-  CerrarVentana() {
-    this.router.navigate(['/listarRegimen']);
+  CerrarVentana(opcion: number, datos: any) {
+    this.componentl.ver_registrar = false;
+    if (opcion === 1) {
+      this.componentl.ver_lista = true;
+    }
+    else {
+      this.componentl.VerDatosRegimen(datos);
+    }
   }
 
 }

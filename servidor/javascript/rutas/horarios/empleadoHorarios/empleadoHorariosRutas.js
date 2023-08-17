@@ -22,7 +22,7 @@ class EmpleadoHorariosRutas {
         this.router.post('/', verificarToken_1.TokenValidation, empleadoHorariosControlador_1.default.CrearEmpleadoHorarios);
         // METODO PARA ACTUALIZAR HORARIO DE USUARIO
         this.router.put('/', verificarToken_1.TokenValidation, empleadoHorariosControlador_1.default.ActualizarEmpleadoHorarios);
-        // METODO PARA BUSCAR HORARIOS EXISTENTES DEL USUARIO EN FECHAS DETERMINADAS
+        // METODO PARA BUSCAR HORARIOS EXISTENTES DEL USUARIO EN FECHAS DETERMINADAS  --**VERIFICADO
         this.router.post('/horarios-existentes/:codigo', verificarToken_1.TokenValidation, empleadoHorariosControlador_1.default.VerificarHorariosExistentes);
         // METODO PARA BUSCAR HORARIOS EXISTENTES DEL USUARIO EN FECHAS DETERMINADAS ACTUALIZACION
         this.router.post('/horarios-existentes-edicion/:empl_id', verificarToken_1.TokenValidation, empleadoHorariosControlador_1.default.VerificarHorariosExistentesEdicion);
@@ -36,7 +36,7 @@ class EmpleadoHorariosRutas {
         this.router.post('/horario-comida-horas-mismo-dia', verificarToken_1.TokenValidation, empleadoHorariosControlador_1.default.ObtenerComidaHorarioHorasMD);
         // METODO PARA OBTENER MINUTOS DE ALIMENTACION - HORARIO DEL USUARIO OPCION HORAS EN DIAS DIFERENTES
         this.router.post('/horario-comida-horas-dias-diferentes', verificarToken_1.TokenValidation, empleadoHorariosControlador_1.default.ObtenerComidaHorarioHorasDD);
-        // METODO PARA VERIFICAR SI EXISTE PLANIFICACION
+        // METODO PARA VERIFICAR SI EXISTE PLANIFICACION   --**VERIFICADO
         this.router.post('/validarFechas/:codigo', verificarToken_1.TokenValidation, empleadoHorariosControlador_1.default.VerificarFechasHorario);
         this.router.get('/', verificarToken_1.TokenValidation, empleadoHorariosControlador_1.default.ListarEmpleadoHorarios);
         this.router.post('/cargaMultiple', [verificarToken_1.TokenValidation, multipartMiddleware], empleadoHorariosControlador_1.default.CargarMultiplesHorariosEmpleadosPlantilla);

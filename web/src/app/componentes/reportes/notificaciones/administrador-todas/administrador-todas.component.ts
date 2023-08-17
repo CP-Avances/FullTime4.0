@@ -18,7 +18,7 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 })
 export class AdministradorTodasComponent implements OnInit {
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA DE LISTA DE SOLICITUDES PENDIENTES
+  // ITEMS DE PAGINACION DE LA TABLA DE LISTA DE SOLICITUDES PENDIENTES
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
@@ -171,12 +171,12 @@ export class AdministradorTodasComponent implements OnInit {
 
     sessionStorage.setItem('Permisos', this.permisos_enviados);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
-      // PIE DE PÁGINA
+      // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
@@ -286,12 +286,12 @@ export class AdministradorTodasComponent implements OnInit {
     }
     sessionStorage.setItem('Horas Extras', this.solicita_horas_enviados);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
-      // PIE DE PÁGINA
+      // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
@@ -405,12 +405,12 @@ export class AdministradorTodasComponent implements OnInit {
     }
     sessionStorage.setItem('VACACIONES', this.vacaciones_enviados);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
-      // PIE DE PÁGINA
+      // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
@@ -522,12 +522,12 @@ export class AdministradorTodasComponent implements OnInit {
     }
     sessionStorage.setItem('PLANIFICACIONES', this.planificaciones_enviados);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
-      // PIE DE PÁGINA
+      // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');

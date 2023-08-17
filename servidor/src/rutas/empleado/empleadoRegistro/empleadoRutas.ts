@@ -42,7 +42,7 @@ class EmpleadoRutas {
          ** **                            MANEJO DE DATOS DE EMPLEADOS                            ** ** 
          ** **************************************************************************************** **/
 
-        // LISTAR DATOS DE UN USUARIO
+        // LISTAR DATOS DE UN USUARIO  --**VERIFICADO
         this.router.get('/:id', TokenValidation, EMPLEADO_CONTROLADOR.BuscarEmpleado);
         // LISTAR EMPLEADOS REGISTRADOS
         this.router.get('/buscador/empleado', TokenValidation, EMPLEADO_CONTROLADOR.ListarBusquedaEmpleados);

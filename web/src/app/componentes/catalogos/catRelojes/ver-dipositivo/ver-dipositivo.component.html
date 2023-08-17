@@ -1,127 +1,134 @@
-<div class="container" *ngFor="let r of datosReloj" style="padding-top: 20px;">
-    <mat-card class="example-card mat-elevation-z8">
-        <div class="d-flex bd-highlight" id="titulo">
-            <span class="w-100 bd-highlight">
-                DISPOSITIVO {{r.nombre.toUpperCase()}}
-            </span>
-            <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                [routerLink]="['/editarRelojes',r.id]">
-                Editar
-            </button>
-        </div>
-        <mat-card-content>
-            <!-- ****************** INFORMACION UBICACION ***************************** -->
-            <div class="container" style="padding-top: 30px;">
-                <div id="resultados">
-                    <span>UBICACIÓN</span>
-                </div>
-                <div class="container" style="padding-top: 20px;">
-                    <div class="row">
-                        <div class="col-md" id="verticalLine">
-                            <div class="espacio d-flex justify-content-start">
-                                <label id="datosF">Empresa:</label>
-                                <label>{{r.nomempresa}}</label>
+<!-- ******************************  DATOS DE RELOJ  ******************************************* -->
+<div *ngIf="ver_datos">
+    <div class="container" *ngFor="let r of datosReloj" style="padding-top: 20px;">
+        <mat-card class="example-card mat-elevation-z8">
+            <div class="d-flex bd-highlight" id="titulo">
+                <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+                    (click)="VerListaReloj()">
+                    Listar dispositivos
+                </button>
+                <span class="w-100 bd-highlight">
+                    DISPOSITIVO {{r.nombre.toUpperCase()}}
+                </span>
+                <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                    (click)="VerEditarReloj(r.id)">
+                    Editar
+                </button>
+            </div>
+            <mat-card-content>
+                <!-- ****************** INFORMACION UBICACION ***************************** -->
+                <div class="container" style="padding-top: 30px;">
+                    <div id="resultados">
+                        <span>UBICACIÓN</span>
+                    </div>
+                    <div class="container" style="padding-top: 20px;">
+                        <div class="row">
+                            <div class="col-md" id="verticalLine">
+                                <div class="espacio d-flex justify-content-start">
+                                    <label id="datosF">Empresa:</label>
+                                    <label>{{r.nomempresa}}</label>
+                                </div>
+                                <div class="espacio d-flex justify-content-start">
+                                    <label id="datosF">Sucursal:</label>
+                                    <label>{{r.nomsucursal}}</label>
+                                </div>
                             </div>
-                            <div class="espacio d-flex justify-content-start">
-                                <label id="datosF">Sucursal:</label>
-                                <label>{{r.nomsucursal}}</label>
-                            </div>
-                        </div>
-                        <div class="col-md" id="verticalLine">
-                            <div class="espacio d-flex justify-content-start">
-                                <label id="datosF">Departamento:</label>
-                                <label>{{r.nomdepar}}</label>
-                            </div>
-                            <div class="espacio d-flex justify-content-start">
-                                <label id="datosF">Código dispositivo:</label>
-                                <label>{{r.id}}</label>
+                            <div class="col-md" id="verticalLine">
+                                <div class="espacio d-flex justify-content-start">
+                                    <label id="datosF">Departamento:</label>
+                                    <label>{{r.nomdepar}}</label>
+                                </div>
+                                <div class="espacio d-flex justify-content-start">
+                                    <label id="datosF">Código dispositivo:</label>
+                                    <label>{{r.id}}</label>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- ****************** INFORMACION CONEXION ***************************** -->
-            <div class="container" style="padding-top: 30px;">
-                <div id="resultados">
-                    <span>CONEXIÓN</span>
-                </div>
-                <div class="container" style="padding-top: 20px;">
-                    <div class="row">
-                        <div class="col-md" id="verticalLine">
-                            <div class="espacio d-flex justify-content-start">
-                                <label id="datosF">Puerto:</label>
-                                <label>{{r.puerto}}</label>
+                <!-- ****************** INFORMACION CONEXION ***************************** -->
+                <div class="container" style="padding-top: 30px;">
+                    <div id="resultados">
+                        <span>CONEXIÓN</span>
+                    </div>
+                    <div class="container" style="padding-top: 20px;">
+                        <div class="row">
+                            <div class="col-md" id="verticalLine">
+                                <div class="espacio d-flex justify-content-start">
+                                    <label id="datosF">Puerto:</label>
+                                    <label>{{r.puerto}}</label>
+                                </div>
+                                <div class="espacio d-flex justify-content-start">
+                                    <label id="datosF">Dirección IP:</label>
+                                    <label>{{r.ip}}</label>
+                                </div>
+                                <div class="espacio d-flex justify-content-start">
+                                    <label id="datosF">Contraseña:</label>
+                                    <label>{{r.contrasenia}}</label>
+                                </div>
                             </div>
-                            <div class="espacio d-flex justify-content-start">
-                                <label id="datosF">Dirección IP:</label>
-                                <label>{{r.ip}}</label>
-                            </div>
-                            <div class="espacio d-flex justify-content-start">
-                                <label id="datosF">Contraseña:</label>
-                                <label>{{r.contrasenia}}</label>
-                            </div>
-                        </div>
-                        <div class="col-md" id="verticalLine">
-                            <div class="espacio d-flex justify-content-start" *ngIf="r.tien_funciones == true">
-                                <label id="datosF">Tiene acciones:</label>
-                                <label>Sí</label>
-                            </div>
-                            <div class="espacio d-flex justify-content-start">
-                                <label id="datosF">N° de acciones:</label>
-                                <label>{{r.numero_accion}}</label>
-                            </div>
-                            <div class="espacio d-flex justify-content-start" *ngIf="r.tien_funciones == false">
-                                <label id="datosF">Tiene acciones:</label>
-                                <label>No</label>
+                            <div class="col-md" id="verticalLine">
+                                <div class="espacio d-flex justify-content-start" *ngIf="r.tien_funciones == true">
+                                    <label id="datosF">Tiene acciones:</label>
+                                    <label>Sí</label>
+                                </div>
+                                <div class="espacio d-flex justify-content-start">
+                                    <label id="datosF">N° de acciones:</label>
+                                    <label>{{r.numero_accion}}</label>
+                                </div>
+                                <div class="espacio d-flex justify-content-start" *ngIf="r.tien_funciones == false">
+                                    <label id="datosF">Tiene acciones:</label>
+                                    <label>No</label>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- ****************** INFORMACION DISPOSITIVO ***************************** -->
-            <div class="container" style="padding-top: 30px;">
-                <div id="resultados">
-                    <span>INFORMACIÓN DISPOSITIVO</span>
-                </div>
-                <div class="container" style="padding-top: 20px;">
-                    <div class="row">
-                        <div class="col-md" id="verticalLine">
-                            <div class="espacio d-flex justify-content-start">
-                                <label id="datosF">Marca:</label>
-                                <label>{{r.marca}}</label>
+                <!-- ****************** INFORMACION DISPOSITIVO ***************************** -->
+                <div class="container" style="padding-top: 30px;">
+                    <div id="resultados">
+                        <span>INFORMACIÓN DISPOSITIVO</span>
+                    </div>
+                    <div class="container" style="padding-top: 20px;">
+                        <div class="row">
+                            <div class="col-md" id="verticalLine">
+                                <div class="espacio d-flex justify-content-start">
+                                    <label id="datosF">Marca:</label>
+                                    <label>{{r.marca}}</label>
+                                </div>
+                                <div class="espacio d-flex justify-content-start">
+                                    <label id="datosF">Modelo:</label>
+                                    <label>{{r.modelo}}</label>
+                                </div>
+                                <div class="espacio d-flex justify-content-start">
+                                    <label id="datosF">Dirección MAC:</label>
+                                    <label>{{r.mac}}</label>
+                                </div>
                             </div>
-                            <div class="espacio d-flex justify-content-start">
-                                <label id="datosF">Modelo:</label>
-                                <label>{{r.modelo}}</label>
-                            </div>
-                            <div class="espacio d-flex justify-content-start">
-                                <label id="datosF">Dirección MAC:</label>
-                                <label>{{r.mac}}</label>
-                            </div>
-                        </div>
-                        <div class="col-md" id="verticalLine">
-                            <div class="espacio d-flex justify-content-start">
-                                <label id="datosF">Serie:</label>
-                                <label>{{r.serie}}</label>
-                            </div>
-                            <div class="espacio d-flex justify-content-start">
-                                <label id="datosF">Fabricante:</label>
-                                <label>{{r.fabricante}}</label>
-                            </div>
-                            <div class="espacio d-flex justify-content-start">
-                                <label id="datosF">ID fabricacion:</label>
-                                <label>{{r.id_fabricacion}}</label>
+                            <div class="col-md" id="verticalLine">
+                                <div class="espacio d-flex justify-content-start">
+                                    <label id="datosF">Serie:</label>
+                                    <label>{{r.serie}}</label>
+                                </div>
+                                <div class="espacio d-flex justify-content-start">
+                                    <label id="datosF">Fabricante:</label>
+                                    <label>{{r.fabricante}}</label>
+                                </div>
+                                <div class="espacio d-flex justify-content-start">
+                                    <label id="datosF">ID fabricacion:</label>
+                                    <label>{{r.id_fabricacion}}</label>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div style="padding-top: 25px; text-align: right;">
-                <input type="submit" class="btn btn-sm" [routerLink]="['/listarRelojes/']"
-                    value="Ir a lista de dispositivos">
-            </div>
-        </mat-card-content>
-    </mat-card>
+            </mat-card-content>
+        </mat-card>
+    </div>
 </div>
+
+<!--  ******************************** PANTALLA EDICION DATOS DE RELOJ *********************************** -->
+<app-editar-reloj *ngIf="ver_editar" [idReloj]="reloj_id" [pagina]="pagina_">
+</app-editar-reloj>

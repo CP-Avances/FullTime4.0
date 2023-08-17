@@ -26,7 +26,6 @@ interface Estado {
 export class EditarEstadoAutorizaccionComponent implements OnInit {
 
   estados: Estado[] = [];
-
   estado = new FormControl('', Validators.required);
 
   public estadoAutorizacionesForm = new FormGroup({
@@ -44,6 +43,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
   public estado_auto: any;
   public empleado_estado: any = [];
   public listaEnvioCorreo: any = [];
+  
   constructor(
     public restA: AutorizacionService,
     private restP: PermisosService,
@@ -67,7 +67,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
       })
     } else {
       this.estadoAutorizacionesForm.patchValue({
-        estadoF: this.data.auto.estado
+        estadoF: ''
       });
     }
 
@@ -80,16 +80,16 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
   ObtenerTiempo() {
     var f = moment();
     this.FechaActual = f.format('YYYY-MM-DD');
-  }
+  }   
 
-  /** **************************************************************************************** **
- ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
- ** **************************************************************************************** **/
-
+  /** ***************************************************************************************** **
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                          ** **
+  ** ****************************************************************************************** **/
+  InfoListaAutoriza: any = [];
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
   gerencia: boolean = false;
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
@@ -101,8 +101,9 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
       (res) => {
         this.ArrayAutorizacionTipos = res;
         this.ArrayAutorizacionTipos.filter(x => {
-          if(x.nom_depar == 'GERENCIA' && x.estado == true){
+          if(x.nombre == 'GERENCIA' && x.estado == true){
             this.gerencia = true;
+            this.InfoListaAutoriza = x;
             if(x.autorizar == true){
               this.estados = [
                 { id: 3, nombre: 'Autorizado' },
@@ -110,11 +111,13 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
               ];
             }else if(x.preautorizar == true){
               this.estados = [
-                { id: 2, nombre: 'Pre-autorizado' }
+                { id: 2, nombre: 'Pre-autorizado' },
+                { id: 4, nombre: 'Negado'}
               ];
             }
           }
           else if((this.gerencia == false) && (this.data.auto.id_departamento == x.id_departamento && x.estado == true)){
+            this.InfoListaAutoriza = x;
             if(x.autorizar == true){
               this.estados = [
                 { id: 3, nombre: 'Autorizado' },
@@ -122,10 +125,12 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
               ];
             }else if(x.preautorizar == true){
               this.estados = [
-                { id: 2, nombre: 'Pre-autorizado' }
+                { id: 2, nombre: 'Pre-autorizado' },
+                { id: 4, nombre: 'Negado'}
               ];
             }
           }
+
         });
       }
     );
@@ -154,15 +159,41 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
         this.solInfo = {
           permiso_mail: res.permiso_mail,
           permiso_noti: res.permiso_noti,
-          empleado: res.id_empleado,
-          id_dep: res.id_departamento,
+          id_empleado: res.id_empleado,
+          id_departamento: res.id_departamento,
           id_suc: res.id_sucursal,
           estado: estado,
           correo: res.correo,
           fullname: res.fullname,
           id_contrato: res.id_contrato,
         }
-      })
+
+        this.BusquedayFiltroDepartamentos();
+      }
+    )
+  } 
+
+  /** ************************************************************************************************************************************** **
+    ** **  BUSQUEDA DE LISTA DE LOS DEPARTAMENTOS CONFIGURADOS PARA REALIZAR LA APROBACION Y FILTRADO PARA TENER SOLO LOS DEPARTAMENTOS  ** ** 
+  ** *************************************************************************************************************************************** **/
+  FilDepartamentosAprueban: any = [];
+  BusquedayFiltroDepartamentos(){
+    this.FilDepartamentosAprueban = [];
+    this.listadoDepaAutoriza = [];
+    this.restAutoriza.BuscarListaAutorizaDepa(this.solInfo.id_departamento).subscribe(res => {
+      this.listadoDepaAutoriza = res;
+      //Listado para eliminar un usuario cuando hay mas de uno en un departamento esto con el fin de contabilizar los departamentos
+      var cont = 0;
+      var filtroArray: any = [];
+      this.listadoDepaAutoriza.forEach(function(elemento, indice, array) {
+        cont = cont + 1;
+        if(filtroArray.find(p=>p.id_dep_nivel == elemento.id_dep_nivel) == undefined)
+        {
+          filtroArray.push(elemento);
+        }
+      });
+      this.FilDepartamentosAprueban = filtroArray;
+    });
   }
 
   // METODO DE APROBACION DE SOLICITUD DE PERMISO
@@ -171,10 +202,12 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
       id_documento: this.data.auto.id_documento + localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       estado: form.estadoF,
     }
+
     this.restA.ActualizarAprobacion(this.data.auto.id, aprobacion).subscribe(res => {
       this.EditarEstadoPermiso(this.data.auto.id_permiso, form.estadoF);
       this.NotificarAprobacion(form.estadoF);
     })
+    
   }
 
   // METODO DE ACTUALIZACION DE ESTADO DE PERMISO
@@ -190,7 +223,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
   // METODO DE ENVIO DE NOTIFICACIONES RESPECTO A LA APROBACION
   NotificarAprobacion(estado: number) {
     var datos = {
-      depa_user_loggin: this.solInfo.id_dep,
+      depa_user_loggin: this.solInfo.id_departamento,
       objeto: this.data.permiso,
     }
 
@@ -209,9 +242,8 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
     }
 
     this.informacion.BuscarJefes(datos).subscribe(permiso => {
-      permiso.EmpleadosSendNotiEmail.push(this.solInfo);
-      this.ConfiguracionCorreo(permiso, estado_p, estado_c);
-      this.EnviarNotificacion(permiso, estado_p);
+      //permiso.EmpleadosSendNotiEmail.push(this.solInfo);
+      this.ConfiguracionCorreoyNotifi(permiso, estado_p, estado_c);
       this.toastr.success('', 'Proceso realizado exitosamente.', {
         timeOut: 6000,
       });
@@ -222,16 +254,17 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
   /** ******************************************************************************************* **
    ** **                   METODO DE ENVIO DE NOTIFICACIONES DE PERMISOS                       ** **
    ** ******************************************************************************************* **/
-  
-   listadoDepaAutoriza: any = [];
-   id_departamento: any;
-  ConfiguracionCorreo(permiso: any, estado_p: string, estado_c: string) {
-    console.log('entra correo')
+  listadoDepaAutoriza: any = [];
+  id_departamento: any;
+  ConfiguracionCorreoyNotifi(permiso: any, estado_p: string, estado_c: string) {
+    console.log('entro ha configuracion correo y Notificacion..')
     // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE PERMISO
     let solicitud = this.validar.FormatearFecha(permiso.fec_creacion, this.formato_fecha, this.validar.dia_completo);
     let desde = this.validar.FormatearFecha(permiso.fec_inicio, this.formato_fecha, this.validar.dia_completo);
     let hasta = this.validar.FormatearFecha(permiso.fec_final, this.formato_fecha, this.validar.dia_completo);
-    this.id_departamento = this.solInfo.id_dep;
+    
+    this.listaEnvioCorreo = [];
+    this.id_departamento = this.solInfo.id_departamento;
     this.lectura = 1;
     this.restA.BuscarAutorizacionPermiso(this.data.permiso.id).subscribe(res1 => {
       this.autorizacion = res1;
@@ -249,54 +282,58 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
             estado: this.estado_auto
           }
 
-          // CAMBIAR DATO ESTADO INT A VARCHAR
-          if (this.estado_auto === '1') {
-            this.estado_auto = 'Pendiente';
-          }
-          if (this.estado_auto === '2') {
-            this.estado_auto = 'Preautorizado';
-          }
-
           this.empleado_estado = this.empleado_estado.concat(data);
           // CUANDO TODOS LOS DATOS SE HAYAN REVISADO EJECUTAR METODO DE INFORMACIÓN DE AUTORIZACIÓN
           if (this.lectura === autorizaciones.length) {
-            if((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')){
-              this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
-                this.listadoDepaAutoriza = res;
-                this.listadoDepaAutoriza.filter(item => {
-                  if((item.nivel === autorizaciones.length) && (item.nivel_padre === item.nivel)){
+            if((estado_p === 'Preautorizado')){
+              this.listadoDepaAutoriza.forEach(item => {
+                console.log(item.nivel === autorizaciones.length,' || ',item.nivel, ' === ',(autorizaciones.length + 1))
+                if((item.nivel === autorizaciones.length) && (item.nivel === this.FilDepartamentosAprueban.length)){
+                  return this.listaEnvioCorreo.push(item);
+                }else if((item.nivel === autorizaciones.length) || (item.nivel === (autorizaciones.length + 1))){
+                  return this.listaEnvioCorreo.push(item);
+                }
+              });
+
+              console.log('this.listaEnvioCorreo PRE: ',this.listaEnvioCorreo);
+              this.EnviarNotificacion(permiso, this.listaEnvioCorreo, estado_p);
+              this.EnviarCorreo(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
+              
+            }else if(estado_p === 'Autorizado' || estado_p === 'Negado'){
+              if(estado_p === 'Autorizado'){
+                this.listadoDepaAutoriza.forEach(item => {
+                  if((item.nivel === this.InfoListaAutoriza.nivel) && (item.nivel === this.FilDepartamentosAprueban.length)){
                     return this.listaEnvioCorreo.push(item);
-                  }else if((item.nivel === autorizaciones.length || item.nivel === (autorizaciones.length - 1))){
+                  }else if((item.nivel === this.InfoListaAutoriza.nivel) || (item.nivel === autorizaciones.length + 1)){
                     return this.listaEnvioCorreo.push(item);
                   }
-                })
-                console.log('this.listaEnvioCorreo 1: ',this.listaEnvioCorreo)
-                this.EnviarCorreo(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
-              });
-            }else if(this.estado_auto > 2){
-              this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
-                this.listadoDepaAutoriza = res;
-                this.listadoDepaAutoriza.filter(item => {
-                  if(item.nivel_padre === item.nivel){
-                    return this.listaEnvioCorreo.push(item);
-                  }
-                })
-                console.log('this.listaEnvioCorreo 2: ',this.listaEnvioCorreo)
-                this.EnviarCorreo(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
-              });
+                });
+              }else{
+                //Esta condicion es para enviar el correo a todos los usuraios que autorizan siempre y cuando la solicitud fue negada antes
+                this.listaEnvioCorreo = this.listadoDepaAutoriza;
+              }
+              
+              console.log('this.listaEnvioCorreo AUTO - Nega: ',this.listaEnvioCorreo);
+              this.EnviarNotificacion(permiso, this.listaEnvioCorreo, estado_p);
+              this.EnviarCorreo(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
+              
             }
           }
-        }else if(autorizaciones.length == 1){
-          this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
-            this.listadoDepaAutoriza = res;
+        }else if(autorizaciones.length < 2){
+          if(estado_p === 'Negado'){
+            //Esta condicion es para enviar el correo a todos los usuraios que autorizan siempre y cuando la solicitud fue negada antes
+            this.listaEnvioCorreo = this.listadoDepaAutoriza;
+          }else{
             this.listadoDepaAutoriza.filter(item => {
               if(item.nivel < 3 ){
                 return this.listaEnvioCorreo.push(item);  
               }
-            })
-            console.log('this.listaEnvioCorreo 3: ',this.listaEnvioCorreo)
-            this.EnviarCorreo(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
-          });
+            });
+          }
+          
+          console.log('this.listaEnvioCorreo PEND: ',this.listaEnvioCorreo);
+          this.EnviarNotificacion(permiso, this.listaEnvioCorreo, estado_p);
+          this.EnviarCorreo(permiso, this.listaEnvioCorreo, estado_p, estado_c, solicitud, desde, hasta);
         }
       })
     });   
@@ -308,9 +345,9 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
     var correo_usuarios = '';
     permiso.EmpleadosSendNotiEmail = listaEnvioCorreo;
     permiso.EmpleadosSendNotiEmail.push(this.solInfo);
-    console.log('nueva lista: ',permiso.EmpleadosSendNotiEmail);
+    console.log('nueva lista C: ',permiso.EmpleadosSendNotiEmail);
 
-
+    
     // VERIFICACIÓN QUE TODOS LOS DATOS HAYAN SIDO LEIDOS PARA ENVIAR CORREO
     permiso.EmpleadosSendNotiEmail.forEach(e => {
 
@@ -343,7 +380,7 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
           dias_permiso: permiso.dia,
           estado_p: estado_p,
           proceso: estado_p.toLowerCase(),
-          id_dep: e.id_dep,
+          id_dep: e.id_departamento,
           id_suc: e.id_suc,
           correo: correo_usuarios,
           asunto: 'SOLICITUD DE PERMISO ' + estado_c.toUpperCase(),
@@ -375,9 +412,13 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
         }
       }
     })
+    
   }
 
-  EnviarNotificacion(permiso: any, estado_p: string) {
+  EnviarNotificacion(permiso: any, listaEnvioCorreo: any, estado_p: string) {
+    permiso.EmpleadosSendNotiEmail = listaEnvioCorreo;
+    console.log('nueva lista N: ',permiso.EmpleadosSendNotiEmail);
+
     // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE PERMISO
     let desde = this.validar.FormatearFecha(permiso.fec_inicio, this.formato_fecha, this.validar.dia_completo);
     let hasta = this.validar.FormatearFecha(permiso.fec_final, this.formato_fecha, this.validar.dia_completo);
@@ -410,8 +451,8 @@ export class EditarEstadoAutorizaccionComponent implements OnInit {
 
     //ForEach para enviar la notificacion a cada usuario dentro de la nueva lista filtrada
     permiso.EmpleadosSendNotiEmail.forEach(e => {
-      notificacion.id_receives_depa = e.id_dep;
-      notificacion.id_receives_empl = e.empleado;
+      notificacion.id_receives_depa = e.id_departamento;
+      notificacion.id_receives_empl = e.id_empleado;
       if (e.permiso_noti) {
         this.realTime.IngresarNotificacionEmpleado(notificacion).subscribe(
           resp => {

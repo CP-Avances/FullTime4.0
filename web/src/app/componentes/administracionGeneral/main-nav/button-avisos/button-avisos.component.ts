@@ -79,7 +79,7 @@ export class ButtonAvisosComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
@@ -156,6 +156,9 @@ export class ButtonAvisosComponent implements OnInit {
       }
       if (data.tipo === 2) {
         this.router.navigate(['/listaSolicitaComida']);
+      }
+      if (data.tipo === 7) {
+        this.router.navigate(['/permisos-solicitados']);
       }
       if (data.tipo === 20) {
         this.router.navigate(['/listaPlanComidas']);

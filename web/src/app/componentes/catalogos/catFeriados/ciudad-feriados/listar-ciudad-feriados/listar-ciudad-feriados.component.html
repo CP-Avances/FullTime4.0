@@ -1,0 +1,119 @@
+<!--  **************************** LISTA DE CIUDADES ASIGNADAS A UN FERIADO *********************************  -->
+<div *ngIf="ver_lista">
+    <div class="container" *ngFor="let f of datosFeriado" style="padding-top: 15px;">
+        <mat-card class="example-card mat-elevation-z8">
+            <div id="titulo">
+                <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+                    (click)="CerrarPantalla()">
+                    Listar feriados
+                </button>
+                <span>{{f.descripcion.toUpperCase()}}</span>
+                <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                    (click)="AbrirVentanaEditarFeriado(f)">
+                    Editar
+                </button>
+            </div>
+            <mat-card-content>
+                <div class="container" style="padding-top: 15px;">
+                    <div class="row">
+                        <div class="col-md">
+                            <div class="d-flex justify-content-start">
+                                <label id="datosF">Fecha:</label>
+                                <label>{{f.fecha_}}</label>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="d-flex justify-content-start">
+                                <label id="datosF">Fecha Recuperación:</label>
+                                <label>{{f.fec_recuperacion_}}</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="container" style="padding-bottom: 15px;">
+                    <div class="d-flex bd-highlight" id="titulo">
+                        <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
+                            matTooltipPosition="right" matTooltip="Elimar múltiples registros." id="SelectCheck">
+                            library_add_check
+                        </mat-icon>
+                        <button *ngIf="btnCheckHabilitar" class="btn btn-outline-light btn-sm"
+                            style="float: left; margin-left: 10px;" (click)="ConfirmarProceso(selection.selected, 2)">
+                            Eliminar
+                        </button>
+                        <span class="w-100 bd-highlight">
+                            FERIADO APLICA
+                        </span>
+                        <mat-icon style="float: right; margin-right: 12px; color: white;"
+                            (click)="ListarCiudadesFeriados(idFeriado)" matSuffix matTooltipPosition="right"
+                            matTooltip="Actualizar registros." id="i-cursor">
+                            autorenew
+                        </mat-icon>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="mat-elevation-z8 table table-hover table-sm">
+                            <thead class="thead-light">
+                                <tr style="text-align: center;">
+                                    <th>
+                                        <mat-checkbox *ngIf="btnCheckHabilitar"
+                                            (change)="$event ? masterToggle() : null"
+                                            [checked]="selection.hasValue() && isAllSelected()"
+                                            [indeterminate]="selection.hasValue() && !isAllSelected()"
+                                            [aria-label]="checkboxLabel()">
+                                        </mat-checkbox>
+                                    </th>
+                                    <th scope="col">Descripción</th>
+                                    <th scope="col">Ciudades</th>
+                                    <th scope="col">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let dc of datosCiudades | paginate:tamanio_pagina:numero_pagina">
+                                    <td>
+                                        <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
+                                            (change)="$event ? selection.toggle(dc) : null"
+                                            [checked]="selection.isSelected(dc)" [aria-label]="checkboxLabel(dc)">
+                                        </mat-checkbox>
+                                    </td>
+                                    <td>{{dc.nombreferiado}}</td>
+                                    <td>{{dc.nombreciudad}}</td>
+                                    <td>
+                                        <i *ngIf="auto_individual" id="editarI" (click)="AbrirVentanaEditarCiudad(dc)"
+                                            matSuffix matTooltipPosition="right"
+                                            matTooltip="Modificar datos de este registro" class="fas fa-edit">
+                                            <p>Editar</p>
+                                        </i>
+                                        <i *ngIf="auto_individual" class="far fa-trash-alt"
+                                            (click)="ConfirmarProceso(dc, 1)" style="color:red; margin-left: 15px;"
+                                            id="i-cursor" matSuffix matTooltipPosition="right"
+                                            matTooltip="Eliminar registro">
+                                            <p>Eliminar</p>
+                                        </i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <mat-paginator id="pagina" [length]="datosCiudades.length" [pageSize]="tamanio_pagina"
+                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)"
+                        showFirstLastButtons>
+                    </mat-paginator>
+                </div>
+                <div class="d-flex flex-wrap justify-content-between">
+                    <button id="btn-raised" class="btn btn-sm float-right" (click)="VerAsignarCiudad(f.id)"
+                        value="Asignar ciudad">
+                        Asignar ciudad
+                    </button>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>
+
+<!--  **************************** PANTALLA ASIGNAR CIUDAD FERIADO *********************************  -->
+<app-asignar-ciudad *ngIf="ver_asignar" [pagina]="pagina" [id_feriado]="feriado_id"></app-asignar-ciudad>
+
+<div class="pantalla-progress" *ngIf="habilitarprogress">
+    <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
+    </mat-progress-spinner>
+</div>

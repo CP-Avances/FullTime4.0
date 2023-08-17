@@ -9,11 +9,6 @@ import { Router } from '@angular/router';
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 
-interface Nivel {
-  valor: string;
-  nombre: string
-}
-
 @Component({
   selector: 'app-registro-departamento',
   templateUrl: './registro-departamento.component.html',
@@ -26,7 +21,6 @@ export class RegistroDepartamentoComponent implements OnInit {
   idSucursal = new FormControl('');
   nombre = new FormControl('', Validators.required);
 
-
   // DATOS DEPARTAMENTO
   sucursales: any = [];
   departamentos: any = [];
@@ -37,11 +31,6 @@ export class RegistroDepartamentoComponent implements OnInit {
     idSucursalForm: this.idSucursal,
     nombreForm: this.nombre,
   });
-
-  // ARREGLO DE NIVELES EXISTENTES
-  niveles: Nivel[] = [
-    { valor: '1', nombre: '1' }
-  ];
 
   /**
    * VARIABLES PROGRESS SPINNER
@@ -99,9 +88,7 @@ export class RegistroDepartamentoComponent implements OnInit {
   InsertarDepartamento(form: any) {
     var departamento = {
       id_sucursal: form.idSucursalForm,
-      depa_padre: null,
       nombre: form.nombreForm.toUpperCase(),
-      nivel: 0,
     };
 
     // VERIFICAR ID DE SUCURSAL
@@ -128,7 +115,7 @@ export class RegistroDepartamentoComponent implements OnInit {
         });
       }
       else {
-        this.toastr.success('Operación Exitosa', 'Departamento registrado', {
+        this.toastr.success('Operación exitosa.', 'Departamento registrado.', {
           timeOut: 6000,
         });
         this.CerrarVentana();

@@ -1,14 +1,14 @@
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ChangeDetectorRef, AfterContentChecked, Input } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatRadioChange } from '@angular/material/radio';
 import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
-import { Router } from '@angular/router';
 
 import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.service';
 import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
+import { ListarRegimenComponent } from '../listar-regimen/listar-regimen.component';
 
 @Component({
   selector: 'app-editar-regimen',
@@ -16,7 +16,7 @@ import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/prov
   styleUrls: ['./editar-regimen.component.css']
 })
 
-export class EditarRegimenComponent implements OnInit {
+export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterContentChecked {
 
   // CONTROL DE FORMULARIOS
   isLinear = true;
@@ -85,20 +85,17 @@ export class EditarRegimenComponent implements OnInit {
   dias_CalendarioF = new FormControl('');
   dias_LaborableF = new FormControl('');
 
-  idRegimen: string;
+  @Input() idRegimen: number;
+  @Input() pagina: string = '';
 
   constructor(
     private rest: RegimenService,
     private pais: ProvinciaService,
     private toastr: ToastrService,
     private formulario: FormBuilder,
-    public router: Router,
-  ) {
-    // OBTENER ID DE REGISTRO
-    var cadena = this.router.url;
-    var aux = cadena.split("/");
-    this.idRegimen = aux[3];
-  }
+    public cambio: ChangeDetectorRef,
+    public componentel: ListarRegimenComponent,
+  ) { }
 
   ngOnInit(): void {
     this.ObtenerPaises();
@@ -107,6 +104,13 @@ export class EditarRegimenComponent implements OnInit {
     this.ObtenerRegimenEditar();
   }
 
+  ngAfterViewInit() {
+    this.cambio.detectChanges();
+  }
+
+  ngAfterContentChecked(): void {
+    this.cambio.detectChanges();
+  }
 
   // VALIDACIONES DE FORMULARIO
   ValidarFormulario() {
@@ -201,7 +205,7 @@ export class EditarRegimenComponent implements OnInit {
   data: any = [];
   ObtenerRegimenEditar() {
     this.data = [];
-    this.rest.ConsultarUnRegimen(parseInt(this.idRegimen)).subscribe(datos => {
+    this.rest.ConsultarUnRegimen(this.idRegimen).subscribe(datos => {
       this.data = datos;
       this.ImprimirDatos();
     })
@@ -211,7 +215,7 @@ export class EditarRegimenComponent implements OnInit {
   periodo: any = [];
   ObtenerPeriodos() {
     this.periodo = [];
-    this.rest.ConsultarUnPeriodo(parseInt(this.idRegimen)).subscribe(dato => {
+    this.rest.ConsultarUnPeriodo(this.idRegimen).subscribe(dato => {
       this.periodo = dato;
       if (this.periodo.length === 3) {
         this.delete_tres = true;
@@ -247,7 +251,7 @@ export class EditarRegimenComponent implements OnInit {
   data_antiguo: any = [];
   ObtenerAntiguedad() {
     this.data_antiguo = [];
-    this.rest.ConsultarAntiguedad(parseInt(this.idRegimen)).subscribe(datos => {
+    this.rest.ConsultarAntiguedad(this.idRegimen).subscribe(datos => {
       this.data_antiguo = datos;
       if (this.data_antiguo.length === 4) {
         this.delete_antiguo_cuatro = true;
@@ -1393,7 +1397,7 @@ export class EditarRegimenComponent implements OnInit {
     else {
       // LECTURA PARA INGRESAR DATOS
       let regimen = {
-        id: parseInt(this.idRegimen),
+        id: this.idRegimen,
         id_pais: pais,
         descripcion: form1.nombreForm,
         mes_periodo: parseFloat(form1.mesesForm),
@@ -1467,16 +1471,16 @@ export class EditarRegimenComponent implements OnInit {
   // METODO PARA GUARDAR DATOS DE REGISTRO DE REGIMEN EN BASE DE DATOS
   FuncionInsertarDatos(regimen: any, form2: any, form3: any) {
     this.rest.ActualizarRegimen(regimen).subscribe(registro => {
-      this.toastr.success('Operación Exitosa. Registro guardado.', '', {
+      this.toastr.success('Operación exitosa. Registro guardado.', '', {
         timeOut: 6000,
       });
       // VALIDAR INGRESO DE DATOS DE PERIODO DE VACACIONES
-      this.LeerDatosPeriodo(form2, parseInt(this.idRegimen));
+      this.LeerDatosPeriodo(form2, this.idRegimen);
 
       // VALIDAR INGRESO DE DATOS DE ANTIGUEDAD DE VACACIONES
-      this.LeerDatosAntiguedad(form3, parseInt(this.idRegimen));
+      this.LeerDatosAntiguedad(form3, this.idRegimen);
 
-      this.CerrarVentana();
+      this.CerrarVentana(2);
 
     }, error => {
       this.toastr.error('Ups!!! algo salio mal.', '', {
@@ -1813,7 +1817,7 @@ export class EditarRegimenComponent implements OnInit {
       keynum = evt.which;
     }
 
-    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMÉRICO Y QUE TECLAS NO RECIBIRÁ.
+    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
     if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6 || keynum == 46) {
       return true;
     }
@@ -1831,7 +1835,19 @@ export class EditarRegimenComponent implements OnInit {
   }
 
   // CERRAR VENTANA DE REGISTRO
-  CerrarVentana() {
-    this.router.navigate(['/listarRegimen']);
+  CerrarVentana(opcion: number) {
+    this.componentel.ver_editar = false;
+    if (opcion === 1 && this.pagina === 'lista-regimen') {
+      this.componentel.ver_lista = true;
+    }
+    else if (opcion === 2 && this.pagina === 'lista-regimen') {
+      this.componentel.VerDatosRegimen(this.idRegimen);
+    }
+    else if (opcion === 1 && this.pagina === 'ver-regimen') {
+      this.componentel.ver_datos = true;
+    }
+    else if (opcion === 2 && this.pagina === 'ver-regimen') {
+      this.componentel.VerDatosRegimen(this.idRegimen);
+    }
   }
 }

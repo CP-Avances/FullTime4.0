@@ -1,0 +1,29 @@
+p {
+    text-align: center;
+    font-size: x-small;
+}
+
+td {
+    padding-top: 10px;
+    text-align: center;
+}
+
+#editarI {
+    cursor: pointer;
+    color: green;
+}
+
+.btn {
+    background-color: rgb(80, 87, 97);
+    margin-left: 15px;
+    color: white;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.contenedor {
+    display: flex;
+    flex-direction: column;
+    margin:1rem auto;
+    max-width: 500px;
+} 
+

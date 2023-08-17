@@ -51,6 +51,7 @@ export class VerPedidoHoraExtraComponent implements OnInit {
   idEmpleado: number;
 
   //Dato para ocultar las opciones de descarga del archivo si esta aun en pendiente
+  ocultar: boolean = true;
   estado: boolean = false;
 
   constructor(
@@ -100,7 +101,7 @@ export class VerPedidoHoraExtraComponent implements OnInit {
       this.BuscarHora(this.formato_fecha)
     });
 
-    this.restAutoriza.BuscarAutoridadEmpleado(this.idEmpleado).subscribe(
+    this.restAutoriza.BuscarAutoridadUsuarioDepa(this.idEmpleado).subscribe(
       (res) => {
         this.ArrayAutorizacionTipos = res;
       }
@@ -135,6 +136,7 @@ export class VerPedidoHoraExtraComponent implements OnInit {
     // BUSQUEDA DE DATOS DE HORAS EXTRAS
     this.restHE.ObtenerUnHoraExtra(this.dataParams.id).subscribe(res => {
       this.hora_extra = res;
+    
       if (this.hora_extra[0].tiempo_autorizado === null) {
         this.HabilitarTiempo = true;
       }
@@ -151,37 +153,6 @@ export class VerPedidoHoraExtraComponent implements OnInit {
         h.fec_solicita_ = this.validar.FormatearFecha(h.fec_solicita, formato_fecha, this.validar.dia_completo);
 
       })
-
-      if(this.hora_extra[0].estado > 2){
-        this.habilitarActualizar = false;
-      }else{
-        this.habilitarActualizar = true;
-
-        if(this.idEmpleado == this.id_usua_solicita){
-          this.habilitarActualizar = false;
-        }else{
-          this.usuarioDepa.ObtenerDepartamentoUsuarios(this.id_usua_solicita).subscribe((usuaDep) => {
-            this.ArrayAutorizacionTipos.filter(x => {
-              if((x.nom_depar == 'GERENCIA') && (x.estado == true)){
-                this.gerencia = true;
-                if(this.hora_extra[0].estado == 2 && x.preautorizar == true){
-                  return this.habilitarActualizar = false;
-                }else {
-                  return this.habilitarActualizar = true;
-                }
-              }else if((this.gerencia == false) && (usuaDep[0].id_departamento == x.id_departamento && x.estado == true)){
-                if(this.hora_extra[0].estado == 2 && x.autorizar == true){
-                  return this.habilitarActualizar = true;
-                }else if(this.hora_extra[0].estado == 1 && x.preautorizar == true){
-                  return this.habilitarActualizar = true;
-                }else{
-                  return this.habilitarActualizar = false;
-                }
-              }
-            })
-          });
-        }
-      }
 
       if(this.hora_extra[0].estado > 1){
         this.estado = true;
@@ -207,7 +178,6 @@ export class VerPedidoHoraExtraComponent implements OnInit {
     // BUSQUEDA DE DATOS DE AUTORIZACIÓN
     this.restA.getUnaAutorizacionByHoraExtraRest(this.dataParams.id).subscribe(res1 => {
       this.autorizacion = res1;
-
       // METODO PARA OBTENER EMPLEADOS Y ESTADOS
       var autorizaciones = this.autorizacion[0].id_documento.split(',');
       autorizaciones.map((obj: string) => {
@@ -236,18 +206,19 @@ export class VerPedidoHoraExtraComponent implements OnInit {
           }
 
           if((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')){
+            //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
             this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
               this.listadoDepaAutoriza = res;
               this.listadoDepaAutoriza.filter(item => {
                 if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
-                  return this.habilitarActualizar = true;
+                  return this.ocultar = false;
                 }else{
-                  return this.habilitarActualizar = false;
+                  return this.ocultar = true;
                 }
               })
             });
           }else{
-            this.habilitarActualizar = false;
+            this.ocultar = true;
           }
 
           this.empleado_estado = this.empleado_estado.concat(data);
@@ -256,12 +227,13 @@ export class VerPedidoHoraExtraComponent implements OnInit {
             this.VerInformacionAutoriza(this.empleado_estado);
           }
         }else{
+          //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
           this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
             this.listadoDepaAutoriza = res;
             this.listadoDepaAutoriza.filter(item => {
               if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
-                return this.habilitarActualizar = true;
-              } 
+                return this.ocultar = false;
+              }
             })
           });
         }
@@ -271,7 +243,7 @@ export class VerPedidoHoraExtraComponent implements OnInit {
       this.cont = autorizaciones.length - 1;
 
     }, error => {
-      this.HabilitarAutorizacion = true;
+      this.HabilitarAutorizacion = false;
     });
   }
 
@@ -350,8 +322,6 @@ export class VerPedidoHoraExtraComponent implements OnInit {
           }
         }
 
-        console.log('this.habilitarActualizar 222 = ',this.habilitarActualizar);
-
       }
     );
     }, err => {
@@ -402,7 +372,39 @@ export class VerPedidoHoraExtraComponent implements OnInit {
     }
   }
 
+  fila1firmas: any = [];
+  fila2firmas: any = [];
   getDocumentDefinicion() {
+    this.fila1firmas = [];
+    this.fila2firmas = [];
+
+    //Array de los datos del empleado para mostrar en la firma;
+    let firmaEmple = {
+      cargo: this.datoSolicitud[0].cargo,
+      departamento: "",
+      estado: "Empleado",
+      id_empleado: this.datoSolicitud[0].id_empl_contrato,
+      nombre: this.datoSolicitud[0].nombre_emple + ' ' + this.datoSolicitud[0].apellido_emple,
+    }
+
+    let cont1 = 1;
+    //Filtar el array empleado_estado para dividir en otros arrays para firmar
+      this.empleado_estado.filter(item =>{
+        if(cont1 < 4){
+          this.fila1firmas.push(item);
+          return cont1 = cont1 + 1;
+        }else{
+          this.fila2firmas.push(item);
+        }
+      });
+
+
+    if(this.fila2firmas.length == 0){
+      this.fila1firmas.push(firmaEmple);
+    }else{
+      this.fila2firmas.push(firmaEmple);
+    }
+
     return {
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
@@ -427,13 +429,13 @@ export class VerPedidoHoraExtraComponent implements OnInit {
         }
       },
       content: [
-        { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: this.datoSolicitud[0].nom_empresa.toUpperCase(), bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
+        { image: this.logo, width: 150, margin: [10, -27, 0, 2] },
+        { text: this.datoSolicitud[0].nom_empresa.toUpperCase(), bold: true, fontSize: 20, alignment: 'center', margin: [0, -2, 0, 10] },
         { text: 'SOLICITUD DE HORAS EXTRAS', fontSize: 10, alignment: 'center', margin: [0, 0, 0, 10] },
         this.SeleccionarMetodo(),
       ],
       styles: {
-        tableHeaderA: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.s_color, margin: [20, 0, 20, 0], },
+        tableHeaderA: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.s_color, margin: [10, 0, 10, 0], },
         tableHeader: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color, },
         itemsTableD: { fontSize: 10, alignment: 'left', margin: [50, 5, 5, 5] },
         itemsTable: { fontSize: 10, alignment: 'center', }
@@ -497,72 +499,63 @@ export class VerPedidoHoraExtraComponent implements OnInit {
           }],
           [{
             columns: [
-              {
-                columns: [
-                  { width: '*', text: '' },
-                  {
-                    width: 'auto',
-                    layout: 'lightHorizontalLines',
-                    table: {
-                      widths: ['auto'],
-                      body: [
-                        [{ text: this.empleado_estado[0].estado.toUpperCase() + ' POR', style: 'tableHeaderA' },],
-                        [{ text: ' ', style: 'itemsTable', margin: [0, 10, 0, 10] },],
-                        [{ text: this.empleado_estado[0].nombre + '\n' + this.empleado_estado[0].cargo, style: 'itemsTable' },]
-                      ]
-                    }
-                  },
-                  { width: '*', text: '' },
-                ]
-              },
-              {
-                columns: [
-                  { width: '*', text: '' },
-                  {
-                    width: 'auto',
-                    layout: 'lightHorizontalLines',
-                    table: {
-                      widths: ['auto'],
-                      body: [
-                        [{ text: this.empleado_estado[this.cont - 1].estado.toUpperCase() + ' POR', style: 'tableHeaderA' }],
-                        [{ text: ' ', style: 'itemsTable', margin: [0, 10, 0, 10] }],
-                        [{ text: this.empleado_estado[this.cont - 1].nombre + '\n' + this.empleado_estado[this.cont - 1].cargo, style: 'itemsTable' }]
-                      ]
-                    }
-                  },
-                  { width: '*', text: '' },
-                ]
-              },
-              {
-                columns: [
-                  { width: '*', text: '' },
-                  {
-                    width: 'auto',
-                    layout: 'lightHorizontalLines',
-                    table: {
-                      widths: ['auto'],
-                      body: [
-                        [{ text: 'EMPLEADO', style: 'tableHeaderA' },],
-                        [{ text: ' ', style: 'itemsTable', margin: [0, 10, 0, 10] }],
-                        [{ text: this.datoSolicitud[0].nombre_emple + ' ' + this.datoSolicitud[0].apellido_emple + '\n' + this.datoSolicitud[0].cargo, style: 'itemsTable' }]
-                      ]
-                    }
-                  },
-                  { width: '*', text: '' },
-                ]
-              }
-            ]
+              ...this.fila1firmas.map(obj => {
+                return {
+                  columns: [
+                    { width: '*', text: '' },
+                    {
+                      width: 'auto',
+                      layout: 'lightHorizontalLines',
+                      table: {
+                        widths: ['auto'],
+                        body: [
+                          [{ text: obj.estado.toUpperCase(), style: 'tableHeaderA'},],
+                          [{ text: ' ', style: 'itemsTable', margin: [0, 15, 0, 15] },],
+                          [{ text: obj.nombre + '\n' + obj.cargo, style: 'itemsTable' },]
+                        ]
+                      }
+                    },
+                    { width: '*', text: ''},
+                  ]
+                } 
+              })
+            ],
           }],
+          [{
+            columns: [
+              ...this.fila2firmas.map(obje => {
+                return {
+                  columns: [
+                    { width: '*', text: '' },
+                    {
+                      width: 'auto',
+                      layout: 'lightHorizontalLines',
+                      table: {
+                        widths: ['auto'],
+                        body: [
+                          [{ text: obje.estado.toUpperCase(), style: 'tableHeaderA'},],
+                          [{ text: ' ', style: 'itemsTable', margin: [0, 15, 0, 15] },],
+                          [{ text: obje.nombre + '\n' + obje.cargo, style: 'itemsTable' },]
+                        ]
+                      }
+                    },
+                  { width: '*', text: ''},
+                  ]
+                }
+              })
+            ]
+          }
+          ],
         ]
       },
       layout: {
         hLineColor: function (i, node) {
           return (i === 0 || i === node.table.body.length) ? 'rgb(80,87,97)' : 'rgb(80,87,97)';
         },
-        paddingLeft: function (i, node) { return 40; },
-        paddingRight: function (i, node) { return 40; },
-        paddingTop: function (i, node) { return 10; },
-        paddingBottom: function (i, node) { return 10; }
+        paddingLeft: function (i: any, node: any) { return 40; },
+        paddingRight: function (i: any, node: any) { return 40; },
+        paddingTop: function (i: any, node: any) { return 6; },
+        paddingBottom: function (i: any, node: any) { return 6; },
       }
     };
   }

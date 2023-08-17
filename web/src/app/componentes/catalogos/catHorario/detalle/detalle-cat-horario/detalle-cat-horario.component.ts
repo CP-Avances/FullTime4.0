@@ -10,7 +10,6 @@ import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCat
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { ComidasSolicitadasEmpleadoComponent } from 'src/app/componentes/rolEmpleado/comidas-empleado/comidas-solicitadas-empleado/comidas-solicitadas-empleado.component';
 
 const OPTIONS_HORARIOS = [
   { orden: 1, accion: 'E', view_option: 'Entrada' },
@@ -394,8 +393,7 @@ export class DetalleCatHorarioComponent implements OnInit {
         this.LimpiarCampos();
       }
       else {
-        this.ventana.close();
-        this.router.navigate(['/verHorario/', this.data.datosHorario.id]);
+        this.ventana.close(this.data.datosHorario.id);
       }
     });
   }

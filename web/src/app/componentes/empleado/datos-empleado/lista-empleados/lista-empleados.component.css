@@ -13,7 +13,7 @@ mat-form-field.input-tables {
 }
 
 .codigo { width: 75px; }
-.cedula { width: 145px;}
+.cedula { width: 150px;}
 
 p {
     font-size: x-small;
@@ -21,7 +21,7 @@ p {
 
 table {
     width: 100%;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 tr {
@@ -31,7 +31,9 @@ tr {
 td {
     padding-top: 10px;
     text-align: center;
+    vertical-align: middle;
 }
+
 #btn_listar{
     background-color: rgb(3, 169, 224);
     margin: 5px 10px 5px 10px;

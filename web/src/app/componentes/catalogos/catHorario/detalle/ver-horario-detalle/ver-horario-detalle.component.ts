@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
@@ -12,8 +12,10 @@ import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.
 
 import { EditarDetalleCatHorarioComponent } from 'src/app/componentes/catalogos/catHorario/detalle/editar-detalle-cat-horario/editar-detalle-cat-horario.component';
 import { DetalleCatHorarioComponent } from 'src/app/componentes/catalogos/catHorario/detalle/detalle-cat-horario/detalle-cat-horario.component';
+import { PrincipalHorarioComponent } from '../../horario/principal-horario/principal-horario.component';
 import { EditarHorarioComponent } from 'src/app/componentes/catalogos/catHorario/horario/editar-horario/editar-horario.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+import { HorarioMultipleEmpleadoComponent } from 'src/app/componentes/horarios/rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
 
 @Component({
   selector: 'app-ver-horario-detalle',
@@ -23,7 +25,9 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
 
 export class VerHorarioDetalleComponent implements OnInit {
 
-  idHorario: string;
+  @Input() idHorario: number;
+  @Input() pagina: string;
+
   datosHorario: any = [];
   datosDetalle: any = [];
 
@@ -43,11 +47,9 @@ export class VerHorarioDetalleComponent implements OnInit {
     public ventana: MatDialog,
     public validar: ValidacionesService,
     public parametro: ParametrosService,
-  ) {
-    var cadena = this.router.url;
-    var aux = cadena.split("/");
-    this.idHorario = aux[2];
-  }
+    public componente: PrincipalHorarioComponent,
+    public componentep: HorarioMultipleEmpleadoComponent,
+  ) { }
 
   ngOnInit(): void {
     this.BuscarDatosHorario(this.idHorario);
@@ -151,8 +153,6 @@ export class VerHorarioDetalleComponent implements OnInit {
           this.EliminarDetalle(datos.id);
           let horasT = this.datosHorario[0].hora_trabajo.split(':')[0] + ':' + this.datosHorario[0].hora_trabajo.split(':')[1];
           this.ActualizarHorario(this.datosHorario[0].id, horasT, false);
-        } else {
-          this.router.navigate(['/verHorario/', this.idHorario]);
         }
       });
   }
@@ -450,10 +450,26 @@ export class VerHorarioDetalleComponent implements OnInit {
         this.toastr.success('Horas totales de trabajo son correctas.', 'Verificación exitosa.', {
           timeOut: 6000
         });
+        if (this.pagina === 'planificar') {
+          this.componentep.ver_horario = false;
+          this.componentep.seleccionar = true;
+        }
       }
     }, err => {
       this.toastr.error(err.message)
     })
+  }
+
+  // METODO PARA VISUALIZAR LISTA DE HORARIOS
+  VerHorarios() {
+    if (this.pagina === 'planificar') {
+      this.router.navigate(['/horario']);
+    } else {
+      this.componente.ver_horarios = true;
+      this.componente.ver_detalles = false;
+      this.componente.ObtenerHorarios();
+    }
+
   }
 
 }

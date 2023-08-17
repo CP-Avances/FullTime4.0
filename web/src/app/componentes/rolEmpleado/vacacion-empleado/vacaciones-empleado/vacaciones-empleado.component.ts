@@ -11,7 +11,7 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 
-import { EditarVacacionesEmpleadoComponent } from '../editar-vacaciones-empleado/editar-vacaciones-empleado.component';
+import { EditarVacacionesEmpleadoComponent } from '../../../modulos/vacaciones/editar-vacaciones-empleado/editar-vacaciones-empleado.component';
 import { CancelarVacacionesComponent } from '../cancelar-vacaciones/cancelar-vacaciones.component';
 import { RegistrarVacacionesComponent } from 'src/app/componentes/modulos/vacaciones/registrar-vacaciones/registrar-vacaciones.component';
 
@@ -26,7 +26,7 @@ export class VacacionesEmpleadoComponent implements OnInit {
   idEmpleado: string;
   idPerVacacion: any = [];
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA 
+  // ITEMS DE PAGINACION DE LA TABLA 
   numero_pagina: number = 1;
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
@@ -67,7 +67,7 @@ export class VacacionesEmpleadoComponent implements OnInit {
     this.numero_pagina = e.pageIndex + 1;
   }
 
-  // METODO PARA VER LA INFORMACIÓN DEL EMPLEADO  
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO  
   empleadoUno: any = [];
   VerEmpleado(formato_fecha: string) {
     this.empleadoUno = [];
@@ -84,7 +84,7 @@ export class VacacionesEmpleadoComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(

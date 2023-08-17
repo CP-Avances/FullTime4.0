@@ -113,10 +113,10 @@ export class EditarBirthdayComponent implements OnInit {
   SubirImagen(id: number) {
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
-      formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
     this.restB.SubirImagenBirthday(formData, id).subscribe(res => {
-      this.toastr.success('Operación Exitosa..', 'Imagen subida con éxito.', {
+      this.toastr.success('Operación exitosa.', 'Imagen subida con éxito.', {
         timeOut: 6000,
       });
       this.archivoForm.reset();

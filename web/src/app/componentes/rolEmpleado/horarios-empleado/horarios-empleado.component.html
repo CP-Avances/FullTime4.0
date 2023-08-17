@@ -70,10 +70,6 @@
                         <td *ngIf="h.domingo == true">Libre</td>
                         <td *ngIf="h.domingo == false">Normal</td>
                         <td class="d-flex justify-content-center">
-                            <i class="fas fa-edit" id="edit" (click)="AbrirEditarHorario(h)" matSuffix
-                                matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro">
-                                <p>Editar</p>
-                            </i>
                             <i class="far fa-trash-alt" (click)="ConfirmarDeleteHorario(h)"
                                 style="color:red; margin-left: 15px;" id="i-cursor" matSuffix
                                 matTooltipPosition="right" matTooltip="Eliminar registro">

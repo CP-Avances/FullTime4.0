@@ -1,10 +1,11 @@
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
-import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
 import { SelectionModel } from '@angular/cdk/collections';
-import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
+
+import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 import { EliminarRealtimeComponent } from '../eliminar-realtime/eliminar-realtime.component';
 
@@ -31,8 +32,6 @@ export interface NotiRealtime {
 
 export class RealtimeNotificacionComponent implements OnInit {
 
-  buscador !: FormGroup;
-
   filtroTimbreEmpl: '';
   filtroTimbreEsta: '';
   filtroTimbreFech: '';
@@ -48,13 +47,12 @@ export class RealtimeNotificacionComponent implements OnInit {
 
   notificaciones: any = [];
   selectionUno = new SelectionModel<NotiRealtime>(true, []);
-
   id_loggin: number;
-  
+
   constructor(
     private realtime: RealTimeService,
-    private toastr: ToastrService,
-    public ventana: MatDialog
+    public ventana: MatDialog,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
@@ -62,30 +60,29 @@ export class RealtimeNotificacionComponent implements OnInit {
     this.ObtenerNotificaciones(this.id_loggin);
   }
 
+  // METODO DE BUSQUEDA DE NOTIFICACIONES
   ObtenerNotificaciones(id_empleado: number) {
     this.notificaciones = [];
     this.realtime.ObtenerNotificacionesAllReceives(id_empleado).subscribe(res => {
       this.notificaciones = res;
-      console.log('notificacioneshhjjkkk', res)
-
     });
   }
 
-  /** Whether the number of selected elements matches the total number of rows. */
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelected() {
     const numSelected = this.selectionUno.selected.length;
     const numRows = this.notificaciones.length;
     return numSelected === numRows;
   }
 
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
+  // SELECCIONA TODAS LAS FILAS SI NO ESTÁN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
       this.notificaciones.forEach(row => this.selectionUno.select(row));
   }
 
-  /** The label for the checkbox on the passed row */
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabel(row?: NotiRealtime): string {
     if (!row) {
       return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
@@ -93,6 +90,7 @@ export class RealtimeNotificacionComponent implements OnInit {
     return `${this.selectionUno.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
+  // METODO PARA HABILITAR SELECCION MULTIPLE
   btnCheckHabilitar: boolean = false;
   HabilitarSeleccion() {
     if (this.btnCheckHabilitar === false) {
@@ -102,18 +100,17 @@ export class RealtimeNotificacionComponent implements OnInit {
     }
   }
 
-  Deshabilitar(opcion: number) {
+  // METODO PARA ELIMINAR NOTIFICACIONES
+  EliminarNotificaciones(opcion: number) {
     let EmpleadosSeleccionados = this.selectionUno.selected.map(obj => {
       return {
         id: obj.id,
         empleado: obj.nombre + ' ' + obj.apellido
       }
     })
-    console.log(EmpleadosSeleccionados);
     this.ventana.open(EliminarRealtimeComponent,
       { width: '500px', data: { opcion: opcion, lista: EmpleadosSeleccionados } })
       .afterClosed().subscribe(item => {
-        console.log(item);
         if (item === true) {
           this.ObtenerNotificaciones(this.id_loggin);
           this.btnCheckHabilitar = false;
@@ -122,40 +119,25 @@ export class RealtimeNotificacionComponent implements OnInit {
       });
   }
 
+  // METODO PARA MANEJAR LA PAGINACION
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
     this.numero_pagina = e.pageIndex + 1;
   }
 
+  // METODO PARA IDENTIFICAR SI LAS NOTIFICACIONES SON VISTAS
   CambiarVistaNotificacion(id_realtime: number) {
     this.realtime.PutVistaNotificacion(id_realtime).subscribe(res => {
-      console.log(res);
     });
   }
 
-  IngresarSoloLetras(e) {
-    let key = e.keyCode || e.which;
-    let tecla = String.fromCharCode(key).toString();
-    // SE DEFINE TODO EL ABECEDARIO QUE SE VA A USAR.
-    let letras = " áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-    // ES LA VALIDACIÓN DEL KEYCODES, QUE TECLAS RECIBE EL CAMPO DE TEXTO.
-    let especiales = [8, 37, 39, 46, 6, 13];
-    let tecla_especial = false
-    for (var i in especiales) {
-      if (key == especiales[i]) {
-        tecla_especial = true;
-        break;
-      }
-    }
-    if (letras.indexOf(tecla) == -1 && !tecla_especial) {
-      this.toastr.info('No se admite datos numéricos', 'Usar solo letras', {
-        timeOut: 6000,
-      })
-      return false;
-    }
+  // METODO PARA INGRESAR SOLO LETRAS
+  IngresarSoloLetras(e: any) {
+    return this.validar.IngresarSoloLetras(e);
   }
 
-  limpiarCampos() {
+  // METODO PARA LIMPIAR FORMULARIO
+  LimpiarCampos() {
     this.nom_empleado.reset();
     this.estado.reset();
     this.fecha.reset();

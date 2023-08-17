@@ -70,7 +70,7 @@ export class HoraExtraRealComponent implements OnInit {
   filtroRegimen: '';
   filtroCargo: '';
 
-  // items de paginacion de la tabla
+  // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
@@ -166,7 +166,7 @@ export class HoraExtraRealComponent implements OnInit {
 
   }
 
-  CalcularTodos(form) {
+  CalcularTodos(form: any) {
     if (form.inicioForm === '' || form.finalForm === '') {
       this.toastr.info('Ingresar fechas de Inicio o Fin de periodo de búsqueda.','', {
         timeOut: 6000,
@@ -294,7 +294,7 @@ export class HoraExtraRealComponent implements OnInit {
     else {
       keynum = evt.which;
     }
-    // Comprobamos si se encuentra en el rango numérico y que teclas no recibirá.
+    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
     if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6) {
       return true;
     }
@@ -336,7 +336,7 @@ export class HoraExtraRealComponent implements OnInit {
   }
 
   /* ****************************************************************************************************
-   *                               PARA LA EXPORTACIÓN DE ARCHIVOS PDF
+   *                               PARA LA EXPORTACION DE ARCHIVOS PDF
    * ****************************************************************************************************/
 
   generarPdf(action = 'open') {
@@ -497,7 +497,7 @@ export class HoraExtraRealComponent implements OnInit {
   }
 
   /* ****************************************************************************************************
-   *                               PARA LA EXPORTACIÓN DE ARCHIVOS EXCEL
+   *                               PARA LA EXPORTACION DE ARCHIVOS EXCEL
    * ****************************************************************************************************/
 
   exportToExcel() {
@@ -508,7 +508,7 @@ export class HoraExtraRealComponent implements OnInit {
   }
 
   /* ****************************************************************************************************
-   *                               PARA LA EXPORTACIÓN DE ARCHIVOS XML
+   *                               PARA LA EXPORTACION DE ARCHIVOS XML 
    * ****************************************************************************************************/
   urlxml: string;
   data: any = [];

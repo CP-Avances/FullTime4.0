@@ -32,7 +32,7 @@ export class RegistroProvinciaComponent implements OnInit {
   ]);
   nombrePaisF = new FormControl("", [Validators.required]);
 
-  // ASIGNACIÓN DE VALIDACIONES A INPUTS DEL FORMULARIO
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public formulario = new FormGroup({
     nombreContinenteForm: this.nombreContinenteF,
     nombreProvinciaForm: this.nombreProvinciaF,
@@ -156,7 +156,7 @@ export class RegistroProvinciaComponent implements OnInit {
         this.LimpiarCampos();
       },
       (error) => {
-        this.toastr.error("Operación Fallida", "Ups!!! algo salio mal.", {
+        this.toastr.error("Ups!!! algo salio mal.", "Ups!!! algo salio mal.", {
           timeOut: 6000,
         });
       }

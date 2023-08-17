@@ -42,7 +42,7 @@ export class EditarDetallePlanComponent implements OnInit {
   fechaF = new FormControl('', [Validators.required]);
   horarioF = new FormControl('', [Validators.required]);
 
-  // Asignación de validaciones a inputs del formulario
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public DetallePlanHorarioForm = new FormGroup({
     fechaForm: this.fechaF,
     tipoDiaForm: this.tipoDia,
@@ -87,7 +87,7 @@ export class EditarDetallePlanComponent implements OnInit {
     }
   }
 
-  InsertarDetallePlanHorario(form) {
+  InsertarDetallePlanHorario(form: any) {
     let datosDetallePlanH = {
       fecha: form.fechaForm,
       id_plan_horario: this.data.detalle.id_plan_horario,
@@ -113,7 +113,7 @@ export class EditarDetallePlanComponent implements OnInit {
 
   ActualizarDetallePlan(datos, form) {
     this.rest.ActualizarRegistro(datos).subscribe(response => {
-      this.toastr.success('Operación Exitosa', 'Detalle de Planificación de Horario actualizado', {
+      this.toastr.success('Operación exitosa.', 'Detalle de Planificación de Horario actualizado', {
         timeOut: 6000,
       });
       this.EliminarPlanificacion();
@@ -140,7 +140,7 @@ export class EditarDetallePlanComponent implements OnInit {
   }
 
   detalles: any = [];
-  IngresarPlanGeneral(form) {
+  IngresarPlanGeneral(form: any) {
     this.detalles = [];
     this.restD.ConsultarUnDetalleHorario(form.horarioForm).subscribe(res => {
       this.detalles = res;
@@ -175,7 +175,7 @@ export class EditarDetallePlanComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  VerificarDetalles(form) {
+  VerificarDetalles(form: any) {
     this.restD.ConsultarUnDetalleHorario(form.horarioForm).subscribe(res => {
     },
       erro => {

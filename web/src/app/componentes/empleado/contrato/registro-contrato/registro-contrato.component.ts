@@ -207,7 +207,7 @@ export class RegistroContratoComponent implements OnInit {
   // METODO PARA REGISTRAR DATOS DE CONTRATO
   RegistrarContrato(form: any, datos: any) {
     this.rest.CrearContratoEmpleado(datos).subscribe(response => {
-      this.toastr.success('Operación Exitosa.', 'Registro guardado.', {
+      this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       })
       if (this.isChecked === true && form.documentoForm != '') {
@@ -284,7 +284,7 @@ export class RegistroContratoComponent implements OnInit {
       formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
     }
     this.rest.SubirContrato(formData, id, form.documentoForm).subscribe(res => {
-      this.toastr.success('Operación Exitosa.', 'Documento guardado.', {
+      this.toastr.success('Operación exitosa.', 'Documento guardado.', {
         timeOut: 6000,
       });
       this.archivoForm.reset();

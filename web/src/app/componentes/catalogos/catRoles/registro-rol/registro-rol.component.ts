@@ -91,7 +91,7 @@ export class RegistroRolComponent implements OnInit {
 
 
     this.rest.RegistraRol(data).subscribe(response => {
-      this.toastr.success('Operación Exitosa.', 'Registro guardado.', {
+      this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       });
       this.salir = true;
@@ -112,7 +112,7 @@ export class RegistroRolComponent implements OnInit {
   // METODO PARA ALMACENAR EN BASE DE DATOS
   GuardarRegistro(rol: any) {
     this.rest.RegistraRol(rol).subscribe(response => {
-      this.toastr.success('Operación Exitosa.', 'Registro guardado.', {
+      this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       });
       this.validar.Auditar('app-web', 'cg_roles', '', this.data_nueva, 'INSERT');

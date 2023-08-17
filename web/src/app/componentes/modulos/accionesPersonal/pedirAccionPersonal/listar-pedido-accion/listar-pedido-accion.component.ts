@@ -1,47 +1,48 @@
 // IMPORTAR LIBRERIAS
 import { Validators, FormControl } from "@angular/forms";
-import { PageEvent } from "@angular/material/paginator";
 import { Component, OnInit } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
 import { environment } from "src/environments/environment";
-import * as FileSaver from "file-saver";
-import * as xlsx from "xlsx";
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import { PageEvent } from "@angular/material/paginator";
 
-// LIBRERÍA PARA FORMATO DE FECHAS
+import * as FileSaver from "file-saver";
+import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as moment from "moment";
+import * as xlsx from "xlsx";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 moment.locale("es");
 
 // LLAMADO DE SERVICIOS
 import { PlantillaReportesService } from "src/app/componentes/reportes/plantilla-reportes.service";
 import { EmpleadoProcesosService } from "src/app/servicios/empleado/empleadoProcesos/empleado-procesos.service";
-import { EmplCargosService } from "src/app/servicios/empleado/empleadoCargo/empl-cargos.service";
 import { AccionPersonalService } from "src/app/servicios/accionPersonal/accion-personal.service";
-import { EmpresaService } from "src/app/servicios/catalogos/catEmpresa/empresa.service";
-import { MainNavService } from "src/app/componentes/administracionGeneral/main-nav/main-nav.service";
 import { ValidacionesService } from "src/app/servicios/validaciones/validaciones.service";
+import { EmplCargosService } from "src/app/servicios/empleado/empleadoCargo/empl-cargos.service";
 import { ParametrosService } from "src/app/servicios/parametrosGenerales/parametros.service";
 import { EmpleadoService } from "src/app/servicios/empleado/empleadoRegistro/empleado.service";
-import { text } from 'express';
-import { Console } from "console";
+import { EmpresaService } from "src/app/servicios/catalogos/catEmpresa/empresa.service";
+import { MainNavService } from "src/app/componentes/administracionGeneral/main-nav/main-nav.service";
 
 @Component({
   selector: "app-listar-pedido-accion",
   templateUrl: "./listar-pedido-accion.component.html",
   styleUrls: ["./listar-pedido-accion.component.css"],
 })
+
 export class ListarPedidoAccionComponent implements OnInit {
-  // ITEMS DE PAGINACIÓN DE LA TABLA
+
+  // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
+
   // DATOS FILTROS DE BUSQUEDA
   filtroCodigo: number;
   filtroCedula: "";
   filtroNombre: "";
   filtroApellido: "";
+
   // DATOS DEL FORMULARIO DE BUSQUEDA
   codigo = new FormControl("");
   cedula = new FormControl("", [Validators.minLength(2)]);
@@ -73,16 +74,16 @@ export class ListarPedidoAccionComponent implements OnInit {
   }
 
   constructor(
-    private plantillaPDF: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
     public restEmpleadoProcesos: EmpleadoProcesosService, // SERVICIO DATOS PROCESOS DEL EMPLEADO
-    private restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     public restAccion: AccionPersonalService, // SERVICIO DATOS ACCIONES DE PERSONAL
     public restCargo: EmplCargosService, // SERVICIO DATOS DE CARGO
     public restEmpre: EmpresaService, // SERVICIO DATOS DE EMPRESA
+    public parametro: ParametrosService,
+    private restE: EmpleadoService, // SERVICIO DATOS DE EMPLEADO
     private toastr: ToastrService, // VARIABLE PARA MANEJO DE NOTIFICACIONES
-    private funciones: MainNavService,
     private validar: ValidacionesService,
-    public parametro: ParametrosService
+    private funciones: MainNavService,
+    private plantillaPDF: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
   ) {
     this.idEmpleado = parseInt(localStorage.getItem("empleado") as string);
   }
@@ -129,6 +130,26 @@ export class ListarPedidoAccionComponent implements OnInit {
     }
   }
 
+  // METODO PARA VER DATOS DE PEDIDOS
+  ver_lista: boolean = true;
+  ver_datos: boolean = false;
+  VerDatosPedidos(id: number) {
+    this.ver_lista = false;
+    this.ver_datos = true;
+    this.pedido_id = id;
+  }
+
+  // METODO PARA ABRIR EDITAR
+  ver_editar: boolean = false;
+  pagina: string = '';
+  pedido_id: number;
+  AbrirEditar(id: number) {
+    this.ver_editar = true;
+    this.ver_lista = false;
+    this.pagina = 'listar-pedido';
+    this.pedido_id = id;
+  }
+
   // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
@@ -137,7 +158,7 @@ export class ListarPedidoAccionComponent implements OnInit {
     });
   }
 
-  // EVENTO PARA MANEJAR LA PÁGINACIÓN
+  // EVENTO PARA MANEJAR LA PAGINACION
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
     this.numero_pagina = e.pageIndex + 1;
@@ -165,6 +186,7 @@ export class ListarPedidoAccionComponent implements OnInit {
     });
   }
 
+  // METODO PARA FORMATEAR DATOS DE FECHA
   FormatearDatos(lista: any, formato_fecha: string, formato_hora: string) {
     lista.forEach((data) => {
       data.fecCreacion_ = this.validar.FormatearFecha(
@@ -180,26 +202,26 @@ export class ListarPedidoAccionComponent implements OnInit {
       data.fecHasta_ =
         data.fec_rige_hasta !== null
           ? this.validar.FormatearFecha(
-              data.fec_rige_hasta,
-              formato_fecha,
-              this.validar.dia_abreviado
-            )
+            data.fec_rige_hasta,
+            formato_fecha,
+            this.validar.dia_abreviado
+          )
           : "";
       data.fechaActa_ =
         data.fec_act_final_concurso !== null
           ? this.validar.FormatearFecha(
-              data.fec_act_final_concurso,
-              formato_fecha,
-              this.validar.dia_abreviado
-            )
+            data.fec_act_final_concurso,
+            formato_fecha,
+            this.validar.dia_abreviado
+          )
           : "";
       data.fechaReemp_ =
         data.primera_fecha_reemp !== null
           ? this.validar.FormatearFecha(
-              data.primera_fecha_reemp,
-              formato_fecha,
-              this.validar.dia_abreviado
-            )
+            data.primera_fecha_reemp,
+            formato_fecha,
+            this.validar.dia_abreviado
+          )
           : "";
     });
   }
@@ -232,7 +254,7 @@ export class ListarPedidoAccionComponent implements OnInit {
   empleadoProcesos: any = [];
   idCargo: any = [];
   contador: number = 0;
-  MostrarInformacion(id: number) {
+  MostrarInformacion(id: number, tipo: string) {
     this.texto_color_cargo = "white";
     this.texto_color_numero = "white";
     this.texto_color_proceso = "white";
@@ -253,36 +275,36 @@ export class ListarPedidoAccionComponent implements OnInit {
     this.restAccion.BuscarDatosPedidoId(id).subscribe((data) => {
       this.datosPedido = data;
       console.log("data pedido", this.datosPedido);
-      this.BuscarPedidoEmpleado(this.datosPedido);
+      this.BuscarPedidoEmpleado(this.datosPedido, tipo);
       this.ObtenerDecreto();
       this.ObtenerTipoAccion();
     });
   }
 
-  /** METODO PARA MOSTRAR DATOS DE LOS EMPLEADOS SELECCIONADOS EN EL PEDIDO */
-  BuscarPedidoEmpleado(pedido: any) {
+  // METODO PARA MOSTRAR DATOS DE LOS EMPLEADOS SELECCIONADOS EN EL PEDIDO 
+  BuscarPedidoEmpleado(pedido: any, tipo: string) {
     this.restAccion
       .BuscarDatosPedidoEmpleados(pedido[0].id_empleado)
       .subscribe((datos1) => {
         this.empleado_1 = datos1;
-        this.ListarProcesosEmpleado(pedido);
+        this.ListarProcesosEmpleado(pedido, tipo);
       });
   }
 
-  /** METODO PARA MOSTRAR LA INFORMACIÓN DE LOS PROCESOS DEL EMPLEADO */
-  ListarProcesosEmpleado(pedido: any) {
+  // METODO PARA MOSTRAR LA INFORMACIÓN DE LOS PROCESOS DEL EMPLEADO
+  ListarProcesosEmpleado(pedido: any, tipo: string) {
     this.restCargo.BuscarIDCargo(pedido[0].id_empleado).subscribe((datos) => {
       this.idCargo = datos;
       var contar = 0;
       for (let i = 0; i <= this.idCargo.length - 1; i++) {
         contar = contar + 1;
-        this.BuscarProcesosCargo(this.idCargo, i, contar);
+        this.BuscarProcesosCargo(this.idCargo, i, contar, tipo);
       }
     });
   }
 
-  /** METODO PARA BUSCAR PROCESOS QUE TIENE EL EMPLEADO DE ACUERDO AL CARGO */
-  BuscarProcesosCargo(id_cargo: any, valor: any, contar: any) {
+  // METODO PARA BUSCAR PROCESOS QUE TIENE EL EMPLEADO DE ACUERDO AL CARGO 
+  BuscarProcesosCargo(id_cargo: any, valor: any, contar: any, tipo: string) {
     // revisar
     this.restEmpleadoProcesos
       .ObtenerProcesoUsuario(id_cargo[valor]["id"])
@@ -305,7 +327,7 @@ export class ListarPedidoAccionComponent implements OnInit {
               .subscribe((proc_a) => {
                 this.procesoActual = proc_a;
                 this.EscribirProcesosActuales(this.procesoActual);
-                this.BusquedaInformacion();
+                this.BusquedaInformacion(tipo);
               });
           }
         },
@@ -313,7 +335,7 @@ export class ListarPedidoAccionComponent implements OnInit {
           if (contar === this.idCargo.length) {
             if (this.empleadoProcesos.length === 0) {
               this.EscribirProcesosActuales_Vacios();
-              this.BusquedaInformacion();
+              this.BusquedaInformacion(tipo);
               this.toastr.info(
                 "El reporte no refleja informácion de procesos actuales del colaborador seleccionado.",
                 "Cargar la información respectiva.",
@@ -327,8 +349,8 @@ export class ListarPedidoAccionComponent implements OnInit {
       );
   }
 
-  /** METODO PARA BUSCAR INFORMACIÓN DE LOS EMPLEADOS RESPONSABLES / FIRMAS */
-  BusquedaInformacion() {
+  // METODO PARA BUSCAR INFORMACIÓN DE LOS EMPLEADOS RESPONSABLES / FIRMAS 
+  BusquedaInformacion(tipo: string) {
     this.restAccion
       .BuscarDatosPedidoEmpleados(parseInt(this.datosPedido[0].firma_empl_uno))
       .subscribe((data2) => {
@@ -340,22 +362,22 @@ export class ListarPedidoAccionComponent implements OnInit {
           .subscribe((data3) => {
             this.empleado_3 = data3;
             this.restAccion.BuscarDatosPedidoEmpleados(parseInt(this.datosPedido[0].id_empl_responsable))
-            .subscribe((data4)=>{
-              this.empleado_4 = data4;
-              this.VerificarDatos();
-            });
+              .subscribe((data4) => {
+                this.empleado_4 = data4;
+                this.VerificarDatos(tipo);
+              });
           });
       });
   }
 
-  /** METODO PARA VERIFICAR DATOS INGRESADO Y NO INGRESADO */
-  VerificarDatos() {
+  // METODO PARA VERIFICAR DATOS INGRESADO Y NO INGRESADO
+  VerificarDatos(tipo: string) {
     if (
       this.datosPedido[0].proceso_propuesto === null &&
       this.datosPedido[0].cargo_propuesto === null
     ) {
       this.DefinirColor(this.datosPedido, "");
-      this.generarPdf("download");
+      tipo === "pdf" ? this.generarPdf("download") : this.generarExcel();
     } else if (
       this.datosPedido[0].proceso_propuesto != null &&
       this.datosPedido[0].cargo_propuesto != null
@@ -372,7 +394,7 @@ export class ListarPedidoAccionComponent implements OnInit {
                 this.datosPedido,
                 carg[0].descripcion.toUpperCase()
               );
-              this.generarPdf("download");
+              tipo === "pdf" ? this.generarPdf("download") : this.generarExcel();
             });
         });
     } else if (
@@ -385,7 +407,7 @@ export class ListarPedidoAccionComponent implements OnInit {
           this.procesoPropuesto = proc;
           this.EscribirProcesosPropuestos(this.procesoPropuesto);
           this.DefinirColor(this.datosPedido, "");
-          this.generarPdf("download");
+          tipo === "pdf" ? this.generarPdf("download") : this.generarExcel();
         });
     } else if (
       this.datosPedido[0].proceso_propuesto === null &&
@@ -398,12 +420,12 @@ export class ListarPedidoAccionComponent implements OnInit {
             this.datosPedido,
             carg[0].descripcion.toUpperCase()
           );
-          this.generarPdf("download");
+          tipo === "pdf" ? this.generarPdf("download") : this.generarExcel();
         });
     }
   }
 
-  /** METODO PARA DEFINIR COLORES DE TEXTO / IMPRIMIR ESPACIOS */
+  // METODO PARA DEFINIR COLORES DE TEXTO / IMPRIMIR ESPACIOS
   cargo_propuesto: string = "";
   proceso_propuesto: string = "";
   salario_propuesto: string = "";
@@ -439,7 +461,7 @@ export class ListarPedidoAccionComponent implements OnInit {
     }
   }
 
-  /** METODO PARA REALIZAR BUSQUEDA DE PROCESOS QUE TIENEN REGISTRADOS EL EMPLEADO */
+  // METODO PARA REALIZAR BUSQUEDA DE PROCESOS QUE TIENEN REGISTRADOS EL EMPLEADO 
   nombre_procesos_a: string = "";
   proceso_padre_a: string = "";
   EscribirProcesosActuales(array) {
@@ -454,7 +476,7 @@ export class ListarPedidoAccionComponent implements OnInit {
     });
   }
 
-  /** M+ETODO PARA IMPRIMIR ESPACIOS CUANDO EL EMPLEADO NO REGISTRA PROCESOS */
+  // METODO PARA IMPRIMIR ESPACIOS CUANDO EL EMPLEADO NO REGISTRA PROCESOS
   texto_color_proceso_actual: string = "";
   EscribirProcesosActuales_Vacios() {
     this.proceso_padre_a = "";
@@ -462,7 +484,7 @@ export class ListarPedidoAccionComponent implements OnInit {
     this.texto_color_proceso_actual = "white";
   }
 
-  /** METODO PARA IMPRIMIR PROCESOS PROPUESTOS */
+  // METODO PARA IMPRIMIR PROCESOS PROPUESTOS
   nombre_procesos_p: string = "";
   proceso_padre_p: string = "";
   EscribirProcesosPropuestos(array) {
@@ -477,23 +499,21 @@ export class ListarPedidoAccionComponent implements OnInit {
     });
   }
 
-  /* ****************************************************************************************************
-   *                               PARA LA EXPORTACIÓN DE ARCHIVOS PDF INDIVIDUAL
-   * ****************************************************************************************************/
+  /** ************************************************************************************************* **
+   ** **                            PARA LA EXPORTACION DE ARCHIVOS PDF INDIVIDUAL                   ** **
+   ** ************************************************************************************************* **/
 
   generarPdf(action = "open") {
     const documentDefinition = this.getDocumentDefinicion();
     switch (action) {
       case "open":
         pdfMake.createPdf(documentDefinition).open();
-        this.generarExcel();
         break;
       case "print":
         pdfMake.createPdf(documentDefinition).print();
         break;
       case "download":
         pdfMake.createPdf(documentDefinition).download();
-        this.generarExcel();
         break;
       default:
         pdfMake.createPdf(documentDefinition).open();
@@ -503,7 +523,7 @@ export class ListarPedidoAccionComponent implements OnInit {
 
   getDocumentDefinicion() {
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageMargins: [10, 40, 10, 40],
       content: [
         this.PresentarHoja1_Parte_1(),
@@ -541,21 +561,22 @@ export class ListarPedidoAccionComponent implements OnInit {
         itemsTable: { fontSize: 8 },
         itemsTable_c: { fontSize: 9 },
         itemsTable_d: { fontSize: 9, alignment: "right" },
+        itemsTable_e: { fontSize: 7 },
       },
     };
   }
 
-  //METODO PARA MOSTRAR EL TIPO DE DECRETO-ACUERDO-RESOLUCION
+  // METODO PARA MOSTRAR EL TIPO DE DECRETO-ACUERDO-RESOLUCION
   ObtenerDecreto() {
-    this.decreto = ["", "", "", ""];
+    this.decreto = ["", "", "", "_______________", "", "white"];
     let decretoTexto: string = "";
-    if (this.datosPedido[0].decre_acue_resol!==null) {
+    if (this.datosPedido[0].decre_acue_resol !== null) {
       try {
         this.restAccion
           .ConsultarUnDecreto(this.datosPedido[0].decre_acue_resol)
           .subscribe((data8) => {
             decretoTexto = data8[0].descripcion;
-            let texto: string = decretoTexto.toUpperCase(); 
+            let texto: string = decretoTexto.toUpperCase();
             switch (texto) {
               case "DECRETO":
                 this.decreto[0] = "X";
@@ -568,6 +589,8 @@ export class ListarPedidoAccionComponent implements OnInit {
                 break;
               default:
                 this.decreto[3] = texto;
+                this.decreto[4] = "X";
+                this.decreto[5] = "black";
                 break;
             }
           });
@@ -577,30 +600,31 @@ export class ListarPedidoAccionComponent implements OnInit {
     }
   }
 
-  //METODO PARA OBTENER MOSTRAR EL TIPO DE ACCION
-  ObtenerTipoAccion(){
+  // METODO PARA OBTENER MOSTRAR EL TIPO DE ACCION
+  ObtenerTipoAccion() {
     let tipoAccion: string = this.datosPedido[0].tipo.toUpperCase();
     let cadena = this.RemoveAccents(tipoAccion);
-    this.tipoAccion = ['','','','','','','','','','','','','','','','','','','','','','',''];
-    let acciones: string[] = ['INGRESO','NOMBRAMIENTO','ASCENSO','SUBROGACION','ENCARGO:',
-    'VACACIONES','TRASLADO','TRASPASO','CAMBIO ADMINISTRATIVO','INTERCAMBIO',
-    'COMISION DE SERVICIOS','LICENCIA','REVALORIZACION','RECLASIFICACION','UBICACION',
-    'REINTEGRO','REINSTITUCIONAL','RENUNCIA','SUPRESION','DESTITUCION','REMOCION','JUBILACION'];
+    this.tipoAccion = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
+    let acciones: string[] = ['INGRESO', 'NOMBRAMIENTO', 'ASCENSO', 'SUBROGACION', 'ENCARGO:',
+      'VACACIONES', 'TRASLADO', 'TRASPASO', 'CAMBIO ADMINISTRATIVO', 'INTERCAMBIO',
+      'COMISION DE SERVICIOS', 'LICENCIA', 'REVALORIZACION', 'RECLASIFICACION', 'UBICACION',
+      'REINTEGRO', 'REINSTITUCIONAL', 'RENUNCIA', 'SUPRESION', 'DESTITUCION', 'REMOCION', 'JUBILACION'];
     let indice = acciones.indexOf(cadena);
-    if (indice!==-1) {
-      this.tipoAccion[indice]='X';
+    if (indice !== -1) {
+      this.tipoAccion[indice] = 'X';
     } else {
-      this.tipoAccion[22]=tipoAccion;
+      this.tipoAccion[22] = tipoAccion;
+      this.tipoAccion[24] = 'X';
     }
     console.log("Obtener tipo de accion")
     console.log(tipoAccion);
     console.log(cadena);
   }
 
-  //Metodo para quitar las tildes
+  // METODO PARA QUITAR LAS TILDES
   RemoveAccents = (str: string) => {
     return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  } 
+  }
 
   PresentarHoja1_Parte_1() {
     return {
@@ -687,7 +711,6 @@ export class ListarPedidoAccionComponent implements OnInit {
   }
 
   PresentarHoja1_Parte_2() {
-    console.log(this.decreto);
     return {
       table: {
         widths: ["*"],
@@ -699,83 +722,91 @@ export class ListarPedidoAccionComponent implements OnInit {
               table: {
                 body: [
                   [
-                    // {
-                      // text: [
-                        { text: "DECRETO: ", style: "itemsTable_c",
-                          margin: [5,5,0,0]},
-                        {
-                          border: [true,true,true,true],
-                          
-                          table:{
-                            widths: [9],
-                            heights: [9],
-                            body: [
-                              [ {text: `${this.decreto[0]}`,style: "itemsTable_c",alignment: 'center',},]
-                            ]
-                          },
-                          layout: {
-                            defaultBorder: true,
-                          },
+                    {
+                      text: "DECRETO: ", style: "itemsTable_c",
+                      margin: [5, 5, 0, 0]
+                    },
+                    {
+                      border: [true, true, true, true],
+                      table: {
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.decreto[0]}`, style: "itemsTable_e", alignment: 'center', },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                      },
+                    },
+                    {
+                      text: "ACUERDO: ", style: "itemsTable_c",
+                      margin: [50, 5, 0, 0]
+                    },
+                    {
+                      border: [true, true, true, true],
+                      table: {
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.decreto[1]}`, style: "itemsTable_e", alignment: 'center', },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                      },
+                    },
+                    { text: "RESOLUCIÓN: ", style: "itemsTable_c", margin: [50, 5, 0, 0] },
+                    {
+                      border: [true, true, true, true],
+                      table: {
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.decreto[2]}`, style: "itemsTable_e", alignment: 'center', },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true
+                      },
+                    },
+                    { text: "OTRO: ", style: "itemsTable_c", margin: [50, 5, 0, 0] },
+                    {
+                      border: [false, false, false, false],
+
+                      table: {
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.decreto[4]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                    {
+                      border: [false, false, false, true],
+                      table: {
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.decreto[3]}`, style: "itemsTable_c", color: this.decreto[5] },],
+                        ]
+                      },
+                      layout: {
+                        hLineWidth: function (i, node) {
+                          if (i === node.table.body.length) {
+                            return 1; // GROSOR DEL BORDE INFERIOR
+                          } else {
+                            return 0; // SIN BORDES EN LAS DEMAS LINEAS
+                          }
                         },
-                        {
-                          text: "---------------------------",
-                          color: "white",
-                          style: "itemsTable",
+                        vLineWidth: function (i) {
+                          return 0; // SIN BORDES VERTICALES
                         },
-                        { text: "ACUERDO: ", style: "itemsTable_c",
-                          margin: [5,5,0,0]},
-                        {
-                          border: [true,true,true,true],
-                          table:{
-                            widths: [9],
-                            heights: [9],
-                            body: [
-                              [ {text: `${this.decreto[1]}`,style: "itemsTable_c",alignment: 'center',},]
-                            ]
-                          },
-                          layout: {
-                            defaultBorder: true,
-                          },
-                        },
-                        {
-                          text: "---------------------------",
-                          color: "white",
-                          style: "itemsTable",
-                        },
-                        { text: "RESOLUCIÓN: ", style: "itemsTable_c",margin: [5,5,0,0]},
-                        {
-                          border: [true,true,true,true],
-                          table:{
-                            widths: [9],
-                            heights: [9],
-                            body: [
-                              [ {text: `${this.decreto[2]}`,style: "itemsTable_c",alignment: 'center',},]
-                            ]
-                          },
-                          layout: {
-                            defaultBorder: true
-                          },
-                        },
-                        {
-                          text: "---------------------------",
-                          color: "white",
-                          style: "itemsTable",
-                        },
-                        { text: "OTRO: ", style: "itemsTable_c"},
-                        {
-                          border: [false,false,false,true],
-                          table:{
-                            heights: [9],
-                            body: [
-                              [{text: `${this.decreto[3]}`},],
-                              // [{text: "---------------------", color: "white"}]
-                            ]
-                          },
-                          layout: "lightHorizontalLines",
-                        },
-                      // ],
-                      // margin: [10, 6, 0, 0],
-                    // },
+                      },
+                    },
                   ],
                 ],
               },
@@ -793,8 +824,8 @@ export class ListarPedidoAccionComponent implements OnInit {
   PresentarHoja1_Parte_3() {
     return {
       table: {
-        widths: ["auto", "*", "auto", "*"],
-        heights: [10],
+        widths: ["auto", "*", "auto", "*", "auto"],
+        heights: [5],
         body: [
           [
             {
@@ -804,14 +835,24 @@ export class ListarPedidoAccionComponent implements OnInit {
             },
             {
               border: [false, false, false, true],
-              margin: [0, 0, 0, 0],
+              margin: [0, 0, 0, 5],
               table: {
                 body: [
                   [{ text: "-------------------------------", color: "white" }],
-                  [{ text: "-------------------------------", color: "white" }],
                 ],
               },
-              layout: "lightHorizontalLines",
+              layout: {
+                hLineWidth: function (i, node) {
+                  if (i === node.table.body.length) {
+                    return 1; // GROSOR DEL BORDE INFERIOR
+                  } else {
+                    return 0; // SIN BORDES EN LAS DEMAS LINEAS
+                  }
+                },
+                vLineWidth: function (i) {
+                  return 0; // SIN BORDES VERTICALES
+                },
+              },
             },
             {
               border: [false, false, false, true],
@@ -819,13 +860,33 @@ export class ListarPedidoAccionComponent implements OnInit {
               text: [{ text: "FECHA:", style: "itemsTable_c" }],
             },
             {
-              border: [false, false, true, true],
+              border: [false, false, false, true],
               margin: [0, 0, 0, 0],
               table: {
                 body: [
-                  [{ text: "------------------------------", color: "white" }],
-                  [{ text: "------------------------------", color: "white" }],
+                  [{ text: "-------------------------------", color: "white" }],
                 ],
+              },
+              layout: {
+                hLineWidth: function (i, node) {
+                  if (i === node.table.body.length) {
+                    return 1; // GROSOR DEL BORDE INFERIOR
+                  } else {
+                    return 0; // SIN BORDES EN LAS DEMAS LINEAS
+                  }
+                },
+                vLineWidth: function (i) {
+                  return 0; // SIN BORDES VERTICALES
+                },
+              },
+            },
+            {
+              border: [false, false, true, true],
+              table: {
+                heights: [9],
+                body: [
+                  [{ text: `` },],
+                ]
               },
               layout: "lightHorizontalLines",
             },
@@ -846,20 +907,21 @@ export class ListarPedidoAccionComponent implements OnInit {
             {
               border: [true, false, true, true],
               table: {
+                widths: ["*"],
                 body: [
                   [
                     {
                       text: this.empleado_1[0].apellido.toUpperCase(),
                       style: "itemsTable_c",
                       margin: [0, 6, 0, 0],
-                      // alignment: 'center',
+                      alignment: 'center',
                     },
                   ],
                   [
                     {
                       text: "APELLIDO",
                       style: "itemsTable_c",
-                      margin: [110, 0, 0, 0],
+                      alignment: 'center',
                     },
                   ],
                 ],
@@ -869,20 +931,21 @@ export class ListarPedidoAccionComponent implements OnInit {
             {
               border: [false, false, true, true],
               table: {
+                widths: ["*"],
                 body: [
                   [
                     {
                       text: this.empleado_1[0].nombre.toUpperCase(),
                       style: "itemsTable_c",
                       margin: [0, 6, 0, 0],
-                      // alignment: 'center',
+                      alignment: 'center',
                     },
                   ],
                   [
                     {
                       text: "NOMBRE",
                       style: "itemsTable_c",
-                      margin: [110, 0, 0, 0],
+                      alignment: 'center',
                     },
                   ],
                 ],
@@ -909,17 +972,13 @@ export class ListarPedidoAccionComponent implements OnInit {
             {
               border: [true, false, true, true],
               table: {
+                widths: ["*"],
                 body: [
                   [
                     {
-                      text: [
-                        {
-                          text: "No. de Cédula de Ciudadanía",
-                          style: "itemsTable_c",
-                        },
-                        { text: "-----", color: "white", style: "itemsTable" },
-                      ],
-                      margin: [40, 0, 0, 0],
+                      text: "No. de Cédula de Ciudadanía",
+                      style: "itemsTable_c",
+                      alignment: 'center',
                     },
                   ],
                 ],
@@ -929,21 +988,13 @@ export class ListarPedidoAccionComponent implements OnInit {
             {
               border: [false, false, true, true],
               table: {
+                widths: ["*"],
                 body: [
                   [
                     {
-                      text: [
-                        {
-                          text: "No. de Afilicación IESS",
-                          style: "itemsTable_c",
-                        },
-                        {
-                          text: "--------",
-                          color: "white",
-                          style: "itemsTable",
-                        },
-                      ],
-                      margin: [40, 0, 0, 0],
+                      text: "No. de Afilicación IESS",
+                      style: "itemsTable_c",
+                      alignment: 'center',
                     },
                   ],
                 ],
@@ -953,12 +1004,13 @@ export class ListarPedidoAccionComponent implements OnInit {
             {
               border: [false, false, true, true],
               table: {
+                widths: ["*"],
                 body: [
                   [
                     {
                       text: "Rige a partir de:",
                       style: "itemsTable_c",
-                      margin: [40, 0, 0, 0],
+                      alignment: 'center',
                     },
                   ],
                 ],
@@ -985,6 +1037,7 @@ export class ListarPedidoAccionComponent implements OnInit {
             {
               border: [true, false, true, true],
               table: {
+                widths: ["*"],
                 body: [
                   [
                     {
@@ -992,9 +1045,9 @@ export class ListarPedidoAccionComponent implements OnInit {
                         {
                           text: this.empleado_1[0].cedula,
                           style: "itemsTable_c",
+                          alignment: 'center',
                         },
                       ],
-                      margin: [130, 0, 0, 0],
                     },
                   ],
                 ],
@@ -1017,6 +1070,7 @@ export class ListarPedidoAccionComponent implements OnInit {
             {
               border: [false, false, true, true],
               table: {
+                widths: ["*"],
                 body: [
                   [
                     {
@@ -1024,6 +1078,7 @@ export class ListarPedidoAccionComponent implements OnInit {
                         "dddd DD MMMM YYYY"
                       ),
                       style: "itemsTable_c",
+                      alignment: 'center',
                     },
                   ],
                 ],
@@ -1078,7 +1133,7 @@ export class ListarPedidoAccionComponent implements OnInit {
     return {
       table: {
         widths: ["*"],
-        heights: [40],
+        heights: [30],
 
         body: [
           [
@@ -1148,8 +1203,8 @@ export class ListarPedidoAccionComponent implements OnInit {
   PresentarHoja1_Parte_9() {
     return {
       table: {
-        widths: ["*", "*", "*", "*"],
-        heights: [10],
+        widths: [110, 10, 120, 10, 100, 10, 100, 10, "*"],
+        heights: [9],
 
         body: [
           [
@@ -1159,40 +1214,152 @@ export class ListarPedidoAccionComponent implements OnInit {
                 body: [
                   [
                     {
-                      text: [{ text: "INGRESO: ", style: "itemsTable" }, {text:this.tipoAccion[0]}],
-                      margin: [15, 0, 0, 0],
+                      text: "INGRESO: ", style: "itemsTable",
+                      margin: [25, 5, 0, 0],
+                    }
+                  ],
+                  [
+                    {
+                      text: "NOMBRAMIENTO: ", style: "itemsTable",
+                      margin: [25, 5, 0, 0],
                     },
                   ],
                   [
                     {
-                      text: [{ text: "NOMBRAMIENTO: ", style: "itemsTable" }, {text:this.tipoAccion[1]}],
-                      margin: [15, 0, 0, 0],
+                      text: "ASCENSO: ", style: "itemsTable",
+                      margin: [25, 5, 0, 0],
                     },
                   ],
                   [
                     {
-                      text: [{ text: "ASCENSO: ", style: "itemsTable" }, {text:this.tipoAccion[2]}],
-                      margin: [15, 0, 0, 0],
+                      text: "SUBROGACIÓN: ", style: "itemsTable",
+                      margin: [25, 5, 0, 0],
                     },
                   ],
                   [
                     {
-                      text: [{ text: "SUBROGACIÓN: ", style: "itemsTable" }, {text:this.tipoAccion[3]}],
-                      margin: [15, 0, 0, 0],
+                      text: "ENCARGO: ", style: "itemsTable",
+                      margin: [25, 5, 0, 0],
                     },
                   ],
                   [
                     {
-                      text: [{ text: "ENCARGO: ", style: "itemsTable" }, {text:this.tipoAccion[4]}],
-                      margin: [15, 0, 0, 0],
+                      text: "VACACIONES: ", style: "itemsTable",
+                      margin: [25, 5, 0, 0],
+                    },
+                  ],
+                ],
+              },
+              layout: "noBorders",
+            },
+            // CASILLAS DE VERIFICACION 1
+            {
+              border: [false, false, false, true],
+              table: {
+                body: [
+                  [
+                    {
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[0]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
                     },
                   ],
                   [
                     {
-                      text: [{ text: "VACACIONES: ", style: "itemsTable" }, {text:this.tipoAccion[5]}],
-                      margin: [15, 0, 0, 0],
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[1]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
                     },
                   ],
+                  [
+                    {
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[2]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                  ],
+                  [
+                    {
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[3]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                  ],
+                  [
+                    {
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [7],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[4]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                  ],
+                  [
+                    {
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [7],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[5]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                  ],
+
                 ],
               },
               layout: "noBorders",
@@ -1203,44 +1370,152 @@ export class ListarPedidoAccionComponent implements OnInit {
                 body: [
                   [
                     {
-                      text: [{ text: "TRASLADO: ", style: "itemsTable" }, {text:this.tipoAccion[6]}],
-                      margin: [5, 0, 0, 0],
+                      text: "TRASLADO: ", style: "itemsTable",
+                      margin: [20, 5, 0, 0],
                     },
                   ],
                   [
                     {
-                      text: [{ text: "TRASPASO: ", style: "itemsTable" }, {text:this.tipoAccion[7]}],
-                      margin: [5, 0, 0, 0],
+                      text: "TRASPASO: ", style: "itemsTable",
+                      margin: [20, 5, 0, 0],
                     },
                   ],
                   [
                     {
-                      text: [
-                        { text: "CAMBIO ADMINISTRATIVO: ", style: "itemsTable" }, {text:this.tipoAccion[8]},
-                      ],
-                      margin: [5, 0, 0, 0],
+                      text: "CAMBIO ADMINISTRATIVO: ", style: "itemsTable",
+                      margin: [20, 5, 0, 0],
                     },
                   ],
                   [
                     {
-                      text: [{ text: "INTERCAMBIO: ", style: "itemsTable" }, {text:this.tipoAccion[9]}],
-                      margin: [5, 0, 0, 0],
+                      text: "INTERCAMBIO: ", style: "itemsTable",
+                      margin: [20, 5, 0, 0],
                     },
                   ],
                   [
                     {
-                      text: [
-                        { text: "COMISIÓN DE SERVICIOS: ", style: "itemsTable" }, {text:this.tipoAccion[10]},
-                      ],
-                      margin: [5, 0, 0, 0],
+                      text: "COMISIÓN DE SERVICIOS: ", style: "itemsTable",
+                      margin: [20, 5, 0, 0],
                     },
                   ],
                   [
                     {
-                      text: [{ text: "LICENCIA: ", style: "itemsTable" }, {text:this.tipoAccion[11]}],
-                      margin: [5, 0, 0, 0],
+                      text: "LICENCIA: ", style: "itemsTable",
+                      margin: [20, 5, 0, 0],
                     },
                   ],
+                ],
+              },
+              layout: "noBorders",
+            },
+            // CASILLAS DE VERIFICACION 2
+            {
+              border: [false, false, false, true],
+              table: {
+                body: [
+                  [
+                    {
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[6]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                  ],
+                  [
+                    {
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[7]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                  ],
+                  [
+                    {
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[8]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                  ],
+                  [
+                    {
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[9]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                  ],
+                  [
+                    {
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [7],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[10]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                  ],
+                  [
+                    {
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [7],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[11]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                  ],
+
                 ],
               },
               layout: "noBorders",
@@ -1251,40 +1526,292 @@ export class ListarPedidoAccionComponent implements OnInit {
                 body: [
                   [
                     {
-                      text: [{ text: "REVALORIZACIÓN: ", style: "itemsTable" }, {text:this.tipoAccion[12]}],
-                      margin: [10, 0, 0, 0],
+                      text: "REVALORIZACIÓN: ", style: "itemsTable",
+                      margin: [20, 5, 0, 0],
                     },
                   ],
                   [
                     {
-                      text: [{ text: "RECLASIFICACIÓN: ", style: "itemsTable" }, {text:this.tipoAccion[13]}],
-                      margin: [10, 0, 0, 0],
+                      text: "RECLASIFICACIÓN: ", style: "itemsTable",
+                      margin: [20, 5, 0, 0],
                     },
                   ],
                   [
                     {
-                      text: [{ text: "UBICACIÓN: ", style: "itemsTable" }, {text:this.tipoAccion[14]}],
-                      margin: [10, 0, 0, 0],
+                      text: "UBICACIÓN: ", style: "itemsTable",
+                      margin: [20, 5, 0, 0],
                     },
                   ],
                   [
                     {
-                      text: [{ text: "REINTEGRO: ", style: "itemsTable" }, {text:this.tipoAccion[15]}],
-                      margin: [10, 0, 0, 0],
+                      text: "REINTEGRO: ", style: "itemsTable",
+                      margin: [20, 5, 0, 0],
                     },
                   ],
                   [
                     {
-                      text: [{ text: "REINSTITUCIONAL: ", style: "itemsTable" }, {text:this.tipoAccion[16]}],
-                      margin: [10, 0, 0, 0],
+                      text: "REINSTITUCIONAL: ", style: "itemsTable",
+                      margin: [20, 5, 0, 0],
                     },
                   ],
                   [
                     {
-                      text: [{ text: "RENUNCIA: ", style: "itemsTable" }, {text:this.tipoAccion[17]}],
-                      margin: [10, 0, 0, 0],
+                      text: "RENUNCIA: ", style: "itemsTable",
+                      margin: [20, 5, 0, 0],
                     },
                   ],
+                ],
+              },
+              layout: "noBorders",
+            },
+            // CASILLAS DE VERIFICACION 3
+            {
+              border: [false, false, false, true],
+              table: {
+                body: [
+                  [
+                    {
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[12]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                  ],
+                  [
+                    {
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[13]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                  ],
+                  [
+                    {
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[14]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                  ],
+                  [
+                    {
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[15]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                  ],
+                  [
+                    {
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [7],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[16]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                  ],
+                  [
+                    {
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [7],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[17]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                  ],
+
+                ],
+              },
+              layout: "noBorders",
+            },
+            {
+              border: [false, false, false, true],
+              table: {
+                body: [
+                  [
+                    {
+                      text: "SUPRESIÓN: ", style: "itemsTable",
+                      margin: [20, 5, 0, 0],
+                    },
+                  ],
+                  [
+                    {
+                      text: "DESTITUCIÓN: ", style: "itemsTable",
+                      margin: [20, 5, 0, 0],
+                    },
+                  ],
+                  [
+                    {
+                      text: "REMOCIÓN: ", style: "itemsTable",
+                      margin: [20, 5, 0, 0],
+                    },
+                  ],
+                  [
+                    {
+                      text: "JUBILACIÓN: ", style: "itemsTable",
+                      margin: [20, 5, 0, 0],
+                    },
+                  ],
+                  [
+                    {
+                      text: "OTRO: ", style: "itemsTable",
+                      margin: [20, 5, 0, 0],
+                    },
+                  ],
+                  [
+                    {
+                      text: this.tipoAccion[22], style: "itemsTable",
+                      margin: [20, 0, 0, 0],
+                    },
+                  ]
+                ],
+              },
+              layout: "noBorders",
+            },
+            //Casillas de verificacion 4
+            {
+              border: [false, false, false, true],
+              table: {
+                body: [
+                  [
+                    {
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[18]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                  ],
+                  [
+                    {
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[19]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                  ],
+                  [
+                    {
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[20]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                  ],
+                  [
+                    {
+                      border: [true, true, true, true],
+
+                      table: {
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[21]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                  ],
+                  [
+                    {
+                      border: [false, false, false, false],
+
+                      table: {
+                        widths: [6],
+                        heights: [9],
+                        body: [
+                          [{ text: `${this.tipoAccion[24]}`, style: "itemsTable_e", alignment: 'center' },]
+                        ]
+                      },
+                      layout: {
+                        defaultBorder: true,
+                        cellPadding: [0, 0, 0, 0],
+                      },
+                    },
+                  ],
+
+
                 ],
               },
               layout: "noBorders",
@@ -1292,89 +1819,10 @@ export class ListarPedidoAccionComponent implements OnInit {
             {
               border: [false, false, true, true],
               table: {
-                body: [
-                  [
-                    {
-                      text: [{ text: "SUPRESIÓN: ", style: "itemsTable" }, {text:this.tipoAccion[18]}],
-                      margin: [5, 0, 0, 0],
-                    },
-                  ],
-                  [
-                    {
-                      text: [{ text: "DESTITUCIÓN: ", style: "itemsTable" }, {text:this.tipoAccion[19]}],
-                      margin: [5, 0, 0, 0],
-                    },
-                  ],
-                  [
-                    {
-                      text: [{ text: "REMOCIÓN: ", style: "itemsTable" }, {text:this.tipoAccion[20]}],
-                      margin: [5, 0, 0, 0],
-                    },
-                  ],
-                  [
-                    {
-                      text: [{ text: "JUBILACIÓN: ", style: "itemsTable" }, {text:this.tipoAccion[21]}],
-                      margin: [5, 0, 0, 0],
-                    },
-                  ],
-                  [
-                    {
-                      text: [{ text: "OTRO: ", style: "itemsTable" }, {text:this.tipoAccion[22]}],
-                      margin: [5, 0, 0, 0],
-                      // table: {
-                      //   widths: ["auto", "*"],
-                      //   body: [
-                      //     [
-                      //       {
-                      //         border: [false, false, false, false],
-                      //         table: {
-                      //           body: [
-                      //             [
-                      //               {
-                      //                 text: [
-                      //                   { text: "OTRO: ", style: "itemsTable" },
-                      //                 ],
-                      //               },
-                      //             ],
-                      //           ],
-                      //         },
-                      //         layout: "noBorders",
-                      //       },
-                      //       {
-                      //         border: [false, false, false, false],
-                      //         table: {
-                      //           margin: [10, -20, 0, 0],
-                      //           body: [
-                      //             [
-                      //               {
-                      //                 text: this.tipoAccion[22],
-                      //                 color: "black",
-                      //                 style: "itemsTable",
-                      //               },
-                      //             ],
-                      //             [
-                      //               {
-                      //                 text: "---------------------",
-                      //                 color: "white",
-                      //                 style: "itemsTable",
-                      //               },
-                      //             ],
-                      //           ],
-                      //         },
-                      //         layout: "lightHorizontalLines",
-                      //       },
-                      //     ],
-                      //   ],
-                      // },
-                      // layout: {
-                      //   defaultBorder: false,
-                      // },
-                    },
-                  ],
-                ],
+                body: [[]],
               },
               layout: "noBorders",
-            },
+            }
           ],
         ],
       },
@@ -1394,13 +1842,14 @@ export class ListarPedidoAccionComponent implements OnInit {
             {
               border: [true, false, true, true],
               table: {
+                widths: ["*"],
                 body: [
                   [
                     {
                       text: [
                         { text: "SITUACIÓN ACTUAL", style: "itemsTable_c" },
                       ],
-                      margin: [110, 0, 0, 0],
+                      alignment: 'center',
                     },
                   ],
                   [
@@ -1502,7 +1951,7 @@ export class ListarPedidoAccionComponent implements OnInit {
                                 body: [
                                   [
                                     {
-                                      text: "\n" + this.nombre_procesos_a,
+                                      text: this.nombre_procesos_a,
                                       style: "itemsTable",
                                       margin: [0, -30, 0, 0],
                                     },
@@ -1697,8 +2146,6 @@ export class ListarPedidoAccionComponent implements OnInit {
                         {
                           text:
                             "PARTIDA PRESUPUESTARIA: " +
-                            // "  " +
-                            // this.datosPedido[0].tipo.toUpperCase() +
                             "\n" +
                             this.datosPedido[0].num_partida,
                           style: "itemsTable",
@@ -1714,13 +2161,14 @@ export class ListarPedidoAccionComponent implements OnInit {
             {
               border: [true, false, true, true],
               table: {
+                widths: ["*"],
                 body: [
                   [
                     {
                       text: [
                         { text: "SITUACIÓN PROPUESTA", style: "itemsTable_c" },
                       ],
-                      margin: [110, 0, 0, 0],
+                      alignment: 'center',
                     },
                   ],
                   [
@@ -2405,7 +2853,7 @@ export class ListarPedidoAccionComponent implements OnInit {
                   [
                     {
                       border: [true, false, false, true],
-                      margin: [15, -5, 0, 0],
+                      margin: [45, -5, 0, 0],
                       text: [{ text: "f.", style: "itemsTable" }],
                     },
                     {
@@ -2421,10 +2869,9 @@ export class ListarPedidoAccionComponent implements OnInit {
                             },
                           ],
                           [
-                            { 
-                              text: this.empleado_4[0].apellido.toUpperCase() + 
-                                    this.empleado_4[0].nombre.toUpperCase() +
-                                    "\n RESPONSABLE DEL REGISTRO" , 
+                            {
+                              text: `${this.empleado_4[0].apellido.toUpperCase()} ${this.empleado_4[0].nombre.toUpperCase()}
+                                    RESPONSABLE DEL REGISTRO`,
                               style: "itemsTable",
                               alignment: "center",
                             }
@@ -2534,7 +2981,6 @@ export class ListarPedidoAccionComponent implements OnInit {
     };
   }
 
-  //241.6
   PresentarHoja2_Parte_3_1() {
     return {
       table: {
@@ -2582,7 +3028,7 @@ export class ListarPedidoAccionComponent implements OnInit {
                 body: [
                   [
                     {
-                      text:this.datosPedido[0].puesto_reemp.toUpperCase(),
+                      text: this.datosPedido[0].puesto_reemp.toUpperCase(),
                       color: "black",
                       style: "itemsTable"
                     },
@@ -2842,7 +3288,6 @@ export class ListarPedidoAccionComponent implements OnInit {
     };
   }
 
-  //392.6
   PresentarHoja2_Parte_4_1() {
     return {
       table: {
@@ -2881,7 +3326,7 @@ export class ListarPedidoAccionComponent implements OnInit {
                 body: [
                   [
                     {
-                      text: this.empleado_1[0].apellido.toUpperCase() + this.empleado_1[0].nombre.toUpperCase(),
+                      text: `${this.empleado_1[0].apellido.toUpperCase()} ${this.empleado_1[0].nombre.toUpperCase()}`,
                       color: "black",
                       style: "itemsTable",
                     },
@@ -3097,7 +3542,7 @@ export class ListarPedidoAccionComponent implements OnInit {
           [
             {
               border: [true, false, false, true],
-              margin: [35, 30, 0, 0],
+              margin: [70, 30, 0, 0],
               text: [{ text: "f.", style: "itemsTable" }],
             },
             {
@@ -3158,25 +3603,37 @@ export class ListarPedidoAccionComponent implements OnInit {
     };
   }
 
-    /* ****************************************************************************************************
-   *                               PARA LA EXPORTACIÓN DE ARCHIVOS XLSX INDIVIDUAL
-   * ****************************************************************************************************/
+  /** ************************************************************************************************* **
+   ** **                           PARA LA EXPORTACION DE ARCHIVOS XLSX INDIVIDUAL                   ** **
+   ** ************************************************************************************************** **/
 
-  generarExcel(){
+  generarExcel() {
     const workbook = xlsx.utils.book_new();
     const worksheet = xlsx.utils.aoa_to_sheet([]);
+
+    const drawing = {
+      image: {
+        base64: this.logo,
+      },
+      type: 'picture',
+      position: {
+        col: 2, // Columna C
+        row: 1, // Fila 2
+      },
+    };
+
 
     //ESTABLECER TAMAÑO DE LAS COLUMNAS
     const columnas = [
       { width: 5 },
       { width: 3 },
-      { width: 16 },
+      { width: 17 },
       { width: 3 },
       { width: 3 },
       { width: 24 },
       { width: 3 },
       { width: 3 },
-      { width: 16 },
+      { width: 17 },
       { width: 3 },
       { width: 3 },
       { width: 12 },
@@ -3186,7 +3643,7 @@ export class ListarPedidoAccionComponent implements OnInit {
       { width: 3 },
     ];
     worksheet['!cols'] = columnas;
-    
+
     // DEFINE LOS RANGOS DE LAS CELDAS A UNIR
     const mergeRange1 = 'C2:I4';
     const mergeRange2 = 'K2:P2';
@@ -3206,6 +3663,43 @@ export class ListarPedidoAccionComponent implements OnInit {
     const mergeRange16 = 'C13:O13';
     const mergeRange17 = 'D14:O14';
     const mergeRange18 = 'C15:O15';
+    const mergeRange19 = 'C30:H30';
+    const mergeRange20 = 'I30:O30';
+    const mergeRange21 = 'C32:E32';
+    const mergeRange22 = 'F32:G32';
+    const mergeRange23 = 'C34:E34';
+    const mergeRange24 = 'F34:G34';
+    const mergeRange25 = 'C36:E36';
+    const mergeRange26 = 'F36:G36';
+    const mergeRange27 = 'C38:E38';
+    const mergeRange28 = 'F38:G38';
+    const mergeRange29 = 'C40:E40';
+    const mergeRange30 = 'F40:G40';
+    const mergeRange31 = 'C42:E42';
+    const mergeRange32 = 'F42:G42';
+    const mergeRange33 = 'I32:K32';
+    const mergeRange34 = 'L32:O32';
+    const mergeRange35 = 'I34:K34';
+    const mergeRange36 = 'L34:O34';
+    const mergeRange37 = 'I36:K36';
+    const mergeRange38 = 'L36:O36';
+    const mergeRange39 = 'I38:K38';
+    const mergeRange40 = 'L38:O38';
+    const mergeRange41 = 'I40:K40';
+    const mergeRange42 = 'L40:O40';
+    const mergeRange43 = 'I42:K42';
+    const mergeRange44 = 'L42:O42';
+    const mergeRange45 = 'C44:H49';
+    const mergeRange46 = 'I44:O49';
+    const mergeRange47 = 'C50:O56';
+    const mergeRange48 = 'C57:H62';
+    const mergeRange49 = 'I57:O62';
+    const mergeRange50 = 'C63:O66';
+    const mergeRange51 = 'C67:O69';
+    const mergeRange52 = 'C70:O89';
+    const mergeRange53 = 'C90:O106';
+    const mergeRange54 = 'C107:H112';
+    const mergeRange55 = 'I107:O112';
 
     // UNE LAS CELDAS
     const merges = [
@@ -3226,103 +3720,246 @@ export class ListarPedidoAccionComponent implements OnInit {
       { s: xlsx.utils.decode_range(mergeRange15).s, e: xlsx.utils.decode_range(mergeRange15).e },
       { s: xlsx.utils.decode_range(mergeRange16).s, e: xlsx.utils.decode_range(mergeRange16).e },
       { s: xlsx.utils.decode_range(mergeRange17).s, e: xlsx.utils.decode_range(mergeRange17).e },
-      { s: xlsx.utils.decode_range(mergeRange18).s, e: xlsx.utils.decode_range(mergeRange18).e }
+      { s: xlsx.utils.decode_range(mergeRange18).s, e: xlsx.utils.decode_range(mergeRange18).e },
+      { s: xlsx.utils.decode_range(mergeRange19).s, e: xlsx.utils.decode_range(mergeRange19).e },
+      { s: xlsx.utils.decode_range(mergeRange20).s, e: xlsx.utils.decode_range(mergeRange20).e },
+      { s: xlsx.utils.decode_range(mergeRange21).s, e: xlsx.utils.decode_range(mergeRange21).e },
+      { s: xlsx.utils.decode_range(mergeRange22).s, e: xlsx.utils.decode_range(mergeRange22).e },
+      { s: xlsx.utils.decode_range(mergeRange23).s, e: xlsx.utils.decode_range(mergeRange23).e },
+      { s: xlsx.utils.decode_range(mergeRange24).s, e: xlsx.utils.decode_range(mergeRange24).e },
+      { s: xlsx.utils.decode_range(mergeRange25).s, e: xlsx.utils.decode_range(mergeRange25).e },
+      { s: xlsx.utils.decode_range(mergeRange26).s, e: xlsx.utils.decode_range(mergeRange26).e },
+      { s: xlsx.utils.decode_range(mergeRange27).s, e: xlsx.utils.decode_range(mergeRange27).e },
+      { s: xlsx.utils.decode_range(mergeRange28).s, e: xlsx.utils.decode_range(mergeRange28).e },
+      { s: xlsx.utils.decode_range(mergeRange29).s, e: xlsx.utils.decode_range(mergeRange29).e },
+      { s: xlsx.utils.decode_range(mergeRange30).s, e: xlsx.utils.decode_range(mergeRange30).e },
+      { s: xlsx.utils.decode_range(mergeRange31).s, e: xlsx.utils.decode_range(mergeRange31).e },
+      { s: xlsx.utils.decode_range(mergeRange32).s, e: xlsx.utils.decode_range(mergeRange32).e },
+      { s: xlsx.utils.decode_range(mergeRange33).s, e: xlsx.utils.decode_range(mergeRange33).e },
+      { s: xlsx.utils.decode_range(mergeRange34).s, e: xlsx.utils.decode_range(mergeRange34).e },
+      { s: xlsx.utils.decode_range(mergeRange35).s, e: xlsx.utils.decode_range(mergeRange35).e },
+      { s: xlsx.utils.decode_range(mergeRange36).s, e: xlsx.utils.decode_range(mergeRange36).e },
+      { s: xlsx.utils.decode_range(mergeRange37).s, e: xlsx.utils.decode_range(mergeRange37).e },
+      { s: xlsx.utils.decode_range(mergeRange38).s, e: xlsx.utils.decode_range(mergeRange38).e },
+      { s: xlsx.utils.decode_range(mergeRange39).s, e: xlsx.utils.decode_range(mergeRange39).e },
+      { s: xlsx.utils.decode_range(mergeRange40).s, e: xlsx.utils.decode_range(mergeRange40).e },
+      { s: xlsx.utils.decode_range(mergeRange41).s, e: xlsx.utils.decode_range(mergeRange41).e },
+      { s: xlsx.utils.decode_range(mergeRange42).s, e: xlsx.utils.decode_range(mergeRange42).e },
+      { s: xlsx.utils.decode_range(mergeRange43).s, e: xlsx.utils.decode_range(mergeRange43).e },
+      { s: xlsx.utils.decode_range(mergeRange44).s, e: xlsx.utils.decode_range(mergeRange44).e },
+      { s: xlsx.utils.decode_range(mergeRange45).s, e: xlsx.utils.decode_range(mergeRange45).e },
+      { s: xlsx.utils.decode_range(mergeRange46).s, e: xlsx.utils.decode_range(mergeRange46).e },
+      { s: xlsx.utils.decode_range(mergeRange47).s, e: xlsx.utils.decode_range(mergeRange47).e },
+      { s: xlsx.utils.decode_range(mergeRange48).s, e: xlsx.utils.decode_range(mergeRange48).e },
+      { s: xlsx.utils.decode_range(mergeRange49).s, e: xlsx.utils.decode_range(mergeRange49).e },
+      { s: xlsx.utils.decode_range(mergeRange50).s, e: xlsx.utils.decode_range(mergeRange50).e },
+      { s: xlsx.utils.decode_range(mergeRange51).s, e: xlsx.utils.decode_range(mergeRange51).e },
+      { s: xlsx.utils.decode_range(mergeRange52).s, e: xlsx.utils.decode_range(mergeRange52).e },
+      { s: xlsx.utils.decode_range(mergeRange53).s, e: xlsx.utils.decode_range(mergeRange53).e },
+      { s: xlsx.utils.decode_range(mergeRange54).s, e: xlsx.utils.decode_range(mergeRange54).e },
+      { s: xlsx.utils.decode_range(mergeRange55).s, e: xlsx.utils.decode_range(mergeRange55).e },
     ];
 
     worksheet['!merges'] = merges;
 
 
-    //VARIABLES AUXILIARES PARA LOS DATOS
+    // VARIABLES AUXILIARES PARA LOS DATOS
     let fecha1 = moment(this.datosPedido[0].fec_creacion).format(
       "DD MMMM YYYY");
     let fecha2 = moment(this.datosPedido[0].fec_rige_desde).format(
       "dddd DD MMMM YYYY");
+    let fecha3 = moment(this.datosPedido[0].fec_act_final_concurso).format("DD MMMM YYYY");
+    let fecha4 = moment(this.datosPedido[0].fec_creacion).format("DD MMMM YYYY");
+    let fecha5 = moment(this.datosPedido[0].primera_fecha_reemp).format("DD MMMM YYYY");
     let nombreEmpleado = this.empleado_1[0].nombre.toUpperCase();
     let apellidoEmpleado = this.empleado_1[0].apellido.toUpperCase();
 
-    //AGREGA LOS DATOS A LAS CELDAS CORRESPONDIENTES
-    xlsx.utils.sheet_add_aoa(worksheet, [['ACCIÓN DE PERSONAL']], {origin: 'K2'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['N°']], {origin: 'L3'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.datosPedido[0].identi_accion_p]], {origin: 'N3'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['FECHA:']], {origin: 'L4'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[fecha1]], {origin: 'N4'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['DECRETO:']], {origin: 'C5'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.decreto[0]]], {origin: 'D5'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['ACUERDO:']], {origin: 'F5'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.decreto[1]]], {origin: 'G5'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['RESOLUCIÓN:']], {origin: 'I5'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.decreto[2]]], {origin: 'J5'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['OTRO:']], {origin: 'L5'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.decreto[3]]], {origin: 'O5'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['N°']], {origin: 'E7'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['FECHA:']], {origin: 'I7'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[apellidoEmpleado]], {origin: 'C9'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['APELLIDO']], {origin: 'C10'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[nombreEmpleado]], {origin: 'I9'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['NOMBRE']], {origin: 'I10'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['N°. de cédula de ciudadanía']], {origin: 'C11'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.empleado_1[0].cedula]], {origin: 'C11'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['N°. de afiliación IESS']], {origin: 'G11'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['Rige a partir de:']], {origin: 'L11'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[fecha2]], {origin: 'L11'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['EXPLICACIÓN:']], {origin: 'C13'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['BASE LEGAL:']], {origin: 'C14'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.datosPedido[0].base_legal]], {origin: 'D14'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.datosPedido[0].adicion_legal]], {origin: 'C15'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['INGRESO:']], {origin: 'C18'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[0]]], {origin: 'D18'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['NOMBRAMIENTO:']], {origin: 'C20'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[1]]], {origin: 'D20'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['ASCENSO:']], {origin: 'C22'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[2]]], {origin: 'D22'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['SUBROGACIÓN:']], {origin: 'C24'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[3]]], {origin: 'D24'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['ENCARGO:']], {origin: 'C26'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[4]]], {origin: 'D26'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['VACACIONES:']], {origin: 'C28'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[5]]], {origin: 'D28'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['TRASLADO:']], {origin: 'F18'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[6]]], {origin: 'G18'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['TRASPASO:']], {origin: 'F20'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[7]]], {origin: 'G20'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['CAMBIO ADMINISTRATIVO:']], {origin: 'F22'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[8]]], {origin: 'G22'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['INTERCAMBIO:']], {origin: 'F24'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[9]]], {origin: 'G24'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['COMISIÓN DE SERVICIOS:']], {origin: 'F26'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[10]]], {origin: 'G26'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['LICENCIA:']], {origin: 'F28'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[11]]], {origin: 'G28'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['REVALORIZACIÓN:']], {origin: 'I18'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[12]]], {origin: 'J18'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['RECLASIFICACIÓN:']], {origin: 'I20'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[13]]], {origin: 'J20'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['UBICACIÓN:']], {origin: 'I22'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[14]]], {origin: 'J22'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['REINTREGO:']], {origin: 'I24'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[15]]], {origin: 'J24'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['REINSTITUCIONAL:']], {origin: 'I26'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[16]]], {origin: 'J26'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['RENUNCIA:']], {origin: 'I28'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[17]]], {origin: 'J28'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['SUPRESION:']], {origin: 'L18'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[18]]], {origin: 'M18'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['DESTITUCION:']], {origin: 'L20'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[19]]], {origin: 'M20'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['REMOCION:']], {origin: 'L22'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[20]]], {origin: 'M22'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['JUBILACION:']], {origin: 'L24'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[21]]], {origin: 'M24'});
-    xlsx.utils.sheet_add_aoa(worksheet, [['OTRO:']], {origin: 'L26'});
-    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[22]]], {origin: 'O26'});
-    
-    // Agrega la hoja de trabajo al libro y descarga el archivo
+    // AGREGA LOS DATOS A LAS CELDAS CORRESPONDIENTES
+    worksheet['!drawing'] = [drawing];
+    xlsx.utils.sheet_add_aoa(worksheet, [['ACCIÓN DE PERSONAL']], { origin: 'K2' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['N°']], { origin: 'L3' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.datosPedido[0].identi_accion_p]], { origin: 'N3' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['FECHA:']], { origin: 'L4' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[fecha1]], { origin: 'N4' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['DECRETO:']], { origin: 'C5' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.decreto[0]]], { origin: 'D5' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['ACUERDO:']], { origin: 'F5' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.decreto[1]]], { origin: 'G5' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['RESOLUCIÓN:']], { origin: 'I5' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.decreto[2]]], { origin: 'J5' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['OTRO:']], { origin: 'L5' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.decreto[3]]], { origin: 'O5' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['N°']], { origin: 'E7' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['FECHA:']], { origin: 'I7' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[apellidoEmpleado]], { origin: 'C9' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['APELLIDO']], { origin: 'C10' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[nombreEmpleado]], { origin: 'I9' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['NOMBRE']], { origin: 'I10' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['N°. de cédula de ciudadanía']], { origin: 'C11' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.empleado_1[0].cedula]], { origin: 'C12' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['N°. de afiliación IESS']], { origin: 'G11' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['Rige a partir de:']], { origin: 'L11' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[fecha2]], { origin: 'L12' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['EXPLICACIÓN:']], { origin: 'C13' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['BASE LEGAL:']], { origin: 'C14' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.datosPedido[0].base_legal]], { origin: 'D14' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.datosPedido[0].adicion_legal]], { origin: 'C15' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['INGRESO:']], { origin: 'C18' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[0]]], { origin: 'D18' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['NOMBRAMIENTO:']], { origin: 'C20' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[1]]], { origin: 'D20' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['ASCENSO:']], { origin: 'C22' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[2]]], { origin: 'D22' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['SUBROGACIÓN:']], { origin: 'C24' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[3]]], { origin: 'D24' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['ENCARGO:']], { origin: 'C26' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[4]]], { origin: 'D26' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['VACACIONES:']], { origin: 'C28' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[5]]], { origin: 'D28' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['TRASLADO:']], { origin: 'F18' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[6]]], { origin: 'G18' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['TRASPASO:']], { origin: 'F20' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[7]]], { origin: 'G20' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['CAMBIO ADMINISTRATIVO:']], { origin: 'F22' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[8]]], { origin: 'G22' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['INTERCAMBIO:']], { origin: 'F24' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[9]]], { origin: 'G24' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['COMISIÓN DE SERVICIOS:']], { origin: 'F26' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[10]]], { origin: 'G26' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['LICENCIA:']], { origin: 'F28' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[11]]], { origin: 'G28' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['REVALORIZACIÓN:']], { origin: 'I18' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[12]]], { origin: 'J18' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['RECLASIFICACIÓN:']], { origin: 'I20' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[13]]], { origin: 'J20' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['UBICACIÓN:']], { origin: 'I22' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[14]]], { origin: 'J22' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['REINTREGO:']], { origin: 'I24' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[15]]], { origin: 'J24' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['REINSTITUCIONAL:']], { origin: 'I26' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[16]]], { origin: 'J26' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['RENUNCIA:']], { origin: 'I28' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[17]]], { origin: 'J28' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['SUPRESION:']], { origin: 'L18' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[18]]], { origin: 'M18' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['DESTITUCION:']], { origin: 'L20' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[19]]], { origin: 'M20' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['REMOCION:']], { origin: 'L22' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[20]]], { origin: 'M22' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['JUBILACION:']], { origin: 'L24' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[21]]], { origin: 'M24' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['OTRO:']], { origin: 'L26' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.tipoAccion[22]]], { origin: 'O26' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['SITUACIÓN ACTUAL']], { origin: 'C30' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['SITUACIÓN PROPUESTA']], { origin: 'I30' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['PROCESO:']], { origin: 'C32' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.proceso_padre_a]], { origin: 'F32' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['SUBPROCESO:']], { origin: 'C34' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.nombre_procesos_a]], { origin: 'F34' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['PUESTO:']], { origin: 'C36' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.empleado_1[0].cargo.toUpperCase()]], { origin: 'F36' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['LUGAR DE TRABAJO:']], { origin: 'C38' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.empresa[0].nombre.toUpperCase()]], { origin: 'F38' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['REMUNERACIÓN MENSUAL:']], { origin: 'C40' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.empleado_1[0].sueldo]], { origin: 'F40' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['PARTIDA PRESUPUESTARIA:']], { origin: 'C42' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.datosPedido[0].num_partida]], { origin: 'F42' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['PROCESO:']], { origin: 'I32' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.proceso_padre_p]], { origin: 'L32' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['SUBPROCESO:']], { origin: 'I34' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.nombre_procesos_p]], { origin: 'L34' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['PUESTO:']], { origin: 'I36' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.cargo_propuesto.toUpperCase()]], { origin: 'L36' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['LUGAR DE TRABAJO:']], { origin: 'I38' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.empresa[0].nombre.toUpperCase()]], { origin: 'L38' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['REMUNERACIÓN MENSUAL:']], { origin: 'I40' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.datosPedido[0].salario_propuesto]], { origin: 'L40' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['PARTIDA PRESUPUESTARIA:']], { origin: 'I42' });
+    xlsx.utils.sheet_add_aoa(worksheet, [[this.datosPedido[0].num_partida_propuesta]], { origin: 'L42' });
+    xlsx.utils.sheet_add_aoa(worksheet,
+      [[
+        `ACTA FINAL DEL CONCURSO\n\n
+        No. ${this.datosPedido[0].act_final_concurso}   Fecha: ${fecha3}\n\n\n
+        `
+      ]], { origin: 'C44' });
+    xlsx.utils.sheet_add_aoa(worksheet,
+      [[
+        `PROCESOS DE RECURSOS HUMANOS\n\n
+        f. __________________________________________________\n
+        ${this.datosPedido[0].abrev_empl_uno.toUpperCase()} ${this.empleado_2[0].nombre.toUpperCase()} ${this.empleado_2[0].apellido.toUpperCase()}\n
+        ${this.empleado_2[0].cargo.toUpperCase()}\n
+        ${this.empleado_2[0].departamento.toUpperCase()}
+        `
+      ]], { origin: 'I44' });
+    xlsx.utils.sheet_add_aoa(worksheet,
+      [[
+        `DIOS, PATRIA Y LIBERTAD\n\n
+        f. _____________________________________________________\n
+        ${this.datosPedido[0].abrev_empl_dos.toUpperCase()} ${this.empleado_3[0].nombre.toUpperCase()} ${this.empleado_3[0].apellido.toUpperCase()}\n
+        ${this.empleado_3[0].cargo.toUpperCase()}\n
+        ${this.empleado_3[0].departamento.toUpperCase()}
+        `
+      ]], { origin: 'C50' });
+    xlsx.utils.sheet_add_aoa(worksheet,
+      [[
+        `RECURSOS HUMANOS\n\n
+        No. ${this.datosPedido[0].identi_accion_p}  Fecha: ${fecha4}\n\n\n
+        `
+      ]], { origin: 'C57' });
+    xlsx.utils.sheet_add_aoa(worksheet,
+      [[
+        `REGISTRO Y CONTROL\n\n
+        f. __________________________________________________\n
+        ${this.empleado_4[0].apellido.toUpperCase()} ${this.empleado_4[0].nombre.toUpperCase()}\n
+        RESPONSABLE DEL REGISTRO
+        `
+      ]], { origin: 'I57' });
+    xlsx.utils.sheet_add_aoa(worksheet,
+      [[
+        `CAUCIÓN REGISTRADA CON No. __________________________________         FECHA:  ____________________________\n\n
+        `
+      ]], { origin: 'C63' });
+
+    xlsx.utils.sheet_add_aoa(worksheet,
+      [[
+        `\n\n
+        LA PERSONA REEMPLAZA A:  ${this.datosPedido[0].nombre_reemp.toUpperCase()}       EN EL PUESTO DE:  ${this.datosPedido[0].puesto_reemp.toUpperCase()}\n
+        QUIEN CESE EN FUNCIONES POR:   ___________________________________________________________________________\n
+        ACCIÓN DE PERSONAL REGISTRADA CON No.   ${this.datosPedido[0].num_accion_reemp}   FECHA:
+        ${fecha5}\n\n\n\n\n
+        FILIACIÓN AL COLEGIO DE PROFESIONALES DE:   _______________________________________________________________\n\n\n\n\n
+        No. ____________________________________________                   FECHA:   _________________________________________\n\n\n\n
+        `
+      ]], { origin: 'C70' });
+    xlsx.utils.sheet_add_aoa(worksheet,
+      [[
+        `POSESIÓN DEL CARGO\n\n
+        YO ${this.empleado_1[0].apellido.toUpperCase()} ${this.empleado_1[0].nombre.toUpperCase()}     CON CÉDULA DE CIUDADANÍA No. 
+        ${this.empleado_1[0].cedula.toUpperCase()}\n
+        JURO LEALTAD AL ESTADO ECUATORIANO.\n\n\n
+        LUGAR:  ___________________________________\n\n
+        FECHA:  ___________________________________\n\n\n\n\n\n
+        `
+      ]], { origin: 'C90' });
+    xlsx.utils.sheet_add_aoa(worksheet,
+      [[
+        `f. ______________________________________\n
+        Funcionario\n\n 
+        `
+      ]], { origin: 'C107' });
+    xlsx.utils.sheet_add_aoa(worksheet,
+      [[
+        `f. ______________________________________\n
+        Responsable de Recursos Humanos\n\n
+        `
+      ]], { origin: 'I107' });
+    // AGREGA LA HOJA DE TRABAJO AL LIBRO Y DESCARGA EL ARCHIVO
     xlsx.utils.book_append_sheet(workbook, worksheet, 'Hoja 1');
-    xlsx.writeFile(workbook, 'ejemplo.xlsx');
+    xlsx.writeFile(workbook, 'accionDePersonal.xlsx');
 
   }
-  
 
+  // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
     this.codigo.reset();
     this.cedula.reset();
@@ -3330,57 +3967,17 @@ export class ListarPedidoAccionComponent implements OnInit {
     this.apellido.reset();
   }
 
-  IngresarSoloLetras(e) {
-    let key = e.keyCode || e.which;
-    let tecla = String.fromCharCode(key).toString();
-    //Se define todo el abecedario que se va a usar.
-    let letras =
-      " áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-    //Es la validación del KeyCodes, que teclas recibe el campo de texto.
-    let especiales = [8, 37, 39, 46, 6, 13];
-    let tecla_especial = false;
-    for (var i in especiales) {
-      if (key == especiales[i]) {
-        tecla_especial = true;
-        break;
-      }
-    }
-    if (letras.indexOf(tecla) == -1 && !tecla_especial) {
-      this.toastr.info("No se admite datos numéricos", "Usar solo letras", {
-        timeOut: 6000,
-      });
-      return false;
-    }
+  // METODO PARA VALIDAR INGRESO DE NUMEROS
+  IngresarSoloLetras(e: any) {
+    return this.validar.IngresarSoloLetras(e);
   }
 
-  IngresarSoloNumeros(evt) {
-    if (window.event) {
-      var keynum = evt.keyCode;
-    } else {
-      keynum = evt.which;
-    }
-    // Comprobamos si se encuentra en el rango numérico y que teclas no recibirá.
-    if (
-      (keynum > 47 && keynum < 58) ||
-      keynum == 8 ||
-      keynum == 13 ||
-      keynum == 6
-    ) {
-      return true;
-    } else {
-      this.toastr.info(
-        "No se admite el ingreso de letras",
-        "Usar solo números",
-        {
-          timeOut: 6000,
-        }
-      );
-      return false;
-    }
+  IngresarSoloNumeros(evt: any) {
+    return this.validar.IngresarSoloNumeros(evt);
   }
 
   /** ************************************************************************************************* **
-   ** **        MÉTODOS PARA GENERAR REPORTES DE LA LISTA DE PEDIDOS DE ACCIONES DE PERSONAL         ** **
+   ** **        METODOS PARA GENERAR REPORTES DE LA LISTA DE PEDIDOS DE ACCIONES DE PERSONAL         ** **
    ** ************************************************************************************************* **/
 
   /** ************************************************************************************************* **
@@ -3408,7 +4005,7 @@ export class ListarPedidoAccionComponent implements OnInit {
   GetDocumentDefinicion() {
     sessionStorage.setItem("Pedidos", this.listaPedidos);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: "landscape",
       watermark: {
         text: this.frase,
@@ -3428,7 +4025,7 @@ export class ListarPedidoAccionComponent implements OnInit {
         opacity: 0.3,
         alignment: "right",
       },
-      // PIE DE PÁGINA
+      // PIE DE PAGINA
       footer: function (
         currentPage: any,
         pageCount: any,

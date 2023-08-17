@@ -146,7 +146,7 @@ export class MainNavComponent implements OnInit {
     var f = moment();
     let hora: number = parseInt(moment(f).format('HH'));
     let fecha: string = moment(f).format('YYYY-MM-DD');
-    console.log('HORAS ',hora, ' fechas ', fecha)
+    console.log('HORAS ', hora, ' fechas ', fecha)
 
   }
 
@@ -224,9 +224,9 @@ export class MainNavComponent implements OnInit {
             subtitulo: true,
             icono: 'widgets',
             children: [
-              { name: nombre, url: '/vistaEmpresa/' + localStorage.getItem('empresa') as string, color: true },
+              { name: nombre, url: '/vistaEmpresa', color: true },
               { name: 'Parámetros', url: '/parametros', color: true },
-              { name: 'Correo', url: '/configurarCorreo/' + localStorage.getItem('empresa') as string, color: true },
+              { name: 'Correo', url: '/configurarCorreo', color: true },
               { name: 'Roles', url: '/roles', color: true },
               { name: 'Régimen Laboral', url: '/listarRegimen', color: true },
             ]
@@ -293,7 +293,7 @@ export class MainNavComponent implements OnInit {
             children: [
               { name: 'Configurar Permisos', url: '/verTipoPermiso', color: true },
               { name: 'Permisos Múltiples', url: '/permisosMultiples', color: true },
-              { name: 'Aprobación Múltiple P', url: '/permisos-solicitados', color: true },
+              { name: 'Aprobación Múltiple P.', url: '/permisos-solicitados', color: true },
             ]
           },
           {
@@ -313,7 +313,7 @@ export class MainNavComponent implements OnInit {
             subtitulo: true,
             color: true,
             children: [
-              { name: 'Aprobación Múltiple V', url: '/vacaciones-solicitados', color: true },
+              { name: 'Aprobación Múltiple V.', url: '/vacaciones-solicitados', color: true },
             ]
           },
           {
@@ -336,7 +336,7 @@ export class MainNavComponent implements OnInit {
               { name: 'Configurar HoraExtra', url: '/listaHorasExtras', color: true },
               { name: 'Planificar Hora Extra', url: '/planificaHoraExtra', color: true },
               { name: 'Listar Planificación', url: '/listadoPlanificaciones', color: true },
-              { name: 'Aprobación Múltiple H', url: '/horas-extras-solicitadas', color: true },
+              { name: 'Aprobación Múltiple HE.', url: '/horas-extras-solicitadas', color: true },
             ]
           },
           {
@@ -356,9 +356,10 @@ export class MainNavComponent implements OnInit {
             icono: 'local_dining',
             color: true,
             children: [
+              { name: 'Configurar comidas', url: '/listarTipoComidas', color: true },
               { name: 'Planificar Servicio', url: '/alimentacion', color: true },
               { name: 'Listar Planificación', url: '/listaPlanComida', color: true },
-              { name: 'Aprobación Múltiple A', url: '/listaSolicitaComida', color: true },
+              { name: 'Aprobación Múltiple A.', url: '/listaSolicitaComida', color: true },
             ]
           },
           {

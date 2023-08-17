@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { QueryResult } from "pg";
 import fs from 'fs';
 import pool from '../../database';
 const builder = require('xmlbuilder');
@@ -25,10 +26,24 @@ class HorasExtrasControlador {
     }
   }
 
-  public async CrearHoraExtra(req: Request, res: Response): Promise<void> {
-    const { descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion } = req.body;
-    await pool.query('INSERT INTO cg_hora_extras ( descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)', [descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion]);
-    res.jsonp({ message: 'Hora extra guardada' });
+  public async CrearHoraExtra(req: Request, res: Response) {
+    const { descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo,
+      incl_almuerzo, tipo_funcion } = req.body;
+    const response: QueryResult = await pool.query(
+      `
+      INSERT INTO cg_hora_extras ( descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, 
+        tipo_dia, codigo, incl_almuerzo, tipo_funcion ) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *
+      `
+      , [descripcion, tipo_descuento, reca_porcentaje, hora_inicio, hora_final, hora_jornada, tipo_dia, codigo, incl_almuerzo, tipo_funcion]);
+
+    const [HORA] = response.rows;
+
+    if (HORA) {
+      return res.status(200).jsonp(HORA);
+    } else {
+      return res.status(404).jsonp({ message: "error" });
+    }
   }
 
   public async EliminarRegistros(req: Request, res: Response): Promise<void> {

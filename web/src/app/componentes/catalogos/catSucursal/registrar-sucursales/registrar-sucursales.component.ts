@@ -226,10 +226,10 @@ export class RegistrarSucursalesComponent implements OnInit {
         };
         this.restSucursal.RegistrarSucursal(sucursal).subscribe(info => {
           this.habilitarprogress = false;
-          this.toastr.success('Operación Exitosa.', 'Registro guardado.', {
+          this.toastr.success('Operación exitosa.', 'Registro guardado.', {
             timeOut: 6000,
           });
-          this.ventana.close();
+          this.ventana.close(info.id);
         });
       })
     }

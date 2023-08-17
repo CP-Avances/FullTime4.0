@@ -204,7 +204,7 @@ export class EditarCargoComponent implements OnInit {
       this.restEmplCargos.ActualizarContratoEmpleado(this.idSelectCargo, this.id_empl_contrato, cargo).subscribe(res => {
         this.verEmpleado.ObtenerCargoEmpleado(this.idSelectCargo, this.verEmpleado.formato_fecha);
         this.Cancelar();
-        this.toastr.success('Operación Exitosa.', 'Registro actualizado.', {
+        this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
           timeOut: 6000,
         });
       });
@@ -248,7 +248,7 @@ export class EditarCargoComponent implements OnInit {
         this.restEmplCargos.ActualizarContratoEmpleado(this.idSelectCargo, this.id_empl_contrato, datos).subscribe(res => {
           this.verEmpleado.ObtenerCargoEmpleado(this.idSelectCargo, this.verEmpleado.formato_fecha);
           this.Cancelar();
-          this.toastr.success('Operación Exitosa.', 'Registro actualizado.', {
+          this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
             timeOut: 6000,
           });
         });
@@ -278,7 +278,7 @@ export class EditarCargoComponent implements OnInit {
     else {
       keynum = evt.which;
     }
-    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMÉRICO Y QUE TECLAS NO RECIBIRÁ.
+    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
     if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6 || keynum == 58) {
       return true;
     }

@@ -76,11 +76,14 @@ export class RealTimeService {
     return this.http.get(`${environment.url}/noti-real-time/receives/${id_empleado}`);
   }
 
+  // METODO PARA ENVIO DE CORREO MULTIPLE
+  EnviarCorreoMultiple(datos: any) {
+    console.log('datos: ',datos);
+    return this.http.post<any>(`${environment.url}/noti-real-time/mail-multiple`, datos);
+  }
 
 
-
-
-
+  
 
 
 

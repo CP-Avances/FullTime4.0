@@ -477,11 +477,14 @@ export const GraficaHorasExtras = async function (id_empresa: number, fec_inicio
 }
 
 export const GraficaJornada_VS_HorasExtras = async function (id_empresa: number, fec_inicio: Date, fec_final: Date) {
+  
     // console.log('ingreso a jornada ',id_empresa, fec_inicio, fec_final);
     
     /**
      * Para Horas Extras
      */
+
+    /*
     let horas_extras = await M_graficas.HoraExtra_ModelarDatos(fec_inicio, fec_final)
     
     let modelarAnio = {
@@ -553,6 +556,9 @@ export const GraficaJornada_VS_HorasExtras = async function (id_empresa: number,
     /**
      * Para tiempo de joranda
      */
+
+
+    /*
     let timbres = await M_graficas.BuscarTimbresEoSModelado(fec_inicio.toJSON().split('T')[0], fec_final.toJSON().split('T')[0])
 
     let nuevo = timbres.filter(obj => {
@@ -677,7 +683,9 @@ export const GraficaJornada_VS_HorasExtras = async function (id_empresa: number,
                 }
             }
         }
-    } 
+    }
+    
+    */
 }
 
 export const GraficaJ_VS_H_E_SinAcciones = async function (id_empresa: number, fec_inicio: Date, fec_final: Date) {
@@ -686,6 +694,8 @@ export const GraficaJ_VS_H_E_SinAcciones = async function (id_empresa: number, f
     /**
      * Para Horas Extras
      */
+
+    /*
     let horas_extras = await M_graficas.HoraExtra_ModelarDatos(fec_inicio, fec_final)
     
     let modelarAnio = {
@@ -757,6 +767,9 @@ export const GraficaJ_VS_H_E_SinAcciones = async function (id_empresa: number, f
     /**
      * Para Jornada
      */
+
+
+    /*
     let timbres = await M_graficas.BuscarTimbresEntradaSinAccionModelado(fec_inicio.toJSON().split('T')[0], fec_final.toJSON().split('T')[0])
     
     let modelarAnioTiempoJornada = {
@@ -856,6 +869,7 @@ export const GraficaJ_VS_H_E_SinAcciones = async function (id_empresa: number, f
             }
         }
     } 
+    */
 }
 
 export const GraficaT_Jor_VS_HorExtTimbresSinAcciones = async function (id_empresa: number, fec_inicio: Date, fec_final: Date) {
@@ -864,6 +878,9 @@ export const GraficaT_Jor_VS_HorExtTimbresSinAcciones = async function (id_empre
     /**
      * Para Horas Extras
      */
+
+
+    /*
     let horas_extras = await M_graficas.HoraExtra_ModelarDatos(fec_inicio, fec_final)
     
     let modelarAnio = {
@@ -935,6 +952,9 @@ export const GraficaT_Jor_VS_HorExtTimbresSinAcciones = async function (id_empre
     /**
      * Para tiempo de joranda
      */
+
+
+    /*
     let timbres = await M_graficas.BuscarTimbresEntradaSinAccionModelado(fec_inicio.toJSON().split('T')[0], fec_final.toJSON().split('T')[0])
 
     
@@ -1041,6 +1061,8 @@ export const GraficaT_Jor_VS_HorExtTimbresSinAcciones = async function (id_empre
             ]
         }
     } 
+
+    */
 }
 
 export const GraficaTiempoJornada_VS_HorasExtras = async function (id_empresa: number, fec_inicio: Date, fec_final: Date) {
@@ -1049,6 +1071,9 @@ export const GraficaTiempoJornada_VS_HorasExtras = async function (id_empresa: n
     /**
      * Para Horas Extras
      */
+
+
+    /*
     let horas_extras = await M_graficas.HoraExtra_ModelarDatos(fec_inicio, fec_final)
     
     let modelarAnio = {
@@ -1120,6 +1145,9 @@ export const GraficaTiempoJornada_VS_HorasExtras = async function (id_empresa: n
     /**
      * Para tiempo de joranda
      */
+
+
+    /*
     let timbres = await M_graficas.BuscarTimbresEoSModelado(fec_inicio.toJSON().split('T')[0], fec_final.toJSON().split('T')[0])
 
     let nuevo = timbres.filter(obj => {
@@ -1243,10 +1271,15 @@ export const GraficaTiempoJornada_VS_HorasExtras = async function (id_empresa: n
                 {type: 'bar'}
             ]
         }
-    } 
+    }
+    
+    */
 }
 
 export const GraficaMarcaciones = async function (id_empresa: number, fec_inicio: Date, fec_final: Date) {
+   
+   
+   /*
     // console.log(id_empresa, fec_inicio, fec_final);
     let timbres = await M_graficas.BuscarTimbresByFecha(fec_inicio.toJSON().split('T')[0], fec_final.toJSON().split('T')[0])
     // console.log('==========================================');
@@ -1338,9 +1371,13 @@ export const GraficaMarcaciones = async function (id_empresa: number, fec_inicio
             }],
         }  
     } 
+    */
 }
 
 export const GraficaSalidasAnticipadas = async function (id_empresa: number, fec_inicio: Date, fec_final: Date) {
+ 
+ 
+ /*
     // console.log(id_empresa, fec_inicio, fec_final);
     let timbres = await M_graficas.ModelarSalidasAnticipadas(fec_inicio.toJSON().split('T')[0], fec_final.toJSON().split('T')[0])
     // console.log(timbres);    
@@ -1430,9 +1467,14 @@ export const GraficaSalidasAnticipadas = async function (id_empresa: number, fec
             }]
         }   
     }  
+
+    */
 }
 
 export const GraficaSalidasAnticipadasSinAcciones = async function (id_empresa: number, fec_inicio: Date, fec_final: Date) {
+ 
+ 
+ /*
     // console.log(id_empresa, fec_inicio, fec_final);
     let timbres = await M_graficas.ModelarSalidasAnticipadasSinAcciones(fec_inicio.toJSON().split('T')[0], fec_final.toJSON().split('T')[0])
     // console.log(timbres);    
@@ -1525,6 +1567,7 @@ export const GraficaSalidasAnticipadasSinAcciones = async function (id_empresa: 
             }]
         }   
     }  
+    */
 }
 
 /**
@@ -1534,6 +1577,9 @@ export const GraficaSalidasAnticipadasSinAcciones = async function (id_empresa: 
  */
 
 export const MetricaHorasExtraEmpleado = async function (codigo: number | string, id_empleado: number, fec_inicio: Date, fec_final: Date) {
+ 
+ 
+ /*
     // console.log(codigo, id_empleado, fec_inicio, fec_final);
     let horas_extras = await M_graficas.Empleado_HoraExtra_ModelarDatos(codigo, fec_inicio, fec_final)
     
@@ -1827,9 +1873,13 @@ export const MetricaPermisosEmpleado = async function (codigo: number | string, 
             }]
         },
     }
+    */
 }
 
 export const MetricaAtrasosEmpleado = async function (codigo: number | string, id_empleado: number, fec_inicio: Date, fec_final: Date) {
+    
+    
+    /*
     // console.log(id_empleado, fec_inicio, fec_final);
     
     // console.log(codigo, id_empleado, fec_inicio, fec_final);
@@ -1929,9 +1979,14 @@ export const MetricaAtrasosEmpleado = async function (codigo: number | string, i
             }]
         },
     } 
+
+    */
 }
 
 export const MetricaAtrasosEmpleadoSinAcciones = async function (codigo: number | string, id_empleado: number, fec_inicio: Date, fec_final: Date) {
+ 
+ /*
+ 
     // console.log(id_empleado, fec_inicio, fec_final);
     
     let atrasos = await M_graficas.Empleado_Atrasos_ModelarDatos_SinAcciones(codigo, fec_inicio, fec_final)
@@ -2032,5 +2087,7 @@ export const MetricaAtrasosEmpleadoSinAcciones = async function (codigo: number 
                 name: 'Atrasos'
             }]
         },
+        
     }   
+*/
 }

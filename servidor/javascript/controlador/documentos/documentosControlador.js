@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DOCUMENTOS_CONTROLADOR = exports.carpeta = void 0;
 const listarArchivos_1 = require("../../libs/listarArchivos");
 const database_1 = __importDefault(require("../../database"));
+const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 class DocumentosControlador {
     // METODO PARA MOSTRAR LISTA DE CARPETAS DEL SERVIDOR
@@ -76,24 +77,23 @@ class DocumentosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             let { id, documento } = req.params;
             yield database_1.default.query(`
-                DELETE FROM documentacion WHERE id = $1
-                `, [id]);
-            let filePath = `servidor\\documentacion\\${documento}`;
+            DELETE FROM documentacion WHERE id = $1
+            `, [id]);
+            let separador = path_1.default.sep;
+            let filePath = `servidor${separador}documentacion${separador}${documento}`;
             let direccionCompleta = __dirname.split("servidor")[0] + filePath;
             fs_1.default.unlinkSync(direccionCompleta);
             res.jsonp({ message: 'Registro eliminado.' });
         });
     }
-    // METODO PARA REGISTRAR UN DOCUMENTO
+    // METODO PARA REGISTRAR UN DOCUMENTO    --**VERIFICADO
     CrearDocumento(req, res) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            let list = req.files;
-            let documento = list.uploads[0].path.split("\\")[1];
-            console.log('ver path ... ', list.uploads[0].path);
-            let { doc_nombre } = req.params;
+            let documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
             yield database_1.default.query(`
-            INSERT INTO documentacion (documento, doc_nombre) VALUES ($1, $2)
-            `, [documento, doc_nombre]);
+            INSERT INTO documentacion (documento) VALUES ($1)
+            `, [documento]);
             res.jsonp({ message: 'Registro guardado.' });
         });
     }

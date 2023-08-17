@@ -14,61 +14,74 @@
                     Guardar.
                 </span>
             </div>
-            <div class="d-flex flex-wrap justify-content-between">
-                <mat-form-field>
-                    <mat-label>Seleccionar continente</mat-label>
-                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                        matTooltip="Lista de continentes registrados en el sistema.">
-                        help_outline</mat-icon>
-                    <mat-select [formControl]="nombreContinenteF" required>
-                        <mat-option *ngFor="let c of continentes" [value]="c.continente"
-                            (click)="FiltrarPaises(formulario.value)">
-                            {{c.continente}}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <mat-form-field>
-                    <input type="text" placeholder="Seleccionar país" aria-label="Number" matInput
-                        [formControl]="nombrePaisF" [matAutocomplete]="auto" required [readonly]="ver_pais">
-                    <mat-autocomplete #auto="matAutocomplete">
-                        <mat-option *ngFor="let option of filteredOptions | async" [value]="option.nombre"
-                            (click)="FiltrarProvincias(formulario.value)">
-                            {{option.nombre}}
-                        </mat-option>
-                    </mat-autocomplete>
-                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                        matTooltip="Lista de paises ubicados en el continente seleccionado.">
-                        help_outline
-                    </mat-icon>
-                </mat-form-field>
-                <mat-form-field>
-                    <input type="text" placeholder="Seleccionar provincia" aria-label="Number" matInput
-                        [formControl]="idProvinciaF" [matAutocomplete]="auto1" required [readonly]="ver_provincia">
-                    <mat-autocomplete #auto1="matAutocomplete">
-                        <mat-option *ngFor="let option of filteredOpt | async" [value]="option.nombre"
-                            (click)="FiltrarCiudades(formulario.value)">
-                            {{option.nombre}}
-                        </mat-option>
-                    </mat-autocomplete>
-                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                        matTooltip="Lista de provincias, departamentos o estados ubicados en el país seleccionado.">
-                        help_outline
-                    </mat-icon>
-                </mat-form-field>
-                <mat-form-field>
-                    <mat-label>Ingresar ciudad</mat-label>
-                    <input matInput placeholder="Ej: Quito" [formControl]="nombreF"
-                        (keypress)="IngresarSoloLetras($event)" required [readonly]="ver_ciudad">
-                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Registrar nueva ciudad.">
-                        help_outline
-                    </mat-icon>
-                    <mat-error *ngIf="nombreF.invalid">Ingresar un nombre válido</mat-error>
-                </mat-form-field>
+            <div class="row">
+                <div class="col-md">
+                    <div class="d-flex flex-wrap justify-content-between">
+                        <mat-form-field>
+                            <mat-label>Seleccionar continente</mat-label>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Lista de continentes registrados en el sistema.">
+                                help_outline</mat-icon>
+                            <mat-select [formControl]="nombreContinenteF" required>
+                                <mat-option *ngFor="let c of continentes" [value]="c.continente"
+                                    (click)="FiltrarPaises(formulario.value)">
+                                    {{c.continente}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label>Seleccionar país</mat-label>
+                            <input type="text" aria-label="Number" matInput [formControl]="nombrePaisF"
+                                [matAutocomplete]="auto" required [readonly]="ver_pais">
+                            <mat-autocomplete #auto="matAutocomplete">
+                                <mat-option *ngFor="let option of filteredOptions | async" [value]="option.nombre"
+                                    (click)="FiltrarProvincias(formulario.value)">
+                                    {{option.nombre}}
+                                </mat-option>
+                            </mat-autocomplete>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Lista de paises ubicados en el continente seleccionado.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="d-flex flex-wrap justify-content-between">
+                        <mat-form-field>
+                            <mat-label>Seleccionar provincia</mat-label>
+                            <input type="text" aria-label="Number" matInput [formControl]="idProvinciaF"
+                                [matAutocomplete]="auto1" required [readonly]="ver_provincia">
+                            <mat-autocomplete #auto1="matAutocomplete">
+                                <mat-option *ngFor="let option of filteredOpt | async" [value]="option.nombre"
+                                    (click)="FiltrarCiudades(formulario.value)">
+                                    {{option.nombre}}
+                                </mat-option>
+                            </mat-autocomplete>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Lista de provincias, departamentos o estados ubicados en el país seleccionado.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label>Ingresar ciudad</mat-label>
+                            <input matInput placeholder="Ej: Quito" [formControl]="nombreF"
+                                (keypress)="IngresarSoloLetras($event)" required [readonly]="ver_ciudad">
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Registrar nueva ciudad.">
+                                help_outline
+                            </mat-icon>
+                            <mat-error *ngIf="nombreF.invalid">Ingresar un nombre válido</mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 2%;">
+                <button id="btn-raised" class="btn btn-sm" [disabled]="!formulario.valid" value="Guardar"
+                    (click)="InsertarCiudad(formulario.value)">
+                    Guardar
+                </button>
             </div>
         </div>
     </mat-card-content>
 </form>
-<div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 2%;">
-    <button id="btn-raised"  class="btn btn-sm" [disabled]="!formulario.valid" value="Guardar"
-        (click)="InsertarCiudad(formulario.value)">Guardar</button>
-</div>

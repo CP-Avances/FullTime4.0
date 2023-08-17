@@ -4,8 +4,8 @@ import { environment } from '../../../../../environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 
-import { RegistroEmpleadoPermisoComponent } from 'src/app/componentes/modulos/permisos/registro-empleado-permiso/registro-empleado-permiso.component';
-import { EditarPermisoEmpleadoComponent } from '../editar-permiso-empleado/editar-permiso-empleado.component';
+import { RegistroEmpleadoPermisoComponent } from 'src/app/componentes/modulos/permisos/gestionar-permisos/registro-empleado-permiso/registro-empleado-permiso.component';
+
 import { CancelarPermisoComponent } from '../cancelar-permiso/cancelar-permiso.component';
 
 import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
@@ -13,6 +13,7 @@ import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-ge
 import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { PermisosService } from 'src/app/servicios/permisos/permisos.service';
+import { EditarPermisoEmpleadoComponent } from 'src/app/componentes/modulos/permisos/gestionar-permisos/editar-permiso-empleado/editar-permiso-empleado.component';
 
 @Component({
   selector: 'app-solicitar-permisos-empleado',

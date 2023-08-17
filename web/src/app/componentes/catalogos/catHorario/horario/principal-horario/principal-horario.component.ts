@@ -36,6 +36,7 @@ export class PrincipalHorarioComponent implements OnInit {
 
   // ALMACENAMIENTO DE DATOS Y BUSQUEDA
   horarios: any = [];
+  ver_horarios: boolean = true;
 
   // FILTROS
   filtroNombreHorario = '';
@@ -46,7 +47,7 @@ export class PrincipalHorarioComponent implements OnInit {
   archivo2Form = new FormControl('');
   archivo3Form = new FormControl('');
 
-  // ASIGNACIÓN DE VALIDACIONES A INPUTS DEL FORMULARIO
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public formulario = new FormGroup({
     nombreHorarioForm: this.nombreHorarioF,
   });
@@ -132,9 +133,15 @@ export class PrincipalHorarioComponent implements OnInit {
 
   // METODO PARA ABRIR VENTANA REGISTRAR HORARIO
   AbrirVentanaRegistrarHorario(): void {
-    this.ventana.open(RegistroHorarioComponent, { width: '800px' }).afterClosed().subscribe(items => {
-      this.ObtenerHorarios();
-    });
+    this.ventana.open(RegistroHorarioComponent, { width: '800px' })
+      .afterClosed().subscribe(items => {
+        if (items > 0) {
+          this.VerDetallesHorario(items)
+        }
+        else if (items === 0) {
+          this.ObtenerHorarios();
+        }
+      });
   }
 
   // METODO PARA ABRIR VENTANA REGISTRAR DETALLE DE HORARIO
@@ -142,7 +149,9 @@ export class PrincipalHorarioComponent implements OnInit {
     this.ventana.open(DetalleCatHorarioComponent,
       { width: '610px', data: { datosHorario: datosSeleccionados, actualizar: false } })
       .afterClosed().subscribe(items => {
-        this.ObtenerHorarios();
+        if (items) {
+          this.VerDetallesHorario(items)
+        }
       });
   }
 
@@ -159,7 +168,9 @@ export class PrincipalHorarioComponent implements OnInit {
     this.ventana.open(EditarHorarioComponent,
       { width: '900px', data: { horario: datosSeleccionados, actualizar: false } })
       .afterClosed().subscribe(items => {
-        this.ObtenerHorarios();
+        if(items === 1){
+          this.VerDetallesHorario(datosSeleccionados.id)
+        }
       });
   }
 
@@ -181,12 +192,20 @@ export class PrincipalHorarioComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.EliminarDetalle(datos);
-        } else {
-          this.router.navigate(['/horario/']);
         }
       });
   }
 
+  // METODO PARA VISUALIZAR PANTALLA DE HORARIOS Y DETALLES
+  ver_detalles: boolean = false;
+  horario_id: number;
+  pagina: string;
+  VerDetallesHorario(id: number) {
+    this.horario_id = id;
+    this.ver_horarios = false;
+    this.ver_detalles = true;
+    this.pagina = 'lista-horarios';
+  }
 
   /** ************************************************************************************************* ** 
    ** **                              PLANTILLA CARGAR SOLO HORARIOS                                 ** **
@@ -227,7 +246,7 @@ export class PrincipalHorarioComponent implements OnInit {
       if (res.message === 'error') {
         this.toastr.error('Para el buen funcionamiento del sistema verifique los datos de su plantilla. ' +
           'Son datos obligatorios: nombre de horario, horas de trabajo y tipo de horario, además el nombre ' +
-          'de horario debe ser único en cada registro.', 'Operación Fallida', {
+          'de horario debe ser único en cada registro.', 'Ups!!! algo salio mal.', {
           timeOut: 6000,
         });
         this.archivo1Form.reset();
@@ -238,7 +257,7 @@ export class PrincipalHorarioComponent implements OnInit {
           if (res.message === 'error') {
             this.toastr.error('Para el buen funcionamiento del sistema verifique los datos de su plantilla. ' +
               'Son datos obligatorios: nombre de horario, horas de trabajo y tipo de horario, además el nombre ' +
-              'de horario debe ser único en cada registro.', 'Operación Fallida', {
+              'de horario debe ser único en cada registro.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             });
             this.archivo1Form.reset();
@@ -246,7 +265,7 @@ export class PrincipalHorarioComponent implements OnInit {
           }
           else {
             this.rest.CargarHorariosMultiples(formData).subscribe(res => {
-              this.toastr.success('Operación Exitosa', 'Plantilla de Horario importada.', {
+              this.toastr.success('Operación exitosa.', 'Plantilla de Horario importada.', {
                 timeOut: 6000,
               });
               this.archivo1Form.reset();
@@ -299,7 +318,7 @@ export class PrincipalHorarioComponent implements OnInit {
       if (res.message === 'error') {
         this.toastr.error('Para el buen funcionamiento del sistema verifique los datos de su plantilla. ' +
           'Son datos obligatorios: nombre de horario, orden, hora y tipo de accion, además el nombre ' +
-          'de horario debe existir dentro del sistema.', 'Operación Fallida', {
+          'de horario debe existir dentro del sistema.', 'Ups!!! algo salio mal.', {
           timeOut: 6000,
         });
         this.archivo2Form.reset();
@@ -307,7 +326,7 @@ export class PrincipalHorarioComponent implements OnInit {
       }
       else {
         this.restD.CargarPlantillaDetalles(formData).subscribe(res => {
-          this.toastr.success('Operación Exitosa', 'Plantilla de Detalle de Horario importada.', {
+          this.toastr.success('Operación exitosa.', 'Plantilla de Detalle de Horario importada.', {
             timeOut: 6000,
           });
           this.archivo2Form.reset();
@@ -351,7 +370,7 @@ export class PrincipalHorarioComponent implements OnInit {
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
-      // PIE DE PÁGINA
+      // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
@@ -409,8 +428,8 @@ export class PrincipalHorarioComponent implements OnInit {
                   { text: obj.nombre, style: 'itemsTable' },
                   { text: obj.min_almuerzo, style: 'itemsTableC' },
                   { text: obj.hora_trabajo, style: 'itemsTableC' },
-                  { text: obj.noturno==true?'Sí':'No', style: 'itemsTableC' },
-                  { text: obj.detalle==true?'Sí':'No', style: 'itemsTableC' },
+                  { text: obj.noturno == true ? 'Sí' : 'No', style: 'itemsTableC' },
+                  { text: obj.detalle == true ? 'Sí' : 'No', style: 'itemsTableC' },
                   { text: obj.doc_nombre, style: 'itemsTableC' },
                 ];
               })
@@ -452,7 +471,7 @@ export class PrincipalHorarioComponent implements OnInit {
   }
 
   /** ************************************************************************************************* **
-   ** **                           PARA LA EXPORTACIÓN DE ARCHIVOS XML                               ** **
+   ** **                           PARA LA EXPORTACION DE ARCHIVOS XML                                ** **
    ** ************************************************************************************************* **/
 
   urlxml: string;

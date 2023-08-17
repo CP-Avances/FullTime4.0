@@ -45,7 +45,7 @@ const ListarDocumentos = function (nombre_carpeta) {
                             id: doc.id,
                             file: obj,
                             extencion: obj.split('.')[1],
-                            nombre: doc.doc_nombre
+                            nombre: doc.documento
                         };
                         archivos = archivos.concat(datos);
                     }
@@ -124,12 +124,10 @@ const ListarHorarios = function (nombre_carpeta) {
         let archivos = [];
         const ruta = path_1.default.resolve(nombre_carpeta);
         let Lista_Archivos = fs_1.default.readdirSync(ruta);
-        console.log('horarios.. ', Lista_Archivos);
         // CONSULTA DE BUSQUEDA DE DOCUMENTOS
         let documentos = yield database_1.default.query(`
         SELECT * FROM cg_horarios WHERE documento NOTNULL ORDER BY id
         `).then(result => { return result.rows; });
-        console.log('horarios base .. ', documentos);
         if (documentos.length != 0) {
             documentos.forEach((doc) => {
                 Lista_Archivos.forEach((obj) => {
@@ -138,7 +136,7 @@ const ListarHorarios = function (nombre_carpeta) {
                             id: doc.id,
                             file: obj,
                             extencion: obj.split('.')[1],
-                            nombre: doc.doc_nombre
+                            nombre: doc.documento
                         };
                         archivos = archivos.concat(datos);
                     }

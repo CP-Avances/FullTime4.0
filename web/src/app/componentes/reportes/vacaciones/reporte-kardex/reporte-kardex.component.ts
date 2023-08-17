@@ -37,7 +37,7 @@ export class ReporteKardexComponent implements OnInit {
   filtroNombre: '';
   filtroApellido: '';
 
-  // items de paginacion de la tabla
+  // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
@@ -109,7 +109,7 @@ export class ReporteKardexComponent implements OnInit {
   f_final_reqK: string = '';
   habilitarK: boolean = false;
   estiloK: any = { 'visibility': 'hidden' };
-  ValidarRangofechasKardex(form) {
+  ValidarRangofechasKardex(form: any) {
     var f_i = new Date(form.fec_inicio)
     var f_f = new Date(form.fec_final)
 
@@ -156,7 +156,7 @@ export class ReporteKardexComponent implements OnInit {
   }
 
   /* ****************************************************************************************************
-  *                               PARA LA EXPORTACIÓN DE ARCHIVOS PDF 
+  *                               PARA LA EXPORTACION DE ARCHIVOS PDF 
   * ****************************************************************************************************/
   fechaHoy: string;
 
@@ -521,7 +521,7 @@ export class ReporteKardexComponent implements OnInit {
     else {
       keynum = evt.which;
     }
-    // Comprobamos si se encuentra en el rango numérico y que teclas no recibirá.
+    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
     if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6) {
       return true;
     }

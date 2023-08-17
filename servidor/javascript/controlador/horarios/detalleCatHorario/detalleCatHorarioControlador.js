@@ -17,7 +17,7 @@ const database_1 = __importDefault(require("../../../database"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const fs_1 = __importDefault(require("fs"));
 class DetalleCatalogoHorarioControlador {
-    // METODO PARA BUSCAR DETALLE DE UN HORARIO
+    // METODO PARA BUSCAR DETALLE DE UN HORARIO   --**VERIFICADO
     ListarUnDetalleHorario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_horario } = req.params;

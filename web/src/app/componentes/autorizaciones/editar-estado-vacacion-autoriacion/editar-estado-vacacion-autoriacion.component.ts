@@ -38,8 +38,15 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
   FechaActual: any;
   NotifiRes: any;
 
-  ArrayAutorizacionTipos: any = [];
-  gerencia: boolean = false;
+  public InfoListaAutoriza: any = [];
+  public ArrayAutorizacionTipos: any = [];
+  public autorizacion: any []
+  public gerencia: boolean = false;
+  public autorizaDirecto: boolean = false;
+  public lectura: any;
+  public estado_auto: any;
+  public empleado_estado: any = [];
+  public listaEnvioCorreo: any = [];
 
   constructor(
     private informacion: DatosGeneralesService,
@@ -55,24 +62,24 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.data, ' aprobar vacacion');
-
     if (this.data.auto.estado === 1) {
       this.toastr.info('Solicitud pendiente de aprobación.', '', {
         timeOut: 6000,
       })
     } else {
       this.estadoAutorizacionesForm.patchValue({
-        estadoF: this.data.auto.estado
+        estadoF: ''
       });
     }
 
-    this.restAutoriza.BuscarAutoridadEmpleado(this.id_empleado_loggin).subscribe(
+    this.restAutoriza.BuscarAutoridadUsuarioDepa(this.id_empleado_loggin).subscribe(
       (res) => {
         this.ArrayAutorizacionTipos = res;
         this.ArrayAutorizacionTipos.filter(x => {
-          if(x.nom_depar == 'GERENCIA' && x.estado == true){
+          if(x.nombre == 'GERENCIA' && x.estado == true){
             this.gerencia = true;
+            this.autorizaDirecto = false;
+            this.InfoListaAutoriza = x;
             if(x.autorizar == true){
               this.estados = [
                 { id: 3, nombre: 'Autorizado' },
@@ -80,11 +87,14 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
               ];
             }else if(x.preautorizar == true){
               this.estados = [
-                { id: 2, nombre: 'Pre-autorizado' }
+                { id: 2, nombre: 'Pre-autorizado' },
+                { id: 4, nombre: 'Negado'}
               ];
             }
           }
           else if((this.gerencia == false) && (this.data.auto.id_departamento == x.id_departamento && x.estado == true)){
+            this.autorizaDirecto = true;
+            this.InfoListaAutoriza = x;
             if(x.autorizar == true){
               this.estados = [
                 { id: 3, nombre: 'Autorizado' },
@@ -92,7 +102,8 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
               ];
             }else if(x.preautorizar == true){
               this.estados = [
-                { id: 2, nombre: 'Pre-autorizado' }
+                { id: 2, nombre: 'Pre-autorizado' },
+                { id: 4, nombre: 'Negado'}
               ];
             }
           }
@@ -102,6 +113,7 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
 
     this.ObtenerTiempo();
     this.obtenerInformacionEmpleado();
+
   }
 
   ObtenerTiempo() {
@@ -129,7 +141,9 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
           correo: res.correo,
           fullname: res.fullname,
         }
-      })
+      }
+    )
+
   }
 
   // METODO DE APROBACION DE SOLICITUD DE VACACIONES
@@ -138,10 +152,6 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
       id_documento: this.data.auto.id_documento + localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       estado: form.estadoF,
     }
-
-
-    console.log('aprobacion :) : ',aprobacion);
-    console.log('this.data.auto :) : ',this.data.auto);
 
     this.restA.ActualizarAprobacion(this.data.auto.id, aprobacion).subscribe(res => {
       this.EditarEstadoVacacion(this.data.auto.id_vacacion, form.estadoF);
@@ -178,11 +188,11 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
       var estado_v = 'Negado';
       var estado_c = 'Negada';
     }
+
+
     this.informacion.BuscarJefes(datos).subscribe(vacacion => {
-      console.log(vacacion);
-      vacacion.EmpleadosSendNotiEmail.push(this.solInfo);
-      this.EnviarCorreoEmpleados(vacacion, estado_v, estado_c);
       this.EnviarNotificacion(vacacion, estado_v);
+      this.ConfiguracionCorreoEmpleados(vacacion, estado_v, estado_c);
       this.toastr.success('', 'Proceso realizado exitosamente.', {
         timeOut: 6000,
       });
@@ -190,21 +200,110 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
     });
   }
 
+
+  listadoDepaAutoriza: any = [];
+  id_departamento: any;
   // METODO PARA ENVIO DE NOTIFICACIONES DE VACACIONES
-  EnviarCorreoEmpleados(vacacion: any, estado_v: string, estado_c: string) {
+  ConfiguracionCorreoEmpleados(vacacion: any, estado_v: string, estado_c: string) {
+    console.log('entro ha configuracion correo..')
+    // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE VACACIÓN
+    let desde = moment.weekdays(moment(vacacion.fec_inicio).day()).charAt(0).toUpperCase() + moment.weekdays(moment(vacacion.fec_inicio).day()).slice(1);
+    let hasta = moment.weekdays(moment(vacacion.fec_final).day()).charAt(0).toUpperCase() + moment.weekdays(moment(vacacion.fec_final).day()).slice(1);
+    this.listaEnvioCorreo = [];
+    this.id_departamento = this.solInfo.id_dep;
+    this.lectura = 1;
+    this.restA.getUnaAutorizacionByVacacionRest(this.data.vacacion.id).subscribe(res1 => {
+      this.autorizacion = res1;
+      // METODO PARA OBTENER EMPLEADOS Y ESTADOS
+      var autorizaciones = this.autorizacion[0].id_documento.split(',');
+      autorizaciones.map((obj: string) => {
+        this.lectura = this.lectura + 1;
+        if (obj != '') {
+          let empleado_id = obj.split('_')[0];
+          this.estado_auto = obj.split('_')[1];
 
-    console.log('ver vacaciones..   ', vacacion)
+          // CREAR ARRAY DE DATOS DE COLABORADORES
+          var data = {
+            id_empleado: empleado_id,
+            estado: this.estado_auto
+          }
 
+          // CAMBIAR DATO ESTADO INT A VARCHAR
+          if (this.estado_auto === '1') {
+            this.estado_auto = 'Pendiente';
+          }
+          if (this.estado_auto === '2') {
+            this.estado_auto = 'Preautorizado';
+          }
+
+          this.empleado_estado = this.empleado_estado.concat(data);
+          // CUANDO TODOS LOS DATOS SE HAYAN REVISADO EJECUTAR METODO DE INFORMACIÓN DE AUTORIZACIÓN
+          if (this.lectura === autorizaciones.length) {
+            if((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')){
+              this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
+                this.listadoDepaAutoriza = res;
+                this.listadoDepaAutoriza.filter(item => {
+                  if((item.nivel === autorizaciones.length) && (item.nivel_padre === item.nivel)){
+                    return this.listaEnvioCorreo.push(item);
+                  }else if((item.nivel === autorizaciones.length || item.nivel === (autorizaciones.length - 1))){
+                    return this.listaEnvioCorreo.push(item);
+                  }
+                })
+                console.log('listaEnvioCorreo 1: ',this.listaEnvioCorreo );
+                this.EnviarCorreo(this.listaEnvioCorreo, vacacion, estado_v, estado_c, desde, hasta);
+              });
+            }else if(this.estado_auto > 2){
+              this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
+                this.listadoDepaAutoriza = res;
+                this.listadoDepaAutoriza.filter(item => {
+                  if((item.nivel_padre === this.InfoListaAutoriza.nivel) && (item.nivel_padre === item.nivel)){
+                    this.autorizaDirecto = false;
+                    return this.listaEnvioCorreo.push(item);
+                  }else{
+                    this.autorizaDirecto = true;
+                  }
+                })
+
+                //Esta condicion es para enviar el correo a todos los usuraios que autorizan siempre y cuando la solicitud fue negada antes
+                if(this.autorizaDirecto === true){
+                  this.listaEnvioCorreo = this.listadoDepaAutoriza;
+                }
+                
+                console.log('listaEnvioCorreo 2: ',this.listaEnvioCorreo );
+                this.EnviarCorreo(this.listaEnvioCorreo, vacacion, estado_v, estado_c, desde, hasta);
+              });
+            }
+          }
+        }else if(autorizaciones.length == 1){
+          this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
+            this.listadoDepaAutoriza = res;
+            this.listadoDepaAutoriza.filter(item => {
+              if(item.nivel < 3 ){
+                return this.listaEnvioCorreo.push(item);  
+              }
+            })
+
+            console.log('listaEnvioCorreo 3: ',this.listaEnvioCorreo );
+            this.EnviarCorreo(this.listaEnvioCorreo, vacacion, estado_v, estado_c, desde, hasta);
+          });
+        }
+      })
+    });   
+
+
+    
+  }
+
+  EnviarCorreo(listaEnvioCorreo: any, vacacion: any, estado_v: string, estado_c: string, desde: any, hasta: any){
     var cont = 0;
     var correo_usuarios = '';
+    vacacion.EmpleadosSendNotiEmail = listaEnvioCorreo;
+    vacacion.EmpleadosSendNotiEmail.push(this.solInfo);
+    console.log('nueva lista: ',vacacion.EmpleadosSendNotiEmail);
 
     vacacion.EmpleadosSendNotiEmail.forEach(e => {
       // LECTURA DE DATOS LEIDOS
       cont = cont + 1;
-
-      // METODO PARA OBTENER NOMBRE DEL DÍA EN EL CUAL SE REALIZA LA SOLICITUD DE VACACIÓN
-      let desde = moment.weekdays(moment(vacacion.fec_inicio).day()).charAt(0).toUpperCase() + moment.weekdays(moment(vacacion.fec_inicio).day()).slice(1);
-      let hasta = moment.weekdays(moment(vacacion.fec_final).day()).charAt(0).toUpperCase() + moment.weekdays(moment(vacacion.fec_final).day()).slice(1);
 
       // SI EL USUARIO SE ENCUENTRA ACTIVO Y TIENEN CONFIGURACIÓN RECIBIRA CORREO DE SOLICITUD DE VACACIÓN
       if (e.vaca_mail) {
@@ -263,7 +362,7 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
 
   // METODO PARA ENVIAR NOTIFICACIONES
   EnviarNotificacion(vacaciones: any, estado_v: string) {
-
+    vacaciones.EmpleadosSendNotiEmail.push(this.solInfo);
     let desde = moment.weekdays(moment(vacaciones.fec_inicio).day()).charAt(0).toUpperCase() + moment.weekdays(moment(vacaciones.fec_inicio).day()).slice(1);
     let hasta = moment.weekdays(moment(vacaciones.fec_final).day()).charAt(0).toUpperCase() + moment.weekdays(moment(vacaciones.fec_final).day()).slice(1);
 
@@ -299,7 +398,6 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
     allNotificaciones.forEach(e => {
       notificacion.id_receives_depa = e.id_dep;
       notificacion.id_receives_empl = e.empleado;
-      console.log("Empleados enviados: ",allNotificaciones);
       if (e.vaca_noti) {
         this.realTime.IngresarNotificacionEmpleado(notificacion).subscribe(
           resp => {

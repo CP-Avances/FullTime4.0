@@ -21,11 +21,11 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 })
 export class EditarPlanificacionComponent implements OnInit {
 
-  // Control de campos y validaciones del formulario
+  // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   fechaIngresoF = new FormControl('', [Validators.required]);
   fechaSalidaF = new FormControl('', [Validators.required]);
 
-  // Asignación de validaciones a inputs del formulario
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public PlanHorarioForm = new FormGroup({
     fechaIngresoForm: this.fechaIngresoF,
     fechaSalidaForm: this.fechaSalidaF,
@@ -44,7 +44,7 @@ export class EditarPlanificacionComponent implements OnInit {
     console.log('imprimir', this.data)
   }
 
-  ValidarDatosPlanHorario(form) {
+  ValidarDatosPlanHorario(form: any) {
     let datosBusqueda = {
       id_cargo: this.data.datosPlan.id_cargo,
       id_empleado: this.data.idEmpleado
@@ -68,7 +68,7 @@ export class EditarPlanificacionComponent implements OnInit {
     }, error => { });
   }
 
-  InsertarPlanHorario(form) {
+  InsertarPlanHorario(form: any) {
     let fechas = {
       fechaInicio: form.fechaIngresoForm,
       fechaFinal: form.fechaSalidaForm,
@@ -86,7 +86,7 @@ export class EditarPlanificacionComponent implements OnInit {
       };
       this.rest.ActualizarDatos(datosPlanHorario).subscribe(response => {
         console.log('prueba actualizacopn', response)
-        this.toastr.success('Operación Exitosa', 'Planificación de Horario actualizada', {
+        this.toastr.success('Operación exitosa.', 'Planificación de Horario actualizada', {
           timeOut: 6000,
         })
         this.CerrarVentanaPlanHorario();

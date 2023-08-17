@@ -1,7 +1,34 @@
-.btn { margin-left: 15px; }
+.btn {
+    margin-left: 15px;
+}
 
-#cancelar { background-color: rgb(80,87,97); color: white; }
+p {
+    font-size: 13px;
+}
 
-p { font-size: 13px; }
+#mensaje {
+    font-size: 14px;
+    text-align: center;
+    color: red;
+    font-weight: bold;
+}
 
-#mensaje { font-size: 14px; text-align: center; color: red; font-weight: bold;}
+.progress {
+    margin: 250px auto auto auto;
+    opacity: 1
+}
+
+.pantalla-progress {
+    background: #ffff;
+    position: fixed;
+    opacity: 0.8;
+    height: 100%;
+    width: 100%;
+    left: 0px;
+    top: 0px;
+}
+
+mat-progress-spinner {
+    background: transparent;
+    z-index: 100;
+}

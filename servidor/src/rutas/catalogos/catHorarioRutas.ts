@@ -55,7 +55,7 @@ class HorarioRutas {
         this.router.post('/', TokenValidation, HORARIO_CONTROLADOR.CrearHorario);
         // BUSCAR HORARIO POR SU NOMBRE
         this.router.post('/buscar-horario/nombre', TokenValidation, HORARIO_CONTROLADOR.BuscarHorarioNombre);
-        // CARGAR ARCHIVO DE RESPALDO
+        // CARGAR ARCHIVO DE RESPALDO  **//VERIFICADO
         this.router.put('/:id/documento/:archivo/verificar/:codigo', [TokenValidation, upload.single('uploads')], HORARIO_CONTROLADOR.GuardarDocumentoHorario);
         // ACTUALIZAR DATOS DE HORARIO
         this.router.put('/editar/:id', TokenValidation, HORARIO_CONTROLADOR.EditarHorario);
@@ -63,7 +63,7 @@ class HorarioRutas {
         this.router.put('/eliminar_horario/base_servidor', [TokenValidation], HORARIO_CONTROLADOR.EliminarDocumento);
         // ELIMINAR DOCUMENTO DE HORARIOS DEL SERVIDOR
         this.router.put('/eliminar_horario/servidor', [TokenValidation], HORARIO_CONTROLADOR.EliminarDocumentoServidor);
-        // BUSCAR LISTA DE CATALOGO HORARIOS
+        // BUSCAR LISTA DE CATALOGO HORARIOS   --**VERIFICADO
         this.router.get('/', TokenValidation, HORARIO_CONTROLADOR.ListarHorarios);
         // OBTENER VISTA DE DOCUMENTOS
         this.router.get('/documentos/:docs', HORARIO_CONTROLADOR.ObtenerDocumento);

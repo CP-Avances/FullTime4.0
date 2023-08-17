@@ -16,7 +16,6 @@ export class AutorizacionService {
 
   // METODO PARA BUSCAR APROBACIONES DE PERMISO
   BuscarAutorizacionPermiso(id_permiso: number) {
-    console.log('id_permiso: ',id_permiso);
     return this.http.get<any>(`${environment.url}/autorizaciones/by-permiso/${id_permiso}`);
   }
 

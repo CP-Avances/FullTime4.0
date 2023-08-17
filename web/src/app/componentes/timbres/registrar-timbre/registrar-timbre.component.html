@@ -1,0 +1,76 @@
+<div id="titulo">
+    <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
+    <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
+        REGISTRAR TIMBRE
+    </span>
+    <mat-icon class="float-right" id="cerrar" (click)="ventana.close({close: true})" matSuffix
+        matTooltipPosition="right" matTooltip="Cerrar ventana.">
+        highlight_off
+    </mat-icon>
+</div>
+<div class="scrollbar scrollbar-primary">
+    <div class="container d-flex flex-wrap justify-content-center" style="padding-top: 8px;">
+        <span>{{f | date: 'fullDate' : undefined : 'es-EC'}}</span>
+    </div>
+    <div class="container d-flex flex-wrap justify-content-center">
+        <span><b>{{f | date: 'h:mm:ss a'}}</b></span>
+    </div>
+    <form [formGroup]="formulario">
+        <div class="container">
+            <div class="nota" style="text-align: center;">
+                <span>Seleccione una opción para registrar</span>
+            </div>
+            <button id="redondo" class="float-right" matSuffix matTooltipPosition="right"
+                matTooltip="Timbre horario abierto." (click)="ActivarBotones()">
+                <mat-icon id="reloj">alarm</mat-icon>
+            </button>
+            <div style="text-align: center; padding-left: 50px;">
+                <div class="d-flex flex-wrap justify-content-center">
+                    <mat-form-field>
+                        <mat-label>Observación</mat-label>
+                        <textarea matInput #message maxlength="150" placeholder="Ingresar una descripción."
+                            [formControl]="observacionF">
+                        </textarea>
+                        <mat-hint align="start" id="letras">
+                            <strong>Ingresar hasta 150 caracteres</strong>
+                        </mat-hint>
+                        <mat-hint align="end" id="letras">{{message.value.length}} / 150</mat-hint>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row" *ngIf='botones_normal' style="padding-top: 20px;">
+                <div class="col-sm">
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <button mat-raised-button id="botonTimbreInicio" (click)="AlmacenarDatos(1, formulario.value)">
+                            Inicio Jornada Laboral
+                        </button>
+                        <button mat-raised-button id="botonTimbreInicio" (click)="AlmacenarDatos(3, formulario.value)">
+                            Inicio Alimentación
+                        </button>
+                        <button mat-raised-button id="botonTimbreInicio" (click)="AlmacenarDatos(5, formulario.value)">
+                            Inicio Permiso
+                        </button>
+                    </div>
+                </div>
+                <div class="col-sm">
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <button mat-raised-button id="botonTimbreFin" (click)="AlmacenarDatos(2, formulario.value)">
+                            Fin Jornada Laboral
+                        </button>
+                        <button mat-raised-button id="botonTimbreFin" (click)="AlmacenarDatos(4, formulario.value)">
+                            Fin Alimentación
+                        </button>
+                        <button mat-raised-button id="botonTimbreFin" (click)="AlmacenarDatos(6, formulario.value)">
+                            Fin Permiso
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap justify-content-center" *ngIf='boton_abierto' style="padding-top: 20px;">
+                <button mat-button id="botonTimbreAbierto" (click)="AlmacenarDatos(7, formulario.value)">
+                    Horario Abierto
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

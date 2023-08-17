@@ -18,7 +18,7 @@ export class TipoSeguridadComponent implements OnInit {
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   tipoF = new FormControl('', [Validators.required]);
 
-  // ASIGNACIÓN DE VALIDACIONES A INPUTS DEL FORMULARIO
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public formulario = new FormGroup({
     tipoForm: this.tipoF
   });
@@ -87,7 +87,7 @@ export class TipoSeguridadComponent implements OnInit {
     this.habilitarprogress = true;
     this.rest.ActualizarSeguridad(datos).subscribe(response => {
       this.LimpiarCampos();
-      this.toastr.success('Operación Exitosa.', 'Datos de Empresa registrados.', {
+      this.toastr.success('Operación exitosa.', 'Datos de seguridad registrados.', {
         timeOut: 6000,
       })
       this.habilitarprogress = false

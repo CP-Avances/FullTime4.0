@@ -13,7 +13,7 @@ export class TipoComidasService {
 
   // Invocación del METODO post para crear nuevo tipo de comida
   CrearNuevoTipoComida(datos: any) {
-    return this.http.post(`${environment.url}/tipoComidas`, datos);
+    return this.http.post<any>(`${environment.url}/tipoComidas`, datos);
   }
 
   ConsultarTipoComida() {

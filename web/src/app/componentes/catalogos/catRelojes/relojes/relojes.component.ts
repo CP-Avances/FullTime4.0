@@ -19,6 +19,7 @@ export class RelojesComponent implements OnInit {
   // VARIABLES DE ALMACENAMIENTO
   sucursales: any = [];
   departamento: any = [];
+  registrar: boolean = true;
 
   // CONTROL DE FORMULARIOS
   isLinear = true;
@@ -42,7 +43,7 @@ export class RelojesComponent implements OnInit {
 
   // SEGUNDO FORMULARIO
   macF = new FormControl('');
-  marcaF = new FormControl('', [Validators.minLength(4)]);
+  marcaF = new FormControl('', [Validators.minLength(2)]);
   serieF = new FormControl('', Validators.minLength(4));
   modeloF = new FormControl('', [Validators.minLength(3)]);
   fabricanteF = new FormControl('', [Validators.minLength(4)]);
@@ -139,14 +140,14 @@ export class RelojesComponent implements OnInit {
     this.rest.CrearNuevoReloj(reloj).subscribe(response => {
       if (response.message === 'guardado') {
         this.LimpiarCampos();
-        this.router.navigate(['/verDispositivos/', response.reloj.id]);
-        this.toastr.success('Operación Exitosa.', 'Registro guardado.', {
+        this.VerDatosReloj(response.reloj.id);
+        this.toastr.success('Operación exitosa.', 'Registro guardado.', {
           timeOut: 6000,
         })
       }
       else {
         this.toastr.error('Verificar que el código de reloj y la ip del dispositivo no se encuentren registrados.',
-          'Operación Fallida.', {
+          'Ups!!! algo salio mal..', {
           timeOut: 6000,
         })
       }
@@ -175,7 +176,7 @@ export class RelojesComponent implements OnInit {
     else {
       keynum = evt.which;
     }
-    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMÉRICO Y QUE TECLAS NO RECIBIRÁ.
+    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
     if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6 || keynum == 46) {
       return true;
     }
@@ -218,6 +219,18 @@ export class RelojesComponent implements OnInit {
   CerrarVentana() {
     this.LimpiarCampos();
     this.router.navigate(['/listarRelojes']);
+  }
+
+
+  // METODO PARA VER DATOS DE RELOJ
+  ver_datos: boolean = false;
+  reloj_id: number;
+  pagina: string = '';
+  VerDatosReloj(id: number) {
+    this.reloj_id = id;
+    this.ver_datos = true;
+    this.registrar = false;
+    this.pagina = 'registrar-reloj';
   }
 
 }

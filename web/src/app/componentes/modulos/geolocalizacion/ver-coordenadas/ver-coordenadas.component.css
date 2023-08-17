@@ -1,28 +1,59 @@
-p { font-size: x-small; text-align: center; }
-
-td { padding-top: 10px; text-align: center; }
-
-hr { background-color: black; }
-
-.btn { margin-left: 15px; background-color: rgb(80,87,97); color: white; }
-
-#editarI { color:green; cursor: pointer; }
-
-#editarF { color:green; cursor: pointer; text-align: center; margin-left: 15px; }
-
-#datosF { font-weight: bold; font-size: 16px; padding-right: 5px; }
-
-mat-form-field { padding: 10px 15px 0px 15px;}
-
-#boton { background-color: rgb(80,87,97); color: white; margin-top: 10px;}
-
-.mat-radio-button ~ .mat-radio-button {
-    margin-left: 16px;
+p {
+    font-size: x-small;
+    text-align: center;
 }
 
-mat-icon { cursor: pointer; }
+td {
+    padding-top: 10px;
+    text-align: center;
+}
+
+hr {
+    background-color: black;
+}
+
+.btn {
+    margin-left: 15px;
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
+
+#editarI {
+    color: green;
+    cursor: pointer;
+    text-align: center;
+}
+
+#datosF {
+    font-weight: bold;
+    font-size: 16px;
+    padding-right: 5px;
+}
+
+mat-form-field {
+    padding: 10px 15px 0px 15px;
+}
+
+#boton {
+    background-color: rgb(80, 87, 97);
+    color: white;
+    margin-top: 10px;
+}
+
+.mat-mdc-radio-button~.mat-mdc-radio-button {
+    margin-left: 20px;
+}
+
+mat-icon {
+    cursor: pointer;
+}
 
 #SelectCheck {
     cursor: pointer;
     margin-left: 10px;
+}
+
+table {
+    width: 100%;
+    font-size: 14px;
 }

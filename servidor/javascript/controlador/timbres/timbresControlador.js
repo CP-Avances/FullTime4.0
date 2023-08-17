@@ -15,6 +15,29 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.timbresControlador = void 0;
 const database_1 = __importDefault(require("../../database"));
 class TimbresControlador {
+    // ELIMINAR NOTIFICACIONES TABLA DE AVISOS --**VERIFICADO
+    EliminarMultiplesAvisos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const arregloAvisos = req.body;
+            let contador = 0;
+            if (arregloAvisos.length > 0) {
+                contador = 0;
+                arregloAvisos.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
+                    yield database_1.default.query('DELETE FROM realtime_timbres WHERE id = $1', [obj])
+                        .then((result) => {
+                        contador = contador + 1;
+                        if (contador === arregloAvisos.length) {
+                            return res.jsonp({ message: 'OK' });
+                        }
+                        console.log(result.command, 'REALTIME ELIMINADO ====>', obj);
+                    });
+                }));
+            }
+            else {
+                return res.jsonp({ message: 'error' });
+            }
+        });
+    }
     // METODO PARA LISTAR MARCACIONES
     ObtenerTimbres(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -99,10 +122,11 @@ class TimbresControlador {
                     timbres: timbres,
                     cuenta: estado_cuenta,
                     info: yield database_1.default.query(`
-                    SELECT tc.cargo, ca.sueldo, ca.hora_trabaja, eh.fec_inicio, eh.fec_final 
-                    FROM empl_contratos AS co, empl_cargos AS ca, empl_horarios AS eh, tipo_cargo AS tc
-                    WHERE co.id_empleado = $1 AND ca.id_empl_contrato = co.id AND eh.id_empl_cargo = ca.id 
-                        AND tc.id = ca.cargo ORDER BY eh.fec_inicio DESC LIMIT 1
+                    SELECT ec.sueldo, tc.cargo, ec.hora_trabaja, cg.nombre AS departamento
+                    FROM empl_cargos AS ec, tipo_cargo AS tc, cg_departamentos AS cg
+                    WHERE ec.id = (SELECT MAX(cargo_id) AS cargo_id FROM datos_empleado_cargo
+                                    WHERE empl_id = $1)
+                    AND tc.id = ec.cargo AND cg.id = ec.id_departamento
                     `, [id]).then((result) => {
                         return result.rows;
                     }),
@@ -285,22 +309,6 @@ class TimbresControlador {
                 .then((result) => {
                 res.jsonp({ message: 'Vista Actualizada' });
             });
-        });
-    }
-    EliminarMultiplesAvisos(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const arrayIdsRealtimeTimbres = req.body;
-            console.log(arrayIdsRealtimeTimbres);
-            if (arrayIdsRealtimeTimbres.length > 0) {
-                arrayIdsRealtimeTimbres.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
-                    yield database_1.default.query('DELETE FROM realtime_timbres WHERE id = $1', [obj])
-                        .then((result) => {
-                        console.log(result.command, 'REALTIME ELIMINADO ====>', obj);
-                    });
-                }));
-                return res.jsonp({ message: 'Todos las notificaciones han sido eliminadas' });
-            }
-            return res.jsonp({ message: 'No seleccionó ningún timbre' });
         });
     }
     ObtenerUltimoTimbreEmpleado(req, res) {

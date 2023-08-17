@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
 import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.service'
+import { ListarRegimenComponent } from '../listar-regimen/listar-regimen.component';
 
 @Component({
   selector: 'app-ver-regimen',
@@ -12,18 +13,15 @@ import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.s
 
 export class VerRegimenComponent implements OnInit {
 
-  idRegimen: string;
+  @Input() idRegimen: number;
   regimen: any = [];
 
   constructor(
     public pais: ProvinciaService,
     public rest: RegimenService,
     public router: Router,
-  ) {
-    var cadena = this.router.url;
-    var aux = cadena.split("/");
-    this.idRegimen = aux[2];
-  }
+    public componentl: ListarRegimenComponent,
+  ) { }
 
   ngOnInit(): void {
     this.ObtenerPaises();
@@ -32,7 +30,7 @@ export class VerRegimenComponent implements OnInit {
   // METODO PARA CONSULTAR DATOS DE REGIMEN
   CargarDatosRegimen() {
     this.regimen = [];
-    this.rest.ConsultarUnRegimen(parseInt(this.idRegimen)).subscribe(datos => {
+    this.rest.ConsultarUnRegimen(this.idRegimen).subscribe(datos => {
       this.regimen = datos;
       this.regimen.descripcion = this.regimen.descripcion.toUpperCase();
       // OBTENER NOMBRE DEL PAIS REGISTRADO
@@ -75,7 +73,7 @@ export class VerRegimenComponent implements OnInit {
   ver_periodo: boolean = false;
   ObtenerPeriodos() {
     this.periodo = [];
-    this.rest.ConsultarUnPeriodo(parseInt(this.idRegimen)).subscribe(dato => {
+    this.rest.ConsultarUnPeriodo(this.idRegimen).subscribe(dato => {
       this.periodo = dato;
       this.ver_periodo = true;
     })
@@ -92,11 +90,26 @@ export class VerRegimenComponent implements OnInit {
     }
     else {
       this.antiguedad = [];
-      this.rest.ConsultarAntiguedad(parseInt(this.idRegimen)).subscribe(dato => {
+      this.rest.ConsultarAntiguedad(this.idRegimen).subscribe(dato => {
         this.antiguedad = dato;
         this.ver_antiguedad_variable = true;
       })
     }
+  }
+
+  // METODO PARA VER LISTA DE REGIMEN
+  VerListaRegimen() {
+    this.componentl.ver_lista = true;
+    this.componentl.ver_datos = false;
+    this.componentl.ObtenerRegimen();
+  }
+
+  // METODO PARA ABRIR FORMULARIO EDITAR
+  AbrirEditar(id: number) {
+    this.componentl.ver_datos = false;
+    this.componentl.ver_editar = true;
+    this.componentl.pagina = 'ver-regimen';
+    this.componentl.regimen_id = id;
   }
 
 }

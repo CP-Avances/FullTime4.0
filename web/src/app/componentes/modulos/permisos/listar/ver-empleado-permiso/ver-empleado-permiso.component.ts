@@ -21,6 +21,7 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 import { EditarEstadoAutorizaccionComponent } from 'src/app/componentes/autorizaciones/editar-estado-autorizaccion/editar-estado-autorizaccion.component';
 import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 
 @Component({
   selector: 'app-ver-empleado-permiso',
@@ -68,6 +69,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
     public restE: EmpleadoService, // SERVICIO DE DATOS DE EMPLEADO
     public restAutoriza: AutorizaDepartamentoService, //SERVICIO DE DATOS DE AUTORIZACION POR EL EMPLEADO
     public usuarioDepa: UsuarioService, //SERVICIO DE DATOS DE DEPARTAMENTO POR EL USUARIO DE LA SOLICITUD
+    private plangeneral: PlanGeneralService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.id_permiso = this.router.url.split('/')[2];
@@ -86,7 +88,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
   ArrayAutorizacionTipos: any = [];
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
@@ -169,6 +171,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
     this.lectura = 1;
     this.restA.BuscarAutorizacionPermiso(id).subscribe(res1 => {
       this.autorizacion = res1;
+      console.log('autorizacion: ',this.autorizacion);
       // METODO PARA OBTENER EMPLEADOS Y ESTADOS
       var autorizaciones = this.autorizacion[0].id_documento.split(',');
       autorizaciones.map((obj: string) => {
@@ -198,11 +201,12 @@ export class VerEmpleadoPermisoComponent implements OnInit {
           }
         
           if((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')){
+            //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
             this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
               this.listadoDepaAutoriza = res;
-              this.listadoDepaAutoriza.filter(item => {
-                if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
-                  return this.ocultar = false;
+              this.listadoDepaAutoriza.forEach(item => {
+                if((this.idEmpleado == item.id_empleado) && (autorizaciones.length ==  item.nivel)){
+                  this.obtenerPlanificacionHoraria(this.InfoPermiso[0].fec_inicio, this.InfoPermiso[0].fec_final, this.InfoPermiso[0].codigo);
                 }else{
                   return this.ocultar = true;
                 }
@@ -212,31 +216,63 @@ export class VerEmpleadoPermisoComponent implements OnInit {
             this.ocultar = true;
           }
 
-          this.empleado_estado = this.empleado_estado.concat(data);
+          this.empleado_estado = this.empleado_estado.concat(data);     
           // CUANDO TODOS LOS DATOS SE HAYAN REVISADO EJECUTAR METODO DE INFORMACIÓN DE AUTORIZACIÓN
           if (this.lectura === autorizaciones.length) {
             this.VerInformacionAutoriza(this.empleado_estado);
           }
+
         }else{
+          //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
           this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
             this.listadoDepaAutoriza = res;
-            this.listadoDepaAutoriza.filter(item => {
-              if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
-                return this.ocultar = false;
-              } 
+            this.listadoDepaAutoriza.forEach(item => {
+              if((this.idEmpleado == item.id_empleado) && (autorizaciones.length ==  item.nivel)){
+                this.obtenerPlanificacionHoraria(this.InfoPermiso[0].fec_inicio, this.InfoPermiso[0].fec_final, this.InfoPermiso[0].codigo);
+              }else{
+                return this.ocultar = true;
+              }
             })
           });
         }
       })
 
-      
       // TOMAR TAMAÑO DE ARREGLO DE COLABORADORES QUE REVIZARÓN SOLICITUD
       this.cont = autorizaciones.length - 1;
 
     }, error => {
+      this.ocultar = false;
       this.HabilitarAutorizacion = false;
     });
   
+  }
+
+  listahorario: any = [];
+  mensaje: string = '';
+  dia: any;
+  obtenerPlanificacionHoraria(fecha_i: any, fehca_f: any, codigo: any){
+    this.mensaje = '';
+    var datos = {
+      fecha_inicio: fecha_i, 
+      fecha_final: fehca_f, 
+      codigo: '\''+codigo+'\''
+    }
+
+    this.plangeneral.BuscarPlanificacionHoraria(datos).subscribe(res => {
+      this.listahorario = res;
+      console.log('this.listahorario: ',this.listahorario);
+      if(this.listahorario.data.length == 0){
+        this.mensaje = 'No tiene registrado la planificacion horaria en esas fechas';
+        return this.ocultar = true;
+      }else{
+        this.mensaje = '';
+        return this.ocultar = false;
+      }
+    },error => {
+      this.mensaje = 'Problemas con validar su planificacion horaria en esas fechas';
+      return this.ocultar = true;
+    });
+
   }
 
   // METODO PARA OBTENER EL LOGO DE LA EMPRESA
@@ -277,7 +313,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
     })
   }
 
-  // METODO PARA VER LA INFORMACIÓN DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -337,6 +373,11 @@ export class VerEmpleadoPermisoComponent implements OnInit {
       });
   }
 
+  //METODO PARA CERRAR VENTANA
+  cerrarVentana(){
+    this.router.navigate(['/permisos-solicitados']);
+  }
+
   /* **************************************************************************************************** * 
    *                                         METODO PARA EXPORTAR A PDF                                   *
    * **************************************************************************************************** */
@@ -385,12 +426,12 @@ export class VerEmpleadoPermisoComponent implements OnInit {
 
 
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
-      // PIE DE PÁGINA
+      // PIE DE PAGINA
       footer: function (currentPage: { toString: () => string; }, pageCount: string, fecha: string, hora: string) {
         var f = moment();
         fecha = f.format('DD/MM/YYYY');
@@ -412,14 +453,14 @@ export class VerEmpleadoPermisoComponent implements OnInit {
         }
       },
       content: [
-        { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: this.datoSolicitud[0].nom_empresa.toUpperCase(), bold: true, fontSize: 20, alignment: 'center', margin: [0, 0, 0, 20] },
+        { image: this.logo, width: 150, margin: [5, -27, 0, 2] },
+        { text: this.datoSolicitud[0].nom_empresa.toUpperCase(), bold: true, fontSize: 20, alignment: 'center', margin: [0, -2, 0, 10] },
         { text: 'SOLICITUD DE PERMISO', fontSize: 10, alignment: 'center', margin: [0, 0, 0, 10] },
         this.SeleccionarMetodo(),
       ],
       styles: {
         tableHeader: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color, },
-        tableHeaderA: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.s_color, margin: [20, 0, 20, 0], },
+        tableHeaderA: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.s_color, margin: [10, 0, 10, 0], },
         itemsTableD: { fontSize: 10, alignment: 'left', margin: [50, 5, 5, 5] },
         itemsTable: { fontSize: 10, alignment: 'center', }
       }
@@ -427,8 +468,6 @@ export class VerEmpleadoPermisoComponent implements OnInit {
   }
 
   SeleccionarMetodo() {
-    var contador = 0;
-    var contador2 = 0;
     let fec_creacion_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_creacion.split('T')[0], this.formato_fecha, this.validar.dia_completo)
     let fec_inicio_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_inicio.split('T')[0], this.formato_fecha, this.validar.dia_completo)
     let fec_final_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_final.split('T')[0], this.formato_fecha, this.validar.dia_completo)
@@ -491,7 +530,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
                         widths: ['auto'],
                         body: [
                           [{ text: obj.estado.toUpperCase(), style: 'tableHeaderA'},],
-                          [{ text: ' ', style: 'itemsTable', margin: [0, 17, 0, 17] },],
+                          [{ text: ' ', style: 'itemsTable', margin: [0, 15, 0, 15] },],
                           [{ text: obj.nombre + '\n' + obj.cargo, style: 'itemsTable' },]
                         ]
                       }
@@ -516,7 +555,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
                         widths: ['auto'],
                         body: [
                           [{ text: obje.estado.toUpperCase(), style: 'tableHeaderA'},],
-                          [{ text: ' ', style: 'itemsTable', margin: [0, 17, 0, 17] },],
+                          [{ text: ' ', style: 'itemsTable', margin: [0, 15, 0, 15] },],
                           [{ text: obje.nombre + '\n' + obje.cargo, style: 'itemsTable' },]
                         ]
                       }
@@ -536,8 +575,8 @@ export class VerEmpleadoPermisoComponent implements OnInit {
         },
         paddingLeft: function (i: any, node: any) { return 40; },
         paddingRight: function (i: any, node: any) { return 40; },
-        paddingTop: function (i: any, node: any) { return 10; },
-        paddingBottom: function (i: any, node: any) { return 10; },
+        paddingTop: function (i: any, node: any) { return 6; },
+        paddingBottom: function (i: any, node: any) { return 6; },
       }
     };
   }

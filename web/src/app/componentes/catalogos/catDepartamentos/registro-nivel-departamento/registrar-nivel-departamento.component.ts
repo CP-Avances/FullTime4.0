@@ -1,16 +1,12 @@
-import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
+import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { ThemePalette } from '@angular/material/core';
-import { Router } from '@angular/router';
 
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
-
-import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
-
 
 interface Nivel {
   valor: number;
@@ -27,8 +23,8 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   depaPadre = new FormControl('', Validators.required);
-  nombre = new FormControl('');
   nivel = new FormControl('', Validators.required);
+  idSucursal = new FormControl('');
 
   // DATOS DEPARTAMENTO
   sucursales: any = [];
@@ -38,8 +34,8 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
   // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
   public formulario = new FormGroup({
     nivelForm: this.nivel,
-    nombreForm: this.nombre,
     depaPadreForm: this.depaPadre,
+    idSucursalForm: this.idSucursal,
   });
 
 
@@ -53,7 +49,7 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
   ];
 
   /**
-   * VARIABLES PROGRESS SPINNEr
+   * VARIABLES PROGRESS SPINNER
    */
   habilitarprogress: boolean = false;
   color: ThemePalette = 'primary';
@@ -63,116 +59,104 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
   constructor(
     private rest: DepartamentosService,
     private toastr: ToastrService,
-    private router: Router,
+    public sucursal: SucursalService,
     public ventana: MatDialog,
     public ventanacerrar: MatDialogRef<RegistrarNivelDepartamentoComponent>,
     @Inject(MAT_DIALOG_DATA) public info: any
   ) { }
 
   datos: any;
-  listaDepaNiveles: any  = [];
+  listaDepaNiveles: any = [];
+
   ngOnInit(): void {
     this.datos = this.info;
     this.CargarDatos();
+    this.FiltrarSucursales();
+  }
+
+  // METODO PARA CONSULTAR SUCURSALES
+  FiltrarSucursales() {
+    let empresa_id = parseInt(localStorage.getItem('empresa') as string);
+    this.sucursales = [];
+    this.sucursal.BuscarSucursalEmpresa(empresa_id).subscribe(datos => {
+      this.sucursales = datos;
+    })
   }
 
   // METODO PARA IMPRIMIR DATOS EN FORMULARIO
   CargarDatos() {
-    this.nivel.setValue(this.datos.nivel);
-    this.rest.BuscarDepartamentoSucursal(this.datos.id_sucursal).subscribe(datos => {
-      this.departamentos = datos;
-    });
-
     var id_departamento = this.datos.id;
     var id_establecimiento = this.datos.id_sucursal;
     this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
       this.listaDepaNiveles = datos;
+      console.log('VER DATOS ', this.listaDepaNiveles)
     })
-
-
   }
 
-  public listadepnivel: any = [];
+  // OBTENER LISTA DE DEPARTAMENTOS
+  ObtenerDepartamentos(form: any) {
+    this.departamentos = [];
+    this.rest.BuscarDepartamentoSucursal(parseInt(form.idSucursalForm)).subscribe(datos => {
+      this.departamentos = datos;
+    });
+  }
+
   // METODO PARA CAPTURAR DATOS DE FORMULARIO
   RegistrarNivelDepa(form: any) {
     this.rest.BuscarDepartamento(form.depaPadreForm).subscribe(datos => {
-      this.listadepnivel = datos;
-      this.nombre.setValue(this.listadepnivel[0].nombre)
       var departamento = {
         id_departamento: this.datos.id,
         departamento: this.datos.nombre,
         nivel: parseInt(form.nivelForm),
         dep_nivel: form.depaPadreForm,
-        dep_nivel_nombre: this.listadepnivel[0].nombre.toUpperCase(),
-        id_establecimiento: this.datos.id_sucursal
+        dep_nivel_nombre: datos[0].nombre.toUpperCase(),
+        id_establecimiento: parseInt(this.datos.id_sucursal),
+        id_suc_dep_nivel: parseInt(form.idSucursalForm)
       };
-
-      console.log('departamento: ',departamento);
       this.GuardarDatos(departamento);
     });
-   
+
   }
-
-  // METODO DE ACTUALIZACION DE REGISTRO EN BASE DE DATOS
-  ActualizarDepartamento(departamento: any) {
-    var cg_depa = {
-      depa_padre: departamento.dep_nivel,
-      nivel: departamento.nivel
-    }
-
-    this.rest.ActualizarNivelDepartamento(departamento.id_departamento, cg_depa).subscribe(response => {
-      this.habilitarprogress = false;
-      if (response.message === 'error') {
-        this.toastr.error('Existe un error en los datos.', '', {
-          timeOut: 3000,
-        });
-      }
-      else {
-        this.toastr.success('Operacion Exitosa.', 'Registro actualizado.', {
-          timeOut: 3000,
-        });
-        this.CerrarVentana();
-      }
-    })
-  }
-
 
   // METODO DE ALMACENAMIENTO DE DATOS VALIDANDO DUPLICADOS
   contador: number = 0;
   GuardarDatos(departamento: any) {
 
+    // VERIFICAR SI EXISTE DEPARTAMENTO O NIVEL YA REGISTRADO
     for (var i = 0; i <= this.listaDepaNiveles.length - 1; i++) {
-      if ((this.listaDepaNiveles[i].dep_nivel_nombre === departamento.dep_nivel_nombre) || 
-          (this.listaDepaNiveles[i].nivel === departamento.nivel)) {
+      if ((this.listaDepaNiveles[i].id_dep_nivel === departamento.dep_nivel) ||
+        (this.listaDepaNiveles[i].nivel === departamento.nivel)) {
         this.contador = 1;
+        break;
       }
     }
 
+    // SI EXISTE UN REGISTRO SE INDICA AL USUARIO
     if (this.contador === 1) {
       this.contador = 0;
-      this.toastr.error('Nombre de departamento o nivel ya se encuentra registrado.', '', {
+      this.toastr.error('Ups!!! algo salio mal.', 'Departamento o nivel ya se encuentra registrado.', {
         timeOut: 3000,
       });
     }
     else {
-      if((this.listaDepaNiveles.length + 1) === departamento.nivel ){
+      // VERIFICAR QUE EL NIVEL DE APROBACION CORRESPONDA EN EL REGISTRO
+      if ((this.listaDepaNiveles.length + 1) === departamento.nivel) {
         this.rest.RegistrarNivelDepartamento(departamento).subscribe(response => {
           this.habilitarprogress = false;
           if (response.message === 'error') {
             this.toastr.error('Existe un error en los datos.', '', {
-            timeOut: 3000,
+              timeOut: 3000,
             });
           }
           else {
-            this.ActualizarDepartamento(departamento);
-            this.toastr.success('Operacion Exitosa.', 'Registro Creado.', {
+            this.toastr.success('Operación exitosa.', 'Registro Creado.', {
               timeOut: 3000,
             });
-          this.CerrarVentana();
+            this.CerrarVentana();
           }
         });
-      }else{
-        this.toastr.error('Le hace falta registrar los niveles inferiores.', '', {
+      } else {
+        this.toastr.error('Ups!!! algo salio mal.', 'Le hace falta registrar niveles de aprobación inferiores.', {
           timeOut: 3000,
         });
       }
@@ -183,5 +167,7 @@ export class RegistrarNivelDepartamentoComponent implements OnInit {
   CerrarVentana() {
     this.ventanacerrar.close();
   }
+
+
 
 }

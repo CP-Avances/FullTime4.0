@@ -17,45 +17,55 @@
                 </div>
                 <div class="row">
                     <div class="col-sm">
-                        <mat-form-field>
-                            <mat-label>Fecha de inicio</mat-label>
-                            <input matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa"
-                                [formControl]="fechaInicioF" min="1950-01-31" max="2050-01-31" required
-                                (click)="LimpiarHorario()" (dateInput)="LimpiarHorario()" [disabled]="registrar">
-                            <mat-datepicker-toggle matSuffix [for]="picker" id="i-cursor" matTooltipPosition="right"
-                                matTooltip="Seleccionar la fecha dando click en el ícono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
-                            </mat-datepicker-toggle>
-                            <mat-datepicker touchUi #picker></mat-datepicker>
-                        </mat-form-field>
-                        <br>
-                        <mat-form-field>
-                            <mat-label>Fecha de finalización</mat-label>
-                            <input matInput [matDatepicker]="picker2" placeholder="dd/mm/aaaa"
-                                [formControl]="fechaFinalF" required (click)="LimpiarHorario()"
-                                (dateInput)="LimpiarHorario()" [disabled]="registrar">
-                            <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor" matTooltipPosition="right"
-                                matTooltip="Seleccionar la fecha dando click en el ícono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
-                            </mat-datepicker-toggle>
-                            <mat-datepicker touchUi #picker2></mat-datepicker>
-                        </mat-form-field>
-                        <br>
-                        <mat-form-field>
-                            <mat-label>Seleccionar horario</mat-label>
-                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                matTooltip="Lista de horarios cargados en el sistema.">
-                                help_outline</mat-icon>
-                            <mat-select [formControl]="horarioF" required>
-                                <mat-option *ngFor="let h of vista_horarios" [value]="h.id" id="letra"
-                                    (click)=VerificarIngresoFechas(formulario.value) [disabled]="registrar">
-                                    {{h.nombre}}
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
+                        <div class="row">
+                            <div class="col-md d-flex flex-wrap justify-content-start">
+                                <mat-form-field id="campos">
+                                    <mat-label>Fecha desde</mat-label>
+                                    <input matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa"
+                                        [formControl]="fechaInicioF" min="1950-01-31" max="2050-01-31" required
+                                        (click)="LimpiarHorario()" (dateInput)="LimpiarHorario()"
+                                        [disabled]="registrar">
+                                    <mat-datepicker-toggle matSuffix [for]="picker" id="i-cursor"
+                                        matTooltipPosition="right"
+                                        matTooltip="Seleccionar la fecha dando click en el ícono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker touchUi #picker></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md d-flex flex-wrap justify-content-start">
+                                <mat-form-field id="campos">
+                                    <mat-label>Fecha hasta</mat-label>
+                                    <input matInput [matDatepicker]="picker2" placeholder="dd/mm/aaaa"
+                                        [formControl]="fechaFinalF" required (click)="LimpiarHorario()"
+                                        (dateInput)="LimpiarHorario()" [disabled]="registrar">
+                                    <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor"
+                                        matTooltipPosition="right"
+                                        matTooltip="Seleccionar la fecha dando click en el ícono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker touchUi #picker2></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start" style="margin-left: 15px;">
+                                <mat-form-field>
+                                    <mat-label>Seleccionar horario</mat-label>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Lista de horarios cargados en el sistema.">
+                                        help_outline
+                                    </mat-icon>
+                                    <mat-select [formControl]="horarioF" required>
+                                        <mat-option *ngFor="let h of vista_horarios" [value]="h.id" id="letra"
+                                            (click)=VerificarIngresoFechas(formulario.value) [disabled]="registrar">
+                                            {{h.nombre}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-sm" style="text-align: left;">
-                        <div class="col-sm" style="text-align: left; padding-top: 20px;">
+                        <div class="col-sm" style="text-align: left; padding-top: 5px;">
                             <label style="margin-right: 35px; font-size: 15px; padding-top: 10px;">
-                                Marcar días libres*
+                                Marcar días no laborables o libres*
                             </label>
                         </div>
                         <div class="container" style="text-align: center;">
@@ -68,7 +78,8 @@
                                     <mat-checkbox [formControl]="martesF" [(ngModel)]="martes" [disabled]="registrar">
                                         <label id="textoradiobtn">Martes</label>
                                     </mat-checkbox>
-                                    <br>
+                                </div>
+                                <div class="col-sm" style="text-align: left;">
                                     <mat-checkbox [formControl]="miercolesF" [(ngModel)]="miercoles"
                                         [disabled]="registrar">
                                         <label id="textoradiobtn">Miércoles</label>
@@ -82,7 +93,8 @@
                                     <mat-checkbox [formControl]="viernesF" [(ngModel)]="viernes" [disabled]="registrar">
                                         <label id="textoradiobtn">Viernes</label>
                                     </mat-checkbox>
-                                    <br>
+                                </div>
+                                <div class="col-sm" style="text-align: left;">
                                     <mat-checkbox [formControl]="sabadoF" [(ngModel)]="sabado" [disabled]="registrar">
                                         <label id="textoradiobtn">Sábado</label>
                                     </mat-checkbox>
@@ -96,21 +108,21 @@
                     </div>
                 </div>
             </div>
+            <div class="d-flex flex-wrap justify-content-center">
+                <button id="btn-raised" class="btn btn-sm" (click)="ValidarSeleccionados(formulario.value)"
+                    [disabled]="!formulario.valid" *ngIf="validar">
+                    Validar
+                </button>
+                <button id="btn-raised" class="btn btn-sm" *ngIf="btn_eliminar_todo"
+                    (click)="EliminarRegistros(formulario.value, 1)">
+                    Eliminar
+                </button>
+                <button id="btn-raised" class="btn btn-sm" (click)="CerrarTabla()" *ngIf="cancelar">
+                    Cancelar
+                </button>
+            </div>
         </mat-card-content>
     </form>
-    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
-        <button id="btn-raised" class="btn btn-sm" (click)="ValidarSeleccionados(formulario.value)"
-            [disabled]="!formulario.valid" *ngIf="validar">
-            Validar
-        </button>
-        <button id="btn-raised" class="btn btn-sm" *ngIf="btn_eliminar_todo"
-            (click)="EliminarRegistros(formulario.value, 1)">
-            Eliminar
-        </button>
-        <button id="btn-raised" class="btn btn-sm" (click)="CerrarTabla()" *ngIf="cancelar">
-            Cancelar
-        </button>
-    </div>
 </mat-card>
 <div style="margin: 25px 0px 25px 0px; text-align: center;" *ngIf="observaciones">
     <mat-card class="example-card mat-elevation-z8">
@@ -148,7 +160,7 @@
             </table>
         </div>
         <mat-paginator id="pagina" [length]="usuarios.length" [pageSize]="tamanio_pagina_h"
-            [pageSizeOptions]="pageSizeOptions_h" id="pagina" (page)="ManejarPaginaH($event)" showFirstLastButtons>
+            [pageSizeOptions]="pageSizeOptions_h" (page)="ManejarPaginaH($event)" showFirstLastButtons>
         </mat-paginator>
         <br>
         <div class="container" style="text-align: center;">

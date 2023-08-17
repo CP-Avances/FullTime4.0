@@ -49,7 +49,7 @@ export class RegistroEnroladosComponent implements OnInit {
 
   filteredOptions: Observable<any[]>;
 
-  // asignar los campos en un formulario en grupo
+  // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
   public nuevoEnroladoForm = new FormGroup({
     enroladoId_UsuarioForm: this.id_usuario,
     enroladoNombreForm: this.nombre,
@@ -61,7 +61,7 @@ export class RegistroEnroladosComponent implements OnInit {
   });
 
   /**
-   * Variables progress spinner
+   * VARIABLES PROGRESS SPINNER
    */
   color: ThemePalette = 'primary';
   mode: ProgressSpinnerMode = 'indeterminate';
@@ -105,7 +105,7 @@ export class RegistroEnroladosComponent implements OnInit {
       codigo: form.codigoForm
     };
     this.rest.postEnroladosRest(dataEnrolado).subscribe(response => {
-      this.toastr.success('Operacion Exitosa', 'Enrolado con éxito', {
+      this.toastr.success('Operacion exitosa.', 'Enrolado con éxito', {
         timeOut: 6000,
       });
       this.rest.BuscarUltimoId().subscribe(response => {
@@ -121,7 +121,7 @@ export class RegistroEnroladosComponent implements OnInit {
     });
   }
 
-  VerificarDuplicidad(form) {
+  VerificarDuplicidad(form: any) {
     this.idUser = [];
     this.restUsuario.getIdByUsuarioRest(form.enroladoId_UsuarioForm).subscribe(datos => {
       this.idUser = datos;
@@ -171,7 +171,7 @@ export class RegistroEnroladosComponent implements OnInit {
     else {
       keynum = evt.which;
     }
-    // Comprobamos si se encuentra en el rango numérico y que teclas no recibirá.
+    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
     if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6) {
       return true;
     }

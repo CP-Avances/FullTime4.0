@@ -26,7 +26,7 @@ export class ConfigReportFirmasHorasExtrasComponent implements OnInit {
 
   }
 
-  CrearConfiguracion(form) {
+  CrearConfiguracion(form: any) {
     
     console.log(form);
     if (!!sessionStorage.getItem('Firmas_hora_extra')) {

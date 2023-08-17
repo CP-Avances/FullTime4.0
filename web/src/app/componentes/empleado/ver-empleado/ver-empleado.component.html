@@ -755,15 +755,252 @@
             <h6 id="items" style="margin-top: 10%;">Horario</h6>
         </ng-template>
 
-        <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="ventana_horario">
+        <!-- ************** PANTALLA DE REGISTRO DE HORARIO  ************************* -->
+        <div class="container" style="padding-top: 15px; padding-bottom: 15px;" *ngIf="ventana_horario">
             <app-registo-empleado-horario [data_horario]="data_horario">
             </app-registo-empleado-horario>
         </div>
 
-        <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="horarios_usuario">
+        <div class="container" style="padding-bottom: 25px; padding-top: 15px;" *ngIf="horarios_usuario">
+            <mat-card class="example-card mat-elevation-z8">
+                <div id="resultados">
+                    <span>BÚSQUEDA RANGO FECHAS</span>
+                </div>
+                <mat-card-content>
+                    <div class="row">
+                        <div class="nota" style="margin-left: 15px; padding-top: 15px;">
+                            <span>
+                                NOTA: Al presionar Buscar se visualizará la planificación del mes actual. Para una
+                                búsqueda personalizada ingresar mes de inicio y fin de periodo.
+                            </span>
+                        </div>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Mes inicio</mat-label>
+                                    <input matInput [matDatepicker]="fec1" [formControl]="fechaInicialF"
+                                        placeholder="DD/MM/YYYY">
+                                    <mat-datepicker-toggle matIconSuffix [for]="fec1"></mat-datepicker-toggle>
+                                    <mat-datepicker #fec1 startView="year"
+                                        (monthSelected)="FormatearFecha($event, fec1, 1)" touchUi>
+                                    </mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Mes final</mat-label>
+                                    <input matInput [matDatepicker]="fec2" [formControl]="fechaFinalF"
+                                        placeholder="DD/MM/YYYY">
+                                    <mat-datepicker-toggle matIconSuffix [for]="fec2"
+                                        [disabled]="fecHorario"></mat-datepicker-toggle>
+                                    <mat-datepicker #fec2 startView="year"
+                                        (monthSelected)="FormatearFecha($event, fec2, 2)" touchUi>
+                                    </mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+
+                </mat-card-content>
+            </mat-card>
+        </div>
+
+        <!-- *********************** TABLA DE DETALLES DE HORARIOS Y DEFINICIONES ******************************* -->
+        <div *ngIf="horarios_usuario">
+            <div class="container" style="padding-bottom: 25px;" *ngIf="ver_acciones">
+                <div class="row">
+                    <div class="col-md">
+                        <div class="mat-elevation-z8" style="background: white;">
+                            <div class="d-flex bd-highlight" id="resultados">
+                                <span class="w-100 bd-highlight">
+                                    DETALLE DE HORARIOS
+                                </span>
+                            </div>
+                            <div class="table-responsive" style="text-align: center;">
+                                <table id="table_acciones" class="table table-hover table-sm" style="margin: 0 auto;">
+                                    <thead class="thead-light">
+                                        <tr style="text-align: center;">
+                                            <th scope="col" id="td_horarios">HORARIO</th>
+                                            <th scope="col" id="td_horarios">ENTRADA (E)</th>
+                                            <th scope="col" id="td_horarios">INICIO ALIMENTACIÓN (I/A)</th>
+                                            <th scope="col" id="td_horarios">FIN ALIMENTACIÓN (F/A)</th>
+                                            <th scope="col" id="td_horarios">SALIDA (S)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody *ngIf="paginar">
+                                        <tr
+                                            *ngFor="let d of detalle_acciones | paginate:tamanio_paginaD:numero_paginaD">
+                                            <td id="td_horarios">{{d.horario}}</td>
+                                            <td id="td_horarios">{{d.entrada_}}</td>
+                                            <td id="td_horarios">{{d.inicio_comida}}</td>
+                                            <td id="td_horarios">{{d.fin_comida}}</td>
+                                            <td id="td_horarios">{{d.salida_}}</td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody *ngIf="!paginar">
+                                        <tr *ngFor="let d of detalle_acciones">
+                                            <td id="td_horarios">{{d.horario}}</td>
+                                            <td id="td_horarios">{{d.entrada_}}</td>
+                                            <td id="td_horarios">{{d.inicio_comida}}</td>
+                                            <td id="td_horarios">{{d.fin_comida}}</td>
+                                            <td id="td_horarios">{{d.salida_}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <mat-paginator *ngIf="paginar" id="pagina" [length]="detalle_acciones.length"
+                                [pageSize]="tamanio_paginaD" [pageSizeOptions]="pageSizeOptionsD"
+                                (page)="ManejarPaginaDetalles($event)" showFirstLastButtons>
+                            </mat-paginator>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="mat-elevation-z8" style="background: white;">
+                            <div class="d-flex bd-highlight" id="resultados">
+                                <span class="w-100 bd-highlight">
+                                    DEFINICIONES
+                                </span>
+                                <mat-icon class="float-right" id="cerrar_" (click)="CerrarDetalles()">
+                                    highlight_off
+                                </mat-icon>
+                            </div>
+                            <div class="table-responsive" style="text-align: center;">
+                                <table id="table_acciones" class="table table-hover table-sm" style="margin: 0 auto;">
+                                    <thead class="thead-light">
+                                        <tr style="text-align: center;">
+                                            <th scope="col" id="td_horarios">NOMENCLATURA</th>
+                                            <th scope="col" id="td_horarios">DESCRIPCIÓN</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let n of nomenclatura | paginate:tamanio_pagina:numero_pagina">
+                                            <td id="td_horarios">{{n.nombre}}</td>
+                                            <td id="td_horarios">{{n.descripcion}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- *********************** TABLA DE LISTA DE HORARIOS ASIGNADOS AL USUARIO ******************************* -->
+        <div class="container" style="padding-bottom: 25px;" *ngIf="horarios_usuario">
+            <div class="mat-elevation-z8" style="background: white;">
+                <div class="d-flex bd-highlight" id="titulo">
+                    <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+                        (click)="BuscarHorarioPeriodo()">
+                        Buscar
+                    </button>
+                    <span class="w-100 bd-highlight">
+                        LISTA DE HORARIOS DEL USUARIO
+                    </span>
+                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                        (click)="AbrirPlanificarHorario()">
+                        Planificar
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table id="table_horario" class="table table-hover table-sm ">
+                        <thead class="thead-light">
+                            <tr style="text-align: center;">
+                                <th scope="col" id="td_horarios" rowspan="2">AÑO</th>
+                                <th scope="col" id="td_horarios" rowspan="2">MES</th>
+                                <th scope="col" id="td_horarios" colspan="31">DÍAS DEL MES</th>
+                            </tr>
+                            <tr style="text-align: center;">
+                                <th scope="col" id="td_horarios">01</th>
+                                <th scope="col" id="td_horarios">02</th>
+                                <th scope="col" id="td_horarios">03</th>
+                                <th scope="col" id="td_horarios">04</th>
+                                <th scope="col" id="td_horarios">05</th>
+                                <th scope="col" id="td_horarios">06</th>
+                                <th scope="col" id="td_horarios">07</th>
+                                <th scope="col" id="td_horarios">08</th>
+                                <th scope="col" id="td_horarios">09</th>
+                                <th scope="col" id="td_horarios">10</th>
+                                <th scope="col" id="td_horarios">11</th>
+                                <th scope="col" id="td_horarios">12</th>
+                                <th scope="col" id="td_horarios">13</th>
+                                <th scope="col" id="td_horarios">14</th>
+                                <th scope="col" id="td_horarios">15</th>
+                                <th scope="col" id="td_horarios">16</th>
+                                <th scope="col" id="td_horarios">17</th>
+                                <th scope="col" id="td_horarios">18</th>
+                                <th scope="col" id="td_horarios">19</th>
+                                <th scope="col" id="td_horarios">20</th>
+                                <th scope="col" id="td_horarios">21</th>
+                                <th scope="col" id="td_horarios">22</th>
+                                <th scope="col" id="td_horarios">23</th>
+                                <th scope="col" id="td_horarios">24</th>
+                                <th scope="col" id="td_horarios">25</th>
+                                <th scope="col" id="td_horarios">26</th>
+                                <th scope="col" id="td_horarios">27</th>
+                                <th scope="col" id="td_horarios">28</th>
+                                <th scope="col" id="td_horarios">29</th>
+                                <th scope="col" id="td_horarios">30</th>
+                                <th scope="col" id="td_horarios">31</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let h of horariosEmpleado | paginate:tamanio_pagina:numero_pagina">
+                                <td id="td_horarios">{{h.anio}}</td>
+                                <td id="td_horarios">{{h.mes}}</td>
+                                <td id="td_horarios">{{h.dia1}}</td>
+                                <td id="td_horarios">{{h.dia2}}</td>
+                                <td id="td_horarios">{{h.dia3}}</td>
+                                <td id="td_horarios">{{h.dia4}}</td>
+                                <td id="td_horarios">{{h.dia5}}</td>
+                                <td id="td_horarios">{{h.dia6}}</td>
+                                <td id="td_horarios">{{h.dia7}}</td>
+                                <td id="td_horarios">{{h.dia8}}</td>
+                                <td id="td_horarios">{{h.dia9}}</td>
+                                <td id="td_horarios">{{h.dia10}}</td>
+                                <td id="td_horarios">{{h.dia11}}</td>
+                                <td id="td_horarios">{{h.dia12}}</td>
+                                <td id="td_horarios">{{h.dia13}}</td>
+                                <td id="td_horarios">{{h.dia14}}</td>
+                                <td id="td_horarios">{{h.dia15}}</td>
+                                <td id="td_horarios">{{h.dia16}}</td>
+                                <td id="td_horarios">{{h.dia17}}</td>
+                                <td id="td_horarios">{{h.dia18}}</td>
+                                <td id="td_horarios">{{h.dia19}}</td>
+                                <td id="td_horarios">{{h.dia20}}</td>
+                                <td id="td_horarios">{{h.dia21}}</td>
+                                <td id="td_horarios">{{h.dia22}}</td>
+                                <td id="td_horarios">{{h.dia23}}</td>
+                                <td id="td_horarios">{{h.dia24}}</td>
+                                <td id="td_horarios">{{h.dia25}}</td>
+                                <td id="td_horarios">{{h.dia26}}</td>
+                                <td id="td_horarios">{{h.dia27}}</td>
+                                <td id="td_horarios">{{h.dia28}}</td>
+                                <td id="td_horarios">{{h.dia29}}</td>
+                                <td id="td_horarios">{{h.dia30}}</td>
+                                <td id="td_horarios">{{h.dia31}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex flex-wrap justify-content-around" style="margin-top: 1%;" *ngIf="ver_detalle">
+                    <button id="btn-raised" class="btn btn-sm" (click)="ObtenerDetallesPlanificacion()">
+                        Detalle Planificación
+                    </button>
+                </div>
+                <mat-paginator id="pagina" [length]="horariosEmpleado.length" [pageSize]="tamanio_pagina"
+                    [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
+                </mat-paginator>
+                <br>
+            </div>
+        </div>
+
+        <div class="container" style="padding-bottom: 25px; text-align: center;" *ngIf="horarios_usuario">
             <div class="row">
                 <div class="col-md">
-                    <div id="titulo">
+                    <div id="resultados">
                         <h5>ASIGNACIÓN DE HORARIO LABORAL</h5>
                     </div>
                     <mat-card class="example-card mat-elevation-z9" id="carta1">
@@ -775,8 +1012,9 @@
                                             [formControl]="archivoHorarioForm" id="file"
                                             accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                         <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
-                                            matTooltip="Presionar para cargar plantilla con nombre Horario Empleado">Subir
-                                            horario</label>
+                                            matTooltip="Presionar para cargar plantilla con nombre Horario Empleado">
+                                            Subir horario
+                                        </label>
                                     </form>
                                 </div>
                                 <div class="col-md" style="text-align: center;">
@@ -795,87 +1033,17 @@
                 </div>
             </div>
         </div>
-        <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="horarios_usuario">
-            <div class="mat-elevation-z8" style="background: white;">
-                <div class="d-flex bd-highlight" id="titulo">
-                    <span class="w-100 bd-highlight">
-                        LISTA DE HORARIOS DEL USUARIO</span>
-                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                        (click)="AbrirVentanaEmplHorario()">
-                        Añadir
-                    </button>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-hover table-sm ">
-                        <thead class="thead-light">
-                            <tr style="text-align: center;">
-                                <th scope="col" rowspan="2">Horario</th>
-                                <th scope="col" rowspan="2">Inicio</th>
-                                <th scope="col" rowspan="2">Final</th>
-                                <th scope="col" colspan="7">Semana</th>
-                                <th scope="col" rowspan="2">Acciones</th>
-                            </tr>
-                            <tr style="text-align: center;">
-                                <th scope="col">Lu</th>
-                                <th scope="col">Mar</th>
-                                <th scope="col">Mi</th>
-                                <th scope="col">Ju</th>
-                                <th scope="col">Vi</th>
-                                <th scope="col">Sa</th>
-                                <th scope="col">Do</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let h of horariosEmpleado | paginate:tamanio_pagina:numero_pagina">
-                                <td>{{h.nom_horario}}</td>
-                                <td>{{h.fec_inicio_}}</td>
-                                <td>{{h.fec_final_}}</td>
-                                <td *ngIf="h.lunes == true">Libre</td>
-                                <td *ngIf="h.lunes == false">Normal</td>
-                                <td *ngIf="h.martes == true">Libre</td>
-                                <td *ngIf="h.martes == false">Normal</td>
-                                <td *ngIf="h.miercoles == true">Libre</td>
-                                <td *ngIf="h.miercoles == false">Normal</td>
-                                <td *ngIf="h.jueves == true">Libre</td>
-                                <td *ngIf="h.jueves == false">Normal</td>
-                                <td *ngIf="h.viernes == true">Libre</td>
-                                <td *ngIf="h.viernes == false">Normal</td>
-                                <td *ngIf="h.sabado == true">Libre</td>
-                                <td *ngIf="h.sabado == false">Normal</td>
-                                <td *ngIf="h.domingo == true">Libre</td>
-                                <td *ngIf="h.domingo == false">Normal</td>
-                                <td>
-                                    <i class="fas fa-edit" id="edit" (click)="AbrirEditarHorario(h)" matSuffix
-                                        matTooltipPosition="right"
-                                        matTooltip="Modificar los datos generales de este registro">
-                                        <p>Editar</p>
-                                    </i>
-                                    <i class="far fa-trash-alt" (click)="ConfirmarDeleteHorario(h)"
-                                        style="color:red; margin-left: 15px;" matSuffix matTooltipPosition="right"
-                                        matTooltip="Eliminar registro">
-                                        <p>Eliminar</p>
-                                    </i>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <mat-paginator id="pagina" [length]="horariosEmpleado.length" [pageSize]="tamanio_pagina"
-                    [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
-                </mat-paginator>
-                <br>
-            </div>
-        </div>
     </mat-tab>
 
-    <!-- PLANIFICACION DE HORARIOS DEL EMPLEADO Y DETALLE PLANIFICACION HORARIO -->
+    <!-- HORARIOS ROTATIVOS DEL EMPLEADO Y DETALLE PLANIFICACION HORARIO -->
     <mat-tab>
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">today</mat-icon>
             <h6 id="items">Horarios Rotativos</h6>
         </ng-template>
 
-        <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
+
+        <div class="container" style="padding-top: 15px; padding-bottom: 25px;" *ngIf="ver_rotativo">
             <mat-card class="mat-elevation-z8">
                 <div class="d-flex bd-highlight" id="titulo">
                     <div class="w-100 bd-highlight">
@@ -883,11 +1051,13 @@
                     </div>
                     <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
                         <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                            (click)="AbrirVentanaHorarioRotativo()">{{btnTitulo}}</button>
+                            (click)="AbrirVentanaHorarioRotativo()">
+                            Planificar
+                        </button>
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-hover table-sm ">
+                    <table class="table table-hover table-sm">
                         <thead class="thead-light">
                             <tr style="text-align: center;">
                                 <th scope="col">Fecha Inicio</th>
@@ -930,6 +1100,9 @@
                 <br>
             </mat-card>
         </div>
+
+        <app-registro-plan-horario *ngIf="registrar_rotativo" [datoEmpleado]="rotativo"></app-registro-plan-horario>
+
     </mat-tab>
 
     <!-- PERMISOS -->
@@ -939,11 +1112,15 @@
             <h6 id="items">Permisos</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
+
+            <!--  *************** REGISTRO DE PERMISOS  **********************  -->
             <app-registro-empleado-permiso [solicita_permiso]="solicita_permiso" *ngIf="formulario_permiso">
             </app-registro-empleado-permiso>
-            <app-editar-permiso-empleado [solicita_permiso]="solicita_permiso" [id_empleado]="empleado_permiso"
-                *ngIf="formulario_editar_permiso">
+
+            <!--  *************** EDICION DE PERMISOS  **********************  -->
+            <app-editar-permiso-empleado [solicita_permiso]="solicita_permiso" *ngIf="formulario_editar_permiso">
             </app-editar-permiso-empleado>
+
             <mat-card class="mat-elevation-z8" *ngIf="solicitudes_permiso">
                 <div class="d-flex bd-highlight" id="titulo">
                     <div class="w-100 bd-highlight">
@@ -951,7 +1128,9 @@
                     </div>
                     <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
                         <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                            (click)="AbrirVentanaPermiso()">{{btnTitulo}}</button>
+                            (click)="AbrirVentanaPermiso()">
+                            {{btnTitulo}}
+                        </button>
                     </div>
                 </div>
                 <div class="d-flex justify-content-center" style="padding-top: 10px; padding-bottom: 10px;">
@@ -966,7 +1145,7 @@
                     <i class="fa fa-refresh" id="listar" style="padding-top: 10px;" (click)="LimpiarCamposPermisos()"
                         matSuffix matTooltipPosition="right"
                         matTooltip="Modificar los datos generales de este registro">
-                        <p>Mostrar lista</p>
+                        <p>Actualizar y <br> mostrar lista</p>
                     </i>
                 </div>
                 <mat-divider style="margin-bottom: 10px;"></mat-divider>
@@ -1031,13 +1210,14 @@
                                     <label id="datosF">Horas permiso:</label>
                                     <label>{{pt.hora_numero}}</label>
                                 </div>
-                                <div class="espacio d-flex justify-content-start" *ngIf="pt.documento != null">
+                                <div class="espacio d-flex justify-content-start"
+                                    *ngIf="pt.documento != null && pt.documento != ''">
                                     <label id="datosF">Documento:</label>
                                     <a matSuffix matTooltipPosition="right"
                                         matTooltip="Dar click para descargar contrato de trabajo"
-                                        href="{{hipervinculo}}/empleadoPermiso/documentos/{{pt.documento}}"
+                                        href="{{hipervinculo}}/empleadoPermiso/documentos/{{pt.documento}}/visualizar/{{pt.codigo}}"
                                         target="_blank">
-                                        <label style="font-size: 13px;">{{pt.docu_nombre}}</label>
+                                        <label style="font-size: 13px;">{{pt.documento}}</label>
                                     </a>
                                 </div>
                             </div>
@@ -1139,7 +1319,7 @@
                         </div>
                         <div style="text-align: right; margin-right: 1px;">
                             <i (click)="AbrirEditarPeriodoVacaciones(p)" class="fas fa-edit" id="edit" matSuffix
-                                matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro">
+                                matTooltipPosition="right" matTooltip="Modificar los datos generales de este registro.">
                                 <p>Editar</p>
                             </i>
                         </div>
@@ -1645,85 +1825,91 @@
     <mat-tab *ngIf="autorizar">
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">supervisor_account</mat-icon>
-            <h6 id="items"> Autorización</h6>
+            <h6 id="items">Autorización</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
-            <div class="row" *ngIf="HabilitarAlimentacion">
-                <div class="col-md">
-                    <mat-card class="mat-elevation-z8">
-                        <div class="d-flex bd-highlight" id="titulo">
-                            <span class="w-100 bd-highlight">ADMINISTRAR MÓDULO ALIMENTACIÓN</span>
-                            <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                                (click)="AbrirVentanaAdminComida()">Añadir</button>
+            <div *ngIf="HabilitarAlimentacion">
+                <mat-card class="mat-elevation-z8">
+                    <div class="d-flex bd-highlight" id="titulo">
+                        <span class="w-100 bd-highlight">ADMINISTRAR MÓDULO ALIMENTACIÓN</span>
+                        <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                            (click)="AbrirVentanaAdminComida()">Añadir</button>
+                    </div>
+                    <mat-card-content>
+                        <div class="nota" style="margin-left: 10px; padding-top: 20px;">
+                            <span>
+                                NOTA: La configuración realizada será usada para permitir la administración o
+                                acceso al módulo de alimentación.
+                            </span>
                         </div>
-                        <mat-card-content>
-                            <div class="container" *ngFor="let ac of administra_comida" style="padding-top: 15px;">
-                                <div class="d-flex flex-wrap justify-content-between" style="margin-bottom: 10px;">
-                                    <div class="d-flex justify-content-start">
-                                        <label id="datosF">Administra Módulo de Alimentación:</label>
-                                        <label *ngIf="ac.admin_comida == true">Sí</label>
-                                        <label *ngIf="ac.admin_comida == false">No</label>
-                                        <label *ngIf="ac.admin_comida == null">No</label>
-                                    </div>
+                        <div class="container" *ngFor="let ac of administra_comida" style="padding-top: 15px;">
+                            <div class="d-flex flex-wrap justify-content-between" style="margin-bottom: 10px;">
+                                <div class="d-flex justify-content-start">
+                                    <label id="datosF">Administra módulo de alimentación:</label>
+                                    <label *ngIf="ac.admin_comida == true">Sí</label>
+                                    <label *ngIf="ac.admin_comida == false">No</label>
+                                    <label *ngIf="ac.admin_comida == null">No</label>
                                 </div>
-                                <mat-divider></mat-divider>
                             </div>
-                        </mat-card-content>
-                    </mat-card>
-                </div>
+                            <mat-divider></mat-divider>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
             </div>
             <br *ngIf="HabilitarAlimentacion">
-            <div class="row" *ngIf="HabilitarPermisos">
-                <div class="col-md">
-                    <mat-card class="mat-elevation-z8">
-                        <div class="d-flex bd-highlight" id="titulo">
-                            <span class="w-100 bd-highlight">AUTORIZACIÓN DEPARTAMENTOS</span>
-                            <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                                (click)="AbrirVentanaAutorizar()">Crear</button>
-                        </div>
-                        <mat-card-content>
-                            <div class="container" *ngFor="let autoD of autorizacionesTotales"
-                                style="padding-top: 15px;">
-                                <div class="container">
-                                    <div class="row">
-                                        <div class="col-md">
-                                            <div class="espacio d-flex justify-content-start">
-                                                <label id="datosF">Departamento de:</label>
-                                                <label>{{autoD.nom_depar}}</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md">
-                                            <div class="espacio d-flex justify-content-start">
-                                                <label id="datosF" *ngIf="autoD.preautorizar == false">Autoriza:</label>
-                                                <label id="datosF"
-                                                    *ngIf="autoD.preautorizar == true">Pre-Autoriza:</label>
-                                                <label *ngIf="autoD.estado == true">Sí</label>
-                                                <label *ngIf="autoD.estado == false">No</label>
-                                            </div>
-                                        </div>
-                                        <div style="text-align: right;">
-                                            <i class="fas fa-edit" id="edit" (click)="AbrirEditarAutorizar(autoD)"
-                                                matSuffix matTooltipPosition="right"
-                                                matTooltip="Modificar los datos generales de este registro">
-                                                <p>Editar</p>
-                                            </i>
-                                            <i style="color:red; margin-left: 15px;"
-                                                (click)="ConfirmarDeleteAutorizacion(autoD)" class=" far fa-trash-alt"
-                                                matTooltipPosition="right" id="delete" matTooltip="Eliminar registro">
-                                                <p>Eliminar</p>
-                                            </i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <mat-divider style="margin-bottom: 10px;"></mat-divider>
+
+            <div *ngIf="aprobacion">
+                <mat-card class="mat-elevation-z8">
+                    <div class="d-flex bd-highlight" id="titulo">
+                        <span class="w-100 bd-highlight">AUTORIZACIÓN DEPARTAMENTOS</span>
+                        <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                            (click)="AbrirVentanaAutorizar()">Crear</button>
+                    </div>
+                    <mat-card-content>
+                        <div class="container" style="padding-top: 15px;">
+                            <div class="nota" id="espacio">
+                                <span>
+                                    NOTA: La configuración realizada será usada en aprobaciones de permisos, vacaciones
+                                    u horas extras.
+                                </span>
                             </div>
-                        </mat-card-content>
-                    </mat-card>
-                </div>
+                            <div class="table-responsive" style="padding-top: 10px;">
+                                <table class="table table-hover table-sm">
+                                    <thead class="thead-light">
+                                        <tr style="text-align: center;">
+                                            <th scope="col">Departamento</th>
+                                            <th scope="col">Proceso</th>
+                                            <th scope="col">Configurar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let autoD of autorizacionesTotales">
+                                            <td>{{autoD.nom_depar}}</td>
+                                            <td *ngIf="autoD.preautorizar == false">Autorizar</td>
+                                            <td *ngIf="autoD.preautorizar == true">Preautorizar</td>
+                                            <td class="justify-content-center">
+                                                <i class="fas fa-edit" id="edit" (click)="AbrirEditarAutorizar(autoD)"
+                                                    matSuffix matTooltipPosition="right"
+                                                    matTooltip="Modificar los datos generales de este registro">
+                                                    <p>Editar</p>
+                                                </i>
+                                                <i style="color:red; margin-left: 15px;"
+                                                    (click)="ConfirmarDeleteAutorizacion(autoD)"
+                                                    class=" far fa-trash-alt" matTooltipPosition="right" id="delete"
+                                                    matTooltip="Eliminar registro">
+                                                    <p>Eliminar</p>
+                                                </i>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
             </div>
         </div>
     </mat-tab>
-
 
 
 </mat-tab-group>

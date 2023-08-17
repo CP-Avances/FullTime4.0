@@ -1,7 +1,8 @@
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        ASIGNAR PROCESOS</span>
+        ASIGNAR PROCESOS
+    </span>
     <mat-icon class="float-right" id="cerrar" (click)="CerrarVentanaRegistroProceso()">highlight_off</mat-icon>
 </div>
 <div>
@@ -10,8 +11,10 @@
         <mat-card-content>
             <div class="container" style="text-align: center;">
                 <div class="nota">
-                    <span>NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
-                        Guardar.</span>
+                    <span>
+                        NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                        Guardar.
+                    </span>
                 </div>
                 <div class="row">
                     <div class="col-sm">
@@ -20,8 +23,9 @@
                             <input id="nomEmple" matInput placeholder="Empleado" [formControl]="nombreEmpleado"
                                 readonly="readonly" required>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                matTooltip="Nombre de identifiacción del empleado">
-                                help_outline</mat-icon>
+                                matTooltip="Nombre de identifiacción del empleado.">
+                                help_outline
+                            </mat-icon>
                         </mat-form-field>
                         <br>
                         <mat-form-field>

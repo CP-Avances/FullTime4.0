@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-import { enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, fechaHora, Credenciales,
-  FormatearFecha, FormatearHora, dia_completo }
+import {
+  enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, fechaHora, Credenciales,
+  FormatearFecha, FormatearHora, dia_completo
+}
   from '../../libs/settingsMail';
 import pool from '../../database';
 import path from 'path';
@@ -281,11 +283,17 @@ class PlanComidasControlador {
     }
   }
 
-  public async CrearTipoComidas(req: Request, res: Response): Promise<void> {
+  public async CrearTipoComidas(req: Request, res: Response) {
     const { nombre } = req.body;
-    await pool.query('INSERT INTO tipo_comida (nombre) VALUES ($1)',
+    const response: QueryResult = await pool.query('INSERT INTO tipo_comida (nombre) VALUES ($1) RETURNING *',
       [nombre]);
-    res.jsonp({ message: 'Tipo comida ha sido guardado con éxito' });
+    const [tipo] = response.rows;
+
+    if (tipo) {
+      return res.status(200).jsonp(tipo);
+    } else {
+      return res.status(404).jsonp({ message: "error" });
+    };
   }
 
   public async VerUltimoTipoComidas(req: Request, res: Response) {
@@ -669,23 +677,23 @@ class PlanComidasControlador {
 
   }
 
-    // METODO PARA CREAR ARCHIVO XML
-    public async FileXML(req: Request, res: Response): Promise<any> {
-      var xml = builder.create('root').ele(req.body).end({ pretty: true });
-      console.log(req.body.userName);
-      let filename = "PlanComidas-" + req.body.userName + '-' + req.body.userId + '-' + new Date().getTime() + '.xml';
-      fs.writeFile(`xmlDownload/${filename}`, xml, function (err) {
-      });
-      res.jsonp({ text: 'XML creado', name: filename });
-    }
-  
-    // METODO PARA DESCARGAR ARCHIVO XML
-    public async downloadXML(req: Request, res: Response): Promise<any> {
-      const name = req.params.nameXML;
-      let filePath = `servidor\\xmlDownload\\${name}`
-      res.sendFile(__dirname.split("servidor")[0] + filePath);
-    }
-  
+  // METODO PARA CREAR ARCHIVO XML
+  public async FileXML(req: Request, res: Response): Promise<any> {
+    var xml = builder.create('root').ele(req.body).end({ pretty: true });
+    console.log(req.body.userName);
+    let filename = "PlanComidas-" + req.body.userName + '-' + req.body.userId + '-' + new Date().getTime() + '.xml';
+    fs.writeFile(`xmlDownload/${filename}`, xml, function (err) {
+    });
+    res.jsonp({ text: 'XML creado', name: filename });
+  }
+
+  // METODO PARA DESCARGAR ARCHIVO XML
+  public async downloadXML(req: Request, res: Response): Promise<any> {
+    const name = req.params.nameXML;
+    let filePath = `servidor\\xmlDownload\\${name}`
+    res.sendFile(__dirname.split("servidor")[0] + filePath);
+  }
+
 
 
   /** ******************************************************************************************** **

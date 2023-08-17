@@ -37,7 +37,7 @@ export class EditarNivelTituloComponent implements OnInit {
       nombre: form.nombreForm,
     };
     this.nivel.ActualizarNivelTitulo(nivel).subscribe(response => {
-      this.toastr.success('Operación Exitosa', 'Registro actualizado.', {
+      this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
         timeOut: 6000,
       });
       this.CerrarVentana();

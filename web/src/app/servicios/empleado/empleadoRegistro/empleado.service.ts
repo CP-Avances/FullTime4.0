@@ -53,7 +53,7 @@ export class EmpleadoService {
    ** **                     METODO PARA MANEJAR DATOS DE EMPLEADO                                ** ** 
    ** ********************************************************************************************** **/
 
-  // BUSCAR UN REGISTRO DE USUARIO
+  // BUSCAR UN REGISTRO DE USUARIO  --**VERIFICADO
   BuscarUnEmpleado(id: number) {
     return this.http.get<any>(`${environment.url}/empleado/${id}`);
   }
@@ -219,7 +219,7 @@ export class EmpleadoService {
     return this.http.get<any>(`${environment.url}/contratoEmpleado/contrato/${id}`);
   }
 
-  // METODO PARA BUSCAR FECHA DE CONTRATOS
+  // METODO PARA BUSCAR FECHA DE CONTRATOS   --**VERIFICADO
   BuscarFechaContrato(datos: any) {
     return this.http.post(`${environment.url}/contratoEmpleado/buscarFecha`, datos);
   }

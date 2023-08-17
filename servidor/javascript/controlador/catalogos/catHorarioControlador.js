@@ -130,11 +130,11 @@ class HorarioControlador {
             res.jsonp({ message: 'Documento Actualizado' });
         });
     }
-    // BUSCAR LISTA DE CATALOGO HORARIOS
+    // BUSCAR LISTA DE CATALOGO HORARIOS  --**VERIFICADO
     ListarHorarios(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const HORARIOS = yield database_1.default.query(`
-      SELECT * FROM cg_horarios ORDER BY id
+      SELECT * FROM cg_horarios ORDER BY codigo ASC
       `);
             if (HORARIOS.rowCount > 0) {
                 return res.jsonp(HORARIOS.rows);

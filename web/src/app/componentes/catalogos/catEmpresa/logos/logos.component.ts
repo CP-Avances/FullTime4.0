@@ -86,7 +86,7 @@ export class LogosComponent implements OnInit {
     this.restE.EditarLogoEmpresa(this.data.empresa, formData).subscribe(res => {
       this.logo = 'data:image/jpeg;base64,' + res.imagen;
       if (res.imagen != 0) { this.textoBoton = 'Editar' };
-      this.toastr.success('Operación Exitosa', 'Logotipo Actualizado.', {
+      this.toastr.success('Operación exitosa.', 'Logotipo actualizado.', {
         timeOut: 6000,
       });
       this.archivoForm.reset();
@@ -120,7 +120,7 @@ export class LogosComponent implements OnInit {
     this.restE.EditarCabeceraCorreo(this.data.empresa, formData).subscribe(res => {
       this.logo = 'data:image/jpeg;base64,' + res.imagen;
       if (res.imagen != 0) { this.textoBoton = 'Editar' };
-      this.toastr.success('Operación Exitosa', 'Logotipo Actualizado.', {
+      this.toastr.success('Operación exitosa.', 'Logotipo actualizado.', {
         timeOut: 6000,
       });
       this.archivoForm.reset();
@@ -153,7 +153,7 @@ export class LogosComponent implements OnInit {
     this.restE.EditarPieCorreo(this.data.empresa, formData).subscribe(res => {
       this.logo = 'data:image/jpeg;base64,' + res.imagen;
       if (res.imagen != 0) { this.textoBoton = 'Editar' };
-      this.toastr.success('Operación Exitosa', 'Logotipo Actualizado.', {
+      this.toastr.success('Operación exitosa.', 'Logotipo actualizado.', {
         timeOut: 6000,
       });
       this.archivoForm.reset();

@@ -21,7 +21,7 @@ export class InformacionJefeComponent implements OnInit {
   idCargo: any = [];
   autorizan: any = [];
 
-  // items de paginación de la tabla
+  // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
