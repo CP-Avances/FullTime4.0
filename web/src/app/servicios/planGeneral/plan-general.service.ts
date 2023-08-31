@@ -41,6 +41,10 @@ export class PlanGeneralService {
     return this.http.post<any>(`${environment.url}/planificacion_general/horario-general-detalle`, datos);
   }
 
+  // METODO PARA LISTAR PLANIFICACIONES DEL USUARIO --**VERIFICADO
+  BuscarHorariosUsuario(datos: any) {
+    return this.http.post<any>(`${environment.url}/planificacion_general/horario-solo-planificacion/lista`, datos);
+  }
 
 
 

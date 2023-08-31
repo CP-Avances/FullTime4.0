@@ -53,10 +53,10 @@ import { RegistrarEmpleProcesoComponent } from '../../modulos/accionesPersonal/p
 import { EditarEmpleadoProcesoComponent } from '../../modulos/accionesPersonal/procesos/editar-empleado-proceso/editar-empleado-proceso.component';
 import { EditarSolicitudComidaComponent } from '../../modulos/alimentacion/solicitar-comida/editar-solicitud-comida/editar-solicitud-comida.component';
 import { PlanificacionComidasComponent } from '../../modulos/alimentacion/planifica-comida/planificacion-comidas/planificacion-comidas.component';
-import { RegistroPlanHorarioComponent } from 'src/app/componentes/horarios/planificacionHorario/registro-plan-horario/registro-plan-horario.component';
+import { RegistroPlanHorarioComponent } from 'src/app/componentes/horarios/horarios-rotativos/registro-plan-horario/registro-plan-horario.component';
 import { EditarPlanHoraExtraComponent } from '../../modulos/horasExtras/planificacionHoraExtra/editar-plan-hora-extra/editar-plan-hora-extra.component';
 import { RegistrarVacacionesComponent } from '../../modulos/vacaciones/registrar-vacaciones/registrar-vacaciones.component';
-import { EditarPlanificacionComponent } from 'src/app/componentes/horarios/planificacionHorario/editar-planificacion/editar-planificacion.component';
+import { EditarPlanificacionComponent } from 'src/app/componentes/horarios/horarios-rotativos/editar-planificacion/editar-planificacion.component';
 import { CancelarVacacionesComponent } from 'src/app/componentes/rolEmpleado/vacacion-empleado/cancelar-vacaciones/cancelar-vacaciones.component';
 import { RegistrarPeriodoVComponent } from '../../modulos/vacaciones/periodoVacaciones/registrar-periodo-v/registrar-periodo-v.component';
 import { EditarPlanComidasComponent } from '../../modulos/alimentacion/planifica-comida/editar-plan-comidas/editar-plan-comidas.component';
@@ -301,8 +301,7 @@ export class VerEmpleadoComponent implements OnInit {
       // LLAMADO A DATOS DE USUARIO
       this.ObtenerContratoEmpleado(this.datoActual.id_contrato, formato_fecha);
       this.ObtenerCargoEmpleado(this.datoActual.id_cargo, formato_fecha);
-      //this.ObtenerHorariosEmpleado(this.datoActual.codigo, formato_fecha);------------------------------------------------
-      this.ObtenerHorarioRotativo(this.datoActual.codigo, formato_fecha);
+
     }, vacio => {
       this.BuscarContratoActual(formato_fecha);
     });
@@ -838,7 +837,7 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   /** ***************************************************************************************** ** 
-   ** **              METODOS PARA MANEJAR HORARIOS FIJOS DEL USUARIO                        ** ** 
+   ** **                VENTANA PARA VER HORARIOS ASIGNADOS AL USUARIO                       ** ** 
    ** ***************************************************************************************** **/
 
   // FECHAS DE BUSQUEDA
@@ -889,7 +888,14 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   // METODO PARA SELECCIONAR TIPO DE BUSQUEDA
+  ver_tabla_horarios: boolean = true;
   BuscarHorarioPeriodo() {
+    this.ver_tabla_horarios = true;
+    this.eliminar_plan = false;
+    this.ventana_horario = false;
+    this.registrar_rotativo = false;
+    this.editar_horario = false;
+
     if (this.fechaInicialF.value != null && this.fechaFinalF.value != null) {
       this.ObtenerHorariosEmpleado(this.fechaInicialF.value, this.fechaFinalF.value, 1);
     }
@@ -925,12 +931,16 @@ export class VerEmpleadoComponent implements OnInit {
         this.horariosEmpleado = datos.data;
         this.ver_detalle = true;
         this.ver_acciones = false;
+        this.ver_activar_editar = true;
+        this.editar_activar = false;
       }
       else {
         this.toastr.info('Ups no se han encontrado registros!!!', 'No existe planificación.', {
           timeOut: 6000,
         });
         this.ver_acciones = false;
+        this.ver_activar_editar = false;
+        this.editar_activar = false;
       }
     })
   }
@@ -1072,15 +1082,35 @@ export class VerEmpleadoComponent implements OnInit {
     this.ver_acciones = false;
   }
 
+  // ITEMS DE PAGINACION DE LA TABLA 
+  pageSizeOptionsD = [5, 10, 20, 50];
+  tamanio_paginaD: number = 5;
+  numero_paginaD: number = 1;
+
+  // EVENTO PARA MOSTRAR NÚMERO DE FILAS EN TABLA
+  ManejarPaginaDetalles(e: PageEvent) {
+    this.numero_paginaD = e.pageIndex + 1;
+    this.tamanio_paginaD = e.pageSize;
+  }
+
+
+  /** ***************************************************************************************** ** 
+   ** **              METODOS PARA MANEJAR HORARIOS FIJOS DEL USUARIO                        ** ** 
+   ** ***************************************************************************************** **/
+
   // VENTANA PARA REGISTRAR HORARIO 
-  horarios_usuario: boolean = true;
   ventana_horario: boolean = false;
   data_horario: any = [];
   AbrirPlanificarHorario(): void {
+    this.ver_tabla_horarios = false;
+    this.ver_acciones = false;
+    this.eliminar_plan = false;
+    this.registrar_rotativo = false;
+    this.editar_horario = false;
     this.data_horario = [];
     if (this.datoActual.id_cargo != undefined) {
       this.ventana_horario = true;
-      this.horarios_usuario = false;
+      this.ver_rotativo = false;
 
       this.data_horario = {
         pagina: 'ver_empleado',
@@ -1097,20 +1127,15 @@ export class VerEmpleadoComponent implements OnInit {
     }
   }
 
-  // ITEMS DE PAGINACION DE LA TABLA 
-  pageSizeOptionsD = [5, 10, 20, 50];
-  tamanio_paginaD: number = 5;
-  numero_paginaD: number = 1;
 
-  // EVENTO PARA MOSTRAR NÚMERO DE FILAS EN TABLA
-  ManejarPaginaDetalles(e: PageEvent) {
-    this.numero_paginaD = e.pageIndex + 1;
-    this.tamanio_paginaD = e.pageSize;
-  }
+
+
+
 
   /** ********************************************************************************************* **
    ** **                     CARGAR HORARIOS DEL EMPLEADO CON PLANTILLA                          ** **
    ** ********************************************************************************************* **/
+  plantillas: boolean = false;
 
   nameFileHorario: string;
   archivoSubidoHorario: Array<File>;
@@ -1206,28 +1231,21 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
 
+
+
+
+
+
+
   /** **************************************************************************************** **
-   ** **             METODO DE PRESENTACION DE DATOS DE HORARIOS ROTATIVOS                  ** **
+   ** **                          METODO DE REGISTRO DE HORARIOS ROTATIVOS                  ** **
    ** **************************************************************************************** **/
 
-  // METODO PARA IMPRIMIR DATOS DE LA HORARIOS ROTATIVOS 
-  horarioRotativo: any = [];
-  ObtenerHorarioRotativo(codigo: number, formato_fecha: string) {
-    this.horarioRotativo = [];
-    this.restPlanH.ObtenerHorarioRotativo(codigo).subscribe(datos => {
-      this.horarioRotativo = datos;
-      this.horarioRotativo.forEach(data => {
-        data.fec_inicio_ = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado);
-        data.fec_final_ = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
-      })
-    })
-  }
-
+  // VENTANA PARA REGISTRAR PLANIFICACION DE HORARIOS DEL EMPLEADO 
   rotativo: any = []
   registrar_rotativo: boolean = false;
   ver_rotativo: boolean = true;
   pagina_rotativo: string = '';
-  // VENTANA PARA REGISTRAR PLANIFICACION DE HORARIOS DEL EMPLEADO 
   AbrirVentanaHorarioRotativo(): void {
     if (this.datoActual.id_cargo != undefined) {
       this.pagina_rotativo = 'ver-empleado';
@@ -1238,8 +1256,12 @@ export class VerEmpleadoComponent implements OnInit {
         idEmpleado: this.idEmpleado,
         horas_trabaja: this.cargoEmpleado[0].hora_trabaja,
       }
-      this.ver_rotativo = false;
       this.registrar_rotativo = true;
+      this.ver_acciones = false;
+      this.ver_tabla_horarios = false;
+      this.ventana_horario = false;
+      this.eliminar_plan = false;
+      this.editar_horario = false;
     }
     else {
       this.toastr.info('El usuario no tiene registrado un Cargo.', '', {
@@ -1248,20 +1270,18 @@ export class VerEmpleadoComponent implements OnInit {
     }
   }
 
-  // VENTANA PARA REGISTRAR HORARIO 
-  AbrirEditarHorarioRotativo(datoSeleccionado: any): void {
-    this.ventana.open(EditarPlanificacionComponent,
-      { width: '300px', data: { idEmpleado: this.idEmpleado, datosPlan: datoSeleccionado } })
-      .afterClosed().subscribe(item => {
-        this.ObtenerHorarioRotativo(this.datoActual.codigo, this.formato_fecha);
-      });
-  }
+
 
   // VENTANA PARA REGISTRAR DETALLE DE HORARIO DEL EMPLEADO
   AbrirVentanaDetallePlanHorario(datos: any): void {
     console.log(datos);
     this.ventana.open(RegistroDetallePlanHorarioComponent,
-      { width: '350px', data: { idEmpleado: this.idEmpleado, planHorario: datos, actualizarPage: false, direccionarE: false } }).disableClose = true;
+      {
+        width: '350px', data: {
+          idEmpleado: this.idEmpleado, planHorario: datos, actualizarPage: false,
+          direccionarE: false
+        }
+      }).disableClose = true;
   }
 
 
@@ -1284,23 +1304,13 @@ export class VerEmpleadoComponent implements OnInit {
     })
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO DE HORARIO ROTATIVO
-  EliminarHorarioRotativo(id_plan: number) {
-    this.restPlanH.EliminarRegistro(id_plan).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ObtenerHorarioRotativo(this.datoActual.codigo, this.formato_fecha);
-    });
-  }
-
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO DE HORARIO ROTATIVO
   ConfirmarHorarioRotativo(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.BuscarDatosPlanHorario(datos.id, datos.codigo)
-          this.EliminarHorarioRotativo(datos.id);
+          //this.EliminarHorarioRotativo(datos.id);
         } else {
           this.router.navigate(['/verEmpleado/', this.idEmpleado]);
         }
@@ -1335,6 +1345,70 @@ export class VerEmpleadoComponent implements OnInit {
         })
       })
     })
+  }
+
+
+  /** ********************************************************************************************* **
+   ** **                               ELIMINAR PLANIFICACIONES HORARIAS                         ** **
+   ** ********************************************************************************************* **/
+  eliminar_plan: boolean = false;
+  eliminar_horarios: any = [];
+  EliminarHorarios() {
+    this.eliminar_horarios = {
+      pagina: 'ver_empleado',
+      usuario: [{ codigo: this.datoActual.codigo, id_empleado: this.idEmpleado }]
+    }
+    this.ver_tabla_horarios = false;
+    this.eliminar_plan = true;
+    this.ver_acciones = false;
+    this.ventana_horario = false;
+    this.registrar_rotativo = false;
+    this.editar_horario = false;
+  }
+
+  /** ********************************************************************************************* **
+   ** **                                METODO DE EDICION DE HORARIOS                            ** **
+   ** ********************************************************************************************* **/
+  editar_activar: boolean = false;
+  ver_activar_editar: boolean = false;
+  ActivarEditarHorario() {
+    if (this.editar_activar === true) {
+      this.editar_activar = false;
+    }
+    else {
+      this.editar_activar = true;
+    }
+  }
+
+  // VENTANA PARA REGISTRAR HORARIO 
+  editar_horario: boolean = false;
+  datos_editar: any = [];
+  expansion: boolean = true;
+  AbrirEditarHorario(anio: any, mes: any, dia: any, horario: any, valor: any): void {
+    //valor.ob = true;
+    this.datos_editar = {
+      idEmpleado: this.idEmpleado,
+      datosPlan: horario,
+      anio: anio,
+      mes: mes,
+      dia: dia,
+      codigo: this.datoActual.codigo,
+      pagina: 'ver_empleado',
+      idCargo: this.datoActual.id_cargo,
+      horas_trabaja: this.cargoEmpleado[0].hora_trabaja,
+    }
+    this.editar_horario = true;
+    this.expansion = false;
+    this.editar_activar = false;
+  }
+
+  ControlExpandir() {
+    if (this.expansion === true) {
+      this.expansion = false;
+    }
+    else {
+      this.expansion = true;
+    }
   }
 
 

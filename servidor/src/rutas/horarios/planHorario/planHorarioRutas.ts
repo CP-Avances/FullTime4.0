@@ -19,9 +19,12 @@ class PlanHorarioRutas {
 
 
 
-
+/* SE ELIMINA EL SERVICIO
         // BUSQUEDA DE HORARIOS ROTATIVOS POR CODIGO DE USUARIO
         this.router.get('/rotativo/:codigo', TokenValidation, PLAN_HORARIO_CONTROLADOR.BuscarHorarioRotativoCodigo);
+*/
+
+
 
         this.router.get('/', TokenValidation, PLAN_HORARIO_CONTROLADOR.ListarPlanHorario);
         this.router.post('/', TokenValidation, PLAN_HORARIO_CONTROLADOR.CrearPlanHorario);

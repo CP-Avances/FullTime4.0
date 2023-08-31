@@ -58,7 +58,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
   btn_nuevo: boolean = false;
 
 
-  // INICIALIZACIÓN DE CAMPOS DE FORMULARIOS
+  // INICIALIZACION DE CAMPOS DE FORMULARIOS
   fechaInicioF = new FormControl('', Validators.required);
   fechaFinalF = new FormControl('', [Validators.required]);
   miercolesF = new FormControl('');
@@ -614,7 +614,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     this.LimpiarCampos();
     if (this.data_horario.pagina === 'ver_empleado') {
       this.ventana.ventana_horario = false;
-      this.ventana.horarios_usuario = true;
+      this.ventana.ver_tabla_horarios = true;
     }
     else if (this.data_horario.pagina === 'rango_fecha') {
       this.componente.auto_individual = true;

@@ -77,6 +77,7 @@ class PlanHorarioControlador {
         }
     }
 
+   /* SE ELIMINA TABAL
     public async BuscarHorarioRotativoCodigo(req: Request, res: Response): Promise<any> {
         const { codigo } = req.params;
         console.log('CODIGO .. ', codigo)
@@ -93,7 +94,7 @@ class PlanHorarioControlador {
             res.status(404).jsonp({ text: 'Registro no encontrado' });
         }
     }
-
+*/
     public async EncontrarPlanHorarioPorId(req: Request, res: Response): Promise<any> {
         const { id } = req.params;
         const HORARIO_CARGO = await pool.query('SELECT * FROM plan_horarios AS p WHERE p.id = $1', [id]);

@@ -82,22 +82,24 @@ class PlanHorarioControlador {
             }
         });
     }
-    BuscarHorarioRotativoCodigo(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { codigo } = req.params;
-            console.log('CODIGO .. ', codigo);
-            const HORARIO = yield database_1.default.query(`
-            SELECT * FROM plan_horarios AS p WHERE p.codigo = $1
-            `, [codigo]);
-            console.log('data .. ', HORARIO);
-            if (HORARIO.rowCount > 0) {
-                return res.jsonp(HORARIO.rows);
-            }
-            else {
-                res.status(404).jsonp({ text: 'Registro no encontrado' });
-            }
-        });
-    }
+    /* SE ELIMINA TABAL
+     public async BuscarHorarioRotativoCodigo(req: Request, res: Response): Promise<any> {
+         const { codigo } = req.params;
+         console.log('CODIGO .. ', codigo)
+         const HORARIO = await pool.query(
+             `
+             SELECT * FROM plan_horarios AS p WHERE p.codigo = $1
+             `
+             , [codigo]);
+         console.log('data .. ', HORARIO)
+         if (HORARIO.rowCount > 0) {
+             return res.jsonp(HORARIO.rows)
+         }
+         else {
+             res.status(404).jsonp({ text: 'Registro no encontrado' });
+         }
+     }
+ */
     EncontrarPlanHorarioPorId(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;

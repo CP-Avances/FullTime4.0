@@ -52,7 +52,7 @@ import { EnroladoRelojComponent } from './componentes/catalogos/catEnrolados/enr
 import { ListaSucursalesComponent } from './componentes/catalogos/catSucursal/lista-sucursales/lista-sucursales.component';
 import { RegistrarSucursalesComponent } from './componentes/catalogos/catSucursal/registrar-sucursales/registrar-sucursales.component';
 import { DispositivosEnroladosComponent } from './componentes/catalogos/catEnrolados/dispositivos-enrolados/dispositivos-enrolados.component';
-import { RegistroPlanHorarioComponent } from './componentes/horarios/planificacionHorario/registro-plan-horario/registro-plan-horario.component';
+import { RegistroPlanHorarioComponent } from './componentes/horarios/horarios-rotativos/registro-plan-horario/registro-plan-horario.component';
 import { RegistroDetallePlanHorarioComponent } from './componentes/horarios/detallePlanHorario/registro-detalle-plan-horario/registro-detalle-plan-horario.component';
 import { RegistroAutorizacionDepaComponent } from './componentes/autorizaciones/autorizaDepartamentos/registro-autorizacion-depa/registro-autorizacion-depa.component';
 import { RegistoEmpleadoHorarioComponent } from './componentes/horarios/rango-fechas/registo-empleado-horario/registo-empleado-horario.component';
@@ -65,7 +65,7 @@ import { EditarDepartamentoComponent } from './componentes/catalogos/catDepartam
 import { VerDepartamentoComponent } from './componentes/catalogos/catDepartamentos/ver-departamento/ver-departamento.component';
 import { VerListadoNivelComponent } from './componentes/catalogos/catDepartamentos/ver-listado-nivel/ver-listado-nivel.component';
 import { RegistrarNivelDepartamentoComponent } from './componentes/catalogos/catDepartamentos/registro-nivel-departamento/registrar-nivel-departamento.component';
-import { PlanificacionMultipleComponent } from './componentes/horarios/planificacionHorario/planificacion-multiple/planificacion-multiple.component';
+import { PlanificacionMultipleComponent } from './componentes/horarios/horarios-rotativos/planificacion-multiple/planificacion-multiple.component';
 import { VerHorarioDetalleComponent } from './componentes/catalogos/catHorario/detalle/ver-horario-detalle/ver-horario-detalle.component';
 import { EditarHorarioComponent } from './componentes/catalogos/catHorario/horario/editar-horario/editar-horario.component';
 import { AutorizacionesComponent } from './componentes/autorizaciones/autorizaciones/autorizaciones.component';
@@ -96,7 +96,7 @@ import { ConfigurarAtrasosComponent } from './componentes/reportes/configuracion
 import { HoraExtraAutorizacionesComponent } from './componentes/autorizaciones/hora-extra-autorizaciones/hora-extra-autorizaciones.component';
 import { EditarEstadoHoraExtraAutorizacionComponent } from './componentes/autorizaciones/editar-estado-hora-extra-autorizacion/editar-estado-hora-extra-autorizacion.component';
 import { EditarCiudadComponent } from './componentes/catalogos/catFeriados/ciudad-feriados/editar-ciudad/editar-ciudad.component';
-import { EditarPlanificacionComponent } from './componentes/horarios/planificacionHorario/editar-planificacion/editar-planificacion.component';
+import { EditarPlanificacionComponent } from './componentes/horarios/horarios-rotativos/editar-planificacion/editar-planificacion.component';
 import { EditarDetallePlanComponent } from './componentes/horarios/detallePlanHorario/editar-detalle-plan/editar-detalle-plan.component';
 import { EditarAutorizacionDepaComponent } from './componentes/autorizaciones/autorizaDepartamentos/editar-autorizacion-depa/editar-autorizacion-depa.component';
 import { EditarDispositivoEnroladoComponent } from './componentes/catalogos/catEnrolados/editar-dispositivo-enrolado/editar-dispositivo-enrolado.component';
@@ -320,6 +320,8 @@ import { VistaElementosComponent } from './componentes/modulos/permisos/configur
 import { EditarTipoPermisosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/editar-tipo-permisos/editar-tipo-permisos.component';
 import { VerTipoPermisoComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/ver-tipo-permiso/ver-tipo-permiso.component';
 import { EditarPermisoEmpleadoComponent } from './componentes/modulos/permisos/gestionar-permisos/editar-permiso-empleado/editar-permiso-empleado.component';
+import { EliminarIndividualComponent } from './componentes/horarios/eliminar-planificacion/eliminar-individual/eliminar-individual.component';
+import { EliminarMultipleComponent } from './componentes/horarios/eliminar-planificacion/eliminar-multiple/eliminar-multiple.component';
 
 const config: SocketIoConfig = { url: environment.url, options: {} };
 
@@ -578,6 +580,8 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     HorasPlanificadasEmpleadoComponent,
     ComidasSolicitadasEmpleadoComponent,
     BuscarPlanificacionComponent,
+    EliminarIndividualComponent,
+    EliminarMultipleComponent,
 
   ],
 

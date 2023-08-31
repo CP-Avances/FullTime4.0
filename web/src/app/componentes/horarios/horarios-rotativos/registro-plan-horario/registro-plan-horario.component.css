@@ -31,22 +31,28 @@ mat-form-field {
 
 .contenedor {
     display: grid;
-    grid-template-columns: 140px 140px 140px 140px 140px 140px 140px;
-    grid-auto-rows: minmax(150px, auto);
-    margin-left: 15px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    grid-gap: 1px;
+
+    grid-template-columns: repeat(auto-fit, minmax(160px, 7fr));
+    grid-template-rows: auto;
+
 }
 
 .bordes {
     border: 1px solid #000000;
     padding: 10px;
-    border-radius: 10px;
+
     vertical-align: middle;
     background-color: rgb(233, 236, 239);
     font-size: 14px;
+    text-align: center;
 }
 
 .fuente {
-    font-size: 13px;
+    font-size: xx-small;
 }
 
 .fuente_pequeño {
@@ -54,7 +60,7 @@ mat-form-field {
 }
 
 .fuente_feriado {
-    font-size: 13px;
+    font-size: 10px;
     color: rgb(17, 87, 3);
 }
 
@@ -62,17 +68,18 @@ mat-form-field {
     color: rgb(52, 65, 84);
     cursor: pointer;
     margin-right: 2%;
+    font-size: 19px;
 }
 
 #seleccionar_ {
     color: rgb(52, 65, 84);
-    font-size: 20px;
+    font-size: 18px;
 }
 
 #table_acciones {
     border-collapse: collapse;
     width: 100%;
-    font-size: 10px;
+    font-size: xx-small;
 }
 
 #table_definiciones {
@@ -95,10 +102,10 @@ p {
 }
 
 #libre {
-    color: rgb(141, 64, 16);
+    color: rgb(52, 65, 84);
     cursor: pointer;
     margin-right: 2%;
-    font-size: 18px;
+    font-size: 19px;
 }
 
 #libre_eliminar {
@@ -109,13 +116,29 @@ p {
 }
 
 #libre_ {
-    color: rgb(141, 64, 16);
-    cursor: pointer;
-    font-size: 14px;
+    color: rgb(52, 65, 84);
+    font-size: 18px;
 }
 
 #libre_eliminar_ {
-    color: rgb(225, 34, 34);
+    color: rgb(141, 64, 16);
     cursor: pointer;
-    font-size: 14px;
+    font-size: 10px;
+}
+
+#verticalLine {
+    border-left: 1px solid rgb(52, 65, 84);
+}
+
+
+.mat-mdc-form-field+.mat-mdc-form-field {
+    margin-left: 8px;
+}
+
+#resultados_ {
+    color: rgb(17, 17, 17);
+    text-align: center;
+    background: rgb(178, 204, 242);
+    padding-top: 5px;
+    padding-bottom: 5px;
 }

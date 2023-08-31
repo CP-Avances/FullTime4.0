@@ -11,9 +11,13 @@ export class PlanHorarioService {
     private http: HttpClient,
   ) { }
 
+  /* SE ELIMINA EL SERVICIO
   ObtenerHorarioRotativo(codigo: number) {
     return this.http.get<any>(`${environment.url}/planHorario/rotativo/${codigo}`);
   }
+  */
+
+  
 
   ObtenerPlanHorario() {
     return this.http.get(`${environment.url}/planHorario`);

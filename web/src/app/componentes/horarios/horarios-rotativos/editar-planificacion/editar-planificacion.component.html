@@ -1,0 +1,149 @@
+<div class="container" style="padding-bottom: 15px;">
+    <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo">
+            <span>MODIFICAR HORARIOS {{dia_fecha}}</span>
+            <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana(1)">
+                highlight_off
+            </mat-icon>
+        </div>
+        <mat-card-content>
+            <div style="padding-top: 20px;">
+
+                <div *ngIf="ver_nota" style="padding-bottom: 10px;" class="info">
+                    <span [ngStyle]="{'color':CambiarColores(nota_)}"><b>NOTA:</b> &nbsp; <i>{{notas}}</i> </span>
+                </div>
+
+                <div style="padding-bottom: 10px;">
+                    <div class="row">
+
+                        <div class="col-md" style="text-align: center;">
+                            <div class="d-flex bd-highlight" id="resultados">
+                                <span class="w-100 bd-highlight">
+                                    LISTA DE HORARIOS
+                                </span>
+                            </div>
+
+                            <div class="table-responsive" style="text-align: center;">
+                                <table id="table_acciones" class="table table-hover table-sm" style="margin: 0 auto;">
+                                    <thead class="thead-light">
+                                        <tr style="text-align: center;">
+                                            <th scope="col" id="td_horarios" rowspan="2">Código</th>
+                                            <th scope="col" id="td_horarios" rowspan="2">Descripción</th>
+                                            <th scope="col" id="td_horarios" rowspan="2">Min. alimentación</th>
+                                            <th scope="col" id="td_horarios" colspan="2">Acciones</th>
+                                        </tr>
+                                        <tr style="text-align: center;">
+                                            <th scope="col" id="td_horarios">
+                                                <mat-icon (click)="AgregarHorario()"
+                                                    style="font-size: 19px; cursor: pointer;">
+                                                    add_circle
+                                                </mat-icon>
+                                            </th>
+                                            <th scope="col" id="td_horarios">
+                                                <mat-icon style="font-size: 19px; cursor: pointer;"
+                                                    (click)="AgregarLibre()">
+                                                    work_off
+                                                </mat-icon>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let n of horas; index as i">
+                                            <td id="td_horarios">{{n.horarios.codigo}}</td>
+                                            <td id="td_horarios">{{n.horarios.nombre}}</td>
+                                            <td id="td_horarios">{{n.horarios.min_almuerzo}}</td>
+                                            <td id="td_horarios" colspan="2" class="justify-content-center">
+                                                <i class="far fa-trash-alt" id="t-eliminar" matSuffix
+                                                    matTooltipPosition="right" matTooltip="Eliminar este registro."
+                                                    (click)="QuitarHorarios(i)">
+                                                    <p>Eliminar</p>
+                                                </i>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Seleccionar horario</mat-label>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Lista de horarios cargados en el sistema.">
+                                        help_outline
+                                    </mat-icon>
+                                    <mat-select [formControl]="horarioF" required>
+                                        <mat-option *ngFor="let h of vista_horarios" [value]="h.codigo" id="letra"
+                                            (click)="ValidarHorario()">
+                                            {{h.nombre}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+
+                                <div *ngIf="ver_acciones" style="margin: auto 0;">
+                                    <div class="d-flex bd-highlight" id="resultados">
+                                        <span class="w-100 bd-highlight" style="font-size: xx-small;">
+                                            DETALLE DE HORARIO
+                                        </span>
+                                    </div>
+                                    <div class="table-responsive" style="text-align: center;">
+                                        <table id="table_acciones" class="table table-hover table-sm"
+                                            style="margin: 0 auto;">
+                                            <thead class="thead-light">
+                                                <tr style="text-align: center;">
+                                                    <th scope="col" id="td_horarios" style="font-size: 8px;">
+                                                        HORARIO
+                                                    </th>
+                                                    <th scope="col" id="td_horarios" style="font-size: 8px;">
+                                                        ENTRADA (E)
+                                                    </th>
+                                                    <th scope="col" id="td_horarios" style="font-size: 8px;">
+                                                        INICIO ALIMENTACIÓN (I/A)
+                                                    </th>
+                                                    <th scope="col" id="td_horarios" style="font-size: 8px;">
+                                                        FIN ALIMENTACIÓN (F/A)
+                                                    </th>
+                                                    <th scope="col" id="td_horarios" style="font-size: 8px;">
+                                                        SALIDA (S)
+                                                    </th>
+                                                    <th scope="col" id="td_horarios" style="font-size: 8px;">
+                                                        MIN. ALIMENTACIÓN
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr
+                                                    *ngFor="let d of detalle_acciones | paginate:tamanio_paginaD:numero_paginaD">
+                                                    <td id="td_horarios">{{d.horario}}</td>
+                                                    <td id="td_horarios">{{d.entrada_}}</td>
+                                                    <td id="td_horarios">{{d.inicio_comida}}</td>
+                                                    <td id="td_horarios">{{d.fin_comida}}</td>
+                                                    <td id="td_horarios">{{d.salida_}}</td>
+                                                    <td id="td_horarios">{{d.almuerzo}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div *ngIf="ver_horario_" style="padding-top: 10px; margin: 0 auto;">
+                                    <button class="btn btn-sm" (click)="VerificarHorarios()">
+                                        Verificar
+                                    </button>
+                                </div>
+                                <div *ngIf="ver_guardar" style="padding-top: 10px; margin: 0 auto;">
+                                    <button class="btn btn-sm" (click)="RegistrarHorario()">
+                                        Guardar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

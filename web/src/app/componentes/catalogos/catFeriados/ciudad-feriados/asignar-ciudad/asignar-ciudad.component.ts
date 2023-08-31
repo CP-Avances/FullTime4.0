@@ -225,7 +225,6 @@ export class AsignarCiudadComponent implements OnInit {
   }
 
   // METODO PARA VERIFICAR SELECCION DE CIUDADES
-  isChecked_: boolean = false;
   SeleccionarIndividual(event: any, valor: any) {
     const target = event.target as HTMLInputElement;
     if (target.checked === true) {

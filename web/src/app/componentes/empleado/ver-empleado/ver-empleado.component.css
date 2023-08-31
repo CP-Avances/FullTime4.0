@@ -202,7 +202,8 @@ td {
     font-size: 14px;
     font-family: "Poppins", sans-serif;
     border-radius: 5px;
-    height: 60px;
+
+    height: 100%;
     background-color: rgb(0, 76, 255);
     color: white;
     padding-top: 9px;
@@ -214,7 +215,7 @@ td {
     font-size: 14px;
     font-family: "Poppins", sans-serif;
     border-radius: 5px;
-    height: 58px;
+    height: 100%;
     background-color: #93a3c7;
     overflow: hidden;
     color: white;
@@ -290,4 +291,65 @@ td {
     color: red;
     cursor: pointer;
     margin-right: 2%;
+}
+
+.redondo {
+    text-align: center;
+    display: block;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: rgb(16, 97, 204);
+    border: rgb(45, 123, 224);
+    margin: 0 auto;
+}
+
+.redondo-eliminar {
+    text-align: center;
+    display: block;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: rgb(212, 32, 26);
+    border: rgb(212, 32, 26);
+    margin: 0 auto;
+}
+
+#verticalLine {
+    border-left: 1px solid rgb(52, 65, 84);
+}
+
+#boton_redondo {
+    background-color: rgb(16, 97, 204);
+    margin: 5px 10px 5px 10px;
+    color: white;
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: 0.2px;
+    word-wrap: break-word;
+    display: block;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    font-size: xx-small;
+}
+
+#editar_horario {
+    cursor: pointer;
+    color: green;
+    padding-bottom: 15px;
+}
+
+#activar_editar {
+    margin-left: 15px;
+    color: white;
+    cursor: pointer
+}
+
+:host ::ng-deep .mat-expansion-indicator::after {
+    color: white;
+}
+
+#fuente_ {
+    font-family: Roboto, "Helvetica Neue", sans-serif;
 }
