@@ -13,10 +13,14 @@ class TimbresRutas {
 
         // METODO PARA BUSCAR MARCACIONES
         this.router.get('/', TokenValidation, TIMBRES_CONTROLADOR.ObtenerTimbres);
+        // METODO PARA BUSCAR EL TIMBRE DE EMPLEADO POR FECHA
+        this.router.get('/timbresfechaemple', TokenValidation, TIMBRES_CONTROLADOR.ObtenertimbreFechaEmple);
         // METODO PARA REGISTRAR TIMBRES PERSONALES
         this.router.post('/', TokenValidation, TIMBRES_CONTROLADOR.CrearTimbreWeb);
         // METODO PARA REGISTRAR TIMBRE ADMINISTRADOR
         this.router.post('/admin/', TokenValidation, TIMBRES_CONTROLADOR.CrearTimbreWebAdmin);
+        // METODO PARA ACTUALIZAR EL TIMBRE DEL EMPLEADO
+        this.router.put('/timbre/editar', TokenValidation, TIMBRES_CONTROLADOR.EditarTimbreEmpleadoFecha);
 
 
 

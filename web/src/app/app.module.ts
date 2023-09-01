@@ -317,6 +317,9 @@ import { HorasPlanificadasEmpleadoComponent } from './componentes/rolEmpleado/ho
 import { ComidasSolicitadasEmpleadoComponent } from './componentes/rolEmpleado/comidas-empleado/comidas-solicitadas-empleado/comidas-solicitadas-empleado.component';
 import { BrowserModule } from '@angular/platform-browser';
 import { MatPaginatorIntl } from '@angular/material/paginator';
+import { BuscarTimbreComponent } from './componentes/timbre-web/buscar-timbre/buscar-timbre.component';
+import { EditarTimbreComponent } from './componentes/timbre-web/editar-timbre/editar-timbre.component';
+import { VerTimbreComponent } from './componentes/timbre-web/ver-timbre/ver-timbre.component';
 
 const config: SocketIoConfig = { url: environment.url, options: {} };
 
@@ -570,6 +573,9 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     CancelarComidaComponent,
     HorasPlanificadasEmpleadoComponent,
     ComidasSolicitadasEmpleadoComponent,
+    BuscarTimbreComponent,
+    EditarTimbreComponent,
+    VerTimbreComponent,
 
   ],
 
