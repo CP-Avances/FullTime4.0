@@ -1,7 +1,7 @@
 <div class="container" style="padding-bottom: 15px;">
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
-            <span>MODIFICAR HORARIOS {{dia_fecha}}</span>
+            <span>MODIFICAR {{dia_fecha}}</span>
             <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana(1)">
                 highlight_off
             </mat-icon>
@@ -10,7 +10,10 @@
             <div style="padding-top: 20px;">
 
                 <div *ngIf="ver_nota" style="padding-bottom: 10px;" class="info">
-                    <span [ngStyle]="{'color':CambiarColores(nota_)}"><b>NOTA:</b> &nbsp; <i>{{notas}}</i> </span>
+                    <span [ngStyle]="{'color':CambiarColores(nota_)}"><b>NOTA:</b> &nbsp; <i>{{notas1}}</i>
+                        <br>
+                        <i [ngStyle]="{'color':CambiarColores(observacion)}">{{notas2}}</i>
+                    </span>
                 </div>
 
                 <div style="padding-bottom: 10px;">
@@ -23,23 +26,24 @@
                                 </span>
                             </div>
 
-                            <div class="table-responsive" style="text-align: center;">
+                            <div class="table-responsive" style="text-align: center; padding-bottom: 10px;">
                                 <table id="table_acciones" class="table table-hover table-sm" style="margin: 0 auto;">
                                     <thead class="thead-light">
                                         <tr style="text-align: center;">
                                             <th scope="col" id="td_horarios" rowspan="2">Código</th>
                                             <th scope="col" id="td_horarios" rowspan="2">Descripción</th>
+                                            <th scope="col" id="td_horarios" rowspan="2">Horas totales</th>
                                             <th scope="col" id="td_horarios" rowspan="2">Min. alimentación</th>
                                             <th scope="col" id="td_horarios" colspan="2">Acciones</th>
                                         </tr>
                                         <tr style="text-align: center;">
-                                            <th scope="col" id="td_horarios">
+                                            <th scope="col" id="td_horarios" *ngIf="seleccionar_horario">
                                                 <mat-icon (click)="AgregarHorario()"
                                                     style="font-size: 19px; cursor: pointer;">
                                                     add_circle
                                                 </mat-icon>
                                             </th>
-                                            <th scope="col" id="td_horarios">
+                                            <th scope="col" id="td_horarios" *ngIf="seleccionar_libre">
                                                 <mat-icon style="font-size: 19px; cursor: pointer;"
                                                     (click)="AgregarLibre()">
                                                     work_off
@@ -51,16 +55,16 @@
                                         <tr *ngFor="let n of horas; index as i">
                                             <td id="td_horarios">{{n.horarios.codigo}}</td>
                                             <td id="td_horarios">{{n.horarios.nombre}}</td>
+                                            <td id="td_horarios">{{n.horarios.hora_trabajo}}</td>
                                             <td id="td_horarios">{{n.horarios.min_almuerzo}}</td>
                                             <td id="td_horarios" colspan="2" class="justify-content-center">
-                                                <i class="far fa-trash-alt" id="t-eliminar" matSuffix
-                                                    matTooltipPosition="right" matTooltip="Eliminar este registro."
-                                                    (click)="QuitarHorarios(i)">
+                                                <i *ngIf="seleccionar_horario" class="far fa-trash-alt" id="t-eliminar"
+                                                    matSuffix matTooltipPosition="right"
+                                                    matTooltip="Eliminar este registro." (click)="QuitarHorarios(i)">
                                                     <p>Eliminar</p>
                                                 </i>
                                             </td>
                                         </tr>
-
                                     </tbody>
                                 </table>
                             </div>
@@ -68,7 +72,7 @@
 
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-center">
-                                <mat-form-field>
+                                <mat-form-field *ngIf="seleccionar_horario">
                                     <mat-label>Seleccionar horario</mat-label>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Lista de horarios cargados en el sistema.">
@@ -115,7 +119,7 @@
                                             </thead>
                                             <tbody>
                                                 <tr
-                                                    *ngFor="let d of detalle_acciones | paginate:tamanio_paginaD:numero_paginaD">
+                                                    *ngFor="let d of detalle_acciones">
                                                     <td id="td_horarios">{{d.horario}}</td>
                                                     <td id="td_horarios">{{d.entrada_}}</td>
                                                     <td id="td_horarios">{{d.inicio_comida}}</td>
@@ -136,6 +140,11 @@
                                 </div>
                                 <div *ngIf="ver_guardar" style="padding-top: 10px; margin: 0 auto;">
                                     <button class="btn btn-sm" (click)="RegistrarHorario()">
+                                        Guardar
+                                    </button>
+                                </div>
+                                <div *ngIf="ver_feriado" style="padding-top: 10px; margin: 0 auto;">
+                                    <button class="btn btn-sm" (click)="RegistrarFeriado()">
                                         Guardar
                                     </button>
                                 </div>

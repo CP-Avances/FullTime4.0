@@ -1,26 +1,24 @@
 import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { Component, OnInit, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { MatDatepicker } from '@angular/material/datepicker';
 import { FormControl } from '@angular/forms';
-import { PageEvent } from '@angular/material/paginator';
+import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { default as _rollupMoment, Moment } from 'moment';
+import { default as _rollupMoment } from 'moment';
 import moment from 'moment';
 
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
-import { PlanHorarioService } from 'src/app/servicios/horarios/planHorario/plan-horario.service';
+import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { PlanHorarioService } from 'src/app/servicios/horarios/planHorario/plan-horario.service';
+import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
 
 import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
-import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
 @Component({
@@ -70,15 +68,21 @@ export class EditarPlanificacionComponent implements OnInit {
 
   ngOnInit(): void {
     console.log('ver rotativo ', this.datos_horarios)
-
-    this.BuscarFeriados();
-
-
-
     this.BuscarHora();
+    this.BuscarFeriados();
+  }
 
+  /** **************************************************************************************** **
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **************************************************************************************** **/
+  formato_hora: string = 'HH:mm:ss';
 
-
+  BuscarHora() {
+    // id_tipo_parametro Formato hora = 26
+    this.parametro.ListarDetalleParametros(26).subscribe(
+      res => {
+        this.formato_hora = res[0].descripcion;
+      });
   }
 
   // METODO PARA BUSCAR FERIADOS
@@ -118,12 +122,16 @@ export class EditarPlanificacionComponent implements OnInit {
   // VARIABLES DE ALMACENAMIENTO DE DATOS ESPECIFICOS DE UN HORARIO
   detalles_horarios: any = [];
   vista_horarios: any = [];
+  vista_descanso: any = [];
   hora_entrada: any;
   hora_salida: any;
+  segundo_dia: any;
+  tercer_dia: any;
   // METODO PARA MOSTRAR NOMBRE DE HORARIO CON DETALLE DE ENTRADA Y SALIDA
   BuscarHorarios() {
     this.horarios = [];
     this.vista_horarios = [];
+    this.vista_descanso = [];
     // BUSQUEDA DE HORARIOS
     this.restH.BuscarListaHorarios().subscribe(datos => {
       this.horarios = datos;
@@ -131,33 +139,32 @@ export class EditarPlanificacionComponent implements OnInit {
         // BUSQUEDA DE DETALLES DE ACUERDO AL ID DE HORARIO
         this.restD.ConsultarUnDetalleHorario(hor.id).subscribe(res => {
           this.detalles_horarios = res;
+          //console.log('detalles ', this.detalles_horarios)
           this.detalles_horarios.map(det => {
             if (det.tipo_accion === 'E') {
-              this.hora_entrada = det.hora.slice(0, 5)
+              this.hora_entrada = det.hora.slice(0, 5);
             }
             if (det.tipo_accion === 'S') {
-              this.hora_salida = det.hora.slice(0, 5)
+              this.hora_salida = det.hora.slice(0, 5);
+              this.segundo_dia = det.segundo_dia;
+              this.tercer_dia = det.tercer_dia;
             }
+
           })
           let datos_horario = [{
             id: hor.id,
             nombre: hor.codigo + ' (' + this.hora_entrada + '-' + this.hora_salida + ')',
-            codigo: hor.codigo
+            codigo: hor.codigo,
+            entrada: this.hora_entrada,
+            salida: this.hora_salida,
+            segundo_dia: this.segundo_dia,
+            tercer_dia: this.tercer_dia,
           }]
-          if (this.vista_horarios.length === 0) {
-            this.vista_horarios = datos_horario;
-          } else {
-            this.vista_horarios = this.vista_horarios.concat(datos_horario);
+          hor.detalles = datos_horario[0];
+          if (hor.default === 'L' || hor.default === 'FD') {
+            this.vista_descanso = this.vista_descanso.concat(datos_horario);
           }
-        }, error => {
-          let datos_horario = [{
-            id: hor.id,
-            nombre: hor.codigo,
-            codigo: hor.codigo
-          }]
-          if (this.vista_horarios.length === 0) {
-            this.vista_horarios = datos_horario;
-          } else {
+          else {
             this.vista_horarios = this.vista_horarios.concat(datos_horario);
           }
         })
@@ -172,6 +179,8 @@ export class EditarPlanificacionComponent implements OnInit {
   horas: any = [];
   dia_fecha: any;
   tipo_dia_verificar: string = '';
+  seleccionar_horario: boolean = true;
+  seleccionar_libre: boolean = true;
   ListarHorariosSeleccionados() {
     this.tipo_dia_verificar = '';
     this.horas = [];
@@ -183,8 +192,9 @@ export class EditarPlanificacionComponent implements OnInit {
     this.dia_fecha = (moment(fecha_, 'YYYY/MM/DD').format('MMMM, ddd DD, YYYY')).toUpperCase();
 
     for (var i = 0; i < total; i++) {
-      if ((this.datos_horarios.datosPlan.split(',')[i]).trim() === 'L') {
-        this.BuscarPlanificacion();
+      if ((this.datos_horarios.datosPlan.split(',')[i]).trim() === 'L' ||
+        (this.datos_horarios.datosPlan.split(',')[i]).trim() === 'FD') {
+        this.BuscarPlanificacion((this.datos_horarios.datosPlan.split(',')[i]).trim());
         break;
       }
       else {
@@ -203,14 +213,32 @@ export class EditarPlanificacionComponent implements OnInit {
         })
       }
     }
+
+    if (this.feriados.length) {
+      console.log('existen feriados', this.feriados);
+      this.seleccionar_horario = false;
+      this.seleccionar_libre = false;
+      this.ver_feriado = true;
+      this.ver_nota = true;
+      this.notas1 = 'DÍA CONFIGURADO EN EL SISTEMA COMO FERIADO.';
+      this.nota_ = 'feriado';
+    }
     console.log('ver horarios asignados ', this.horas)
   }
 
   // METODO PARA BUSCAR PLANIFICACION
   lista_libres: any = [];
-  BuscarPlanificacion() {
-    this.tipo_dia_verificar = 'L';
+  lista_feriados: any = [];
+  BuscarPlanificacion(tipo: string) {
+    if (tipo === 'L') {
+      this.tipo_dia_verificar = 'L';
+    }
+    else {
+      this.tipo_dia_verificar = 'FD';
+    }
+
     this.lista_libres = [];
+    this.lista_feriados = [];
     let fecha = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
     let busqueda = {
       fecha_inicio: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
@@ -229,14 +257,46 @@ export class EditarPlanificacionComponent implements OnInit {
               anio: this.datos_horarios.anio,
               mes: this.datos_horarios.mes,
               dia: this.datos_horarios.dia,
+              tipo_dia: this.tipo_dia_verificar,
             }
-            this.lista_libres = this.lista_libres.concat(data);
+            if (tipo === 'L') {
+              this.lista_libres = this.lista_libres.concat(data);
+              this.seleccionar_libre = false;
+            }
+            else {
+              this.lista_feriados = this.lista_feriados.concat(data);
+            }
             break;
           }
         }
       }
       console.log('ver horario libre ', this.lista_libres);
     })
+  }
+
+  // METODO PARA VALIDAR SELECCION DE HORARIO
+  ValidarHorario() {
+    const [obj_res] = this.horarios.filter(o => {
+      return o.codigo === this.horarioF.value
+    })
+    if (!obj_res) return this.toastr.warning('Horario no válido.');
+
+    const { hora_trabajo, id, codigo, min_almuerzo } = obj_res;
+
+    // VERIFICACION DE FORMATO CORRECTO DE HORARIOS
+    if (!this.StringTimeToSegundosTime(hora_trabajo)) {
+      this.horarioF.setValue('');
+      this.toastr.warning(
+        'Formato de horas en horario seleccionado no son válidas.',
+        'Dar click para verificar registro de detalle de horario.', {
+        timeOut: 6000,
+      }).onTap.subscribe(obj => {
+        this.router.navigate(['/horario/']);
+      });
+    }
+    else {
+      this.ObtenerDetallesHorario(id, codigo, min_almuerzo);
+    }
   }
 
   // METODO PARA VER DETALLE DE HORARIO
@@ -314,9 +374,15 @@ export class EditarPlanificacionComponent implements OnInit {
       return o.codigo === this.horarioF.value
     })
 
-    if (!obj_res) return this.toastr.warning('Horario no válido.');
+    //console.log('ver obj horario ', obj_res)
+    console.log('ver horas ', this.horas)
 
     this.asignado_libre = [];
+
+    let tipo = 'N';
+    if (obj_res.default === 'HA') {
+      tipo = 'HA';
+    }
 
     let data = {
       horarios: obj_res,
@@ -324,7 +390,7 @@ export class EditarPlanificacionComponent implements OnInit {
       anio: this.datos_horarios.anio,
       mes: this.datos_horarios.mes,
       dia: this.datos_horarios.dia,
-      tipo_dia: 'N',
+      tipo_dia: tipo,
     }
 
     let verificador = 0;
@@ -333,10 +399,55 @@ export class EditarPlanificacionComponent implements OnInit {
         verificador = 1;
         break;
       }
+      else {
+        if (this.horas[i].horarios.detalles.segundo_dia === false && data.horarios.detalles.segundo_dia === false) {
+          if (this.horas[i].horarios.detalles.salida < data.horarios.detalles.entrada) {
+            verificador = 0;
+          }
+          else if (this.horas[i].horarios.detalles.entrada > data.horarios.detalles.salida) {
+            verificador = 0
+          }
+          else {
+            verificador = 2;
+            break;
+          }
+        }
+        else if (this.horas[i].horarios.detalles.segundo_dia === true && data.horarios.detalles.segundo_dia === true) {
+          verificador = 2;
+          break;
+        }
+        else if (this.horas[i].horarios.detalles.segundo_dia === false && data.horarios.detalles.segundo_dia === true) {
+          if (this.horas[i].horarios.detalles.entrada > data.horarios.detalles.salida
+            && this.horas[i].horarios.detalles.salida > data.horarios.detalles.salida
+            && this.horas[i].horarios.detalles.salida < data.horarios.detalles.entrada) {
+            verificador = 0;
+          }
+          else {
+            verificador = 2;
+            break;
+          }
+        }
+        else if (this.horas[i].horarios.detalles.segundo_dia === true && data.horarios.detalles.segundo_dia === false) {
+          if (this.horas[i].horarios.detalles.salida < data.horarios.detalles.entrada
+            && this.horas[i].horarios.detalles.salida < data.horarios.detalles.salida
+            && this.horas[i].horarios.detalles.entrada > data.horarios.detalles.salida) {
+            verificador = 0;
+          }
+          else {
+            verificador = 2;
+            break;
+          }
+        }
+      }
     }
 
     if (verificador === 1) {
       this.toastr.warning('Horario ya se encuentra registrado.', 'Ups!!! VERIFICAR.', {
+        timeOut: 6000,
+      });
+    }
+    else if (verificador === 2) {
+      this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups!!! VERIFICAR.', {
         timeOut: 6000,
       });
     }
@@ -395,14 +506,14 @@ export class EditarPlanificacionComponent implements OnInit {
         this.ver_horario_ = false;
         this.ver_guardar = false;
         this.ver_nota = false;
-        this.notas = '';
+        this.notas1 = '';
+        this.notas2 = '';
       }
       else {
+        //console.log('ver horarios ', this.horarios)
         const [obj_res] = this.horarios.filter(o => {
-          return o.codigo === this.horarioF.value
+          return o.default === 'L'
         })
-
-        if (!obj_res) return this.toastr.warning('Horario no válido.');
 
         this.asignado_libre = [];
 
@@ -414,13 +525,15 @@ export class EditarPlanificacionComponent implements OnInit {
           dia: this.datos_horarios.dia,
           tipo_dia: 'L',
         }
+
         this.asignado_libre = this.asignado_libre.concat(data);
         this.ver_horario_ = false;
         this.ver_guardar = true;
 
         this.ver_nota = true;
         this.nota_ = 'libre';
-        this.notas = 'DÍA CONFIGURADO COMO LIBRE O NO LABORABLE.'
+        this.notas1 = 'DÍA CONFIGURADO COMO LIBRE O NO LABORABLE.';
+        this.notas2 = '';
       }
 
       console.log('ver libre ', this.asignado_libre)
@@ -430,10 +543,12 @@ export class EditarPlanificacionComponent implements OnInit {
 
   // METODO PARA VERIFICAR HORARIOS
   ver_nota: boolean = false;
-  notas: string = '';
+  notas1: string = '';
+  notas2: string = '';
   nota_: string = '';
+  observacion: string = '';
   VerificarHorarios() {
-    this.notas = '';
+    this.notas1 = '';
     const trabajo = this.datos_horarios.horas_trabaja;
     let suma = '00:00:00';
     this.horas.forEach(valor => {
@@ -444,17 +559,19 @@ export class EditarPlanificacionComponent implements OnInit {
     this.ver_nota = true;
     //console.log('ver datos de horas ', this.StringTimeToSegundosTime(suma), ' trabajo ', this.StringTimeToSegundosTime(trabajo))
     if (this.StringTimeToSegundosTime(suma) <= this.StringTimeToSegundosTime(trabajo)) {
-      this.notas = 'Horarios verificados exitosamente.';
+      this.notas1 = 'Horarios verificados exitosamente.';
+      this.notas2 = '';
       this.nota_ = 'ok';
       this.ver_guardar = true;
       this.ver_horario_ = false;
     }
     else {
-      this.toastr.warning('Ups!!! verificar horarios seleccionados.', '', {
-        timeOut: 6000,
-      });
-      this.nota_ = 'error';
-      this.notas = 'Horas totales de horarios seleccionados (' + suma + '). Superan las horas de su jornada laboral (' + trabajo + ').'
+      this.nota_ = 'ok';
+      this.observacion = 'error'
+      this.notas1 = 'Horarios verificados exitosamente.';
+      this.notas2 = 'Horas totales de horarios seleccionados (' + suma + '). Superan las horas de su jornada laboral (' + trabajo + ').';
+      this.ver_guardar = true;
+      this.ver_horario_ = false;
     }
     console.log('ver suma total ', suma);
 
@@ -470,7 +587,12 @@ export class EditarPlanificacionComponent implements OnInit {
     else {
       // VERIFICAR SI ESTA CONFIGURADO COMO LIBRE
       if (this.asignado_libre.length != 0) {
-        this.EliminarPlanificacion(this.lista_eliminar, this.asignado_libre);
+        if (this.lista_eliminar != 0) {
+          this.EliminarPlanificacion(this.lista_eliminar, this.asignado_libre);
+        }
+        else {
+          this.GuardarHorario(this.asignado_libre);
+        }
       }
       else {
         // VERIFICAR SI EXISTEN HORARIOS ELIMINADOS
@@ -638,34 +760,6 @@ export class EditarPlanificacionComponent implements OnInit {
                 }
               })
             }
-            else {
-              let plan = {
-                codigo: this.datos_horarios.codigo,
-                tipo_dia: h.tipo_dia,
-                min_antes: 0,
-                tolerancia: 0,
-                id_horario: h.horarios.id,
-                min_despues: 0,
-                fec_horario: fecha,
-                estado_origen: origen,
-                estado_timbre: h.tipo_dia,
-                id_empl_cargo: this.datos_horarios.idCargo,
-                id_det_horario: null,
-                salida_otro_dia: 99,
-                tipo_entr_salida: 'HA',
-                fec_hora_horario: fecha,
-              };
-              // ALMACENAMIENTO DE PLANIFICACION GENERAL
-              this.plan_general = this.plan_general.concat(plan);
-
-              if (cont3 === res.length) {
-                cont3 = 0;
-                if (cont2 === cont1) {
-                  //console.log('ver data plan generala ', this.plan_general);
-                  this.InsertarPlanificacion();
-                }
-              }
-            }
           })
         }
       })
@@ -676,6 +770,7 @@ export class EditarPlanificacionComponent implements OnInit {
   }
 
   // METODO PARA INGRESAR DATOS A LA BASE
+  plan_general: any = [];
   InsertarPlanificacion() {
     console.log('plan genral ', this.plan_general)
     this.restP.CrearPlanGeneral(this.plan_general).subscribe(res => {
@@ -704,6 +799,38 @@ export class EditarPlanificacionComponent implements OnInit {
     //this.AuditarPlanificar(form);
   }
 
+  // METODO PARA REGISTRAR DIAS COMO FERIADOS
+  ver_feriado: boolean = false;
+  asignado_feriados: any = [];
+  RegistrarFeriado() {
+    const [obj_res] = this.horarios.filter(o => {
+      return o.default === 'FD'
+    })
+
+    this.asignado_feriados = [];
+
+    let data = {
+      horarios: obj_res,
+      asignado: true,
+      anio: this.datos_horarios.anio,
+      mes: this.datos_horarios.mes,
+      dia: this.datos_horarios.dia,
+      tipo_dia: 'FD',
+    }
+    this.asignado_feriados = this.asignado_feriados.concat(data);
+
+    if (this.horas.length != 0) {
+      this.EliminarPlanificacion(this.horas, this.asignado_feriados);
+    }
+    else {
+      if (this.lista_feriados.length != 0) {
+        this.EliminarPlanificacion(this.lista_feriados, this.asignado_feriados);
+      }
+      else {
+        this.GuardarHorario(this.asignado_feriados);
+      }
+    }
+  }
 
   // METODO PARA SUMAR HORAS
   SumarHoras(suma: string, tiempo: string) {
@@ -749,11 +876,13 @@ export class EditarPlanificacionComponent implements OnInit {
     let color: string;
     switch (opcion) {
       case 'error':
-        return color = '#F82A0A';
+        return color = '#A37401';
       case 'ok':
         return color = '#2FA406';
-      case 'ok':
+      case 'libre':
         return color = '#6E09AD';
+      case 'feriado':
+        return color = '#7D2D81';
     }
   }
 
@@ -771,6 +900,7 @@ export class EditarPlanificacionComponent implements OnInit {
       this.componentev.editar_horario = false;
       this.componentev.expansion = true;
       this.componentev.editar_activar = true;
+      this.componentev.ver_activar_editar = true;
       if (opcion === 2) {
         this.componentev.BuscarHorarioPeriodo();
       }
@@ -791,15 +921,6 @@ export class EditarPlanificacionComponent implements OnInit {
 
 
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO DE HORARIO ROTATIVO
-  ConfirmarHorarioRotativo(index: any) {
-    this.ventanae.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          //this.EliminarPlanificacion();
-        }
-      });
-  }
 
 
 
@@ -826,18 +947,7 @@ export class EditarPlanificacionComponent implements OnInit {
 
 
 
-  /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
-   ** **************************************************************************************** **/
-  formato_hora: string = 'HH:mm:ss';
 
-  BuscarHora() {
-    // id_tipo_parametro Formato hora = 26
-    this.parametro.ListarDetalleParametros(26).subscribe(
-      res => {
-        this.formato_hora = res[0].descripcion;
-      });
-  }
 
 
 
@@ -864,692 +974,10 @@ export class EditarPlanificacionComponent implements OnInit {
 
 
 
-  // METODO PARA MOSTRAR FECHA SELECCIONADA
-  FormatearFecha(fecha: Moment, datepicker: MatDatepicker<Moment>, opcion: number) {
-    this.ControlarBotones(true, false);
-    const ctrlValue = fecha;
-    if (opcion === 1) {
-      if (this.fechaFinalF.value) {
-        this.ValidarFechas(ctrlValue, this.fechaFinalF.value, this.fechaInicialF, opcion);
-      }
-      else {
-        let inicio = moment(ctrlValue).format('01/MM/YYYY');
-        this.fechaInicialF.setValue(moment(inicio, 'DD/MM/YYYY'));
-      }
-      this.fecHorario = false;
-    }
-    else {
-      this.ValidarFechas(this.fechaInicialF.value, ctrlValue, this.fechaFinalF, opcion);
-    }
-    datepicker.close();
-  }
 
-  // METODO PARA VALIDAR EL INGRESO DE LAS FECHAS
-  ValidarFechas(fec_inicio: any, fec_fin: any, formulario: any, opcion: number) {
-    // FORMATO DE FECHA PERMITIDO PARA COMPARARLAS
-    let inicio = moment(fec_inicio).format('01/MM/YYYY');
-    let final = moment(fec_fin).daysInMonth() + moment(fec_fin).format('/MM/YYYY');
-    let feci = moment(inicio, 'DD/MM/YYYY').format('YYYY/MM/DD');
-    let fecf = moment(final, 'DD/MM/YYYY').format('YYYY/MM/DD');
-    // VERIFICAR SI LAS FECHAS ESTAN INGRESDAS DE FORMA CORRECTA
-    if (Date.parse(feci) <= Date.parse(fecf)) {
-      if (opcion === 1) {
-        formulario.setValue(moment(inicio, 'DD/MM/YYYY'));
-      }
-      else {
-        formulario.setValue(moment(final, 'DD/MM/YYYY'));
-      }
-    }
-    else {
-      this.toastr.warning('La fecha no se registro. Ups la fecha no es correcta.!!!', 'VERIFICAR', {
-        timeOut: 6000,
-      });
-    }
-  }
-
-  // METODO PARA SELECCIONAR TIPO DE BUSQUEDA
-  GenerarCalendario() {
-    this.ver_horario = true;
-    this.ControlarBotones(true, false);
-
-    if (this.fechaInicialF.value != null && this.fechaFinalF.value != null) {
-     // this.BuscarFeriados(this.fechaInicialF.value, this.fechaFinalF.value);
-    }
-    else {
-      let inicio = moment().format('YYYY/MM/01');
-      let final = moment().format('YYYY/MM/') + moment().daysInMonth();
-     // this.BuscarFeriados(inicio, final);
-    }
-  }
-
-  // METODO PARA OBTENER FECHAS, MES, DIA, AÑO
-  fechas_mes: any = [];
-  dia_inicio: any;
-  dia_fin: any;
-  ListarFechas(fecha_inicio: any, fecha_final: any) {
-    this.fechas_mes = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO 
-
-    this.dia_inicio = moment(fecha_inicio, 'YYYY-MM-DD').format('YYYY-MM-DD');
-    this.dia_fin = moment(fecha_final, 'YYYY-MM-DD').format('YYYY-MM-DD');
-
-    // LOGICA PARA OBTENER EL NOMBRE DE CADA UNO DE LOS DIAS DEL PERIODO INDICADO
-    while (this.dia_inicio <= this.dia_fin) {
-      let fechas = {
-        fecha: this.dia_inicio,
-        dia: (moment(this.dia_inicio).format('dddd')).toUpperCase(),
-        formato: (moment(this.dia_inicio).format('MMMM DD, YYYY')).toUpperCase(),
-        mes: moment(this.dia_inicio).format('MMMM').toUpperCase(),
-        anio: moment(this.dia_inicio).format('YYYY'),
-        horarios: [],
-        tipo_dia: '-',
-        estado: false,
-      }
-      this.fechas_mes.push(fechas);
-      var newDate = moment(this.dia_inicio).add(1, 'd').format('YYYY-MM-DD')
-      this.dia_inicio = newDate;
-    }
-
-    // TRATAMIENTO DE FERIADOS
-    this.fechas_mes.forEach(obj => {
-      // BUSCAR FERIADOS 
-      if (this.feriados.length != 0) {
-        //console.log('ingresa feriados ', this.feriados)
-        for (let i = 0; i < this.feriados.length; i++) {
-          //console.log('fecha feriados ', moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
-          //console.log('obj ', obj)
-          if (moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj.fecha) {
-            obj.tipo_dia = 'FD';
-            obj.estado = true;
-            obj.observacion = 'FERIADO*';
-            break;
-          }
-        }
-      }
-
-      // BUSCAR FECHAS DE RECUPERACION DE FERIADOS
-      if (this.recuperar.length != 0) {
-        for (let j = 0; j < this.recuperar.length; j++) {
-          if (moment(this.recuperar[j].fec_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj.fecha) {
-            obj.tipo_dia = 'N';
-            obj.observacion = 'RECUPERACIÓN*';
-            break;
-          }
-        }
-      }
-    })
-  }
-
-
-
-  // METODO PARA SUBRAYAR TEXTO
-  EstiloSubrayado(opcion: any) {
-    let color: string;
-    switch (opcion) {
-      case 'OK':
-        return color = 'none';
-      case 'Horario ya existe.':
-        return color = 'line-through red';
-    }
-  }
-
-  // METODO PARA SELECCIONAR HORARIO
-  valor: any;
-  ver_icono: boolean = false;
-  SeleccionarHorario() {
-    this.ver_icono = true;
-    this.valor = this.horarioF.value
-  }
-
-  // METODO PARA VALIDAR SELECCION DE HORARIO
-  ValidarHorario() {
-    const [obj_res] = this.horarios.filter(o => {
-      return o.codigo === this.horarioF.value
-    })
-    if (!obj_res) return this.toastr.warning('Horario no válido.');
-
-    const { hora_trabajo, id, codigo, min_almuerzo } = obj_res;
-
-    // VERIFICACION DE FORMATO CORRECTO DE HORARIOS
-    if (!this.StringTimeToSegundosTime(hora_trabajo)) {
-      this.ver_icono = false;
-      this.horarioF.setValue('');
-      this.toastr.warning(
-        'Formato de horas en horario seleccionado no son válidas.',
-        'Dar click para verificar registro de detalle de horario.', {
-        timeOut: 6000,
-      }).onTap.subscribe(obj => {
-        this.router.navigate(['/horario/']);
-      });
-    }
-    else {
-      this.SeleccionarHorario();
-      this.ObtenerDetallesHorario(id, codigo, min_almuerzo);
-    }
-  }
-
-  // ITEMS DE PAGINACION DE LA TABLA 
-  pageSizeOptionsD = [5, 10, 20, 50];
-  tamanio_paginaD: number = 5;
-  numero_paginaD: number = 1;
-
-  // EVENTO PARA MOSTRAR NÚMERO DE FILAS EN TABLA
-  ManejarPaginaDetalles(e: PageEvent) {
-    this.numero_paginaD = e.pageIndex + 1;
-    this.tamanio_paginaD = e.pageSize;
-  }
-
-  // METODO PARA INGRESAR HORARIO
-  IngresarHorario(index: number) {
-    let verificador = 0;
-    this.ControlarBotones(true, false);
-
-    const [datoHorario] = this.horarios.filter(o => {
-      return o.codigo === this.horarioF.value
-    })
-
-    let data = [{
-      horario: this.horarioF.value,
-      id_horario: datoHorario.id,
-      hora_trabajo: datoHorario.hora_trabajo,
-    }]
-
-    //console.log('tipo dia ', this.fechas_mes[index].tipo_dia, ' observa ', this.fechas_mes[index].observacion)
-    if (this.fechas_mes[index].tipo_dia === 'L') {
-      this.toastr.warning('Este día esta configurado como libre.', 'Ups!!! VERIFICAR.', {
-        timeOut: 6000,
-      });
-    }
-    else {
-      for (let i = 0; i < this.fechas_mes[index].horarios.length; i++) {
-        if (this.fechas_mes[index].horarios[i].horario === this.horarioF.value) {
-          verificador = 1;
-          break
-        }
-      }
-
-      if (verificador === 0) {
-        this.fechas_mes[index].estado = true;
-        this.fechas_mes[index].tipo_dia = 'N';
-        if (this.fechas_mes[index].observacion === 'FERIADO*') {
-          if (this.fechas_mes[index].horarios.length === 0) {
-            this.fechas_mes[index].tipo_dia = 'FD';
-            this.fechas_mes[index].horarios = this.fechas_mes[index].horarios.concat(data);
-          }
-          else {
-            this.toastr.warning('No es factible registrar más de un horario.', 'Ups!!! VERIFICAR.', {
-              timeOut: 6000,
-            });
-          }
-        }
-        else {
-          this.fechas_mes[index].horarios = this.fechas_mes[index].horarios.concat(data);
-        }
-      }
-      else {
-        this.toastr.warning('Horario ya se encuentra registrado.', 'Ups!!! VERIFICAR.', {
-          timeOut: 6000,
-        });
-      }
-    }
-
-  }
-
-
-
-  // METODO PARA ELIMINAR HORARIOS
-  EliminarHorario(index: number) {
-    this.ControlarBotones(true, false);
-
-
-    if (this.fechas_mes[index].horarios.length === 0) {
-      this.fechas_mes[index].tipo_dia = '-';
-      if (this.fechas_mes[index].observacion === 'FERIADO*') {
-        this.fechas_mes[index].tipo_dia = 'FD';
-      }
-      this.fechas_mes[index].estado = false;
-      this.fechas_mes[index].horas_validas = '';
-    }
-
-  }
-
-  // METODO PARA ELIMINAR HORARIOS LIBRES
-  EliminarLibre(index: number) {
-    this.ControlarBotones(true, false);
-
-    for (let i = 0; i < this.fechas_mes[index].horarios.length; i++) {
-      if (this.fechas_mes[index].tipo_dia === 'L') {
-        this.fechas_mes[index].tipo_dia = '-';
-        this.fechas_mes[index].estado = false;
-        this.fechas_mes[index].horarios.splice(i, 1);
-        break
-      }
-    }
-    //console.log('ver fechas final', this.fechas_mes)
-  }
-
-  // METODO PARA VALIDAR DATOS SELECCIONADOS
-  data_horarios: any = [];
-  VerificarHorario() {
-    let verificador = 0;
-    this.data_horarios = [];
-    //console.log('ver fechas origen ', this.fechas_mes, ' form ', this.horarioF.value);
-    if (this.horarioF.value != null) {
-
-      this.fechas_mes.forEach(obj => {
-        if (obj.estado === true) {
-          verificador = verificador + 1;
-          this.data_horarios = this.data_horarios.concat(obj);
-        }
-      })
-
-      // METODO PARA TRATAR FERIADOS
-      this.RegistrarFeriados();
-
-      //console.log('verificador ', verificador);
-      if (verificador > 0) {
-        //console.log('ingresa ver datos seleccionados ', this.data_horarios)
-        this.VerificarContrato();
-      }
-      else {
-        this.toastr.warning('No ha registrado horarios.', 'Ups!!! VERIFICAR.', {
-          timeOut: 6000,
-        });
-      }
-    }
-    else {
-      this.toastr.warning('No ha registrado horarios.', 'Ups!!! VERIFICAR.', {
-        timeOut: 6000,
-      });
-    }
-    //console.log('ver datos seleccionados ', this.data_horarios)
-  }
-
-  // METODO PARA VALIDAR REGISTRO DE HORARIO POSTERIOR AL CONTRATO
-  VerificarContrato() {
-    //console.log('ver datos horarios ', this.data_horarios);
-    let datosBusqueda = {
-      id_empleado: this.datos_horarios.idEmpleado
-    }
-
-    let inicio = moment(this.data_horarios[0].fecha).format('YYYY-MM-DD');
-
-    // METODO PARA BUSCAR FECHA DE CONTRATO REGISTRADO EN FICHA DE EMPLEADO
-    this.restE.BuscarFechaContrato(datosBusqueda).subscribe(response => {
-      // VERIFICAR SI LAS FECHAS SON VALIDAS DE ACUERDO A LOS REGISTROS Y FECHAS INGRESADAS
-      if (Date.parse(response[0].fec_ingreso.split('T')[0]) < Date.parse(inicio)) {
-        //console.log('ingresa a verificar duplicidad');
-        this.VerificarDuplicidad();
-      }
-      else {
-        this.toastr.warning('Fecha de inicio de actividades no puede ser anterior a fecha de ingreso de contrato.', '', {
-          timeOut: 6000,
-        });
-      }
-    });
-  }
-
-  // METODO PARA VERIFICAR DUPLICIDAD DE REGISTROS
-  iterar: number = 0;
-  leer_horario: number = 0;
-  contar_duplicado: number = 0;
-  sin_duplicidad: any = [];
-  VerificarDuplicidad() {
-    //console.log('duplicidad ', this.data_horarios);
-    this.sin_duplicidad = [];
-    let total = 0;
-
-    this.data_horarios.forEach(obj => {
-      total = total + obj.horarios.length
-    })
-
-    this.contar_duplicado = 0;
-    this.leer_horario = 0;
-    this.iterar = 0;
-
-    this.data_horarios.forEach(obj => {
-
-      this.iterar = this.iterar + 1;
-      obj.horarios.forEach(h => {
-        const [horario] = this.horarios.filter(o => {
-          return o.codigo === h.horario
-        })
-
-        let fechas = {
-          fechaInicio: obj.fecha,
-          fechaFinal: obj.fecha,
-          id_horario: horario.id
-        };
-
-        h.verificar = 'OK';
-        //console.log('ver datos de horario ', fechas)
-        this.horario.VerificarDuplicidadHorarios(this.datos_horarios.codigo, fechas).subscribe(existe => {
-          this.leer_horario = this.leer_horario + 1;
-          this.contar_duplicado = 1;
-          h.verificar = 'Horario ya existe.';
-          //console.log('duplicado ', this.contar_duplicado)
-          if (this.iterar === this.data_horarios.length) {
-            if (this.leer_horario === total) {
-              this.ValidarHorarioByHorasTrabaja()
-            }
-          }
-        }, error => {
-          this.leer_horario = this.leer_horario + 1;
-          if (this.iterar === this.data_horarios.length) {
-            if (this.leer_horario === total) {
-              this.ValidarHorarioByHorasTrabaja()
-            }
-          }
-        });
-      })
-      //console.log('duplicaso for', this.contar_duplicado)
-    })
-
-    this.data_horarios.forEach(obj => {
-      this.fechas_mes.forEach(fec => {
-        if (obj.fecha === fec.fecha) {
-          fec.horarios = obj.horarios;
-        }
-      })
-    })
-
-    //console.log('data_horarios ', this.data_horarios)
-  }
-
-  // METODO PARA VALIDAR HORAS DE TRABAJO SEGUN CONTRATO
-  sumHoras: any;
-  suma = '00:00:00';
-  horariosEmpleado: any = [];
-  iterar2: number = 0;
-  leer_horario2: number = 0;
-  ValidarHorarioByHorasTrabaja() {
-    const trabajo = this.datos_horarios.horas_trabaja;
-    let suma1 = '00:00:00';
-    let suma2 = '00:00:00';
-    this.iterar2 = 0;
-    this.leer_horario2 = 0;
-    let horario1: number = 0;
-    let horario2: number = 0;
-
-    this.data_horarios.forEach(obj => {
-      obj.horas_seleccionadas = suma1;
-      obj.horas_registradas = suma2;
-
-      obj.horarios.forEach(valor => {
-        horario1 = horario1 + 1;
-        // SUMA DE HORAS DE CADA UNO DE LOS HORARIOS SELECCIONADOS
-        suma1 = this.SumarHoras(suma1, valor.hora_trabajo);
-        if (obj.horarios.length === horario1) {
-          obj.horas_seleccionadas = suma1;
-          horario1 = 0;
-          suma1 = '00:00:00';
-        }
-      })
-
-      // METODO PARA LECTURA DE HORARIOS EXISTENTES DEL EMPLEADO
-      let fechas = {
-        fechaInicio: obj.fecha,
-        fechaFinal: obj.fecha,
-      };
-
-      this.horario.VerificarHorariosExistentes(this.datos_horarios.codigo, fechas).subscribe(existe => {
-        this.iterar2 = this.iterar2 + 1;
-        obj.horarios_existentes = '***';
-        obj.registrados = existe;
-        existe.map(h => {
-          horario2 = horario2 + 1;
-          // SUMA DE HORAS DE CADA UNO DE LOS HORARIOS DEL EMPLEADO
-          suma2 = this.SumarHoras(suma2, h.hora_trabajo);
-          if (horario2 === existe.length) {
-            obj.horas_registradas = suma2;
-            horario2 = 0;
-            suma2 = '00:00:00';
-            if (this.iterar2 === this.data_horarios.length) {
-              this.data_horarios.forEach(obj => {
-                this.leer_horario2 = this.leer_horario2 + 1;
-                if (obj.tipo_dia != 'L') {
-                  //console.log('ver valor ', obj.horas_registradas, obj.horas_seleccionadas)
-                  let suma3 = this.SumarHoras(obj.horas_seleccionadas, obj.horas_registradas);
-                  if (this.StringTimeToSegundosTime(suma3) <= this.StringTimeToSegundosTime(trabajo)) {
-                    obj.horas_validas = 'OK'
-                  }
-                  else {
-                    obj.horas_validas = 'Jornada superada: ' + suma3;
-                  }
-                }
-              })
-
-              //console.log('iterar2 ', this.leer_horario2, ' ver original ', this.data_horarios.length)
-              if (this.leer_horario2 === this.data_horarios.length) {
-                //console.log('ingresa 1')
-                this.ControlarBotones(false, true);
-              }
-            }
-          }
-        })
-      }, error => {
-        this.iterar2 = this.iterar2 + 1;
-        obj.horarios_existentes = '';
-        obj.horas_registradas = suma2;
-        if (this.iterar2 === this.data_horarios.length) {
-          this.data_horarios.forEach(obj => {
-            this.leer_horario2 = this.leer_horario2 + 1;
-            if (obj.tipo_dia != 'L') {
-              //console.log('ver valor ', obj.horas_registradas, obj.horas_seleccionadas)
-              let suma3 = this.SumarHoras(obj.horas_seleccionadas, obj.horas_registradas);
-              if (this.StringTimeToSegundosTime(suma3) <= this.StringTimeToSegundosTime(trabajo)) {
-                obj.horas_validas = 'OK';
-              }
-              else {
-                obj.horas_validas = 'Jornada superada: ' + suma3;
-              }
-            }
-          })
-
-          //console.log('iterar2 ', this.leer_horario2, ' ver original ', this.data_horarios.length)
-          if (this.leer_horario2 === this.data_horarios.length) {
-            //console.log('ingresa 2')
-            this.ControlarBotones(false, true);
-          }
-        }
-      });
-    })
-    //console.log('ver data horarios ', this.data_horarios)
-  }
-
-
-
-  // CONTROL DE BOTONES
-  ControlarBotones(horario: boolean, guardar: boolean) {
-    this.ver_horario_ = horario;
-    this.ver_guardar = guardar;
-  }
-
-  // METODO DE VALIDACION DE REGISTRO DE HORARIOS
-  RegistrarFeriados() {
-    const [datoHorario] = this.horarios.filter(o => {
-      return o.codigo === this.horarioF.value
-    })
-
-    let data = [{
-      horario: this.horarioF.value,
-      id_horario: datoHorario.id,
-      hora_trabajo: datoHorario.hora_trabajo,
-    }]
-
-    this.data_horarios.forEach(valor => {
-      if (valor.observacion === 'FERIADO*') {
-        valor.horas_validas = 'OK';
-        if (valor.horarios.length === 0) {
-          valor.horarios = data;
-        }
-      }
-    })
-  }
-
-  // METODO PARA GUARDAR DATOS
-  guardar: any = [];
-  GuardarDatos() {
-    //console.log('datos a verificar ', this.data_horarios)
-    let datos: any = [];
-
-    this.data_horarios.forEach(valor => {
-      if (valor.horas_validas === 'OK') {
-        datos = datos.concat(valor);
-      }
-      if (valor.tipo_dia === 'L') {
-        datos = datos.concat(valor);
-      }
-    })
-
-    if (datos.length === 0) {
-      this.toastr.warning('No se han encontrado datos para registrar.', 'Ups!!! verificar calendario.', {
-        timeOut: 6000,
-      });
-      this.ControlarBotones(true, false);
-    }
-    else {
-      this.CrearPlanGeneral(datos);
-    }
-    //console.log('datos finales ', datos)
-  }
-
-  plan_general: any = [];
-  CrearPlanGeneral(seleccionados: any) {
-    this.plan_general = [];
-    let total = 0;
-    var origen: string = '';
-
-    // DEFINICION DE TIPO DE DIA SEGUN HORARIO
-    origen = 'N';
-
-    // SELECCIONADOS SIN HORARIOS
-    total = this.LeerDatosFeriados(seleccionados, total, origen);
-
-    this.LeerDatosConHorario(seleccionados, total, origen);
-
-    //this.progreso = true;
-    //console.log('ver datos totala ', total)
-  }
-
-  // METODO PARA LEER DATOS DE FERIADOS
-  LeerDatosFeriados(seleccionados: any, total: number, origen: any) {
-    seleccionados.forEach(valor => {
-      total = total + valor.horarios.length;
-      if (valor.observacion === 'FERIADO*') {
-        if (valor.horarios_existentes === '***') {
-          //console.log('ver datos ', valor.registrados)
-          valor.registrados.forEach(h => {
-            // this.EliminarPlanificacion(valor, h);
-          })
-        }
-      }
-    })
-    return total;
-  }
-
-
-
-  // METODO PARA LEER DATOS CON HORARIO
-  LeerDatosConHorario(seleccionados: any, total: number, origen: any) {
-    let cont1 = 0;
-    let cont2 = 0;
-    let cont3 = 0;
-    // SELECCIONADOS CON HORARIOS
-    seleccionados.forEach(valor => {
-      cont1 = cont1 + 1;
-      valor.horarios.forEach(h => {
-        this.restD.ConsultarUnDetalleHorario(h.id_horario).subscribe(res => {
-          cont2 = cont2 + 1;
-          if (res.length != 0) {
-            // COLOCAR DETALLE DE DIA SEGUN HORARIO
-            res.map(deta => {
-              cont3 = cont3 + 1;
-              //console.log('ver detalle ', deta)
-              var accion = 0;
-              var nocturno: number = 0;
-              if (deta.tipo_accion === 'E') {
-                accion = deta.minu_espera;
-              }
-              if (deta.segundo_dia === true) {
-                nocturno = 1;
-              }
-              else if (deta.tercer_dia === true) {
-                nocturno = 2;
-              }
-              else {
-                nocturno = 0;
-              }
-
-              let plan = {
-                codigo: this.datos_horarios.codigo,
-                tipo_dia: valor.tipo_dia,
-                min_antes: deta.min_antes,
-                tolerancia: accion,
-                id_horario: h.id_horario,
-                min_despues: deta.min_despues,
-                fec_horario: valor.fecha,
-                estado_origen: origen,
-                estado_timbre: valor.tipo_dia,
-                id_empl_cargo: this.datos_horarios.idCargo,
-                id_det_horario: deta.id,
-                salida_otro_dia: nocturno,
-                tipo_entr_salida: deta.tipo_accion,
-                fec_hora_horario: valor.fecha + ' ' + deta.hora,
-              };
-              if (deta.segundo_dia === true) {
-                plan.fec_hora_horario = moment(valor.fecha).add(1, 'd').format('YYYY-MM-DD') + ' ' + deta.hora;
-              }
-              if (deta.tercer_dia === true) {
-                plan.fec_hora_horario = moment(valor.fecha).add(2, 'd').format('YYYY-MM-DD') + ' ' + deta.hora;
-              }
-              // ALMACENAMIENTO DE PLANIFICACION GENERAL
-              this.plan_general = this.plan_general.concat(plan);
-
-              if (cont3 === res.length) {
-                cont3 = 0;
-                if (cont1 === seleccionados.length) {
-                  if (cont2 === total) {
-                    //console.log('ver data plan generala ', this.plan_general);
-                    this.InsertarPlanificacion();
-                  }
-                }
-              }
-            })
-          }
-          else {
-            let plan = {
-              codigo: this.datos_horarios.codigo,
-              tipo_dia: valor.tipo_dia,
-              min_antes: 0,
-              tolerancia: 0,
-              id_horario: h.id_horario,
-              min_despues: 0,
-              fec_horario: valor.fecha,
-              estado_origen: origen,
-              estado_timbre: valor.tipo_dia,
-              id_empl_cargo: this.datos_horarios.idCargo,
-              id_det_horario: null,
-              salida_otro_dia: 99,
-              tipo_entr_salida: 'HA',
-              fec_hora_horario: valor.fecha,
-            };
-            // ALMACENAMIENTO DE PLANIFICACION GENERAL
-            this.plan_general = this.plan_general.concat(plan);
-
-            if (cont3 === res.length) {
-              cont3 = 0;
-              if (cont1 === seleccionados.length) {
-                if (cont2 === total) {
-                  //console.log('ver data plan generala ', this.plan_general)
-                  this.InsertarPlanificacion();
-                }
-              }
-            }
-          }
-        })
-      })
-    })
-  }
+
+
+
 
 
 

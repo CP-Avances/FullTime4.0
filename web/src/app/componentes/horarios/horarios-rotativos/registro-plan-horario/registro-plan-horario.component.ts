@@ -4,22 +4,21 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { FormControl } from '@angular/forms';
-import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 import { default as _rollupMoment, Moment } from 'moment';
 import moment from 'moment';
 
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
-import { PlanHorarioService } from 'src/app/servicios/horarios/planHorario/plan-horario.service';
+import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { PlanHorarioService } from 'src/app/servicios/horarios/planHorario/plan-horario.service';
+import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
 
 import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
-import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
-import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 
 @Component({
   selector: 'app-registro-plan-horario',
@@ -379,18 +378,6 @@ export class RegistroPlanHorarioComponent implements OnInit {
     const s = parseInt(stringTime.split(':')[2]);
     return h + m + s
   }
-
-  // ITEMS DE PAGINACION DE LA TABLA 
-  pageSizeOptionsD = [5, 10, 20, 50];
-  tamanio_paginaD: number = 5;
-  numero_paginaD: number = 1;
-
-  // EVENTO PARA MOSTRAR NÚMERO DE FILAS EN TABLA
-  ManejarPaginaDetalles(e: PageEvent) {
-    this.numero_paginaD = e.pageIndex + 1;
-    this.tamanio_paginaD = e.pageSize;
-  }
-
 
   // METODO PARA VER DETALLE DE HORARIO
   ver_acciones: boolean = false;

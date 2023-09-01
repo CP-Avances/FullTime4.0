@@ -41,7 +41,6 @@ export class EditarFeriadosComponent implements OnInit {
   constructor(
     private rest: FeriadosService,
     private toastr: ToastrService,
-    private router: Router,
     public ventana: MatDialogRef<EditarFeriadosComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any) { }
 
@@ -167,8 +166,7 @@ export class EditarFeriadosComponent implements OnInit {
         this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
           timeOut: 6000,
         })
-        this.CerrarVentana();
-        this.router.navigate(['/verFeriados/', feriado.id]);
+        this.CerrarVentana(feriado.id);
       }
     });
   }
@@ -179,9 +177,9 @@ export class EditarFeriadosComponent implements OnInit {
   }
 
   // METODO PARA CERRAR VENTANA DE REGISTRO
-  CerrarVentana() {
+  CerrarVentana(opcion: number) {
     this.LimpiarCampos();
-    this.ventana.close();
+    this.ventana.close(opcion);
   }
 
 }

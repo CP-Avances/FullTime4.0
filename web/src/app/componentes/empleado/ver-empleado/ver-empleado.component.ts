@@ -1400,6 +1400,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.editar_horario = true;
     this.expansion = false;
     this.editar_activar = false;
+    this.ver_activar_editar = false;
   }
 
   ControlExpandir() {

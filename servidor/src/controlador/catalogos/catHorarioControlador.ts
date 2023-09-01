@@ -35,13 +35,13 @@ class HorarioControlador {
 
   // BUSCAR HORARIOS POR EL NOMBRE
   public async BuscarHorarioNombre(req: Request, res: Response) {
-    const { nombre, codigo } = req.body;
+    const { codigo } = req.body;
     try {
       const HORARIOS = await pool.query(
         `
-        SELECT * FROM cg_horarios WHERE UPPER(nombre) = $1 OR UPPER(codigo) = $2
+        SELECT * FROM cg_horarios WHERE UPPER(codigo) = $1
         `
-        , [nombre.toUpperCase(), codigo.toUpperCase()]);
+        , [codigo.toUpperCase()]);
 
       if (HORARIOS.rowCount > 0) return res.status(200).jsonp({ message: 'No se encuentran registros.' });
 
@@ -154,13 +154,13 @@ class HorarioControlador {
 
   // METODO PARA BUSCAR HORARIOS SIN CONSIDERAR UNO EN ESPECIFICO (METODO DE EDICION)
   public async BuscarHorarioNombre_(req: Request, res: Response) {
-    const { id, nombre, codigo } = req.body;
+    const { id, codigo } = req.body;
     try {
       const HORARIOS = await pool.query(
         `
-        SELECT * FROM cg_horarios WHERE NOT id = $1 AND (UPPER(nombre) = $2 OR UPPER(codigo) = $3)
+        SELECT * FROM cg_horarios WHERE NOT id = $1 AND UPPER(codigo) = $2)
         `,
-        [parseInt(id), nombre.toUpperCase(), codigo.toUpperCase()]);
+        [parseInt(id), codigo.toUpperCase()]);
 
       if (HORARIOS.rowCount > 0) return res.status(200).jsonp({
         message: 'El nombre de horario ya existe, ingresar un nuevo nombre.'

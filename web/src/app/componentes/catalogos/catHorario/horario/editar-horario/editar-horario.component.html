@@ -46,10 +46,10 @@
             <div class="col-md">
                 <div class="d-flex flex-wrap justify-content-around">
                     <mat-form-field>
-                        <mat-label>Horas de trabajo</mat-label>
+                        <mat-label>Horas totales</mat-label>
                         <input matInput placeholder="Ej: 8:15 " [formControl]="horaTrabajo" required
                             (keypress)="IngresarNumeroCaracter($event)">
-                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Indicar el número de horas de trabajo. 
+                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Indicar el número de horas de jornada. 
                     En caso de horas y minutos ingresar en el siguiente formato 10 : 35">
                             help_outline
                         </mat-icon>
@@ -60,17 +60,11 @@
 
                     <mat-checkbox id="check" [formControl]="tipoF" [(ngModel)]="nocturno" matSuffix
                         matTooltipPosition="right" matTooltip="Marcar si el horario es Nocturno.">
-                        Horario Nocturno
-                    </mat-checkbox>
-
-                    <mat-checkbox id="check_" [formControl]="detalleF" [(ngModel)]="detalle" matSuffix
-                        matTooltipPosition="right"
-                        matTooltip="Marcar si el horario requiere detalles de entrada, alimentación, salida.">
-                        Requiere Detalle
+                        <label id="textoradiobtn">Horario nocturno</label>
                     </mat-checkbox>
 
                     <mat-checkbox id="checks" (change)="VerificarArchivo($event)">
-                        Control de archivos
+                        <label id="textoradiobtn">Control de archivos</label>                     
                     </mat-checkbox>
                 </div>
             </div>

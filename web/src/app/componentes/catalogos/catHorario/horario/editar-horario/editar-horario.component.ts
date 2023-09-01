@@ -32,7 +32,6 @@ export class EditarHorarioComponent implements OnInit {
   minAlmuerzo = new FormControl(0, Validators.pattern('[0-9]*'));
   documentoF = new FormControl('');
   seleccion = new FormControl('');
-  detalleF = new FormControl('');
   codigoF = new FormControl('', [Validators.required]);
   nombre = new FormControl('', [Validators.required, Validators.minLength(2)]);
   tipoF = new FormControl('');
@@ -42,7 +41,6 @@ export class EditarHorarioComponent implements OnInit {
     horarioHoraTrabajoForm: this.horaTrabajo,
     horarioMinAlmuerzoForm: this.minAlmuerzo,
     documentoForm: this.documentoF,
-    detalleForm: this.detalleF,
     nombreForm: this.nombre,
     codigoForm: this.codigoF,
     tipoForm: this.tipoF,
@@ -88,10 +86,8 @@ export class EditarHorarioComponent implements OnInit {
       }
     }
 
-
     this.formulario.patchValue({
       horarioMinAlmuerzoForm: this.data.horario.min_almuerzo,
-      detalleForm: this.data.horario.detalle,
       nombreForm: this.data.horario.nombre,
       codigoForm: this.data.horario.codigo,
       tipoForm: this.data.horario.nocturno,
@@ -119,7 +115,7 @@ export class EditarHorarioComponent implements OnInit {
       min_almuerzo: form.horarioMinAlmuerzoForm,
       hora_trabajo: form.horarioHoraTrabajoForm,
       nocturno: form.tipoForm,
-      detalle: form.detalleForm,
+      detalle: true,
       nombre: form.nombreForm,
       codigo: form.codigoForm
     };
@@ -139,11 +135,6 @@ export class EditarHorarioComponent implements OnInit {
       }
     }
 
-    // VALIDAR REGISTRO DE DETALLE DE HORARIO
-    if (dataHorario.detalle === false) {
-      dataHorario.hora_trabajo = dataHorario.hora_trabajo + ':00';
-    }
-
     // SI EL HORARIO ES >= 24:00 Y < 72:00 HORAS (NO REGISTRA ALIMENTACION)
     if ((dataHorario.hora_trabajo >= '24:00' && dataHorario.hora_trabajo < '72:00') &&
       (dataHorario.hora_trabajo >= '24:00:00' && dataHorario.hora_trabajo < '72:00:00')) {
@@ -159,8 +150,8 @@ export class EditarHorarioComponent implements OnInit {
       dataHorario.min_almuerzo = 0;
     }
 
-    // SI EL NOMBRE Y CODIGO DE HORARIO SON IGUALES NO VERIFICA DUPLICADOS
-    if (form.nombreForm === this.data.horario.nombre && form.codigoForm === this.data.horario.codigo) {
+    // SI EL CODIGO DE HORARIO ES IGUAL NO VERIFICA DUPLICADOS
+    if (form.codigoForm === this.data.horario.codigo) {
       this.VerificarInformacion(dataHorario, form);
     }
     else {
@@ -173,11 +164,10 @@ export class EditarHorarioComponent implements OnInit {
   VerificarDuplicidad(form: any, horario: any) {
     let data = {
       id: parseInt(this.data.horario.id),
-      nombre: form.nombreForm,
       codigo: form.codigoForm
     }
     this.rest.BuscarHorarioNombre_(data).subscribe(response => {
-      this.toastr.info('Nombre de horario ya se encuentra registrado.', 'Verificar Datos.', {
+      this.toastr.info('Código de horario ya se encuentra registrado.', 'Verificar Datos.', {
         timeOut: 6000,
       });
       this.habilitarprogress = false;
@@ -237,9 +227,6 @@ export class EditarHorarioComponent implements OnInit {
       if (datos.min_almuerzo === 0) {
         this.EliminarDetallesComida();
       }
-      if (datos.detalle === false) {
-        this.EliminarTodoDetalles();
-      }
       this.SalirActualizar(datos, response);
     }, error => {
       this.habilitarprogress = false;
@@ -260,9 +247,6 @@ export class EditarHorarioComponent implements OnInit {
       });
       if (datos.min_almuerzo === 0) {
         this.EliminarDetallesComida();
-      }
-      if (datos.detalle === false) {
-        this.EliminarTodoDetalles();
       }
       this.SalirActualizar(datos, response);
     }, error => {
@@ -387,15 +371,7 @@ export class EditarHorarioComponent implements OnInit {
     }, error => { })
   }
 
-  // CONSULTAR DETALLES DE HORARIO - PROCESO DE ELIMINACION TOTAL
-  EliminarTodoDetalles() {
-    this.restD.ConsultarUnDetalleHorario(this.data.horario.id).subscribe(res => {
-      this.detalles_horarios = res;
-      this.detalles_horarios.map(det => {
-        this.EliminarDetalle(det.id);
-      })
-    })
-  }
+
 
   // METODO PARA ELIMINAR DETALLES EN LA BASE DE DATOS
   EliminarDetalle(id_detalle: number) {

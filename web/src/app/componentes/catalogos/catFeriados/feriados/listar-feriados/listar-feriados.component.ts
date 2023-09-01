@@ -152,7 +152,15 @@ export class ListarFeriadosComponent implements OnInit {
   // METODO PARA EDITAR FERIADOS
   AbrirVentanaEditarFeriado(datosSeleccionados: any): void {
     this.ventana.open(EditarFeriadosComponent,
-      { width: '350px', data: { datosFeriado: datosSeleccionados, actualizar: true } }).disableClose = true;
+      {
+        width: '350px', data: { datosFeriado: datosSeleccionados, actualizar: true },
+        disableClose: true
+      }).afterClosed()
+      .subscribe((confirmado: number) => {
+        if (confirmado > 0) {
+          this.VerListaCiudades(confirmado);
+        }
+      });;
   }
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 

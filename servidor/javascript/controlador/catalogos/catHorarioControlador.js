@@ -44,11 +44,11 @@ class HorarioControlador {
     // BUSCAR HORARIOS POR EL NOMBRE
     BuscarHorarioNombre(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { nombre, codigo } = req.body;
+            const { codigo } = req.body;
             try {
                 const HORARIOS = yield database_1.default.query(`
-        SELECT * FROM cg_horarios WHERE UPPER(nombre) = $1 OR UPPER(codigo) = $2
-        `, [nombre.toUpperCase(), codigo.toUpperCase()]);
+        SELECT * FROM cg_horarios WHERE UPPER(codigo) = $1
+        `, [codigo.toUpperCase()]);
                 if (HORARIOS.rowCount > 0)
                     return res.status(200).jsonp({ message: 'No se encuentran registros.' });
                 return res.status(404).jsonp({ message: 'No existe horario. Continua.' });
@@ -147,11 +147,11 @@ class HorarioControlador {
     // METODO PARA BUSCAR HORARIOS SIN CONSIDERAR UNO EN ESPECIFICO (METODO DE EDICION)
     BuscarHorarioNombre_(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id, nombre, codigo } = req.body;
+            const { id, codigo } = req.body;
             try {
                 const HORARIOS = yield database_1.default.query(`
-        SELECT * FROM cg_horarios WHERE NOT id = $1 AND (UPPER(nombre) = $2 OR UPPER(codigo) = $3)
-        `, [parseInt(id), nombre.toUpperCase(), codigo.toUpperCase()]);
+        SELECT * FROM cg_horarios WHERE NOT id = $1 AND UPPER(codigo) = $2)
+        `, [parseInt(id), codigo.toUpperCase()]);
                 if (HORARIOS.rowCount > 0)
                     return res.status(200).jsonp({
                         message: 'El nombre de horario ya existe, ingresar un nuevo nombre.'

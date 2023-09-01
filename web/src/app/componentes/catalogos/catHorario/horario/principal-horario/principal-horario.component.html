@@ -77,7 +77,7 @@
                             <th scope="col">Código</th>
                             <th scope="col">Descripción</th>
                             <th scope="col">Minutos de alimentación</th>
-                            <th scope="col">Horas de trabajo</th>
+                            <th scope="col">Horas totales</th>
                             <th scope="col">Horario nocturno</th>
                             <th scope="col">Documento</th>
                             <th scope="col">Acciones</th>
@@ -113,8 +113,9 @@
                             <td *ngIf="horario.nocturno == false">No</td>
                             <td *ngIf="horario.documento == null"></td>
                             <td *ngIf="horario.documento != null"> <a class="fas fa-file-alt"
-                                    style="color:rgb(197, 95, 11); margin-left: 15px; text-align: center; text-decoration: none;" matSuffix
-                                    matTooltipPosition="right" matTooltip="Dar click para ver o descargar el documento."
+                                    style="color:rgb(197, 95, 11); margin-left: 15px; text-align: center; text-decoration: none;"
+                                    matSuffix matTooltipPosition="right"
+                                    matTooltip="Dar click para ver o descargar el documento."
                                     href="{{hipervinculo}}/horario/documentos/{{horario.documento}}" target="_blank">
                                     <p>{{horario.documento}}</p>
                                 </a>
@@ -136,7 +137,8 @@
                                     <p>Editar</p>
                                 </i>
                                 <i (click)="ConfirmarDelete(horario)" class="far fa-trash-alt" id="t-eliminar" matSuffix
-                                    matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                    matTooltipPosition="right" matTooltip="Eliminar este registro."
+                                    *ngIf="horario.default === 'N'">
                                     <p>Eliminar</p>
                                 </i>
                             </td>

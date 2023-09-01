@@ -31,7 +31,6 @@ export class RegistroHorarioComponent implements OnInit {
   minAlmuerzo = new FormControl(0, Validators.pattern('[0-9]*'));
   archivoForm = new FormControl('');
   documentoF = new FormControl('');
-  detalleF = new FormControl('');
   codigoF = new FormControl('', [Validators.required]);
   nombre = new FormControl('', [Validators.required, Validators.minLength(2)]);
   tipoF = new FormControl('');
@@ -41,7 +40,6 @@ export class RegistroHorarioComponent implements OnInit {
     horarioHoraTrabajoForm: this.horaTrabajo,
     horarioMinAlmuerzoForm: this.minAlmuerzo,
     documentoForm: this.documentoF,
-    detalleForm: this.detalleF,
     nombreForm: this.nombre,
     codigoForm: this.codigoF,
     tipoForm: this.tipoF,
@@ -76,7 +74,7 @@ export class RegistroHorarioComponent implements OnInit {
       min_almuerzo: form.horarioMinAlmuerzoForm,
       hora_trabajo: form.horarioHoraTrabajoForm,
       nocturno: form.tipoForm,
-      detalle: form.detalleForm,
+      detalle: true,
       nombre: form.nombreForm,
       codigo: form.codigoForm,
     };
@@ -94,11 +92,6 @@ export class RegistroHorarioComponent implements OnInit {
       if (parseInt(dataHorario.hora_trabajo.split(':')[0]) < 10) {
         dataHorario.hora_trabajo = '0' + parseInt(dataHorario.hora_trabajo.split(':')[0]) + ':' + dataHorario.hora_trabajo.split(':')[1]
       }
-    }
-
-    // VALIDAR SI EL HORARIO REQUIERE DETALLES
-    if (dataHorario.detalle === false) {
-      dataHorario.hora_trabajo = dataHorario.hora_trabajo + ':00';
     }
 
     // VALIDAR SI EL HORARIO ES >= 24:00 Y < 72:00 (NO DETALLES DE ALIMENTACION)
@@ -124,11 +117,10 @@ export class RegistroHorarioComponent implements OnInit {
   // VERIFICAR DUPLICIDAD DE NOMBRES Y CODIGOS
   VerificarDuplicidad(form: any, horario: any) {
     let data = {
-      nombre: form.nombreForm,
       codigo: form.codigoForm
     }
     this.rest.BuscarHorarioNombre(data).subscribe(response => {
-      this.toastr.warning('Nombre o código de horario ya existe.', 'Verificar Datos.', {
+      this.toastr.warning('Código de horario ya existe.', 'Verificar datos.', {
         timeOut: 6000,
       });
       this.habilitarprogress = false;
