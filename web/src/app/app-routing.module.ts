@@ -88,12 +88,7 @@ import { DetallePlanificadosComponent } from './componentes/reportes/alimentacio
 import { HorarioMultipleEmpleadoComponent } from './componentes/horarios/rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
 import { AdministradorTodasComponent } from './componentes/reportes/notificaciones/administrador-todas/administrador-todas.component';
 import { PorUsuarioComponent } from './componentes/reportes/notificaciones/por-usuario/por-usuario.component';
-<<<<<<< HEAD
-import { TimbreMultipleComponent } from './componentes/timbre-web/timbre-multiple/timbre-multiple.component';
 import { BuscarTimbreComponent } from './componentes/timbre-web/buscar-timbre/buscar-timbre.component';
-=======
-import { TimbreMultipleComponent } from './componentes/timbres/timbre-multiple/timbre-multiple.component';
->>>>>>> 34e0f140a9a29219c3a064ed1b93dec6962b0870
 
 import { RecuperarFraseComponent } from './componentes/administracionGeneral/frase-seguridad/recuperar-frase/recuperar-frase.component';
 import { OlvidarFraseComponent } from './componentes/administracionGeneral/frase-seguridad/olvidar-frase/olvidar-frase.component';
@@ -342,7 +337,6 @@ const routes: Routes = [
   { path: 'registrarRelojes', component: RelojesComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   // ACCESO A RUTAS DE TIMBRES
   { path: 'timbres-personal', component: TimbreWebComponent, canActivate: [AuthGuard], data: { rolMix: 0 } },
-  { path: 'timbres-multiples', component: TimbreMultipleComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'timbres-admin', component: TimbreAdminComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'timbresWeb', component: ListaWebComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'buscar-timbre', component: BuscarTimbreComponent, canActivate: [AuthGuard], data: { rolMix: 0 } },

@@ -11,6 +11,7 @@ import { MatDialog } from '@angular/material/dialog';
 
 import { EditarTimbreComponent } from '../editar-timbre/editar-timbre.component';
 import { VerTimbreComponent } from '../ver-timbre/ver-timbre.component';
+import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 
 @Component({
   selector: 'app-buscar-timbre',
@@ -29,8 +30,8 @@ export class BuscarTimbreComponent implements OnInit {
 
   // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
   public buscarTimbreForm = new FormGroup({
-    cedulaForm: this.codigo,
-    codigoForm: this.cedula,
+    cedulaForm: this.cedula,
+    codigoForm: this.codigo,
     fechaForm: this.fecha
   });
 
@@ -43,17 +44,30 @@ export class BuscarTimbreComponent implements OnInit {
 
   timbres: any [];
 
+  idEmpleadoLogueado: any;
+
   constructor(
     private toastr: ToastrService,
     private validar: ValidacionesService,
     private timbresServicio: TimbresService,
     public ventana: MatDialog,
+    public restEmpleado: EmpleadoService,
   ){
-
+    this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
-    this.rol = localStorage.getItem('rol')
+    this.rol = localStorage.getItem('rol');
+    this.ObtenerEmpleadoLogueado(this.idEmpleadoLogueado);
+  }
+
+  datosEmpleadoLogueado: any = [];
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO QUE INICIA SESION
+  ObtenerEmpleadoLogueado(idemploy: any) {
+    this.datosEmpleadoLogueado = [];
+    this.restEmpleado.BuscarUnEmpleado(idemploy).subscribe(data => {
+      this.datosEmpleadoLogueado = data[0];
+    })
   }
 
   IngresarSoloNumeros(evt) {
@@ -89,7 +103,11 @@ export class BuscarTimbreComponent implements OnInit {
   buscarTimbresFecha(form: any){
     this.timbres = [];
 
-    console.log('datos form: ',form)
+    if(this.rol != '1'){
+      form.codigoForm = this.datosEmpleadoLogueado.codigo;
+      form.cedulaForm = this.datosEmpleadoLogueado.cedula;
+    }
+
 
     if(form.codigoForm === "" && form.cedulaForm === ""){
       return this.toastr.error('Ingrese el codigo o la cedula.', 'Llenar los campos.', {
@@ -98,15 +116,13 @@ export class BuscarTimbreComponent implements OnInit {
       
     }else{
       var datos: any = {
-        codigo: form.cedulaForm,
-        cedula: form.codigoForm,
+        codigo: form.codigoForm,
+        cedula: form.cedulaForm,
         fecha: moment(form.fechaForm).format('YYYY-MM-DD')
       }
-  
-      if(this.rol != '1'){
-        datos.codigo = '5008' //codigo del empleado pero obtenido directamente en el onInit
-        datos.cedula = '1753595717' //cedula del empleado pero obtenido directamente en el onInit
-      }
+
+
+      console.log('datos: ',datos);
       
       this.timbresServicio.obtenerTimbresFechaEmple(datos).subscribe( timbres => {
         this.timbres = timbres.timbres

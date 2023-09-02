@@ -314,11 +314,10 @@ import { HorasPlanificadasEmpleadoComponent } from './componentes/rolEmpleado/ho
 import { ComidasSolicitadasEmpleadoComponent } from './componentes/rolEmpleado/comidas-empleado/comidas-solicitadas-empleado/comidas-solicitadas-empleado.component';
 import { BrowserModule } from '@angular/platform-browser';
 import { MatPaginatorIntl } from '@angular/material/paginator';
-<<<<<<< HEAD
 import { BuscarTimbreComponent } from './componentes/timbre-web/buscar-timbre/buscar-timbre.component';
 import { EditarTimbreComponent } from './componentes/timbre-web/editar-timbre/editar-timbre.component';
 import { VerTimbreComponent } from './componentes/timbre-web/ver-timbre/ver-timbre.component';
-=======
+
 import { BuscarPlanificacionComponent } from './componentes/horarios/rango-fechas/buscar-planificacion/buscar-planificacion.component';
 import { TipoPermisosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/tipo-permisos/tipo-permisos.component';
 import { VistaElementosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/listarTipoPermisos/vista-elementos.component';
@@ -327,7 +326,7 @@ import { VerTipoPermisoComponent } from './componentes/modulos/permisos/configur
 import { EditarPermisoEmpleadoComponent } from './componentes/modulos/permisos/gestionar-permisos/editar-permiso-empleado/editar-permiso-empleado.component';
 import { EliminarIndividualComponent } from './componentes/horarios/eliminar-planificacion/eliminar-individual/eliminar-individual.component';
 import { EliminarMultipleComponent } from './componentes/horarios/eliminar-planificacion/eliminar-multiple/eliminar-multiple.component';
->>>>>>> 34e0f140a9a29219c3a064ed1b93dec6962b0870
+
 
 const config: SocketIoConfig = { url: environment.url, options: {} };
 
@@ -585,15 +584,12 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     CancelarComidaComponent,
     HorasPlanificadasEmpleadoComponent,
     ComidasSolicitadasEmpleadoComponent,
-<<<<<<< HEAD
     BuscarTimbreComponent,
     EditarTimbreComponent,
     VerTimbreComponent,
-=======
     BuscarPlanificacionComponent,
     EliminarIndividualComponent,
     EliminarMultipleComponent,
->>>>>>> 34e0f140a9a29219c3a064ed1b93dec6962b0870
 
   ],
 
