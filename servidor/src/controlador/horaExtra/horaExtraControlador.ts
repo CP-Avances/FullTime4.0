@@ -17,10 +17,11 @@ class HorasExtrasPedidasControlador {
   public async ListarHorasExtrasPedidas(req: Request, res: Response) {
     const HORAS_EXTRAS_PEDIDAS = await pool.query('SELECT h.id, h.fec_inicio, h.fec_final, h.estado, ' +
       'h.fec_solicita, h.descripcion, h.num_hora, h.tiempo_autorizado, e.id AS id_usua_solicita, h.id_empl_cargo, ' +
-      'e.nombre, e.apellido, contrato.id AS id_contrato FROM hora_extr_pedidos AS h, empleados AS e, ' +
-      'empl_contratos As contrato, empl_cargos AS cargo WHERE h.id_usua_solicita = e.id AND ' +
-      '(h.estado = 1 OR h.estado = 2) AND ' +
-      'contrato.id = cargo.id_empl_contrato AND cargo.id = h.id_empl_cargo AND h.observacion = false');
+      'e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, contrato.id AS id_contrato, da.id_departamento, da.codigo, depa.nombre AS depa_nombre ' +
+      'FROM hora_extr_pedidos AS h, empleados AS e, empl_contratos As contrato, empl_cargos AS cargo, ' +
+      'datos_actuales_empleado AS da, cg_departamentos AS depa WHERE h.id_usua_solicita = e.id AND ' +
+      'da.id_contrato = contrato.id AND depa.id = da.id_departamento AND (h.estado = 1 OR h.estado = 2) AND ' +
+      'contrato.id = cargo.id_empl_contrato AND cargo.id = h.id_empl_cargo AND h.observacion = false ORDER BY id DESC');
     if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
       return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows)
     }
@@ -32,10 +33,11 @@ class HorasExtrasPedidasControlador {
   public async ListarHorasExtrasPedidasObservacion(req: Request, res: Response) {
     const HORAS_EXTRAS_PEDIDAS = await pool.query('SELECT h.id, h.fec_inicio, h.fec_final, h.estado, ' +
       'h.fec_solicita, h.descripcion, h.num_hora, h.tiempo_autorizado, e.id AS id_usua_solicita, h.id_empl_cargo, ' +
-      'e.nombre, e.apellido, contrato.id AS id_contrato FROM hora_extr_pedidos AS h, empleados AS e, ' +
-      'empl_contratos As contrato, empl_cargos AS cargo WHERE h.id_usua_solicita = e.id AND ' +
-      '(h.estado = 1 OR h.estado = 2) AND ' +
-      'contrato.id = cargo.id_empl_contrato AND cargo.id = h.id_empl_cargo AND h.observacion = true');
+      'e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, contrato.id AS id_contrato, da.id_departamento, da.codigo, depa.nombre AS depa_nombre FROM hora_extr_pedidos AS h, empleados AS e, ' +
+      'empl_contratos As contrato, empl_cargos AS cargo, datos_actuales_empleado AS da, cg_departamentos AS depa WHERE h.id_usua_solicita = e.id AND ' +
+      '(h.estado = 1 OR h.estado = 2) AND contrato.id = cargo.id_empl_contrato AND ' +
+      'cargo.id = h.id_empl_cargo AND h.observacion = true AND ' +
+      'da.id_contrato = e.id AND depa.id = da.id_departamento ORDER BY id DESC');
     if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
       return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows)
     }
@@ -47,10 +49,10 @@ class HorasExtrasPedidasControlador {
   public async ListarHorasExtrasPedidasAutorizadas(req: Request, res: Response) {
     const HORAS_EXTRAS_PEDIDAS = await pool.query('SELECT h.id, h.fec_inicio, h.fec_final, h.estado, ' +
       'h.fec_solicita, h.descripcion, h.num_hora, h.tiempo_autorizado, e.id AS id_usua_solicita, h.id_empl_cargo, ' +
-      'e.nombre, e.apellido, contrato.id AS id_contrato FROM hora_extr_pedidos AS h, empleados AS e, ' +
-      'empl_contratos As contrato, empl_cargos AS cargo WHERE h.id_usua_solicita = e.id AND ' +
-      '(h.estado = 3 OR h.estado = 4) AND ' +
-      'contrato.id = cargo.id_empl_contrato AND cargo.id = h.id_empl_cargo');
+      'e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, contrato.id AS id_contrato, da.codigo, depa.nombre AS depa_nombre FROM hora_extr_pedidos AS h, empleados AS e, ' +
+      'empl_contratos As contrato, empl_cargos AS cargo, datos_actuales_empleado AS da, cg_departamentos AS depa WHERE h.id_usua_solicita = e.id AND ' +
+      '(h.estado = 3 OR h.estado = 4) AND contrato.id = cargo.id_empl_contrato AND ' +
+      'cargo.id = h.id_empl_cargo AND da.id_contrato = e.id AND depa.id = da.id_departamento ORDER BY id DESC');
     if (HORAS_EXTRAS_PEDIDAS.rowCount > 0) {
       return res.jsonp(HORAS_EXTRAS_PEDIDAS.rows)
     }

@@ -74,9 +74,9 @@ export class PlanComidasService {
 
 
 
-  /** Servicio para obtener datos de la tabla tipo_comida */
+  // SERVICIO PARA OBTENER DATOS DE LA TABLA TIPO_COMIDA 
   CrearTipoComidas(datos: any) {
-    return this.http.post(`${environment.url}/planComidas/tipo_comida`, datos);
+    return this.http.post<any>(`${environment.url}/planComidas/tipo_comida`, datos);
   }
 
   ObtenerTipoComidas() {

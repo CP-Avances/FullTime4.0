@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import pool from '../../database';
+import path from 'path';
 import fs from 'fs';
 
 class BirthdayControlador {
@@ -37,12 +38,11 @@ class BirthdayControlador {
         res.jsonp([{ message: 'Registro guardado.', id: idMessageGuardado }]);
     }
 
-    // METODO PARA CARGAR MENSAJE DE CUMPLEAÑOS
+    // METODO PARA CARGAR MENSAJE DE CUMPLEAÑOS    --**VERIFICADO
     public async CrearImagenEmpleado(req: Request, res: Response): Promise<void> {
-        let list: any = req.files;
-        let imagen = list.uploads[0].path.split("\\")[1];
+        let imagen = req.file?.originalname;;
         let id = req.params.id_empresa;
-
+        let separador = path.sep;
         const unEmpleado = await pool.query(
             `
             SELECT * FROM message_birthday WHERE id = $1
@@ -54,7 +54,7 @@ class BirthdayControlador {
 
                     try {
 
-                        let filePath = `servidor\\cumpleanios\\${obj.img}`;
+                        let filePath = `servidor${separador}cumpleanios${separador}${obj.img}`;
                         let direccionCompleta = __dirname.split("servidor")[0] + filePath;
                         fs.unlinkSync(direccionCompleta);
                         await pool.query(
@@ -62,7 +62,7 @@ class BirthdayControlador {
                             UPDATE message_birthday SET img = $2 WHERE id = $1
                             `
                             , [id, imagen]);
-                        res.jsonp({ message: 'Imagen Actualizada.' });
+                        res.jsonp({ message: 'Imagen actualizada.' });
 
                     } catch (error) {
                         await pool.query(
@@ -70,7 +70,7 @@ class BirthdayControlador {
                             UPDATE message_birthday SET img = $2 WHERE id = $1
                             `
                             , [id, imagen]);
-                        res.jsonp({ message: 'Imagen Actualizada.' });
+                        res.jsonp({ message: 'Imagen actualizada.' });
                     }
 
                 } else {
@@ -79,7 +79,7 @@ class BirthdayControlador {
                         UPDATE message_birthday SET img = $2 WHERE id = $1
                         `
                         , [id, imagen]);
-                    res.jsonp({ message: 'Imagen Actualizada.' });
+                    res.jsonp({ message: 'Imagen actualizada.' });
                 }
             });
         }

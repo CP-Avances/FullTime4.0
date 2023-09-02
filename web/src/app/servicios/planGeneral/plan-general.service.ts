@@ -11,25 +11,42 @@ export class PlanGeneralService {
     private http: HttpClient,
   ) { }
 
-  // METODO PARA CREAR PLAN GENERAL
+  // METODO PARA CREAR PLAN GENERAL   --**VERIFICADO
   CrearPlanGeneral(datos: any) {
-    return this.http.post(`${environment.url}/planificacion_general/`, datos);
+    return this.http.post<any>(`${environment.url}/planificacion_general/`, datos);
   }
 
-  // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL
+  // METODO PARA BUSCAR ID POR FECHAS PLAN GENERAL   --**VERIFICADO
   BuscarFechas(datos: any) {
     return this.http.post(`${environment.url}/planificacion_general/buscar_fechas`, datos);
   }
 
-  // METODO PARA ELIMINAR REGISTROS
-  EliminarRegistro(id: number,) {
-    return this.http.delete(`${environment.url}/planificacion_general/eliminar/${id}`);
+  // METODO PARA ELIMINAR REGISTROS    --**VERIFICADO
+  EliminarRegistro(data: any,) {
+    return this.http.post<any>(`${environment.url}/planificacion_general/eliminar`, data);
   }
 
   // METODO PARA BUSCAR HORARIO DEL USUARIO EN FECHAS ESPECIFICAS
   BuscarHorarioFechas(datos: any) {
     return this.http.post(`${environment.url}/planificacion_general/horario-general-fechas`, datos);
   }
+
+  // METODO PARA LISTAR PLANIFICACIONES DEL USUARIO --**VERIFICADO
+  BuscarPlanificacionHoraria(datos: any) {
+    return this.http.post<any>(`${environment.url}/planificacion_general/horario-general-planificacion`, datos);
+  }
+
+  // METODO PARA LISTAR PLANIFICACIONES DEL USUARIO --**VERIFICADO
+  BuscarDetallePlanificacion(datos: any) {
+    return this.http.post<any>(`${environment.url}/planificacion_general/horario-general-detalle`, datos);
+  }
+
+  // METODO PARA LISTAR PLANIFICACIONES DEL USUARIO --**VERIFICADO
+  BuscarHorariosUsuario(datos: any) {
+    return this.http.post<any>(`${environment.url}/planificacion_general/horario-solo-planificacion/lista`, datos);
+  }
+
+
 
 
 

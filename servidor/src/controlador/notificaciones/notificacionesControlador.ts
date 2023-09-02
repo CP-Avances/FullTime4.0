@@ -10,6 +10,39 @@ import { QueryResult } from 'pg';
 
 class NotificacionTiempoRealControlador {
 
+  // METODO PARA ELIMINAR NOTIFICACIONES DE PERMISOS - VACACIONES - HORAS EXTRAS  --**VERIFICACION
+  public async EliminarMultiplesNotificaciones(req: Request, res: Response): Promise<any> {
+    const arregloNotificaciones = req.body;
+    let contador: number = 0;
+
+    console.log('VER IDS', arregloNotificaciones);
+
+    if (arregloNotificaciones.length > 0) {
+      contador = 0;
+      arregloNotificaciones.forEach(async (obj: number) => {
+        await pool.query('DELETE FROM realtime_noti WHERE id = $1', [obj])
+          .then((result: any) => {
+            contador = contador + 1;
+            if (contador === arregloNotificaciones.length) {
+              return res.jsonp({ message: 'OK' });
+            }
+            console.log(result.command, 'REALTIME ELIMINADO ====>', obj);
+          });
+      });
+    }
+    else {
+      return res.jsonp({ message: 'error' });
+    }
+
+  }
+
+
+
+
+
+
+
+
 
   // METODO PARA LISTAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES
   public async ObtenerConfigEmpleado(req: Request, res: Response): Promise<any> {
@@ -162,21 +195,7 @@ class NotificacionTiempoRealControlador {
     res.jsonp({ message: 'Vista modificado' });
   }
 
-  public async EliminarMultiplesNotificaciones(req: Request, res: Response): Promise<any> {
-    const arrayIdsRealtimeNotificaciones = req.body;
-    console.log(arrayIdsRealtimeNotificaciones);
 
-    if (arrayIdsRealtimeNotificaciones.length > 0) {
-      arrayIdsRealtimeNotificaciones.forEach(async (obj: number) => {
-        await pool.query('DELETE FROM realtime_noti WHERE id = $1', [obj])
-          .then((result: any) => {
-            console.log(result.command, 'REALTIME ELIMINADO ====>', obj);
-          });
-      });
-      return res.jsonp({ message: 'Todos las notificaciones seleccionadas han sido eliminadas' });
-    }
-    return res.jsonp({ message: 'No seleccionó ninguna notificación' });
-  }
 
   /** *********************************************************************************************** **
    **                         METODOS PARA LA TABLA DE CONFIG_NOTI                                    **
@@ -439,6 +458,7 @@ class NotificacionTiempoRealControlador {
       var corr = enviarMail(servidor, parseInt(puerto));
       corr.sendMail(data, function (error: any, info: any) {
         if (error) {
+          console.log('error: ', error)
           corr.close();
           return res.jsonp({ message: 'error' });
         } else {
@@ -483,7 +503,171 @@ class NotificacionTiempoRealControlador {
 
   }
 
+
+  /** ***************************************************************************************** **
+   ** **                      MANEJO DE ENVIO DE CORREOS DE SOLICITUDES                      ** ** 
+   ** ***************************************************************************************** **/
+
+  // METODO PARA ENVIO DE CORREO ELECTRONICO DE COMUNICADOS MEDIANTE SISTEMA WEB
+  public async EnviarCorreoSolicitudes(req: Request, res: Response): Promise<void> {
+
+    var tablaHTML = '';
+    var tiempo = fechaHora();
+    var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);
+    var hora = await FormatearHora(tiempo.hora);
+    var dispositivo = ''
+
+    const path_folder = path.resolve('logos');
+
+    const { id_envia, correo, mensaje, asunto} = req.body.datosCorreo;
+    const solicitudes = req.body.solicitudes;
+
+    console.log('req.body.movil: ',req.body.movil);
+    if(req.body.movil === true){
+      dispositivo = 'Aprobado desde aplicación móvil';
+      var datos = await Credenciales(req.body.id_empresa);
+      tablaHTML = await generarTablaHTMLMovil(solicitudes);
+    }else{
+      dispositivo = 'Aprobado desde la aplicacion web';
+      var datos = await Credenciales(req.id_empresa);
+      tablaHTML = await generarTablaHTMLWeb(solicitudes);
+    }
+    
+    if (datos === 'ok') {
+
+      const USUARIO_ENVIA = await pool.query(
+        `
+        SELECT e.id, e.correo, e.nombre, e.apellido, e.cedula,
+          tc.cargo, d.nombre AS departamento 
+        FROM datos_actuales_empleado AS e, empl_cargos AS ec, tipo_cargo AS tc, cg_departamentos AS d 
+        WHERE e.id = $1 AND ec.id = e.id_cargo AND tc.id = ec.cargo AND d.id = ec.id_departamento
+        `
+        , [id_envia]);
+
+      let data = {
+        to: correo,
+        from: email,
+        subject: asunto,
+        html: `<body>
+                <div style="text-align: center;">
+                  <img width="25%" height="25%" src="cid:cabeceraf"/>
+                </div>
+                <br>
+                <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+                  El presente correo es para informar el siguiente comunicado: <br>  
+                </p>
+                <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
+                  <b>Empresa:</b> ${nombre}<br>
+                  <b>Asunto:</b> ${asunto} <br>
+                  <b>Colaborador que envía:</b> ${USUARIO_ENVIA.rows[0].nombre} ${USUARIO_ENVIA.rows[0].apellido} <br>
+                  <b>Cargo:</b> ${USUARIO_ENVIA.rows[0].cargo} <br>
+                  <b>Departamento:</b> ${USUARIO_ENVIA.rows[0].departamento} <br>
+                  <b>Generado mediante:</b> Sistema Web <br>
+                  <b>Fecha de envío:</b> ${fecha} <br> 
+                  <b>Hora de envío:</b> ${hora} <br><br>                  
+                  <b>Mensaje:</b> ${dispositivo} 
+                </p>
+                <div style="font-family: Arial; font-size:15px; margin: auto; text-align: center;">
+                  <p><b>LISTADO DE PERMISOS</b></p>
+                  ${tablaHTML}
+                  <br><br>
+                </div>
+                <p style="font-family: Arial; font-size:12px; line-height: 1em;">
+                  <b>Gracias por la atención</b><br>
+                  <b>Saludos cordiales,</b> <br><br>
+                </p>
+                <img src="cid:pief" width="50%" height="50%"/>
+              </body>
+            `,
+        attachments: [
+          {
+            filename: 'cabecera_firma.jpg',
+            path: `${path_folder}/${cabecera_firma}`,
+            cid: 'cabeceraf' // VALOR cid COLOCARSE IGUAL EN LA ETIQUETA img src DEL HTML.
+          },
+          {
+            filename: 'pie_firma.jpg',
+            path: `${path_folder}/${pie_firma}`,
+            cid: 'pief' // VALOR cid COLOCARSE IGUAL EN LA ETIQUETA img src DEL HTML.
+          }]
+      };
+
+      var corr = enviarMail(servidor, parseInt(puerto));
+      corr.sendMail(data, function (error: any, info: any) {
+        if (error) {
+          corr.close();
+          return res.jsonp({ message: 'error' });
+        } else {
+          corr.close();
+          return res.jsonp({ message: 'ok' });
+        }
+      });
+
+    } else {
+      res.jsonp({ message: 'Ups! algo salio mal!!! No fue posible enviar correo electrónico.' });
+    }
+  }
+
 }
+
+const generarTablaHTMLWeb = async function (datos: any []): Promise<string> {
+  let tablaHtml = "<table style='border-collapse: collapse; width: 100%;'>";
+  tablaHtml += "<tr style='background-color: #f2f2f2; text-align: center; font-size: 14px;'>";
+  tablaHtml += "<th scope='col'>Permiso</th><th scope='col'>Departamento</th><th scope='col'>Empleado</th><th scope='col'>Aprobado</th><th scope='col'>Estado</th><th scope='col'>Observación</th>";
+  tablaHtml += "</tr>";
+
+    for(const dato of datos){
+      let colorText = "black";
+
+      if(dato.aprobar === "SI"){
+        colorText = "green";
+      }else if(dato.aprobar === "NO"){
+        colorText = "red";
+      }
+
+      tablaHtml += "<tr style='text-align: center; font-size: 14px;'>"
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.id}</td>`;
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.nombre_depa}</td>`;
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.empleado}</td>`;
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px; color: ${colorText};'>${dato.aprobar}</td>`;
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.estado}</td>`
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.observacion}</td>`;
+      tablaHtml += "<tr>"
+    }
+
+    tablaHtml += "</table>"
+    return tablaHtml;
+};
+
+const generarTablaHTMLMovil = async function (datos: any []): Promise<string> {
+  let tablaHtml = "<table style='border-collapse: collapse; width: 100%;'>";
+  tablaHtml += "<tr style='background-color: #f2f2f2; text-align: center; font-size: 14px;'>";
+  tablaHtml += "<th scope='col'>Permiso</th><th scope='col'>Departamento</th><th scope='col'>Empleado</th><th scope='col'>Aprobado</th><th scope='col'>Estado</th><th scope='col'>Observación</th>";
+  tablaHtml += "</tr>";
+
+    for(const dato of datos){
+      let colorText = "black";
+
+      if(dato.aprobacion === "SI"){
+        colorText = "green";
+      }else if(dato.aprobacion === "NO"){
+        colorText = "red";
+      }
+
+      tablaHtml += "<tr style='text-align: center; font-size: 14px;'>"
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.id}</td>`;
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.nombre_depa}</td>`;
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.nempleado}</td>`;
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px; color: ${colorText};'>${dato.aprobacion}</td>`;
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.estado}</td>`
+      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.observacion}</td>`;
+      tablaHtml += "<tr>"
+    }
+
+    tablaHtml += "</table>"
+    return tablaHtml;
+};
+
 
 export const NOTIFICACION_TIEMPO_REAL_CONTROLADOR = new NotificacionTiempoRealControlador();
 

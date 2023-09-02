@@ -21,6 +21,7 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 
 import { RegistroDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/registro-departamento/registro-departamento.component';
 import { EditarDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/editar-departamento/editar-departamento.component';
+import { VerDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/ver-departamento/ver-departamento.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
 @Component({
@@ -37,20 +38,21 @@ export class PrincipalDepartamentoComponent implements OnInit {
   filtroEmpresaSuc = '';
   filtroDeparPadre = '';
   departamentos: any = [];
+  depainfo: any = [];
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   departamentoPadreF = new FormControl('');
   departamentoF = new FormControl('');
   buscarNombre = new FormControl('', [Validators.minLength(2)]);
 
-  // ASIGNACIÓN DE VALIDACIONES A INPUTS DEL FORMULARIO
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public formulario = new FormGroup({
     departamentoPadreForm: this.departamentoPadreF,
     departamentoForm: this.departamentoF,
     buscarNombreForm: this.buscarNombre,
   });
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA
+  // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
@@ -78,7 +80,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.ObtenerLogo();
   }
 
-  // METODO PARA VER LA INFORMACIÓN DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -112,6 +114,8 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.numero_pagina = e.pageIndex + 1
   }
 
+  niveles: number = 0;
+  depaSuperior: string = '';
   // METODO PARA BUSCAR DEPARTAMENTOS
   ListaDepartamentos() {
     this.departamentos = []
@@ -124,15 +128,24 @@ export class PrincipalDepartamentoComponent implements OnInit {
   // METODO PARA ABRIR VENTANA DE REGISTRO DE DEPARTAMENTO
   AbrirVentanaRegistrarDepartamento(): void {
     this.ventana.open(RegistroDepartamentoComponent,
-      { width: '600px' }).afterClosed().subscribe(item => {
+      { width: '500px' }).afterClosed().subscribe(item => {
+        this.ListaDepartamentos();
+      });
+  }
+
+  // VENTANA PARA EDITAR DATOS DE DEPARTAMENTO 
+  AbrirEditarDepartamento(departamento: any): void {
+    this.ventana.open(EditarDepartamentoComponent,
+      { width: '400px', data: { data: departamento, establecimiento: false } })
+      .afterClosed().subscribe(item => {
         this.ListaDepartamentos();
       });
   }
 
   // METODO PARA ABRIR VENTANA DE EDICION DE DEPARTAMENTO
-  AbrirVentanaEditarDepartamento(departamento: any): void {
-    this.ventana.open(EditarDepartamentoComponent,
-      { width: '600px', data: departamento }).afterClosed().subscribe(item => {
+  AbrirVentanaVerDepartamento(departamento: any): void {
+    this.ventana.open(VerDepartamentoComponent,
+      { width: '650px', data: departamento }).afterClosed().subscribe(item => {
         this.ListaDepartamentos();
       });
   }
@@ -147,9 +160,22 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.ListaDepartamentos();
   }
 
+
+  public departamentosNiveles: any = [];
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
-  Eliminar(id_dep: number) {
+  Eliminar(id_dep: number, id_sucursal: number, nivel: number) {
     this.rest.EliminarRegistro(id_dep).subscribe(res => {
+      this.departamentosNiveles = [];
+      var id_departamento = id_dep;
+      var id_establecimiento = id_sucursal;
+      if (nivel > 0) {
+        this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
+          this.departamentosNiveles = datos;
+          this.departamentosNiveles.filter(item => {
+            this.rest.EliminarRegistroNivelDepa(item.id).subscribe({})
+          })
+        })
+      }
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
@@ -157,25 +183,26 @@ export class PrincipalDepartamentoComponent implements OnInit {
     });
   }
 
+
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.Eliminar(datos.id);
+          this.Eliminar(datos.id, datos.id_sucursal, datos.nivel);
         } else {
           this.router.navigate(['/departamento']);
         }
       });
   }
 
-  // ORDENAR LOS DATOS SEGÚN EL ID 
+  // ORDENAR LOS DATOS SEGUN EL ID 
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
-      if (a.id < b.id) {
+      if (a.nomsucursal < b.nomsucursal) {
         return -1;
       }
-      if (a.id > b.id) {
+      if (a.nomsucursal > b.nomsucursal) {
         return 1;
       }
       return 0;
@@ -183,6 +210,18 @@ export class PrincipalDepartamentoComponent implements OnInit {
     array.sort(compare);
   }
 
+
+  // METODO PARA NAVEGAR A PANTALLA DE NIVELES
+  data_id: number = 0;
+  ver_nivel: boolean = false;
+  ver_departamentos: boolean = true;
+  pagina: string = '';
+  VerNiveles(id: number) {
+    this.data_id = id;
+    this.pagina = 'ver-departamento';
+    this.ver_nivel = true;
+    this.ver_departamentos = false;
+  }
 
 
   /** ************************************************************************************************** ** 
@@ -205,12 +244,12 @@ export class PrincipalDepartamentoComponent implements OnInit {
   getDocumentDefinicion() {
     sessionStorage.setItem('Departamentos', this.departamentos);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'portrait',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
-      // PIE DE PÁGINA
+      // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');

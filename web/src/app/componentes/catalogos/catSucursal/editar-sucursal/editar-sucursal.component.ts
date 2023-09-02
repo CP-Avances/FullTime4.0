@@ -268,7 +268,7 @@ export class EditarSucursalComponent implements OnInit {
   // METODO PARA ACTUALIZAR REGISTRO
   ActualizarSucursal(sucursal: any) {
     this.restSucursal.ActualizarSucursal(sucursal).subscribe(response => {
-      this.toastr.success('Operación Exitosa.', 'Registro actualizado.', {
+      this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
         timeOut: 6000,
       });
       this.habilitarprogress === false;
@@ -278,11 +278,11 @@ export class EditarSucursalComponent implements OnInit {
 
   // METODO PARA CERRAR VENTANA
   CerrarVentana() {
-    this.ventana.close({ actualizar: true });
+    this.ventana.close(this.data.id);
   }
 
   Salir() {
-    this.ventana.close({ actualizar: false });
+    this.ventana.close(0);
   }
 
   // METODOS PARA LIMPIAR FORMULARIO SEGUN SELECCION

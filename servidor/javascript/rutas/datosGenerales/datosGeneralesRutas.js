@@ -17,6 +17,8 @@ class CiudadRutas {
         this.router.get('/datos-actuales/:empleado_id', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.DatosActuales);
         // METODO DE ACCESO A CONSULTA DE DATOS DE COLABORADORES ACTIVOS E INACTIVOS
         this.router.get('/informacion-general/:estado', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.DatosGenerales);
+        // METODO DE ACCESO A CONSULTA DE DATOS DE CRAGOS DE COLABORADORES ACTIVOS E INACTIVOS
+        this.router.get('/informacion-general-cargo/:estado', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.DatosGeneralesCargo);
         // METODO PARA LISTAR INFORMACION ACTUAL DEL USUARIO
         this.router.get('/info_actual', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.ListarDatosActualesEmpleado);
         // METODO DE BUSQUEDA DE DATOS DE USUARIO QUE APRUEBA SOLICITUDES
@@ -25,6 +27,14 @@ class CiudadRutas {
         this.router.post('/buscar-jefes', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], datosGeneralesControlador_1.default.BuscarJefes);
         // METODO DE BUSQUEDA DE INFORMACION DE CONFIGURACIONES DE NOTIFICACIONES
         this.router.get('/info-configuracion/:id_empleado', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.BuscarConfigEmpleado);
+        // LISTA DE DATOS (SUCURSALES-DEPARTAMENTOS-EMPLEADOS) ACTIVOS O INACTIVOS QUE TIENEN CONFIGURADO COMUNICADOS
+        this.router.get('/datos_generales_comunicados/:estado', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.DatosGeneralesComunicados);
+        // LISTA DATOS (CARGOS-EMPLEADOS) ACTIVOS O INACTIVOS QUE TIENEN CONFIGURADO COMUNICADOS
+        this.router.get('/datos_cargos_comunicados/:estado', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.DatosCargoComunicados);
+        // METODO DE ACCESO A CONSULTA DE DATOS DE COLABORADORES ASIGNADOS UBICACION
+        this.router.post('/informacion-general-ubicacion/:estado', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.DatosGeneralesUbicacion);
+        // METODO DE ACCESO A CONSULTA DE DATOS DE CRAGOS Y COLABORADORES ASIGNADOS A UBICACIONES
+        this.router.post('/informacion-general-ubicacion-cargo/:estado', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.DatosGeneralesCargoUbicacion);
         /** INICIO RUTAS PARA ACCEDER A CONSULTAS PARA FILTRAR INFORMACIÓN */
         this.router.get('/filtros/sucursal/:id', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.ListarEmpleadoSucursal);
         this.router.get('/filtros/sucursal/departamento/:id_sucursal/:id_departamento', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.ListarEmpleadoSucuDepa);

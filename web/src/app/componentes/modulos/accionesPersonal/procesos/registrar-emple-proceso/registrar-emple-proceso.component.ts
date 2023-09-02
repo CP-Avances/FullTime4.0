@@ -71,7 +71,7 @@ export class RegistrarEmpleProcesoComponent implements OnInit {
     });
   }
 
-  ValidarDatosProeso(form) {
+  ValidarDatosProeso(form: any) {
     if (Date.parse(form.fecInicioForm) < Date.parse(form.fecFinalForm)) {
       this.InsertarProceso(form);
     }
@@ -82,7 +82,7 @@ export class RegistrarEmpleProcesoComponent implements OnInit {
     }
   }
 
-  InsertarProceso(form) {
+  InsertarProceso(form: any) {
     let datosProceso = {
       id_empl_cargo: this.datoEmpleado.idCargo,
       id_empleado: this.datoEmpleado.idEmpleado,
@@ -91,12 +91,12 @@ export class RegistrarEmpleProcesoComponent implements OnInit {
       id: form.idProcesoForm,
     };
     this.restP.RegistrarEmpleProcesos(datosProceso).subscribe(response => {
-      this.toastr.success('Operación Exitosa', 'Período de Procesos del Empleado registrados', {
+      this.toastr.success('Operación exitosa.', 'Período de Procesos del Empleado registrados', {
         timeOut: 6000,
       })
       this.CerrarVentanaRegistroProceso();
     }, error => {
-      this.toastr.error('Operación Fallida', 'Registro Inválido', {
+      this.toastr.error('Ups!!! algo salio mal.', 'Registro Inválido', {
         timeOut: 6000,
       })
     });

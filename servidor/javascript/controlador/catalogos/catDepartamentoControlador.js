@@ -21,15 +21,48 @@ class DepartamentoControlador {
     CrearDepartamento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nombre, depa_padre, nivel, id_sucursal } = req.body;
+                const { nombre, id_sucursal } = req.body;
                 yield database_1.default.query(`
-        INSERT INTO cg_departamentos (nombre, depa_padre, nivel, id_sucursal ) VALUES ($1, $2, $3, $4)
-        `, [nombre, depa_padre, nivel, id_sucursal]);
+        INSERT INTO cg_departamentos (nombre, id_sucursal ) VALUES ($1, $2)
+        `, [nombre, id_sucursal]);
                 res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
                 return res.jsonp({ message: 'error' });
             }
+        });
+    }
+    // ACTUALIZAR REGISTRO DE DEPARTAMENTO   --**VERIFICADO
+    ActualizarDepartamento(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { nombre, id_sucursal } = req.body;
+                const id = req.params.id;
+                console.log(id);
+                yield database_1.default.query(`
+        UPDATE cg_departamentos set nombre = $1, id_sucursal = $2 
+        WHERE id = $3
+        `, [nombre, id_sucursal, id]);
+                res.jsonp({ message: 'Registro actualizado.' });
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error' });
+            }
+        });
+    }
+    // METODO PARA BUSCAR LISTA DE DEPARTAMENTOS POR ID SUCURSAL
+    ObtenerDepartamento(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            const DEPARTAMENTO = yield database_1.default.query(`
+      SELECT d.*, s.nombre AS sucursal
+      FROM cg_departamentos AS d, sucursales AS s 
+      WHERE d.id = $1 AND s.id = d.id_sucursal
+      `, [id]);
+            if (DEPARTAMENTO.rowCount > 0) {
+                return res.jsonp(DEPARTAMENTO.rows);
+            }
+            res.status(404).jsonp({ text: 'El departamento no ha sido encontrado.' });
         });
     }
     // METODO PARA BUSCAR LISTA DE DEPARTAMENTOS POR ID SUCURSAL
@@ -58,87 +91,74 @@ class DepartamentoControlador {
             res.status(404).jsonp({ text: 'El departamento no ha sido encontrado' });
         });
     }
-    // ACTUALIZAR REGISTRO DE DEPARTAMENTO
-    ActualizarDepartamento(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { nombre, depa_padre, nivel, id_sucursal } = req.body;
-                const id = req.params.id;
-                console.log(id);
-                yield database_1.default.query(`
-        UPDATE cg_departamentos set nombre = $1, depa_padre = $2, nivel = $3 , id_sucursal = $4 
-        WHERE id = $5
-        `, [nombre, depa_padre, nivel, id_sucursal, id]);
-                res.jsonp({ message: 'Registro actualizado.' });
-            }
-            catch (error) {
-                return res.jsonp({ message: 'error' });
-            }
-        });
-    }
-    // METODO DE BUSQUEDA DE DEPARTAMENTOS
+    // METODO DE BUSQUEDA DE DEPARTAMENTOS   --**VERIFICAR
     ListarDepartamentos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const CON_DEPA_PADRE = yield database_1.default.query(`
-      SELECT d.id, d.nombre, d.nivel, nom_d.nombre AS departamento_padre, d.id_sucursal, 
-        s.nombre AS nomsucursal, e.id AS id_empresa, e.nombre AS nomempresa 
-      FROM cg_departamentos AS d, nombredepartamento AS nom_d, sucursales AS s, cg_empresa AS e 
-      WHERE d.depa_padre = nom_d.id AND d.id_sucursal = s.id AND e.id = s.id_empresa 
-      ORDER BY nombre ASC
+            const NIVELES = yield database_1.default.query(`
+      SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, n.id_departamento AS id, 
+        n.departamento AS nombre, n.nivel, n.dep_nivel_nombre AS departamento_padre
+      FROM nivel_jerarquicodep AS n, sucursales AS s
+      WHERE n.id_establecimiento = s.id AND 
+        n.nivel = (SELECT MAX(nivel) FROM nivel_jerarquicodep WHERE id_departamento = n.id_departamento)
+      ORDER BY s.nombre, n.departamento ASC
       `);
-            const SIN_DEPA_PADRE = yield database_1.default.query(`
-      SELECT d.id, d.nombre, d.nivel, d.depa_padre AS departamento_padre, d.id_sucursal, 
-        s.nombre AS nomsucursal, e.id AS id_empresa, e.nombre AS nomempresa 
-      FROM cg_departamentos AS d, sucursales AS s, cg_empresa AS e 
-      WHERE d.id_sucursal = s.id AND e.id = s.id_empresa AND d.depa_padre IS NULL 
-      ORDER BY nombre ASC
+            const DEPARTAMENTOS = yield database_1.default.query(`
+      SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, cd.id, cd.nombre,
+      0 AS NIVEL, null AS departamento_padre
+      FROM cg_departamentos AS cd, sucursales AS s
+      WHERE NOT cd.id IN (SELECT id_departamento FROM nivel_jerarquicodep) AND
+      s.id = cd.id_sucursal
+      ORDER BY s.nombre, cd.nombre ASC;
       `);
-            if (SIN_DEPA_PADRE.rowCount > 0 && CON_DEPA_PADRE.rowCount > 0) {
-                SIN_DEPA_PADRE.rows.forEach((obj) => {
-                    CON_DEPA_PADRE.rows.push(obj);
+            if (DEPARTAMENTOS.rowCount > 0 && NIVELES.rowCount > 0) {
+                NIVELES.rows.forEach((obj) => {
+                    DEPARTAMENTOS.rows.push(obj);
                 });
-                return res.jsonp(CON_DEPA_PADRE.rows);
+                return res.jsonp(DEPARTAMENTOS.rows);
             }
-            else if (SIN_DEPA_PADRE.rowCount > 0) {
-                return res.jsonp(SIN_DEPA_PADRE.rows);
+            else if (DEPARTAMENTOS.rowCount > 0) {
+                return res.jsonp(DEPARTAMENTOS.rows);
             }
-            else if (CON_DEPA_PADRE.rowCount > 0) {
-                return res.jsonp(CON_DEPA_PADRE.rows);
+            else if (NIVELES.rowCount > 0) {
+                return res.jsonp(NIVELES.rows);
             }
             else {
                 return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
-    // METODO PARA LISTAR INFORMACION DE DEPARTAMENTOS POR ID DE SUCURSAL
+    // METODO PARA LISTAR INFORMACION DE DEPARTAMENTOS POR ID DE SUCURSAL   --**VERIFICADO
     ListarDepartamentosSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id_sucursal;
-            const CON_DEPA_PADRE = yield database_1.default.query(`
-      SELECT d.id, d.nombre, d.nivel, nom_d.nombre AS departamento_padre, d.id_sucursal, 
-        s.nombre AS nomsucursal, e.id AS id_empresa, e.nombre AS nomempresa 
-      FROM cg_departamentos AS d, nombredepartamento AS nom_d, sucursales AS s, cg_empresa AS e 
-      WHERE d.depa_padre = nom_d.id AND d.id_sucursal = s.id AND e.id = s.id_empresa AND id_sucursal = $1
-      ORDER BY nombre ASC
+            const NIVEL = yield database_1.default.query(`
+      SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, n.id_departamento AS id, 
+        n.departamento AS nombre, n.nivel, n.dep_nivel_nombre AS departamento_padre
+      FROM nivel_jerarquicodep AS n, sucursales AS s
+      WHERE n.id_establecimiento = s.id AND 
+        n.nivel = (SELECT MAX(nivel) FROM nivel_jerarquicodep WHERE id_departamento = n.id_departamento)
+        AND s.id = $1
+      ORDER BY s.nombre, n.departamento ASC
       `, [id]);
-            const SIN_DEPA_PADRE = yield database_1.default.query(`
-      SELECT d.id, d.nombre, d.nivel, d.depa_padre AS departamento_padre, d.id_sucursal, 
-        s.nombre AS nomsucursal, e.id AS id_empresa, e.nombre AS nomempresa 
-      FROM cg_departamentos AS d, sucursales AS s, cg_empresa AS e 
-      WHERE d.id_sucursal = s.id AND e.id = s.id_empresa AND d.depa_padre IS NULL AND id_sucursal = $1
-      ORDER BY nombre ASC
+            const DEPARTAMENTO = yield database_1.default.query(`
+      SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, cd.id, cd.nombre,
+        0 AS NIVEL, null AS departamento_padre
+      FROM cg_departamentos AS cd, sucursales AS s
+      WHERE NOT cd.id IN (SELECT id_departamento FROM nivel_jerarquicodep) AND
+        s.id = cd.id_sucursal AND s.id = $1
+      ORDER BY s.nombre, cd.nombre ASC
       `, [id]);
-            if (SIN_DEPA_PADRE.rowCount > 0 && CON_DEPA_PADRE.rowCount > 0) {
-                SIN_DEPA_PADRE.rows.forEach((obj) => {
-                    CON_DEPA_PADRE.rows.push(obj);
+            if (DEPARTAMENTO.rowCount > 0 && NIVEL.rowCount > 0) {
+                DEPARTAMENTO.rows.forEach((obj) => {
+                    NIVEL.rows.push(obj);
                 });
-                return res.jsonp(CON_DEPA_PADRE.rows);
+                return res.jsonp(NIVEL.rows);
             }
-            else if (SIN_DEPA_PADRE.rowCount > 0) {
-                return res.jsonp(SIN_DEPA_PADRE.rows);
+            else if (DEPARTAMENTO.rowCount > 0) {
+                return res.jsonp(DEPARTAMENTO.rows);
             }
-            else if (CON_DEPA_PADRE.rowCount > 0) {
-                return res.jsonp(CON_DEPA_PADRE.rows);
+            else if (NIVEL.rowCount > 0) {
+                return res.jsonp(NIVEL.rows);
             }
             else {
                 return res.status(404).jsonp({ text: 'No se encuentran registros.' });
@@ -171,6 +191,86 @@ class DepartamentoControlador {
             const name = req.params.nameXML;
             let filePath = `servidor\\xmlDownload\\${name}`;
             res.sendFile(__dirname.split("servidor")[0] + filePath);
+        });
+    }
+    //METODO PARA CREAR NIVELES JERARQUICOS POR DEPARTAMENTOS  --**VERIFICADO
+    CrearNivelDepa(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id_departamento, departamento, nivel, dep_nivel, dep_nivel_nombre, id_establecimiento, id_suc_dep_nivel } = req.body;
+                yield database_1.default.query(`
+        INSERT INTO nivel_jerarquicodep (departamento, id_departamento, nivel, dep_nivel_nombre, id_dep_nivel, 
+          id_establecimiento, id_suc_dep_nivel ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+        `, [departamento, id_departamento, nivel, dep_nivel_nombre, dep_nivel, id_establecimiento, id_suc_dep_nivel]);
+                res.jsonp({ message: 'Registro guardado.' });
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error' });
+            }
+        });
+    }
+    //METODO PARA BUSCAR NIVELES JERARQUICOS POR DEPARTAMENTO   --**VERIFICADO
+    ObtenerNivelesDepa(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_departamento, id_establecimiento } = req.params;
+            const NIVELESDEP = yield database_1.default.query(`
+      SELECT n.*, s.nombre AS suc_nivel
+      FROM nivel_jerarquicodep AS n, sucursales AS s
+      WHERE id_departamento = $1 AND id_establecimiento = $2 
+        AND s.id = n.id_suc_dep_nivel
+      ORDER BY nivel DESC 
+      `, [id_departamento, id_establecimiento]);
+            if (NIVELESDEP.rowCount > 0) {
+                return res.jsonp(NIVELESDEP.rows);
+            }
+            res.status(404).jsonp({ text: 'Registros no encontrados.' });
+        });
+    }
+    // ACTUALIZAR REGISTRO DE NIVEL DE DEPARTAMENTO DE TABLA NIVEL_JERARQUICO   --**VERIFICADO
+    ActualizarNivelDepa(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { nivel } = req.body;
+                const id = req.params.id;
+                yield database_1.default.query(`
+        UPDATE nivel_jerarquicodep set nivel = $1 
+        WHERE id = $2
+        `, [nivel, id]);
+                res.jsonp({ message: 'Registro actualizado.' });
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error' });
+            }
+        });
+    }
+    // METODO PARA ELIMINAR REGISTRO DE NIVEL DE DEPARTAMENTO   --**VERIFICADO
+    EliminarRegistroNivelDepa(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = req.params.id;
+            yield database_1.default.query(`
+      DELETE FROM nivel_jerarquicodep WHERE id = $1
+      `, [id]);
+            res.jsonp({ message: 'Registro eliminado.' });
+        });
+    }
+    //METODO PARA CREAR NIVELES JERARQUICOS POR DEPARTAMENTOS  --**VERIFICADO
+    ActualizarNombreNivel(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id_departamento, departamento } = req.body;
+                yield database_1.default.query(`
+        UPDATE nivel_jerarquicodep SET departamento = $1
+        WHERE id_departamento = $2
+        `, [departamento, id_departamento]);
+                yield database_1.default.query(`
+        UPDATE nivel_jerarquicodep SET dep_nivel_nombre = $1
+        WHERE id_dep_nivel = $2
+        `, [departamento, id_departamento]);
+                res.jsonp({ message: 'Registro guardado.' });
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error' });
+            }
         });
     }
     ListarNombreDepartamentos(req, res) {

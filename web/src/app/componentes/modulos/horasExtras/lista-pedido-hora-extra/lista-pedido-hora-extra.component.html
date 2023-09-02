@@ -6,10 +6,10 @@
                 matTooltipPosition="right" matTooltip="Autorizar a todos los empleados su Solicitud de Horas Extras"
                 id="SelectCheck">library_add_check</mat-icon>
             <button *ngIf="btnCheckHabilitar" class="btn btn-primary" (click)="AutorizarHorasExtrasMultiple('pedido')"
-                style="float: left; margin-left: 10px;">Autorizar</button>
+                style="float: left; margin-left: 8px;">Autorizar</button>
             <span class="w-100 bd-highlight">
                 LISTA DE SOLICITUDES DE HORAS EXTRAS</span>
-            <button class="btn btn-sm" style="float: right; margin-right: 10px;" ngDefaultControl
+            <button class="btn btn-sm" style="float: right; margin-right: 6px;" ngDefaultControl
                 [(ngModel)]="totalHorasExtras" [ngModelOptions]="{standalone: true}">Horas Totales
                 {{totalHorasExtras}}</button>
         </div>
@@ -34,7 +34,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let h of lista_pedidosFiltradas | paginate:tamanio_pagina:numero_pagina">
+                    <tr *ngFor="let h of lista_HorasExtras | paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionUno.toggle(h) : null" [checked]="selectionUno.isSelected(h)"
@@ -61,16 +61,19 @@
         </div>
         <br>
         <div>
-            <button mat-raised-button id="btn-raised" type="submit" class="float-right" ngDefaultControl [(ngModel)]="horasSumadas"
-                style="margin-right: 10px;" [ngModelOptions]="{standalone: true}">Sub-total Horas
-                {{horasSumadas}}</button>
+            <button mat-raised-button id="btn-raised" class="btn_horas" type="submit" ngDefaultControl [(ngModel)]="horasSumadas"
+            style="margin-right: 10px;" [ngModelOptions]="{standalone: true}">Sub-total Horas
+            {{horasSumadas}}</button>
         </div>
         <br>
-        <mat-paginator id="pagina" [length]="lista_pedidosFiltradas.length" [pageSize]="tamanio_pagina"
-            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)"
-            (click)="calcularHoraPaginacion()" showFirstLastButtons>
-        </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+        <div>
+            <mat-paginator id="pagina" [length]="lista_HorasExtras.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)"
+                (click)="calcularHoraPaginacion()" showFirstLastButtons>
+            </mat-paginator>
+        </div>
+        
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
             <i (click)="generarPdf('download','Solicitudes de horas extras')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de solicitudes de horas extras en formato PDF.">
                 <p>PDF</p>
@@ -159,16 +162,16 @@
         </div>
         <br>
         <div>
-            <button mat-raised-button id="btn-raised" type="submit" class="float-right" ngDefaultControl [(ngModel)]="horasSumadas_observacion"
-                style="margin-right: 10px;" [ngModelOptions]="{standalone: true}">Sub-total Horas
-                {{horasSumadas_observacion}}</button>
+            <button mat-raised-button id="btn-raised" class="btn_horas" type="submit" ngDefaultControl [(ngModel)]="horasSumadas_observacion"
+            style="margin-right: 10px;" [ngModelOptions]="{standalone: true}">Sub-total Horas
+            {{horasSumadas_observacion}}</button>
         </div>
         <br>
         <mat-paginator id="pagina" [length]="listaHorasExtrasObservaFiltradas.length" [pageSize]="tamanio_pagina_observacion"
             [pageSizeOptions]="pageSizeOptions_observacion" id="pagina" (page)="ManejarPaginaObservacion($event)"
             (click)="calcularHoraPaginacionObservacion()" showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
             <i (click)="generarPdf('download','Solicitudes de horas extras con observaciones')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de solicitudes de horas extras con observaciones en formato PDF.">
                 <p>PDF</p>
@@ -239,7 +242,7 @@
             [pageSizeOptions]="pageSizeOptions_auto" id="pagina" (page)="ManejarPaginaAutorizadas($event)"
             showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
             <i (click)="generarPdf('download','Horas extras autorizadas o negadas')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de horas extras autorizadas o negadas en formato PDF.">
                 <p>PDF</p>
@@ -265,6 +268,6 @@
 
 <div *ngIf="(validarMensaje1) && (validarMensaje2) && (validarMensaje3)" class="container" style="padding-bottom: 50px; text-align: center; padding-top: 20px;" >
     <div class="mat-elevation-z8" style="color: rgb(158, 154, 154); padding: 2%;">
-        <h5> Por el Momento no tiene Solicitudes de Horas Extras para Aprobar </h5>
+        <h5> Por el Momento no tiene Solicitudes de Horas Extras por Aprobar </h5>
     </div>
 </div>

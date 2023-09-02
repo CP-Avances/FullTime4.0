@@ -124,7 +124,7 @@ export class DiscapacidadComponent implements OnInit {
       tipo: idTipoD,
     }
     this.rest.RegistroDiscapacidad(carnet).subscribe(response => {
-      this.toastr.success('Operación Exitosa.', 'Registro actualizado.', {
+      this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
         timeOut: 6000,
       });
       this.LimpiarCampos();
@@ -141,7 +141,7 @@ export class DiscapacidadComponent implements OnInit {
       tipo: idTipoD,
     }
     this.rest.ActualizarDiscapacidad(parseInt(this.idEmploy), carnet).subscribe(res => {
-      this.toastr.success('Operación Exitosa.', 'Registro actualizado.', {
+      this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
         timeOut: 6000,
       });
       this.CerrarRegistro();

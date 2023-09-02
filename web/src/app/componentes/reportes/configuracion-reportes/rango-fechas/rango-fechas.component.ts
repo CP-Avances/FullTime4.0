@@ -33,7 +33,7 @@ export class RangoFechasComponent implements OnInit, OnDestroy {
    f_inicio_req: string = '';
    f_final_req: string = '';
    habilitar: boolean = false;
-   ValidarRangofechas(form) {
+   ValidarRangofechas(form: any) {
      var f_i = new Date(form.fec_inicio)
      var f_f = new Date(form.fec_final)
  

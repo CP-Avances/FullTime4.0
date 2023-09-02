@@ -38,6 +38,11 @@ mat-form-field {
     padding: 0px 10px 0px 5px;
 }
 
+#periodo_calculo {
+    width: 170px;
+    padding: 0px 10px 0px 5px;
+}
+
 #Vacacion_periodo{
     width: 240px;
     padding: 0px 5px 0px 5px;
@@ -59,7 +64,7 @@ mat-form-field {
 }
 
 #campos_calculos {
-    width: 230px;
+    width: 260px;
     padding: 5px 5px 0px 10px;
 }
 
@@ -98,7 +103,7 @@ label {
     margin-bottom: 10px;
     margin-top: 20px;
     margin-right: 20px;
-    margin-left: 20px;
+    margin-left: 0px;
     font-size: 12px;
 }
 
@@ -119,7 +124,7 @@ label {
     font-size: 14px;
 }
 
-.mat-radio-button~.mat-radio-button {
+.mat-mdc-radio-button ~ .mat-mdc-radio-button {
     margin-left: 50px;
 }
 

@@ -43,7 +43,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
   selectionDep = new SelectionModel<ITableEmpleados>(true, []);
   selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
   
-  // Items de paginación de la tabla
+  // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
@@ -135,15 +135,15 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     if (this.parametrizacion === '') return this.toastr.error('Ingrese rango de semaforización para generar Reporte','Falta Semaforización') 
     
     switch (this.opcion) {
-      case 1:
+      case 's':
         if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione sucursal')
         this.ModelarSucursal(action);
       break;
-      case 2:
+      case 'd':
         if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione departamentos')
         this.ModelarDepartamento(action);
       break;
-      case 3:
+      case 'e':
         if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione empleados')
         this.ModelarEmpleados(action);
       break;
@@ -490,9 +490,9 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     return n
   }
 
-  /****************************************************************************************************** 
-   *                                       METODO PARA EXPORTAR A EXCEL
-   ******************************************************************************************************/
+  /** ************************************************************************************************** ** 
+   ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
+   ** ************************************************************************************************** **/
    exportToExcel(): void {
 
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefault(this.data_pdf));
@@ -521,20 +521,20 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
   }
 
 
-  /** Si el número de elementos seleccionados coincide con el número total de filas. */
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc() {
     const numSelected = this.selectionSuc.selected.length;
     return numSelected === this.sucursales.length
   }
 
-  /** Selecciona todas las filas si no están todas seleccionadas; de lo contrario, selección clara. */
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleSuc() {
     this.isAllSelectedSuc() ?
       this.selectionSuc.clear() :
       this.sucursales.forEach(row => this.selectionSuc.select(row));
   }
 
-  /** La etiqueta de la casilla de verificación en la fila pasada*/
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelSuc(row?: ITableEmpleados): string {
     if (!row) {
       return `${this.isAllSelectedSuc() ? 'select' : 'deselect'} all`;
@@ -542,20 +542,20 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  /** Si el número de elementos seleccionados coincide con el número total de filas. */
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedDep() {
     const numSelected = this.selectionDep.selected.length;
     return numSelected === this.departamentos.length
   }
 
-  /** Selecciona todas las filas si no están todas seleccionadas; de lo contrario, selección clara. */
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionDep.clear() :
       this.departamentos.forEach(row => this.selectionDep.select(row));
   }
 
-  /** La etiqueta de la casilla de verificación en la fila pasada*/
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelDep(row?: ITableEmpleados): string {
     if (!row) {
       return `${this.isAllSelectedDep() ? 'select' : 'deselect'} all`;
@@ -563,20 +563,20 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     return `${this.selectionDep.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  /** Si el número de elementos seleccionados coincide con el número total de filas. */
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedEmp() {
     const numSelected = this.selectionEmp.selected.length;
     return numSelected === this.empleados.length
   }
 
-  /** Selecciona todas las filas si no están todas seleccionadas; de lo contrario, selección clara. */
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :
       this.empleados.forEach(row => this.selectionEmp.select(row));
   }
 
-  /** La etiqueta de la casilla de verificación en la fila pasada*/
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelEmp(row?: ITableEmpleados): string {
     if (!row) {
       return `${this.isAllSelectedEmp() ? 'select' : 'deselect'} all`;
@@ -622,7 +622,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     else {
       keynum = evt.which;
     }
-    // Comprobamos si se encuentra en el rango numérico y que teclas no recibirá.
+    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
     if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6) {
       return true;
     }
@@ -635,15 +635,15 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
   }
 
   MostrarLista() {
-    if (this.opcion === 1) {
+    if (this.opcion === 's') {
       /*this.nombre_suc.reset();
       this.Filtrar('', 1)*/
     }
-    else if (this.opcion === 2) {
+    else if (this.opcion === 'd') {
      /* this.nombre_dep.reset();
       this.Filtrar('', 2)*/
     }
-    else if (this.opcion === 3) {
+    else if (this.opcion === 'e') {
       /*this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();

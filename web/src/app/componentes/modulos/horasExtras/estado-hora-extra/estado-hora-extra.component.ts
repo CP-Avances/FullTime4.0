@@ -63,7 +63,7 @@ export class EstadoHoraExtraComponent implements OnInit {
   }
 
   resEstado: any = [];
-  EditarEstadoHoraExtra(form) {
+  EditarEstadoHoraExtra(form: any) {
     let datosHorasExtras = {
       estado: form.estadoForm,
       id_hora_extra: this.data.id, 

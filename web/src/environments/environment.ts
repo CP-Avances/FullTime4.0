@@ -4,7 +4,11 @@
 
 export const environment = {
   production: true,
+<<<<<<< HEAD
   url: 'http://localhost:3001/api'
+=======
+  url: 'http://192.168.0.110:3001'
+>>>>>>> 34e0f140a9a29219c3a064ed1b93dec6962b0870
 };
 
 /*

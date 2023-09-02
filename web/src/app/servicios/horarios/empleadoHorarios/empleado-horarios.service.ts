@@ -23,14 +23,14 @@ export class EmpleadoHorariosService {
     return this.http.post(`${environment.url}/empleadoHorario`, datos);
   }
 
-  // METODO PARA VERIFICAR HORARIOS DUPLICADOS
-  VerificarDuplicidadHorarios(id_empl: number, datos: any) {
-    return this.http.post(`${environment.url}/empleadoHorario/validarFechas/${id_empl}`, datos);
+  // METODO PARA VERIFICAR HORARIOS DUPLICADOS  --**VERIFICADO
+  VerificarDuplicidadHorarios(codigo: string, datos: any) {
+    return this.http.post(`${environment.url}/empleadoHorario/validarFechas/${codigo}`, datos);
   }
 
-  // METODO PARA BUSCAR HORARIOS DE EMPLEADO EN UN RANGO DE FECHAS
-  VerificarHorariosExistentes(id_empl: number, datos: any) {
-    return this.http.post(`${environment.url}/empleadoHorario/horarios-existentes/${id_empl}`, datos);
+  // METODO PARA BUSCAR HORARIOS DE EMPLEADO EN UN RANGO DE FECHAS  --**VERIFICADO
+  VerificarHorariosExistentes(codigo: string, datos: any) {
+    return this.http.post<any>(`${environment.url}/empleadoHorario/horarios-existentes/${codigo}`, datos);
   }
 
   // METODO PARA VERIFICAR HORARIOS DUPLICADOS ACTUALIZACION
@@ -67,6 +67,15 @@ export class EmpleadoHorariosService {
   BuscarComidaHorarioHorasDD(datos: any) {
     return this.http.post<any>(`${environment.url}/empleadoHorario/horario-comida-horas-dias-diferentes`, datos);
   }
+
+
+
+
+
+
+
+
+
 
 
 

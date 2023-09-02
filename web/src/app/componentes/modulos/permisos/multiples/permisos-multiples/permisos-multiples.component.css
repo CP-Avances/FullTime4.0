@@ -110,4 +110,9 @@ table {
 td {
     padding-top: 10px;
     text-align: center;
+    vertical-align: middle;
+}
+
+#centrar {
+    vertical-align: middle;
 }

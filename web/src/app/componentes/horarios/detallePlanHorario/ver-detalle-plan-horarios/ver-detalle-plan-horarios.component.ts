@@ -30,7 +30,7 @@ export class VerDetallePlanHorariosComponent implements OnInit {
   idEmpleado: string;
   idPlanH: string;
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA
+  // ITEMS DE PAGINACION DE LA TABLA
   numero_pagina: number = 1;
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
@@ -75,7 +75,7 @@ export class VerDetallePlanHorariosComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
@@ -173,7 +173,7 @@ export class VerDetallePlanHorariosComponent implements OnInit {
 
   empleado: any = [];
   usuario: string = '';
-  // METODO PARA VER LA INFORMACIÓN DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
   ObtenerEmpleado(idemploy: any) {
     this.empleado = [];
     this.restEmpleado.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -240,7 +240,7 @@ export class VerDetallePlanHorariosComponent implements OnInit {
           else {
             this.restDP.subirArchivoExcel(parseInt(this.idPlanH), formData).subscribe(resS => {
               this.restDP.CrearPlanificacionGeneral(parseInt(this.idEmpleado), parseInt(this.empleado[0].codigo), formData).subscribe(resPG => {
-                this.toastr.success('Operación Exitosa', 'Plantilla de Horario importada.', {
+                this.toastr.success('Operación exitosa.', 'Plantilla de Horario importada.', {
                   timeOut: 6000,
                 });
                 this.ListarDetalles(this.idPlanH, this.formato_fecha);

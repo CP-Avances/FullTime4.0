@@ -1,18 +1,23 @@
-<!--*********** LISTA DE SOLICITUDES DE PLANIFICACIONES HORAS EXTRAS PENDIENTES O PREAUTORIZADAS *************-->
-<br *ngIf="!HabilitarPlan">
-<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!HabilitarPlan">
+<!--  *********** LISTA DE SOLICITUDES DE PLANIFICACIONES HORAS EXTRAS PENDIENTES O PREAUTORIZADAS *************  -->
+<div class="container" style="padding-bottom: 50px; padding-top: 20px; text-align: center;" *ngIf="!HabilitarPlan">
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
             <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
-                matTooltipPosition="right" matTooltip="Autorizar a todos los empleados la Planificación de Horas Extras"
-                id="SelectCheck">library_add_check</mat-icon>
+                matTooltipPosition="right"
+                matTooltip="Autorizar a todos los empleados la Planificación de Horas Extras." id="SelectCheck">
+                library_add_check
+            </mat-icon>
             <button *ngIf="btnCheckHabilitar" class="btn btn-primary" (click)="AutorizarHoras('pedido')"
-                style="float: left; margin-left: 10px;">Autorizar</button>
+                style="float: left; margin-left: 10px;">
+                Autorizar
+            </button>
             <span class="w-100 bd-highlight">
-                USUARIOS QUE HAN REALIZADO PLANIFICACIÓN DE HORAS EXTRAS</span>
+                USUARIOS QUE HAN REALIZADO PLANIFICACIÓN DE HORAS EXTRAS
+            </span>
             <button class="btn btn-sm" style="float: right; margin-right: 10px;" ngDefaultControl
-                [(ngModel)]="totalHorasExtras" [ngModelOptions]="{standalone: true}">Horas Totales
-                {{totalHorasExtras}}</button>
+                [(ngModel)]="totalHorasExtras" [ngModelOptions]="{standalone: true}">
+                Horas Totales {{totalHorasExtras}}
+            </button>
         </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
@@ -28,11 +33,11 @@
                         <th scope="col">Cédula</th>
                         <th scope="col">Empleado</th>
                         <th scope="col">Estado</th>
-                        <th scope="col">Fecha Desde</th>
-                        <th scope="col">Fecha Hasta</th>
-                        <th scope="col">Horas Planificadas</th>
-                        <th scope="col">Fecha Timbre</th>
-                        <th scope="col">Horas Realizadas</th>
+                        <th scope="col">Fecha desde</th>
+                        <th scope="col">Fecha hasta</th>
+                        <th scope="col">Horas planificadas</th>
+                        <th scope="col">Fecha timbre</th>
+                        <th scope="col">Horas realizadas</th>
                         <th scope="col">Acciones</th>
                     </tr>
                 </thead>
@@ -64,9 +69,10 @@
                             </mat-icon>
                         </td>
                         <td>
-                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right" 
+                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
                                 matTooltip="Búsqueda de datos de acuerdo a la columna de la tabla.">
-                                help_outline</mat-icon>
+                                help_outline
+                            </mat-icon>
                         </td>
                     </tr>
                     <tr
@@ -104,8 +110,9 @@
         <br>
         <div>
             <button class="btn btn-sm float-right" ngDefaultControl [(ngModel)]="horasSumadas"
-                style="margin-right: 10px;" [ngModelOptions]="{standalone: true}">Sub-total Horas
-                {{horasSumadas}}</button>
+                style="margin-right: 10px;" [ngModelOptions]="{standalone: true}">
+                Sub-total Horas {{horasSumadas}}
+            </button>
         </div>
         <br>
         <mat-paginator id="pagina" [length]="horas_extras_plan.length" [pageSize]="tamanio_pagina"
@@ -113,9 +120,10 @@
         </mat-paginator>
     </div>
 </div>
-<!--************** LISTA DE SOLICITUDES DE PLANIFICACIONES HORAS EXTRAS CON OBSERVACIONES  *********************-->
-<br *ngIf="!HabilitarObservacion">
-<div class="container" style="margin-bottom: 25px; padding-bottom: 10px;" *ngIf="!HabilitarObservacion">
+
+<!--  **************  LISTA DE SOLICITUDES DE PLANIFICACIONES HORAS EXTRAS CON OBSERVACIONES  *********************  -->
+<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;"
+    *ngIf="!HabilitarObservacion">
     <div class="row">
         <div class="col-lg-7" style="margin-bottom: 15px;">
             <mat-accordion>
@@ -125,10 +133,12 @@
                             Críterios de Búsqueda
                         </mat-panel-title>
                         <mat-icon class="flex-shrink-1 bd-highlight" matTooltipPosition="right"
-                            matTooltip="Se puede filtra de acuerdo al campo que escriba">search</mat-icon>
+                            matTooltip="Se puede filtra de acuerdo al campo que escriba">
+                            search
+                        </mat-icon>
                     </mat-expansion-panel-header>
 
-                    <form [formGroup]="buscador">
+                    <form>
                         <div class="d-flex flex-wrap justify-content-center">
                             <!--  <mat-form-field>
                                 <mat-label>Ingresar Código</mat-label>
@@ -144,12 +154,10 @@
                                 <input matInput placeholder="Ej: " [(ngModel)]="filtroCedulaO" maxlength="10"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                     [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
-                                <mat-error *ngIf="cedula.invalid">Indispensable ingresar dos valores
-                                </mat-error>
                                 <mat-icon id="iemple" matSuffix matTooltipPosition="right"
-                                    
-                                    matTooltip="Búsqueda de empleado por la cédula de identificación o pasaporte">
-                                    help_outline</mat-icon>
+                                    matTooltip="Búsqueda de empleado por la cédula de identificación o pasaporte.">
+                                    help_outline
+                                </mat-icon>
                             </mat-form-field>
                             <!--  <mat-form-field>
                                 <mat-label>Ingresar Nombres</mat-label>
@@ -190,14 +198,20 @@
         <div class="d-flex bd-highlight" id="titulo">
             <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccionO()" matSuffix
                 matTooltipPosition="right" matTooltip="Autorizar a todos los empleados la Planificación de Horas Extras"
-                id="SelectCheck">library_add_check</mat-icon>
+                id="SelectCheck">
+                library_add_check
+            </mat-icon>
             <button *ngIf="btnCheckHabilitarO" class="btn btn-primary" (click)="AutorizarHoras('observacion')"
-                style="float: left; margin-left: 10px;">Autorizar</button>
+                style="float: left; margin-left: 10px;">
+                Autorizar
+            </button>
             <span class="w-100 bd-highlight">
-                USUARIOS QUE REQUIEREN JUSTIFICAR HORAS EXTRAS</span>
+                USUARIOS QUE REQUIEREN JUSTIFICAR HORAS EXTRAS
+            </span>
             <button class="btn btn-sm" style="float: right; margin-right: 10px;" ngDefaultControl
-                [(ngModel)]="totalHorasExtrasO" [ngModelOptions]="{standalone: true}">Horas Totales
-                {{totalHorasExtrasO}}</button>
+                [(ngModel)]="totalHorasExtrasO" [ngModelOptions]="{standalone: true}">
+                Horas Totales {{totalHorasExtrasO}}
+            </button>
         </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
@@ -213,11 +227,11 @@
                         <th scope="col">Cédula</th>
                         <th scope="col">Empleado</th>
                         <th scope="col">Estado</th>
-                        <th scope="col">Fecha Desde</th>
-                        <th scope="col">Fecha Hasta</th>
-                        <th scope="col">Horas Planificadas</th>
-                        <th scope="col">Fecha Timbre</th>
-                        <th scope="col">Horas Realizadas</th>
+                        <th scope="col">Fecha desde</th>
+                        <th scope="col">Fecha hasta</th>
+                        <th scope="col">Horas planificadas</th>
+                        <th scope="col">Fecha timbre</th>
+                        <th scope="col">Horas realizadas</th>
                         <th scope="col">Acciones</th>
                     </tr>
                 </thead>
@@ -259,8 +273,9 @@
         <br>
         <div>
             <button class="btn btn-sm float-right" ngDefaultControl [(ngModel)]="horasSumadas2"
-                style="margin-right: 10px;" [ngModelOptions]="{standalone: true}">Sub-total Horas
-                {{horasSumadas2}}</button>
+                style="margin-right: 10px;" [ngModelOptions]="{standalone: true}">
+                Sub-total Horas {{horasSumadas2}}
+            </button>
         </div>
         <br>
         <mat-paginator id="pagina" [length]="horas_extras_plan_observacion.length" [pageSize]="tamanio_pagina_O"
@@ -269,16 +284,18 @@
         </mat-paginator>
     </div>
 </div>
-<!--******************** LISTA DE SOLICITUDES DE PLANIFICACIONES HORAS EXTRAS AUTORIZADAS *********************-->
-<br *ngIf="!HabilitarAutoriza">
-<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!HabilitarAutoriza">
+
+<!--  ********************  LISTA DE SOLICITUDES DE PLANIFICACIONES HORAS EXTRAS AUTORIZADAS  *********************  -->
+<div class="container" style="padding-bottom: 50px; padding-top: 20px; text-align: center;" *ngIf="!HabilitarAutoriza">
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
             <span class="w-100 bd-highlight">
-                LISTA DE PLANIFICACIONES DE HORAS EXTRAS REALIZADAS AUTORIZADAS</span>
+                LISTA DE PLANIFICACIONES DE HORAS EXTRAS REALIZADAS AUTORIZADAS
+            </span>
             <button class="btn btn-sm" style="float: right; margin-right: 10px;" ngDefaultControl
-                [(ngModel)]="totalAutorizadas" [ngModelOptions]="{standalone: true}">Horas Totales
-                {{totalAutorizadas}}</button>
+                [(ngModel)]="totalAutorizadas" [ngModelOptions]="{standalone: true}">
+                Horas Totales {{totalAutorizadas}}
+            </button>
         </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
@@ -287,11 +304,11 @@
                         <th scope="col">Cédula</th>
                         <th scope="col">Empleado</th>
                         <th scope="col">Estado</th>
-                        <th scope="col">Fecha Desde</th>
-                        <th scope="col">Fecha Hasta</th>
-                        <th scope="col">Horas Planificadas</th>
-                        <th scope="col">Fecha Timbre</th>
-                        <th scope="col">Horas Realizadas</th>
+                        <th scope="col">Fecha desde</th>
+                        <th scope="col">Fecha hasta</th>
+                        <th scope="col">Horas planificadas</th>
+                        <th scope="col">Fecha timbre</th>
+                        <th scope="col">Horas realizadas</th>
                         <!--   <th scope="col">Acciones</th>-->
                     </tr>
                 </thead>
@@ -326,8 +343,9 @@
         <br>
         <div>
             <button class="btn btn-sm float-right" ngDefaultControl [(ngModel)]="horasSumadas_auto"
-                style="margin-right: 10px;" [ngModelOptions]="{standalone: true}">Sub-total Horas
-                {{horasSumadas_auto}}</button>
+                style="margin-right: 10px;" [ngModelOptions]="{standalone: true}">
+                Sub-total Horas {{horasSumadas_auto}}
+            </button>
         </div>
         <br>
         <mat-paginator id="pagina" [length]="horas_extras_autorizadas.length" [pageSize]="tamanio_pagina_auto"

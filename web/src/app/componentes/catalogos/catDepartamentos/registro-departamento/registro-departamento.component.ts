@@ -9,11 +9,6 @@ import { Router } from '@angular/router';
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 
-interface Nivel {
-  valor: string;
-  nombre: string
-}
-
 @Component({
   selector: 'app-registro-departamento',
   templateUrl: './registro-departamento.component.html',
@@ -24,9 +19,7 @@ export class RegistroDepartamentoComponent implements OnInit {
 
   // CONTROL DE LOS CAMPOS DEL FORMULARIO
   idSucursal = new FormControl('');
-  depaPadre = new FormControl(null);
   nombre = new FormControl('', Validators.required);
-  nivel = new FormControl('', Validators.required);
 
   // DATOS DEPARTAMENTO
   sucursales: any = [];
@@ -36,19 +29,8 @@ export class RegistroDepartamentoComponent implements OnInit {
   // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
   public formulario = new FormGroup({
     idSucursalForm: this.idSucursal,
-    depaPadreForm: this.depaPadre,
     nombreForm: this.nombre,
-    nivelForm: this.nivel,
   });
-
-  // ARREGLO DE NIVELES EXISTENTES
-  niveles: Nivel[] = [
-    { valor: '1', nombre: '1' },
-    { valor: '2', nombre: '2' },
-    { valor: '3', nombre: '3' },
-    { valor: '4', nombre: '4' },
-    { valor: '5', nombre: '5' }
-  ];
 
   /**
    * VARIABLES PROGRESS SPINNER
@@ -106,9 +88,7 @@ export class RegistroDepartamentoComponent implements OnInit {
   InsertarDepartamento(form: any) {
     var departamento = {
       id_sucursal: form.idSucursalForm,
-      depa_padre: form.depaPadreForm,
       nombre: form.nombreForm.toUpperCase(),
-      nivel: parseInt(form.nivelForm),
     };
 
     // VERIFICAR ID DE SUCURSAL
@@ -135,7 +115,7 @@ export class RegistroDepartamentoComponent implements OnInit {
         });
       }
       else {
-        this.toastr.success('Operación Exitosa', 'Departamento registrado', {
+        this.toastr.success('Operación exitosa.', 'Departamento registrado.', {
           timeOut: 6000,
         });
         this.CerrarVentana();

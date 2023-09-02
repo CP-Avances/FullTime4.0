@@ -1,14 +1,15 @@
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatRadioChange } from '@angular/material/radio';
 import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
-import { Router } from '@angular/router';
 
-import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.service';
 import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
+import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.service';
+
+import { ListarRegimenComponent } from '../listar-regimen/listar-regimen.component';
 
 @Component({
   selector: 'app-regimen',
@@ -16,7 +17,7 @@ import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/prov
   styleUrls: ['./regimen.component.css'],
 })
 
-export class RegimenComponent implements OnInit {
+export class RegimenComponent implements AfterViewInit, OnInit {
 
   // CONTROL DE FORMULARIOS
   isLinear = true;
@@ -44,19 +45,15 @@ export class RegimenComponent implements OnInit {
 
   // SEGUNDO FORMULARIO
   diasAcumulacionF = new FormControl('');
-  diasLaborablesF = new FormControl(0);
-  diasCalendarioF = new FormControl(0);
+  diasLaborablesF = new FormControl('');
+  diasCalendarioF = new FormControl('');
   periodoTresF = new FormControl('');
   periodoUnoF = new FormControl('');
   periodoDosF = new FormControl('');
-  diasLibresF = new FormControl(0);
-  licenciasF = new FormControl(false);
-  permisosF = new FormControl(false);
+  diasLibresF = new FormControl('');
   feriadosF = new FormControl(false);
   periodosF = new FormControl(false);
   acumularF = new FormControl(false);
-  libresF = new FormControl(false);
-  faltasF = new FormControl(false);
 
   // TERCER FORMULARIO
   vacaciones_cuatroF = new FormControl('');
@@ -66,6 +63,7 @@ export class RegimenComponent implements OnInit {
   diasAdicionalesF = new FormControl('');
   vacaciones_dosF = new FormControl('');
   vacaciones_unoF = new FormControl('');
+  meses_calculoF = new FormControl('');
   desde_cuatroF = new FormControl('');
   hasta_cuatroF = new FormControl('');
   antiguedadF = new FormControl('');
@@ -79,23 +77,28 @@ export class RegimenComponent implements OnInit {
   variableF: boolean = false;
 
   // CALCULOS DE VACACIONES
-  diasMesCalendarioF = new FormControl(0);
-  diasMesLaborableF = new FormControl(0);
-  dias_CalendarioF = new FormControl(0);
-  dias_LaborableF = new FormControl(0);
+  diasMesCalendarioF = new FormControl('');
+  diasMesLaborableF = new FormControl('');
+  dias_CalendarioF = new FormControl('');
+  dias_LaborableF = new FormControl('');
 
   constructor(
     private rest: RegimenService,
     private pais: ProvinciaService,
     private toastr: ToastrService,
     private formulario: FormBuilder,
-    public router: Router,
+    public cambio: ChangeDetectorRef,
+    public componentl: ListarRegimenComponent,
   ) { }
 
   ngOnInit(): void {
     this.ObtenerPaises();
     this.ObtenerRegimen();
     this.ValidarFormulario();
+  }
+
+  ngAfterViewInit() {
+    this.cambio.detectChanges();
   }
 
 
@@ -121,13 +124,9 @@ export class RegimenComponent implements OnInit {
       periodoUnoForm: this.periodoUnoF,
       periodoDosForm: this.periodoDosF,
       diasLibresForm: this.diasLibresF,
-      licenciasForm: this.licenciasF,
-      permisosForm: this.permisosF,
       feriadosForm: this.feriadosF,
       periodosForm: this.periodosF,
       acumularForm: this.acumularF,
-      libresForm: this.libresF,
-      faltasForm: this.faltasF,
     });
 
     this.tercerFormulario = this.formulario.group({
@@ -138,6 +137,7 @@ export class RegimenComponent implements OnInit {
       diasAdicionalesForm: this.diasAdicionalesF,
       vacaciones_dosForm: this.vacaciones_dosF,
       vacaciones_unoForm: this.vacaciones_unoF,
+      meses_calculoForm: this.meses_calculoF,
       desde_cuatroForm: this.desde_cuatroF,
       hasta_cuatroForm: this.hasta_cuatroF,
       antiguedadForm: this.antiguedadF,
@@ -236,6 +236,7 @@ export class RegimenComponent implements OnInit {
   escritura_dias: boolean = false; // ------------------------------- Parametro readonly inhabilitado (false)
   // VALIDAR DIAS DE VACACIONES INGRESADAS
   ValidarVacaciones(form2: any) {
+    console.log('ingresa')
     this.LimpiarCalcular();
     // VERIFICAR QUE LOS DATOS NO SEAN VACIOS
     if (form2.diasCalendarioForm === '' && form2.diasLaborablesForm === '' && form2.diasLibresForm === '') {
@@ -270,7 +271,7 @@ export class RegimenComponent implements OnInit {
       // VERIFICAR QUE LOS DIAS CALENDARIO SEAN MAYORES A LOS DIAS HABILES
       if (parseFloat(form2.diasCalendarioForm) > parseFloat(form2.diasLaborablesForm)) {
         var libres = Number((parseFloat(form2.diasCalendarioForm) - parseFloat(form2.diasLaborablesForm)).toFixed(10));
-        this.diasLibresF.setValue(libres);
+        this.diasLibresF.setValue(String(libres));
         // VERIFICAR QUE LOS DIAS HABILES SEAN MAYORES A LOS DIAS LIBRES
         if (parseFloat(form2.diasLaborablesForm) > libres) {
           this.validar_dias = false;
@@ -296,7 +297,7 @@ export class RegimenComponent implements OnInit {
       // VERIFICAR QUE LOS DIAS CALENDARIO SEAN MAYORES A LOS DIAS LIBRES
       if (parseFloat(form2.diasCalendarioForm) > parseFloat(form2.diasLibresForm)) {
         var habiles = Number((parseFloat(form2.diasCalendarioForm) - parseFloat(form2.diasLibresForm)).toFixed(10));
-        this.diasLaborablesF.setValue(habiles);
+        this.diasLaborablesF.setValue(String(habiles));
         // VERIFICAR QUE LOS DIAS HABILES SEAN MAYORES A LOS DIAS LIBRES
         if (habiles > parseFloat(form2.diasLibresForm)) {
           this.validar_dias = false;
@@ -347,7 +348,7 @@ export class RegimenComponent implements OnInit {
       // VERIFICAR QUE LOS DIAS HABILES SEAN MAYORES A LOS DIAS LIBRES
       if (parseFloat(form2.diasLaborablesForm) > parseFloat(form2.diasLibresForm)) {
         var calendario = Number((parseFloat(form2.diasLaborablesForm) + parseFloat(form2.diasLibresForm)).toFixed(10));
-        this.diasCalendarioF.setValue(calendario);
+        this.diasCalendarioF.setValue(String(calendario));
         this.validar_dias = false;
         this.correcto_dias = true;
         this.escritura_dias = true;
@@ -560,9 +561,9 @@ export class RegimenComponent implements OnInit {
   mensaje2_: boolean = false;
   mensaje3_: boolean = false;
   //VerificarPeriodos(valor: string, opcion: number): void {
-    VerificarPeriodos(event: Event, opcion: number): void {
-      var valor = event.target as HTMLInputElement;
-  
+  VerificarPeriodos(event: Event, opcion: number): void {
+    var valor = event.target as HTMLInputElement;
+
     console.log(valor.value);
     if (parseFloat(valor.value) >= 5) {
       if (opcion === 1) {
@@ -1106,17 +1107,25 @@ export class RegimenComponent implements OnInit {
   // METODO PARA VALIDAR REALIZACION DE CALCULOS
   ValidarRequerido(event: MatCheckboxChange, form1: any, form2: any, form3: any) {
     if (event.checked === true) {
-      this.limpiar_calcular = true; // --------------------- Activar boton limpiar formulario (true)
-      this.CalcularDiasMeses(form1, form2);
-      if (form3.antiguedadActivaForm === true && form3.antiguedadForm === 'variable') {
-        if (this.correcto_antiguo === true) {
+      if (form3.meses_calculoForm != '') {
+        this.limpiar_calcular = true; // --------------------- Activar boton limpiar formulario (true)
+        this.CalcularDiasMeses(form1, form2, form3);
+        if (form3.antiguedadActivaForm === true && form3.antiguedadForm === 'variable') {
+          if (this.correcto_antiguo === true) {
+            this.activar_guardar = false;
+          } else {
+            this.activar_guardar = true;
+          }
+        }
+        else {
           this.activar_guardar = false;
-        } else {
-          this.activar_guardar = true;
         }
       }
       else {
-        this.activar_guardar = false;
+        this.calculoF.setValue(false);
+        this.toastr.warning('Registrar número de meses de periodo considerados en el cálculo.', '', {
+          timeOut: 6000
+        })
       }
     }
     else {
@@ -1125,16 +1134,17 @@ export class RegimenComponent implements OnInit {
   }
 
   // METODO PARA CALCULAR VACACIONES GANADAS AL MES
-  CalcularDiasMeses(form1: any, form2: any) {
+  CalcularDiasMeses(form1: any, form2: any, form3: any) {
+
     // EJEMPLO:
     // 12 --> 11
     //  1 --> x
     // CALCULO DE DIAS GANADOS AL MES
-    var dias_laborables_mes = Number((parseFloat(form2.diasLaborablesForm) / parseFloat(form1.mesesForm)).toFixed(10));
-    var dias_calendario_mes = Number((parseFloat(form2.diasCalendarioForm) / parseFloat(form1.mesesForm)).toFixed(10));
+    var dias_laborables_mes = Number((parseFloat(form2.diasLaborablesForm) / parseFloat(form3.meses_calculoForm)).toFixed(10));
+    var dias_calendario_mes = Number((parseFloat(form2.diasCalendarioForm) / parseFloat(form3.meses_calculoForm)).toFixed(10));
 
-    this.diasMesLaborableF.setValue(dias_laborables_mes);
-    this.diasMesCalendarioF.setValue(dias_calendario_mes);
+    this.diasMesLaborableF.setValue(String(dias_laborables_mes));
+    this.diasMesCalendarioF.setValue(String(dias_calendario_mes));
 
     // EJEMPLO:
     // 30 --> dias_laborables_mes
@@ -1143,9 +1153,8 @@ export class RegimenComponent implements OnInit {
     var dias_laborables = Number((dias_laborables_mes / parseFloat(form1.diasForm)).toFixed(10));
     var dias_calendario = Number((dias_calendario_mes / parseFloat(form1.diasForm)).toFixed(10));
 
-    this.dias_LaborableF.setValue(dias_laborables);
-    this.dias_CalendarioF.setValue(dias_calendario);
-
+    this.dias_LaborableF.setValue(String(dias_laborables));
+    this.dias_CalendarioF.setValue(String(dias_calendario));
   }
 
 
@@ -1153,10 +1162,10 @@ export class RegimenComponent implements OnInit {
     this.limpiar_calcular = false;
     this.activar_guardar = true;
     this.calculoF.setValue(false);
-    this.diasMesLaborableF.setValue(0);
-    this.diasMesCalendarioF.setValue(0);
-    this.dias_LaborableF.setValue(0);
-    this.dias_CalendarioF.setValue(0);
+    this.diasMesLaborableF.setValue('');
+    this.diasMesCalendarioF.setValue('');
+    this.dias_LaborableF.setValue('');
+    this.dias_CalendarioF.setValue('');
   }
 
 
@@ -1228,10 +1237,6 @@ export class RegimenComponent implements OnInit {
         acumular: form2.acumularForm,
         dias_max_acumulacion: 0,
         contar_feriados: form2.feriadosForm,
-        contar_dias_libres: form2.libresForm,
-        contar_licencias: form2.licenciasForm,
-        contar_faltas: form2.faltasForm,
-        contar_permiso: form2.permisosForm,
         vacacion_divisible: form2.periodosForm,
 
         antiguedad: form3.antiguedadActivaForm,
@@ -1244,6 +1249,7 @@ export class RegimenComponent implements OnInit {
         vacacion_dias_laboral_mes: form3.diasMesLaborableForm,
         calendario_dias: form3.dias_CalendarioForm,
         laboral_dias: form3.dias_LaborableForm,
+        meses_calculo: form3.meses_calculoForm,
 
       };
 
@@ -1289,13 +1295,13 @@ export class RegimenComponent implements OnInit {
     this.rest.CrearNuevoRegimen(regimen).subscribe(registro => {
       // VALIDAR SI EXISTEN ERRORES EN LOS DATOS
       if (registro.message === 'error') {
-        this.toastr.error('Verificar que el nombre de regimen no se encuntra ya registrado o verificar que los datos numéricos no contengan letras.', '', {
+        this.toastr.error('Verificar que el nombre de regimen no se encuentre ya registrado o verificar que los datos numéricos no contengan letras.', '', {
           timeOut: 6000,
         });
       }
       // REGISTROS GUARDADO
       else {
-        this.toastr.success('Operación Exitosa. Registro guardado.', '', {
+        this.toastr.success('Operación exitosa. Registro guardado.', '', {
           timeOut: 6000,
         });
         // VALIDAR INGRESO DE DATOS DE PERIODO DE VACACIONES
@@ -1306,7 +1312,7 @@ export class RegimenComponent implements OnInit {
         if (this.correcto_antiguo === true) {
           this.LeerDatosAntiguedad(form3, registro.id);
         }
-        this.CerrarVentana();
+        this.CerrarVentana(2, registro.id);
       }
     }, error => {
       this.toastr.error('Ups!!! algo salio mal.', '', {
@@ -1415,7 +1421,7 @@ export class RegimenComponent implements OnInit {
       keynum = evt.which;
     }
 
-    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMÉRICO Y QUE TECLAS NO RECIBIRÁ.
+    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
     if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6 || keynum == 46) {
       return true;
     }
@@ -1433,8 +1439,14 @@ export class RegimenComponent implements OnInit {
   }
 
   // CERRAR VENTANA DE REGISTRO
-  CerrarVentana() {
-    this.router.navigate(['/listarRegimen']);
+  CerrarVentana(opcion: number, datos: any) {
+    this.componentl.ver_registrar = false;
+    if (opcion === 1) {
+      this.componentl.ver_lista = true;
+    }
+    else {
+      this.componentl.VerDatosRegimen(datos);
+    }
   }
-  
+
 }

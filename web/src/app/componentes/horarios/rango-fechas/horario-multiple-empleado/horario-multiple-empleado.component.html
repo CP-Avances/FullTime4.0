@@ -1,4 +1,26 @@
-<div style="padding-top: 20px;">
+<!-- *** VENTANA DE REGISTRO DE MULTIPLES PLANIFICACIONES *** -->
+<div style="padding-top: 20px;" *ngIf="asignar">
+    <app-horarios-multiples [seleccionados]="seleccionados">
+    </app-horarios-multiples>
+</div>
+
+<!-- *** VENTANA DE REGISTRO INDIVDUAL DE PLANIFICACION *** -->
+<div style="padding-top: 20px;" *ngIf="ventana_horario">
+    <app-registo-empleado-horario [data_horario]="data_horario">
+    </app-registo-empleado-horario>
+</div>
+
+<!-- *** VENTANA DE BUSQUEDA DE PLANIFICACIONES  *** -->
+<div style="padding-top: 20px;" *ngIf="ventana_busqueda">
+    <app-buscar-planificacion [resultados]="resultados">
+    </app-buscar-planificacion>
+</div>
+
+
+<!--  *********************** PANTALLA DETALLE DE HORARIOS ********************************* -->
+<app-ver-horario-detalle *ngIf="ver_horario" [idHorario]="horario_id" [pagina]="pagina"></app-ver-horario-detalle>
+
+<div style="padding-top: 20px;" *ngIf="seleccionar">
     <div id="titulo">PLANIFICACIÓN RANGO FECHAS</div>
     <mat-card class="example-card mat-elevation-z9">
         <mat-card-content>
@@ -6,50 +28,64 @@
                 <span>CRÍTERIOS DE BÚSQUEDA</span>
             </div>
             <br>
-            <form [formGroup]="buscador">
+            <form>
                 <mat-radio-group class="d-flex flex-wrap justify-content-center" [formControl]="seleccion">
                     <mat-radio-button class="example-radio-button" *ngFor="let c of check" [value]="c.opcion"
                         (change)="BuscarPorTipo($event)">
-                        <label id="textoradiobtn">{{c.valor}}</label></mat-radio-button>
+                        <label id="textoradiobtn">{{c.valor}}</label>
+                    </mat-radio-button>
                 </mat-radio-group>
             </form>
-            <!-- FORM PARA SUCURSALES -->
-            <form [formGroup]="buscador" *ngIf="_booleanOptions.bool_suc">
+            <!-- FORM PARA CARGOS -->
+            <form *ngIf="_booleanOptions.bool_cargo">
                 <div class="d-flex flex-wrap justify-content-center">
                     <mat-form-field>
-                        <mat-label>Sucursal</mat-label>
-                        <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreSuc_"
-                            (input)="Filtrar(filtroNombreSuc_, 1)" [formControl]="nombre_suc" type="text"
+                        <mat-label>Cargo</mat-label>
+                        <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreCarg_"
+                            (input)="Filtrar(filtroNombreCarg_, 1)" [formControl]="nombre_carg" type="text"
                             (keypress)="IngresarSoloLetras($event)">
-                        <mat-error *ngIf="nombre_suc.invalid">
-                            Indispensable ingresar dos letras
-                        </mat-error>
-                        <mat-icon matSuffix matTooltipPosition="right" matTooltip="Búsqueda de sucursales por nombre.">
+                        <mat-icon matSuffix matTooltipPosition="right"
+                            matTooltip="Búsqueda de cargos por su descripción.">
                             help_outline
                         </mat-icon>
                     </mat-form-field>
                 </div>
             </form>
             <!-- FORM PARA DEPARTAMENTOS -->
-            <form [formGroup]="buscador" *ngIf="_booleanOptions.bool_dep">
-                <div class="d-flex flex-wrap justify-content-center">
-                    <mat-form-field>
-                        <mat-label>Departamento</mat-label>
-                        <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreDep_"
-                            (input)="Filtrar(filtroNombreDep_, 2)" [formControl]="nombre_dep" type="text"
-                            (keypress)="IngresarSoloLetras($event)">
-                        <mat-error *ngIf="nombre_dep.invalid">
-                            Indispensable ingresar dos letras
-                        </mat-error>
-                        <mat-icon matSuffix matTooltipPosition="right"
-                            matTooltip="Búsqueda de departamentos por nombre.">
-                            help_outline
-                        </mat-icon>
-                    </mat-form-field>
+            <form *ngIf="_booleanOptions.bool_dep">
+                <div class="row">
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Sucursal</mat-label>
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreSuc_"
+                                    (input)="Filtrar(filtroNombreSuc_, 6)" [formControl]="nombre_suc" type="text"
+                                    (keypress)="IngresarSoloLetras($event)">
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de sucursales por nombre.">
+                                    help_outline
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Departamento</mat-label>
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreDep_"
+                                    (input)="Filtrar(filtroNombreDep_, 2)" [formControl]="nombre_dep" type="text"
+                                    (keypress)="IngresarSoloLetras($event)">
+                                <mat-icon matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de departamentos por nombre.">
+                                    help_outline
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
+                    </div>
                 </div>
             </form>
             <!-- FORM PARA EMPLEADOS -->
-            <form [formGroup]="buscador" *ngIf="_booleanOptions.bool_emp">
+            <form *ngIf="_booleanOptions.bool_emp">
                 <div class="d-flex flex-wrap justify-content-center">
                     <mat-form-field>
                         <mat-label>Código</mat-label>
@@ -67,9 +103,6 @@
                             (input)="Filtrar(filtroCedula_, 4)"
                             oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                             [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
-                        <mat-error *ngIf="cedula.invalid">
-                            Indispensable ingresar dos valores
-                        </mat-error>
                         <mat-icon matSuffix matTooltipPosition="right"
                             matTooltip="Búsqueda de datos de empleado por cédula de identificación o pasaporte.">
                             help_outline
@@ -80,9 +113,6 @@
                         <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreEmp_"
                             (input)="Filtrar(filtroNombreEmp_, 5)" [formControl]="nombre_emp" type="text"
                             (keypress)="IngresarSoloLetras($event)">
-                        <mat-error *ngIf="nombre_emp.invalid">
-                            Indispensable ingresar dos letras
-                        </mat-error>
                         <mat-icon matSuffix matTooltipPosition="right"
                             matTooltip="Búsqueda de datos de empleado por nombre.">
                             help_outline
@@ -92,16 +122,20 @@
             </form>
 
             <div *ngIf="activar_boton" class="d-flex flex-wrap justify-content-center" style="padding-top: 15px;">
-                <button mat-raised-button id="btn-raised" type="submit" (click)="GuardarRegistros(0)">Planificar</button>
-                <button mat-raised-button id="btn-raised" type="submit" (click)="LimpiarFormulario()">Cancelar</button>
+                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 'b')">
+                    Buscar Planificación
+                </button>
+                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 'p')">Planificar</button>
+                <button id="btn-raised" class="btn btn-sm" (click)="LimpiarFormulario()">Cancelar</button>
             </div>
 
             <hr>
-            <!-- TABLA PARA SUCURSALES -->
-            <div *ngIf="_booleanOptions.bool_suc" class="mat-elevation-z8" style="background: white;">
+
+            <!-- TABLA PARA CARGOS -->
+            <div *ngIf="_booleanOptions.bool_cargo" class="mat-elevation-z8" style="background: white;">
                 <div class="d-flex bd-highlight" id="resultados">
                     <span class="w-100 bd-highlight">
-                        RESULTADO SUCURSALES
+                        RESULTADO CARGOS
                     </span>
                     <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
                         (click)="MostrarLista()">Mostrar lista</button>
@@ -117,45 +151,43 @@
                                         (click)="HabilitarSeleccion()">
                                         library_add_check
                                     </mat-icon>
-                                    <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterToggleSuc() : null"
-                                        [checked]="selectionSuc.hasValue() && isAllSelectedSuc()"
-                                        [indeterminate]="selectionSuc.hasValue() && !isAllSelectedSuc()"
-                                        [aria-label]="checkboxLabelSuc()">
+                                    <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterToggleCarg() : null"
+                                        [checked]="selectionCarg.hasValue() && isAllSelectedCarg()"
+                                        [indeterminate]="selectionCarg.hasValue() && !isAllSelectedCarg()"
+                                        [aria-label]="checkboxLabelCarg()">
                                     </mat-checkbox>
                                 </th>
-                                <th scope="col">Nombre</th>
+                                <th scope="col">Descripción</th>
                                 <th scope="col">Planificar</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr
-                                *ngFor="let s of sucursales | emplNombre: filtroNombreSuc | paginate:tamanio_pagina_suc:numero_pagina_suc">
+                                *ngFor="let c of cargos | emplNombre: filtroNombreCarg | paginate:tamanio_pagina_car:numero_pagina_car">
                                 <td>
-                                    <mat-checkbox *ngIf="plan_multiple" (click)="$event.stopPropagation()"
-                                        (change)="$event ? selectionSuc.toggle(s) : null"
-                                        [checked]="selectionSuc.isSelected(s)" [aria-label]="checkboxLabelSuc(s)">
+                                    <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                                        (change)="$event ? selectionCarg.toggle(c) : null"
+                                        [checked]="selectionCarg.isSelected(c)" [aria-label]="checkboxLabelCarg(c)">
                                     </mat-checkbox>
                                 </td>
-                                <td>{{s.nombre}}</td>
-                                <td class="d-flex justify-content-center">
-                                    <i (click)="GuardarRegistros(s.id)" id="plan" *ngIf="auto_individual"
-                                        class="fas fa-calendar" matSuffix matTooltipPosition="right"
-                                        matTooltip="Abrir formulario de registro de horarios."
-                                        [ngStyle]="habilitado">
+                                <td>{{c.nombre}}</td>
+                                <td>
+                                    <i (click)="GuardarRegistros(c.id, 'p')" id="plan" *ngIf="auto_individual"
+                                        class="fa fa-calendar" matSuffix matTooltipPosition="right"
+                                        matTooltip="Abrir formulario de registro de horarios.">
                                         <p>Planificar</p>
                                     </i>
-                                    <div *ngIf="!auto_individual" style="padding-bottom: 1%;">
-                                        <br><br>
-                                    </div>
+
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina_suc"
-                    [pageSizeOptions]="pageSizeOptions_suc" (page)="ManejarPaginaResultados($event)"
+                <mat-paginator id="pagina" [length]="cargos.length" [pageSize]="tamanio_pagina_car"
+                    [pageSizeOptions]="pageSizeOptions_car" (page)="ManejarPaginaResultados($event)"
                     showFirstLastButtons>
                 </mat-paginator>
+                <br>
             </div>
 
             <!-- TABLA PARA DEPARTAMENTOS -->
@@ -184,30 +216,28 @@
                                         [aria-label]="checkboxLabelDep()">
                                     </mat-checkbox>
                                 </th>
+                                <th scope="col">Establecimiento</th>
                                 <th scope="col">Nombre</th>
                                 <th scope="col">Planificar</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr
-                                *ngFor="let d of departamentos | emplNombre: filtroNombreDep | paginate:tamanio_pagina_dep:numero_pagina_dep">
+                                *ngFor="let d of departamentos | emplNombre: filtroNombreSuc | departamento: filtroNombreDep | paginate:tamanio_pagina_dep:numero_pagina_dep">
                                 <td>
-                                    <mat-checkbox *ngIf="plan_multiple" (click)="$event.stopPropagation()"
+                                    <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                         (change)="$event ? selectionDep.toggle(d) : null"
                                         [checked]="selectionDep.isSelected(d)" [aria-label]="checkboxLabelDep(d)">
                                     </mat-checkbox>
                                 </td>
                                 <td>{{d.nombre}}</td>
-                                <td class="d-flex justify-content-center">
-                                    <i (click)="GuardarRegistros(d.id)" id="plan" *ngIf="auto_individual"
+                                <td>{{d.departamento}}</td>
+                                <td>
+                                    <i (click)="GuardarRegistros(d.id, 'p')" id="plan" *ngIf="auto_individual"
                                         class="fa fa-calendar" matSuffix matTooltipPosition="right"
-                                        matTooltip="Abrir formulario de registro de horarios."
-                                        [ngStyle]="habilitado">
+                                        matTooltip="Abrir formulario de registro de horarios.">
                                         <p>Planificar</p>
                                     </i>
-                                    <div *ngIf="!auto_individual" style="padding-bottom: 1%;">
-                                        <br><br>
-                                    </div>
                                 </td>
                             </tr>
                         </tbody>
@@ -217,6 +247,7 @@
                     [pageSizeOptions]="pageSizeOptions_dep" (page)="ManejarPaginaResultados($event)"
                     showFirstLastButtons>
                 </mat-paginator>
+                <br>
             </div>
 
             <!-- TABLA PARA EMPLEADOS -->
@@ -248,14 +279,14 @@
                                 <th scope="col">Nombre</th>
                                 <th scope="col">Cédula</th>
                                 <th scope="col">Codigo</th>
-                                <th scope="col">Planificar</th>
+                                <th scope="col">Planificaciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr
                                 *ngFor="let e of empleados | emplCodigo: filtroCodigo | emplCedula: filtroCedula | emplNombre: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
                                 <td>
-                                    <mat-checkbox *ngIf="plan_multiple" (click)="$event.stopPropagation()"
+                                    <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                                         (change)="$event ? selectionEmp.toggle(e) : null"
                                         [checked]="selectionEmp.isSelected(e)" [aria-label]="checkboxLabelEmp(e)">
                                     </mat-checkbox>
@@ -263,16 +294,17 @@
                                 <td>{{e.nombre}}</td>
                                 <td>{{e.cedula}}</td>
                                 <td>{{e.codigo}}</td>
-                                <td class="d-flex justify-content-center">
-                                    <i (click)="PlanificarIndividual(e)" id="plan" *ngIf="auto_individual"
+                                <td>
+                                    <i (click)="PlanificarIndividual(e, 'p')" id="plan" *ngIf="auto_individual"
                                         class="fa fa-calendar" matSuffix matTooltipPosition="right"
-                                        matTooltip="Abrir formulario de registro de horarios."
-                                        [ngStyle]="habilitado">
+                                        matTooltip="Abrir formulario de registro de horarios.">
                                         <p>Planificar</p>
                                     </i>
-                                    <div *ngIf="!auto_individual" style="padding-bottom: 1%;">
-                                        <br><br>
-                                    </div>
+                                    <i (click)="PlanificarIndividual(e, 'b')" id="busca" *ngIf="auto_individual"
+                                        class="fa fa-search" matSuffix matTooltipPosition="right"
+                                        matTooltip="Abrir formulario de registro de horarios.">
+                                        <p>Listar</p>
+                                    </i>
                                 </td>
                             </tr>
                         </tbody>
@@ -282,43 +314,9 @@
                     [pageSizeOptions]="pageSizeOptions_emp" (page)="ManejarPaginaResultados($event)"
                     showFirstLastButtons>
                 </mat-paginator>
+                <br>
             </div>
 
         </mat-card-content>
     </mat-card>
-
-    <div class="container" style="margin: 25px 0px 25px 0px; text-align: center;" *ngIf="no_asignados">
-        <div class="nota">
-            <span>NOTA: No se asigna horario a un colaborador cuando: 1. El horario a asignar ya se encuentra
-                registrado. 2. El número de horas del horario sobrepasa el número de horas establecidas en su
-                contrato. 3. El horario a asignar no se encuentra dentro de las fechas indicadas en su contrato.</span>
-        </div>
-        <div class="mat-elevation-z8" style="background: white;">
-            <div class="d-flex bd-highlight" id="titulo">
-                <span class="w-100 bd-highlight">
-                    LISTA DE EMPLEADOS SIN ASIGNACIÓN DE HORARIO <mat-icon (click)="CerrarTabla()" matSuffix
-                        matTooltipPosition="right" matTooltip="Cerrar la tabla." id="cerrar">
-                        close</mat-icon></span>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover table-sm">
-                    <thead class="thead-light">
-                        <tr style="text-align: center;">
-                            <th scope="col">Código</th>
-                            <th scope="col">Empleado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let e of empleados_sin_asignacion | paginate:tamanio_pagina_h:numero_pagina_h">
-                            <td>{{e.codigo}}</td>
-                            <td>{{e.nombre}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <mat-paginator id="pagina" [length]="empleados_sin_asignacion.length" [pageSize]="tamanio_pagina_h"
-                [pageSizeOptions]="pageSizeOptions_h" id="pagina" (page)="ManejarPaginaH($event)" showFirstLastButtons>
-            </mat-paginator>
-        </div>
-    </div>
 </div>

@@ -297,11 +297,11 @@ export class EditarContratoComponent implements OnInit {
   // GUARDAR DATOS DE CONTRATO
   GuardarDatos(datos: any) {
     this.rest.ActualizarContratoEmpleado(this.idSelectContrato, datos).subscribe(response => {
-      this.toastr.success('Operación Exitosa.', 'Registro actualizado.', {
+      this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
         timeOut: 6000,
       });
     }, error => {
-      this.toastr.error('Operación Fallida', 'Ups!!! algo salio mal.', {
+      this.toastr.error('Ups!!! algo salio mal.', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
       })
     });

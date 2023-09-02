@@ -1,5 +1,5 @@
-import { Request, Response, text } from 'express';
-import excel from 'xlsx';
+import { Request, Response } from 'express';
+import { QueryResult } from 'pg';
 import fs from 'fs';
 const builder = require('xmlbuilder');
 
@@ -21,7 +21,7 @@ class TipoComidasControlador {
 
     public async ListarTipoComidasDetalles(req: Request, res: Response) {
         const TIPO_COMIDAS = await pool.query('SELECT ctc.id, ctc.nombre, ctc.tipo_comida, ctc.hora_inicio, ' +
-            'ctc.hora_fin, tc.nombre AS tipo, dm.nombre AS nombre_plato, dm.valor, dm.observacion ' + 
+            'ctc.hora_fin, tc.nombre AS tipo, dm.nombre AS nombre_plato, dm.valor, dm.observacion ' +
             'FROM cg_tipo_comidas AS ctc, tipo_comida AS tc, detalle_menu AS dm ' +
             'WHERE ctc.tipo_comida = tc.id AND dm.id_menu = ctc.id ORDER BY tc.nombre ASC, ctc.id ASC');
         if (TIPO_COMIDAS.rowCount > 0) {
@@ -58,11 +58,25 @@ class TipoComidasControlador {
         }
     }
 
-    public async CrearTipoComidas(req: Request, res: Response): Promise<void> {
+    public async CrearTipoComidas(req: Request, res: Response) {
+
         const { nombre, tipo_comida, hora_inicio, hora_fin } = req.body;
-        await pool.query('INSERT INTO cg_tipo_comidas (nombre, tipo_comida, hora_inicio, hora_fin) ' +
-            'VALUES ($1, $2, $3, $4)', [nombre, tipo_comida, hora_inicio, hora_fin]);
-        res.jsonp({ message: 'Tipo de comida registrada' });
+
+        const response: QueryResult = await pool.query(
+            `
+            INSERT INTO cg_tipo_comidas (nombre, tipo_comida, hora_inicio, hora_fin)
+            VALUES ($1, $2, $3, $4) RETURNING *
+            `
+            , [nombre, tipo_comida, hora_inicio, hora_fin]);
+
+        const [tipos_comida] = response.rows;
+
+        if (!tipos_comida) {
+            return res.status(404).jsonp({ message: 'error' })
+        }
+        else {
+            return res.status(200).jsonp({ message: 'OK', info: tipos_comida });
+        }
     }
 
     public async ActualizarComida(req: Request, res: Response): Promise<void> {

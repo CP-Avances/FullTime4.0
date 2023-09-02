@@ -16,6 +16,7 @@ exports.HORARIO_CONTROLADOR = void 0;
 const database_1 = __importDefault(require("../../database"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
 const builder = require('xmlbuilder');
 class HorarioControlador {
     // REGISTRAR HORARIO
@@ -43,11 +44,11 @@ class HorarioControlador {
     // BUSCAR HORARIOS POR EL NOMBRE
     BuscarHorarioNombre(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { nombre, codigo } = req.body;
+            const { codigo } = req.body;
             try {
                 const HORARIOS = yield database_1.default.query(`
-        SELECT * FROM cg_horarios WHERE UPPER(nombre) = $1 OR UPPER(codigo) = $2
-        `, [nombre.toUpperCase(), codigo.toUpperCase()]);
+        SELECT * FROM cg_horarios WHERE UPPER(codigo) = $1
+        `, [codigo.toUpperCase()]);
                 if (HORARIOS.rowCount > 0)
                     return res.status(200).jsonp({ message: 'No se encuentran registros.' });
                 return res.status(404).jsonp({ message: 'No existe horario. Continua.' });
@@ -59,15 +60,24 @@ class HorarioControlador {
     }
     // GUARDAR DOCUMENTO DE HORARIO
     GuardarDocumentoHorario(req, res) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            let list = req.files;
-            let doc = list.uploads[0].path.split("\\")[1];
-            let { nombre } = req.params;
             let id = req.params.id;
+            let { archivo, codigo } = req.params;
+            // LEER DATOS DE IMAGEN
+            let documento = id + '_' + codigo + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
+            let separador = path_1.default.sep;
             yield database_1.default.query(`
-      UPDATE cg_horarios SET documento = $2, doc_nombre = $3 WHERE id = $1
-      `, [id, doc, nombre]);
-            res.jsonp({ message: 'Documento Actualizado' });
+      UPDATE cg_horarios SET documento = $2 WHERE id = $1
+      `, [id, documento]);
+            res.jsonp({ message: 'Documento actualizado.' });
+            if (archivo != 'null' && archivo != '' && archivo != null) {
+                if (archivo != documento) {
+                    let filePath = `servidor${separador}horarios${separador}${archivo}`;
+                    let direccionCompleta = __dirname.split("servidor")[0] + filePath;
+                    fs_1.default.unlinkSync(direccionCompleta);
+                }
+            }
         });
     }
     // METODO PARA ACTUALIZAR DATOS DE HORARIO
@@ -95,53 +105,57 @@ class HorarioControlador {
     EliminarDocumento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let { documento, id } = req.body;
+            let separador = path_1.default.sep;
             yield database_1.default.query(`
-            UPDATE cg_horarios SET documento = null, doc_nombre = null WHERE id = $1
+            UPDATE cg_horarios SET documento = null WHERE id = $1
             `, [id]);
             if (documento != 'null' && documento != '' && documento != null) {
-                let filePath = `servidor\\horarios\\${documento}`;
+                let filePath = `servidor${separador}horarios${separador}${documento}`;
                 let direccionCompleta = __dirname.split("servidor")[0] + filePath;
                 fs_1.default.unlinkSync(direccionCompleta);
             }
-            res.jsonp({ message: 'Documento Actualizado' });
+            res.jsonp({ message: 'Documento actualizado.' });
         });
     }
     // ELIMINAR DOCUMENTO HORARIO DEL SERVIDOR
     EliminarDocumentoServidor(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let { documento } = req.body;
+            let separador = path_1.default.sep;
             if (documento != 'null' && documento != '' && documento != null) {
-                let filePath = `servidor\\horarios\\${documento}`;
+                let filePath = `servidor${separador}horarios${separador}${documento}`;
                 let direccionCompleta = __dirname.split("servidor")[0] + filePath;
                 fs_1.default.unlinkSync(direccionCompleta);
             }
             res.jsonp({ message: 'Documento Actualizado' });
         });
     }
-    // BUSCAR LISTA DE CATALOGO HORARIOS
+    // BUSCAR LISTA DE CATALOGO HORARIOS  --**VERIFICADO
     ListarHorarios(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const HORARIOS = yield database_1.default.query(`
-      SELECT * FROM cg_horarios ORDER BY id
+      SELECT * FROM cg_horarios ORDER BY codigo ASC
       `);
             if (HORARIOS.rowCount > 0) {
                 return res.jsonp(HORARIOS.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
     // METODO PARA BUSCAR HORARIOS SIN CONSIDERAR UNO EN ESPECIFICO (METODO DE EDICION)
     BuscarHorarioNombre_(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id, nombre, codigo } = req.body;
+            const { id, codigo } = req.body;
             try {
                 const HORARIOS = yield database_1.default.query(`
-        SELECT * FROM cg_horarios WHERE NOT id = $1 AND (UPPER(nombre) = $2 OR UPPER(codigo) = $3)
-        `, [parseInt(id), nombre.toUpperCase(), codigo.toUpperCase()]);
+        SELECT * FROM cg_horarios WHERE NOT id = $1 AND UPPER(codigo) = $2)
+        `, [parseInt(id), codigo.toUpperCase()]);
                 if (HORARIOS.rowCount > 0)
-                    return res.status(200).jsonp({ message: 'El nombre de horario ya existe, ingresar un nuevo nombre.' });
+                    return res.status(200).jsonp({
+                        message: 'El nombre de horario ya existe, ingresar un nuevo nombre.'
+                    });
                 return res.status(404).jsonp({ message: 'No existe horario. Continua.' });
             }
             catch (error) {
@@ -203,7 +217,7 @@ class HorarioControlador {
         `, [hora_trabajo, id])
                     .then((result) => { return result.rows; });
                 if (respuesta.length === 0)
-                    return res.status(400).jsonp({ message: 'No Actualizado.' });
+                    return res.status(400).jsonp({ message: 'No actualizado.' });
                 return res.status(200).jsonp(respuesta);
             }
             catch (error) {
@@ -215,7 +229,8 @@ class HorarioControlador {
     ObtenerDocumento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const docs = req.params.docs;
-            let filePath = `servidor\\horarios\\${docs}`;
+            let separador = path_1.default.sep;
+            let filePath = `servidor${separador}horarios${separador}${docs}`;
             res.sendFile(__dirname.split("servidor")[0] + filePath);
         });
     }

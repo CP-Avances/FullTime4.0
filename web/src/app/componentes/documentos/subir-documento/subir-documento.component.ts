@@ -74,10 +74,10 @@ export class SubirDocumentoComponent implements OnInit {
   SubirRespaldo(form: any) {
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
-      formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
     this.rest.CrearArchivo(formData, form.documentoForm).subscribe(res => {
-      this.toastr.success('Operación Exitosa.', 'Registro guardado.', {
+      this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       });
       this.archivoForm.reset();

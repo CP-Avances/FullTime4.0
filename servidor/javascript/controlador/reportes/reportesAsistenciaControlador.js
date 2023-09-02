@@ -616,62 +616,69 @@ const REPORTE_A_CONTROLADOR = new ReportesAsistenciaControlador();
 exports.default = REPORTE_A_CONTROLADOR;
 const AtrasosTimbresSinAccion = function (fec_inicio, fec_final, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
-        const orden = 1;
-        // console.log('ATRASOS - TIMBRES SIN ACCION: ', fec_inicio, fec_final, codigo );
-        let horarioEntrada = yield database_1.default.query('SELECT dt.hora, dt.minu_espera, CAST(eh.fec_inicio AS VARCHAR), CAST(eh.fec_final AS VARCHAR), ' +
-            'eh.lunes, eh.martes, eh.miercoles, eh.jueves, eh.viernes, eh.sabado, eh.domingo ' +
-            'FROM empl_horarios AS eh, cg_horarios AS ch, deta_horarios AS dt ' +
-            'WHERE dt.orden = $1 AND eh.fec_inicio BETWEEN $2 AND $3 AND eh.fec_final BETWEEN $2 AND $3 AND eh.codigo = $4 ' +
-            'AND eh.id_horarios = ch.id AND ch.id = dt.id_horario', [orden, new Date(fec_inicio), new Date(fec_final), codigo])
-            .then(result => { return result.rows; });
-        if (horarioEntrada.length === 0)
-            return [0];
-        // console.log('HORARIOS: ',horarioEntrada);    
-        let nuevo = [];
-        let aux = yield Promise.all(horarioEntrada.map((obj) => __awaiter(this, void 0, void 0, function* () {
-            let fechas = (0, SubMetodosGraficas_1.ModelarFechas)(obj.fec_inicio, obj.fec_final, obj);
-            const hora_seg = (0, SubMetodosGraficas_1.HHMMtoSegundos)(obj.hora) + (obj.minu_espera * 60);
-            let timbres = yield Promise.all(fechas.map((o) => __awaiter(this, void 0, void 0, function* () {
-                var f_inicio = o.fecha + ' ' + (0, SubMetodosGraficas_1.SegundosToHHMM)(hora_seg);
-                var f_final = o.fecha + ' ' + (0, SubMetodosGraficas_1.SegundosToHHMM)(hora_seg + (0, SubMetodosGraficas_1.HHMMtoSegundos)('02:00:00'));
-                // console.log( f_inicio, ' || ', f_final, ' || ', codigo);
-                const query = 'SELECT CAST(fec_hora_timbre AS VARCHAR) from timbres where fec_hora_timbre >= TO_TIMESTAMP(\'' + f_inicio + '\'' + ', \'YYYY-MM-DD HH:MI:SS\') ' +
-                    'and fec_hora_timbre <= TO_TIMESTAMP(\'' + f_final + '\'' + ', \'YYYY-MM-DD HH:MI:SS\') and id_empleado = ' + codigo + ' order by fec_hora_timbre';
-                // console.log(query);
-                return yield database_1.default.query(query)
-                    .then(res => {
-                    if (res.rowCount === 0) {
-                        return 0;
-                    }
-                    else {
-                        const f_timbre = res.rows[0].fec_hora_timbre.split(' ')[0];
-                        const h_timbre = res.rows[0].fec_hora_timbre.split(' ')[1];
-                        const t_tim = (0, SubMetodosGraficas_1.HHMMtoSegundos)(h_timbre);
-                        // console.log(f_timbre);
-                        let diferencia = (t_tim - hora_seg) / 3600;
-                        return {
-                            fecha: DiaSemana(new Date(f_timbre)) + ' ' + f_timbre,
-                            horario: obj.hora,
-                            timbre: h_timbre,
-                            atraso_dec: diferencia.toFixed(2),
-                            atraso_HHMM: (0, SubMetodosGraficas_1.SegundosToHHMM)(t_tim - hora_seg),
-                        };
-                    }
-                });
-            })));
-            return timbres;
-        })));
-        aux.forEach(obj => {
-            if (obj.length > 0) {
-                obj.forEach(o => {
-                    if (o !== 0) {
-                        nuevo.push(o);
-                    }
-                });
-            }
-        });
-        // console.log('Este es el resul: ',nuevo);
-        return nuevo;
+        /*
+          const orden = 1;
+          // console.log('ATRASOS - TIMBRES SIN ACCION: ', fec_inicio, fec_final, codigo );
+          let horarioEntrada = await pool.query('SELECT dt.hora, dt.minu_espera, CAST(eh.fec_inicio AS VARCHAR), CAST(eh.fec_final AS VARCHAR), ' +
+              'eh.lunes, eh.martes, eh.miercoles, eh.jueves, eh.viernes, eh.sabado, eh.domingo ' +
+              'FROM empl_horarios AS eh, cg_horarios AS ch, deta_horarios AS dt ' +
+              'WHERE dt.orden = $1 AND eh.fec_inicio BETWEEN $2 AND $3 AND eh.fec_final BETWEEN $2 AND $3 AND eh.codigo = $4 ' +
+              'AND eh.id_horarios = ch.id AND ch.id = dt.id_horario', [orden, new Date(fec_inicio), new Date(fec_final), codigo])
+              .then(result => { return result.rows })
+      
+          if (horarioEntrada.length === 0) return [0];
+          // console.log('HORARIOS: ',horarioEntrada);
+          let nuevo: Array<any> = [];
+      
+          let aux = await Promise.all(horarioEntrada.map(async (obj) => {
+      
+              let fechas = ModelarFechas(obj.fec_inicio, obj.fec_final, obj);
+              const hora_seg = HHMMtoSegundos(obj.hora) + (obj.minu_espera * 60);
+      
+              let timbres = await Promise.all(fechas.map(async (o) => {
+                  var f_inicio = o.fecha + ' ' + SegundosToHHMM(hora_seg);
+                  var f_final = o.fecha + ' ' + SegundosToHHMM(hora_seg + HHMMtoSegundos('02:00:00'));
+                  // console.log( f_inicio, ' || ', f_final, ' || ', codigo);
+                  const query = 'SELECT CAST(fec_hora_timbre AS VARCHAR) from timbres where fec_hora_timbre >= TO_TIMESTAMP(\'' + f_inicio + '\'' + ', \'YYYY-MM-DD HH:MI:SS\') ' +
+                      'and fec_hora_timbre <= TO_TIMESTAMP(\'' + f_final + '\'' + ', \'YYYY-MM-DD HH:MI:SS\') and id_empleado = ' + codigo + ' order by fec_hora_timbre'
+                  // console.log(query);
+                  return await pool.query(query)
+                      .then(res => {
+                          if (res.rowCount === 0) {
+                              return 0
+                          } else {
+                              const f_timbre = res.rows[0].fec_hora_timbre.split(' ')[0];
+                              const h_timbre = res.rows[0].fec_hora_timbre.split(' ')[1];
+                              const t_tim = HHMMtoSegundos(h_timbre);
+                              // console.log(f_timbre);
+                              let diferencia = (t_tim - hora_seg) / 3600;
+                              return {
+                                  fecha: DiaSemana(new Date(f_timbre)) + ' ' + f_timbre,
+                                  horario: obj.hora,
+                                  timbre: h_timbre,
+                                  atraso_dec: diferencia.toFixed(2),
+                                  atraso_HHMM: SegundosToHHMM(t_tim - hora_seg),
+                              };
+                          }
+                      })
+              }));
+      
+              return timbres
+          }))
+      
+          aux.forEach(obj => {
+              if (obj.length > 0) {
+                  obj.forEach(o => {
+                      if (o !== 0) {
+                          nuevo.push(o)
+                      }
+                  })
+              }
+          })
+          // console.log('Este es el resul: ',nuevo);
+          return nuevo
+          */
+        return [];
     });
 };
 const BuscarTimbresEoSReporte = function (fec_inicio, fec_final, codigo) {
@@ -684,42 +691,51 @@ const BuscarTimbresEoSReporte = function (fec_inicio, fec_final, codigo) {
 };
 const BuscarTimbresSinAccionesDeEntrada = function (fec_inicio, fec_final, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
-        const orden = 1;
-        let horarioEntrada = yield database_1.default.query('SELECT dt.hora, dt.minu_espera, CAST(eh.fec_inicio AS VARCHAR), CAST(eh.fec_final AS VARCHAR), ' +
-            'eh.lunes, eh.martes, eh.miercoles, eh.jueves, eh.viernes, eh.sabado, eh.domingo ' +
-            'FROM empl_horarios AS eh, cg_horarios AS ch, deta_horarios AS dt ' +
-            'WHERE dt.orden = $1 AND eh.fec_inicio BETWEEN $2 AND $3 AND eh.fec_final BETWEEN $2 AND $3 AND eh.codigo = $4 ' +
-            'AND eh.id_horarios = ch.id AND ch.id = dt.id_horario', [orden, new Date(fec_inicio), new Date(fec_final), codigo])
-            .then(result => { return result.rows; });
-        if (horarioEntrada.length === 0)
-            return [];
-        let aux = yield Promise.all(horarioEntrada.map((obj) => __awaiter(this, void 0, void 0, function* () {
-            let fechas = (0, SubMetodosGraficas_1.ModelarFechas)(obj.fec_inicio, obj.fec_final, obj);
-            const hora_seg = (0, SubMetodosGraficas_1.HHMMtoSegundos)(obj.hora) + (obj.minu_espera * 60);
-            let timbres = yield Promise.all(fechas.map((o) => __awaiter(this, void 0, void 0, function* () {
-                var f_inicio = o.fecha + ' ' + (0, SubMetodosGraficas_1.SegundosToHHMM)(hora_seg - (0, SubMetodosGraficas_1.HHMMtoSegundos)('02:00:00'));
-                var f_final = o.fecha + ' ' + (0, SubMetodosGraficas_1.SegundosToHHMM)(hora_seg);
-                // console.log( f_inicio, ' || ', f_final, ' || ', codigo);
-                const query = 'SELECT CAST(fec_hora_timbre AS VARCHAR) FROM timbres WHERE fec_hora_timbre >= TO_TIMESTAMP(\'' + f_inicio + '\'' + ', \'YYYY-MM-DD HH:MI:SS\') ' +
-                    'and fec_hora_timbre <= TO_TIMESTAMP(\'' + f_final + '\'' + ', \'YYYY-MM-DD HH:MI:SS\') AND id_empleado = ' + codigo + ' ORDER BY fec_hora_timbre';
-                return yield database_1.default.query(query).then(res => { return res.rows; });
-            })));
-            return timbres.filter(o => {
-                return o.length >= 1;
-            }).map((e) => {
-                // console.warn('Filtrado:',e);
-                return 1;
-            });
-        })));
-        let nuevo = [];
-        aux.filter(o => {
-            return o.length >= 1;
-        }).forEach((o) => {
-            o.forEach(e => {
-                nuevo.push(e);
-            });
-        });
-        return nuevo;
+        /*
+            const orden = 1;
+            let horarioEntrada = await pool.query('SELECT dt.hora, dt.minu_espera, CAST(eh.fec_inicio AS VARCHAR), CAST(eh.fec_final AS VARCHAR), ' +
+                'eh.lunes, eh.martes, eh.miercoles, eh.jueves, eh.viernes, eh.sabado, eh.domingo ' +
+                'FROM empl_horarios AS eh, cg_horarios AS ch, deta_horarios AS dt ' +
+                'WHERE dt.orden = $1 AND eh.fec_inicio BETWEEN $2 AND $3 AND eh.fec_final BETWEEN $2 AND $3 AND eh.codigo = $4 ' +
+                'AND eh.id_horarios = ch.id AND ch.id = dt.id_horario', [orden, new Date(fec_inicio), new Date(fec_final), codigo])
+                .then(result => { return result.rows })
+        
+            if (horarioEntrada.length === 0) return [];
+        
+            let aux = await Promise.all(horarioEntrada.map(async (obj) => {
+        
+                let fechas = ModelarFechas(obj.fec_inicio, obj.fec_final, obj);
+                const hora_seg = HHMMtoSegundos(obj.hora) + (obj.minu_espera * 60);
+        
+                let timbres = await Promise.all(fechas.map(async (o) => {
+                    var f_inicio = o.fecha + ' ' + SegundosToHHMM(hora_seg - HHMMtoSegundos('02:00:00'));
+                    var f_final = o.fecha + ' ' + SegundosToHHMM(hora_seg);
+                    // console.log( f_inicio, ' || ', f_final, ' || ', codigo);
+                    const query = 'SELECT CAST(fec_hora_timbre AS VARCHAR) FROM timbres WHERE fec_hora_timbre >= TO_TIMESTAMP(\'' + f_inicio + '\'' + ', \'YYYY-MM-DD HH:MI:SS\') ' +
+                        'and fec_hora_timbre <= TO_TIMESTAMP(\'' + f_final + '\'' + ', \'YYYY-MM-DD HH:MI:SS\') AND id_empleado = ' + codigo + ' ORDER BY fec_hora_timbre'
+                    return await pool.query(query).then(res => { return res.rows })
+                }));
+        
+                return timbres.filter(o => {
+                    return o.length >= 1
+                }).map((e: any) => {
+                    // console.warn('Filtrado:',e);
+                    return 1
+                })
+            }))
+        
+            let nuevo: Array<number> = [];
+        
+            aux.filter(o => {
+                return o.length >= 1
+            }).forEach((o: Array<any>) => {
+                o.forEach(e => {
+                    nuevo.push(e)
+                })
+            })
+        
+            return nuevo*/
+        return [];
     });
 };
 const BuscarTimbres = function (fec_inicio, fec_final, codigo) {

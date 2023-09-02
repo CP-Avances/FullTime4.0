@@ -16,8 +16,22 @@ exports.EMPLEADO_CONTROLADOR = void 0;
 const ts_md5_1 = require("ts-md5");
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../../database"));
+const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const builder = require('xmlbuilder');
+const ObtenerRuta = function (codigo, cedula) {
+    var ruta = '';
+    let separador = path_1.default.sep;
+    for (var i = 0; i < __dirname.split(separador).length - 4; i++) {
+        if (ruta === '') {
+            ruta = __dirname.split(separador)[i];
+        }
+        else {
+            ruta = ruta + separador + __dirname.split(separador)[i];
+        }
+    }
+    return ruta + separador + 'permisos' + separador + codigo + '_' + cedula;
+};
 class EmpleadoControlador {
     /** ** ********************************************************************************************* **
      ** ** **                        MANEJO DE CODIGOS DE USUARIOS                                    ** **
@@ -96,10 +110,20 @@ class EmpleadoControlador {
                     telefono, id_nacionalidad, codigo]);
                 const [empleado] = response.rows;
                 if (empleado) {
-                    return res.status(200).jsonp(empleado);
+                    // RUTA DE LA CARPETA PRINCIPAL PERMISOS
+                    const nuevaCarpeta = ObtenerRuta(codigo, cedula);
+                    // METODO MKDIR PARA CREAR LA CARPETA
+                    fs_1.default.mkdir(nuevaCarpeta, { recursive: true }, (err) => {
+                        if (err) {
+                            console.error('Error al crear la carpeta:', err);
+                        }
+                        else {
+                            return res.status(200).jsonp(empleado);
+                        }
+                    });
                 }
                 else {
-                    return res.status(404).jsonp({ message: 'Empleado guardado.' });
+                    return res.status(404).jsonp({ message: 'error' });
                 }
             }
             catch (error) {
@@ -119,14 +143,32 @@ class EmpleadoControlador {
         telefono = $11, id_nacionalidad = $12, codigo = $13 WHERE id = $1 
         `, [id, cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
                     domicilio, telefono, id_nacionalidad, codigo]);
-                res.jsonp({ message: 'Empleado Actualizado' });
+                // RUTA DE LA CARPETA PERMISOS DEL USUARIO
+                const carpeta = ObtenerRuta(codigo, cedula);
+                // VERIFICACION DE EXISTENCIA CARPETA DE USUARIO
+                fs_1.default.access(carpeta, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                        // METODO MKDIR PARA CREAR LA CARPETA
+                        fs_1.default.mkdir(carpeta, { recursive: true }, (err) => {
+                            if (err) {
+                                res.jsonp({ message: 'Ups!!! no fue posible crear el directorio del usuario.' });
+                            }
+                            else {
+                                res.jsonp({ message: 'Registro actualizado.' });
+                            }
+                        });
+                    }
+                    else {
+                        res.jsonp({ message: 'Registro actualizado.' });
+                    }
+                });
             }
             catch (error) {
                 return res.jsonp({ message: 'error' });
             }
         });
     }
-    // BUSQUEDA DE UN SOLO EMPLEADO
+    // BUSQUEDA DE UN SOLO EMPLEADO  --**VERIFICADO
     BuscarEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;

@@ -79,7 +79,7 @@ export class CambiarContrasenaComponent implements OnInit {
       contrasena: clave
     }
     this.restUser.ActualizarPassword(datos).subscribe(data => {
-      this.toastr.success('Operación Exitosa.', 'Registro actualizado.', {
+      this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
         timeOut: 6000,
       });
       this.CerrarRegistro(true);

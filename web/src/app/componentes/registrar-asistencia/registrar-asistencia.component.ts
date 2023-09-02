@@ -11,7 +11,7 @@ import { TipoPermisosService } from 'src/app/servicios/catalogos/catTipoPermisos
 })
 export class RegistrarAsistenciaComponent implements OnInit {
 
-      // Control de campos y validaciones del formulario
+      // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
       fechaHoraHF = new FormControl('', [Validators.required]);
       fechaHoraTF = new FormControl('', [Validators.required]);
       accionF = new FormControl('', [Validators.required]);
@@ -55,7 +55,7 @@ export class RegistrarAsistenciaComponent implements OnInit {
   
     IngresarDatos(datos) {
       this.rest.RegistrarTipoPermiso(datos).subscribe(res => {
-        this.toastr.success('Operación Exitosa', 'Tipo Permiso guardado', {
+        this.toastr.success('Operación exitosa.', 'Tipo Permiso guardado', {
           timeOut: 6000,
         });
         window.location.reload();

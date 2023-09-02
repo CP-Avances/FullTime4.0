@@ -2,45 +2,120 @@
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
             <span>REGISTRAR PEDIDO ACCIÓN DE PERSONAL</span>
+            <mat-icon class="float-right" id="cerrar" [routerLink]="['/listaPedidos/']">highlight_off</mat-icon>
         </div>
-        <div class="nota">
-            <span>NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
-                Guardar.</span>
+
+        <div class="container nota" style="padding-top: 20px; margin-left: 20px;">
+            <span>
+                NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                Guardar.
+            </span>
         </div>
+
+        <!-- ****************************** PRIMER FORMULARIO ******************************************* -->
         <mat-horizontal-stepper [linear]="isLinear" #stepper>
             <mat-step [stepControl]="firstFormGroup">
                 <ng-template matStepLabel>
+                    <mat-icon id="icono" matSuffix matTooltipPosition="right" matTooltip="Sección 1:">
+                        settings
+                    </mat-icon>
                 </ng-template>
-                <div class="subtitulo">
-                    <span>ACCIÓN DE PERSONAL</span>
-                </div>
+
                 <form [formGroup]="firstFormGroup">
                     <div class="row">
                         <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-around">
+                            <div class="subtitulo">
+                                <span>ACCIÓN DE PERSONAL</span>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field>
-                                    <mat-label id="letra">Identificación acción de personal</mat-label>
+                                    <mat-label class="letra">Identificación acción de personal</mat-label>
                                     <input matInput placeholder="HU-001" formControlName="identificacionForm" required>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar un identificador del registro de acción de personal">
-                                        help_outline</mat-icon>
-                                    <mat-error *ngIf="identificacionF.invalid">Ingresar un identificador
-                                        válido</mat-error>
+                                        matTooltip="Ingresar un identificador del registro de acción de personal.">
+                                        help_outline
+                                    </mat-icon>
                                 </mat-form-field>
                             </div>
-                        </div>
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-around">
+                            <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field>
-                                    <mat-label>Fecha Realización</mat-label>
+                                    <mat-label>Fecha realización</mat-label>
                                     <input matInput [matDatepicker]="pickerF" placeholder="dd/mm/aaaa"
                                         [formControl]="fechaF" min="1950-01-31" max="2050-01-31" required
                                         [disabled]="true">
                                     <mat-datepicker-toggle matSuffix [for]="pickerF" id="i-cursor"
                                         matTooltipPosition="right"
-                                        matTooltip="Fecha en la que se realiza el registro de ingreso de acción de personal">
+                                        matTooltip="Fecha en la que se realiza el registro de ingreso de acción de personal.">
                                     </mat-datepicker-toggle>
                                     <mat-datepicker touchUi #pickerF></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="subtitulo">
+                                <span>TIPO DE ACCIÓN</span>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-form-field>
+                                    <mat-label class="letra">Tipo de acción</mat-label>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Lista de tipos de acción de personal registrados en el sistema.">
+                                        help_outline
+                                    </mat-icon>
+                                    <mat-select formControlName="accionForm" required>
+                                        <mat-option *ngFor="let ta of tipos_accion" [value]="ta.id">
+                                            {{ta.nombre}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="padding-top: 15px;">
+                        <div class="col-md">
+                            <div class="subtitulo">
+                                <span>DECRETO-ACUERDO-RESOLUCIÓN</span>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-form-field *ngIf="vistaAcuerdo">
+                                    <mat-label class="letra">Seleccionar decreto, acuerdo, resolución</mat-label>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Seleccione una de las opciones de la lista.">
+                                        help_outline
+                                    </mat-icon>
+                                    <mat-select [formControl]="tipoDecretoF">
+                                        <mat-option *ngFor="let d of decretos" [value]="d.id"
+                                            (click)="IngresarOtro(firstFormGroup.value)">
+                                            {{d.descripcion.toUpperCase()}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <mat-form-field *ngIf="ingresoAcuerdo">
+                                    <mat-label>Ingresar opción</mat-label>
+                                    <input matInput placeholder="Ej: Decreto" [formControl]="otroDecretoF">
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Regresar a la lista de opciones existentes."
+                                        (click)="VerDecretos()">
+                                        help_outline
+                                    </mat-icon>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="subtitulo">
+                                <span>EXPLICACIÓN (Base legal del tipo de acción y su adición)</span>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-form-field>
+                                    <mat-label>Adición a base legal</mat-label>
+                                    <textarea matInput #base maxlength="200" placeholder="Ingresar base legal"
+                                        formControlName="baseForm"></textarea>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar una descripción adicional a la base legal.">
+                                        help_outline
+                                    </mat-icon>
+                                    <mat-hint align="start"><strong>Ingresar hasta 200 caracteres</strong></mat-hint>
+                                    <mat-hint align="end">{{base.value.length}} / 200</mat-hint>
                                 </mat-form-field>
                             </div>
                         </div>
@@ -51,21 +126,23 @@
                     <button mat-raised-button matStepperNext id="btn-raised" class="float-right">Siguiente</button>
                 </div>
             </mat-step>
-
             <mat-step [stepControl]="secondFormGroup">
                 <ng-template matStepLabel>
+                    <mat-icon id="icono" matSuffix matTooltipPosition="right" matTooltip="Sección 2:">
+                        settings
+                    </mat-icon>
                 </ng-template>
-                <div class="subtitulo">
-                    <span>DATOS DEL EMPLEADO</span>
-                </div>
                 <form [formGroup]="secondFormGroup">
                     <div class="row">
                         <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-around">
-                                <mat-form-field>
-                                    <input type="text" placeholder="Empleado" aria-label="Number" matInput
-                                        [formControl]="idEmpleadoF" [matAutocomplete]="auto1"
-                                        [(ngModel)]="seleccionarEmpleados" required>
+                            <div class="subtitulo">
+                                <span>DATOS DEL EMPLEADO</span>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-form-field class="contenedor-completo">
+                                    <mat-label class="letra">Usuario</mat-label>
+                                    <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoF"
+                                        [matAutocomplete]="auto1" [(ngModel)]="seleccionarEmpleados" required>
                                     <mat-autocomplete #auto1="matAutocomplete">
                                         <mat-option *ngFor="let option of filtroNombre | async"
                                             [value]="option.empleado">
@@ -74,10 +151,11 @@
                                     </mat-autocomplete>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Colaboradores registrados en el sistema.">
-                                        help_outline</mat-icon>
+                                        help_outline
+                                    </mat-icon>
                                 </mat-form-field>
-                                <mat-form-field>
-                                    <mat-label>Rige Desde</mat-label>
+                                <mat-form-field class="contenedor-medio">
+                                    <mat-label>Rige desde</mat-label>
                                     <input matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa"
                                         formControlName="fechaDesdeForm" required>
                                     <mat-datepicker-toggle matSuffix [for]="picker" id="i-cursor"
@@ -86,12 +164,9 @@
                                     </mat-datepicker-toggle>
                                     <mat-datepicker touchUi #picker></mat-datepicker>
                                 </mat-form-field>
-                            </div>
-                        </div>
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-around">
-                                <mat-form-field>
-                                    <mat-label>Rige Hasta</mat-label>
+
+                                <mat-form-field class="contenedor-medio">
+                                    <mat-label>Rige hasta</mat-label>
                                     <input matInput [matDatepicker]="picker2" placeholder="dd/mm/aaaa"
                                         formControlName="fechaHastaForm">
                                     <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor"
@@ -102,125 +177,13 @@
                                 </mat-form-field>
                             </div>
                         </div>
-                    </div>
-                </form>
-                <br>
-                <div class="d-flex flex-wrap justify-content-between">
-                    <button mat-raised-button matStepperPrevious id="btn-raised" class="float-left">Atrás</button>
-                    <button mat-raised-button matStepperNext id="btn-raised" class="float-right">Siguiente</button>
-                </div>
-            </mat-step>
-            <mat-step [stepControl]="thirdFormGroup">
-                <ng-template matStepLabel>
-                </ng-template>
-                <form [formGroup]="thirdFormGroup">
-                    <div class="row">
                         <div class="col-md">
                             <div class="subtitulo">
-                                <span>DECRETO-ACUERDO-RESOLUCIÓN</span>
+                                <span>SITUACIÓN PROPUESTA</span>
                             </div>
-                            <div class="d-flex flex-wrap justify-content-around">
-                                <mat-form-field *ngIf="vistaAcuerdo">
-                                    <mat-label id="letra">Seleccionar decreto, acuerdo o resolución</mat-label>
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Seleccione una de las opciones de la lista.">
-                                        help_outline
-                                    </mat-icon>
-                                    <mat-select [formControl]="tipoDecretoF">
-                                        <mat-option *ngFor="let d of decretos" [value]="d.id"
-                                            (click)="IngresarOtro(thirdFormGroup.value)">
-                                            {{d.descripcion.toUpperCase()}}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                                <mat-form-field *ngIf="ingresoAcuerdo">
-                                    <mat-label>Ingresar opción</mat-label>
-                                    <input matInput placeholder="Ej: Decreto" [formControl]="otroDecretoF"
-                                        [ngStyle]="estilo">
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Regresar a la lista de opciones existentes" (click)="VerDecretos()">
-                                        help_outline</mat-icon>
-                                    <mat-error *ngIf="otroDecretoF.invalid">Ingresar un nombre válido</mat-error>
-                                </mat-form-field>
-                            </div>
-                            <br>
-                            <div class="subtitulo">
-                                <span>EXPLICACIÓN</span>
-                            </div>
-                            <div class="d-flex flex-wrap justify-content-around">
-                                <mat-form-field>
-                                    <mat-label>Adición a base legal</mat-label>
-                                    <textarea matInput #base maxlength="200" placeholder="Ingresar base legal"
-                                        formControlName="baseForm"></textarea>
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar una descripción adicional a la base legal">
-                                        help_outline</mat-icon>
-                                    <mat-hint align="start"><strong>Ingresar hasta 200 caracteres</strong></mat-hint>
-                                    <mat-hint align="end">{{base.value.length}} / 200</mat-hint>
-                                    <mat-error *ngIf="baseF.invalid">Ingrese una información válida</mat-error>
-                                </mat-form-field>
-                            </div>
-                        </div>
-                        <div class="col-md">
-                            <div class="subtitulo">
-                                <span>TIPO DE ACCIÓN</span>
-                            </div>
-                            <div class="d-flex flex-wrap justify-content-around">
-                                <mat-form-field>
-                                    <mat-label id="letra">Tipo de acción</mat-label>
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Lista de tipos de acción de personal registrados en el sistema.">
-                                        help_outline</mat-icon>
-                                    <mat-select formControlName="accionForm" required>
-                                        <mat-option *ngFor="let ta of tipos_accion" [value]="ta.id">
-                                            {{ta.nombre}}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-                <br>
-                <div class="d-flex flex-wrap justify-content-between">
-                    <button mat-raised-button id="btn-raised" matStepperPrevious class="float-left">Atrás</button>
-                    <button mat-raised-button id="btn-raised" matStepperNext class="float-right">Siguiente</button>
-                </div>
-            </mat-step>
-            <mat-step [stepControl]="fourthFormGroup">
-                <ng-template matStepLabel>
-                </ng-template>
-                <form [formGroup]="fourthFormGroup">
-                    <div class="subtitulo">
-                        <span>SITUACIÓN ACTUAL</span>
-                    </div>
-                    <div class="row">
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-around">
-                                <mat-form-field>
-                                    <mat-label id="letra">Número Partida Presupuestaria</mat-label>
-                                    <input id="numero" matInput placeholder="13369689656312"
-                                        formControlName="numPartidaForm" required
-                                        [disabled]="true"
-                                        (keypress)="IngresarSoloNumeros($event)">
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar número de partida presupuestaria">
-                                        help_outline</mat-icon>
-                                </mat-form-field>
-                            </div>
-                        </div>
-                        <div class="col-md">
-                        </div>
-                    </div>
-                    <br>
-                    <div class="subtitulo">
-                        <span>SITUACIÓN PROPUESTA</span>
-                    </div>
-                    <div class="row">
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-around">
-                                <mat-form-field>
-                                    <mat-label id="letra">Proceso propuesto</mat-label>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-form-field class="contenedor-completo">
+                                    <mat-label class="letra">Proceso propuesto</mat-label>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Seleccionar el proceso que se encuentra propuesto.">
                                         help_outline
@@ -231,10 +194,10 @@
                                         </mat-option>
                                     </mat-select>
                                 </mat-form-field>
-                                <mat-form-field>
-                                    <input type="text" placeholder="Ciudad" aria-label="Number" matInput
-                                        [formControl]="idCiudad" [matAutocomplete]="auto4"
-                                        [(ngModel)]="seleccionarCiudad" required>
+                                <mat-form-field class="contenedor-completo">
+                                    <mat-label class="letra">Ciudad</mat-label>
+                                    <input type="text" aria-label="Number" matInput [formControl]="idCiudad"
+                                        [matAutocomplete]="auto4" [(ngModel)]="seleccionarCiudad" required>
                                     <mat-autocomplete #auto4="matAutocomplete">
                                         <mat-option *ngFor="let option of filtroCiudad | async"
                                             [value]="option.descripcion">
@@ -243,105 +206,119 @@
                                     </mat-autocomplete>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ciudades registradas en el sistema.">
-                                        help_outline</mat-icon>
+                                        help_outline
+                                    </mat-icon>
                                 </mat-form-field>
-                                <mat-form-field *ngIf="vistaCargo">
-                                    <mat-label id="letra">Cargo/Puesto propuesto</mat-label>
+                                <mat-form-field *ngIf="vistaCargo" class="contenedor-completo">
+                                    <mat-label class="letra">Cargo/puesto propuesto</mat-label>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Seleccionar el cargo o puesto que se encuentra propuesto.">
                                         help_outline
                                     </mat-icon>
                                     <mat-select [formControl]="tipoCargoF">
                                         <mat-option *ngFor="let c of cargos" [value]="c.id"
-                                            (click)="IngresarCargo(fourthFormGroup.value)">
+                                            (click)="IngresarCargo(secondFormGroup.value)">
                                             {{c.descripcion}}
                                         </mat-option>
                                     </mat-select>
                                 </mat-form-field>
-                                <mat-form-field *ngIf="ingresoCargo">
+                                <mat-form-field *ngIf="ingresoCargo" class="contenedor-completo">
                                     <mat-label>Ingresar cargo</mat-label>
-                                    <input matInput placeholder="Ej: Laboratorista" [formControl]="otroCargoF"
-                                        [ngStyle]="estiloC">
+                                    <input matInput placeholder="Ej: Laboratorista" [formControl]="otroCargoF">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Regresar a la lista de opciones existentes" (click)="VerCargos()">
-                                        help_outline</mat-icon>
-                                    <mat-error *ngIf="otroCargoF.invalid">Ingresar un nombre válido</mat-error>
+                                        matTooltip="Regresar a la lista de opciones existentes." (click)="VerCargos()">
+                                        help_outline
+                                    </mat-icon>
                                 </mat-form-field>
-                                <mat-form-field>
-                                    <mat-label>Salario Propuesto</mat-label>
+                                <mat-form-field class="contenedor-completo">
+                                    <mat-label>Salario propuesto</mat-label>
                                     <input matInput [formControl]="sueldoF" style="text-align: right;"
                                         (keypress)="IngresarSoloNumeros($event)" value="0">
-                                    <span matPrefix>$&nbsp;</span>
-                                    <span matSuffix>.00</span>
+                                    <span matTextPrefix>$&nbsp;</span>
+                                    <span matTextSuffix>.00</span>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Indicar cual es el salario propuesto">
-                                        help_outline</mat-icon>
+                                        matTooltip="Indicar cual es el salario propuesto.">
+                                        help_outline
+                                    </mat-icon>
                                 </mat-form-field>
                             </div>
                         </div>
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-around">
-                                <mat-form-field>
-                                    <mat-label id="letra">Número Partida Propuesta</mat-label>
-                                    <input id="numero" matInput placeholder="13369689656312"
+                        <div class="col-md columna">
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-form-field class="contenedor-completo">
+                                    <mat-label class="letra">Número partida propuesta</mat-label>
+                                    <input class="numero" matInput placeholder="13369689656312"
                                         formControlName="numPropuestaForm" (keypress)="IngresarSoloNumeros($event)">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar número de partida propuesta">
-                                        help_outline</mat-icon>
+                                        matTooltip="Ingresar número de partida propuesta.">
+                                        help_outline
+                                    </mat-icon>
                                 </mat-form-field>
-                                <mat-form-field>
-                                    <mat-label id="letra">Descripción de la partida propuesta</mat-label>
-                                    <input matInput placeholder="" formControlName="descripcionForm"
-                                        (keypress)="IngresarSoloLetras($event)">
-                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar una descripción de la partida propuesta">
-                                        help_outline</mat-icon>
-                                    <mat-error
-                                        *ngIf="descripcionF.invalid">{{ObtenerMensajeErrorDescripcion()}}</mat-error>
-                                </mat-form-field>
-                                <mat-form-field>
-                                    <mat-label id="letra">Partida presupuestaría individual</mat-label>
-                                    <input id="numero" matInput placeholder="13369689656312"
+                                <mat-form-field class="contenedor-completo">
+                                    <mat-label class="letra">Partida presupuestaria individual</mat-label>
+                                    <input class="numero" matInput placeholder="13369689656312"
                                         formControlName="numPartidaIForm" (keypress)="IngresarSoloNumeros($event)">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar número de partida individual">
-                                        help_outline</mat-icon>
+                                        matTooltip="Ingresar número de partida individual.">
+                                        help_outline
+                                    </mat-icon>
                                 </mat-form-field>
                             </div>
                         </div>
                     </div>
+                    <div class="row" style="padding-top: 15px;">
+                        <div class="subtitulo">
+                            <span>SITUACIÓN ACTUAL (Dato tomado de la ficha del empleado)</span>
+                        </div>
+                        <mat-form-field class="contenedor-completo">
+                            <mat-label class="letra">Número partida presupuestaria</mat-label>
+                            <input class="numero" matInput placeholder="13369689656312" formControlName="numPartidaForm"
+                                required [disabled]="true" (keypress)="IngresarSoloNumeros($event)">
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                matTooltip="Ingresar número de partida presupuestaria.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                    </div>
                 </form>
                 <br>
                 <div class="d-flex flex-wrap justify-content-between">
-                    <button mat-raised-button id="btn-raised" matStepperPrevious class="float-left">Atrás</button>
-                    <button mat-raised-button id="btn-raised" matStepperNext class="float-right">Siguiente</button>
+                    <button mat-raised-button matStepperPrevious id="btn-raised" class="float-left">Atrás</button>
+                    <button mat-raised-button matStepperNext id="btn-raised" class="float-right">Siguiente</button>
                 </div>
             </mat-step>
-            <mat-step [stepControl]="fifthFormGroup">
+            <mat-step [stepControl]="thirdFormGroup">
                 <ng-template matStepLabel>
+                    <mat-icon id="icono" matSuffix matTooltipPosition="right" matTooltip="Sección 3:">
+                        settings
+                    </mat-icon>
                 </ng-template>
                 <div class="subtitulo">
                     <span>ACTA FINAL DEL CONCURSO</span>
                 </div>
-                <form [formGroup]="fifthFormGroup">
+                <form [formGroup]="thirdFormGroup">
                     <div class="row">
                         <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-around">
+                            <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field>
                                     <mat-label>Acta final del concurso No.</mat-label>
                                     <textarea matInput #acta maxlength="200"
                                         placeholder="Ingresar número del acta final del concurso"
                                         formControlName="actaForm"></textarea>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar el número del acta final del consurso">
-                                        help_outline</mat-icon>
+                                        matTooltip="Ingresar el número del acta final del consurso.">
+                                        help_outline
+                                    </mat-icon>
                                     <mat-hint align="start"><strong>Ingresar hasta 200 caracteres</strong></mat-hint>
                                     <mat-hint align="end">{{acta.value.length}} / 200</mat-hint>
                                 </mat-form-field>
                             </div>
+
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-around">
+                            <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field>
                                     <mat-label>Fecha</mat-label>
                                     <input matInput [matDatepicker]="picker3" placeholder="dd/mm/aaaa"
@@ -355,31 +332,20 @@
                             </div>
                         </div>
                     </div>
-                </form>
-                <br>
-                <div class="d-flex flex-wrap justify-content-between">
-                    <button mat-raised-button id="btn-raised" matStepperPrevious class="float-left">Atrás</button>
-                    <button mat-raised-button id="btn-raised" matStepperNext class="float-right">Siguiente</button>
-                </div>
-            </mat-step>
-            <mat-step [stepControl]="sixthFormGroup">
-                <ng-template matStepLabel>
-                </ng-template>
-                <form [formGroup]="sixthFormGroup">
                     <div class="row">
                         <div class="col-md">
                             <div class="subtitulo">
                                 <span>PROCESO DE RECURSOS HUMANOS</span>
                             </div>
-                            <div class="d-flex flex-wrap justify-content-around">
-                                <div class="row">
-                                    <mat-form-field id="abrv">
+                            <div class="row">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-form-field class="abrv">
                                         <input type="text" placeholder="ING." matInput [formControl]="abrevHF">
                                     </mat-form-field>
-                                    <mat-form-field id="nombre">
-                                        <input type="text" placeholder="Firma Talento Humano" aria-label="Number"
-                                            matInput [formControl]="idEmpleadoHF" [matAutocomplete]="auto2"
-                                            [(ngModel)]="seleccionEmpleadoH" required>
+                                    <mat-form-field class="nombre">
+                                        <mat-label>Firma Talento Humano</mat-label>
+                                        <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoHF"
+                                            [matAutocomplete]="auto2" [(ngModel)]="seleccionEmpleadoH" required>
                                         <mat-autocomplete #auto2="matAutocomplete">
                                             <mat-option *ngFor="let th of filtroNombreH | async" [value]="th.empleado">
                                                 {{th.empleado.toUpperCase()}}
@@ -387,17 +353,20 @@
                                         </mat-autocomplete>
                                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                             matTooltip="Colaboradores registrados en el sistema.">
-                                            help_outline</mat-icon>
+                                            help_outline
+                                        </mat-icon>
                                     </mat-form-field>
                                 </div>
-                                <div class="row">
-                                    <mat-form-field id="abrv">
+                            </div>
+                            <div class="row">
+                                <div class="d-flex flex-wrap justify-content-start">
+                                    <mat-form-field class="abrv">
                                         <input type="text" placeholder="ING." matInput [formControl]="abrevGF">
                                     </mat-form-field>
-                                    <mat-form-field id="nombre">
-                                        <input type="text" placeholder="Firma Gerente" aria-label="Number" matInput
-                                            [formControl]="idEmpleadoGF" [matAutocomplete]="auto3"
-                                            [(ngModel)]="seleccionEmpleadoG" required>
+                                    <mat-form-field class="nombre">
+                                        <mat-label>Firma Gerente</mat-label>
+                                        <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoGF"
+                                            [matAutocomplete]="auto3" [(ngModel)]="seleccionEmpleadoG" required>
                                         <mat-autocomplete #auto3="matAutocomplete">
                                             <mat-option *ngFor="let g of filtroNombreG | async" [value]="g.empleado">
                                                 {{g.empleado.toUpperCase()}}
@@ -405,7 +374,8 @@
                                         </mat-autocomplete>
                                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                             matTooltip="Colaboradores registrados en el sistema.">
-                                            help_outline</mat-icon>
+                                            help_outline
+                                        </mat-icon>
                                     </mat-form-field>
                                 </div>
                             </div>
@@ -414,11 +384,11 @@
                             <div class="subtitulo">
                                 <span>REGISTRO Y CONTROL</span>
                             </div>
-                            <div class="d-flex flex-wrap justify-content-around">
+                            <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field>
-                                    <input type="text" placeholder="Responsable del registro" aria-label="Number"
-                                        matInput [formControl]="idEmpleadoRF" [matAutocomplete]="auto5"
-                                        [(ngModel)]="seleccionarEmpResponsable" required>
+                                    <mat-label>Responsable del registro</mat-label>
+                                    <input type="text" aria-label="Number" matInput [formControl]="idEmpleadoRF"
+                                        [matAutocomplete]="auto5" [(ngModel)]="seleccionarEmpResponsable" required>
                                     <mat-autocomplete #auto5="matAutocomplete">
                                         <mat-option *ngFor="let option of filtroNombreR | async"
                                             [value]="option.empleado">
@@ -427,10 +397,12 @@
                                     </mat-autocomplete>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Colaboradores registrados en el sistema.">
-                                        help_outline</mat-icon>
+                                        help_outline
+                                    </mat-icon>
                                 </mat-form-field>
                             </div>
                         </div>
+
                     </div>
                 </form>
                 <br>
@@ -439,53 +411,56 @@
                     <button mat-raised-button id="btn-raised" matStepperNext class="float-right">Siguiente</button>
                 </div>
             </mat-step>
-            <mat-step [stepControl]="seventhFormGroup">
+            <mat-step [stepControl]="fourthFormGroup">
                 <ng-template matStepLabel>
+                    <mat-icon id="icono" matSuffix matTooltipPosition="right" matTooltip="Sección 4:">
+                        settings
+                    </mat-icon>
                 </ng-template>
                 <div class="subtitulo">
                     <span>LA PERSONA REEMPLAZA A</span>
                 </div>
-                <form [formGroup]="seventhFormGroup">
+                <form [formGroup]="fourthFormGroup">
                     <div class="row">
                         <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-around">
+                            <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field>
-                                    <mat-label id="letra">Nombre</mat-label>
+                                    <mat-label class="letra">Nombre</mat-label>
                                     <input matInput placeholder="" formControlName="nombreReempForm"
                                         (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar el nombre">
-                                        help_outline</mat-icon>
+                                        matTooltip="Ingresar el nombre.">
+                                        help_outline
+                                    </mat-icon>
                                 </mat-form-field>
                                 <mat-form-field>
-                                    <mat-label id="letra">Puesto</mat-label>
+                                    <mat-label class="letra">Puesto</mat-label>
                                     <input matInput placeholder="" formControlName="puestoReempForm"
                                         (keypress)="IngresarSoloLetras($event)">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar el puesto">
-                                        help_outline</mat-icon>
+                                        matTooltip="Ingresar el puesto.">
+                                        help_outline
+                                    </mat-icon>
                                 </mat-form-field>
                                 <mat-form-field>
                                     <mat-label>Funciones</mat-label>
                                     <textarea matInput #funciones maxlength="200" placeholder="Ingresar las funcines"
                                         formControlName="funcionesReempForm"></textarea>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar las funciones">
-                                        help_outline</mat-icon>
+                                        matTooltip="Ingresar las funciones.">
+                                        help_outline
+                                    </mat-icon>
                                     <mat-hint align="start"><strong>Ingresar hasta 200 caracteres</strong></mat-hint>
                                     <mat-hint align="end">{{funciones.value.length}} / 200</mat-hint>
                                 </mat-form-field>
-                            </div>
-                        </div>
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-around">
                                 <mat-form-field>
-                                    <mat-label id="letra">Número de acción</mat-label>
-                                    <input id="numero" matInput placeholder="13369689656312"
+                                    <mat-label class="letra">Número de acción</mat-label>
+                                    <input class="numero" matInput placeholder="13369689656312"
                                         formControlName="accionReempForm" (keypress)="IngresarSoloNumeros($event)">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ingresar número de acción">
-                                        help_outline</mat-icon>
+                                        matTooltip="Ingresar número de acción.">
+                                        help_outline
+                                    </mat-icon>
                                 </mat-form-field>
                                 <mat-form-field>
                                     <mat-label>Primera fecha</mat-label>
@@ -499,46 +474,31 @@
                                 </mat-form-field>
                             </div>
                         </div>
-                    </div>
-                </form>
-                <br>
-                <div class="d-flex flex-wrap justify-content-between">
-                    <button mat-raised-button id="btn-raised" matStepperPrevious class="float-left">Atrás</button>
-                    <button mat-raised-button id="btn-raised" matStepperNext class="float-right">Siguiente</button>
-                </div>
-            </mat-step>
-            <mat-step [stepControl]="eighthFormGroup">
-                <ng-template matStepLabel>
-                </ng-template>
-                <div class="subtitulo">
-                    <span>POSESIÓN/NOTIFICACIÓN</span>
-                </div>
-                <form [formGroup]="eighthFormGroup">
-                    <div class="row">
                         <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-around">
+                            <div class="subtitulo">
+                                <span>POSESIÓN/NOTIFICACIÓN</span>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
                                 <mat-form-field>
-                                    <mat-label id="letra">Posesión/Notificación</mat-label>
+                                    <mat-label class="letra">Posesión/Notificación</mat-label>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                        matTooltip="Lista de posesiones y notificaciones">
-                                        help_outline</mat-icon>
+                                        matTooltip="Lista de posesiones y notificaciones.">
+                                        help_outline
+                                    </mat-icon>
                                     <mat-select formControlName="posesionNotificacionForm" required>
                                         <mat-option *ngFor="let ta of posesiones_notificaciones" [value]="ta.nombre">
                                             {{ta.nombre}}
                                         </mat-option>
                                     </mat-select>
                                 </mat-form-field>
-                            </div>
-                        </div>
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-around">
                                 <mat-form-field>
                                     <mat-label>Descripción</mat-label>
                                     <textarea matInput #descripcionP maxlength="200" placeholder="Ingresar las funcines"
                                         formControlName="descripcionPForm"></textarea>
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar la descripción de la posesión o notificación">
-                                        help_outline</mat-icon>
+                                        help_outline
+                                    </mat-icon>
                                     <mat-hint align="start"><strong>Ingresar hasta 200 caracteres</strong></mat-hint>
                                     <mat-hint align="end">{{descripcionP.value.length}} / 200</mat-hint>
                                 </mat-form-field>
@@ -547,17 +507,19 @@
                     </div>
                 </form>
                 <br>
-                <div class="d-flex flex-wrap justify-content-start">
+                <div class="d-flex flex-wrap justify-content-between">
                     <button mat-raised-button id="btn-raised" matStepperPrevious class="float-left">Atrás</button>
                 </div>
             </mat-step>
 
         </mat-horizontal-stepper>
         <div style="text-align: center; margin-bottom: 3%;">
-            <button mat-raised-button id="btn-raised" type="submit"
-                (click)="InsertarAccionPersonal(firstFormGroup.value,secondFormGroup.value,thirdFormGroup.value,fourthFormGroup.value,fifthFormGroup.value,sixthFormGroup.value,seventhFormGroup.value,eighthFormGroup.value)"
-                [disabled]="!eighthFormGroup.valid" value="Guardar">Guardar</button>
-            <button mat-raised-button id="btn-raised" type="submit" [routerLink]="['/listaPedidos/']" value="Cancelar">Cancelar</button>
+            <button id="btn-raised" class="btn btn-sm"
+                (click)="InsertarAccionPersonal(firstFormGroup.value,secondFormGroup.value,thirdFormGroup.value,fourthFormGroup.value)"
+                [disabled]="!firstFormGroup.valid || !secondFormGroup.valid || !thirdFormGroup.valid || !fourthFormGroup.valid"
+                value="Guardar">
+                Guardar
+            </button>
         </div>
     </mat-card>
 </div>

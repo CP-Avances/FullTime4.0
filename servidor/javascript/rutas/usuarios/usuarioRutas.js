@@ -13,6 +13,8 @@ class UsuarioRutas {
         this.router.post('/', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.CrearUsuario);
         // METODO DE BUSQUEDA DE DATOS DE USUARIO
         this.router.get('/datos/:id_empleado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ObtenerDatosUsuario);
+        // METODO DE BUSQUEDA DE DATOS DE USUARIO POR EL TIPO DE DEPARTAMENTO
+        this.router.get('/dato/:id_empleado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ObtenerDepartamentoUsuarios);
         // METODO PARA ACTUALIZAR DATOS DE USUARIO
         this.router.put('/actualizarDatos', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ActualizarUsuario);
         // METODO PARA REGISTRAR ACCESOS AL SISTEMA
@@ -23,12 +25,16 @@ class UsuarioRutas {
         this.router.put('/admin/comida', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.RegistrarAdminComida);
         // METODO PARA REGISTRAR FRASE DE SEGURIDAD
         this.router.put('/frase', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ActualizarFrase);
+        // METODO PARA BUSCAR DATOS DE USUARIOS Y CARGOS TIMBRE WEB
+        this.router.get('/lista-web-cargos/:estado/activo/:habilitado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.UsuariosTimbreWebCargos);
         // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB
         this.router.get('/lista-web/:estado/activo/:habilitado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.UsuariosTimbreWeb);
         // METODO PARA ACTUALIZAR ESTADO DE TIMBRE WEB
         this.router.put('/lista-web/', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ActualizarEstadoTimbreWeb);
         // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
         this.router.get('/lista-app-movil/:estado/activo/:habilitado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.UsuariosTimbreMovil);
+        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
+        this.router.get('/lista-app-movil-cargos/:estado/activo/:habilitado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.UsuariosTimbreMovilCargos);
         // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL
         this.router.put('/lista-app-movil/', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ActualizarEstadoTimbreMovil);
         // LISTAR DISPOSITIVOS REGISTRADOS

@@ -60,7 +60,7 @@ export class DocumentosService {
     return this.http.delete(`${environment.url}/archivosCargados/eliminar/${id}/${documento}`);
   }
 
-  // METODO PARA LISTAR LOS ARCHIVOS DE CADA CARPETA
+  // METODO PARA LISTAR LOS ARCHIVOS DE CADA CARPETA   --**VERIFICADO
   ListarDocumentacion(nom_carpeta: string) {
     return this.http.get<any>(`${environment.url}/archivosCargados/documentacion/${nom_carpeta}`)
   }

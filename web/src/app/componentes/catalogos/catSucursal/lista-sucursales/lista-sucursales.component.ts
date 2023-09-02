@@ -6,9 +6,9 @@ import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
-import * as moment from 'moment';
 
 import * as xlsx from 'xlsx';
+import * as moment from 'moment';
 import * as FileSaver from 'file-saver';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
@@ -21,6 +21,7 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-lista-sucursales',
@@ -45,7 +46,7 @@ export class ListaSucursalesComponent implements OnInit {
 
   sucursales: any = [];
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA
+  // ITEMS DE PAGINACION DE LA TABLA
   numero_pagina: number = 1;
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
@@ -59,6 +60,7 @@ export class ListaSucursalesComponent implements OnInit {
     private router: Router,
     public restEmpre: EmpresaService,
     public ventana: MatDialog,
+    public validar: ValidacionesService,
     public restE: EmpleadoService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
@@ -71,7 +73,7 @@ export class ListaSucursalesComponent implements OnInit {
     this.ObtenerLogo();
   }
 
-  // METODO PARA VER LA INFORMACIÓN DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -113,17 +115,26 @@ export class ListaSucursalesComponent implements OnInit {
   }
 
   // METODO PARA REGISTRAR SUCURSAL
-  AbrirVentanaRegistrarSucursal() {
-    this.ventana.open(RegistrarSucursalesComponent, { width: '650px' }).afterClosed().subscribe(items => {
-      this.ObtenerSucursal();
-    });
+  AbrirVentanaRegistrar() {
+    this.ventana.open(RegistrarSucursalesComponent, { width: '650px' })
+      .afterClosed().subscribe(items => {
+        if (items) {
+          if (items > 0) {
+            this.VerDepartamentos(items);
+          }
+        }
+      });
   }
 
   // METODO PARA EDITAR SUCURSAL
   AbrirVentanaEditar(datosSeleccionados: any): void {
     this.ventana.open(EditarSucursalComponent, { width: '650px', data: datosSeleccionados })
       .afterClosed().subscribe(items => {
-        this.ObtenerSucursal();
+        if (items) {
+          if (items > 0) {
+            this.VerDepartamentos(items);
+          }
+        }
       });
   }
 
@@ -139,25 +150,7 @@ export class ListaSucursalesComponent implements OnInit {
 
   // METODO PARA VALIDAR SOLO LETRAS
   IngresarSoloLetras(e: any) {
-    let key = e.keyCode || e.which;
-    let tecla = String.fromCharCode(key).toString();
-    // SE DEFINE TODO EL ABECEDARIO QUE SE VA A USAR.
-    let letras = " áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-    // ES LA VALIDACIÓN DEL KEYCODES, QUE TECLAS RECIBE EL CAMPO DE TEXTO.
-    let especiales = [8, 37, 39, 46, 6, 13];
-    let tecla_especial = false
-    for (var i in especiales) {
-      if (key == especiales[i]) {
-        tecla_especial = true;
-        break;
-      }
-    }
-    if (letras.indexOf(tecla) == -1 && !tecla_especial) {
-      this.toastr.info('No se admite datos numéricos', 'Usar solo letras', {
-        timeOut: 6000,
-      })
-      return false;
-    }
+    return this.validar.IngresarSoloLetras(e);
   }
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
@@ -182,6 +175,18 @@ export class ListaSucursalesComponent implements OnInit {
       });
   }
 
+  // METODO PARA VER DATOS DE DEPARTAMENTOS DE SUCURSAL
+  ver_departamentos: boolean = false;
+  sucursal_id: number;
+  ver_lista: boolean = true;
+  pagina: string = '';
+  VerDepartamentos(id: number) {
+    this.pagina = 'lista-sucursal';
+    this.ver_lista = false;
+    this.sucursal_id = id;
+    this.ver_departamentos = true;
+  }
+
   /** ************************************************************************************************** ** 
    ** **                                      METODO PARA EXPORTAR A PDF                              ** **
    ** ************************************************************************************************** **/
@@ -201,11 +206,11 @@ export class ListaSucursalesComponent implements OnInit {
   getDocumentDefinicion() {
     sessionStorage.setItem('Establecimientos', this.sucursales);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'portrait',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
-      // PIE DE PÁGINA
+      // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');

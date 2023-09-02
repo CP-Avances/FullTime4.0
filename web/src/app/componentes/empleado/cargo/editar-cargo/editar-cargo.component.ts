@@ -29,7 +29,7 @@ export class EditarCargoComponent implements OnInit {
 
   // VARIABLES DE FORMULARIO
   idDepartamento = new FormControl('', [Validators.required]);
-  horaTrabaja = new FormControl('', [Validators.required]);
+  horaTrabaja = new FormControl('', [Validators.required, Validators.pattern("^[0-9]*(:[0-9][0-9])?$")]);
   fechaInicio = new FormControl('', Validators.required);
   fechaFinal = new FormControl('', Validators.required);
   idSucursal = new FormControl('', [Validators.required]);
@@ -112,8 +112,19 @@ export class EditarCargoComponent implements OnInit {
       this.id_empl_contrato = this.cargo[0].id_empl_contrato;
       this.cargo.forEach(obj => {
         this.ObtenerDepartamentosImprimir(obj.id_sucursal);
+        // FORMATEAR HORAS
+        if (obj.hora_trabaja.split(':').length === 3) {
+          this.horaTrabaja.setValue(obj.hora_trabaja.split(':')[0] + ':' + obj.hora_trabaja.split(':')[1]);
+        }
+        else if (obj.hora_trabaja.split(':').length === 2) {
+          if (parseInt(obj.hora_trabaja.split(':')[0]) < 10) {
+            this.horaTrabaja.setValue('0' + parseInt(obj.hora_trabaja.split(':')[0]) + ':00');
+          }
+          else {
+            this.horaTrabaja.setValue(obj.hora_trabaja);
+          }
+        }
         this.formulario.patchValue({
-          horaTrabajaForm: obj.hora_trabaja,
           idSucursalForm: obj.id_sucursal,
           fecInicioForm: obj.fec_inicio,
           fecFinalForm: obj.fec_final,
@@ -163,7 +174,7 @@ export class EditarCargoComponent implements OnInit {
 
   // METODO PARA ACTUALIZAR REGISTRO
   ActualizarEmpleadoCargo(form: any) {
-    let dataEmpleadoCargo = {
+    let cargo = {
       id_departamento: form.idDeparForm,
       hora_trabaja: form.horaTrabajaForm,
       id_sucursal: form.idSucursalForm,
@@ -172,14 +183,28 @@ export class EditarCargoComponent implements OnInit {
       sueldo: form.sueldoForm,
       cargo: form.tipoForm
     }
-    if (form.tipoForm === undefined) {
-      this.IngresarTipoCargo(form, dataEmpleadoCargo);
+    // FORMATEAR HORAS
+    if (cargo.hora_trabaja.split(':').length === 1) {
+      if (parseInt(cargo.hora_trabaja) < 10) {
+        cargo.hora_trabaja = '0' + parseInt(cargo.hora_trabaja) + ':00:00'
+      }
+      else {
+        cargo.hora_trabaja = cargo.hora_trabaja + ':00:00'
+      }
     }
     else {
-      this.restEmplCargos.ActualizarContratoEmpleado(this.idSelectCargo, this.id_empl_contrato, dataEmpleadoCargo).subscribe(res => {
+      if (parseInt(cargo.hora_trabaja.split(':')[0]) < 10) {
+        cargo.hora_trabaja = '0' + parseInt(cargo.hora_trabaja.split(':')[0]) + ':' + cargo.hora_trabaja.split(':')[1] + ':00'
+      }
+    }
+    if (form.tipoForm === undefined) {
+      this.IngresarTipoCargo(form, cargo);
+    }
+    else {
+      this.restEmplCargos.ActualizarContratoEmpleado(this.idSelectCargo, this.id_empl_contrato, cargo).subscribe(res => {
         this.verEmpleado.ObtenerCargoEmpleado(this.idSelectCargo, this.verEmpleado.formato_fecha);
         this.Cancelar();
-        this.toastr.success('Operación Exitosa.', 'Registro actualizado.', {
+        this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
           timeOut: 6000,
         });
       });
@@ -223,7 +248,7 @@ export class EditarCargoComponent implements OnInit {
         this.restEmplCargos.ActualizarContratoEmpleado(this.idSelectCargo, this.id_empl_contrato, datos).subscribe(res => {
           this.verEmpleado.ObtenerCargoEmpleado(this.idSelectCargo, this.verEmpleado.formato_fecha);
           this.Cancelar();
-          this.toastr.success('Operación Exitosa.', 'Registro actualizado.', {
+          this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
             timeOut: 6000,
           });
         });
@@ -243,5 +268,32 @@ export class EditarCargoComponent implements OnInit {
 
   Cancelar() {
     this.verEmpleado.VerCargoEdicion(true);
+  }
+
+  // METODO PARA VALIDAR INGRESO DE HORAS
+  IngresarNumeroCaracter(evt: any) {
+    if (window.event) {
+      var keynum = evt.keyCode;
+    }
+    else {
+      keynum = evt.which;
+    }
+    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
+    if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6 || keynum == 58) {
+      return true;
+    }
+    else {
+      this.toastr.info('No se admite el ingreso de letras', 'Usar solo números', {
+        timeOut: 6000,
+      })
+      return false;
+    }
+  }
+
+  // MENSAJE QUE INDICA FORMATO DE INGRESO DE NUMERO DE HORAS
+  ObtenerMensajeErrorHoraTrabajo() {
+    if (this.horaTrabaja.hasError('pattern')) {
+      return 'Indicar horas y minutos. Ejemplo: 12:05';
+    }
   }
 }

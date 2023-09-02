@@ -1,13 +1,14 @@
-// SECCIÓN DE LIBRERIAS
+// SECCION DE LIBRERIAS
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 
-// SECCIÓN SERVICIOS
-import { EmplLeafletComponent } from 'src/app/componentes/modulos/geolocalizacion/empl-leaflet/empl-leaflet.component';
+// SECCION SERVICIOS
 import { EmpleadoUbicacionService } from 'src/app/servicios/empleadoUbicacion/empleado-ubicacion.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+
+import { EmplLeafletComponent } from 'src/app/componentes/modulos/geolocalizacion/empl-leaflet/empl-leaflet.component';
 
 @Component({
   selector: 'app-crear-coordenadas',
@@ -23,7 +24,7 @@ export class CrearCoordenadasComponent implements OnInit {
   descripcion = new FormControl('', Validators.required);
 
   // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
-  public CoordenadasForm = new FormGroup({
+  public formulario = new FormGroup({
     latitudForm: this.latitud,
     longitudForm: this.longitud,
     descripcionForm: this.descripcion
@@ -42,10 +43,10 @@ export class CrearCoordenadasComponent implements OnInit {
     this.BuscarParametro();
   }
 
-  // METODO PARA OBTENER RANGO DE PERÍMETRO
+  // METODO PARA OBTENER RANGO DE PERIMETRO
   rango: any;
   BuscarParametro() {
-    // id_tipo_parametro PARA RANGO DE UBICACIÓN = 22
+    // id_tipo_parametro PARA RANGO DE UBICACION = 22
     let datos: any = [];
     this.restP.ListarDetalleParametros(22).subscribe(
       res => {
@@ -59,7 +60,15 @@ export class CrearCoordenadasComponent implements OnInit {
       });
   }
 
-  // METODO PARA REGISTRAR NUEVO PARÁMETRO
+  // METODO PARA CONSULTAR COORDENADAS
+  coordenadas: any = [];
+  ConsultarCoordenadas() {
+    this.rest.ListarCoordenadas().subscribe(response => {
+      this.coordenadas = response;
+    });
+  }
+
+  // METODO PARA REGISTRAR NUEVO PARAMETRO
   GuardarDatos(form: any) {
     if (form.latitudForm != '' && form.longitudForm != '') {
       let datos = {
@@ -72,27 +81,20 @@ export class CrearCoordenadasComponent implements OnInit {
           '', {
           timeOut: 2000,
         })
-        this.CerrarVentana();
+        this.ventanap.close(response.respuesta.id);
       });
-
     }
     else {
       this.toastr.error('Por favor ingresar coordenadas de ubicación.',
-        '', {
+        'Ups!!! algo salio mal.', {
         timeOut: 2000,
       })
     }
 
   }
 
-  coordenadas: any = [];
-  ConsultarCoordenadas() {
-    this.rest.ListarCoordenadas().subscribe(response => {
-      this.coordenadas = response;
-    });
-  }
-
-  VerificarDatos(form) {
+  // METODO PARA VERIFICAR DATOS
+  VerificarDatos(form: any) {
     this.cont = 0;
     this.contDuplicado = 0;
     if (this.coordenadas.length != 0) {
@@ -114,6 +116,7 @@ export class CrearCoordenadasComponent implements OnInit {
     }
   }
 
+  // METODO PARA COMPARAR REGISTROS DE COORDENADAS
   contDuplicado: number = 0;
   cont: number = 0;
   CompararCoordenadas(informacion: any, form: any, data: any) {
@@ -123,14 +126,13 @@ export class CrearCoordenadasComponent implements OnInit {
           this.contDuplicado = this.contDuplicado + 1;
           if (this.contDuplicado === 1) {
             this.toastr.info('El perímetro ingresado ya se encuentra registrado.',
-              'VERIFICAR LA INFORMACIÓN.', {
+              'Ups!!! algo salío mal.', {
               timeOut: 4000,
             })
           }
         }
         else {
           this.cont = this.cont + 1;
-          console.log('ver contador', this.cont + '  ' + data.length)
           if (this.cont === data.length) {
             this.GuardarDatos(form)
           }
@@ -143,15 +145,17 @@ export class CrearCoordenadasComponent implements OnInit {
     this.ventanap.close();
   }
 
+  // METODO PARA TOMAR COORDENADAS DEL MAPA
   TomarCoordenadasMapa() {
     this.ventanas.open(EmplLeafletComponent, { width: '500px', height: '500px' }).afterClosed().subscribe((res: any) => {
-      console.log(res);
-      if (res.message === true) {
-        if (res.latlng != undefined) {
-          this.CoordenadasForm.patchValue({
-            latitudForm: res.latlng.lat,
-            longitudForm: res.latlng.lng,
-          })
+      if (res) {
+        if (res.message === true) {
+          if (res.latlng != undefined) {
+            this.formulario.patchValue({
+              latitudForm: res.latlng.lat,
+              longitudForm: res.latlng.lng,
+            })
+          }
         }
       }
     });

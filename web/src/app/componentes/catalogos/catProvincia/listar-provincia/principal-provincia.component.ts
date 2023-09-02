@@ -36,7 +36,7 @@ export class PrincipalProvinciaComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number;
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA
+  // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
@@ -47,7 +47,7 @@ export class PrincipalProvinciaComponent implements OnInit {
   paisF = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
   provinciaF = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
 
-  // ASIGNACIÓN DE VALIDACIONES A INPUTS DEL FORMULARIO
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public formulario = new FormGroup({
     paisForm: this.paisF,
     provinciaForm: this.provinciaF,
@@ -188,7 +188,7 @@ export class PrincipalProvinciaComponent implements OnInit {
   getDocumentDefinicion() {
     sessionStorage.setItem("Provincia", this.provincias);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: "landscape",
       watermark: {
         text: this.frase,
@@ -208,7 +208,7 @@ export class PrincipalProvinciaComponent implements OnInit {
         opacity: 0.3,
         alignment: "right",
       },
-      // PIE DE PÁGINA
+      // PIE DE PAGINA
       footer: function (
         currentPage: any,
         pageCount: any,

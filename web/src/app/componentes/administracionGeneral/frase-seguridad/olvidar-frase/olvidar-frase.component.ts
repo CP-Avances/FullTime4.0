@@ -48,7 +48,7 @@ export class OlvidarFraseComponent implements OnInit {
 
   // METODO PARA ENVIAR CORREO ELECTRONICO
   respuesta: any = [];
-  EnviarCorreoConfirmacion(form) {
+  EnviarCorreoConfirmacion(form: any) {
     let dataPass = {
       correo: form.usuarioF,
       url_page: this.cadena
@@ -56,7 +56,7 @@ export class OlvidarFraseComponent implements OnInit {
     this.rest.RecuperarFraseSeguridad(dataPass).subscribe(res => {
       this.respuesta = res;
       if (this.respuesta.message === 'ok') {
-        this.toastr.success('Operación Exitosa.', 'Un link para cambiar su frase de seguridad fue enviado a su correo electrónico.', {
+        this.toastr.success('Operación exitosa.', 'Un link para cambiar su frase de seguridad fue enviado a su correo electrónico.', {
           timeOut: 6000,
         });
         this.router.navigate(['/login']);

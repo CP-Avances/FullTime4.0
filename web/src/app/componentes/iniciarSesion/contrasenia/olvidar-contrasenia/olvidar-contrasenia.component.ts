@@ -52,7 +52,7 @@ export class OlvidarContraseniaComponent implements OnInit {
     this.rest.EnviarCorreoContrasena(dataPass).subscribe(res => {
       this.respuesta = res;
       if (this.respuesta.message === 'ok') {
-        this.toastr.success('Operación Exitosa.', 'Un link para cambiar la contraseña fue enviado a su correo electrónico.', {
+        this.toastr.success('Operación exitosa.', 'Un link para cambiar la contraseña fue enviado a su correo electrónico.', {
           timeOut: 6000,
         });
         this.router.navigate(['/login']);

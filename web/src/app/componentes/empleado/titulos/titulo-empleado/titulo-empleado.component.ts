@@ -54,7 +54,7 @@ export class TituloEmpleadoComponent implements OnInit {
       id_titulo: form.idTituloForm,
     }
     this.restEmpleado.RegistrarTitulo(titulo).subscribe(data => {
-      this.toastr.success('Operacion Exitosa.', 'Registro guardado.', {
+      this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       });
       this.LimpiarCampos();

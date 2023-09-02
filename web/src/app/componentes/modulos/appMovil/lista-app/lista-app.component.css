@@ -26,9 +26,9 @@ table {
     margin-left: 10px;
 }
 
-.mat-radio-button~.mat-radio-button {
+.mat-mdc-radio-button ~ .mat-mdc-radio-button {
     margin-left: 16px;
-}
+  }
 
 #plan {
     color: rgb(52, 65, 84);
@@ -53,4 +53,14 @@ p {
     color: rgb(3, 50, 120);
     text-align: center;
     cursor: pointer;
+}
+
+.inactivo {
+    background-color: rgb(117, 123, 133);
+    color: white;
+}
+
+.activo {
+    background-color: rgb(42, 82, 151);
+    color: white;
 }

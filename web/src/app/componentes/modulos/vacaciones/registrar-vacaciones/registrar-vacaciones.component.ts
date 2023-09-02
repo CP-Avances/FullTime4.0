@@ -92,7 +92,7 @@ export class RegistrarVacacionesComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
@@ -215,7 +215,7 @@ export class RegistrarVacacionesComponent implements OnInit {
     return sa;
   }
 
-  ImprimirCalculos(form) {
+  ImprimirCalculos(form: any) {
     console.log(form.calcularForm);
     if (form.fecInicioForm === '' || form.fecFinalForm === '') {
       this.toastr.info('Aún no ha ingresado fecha de inicio o fin de vacaciones', '', {
@@ -265,7 +265,7 @@ export class RegistrarVacacionesComponent implements OnInit {
     })
   }
 
-  ValidarDatosVacacion(form) {
+  ValidarDatosVacacion(form: any) {
     if (Date.parse(form.fecInicioForm) < Date.parse(form.fecFinalForm) && Date.parse(form.fecInicioForm) < Date.parse(form.fechaIngresoForm)) {
       const ingreso = moment(form.fechaIngresoForm).diff(moment(form.fecFinalForm), 'days');
       console.log(ingreso);
@@ -288,7 +288,7 @@ export class RegistrarVacacionesComponent implements OnInit {
   responseVacacion: any = [];
   NotifiRes: any;
   arrayNivelesDepa: any = [];
-  InsertarVacaciones(form) {
+  InsertarVacaciones(form: any) {
     let datosVacaciones = {
       id_peri_vacacion: this.datoEmpleado.idPerVacacion,
       depa_user_loggin: this.solInfo.id_dep,
@@ -308,12 +308,12 @@ export class RegistrarVacacionesComponent implements OnInit {
       this.IngresarAutorizacion(vacacion);
       this.EnviarNotificacion(vacacion);
       this.EnviarCorreoEmpleados(vacacion);
-      this.toastr.success('Operación Exitosa', 'Solicitud registrada.', {
+      this.toastr.success('Operación exitosa.', 'Solicitud registrada.', {
         timeOut: 6000,
       })
       this.CerrarVentanaRegistroVacaciones();
     }, error => {
-      this.toastr.error('Operación Fallida', 'Registro Inválido', {
+      this.toastr.error('Ups!!! algo salio mal.', 'Registro Inválido', {
         timeOut: 6000,
       })
     });
@@ -335,7 +335,7 @@ export class RegistrarVacacionesComponent implements OnInit {
     else {
       keynum = evt.which;
     }
-    // Comprobamos si se encuentra en el rango numérico y que teclas no recibirá.
+    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
     if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6) {
       return true;
     }

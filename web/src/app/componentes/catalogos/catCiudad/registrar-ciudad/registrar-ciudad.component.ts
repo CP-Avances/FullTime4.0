@@ -209,12 +209,12 @@ export class RegistrarCiudadComponent implements OnInit {
   // GUARDAR DATOS DE CIUDAD EN BASE DE DATOS
   GuardarDatos(ciudad: any) {
     this.rest.RegistrarCiudad(ciudad).subscribe(response => {
-      this.toastr.success('Operación Exitosa.', 'Registro guardado.', {
+      this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       });
       this.CerrarVentana();
     }, error => {
-      this.toastr.error('Operación Fallida.', 'Ups!!! algo salio mal.', {
+      this.toastr.error('Ups!!! algo salio mal..', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
       })
     });

@@ -23,6 +23,37 @@ export class DatosGeneralesService {
     return this.http.get<any>(`${environment.url}/generalidades/informacion-general/${estado}`);
   }
 
+  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR CARGOS
+  ObtenerInformacionCargo() {
+    const estado = 1; // 1 = activo 
+    return this.http.get<any>(`${environment.url}/generalidades/informacion-general-cargo/${estado}`);
+  }
+
+  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR COMUNICADOS
+  ObtenerInformacionComunicados() {
+    const estado = 1; // 1 = activo 
+    return this.http.get<any>(`${environment.url}/generalidades/datos_generales_comunicados/${estado}`);
+  }
+
+  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR COMUNICADOS
+  ObtenerCargosComunicados() {
+    const estado = 1; // 1 = activo 
+    return this.http.get<any>(`${environment.url}/generalidades/datos_cargos_comunicados/${estado}`);
+  }
+
+
+  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR ASIGNADOS UBICACION
+  ObtenerInformacionUbicacion(ubicacion: any) {
+    const estado = 1; // 1 = activo 
+    return this.http.post<any>(`${environment.url}/generalidades/informacion-general-ubicacion/${estado}`, ubicacion);
+  }
+
+  // CONSULTA DE INFORMACION GENERAL DEL CARGO Y COLABORADOR ASIGNADOS UBICACION
+  ObtenerInformacionCargosUbicacion(ubicacion: any) {
+    const estado = 1; // 1 = activo 
+    return this.http.post<any>(`${environment.url}/generalidades/informacion-general-ubicacion-cargo/${estado}`, ubicacion);
+  }
+
   // METODO PARA LISTAR INFORMACION ACTUAL DE USUARIO
   ListarInformacionActual() {
     return this.http.get(`${environment.url}/generalidades/info_actual`);

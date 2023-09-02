@@ -46,7 +46,7 @@ export class CancelarVacacionesComponent implements OnInit {
 
   formato_fecha: string = 'DD/MM/YYYY';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(

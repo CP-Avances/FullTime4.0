@@ -6,10 +6,10 @@
             </div>
             <mat-card class="example-card mat-elevation-z8">
                 <div class="d-flex justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                    <button mat-raised-button id="btn-raised" type="submit" (click)="AbrirVentanaRegistrarCiudad()">
+                    <button id="btn-raised"  class="btn btn-sm" (click)="AbrirVentanaRegistrarCiudad()">
                         Crear ciudad
                     </button>
-                    <button mat-raised-button id="btn-raised" type="submit" (click)="LimpiarCampos()" matSuffix
+                    <button id="btn-raised"  class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
                         matTooltipPosition="right"
                         matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
                         Mostrar lista
@@ -48,7 +48,8 @@
                         <td>
                             <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
                                 matTooltip="Búsqueda de ciudades de acuerdo a cada columna de la tabla.">
-                                help_outline</mat-icon>
+                                help_outline
+                            </mat-icon>
                         </td>
                     </tr>
                     <tr
@@ -68,7 +69,8 @@
         <mat-paginator id="pagina" [length]="datosCiudades.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
             <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de Ciudades en formato PDF.">
                 <p>PDF</p>

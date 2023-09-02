@@ -24,14 +24,12 @@ export class RegistroAutorizacionDepaComponent implements OnInit {
   idEmpresa: number;
 
   // VARIABLES DE FORMULARIO
-  nombreEmpleadoF = new FormControl('', [Validators.required]);
   idDepartamento = new FormControl('', [Validators.required]);
   idSucursal = new FormControl('', [Validators.required]);
   autorizarF = new FormControl('', [Validators.required]);
 
   // AGREGRA FORMULARIO A UN GRUPO
   public formulario = new FormGroup({
-    nombreEmpleadoForm: this.nombreEmpleadoF,
     idSucursalForm: this.idSucursal,
     autorizarForm: this.autorizarF,
     idDeparForm: this.idDepartamento,
@@ -50,18 +48,27 @@ export class RegistroAutorizacionDepaComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.ObtenerAutorizaciones();
     this.ObtenerEmpleados(this.datoEmpleado.idEmpleado);
     this.BuscarSucursales();
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA MOSTRAR DATOS DE AUTORIDAD DEPARTAMENTOS 
+  autorizaciones: any = [];
+  ObtenerAutorizaciones() {
+    this.autorizaciones = [];
+    this.restAutoriza.BuscarAutoridadEmpleado(this.datoEmpleado.idEmpleado).subscribe(datos => {
+      this.autorizaciones = datos;
+    })
+  }
+
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
+  usuario: string = '';
   ObtenerEmpleados(idemploy: any) {
     this.empleados = [];
     this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
       this.empleados = data;
-      this.formulario.patchValue({
-        nombreEmpleadoForm: this.empleados[0].nombre + ' ' + this.empleados[0].apellido,
-      })
+      this.usuario = this.empleados[0].nombre + ' ' + this.empleados[0].apellido;
     })
   }
 
@@ -91,11 +98,45 @@ export class RegistroAutorizacionDepaComponent implements OnInit {
     let autoriza = {
       id_departamento: form.idDeparForm,
       id_empl_cargo: this.datoEmpleado.idCargo,
+      preautorizar: false,
       id_empleado: this.datoEmpleado.idEmpleado,
-      estado: form.autorizarForm,
+      autorizar: false,
+      estado: true,
     }
+
+    if (form.autorizarForm == 'preautorizar') {
+      autoriza.preautorizar = true;
+    }
+    else if (form.autorizarForm == 'autorizar') {
+      autoriza.autorizar = true;
+    }
+    else {
+      autoriza.preautorizar = false;
+      autoriza.autorizar = false;
+    }
+
+    let verificador = 0;
+    if (this.autorizaciones.length > 0) {
+      for (var i = 0; i < this.autorizaciones.length; i++) {
+        if (this.autorizaciones[i].id_departamento === autoriza.id_departamento) {
+          verificador = 1;
+        }
+      }
+    }
+
+    if (verificador === 0) {
+      this.GuardarDatos(autoriza);
+    } else {
+      this.toastr.error('Ups!!! algo salio mal.', 'Departamento ya se encuentra configurado.', {
+        timeOut: 6000,
+      });
+    }
+  }
+
+  // METODO PARA GUARDAR EN BASE DE DATOS
+  GuardarDatos(autoriza: any) {
     this.restAutoriza.IngresarAutorizaDepartamento(autoriza).subscribe(res => {
-      this.toastr.success('Operación Exitosa.', 'Registro guardado.', {
+      this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       });
       this.CerrarVentana();

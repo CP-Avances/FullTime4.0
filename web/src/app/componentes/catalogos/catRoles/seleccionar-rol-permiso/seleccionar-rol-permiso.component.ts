@@ -68,7 +68,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   tablePermios: any = [];
   nombreRol: string;
 
-  // items de paginacion de la tabla
+  // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
@@ -130,7 +130,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
     this.rest.postRolPermisoRest(dataRol).subscribe(res => {
 
-      this.toastr.success('Operacion Exitosa', 'Rol Permiso guardado', {
+      this.toastr.success('Operacion exitosa.', 'Rol Permiso guardado', {
         timeOut: 6000,
       });
       

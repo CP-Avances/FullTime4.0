@@ -2,7 +2,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { Md5 } from 'ts-md5';
+import { Md5 } from 'ts-md5/dist/md5';
 import * as moment from 'moment';
 moment.locale('es');
 

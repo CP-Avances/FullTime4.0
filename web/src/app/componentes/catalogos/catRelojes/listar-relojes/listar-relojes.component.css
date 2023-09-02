@@ -115,4 +115,14 @@ mat-form-field.input-tables {
     height: 65px;
 }
 
-.ip { width: 125px; }
+.ip { width: 120px; }
+
+#t-inputs {
+    background: transparent;
+    font-size: 14px;
+    text-align: center;
+    outline: none;
+    fill: none;
+    width: 120px;
+    height: 65px;
+}

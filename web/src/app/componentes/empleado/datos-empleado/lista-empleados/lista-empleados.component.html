@@ -6,10 +6,10 @@
             </div>
             <mat-card class="example-card mat-elevation-z8">
                 <div class="d-flex flex-wrap justify-content-around" style="margin-top: 1%;">
-                    <button mat-raised-button id="btn-raised" type="submit" [routerLink]="['/registrarEmpleado']">
+                    <button id="btn-raised" class="btn btn-sm" [routerLink]="['/registrarEmpleado']">
                         Crear usuario
                     </button>
-                    <button mat-raised-button id="btn-raised" type="submit" (click)="LimpiarCampos()" matSuffix
+                    <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
                         matTooltipPosition="right"
                         matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
                         Mostrar lista
@@ -38,10 +38,12 @@
                 <div class="row">
                     <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-around">
-                            <form method="post" enctype="multipart/form-data" class="d-flex flex-wrap justify-content-around" style="margin: 2% 0% -1% 0%;">
+                            <form method="post" enctype="multipart/form-data"
+                                class="d-flex flex-wrap justify-content-around" style="margin: 2% 0% -1% 0%;">
                                 <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
                                     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                <label for="file" class="btn-2" matSuffix matTooltipPosition="right" style="height: 65px;"
+                                <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
+                                    style="height: 65px;"
                                     matTooltip="Dar click para selecionar plantilla y cargar registros.">
                                     Subir plantilla
                                 </label>
@@ -50,8 +52,9 @@
                     </div>
                     <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-around">
-                            <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right" style="margin: 2% 0% 3% 0%;"
-                                matTooltip="Dar click para ver o descargar el documento." href="{{link}}">
+                            <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                                style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
+                                href="{{link}}">
                                 <span class="material-icons">cloud_download</span>
                                 <br>
                                 Descargar plantilla usuarios
@@ -123,7 +126,7 @@
         <mat-paginator id="pagina" [length]="desactivados.length" [pageSize]="tamanio_paginaDes"
             [pageSizeOptions]="pageSizeOptionsDes" id="pagina" (page)="ManejarPaginaDes($event)" showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
             <i (click)="GenerarPdf('download', 2)" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de Empleados en formato PDF.">
                 <p>PDF</p>
@@ -193,13 +196,13 @@
                             </mat-form-field>
                         </td>
                         <td>
-                            <mat-form-field id="t-inputs">
+                            <mat-form-field class="input-tables cedula">
                                 <input matInput placeholder="Buscar" [(ngModel)]="filtroNombre" [formControl]="nombre"
                                     type="text" (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
                         </td>
                         <td>
-                            <mat-form-field id="t-inputs">
+                            <mat-form-field class="input-tables cedula">
                                 <input matInput placeholder="Buscar" [(ngModel)]="filtroApellido"
                                     [formControl]="apellido" type="text" (keypress)="IngresarSoloLetras($event)">
                             </mat-form-field>
@@ -237,7 +240,7 @@
                             <td *ngIf="e.estado === 2">Inactivo</td>
                         </ng-template>
                         <td>{{e.correo}}</td>
-                        <td class="d-flex justify-content-center">
+                        <td class="justify-content-center">
                             <i matSuffix matTooltipPosition="right" matTooltip="Ver datos generales de este registro."
                                 class="fas fa-eye" id="t-ver" [routerLink]="['/verEmpleado/',e.id]">
                                 <p>Ver</p>
@@ -250,7 +253,7 @@
         <mat-paginator id="pagina" [length]="empleado.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%;">
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
             <i (click)="GenerarPdf('download', 1)" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de Empleados en formato PDF.">
                 <p>PDF</p>

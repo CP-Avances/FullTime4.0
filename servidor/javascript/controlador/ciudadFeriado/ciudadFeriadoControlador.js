@@ -78,11 +78,22 @@ class CiudadFeriadoControlador {
     // METODO PARA ASIGNAR CIUDADES A FERIADO
     AsignarCiudadFeriado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_feriado, id_ciudad } = req.body;
-            yield database_1.default.query(`
-            INSERT INTO ciud_feriados (id_feriado, id_ciudad) VALUES ($1, $2)
-            `, [id_feriado, id_ciudad]);
-            res.jsonp({ message: 'Ciudad asignada a feriado' });
+            try {
+                const { id_feriado, id_ciudad } = req.body;
+                const response = yield database_1.default.query(`
+                INSERT INTO ciud_feriados (id_feriado, id_ciudad) VALUES ($1, $2) RETURNING *
+                `, [id_feriado, id_ciudad]);
+                const [feriado] = response.rows;
+                if (feriado) {
+                    return res.status(200).jsonp({ message: 'OK', reloj: feriado });
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'error' });
+                }
+            }
+            catch (error) {
+                return res.status(500).jsonp({ message: 'error' });
+            }
         });
     }
     // METODO PARA ACTUALIZAR REGISTRO

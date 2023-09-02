@@ -25,6 +25,10 @@ export class UsuarioService {
     return this.http.get(`${environment.url}/usuarios/datos/${id}`);
   }
 
+  ObtenerDepartamentoUsuarios(id: number) {
+    return this.http.get(`${environment.url}/usuarios/dato/${id}`);
+  }
+
   // METODO PARA ACTUALIZAR REGISTRO DE USUARIO
   ActualizarDatos(data: any) {
     return this.http.put(`${environment.url}/usuarios/actualizarDatos`, data).pipe(
@@ -57,6 +61,12 @@ export class UsuarioService {
     return this.http.get<any>(`${environment.url}/usuarios/lista-web/${estado}/activo/${habilitado}`);
   }
 
+  // METODO PARA BUSCAR DATOS DE USUARIOS Y CARGOS TIMBRE WEB
+  UsuariosTimbreWebCargos(habilitado: boolean) {
+    const estado = 1; // 1 = activo 
+    return this.http.get<any>(`${environment.url}/usuarios/lista-web-cargos/${estado}/activo/${habilitado}`);
+  }
+
   // METODO PARA ACTUALIZAR ESTADO TIMBRE WEB
   ActualizarEstadoTimbreWeb(data: any) {
     return this.http.put<any>(`${environment.url}/usuarios/lista-web/`, data);
@@ -67,6 +77,12 @@ export class UsuarioService {
     const estado = 1; // 1 = activo 
     return this.http.get<any>(`${environment.url}/usuarios/lista-app-movil/${estado}/activo/${habilitado}`);
   }
+
+    // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
+    UsuariosTimbreMovilCargos(habilitado: boolean) {
+      const estado = 1; // 1 = activo 
+      return this.http.get<any>(`${environment.url}/usuarios/lista-app-movil-cargos/${estado}/activo/${habilitado}`);
+    }
 
   // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL
   ActualizarEstadoTimbreMovil(data: any) {

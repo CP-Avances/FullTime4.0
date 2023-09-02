@@ -11,14 +11,11 @@ table {
     font-size: 14px;
 }
 
-.fas {
-    color: green;
-    cursor: pointer;
-}
 
 td {
     padding-top: 10px;
     text-align: center;
+    vertical-align: middle;
 }
 
 .button {

@@ -38,12 +38,17 @@ mat-form-field {
     padding: 0px 10px 0px 5px;
 }
 
-#Vacacion_periodo{
+#periodo_calculo {
+    width: 170px;
+    padding: 0px 10px 0px 5px;
+}
+
+#Vacacion_periodo {
     width: 240px;
     padding: 0px 5px 0px 5px;
 }
 
-#Máximo_días{
+#Maximo_dias {
     width: 220px;
     padding: 10px 10px 0px 10px;
 }
@@ -59,7 +64,7 @@ mat-form-field {
 }
 
 #campos_calculos {
-    width: 230px;
+    width: 260px;
     padding: 5px 5px 0px 10px;
 }
 
@@ -103,7 +108,7 @@ label {
     margin-bottom: 10px;
     margin-top: 20px;
     margin-right: 20px;
-    margin-left: 20px;
+    margin-left: 0px;
     font-size: 12px;
 }
 
@@ -121,12 +126,10 @@ label {
     padding: 15px 20px 5px 20x;
     margin-top: 20px;
     margin-right: 20px;
+    margin-left: 0px;
     font-size: 14px;
 }
 
-.mat-radio-button~.mat-radio-button {
-    margin-left: 50px;
-}
 
 mat-radio-group {
     padding: 20px 20px 20px 20x;
@@ -160,3 +163,7 @@ mat-radio-group {
 hr {
     background-color: rgb(243, 239, 239);
 }
+
+.mat-mdc-radio-button ~ .mat-mdc-radio-button {
+    margin-left: 40px;
+  }

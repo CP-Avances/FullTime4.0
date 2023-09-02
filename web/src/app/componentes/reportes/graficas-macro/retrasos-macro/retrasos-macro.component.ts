@@ -95,7 +95,7 @@ export class RetrasosMacroComponent implements OnInit {
   }
 
 
-  ValidarRangofechas(form) {
+  ValidarRangofechas(form: any) {
     var f_i = new Date(form.fec_inicio)
     var f_f = new Date(form.fec_final)
 

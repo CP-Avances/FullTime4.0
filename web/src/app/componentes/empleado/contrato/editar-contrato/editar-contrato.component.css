@@ -3,9 +3,9 @@ mat-form-field {
     margin: 10px;
 }
 
-.mat-radio-button~.mat-radio-button {
+.mat-mdc-radio-button ~ .mat-mdc-radio-button {
     margin-left: 16px;
-}
+  }
 
 mat-radio-group {
     width: 210px;

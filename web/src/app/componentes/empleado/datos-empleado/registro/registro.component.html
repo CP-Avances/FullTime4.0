@@ -1,6 +1,10 @@
 <div class="container" style="padding-top: 15px;">
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
+            <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+                [routerLink]="['/empleado']">
+                Listar usuarios
+            </button>
             <span>REGISTRAR DATOS DEL USUARIO</span>
         </div>
         <mat-horizontal-stepper [linear]="isLinear" #stepper>
@@ -94,8 +98,7 @@
                         </div>
                     </div>
                 </form>
-                <div class="d-flex flex-wrap justify-content-between">
-                    <button mat-raised-button id="btn-raised" [routerLink]="['/empleado']" class="float-left">Regresar lista usuarios</button>
+                <div class="d-flex flex-wrap justify-content-between float-right">
                     <button mat-raised-button id="btn-raised" matStepperNext class="float-right">Siguiente</button>
                 </div>
             </mat-step>
@@ -247,14 +250,16 @@
                             </button>
                         </mat-form-field>
                     </div>
-                    <div>
+                    <div style="text-align: center; padding-top: 15px;">
                         <button mat-raised-button id="btn-raised" matStepperPrevious class="float-left">Atrás</button>
-                        <button button mat-raised-button id="btn-raised"
+
+                        <button button mat-raised-button id="btn-raised" (click)="stepper.reset()">Cancelar</button>
+
+                        <button button mat-raised-button id="btn-raised" class="float-right"
                             (click)="InsertarEmpleado(primeroFormGroup.value, segundoFormGroup.value, terceroFormGroup.value);"
                             type="submit" [disabled]="!terceroFormGroup.valid">
                             Guardar
                         </button>
-                        <button button mat-raised-button id="btn-raised" (click)="stepper.reset()" class="float-right">Cancelar</button>
                     </div>
                 </form>
             </mat-step>

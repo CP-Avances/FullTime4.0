@@ -69,11 +69,7 @@ export const enviarMail = function (servidor: any, puerto: number) {
   }
 
   const transporter = nodemailer.createTransport({
-    pool: true,
-    maxConnections: 2,
-    maxMessages: Infinity,
-    //rateLimit: 14, // 14 emails/second max
-    //rateDelta: 1000,
+    //pool: true,
     host: servidor,
     port: puerto,
     secure: seguridad,

@@ -34,17 +34,16 @@ export class ListarRelojesComponent implements OnInit {
   filtroSucursalReloj = '';
   filtroEmpresaReloj = '';
   filtroNombreReloj = '';
-  filtroModeloReloj = '';
   filtroIpReloj = '';
   relojes: any = [];
 
   empleado: any = [];
   idEmpleado: number;
+  listar_relojes: boolean = true;
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   ipF = new FormControl('');
   nombreF = new FormControl('', [Validators.minLength(2)]);
-  modeloF = new FormControl('', [Validators.minLength(2)]);
   empresaF = new FormControl('', [Validators.minLength(2)]);
   sucursalF = new FormControl('', [Validators.minLength(2)]);
   departamentoF = new FormControl('', [Validators.minLength(2)]);
@@ -53,7 +52,6 @@ export class ListarRelojesComponent implements OnInit {
   public formulario = new FormGroup({
     ipForm: this.ipF,
     nombreForm: this.nombreF,
-    modeloForm: this.modeloF,
     empresaForm: this.empresaF,
     sucursalForm: this.sucursalF,
     departamentoForm: this.departamentoF
@@ -151,7 +149,6 @@ export class ListarRelojesComponent implements OnInit {
     this.formulario.setValue({
       nombreForm: '',
       ipForm: '',
-      modeloForm: '',
       empresaForm: '',
       sucursalForm: '',
       departamentoForm: ''
@@ -191,6 +188,28 @@ export class ListarRelojesComponent implements OnInit {
       .afterClosed().subscribe(item => {
         this.ObtenerReloj();
       });;
+  }
+
+  // METODO PARA VER DATOS DE RELOJ
+  ver_datos: boolean = false;
+  reloj_id: number;
+  pagina: string = '';
+  VerDatosReloj(id: number) {
+    this.reloj_id = id;
+    this.ver_datos = true;
+    this.ver_editar = false;
+    this.listar_relojes = false;
+    this.pagina = 'listar-relojes';
+  }
+
+  // METODO PARA EDITAR DATOS DE RELOJ
+  ver_editar: boolean = false;
+  VerEditarReloj(id: number) {
+    this.reloj_id = id;
+    this.listar_relojes = false;
+    this.ver_datos = false;
+    this.ver_editar = true;
+    this.pagina = 'editar-reloj';
   }
 
   /** ********************************************************************************* **
@@ -260,7 +279,7 @@ export class ListarRelojesComponent implements OnInit {
             this.nameFile = '';
           } else {
             this.rest.subirArchivoExcel(formData).subscribe(datos_reloj => {
-              this.toastr.success('Operación Exitosa.', 'Plantilla de Relojes importada.', {
+              this.toastr.success('Operación exitosa.', 'Plantilla de Relojes importada.', {
                 timeOut: 10000,
               });
               this.archivoForm.reset();

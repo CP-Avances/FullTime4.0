@@ -21,6 +21,8 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 import { HoraExtraAutorizacionesComponent } from 'src/app/componentes/autorizaciones/hora-extra-autorizaciones/hora-extra-autorizaciones.component';
 import { EditarEstadoHoraExtraAutorizacionComponent } from 'src/app/componentes/autorizaciones/editar-estado-hora-extra-autorizacion/editar-estado-hora-extra-autorizacion.component';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
   selector: 'app-ver-pedido-hora-extra',
@@ -49,6 +51,7 @@ export class VerPedidoHoraExtraComponent implements OnInit {
   idEmpleado: number;
 
   //Dato para ocultar las opciones de descarga del archivo si esta aun en pendiente
+  ocultar: boolean = true;
   estado: boolean = false;
 
   constructor(
@@ -61,6 +64,8 @@ export class VerPedidoHoraExtraComponent implements OnInit {
     private restE: EmpleadoService, // SERVICIO DE DATOS DE EMPLEADO
     public restEmpre: EmpresaService, // SERVICIOS DE DATOS EMPRESA
     public restGeneral: DatosGeneralesService, // SERVICIO DATOS GENERALES DE EMPLEADO
+    public restAutoriza: AutorizaDepartamentoService, //SERVICIO DE DATOS DE AUTORIZACION POR EL EMPLEADO
+    public usuarioDepa: UsuarioService, //SERVICIO DE DATOS DE DEPARTAMENTO POR EL USUARIO DE LA SOLICITUD
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.dataParams = this.router.routerState.snapshot.root.children[0].params;
@@ -81,17 +86,26 @@ export class VerPedidoHoraExtraComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
+  ArrayAutorizacionTipos: any = []
+  gerencia: boolean = false;
+
   // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
       res => {
-        this.formato_fecha = res[0].descripcion;
-        this.BuscarHora(this.formato_fecha)
-      },
-      vacio => {
-        this.BuscarHora(this.formato_fecha)
-      });
+      this.formato_fecha = res[0].descripcion;
+      this.BuscarHora(this.formato_fecha)
+    },
+    vacio => {
+      this.BuscarHora(this.formato_fecha)
+    });
+
+    this.restAutoriza.BuscarAutoridadUsuarioDepa(this.idEmpleado).subscribe(
+      (res) => {
+        this.ArrayAutorizacionTipos = res;
+      }
+    );
   }
 
   BuscarHora(fecha: string) {
@@ -122,6 +136,7 @@ export class VerPedidoHoraExtraComponent implements OnInit {
     // BUSQUEDA DE DATOS DE HORAS EXTRAS
     this.restHE.ObtenerUnHoraExtra(this.dataParams.id).subscribe(res => {
       this.hora_extra = res;
+    
       if (this.hora_extra[0].tiempo_autorizado === null) {
         this.HabilitarTiempo = true;
       }
@@ -139,14 +154,10 @@ export class VerPedidoHoraExtraComponent implements OnInit {
 
       })
 
-      console.log('data horas .. ', this.hora_extra);
-
-      if(this.idEmpleado == this.id_usua_solicita){
-        this.habilitarActualizar = false;
-      }
-
       if(this.hora_extra[0].estado > 1){
         this.estado = true;
+      }else{
+        this.estado = false;
       }
 
       this.ObtenerAprobacion();
@@ -157,52 +168,82 @@ export class VerPedidoHoraExtraComponent implements OnInit {
     this.ObtenerSolicitud(this.dataParams.id);
   }
 
+  estado_auto: any;
+  listadoDepaAutoriza: any = []
   ObtenerAprobacion() {
     this.autorizacion = [];
     this.empleado_estado = [];
+    this.listadoDepaAutoriza = [];
     this.lectura = 1;
     // BUSQUEDA DE DATOS DE AUTORIZACIÓN
     this.restA.getUnaAutorizacionByHoraExtraRest(this.dataParams.id).subscribe(res1 => {
       this.autorizacion = res1;
-
       // METODO PARA OBTENER EMPLEADOS Y ESTADOS
       var autorizaciones = this.autorizacion[0].id_documento.split(',');
       autorizaciones.map((obj: string) => {
         this.lectura = this.lectura + 1;
         if (obj != '') {
           let empleado_id = obj.split('_')[0];
-          var estado_auto = obj.split('_')[1];
+          this.estado_auto = obj.split('_')[1];
           // CAMBIAR DATO ESTADO INT A VARCHAR
           // CAMBIAR DATO ESTADO INT A VARCHAR
-          if (estado_auto === '1') {
-            estado_auto = 'Pendiente';
+          if (this.estado_auto === '1') {
+            this.estado_auto = 'Pendiente';
           }
-          if (estado_auto === '2') {
-            estado_auto = 'Preautorización';
+          if (this.estado_auto === '2') {
+            this.estado_auto = 'Preautorizado';
           }
-          if (estado_auto === '3') {
-            estado_auto = 'Autorización';
+          if (this.estado_auto === '3') {
+            this.estado_auto = 'Autorizado';
           }
-          if (estado_auto === '4') {
-            estado_auto = 'Permiso Negado';
+          if (this.estado_auto === '4') {
+            this.estado_auto = 'Permiso Negado';
           }
           // CREAR ARRAY DE DATOS DE COLABORADORES
           var data = {
             id_empleado: empleado_id,
-            estado: estado_auto
+            estado: this.estado_auto
           }
+
+          if((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')){
+            //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
+            this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
+              this.listadoDepaAutoriza = res;
+              this.listadoDepaAutoriza.filter(item => {
+                if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
+                  return this.ocultar = false;
+                }else{
+                  return this.ocultar = true;
+                }
+              })
+            });
+          }else{
+            this.ocultar = true;
+          }
+
           this.empleado_estado = this.empleado_estado.concat(data);
           // CUANDO TODOS LOS DATOS SE HAYAN REVISADO EJECUTAR METODO DE INFORMACIÓN DE AUTORIZACIÓN
           if (this.lectura === autorizaciones.length) {
             this.VerInformacionAutoriza(this.empleado_estado);
           }
+        }else{
+          //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
+          this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
+            this.listadoDepaAutoriza = res;
+            this.listadoDepaAutoriza.filter(item => {
+              if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
+                return this.ocultar = false;
+              }
+            })
+          });
         }
+
       })
       // TOMAR TAMAÑO DE ARREGLO DE COLABORADORES QUE REVIZARÓN SOLICITUD
       this.cont = autorizaciones.length - 1;
 
     }, error => {
-      this.HabilitarAutorizacion = true;
+      this.HabilitarAutorizacion = false;
     });
   }
 
@@ -262,23 +303,27 @@ export class VerPedidoHoraExtraComponent implements OnInit {
       this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
         var fecha_inicio = moment(this.datoSolicitud[0].fec_inicio);
         // METODO PARA VER DÍAS DISPONIBLES DE AUTORIZACIÓN
-        if (res[0].cambios === true) {
-          if (res[0].cambios === 0) {
-            this.habilitarActualizar = false;
-          }
-          else {
-            var dias = fecha_inicio.diff(this.fechaActual, 'days');
-            if (dias >= res[0].dias_cambio) {
+        if(this.hora_extra[0].estado > 2){
+          this.habilitarActualizar = false;
+        }else{
+          if (res[0].cambios === true) {
+            if (res[0].cambios === 0) {
               this.habilitarActualizar = false;
             }
             else {
-              this.habilitarActualizar = true;
+              var dias = fecha_inicio.diff(this.fechaActual, 'days');
+              if (dias >= res[0].dias_cambio) {
+                this.habilitarActualizar = false;
+              }
+              else {
+                this.habilitarActualizar = true;
+              }
             }
           }
-        } else {
-          this.habilitarActualizar = true;
         }
-      });
+
+      }
+    );
     }, err => {
       return this.validar.RedireccionarMixto(err.error)
     })
@@ -327,7 +372,39 @@ export class VerPedidoHoraExtraComponent implements OnInit {
     }
   }
 
+  fila1firmas: any = [];
+  fila2firmas: any = [];
   getDocumentDefinicion() {
+    this.fila1firmas = [];
+    this.fila2firmas = [];
+
+    //Array de los datos del empleado para mostrar en la firma;
+    let firmaEmple = {
+      cargo: this.datoSolicitud[0].cargo,
+      departamento: "",
+      estado: "Empleado",
+      id_empleado: this.datoSolicitud[0].id_empl_contrato,
+      nombre: this.datoSolicitud[0].nombre_emple + ' ' + this.datoSolicitud[0].apellido_emple,
+    }
+
+    let cont1 = 1;
+    //Filtar el array empleado_estado para dividir en otros arrays para firmar
+      this.empleado_estado.filter(item =>{
+        if(cont1 < 4){
+          this.fila1firmas.push(item);
+          return cont1 = cont1 + 1;
+        }else{
+          this.fila2firmas.push(item);
+        }
+      });
+
+
+    if(this.fila2firmas.length == 0){
+      this.fila1firmas.push(firmaEmple);
+    }else{
+      this.fila2firmas.push(firmaEmple);
+    }
+
     return {
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
@@ -352,13 +429,13 @@ export class VerPedidoHoraExtraComponent implements OnInit {
         }
       },
       content: [
-        { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: this.datoSolicitud[0].nom_empresa.toUpperCase(), bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
+        { image: this.logo, width: 150, margin: [10, -27, 0, 2] },
+        { text: this.datoSolicitud[0].nom_empresa.toUpperCase(), bold: true, fontSize: 20, alignment: 'center', margin: [0, -2, 0, 10] },
         { text: 'SOLICITUD DE HORAS EXTRAS', fontSize: 10, alignment: 'center', margin: [0, 0, 0, 10] },
         this.SeleccionarMetodo(),
       ],
       styles: {
-        tableHeaderA: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.s_color, margin: [20, 0, 20, 0], },
+        tableHeaderA: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.s_color, margin: [10, 0, 10, 0], },
         tableHeader: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color, },
         itemsTableD: { fontSize: 10, alignment: 'left', margin: [50, 5, 5, 5] },
         itemsTable: { fontSize: 10, alignment: 'center', }
@@ -367,8 +444,6 @@ export class VerPedidoHoraExtraComponent implements OnInit {
   }
 
   SeleccionarMetodo() {
-
-
     let fecha = this.validar.FormatearFecha(this.fechaActual, this.formato_fecha, this.validar.dia_completo);
     let fec_inicio_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_inicio, this.formato_fecha, this.validar.dia_completo);
     let fec_final_ = this.validar.FormatearFecha(this.datoSolicitud[0].fec_final, this.formato_fecha, this.validar.dia_completo);
@@ -424,54 +499,63 @@ export class VerPedidoHoraExtraComponent implements OnInit {
           }],
           [{
             columns: [
-              {
-                columns: [
-                  { width: '*', text: '' },
-                  {
-                    width: 'auto',
-                    layout: 'lightHorizontalLines',
-                    table: {
-                      widths: ['auto'],
-                      body: [
-                        [{ text: this.empleado_estado[this.cont - 1].estado.toUpperCase() + ' POR', style: 'tableHeaderA' }],
-                        [{ text: ' ', style: 'itemsTable', margin: [0, 20, 0, 20] }],
-                        [{ text: this.empleado_estado[this.cont - 1].nombre + '\n' + this.empleado_estado[this.cont - 1].cargo, style: 'itemsTable' }]
-                      ]
-                    }
-                  },
-                  { width: '*', text: '' },
-                ]
-              },
-              {
-                columns: [
-                  { width: '*', text: '' },
-                  {
-                    width: 'auto',
-                    layout: 'lightHorizontalLines',
-                    table: {
-                      widths: ['auto'],
-                      body: [
-                        [{ text: 'EMPLEADO', style: 'tableHeaderA' },],
-                        [{ text: ' ', style: 'itemsTable', margin: [0, 20, 0, 20] }],
-                        [{ text: this.datoSolicitud[0].nombre_emple + ' ' + this.datoSolicitud[0].apellido_emple + '\n' + this.datoSolicitud[0].cargo, style: 'itemsTable' }]
-                      ]
-                    }
-                  },
-                  { width: '*', text: '' },
-                ]
-              }
-            ]
+              ...this.fila1firmas.map(obj => {
+                return {
+                  columns: [
+                    { width: '*', text: '' },
+                    {
+                      width: 'auto',
+                      layout: 'lightHorizontalLines',
+                      table: {
+                        widths: ['auto'],
+                        body: [
+                          [{ text: obj.estado.toUpperCase(), style: 'tableHeaderA'},],
+                          [{ text: ' ', style: 'itemsTable', margin: [0, 15, 0, 15] },],
+                          [{ text: obj.nombre + '\n' + obj.cargo, style: 'itemsTable' },]
+                        ]
+                      }
+                    },
+                    { width: '*', text: ''},
+                  ]
+                } 
+              })
+            ],
           }],
+          [{
+            columns: [
+              ...this.fila2firmas.map(obje => {
+                return {
+                  columns: [
+                    { width: '*', text: '' },
+                    {
+                      width: 'auto',
+                      layout: 'lightHorizontalLines',
+                      table: {
+                        widths: ['auto'],
+                        body: [
+                          [{ text: obje.estado.toUpperCase(), style: 'tableHeaderA'},],
+                          [{ text: ' ', style: 'itemsTable', margin: [0, 15, 0, 15] },],
+                          [{ text: obje.nombre + '\n' + obje.cargo, style: 'itemsTable' },]
+                        ]
+                      }
+                    },
+                  { width: '*', text: ''},
+                  ]
+                }
+              })
+            ]
+          }
+          ],
         ]
       },
       layout: {
         hLineColor: function (i, node) {
           return (i === 0 || i === node.table.body.length) ? 'rgb(80,87,97)' : 'rgb(80,87,97)';
         },
-        paddingLeft: function (i, node) { return 40; },
-        paddingRight: function (i, node) { return 40; },
-        paddingTop: function (i, node) { return 10; },
-        paddingBottom: function (i, node) { return 10; }
+        paddingLeft: function (i: any, node: any) { return 40; },
+        paddingRight: function (i: any, node: any) { return 40; },
+        paddingTop: function (i: any, node: any) { return 6; },
+        paddingBottom: function (i: any, node: any) { return 6; },
       }
     };
   }

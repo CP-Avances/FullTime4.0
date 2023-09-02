@@ -50,7 +50,7 @@ export class CancelarPermisoComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
@@ -107,7 +107,7 @@ export class CancelarPermisoComponent implements OnInit {
 
   AceptarAdvertencia() {
     var correo = 0;
-    this.restP.EliminarPermiso(this.data.info.id, this.data.info.documento).subscribe(res => {
+    this.restP.EliminarPermiso(this.data.info.id, this.data.info.documento, this.data.info.codigo).subscribe(res => {
       console.log(res);
 
       // VALIDAR ENVIO DE CORREO SEGUN CONFIGURACION

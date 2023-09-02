@@ -9,17 +9,20 @@
                 <span>OPCIONES DE DESCARGA</span>
             </div>
             <mat-card class="example-card mat-elevation-z9">
-                <div class="d-flex flex-wrap justify-content-center">
-                    <i matSuffix matTooltipPosition="right" matTooltip="Descargar reporte en formato PDF." id="i-cursor"
-                        class="material-icons i-download" (click)="ListaEmpleadosDetallado('download')"> cloud_download
-                    </i>
-                    <i matSuffix matTooltipPosition="right" id="opciones"
-                        matTooltip="Visuaizar reporte en formato PDF desde el navegador." class="material-icons i-pdf"
-                        (click)="ListaEmpleadosDetallado('open')">picture_as_pdf
-                    </i>
-                    <i (click)="exportToExcelListaEmpleados()" class="fas fa-file-excel i-excel" id="opciones" matSuffix
-                        matTooltipPosition="right" matTooltip="Descargar reporte formato EXCEL.">
-                    </i>
+                <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
+                    <button mat-icon-button (click)="ListaEmpleadosDetallado('open')">
+                        <mat-icon class="i-pdf" matTooltipPosition="right"
+                            matTooltip="Previsualizar reporte en el navegador en fomato PDF.">picture_as_pdf
+                        </mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="ListaEmpleadosDetallado('download')">
+                        <mat-icon class="i-download" matTooltipPosition="right"
+                            matTooltip="Descargar reporte en formato PDF.">cloud_download</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="exportToExcelListaEmpleados()">
+                        <mat-icon class="fas fa-file-excel i-excel" matTooltipPosition="right"
+                            matTooltip="Descargar reporte en formato EXCEL."></mat-icon>
+                    </button>
                     <button id="opciones" mat-icon-button (click)="ConfiguracionReporteEmpleados()">
                         <mat-icon style="margin-top: -8px; color: black;" matSuffix matTooltipPosition="right"
                             matTooltip="Seleccionar datos que se visualizarán en el reporte.">settings</mat-icon>
@@ -95,5 +98,6 @@
         <mat-paginator id="pagina" [length]="empleados.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
             id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
+        <br>
     </div>
 </div>

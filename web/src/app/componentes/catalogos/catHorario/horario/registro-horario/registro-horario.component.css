@@ -14,9 +14,18 @@ mat-form-field {
     padding: 15px 20px 15px 20x;
     margin-bottom: 10px;
     margin-right: 80px;
+    padding-bottom: 10px;
 }
 
 #check_ {
+    width: 210px;
+    padding: 15px 20px 15px 20x;
+    margin-bottom: 10px;
+    margin-right: 84px;
+    padding-bottom: 10px;
+}
+
+#checks {
     width: 210px;
     padding: 15px 20px 15px 20x;
     margin-bottom: 10px;

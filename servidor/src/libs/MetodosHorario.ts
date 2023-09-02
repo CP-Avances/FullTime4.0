@@ -6,7 +6,7 @@ const FECHA_FERIADOS: any = [];
 
 export const VerificarHorario = async function(id_cargo: number) {
     
-    let horario = await pool.query('SELECT * FROM empl_horarios WHERE id_empl_cargo = $1 AND estado = 1 ORDER BY fec_inicio DESC LIMIT 1', [id_cargo]).then(result => { return result.rows[0]}); // devuelve el ultimo horario del cargo
+  /*  let horario = await pool.query('SELECT * FROM empl_horarios WHERE id_empl_cargo = $1 AND estado = 1 ORDER BY fec_inicio DESC LIMIT 1', [id_cargo]).then(result => { return result.rows[0]}); // devuelve el ultimo horario del cargo
 
     if (!horario) return {message: 'Horario no encontrado'}
     // console.log(horario);
@@ -39,7 +39,7 @@ export const VerificarHorario = async function(id_cargo: number) {
     }
     // console.log('Fechas rango: ', fechasRango);
     // console.log('Objeto JSON: ', objeto);
-    return objeto
+    return objeto*/
 }
 
 /**
@@ -109,7 +109,7 @@ function fechaIterada(fechaIterada: Date, horario: any){
 }
 
 export const EstadoHorarioPeriVacacion = async function(id_empleado: number) {
-    console.log(id_empleado);
+   /* console.log(id_empleado);
     
     let ids = await pool.query('SELECT co.id AS id_contrato, ca.id AS id_cargo FROM empl_contratos AS co, empl_cargos AS ca WHERE co.id_empleado = $1 AND co.id = ca.id_empl_contrato',[id_empleado])
     .then(result => { return result.rows});
@@ -138,7 +138,7 @@ export const EstadoHorarioPeriVacacion = async function(id_empleado: number) {
     contratos.forEach(async(id_contrato) => {
         await pool.query('UPDATE peri_vacaciones SET estado = 2 WHERE id_empl_contrato = $1',[id_contrato]) //Estado 2 es para q esten desactivados esos periodos de vacacion
     })
-  
+  */
     return 0
 }
 

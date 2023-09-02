@@ -1,10 +1,20 @@
-p { font-weight: bold; }
+p {
+    font-weight: bold;
+}
 
-.caja {padding: 5px 5px 5px 5px;}
+.caja {
+    padding: 5px 5px 5px 5px;
+}
 
-.mat-radio-button ~ .mat-radio-button { margin-left: 16px; }
+.mat-mdc-radio-button ~ .mat-mdc-radio-button {
+    margin-left: 20px;
+  }
 
-.btn { margin-left: 15px; background-color: rgb(80,87,97); color: white; }
+.btn {
+    margin-left: 15px;
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
 
 .scrollbar {
     float: left;
@@ -18,5 +28,5 @@ p { font-weight: bold; }
 
 .scrollbar-primary::-webkit-scrollbar {
     width: 12px;
-    background-color: #F5F5F5; 
+    background-color: #F5F5F5;
 }

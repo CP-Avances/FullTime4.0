@@ -1,7 +1,7 @@
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        AUTORIZAR DEPARTAMENTO
+        APROBACIÓN DEPARTAMENTO
     </span>
     <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
 </div>
@@ -19,15 +19,19 @@
                 <div class="row">
                     <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
+                            <span>
+                                <b>{{usuario.toUpperCase()}}</b>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
-                                <mat-label id="fuente">Empleado</mat-label>
-                                <input id="letras" matInput placeholder="Empleado" [formControl]="nombreEmpleadoF"
-                                    readonly="readonly" required>
-                            </mat-form-field>
-                            <mat-form-field>
-                                <mat-label id="fuente">Seleccionar Sucursal</mat-label>
+                                <mat-label>Seleccionar sucursal</mat-label>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                    matTooltip="Seleccionar una de las sucursales existentes en la empresa.">
+                                    matTooltip="Seleccionar una de las sucursales existentes en la entidad.">
                                     help_outline
                                 </mat-icon>
                                 <mat-select [formControl]="idSucursal" required>
@@ -35,33 +39,31 @@
                                         (click)="ObtenerDepartamentos(formulario.value)">{{s.nombre}}</mat-option>
                                 </mat-select>
                             </mat-form-field>
-                        </div>
-                    </div>
-                    <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
-                                <mat-label id="fuente">Departamento</mat-label>
+                                <mat-label>Departamento</mat-label>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                    matTooltip="Seleccionar el departamento en el que autoriza solicitudes.">
+                                    matTooltip="Seleccionar el departamento en el que realizará alguna aprobación de solicitudes.">
                                     help_outline</mat-icon>
                                 <mat-select [formControl]="idDepartamento" required>
                                     <mat-option *ngFor="let d of departamento" [value]="d.id">{{d.nombre}}</mat-option>
                                 </mat-select>
                             </mat-form-field>
-                            <mat-radio-group aria-label="Select an option" [formControl]="autorizarF"
-                                [value]="autorizarF.value" required>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="contenedor d-flex flex-wrap justify-content-start" style="padding-top: 5px;">
+                            <mat-radio-group aria-labelledby="example-radio-group-label" class="contenedor"
+                                [formControl]="autorizarF" [value]="autorizarF.value" required>
                                 <label class="d-flex justify-content-between"
-                                    style="position: relative; left:10px; font-size: 15px; padding-top: 10px;">
-                                    <span>Autoriza *</span>
+                                    style="position: relative; right: 10px; font-size: 14px; padding-bottom: 5px;">
+                                    <span>Opciones de aprobación*</span>
                                 </label>
-                                <div class="d-flex justify-content-around">
-                                    <mat-radio-button class="example-match" value="true">
-                                        <label id="textoradiobtn">Si</label>
-                                    </mat-radio-button>
-                                    <mat-radio-button class="example-match" value="false">
-                                        <label id="textoradiobtn">No</label>
-                                    </mat-radio-button>
-                                </div>
+                                <mat-radio-button class="radio-button" value="preautorizar">
+                                    <label id="textoradiobtn">Pre-autorizar</label>
+                                </mat-radio-button>
+                                <mat-radio-button class="radio-button" value="autorizar">
+                                    <label id="textoradiobtn">Autorizar</label>
+                                </mat-radio-button>
                             </mat-radio-group>
                         </div>
                     </div>
@@ -69,9 +71,10 @@
             </div>
         </mat-card-content>
     </form>
-    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
-        <button mat-raised-button id="btn-raised" type="submit" (click)="InsertarAutorizacion(formulario.value)"
-            [disabled]="!formulario.valid">Guardar</button>
-        <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentana()">Salir</button-->
+    <div class="d-flex flex-wrap justify-content-center" style="margin-bottom: 3%;">
+        <button id="btn-raised" class="btn btn-sm" (click)="InsertarAutorizacion(formulario.value)"
+            [disabled]="!formulario.valid">
+            Guardar
+        </button>
     </div>
 </div>

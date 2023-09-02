@@ -1,27 +1,25 @@
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        REGISTRAR HORARIO</span>
+        REGISTRAR HORARIO
+    </span>
     <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
 </div>
 <div class="container">
     <!-- FORMULARIO COMPLETO -->
     <div style="text-align: center">
-        <div class="nota">
+        <div class="nota" id="espacio">
             <span>
                 NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
                 Guardar.
             </span>
         </div>
-        <span class="nota">Desea subir un archivo (opcional) </span>
-        <mat-slide-toggle [(ngModel)]="isChecked"></mat-slide-toggle>
-        <br>
         <form [formGroup]="formulario">
             <div class="row">
                 <div class="col-md">
                     <div class="d-flex flex-wrap justify-content-around">
                         <mat-form-field>
-                            <mat-label>Nombre de horario</mat-label>
+                            <mat-label>Descripción</mat-label>
                             <input matInput placeholder="Ej: Administrativo" [formControl]="nombre" required>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Ingresar un nombre de horario.">
@@ -50,28 +48,28 @@
                 <div class="col-md">
                     <div class="d-flex flex-wrap justify-content-around">
                         <mat-form-field>
-                            <mat-label>Horas de trabajo</mat-label>
+                            <mat-label>Horas totales</mat-label>
                             <input matInput placeholder="Ej: 8:10 " [formControl]="horaTrabajo" required
                                 (keypress)="IngresarNumeroCaracter($event)">
-                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Indicar el número de horas de trabajo. 
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Indicar el número de horas de jornada. 
                             En caso de horas y minutos ingresar en el siguiente formato 10 : 35">
-                                help_outline</mat-icon>
+                                help_outline
+                            </mat-icon>
                             <mat-error id="hora" *ngIf="horaTrabajo.invalid">
                                 {{ObtenerMensajeErrorHoraTrabajo()}}
                             </mat-error>
                         </mat-form-field>
-
                         <mat-checkbox id="check" [formControl]="tipoF" [(ngModel)]="nocturno" matSuffix
-                            matTooltipPosition="right" matTooltip="Marcar si el horario es Nocturno.">Horario Nocturno
+                            matTooltipPosition="right" matTooltip="Marcar si el horario es Nocturno.">
+                            <label id="textoradiobtn">Horario nocturno</label>
                         </mat-checkbox>
-
-                        <mat-checkbox id="check_" [formControl]="detalleF" [(ngModel)]="detalle" matSuffix
-                            matTooltipPosition="right"
-                            matTooltip="Marcar si el horario requiere detalles de entrada, alimentación, salida.">
-                            Requiere detalle
+                        <mat-checkbox id="checks" (change)="ActivarArchivo($event)">
+                            <label id="textoradiobtn">Subir un archivo</label>
                         </mat-checkbox>
                     </div>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-md">
                     <div class="d-flex flex-wrap justify-content-center" *ngIf="isChecked">
                         <div class="separar">
@@ -80,13 +78,13 @@
                                 <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()" id="i-cursor" matSuffix
                                     matTooltipPosition="right"
                                     matTooltip="Cargar archivo como respaldo de registro de horario. (Opcional)">
-                                    Documento</label>
+                                    Documento
+                                </label>
                             </form>
                             <br>
                             <div class="separar" style="margin-top: -4px;">
                                 <input type="text" id="respaldo" placeholder="Ningún archivo seleccionado"
-                                    class="form-control" style="width: 200px;" [formControl]="documentoF">
-
+                                    class="form-control" style="width: 200px;" [formControl]="documentoF" readonly>
                                 <i *ngIf="HabilitarBtn" class="far fa-trash-alt" style="color:red; margin-left: 5px;"
                                     id="i-cursor" (click)="RetirarArchivo()" matSuffix matTooltipPosition="right"
                                     matTooltip="Eliminar archivo seleccionado.">
@@ -96,14 +94,12 @@
                     </div>
                 </div>
             </div>
+            <div class="d-flex flex-wrap justify-content-center" style="padding-top: 10px; margin-bottom: 4%;">
+                <button id="btn-raised" class="btn btn-sm" [disabled]="!formulario.valid"
+                    (click)="InsertarHorario(formulario.value)" value="Guardar">Guardar</button>
+            </div>
         </form>
     </div>
-    <br>
-</div>
-<div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 4%;">
-    <button mat-raised-button id="btn-raised" type="submit" [disabled]="!formulario.valid"
-        (click)="InsertarHorario(formulario.value)" value="Guardar">Guardar</button>
-    <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentana()" value="Salir">Salir</button-->
 </div>
 
 <div class="pantalla-progress" *ngIf="habilitarprogress">

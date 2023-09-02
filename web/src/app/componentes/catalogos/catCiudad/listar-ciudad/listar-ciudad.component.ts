@@ -46,7 +46,7 @@ export class ListarCiudadComponent implements OnInit {
   ciudadF = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
   provinciaF = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
 
-  // ASIGNACIÓN DE VALIDACIONES A INPUTS DEL FORMULARIO
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public formulario = new FormGroup({
     ciudadForm: this.ciudadF,
     provinciaForm: this.provinciaF,
@@ -71,7 +71,7 @@ export class ListarCiudadComponent implements OnInit {
     this.ObtenerLogo();
   }
 
-  // METODO PARA VER LA INFORMACIÓN DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -183,7 +183,7 @@ export class ListarCiudadComponent implements OnInit {
   getDocumentDefinicion() {
     sessionStorage.setItem("Ciudades", this.datosCiudades);
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: "landscape",
       watermark: {
         text: this.frase,
@@ -203,7 +203,7 @@ export class ListarCiudadComponent implements OnInit {
         opacity: 0.3,
         alignment: "right",
       },
-      // PIE DE PÁGINA
+      // PIE DE PAGINA
       footer: function (
         currentPage: any,
         pageCount: any,

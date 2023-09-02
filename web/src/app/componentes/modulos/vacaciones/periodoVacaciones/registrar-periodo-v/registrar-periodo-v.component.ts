@@ -26,7 +26,7 @@ export class RegistrarPeriodoVComponent implements OnInit {
   // Datos del empleado
   empleados: any = [];
 
-  // Control de campos y validaciones del formulario
+  // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreEmpleadoF = new FormControl('', [Validators.required]);
   descripcionF = new FormControl('', [Validators.required, Validators.minLength(4)]);
   diaVacacionF = new FormControl(0, [Validators.required]);
@@ -38,7 +38,7 @@ export class RegistrarPeriodoVComponent implements OnInit {
   fechaInicioF = new FormControl('', [Validators.required]);
   diaPerdidoF = new FormControl(0, [Validators.required]);
 
-  // Asignación de validaciones a inputs del formulario
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public PerVacacionesForm = new FormGroup({
     nombreEmpleadoForm: this.nombreEmpleadoF,
     descripcionForm: this.descripcionF,
@@ -72,7 +72,7 @@ export class RegistrarPeriodoVComponent implements OnInit {
     })
   }
 
-  // METODO para ver la información del empleado 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
   ObtenerEmpleados(idemploy: any) {
     this.empleados = [];
     this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -85,7 +85,7 @@ export class RegistrarPeriodoVComponent implements OnInit {
   }
 
 
-  // METODO para ver la información del empleado 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
   datosContrato: any = [];
   ObtenerContrato() {
     this.datosContrato = [];
@@ -98,7 +98,7 @@ export class RegistrarPeriodoVComponent implements OnInit {
     })
   }
 
-  ValidarDatosPerVacacion(form) {
+  ValidarDatosPerVacacion(form: any) {
     if (form.fechaFinForm === '') {
       form.fechaFinForm = null;
       this.InsertarPerVacacion(form);
@@ -114,7 +114,7 @@ export class RegistrarPeriodoVComponent implements OnInit {
     }
   }
 
-  InsertarPerVacacion(form) {
+  InsertarPerVacacion(form: any) {
     let datosPerVacaciones = {
       id_empl_contrato: this.datoEmpleado.idContrato,
       descripcion: form.descripcionForm,
@@ -129,12 +129,12 @@ export class RegistrarPeriodoVComponent implements OnInit {
       codigo: parseInt(this.empleados[0].codigo)
     };
     this.restV.CrearPerVacaciones(datosPerVacaciones).subscribe(response => {
-      this.toastr.success('Operación Exitosa', 'Período de Vacaciones registrado', {
+      this.toastr.success('Operación exitosa.', 'Período de Vacaciones registrado', {
         timeOut: 6000,
       })
       this.CerrarVentanaRegistroPerVacaciones();
     }, error => {
-      this.toastr.error('Operación Fallida', 'Período de Vacaciones no fue registrado', {
+      this.toastr.error('Ups!!! algo salio mal.', 'Período de Vacaciones no fue registrado', {
         timeOut: 6000,
       })
     });
@@ -163,7 +163,7 @@ export class RegistrarPeriodoVComponent implements OnInit {
     else {
       keynum = evt.which;
     }
-    // Comprobamos si se encuentra en el rango numérico y que teclas no recibirá.
+    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
     if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6) {
       return true;
     }

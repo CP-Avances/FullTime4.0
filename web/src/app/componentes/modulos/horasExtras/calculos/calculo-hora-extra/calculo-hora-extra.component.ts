@@ -25,7 +25,7 @@ interface tipoDia {
 })
 export class CalculoHoraExtraComponent implements OnInit {
 
-  // Control de campos y validaciones del formulario
+  // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
 
   nombreEmpleadoF = new FormControl('');
   seleccionarHoraF = new FormControl('', [Validators.required]);
@@ -85,7 +85,7 @@ export class CalculoHoraExtraComponent implements OnInit {
     });
   }
 
-  insertarTipoPermiso(form) {
+  insertarTipoPermiso(form: any) {
     let dataHoraExtra = {
       id_hora_extr_pedido: 1,
       id_empl_cargo: 1,
@@ -108,7 +108,7 @@ export class CalculoHoraExtraComponent implements OnInit {
 
   IngresarDatos(datos) {
     /* this.rest.RegistrarTipoPermiso(datos).subscribe(res => {
-       this.toastr.success('Operación Exitosa', 'Tipo Permiso guardado', {
+       this.toastr.success('Operación exitosa.', 'Tipo Permiso guardado', {
         timeOut: 6000,
       });
        window.location.reload();

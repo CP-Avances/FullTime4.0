@@ -64,6 +64,7 @@ class CargaMultipleControlador {
             fs_1.default.unlinkSync(filePath);
         });
     }
+    // **************** verificar empl_horario
     CargarHorarioMultiplesEmpleados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let list = req.files;

@@ -1,0 +1,83 @@
+<div class="container" *ngFor="let m of datosMenu" style="padding-top: 15px;">
+    <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo">
+            <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px;"
+                (click)="VerListaServicios()">
+                Listar menús
+            </button>
+            <span>MENÚ: {{m.nombre.toUpperCase()}}</span>
+            <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                (click)="AbrirVentanaEditar(m)">
+                Editar
+            </button>
+        </div>
+        <mat-card-content>
+            <div class="container" style="padding-top: 15px;">
+                <div class="row">
+                    <div class="col-md">
+                        <label id="datosF" class="col-sm col-form-label">Servicio:</label>
+                        <br>
+                        <label class="col-sm col-form-label">{{m.tipo}}</label>
+                    </div>
+                    <div class="col-md">
+                        <label id="datosF" class="col-sm col-form-label">Hora desde:</label>
+                        <br>
+                        <label class="col-sm col-form-label">{{m.hora_inicio_}}</label>
+                    </div>
+                    <div class="col-md">
+                        <label id="datosF" class="col-sm col-form-label">Hora hasta:</label>
+                        <br>
+                        <label class="col-sm col-form-label">{{m.hora_fin_}}</label>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="container" style="padding-bottom: 25px; text-align: center;">
+                <div class="mat-elevation-z8" style="background: white;">
+                    <div id="titulo">
+                        <span> DETALLES DEL MENÚ</span>
+                        <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                            (click)="AbrirVentanaDetalles(m)">
+                            Registrar detalle
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead class="thead-light">
+                                <tr style="text-align: center;">
+                                    <th scope="col">Plato</th>
+                                    <th scope="col">Valor</th>
+                                    <th scope="col">Observación</th>
+                                    <th scope="col">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let dm of datosDetalle | paginate:tamanio_pagina:numero_pagina">
+                                    <td>{{dm.plato}}</td>
+                                    <td>$ {{dm.valor}}</td>
+                                    <td>{{dm.observacion}}</td>
+                                    <td>
+                                        <i id="editarI" (click)="AbrirVentanaEditarDetalle(dm)" matSuffix
+                                            matTooltipPosition="right" matTooltip="Modificar datos de este registro"
+                                            class="fas fa-edit">
+                                            <p>Editar</p>
+                                        </i>
+                                        <i matSuffix matTooltipPosition="right" matTooltip="Eliminar registro"
+                                            class="far fa-trash-alt" (click)="ConfirmarDelete(dm)"
+                                            style="color:red; margin-left: 15px;">
+                                            <p>Eliminar</p>
+                                        </i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <mat-paginator id="pagina" [length]="datosDetalle.length" [pageSize]="tamanio_pagina"
+                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)"
+                        showFirstLastButtons>
+                    </mat-paginator>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

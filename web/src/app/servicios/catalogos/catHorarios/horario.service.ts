@@ -22,9 +22,9 @@ export class HorarioService {
     return this.http.post(`${environment.url}/horario/buscar-horario/nombre`, datos);
   }
 
-  // CARGAR ARCHIVO DE RESPALDO
-  SubirArchivo(formData: any, id: number, nombre: string) {
-    return this.http.put(`${environment.url}/horario/${id}/documento/${nombre}`, formData)
+  // CARGAR ARCHIVO DE RESPALDO   --**VERIFICADO
+  SubirArchivo(formData: any, id: number, archivo: any, codigo: any) {
+    return this.http.put(`${environment.url}/horario/${id}/documento/${archivo}/verificar/${codigo}`, formData)
   }
 
   // ACTUALIZACION DE HORARIO
@@ -42,7 +42,7 @@ export class HorarioService {
     return this.http.put(`${environment.url}/horario/eliminar_horario/servidor`, datos)
   }
 
-  // BUSCAR LISTA DE CATALOGO DE HORARIOS
+  // BUSCAR LISTA DE CATALOGO DE HORARIOS         --** VERIFICADO
   BuscarListaHorarios() {
     return this.http.get(`${environment.url}/horario`);
   }
@@ -81,7 +81,7 @@ export class HorarioService {
 
 
 
-  
+
   // VERIFICAR DATOS DE LA PLANTILLA DE CATÁLOGO HORARIO Y CARGAR AL SISTEMA
   VerificarDatosHorario(formData) {
     return this.http.post<any>(`${environment.url}/horario/cargarHorario/verificarDatos/upload`, formData);

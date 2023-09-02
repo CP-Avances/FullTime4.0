@@ -49,7 +49,7 @@ export class ConfirmarContraseniaComponent implements OnInit {
   }
 
   // NETODO PARA CAMBIAR CONTRASEÑA
-  EnviarContraseniaConfirmacion(form) {
+  EnviarContraseniaConfirmacion(form: any) {
 
     // CIFRADO DE CONTRASEÑA
     const md5 = new Md5();
@@ -68,7 +68,7 @@ export class ConfirmarContraseniaComponent implements OnInit {
         });
       } else {
         this.router.navigate(['/login']);
-        this.toastr.success('Operación exitosa', this.mensaje.message, {
+        this.toastr.success('Operación exitosa.', this.mensaje.message, {
           timeOut: 6000,
         });
       }

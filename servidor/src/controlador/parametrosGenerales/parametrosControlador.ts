@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { QueryResult } from 'pg';
 import pool from '../../database';
 import fs from 'fs';
 const builder = require('xmlbuilder');
@@ -7,11 +8,15 @@ class ParametrosControlador {
 
     // METODO PARA LISTAR PARAMETROS GENERALES
     public async ListarParametros(req: Request, res: Response) {
-        const PARAMETRO = await pool.query(
-            `
-            SELECT tp.id, tp.descripcion, dtp.descripcion AS detalle
+        /**
+          SELECT tp.id, tp.descripcion, dtp.descripcion AS detalle
             FROM tipo_parametro AS tp, detalle_tipo_parametro AS dtp
             WHERE tp.id = dtp.id_tipo_parametro
+         */
+        const PARAMETRO = await pool.query(
+            `
+            SELECT tp.id, tp.descripcion
+            FROM tipo_parametro AS tp
             `
         );
         if (PARAMETRO.rowCount > 0) {
@@ -125,12 +130,20 @@ class ParametrosControlador {
     // METODO PARA INGRESAR TIPO PARAMETRO GENERAL
     public async IngresarTipoParametro(req: Request, res: Response): Promise<any> {
         const { descripcion } = req.body;
-        await pool.query(
+        const response: QueryResult = await pool.query(
             `
-            INSERT INTO tipo_parametro (descripcion) VALUES ($1)
+            INSERT INTO tipo_parametro (descripcion) VALUES ($1) RETURNING *
             `
             , [descripcion]);
-        res.jsonp({ message: 'Registro exitoso.' });
+
+        const [parametro] = response.rows;
+
+        if (parametro) {
+            return res.status(200).jsonp({ message: 'OK', respuesta: parametro })
+        }
+        else {
+            return res.status(404).jsonp({ message: 'error' })
+        }
     }
 
     // METODO PARA COMPARAR COORDENADAS

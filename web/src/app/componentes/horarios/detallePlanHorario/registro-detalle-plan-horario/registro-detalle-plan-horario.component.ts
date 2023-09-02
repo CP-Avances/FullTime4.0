@@ -44,7 +44,7 @@ export class RegistroDetallePlanHorarioComponent implements OnInit {
   fechaF = new FormControl('', [Validators.required]);
   horarioF = new FormControl('', [Validators.required]);
 
-  // Asignación de validaciones a inputs del formulario
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public DetallePlanHorarioForm = new FormGroup({
     fechaForm: this.fechaF,
     tipoDiaForm: this.tipoDia,
@@ -114,7 +114,7 @@ export class RegistroDetallePlanHorarioComponent implements OnInit {
     })
   }
 
-  ValidarRegistro(form) {
+  ValidarRegistro(form: any) {
     var fin = this.data.planHorario.fec_final.split('T')[0];
     var inicio = this.data.planHorario.fec_inicio.split('T')[0];
     var ingreso = String(moment(form.fechaForm, "YYYY/MM/DD").format("YYYY-MM-DD"));
@@ -129,7 +129,7 @@ export class RegistroDetallePlanHorarioComponent implements OnInit {
     }
   }
 
-  InsertarDetallePlanHorario(form) {
+  InsertarDetallePlanHorario(form: any) {
     let datosBusqueda = {
       id_plan_horario: this.data.planHorario.id,
       fecha: form.fechaForm,
@@ -154,7 +154,7 @@ export class RegistroDetallePlanHorarioComponent implements OnInit {
   }
 
   detalles: any = [];
-  IngresarPlanGeneral(form) {
+  IngresarPlanGeneral(form: any) {
     this.detalles = [];
     this.restD.ConsultarUnDetalleHorario(form.horarioForm).subscribe(res => {
       this.detalles = res;
@@ -165,7 +165,7 @@ export class RegistroDetallePlanHorarioComponent implements OnInit {
         }
         let plan = {
           fec_hora_horario: moment(form.fechaForm).format('YYYY-MM-DD') + ' ' + element.hora,
-          maxi_min_espera: accion,
+          tolerancia: accion,
           estado: null,
           id_det_horario: element.id,
           fec_horario: form.fechaForm,
@@ -177,7 +177,7 @@ export class RegistroDetallePlanHorarioComponent implements OnInit {
         this.restP.CrearPlanGeneral(plan).subscribe(res => {
         })
       })
-      this.toastr.success('Operación Exitosa', 'Detalle de Planificación de Horario registrado', {
+      this.toastr.success('Operación exitosa.', 'Detalle de Planificación de Horario registrado', {
         timeOut: 6000,
       });
     });
@@ -198,7 +198,7 @@ export class RegistroDetallePlanHorarioComponent implements OnInit {
     }
   }
 
-  VerificarDetalles(form) {
+  VerificarDetalles(form: any) {
     this.restD.ConsultarUnDetalleHorario(form.horarioForm).subscribe(res => {
     },
       erro => {

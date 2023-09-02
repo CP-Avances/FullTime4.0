@@ -8,6 +8,7 @@ import { ThemePalette } from '@angular/material/core';
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
+import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 
 const OPTIONS_HORARIOS = [
   { orden: 1, accion: 'E', view_option: 'Entrada' },
@@ -28,7 +29,9 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
   tercero: boolean = false;
   comida: boolean = false;
 
+  min_despuesF = new FormControl('');
   minEsperaF = new FormControl('');
+  min_antesF = new FormControl('');
   segundoF = new FormControl(false);
   terceroF = new FormControl(false);
   accionF = new FormControl('', [Validators.required]);
@@ -37,6 +40,8 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
 
   // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public formulario = new FormGroup({
+    min_despuesForm: this.min_despuesF,
+    min_antesForm: this.min_antesF,
     minEsperaForm: this.minEsperaF,
     terceroForm: this.terceroF,
     segundoForm: this.segundoF,
@@ -56,18 +61,37 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
   options = OPTIONS_HORARIOS;
   espera: boolean = false;
 
+  acciones: boolean = false;
+
   constructor(
     public ventana: MatDialogRef<EditarDetalleCatHorarioComponent>,
     public validar: ValidacionesService,
     public restH: HorarioService,
     public rest: DetalleCatHorariosService,
     private toastr: ToastrService,
+    private empre: EmpresaService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
   ngOnInit(): void {
+    this.VerEmpresa();
     this.ListarDetalles(this.data.detalle.id_horario);
     this.BuscarDatosHorario(this.data.detalle.id_horario);
+  }
+
+  // METODO DE CONSULTA DE DATOS DE EMPRESA
+  empresa: any = [];
+  VerEmpresa() {
+    this.empresa = [];
+    this.empre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(data => {
+      this.empresa = data;
+      if (this.empresa[0].acciones_timbres === true) {
+        this.acciones = true;
+      }
+      else {
+        this.acciones = false;
+      }
+    });
   }
 
   // METODO PARA BUSCAR DATOS DE HORARIO
@@ -92,6 +116,8 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
       segundoForm: this.data.detalle.segundo_dia,
       terceroForm: this.data.detalle.tercer_dia,
       minEsperaForm: this.data.detalle.minu_espera,
+      min_antesForm: this.data.detalle.min_antes,
+      min_despuesForm: this.data.detalle.min_despues,
     })
     if (obj.orden === 1) {
       this.espera = true;
@@ -167,8 +193,15 @@ export class EditarDetalleCatHorarioComponent implements OnInit {
       id_horario: this.data.detalle.id_horario,
       orden: form.ordenForm,
       hora: form.horaForm,
+      min_antes: this.data.detalle.min_antes,
+      min_despues: this.data.detalle.min_despues,
       id: this.data.detalle.id
     };
+    if (this.acciones === true) {
+      detalle.min_antes = parseInt(form.min_antesForm);
+      detalle.min_despues = parseInt(form.min_despuesForm);
+    }
+    console.log('ver datos de horario ', detalle)
     this.ValidarMinEspera(form, detalle);
     if (this.datosHorario[0].min_almuerzo === 0) {
       this.ValidarDetallesSinAlimentacion(detalle);

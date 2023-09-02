@@ -317,16 +317,17 @@ export interface rango {
 }
 
 export interface checkOptions {
-    opcion: number,
+    opcion: string,
     valor: string
 }
 
 export interface FormCriteriosBusqueda {
-    bool_suc: boolean;
+    bool_suc?: boolean;
     bool_dep: boolean;
     bool_emp: boolean;
     bool_tab?: boolean;
     bool_inc?: boolean;
+    bool_cargo?: boolean;
 }
 
 // REPORTE DE VACUNAS

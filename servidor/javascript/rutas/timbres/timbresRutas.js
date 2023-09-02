@@ -12,6 +12,8 @@ class TimbresRutas {
         this.configuracion();
     }
     configuracion() {
+        // METODO PARA ELIMINAR NOTIFICACIONES DE AVISOS  --**VERIFICADO
+        this.router.put('/eliminar-multiples/avisos', verificarToken_1.TokenValidation, timbresControlador_1.default.EliminarMultiplesAvisos);
         // METODO PARA BUSCAR MARCACIONES
         this.router.get('/', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenerTimbres);
         // METODO PARA BUSCAR EL TIMBRE DE EMPLEADO POR FECHA
@@ -28,7 +30,6 @@ class TimbresRutas {
         this.router.get('/aviso-individual/:id', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenerUnAviso);
         this.router.get('/noti-timbres/avisos/:id_empleado', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenerAvisosTimbresEmpleado);
         this.router.put('/noti-timbres/vista/:id_noti_timbre', verificarToken_1.TokenValidation, timbresControlador_1.default.ActualizarVista);
-        this.router.put('/eliminar-multiples/avisos', verificarToken_1.TokenValidation, timbresControlador_1.default.EliminarMultiplesAvisos);
         this.router.get('/ver/timbres/:id', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenerTimbresEmpleado);
         this.router.get('/ultimo-timbre', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenerUltimoTimbreEmpleado);
     }

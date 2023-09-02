@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -6,11 +15,57 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const verificarPermisos_1 = require("../../libs/Modulos/verificarPermisos");
 const verificarToken_1 = require("../../libs/verificarToken");
 const express_1 = require("express");
+const multer_1 = __importDefault(require("multer"));
+const path_1 = __importDefault(require("path"));
+const database_1 = __importDefault(require("../../database"));
+const moment_1 = __importDefault(require("moment"));
+moment_1.default.locale('es');
 const permisosControlador_1 = __importDefault(require("../../controlador/permisos/permisosControlador"));
-const multipart = require('connect-multiparty');
-const multipartMiddleware = multipart({
-    uploadDir: './permisos',
+// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO
+const ObtenerRuta = function (codigo) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var ruta = '';
+        let separador = path_1.default.sep;
+        const usuario = yield database_1.default.query(`
+        SELECT cedula FROM empleados WHERE codigo = $1
+        `, [codigo]);
+        for (var i = 0; i < __dirname.split(separador).length - 3; i++) {
+            if (ruta === '') {
+                ruta = __dirname.split(separador)[i];
+            }
+            else {
+                ruta = ruta + separador + __dirname.split(separador)[i];
+            }
+        }
+        return ruta + separador + 'permisos' + separador + codigo + '_' + usuario.rows[0].cedula;
+    });
+};
+const storage = multer_1.default.diskStorage({
+    destination: function (req, file, cb) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let { codigo } = req.params;
+            var ruta = yield ObtenerRuta(codigo);
+            cb(null, ruta);
+        });
+    },
+    filename: function (req, file, cb) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // FECHA DEL SISTEMA
+            var fecha = (0, moment_1.default)();
+            var anio = fecha.format('YYYY');
+            var mes = fecha.format('MM');
+            var dia = fecha.format('DD');
+            // DATOS DOCUMENTO
+            let { id, codigo } = req.params;
+            const permiso = yield database_1.default.query(`
+            SELECT num_permiso FROM permisos WHERE id = $1
+            `, [id]);
+            let documento = permiso.rows[0].num_permiso + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
+            cb(null, documento);
+        });
+    }
 });
+const upload = (0, multer_1.default)({ storage: storage });
 class PermisosRutas {
     constructor() {
         this.router = (0, express_1.Router)();
@@ -36,7 +91,9 @@ class PermisosRutas {
         // ACTUALIZAR PERMISO
         this.router.put('/:id/permiso-solicitado', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EditarPermiso);
         // GUARDAR DOCUMENTO DE RESPALDO DE PERMISO
-        this.router.put('/:id/documento/:documento/archivo/:archivo', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation, multipartMiddleware], permisosControlador_1.default.GuardarDocumentoPermiso);
+        this.router.put('/:id/archivo/:archivo/validar/:codigo', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation, upload.single('uploads')], permisosControlador_1.default.GuardarDocumentoPermiso);
+        // GUARDAR DOCUMENTO DE RESPALDO DE PERMISO APLICACION MOVIL
+        this.router.put('/:id/archivo/:archivo/validar/:codigo', upload.single('uploads'), permisosControlador_1.default.GuardarDocumentoPermiso);
         // ELIMINAR DOCUMENTO
         this.router.put('/eliminar-documento', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EliminarDocumentoPermiso);
         // BUSQUEDA DE PERMISOS POR ID DE EMPLEADO
@@ -44,15 +101,19 @@ class PermisosRutas {
         // BUSCAR INFORMACION DE UN PERMISO
         this.router.get('/informe-un-permiso/:id_permiso', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.InformarUnPermiso);
         // ELIMINAR PERMISO
-        this.router.delete('/eliminar/:id_permiso/:doc', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EliminarPermiso);
+        this.router.delete('/eliminar/:id_permiso/:doc/verificar/:codigo', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EliminarPermiso);
         // METODO PARA CREAR ARCHIVO XML
         this.router.post('/xmlDownload/', verificarToken_1.TokenValidation, permisosControlador_1.default.FileXML);
         // METODO PARA DESCARGAR ARCHIVO XML
         this.router.get('/download/:nameXML', permisosControlador_1.default.downloadXML);
         // BUSQUEDA DE RESPALDOS DE PERMISOS
-        this.router.get('/documentos/:docs', permisosControlador_1.default.ObtenerDocumentoPermiso);
+        this.router.get('/documentos/:docs/visualizar/:codigo', permisosControlador_1.default.ObtenerDocumentoPermiso);
         // ENVIAR CORREO MEDIANTE APLICACION WEB
         this.router.post('/mail-noti/', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EnviarCorreoWeb);
+        // ENVIAR CORREO EDICION MEDIANTE APLICACION WEB
+        this.router.post('/mail-noti-editar/', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EnviarCorreoWebEditar);
+        // ENVIAR CORREO MEDIANTE APLICACION WEB SOLICITUDES MULTIPLES
+        this.router.post('/mail-noti/solicitud-multiple', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EnviarCorreoWebMultiple);
         this.router.get('/', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.ListarPermisos);
         this.router.get('/lista/', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.ListarEstadosPermisos);
         this.router.get('/lista-autorizados/', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.ListarPermisosAutorizados);
@@ -71,11 +132,11 @@ class PermisosRutas {
         // BUSCAR INFORMACION DE UN PERMISO
         this.router.get('/un-permiso/:id_permiso', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.ListarUnPermisoInfo);
         // ELIMINAR DOCUMENTO DE PERMISO DESDE APLICACION MOVIL
-        this.router.delete('/eliminar-movil/:documento', permisosControlador_1.default.EliminarPermisoMovil);
+        this.router.delete('/eliminar-movil/:documento/validar:codigo', permisosControlador_1.default.EliminarPermisoMovil);
         // ENVIAR CORREO MEDIANTE APLICACION MOVIL
         this.router.post('/mail-noti-permiso-movil/:id_empresa', permisosControlador_1.default.EnviarCorreoPermisoMovil);
-        // GUARDAR DOCUMENTO DE RESPALDO DE PERMISO APLICACION MOVIL
-        this.router.put('/:id/documento-movil/:documento', [multipartMiddleware], permisosControlador_1.default.GuardarDocumentoPermiso);
+        // ENVIAR CORREO EDICION MEDIANTE APLICACION MOVIL
+        this.router.post('/mail-noti-permiso-editar-movil/:id_empresa', permisosControlador_1.default.EnviarCorreoPermisoEditarMovil);
     }
 }
 const PERMISOS_RUTAS = new PermisosRutas();

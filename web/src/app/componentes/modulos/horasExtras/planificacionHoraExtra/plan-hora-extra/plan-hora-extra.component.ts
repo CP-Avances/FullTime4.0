@@ -1,8 +1,7 @@
 import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
-import { Validators, FormGroup, FormControl } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Component, OnInit, Inject } from '@angular/core';
+import { Validators, FormGroup, FormControl } from '@angular/forms';;
+import { Component, OnInit, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import * as moment from 'moment';
 
@@ -11,6 +10,8 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { RealTimeService } from 'src/app/servicios/notificaciones/real-time.service';
+
+import { ListaEmplePlanHoraEComponent } from '../empleados-planificar/lista-emple-plan-hora-e.component';
 
 interface Estado {
   id: number,
@@ -31,6 +32,8 @@ interface Estado {
 
 export class PlanHoraExtraComponent implements OnInit {
 
+  @Input() data: any;
+
   estados: Estado[] = [
     { id: 1, nombre: 'Pendiente' },
     { id: 2, nombre: 'Pre-autorizado' },
@@ -47,7 +50,7 @@ export class PlanHoraExtraComponent implements OnInit {
   horaFinF = new FormControl('', [Validators.required]);
   horasF = new FormControl('', [Validators.required]);
 
-  public PedirHoraExtraForm = new FormGroup({
+  public formulario = new FormGroup({
     fechaSolicitudForm: this.fechaSolicitudF,
     descripcionForm: this.descripcionF,
     fechaInicioForm: this.fechaInicioF,
@@ -63,13 +66,12 @@ export class PlanHoraExtraComponent implements OnInit {
 
   constructor(
     public restEmpleado: EmpleadoService,
-    public ventana: MatDialogRef<PlanHoraExtraComponent>,
+    public componenteb: ListaEmplePlanHoraEComponent,
     public validar: ValidacionesService,
     public aviso: RealTimeService,
     private restPE: PlanHoraExtraService,
     private toastr: ToastrService,
     private parametro: ParametrosService,
-    @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
   ngOnInit(): void {
@@ -80,7 +82,7 @@ export class PlanHoraExtraComponent implements OnInit {
     this.id_user_loggin = parseInt(localStorage.getItem("empleado") as string);
     this.id_cargo_loggin = parseInt(localStorage.getItem("ultimoCargo") as string);
 
-    this.PedirHoraExtraForm.patchValue({
+    this.formulario.patchValue({
       fechaSolicitudForm: this.FechaActual,
     });
 
@@ -96,7 +98,7 @@ export class PlanHoraExtraComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarFecha() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
@@ -145,7 +147,7 @@ export class PlanHoraExtraComponent implements OnInit {
 
   // METODO DE PLANIFICACION DE HORAS EXTRAS
   InsertarPlanificacion(form: any) {
-    // DATOS DE PLANIFICACIÓN
+    // DATOS DE PLANIFICACION
     let planificacion = {
       id_empl_planifica: this.id_user_loggin,
       horas_totales: form.horasForm,
@@ -156,7 +158,7 @@ export class PlanHoraExtraComponent implements OnInit {
       hora_fin: form.horaFinForm,
     }
 
-    // INSERCIÓN DE PLANIFICACIÓN
+    // INSERCIÓN DE PLANIFICACION
     this.restPE.CrearPlanificacionHoraExtra(planificacion).subscribe(res => {
 
       if (res.message != 'error') {
@@ -167,14 +169,14 @@ export class PlanHoraExtraComponent implements OnInit {
           '</th><th>' + this.data.planifica.cedula + '</th></tr>';
         let cuenta_correo = this.data.planifica.correo;
 
-        // LECTURA DE DATOS DE LA PLANIFICACIÓN
+        // LECTURA DE DATOS DE LA PLANIFICACION
         let desde = this.validar.FormatearFecha(plan.fecha_desde, this.formato_fecha, this.validar.dia_completo);
         let hasta = this.validar.FormatearFecha(plan.fecha_hasta, this.formato_fecha, this.validar.dia_completo);
 
         let h_inicio = this.validar.FormatearHora(plan.hora_inicio, this.formato_hora)
         let h_fin = this.validar.FormatearHora(plan.hora_fin, this.formato_hora);
 
-        // DATOS DE ASIGNACIÓN DE PLANIFICACIÓN A EMPLEADOS
+        // DATOS DE ASIGNACIÓN DE PLANIFICACION A EMPLEADOS
         let planEmpleado = {
           estado: 1,
           codigo: this.data.planifica.codigo,
@@ -185,7 +187,7 @@ export class PlanHoraExtraComponent implements OnInit {
           id_empl_contrato: this.data.planifica.id_contrato
         }
 
-        // VALIDAR SI LA PLANIFICACIÓN ES DE VARIOS USUARIOS
+        // VALIDAR SI LA PLANIFICACION ES DE VARIOS USUARIOS
         if (this.data.planifica.length != undefined) {
           this.CrearPlanSeleccionados(plan, planEmpleado, desde, hasta, h_inicio, h_fin);
         }
@@ -281,9 +283,9 @@ export class PlanHoraExtraComponent implements OnInit {
   }
 
   // METODO PARA CALCULAR HORAS SOLICITADAS
-  CalcularTiempo(form) {
+  CalcularTiempo(form: any) {
     // LIMPIAR CAMPO NÚMERO DE HORAS
-    this.PedirHoraExtraForm.patchValue({ horasForm: '' })
+    this.formulario.patchValue({ horasForm: '' })
 
     // VALIDAR HORAS INGRESDAS
     if (form.horaInicioForm != '' && form.horaFinForm != '') {
@@ -304,7 +306,7 @@ export class PlanHoraExtraComponent implements OnInit {
       }
       // COLOCAR FORMATO DE HORAS EN FORMULARIO
       var tiempoTotal: string = horas + ':' + minutos;
-      this.PedirHoraExtraForm.patchValue({ horasForm: tiempoTotal })
+      this.formulario.patchValue({ horasForm: tiempoTotal })
     }
     else {
       this.toastr.info('Debe ingresar la hora de inicio y la hora de fin de actividades.', 'VERIFICAR', {
@@ -318,7 +320,7 @@ export class PlanHoraExtraComponent implements OnInit {
     let mensaje = {
       id_empl_envia: this.id_user_loggin,
       id_empl_recive: recibe,
-      tipo: 10, // PLANIFICACIÓN DE HORAS EXTRAS
+      tipo: 10, // PLANIFICACION DE HORAS EXTRAS
       mensaje: 'Planificación de horas extras desde ' +
         desde + ' hasta ' +
         hasta +
@@ -329,7 +331,7 @@ export class PlanHoraExtraComponent implements OnInit {
     });
   }
 
-  // METODO DE ENVIO DE CORREO DE PLANIFICACIÓN DE HORAS EXTRAS
+  // METODO DE ENVIO DE CORREO DE PLANIFICACION DE HORAS EXTRAS
   EnviarCorreo(datos: any, cuenta_correo: any, usuario: any, desde: any, hasta: any, h_inicio: any, h_fin: any) {
 
     // DATOS DE ESTRUCTURA DEL CORREO
@@ -348,7 +350,7 @@ export class PlanHoraExtraComponent implements OnInit {
       fin: h_fin,
     }
 
-    // METODO ENVIO DE CORREO DE PLANIFICACIÓN DE HE
+    // METODO ENVIO DE CORREO DE PLANIFICACION DE HE
     this.restPE.EnviarCorreoPlanificacion(DataCorreo).subscribe(res => {
       if (res.message === 'ok') {
         this.toastr.success('Correo de planificación enviado exitosamente.', '', {
@@ -398,22 +400,25 @@ export class PlanHoraExtraComponent implements OnInit {
   }
 
   // METODOS DE VALIDACION DE INGRESO DE LETRAS Y NUMEROS
-  IngresarSoloLetras(e) {
-    this.validar.IngresarSoloLetras(e);
+  IngresarSoloLetras(e: any) {
+    return this.validar.IngresarSoloLetras(e);
   }
 
-  IngresarSoloNumeros(evt) {
-    this.validar.IngresarSoloNumeros(evt);
+  IngresarSoloNumeros(evt: any) {
+    return this.validar.IngresarSoloNumeros(evt);
   }
 
   // METODOS DE LIMIEZA DE FORMULARIOS Y CERRAR COMPONENTE
   LimpiarCampoHoras() {
-    this.PedirHoraExtraForm.patchValue({ horasForm: '' })
+    this.formulario.patchValue({ horasForm: '' })
   }
 
+  // METODO PARA CERRAR REGISTRO
   CerrarVentana() {
-    this.PedirHoraExtraForm.reset();
-    this.ventana.close();
+    this.formulario.reset();
+    this.componenteb.ver_busqueda = true;
+    this.componenteb.ver_planificar = false;
+    this.componenteb.LimpiarFormulario();
   }
 
 }

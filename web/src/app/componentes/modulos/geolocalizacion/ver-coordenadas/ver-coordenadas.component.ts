@@ -1,28 +1,27 @@
-// SECCIÓN DE LIBRERIAS
-import { Component, OnInit } from '@angular/core';
+// SECCION DE LIBRERIAS
+import { Component, Input, OnInit } from '@angular/core';
+import { FormControl, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { MatRadioChange } from '@angular/material/radio';
+import { SelectionModel } from '@angular/cdk/collections';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatRadioChange } from '@angular/material/radio';
-import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.model';
-
-import { SelectionModel } from '@angular/cdk/collections';
-
 
 // IMPORTAR MODELOS
+import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.model';
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 
-
-// SECCIÓN DE SERVICIOS
-import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+// SECCION DE SERVICIOS
 import { EmpleadoUbicacionService } from 'src/app/servicios/empleadoUbicacion/empleado-ubicacion.service';
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+
 import { EditarCoordenadasComponent } from '../editar-coordenadas/editar-coordenadas.component';
+import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
+import { ListarCoordenadasComponent } from '../listar-coordenadas/listar-coordenadas.component';
 
 export interface EmpleadoElemento {
   id_emplu: number;
@@ -40,7 +39,7 @@ export interface EmpleadoElemento {
 
 export class VerCoordenadasComponent implements OnInit {
 
-  buscador !: FormGroup;
+  @Input() idUbicacion: number;
 
   asignar: boolean = false;
 
@@ -49,38 +48,74 @@ export class VerCoordenadasComponent implements OnInit {
   nombre_emp = new FormControl('', [Validators.minLength(2)]);
   nombre_dep = new FormControl('', [Validators.minLength(2)]);
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
+  nombre_carg = new FormControl('', [Validators.minLength(2)]);
   seleccion = new FormControl('');
-
-  filtroNombreSuc_: string = '';
-
-  filtroNombreDep_: string = '';
-
-  filtroCodigo_: number;
-  filtroCedula_: string = '';
-  filtroNombreEmp_: string = '';
-
 
   public _booleanOptions: FormCriteriosBusqueda = {
     bool_suc: false,
     bool_dep: false,
     bool_emp: false,
+    bool_cargo: false,
   };
 
+  // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA
+  selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
+  selectionCarg = new SelectionModel<ITableEmpleados>(true, []);
+  selectionDep = new SelectionModel<ITableEmpleados>(true, []);
+  selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
   public check: checkOptions[];
 
+  departamentos: any = [];
+  sucursales: any = [];
+  respuesta: any[];
+  empleados: any = [];
+  origen: any = [];
+  data_pdf: any = [];
 
+  // ITEMS DE PAGINACION DE LA TABLA SUCURSAL
+  pageSizeOptions_suc = [5, 10, 20, 50];
+  tamanio_pagina_suc: number = 5;
+  numero_pagina_suc: number = 1;
 
+  // ITEMS DE PAGINACION DE LA TABLA CARGO
+  pageSizeOptions_car = [5, 10, 20, 50];
+  tamanio_pagina_car: number = 5;
+  numero_pagina_car: number = 1;
 
+  // ITEMS DE PAGINACION DE LA TABLA DEPARTAMENTO
+  pageSizeOptions_dep = [5, 10, 20, 50];
+  tamanio_pagina_dep: number = 5;
+  numero_pagina_dep: number = 1;
 
+  // ITEMS DE PAGINACION DE LA TABLA EMPLEADOS
+  pageSizeOptions_emp = [5, 10, 20, 50];
+  tamanio_pagina_emp: number = 5;
+  numero_pagina_emp: number = 1;
 
+  // FILTROS SUCURSALES
+  filtroNombreSuc_: string = '';
+  get filtroNombreSuc() { return this.filtros.filtroNombreSuc }
 
+  // FILTROS DEPARTAMENTOS
+  filtroNombreDep_: string = '';
+  get filtroNombreDep() { return this.filtros.filtroNombreDep }
 
+  // FILTROS EMPLEADO
+  filtroCodigo_: any;
+  filtroCedula_: string = '';
+  filtroNombreEmp_: string = '';
+  get filtroNombreEmp() { return this.filtros.filtroNombreEmp };
+  get filtroCodigo() { return this.filtros.filtroCodigo };
+  get filtroCedula() { return this.filtros.filtroCedula };
 
-  idUbicacion: string;
+  // FILTRO CARGOS
+  filtroNombreCarg_: string = '';
+  get filtroNombreCarg() { return this.filtros.filtroNombreCarg };
+
   coordenadas: any = [];
   datosUsuarios: any = [];
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA
+  // ITEMS DE PAGINACION DE LA TABLA
   numero_pagina: number = 1;
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
@@ -91,87 +126,47 @@ export class VerCoordenadasComponent implements OnInit {
     public restP: ParametrosService,
     public router: Router,
     public ventana: MatDialog,
-
-
-    private reporteService: ReportesService,
-    private validacionService: ValidacionesService,
-
-    private R_asistencias: ReportesAsistenciasService,
-
-
-  ) {
-    var cadena = this.router.url;
-    var aux = cadena.split("/");
-    this.idUbicacion = aux[2];
-  }
+    private filtros: ReportesService,
+    private validar: ValidacionesService,
+    public informacion: DatosGeneralesService,
+    public componentec: ListarCoordenadasComponent,
+  ) { }
 
   ngOnInit(): void {
-    this.BuscarUbicacion(this.idUbicacion);
-    this.ListarUsuarios(parseInt(this.idUbicacion));
-
-
-
-
-
-    this.check = this.reporteService.checkOptions(3);
-    console.log('CHECK ', this.check);
-
-
-
-
-
-
-
-
-
-    sessionStorage.removeItem('reporte_timbres_multiple');
-    this.R_asistencias.DatosGeneralesUsuarios().subscribe((res: any[]) => {
-      sessionStorage.setItem('reporte_timbres_multiple', JSON.stringify(res))
-
-      res.forEach(obj => {
-        this.sucursales.push({
-          id: obj.id_suc,
-          nombre: obj.name_suc
-        })
-      })
-
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
-          this.departamentos.push({
-            id: ele.id_depa,
-            nombre: ele.name_dep
-          })
-        })
-      })
-
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
-          ele.empleado.forEach(r => {
-            let elemento = {
-              id: r.id,
-              nombre: r.name_empleado,
-              codigo: r.codigo,
-              cedula: r.cedula
-            }
-            this.empleados.push(elemento)
-          })
-        })
-      })
-      console.log('SUCURSALES', this.sucursales);
-      console.log('DEPARTAMENTOS', this.departamentos);
-      console.log('EMPLEADOS', this.empleados);
-      // console.log('TABULADO',this.tabulado);
-      // console.log('INCOMPLETOS',this.incompletos);
-
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-
-
-
+    this.check = this.filtros.checkOptions([{ opcion: 's' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
+    this.ConsultarDatos();
   }
 
-  // METODO PARA MANEJAR PAGINACIÓN DE TABLAS
+  // METODO PARA CONSULTAR INFORMACION
+  ConsultarDatos() {
+    this.BuscarUbicacion(this.idUbicacion);
+    this.ListarUsuarios(this.idUbicacion);
+    this.BuscarInformacion();
+    this.BuscarCargos();
+  }
+
+  ngOnDestroy() {
+    this.filtros.GuardarCheckOpcion('');
+    this.filtros.DefaultFormCriterios();
+    this.filtros.DefaultValoresFiltros();
+    this.origen = [];
+    this.origen_cargo = [];
+  }
+
+  // METODO PARA ACTIVAR SELECCION MULTIPLE PARA ELIMINAR
+  btnCheckHabilitar: boolean = false;
+  auto_individual: boolean = true;
+  HabilitarSeleccion() {
+    if (this.btnCheckHabilitar === false) {
+      this.btnCheckHabilitar = true;
+      this.auto_individual = false;
+    } else if (this.btnCheckHabilitar === true) {
+      this.btnCheckHabilitar = false;
+      this.auto_individual = true;
+    }
+  }
+
+  // METODO PARA MANEJAR PAGINACION DE TABLAS
   ManejarPagina(e: PageEvent) {
     this.numero_pagina = e.pageIndex + 1
     this.tamanio_pagina = e.pageSize;
@@ -185,7 +180,7 @@ export class VerCoordenadasComponent implements OnInit {
     })
   }
 
-  // METODO PARA BUSCAR DETALLES DE PARAMÉTRO GENERAL
+  // METODO PARA BUSCAR DETALLES DE PARAMETRO GENERAL
   ListarUsuarios(id: number) {
     this.datosUsuarios = [];
     this.restU.ListarCoordenadasUsuarioU(id).subscribe(datos => {
@@ -193,24 +188,24 @@ export class VerCoordenadasComponent implements OnInit {
     })
   }
 
-  // METODO PARA INGRESAR DETALLE DE PARÁMETRO
+  // METODO PARA ASIGNAR UBICACION A USUARIOS
   AbrirVentanaBusqueda(): void {
     if (this.asignar === true) {
       this.asignar = false;
-      this.reporteService.DefaultFormCriterios();
-      this.reporteService.DefaultValoresFiltros();
+      this.filtros.DefaultFormCriterios();
+      this.filtros.DefaultValoresFiltros();
       this.seleccion.reset();
     } else {
       this.asignar = true;
     }
   }
 
-  // METODO PARA EDITAR PARÁMETRO
+  // METODO PARA EDITAR COORDENADAS
   AbrirVentanaEditar(datos: any): void {
     this.ventana.open(EditarCoordenadasComponent,
       { width: '400px', data: { ubicacion: datos, actualizar: true } }).afterClosed().subscribe(item => {
         this.BuscarUbicacion(this.idUbicacion);
-        this.ListarUsuarios(parseInt(this.idUbicacion));
+        this.ListarUsuarios(this.idUbicacion);
       });
   }
 
@@ -220,8 +215,7 @@ export class VerCoordenadasComponent implements OnInit {
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 6000,
       });
-      this.BuscarUbicacion(this.idUbicacion);
-      this.ListarUsuarios(parseInt(this.idUbicacion));
+      this.ConsultarDatos();
     });
   }
 
@@ -231,179 +225,319 @@ export class VerCoordenadasComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.EliminarRegistro(datos.id_emplu);
-        } else {
-          this.router.navigate(['/detalle-coordenadas/', this.idUbicacion]);
         }
       });
   }
 
 
+  // BUSCAR DATOS DE USUARIOS
+  BuscarInformacion() {
+    this.departamentos = [];
+    this.sucursales = [];
+    this.empleados = [];
+    this.origen = [];
+    let ubicacion = {
+      ubicacion: this.idUbicacion
+    }
+    this.informacion.ObtenerInformacionUbicacion(ubicacion).subscribe((res: any[]) => {
+      this.origen = JSON.stringify(res);
 
+      res.forEach(obj => {
+        this.sucursales.push({
+          id: obj.id_suc,
+          nombre: obj.name_suc
+        })
+      })
 
-  ngOnDestroy() {
-    this.reporteService.GuardarCheckOpcion(0);
-    this.reporteService.DefaultFormCriterios();
-    this.reporteService.DefaultValoresFiltros();
-    console.log('Componenete destruido');
+      res.forEach(obj => {
+        obj.departamentos.forEach(ele => {
+          this.departamentos.push({
+            id: ele.id_depa,
+            departamento: ele.name_dep,
+            nombre: ele.sucursal
+          })
+        })
+      })
+
+      res.forEach(obj => {
+        obj.departamentos.forEach(ele => {
+          ele.empleado.forEach(r => {
+            let elemento = {
+              id: r.id,
+              nombre: r.name_empleado,
+              codigo: r.codigo,
+              cedula: r.cedula,
+              correo: r.correo,
+              id_cargo: r.id_cargo,
+              id_contrato: r.id_contrato,
+            }
+            this.empleados.push(elemento)
+          })
+        })
+      })
+    }, err => { })
   }
 
-  opcion: number;
+  // METODO PARA FILTRAR POR CARGOS
+  empleados_cargos: any = [];
+  origen_cargo: any = [];
+  cargos: any = [];
+  BuscarCargos() {
+    this.empleados_cargos = [];
+    this.origen_cargo = [];
+    this.cargos = [];
+    let ubicacion = {
+      ubicacion: this.idUbicacion
+    }
+    this.informacion.ObtenerInformacionCargosUbicacion(ubicacion).subscribe((res: any[]) => {
+      this.origen_cargo = JSON.stringify(res);
+
+      res.forEach(obj => {
+        this.cargos.push({
+          id: obj.id_cargo,
+          nombre: obj.name_cargo,
+        })
+      })
+
+      res.forEach(obj => {
+        obj.empleados.forEach(r => {
+          this.empleados_cargos.push({
+            id: r.id,
+            nombre: r.name_empleado,
+            codigo: r.codigo,
+            cedula: r.cedula,
+            correo: r.correo,
+            id_cargo: r.id_cargo,
+            id_contrato: r.id_contrato,
+            hora_trabaja: r.hora_trabaja
+          })
+        })
+      })
+    }, err => { })
+  }
+
+  // METODO PARA ACTIVAR SELECCION MULTIPLE
+  multiple: boolean = false;
+  multiple_: boolean = false;
+  activar_seleccion: boolean = true;
+  HabilitarSeleccion_() {
+    this.multiple = true;
+    this.multiple_ = true;
+    this.activar_seleccion = false;
+  }
+
+  // METODO PARA MOSTRAR DATOS DE BUSQUEDA
+  opcion: string;
   BuscarPorTipo(e: MatRadioChange) {
-    console.log('CHECK ', e.value);
     this.opcion = e.value;
+    this.MostrarLista();
     switch (this.opcion) {
-      case 1:
-        this._booleanOptions.bool_suc = true;
-        this._booleanOptions.bool_dep = false;
-        this._booleanOptions.bool_emp = false;
+      case 's':
+        this.ControlarOpciones(true, false, false, false);
+        this.ControlarBotones(true, false);
         break;
-      case 2:
-        this._booleanOptions.bool_suc = false;
-        this._booleanOptions.bool_dep = true;
-        this._booleanOptions.bool_emp = false;
+      case 'c':
+        this.ControlarOpciones(false, true, false, false);
+        this.ControlarBotones(true, false);
         break;
-      case 3:
-        this._booleanOptions.bool_suc = false;
-        this._booleanOptions.bool_dep = false;
-        this._booleanOptions.bool_emp = true;
+      case 'd':
+        this.ControlarOpciones(false, false, true, false);
+        this.ControlarBotones(true, false);
         break;
-      case 4:
-        this._booleanOptions.bool_suc = false;
-        this._booleanOptions.bool_dep = false;
-        this._booleanOptions.bool_emp = false;
-        break;
-      case 5:
-        this._booleanOptions.bool_suc = false;
-        this._booleanOptions.bool_dep = false;
-        this._booleanOptions.bool_emp = false;
+      case 'e':
+        this.ControlarOpciones(false, false, false, true);
+        this.ControlarBotones(true, false);
         break;
       default:
-        this._booleanOptions.bool_suc = false;
-        this._booleanOptions.bool_dep = false;
-        this._booleanOptions.bool_emp = false;
+        this.ControlarOpciones(false, false, false, false);
+        this.ControlarBotones(true, false);
         break;
     }
-    this.reporteService.GuardarFormCriteriosBusqueda(this._booleanOptions);
-    this.reporteService.GuardarCheckOpcion(this.opcion)
-
+    this.filtros.GuardarFormCriteriosBusqueda(this._booleanOptions);
+    this.filtros.GuardarCheckOpcion(this.opcion)
   }
 
-  Filtrar(e, orden: number) {
+  // METODO PARA CONTROLAR VISUALIZACION DE OPCIONES
+  ControlarOpciones(sucursal: boolean, cargo: boolean, departamento: boolean, empleado: boolean) {
+    this._booleanOptions.bool_suc = sucursal;
+    this._booleanOptions.bool_cargo = cargo;
+    this._booleanOptions.bool_dep = departamento;
+    this._booleanOptions.bool_emp = empleado;
+  }
+
+  // METODO PARA CONTROLAR VISTA DE BOTONES
+  ControlarBotones(seleccion: boolean, multiple: boolean) {
+    this.activar_seleccion = seleccion;
+    this.multiple = multiple;
+    this.multiple_ = multiple;
+  }
+
+  // METODO PARA FILTRAR DATOS DE BUSQUEDA
+  Filtrar(e: any, orden: number) {
+    this.ControlarFiltrado(e);
     switch (orden) {
-      case 1: this.reporteService.setFiltroNombreSuc(e); break;
-      case 2: this.reporteService.setFiltroNombreDep(e); break;
-      case 3: this.reporteService.setFiltroCodigo(e); break;
-      case 4: this.reporteService.setFiltroCedula(e); break;
-      case 5: this.reporteService.setFiltroNombreEmp(e); break;
+      case 1: this.filtros.setFiltroNombreSuc(e); break;
+      case 2: this.filtros.setFiltroNombreCarg(e); break;
+      case 3: this.filtros.setFiltroNombreDep(e); break;
+      case 4: this.filtros.setFiltroCodigo(e); break;
+      case 5: this.filtros.setFiltroCedula(e); break;
+      case 6: this.filtros.setFiltroNombreEmp(e); break;
       default:
         break;
     }
   }
 
-  IngresarSoloLetras(e) {
-    return this.validacionService.IngresarSoloLetras(e);
+  // METODO PARA CONTROLAR FILTROS DE BUSQUEDA
+  ControlarFiltrado(e: any) {
+    if (e === '') {
+      if (this.multiple === true) {
+        this.activar_seleccion = false;
+      }
+      else {
+        if (this.activar_seleccion === false) {
+          this.multiple = true;
+        }
+      }
+    }
+    else {
+      if (this.activar_seleccion === true) {
+        this.activar_seleccion = false;
+        this.multiple_ = true;
+      }
+      else {
+        this.multiple = false;
+      }
+    }
   }
 
-  IngresarSoloNumeros(evt) {
-    return this.validacionService.IngresarSoloNumeros(evt);
+  // METODOS DE VALIDACION DE INGRESO DE LETRAS Y NUMEROS
+  IngresarSoloLetras(e: any) {
+    return this.validar.IngresarSoloLetras(e);
   }
 
-  limpiarCampos() {
-    if (this._booleanOptions.bool_emp === true || this._booleanOptions.bool_tab === true || this._booleanOptions.bool_inc === true) {
+  IngresarSoloNumeros(evt: any) {
+    return this.validar.IngresarSoloNumeros(evt);
+  }
+
+  // METODO PARA LIMPIAR FORMULARIOS
+  LimpiarCampos() {
+    if (this._booleanOptions.bool_emp) {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();
       this._booleanOptions.bool_emp = false;
-      this._booleanOptions.bool_tab = false;
-      this._booleanOptions.bool_inc = false;
+      this.selectionEmp.deselect();
+      this.selectionEmp.clear();
     }
+
     if (this._booleanOptions.bool_dep) {
       this.nombre_dep.reset();
       this._booleanOptions.bool_dep = false;
+      this.selectionDep.clear();
+      this.selectionDep.deselect();
     }
+
     if (this._booleanOptions.bool_suc) {
       this.nombre_suc.reset();
       this._booleanOptions.bool_suc = false;
+      this.selectionSuc.deselect();
+      this.selectionSuc.clear();
     }
+
+    if (this._booleanOptions.bool_cargo) {
+      this._booleanOptions.bool_cargo = false;
+      this.selectionCarg.deselect();
+      this.selectionCarg.clear();
+    }
+
     this.seleccion.reset();
+    this.asignar = false;
   }
 
+  // MOSTRAR DATOS DE EMPRESA
   MostrarLista() {
-    if (this.opcion === 1) {
+    if (this.opcion === 's') {
       this.nombre_suc.reset();
+      this.filtroNombreSuc_ = '';
+      this.selectionDep.clear();
+      this.selectionCarg.clear();
+      this.selectionEmp.clear();
       this.Filtrar('', 1)
     }
-    else if (this.opcion === 2) {
-      this.nombre_dep.reset();
+    else if (this.opcion === 'c') {
+      this.nombre_carg.reset();
+      this.filtroNombreCarg_ = '';
+      this.selectionEmp.clear();
+      this.selectionDep.clear();
+      this.selectionSuc.clear();
       this.Filtrar('', 2)
     }
-    else if (this.opcion === 3) {
+    else if (this.opcion === 'd') {
+      this.nombre_dep.reset();
+      this.filtroNombreDep_ = '';
+      this.nombre_suc.reset();
+      this.filtroNombreSuc_ = '';
+      this.selectionEmp.clear();
+      this.selectionCarg.clear();
+      this.selectionSuc.clear();
+      this.Filtrar('', 1)
+      this.Filtrar('', 3)
+    }
+    else if (this.opcion === 'e') {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();
-      this.Filtrar('', 3)
+      this.filtroCodigo_ = '';
+      this.filtroCedula_ = '';
+      this.filtroNombreEmp_ = '';
+      this.selectionDep.clear();
+      this.selectionCarg.clear();
+      this.selectionSuc.clear();
       this.Filtrar('', 4)
       this.Filtrar('', 5)
+      this.Filtrar('', 6)
     }
   }
 
-  departamentos: any = [];
-  sucursales: any = [];
-  respuesta: any[];
-  empleados: any = [];
-  tabulado: any = [];
+  /** ************************************************************************************** **
+   ** **                   METODOS DE SELECCION DE DATOS DE USUARIOS                      ** **
+   ** ************************************************************************************** **/
 
-  data_pdf: any = [];
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  isAllSelectedCarg() {
+    const numSelected = this.selectionCarg.selected.length;
+    return numSelected === this.cargos.length
+  }
 
-  selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
-  selectionDep = new SelectionModel<ITableEmpleados>(true, []);
-  selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  masterToggleCarg() {
+    this.isAllSelectedCarg() ?
+      this.selectionCarg.clear() :
+      this.cargos.forEach(row => this.selectionCarg.select(row));
+  }
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA SUCURSAL
-  pageSizeOptions_suc = [5, 10, 20, 50];
-  tamanio_pagina_suc: number = 5;
-  numero_pagina_suc: number = 1;
-  // ITEMS DE PAGINACIÓN DE LA TABLA DEPARTAMENTO
-  pageSizeOptions_dep = [5, 10, 20, 50];
-  tamanio_pagina_dep: number = 5;
-  numero_pagina_dep: number = 1;
-  // ITEMS DE PAGINACIÓN DE LA TABLA EMPLEADOS
-  pageSizeOptions_emp = [5, 10, 20, 50];
-  tamanio_pagina_emp: number = 5;
-  numero_pagina_emp: number = 1;
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelCarg(row?: ITableEmpleados): string {
+    if (!row) {
+      return `${this.isAllSelectedCarg() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selectionCarg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
 
-
-  get filtroNombreSuc() { return this.reporteService.filtroNombreSuc }
-
-  get filtroNombreDep() { return this.reporteService.filtroNombreDep }
-
-  get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
-  get filtroCodigo() { return this.reporteService.filtroCodigo };
-  get filtroCedula() { return this.reporteService.filtroCedula };
-
-
-  /*****************************************************************************
-  * 
-  * 
-  * Varios Metodos Complementarios al funcionamiento. 
-  * 
-  * 
-  **************************************************************************/
-
-  /** Si el número de elementos seleccionados coincide con el número total de filas. */
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
   isAllSelectedSuc() {
     const numSelected = this.selectionSuc.selected.length;
     return numSelected === this.sucursales.length
   }
 
-  /** Selecciona todas las filas si no están todas seleccionadas; de lo contrario, selección clara. */
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
   masterToggleSuc() {
     this.isAllSelectedSuc() ?
       this.selectionSuc.clear() :
       this.sucursales.forEach(row => this.selectionSuc.select(row));
   }
 
-  /** La etiqueta de la casilla de verificación en la fila pasada*/
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelSuc(row?: ITableEmpleados): string {
     if (!row) {
       return `${this.isAllSelectedSuc() ? 'select' : 'deselect'} all`;
@@ -411,20 +545,20 @@ export class VerCoordenadasComponent implements OnInit {
     return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  /** Si el número de elementos seleccionados coincide con el número total de filas. */
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
   isAllSelectedDep() {
     const numSelected = this.selectionDep.selected.length;
     return numSelected === this.departamentos.length
   }
 
-  /** Selecciona todas las filas si no están todas seleccionadas; de lo contrario, selección clara. */
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionDep.clear() :
       this.departamentos.forEach(row => this.selectionDep.select(row));
   }
 
-  /** La etiqueta de la casilla de verificación en la fila pasada*/
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelDep(row?: ITableEmpleados): string {
     if (!row) {
       return `${this.isAllSelectedDep() ? 'select' : 'deselect'} all`;
@@ -432,20 +566,20 @@ export class VerCoordenadasComponent implements OnInit {
     return `${this.selectionDep.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  /** Si el número de elementos seleccionados coincide con el número total de filas. */
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
   isAllSelectedEmp() {
     const numSelected = this.selectionEmp.selected.length;
     return numSelected === this.empleados.length
   }
 
-  /** Selecciona todas las filas si no están todas seleccionadas; de lo contrario, selección clara. */
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :
       this.empleados.forEach(row => this.selectionEmp.select(row));
   }
 
-  /** La etiqueta de la casilla de verificación en la fila pasada*/
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabelEmp(row?: ITableEmpleados): string {
     if (!row) {
       return `${this.isAllSelectedEmp() ? 'select' : 'deselect'} all`;
@@ -453,24 +587,30 @@ export class VerCoordenadasComponent implements OnInit {
     return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
+  // METODO DE PAGINACION DE DATOS
   ManejarPaginaResultados(e: PageEvent) {
     if (this._booleanOptions.bool_suc === true) {
       this.tamanio_pagina_suc = e.pageSize;
       this.numero_pagina_suc = e.pageIndex + 1;
-    } else if (this._booleanOptions.bool_dep === true) {
+    }
+    else if (this._booleanOptions.bool_dep === true) {
       this.tamanio_pagina_dep = e.pageSize;
       this.numero_pagina_dep = e.pageIndex + 1;
-    } else if (this._booleanOptions.bool_emp === true) {
+    }
+    else if (this._booleanOptions.bool_emp === true) {
       this.tamanio_pagina_emp = e.pageSize;
       this.numero_pagina_emp = e.pageIndex + 1;
     }
+    else if (this._booleanOptions.bool_cargo === true) {
+      this.tamanio_pagina_car = e.pageSize;
+      this.numero_pagina_car = e.pageIndex + 1;
+    }
   }
 
-
-
+  // METODO PARA PRESENTAR DATOS DE SUCURSALES
   ModelarSucursal() {
     let usuarios: any = [];
-    let respuesta = JSON.parse(sessionStorage.getItem('reporte_timbres_multiple') as any)
+    let respuesta = JSON.parse(this.origen)
     respuesta.forEach((obj: any) => {
       this.selectionSuc.selected.find(obj1 => {
         if (obj.id_suc === obj1.id) {
@@ -486,6 +626,23 @@ export class VerCoordenadasComponent implements OnInit {
     this.RegistrarUbicacionUsuario(usuarios);
   }
 
+  // METODO PARA MOSTRAR DATOS DE CARGOS
+  ModelarCargo() {
+    let usuarios: any = [];
+    let respuesta = JSON.parse(this.origen_cargo)
+    respuesta.forEach((obj: any) => {
+      this.selectionCarg.selected.find(obj1 => {
+        if (obj.id_cargo === obj1.id) {
+          obj.empleados.forEach((obj3: any) => {
+            usuarios.push(obj3)
+          })
+        }
+      })
+    })
+    this.RegistrarUbicacionUsuario(usuarios);
+  }
+
+  // METODO PARA PRESENTAR DATOS DE EMPLEADO
   ModelarEmpleados() {
     let respuesta: any = [];
     this.empleados.forEach((obj: any) => {
@@ -498,9 +655,10 @@ export class VerCoordenadasComponent implements OnInit {
     this.RegistrarUbicacionUsuario(respuesta);
   }
 
+  // METODO PARA PRESENTAR DATOS DE DEPARTAMENTOS
   ModelarDepartamentos() {
     let usuarios: any = [];
-    let respuesta = JSON.parse(sessionStorage.getItem('reporte_timbres_multiple') as any)
+    let respuesta = JSON.parse(this.origen)
     respuesta.forEach((obj: any) => {
       obj.departamentos.forEach((obj1: any) => {
         this.selectionDep.selected.find(obj2 => {
@@ -515,76 +673,79 @@ export class VerCoordenadasComponent implements OnInit {
     this.RegistrarUbicacionUsuario(usuarios);
   }
 
+  /** ************************************************************************************** **
+   ** **                       METODOS DE REGISTRO DE UBICACIONES                         ** ** 
+   ** ************************************************************************************** **/
+
+  // METODO PARA REGISTRAR UBICACIONES
   cont: number = 0;
   RegistrarUbicacionUsuario(data: any) {
-
-    this.cont = 0;
-    data.forEach((obj: any) => {
-      var datos = {
-        id_empl: obj.id,
-        codigo: obj.codigo,
-        id_ubicacion: this.idUbicacion
-      }
-      this.restU.RegistrarCoordenadasUsuario(datos).subscribe(res => {
-        this.cont = this.cont + 1;
-
-        if (this.cont === data.length) {
-          this.toastr.success('Registros de ubicación asignados exitosamente.', '', {
-            timeOut: 6000,
-          });
-          this.ListarUsuarios(parseInt(this.idUbicacion));
+    if (data.length > 0) {
+      this.cont = 0;
+      data.forEach((obj: any) => {
+        var datos = {
+          id_empl: obj.id,
+          codigo: obj.codigo,
+          id_ubicacion: this.idUbicacion
         }
+        this.restU.RegistrarCoordenadasUsuario(datos).subscribe(res => {
+          this.cont = this.cont + 1;
+          if (this.cont === data.length) {
+            this.toastr.success('Registros de ubicación asignados exitosamente.', '', {
+              timeOut: 6000,
+            });
+            this.ConsultarDatos();
+            this.AbrirVentanaBusqueda();
+          }
+        });
+      })
+    }
+    else {
+      this.toastr.warning('No ha seleccionado usuarios.', '', {
+        timeOut: 6000,
       });
-    })
+    }
+
   }
 
+  // METODO PARA TOMAR DATOS SELECCIONADOS
   GuardarRegistros() {
-    // console.log('ver seleccion', this.opcion)
-    if (this.opcion === 1) {
+    if (this.opcion === 's') {
       this.ModelarSucursal();
-      this.AbrirVentanaBusqueda();
     }
-    else if (this.opcion === 2) {
+    else if (this.opcion === 'c') {
+      this.ModelarCargo();
+    }
+    else if (this.opcion === 'd') {
       this.ModelarDepartamentos();
-      this.AbrirVentanaBusqueda();
     }
     else {
       this.ModelarEmpleados();
-      this.AbrirVentanaBusqueda();
     }
   }
 
 
-
+  /** ************************************************************************************** **
+   ** **           METODOS DE SELECCION DE DATOS DE USUARIOS ELIMINAR UBICACION           ** **
+   ** ************************************************************************************** **/
 
   selectionUno = new SelectionModel<EmpleadoElemento>(true, []);
-  btnCheckHabilitar: boolean = false;
-  auto_individual: boolean = true;
-  HabilitarSeleccion() {
-    if (this.btnCheckHabilitar === false) {
-      this.btnCheckHabilitar = true;
-      this.auto_individual = false;
-    } else if (this.btnCheckHabilitar === true) {
-      this.btnCheckHabilitar = false;
-      this.auto_individual = true;
-    }
-  }
 
-  /** Si el número de elementos seleccionados coincide con el número total de filas. */
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelected() {
     const numSelected = this.selectionUno.selected.length;
     const numRows = this.datosUsuarios.length;
     return numSelected === numRows;
   }
 
-  /** Selecciona todas las filas si no están todas seleccionadas; de lo contrario, selección clara. */
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
       this.datosUsuarios.forEach(row => this.selectionUno.select(row));
   }
 
-  /** La etiqueta de la casilla de verificación en la fila pasada*/
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabel(row?: EmpleadoElemento): string {
     if (!row) {
       return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
@@ -592,8 +753,9 @@ export class VerCoordenadasComponent implements OnInit {
     return `${this.selectionUno.isSelected(row) ? 'deselect' : 'select'} row ${row.id_emplu + 1}`;
   }
 
+  // METODO PARA ELIMNAR REGISTROS DE UBICACION
   Remover() {
-    let EmpleadosSeleccionados;
+    let EmpleadosSeleccionados: any;
     EmpleadosSeleccionados = this.selectionUno.selected.map(obj => {
       return {
         id_emplu: obj.id_emplu,
@@ -603,11 +765,9 @@ export class VerCoordenadasComponent implements OnInit {
       }
     })
     if (EmpleadosSeleccionados.length > 0) {
-      console.log('ver eliminar................', EmpleadosSeleccionados)
       EmpleadosSeleccionados.forEach((obj: any) => {
         this.restU.EliminarCoordenadasUsuario(obj.id_emplu).subscribe(res => {
-          this.BuscarUbicacion(this.idUbicacion);
-          this.ListarUsuarios(parseInt(this.idUbicacion));
+          this.ConsultarDatos();
         });
       })
       this.toastr.error('Registros removidos de la lista.', '', {
@@ -617,7 +777,6 @@ export class VerCoordenadasComponent implements OnInit {
       this.selectionUno.clear();
       EmpleadosSeleccionados = [];
     }
-
   }
 
 
@@ -627,11 +786,15 @@ export class VerCoordenadasComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Remover();
-        } else {
-          this.router.navigate(['/detalle-coordenadas/', this.idUbicacion]);
         }
       });
   }
 
+  // METODO PARA LISTAR COORDENADAS
+  ListarCoordenadas() {
+    this.componentec.ver_lista = true;
+    this.componentec.ver_detalles = false;
+    this.componentec.ObtenerCoordenadas();
+  }
 
 }

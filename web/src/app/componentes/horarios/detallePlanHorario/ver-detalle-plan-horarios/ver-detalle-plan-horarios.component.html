@@ -28,12 +28,12 @@
                 </mat-card-content>
                 <mat-card-actions *ngFor="let h of datosPlanificacion" style="padding: auto; width: 100%;">
                     <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%; width: 100%;">
-                        <button mat-raised-button id="btn-raised" type="submit" [routerLink]="['/verEmpleado/',idEmpleado]" matSuffix 
+                        <button id="btn-raised"  class="btn btn-sm" [routerLink]="['/verEmpleado/',idEmpleado]" matSuffix 
                             matTooltipPosition="right"
                             matTooltip="Regresar a la ventana de Usuario." value="Regresar">
                             Regresar
                         </button>
-                        <button mat-raised-button id="btn-raised" type="submit" (click)="AbrirVentanaDetalles(h)" value="Registrar detalle">
+                        <button id="btn-raised"  class="btn btn-sm" (click)="AbrirVentanaDetalles(h)" value="Registrar detalle">
                             Registrar detalle</button>
                     </div>
                 </mat-card-actions>

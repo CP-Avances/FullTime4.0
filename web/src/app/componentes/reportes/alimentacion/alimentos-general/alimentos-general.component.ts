@@ -72,7 +72,7 @@ export class AlimentosGeneralComponent implements OnInit {
   filtroRegimen: '';
   filtroCargo: '';
 
-  // Items de paginación de la tabla
+  // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
@@ -102,7 +102,7 @@ export class AlimentosGeneralComponent implements OnInit {
     this.ObtenerColores();
   }
 
-  // METODO para ver la información del empleado 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
   ObtenerEmpleadoLogueado(idemploy: any) {
     this.empleadoLogueado = [];
     this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -111,7 +111,7 @@ export class AlimentosGeneralComponent implements OnInit {
     })
   }
 
-  // METODO para obtener el logo de la empresa
+  // METODO PARA OBTENER EL LOGO DE LA EMPRESA
   logo: any = String;
   ObtenerLogo() {
     this.restEmpre.LogoEmpresaImagenBase64(localStorage.getItem('empresa') as string).subscribe(res => {
@@ -133,7 +133,7 @@ export class AlimentosGeneralComponent implements OnInit {
     });
   }
 
-  // Evento para manejar la páginación
+  // EVENTO PARA MANEJAR LA PAGINACION
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
     this.numero_pagina = e.pageIndex + 1;
@@ -286,7 +286,7 @@ export class AlimentosGeneralComponent implements OnInit {
   }
 
   /* ****************************************************************************************************
-   *                               PARA LA EXPORTACIÓN DE ARCHIVOS PDF
+   *                               PARA LA EXPORTACION DE ARCHIVOS PDF
    * ****************************************************************************************************/
 
   generarPdf(action = 'open') {
@@ -318,12 +318,12 @@ export class AlimentosGeneralComponent implements OnInit {
 
     return {
 
-      // Encabezado de la página
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
-      // Pie de la página
+      // PIE DE LA PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var h = new Date();
         var f = moment();
@@ -555,12 +555,12 @@ export class AlimentosGeneralComponent implements OnInit {
 
     return {
 
-      // Encabezado de la página
+      // ENCABEZADO DE LA PAGINA
       //pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
-      // Pie de la página
+      // PIE DE LA PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var h = new Date();
         var f = moment();
@@ -607,7 +607,7 @@ export class AlimentosGeneralComponent implements OnInit {
   /****************************************************************************************************** 
     *                                       METODO PARA EXPORTAR A EXCEL
     ******************************************************************************************************/
-  exportToExcelAlimentacion(form) {
+  exportToExcelAlimentacion(form: any) {
     var j = 0;
     const wsp: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificados.map(obj => {
       return {

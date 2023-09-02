@@ -1,4 +1,5 @@
-<div class="container" style="padding-top: 15px;">
+<!-- ******************************  FORMULARIO REGISTRO RELOJ  ******************************************* -->
+<div class="container" style="padding-top: 15px;" *ngIf="registrar">
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
             <span>REGISTRAR DISPOSITIVOS</span>
@@ -106,7 +107,7 @@
                                             <label id="textoradiobtn">Si</label>
                                         </mat-radio-button>
                                         <mat-radio-button value="false" (click)="DesactivarVista()">
-                                            <label id="textoradiobtn">No</label> 
+                                            <label id="textoradiobtn">No</label>
                                         </mat-radio-button>
                                     </div>
                                 </mat-radio-group>
@@ -124,8 +125,8 @@
                     </div>
                 </form>
                 <div style="text-align: center; padding-top: 25px;">
-                    <button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentana()" class="float-left">Cancelar</button>
-                    <button mat-raised-button id="btn-raised" matStepperNext class="float-right">Siguiente</button>
+                    <button id="btn-raised" (click)="CerrarVentana()" class="btn btn-sm float-left">Cancelar</button>
+                    <button id="btn-raised" matStepperNext class="btn btn-sm float-right">Siguiente</button>
                 </div>
             </mat-step>
 
@@ -217,12 +218,20 @@
                 </form>
                 <div style="text-align: center; padding-top: 25px;">
                     <button mat-raised-button id="btn-raised" matStepperPrevious class="float-left">Atrás</button>
-                    <button mat-raised-button id="btn-raised" (click)="InsertarReloj(primerFormulario.value, segundoFormulario.value)"
-                        [disabled]="!segundoFormulario.valid">Guardar
+                    <button mat-raised-button id="btn-raised"
+                        (click)="InsertarReloj(primerFormulario.value, segundoFormulario.value)"
+                        [disabled]="!segundoFormulario.valid">
+                        Guardar
                     </button>
-                    <button mat-raised-button id="btn-raised" (click)="CerrarVentana()" class="float-right">Cancelar</button>
+                    <button mat-raised-button id="btn-raised" (click)="CerrarVentana()"
+                        class="float-right">
+                        Cancelar
+                    </button>
                 </div>
             </mat-step>
         </mat-horizontal-stepper>
     </mat-card>
 </div>
+
+<!--  ******************************** PANTALLA DATOS DE RELOJ *********************************** -->
+<app-ver-dipositivo *ngIf="ver_datos" [idReloj]="reloj_id" [pagina]="pagina"></app-ver-dipositivo>

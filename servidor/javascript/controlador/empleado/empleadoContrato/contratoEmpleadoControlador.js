@@ -152,7 +152,7 @@ class ContratoEmpleadoControlador {
             }
         });
     }
-    // METODO PARA BUSCAR FECHAS DE CONTRATOS
+    // METODO PARA BUSCAR FECHAS DE CONTRATOS    --**VERIFICADO
     EncontrarFechaContrato(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.body;
@@ -165,7 +165,7 @@ class ContratoEmpleadoControlador {
                 return res.jsonp(FECHA.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'Registro no encontrado' });
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
         });
     }

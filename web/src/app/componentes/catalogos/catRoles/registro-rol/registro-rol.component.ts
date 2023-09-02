@@ -47,6 +47,7 @@ export class RegistroRolComponent implements OnInit {
   contador: number = 0;
   roles: any = [];
   InsertarRol(form: any) {
+  
     this.contador = 0;
     let rol = {
       nombre: form.descripcionForm,
@@ -74,6 +75,30 @@ export class RegistroRolComponent implements OnInit {
     else {
       this.GuardarRegistro(rol);
     }
+
+/*
+    var j = 125000;
+
+
+    let data = [{
+      nombre: ''
+    }]
+    for (var i = 0; i <= j; i++) {
+      data = data.concat({ nombre: 'rol' + [i] })
+    }
+
+    console.log('ver arreglo ', data);
+
+
+    this.rest.RegistraRol(data).subscribe(response => {
+      this.toastr.success('Operación exitosa.', 'Registro guardado.', {
+        timeOut: 6000,
+      });
+      this.salir = true;
+      this.CerrarVentana();
+    });
+*/
+
   }
 
   // METODO PARA BUSCAR ROLES
@@ -87,7 +112,7 @@ export class RegistroRolComponent implements OnInit {
   // METODO PARA ALMACENAR EN BASE DE DATOS
   GuardarRegistro(rol: any) {
     this.rest.RegistraRol(rol).subscribe(response => {
-      this.toastr.success('Operación Exitosa.', 'Registro guardado.', {
+      this.toastr.success('Operación exitosa.', 'Registro guardado.', {
         timeOut: 6000,
       });
       this.validar.Auditar('app-web', 'cg_roles', '', this.data_nueva, 'INSERT');

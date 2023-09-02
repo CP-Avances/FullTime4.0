@@ -1,0 +1,312 @@
+<div class="container" style="padding-bottom: 15px;">
+    <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo">
+            <span>CALENDARIO RANGO FECHAS</span>
+            <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">
+                highlight_off
+            </mat-icon>
+        </div>
+        <mat-card-content>
+            <div style="text-align: center;  padding-top: 10px;" *ngIf="ver_icono === true">
+                <mat-accordion>
+                    <mat-expansion-panel (opened)="expansion = true" (closed)="expansion = false">
+                        <mat-expansion-panel-header style="background: rgb(58, 132, 242); font-size: 16px;">
+                            <mat-panel-title style="color: white;">
+                                <span style="margin-left: 15px;">
+                                    INDICACIONES
+                                </span>
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <div class="row" style="padding-bottom: 5px; padding-top: 5px;">
+                            <div class="col-md">
+                                <div class="d-flex bd-highlight" id="resultados">
+                                    <span class="w-100 bd-highlight" style="font-size: xx-small;">
+                                        DEFINICIONES
+                                    </span>
+                                </div>
+                                <div class="table-responsive" style="text-align: center;">
+                                    <table id="table_definiciones" class="table table-hover table-sm"
+                                        style="margin: 0 auto;">
+                                        <tbody>
+                                            <tr>
+                                                <td id="td_horarios">
+                                                    <b>Jornada</b>
+                                                </td>
+                                                <td id="td_horarios">Horas de trabajo registradas en su contrato.</td>
+                                            </tr>
+                                            <tr>
+                                                <td id="td_horarios" style="color: red">
+                                                    ***
+                                                </td>
+                                                <td id="td_horarios">
+                                                    Indica que ya existe una planificación horaria registrada.
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td id="td_horarios"
+                                                    [ngStyle]="{'text-decoration':EstiloSubrayado('Horario ya existe.')}">
+                                                    Horario
+                                                </td>
+                                                <td id="td_horarios">Horario duplicado (ya existe).</td>
+                                            </tr>
+                                            <tr>
+                                                <td id="td_horarios" style="color: red">
+                                                    <b>Jornada superada</b>
+                                                </td>
+                                                <td id="td_horarios">Suma de horas de horarios existentes y
+                                                    seleccionados.
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div class="d-flex bd-highlight" id="resultados">
+                                    <span class="w-100 bd-highlight" style="font-size: xx-small;">
+                                        ACCIONES
+                                    </span>
+                                </div>
+                                <div class="table-responsive" style="text-align: center;">
+                                    <table id="table_definiciones" class="table table-hover table-sm"
+                                        style="margin: 0 auto;">
+                                        <tbody>
+                                            <tr>
+                                                <td id="td_horarios" style="padding: 0px;">
+                                                    <mat-icon id="seleccionar_">
+                                                        add_circle
+                                                    </mat-icon>
+                                                </td>
+                                                <td id="td_horarios">Agregar horario.</td>
+                                            </tr>
+                                            <tr>
+                                                <td id="td_horarios" style="padding: 0px;">
+                                                    <mat-icon id="libre_">
+                                                        work_off
+                                                    </mat-icon>
+                                                </td>
+                                                <td id="td_horarios">Día libre o no laborable.</td>
+                                            </tr>
+                                            <tr>
+                                                <td id="td_horarios" style="padding: 0px;">
+                                                    <mat-icon id="seleccionar_">
+                                                        delete_forever
+                                                    </mat-icon>
+                                                </td>
+                                                <td id="td_horarios">Eliminar horario.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </div>
+            <div class="row">
+                <div class="nota" style="margin-left: 15px; padding-top: 10px;">
+                    <span>
+                        NOTA: Al presionar Generar calendario se visualizará todos los días del mes actual. Para generar
+                        un calendario de manera personalizada ingresar mes de inicio y fin de periodo.
+                    </span>
+                </div>
+                <div class="col-md">
+                    <div class="row">
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field style="width: 165px;">
+                                    <mat-label>Mes inicio</mat-label>
+                                    <input matInput [matDatepicker]="fec1" [formControl]="fechaInicialF"
+                                        placeholder="DD/MM/YYYY">
+                                    <mat-datepicker-toggle matIconSuffix [for]="fec1"></mat-datepicker-toggle>
+                                    <mat-datepicker #fec1 startView="year"
+                                        (monthSelected)="FormatearFecha($event, fec1, 1)" touchUi>
+                                    </mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field style="width: 165px;">
+                                    <mat-label>Mes final</mat-label>
+                                    <input matInput [matDatepicker]="fec2" [formControl]="fechaFinalF"
+                                        placeholder="DD/MM/YYYY">
+                                    <mat-datepicker-toggle matIconSuffix [for]="fec2"
+                                        [disabled]="fecHorario"></mat-datepicker-toggle>
+                                    <mat-datepicker #fec2 startView="year"
+                                        (monthSelected)="FormatearFecha($event, fec2, 2)" touchUi>
+                                    </mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <div style="margin: 0 auto;">
+                                <button class="btn btn-sm" (click)="GenerarCalendario()">
+                                    Generar calendario
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md" id="verticalLine">
+                    <div class="row">
+                        <div class="col-md" *ngIf="ver_horario">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Seleccionar horario</mat-label>
+                                    <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                        matTooltip="Lista de horarios cargados en el sistema.">
+                                        help_outline
+                                    </mat-icon>
+                                    <mat-select [formControl]="horarioF" required>
+                                        <mat-option *ngFor="let h of vista_horarios" [value]="h.codigo" id="letra"
+                                            (click)="ValidarHorario()">
+                                            {{h.nombre}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="col-md" style="text-align: center;">
+                            <div *ngIf="ver_horario_" style="padding-top: 10px; margin: 0 auto;">
+                                <button class="btn btn-sm" (click)="VerificarHorario()">
+                                    Verificar
+                                </button>
+                            </div>
+                            <div *ngIf="ver_guardar" style="padding-top: 10px; margin: 0 auto;">
+                                <button class="btn btn-sm" (click)="GuardarDatos()">
+                                    Guardar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="container" style="padding-bottom: 10px;" *ngIf="ver_acciones">
+                            <div class="mat-elevation-z8" style="background: white;">
+                                <div class="d-flex bd-highlight" id="resultados">
+                                    <span class="w-100 bd-highlight" style="font-size: xx-small;">
+                                        DETALLE DE HORARIO
+                                    </span>
+                                </div>
+                                <div class="table-responsive" style="text-align: center;">
+                                    <table id="table_acciones" class="table table-hover table-sm"
+                                        style="margin: 0 auto;">
+                                        <thead class="thead-light">
+                                            <tr style="text-align: center;">
+                                                <th scope="col" id="td_horarios" style="font-size: 8px;">
+                                                    HORARIO
+                                                </th>
+                                                <th scope="col" id="td_horarios" style="font-size: 8px;">
+                                                    ENTRADA (E)
+                                                </th>
+                                                <th scope="col" id="td_horarios" style="font-size: 8px;">
+                                                    INICIO ALIMENTACIÓN (I/A)
+                                                </th>
+                                                <th scope="col" id="td_horarios" style="font-size: 8px;">
+                                                    FIN ALIMENTACIÓN (F/A)
+                                                </th>
+                                                <th scope="col" id="td_horarios" style="font-size: 8px;">
+                                                    SALIDA (S)
+                                                </th>
+                                                <th scope="col" id="td_horarios" style="font-size: 8px;">
+                                                    MIN. ALIMENTACIÓN
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr
+                                                *ngFor="let d of detalle_acciones">
+                                                <td id="td_horarios">{{d.horario}}</td>
+                                                <td id="td_horarios">{{d.entrada_}}</td>
+                                                <td id="td_horarios">{{d.inicio_comida}}</td>
+                                                <td id="td_horarios">{{d.fin_comida}}</td>
+                                                <td id="td_horarios">{{d.salida_}}</td>
+                                                <td id="td_horarios">{{d.almuerzo}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+
+            <div class="contenedor">
+                <div class="bordes" *ngFor="let d of fechas_mes; index as i"
+                    [ngStyle]="{'background-color':CambiarColores('1')}">
+
+                    <mat-icon *ngIf="ver_icono" class="float-left" id="seleccionar" (click)="IngresarHorario(i)">
+                        add_circle
+                    </mat-icon>
+
+                    <mat-icon *ngIf="ver_icono" class="center" id="libre" (click)="IngresarLibre(i)">
+                        work_off
+                    </mat-icon>
+
+                    <mat-icon *ngIf="ver_icono" class="float-right" id="seleccionar" (click)="EliminarHorario(i)">
+                        delete_forever
+                    </mat-icon>
+
+                    <div id="resultados_" style="font-size: xx-small;"
+                        [ngStyle]="{'background':CambiarColores(d.num_dia)}">
+                        <span class="fuente">
+                            <b>{{d.formato}}</b>
+                            <b *ngIf="d.horarios_existentes === '***'" style="color: red;">
+                                {{d.horarios_existentes}}
+                            </b>
+                        </span>
+                    </div>
+
+                    <div>
+                        <span class="fuente_pequeño">
+                            <b>Jornada: {{datoEmpleado.horas_trabaja}}</b>
+                        </span>
+                    </div>
+
+                    <input class="entrada" type="hidden" [(ngModel)]="valor" readonly />
+
+                    <div>
+                        <span class="fuente_feriado" *ngIf="d.observacion != ''">
+                            <b>{{d.observacion}}</b>
+                        </span>
+                    </div>
+
+                    <span class="fuente" *ngFor="let h of d.horarios">
+                        <div>
+                            <b style="color: blue;" *ngIf="d.tipo_dia === 'N'"
+                                [ngStyle]="{'text-decoration':EstiloSubrayado(h.verificar)}">
+                                <span class="fuente_pequeño">({{h.hora_trabajo}})</span>
+                                {{h.horario}}
+                            </b>
+                        </div>
+
+                        <div>
+                            <b style="color: blue;" *ngIf="d.tipo_dia === 'FD'">
+                                <span class="fuente_pequeño">({{h.hora_trabajo}})</span>
+                                {{h.horario}}
+                            </b>
+                        </div>
+
+                        <div>
+                            <span *ngIf="d.horas_validas === 'OK'" style="font-size: 10px; padding-left: 5px;"
+                                [ngStyle]="{'color':CambiarColores(h.verificar)}">
+                                <b>{{h.verificar}}</b>
+                            </span>
+                        </div>
+
+                        <div *ngIf="d.tipo_dia === 'L'">
+                            <span class="fuente" style="color:green"><b>DIA LIBRE</b></span>
+                        </div>
+                    </span>
+
+                    <div>
+                        <span class="fuente_pequeño" style="color:red" *ngIf="d.horas_validas != 'OK'">
+                            <b>{{d.horas_validas}}</b>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+        </mat-card-content>
+    </mat-card>
+</div>

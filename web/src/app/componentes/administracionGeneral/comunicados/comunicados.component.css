@@ -21,6 +21,12 @@ td {
 
 mat-form-field {
     padding: 10px 15px 0px 15px;
+    width: 100%;
+}
+
+#campos {
+    padding: 10px 15px 0px 15px;
+    width: 250px;
 }
 
 #ver {
@@ -34,8 +40,8 @@ mat-form-field {
     color: white;
 }
 
-.mat-radio-button~.mat-radio-button {
-    margin-left: 16px;
+.mat-mdc-radio-button~.mat-mdc-radio-button {
+    margin-left: 20px;
 }
 
 

@@ -1,17 +1,7 @@
-.mat-radio-button~.mat-radio-button {
-    margin-left: 20px;
-}
-
 .btn {
     background-color: rgb(80, 87, 97);
     margin-left: 15px;
     color: white;
-}
-
-mat-radio-group {
-    width: 250px;
-    padding: 15px 20px 15px 20x;
-    margin-bottom: 10px;
 }
 
 mat-form-field {
@@ -19,33 +9,14 @@ mat-form-field {
     padding: 10px 10px 0px 10px;
 }
 
-#letras {
-    font-size: 12px;
+.contenedor {
+    display: flex;
+    flex-direction: column;
+    margin: 1rem auto;
+    max-width: 200px;
+    align-items: flex-start;
 }
 
-#fuente {
-    font-size: 14px;
-}
-
-.scrollbar {
-    float: left;
-    height: 450px;
-    width: 100%;
-    background: #fff;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    margin-bottom: 25px;
-}
-
-.scrollbar-primary::-webkit-scrollbar {
-    width: 12px;
-    background-color: #F5F5F5;
-}
-
-#textoradiobtn {
-    font-size: 14px;
-    margin: 12px 0px 0px 0px;
-    font-style: normal;
-    font-weight: 500;
-    letter-spacing: 0.1px;
+.radio-button {
+    margin: 0px 0px 10px;
 }

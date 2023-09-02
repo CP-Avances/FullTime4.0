@@ -4,7 +4,9 @@ import { MatTableDataSource } from '@angular/material/table';
 import { ToastrService } from 'ngx-toastr';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { KardexService } from 'src/app/servicios/reportes/kardex.service';
-var pdfMake = require('pdfmake/build/pdfmake');
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfigReportFirmasHorasExtrasComponent } from '../../configuracion-reportes/config-report-firmas-horas-extras/config-report-firmas-horas-extras.component';
@@ -23,7 +25,7 @@ export class ReporteHorasExtrasComponent implements OnInit {
 
   Lista_empleados: any = [];
 
-  // items de paginacion de la tabla
+  // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
@@ -110,7 +112,7 @@ export class ReporteHorasExtrasComponent implements OnInit {
   }
 
   /* ****************************************************************************************************
- *                               PARA LA EXPORTACIÓN DE ARCHIVOS PDF 
+ *                               PARA LA EXPORTACION DE ARCHIVOS PDF 
  * ****************************************************************************************************/
   fechaHoy: string;
 

@@ -8,7 +8,7 @@
 <div class="container">
     <form [formGroup]="formulario">
         <div class="container">
-            <div class="nota">
+            <div class="nota" id="espacio">
                 <span>
                     NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
                     Guardar.
@@ -61,7 +61,6 @@
     </form>
 </div>
 <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
-    <button mat-raised-button id="btn-raised" type="submit" (click)="ModificarMensajeBirthday(formulario.value)"
+    <button id="btn-raised"  class="btn btn-sm" (click)="ModificarMensajeBirthday(formulario.value)"
         [disabled]="!formulario.valid">Guardar</button>
-    <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentana()">Salir</button-->
 </div>

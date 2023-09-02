@@ -1,9 +1,8 @@
-import { Validators, FormControl, FormGroup } from '@angular/forms';
+import { Validators, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
 import { ToastrService } from 'ngx-toastr';
-import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 
 // IMPORTAR PLANTILLA DE MODELO DE DATOS
@@ -24,8 +23,6 @@ import { MainNavService } from 'src/app/componentes/administracionGeneral/main-n
 
 export class PermisosMultiplesEmpleadosComponent implements OnInit {
 
-  buscador !: FormGroup;
-
   idEmpleadoLogueado: any;
 
   // CONTROL DE CRITERIOS DE BUSQUEDA
@@ -34,24 +31,36 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
   nombre_emp = new FormControl('', [Validators.minLength(2)]);
   nombre_dep = new FormControl('', [Validators.minLength(2)]);
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
+  nombre_carg = new FormControl('', [Validators.minLength(2)]);
   seleccion = new FormControl('');
 
   // VARIABLES DE FILTROS DE BUSQUEDA
   filtroNombreSuc_: string = '';
+  get filtroNombreSuc() { return this.restR.filtroNombreSuc }
+
+  filtroNombreCarg_: string = '';
+  get filtroNombreCarg() { return this.restR.filtroNombreCarg };
+
   filtroNombreDep_: string = '';
-  filtroCodigo_: number;
+  get filtroNombreDep() { return this.restR.filtroNombreDep }
+
+  filtroCodigo_: any;
   filtroCedula_: string = '';
   filtroNombreEmp_: string = '';
+  get filtroNombreEmp() { return this.restR.filtroNombreEmp };
+  get filtroCodigo() { return this.restR.filtroCodigo };
+  get filtroCedula() { return this.restR.filtroCedula };
 
-  habilitado: any;
 
   public _booleanOptions: FormCriteriosBusqueda = {
     bool_suc: false,
     bool_dep: false,
     bool_emp: false,
+    bool_cargo: false,
   };
 
   public check: checkOptions[];
+  habilitado: any;
 
   // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA
   departamentos: any = [];
@@ -61,6 +70,7 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
   origen: any = [];
 
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
+  selectionCarg = new SelectionModel<ITableEmpleados>(true, []);
   selectionDep = new SelectionModel<ITableEmpleados>(true, []);
   selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
 
@@ -69,22 +79,20 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
   tamanio_pagina_suc: number = 5;
   numero_pagina_suc: number = 1;
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA DEPARTAMENTO
+  // ITEMS DE PAGINACION DE LA TABLA CARGO
+  pageSizeOptions_car = [5, 10, 20, 50];
+  tamanio_pagina_car: number = 5;
+  numero_pagina_car: number = 1;
+
+  // ITEMS DE PAGINACION DE LA TABLA DEPARTAMENTO
   pageSizeOptions_dep = [5, 10, 20, 50];
   tamanio_pagina_dep: number = 5;
   numero_pagina_dep: number = 1;
 
-  // ITEMS DE PAGINACIÓN DE LA TABLA EMPLEADOS
+  // ITEMS DE PAGINACION DE LA TABLA EMPLEADOS
   pageSizeOptions_emp = [5, 10, 20, 50];
   tamanio_pagina_emp: number = 5;
   numero_pagina_emp: number = 1;
-
-  // APLICACION DE FILTROS
-  get filtroNombreSuc() { return this.restR.filtroNombreSuc }
-  get filtroNombreDep() { return this.restR.filtroNombreDep }
-  get filtroNombreEmp() { return this.restR.filtroNombreEmp };
-  get filtroCodigo() { return this.restR.filtroCodigo };
-  get filtroCedula() { return this.restR.filtroCedula };
 
   // HABILITAR O DESHABILITAR EL ICONO DE AUTORIZACION INDIVIDUAL
   auto_individual: boolean = true;
@@ -101,10 +109,9 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
     public informacion: DatosGeneralesService,
     public restPerV: PeriodoVacacionesService,
     public restR: ReportesService,
-    private funciones: MainNavService,
-    private ventana: MatDialog,
-    private validar: ValidacionesService,
     private toastr: ToastrService,
+    private validar: ValidacionesService,
+    private funciones: MainNavService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -120,16 +127,53 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
-      this.check = this.restR.checkOptions(3);
+      this.check = this.restR.checkOptions([{ opcion: 'c' }, { opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
       this.BuscarInformacion();
+      this.BuscarCargos();
     }
   }
 
+  // METODO PARA DESTRUIR PROCESOS
   ngOnDestroy() {
-    this.restR.GuardarCheckOpcion(0);
+    this.restR.GuardarCheckOpcion('');
     this.restR.DefaultFormCriterios();
     this.restR.DefaultValoresFiltros();
     this.origen = [];
+  }
+
+  // METODO PARA FILTRAR POR CARGOS
+  empleados_cargos: any = [];
+  origen_cargo: any = [];
+  cargos: any = [];
+  BuscarCargos() {
+    this.informacion.ObtenerInformacionCargo().subscribe((res: any[]) => {
+      this.origen_cargo = JSON.stringify(res);
+      //console.log('ver res cargo ', res)
+      res.forEach(obj => {
+        this.cargos.push({
+          id: obj.id_cargo,
+          nombre: obj.name_cargo
+        })
+      })
+
+      res.forEach(obj => {
+        obj.empleados.forEach(r => {
+          this.empleados_cargos.push({
+            id: r.id,
+            nombre: r.name_empleado,
+            codigo: r.codigo,
+            cedula: r.cedula,
+            correo: r.correo,
+            id_cargo: r.id_cargo,
+            id_contrato: r.id_contrato,
+            hora_trabaja: r.hora_trabaja,
+            name_departamento: r.departamento,
+          })
+        })
+      })
+    }, err => {
+      this.toastr.error(err.error.message)
+    })
   }
 
   // BUSCAR DATOS DE USUARIOS
@@ -137,7 +181,7 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
     this.origen = [];
     this.informacion.ObtenerInformacion().subscribe((res: any[]) => {
       this.origen = JSON.stringify(res);
-
+      //console.log('ver departamento--- ', res)
       res.forEach(obj => {
         this.sucursales.push({
           id: obj.id_suc,
@@ -149,8 +193,8 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
         obj.departamentos.forEach(ele => {
           this.departamentos.push({
             id: ele.id_depa,
-            nombre: ele.name_dep,
-            sucursal: ele.sucursal
+            departamento: ele.name_dep,
+            nombre: ele.sucursal,
           })
         })
       })
@@ -166,15 +210,13 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
               correo: r.correo,
               id_cargo: r.id_cargo,
               id_contrato: r.id_contrato,
+              hora_trabaja: r.hora_trabaja,
+              name_departamento: r.departamento,
             }
             this.empleados.push(elemento)
           })
         })
       })
-      console.log('SUCURSALES', this.sucursales);
-      console.log('DEPARTAMENTOS', this.departamentos);
-      console.log('EMPLEADOS', this.empleados);
-
     }, err => {
       this.toastr.info(err.error.message);
     })
@@ -182,68 +224,101 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
 
   // METODO PARA ACTIVAR SELECCION MULTIPLE
   plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
   HabilitarSeleccion() {
     this.plan_multiple = true;
+    this.plan_multiple_ = true;
     this.auto_individual = false;
     this.activar_seleccion = false;
   }
 
   // METODO PARA MOSTRAR DATOS DE BUSQUEDA
-  opcion: number;
+  opcion: string;
   activar_boton: boolean = false;
   activar_seleccion: boolean = true;
   BuscarPorTipo(e: MatRadioChange) {
     this.opcion = e.value;
     this.activar_boton = true;
+    this.MostrarLista();
     switch (this.opcion) {
-      case 1:
-        this._booleanOptions.bool_suc = true;
-        this._booleanOptions.bool_dep = false;
-        this._booleanOptions.bool_emp = false;
-        this.activar_seleccion = true;
-        this.plan_multiple = false;
-        this.auto_individual = true;
+      case 's':
+        this.ControlarOpciones(true, false, false, false);
+        this.ControlarBotones(true, false, true);
         break;
-      case 2:
-        this._booleanOptions.bool_suc = false;
-        this._booleanOptions.bool_dep = true;
-        this._booleanOptions.bool_emp = false;
-        this.activar_seleccion = true;
-        this.plan_multiple = false;
-        this.auto_individual = true;
+      case 'c':
+        this.ControlarOpciones(false, true, false, false);
+        this.ControlarBotones(true, false, true);
         break;
-      case 3:
-        this._booleanOptions.bool_suc = false;
-        this._booleanOptions.bool_dep = false;
-        this._booleanOptions.bool_emp = true;
-        this.activar_seleccion = true;
-        this.plan_multiple = false;
-        this.auto_individual = true;
+      case 'd':
+        this.ControlarOpciones(false, false, true, false);
+        this.ControlarBotones(true, false, true);
+        break;
+      case 'e':
+        this.ControlarOpciones(false, false, false, true);
+        this.ControlarBotones(true, false, true);
         break;
       default:
-        this._booleanOptions.bool_suc = false;
-        this._booleanOptions.bool_dep = false;
-        this._booleanOptions.bool_emp = false;
-        this.activar_seleccion = true;
-        this.plan_multiple = false;
-        this.auto_individual = true;
+        this.ControlarOpciones(false, false, false, false);
+        this.ControlarBotones(true, false, true);
         break;
     }
     this.restR.GuardarFormCriteriosBusqueda(this._booleanOptions);
     this.restR.GuardarCheckOpcion(this.opcion)
+  }
 
+  // METODO PARA CONTROLAR OPCIONES DE BUSQUEDA
+  ControlarOpciones(sucursal: boolean, cargo: boolean, departamento: boolean, empleado: boolean,) {
+    this._booleanOptions.bool_suc = sucursal;
+    this._booleanOptions.bool_cargo = cargo;
+    this._booleanOptions.bool_dep = departamento;
+    this._booleanOptions.bool_emp = empleado;
+  }
+
+  // METODO PARA CONTROLAR VISTA DE BOTONES
+  ControlarBotones(seleccion: boolean, multiple: boolean, individual: boolean) {
+    this.activar_seleccion = seleccion;
+    this.plan_multiple = multiple;
+    this.plan_multiple_ = multiple;
+    this.auto_individual = individual;
   }
 
   // METODO PARA FILTRAR DATOS DE BUSQUEDA
   Filtrar(e: any, orden: number) {
+    this.ControlarFiltrado(e);
     switch (orden) {
       case 1: this.restR.setFiltroNombreSuc(e); break;
-      case 2: this.restR.setFiltroNombreDep(e); break;
-      case 3: this.restR.setFiltroCodigo(e); break;
-      case 4: this.restR.setFiltroCedula(e); break;
-      case 5: this.restR.setFiltroNombreEmp(e); break;
+      case 2: this.restR.setFiltroNombreCarg(e); break;
+      case 3: this.restR.setFiltroNombreDep(e); break;
+      case 4: this.restR.setFiltroCodigo(e); break;
+      case 5: this.restR.setFiltroCedula(e); break;
+      case 6: this.restR.setFiltroNombreEmp(e); break;
       default:
         break;
+    }
+  }
+
+  // METODO PARA CONTROLAR FILTROS DE BUSQUEDA
+  ControlarFiltrado(e: any) {
+    if (e === '') {
+      if (this.plan_multiple === true) {
+        this.activar_seleccion = false;
+      }
+      else {
+        if (this.activar_seleccion === false) {
+          this.plan_multiple = true;
+          this.auto_individual = false;
+        }
+      }
+    }
+    else {
+      if (this.activar_seleccion === true) {
+        this.activar_seleccion = false;
+        this.plan_multiple_ = true;
+        this.auto_individual = false;
+      }
+      else {
+        this.plan_multiple = false;
+      }
     }
   }
 
@@ -270,6 +345,27 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
       return `${this.isAllSelectedSuc() ? 'select' : 'deselect'} all`;
     }
     return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  isAllSelectedCarg() {
+    const numSelected = this.selectionCarg.selected.length;
+    return numSelected === this.cargos.length
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  masterToggleCarg() {
+    this.isAllSelectedCarg() ?
+      this.selectionCarg.clear() :
+      this.cargos.forEach(row => this.selectionCarg.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelCarg(row?: ITableEmpleados): string {
+    if (!row) {
+      return `${this.isAllSelectedCarg() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selectionCarg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
@@ -319,12 +415,18 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
     if (this._booleanOptions.bool_suc === true) {
       this.tamanio_pagina_suc = e.pageSize;
       this.numero_pagina_suc = e.pageIndex + 1;
-    } else if (this._booleanOptions.bool_dep === true) {
+    }
+    else if (this._booleanOptions.bool_dep === true) {
       this.tamanio_pagina_dep = e.pageSize;
       this.numero_pagina_dep = e.pageIndex + 1;
-    } else if (this._booleanOptions.bool_emp === true) {
+    }
+    else if (this._booleanOptions.bool_emp === true) {
       this.tamanio_pagina_emp = e.pageSize;
       this.numero_pagina_emp = e.pageIndex + 1;
+    }
+    else if (this._booleanOptions.bool_cargo === true) {
+      this.tamanio_pagina_car = e.pageSize;
+      this.numero_pagina_car = e.pageIndex + 1;
     }
   }
 
@@ -352,6 +454,38 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
             obj2.empleado.forEach((obj3: any) => {
               usuarios.push(obj3)
             })
+          })
+        }
+      })
+    }
+
+    if (usuarios.length === 1) {
+      this.RegistrarPermiso(usuarios[0]);
+    } else {
+      this.RegistrarMultiple(usuarios);
+    }
+  }
+
+  // METODO PARA MOSTRAR DATOS DE CARGOS
+  ModelarCargo(id: number) {
+    let usuarios: any = [];
+    let respuesta = JSON.parse(this.origen_cargo)
+    if (id === 0) {
+      respuesta.forEach((obj: any) => {
+        this.selectionCarg.selected.find(obj1 => {
+          if (obj.id_cargo === obj1.id) {
+            obj.empleados.forEach((obj3: any) => {
+              usuarios.push(obj3)
+            })
+          }
+        })
+      })
+    }
+    else {
+      respuesta.forEach((obj: any) => {
+        if (obj.id_cargo === id) {
+          obj.empleados.forEach((obj3: any) => {
+            usuarios.push(obj3)
           })
         }
       })
@@ -466,10 +600,13 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
   GuardarRegistros(id: number) {
-    if (this.opcion === 1) {
+    if (this.opcion === 's') {
       this.ModelarSucursal(id);
     }
-    else if (this.opcion === 2) {
+    else if (this.opcion === 'c') {
+      this.ModelarCargo(id);
+    }
+    else if (this.opcion === 'd') {
       this.ModelarDepartamentos(id);
     }
     else {
@@ -479,27 +616,35 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
 
   // METODO PARA LIMPIAR FORMULARIOS
   LimpiarFormulario() {
-    if (this._booleanOptions.bool_emp === true) {
-
+    if (this._booleanOptions.bool_emp) {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();
 
       this._booleanOptions.bool_emp = false;
-
+      this.selectionEmp.deselect();
       this.selectionEmp.clear();
     }
 
     if (this._booleanOptions.bool_dep) {
       this.nombre_dep.reset();
+      this.nombre_suc.reset();
       this._booleanOptions.bool_dep = false;
+      this.selectionDep.deselect();
       this.selectionDep.clear();
     }
 
     if (this._booleanOptions.bool_suc) {
       this.nombre_suc.reset();
       this._booleanOptions.bool_suc = false;
+      this.selectionSuc.deselect();
       this.selectionSuc.clear();
+    }
+
+    if (this._booleanOptions.bool_cargo) {
+      this._booleanOptions.bool_cargo = false;
+      this.selectionCarg.deselect();
+      this.selectionCarg.clear();
     }
 
     this.seleccion.reset();
@@ -508,21 +653,46 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
 
   // METODO PARA MOSTRAR LISTA DE DATOS
   MostrarLista() {
-    if (this.opcion === 1) {
+    if (this.opcion === 's') {
       this.nombre_suc.reset();
+      this.filtroNombreSuc_ = '';
+      this.selectionDep.clear();
+      this.selectionCarg.clear();
+      this.selectionEmp.clear();
       this.Filtrar('', 1)
     }
-    else if (this.opcion === 2) {
-      this.nombre_dep.reset();
+    else if (this.opcion === 'c') {
+      this.nombre_carg.reset();
+      this.filtroNombreCarg_ = '';
+      this.selectionEmp.clear();
+      this.selectionDep.clear();
+      this.selectionSuc.clear();
       this.Filtrar('', 2)
     }
-    else if (this.opcion === 3) {
+    else if (this.opcion === 'd') {
+      this.nombre_dep.reset();
+      this.filtroNombreDep_ = '';
+      this.nombre_suc.reset();
+      this.filtroNombreSuc_ = '';
+      this.selectionEmp.clear();
+      this.selectionCarg.clear();
+      this.selectionSuc.clear();
+      this.Filtrar('', 1)
+      this.Filtrar('', 3)
+    }
+    else if (this.opcion === 'e') {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();
-      this.Filtrar('', 3)
+      this.filtroCodigo_ = '';
+      this.filtroCedula_ = '';
+      this.filtroNombreEmp_ = '';
+      this.selectionDep.clear();
+      this.selectionCarg.clear();
+      this.selectionSuc.clear();
       this.Filtrar('', 4)
       this.Filtrar('', 5)
+      this.Filtrar('', 6)
     }
   }
 

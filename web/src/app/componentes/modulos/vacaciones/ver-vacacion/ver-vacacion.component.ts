@@ -18,6 +18,8 @@ import { EditarEstadoVacacionAutoriacionComponent } from 'src/app/componentes/au
 import { VacacionAutorizacionesComponent } from 'src/app/componentes/autorizaciones/vacacion-autorizaciones/vacacion-autorizaciones.component';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
   selector: 'app-ver-vacacion',
@@ -45,8 +47,11 @@ export class VerVacacionComponent implements OnInit {
   datosAutorizacion: any = [];
   habilitarActualizar: boolean = true;
 
-  ocultar: boolean = false;
+  ocultar: boolean = true;
   estado: boolean = false;
+
+  ArrayAutorizacionTipos: any = []
+  gerencia: boolean = false;
 
   constructor(
     public restGeneral: DatosGeneralesService, // SERVICIO DE DATOS GENERALES DE EMPLEADO
@@ -58,6 +63,8 @@ export class VerVacacionComponent implements OnInit {
     private restA: AutorizacionService, // SERVICIO DE DATOS DE AUTORIZACIÓN
     private restV: VacacionesService, // SERVICIO DE DATOS DE SOLICITUD DE VACACIONES
     private parametro: ParametrosService,
+    public restAutoriza: AutorizaDepartamentoService, //SERVICIO DE DATOS DE AUTORIZACION POR EL EMPLEADO
+    public usuarioDepa: UsuarioService, //SERVICIO DE DATOS DE DEPARTAMENTO POR EL USUARIO DE LA SOLICITUD
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.id_vacacion = this.router.url.split('/')[2];
@@ -80,7 +87,7 @@ export class VerVacacionComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     var f = moment();
     this.fechaActual = f.format('YYYY-MM-DD');
@@ -92,7 +99,14 @@ export class VerVacacionComponent implements OnInit {
       },
       vacio => {
         this.BuscarDatos(this.formato_fecha);
-      });
+      }
+    );
+
+    this.restAutoriza.BuscarAutoridadEmpleado(this.idEmpleado).subscribe(
+      (res) => {
+        this.ArrayAutorizacionTipos = res;
+      }
+    );
   }
 
   // VARIABE DE ALMACENAMIENTO DE DATOS DE COLABORADORES QUE REVISARON SOLICITUD
@@ -106,10 +120,8 @@ export class VerVacacionComponent implements OnInit {
     // BUSQUEDA DE DATOS DE VACACIONES
     this.restV.ObtenerUnaVacacion(parseInt(this.id_vacacion)).subscribe(res => {
       this.vacacion = res;
-      console.log('ver data ... ', this.vacacion);
-
       this.id_solicitud = this.vacacion[0].id;
-
+      this.ObtenerAutorizacion(this.vacacion[0].id);
       this.vacacion.forEach(v => {
         // TRATAMIENTO DE FECHAS Y HORAS 
         v.fec_ingreso_ = this.validar.FormatearFecha(v.fec_ingreso, formato_fecha, this.validar.dia_completo);
@@ -117,25 +129,20 @@ export class VerVacacionComponent implements OnInit {
         v.fec_final_ = this.validar.FormatearFecha(v.fec_final, formato_fecha, this.validar.dia_completo);
       })
 
-      if(this.idEmpleado == this.vacacion[0].id_empleado){
-        this.ocultar = true;
-      }else{
-        this.ocultar = false;
-      }
-
       if(this.vacacion[0].estado > 1){
         this.estado = true;
       }else{
         this.estado = false;
       }
 
-      this.ObtenerAutorizacion(this.vacacion[0].id);
     });
 
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerSolicitud(this.id_vacacion);
   }
 
+  estado_auto: any;
+  listadoDepaAutoriza: any = [];
   ObtenerAutorizacion(id: number) {
     this.autorizacion = [];
     this.empleado_estado = [];
@@ -144,38 +151,64 @@ export class VerVacacionComponent implements OnInit {
     // BUSQUEDA DE DATOS DE AUTORIZACIÓN
     this.restA.getUnaAutorizacionByVacacionRest(id).subscribe(res1 => {
       this.autorizacion = res1;
-      console.log("Autorizacion: ",this.autorizacion);
-
       // METODO PARA OBTENER EMPLEADOS Y ESTADOS
       var autorizaciones = this.autorizacion[0].id_documento.split(',');
       autorizaciones.map((obj: string) => {
         this.lectura = this.lectura + 1;
         if (obj != '') {
           let empleado_id = obj.split('_')[0];
-          var estado_auto = obj.split('_')[1];
+          this.estado_auto = obj.split('_')[1];
           // CAMBIAR DATO ESTADO INT A VARCHAR
-          if (estado_auto === '1') {
-            estado_auto = 'Pendiente';
+          if (this.estado_auto === '1') {
+            this.estado_auto = 'Pendiente';
           }
-          if (estado_auto === '2') {
-            estado_auto = 'Preautorización';
+          if (this.estado_auto === '2') {
+            this.estado_auto = 'Preautorizado';
           }
-          if (estado_auto === '3') {
-            estado_auto = 'Autorización';
+          if (this.estado_auto === '3') {
+            this.estado_auto = 'Autorizado';
           }
-          if (estado_auto === '4') {
-            estado_auto = 'Permiso Negado';
+          if (this.estado_auto === '4') {
+            this.estado_auto = 'Permiso Negado';
           }
           // CREAR ARRAY DE DATOS DE COLABORADORES
           var data = {
             id_empleado: empleado_id,
-            estado: estado_auto
+            estado: this.estado_auto
           }
+
+          if((this.estado_auto === 'Pendiente') || (this.estado_auto === 'Preautorizado')){
+            //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
+            this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
+              this.listadoDepaAutoriza = res;
+              this.listadoDepaAutoriza.filter(item => {
+                if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
+                  return this.ocultar = false;
+                }else{
+                  return this.ocultar = true;
+                }
+              })
+            });
+          }else{
+            this.ocultar = true;
+          }
+
+
           this.empleado_estado = this.empleado_estado.concat(data);
           // CUANDO TODOS LOS DATOS SE HAYAN REVISADO EJECUTAR METODO DE INFORMACIÓN DE AUTORIZACIÓN
           if (this.lectura === autorizaciones.length) {
             this.VerInformacionAutoriza(this.empleado_estado);
           }
+        }else{
+          //Valida que el usuario que va a realizar la aprobacion le corresponda su nivel y autorice caso contrario se oculta el boton de aprobar.
+          this.restAutoriza.BuscarListaAutorizaDepa(this.autorizacion[0].id_departamento).subscribe(res => {
+            this.listadoDepaAutoriza = res;
+            this.listadoDepaAutoriza.filter(item => {
+              if((this.idEmpleado == item.id_contrato) && (autorizaciones.length ==  item.nivel)){
+                return this.ocultar = false;
+              } 
+            })
+          });
         }
       })
       // TOMAR TAMAÑO DE ARREGLO DE COLABORADORES QUE REVIZARÓN SOLICITUD
@@ -242,32 +275,30 @@ export class VerVacacionComponent implements OnInit {
         var fecha_inicio = moment(this.datoSolicitud[0].fec_inicio);
         // METODO PARA VER DÍAS DISPONIBLES DE AUTORIZACIÓN
         console.log(fecha_inicio.diff(this.fechaActual, 'days'), ' dias de diferencia ' + res[0].dias_cambio);
-        if (res[0].cambios === true) {
-          if (res[0].cambios === 0) {
-            this.habilitarActualizar = false;
-          }
-          else {
-            var dias = fecha_inicio.diff(this.fechaActual, 'days');
-            if (dias >= res[0].dias_cambio) {
-              this.habilitarActualizar = true;
-            }
-            else {
+        if(this.vacacion[0].estado > 2){
+          this.habilitarActualizar = false;
+        }else{
+          if (res[0].cambios === true) {
+            if (res[0].cambios === 0) {
               this.habilitarActualizar = false;
             }
+            else {
+              var dias = fecha_inicio.diff(this.fechaActual, 'days');
+              if (dias >= res[0].dias_cambio) {
+                this.habilitarActualizar = true;
+              }
+              else {
+                this.habilitarActualizar = false;
+              }
+            }
           }
-        } else {
-          this.habilitarActualizar = false;
         }
       });
-
-
-
     })
   }
 
   // ABRIR VENTANAS DE NAVEGACIÓN
   AbrirVentanaEditarAutorizacion(datosSeleccionados: any): void {
-    console.log("Esta en autorizacion 1 edicion: ",datosSeleccionados);
     this.ventana.open(EditarEstadoVacacionAutoriacionComponent,
       { width: '350px', data: { auto: datosSeleccionados, vacacion: this.vacacion[0] } })
       .afterClosed().subscribe(item => {
@@ -296,13 +327,47 @@ export class VerVacacionComponent implements OnInit {
     }
   }
 
+
+  fila1firmas: any = [];
+  fila2firmas: any = [];
   getDocumentDefinicion() {
+    this.fila1firmas = [];
+    this.fila2firmas = [];
+
+    //Array de los datos del empleado para mostrar en la firma;
+    let firmaEmple = {
+      cargo: this.datoSolicitud[0].cargo,
+      departamento: "",
+      estado: "Empleado",
+      id_empleado: this.datoSolicitud[0].id_empl_contrato,
+      nombre: this.datoSolicitud[0].nombre_emple + ' ' + this.datoSolicitud[0].apellido_emple,
+    }
+
+    let cont1 = 1;
+    //Filtar el array empleado_estado para dividir en otros arrays para firmar
+      this.empleado_estado.filter(item =>{
+        if(cont1 < 4){
+          this.fila1firmas.push(item);
+          return cont1 = cont1 + 1;
+        }else{
+          this.fila2firmas.push(item);
+        }
+      });
+
+
+    if(this.fila2firmas.length == 0){
+      this.fila1firmas.push(firmaEmple);
+    }else{
+      this.fila2firmas.push(firmaEmple);
+    }
+
+
     return {
-      // ENCABEZADO DE LA PÁGINA
+      // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleado[0].nombre + ' ' + this.empleado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
-      // PIE DE PÁGINA
+      // PIE DE PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
@@ -323,15 +388,14 @@ export class VerVacacionComponent implements OnInit {
         }
       },
       content: [
-        { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: this.datoSolicitud[0].nom_empresa.toUpperCase(), bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
+        { image: this.logo, width: 150, margin: [10, -27, 0, 2] },
+        { text: this.datoSolicitud[0].nom_empresa.toUpperCase(), bold: true, fontSize: 20, alignment: 'center', margin: [0, -2, 0, 10] },
         { text: 'SOLICITUD DE VACACIONES', fontSize: 10, alignment: 'center', margin: [0, 0, 0, 10] },
         this.SeleccionarMetodo(),
       ],
       styles: {
-        tableHeaderA: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.s_color, margin: [20, 0, 20, 0] },
+        tableHeaderA: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.s_color, margin: [10, 0, 10, 0] },
         tableHeader: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTableC: { fontSize: 10, alignment: 'center', margin: [50, 5, 5, 5] },
         itemsTableD: { fontSize: 10, alignment: 'left', margin: [50, 5, 5, 5] },
         itemsTable: { fontSize: 10, alignment: 'center', }
       }
@@ -390,8 +454,27 @@ export class VerVacacionComponent implements OnInit {
               { text: [{ text: 'REVISADO POR: ' + this.cadena_texto, style: 'itemsTableD' }] },
             ]
           }],
-          [{
-            columns: [{
+          /*[{
+            columns: [
+              {
+                columns: [
+                  { width: '*', text: '' },
+                  {
+                    width: 'auto',
+                    layout: 'lightHorizontalLines',
+                    table: {
+                      widths: ['auto'],
+                      body: [
+                        [{ text: this.empleado_estado[0].estado.toUpperCase() + ' POR', style: 'tableHeaderA' },],
+                        [{ text: ' ', style: 'itemsTable', margin: [0, 10, 0, 10] },],
+                        [{ text: this.empleado_estado[0].nombre + '\n' + this.empleado_estado[0].cargo, style: 'itemsTable' },]
+                      ]
+                    }
+                  },
+                  { width: '*', text: '' },
+                ]
+              },
+              {
               columns: [
                 { width: '*', text: '' },
                 {
@@ -401,15 +484,15 @@ export class VerVacacionComponent implements OnInit {
                     widths: ['auto'],
                     body: [
                       [{ text: this.empleado_estado[this.cont - 1].estado.toUpperCase() + ' POR', style: 'tableHeaderA' }],
-                      [{ text: ' ', style: 'itemsTable', margin: [0, 20, 0, 20] }],
+                      [{ text: ' ', style: 'itemsTable', margin: [0, 10, 0, 10] }],
                       [{ text: this.empleado_estado[this.cont - 1].nombre + '\n' + this.empleado_estado[this.cont - 1].cargo, style: 'itemsTable' }]
                     ]
                   }
                 },
                 { width: '*', text: '' },
               ]
-            },
-            {
+              },
+              {
               columns: [
                 { width: '*', text: '' },
                 {
@@ -419,26 +502,76 @@ export class VerVacacionComponent implements OnInit {
                     widths: ['auto'],
                     body: [
                       [{ text: 'EMPLEADO', style: 'tableHeaderA' }],
-                      [{ text: ' ', style: 'itemsTable', margin: [0, 20, 0, 20] }],
+                      [{ text: ' ', style: 'itemsTable', margin: [0, 10, 0, 10] }],
                       [{ text: this.datoSolicitud[0].nombre_emple + ' ' + this.datoSolicitud[0].apellido_emple + '\n' + this.datoSolicitud[0].cargo, style: 'itemsTable' }]
                     ]
                   }
                 },
                 { width: '*', text: '' },
               ]
-            }
+              }
             ]
+          }],*/
+
+          [{
+            columns: [
+              ...this.fila1firmas.map(obj => {
+                return {
+                  columns: [
+                    { width: '*', text: '' },
+                    {
+                      width: 'auto',
+                      layout: 'lightHorizontalLines',
+                      table: {
+                        widths: ['auto'],
+                        body: [
+                          [{ text: obj.estado.toUpperCase(), style: 'tableHeaderA'},],
+                          [{ text: ' ', style: 'itemsTable', margin: [0, 15, 0, 15] },],
+                          [{ text: obj.nombre + '\n' + obj.cargo, style: 'itemsTable' },]
+                        ]
+                      }
+                    },
+                    { width: '*', text: ''},
+                  ]
+                } 
+              })
+            ],
           }],
+          [{
+            columns: [
+              ...this.fila2firmas.map(obje => {
+                return {
+                  columns: [
+                    { width: '*', text: '' },
+                    {
+                      width: 'auto',
+                      layout: 'lightHorizontalLines',
+                      table: {
+                        widths: ['auto'],
+                        body: [
+                          [{ text: obje.estado.toUpperCase(), style: 'tableHeaderA'},],
+                          [{ text: ' ', style: 'itemsTable', margin: [0, 15, 0, 15] },],
+                          [{ text: obje.nombre + '\n' + obje.cargo, style: 'itemsTable' },]
+                        ]
+                      }
+                    },
+                  { width: '*', text: ''},
+                  ]
+                }
+              })
+            ]
+          }
+          ],
         ]
       },
       layout: {
         hLineColor: function (i, node) {
           return (i === 0 || i === node.table.body.length) ? 'rgb(80,87,97)' : 'rgb(80,87,97)';
         },
-        paddingLeft: function (i, node) { return 40; },
-        paddingRight: function (i, node) { return 40; },
-        paddingTop: function (i, node) { return 10; },
-        paddingBottom: function (i, node) { return 10; }
+        paddingLeft: function (i: any, node: any) { return 40; },
+        paddingRight: function (i: any, node: any) { return 40; },
+        paddingTop: function (i: any, node: any) { return 6; },
+        paddingBottom: function (i: any, node: any) { return 6; },
       }
     };
   }

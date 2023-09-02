@@ -1,10 +1,12 @@
-import { SelectionModel } from '@angular/cdk/collections';
+import { FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { SelectionModel } from '@angular/cdk/collections';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { ToastrService } from 'ngx-toastr';
+
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+
 import { EliminarRealtimeComponent } from '../eliminar-realtime/eliminar-realtime.component';
 
 export interface TimbresAvisos {
@@ -21,9 +23,8 @@ export interface TimbresAvisos {
   templateUrl: './realtime-avisos.component.html',
   styleUrls: ['./realtime-avisos.component.css']
 })
-export class RealtimeAvisosComponent implements OnInit {
 
-  buscador !: FormGroup;
+export class RealtimeAvisosComponent implements OnInit {
 
   id_empleado_logueado: number;
   timbres_noti: any = [];
@@ -32,7 +33,7 @@ export class RealtimeAvisosComponent implements OnInit {
   filtroTimbreDesc: '';
   filtroTimbreFech: '';
 
-  // items de paginacion de la tabla
+  // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 10;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
@@ -43,11 +44,10 @@ export class RealtimeAvisosComponent implements OnInit {
 
   selectionUno = new SelectionModel<TimbresAvisos>(true, []);
 
-
   constructor(
-    private timbresNoti: TimbresService,
-    private toastr: ToastrService,
-    public vistaRegistrarDatos: MatDialog
+    private avisos: TimbresService,
+    public ventana: MatDialog,
+    public validar: ValidacionesService,
   ) { }
 
   ngOnInit(): void {
@@ -55,21 +55,21 @@ export class RealtimeAvisosComponent implements OnInit {
     this.LlamarNotificacionesTimbres(this.id_empleado_logueado);
   }
 
-  /** Whether the number of selected elements matches the total number of rows. */
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelected() {
     const numSelected = this.selectionUno.selected.length;
     const numRows = this.timbres_noti.length;
     return numSelected === numRows;
   }
 
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
+  // SELECCIONA TODAS LAS FILAS SI NO ESTÁN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggle() {
     this.isAllSelected() ?
-    this.selectionUno.clear() :
-    this.timbres_noti.forEach(row => this.selectionUno.select(row));
+      this.selectionUno.clear() :
+      this.timbres_noti.forEach(row => this.selectionUno.select(row));
   }
 
-  /** The label for the checkbox on the passed row */
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
   checkboxLabel(row?: TimbresAvisos): string {
     if (!row) {
       return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
@@ -77,75 +77,55 @@ export class RealtimeAvisosComponent implements OnInit {
     return `${this.selectionUno.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
+  // METODO PARA HABILITAR SELECCION MULTIPLE
   btnCheckHabilitar: boolean = false;
-  HabilitarSeleccion(){
+  HabilitarSeleccion() {
     if (this.btnCheckHabilitar === false) {
       this.btnCheckHabilitar = true;
-    } else if(this.btnCheckHabilitar === true) {
+    } else if (this.btnCheckHabilitar === true) {
       this.btnCheckHabilitar = false;
     }
   }
 
+  // METODO DE PAGINACION
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
     this.numero_pagina = e.pageIndex + 1;
   }
 
+  // METODO PARA BUSCAR NOTIFICACIONES DE AVISOS
   LlamarNotificacionesTimbres(id: number) {
     this.timbres_noti = [];
-    this.timbresNoti.AvisosTimbresRealtime(id).subscribe(res => {
+    this.avisos.AvisosTimbresRealtime(id).subscribe(res => {
       this.timbres_noti = res;
-      console.log(this.timbres_noti);
-      if (!this.timbres_noti.message) {
-        if (this.timbres_noti.length > 0) {
-          console.log('mayor a cero');
-          
-        }
-      }
     });
   }
 
-  Deshabilitar(opcion: number){
+  // METODO PARA ABRIR VENTANA DE ELIMINACION DE NOTIFICACIONES
+  EliminarNotificaciones(opcion: number) {
     let EmpleadosSeleccionados = this.selectionUno.selected.map(obj => {
-        return {
-          id: obj.id,
-          empleado: obj.empleado
-        }
-      })
-    console.log(EmpleadosSeleccionados);
-    this.vistaRegistrarDatos.open(EliminarRealtimeComponent, { width: '500px', data: {opcion: opcion, lista: EmpleadosSeleccionados} }).afterClosed().subscribe(item => {
-      console.log(item);
-      if (item === true) {
-        this.LlamarNotificacionesTimbres(this.id_empleado_logueado);
-        this.btnCheckHabilitar = false;
-        this.selectionUno.clear();
-      };
-    });
-  }
-
-  IngresarSoloLetras(e) {
-    let key = e.keyCode || e.which;
-    let tecla = String.fromCharCode(key).toString();
-    // SE DEFINE TODO EL ABECEDARIO QUE SE VA A USAR.
-    let letras = " áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-    // ES LA VALIDACIÓN DEL KEYCODES, QUE TECLAS RECIBE EL CAMPO DE TEXTO.
-    let especiales = [8, 37, 39, 46, 6, 13];
-    let tecla_especial = false
-    for (var i in especiales) {
-      if (key == especiales[i]) {
-        tecla_especial = true;
-        break;
+      return {
+        id: obj.id,
+        empleado: obj.empleado
       }
-    }
-    if (letras.indexOf(tecla) == -1 && !tecla_especial) {
-      this.toastr.info('No se admite datos numéricos', 'Usar solo letras', {
-        timeOut: 6000,
-      })
-      return false;
-    }
+    })
+    this.ventana.open(EliminarRealtimeComponent,
+      { width: '500px', data: { opcion: opcion, lista: EmpleadosSeleccionados } }).afterClosed().subscribe(item => {
+        if (item === true) {
+          this.LlamarNotificacionesTimbres(this.id_empleado_logueado);
+          this.btnCheckHabilitar = false;
+          this.selectionUno.clear();
+        };
+      });
   }
 
-  limpiarCampos() {
+  // METODO PARA INGRESAR SOLO LETRAS
+  IngresarSoloLetras(e: any) {
+    return this.validar.IngresarSoloLetras(e);
+  }
+
+  // METODO PARA LIMPIAR FORMULARIO
+  LimpiarCampos() {
     this.nom_empleado.reset();
     this.descripcion.reset();
     this.fecha.reset();

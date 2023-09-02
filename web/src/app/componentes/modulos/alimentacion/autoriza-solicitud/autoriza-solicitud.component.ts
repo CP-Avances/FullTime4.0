@@ -1,7 +1,6 @@
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import * as moment from 'moment';
 
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { PlanComidasService } from 'src/app/servicios/planComidas/plan-comidas.service';
@@ -52,7 +51,7 @@ export class AutorizaSolicitudComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
@@ -193,7 +192,7 @@ export class AutorizaSolicitudComponent implements OnInit {
             contador_plan = contador_plan + 1;
             // this.EnviarNotificaciones(obj.fecha, obj.hora_inicio, obj.hora_fin, this.idEmpleadoLogueado, obj.id_empleado, nombre_estado);
             if (contador_plan === this.data.datosMultiple.length) {
-              this.toastr.success('Operación Exitosa', 'Se notifica que ' + this.data.datosMultiple.length + ' Servicios de Alimentación han sido APROBADOS.', {
+              this.toastr.success('Operación exitosa.', 'Se notifica que ' + this.data.datosMultiple.length + ' Servicios de Alimentación han sido APROBADOS.', {
                 timeOut: 6000,
               })
               this.Cerrar();
@@ -204,7 +203,7 @@ export class AutorizaSolicitudComponent implements OnInit {
           nombre_estado = 'NEGADO';
           //this.EnviarNotificaciones(obj.fecha, obj.hora_inicio, obj.hora_fin, this.idEmpleadoLogueado, obj.id_empleado, nombre_estado);
           if (contador === this.data.datosMultiple.length) {
-            this.toastr.success('Operación Exitosa', 'Se notifica que ' + this.data.datosMultiple.length + ' Servicios de Alimentación han sido NEGADOS.', {
+            this.toastr.success('Operación exitosa.', 'Se notifica que ' + this.data.datosMultiple.length + ' Servicios de Alimentación han sido NEGADOS.', {
               timeOut: 6000,
             })
             this.Cerrar();

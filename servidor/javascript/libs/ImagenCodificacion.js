@@ -20,6 +20,7 @@ const ImagenBase64LogosEmpresas = function (path_file) {
         console.log("Path logo: ", path_file);
         try {
             path_file = path_1.default.resolve('logos') + '/' + path_file;
+            console.log('ver si ingresa ', path_file);
             let data = fs_1.default.readFileSync(path_file);
             return data.toString('base64');
         }

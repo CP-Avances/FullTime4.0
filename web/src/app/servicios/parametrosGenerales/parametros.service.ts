@@ -53,7 +53,7 @@ export class ParametrosService {
 
   // REGISTRAR PARAMETRO
   IngresarTipoParametro(data: any) {
-    return this.http.post(`${environment.url}/parametrizacion/tipo`, data);
+    return this.http.post<any>(`${environment.url}/parametrizacion/tipo`, data);
   }
 
   // METODO PARA COMPARAR CORDENADAS

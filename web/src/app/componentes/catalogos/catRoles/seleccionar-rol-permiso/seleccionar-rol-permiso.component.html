@@ -64,10 +64,10 @@
         </mat-card-content>
         <mat-card-actions>
             <div class="container" style="text-align: center;">
-                <button mat-raised-button id="btn-raised" type="submit" [routerLink]="['/roles']">Atrás</button>
-                <button mat-raised-button id="btn-raised" type="submit" [disabled]="!nuevoRolPermisoForm.valid"
+                <button id="btn-raised"  class="btn btn-sm" [routerLink]="['/roles']">Atrás</button>
+                <button id="btn-raised"  class="btn btn-sm" [disabled]="!nuevoRolPermisoForm.valid"
                     (click)="insertarRolPermiso(nuevoRolPermisoForm.value)" value="Guardar">Guardar</button>
-                <button mat-raised-button id="btn-raised" type="submit" (click)="limpliarCampos()" value="Cancelar">Cancelar</button>
+                <button id="btn-raised"  class="btn btn-sm" (click)="limpliarCampos()" value="Cancelar">Cancelar</button>
             </div>
         </mat-card-actions>
     </mat-card>

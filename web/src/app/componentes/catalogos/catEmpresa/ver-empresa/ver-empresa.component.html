@@ -1,219 +1,232 @@
-<div class="container" *ngFor="let e of datosEmpresa" style="padding-top: 15px;">
-    <mat-card class="example-card mat-elevation-z8">
-        <div id="titulo">
-            <span>{{e.nombre.toUpperCase()}}</span>
-        </div>
-        <mat-card-content>
-            <div class="container" style="padding-top: 15px;">
-                <div class="row">
-                    <div class="col-3"></div>
-                    <div class="col-6" style="text-align: center;">
-                        <!--  ************************* LOGO DE EMPRESA ******************************** -->
-                        <figure>
-                            <div *ngIf="imagen_default; else logoEmpresa">
-                                <img src="../../../../../assets/imagenes/photo.png" alt="logo_default" srcset=""
-                                    width="30%" height="30%">
-                            </div>
-                            <ng-template #logoEmpresa>
-                                <div class="d-flex flex-wrap justify-content-center">
-                                    <img src="{{logo}}" alt="logo de empresa" srcset="" width="50%" height="50%">
+<!--  *********************  VER INFORMACION GENERAL DE EMPRESA  *************************  -->
+<div *ngIf="ver_informacion">
+    <div class="container" *ngFor="let e of datosEmpresa" style="padding-top: 15px;">
+        <mat-card class="example-card mat-elevation-z8">
+            <div id="titulo">
+                <span>{{e.nombre.toUpperCase()}}</span>
+            </div>
+            <div>
+                <div class="container" style="padding-top: 15px;">
+                    <div class="row">
+                        <div class="col-3"></div>
+                        <div class="col-6" style="text-align: center;">
+                            <!--  ************************* LOGO DE EMPRESA ******************************** -->
+                            <figure>
+                                <div *ngIf="imagen_default; else logoEmpresa">
+                                    <img src="../../../../../assets/imagenes/photo.png" alt="logo_default" srcset=""
+                                        width="30%" height="30%">
                                 </div>
-                            </ng-template>
-                            <br>
-                            <a style="padding-top: 10px;" (click)="EditarLogo()" matSuffix matTooltipPosition="right"
-                                matTooltip="Editar logo de la empresa.">
-                                <mat-icon id="logo">add_a_photo</mat-icon>
-                            </a>
-                        </figure>
+                                <ng-template #logoEmpresa>
+                                    <div class="d-flex flex-wrap justify-content-center">
+                                        <img src="{{logo}}" alt="logo de empresa" srcset="" width="50%" height="50%">
+                                    </div>
+                                </ng-template>
+                                <br>
+                                <a style="padding-top: 10px; font-family: Arial;   font-size: 100px;"
+                                    (click)="EditarLogo()" matSuffix matTooltipPosition="right"
+                                    matTooltip="Editar logo de la empresa." matTooltipClass="tooltip">
+                                    <mat-icon id="logo">add_a_photo</mat-icon>
+                                </a>
+                            </figure>
+                        </div>
+                        <div class="col-3"></div>
                     </div>
-                    <div class="col-3"></div>
-                </div>
-                <div class="row">
-                    <!--  ************************* INFORMACION EMPRESA ******************************** -->
-                    <div class="col" id="verticalLine">
-                        <div class="d-flex justify-content-around ">
-                            <label id="datosF">INFORMACIÓN GENERAL</label>
-                        </div>
-                        <div class="caja1 d-flex justify-content-start">
-                            <label id="datosF">RUC:</label>
-                            <label>{{e.ruc}}</label>
-                        </div>
-                        <div class="caja1 d-flex justify-content-start" style="width: 100%;">
-                            <label id="datosF">Dirección:</label>
-                            <label>{{e.direccion}}</label>
-                        </div>
-                        <div class="caja1 d-flex justify-content-start">
-                            <label id="datosF">Teléfono:</label>
-                            <label>{{e.telefono}}</label>
-                        </div>
-                        <div class="caja1 d-flex justify-content-start">
-                            <label id="datosF">E-mail:</label>
-                            <label>{{e.correo_empresa}}</label>
-                        </div>
-                        <div class="caja1 d-flex justify-content-start">
-                            <label id="datosF">Representante:</label>
-                            <label>{{e.representante}}</label>
-                        </div>
-                        <div class="caja1 d-flex justify-content-start">
-                            <label id="datosF">Tipo de empresa:</label>
-                            <label>{{e.tipo_empresa}}</label>
-                        </div>
-                        <div class="caja1 d-flex justify-content-start">
-                            <label id="datosF">Establecimientos:</label>
-                            <label>{{e.establecimiento}}</label>
-                        </div>
-                        <div *ngIf="e.num_partida != null && e.num_partida != ''"
-                            class="caja1 d-flex justify-content-start">
-                            <label id="datosF">Número partida presupuestaria:</label>
-                        </div>
-                        <div class="caja1 d-flex justify-content-start">
-                            <label id="num">{{e.num_partida}}</label>
-                        </div>
-                        <div style="text-align: right;">
-                            <i id="editarF" (click)="EditarDatosEmpresa()" matSuffix matTooltipPosition="right"
-                                matTooltip="Modificar datos de este registro." class="fas fa-edit">
-                                <p>Editar</p>
-                            </i>
-                        </div>
-                    </div>
-                    <br>
-                    <!--  ******************** INFORMACION AUTORIZACION SOLICITUDES ********************* -->
-                    <div class="col" id="verticalLine">
-                        <div class="d-flex justify-content-around text-center">
-                            <label id="datosF">AUTORIZACIÓN SOLICITUDES</label>
-                        </div>
-                        <div class="caja1 d-flex justify-content-start" *ngIf="!conCambios">
-                            <label id="datosF">Hasta:</label>
-                            <label>{{e.dias_cambio}} días antes de la fecha de solicitud.</label>
-                        </div>
-                        <div class="d-flex justify-content-around text-center" *ngIf="!cambiosTodos">
-                            <label>Las solicitudes se autorizaran sin restricciones.</label>
-                        </div>
-                        <div class="d-flex justify-content-around text-center" *ngIf="!sinCambios">
-                            <label>Las solicitudes se autorizaran sin restricciones.</label>
+                    <div class="row">
+                        <!--  ************************* INFORMACION EMPRESA ******************************** -->
+                        <div class="col" id="verticalLine">
+                            <div class="d-flex justify-content-around ">
+                                <label id="datosF">INFORMACIÓN GENERAL</label>
+                            </div>
+                            <div class="caja1 d-flex justify-content-start">
+                                <label id="datosF">RUC:</label>
+                                <label>{{e.ruc}}</label>
+                            </div>
+                            <div class="caja1 d-flex justify-content-start" style="width: 100%;">
+                                <label id="datosF">Dirección:</label>
+                                <label>{{e.direccion}}</label>
+                            </div>
+                            <div class="caja1 d-flex justify-content-start">
+                                <label id="datosF">Teléfono:</label>
+                                <label>{{e.telefono}}</label>
+                            </div>
+                            <div class="caja1 d-flex justify-content-start">
+                                <label id="datosF">E-mail:</label>
+                                <label>{{e.correo_empresa}}</label>
+                            </div>
+                            <div class="caja1 d-flex justify-content-start">
+                                <label id="datosF">Representante:</label>
+                                <label>{{e.representante}}</label>
+                            </div>
+                            <div class="caja1 d-flex justify-content-start">
+                                <label id="datosF">Tipo de empresa:</label>
+                                <label>{{e.tipo_empresa}}</label>
+                            </div>
+                            <div class="caja1 d-flex justify-content-start">
+                                <label id="datosF">Establecimientos:</label>
+                                <label>{{e.establecimiento}}</label>
+                            </div>
+                            <div *ngIf="e.num_partida != null && e.num_partida != ''"
+                                class="caja1 d-flex justify-content-start">
+                                <label id="datosF">Número partida presupuestaria:</label>
+                            </div>
+                            <div class="caja1 d-flex justify-content-start">
+                                <label id="num">{{e.num_partida}}</label>
+                            </div>
+                            <div style="text-align: right;">
+                                <i id="editarF" (click)="EditarDatosEmpresa()" matSuffix matTooltipPosition="right"
+                                    matTooltip="Modificar datos de este registro." class="fas fa-edit">
+                                    <p>Editar</p>
+                                </i>
+                            </div>
                         </div>
                         <br>
-                        <!--  ************************* NIVELES DE SEGURIDAD ******************************** -->
-                        <div class="d-flex justify-content-around text-center">
-                            <label id="datosF">NIVEL DE SEGURIDAD</label>
-                        </div>
-                        <div class="caja1 d-flex justify-content-start">
-                            <label id="datosF">Seguridad:</label>
-                            <label *ngIf="e.seg_ninguna === true">Ninguna</label>
-                            <label *ngIf="e.seg_frase === true">Usar una frase</label>
-                            <label *ngIf="e.seg_contrasena === true">Usar contraseña</label>
-                        </div>
-                        <div class="d-flex justify-content-around text-center">
-                            <button mat-raised-button id="btn-raised" type="submit"
-                                (click)="AbrirVentanaSeguridad(e)">Configurar seguridad</button>
-                        </div>
-                    </div>
-                </div>
-                <br>
-                <div class="row">
-                    <!--  ********************** CONFIGURAR COLORES DE EMPRESA ************************ -->
-                    <div class="col-md" id="verticalLine">
-                        <div class="d-flex justify-content-around text-center">
-                            <label id="datosF">COLORES EMPRESA</label>
-                        </div>
-                        <div class="row" style="padding-bottom: 15px;">
-                            <div class="col-md">
-                                <div class="caja2 d-flex justify-content-start">
-                                    <label id="datosF">Color principal:</label>
-                                </div>
-                                <div class="caja2 d-flex justify-content-center">
-                                    <input type="color" [(ngModel)]="p_color" value="{{p_color}}" [formControl]="principal" matSuffix
-                                        matTooltip="Seleccionar color principal">
-                                </div>
+                        <!--  ******************** INFORMACION AUTORIZACION SOLICITUDES ********************* -->
+                        <div class="col" id="verticalLine">
+                            <div class="d-flex justify-content-around text-center">
+                                <label id="datosF">AUTORIZACIÓN SOLICITUDES</label>
                             </div>
-                            <div class="col-md">
-                                <div class="caja2 d-flex justify-content-start">
-                                    <label id="datosF">Color secundario:</label>
-                                </div>
-                                <div class="caja2 d-flex justify-content-center">
-                                    <input type="color" [(ngModel)]="s_color" value="{{s_color}}" [formControl]="secundario" matSuffix
-                                        matTooltip="Seleccionar color secundario">
-                                </div>
+                            <div class="caja1 d-flex justify-content-start" *ngIf="!conCambios">
+                                <label id="datosF">Hasta:</label>
+                                <label>{{e.dias_cambio}} días antes de la fecha de solicitud.</label>
                             </div>
-                        </div>
-                        <div class="d-flex justify-content-around text-center">
-                            <button mat-raised-button id="btn-raised" type="submit" (click)="GenerarPdf('open')">Visualizar</button>
-                            <button mat-raised-button id="btn-raised" type="submit" (click)="CambiarColores()">Guardar</button>
+                            <div class="d-flex justify-content-around text-center" *ngIf="!cambiosTodos">
+                                <label>Las solicitudes se autorizaran sin restricciones.</label>
+                            </div>
+                            <div class="d-flex justify-content-around text-center" *ngIf="!sinCambios">
+                                <label>Las solicitudes se autorizaran sin restricciones.</label>
+                            </div>
+                            <br>
+                            <!--  ************************* NIVELES DE SEGURIDAD ******************************** -->
+                            <div class="d-flex justify-content-around text-center">
+                                <label id="datosF">NIVEL DE SEGURIDAD</label>
+                            </div>
+                            <div class="caja1 d-flex justify-content-start">
+                                <label id="datosF">Seguridad:</label>
+                                <label *ngIf="e.seg_ninguna === true">Ninguna</label>
+                                <label *ngIf="e.seg_frase === true">Usar una frase</label>
+                                <label *ngIf="e.seg_contrasena === true">Usar contraseña</label>
+                            </div>
+                            <div class="d-flex justify-content-around text-center">
+                                <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaSeguridad(e)">Configurar
+                                    seguridad</button>
+                            </div>
                         </div>
                     </div>
                     <br>
-                    <!--  ************************* REGISTRAR MARCA DE AGUA ***************************** -->
-                    <div class="col-md" id="verticalLine">
-                        <div class="d-flex justify-content-around text-center">
-                            <label id="datosF">REPORTES</label>
+                    <div class="row">
+                        <!--  ********************** CONFIGURAR COLORES DE EMPRESA ************************ -->
+                        <div class="col-md" id="verticalLine">
+                            <div class="d-flex justify-content-around text-center">
+                                <label id="datosF">COLORES EMPRESA</label>
+                            </div>
+                            <div class="row" style="padding-bottom: 15px;">
+                                <div class="col-md">
+                                    <div class="caja2 d-flex justify-content-start">
+                                        <label id="datosF">Color principal:</label>
+                                    </div>
+                                    <div class="caja2 d-flex justify-content-center">
+                                        <input type="color" [(ngModel)]="p_color" value="{{p_color}}"
+                                            [formControl]="principal" matSuffix
+                                            matTooltip="Seleccionar color principal.">
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="caja2 d-flex justify-content-start">
+                                        <label id="datosF">Color secundario:</label>
+                                    </div>
+                                    <div class="caja2 d-flex justify-content-center">
+                                        <input type="color" [(ngModel)]="s_color" value="{{s_color}}"
+                                            [formControl]="secundario" matSuffix
+                                            matTooltip="Seleccionar color secundario.">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-around text-center">
+                                <button id="btn-raised" class="btn btn-sm"
+                                    (click)="GenerarPdf('open')">Visualizar</button>
+                                <button id="btn-raised" class="btn btn-sm" (click)="CambiarColores()">Guardar</button>
+                            </div>
                         </div>
-                        <div class="caja1 d-flex justify-content-start">
-                            <label id="datosF">Marca de agua:</label>
-                            <label *ngIf="e.marca_agua === ''">Ninguna</label>
-                            <label *ngIf="e.marca_agua != ''">{{e.marca_agua}}</label>
-                        </div>
-                        <div class="d-flex justify-content-around text-center">
-                            <button mat-raised-button id="btn-raised" type="submit"
-                                (click)="AbrirVentanaReportes(e, 'frase')">
-                                Configurar frase
-                            </button>
+                        <br>
+                        <!--  ************************* REGISTRAR MARCA DE AGUA ***************************** -->
+                        <div class="col-md" id="verticalLine">
+                            <div class="d-flex justify-content-around text-center">
+                                <label id="datosF">REPORTES</label>
+                            </div>
+                            <div class="caja1 d-flex justify-content-start">
+                                <label id="datosF">Marca de agua:</label>
+                                <label *ngIf="e.marca_agua === ''">Ninguna</label>
+                                <label *ngIf="e.marca_agua != ''">{{e.marca_agua}}</label>
+                            </div>
+                            <div class="d-flex justify-content-around text-center">
+                                <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaReportes(e, 'frase')">
+                                    Configurar frase
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <hr>
-            <!--  ************************* TABLA LISTA DE ESTABLECIMIENTOS ******************************** -->
-            <div class="container" style="padding-bottom: 50px; text-align: center;">
-                <div class="mat-elevation-z8" style="background: white;">
-                    <div class="d-flex bd-highlight" id="titulo">
-                        <div class="w-100 bd-highlight">
-                            <h5>LISTA DE
-                                {{nombre_establecimiento.toUpperCase()}}</h5>
+                <hr>
+                <!--  ************************* TABLA LISTA DE ESTABLECIMIENTOS ******************************** -->
+                <div class="container" style="padding-bottom: 50px; text-align: center; padding: 0%;">
+                    <div class="mat-elevation-z8" style="background: white;">
+                        <div class="d-flex bd-highlight" id="titulo">
+                            <div class="w-100 bd-highlight">
+                                <h5>
+                                    LISTA DE {{nombre_establecimiento.toUpperCase()}}
+                                </h5>
+                            </div>
+                            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
+                                <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
+                                    (click)="AbrirVentanaRegistrarSucursal()">Crear {{e.establecimiento}}</button>
+                            </div>
                         </div>
-                        <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-                            <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                                (click)="AbrirVentanaRegistrarSucursal()">Crear {{e.establecimiento}}</button>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-sm">
+                                <thead class="thead-light">
+                                    <tr style="text-align: center;">
+                                        <th scope="col">{{nombre_establecimiento | titlecase}}</th>
+                                        <th scope="col">Ciudad</th>
+                                        <th scope="col">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let ds of datosSucursales | paginate:tamanio_pagina:numero_pagina">
+                                        <td>{{ds.nombre}}</td>
+                                        <td>{{ds.descripcion}}</td>
+                                        <td>
+                                            <i matSuffix matTooltipPosition="right"
+                                                matTooltip="Registrar departamentos." class="fa fa-building" id="ver"
+                                                (click)="VerDepartamentos(ds.id)">
+                                                <p>Departamento</p>
+                                            </i>
+                                            <i id="t-editar" (click)="AbrirVentanaEditarSucursal(ds)" matSuffix
+                                                matTooltipPosition="right"
+                                                matTooltip="Modificar datos de este registro." class="fas fa-edit">
+                                                <p>Editar</p>
+                                            </i>
+                                            <i class="far fa-trash-alt" (click)="ConfirmarDelete(ds)" id="t-eliminar"
+                                                matSuffix matTooltipPosition="right" matTooltip="Eliminar registro.">
+                                                <p>Eliminar</p>
+                                            </i>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
+                        <mat-paginator id="pagina" [length]="datosSucursales.length" [pageSize]="tamanio_pagina"
+                            [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
+                        </mat-paginator>
+                        <br>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover table-sm">
-                            <thead class="thead-light">
-                                <tr style="text-align: center;">
-                                    <th scope="col">{{nombre_establecimiento | titlecase}}</th>
-                                    <th scope="col">Ciudad</th>
-                                    <th scope="col">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let ds of datosSucursales | paginate:tamanio_pagina:numero_pagina">
-                                    <td>{{ds.nombre}}</td>
-                                    <td>{{ds.descripcion}}</td>
-                                    <td>
-                                        <i matSuffix matTooltipPosition="right"
-                                            matTooltip="Ver datos generales de este establecimiento"
-                                            class="fa fa-building" id="ver" [routerLink]="['/vistaSucursales/', ds.id]">
-                                            <p>Departamento</p>
-                                        </i>
-                                        <i id="t-editar" (click)="AbrirVentanaEditarSucursal(ds)" matSuffix
-                                            matTooltipPosition="right" matTooltip="Modificar datos de este registro."
-                                            class="fas fa-edit">
-                                            <p>Editar</p>
-                                        </i>
-                                        <i class="far fa-trash-alt" (click)="ConfirmarDelete(ds)" id="t-eliminar"
-                                            matSuffix matTooltipPosition="right" matTooltip="Eliminar registro.">
-                                            <p>Eliminar</p>
-                                        </i>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <mat-paginator id="pagina" [length]="datosSucursales.length" [pageSize]="tamanio_pagina"
-                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)"
-                        showFirstLastButtons>
-                    </mat-paginator>
                 </div>
             </div>
-        </mat-card-content>
-    </mat-card>
+        </mat-card>
+    </div>
 </div>
+
+<!--  *********************  EDITAR INFORMACION GENERAL DE EMPRESA  *************************  -->
+<app-editar-empresa *ngIf="ver_editar" [idEmpresa]="idEmpresa"></app-editar-empresa>
+
+<!--  ********************  VER DEPARTAMETOS DE SUCURSALES  ************************  -->
+<app-ver-sucursal *ngIf="ver_departamentos" [idSucursal]="sucursal_id" [pagina_]="pagina"></app-ver-sucursal>

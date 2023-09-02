@@ -1,7 +1,16 @@
 
 .btn {
     margin-left: 15px;
-    background-color: rgb(80, 87, 97);
+
+}
+
+.inactivo {
+    background-color: rgb(117, 123, 133);
+    color: white;
+}
+
+.activo {
+    background-color: rgb(42, 82, 151);
     color: white;
 }
 
@@ -42,9 +51,9 @@ mat-panel-description { color: white; }
     margin-left: 10px;
 }
 
-.mat-radio-button~.mat-radio-button {
+.mat-mdc-radio-button ~ .mat-mdc-radio-button {
     margin-left: 16px;
-}
+  }
 
 #plan {
     color: rgb(52, 65, 84);

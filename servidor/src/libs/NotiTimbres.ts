@@ -142,7 +142,7 @@ interface InfoDepaJefe {
 }
 
 async function HorarioEmpleado(codigo: number, orden: number, fecha: string): Promise<horarioEmpleado> {
-
+/*
     let [IdCgHorario] = await pool.query('SELECT id_horarios, id_empl_cargo FROM empl_horarios WHERE codigo = $1 AND estado = 1 AND fec_inicio <= $2 AND fec_final >= $2 ORDER BY fec_inicio DESC LIMIT 1', [codigo, fecha])
         .then((result: any) => { return result.rows })
 
@@ -195,6 +195,8 @@ async function HorarioEmpleado(codigo: number, orden: number, fecha: string): Pr
         tiempo: hora_detalle,
         arrayJefes: JefesDepartamentos
     };
+    */
+   return {}
 }
 
 function SegundosTotal(hora: string, minu_espera: number) {

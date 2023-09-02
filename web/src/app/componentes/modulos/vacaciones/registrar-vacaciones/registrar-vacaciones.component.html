@@ -111,8 +111,7 @@
         </mat-card-content>
     </form>
     <div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 2%;">
-        <button mat-raised-button id="btn-raised" type="submit" [disabled]="!VacacionesForm.valid"
+        <button id="btn-raised"  class="btn btn-sm" [disabled]="!VacacionesForm.valid"
         (click)="ValidarDatosVacacion(VacacionesForm.value)" value="Guardar"> Guardar</button>
-        <!--button mat-raised-button id="btn-raised" type="submit" (click)="CerrarVentanaRegistroVacaciones()" value="Salir">Salir</button-->
     </div>
 </div>

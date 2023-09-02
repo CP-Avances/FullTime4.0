@@ -15,7 +15,7 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 export class HorasPlanificadasEmpleadoComponent implements OnInit {
 
   idEmpleado: number = 0;
-  // ITEMS DE PAGINACIÓN DE LA TABLA 
+  // ITEMS DE PAGINACION DE LA TABLA 
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
@@ -44,7 +44,7 @@ export class HorasPlanificadasEmpleadoComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(

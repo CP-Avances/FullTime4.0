@@ -19,9 +19,9 @@ export class LogosComponent implements OnInit {
   textoBoton: string = 'Editar';
 
   constructor(
-    private toastr: ToastrService,
     public restE: EmpresaService,
     public ventana: MatDialogRef<LogosComponent>,
+    private toastr: ToastrService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
@@ -45,12 +45,32 @@ export class LogosComponent implements OnInit {
   archivoForm = new FormControl('');
   fileChange(element: any) {
     this.archivoSubido = element.target.files;
-    if (this.data.pagina === 'empresa') {
-      this.ActualizarLogoEmpresa();
-    } else if (this.data.pagina === 'header') {
-      this.ActualizarCabeceraCorreo();
-    } else if (this.data.pagina === 'footer') {
-      this.ActualizarPieCorreo();
+    if (this.archivoSubido.length != 0) {
+      const name = this.archivoSubido[0].name;
+      let arrayItems = name.split(".");
+      let itemExtencion = arrayItems[arrayItems.length - 1];
+      if (this.archivoSubido[0].size <= 2e+6) {
+        if (itemExtencion == 'png' || itemExtencion == 'jpg' ||
+          itemExtencion == 'jpeg' || itemExtencion == 'gif') {
+          if (this.data.pagina === 'empresa') {
+            this.ActualizarLogoEmpresa();
+          } else if (this.data.pagina === 'header') {
+            this.ActualizarCabeceraCorreo();
+          } else if (this.data.pagina === 'footer') {
+            this.ActualizarPieCorreo();
+          }
+        }
+        else {
+          this.toastr.warning('Formatos aceptados .png, .jpg, .gif y .jpeg.', 'Error formato del archivo.', {
+            timeOut: 6000,
+          });
+        }
+      }
+      else {
+        this.toastr.info('El archivo ha excedido el tamaño permitido.', 'Tamaño de archivos permitido máximo 2MB.', {
+          timeOut: 6000,
+        });
+      }
     }
   }
 
@@ -61,12 +81,12 @@ export class LogosComponent implements OnInit {
   ActualizarLogoEmpresa() {
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
-      formData.append("image[]", this.archivoSubido[i], this.archivoSubido[i].name);
+      formData.append("image", this.archivoSubido[i], this.archivoSubido[i].name);
     }
     this.restE.EditarLogoEmpresa(this.data.empresa, formData).subscribe(res => {
       this.logo = 'data:image/jpeg;base64,' + res.imagen;
       if (res.imagen != 0) { this.textoBoton = 'Editar' };
-      this.toastr.success('Operación Exitosa', 'Logotipo Actualizado.', {
+      this.toastr.success('Operación exitosa.', 'Logotipo actualizado.', {
         timeOut: 6000,
       });
       this.archivoForm.reset();
@@ -95,12 +115,12 @@ export class LogosComponent implements OnInit {
   ActualizarCabeceraCorreo() {
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
-      formData.append("image[]", this.archivoSubido[i], this.archivoSubido[i].name);
+      formData.append("image", this.archivoSubido[i], this.archivoSubido[i].name);
     }
     this.restE.EditarCabeceraCorreo(this.data.empresa, formData).subscribe(res => {
       this.logo = 'data:image/jpeg;base64,' + res.imagen;
       if (res.imagen != 0) { this.textoBoton = 'Editar' };
-      this.toastr.success('Operación Exitosa', 'Logotipo Actualizado.', {
+      this.toastr.success('Operación exitosa.', 'Logotipo actualizado.', {
         timeOut: 6000,
       });
       this.archivoForm.reset();
@@ -128,12 +148,12 @@ export class LogosComponent implements OnInit {
   ActualizarPieCorreo() {
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
-      formData.append("image[]", this.archivoSubido[i], this.archivoSubido[i].name);
+      formData.append("image", this.archivoSubido[i], this.archivoSubido[i].name);
     }
     this.restE.EditarPieCorreo(this.data.empresa, formData).subscribe(res => {
       this.logo = 'data:image/jpeg;base64,' + res.imagen;
       if (res.imagen != 0) { this.textoBoton = 'Editar' };
-      this.toastr.success('Operación Exitosa', 'Logotipo Actualizado.', {
+      this.toastr.success('Operación exitosa.', 'Logotipo actualizado.', {
         timeOut: 6000,
       });
       this.archivoForm.reset();

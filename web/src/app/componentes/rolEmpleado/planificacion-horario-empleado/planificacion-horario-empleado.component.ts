@@ -14,8 +14,8 @@ import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-ge
 import { DetallePlanHorarioService } from 'src/app/servicios/horarios/detallePlanHorario/detalle-plan-horario.service';
 
 import { RegistroDetallePlanHorarioComponent } from 'src/app/componentes/horarios/detallePlanHorario/registro-detalle-plan-horario/registro-detalle-plan-horario.component';
-import { RegistroPlanHorarioComponent } from 'src/app/componentes/horarios/planificacionHorario/registro-plan-horario/registro-plan-horario.component';
-import { EditarPlanificacionComponent } from 'src/app/componentes/horarios/planificacionHorario/editar-planificacion/editar-planificacion.component';
+import { RegistroPlanHorarioComponent } from 'src/app/componentes/horarios/horarios-rotativos/registro-plan-horario/registro-plan-horario.component';
+import { EditarPlanificacionComponent } from 'src/app/componentes/horarios/horarios-rotativos/editar-planificacion/editar-planificacion.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
 @Component({
@@ -94,7 +94,7 @@ export class PlanificacionHorarioEmpleadoComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
@@ -115,6 +115,8 @@ export class PlanificacionHorarioEmpleadoComponent implements OnInit {
   horarioRotativo: any = [];
   ObtenerHorarioRotativo(codigo: number, formato_fecha: string) {
     this.horarioRotativo = [];
+
+    /* SERVICIO ELIMINADO
     this.restPlanH.ObtenerHorarioRotativo(codigo).subscribe(datos => {
       this.horarioRotativo = datos;
       this.horarioRotativo.forEach((data: any) => {
@@ -122,6 +124,7 @@ export class PlanificacionHorarioEmpleadoComponent implements OnInit {
         data.fec_final_ = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
       })
     })
+    */
   }
 
   // VENTANA PARA REGISTRAR PLANIFICACIÓN DE HORARIOS DEL EMPLEADO 

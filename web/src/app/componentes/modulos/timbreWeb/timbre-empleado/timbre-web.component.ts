@@ -13,7 +13,7 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { MainNavService } from '../../../administracionGeneral/main-nav/main-nav.service';
 
 // IMPORTAR COMPONENTES
-import { RegistrarTimbreComponent } from '../../../timbre-web/registrar-timbre/registrar-timbre.component';
+import { RegistrarTimbreComponent } from '../../../timbres/registrar-timbre/registrar-timbre.component';
 
 @Component({
   selector: 'app-timbre-web',
@@ -78,7 +78,7 @@ export class TimbreWebComponent implements OnInit {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
-  // METODO PARA BUSCAR PARÁMETRO DE FORMATO DE FECHA
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(

@@ -178,9 +178,8 @@
         </form>
     </mat-card-content>
     <div class="d-flex flex-wrap justify-content-center" style="padding-top: 2%; margin-bottom: 2%;">
-        <button mat-raised-button id="btn-raised" type="submit" [disabled]="!ContratoForm.valid"
+        <button id="btn-raised"  class="btn btn-sm" [disabled]="!ContratoForm.valid"
             (click)="ValidarDatosContrato(ContratoForm.value)" value="Guardar">Guardar</button>
-        <!--button mat-raised-button id="btn-raised" type="submit" (click)="Cancelar()" value="Cancelar">Cancelar</button-->
     </div>
 </div>
 

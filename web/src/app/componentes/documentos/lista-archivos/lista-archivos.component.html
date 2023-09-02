@@ -13,7 +13,7 @@
     </ol>
   </nav>
   <div class="d-flex flex-wrap justify-content-end" *ngIf="subir">
-    <button mat-button type="submit" class="btn btn-sm btn-primary" (click)="AbrirVentanaRegistrar()">
+    <button type="submit" class="btn btn-sm btn-primary" (click)="AbrirVentanaRegistrar()">
       Subir Documento
     </button>
   </div>
@@ -45,7 +45,7 @@
           <td style="padding-top: 10px;">{{a.nombre}}</td>
           <td style="padding-top: 10px; text-align: center;">
             <a mat-buttom type="button" (click)="DescargarArchivo(a.file)"
-              href="{{hipervinculo}}/archivosCargados/download/files/{{Dirname}}/{{a.file}}" target="_blank">
+              href="{{hipervinculo}}/archivosCargados/download/files/{{Dirname}}/{{a.nombre}}" target="_blank">
               <mat-icon style="color: rgb(38, 184, 46);" matTooltip="Ver documento.">cloud_download</mat-icon>
             </a>
             <i *ngIf="subir" class="far fa-trash-alt" (click)="EliminarArchivo(a.file, a.id)" matSuffix

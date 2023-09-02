@@ -1,24 +1,29 @@
-<mat-icon class="float-right" id="cerrar" (click)="ventana.close(false)">clear</mat-icon>
-
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
         APROBACIÓN DE HORAS EXTRAS</span>
+    <mat-icon class="float-right" id="cerrar" (click)="ventana.close(false)">clear</mat-icon>
 </div>
-<div class="nota">
+<div class="nota" style="width: 100%; text-align: center;">
     <span>NOTA: El colaborador ha solicitado realizar {{data.horaExtra.num_hora}} horas extras.</span>
 </div>
 
-<div class="d-flex justify-content-between" *ngIf="aprobacion">
-    <button type="submit" class="btn btn-sm" (click)="AprobacionSolicitud(2)">
-        Pre-autorizar
-    </button>
-    <button type="submit" class="btn btn-sm" (click)="AprobacionSolicitud(3)">
-        Autorizar
-    </button>
-    <button type="submit" class="btn btn-sm" (click)="AprobacionSolicitud(4)">
-        Negar
-    </button>
+<div class="d-flex justify-content-center" *ngIf="aprobacion" style="padding: 2%;">
+    <span [hidden] = "ocultarPre" style="margin: 2%;">
+        <button type="submit" class="btn btn-sm" (click)="AprobacionSolicitud(2)">
+            Pre-autorizar
+        </button>
+    </span>
+    <span [hidden] = "ocultarAu" style="margin: 2%;">
+        <button type="submit" class="btn btn-sm" (click)="AprobacionSolicitud(3)">
+            Autorizar
+        </button>
+    </span>
+    <span style="margin: 2%;">
+        <button type="submit" class="btn btn-sm" (click)="AprobacionSolicitud(4)">
+            Negar
+        </button>
+    </span>
 </div>
 
 <div *ngIf="editarHoras">
@@ -39,12 +44,12 @@
             </div>
         </mat-card-content>
     </form>
-    <div class="d-flex justify-content-between">
-        <button type="submit" class="btn btn-sm" (click)="ActualizarHoras(2, TiempoHoraExtraForm.value)"
+    <div class="d-flex justify-content-between" style="padding: 2%;">
+        <button style="margin: 2%;" type="submit" class="btn btn-sm" (click)="ActualizarHoras(2, TiempoHoraExtraForm.value)"
             [disabled]="!TiempoHoraExtraForm.valid">
             Pre-autorizar
         </button>
-        <button type="submit" class="btn btn-sm" (click)="ActualizarHoras(3, TiempoHoraExtraForm.value)"
+        <button style="margin: 2%;" type="submit" class="btn btn-sm" (click)="ActualizarHoras(3, TiempoHoraExtraForm.value)"
             [disabled]="!TiempoHoraExtraForm.valid">
             Autorizar
         </button>
@@ -68,7 +73,7 @@
         </mat-card-content>
     </form>
     <br>
-    <div class="d-flex justify-content-center">
+    <div class="d-flex justify-content-center" style="padding: 3%;">
         <button type="submit" class="btn btn-sm" (click)="EnviarMensaje(MensajeForm.value)"
             [disabled]="!MensajeForm.valid">Enviar</button>
     </div>

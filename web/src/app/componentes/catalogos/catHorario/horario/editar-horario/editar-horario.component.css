@@ -27,6 +27,25 @@ mat-form-field {
     margin-bottom: 10px;
 }
 
+#checks {
+    width: 215px;
+    padding: 15px 20px 15px 20x;
+    margin-right: 65px;
+    margin-bottom: 10px;
+}
+
+.contenedor {
+    display: flex;
+    flex-direction: column;
+    margin: 1rem auto;
+    max-width: 200px;
+    align-items: flex-start;
+}
+
+.radio-button {
+    margin: 0px 0px 10px;
+}
+
 #respaldo {
     font-size: 13px;
     display: inline-block;
@@ -109,6 +128,6 @@ mat-progress-spinner {
     z-index: 100;
 }
 
-mat-label{
+mat-label {
     font-size: 13px;
 }

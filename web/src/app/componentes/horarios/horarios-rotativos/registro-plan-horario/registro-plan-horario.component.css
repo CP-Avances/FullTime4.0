@@ -1,0 +1,144 @@
+.btn {
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
+
+table {
+    width: 100%;
+    font-size: 14px;
+}
+
+th {
+    padding-top: 10px;
+    text-align: center;
+}
+
+td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+mat-form-field {
+    padding: 10px 10px 0px 10px;
+}
+
+.entrada {
+    width: 70px;
+    font-size: 12px;
+    text-align: center;
+    background-color: beige;
+}
+
+.contenedor {
+    display: grid;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    grid-gap: 1px;
+
+    grid-template-columns: repeat(auto-fit, minmax(160px, 7fr));
+    grid-template-rows: auto;
+
+}
+
+.bordes {
+    border: 1px solid #000000;
+    padding: 10px;
+
+    vertical-align: middle;
+    background-color: rgb(233, 236, 239);
+    font-size: 14px;
+    text-align: center;
+}
+
+.fuente {
+    font-size: xx-small;
+}
+
+.fuente_pequeño {
+    font-size: 10px;
+}
+
+.fuente_feriado {
+    font-size: 10px;
+    color: rgb(17, 87, 3);
+}
+
+#seleccionar {
+    color: rgb(52, 65, 84);
+    cursor: pointer;
+    margin-right: 2%;
+    font-size: 19px;
+}
+
+#seleccionar_ {
+    color: rgb(52, 65, 84);
+    font-size: 18px;
+}
+
+#table_acciones {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: xx-small;
+}
+
+#table_definiciones {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 10px;
+}
+
+#td_horarios {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+p {
+    margin-top: 1%;
+    font-size: x-small;
+    font-weight: bold;
+}
+
+#libre {
+    color: rgb(52, 65, 84);
+    cursor: pointer;
+    margin-right: 2%;
+    font-size: 19px;
+}
+
+#libre_eliminar {
+    color: rgb(225, 34, 34);
+    cursor: pointer;
+    margin-right: 2%;
+    font-size: 10px;
+}
+
+#libre_ {
+    color: rgb(52, 65, 84);
+    font-size: 18px;
+}
+
+#libre_eliminar_ {
+    color: rgb(141, 64, 16);
+    cursor: pointer;
+    font-size: 10px;
+}
+
+#verticalLine {
+    border-left: 1px solid rgb(52, 65, 84);
+}
+
+
+.mat-mdc-form-field+.mat-mdc-form-field {
+    margin-left: 8px;
+}
+
+#resultados_ {
+    color: rgb(17, 17, 17);
+    text-align: center;
+    background: rgb(178, 204, 242);
+    padding-top: 5px;
+    padding-bottom: 5px;
+}

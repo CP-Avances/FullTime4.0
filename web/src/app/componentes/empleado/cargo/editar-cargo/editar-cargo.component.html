@@ -93,13 +93,15 @@
                         </mat-form-field>
                         <mat-form-field>
                             <mat-label>Horas de trabajo</mat-label>
-                            <input matInput placeholder="Ej: 8" maxlength="2" [formControl]="horaTrabaja"
-                                oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                (keypress)="IngresarSoloNumeros($event)" required>
-                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                matTooltip="Indicar el número de horas que va a laborar el usuario.">
+                            <input matInput placeholder="Ej: 8:10 " [formControl]="horaTrabaja"
+                                (keypress)="IngresarNumeroCaracter($event)" required>
+                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Indicar el número de horas de trabajo. 
+                            En caso de horas y minutos ingresar en el siguiente formato 10 : 35">
                                 help_outline
                             </mat-icon>
+                            <mat-error id="hora" *ngIf="horaTrabaja.invalid">
+                                {{ObtenerMensajeErrorHoraTrabajo()}}
+                            </mat-error>
                         </mat-form-field>
                     </div>
                 </div>
@@ -107,8 +109,8 @@
         </mat-card-content>
     </form>
     <div class="d-flex flex-wrap justify-content-center" style="padding-top: 2%; margin-bottom: 2%;">
-        <button mat-raised-button id="btn-raised" type="submit" (click)="ValidarDatosRegistro(formulario.value)"
+        <button id="btn-raised" class="btn btn-sm" (click)="ValidarDatosRegistro(formulario.value)"
             [disabled]="!formulario.valid"> Guardar </button>
-        <button mat-raised-button id="btn-raised" type="submit" (click)="Cancelar()"> Cancelar </button>
+        <button id="btn-raised" class="btn btn-sm" (click)="Cancelar()"> Cancelar </button>
     </div>
 </mat-card>

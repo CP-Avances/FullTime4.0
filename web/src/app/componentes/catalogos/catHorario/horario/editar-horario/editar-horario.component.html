@@ -1,25 +1,23 @@
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        MODIFICAR HORARIO</span>
+        MODIFICAR HORARIO
+    </span>
     <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
 </div>
 <div class="container" style="text-align: center">
-    <div class="nota">
+    <div class="nota" id="espacio">
         <span>
             NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
             Guardar.
         </span>
     </div>
-    <span class="nota">Desea subir un archivo (opcional) </span>
-    <mat-slide-toggle [(ngModel)]="isChecked"></mat-slide-toggle>
-    <br>
     <form [formGroup]="formulario">
         <div class="row">
             <div class="col-md">
                 <div class="d-flex flex-wrap justify-content-around">
                     <mat-form-field>
-                        <mat-label>Nombre de horario</mat-label>
+                        <mat-label>Descripción</mat-label>
                         <input matInput placeholder="Ej: Contabilidad" [formControl]="nombre" required>
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                             matTooltip="Ingresar un nombre de horario.">
@@ -48,10 +46,10 @@
             <div class="col-md">
                 <div class="d-flex flex-wrap justify-content-around">
                     <mat-form-field>
-                        <mat-label>Horas de trabajo</mat-label>
+                        <mat-label>Horas totales</mat-label>
                         <input matInput placeholder="Ej: 8:15 " [formControl]="horaTrabajo" required
                             (keypress)="IngresarNumeroCaracter($event)">
-                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Indicar el número de horas de trabajo. 
+                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Indicar el número de horas de jornada. 
                     En caso de horas y minutos ingresar en el siguiente formato 10 : 35">
                             help_outline
                         </mat-icon>
@@ -61,39 +59,43 @@
                     </mat-form-field>
 
                     <mat-checkbox id="check" [formControl]="tipoF" [(ngModel)]="nocturno" matSuffix
-                        matTooltipPosition="right" matTooltip="Marcar si el horario es Nocturno.">Horario Nocturno
+                        matTooltipPosition="right" matTooltip="Marcar si el horario es Nocturno.">
+                        <label id="textoradiobtn">Horario nocturno</label>
                     </mat-checkbox>
 
-                    <mat-checkbox id="check_" [formControl]="detalleF" [(ngModel)]="detalle" matSuffix
-                        matTooltipPosition="right"
-                        matTooltip="Marcar si el horario requiere detalles de entrada, alimentación, salida.">Requiere
-                        Detalle
+                    <mat-checkbox id="checks" (change)="VerificarArchivo($event)">
+                        <label id="textoradiobtn">Control de archivos</label>                     
                     </mat-checkbox>
                 </div>
             </div>
             <div class="col-md" *ngIf="isChecked">
-                <div class="d-flex flex-wrap justify-content-center">
+                <div class="d-flex flex-wrap justify-content-start">
                     <section class="d-flex flex-column bd-highlight" style="padding-top: 20px;">
                         <mat-radio-group aria-label="Select an option" [formControl]="seleccion">
                             <div class="bd-highlight">
                                 <div class="row">
                                     <div class="col-md">
-                                        <mat-radio-button value=1 (click)="QuitarArchivo()">Retirar archivo
-                                        </mat-radio-button>
-                                    </div>
-                                    <div class="col-md">
-                                        <mat-radio-button value=2 (click)="ActivarArchivo()">Actualizar archivo
-                                        </mat-radio-button>
-                                    </div>
-                                    <div class="col-md" *ngIf="acciones">
-                                        <mat-radio-button value=3 (click)="LimpiarAcciones()">Cancelar
-                                        </mat-radio-button>
+                                        <div class="contenedor d-flex flex-wrap justify-content-start">
+                                            <mat-radio-group aria-labelledby="example-radio-group-label"
+                                                class="contenedor">
+                                                <mat-radio-button class="radio-button" value=1
+                                                    (click)="QuitarArchivo()">
+                                                    Retirar archivo
+                                                </mat-radio-button>
+                                                <mat-radio-button class="radio-button" value=2
+                                                    (click)="ActivarArchivo()">
+                                                    Actualizar archivo
+                                                </mat-radio-button>
+                                            </mat-radio-group>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </mat-radio-group>
                     </section>
-                    <section class="d-flex flex-column bd-highlight" style="padding-top: 20px;" *ngIf="activar">
+                </div>
+                <div class="d-flex flex-wrap justify-content-start">
+                    <section class="d-flex flex-column bd-highlight" *ngIf="activar">
                         <div class="separar">
                             <form method="post" enctype="multipart/form-data">
                                 <input (change)="fileChange($event)" type="file" [formControl]="archivoForm" id="file">
@@ -118,10 +120,11 @@
             </div>
         </div>
     </form>
-    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 2%;">
-        <button mat-raised-button id="btn-raised" type="submit" [disabled]="!formulario.valid"
-            (click)="ModificarHorario(formulario.value)" value="Guardar"> Guardar</button>
-        <!--button mat-raised-button id="btn-raised" type="submit" (click)="ventana.close()" value="Salir">Salir</button-->
+    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 10px; margin-bottom: 2%;">
+        <button id="btn-raised" class="btn btn-sm" [disabled]="!formulario.valid"
+            (click)="ModificarHorario(formulario.value)" value="Guardar">
+            Guardar
+        </button>
     </div>
 </div>
 

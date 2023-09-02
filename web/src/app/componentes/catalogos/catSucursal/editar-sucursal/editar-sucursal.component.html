@@ -1,12 +1,13 @@
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        MODIFICAR ESTABLECIMIENTO</span>
+        MODIFICAR ESTABLECIMIENTO
+    </span>
     <mat-icon class="float-right" id="cerrar" (click)="Salir()">highlight_off</mat-icon>
 </div>
 <form [formGroup]="formulario">
     <div class="container">
-        <div class="nota">
+        <div class="nota" id="espacio">
             <span>
                 NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
                 Guardar.
@@ -27,7 +28,7 @@
                         </mat-select>
                     </mat-form-field>
                     <mat-form-field>
-                        <mat-label>Pais</mat-label>
+                        <mat-label>Seleccionar país</mat-label>
                         <input type="text" placeholder="Seleccionar país" aria-label="Number" matInput
                             [formControl]="nombrePaisF" [matAutocomplete]="auto" required [readonly]="ver_pais">
                         <mat-autocomplete #auto="matAutocomplete">
@@ -42,7 +43,7 @@
                         </mat-icon>
                     </mat-form-field>
                     <mat-form-field>
-                        <mat-label>Provincia</mat-label>
+                        <mat-label>Seleccionar provincia</mat-label>
                         <input type="text" placeholder="Seleccionar provincia" aria-label="Number" matInput
                             [formControl]="idProvinciaF" [matAutocomplete]="auto1" required [readonly]="ver_provincia">
                         <mat-autocomplete #auto1="matAutocomplete">
@@ -61,7 +62,7 @@
             <div class="col-md">
                 <div class="d-flex flex-wrap justify-content-between">
                     <mat-form-field>
-                        <mat-label>Ciudad</mat-label>
+                        <mat-label>Seleccionar ciudad</mat-label>
                         <input type="text" placeholder="Seleccionar ciudad" aria-label="Number" matInput
                             [formControl]="idCiudad" [matAutocomplete]="auto2" required [readonly]="ver_ciudad">
                         <mat-autocomplete #auto2="matAutocomplete">
@@ -76,25 +77,25 @@
                         </mat-icon>
                     </mat-form-field>
                     <mat-form-field>
-                        <mat-label>Nuevo Establecimiento</mat-label>
-                        <input matInput placeholder="Ej: nombre de la sucursal" [formControl]="nombre" required
+                        <mat-label>Establecimiento</mat-label>
+                        <input matInput placeholder="Ej: Sucursal ..." [formControl]="nombre" required
                             [readonly]="sucursal">
                         <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                            matTooltip="Ingresar nombre de identificación de nueva sucursal">
+                            matTooltip="Ingresar nombre de identificación del establecimiento.">
                             help_outline
                         </mat-icon>
-                        <mat-error *ngIf="nombre.invalid">Ingrese un nombre válido.</mat-error>
                     </mat-form-field>
                 </div>
             </div>
         </div>
     </div>
+    <div class="d-flex flex-wrap justify-content-center" style="padding-top: 10px; margin-bottom: 2%;">
+        <button class="btn btn-sm" id="btn-raised" (click)="InsertarSucursal(formulario.value)"
+            [disabled]="!formulario.valid" value="Guardar">
+            Guardar
+        </button>
+    </div>
 </form>
-<div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 2%;">
-    <button mat-raised-button id="btn-raised" type="submit" (click)="InsertarSucursal(formulario.value)"
-        [disabled]="!formulario.valid" value="Guardar">Guardar</button>
-    <!--button mat-raised-button id="btn-raised" type="submit" (click)="Salir()" value="Salir">Salir</button-->
-</div>
 <div class="pantalla-progress" *ngIf="habilitarprogress">
     <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
     </mat-progress-spinner>

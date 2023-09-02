@@ -1,95 +1,114 @@
-<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;">
-    <div class="row">
-        <div class="col-md">
-            <div id="titulo">
-                <span>TIPO DE ACCIONES DE PERSONAL</span>
-            </div>
-            <mat-card class="example-card mat-elevation-z9">
-                <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                    <button mat-raised-button id="btn-raised" type="submit" (click)="AbrirVentanaCrearTipoAccion()">
-                        Crear nuevo tipo de acción
-                    </button>
-                    <button mat-raised-button id="btn-raised" type="submit" (click)="LimpiarCampos()" matSuffix
-                        matTooltipPosition="right"
-                        matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">Mostrar lista
-                    </button>
+<!--  *********************** PANTALLA LISTA DE TIPO DE ACCIONES  ****************************  -->
+<div *ngIf="ver_lista">
+    <div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;">
+        <div class="row">
+            <div class="col-md">
+                <div id="titulo">
+                    <span>TIPO DE ACCIONES DE PERSONAL</span>
                 </div>
-            </mat-card>
+                <mat-card class="example-card mat-elevation-z9">
+                    <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
+                        <button id="btn-raised" class="btn btn-sm" (click)="AbrirRegistrar()">
+                            Crear tipo de acción
+                        </button>
+                        <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
+                            matTooltipPosition="right"
+                            matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
+                            Mostrar lista
+                        </button>
+                    </div>
+                </mat-card>
+            </div>
+        </div>
+    </div>
+    <div class="container" style="padding-bottom: 50px; text-align: center;">
+        <div class="mat-elevation-z8" style="background: white;">
+            <div id="resultados">LISTA TIPOS DE ACCIONES DE PERSONAL</div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="thead-light">
+                        <tr style="text-align: center;">
+                            <th scope="col">Tipo de Acción Personal</th>
+                            <th scope="col">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <mat-form-field id="t-inputs">
+                                    <input matInput name="filtroNombre" placeholder="Buscar" minlength="2"
+                                        [formControl]="nombreF" [(ngModel)]="filtroNombre">
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                    matTooltip="Búsqueda de un tipo de acción de personal por su descripción.">
+                                    help_outline
+                                </mat-icon>
+                            </td>
+                        </tr>
+                        <tr
+                            *ngFor="let ta of tipo_acciones | nombre:filtroNombre | paginate:tamanio_pagina:numero_pagina">
+                            <td id="centrar">{{ta.nombre}}</td>
+                            <td id="centrar" class="justify-content-center">
+                                <i matSuffix matTooltipPosition="right"
+                                    matTooltip="Ver datos generales de este registro." class="fas fa-eye" id="t-ver"
+                                    (click)="AbrirDatosAccion(ta.id)">
+                                    <p>Ver</p>
+                                </i>
+                                <i id="i-cursor" class="fas fa-edit" id="t-editar" matSuffix matTooltipPosition="right"
+                                    (click)="AbrirEditar(ta)"
+                                    matTooltip="Modificar los datos generales de este registro.">
+                                    <p>Editar</p>
+                                </i>
+                                <i (click)="ConfirmarDelete(ta)" id="t-eliminar" class="far fa-trash-alt" matSuffix
+                                    matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                    <p>Eliminar</p>
+                                </i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <mat-paginator id="pagina" [length]="tipo_acciones.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+            </mat-paginator>
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px">
+                <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
+                    matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Tipos de Acciones de Personal en formato PDF.">
+                    <p>PDF</p>
+                </i>
+                <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Tipos de Acciones de Personal en formato EXCEL.">
+                    <p>XLSL</p>
+                </i>
+                <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Lista de Tipos de Acciones de Personal en formato CSV.">
+                    <p>CSV</p>
+                </i>
+                <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar Tipos de Acciones de Personal en formato XML.">
+                    <p>XML</p>
+                </i>
+            </div>
+            <div class="d-flex justify-content-end"
+                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                <p> Reporte de tipos de acciones de personal. </p>
+            </div>
         </div>
     </div>
 </div>
-<div class="container" style="padding-bottom: 50px; text-align: center;">
-    <div class="mat-elevation-z8" style="background: white;">
-        <div id="resultados">LISTA TIPOS DE ACCIONES DE PERSONAL</div>
-        <div class="table-responsive">
-            <table class="table table-hover table-sm">
-                <thead class="thead-light">
-                    <tr style="text-align: center;">
-                        <th scope="col">Código </th>
-                        <th scope="col">Tipo de Acción Personal</th>
-                        <th scope="col">Acción</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td></td>
-                        <td>
-                            <mat-form-field id="t-inputs">
-                                <input matInput name="filtroNombre" placeholder="Buscar" minlength="2"
-                                    [formControl]="nombreF" [(ngModel)]="filtroNombre">
-                            </mat-form-field>
-                        </td>
-                        <td>
-                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
-                                matTooltip="Búsqueda de un tipo de acción de personal por su descripción.">
-                                help_outline</mat-icon>
-                        </td>
-                    </tr>
-                    <tr *ngFor="let ta of tipo_acciones | nombre:filtroNombre | paginate:tamanio_pagina:numero_pagina">
-                        <th id="centrar" scope="row">{{ta.id}}</th>
-                        <td id="centrar">{{ta.nombre}}</td>
-                        <td id="centrar" class="d-flex justify-content-center">
-                            <i matSuffix matTooltipPosition="right" matTooltip="Ver datos generales de este registro."
-                                class="fas fa-eye" id="t-ver" [routerLink]="['/vistaTipoAccion/', ta.id]">
-                                <p>Ver</p>
-                            </i>
-                            <i id="i-cursor" class="fas fa-edit" id="t-editar" matSuffix matTooltipPosition="right"
-                                (click)="AbrirVentanaEditarTipoAccion(ta)"
-                                matTooltip="Modificar los datos generales de este registro.">
-                                <p>Editar</p>
-                            </i>
-                            <i (click)="ConfirmarDelete(ta)" id="t-eliminar" class="far fa-trash-alt" matSuffix
-                                matTooltipPosition="right" matTooltip="Eliminar este registro.">
-                                <p>Eliminar</p>
-                            </i>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <mat-paginator id="pagina" [length]="tipo_acciones.length" [pageSize]="tamanio_pagina"
-            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
-        </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%;">
-            <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Tipos de Acciones de Personal en formato PDF.">
-                <p>PDF</p>
-            </i>
-            <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Tipos de Acciones de Personal en formato EXCEL.">
-                <p>XLSL</p>
-            </i>
-            <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Lista de Tipos de Acciones de Personal en formato CSV.">
-                <p>CSV</p>
-            </i>
-            <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
-                matTooltip="Descargar Tipos de Acciones de Personal en formato XML.">
-                <p>XML</p>
-            </i>
-        </div>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
-            <p> Reporte de tipos de acciones de personal. </p>
-        </div>
-    </div>
+
+<!--  *********************** PANTALLA REGISTRAR TIPO PERMISO  ****************************  -->
+<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;" *ngIf="ver_registrar">
+    <app-crear-tipoaccion></app-crear-tipoaccion>
 </div>
+
+<!--  *********************** PANTALLA EDITAR TIPO PERMISO  ****************************  -->
+<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;" *ngIf="ver_editar">
+    <app-editar-tipo-accion [pagina]="pagina" [data]="accion"></app-editar-tipo-accion>
+</div>
+
+<!--  *********************** PANTALLA DATOS GENERALES DE TIPOS DE ACCION  ****************************  -->
+<app-ver-tipo-accion *ngIf="ver_datos" [idAccion]="accion_id"></app-ver-tipo-accion>

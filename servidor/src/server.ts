@@ -103,8 +103,9 @@ class Servidor {
         this.app.set('puerto', process.env.PORT || 3001);
         this.app.use(morgan('dev'));
         this.app.use(cors());
-        this.app.use(express.json());
-        this.app.use(express.urlencoded({ extended: false }));
+        //this.app.use(express.json());
+        this.app.use(express.json({limit: '50mb'}));
+        this.app.use(express.urlencoded({limit: '50mb', extended: true}));
         this.app.use(express.raw({ type: 'image/*', limit: '2Mb' }));
         this.app.set('trust proxy', true);
         this.app.get('/',(req, res)=> {
@@ -254,7 +255,7 @@ class Servidor {
         });
 
         this.app.use((req, res, next) => {
-            res.header('Access-Control-Allow-Origin', '*:*');
+            res.header('Access-Control-Allow-Origin', '*');
             next();
         })
         io.on('connection', (socket: any) => {

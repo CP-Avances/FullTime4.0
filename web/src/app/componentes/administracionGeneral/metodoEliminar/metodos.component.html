@@ -6,13 +6,15 @@
 <mat-card-content>
     <div style="padding: 2%;">
         <p>Se le recuerda que al eliminar este registro automáticamente se eliminarán <b>TODOS</b> los registro con los
-            que guarde
-            alguna relación. <b>Podría afectar al buen funcionamiento del sistema.</b> </p>
+            que guarde alguna relación.
+            <b>Podría afectar al buen funcionamiento del sistema.</b>
+        </p>
         <p id="mensaje">¿ESTÁ SEGURO DE ELIMINAR ESTE REGISTRO?</p>
     </div>
 </mat-card-content>
 <div style="text-align: center; margin-bottom: 3%;">
-    <button mat-raised-button id="aceptar" color="primary" (click)="Confirmar()"
-        cdkFocusInitial>Aceptar</button>&nbsp;&nbsp;
-    <button mat-raised-button id="btn-raised" (click)="CerrarVentana()">Cancelar</button>
+    <button mat-raised-button id="aceptar" class="btn-sm" color="primary" (click)="Confirmar()">
+        Aceptar
+    </button>&nbsp;&nbsp;
+    <button mat-button id="btn-raised" (click)="CerrarVentana()" cdkFocusInitial>Cancelar</button>
 </div>
