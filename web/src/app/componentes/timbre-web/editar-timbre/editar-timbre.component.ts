@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 
@@ -15,62 +15,87 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 export class EditarTimbreComponent implements OnInit {
 
   datosTimbre: any;
-  teclaFuncionF: number = 0;
+  teclaFuncionF: any;
+  accionF: any;
 
   // LISTA DE ACCIONES DE TIMBRES
   acciones: any = [
-    { value: 1, item: 'E', text: 'Entrada' },
-    { value: 2, item: 'S', text: 'Salida' },
-    { value: 3, item: 'I/A', text: 'Inicio Alimentación' },
-    { value: 4, item: 'F/A', text: 'Fin Alimentación' },
-    { value: 5, item: 'S/P', text: 'Inicio Permiso' },
-    { value: 7, item: 'E/P', text: 'Fin Permiso' },
-    { value: 6, item: 'HA', text: 'Fin' }
+    { value: '0', item: 'E', text: 'Entrada' },
+    { value: '1', item: 'S', text: 'Salida' },
+    { value: '2', item: 'I/A', text: 'Inicio Alimentación' },
+    { value: '3', item: 'F/A', text: 'Fin Alimentación' },
+    { value: '4', item: 'S/P', text: 'Inicio Permiso' },
+    { value: '5', item: 'HA', text: 'Fin' },
+    { value: '6', item: 'E/P', text: 'Fin Permiso' }
   ]
 
-  accionF: FormControl = new FormControl(null,); // Inicializa el FormControl
+  tecl_funcio: any = [
+    {value: '0'},
+    {value: '1'},
+    {value: '2'},
+    {value: '3'},
+    {value: '4'},
+    {value: '5'},
+    {value: '6'},
+  ]
 
-  public timbreForm: FormGroup = new FormGroup({
-    accion: this.accionF
-  });
-
+  EditartimbreForm: FormGroup; 
 
   constructor(
     public ventana: MatDialogRef<EditarTimbreComponent>,
     private timbreServicio: TimbresService,
     private toastr: ToastrService,
     private validar: ValidacionesService,
+    private formBuilder: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public data: any
   ){
-  }
-
-  accion:any = [];
-  teclaFun: any = [];
-  textareaValue: string = '';
-  ngOnInit() {
     this.datosTimbre = [];
     this.datosTimbre = this.data.timbre;
-    console.log(this.datosTimbre)
-    this.acciones.forEach(accion => {
-      if(accion.value == this.datosTimbre.tecl_funcion){
-        this.accion = accion;
-        this.teclaFun = accion;
-      }
-    });
-    this.teclaFuncionF = this.datosTimbre.tecl_funcion
-    this.textareaValue = this.datosTimbre.observacion;
 
+    this.EditartimbreForm = this.formBuilder.group({
+        accionTimbre: [this.datosTimbre.accion, Validators.required],
+        teclaFunTimbre: [this.datosTimbre.tecl_funcion, Validators.required],
+        ObservacionForm: [this.datosTimbre.observacion, Validators.required]
+    });
   }
 
-  EnviarDatosTimbre(){
+  ngOnInit() {
+  }
+
+  
+  seleccion: any;
+  SeleccionTecla: any;
+  teclaFun: any;
+  SelectedAccion(item: any){
+    this.seleccion = item.value;
+    this.acciones.forEach(elementAccion => {
+      if(elementAccion.item == this.seleccion){
+        this.SeleccionTecla = elementAccion.value;
+      }
+    });
+  }
+
+  SelectedTecla(item: any){
+    this.SeleccionTecla = item.value;
+    this.acciones.forEach(elementAccion => {
+      if(elementAccion.value == this.SeleccionTecla){
+        this.seleccion = elementAccion.item;
+      }
+    });
+  }
+
+  envio_accion: string = ''
+  EnviarDatosTimbre(formTimbre: any){    
     let data = {
       id: this.datosTimbre.id, 
       codigo: this.datosTimbre.id_empleado, 
-      accion: this.teclaFun.item,
-      tecla: this.teclaFun.value, 
-      observacion: this.textareaValue 
+      accion: formTimbre.accionTimbre,
+      tecla: formTimbre.teclaFunTimbre, 
+      observacion: formTimbre.ObservacionForm
     }
 
+    console.log('data: ',data);
+    
     this.timbreServicio.EditarTimbreEmpleado(data).subscribe(res => {
       const mensaje: any  = res
       this.ventana.close();

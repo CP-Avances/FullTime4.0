@@ -120,9 +120,6 @@ export class BuscarTimbreComponent implements OnInit {
         cedula: form.cedulaForm,
         fecha: moment(form.fechaForm).format('YYYY-MM-DD')
       }
-
-
-      console.log('datos: ',datos);
       
       this.timbresServicio.obtenerTimbresFechaEmple(datos).subscribe( timbres => {
         this.timbres = timbres.timbres
@@ -138,10 +135,11 @@ export class BuscarTimbreComponent implements OnInit {
   }
 
   AbrirVentanaEditarAutorizacion(timbre: any): void {
+
     this.ventana.open(EditarTimbreComponent,
       { width: '650px', data: { timbre: timbre } })
       .afterClosed().subscribe(item => {
-        
+        this.ngOnInit();
       });
   }
 

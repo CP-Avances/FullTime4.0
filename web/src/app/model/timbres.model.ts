@@ -25,6 +25,7 @@ export interface HorarioTimbre{
     cargo: number,
     id_cargo: number,
     hora_total: string
+    novedades_conexion: string
 }
 
 export interface EntradasSalidas {
@@ -53,5 +54,6 @@ export interface EntradasSalidas {
     cargo_horas: number,
     cargo: number,
     id_cargo: number,
-    hora_total: string
+    hora_total: string,
+    novedades_conexion: string
 }

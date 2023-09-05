@@ -37,7 +37,6 @@ export class TimbresService {
 
   
   EditarTimbreEmpleado(data: any) {
-    console.log('data: ',data);
     return this.http.put(`${environment.url}/timbres/timbre/editar`, data);
   }
 
