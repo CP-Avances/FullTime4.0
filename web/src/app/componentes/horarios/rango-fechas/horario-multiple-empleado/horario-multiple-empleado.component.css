@@ -46,6 +46,13 @@ table {
     text-align: center;
 }
 
+#elimina_ {
+    color: rgb(232, 7, 7);
+    cursor: pointer;
+    margin-left: 15px;
+    text-align: center;
+}
+
 p {
     font-size: x-small;
 }

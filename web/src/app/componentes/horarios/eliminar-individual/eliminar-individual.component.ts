@@ -13,8 +13,8 @@ import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.s
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 // IMPORTAR COMPONENTES
-import { HorarioMultipleEmpleadoComponent } from '../../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
-import { BuscarPlanificacionComponent } from '../../rango-fechas/buscar-planificacion/buscar-planificacion.component';
+import { HorarioMultipleEmpleadoComponent } from '../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
+import { BuscarPlanificacionComponent } from '../rango-fechas/buscar-planificacion/buscar-planificacion.component';
 import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
@@ -56,10 +56,12 @@ export class EliminarIndividualComponent implements OnInit {
     public ventana_: MatDialog, // VARIABLE MANEJO DE VENTANAS
     public busqueda: BuscarPlanificacionComponent,
     public componente: HorarioMultipleEmpleadoComponent,
+    public componentem: HorarioMultipleEmpleadoComponent,
     private toastr: ToastrService,
   ) { }
 
   ngOnInit(): void {
+    console.log('ver datos eliminar ', this.datosEliminar)
   }
 
   // METODO PARA VERIFICAR QUE CAMPOS DE FECHAS NO SE ENCUENTREN VACIOS
@@ -185,108 +187,63 @@ export class EliminarIndividualComponent implements OnInit {
   }
 
   // METODO PARA ELIMINAR PLANIFICACION GENERAL DE HORARIOS
+  lista_eliminar: any = [];
   EliminarPlanificacion(form: any) {
     let inicio = moment(form.fechaInicioForm).format('YYYY-MM-DD');
     let final = moment(form.fechaFinalForm).format('YYYY-MM-DD');
 
     let total = this.horariosSeleccionados.length * this.datosEliminar.usuario.length;
     let contador = 0;
-    let correctos = 0;
-    let incorrectos = 0;
     this.progreso = true;
 
     this.horariosSeleccionados.forEach(obj => {
-
       this.datosEliminar.usuario.forEach(usu => {
-
         let plan_fecha = {
           codigo: usu.codigo,
           fec_final: final,
           fec_inicio: inicio,
           id_horario: obj.id_horario,
         };
-
         this.restP.BuscarFechas(plan_fecha).subscribe(res => {
           contador = contador + 1;
-
-          // METODO PARA ELIMINAR DE LA BASE DE DATOS
-          this.restP.EliminarRegistro(res).subscribe(datos => {
-
-            if (datos.message === 'OK') {
-              correctos = correctos + 1;
-            }
-            else {
-              incorrectos = incorrectos + 1;
-            }
-
-            if (contador === total) {
-              if (contador === correctos) {
-                this.progreso = false;
-                this.toastr.error('Operación exitosa.', 'Registros eliminados.', {
-                  timeOut: 6000,
-                });
-                this.CerrarVentana();
-              }
-              else if (incorrectos > 0) {
-                this.progreso = false;
-                this.toastr.error('Ups!!! se ha producido un error y solo algunos registros fueron eliminados.',
-                  'Intentar eliminar los registros nuevamente.', {
-                  timeOut: 6000,
-                });
-              }
-              else {
-                this.progreso = false;
-              }
-            }
-
-          }, error => {
-            incorrectos = incorrectos + 1;
-            if (contador === total) {
-              if (contador === correctos) {
-                this.progreso = false;
-                this.toastr.error('Operación exitosa.', 'Registros eliminados.', {
-                  timeOut: 6000,
-                });
-                this.CerrarVentana();
-              }
-              else if (incorrectos > 0) {
-                this.progreso = false;
-                this.toastr.error('Ups!!! se ha producido un error y solo algunos registros fueron eliminados.',
-                  'Intentar eliminar los registros nuevamente.', {
-                  timeOut: 6000,
-                });
-              }
-              else {
-                this.progreso = false;
-              }
-            }
-          })
-
+          this.lista_eliminar = this.lista_eliminar.concat(res);
+          if (contador === total) {
+            this.EliminarDatos(this.lista_eliminar);
+          }
         }, error => {
           contador = contador + 1;
           if (contador === total) {
-            if (contador === correctos) {
-              this.progreso = false;
-              this.toastr.error('Operación exitosa.', 'Registros eliminados.', {
-                timeOut: 6000,
-              });
-              this.CerrarVentana();
-            }
-            else if (incorrectos > 0) {
-              this.progreso = false;
-              this.toastr.error('Ups!!! se ha producido un error y solo algunos registros fueron eliminados.',
-                'Intentar eliminar los registros nuevamente.', {
-                timeOut: 6000,
-              });
-            }
-            else {
-              this.progreso = false;
-            }
+            this.EliminarDatos(this.lista_eliminar);
           }
         })
       })
     })
+  }
 
+  // ELIMINAR DATOS DE BASE DE DATOS
+  EliminarDatos(eliminar: any) {
+    // METODO PARA ELIMINAR DE LA BASE DE DATOS
+    this.restP.EliminarRegistro(eliminar).subscribe(datos => {
+      if (datos.message === 'OK') {
+        this.progreso = false;
+        this.toastr.error('Operación exitosa.', 'Registros eliminados.', {
+          timeOut: 6000,
+        });
+        this.CerrarVentana();
+      }
+      else {
+        this.progreso = false;
+        this.toastr.error('Ups!!! se ha producido un error y solo algunos registros fueron eliminados.',
+          'Intentar eliminar los registros nuevamente.', {
+          timeOut: 6000,
+        });
+      }
+    }, error => {
+      this.progreso = false;
+      this.toastr.error('Ups!!! se ha producido un error. Intentar eliminar los registros nuevamente.', '', {
+        timeOut: 6000,
+      });
+    })
   }
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO DE HORARIO ROTATIVO
@@ -317,6 +274,10 @@ export class EliminarIndividualComponent implements OnInit {
     if (this.datosEliminar.pagina === 'ver_empleado') {
       this.ventana.eliminar_plan = false;
       this.ventana.ver_tabla_horarios = true;
+    }
+    else if (this.datosEliminar.pagina === 'planificar') {
+      this.componentem.eliminar_plan = false;
+      this.componentem.seleccionar = true;
     }
   }
 

@@ -68,3 +68,7 @@ p {
     width: 100%;
     font-size: 10px;
 }
+
+#fuente_ {
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}

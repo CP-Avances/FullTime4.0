@@ -320,8 +320,7 @@ import { VistaElementosComponent } from './componentes/modulos/permisos/configur
 import { EditarTipoPermisosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/editar-tipo-permisos/editar-tipo-permisos.component';
 import { VerTipoPermisoComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/ver-tipo-permiso/ver-tipo-permiso.component';
 import { EditarPermisoEmpleadoComponent } from './componentes/modulos/permisos/gestionar-permisos/editar-permiso-empleado/editar-permiso-empleado.component';
-import { EliminarIndividualComponent } from './componentes/horarios/eliminar-planificacion/eliminar-individual/eliminar-individual.component';
-import { EliminarMultipleComponent } from './componentes/horarios/eliminar-planificacion/eliminar-multiple/eliminar-multiple.component';
+import { EliminarIndividualComponent } from './componentes/horarios/eliminar-individual/eliminar-individual.component';
 
 const config: SocketIoConfig = { url: environment.url, options: {} };
 
@@ -581,7 +580,6 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     ComidasSolicitadasEmpleadoComponent,
     BuscarPlanificacionComponent,
     EliminarIndividualComponent,
-    EliminarMultipleComponent,
 
   ],
 

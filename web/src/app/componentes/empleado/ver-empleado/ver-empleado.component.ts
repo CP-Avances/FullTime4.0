@@ -1356,7 +1356,7 @@ export class VerEmpleadoComponent implements OnInit {
   EliminarHorarios() {
     this.eliminar_horarios = {
       pagina: 'ver_empleado',
-      usuario: [{ codigo: this.datoActual.codigo, id_empleado: this.idEmpleado }]
+      usuario: [{ codigo: this.datoActual.codigo, id: this.idEmpleado }]
     }
     this.ver_tabla_horarios = false;
     this.eliminar_plan = true;

@@ -408,8 +408,11 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     if (tipo === 'p') {
       this.PlanificarMultiple(usuarios);
     }
-    else {
+    else if (tipo === 'b') {
       this.VerPlanificacion(usuarios);
+    }
+    else if (tipo === 'e') {
+      this.EliminarHorarios(usuarios);
     }
   }
 
@@ -446,8 +449,11 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     if (tipo === 'p') {
       this.PlanificarMultiple(usuarios);
     }
-    else {
+    else if (tipo === 'b') {
       this.VerPlanificacion(usuarios);
+    }
+    else if (tipo === 'e') {
+      this.EliminarHorarios(usuarios);
     }
   }
 
@@ -465,8 +471,11 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     if (tipo === 'p') {
       this.PlanificarMultiple(respuesta);
     }
-    else {
+    else if (tipo === 'b') {
       this.VerPlanificacion(respuesta);
+    }
+    else if (tipo === 'e') {
+      this.EliminarHorarios(respuesta);
     }
   }
 
@@ -628,6 +637,27 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     this.ver_horario = true;
     this.horario_id = id;
     this.pagina = 'planificar';
+  }
+
+  /** ********************************************************************************************* **
+   ** **                               ELIMINAR PLANIFICACIONES HORARIAS                         ** **
+   ** ********************************************************************************************* **/
+  eliminar_plan: boolean = false;
+  eliminar_horarios: any = [];
+  EliminarHorarios(respuesta: any) {
+    if (respuesta.length > 0) {
+      this.eliminar_horarios = {
+        pagina: 'planificar',
+        usuario: respuesta
+      }
+      this.eliminar_plan = true;
+      this.seleccionar = false;
+    }
+    else {
+      this.toastr.warning('No ha seleccionado usuarios.', '', {
+        timeOut: 6000,
+      });
+    }
   }
 
 }

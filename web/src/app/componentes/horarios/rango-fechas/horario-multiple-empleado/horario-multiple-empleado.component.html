@@ -16,6 +16,11 @@
     </app-buscar-planificacion>
 </div>
 
+<!-- ************** PANTALLA ELIMINAR REGISTROS ************************* -->
+<div class="container" style="padding-top: 20px;" *ngIf="eliminar_plan">
+    <app-eliminar-individual [datosEliminar]="eliminar_horarios"></app-eliminar-individual>
+</div>
+
 
 <!--  *********************** PANTALLA DETALLE DE HORARIOS ********************************* -->
 <app-ver-horario-detalle *ngIf="ver_horario" [idHorario]="horario_id" [pagina]="pagina"></app-ver-horario-detalle>
@@ -122,6 +127,9 @@
             </form>
 
             <div *ngIf="activar_boton" class="d-flex flex-wrap justify-content-center" style="padding-top: 15px;">
+                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 'e')">
+                    Eliminar
+                </button>
                 <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 'b')">
                     Buscar Planificación
                 </button>
@@ -177,7 +185,16 @@
                                         matTooltip="Abrir formulario de registro de horarios.">
                                         <p>Planificar</p>
                                     </i>
-
+                                    <i (click)="GuardarRegistros(c.id, 'b')" id="busca" *ngIf="auto_individual"
+                                        class="fa fa-search" matSuffix matTooltipPosition="right"
+                                        matTooltip="Búsqueda de planificaciones asignadas.">
+                                        <p>Listar</p>
+                                    </i>
+                                    <i (click)="GuardarRegistros(c.id, 'e')" id="elimina_" *ngIf="auto_individual"
+                                        class="far fa-trash-alt" matSuffix matTooltipPosition="right"
+                                        matTooltip="Eliminar planificaciones asignadas.">
+                                        <p>Eliminar</p>
+                                    </i>
                                 </td>
                             </tr>
                         </tbody>
@@ -237,6 +254,16 @@
                                         class="fa fa-calendar" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de horarios.">
                                         <p>Planificar</p>
+                                    </i>
+                                    <i (click)="GuardarRegistros(d.id, 'b')" id="busca" *ngIf="auto_individual"
+                                        class="fa fa-search" matSuffix matTooltipPosition="right"
+                                        matTooltip="Búsqueda de planificaciones asignadas.">
+                                        <p>Listar</p>
+                                    </i>
+                                    <i (click)="GuardarRegistros(d.id, 'e')" id="elimina_" *ngIf="auto_individual"
+                                        class="far fa-trash-alt" matSuffix matTooltipPosition="right"
+                                        matTooltip="Eliminar planificaciones asignadas.">
+                                        <p>Eliminar</p>
                                     </i>
                                 </td>
                             </tr>
@@ -304,6 +331,11 @@
                                         class="fa fa-search" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de horarios.">
                                         <p>Listar</p>
+                                    </i>
+                                    <i (click)="EliminarHorarios([e])" id="elimina_" *ngIf="auto_individual"
+                                        class="far fa-trash-alt" matSuffix matTooltipPosition="right"
+                                        matTooltip="Eliminar planificaciones asignadas.">
+                                        <p>Eliminar</p>
                                     </i>
                                 </td>
                             </tr>
