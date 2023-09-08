@@ -374,6 +374,8 @@ export class EditarPlanificacionComponent implements OnInit {
       return o.codigo === this.horarioF.value
     })
 
+    if (!obj_res) return this.toastr.warning('Horario no válido.');
+
     //console.log('ver obj horario ', obj_res)
     console.log('ver horas ', this.horas)
 

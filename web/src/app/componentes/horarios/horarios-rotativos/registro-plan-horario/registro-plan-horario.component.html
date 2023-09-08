@@ -212,8 +212,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr
-                                                *ngFor="let d of detalle_acciones">
+                                            <tr *ngFor="let d of detalle_acciones">
                                                 <td id="td_horarios">{{d.horario}}</td>
                                                 <td id="td_horarios">{{d.entrada_}}</td>
                                                 <td id="td_horarios">{{d.inicio_comida}}</td>
@@ -235,15 +234,17 @@
                 <div class="bordes" *ngFor="let d of fechas_mes; index as i"
                     [ngStyle]="{'background-color':CambiarColores('1')}">
 
-                    <mat-icon *ngIf="ver_icono" class="float-left" id="seleccionar" (click)="IngresarHorario(i)">
+                    <mat-icon *ngIf="ver_icono === true && d.tipo_dia != 'FD'" class="float-left" id="seleccionar"
+                        (click)="IngresarHorario(i)">
                         add_circle
                     </mat-icon>
 
-                    <mat-icon *ngIf="ver_icono" class="center" id="libre" (click)="IngresarLibre(i)">
+                    <mat-icon class="center" *ngIf="d.tipo_dia != 'FD'" id="libre" (click)="IngresarLibre(i)">
                         work_off
                     </mat-icon>
 
-                    <mat-icon *ngIf="ver_icono" class="float-right" id="seleccionar" (click)="EliminarHorario(i)">
+                    <mat-icon *ngIf="ver_icono === true && d.tipo_dia != 'FD' && d.tipo_dia != 'L'" class="float-right"
+                        id="seleccionar" (click)="EliminarHorario(i)">
                         delete_forever
                     </mat-icon>
 
@@ -254,6 +255,10 @@
                             <b *ngIf="d.horarios_existentes === '***'" style="color: red;">
                                 {{d.horarios_existentes}}
                             </b>
+                            <br>
+                            <span class="fuente" *ngFor="let r of d.registrados">
+                                ({{r.hora_trabajo}}) {{r.codigo}} <br>
+                            </span>
                         </span>
                     </div>
 
@@ -280,8 +285,12 @@
                             </b>
                         </div>
 
+                        <div *ngIf="d.tipo_dia === 'L'">
+                            <span class="fuente" style="color:green"><b>DIA LIBRE</b></span>
+                        </div>
+
                         <div>
-                            <b style="color: blue;" *ngIf="d.tipo_dia === 'FD'">
+                            <b style="color: blue;" *ngIf="d.tipo_dia === 'FD' || d.tipo_dia === 'L'">
                                 <span class="fuente_pequeño">({{h.hora_trabajo}})</span>
                                 {{h.horario}}
                             </b>
@@ -294,9 +303,6 @@
                             </span>
                         </div>
 
-                        <div *ngIf="d.tipo_dia === 'L'">
-                            <span class="fuente" style="color:green"><b>DIA LIBRE</b></span>
-                        </div>
                     </span>
 
                     <div>
@@ -304,7 +310,18 @@
                             <b>{{d.horas_validas}}</b>
                         </span>
                     </div>
+
+                    <div>
+                        <span class="fuente_pequeño" style="color:rgb(102, 7, 181)" *ngIf="d.supera_jornada === 'OK'">
+                            <b>{{d.horas_superadas}}</b>
+                        </span>
+                    </div>
                 </div>
+            </div>
+
+            <div class="pantalla-progress" *ngIf="progreso">
+                <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
+                </mat-progress-spinner>
             </div>
 
         </mat-card-content>

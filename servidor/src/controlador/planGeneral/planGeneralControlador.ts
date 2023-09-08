@@ -252,7 +252,7 @@ class PlanGeneralControlador {
                 "INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
                 "INNER JOIN cg_horarios horario ON horario.id = p_g.id_horario " +
                 "WHERE fec_horario BETWEEN $1 AND $2 " +
-                "GROUP BY codigo_horario, p_g.id_horario "
+                "GROUP BY codigo_horario, p_g.id_horario"
                 , [fecha_inicio, fecha_final]);
 
             if (HORARIO.rowCount > 0) {
@@ -267,7 +267,30 @@ class PlanGeneralControlador {
         }
     }
 
+    // METODO PARA LISTAR PLANIFICACIONES DE DIAS LIBRES Y FERIADOS   --**VERIFICADO
+    public async ListarHorariosDescanso(req: Request, res: Response) {
+        try {
+            const { fecha_inicio, fecha_final, codigo } = req.body;
+            const HORARIO = await pool.query(
+                "SELECT p_g.id_horario, horario.codigo  AS codigo_horario, horario.default " +
+                "FROM plan_general p_g " +
+                "INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigo + ") " +
+                "INNER JOIN cg_horarios horario ON horario.id = p_g.id_horario " +
+                "WHERE fec_horario BETWEEN $1 AND $2 AND (horario.default = 'FD' OR horario.default = 'L') " +
+                "GROUP BY codigo_horario, p_g.id_horario, horario.default"
+                , [fecha_inicio, fecha_final]);
 
+            if (HORARIO.rowCount > 0) {
+                return res.jsonp({ message: 'OK', data: HORARIO.rows })
+            }
+            else {
+                return res.jsonp({ message: 'vacio', data: HORARIO.rows });
+            }
+        }
+        catch (error) {
+            return res.jsonp({ message: 'error', error: error });
+        }
+    }
 
 
 

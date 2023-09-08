@@ -77,7 +77,7 @@ class EmpleadoHorariosControlador {
             const { fechaInicio, fechaFinal } = req.body;
             const { codigo } = req.params;
             const HORARIO = yield database_1.default.query(`
-            SELECT DISTINCT pg.id_horario, ch.hora_trabajo 
+            SELECT DISTINCT pg.id_horario, ch.hora_trabajo, ch.codigo, ch.default  
             FROM plan_general AS pg, cg_horarios AS ch
             WHERE pg.codigo = $3 AND pg.id_horario = ch.id AND
                 (fec_horario BETWEEN $1 AND $2)

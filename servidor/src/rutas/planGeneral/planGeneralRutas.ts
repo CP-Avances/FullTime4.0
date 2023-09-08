@@ -24,6 +24,11 @@ class DepartamentoRutas {
         this.router.post('/horario-general-detalle', TokenValidation, PLAN_GENERAL_CONTROLADOR.ListarDetalleHorarios);
         // METODO PARA LISTAR SOLO HORARIOS DE USUARIOS  --**VERIFICADO
         this.router.post('/horario-solo-planificacion/lista', TokenValidation, PLAN_GENERAL_CONTROLADOR.ListarHorariosUsuario);
+        // METODO PARA LISTAR SOLO HORARIOS DE DESCANSO DE USUARIOS  --**VERIFICADO
+        this.router.post('/horario-solo-planificacion/lista-descanso', TokenValidation, PLAN_GENERAL_CONTROLADOR.ListarHorariosDescanso);
+
+
+
 
 
         this.router.post('/buscar_fecha/plan', TokenValidation, PLAN_GENERAL_CONTROLADOR.BuscarFecha);

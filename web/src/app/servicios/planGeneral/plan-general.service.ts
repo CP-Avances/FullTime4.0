@@ -46,6 +46,19 @@ export class PlanGeneralService {
     return this.http.post<any>(`${environment.url}/planificacion_general/horario-solo-planificacion/lista`, datos);
   }
 
+  // METODO PARA LISTAR PLANIFICACIONES DESCANSO DEL USUARIO --**VERIFICADO
+  BuscarHorariosDescanso(datos: any) {
+    return this.http.post<any>(`${environment.url}/planificacion_general/horario-solo-planificacion/lista-descanso`, datos);
+  }
+
+
+
+
+
+
+
+
+
 
 
 
