@@ -1,0 +1,135 @@
+<div class="container" style="padding-bottom: 25px; text-align: center; padding-top: 20px;">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="titulo">
+            BUSCAR TIMBRES POR EMPLEADO
+        </div>
+        <form [formGroup]="buscarTimbreForm">
+            <div style="text-align: center">
+                <div class="nota">
+                    <span>Por favor llenar todos los campos obligatorios (*) del formulario y dar click en Siguiente
+                        para continuar.
+                    </span>
+                </div>
+                <div>
+                    <div class="row">
+                        <div class="col-md">
+
+                            <div #showAdministrador 
+                                *ngIf="rol === '1'"
+                                class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field>
+                                    <mat-label>Codigo</mat-label>
+                                    <input matInput [formControl]="codigo"  (keypress)="IngresarSoloNumeros($event)">
+                                    <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar el codigo.">
+                                        help_outline</mat-icon>
+                                </mat-form-field>
+                                <mat-form-field>
+                                    <mat-label>Cedula</mat-label>
+                                    <input matInput [formControl]="cedula" (keypress)="IngresarSoloNumeros($event)">
+                                    <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar la cedula.">
+                                        help_outline</mat-icon>
+                                </mat-form-field>
+                                <mat-form-field id="formulario">
+                                    <mat-label>Fecha</mat-label>
+                                    <input matInput [matDatepicker]="picker2" readonly
+                                        placeholder="dd/mm/aaaa" [formControl]="fecha" min="1950-01-31"
+                                        max="2050-01-31" required>
+                                    <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor"
+                                        matTooltipPosition="right"
+                                        matTooltip="Ingre la fecha de consulta">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker touchUi #picker2></mat-datepicker>
+                                </mat-form-field>
+                            
+                            </div>
+
+                            <div #showEmpleado 
+                                *ngIf="rol != '1'"
+                                class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field id="formulario">
+                                    <mat-label>Fecha</mat-label>
+                                    <input matInput [matDatepicker]="picker2" readonly
+                                        placeholder="dd/mm/aaaa" [formControl]="fecha" min="1950-01-31"
+                                        max="2050-01-31" required>
+                                    <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor"
+                                        matTooltipPosition="right"
+                                        matTooltip="Ingre la fecha de consulta">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker touchUi #picker2></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <button mat-raised-button id="btn-raised" type="submit"
+                                (click) = "buscarTimbresFecha(buscarTimbreForm.value)"
+                                [disabled]="!buscarTimbreForm.valid">Buscar</button>
+
+                                <button mat-raised-button id="btn-raised" type="submit"
+                                (click) = "LimpiarCampos()"
+                                [disabled]="!buscarTimbreForm.valid">Limpiar</button>
+                            </div><br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div [hidden]="mostrarTabla" class="container" style="padding-bottom: 25px; text-align: center; padding-top: 20px;">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="titulo">
+            TIMBRES ENCONTRADOS
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Empleado</th>
+                        <th scope="col">Código</th>
+                        <th scope="col">Fecha - Hora timbre</th>
+                        <th scope="col">Codigo reloj</th>
+                        <th scope="col">Accion</th>
+                        <th scope="col">Tecla funcion</th>
+                        <th scope="col">Observacion</th>
+                        <th scope="col">Latitud</th>
+                        <th scope="col">Longitud</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let t of timbres">
+                        <td>{{t.empleado}}</td>
+                        <td>{{t.id_empleado}}</td>
+                        <td>{{t.fec_hora_timbre | date:'yyyy-MM-dd'}}</td>
+                        <td>{{t.dispositivo_timbre}}</td>
+                        <td>{{t.accion}}</td>
+                        <td>{{t.tecl_funcion}}</td>
+                        <td>{{t.observacion}}</td>
+                        <td>{{t.latitud}}</td>
+                        <td>{{t.longitud}}</td>
+                        <td class="d-flex justify-content-center">
+                            <i id="ver" class="fas fa-eye" style="margin-right: 20px;"
+                                matSuffix matTooltipPosition="left"
+                                matTooltip="Ver timbre."
+                                (click)="AbrirVentanaVerInfoTimbre(t)">
+                                <p>Ver</p>
+                            </i>
+                            <i  id="edit"  
+                                class="fas fa-edit" style="margin-right: 20px;"
+                                matSuffix matTooltipPosition="right"
+                                matTooltip="Modificar los datos generales de este registro"
+                                (click)="AbrirVentanaEditarAutorizacion(t)">
+                                <p>Editar</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [pageSize]="tamanio_pagina_e"
+            [pageSizeOptions]="pageSizeOptions_e" id="pagina" (page)="ManejarPaginaE($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>

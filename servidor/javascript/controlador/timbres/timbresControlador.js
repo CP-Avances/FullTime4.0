@@ -137,6 +137,80 @@ class TimbresControlador {
             }
         });
     }
+    //METODO PARA BUSCAR EL TIMBRE DEL EMPLEADO POR FECHA
+    ObtenertimbreFechaEmple(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let { codigo, cedula, fecha } = req.query;
+                fecha = fecha + '%';
+                if (codigo === '') {
+                    let usuario = yield database_1.default.query(`SELECT * FROM datos_actuales_empleado 
+                        WHERE cedula = $1
+                    `, [cedula]).then((result) => {
+                        return result.rows.map((obj) => {
+                            codigo = obj.codigo;
+                        });
+                    });
+                }
+                else if (cedula === '') {
+                    let usuario = yield database_1.default.query(`SELECT * FROM datos_actuales_empleado 
+                        WHERE codigo = $1
+                    `, [codigo]).then((result) => {
+                        return result.rows.map((obj) => {
+                            cedula = obj.cedula;
+                        });
+                    });
+                }
+                let timbresRows = 0;
+                let timbres = yield database_1.default.query(`
+                SELECT (da.nombre || ' ' || da.apellido) AS empleado, t.* 
+                    FROM timbres AS t, datos_actuales_empleado AS da
+                    WHERE CAST(t.id_empleado AS VARCHAR) = $1 
+                    AND CAST(t.fec_hora_timbre AS VARCHAR) LIKE $2
+                    AND CAST(da.codigo AS integer) = t.id_empleado 
+                    AND da.cedula = $3
+                `, [codigo, fecha, cedula]).then((result) => {
+                    timbresRows = result.rowCount;
+                    if (result.rowCount > 0) {
+                        return res.status(200).jsonp({ message: 'timbres encontrados', timbres: result.rows });
+                    }
+                });
+                console.log('respuesta: ', timbresRows);
+                if (timbresRows == 0) {
+                    return res.status(400).jsonp({ message: "No se encontraron timbres en esa fecha" });
+                }
+            }
+            catch (err) {
+                const message = '!Ups poblemas con la peticion al servidor';
+                return res.status(500).jsonp({ error: err, message: message });
+            }
+        });
+    }
+    //METODO PARA ACTUALIZAR O EDITAR EL TIMBRE DEL EMPLEADO
+    EditarTimbreEmpleadoFecha(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let { id, codigo, accion, tecla, observacion } = req.body;
+                console.log('id: ', id);
+                console.log('codigo: ', codigo);
+                console.log('accion: ', accion);
+                console.log('tecla: ', tecla);
+                console.log('observacion: ', observacion);
+                yield database_1.default.query(`
+                UPDATE timbres SET accion = $1, tecl_funcion = $2, observacion = $3 
+                    WHERE id = $4 
+                    AND id_empleado = $5  
+                `, [accion, tecla, observacion, id, codigo])
+                    .then((result) => {
+                    return res.status(200).jsonp({ message: 'Registro actualizado' });
+                });
+            }
+            catch (err) {
+                const message = '!Ups poblemas con la peticion al servidor';
+                return res.status(500).jsonp({ error: err, message: message });
+            }
+        });
+    }
     // METODO DE REGISTRO DE TIMBRES PERSONALES
     CrearTimbreWeb(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -314,6 +314,10 @@ import { HorasPlanificadasEmpleadoComponent } from './componentes/rolEmpleado/ho
 import { ComidasSolicitadasEmpleadoComponent } from './componentes/rolEmpleado/comidas-empleado/comidas-solicitadas-empleado/comidas-solicitadas-empleado.component';
 import { BrowserModule } from '@angular/platform-browser';
 import { MatPaginatorIntl } from '@angular/material/paginator';
+import { BuscarTimbreComponent } from './componentes/timbre-web/buscar-timbre/buscar-timbre.component';
+import { EditarTimbreComponent } from './componentes/timbre-web/editar-timbre/editar-timbre.component';
+import { VerTimbreComponent } from './componentes/timbre-web/ver-timbre/ver-timbre.component';
+
 import { BuscarPlanificacionComponent } from './componentes/horarios/rango-fechas/buscar-planificacion/buscar-planificacion.component';
 import { TipoPermisosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/tipo-permisos/tipo-permisos.component';
 import { VistaElementosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/listarTipoPermisos/vista-elementos.component';
@@ -321,6 +325,7 @@ import { EditarTipoPermisosComponent } from './componentes/modulos/permisos/conf
 import { VerTipoPermisoComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/ver-tipo-permiso/ver-tipo-permiso.component';
 import { EditarPermisoEmpleadoComponent } from './componentes/modulos/permisos/gestionar-permisos/editar-permiso-empleado/editar-permiso-empleado.component';
 import { EliminarIndividualComponent } from './componentes/horarios/eliminar-individual/eliminar-individual.component';
+
 
 const config: SocketIoConfig = { url: environment.url, options: {} };
 
@@ -578,6 +583,9 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     CancelarComidaComponent,
     HorasPlanificadasEmpleadoComponent,
     ComidasSolicitadasEmpleadoComponent,
+    BuscarTimbreComponent,
+    EditarTimbreComponent,
+    VerTimbreComponent,
     BuscarPlanificacionComponent,
     EliminarIndividualComponent,
 
