@@ -1384,8 +1384,10 @@ export class VerEmpleadoComponent implements OnInit {
   editar_horario: boolean = false;
   datos_editar: any = [];
   expansion: boolean = true;
-  AbrirEditarHorario(anio: any, mes: any, dia: any, horario: any, valor: any): void {
+  AbrirEditarHorario(anio: any, mes: any, dia: any, horario: any, index: any): void {
     //valor.ob = true;
+    this.horariosEmpleado[index].color = 'ok';
+    this.horariosEmpleado[index].seleccionado = dia;
     this.datos_editar = {
       idEmpleado: this.idEmpleado,
       datosPlan: horario,
@@ -1396,6 +1398,7 @@ export class VerEmpleadoComponent implements OnInit {
       pagina: 'ver_empleado',
       idCargo: this.datoActual.id_cargo,
       horas_trabaja: this.cargoEmpleado[0].hora_trabaja,
+      index: index
     }
     this.editar_horario = true;
     this.expansion = false;
@@ -1409,6 +1412,16 @@ export class VerEmpleadoComponent implements OnInit {
     }
     else {
       this.expansion = true;
+    }
+  }
+
+  // METODO PARA CAMBIAR DE COLORES SEGUN EL MES
+  CambiarColores(opcion: any) {
+    console.log('ver opcion ', opcion)
+    let color: string;
+    switch (opcion) {
+      case 'ok':
+        return color = '#F6DDCC';
     }
   }
 

@@ -5,8 +5,8 @@ import { ToastrService } from 'ngx-toastr';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { default as _rollupMoment } from 'moment';
 import moment from 'moment';
+import { default as _rollupMoment } from 'moment';
 
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
@@ -18,6 +18,7 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
 
+import { BuscarPlanificacionComponent } from '../../rango-fechas/buscar-planificacion/buscar-planificacion.component';
 import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
@@ -52,7 +53,9 @@ export class EditarPlanificacionComponent implements OnInit {
 
   constructor(
     public componentev: VerEmpleadoComponent,
+    public componenteb: BuscarPlanificacionComponent,
     public parametro: ParametrosService,
+    public ventanae: MatDialog,
     public feriado: FeriadosService,
     public validar: ValidacionesService,
     public horario: EmpleadoHorariosService,
@@ -63,7 +66,6 @@ export class EditarPlanificacionComponent implements OnInit {
     public restP: PlanGeneralService,
     public rest: PlanHorarioService,
     private toastr: ToastrService,
-    public ventanae: MatDialog,
   ) { }
 
   ngOnInit(): void {
@@ -270,7 +272,7 @@ export class EditarPlanificacionComponent implements OnInit {
           }
         }
       }
-      console.log('ver horario libre ', this.lista_libres);
+      //console.log('ver horario libre ', this.lista_libres);
     })
   }
 
@@ -296,6 +298,7 @@ export class EditarPlanificacionComponent implements OnInit {
     }
     else {
       this.ObtenerDetallesHorario(id, codigo, min_almuerzo);
+      this.AgregarHorario();
     }
   }
 
@@ -377,7 +380,7 @@ export class EditarPlanificacionComponent implements OnInit {
     if (!obj_res) return this.toastr.warning('Horario no válido.');
 
     //console.log('ver obj horario ', obj_res)
-    console.log('ver horas ', this.horas)
+    //console.log('ver horas ', this.horas)
 
     this.asignado_libre = [];
 
@@ -460,7 +463,7 @@ export class EditarPlanificacionComponent implements OnInit {
       this.ver_nota = false;
     }
 
-    console.log('horarios agregados ', this.horas)
+    //console.log('horarios agregados ', this.horas)
   }
 
   // METODO PARA QUITAR HORARIOS DE LA LISTA
@@ -774,9 +777,9 @@ export class EditarPlanificacionComponent implements OnInit {
   // METODO PARA INGRESAR DATOS A LA BASE
   plan_general: any = [];
   InsertarPlanificacion() {
-    console.log('plan genral ', this.plan_general)
+    //console.log('plan genral ', this.plan_general)
     this.restP.CrearPlanGeneral(this.plan_general).subscribe(res => {
-      console.log('ver respuesta ', res)
+      //console.log('ver respuesta ', res)
       if (res.message === 'OK') {
         //this.progreso = false;
         this.toastr.success('Operación exitosa.', 'Planificación horaria registrada.', {
@@ -903,8 +906,22 @@ export class EditarPlanificacionComponent implements OnInit {
       this.componentev.expansion = true;
       this.componentev.editar_activar = true;
       this.componentev.ver_activar_editar = true;
+      this.componentev.horariosEmpleado[this.datos_horarios.index].color = '';
+      this.componentev.horariosEmpleado[this.datos_horarios.index].seleccionado = 0;
       if (opcion === 2) {
         this.componentev.BuscarHorarioPeriodo();
+      }
+    }
+    else if (this.datos_horarios.pagina === 'lista-planificar') {
+      this.componenteb.editar_horario = false;
+      this.componenteb.multiple = true;
+      this.componenteb.auto_individual = true;
+      this.componenteb.ver_activar_editar = true;
+      this.componenteb.editar_activar = true;
+      this.componenteb.horariosEmpleado[this.datos_horarios.index].color = '';
+      this.componenteb.horariosEmpleado[this.datos_horarios.index].seleccionado = 0;
+      if (opcion === 2) {
+        this.componenteb.VerPlanificacion();
       }
     }
   }

@@ -72,3 +72,16 @@ p {
 #fuente_ {
     font-family: Roboto, "Helvetica Neue", sans-serif;
 }
+
+#editar_horario {
+    cursor: pointer;
+    color: green;
+    padding-bottom: 15px;
+}
+
+#activar_editar {
+    padding-top: 10px;
+    margin-left: 15px;
+    color: white;
+    cursor: pointer
+}

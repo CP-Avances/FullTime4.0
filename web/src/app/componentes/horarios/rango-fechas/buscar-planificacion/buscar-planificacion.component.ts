@@ -118,6 +118,7 @@ export class BuscarPlanificacionComponent {
   codigos: string = '';
   VerPlanificacion() {
     this.codigos = '';
+    console.log('resultados .... ', this.resultados)
     this.resultados.forEach(obj => {
       if (this.codigos === '') {
         this.codigos = '\'' + obj.codigo + '\''
@@ -146,6 +147,8 @@ export class BuscarPlanificacionComponent {
   mes_inicio: any = '';
   mes_fin: any = '';
   ObtenerHorariosEmpleado(fec_inicio: any, fec_final: any, opcion: number, codigo: any) {
+    this.editar_activar = false;
+    this.editar_horario = false;
     this.horariosEmpleado = [];
     if (opcion === 1) {
       this.mes_inicio = fec_inicio.format("YYYY-MM-DD");
@@ -164,12 +167,29 @@ export class BuscarPlanificacionComponent {
     this.plan.BuscarPlanificacionHoraria(busqueda).subscribe(datos => {
       if (datos.message === 'OK') {
         this.horariosEmpleado = datos.data;
+
+        this.horariosEmpleado.forEach(obj => {
+          this.resultados.forEach(r => {
+            if (r.codigo === obj.codigo_e) {
+              obj.id_empleado = r.id;
+              obj.id_cargo = r.id_cargo;
+              obj.hora_trabaja = r.hora_trabaja;
+              obj.seleccionado = '';
+              obj.color = '';
+            }
+          })
+        })
+        console.log('ver datos de horario ', this.horariosEmpleado)
         if (this.asignar_multiple === true || this.ventana_horario_individual === true) {
           this.multiple = false;
+          // EDITAR HORARIO
+          this.ver_activar_editar = false;
           this.auto_individual = false;
         }
         else {
           this.multiple = true;
+          // EDITAR HORARIO
+          this.ver_activar_editar = true;
           this.auto_individual = true;
         }
       }
@@ -178,6 +198,8 @@ export class BuscarPlanificacionComponent {
           timeOut: 6000,
         });
         this.multiple = false;
+        // EDITAR HORARIO
+        this.ver_activar_editar = false;
       }
     })
   }
@@ -214,6 +236,8 @@ export class BuscarPlanificacionComponent {
         this.ventana_horario_individual = true;
         this.buscar_fechas = false;
         this.multiple = false;
+        // EDITAR HORARIO
+        this.ver_activar_editar = false;
         this.auto_individual = false;
         break;
       }
@@ -231,6 +255,8 @@ export class BuscarPlanificacionComponent {
     console.log('ver resultados ', this.resultados.length)
     this.auto_individual = false;
     this.multiple = false;
+    // EDITAR HORARIO
+    this.ver_activar_editar = false;
     this.buscar_fechas = false;
     if (this.resultados.length === 1) {
       this.PlanificarIndividual(this.resultados[0]);
@@ -395,6 +421,57 @@ export class BuscarPlanificacionComponent {
   ManejarPaginaDetalles(e: PageEvent) {
     this.numero_paginaD = e.pageIndex + 1;
     this.tamanio_paginaD = e.pageSize;
+  }
+
+  /** ********************************************************************************************* **
+   ** **                                METODO DE EDICION DE HORARIOS                            ** **
+   ** ********************************************************************************************* **/
+  editar_activar: boolean = false;
+  ver_activar_editar: boolean = false;
+  ActivarEditarHorario() {
+    if (this.editar_activar === true) {
+      this.editar_activar = false;
+    }
+    else {
+      this.editar_activar = true;
+    }
+  }
+
+  // VENTANA PARA REGISTRAR HORARIO 
+  editar_horario: boolean = false;
+  datos_editar: any = [];
+  AbrirEditarHorario(anio: any, mes: any, dia: any, horario: any, id_empleado: any, codigo: any, id_cargo: any, hora_trabaja: any, index: any): void {
+    //valor.ob = true;
+    this.horariosEmpleado[index].color = 'ok';
+    this.horariosEmpleado[index].seleccionado = dia;
+    console.log('index ', index)
+    this.datos_editar = {
+      idEmpleado: id_empleado,
+      datosPlan: horario,
+      anio: anio,
+      mes: mes,
+      dia: dia,
+      codigo: codigo,
+      pagina: 'lista-planificar',
+      idCargo: id_cargo,
+      horas_trabaja: hora_trabaja,
+      index: index
+    }
+    this.multiple = false;
+    this.editar_horario = true;
+    this.editar_activar = false;
+    this.auto_individual = false;
+    this.ver_activar_editar = false;
+  }
+
+  // METODO PARA CAMBIAR DE COLORES SEGUN EL MES
+  CambiarColores(opcion: any) {
+    console.log('ver opcion ', opcion)
+    let color: string;
+    switch (opcion) {
+      case 'ok':
+        return color = '#F6DDCC';
+    }
   }
 
 }
