@@ -423,8 +423,8 @@ export class MainNavComponent implements OnInit {
             color: true,
             subtitulo: true,
             children: [
-              { name: 'Timbre Web', url: '/timbresWeb', color: true },
-              { name: 'Timbre Teletrabajo', url: '/timbres-personal', color: true },
+              { name: 'Configurar Teletrabajo', url: '/timbresWeb', color: true },
+              { name: 'Timbrar Teletrabajo', url: '/timbres-personal', color: true },
             ]
           },
           {
