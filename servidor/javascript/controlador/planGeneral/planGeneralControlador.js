@@ -125,7 +125,7 @@ class PlanGeneralControlador {
                 pg.estado_origen 
                 FROM plan_general AS pg, empl_cargos AS c 
                 WHERE pg.fec_horario IN(${lista_fechas}) 
-                AND pg.codigo:: varchar = $1 AND c.id = pg.id_empl_cargo 
+                AND pg.codigo = $1 AND c.id = pg.id_empl_cargo 
                 AND(pg.tipo_entr_salida = 'E' OR pg.tipo_entr_salida = 'S') 
                 ORDER BY pg.fec_horario ASC
                 `, [codigo]);
@@ -141,6 +141,7 @@ class PlanGeneralControlador {
             }
         });
     }
+    //TODO Revisar
     // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO   --**VERIFICADO
     ListarPlanificacionHoraria(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

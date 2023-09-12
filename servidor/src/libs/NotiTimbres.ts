@@ -49,7 +49,7 @@ export const NotificacionTimbreAutomatica = function () {
 async function CalcularHoras(fecha: string, hora: string) {
     let datoConsulta = fecha + ' ' + hora;
     console.log('FECHA ====>', datoConsulta);
-    let timbres = await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR), accion, id_empleado, id FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) LIKE $1 || \'%\'', [datoConsulta])
+    let timbres = await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR), accion, codigo, id FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) LIKE $1 || \'%\'', [datoConsulta])
         .then((result: any) => { return result.rows });
 
     console.log(timbres);

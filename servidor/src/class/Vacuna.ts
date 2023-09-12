@@ -15,7 +15,7 @@ interface emp_vac {
     id: number,
     name_empleado: string,
     cedula: string,
-    codigo: number,
+    codigo: string | number,
     genero?: string | number,
     cargo?: string,
     contrato?: string,

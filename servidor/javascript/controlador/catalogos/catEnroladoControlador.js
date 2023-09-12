@@ -99,7 +99,7 @@ class EnroladoControlador {
                 //Nombre, Apellido, Código e id_usuario del empleado
                 const datosEmpleado = yield database_1.default.query('SELECT id, nombre, apellido, codigo, estado FROM empleados WHERE cedula = $1', [cedula]);
                 let nombre = datosEmpleado.rows[0]['nombre'] + ' ' + datosEmpleado.rows[0]['apellido'];
-                let codigo = parseInt(datosEmpleado.rows[0]['codigo']);
+                let codigo = datosEmpleado.rows[0]['codigo'];
                 if (datosEmpleado.rows[0]['estado'] === 1) {
                     var activo = true;
                 }

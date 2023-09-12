@@ -413,7 +413,7 @@ class UsuarioControlador {
             try {
                 const DISPOSITIVOS = yield database_1.default.query(`
         SELECT e.codigo, (e.nombre || \' \' || e.apellido) AS nombre, e.cedula, d.id_dispositivo, d.modelo_dispositivo
-        FROM id_dispositivos AS d INNER JOIN empleados AS e ON d.id_empleado = CAST(e.codigo AS Integer) 
+        FROM id_dispositivos AS d INNER JOIN empleados AS e ON d.id_empleado = e.codigo
         ORDER BY nombre
         `).then((result) => { return result.rows; });
                 if (DISPOSITIVOS.length === 0)

@@ -25,7 +25,7 @@ class PeriodoVacacionControlador {
             FROM peri_vacaciones AS pv
             WHERE pv.id = (SELECT MAX(pv.id) AS id 
                            FROM peri_vacaciones AS pv, empleados AS e 
-                           WHERE pv.codigo::varchar = e.codigo AND e.id = $1 )
+                           WHERE pv.codigo = e.codigo AND e.id = $1 )
             `, [id_empleado]);
             if (VACACIONES.rowCount > 0) {
                 return res.jsonp(VACACIONES.rows);
@@ -107,7 +107,7 @@ class PeriodoVacacionControlador {
                         if (CONTRATO.rowCount != 0) {
                             contarContrato = contarContrato + 1;
                             // Verificar si el empleado ya tiene registrado un periodo de vacaciones
-                            const PERIODO = yield database_1.default.query('SELECT * FROM peri_vacaciones WHERE codigo = $1', [parseInt(CEDULA.rows[0]['codigo'])]);
+                            const PERIODO = yield database_1.default.query('SELECT * FROM peri_vacaciones WHERE codigo = $1', CEDULA.rows[0]['codigo']);
                             if (PERIODO.rowCount === 0) {
                                 contarPeriodos = contarPeriodos + 1;
                             }

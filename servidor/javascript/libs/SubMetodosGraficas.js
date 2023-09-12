@@ -51,7 +51,7 @@ const BuscarTimbresByCodigo_Fecha = function (codigo, horario) {
         return yield Promise.all(horario.map((obj) => __awaiter(this, void 0, void 0, function* () {
             return {
                 fecha: obj.fecha,
-                timbresTotal: yield database_1.default.query('SELECT fec_hora_timbre FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\' AND id_empleado = $2 ORDER BY fec_hora_timbre ASC', [obj.fecha, codigo])
+                timbresTotal: yield database_1.default.query('SELECT fec_hora_timbre FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\' AND codigo = $2 ORDER BY fec_hora_timbre ASC', [obj.fecha, codigo])
                     .then(res => {
                     return res.rowCount;
                 })
@@ -975,7 +975,7 @@ const Empleado_Permisos_ModelarDatos = function (codigo, fec_desde, fec_hasta) {
 exports.Empleado_Permisos_ModelarDatos = Empleado_Permisos_ModelarDatos;
 const Empleado_Atrasos_ModelarDatos = function (codigo, fec_desde, fec_hasta) {
     return __awaiter(this, void 0, void 0, function* () {
-        let timbres = yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR), id_empleado FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) between $1 || \'%\' AND $2 || \'%\' AND accion in (\'EoS\',\'E\') AND id_empleado = $3 ORDER BY fec_hora_timbre ASC ', [fec_desde, fec_hasta, codigo])
+        let timbres = yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR), codigo FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) between $1 || \'%\' AND $2 || \'%\' AND accion in (\'EoS\',\'E\') AND codigo = $3 ORDER BY fec_hora_timbre ASC ', [fec_desde, fec_hasta, codigo])
             .then(res => {
             return res.rows;
         });
@@ -1132,7 +1132,7 @@ function fechaIterada(fechaIterada, horario) {
 }
 const BuscarTimbresSinAccionesReporte = function (fecha, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR) FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\' AND id_empleado = $2 ORDER BY fec_hora_timbre ASC ', [fecha, codigo])
+        return yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR) FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\' AND codigo = $2 ORDER BY fec_hora_timbre ASC ', [fecha, codigo])
             .then(res => {
             return res.rows;
         });

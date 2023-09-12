@@ -106,6 +106,7 @@ class ReportesControlador {
              return res.status(404).jsonp({ text: 'error' });
          }
      }*/
+    //TODO BuscarPlan
     ////PLANIFICACION DE EMPLEADO CON FECHAS
     BuscarPlan(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -132,12 +133,12 @@ class ReportesControlador {
             const { id_empleado } = req.params;
             const { fechaInicio, fechaFinal } = req.body;
             const DATOS = yield database_1.default.query('SELECT t.fec_hora_timbre,t.accion, t.tecl_funcion, t.observacion, ' +
-                't.latitud, t.longitud, t.id, t.id_empleado, t.id_reloj, t.hora_timbre_diferente, ' +
+                't.latitud, t.longitud, t.id, t.codigo, t.id_reloj, t.hora_timbre_diferente, ' +
                 't.fec_hora_timbre_servidor, t.dispositivo_timbre, t.tipo_autenticacion ' +
-                'FROM timbres t WHERE t.id_empleado = $1 AND NOT accion = \'HA\' AND ' +
+                'FROM timbres t WHERE t.codigo = $1 AND NOT accion = \'HA\' AND ' +
                 't.fec_hora_timbre::date BETWEEN $2 AND $3 ' +
                 'GROUP BY t.fec_hora_timbre,t.accion, t.tecl_funcion, t.observacion, t.latitud, ' +
-                't.longitud, t.id, t.id_empleado, t.id_reloj, t.hora_timbre_diferente, ' +
+                't.longitud, t.id, t.codigo, t.id_reloj, t.hora_timbre_diferente, ' +
                 't.fec_hora_timbre_servidor, t.dispositivo_timbre, t.tipo_autenticacion ' +
                 'ORDER BY t.fec_hora_timbre ASC;', [id_empleado, fechaInicio, fechaFinal]);
             console.log("LT RepCont: ", (DATOS.rows));
@@ -150,6 +151,7 @@ class ReportesControlador {
         });
     }
     ////FIN CAMBIO DE LISTAR TIMBRES
+    //TODO ListarPermisoHorarioEmpleado
     ListarPermisoHorarioEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
@@ -170,7 +172,7 @@ class ReportesControlador {
                 'a.estado, a.id_documento, ec.hora_trabaja, ec.id AS id_cargo ' +
                 'FROM permisos AS p, cg_tipo_permisos AS cp, autorizaciones AS a, empl_cargos AS ec ' +
                 'WHERE cp.id = p.id_tipo_permiso AND a.id_permiso = p.id AND ' +
-                'ec.id = (SELECT MAX(cargo_id) FROM datos_empleado_cargo WHERE codigo::int = $1) AND ' +
+                'ec.id = (SELECT MAX(cargo_id) FROM datos_empleado_cargo WHERE codigo = $1) AND ' +
                 'p.codigo = $1 ORDER BY p.num_permiso ASC', [id_empleado]);
             if (DATOS.rowCount > 0) {
                 DATOS.rows.map((obj) => {
@@ -244,7 +246,7 @@ class ReportesControlador {
                 'p.codigo, a.estado, a.id_documento, ec.hora_trabaja, ec.id AS id_cargo ' +
                 'FROM permisos AS p, cg_tipo_permisos AS cp, autorizaciones AS a, empl_cargos AS ec ' +
                 'WHERE cp.id = p.id_tipo_permiso AND a.id_permiso = p.id AND ' +
-                'ec.id = (SELECT MAX(cargo_id) FROM datos_empleado_cargo WHERE codigo::int = $1) AND ' +
+                'ec.id = (SELECT MAX(cargo_id) FROM datos_empleado_cargo WHERE codigo = $1) AND ' +
                 'p.fec_inicio::date BETWEEN $2 AND $3 AND p.codigo = $1 ' +
                 'ORDER BY p.num_permiso ASC', [id_empleado, fechaInicio, fechaFinal]);
             if (DATOS.rowCount > 0) {
@@ -449,8 +451,8 @@ function AtrasosTimbresConAcciones(id_empleado, fechaInicio, fechaFinal) {
             '(dh.hora + rpad((dh.minu_espera)::varchar(2),6,\' min\')::INTERVAL) AS hora_total ' +
             'FROM empl_horarios AS h, empl_cargos AS cargo, cg_horarios AS ch, deta_horarios AS dh ' +
             'WHERE h.id_empl_cargo = cargo.id AND ch.id = h.id_horarios AND dh.id_horario = h.id_horarios ' +
-            'AND dh.tipo_accion = \'E\') AS h ON e.codigo = $1::varchar(15) AND e.estado_empl = 1 AND cargo_id = h.id_cargo) AS h ' +
-            'ON t.id_empleado::varchar(15) = h.codigo AND t.accion IN (\'EoS\',\'E\') AND ' +
+            'AND dh.tipo_accion = \'E\') AS h ON e.codigo = $1 AND e.estado_empl = 1 AND cargo_id = h.id_cargo) AS h ' +
+            'ON t.codigo = h.codigo AND t.accion IN (\'EoS\',\'E\') AND ' +
             't.fec_hora_timbre::date BETWEEN h.fec_inicio AND h.fec_final AND ' +
             't.fec_hora_timbre::date BETWEEN $2 AND $3 AND ' +
             't.fec_hora_timbre::time > hora_total ORDER BY t.fec_hora_timbre ASC', [id_empleado, fechaInicio, fechaFinal])
@@ -469,8 +471,8 @@ function AtrasosTimbresSinAcciones(id_empleado, fechaInicio, fechaFinal) {
             '(dh.hora + rpad((dh.minu_espera)::varchar(2),6,\' min\')::INTERVAL) AS hora_total ' +
             'FROM empl_horarios AS h, empl_cargos AS cargo, cg_horarios AS ch, deta_horarios AS dh ' +
             'WHERE h.id_empl_cargo = cargo.id AND ch.id = h.id_horarios AND dh.id_horario = h.id_horarios ' +
-            'AND dh.tipo_accion = \'E\') AS h ON e.codigo = $1::varchar(15) AND e.estado_empl = 1 AND cargo_id = h.id_cargo) AS h ' +
-            'ON t.id_empleado::varchar(15) = h.codigo AND ' +
+            'AND dh.tipo_accion = \'E\') AS h ON e.codigo = $1 AND e.estado_empl = 1 AND cargo_id = h.id_cargo) AS h ' +
+            'ON t.codigo = h.codigo AND ' +
             't.fec_hora_timbre::date BETWEEN h.fec_inicio AND h.fec_final AND ' +
             't.fec_hora_timbre::date BETWEEN $2 AND $3 AND ' +
             't.fec_hora_timbre::time > hora_total ORDER BY t.fec_hora_timbre ASC', [id_empleado, fechaInicio, fechaFinal])
@@ -501,8 +503,8 @@ function AtrasosTimbresPlanificadosConAcciones(id_empleado, fechaInicio, fechaFi
             'deta_horarios AS dh ' +
             'WHERE cargo.id = ph.id_cargo AND dh.id_horario = dp.id_cg_horarios AND dh.tipo_accion = \'E\' AND ' +
             'ch.id = dp.id_cg_horarios AND ph.id = dp.id_plan_horario) AS ph ' +
-            'ON e.codigo = $1::varchar(15) AND cargo_id = ph.id_cargo) AS ph ' +
-            'ON t.id_empleado::varchar(15) = ph.codigo AND t.fec_hora_timbre::date BETWEEN $2 AND $3 ' +
+            'ON e.codigo = $1 AND cargo_id = ph.id_cargo) AS ph ' +
+            'ON t.codigo = ph.codigo AND t.fec_hora_timbre::date BETWEEN $2 AND $3 ' +
             'AND t.accion IN (\'EoS\',\'E\') AND t.fec_hora_timbre::date BETWEEN ph.fec_inicio AND ph.fec_final ' +
             'AND t.fec_hora_timbre::date = fecha AND t.fec_hora_timbre::time > hora_total ' +
             'ORDER BY t.fec_hora_timbre ASC', [id_empleado, fechaInicio, fechaFinal])
@@ -527,7 +529,7 @@ function AtrasosTimbresPlanificadosSinAcciones(id_empleado, fechaInicio, fechaFi
             'WHERE cargo.id = ph.id_cargo AND dh.id_horario = dp.id_cg_horarios AND dh.tipo_accion = \'E\' AND ' +
             'ch.id = dp.id_cg_horarios AND ph.id = dp.id_plan_horario) AS ph ' +
             'ON e.codigo = $1::varchar(15) AND cargo_id = ph.id_cargo) AS ph ' +
-            'ON t.id_empleado::varchar(15) = ph.codigo AND t.fec_hora_timbre::date BETWEEN $2 AND $3 ' +
+            'ON t.codigo::varchar(15) = ph.codigo AND t.fec_hora_timbre::date BETWEEN $2 AND $3 ' +
             'AND t.accion IN (\'EoS\',\'E\') AND t.fec_hora_timbre::date BETWEEN ph.fec_inicio AND ph.fec_final ' +
             'AND t.fec_hora_timbre::date = fecha AND t.fec_hora_timbre::time > hora_total ' +
             'ORDER BY t.fec_hora_timbre ASC', [id_empleado, fechaInicio, fechaFinal])
@@ -560,8 +562,8 @@ function EntradaSalidaHorarioConAcciones(id_empleado, fechaInicio, fechaFinal) {
             '(dh.hora + rpad((dh.minu_espera)::varchar(2),6,\' min\')::INTERVAL) AS hora_total ' +
             'FROM empl_horarios AS h, empl_cargos AS cargo, cg_horarios AS ch, deta_horarios AS dh ' +
             'WHERE h.id_empl_cargo = cargo.id AND ch.id = h.id_horarios AND dh.id_horario = h.id_horarios ) AS h ' +
-            'ON e.codigo::int = $1 AND e.estado_empl = 1 AND cargo_id = h.id_cargo) AS h ' +
-            'ON t.id_empleado::varchar(15) = h.codigo AND t.fec_hora_timbre::date BETWEEN $2 AND $3 AND ' +
+            'ON e.codigo = $1 AND e.estado_empl = 1 AND cargo_id = h.id_cargo) AS h ' +
+            'ON t.codigo::varchar(15) = h.codigo AND t.fec_hora_timbre::date BETWEEN $2 AND $3 AND ' +
             't.fec_hora_timbre::date BETWEEN h.fec_inicio AND h.fec_final ' +
             'AND t.accion = h.tipo_accion ' +
             'ORDER BY t.fec_hora_timbre ASC', [id_empleado, fechaInicio, fechaFinal])
@@ -584,15 +586,15 @@ function EntradaSalidaHorarioSinAcciones(id_empleado, fechaInicio, fechaFinal) {
             '(dh.hora + rpad((dh.minu_espera)::varchar(2),6,\' min\')::INTERVAL) AS hora_total ' +
             'FROM empl_horarios AS h, empl_cargos AS cargo, cg_horarios AS ch, deta_horarios AS dh ' +
             'WHERE h.id_empl_cargo = cargo.id AND ch.id = h.id_horarios AND dh.id_horario = h.id_horarios ) AS h ' +
-            'ON e.codigo::int = $1 AND e.estado_empl = 1 AND cargo_id = h.id_cargo) AS h ' +
-            'ON t.id_empleado::varchar(15) = h.codigo AND t.fec_hora_timbre::date BETWEEN $2 AND $3 AND ' +
+            'ON e.codigo = $1 AND e.estado_empl = 1 AND cargo_id = h.id_cargo) AS h ' +
+            'ON t.codigo::varchar(15) = h.codigo AND t.fec_hora_timbre::date BETWEEN $2 AND $3 AND ' +
             't.fec_hora_timbre::date BETWEEN h.fec_inicio AND h.fec_final ' +
             'ORDER BY t.fec_hora_timbre ASC', [id_empleado, fechaInicio, fechaFinal])
             .then((result) => {
             return result.rows;
         });
         const arrayModelado1 = yield database_1.default.query('SELECT t.fec_hora_timbre::date AS fecha, ' +
-            't.fec_hora_timbre::time AS hora, t.accion FROM timbres AS t WHERE t.id_empleado = $1 AND ' +
+            't.fec_hora_timbre::time AS hora, t.accion FROM timbres AS t WHERE t.codigo = $1 AND ' +
             't.fec_hora_timbre BETWEEN $2 AND $3 ORDER BY t.fec_hora_timbre ASC', [id_empleado, fechaInicio, fechaFinal])
             .then((result) => {
             return result.rows;
@@ -633,8 +635,8 @@ function EntradaSalidaPlanificacionConAcciones(id_empleado, fechaInicio, fechaFi
             'deta_horarios AS dh ' +
             'WHERE cargo.id = ph.id_cargo AND dh.id_horario = dp.id_cg_horarios AND ' +
             'ch.id = dp.id_cg_horarios AND ph.id = dp.id_plan_horario) AS ph ' +
-            'ON e.codigo::int = $1 AND cargo_id = ph.id_cargo) AS ph ' +
-            'ON t.id_empleado::varchar(15) = ph.codigo AND t.fec_hora_timbre::date BETWEEN $2 AND $3 ' +
+            'ON e.codigo = $1 AND cargo_id = ph.id_cargo) AS ph ' +
+            'ON t.codigo::varchar(15) = ph.codigo AND t.fec_hora_timbre::date BETWEEN $2 AND $3 ' +
             'AND t.fec_hora_timbre::date BETWEEN ph.fec_inicio AND ph.fec_final ' +
             'AND t.fec_hora_timbre::date = fecha AND ph.tipo_accion = t.accion ' +
             'ORDER BY t.fec_hora_timbre ASC', [id_empleado, fechaInicio, fechaFinal])
@@ -655,8 +657,8 @@ function EntradaSalidaPlanificacionSinAcciones(id_empleado, fechaInicio, fechaFi
             'deta_horarios AS dh ' +
             'WHERE cargo.id = ph.id_cargo AND dh.id_horario = dp.id_cg_horarios AND ' +
             'ch.id = dp.id_cg_horarios AND ph.id = dp.id_plan_horario) AS ph ' +
-            'ON e.codigo::int = $1 AND cargo_id = ph.id_cargo) AS ph ' +
-            'ON t.id_empleado::varchar(15) = ph.codigo AND t.fec_hora_timbre::date BETWEEN $2 AND $3 ' +
+            'ON e.codigo = $1 AND cargo_id = ph.id_cargo) AS ph ' +
+            'ON t.codigo::varchar(15) = ph.codigo AND t.fec_hora_timbre::date BETWEEN $2 AND $3 ' +
             'AND t.fec_hora_timbre::date BETWEEN ph.fec_inicio AND ph.fec_final ' +
             'AND t.fec_hora_timbre::date = fecha ' +
             'ORDER BY t.fec_hora_timbre ASC', [id_empleado, fechaInicio, fechaFinal])

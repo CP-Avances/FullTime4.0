@@ -165,7 +165,7 @@ function fechaIterada(fechaIterada, horario) {
 }
 const EliminarTimbres = function (id_empleado) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield database_1.default.query('DELETE FROM timbres WHERE id_empleado = $1', [id_empleado])
+        yield database_1.default.query('DELETE FROM timbres WHERE codigo = $1', [id_empleado])
             .then(result => {
             console.log(result.command);
         });
@@ -174,7 +174,7 @@ const EliminarTimbres = function (id_empleado) {
 exports.EliminarTimbres = EliminarTimbres;
 const ModificarTimbresEntrada = function () {
     return __awaiter(this, void 0, void 0, function* () {
-        let arrayRespuesta = yield database_1.default.query('select id, CAST(fec_hora_timbre as VARCHAR) from timbres where accion like \'E\' order by fec_hora_timbre, id_empleado ASC')
+        let arrayRespuesta = yield database_1.default.query('select id, CAST(fec_hora_timbre as VARCHAR) from timbres where accion like \'E\' order by fec_hora_timbre, codigo ASC')
             .then(result => {
             console.log(result.rowCount);
             return result.rows.filter(obj => {

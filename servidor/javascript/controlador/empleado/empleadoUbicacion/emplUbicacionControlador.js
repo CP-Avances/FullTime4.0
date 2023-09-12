@@ -144,7 +144,7 @@ class UbicacionControlador {
             const UBICACIONES = yield database_1.default.query('SELECT eu.id AS id_emplu, eu.codigo, eu.id_ubicacion, eu.id_empl, ' +
                 'cu.latitud, cu.longitud, cu.descripcion, e.nombre, e.apellido ' +
                 'FROM empl_ubicacion AS eu, cg_ubicaciones AS cu, empleados AS e ' +
-                'WHERE eu.id_ubicacion = cu.id AND e.codigo::int = eu.codigo AND cu.id = $1', [id_ubicacion]);
+                'WHERE eu.id_ubicacion = cu.id AND e.codigo = eu.codigo AND cu.id = $1', [id_ubicacion]);
             if (UBICACIONES.rowCount > 0) {
                 return res.jsonp(UBICACIONES.rows);
             }

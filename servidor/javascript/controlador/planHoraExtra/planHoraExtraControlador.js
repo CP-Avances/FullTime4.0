@@ -30,7 +30,7 @@ class PlanHoraExtraControlador {
                 'FROM empleados AS e, (SELECT * FROM timbres_entrada_plan_hora_extra AS tehe ' +
                 'FULL JOIN timbres_salida_plan_hora_extra AS tshe ' +
                 'ON tehe.fecha_timbre_e = tshe.fecha_timbre AND tehe.id_empl = tshe.id_empleado) AS t ' +
-                'WHERE t.observacion = false AND (e.codigo::int = t.id_empleado OR e.codigo::int = t.id_empl) AND (t.estado = 1 OR t.estado = 2)');
+                'WHERE t.observacion = false AND (e.codigo = t.id_empleado OR e.codigo = t.id_empl) AND (t.estado = 1 OR t.estado = 2)');
             if (PLAN.rowCount > 0) {
                 res.jsonp(PLAN.rows);
             }
@@ -50,7 +50,7 @@ class PlanHoraExtraControlador {
                 'FROM empleados AS e, (SELECT * FROM timbres_entrada_plan_hora_extra AS tehe ' +
                 'FULL JOIN timbres_salida_plan_hora_extra AS tshe ' +
                 'ON tehe.fecha_timbre_e = tshe.fecha_timbre AND tehe.id_empl = tshe.id_empleado) AS t ' +
-                'WHERE t.observacion = true AND (e.codigo::int = t.id_empleado OR e.codigo::int = t.id_empl) AND (t.estado = 1 OR t.estado = 2)');
+                'WHERE t.observacion = true AND (e.codigo = t.id_empleado OR e.codigo = t.id_empl) AND (t.estado = 1 OR t.estado = 2)');
             if (PLAN.rowCount > 0) {
                 res.jsonp(PLAN.rows);
             }
@@ -70,7 +70,7 @@ class PlanHoraExtraControlador {
                 'FROM empleados AS e, (SELECT * FROM timbres_entrada_plan_hora_extra AS tehe ' +
                 'FULL JOIN timbres_salida_plan_hora_extra AS tshe ' +
                 'ON tehe.fecha_timbre_e = tshe.fecha_timbre AND tehe.id_empl = tshe.id_empleado) AS t ' +
-                'WHERE (e.codigo::int = t.id_empleado OR e.codigo::int = t.id_empl) AND (t.estado = 3 OR t.estado = 4)');
+                'WHERE (e.codigo = t.id_empleado OR e.codigo = t.id_empl) AND (t.estado = 3 OR t.estado = 4)');
             if (PLAN.rowCount > 0) {
                 res.jsonp(PLAN.rows);
             }

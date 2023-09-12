@@ -47,7 +47,7 @@ class SolicitudVacacionesControlador {
 const VACACIONES_REPORTE_CONTROLADOR = new SolicitudVacacionesControlador();
 export default VACACIONES_REPORTE_CONTROLADOR;
 
-const BuscarVacaciones = async function (id: number, desde: string, hasta: string) {
+const BuscarVacaciones = async function (id: string | number, desde: string, hasta: string) {
     return await pool.query('SELECT v.fec_inicio, v.fec_final, v.fec_ingreso,v.id AS id_vacacion, ' +
         'a.id_documento, a.estado ' +
         'FROM vacaciones AS v, autorizaciones AS a ' +

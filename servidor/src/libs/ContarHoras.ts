@@ -38,11 +38,11 @@ function CalcularEntradaAlmuerzo(hora: any, tiempo_almuerzo: any) { //tiempo sol
 
 async function ListaTimbresDiarioToEmpleado(hoy: any) {
     // aqui falta definir si es entrada, salida, entrada de almuerzo y salida de almuerzo === o crear mas funciones para cada uno
-    return await pool.query('SELECT id_empleado, CAST(fec_hora_timbre AS VARCHAR) FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\'', [hoy])
+    return await pool.query('SELECT codigo, CAST(fec_hora_timbre AS VARCHAR) FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\'', [hoy])
         .then(result => {
             return result.rows.map(obj => {
                 return {
-                    codigo: obj.id_empleado,
+                    codigo: obj.codigo,
                     fec_hora_timbre: obj.fec_hora_timbre
                 }
             })
@@ -242,7 +242,7 @@ async function UltimoCargoContrato(id_empleado: number, desde: Date, hasta: Date
 
 async function ListaTimbresDiario(hoy: any, codigo: number, bool: boolean, id_horarios: number, IhorarioLaboral: any, empleado: any) {
     let timbres = await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR), accion, tecl_funcion FROM timbres ' +
-        'WHERE id_empleado = $2 AND CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\' ' +
+        'WHERE codigo = $2 AND CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\' ' +
         'ORDER BY fec_hora_timbre ASC',
         [hoy, codigo])
         .then(result => { return result.rows });

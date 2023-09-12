@@ -65,7 +65,7 @@ class EmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const VALOR = yield database_1.default.query(`
       SELECT MAX(codigo) AS codigo FROM empleados
-      `);
+      `); //TODO Revisar Instrucción SQL
             if (VALOR.rowCount > 0) {
                 return res.jsonp(VALOR.rows);
             }
@@ -562,6 +562,7 @@ class EmpleadoControlador {
             var contarLlenos = 0;
             var contador = 1;
             const VALOR = yield database_1.default.query('SELECT * FROM codigo');
+            //TODO Revisar
             var codigo = parseInt(VALOR.rows[0].valor);
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                 // Datos que se leen de la plantilla ingresada
@@ -600,10 +601,11 @@ class EmpleadoControlador {
                 if (VERIFICAR_NACIONALIDAD.rowCount > 0) {
                     contarNacionalidad = contarNacionalidad + 1;
                 }
+                //TODO Revisar
                 // Verificar que el código no se duplique en los registros
                 codigo = codigo + 1;
                 console.log('codigo_ver', codigo);
-                const VERIFICAR_CODIGO = yield database_1.default.query('SELECT * FROM empleados WHERE codigo::int = $1', [codigo]);
+                const VERIFICAR_CODIGO = yield database_1.default.query('SELECT * FROM empleados WHERE codigo = $1', [codigo]);
                 if (VERIFICAR_CODIGO.rowCount === 0) {
                     contarCodigo = contarCodigo + 1;
                 }
@@ -696,6 +698,7 @@ class EmpleadoControlador {
             const sheet_name_list = workbook.SheetNames;
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
             const VALOR = yield database_1.default.query('SELECT * FROM codigo');
+            //TODO Revisar
             var codigo = parseInt(VALOR.rows[0].valor);
             var contador = 1;
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
@@ -819,7 +822,7 @@ class EmpleadoControlador {
                     contarCedula = contarCedula + 1;
                 }
                 // Verificar que el código no se duplique en los registros
-                const VERIFICAR_CODIGO = yield database_1.default.query('SELECT * FROM empleados WHERE codigo::int = $1', [codigo]);
+                const VERIFICAR_CODIGO = yield database_1.default.query('SELECT * FROM empleados WHERE codigo = $1', [codigo]);
                 if (VERIFICAR_CODIGO.rowCount === 0) {
                     contarCodigo = contarCodigo + 1;
                 }

@@ -128,7 +128,7 @@ class PlanGeneralControlador {
                 pg.estado_origen 
                 FROM plan_general AS pg, empl_cargos AS c 
                 WHERE pg.fec_horario IN(${lista_fechas}) 
-                AND pg.codigo:: varchar = $1 AND c.id = pg.id_empl_cargo 
+                AND pg.codigo = $1 AND c.id = pg.id_empl_cargo 
                 AND(pg.tipo_entr_salida = 'E' OR pg.tipo_entr_salida = 'S') 
                 ORDER BY pg.fec_horario ASC
                 `
@@ -147,6 +147,7 @@ class PlanGeneralControlador {
     }
 
 
+    //TODO Revisar
     // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO   --**VERIFICADO
     public async ListarPlanificacionHoraria(req: Request, res: Response) {
         try {

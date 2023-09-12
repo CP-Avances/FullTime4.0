@@ -63,7 +63,7 @@ class EmpleadoControlador {
       `
       SELECT MAX(codigo) AS codigo FROM empleados
       `
-    );
+    ); //TODO Revisar Instrucción SQL
     if (VALOR.rowCount > 0) {
       return res.jsonp(VALOR.rows)
     }
@@ -630,6 +630,7 @@ class EmpleadoControlador {
     var contarLlenos = 0;
     var contador = 1;
     const VALOR = await pool.query('SELECT * FROM codigo');
+    //TODO Revisar
     var codigo = parseInt(VALOR.rows[0].valor);
 
     plantilla.forEach(async (data: any) => {
@@ -680,10 +681,11 @@ class EmpleadoControlador {
         contarNacionalidad = contarNacionalidad + 1;
       }
 
+      //TODO Revisar
       // Verificar que el código no se duplique en los registros
       codigo = codigo + 1;
       console.log('codigo_ver', codigo);
-      const VERIFICAR_CODIGO = await pool.query('SELECT * FROM empleados WHERE codigo::int = $1', [codigo]);
+      const VERIFICAR_CODIGO = await pool.query('SELECT * FROM empleados WHERE codigo = $1', [codigo]);
       if (VERIFICAR_CODIGO.rowCount === 0) {
         contarCodigo = contarCodigo + 1;
       }
@@ -779,6 +781,7 @@ class EmpleadoControlador {
     const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
     const VALOR = await pool.query('SELECT * FROM codigo');
+    //TODO Revisar
     var codigo = parseInt(VALOR.rows[0].valor);
     var contador = 1;
     plantilla.forEach(async (data: any) => {
@@ -921,7 +924,7 @@ class EmpleadoControlador {
       }
 
       // Verificar que el código no se duplique en los registros
-      const VERIFICAR_CODIGO = await pool.query('SELECT * FROM empleados WHERE codigo::int = $1', [codigo]);
+      const VERIFICAR_CODIGO = await pool.query('SELECT * FROM empleados WHERE codigo = $1', [codigo]);
       if (VERIFICAR_CODIGO.rowCount === 0) {
         contarCodigo = contarCodigo + 1;
       }

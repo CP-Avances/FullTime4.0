@@ -56,10 +56,10 @@ class TimbresControlador {
             let timbres = await pool.query(
                 `
                 SELECT CAST(t.fec_hora_timbre AS VARCHAR), t.accion, t.tecl_funcion, t.observacion, 
-                    t.latitud, t.longitud, t.id_empleado, t.id_reloj, ubicacion, 
+                    t.latitud, t.longitud, t.codigo, t.id_reloj, ubicacion, 
                     CAST(fec_hora_timbre_servidor AS VARCHAR), dispositivo_timbre 
                 FROM empleados AS e, timbres AS t 
-                WHERE e.id = $1 AND CAST(e.codigo AS integer) = t.id_empleado 
+                WHERE e.id = $1 AND e.codigo = t.codigo 
                 ORDER BY t.fec_hora_timbre DESC LIMIT 100
                 `
                 , [id]).then((result: any) => {
@@ -89,7 +89,7 @@ class TimbresControlador {
                     `
                     SELECT count(*) 
                     FROM empleados AS e, timbres AS t 
-                    WHERE e.id = $1 AND CAST(e.codigo AS integer) = t.id_empleado 
+                    WHERE e.id = $1 AND e.codigo = t.codigo 
                         AND t.accion in (\'PES\', \'E/P\', \'S/P\')
                     `
                     , [id]).then((result: any) => { return result.rows[0].count }),
@@ -98,7 +98,7 @@ class TimbresControlador {
                     `
                     SELECT count(*) 
                     FROM empleados AS e, timbres AS t 
-                    WHERE e.id = $1 AND CAST(e.codigo AS integer) = t.id_empleado 
+                    WHERE e.id = $1 AND e.codigo = t.codigo 
                     AND t.accion in (\'AES\', \'E/A\', \'S/A\')
                     `
                     , [id]).then((result: any) => { return result.rows[0].count }),
@@ -107,7 +107,7 @@ class TimbresControlador {
                     `
                     SELECT count(*) 
                     FROM empleados AS e, timbres AS t 
-                    WHERE e.id = $1 AND CAST(e.codigo AS integer) = t.id_empleado 
+                    WHERE e.id = $1 AND e.codigo = t.codigo 
                         AND t.accion in (\'EoS\', \'E\', \'S\')
                     `
                     , [id]).then((result: any) => { return result.rows[0].count }),
@@ -116,7 +116,7 @@ class TimbresControlador {
                     `
                     SELECT count(*) 
                     FROM empleados AS e, timbres AS t 
-                    WHERE e.id = $1 AND CAST(e.codigo AS integer) = t.id_empleado
+                    WHERE e.id = $1 AND e.codigo = t.codigo
                     `
                     , [id]).then((result: any) => { return result.rows[0].count })
             }]
@@ -175,9 +175,9 @@ class TimbresControlador {
                 `
                 SELECT (da.nombre || ' ' || da.apellido) AS empleado, t.* 
                     FROM timbres AS t, datos_actuales_empleado AS da
-                    WHERE CAST(t.id_empleado AS VARCHAR) = $1 
+                    WHERE t.codigo = $1 
                     AND CAST(t.fec_hora_timbre AS VARCHAR) LIKE $2
-                    AND CAST(da.codigo AS integer) = t.id_empleado 
+                    AND da.codigo = t.codigo 
                     AND da.cedula = $3
                 `
                 , [codigo, fecha, cedula]).then((result: any) => {
@@ -211,7 +211,7 @@ class TimbresControlador {
                 `
                 UPDATE timbres SET accion = $1, tecl_funcion = $2, observacion = $3 
                     WHERE id = $4 
-                    AND id_empleado = $5  
+                    AND codigo = $5  
                 `
                 , [accion, tecla, observacion, id, codigo])
             .then((result: any) => {
@@ -255,7 +255,7 @@ class TimbresControlador {
             const [timbre] = await pool.query(
                 `
                 INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, 
-                    id_empleado, fec_hora_timbre_servidor, id_reloj, ubicacion, dispositivo_timbre)
+                    codigo, fec_hora_timbre_servidor, id_reloj, ubicacion, dispositivo_timbre)
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id
                 `
                 , [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
@@ -307,7 +307,7 @@ class TimbresControlador {
             await pool.query(
                 `
                 INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, observacion, latitud, 
-                    longitud, id_empleado, id_reloj, dispositivo_timbre, fec_hora_timbre_servidor) 
+                    longitud, codigo, id_reloj, dispositivo_timbre, fec_hora_timbre_servidor) 
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                 `
                 , [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
@@ -451,7 +451,7 @@ class TimbresControlador {
     public async ObtenerUltimoTimbreEmpleado(req: Request, res: Response): Promise<any> {
         try {
             const codigo = req.userCodigo
-            let timbre = await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR) as timbre, accion FROM timbres WHERE id_empleado = $1 ORDER BY fec_hora_timbre DESC LIMIT 1', [codigo])
+            let timbre = await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR) as timbre, accion FROM timbres WHERE codigo = $1 ORDER BY fec_hora_timbre DESC LIMIT 1', [codigo])
                 .then((result: any) => {
                     return result.rows.map((obj: any) => {
                         switch (obj.accion) {
@@ -483,8 +483,8 @@ class TimbresControlador {
         try {
             const { id } = req.params;
             let timbres = await pool.query('SELECT CAST(t.fec_hora_timbre AS VARCHAR), t.accion, t.tecl_funcion, ' +
-                't.observacion, t.latitud, t.longitud, t.id_empleado, t.id_reloj ' +
-                'FROM empleados AS e, timbres AS t WHERE e.id = $1 AND CAST(e.codigo AS integer) = t.id_empleado ' +
+                't.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj ' +
+                'FROM empleados AS e, timbres AS t WHERE e.id = $1 AND e.codigo = t.codigo ' +
                 'ORDER BY t.fec_hora_timbre DESC LIMIT 50', [id]).then((result: any) => {
                     return result.rows
                         .map((obj: any) => {

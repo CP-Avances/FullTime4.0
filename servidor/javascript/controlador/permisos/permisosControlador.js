@@ -46,7 +46,7 @@ class PermisosControlador {
             const { id_empleado } = req.params;
             const NUMERO_PERMISO = yield database_1.default.query(`
             SELECT MAX(p.num_permiso) FROM permisos AS p, empleados AS e 
-            WHERE p.codigo::varchar = e.codigo AND e.id = $1
+            WHERE p.codigo = e.codigo AND e.id = $1
             `, [id_empleado]);
             if (NUMERO_PERMISO.rowCount > 0) {
                 return res.jsonp(NUMERO_PERMISO.rows);
@@ -65,7 +65,7 @@ class PermisosControlador {
                 const PERMISO = yield database_1.default.query(`
                     SELECT id FROM permisos 
                         WHERE ((fec_inicio::date BETWEEN $1 AND $2) OR (fec_final::date BETWEEN $1 AND $2)) 
-                        AND codigo::varchar = $3
+                        AND codigo = $3
                         AND (estado = 2 OR estado = 3 OR estado = 1)
                     `, [fec_inicio, fec_final, codigo]);
                 return res.jsonp(PERMISO.rows);
@@ -83,7 +83,7 @@ class PermisosControlador {
                 const PERMISO = yield database_1.default.query(`
                 SELECT id FROM permisos 
                     WHERE ((fec_inicio::date BETWEEN $1 AND $2) OR (fec_final::date BETWEEN $1 AND $2)) 
-                    AND codigo::varchar = $3 AND dia != 0
+                    AND codigo = $3 AND dia != 0
                     AND (estado = 2 OR estado = 3 OR estado = 1)
                 `, [fec_inicio, fec_final, codigo]);
                 return res.jsonp(PERMISO.rows);
@@ -103,7 +103,7 @@ class PermisosControlador {
                 SELECT id FROM permisos 
                 WHERE (($1 BETWEEN fec_inicio::date AND fec_final::date) 
                     OR ($2 BETWEEN fec_inicio::date AND fec_final::date )) 
-                    AND codigo::varchar = $5 
+                    AND codigo = $5 
                     AND dia = 0
                     AND (($3 BETWEEN hora_salida AND hora_ingreso) OR ($4 BETWEEN hora_salida AND hora_ingreso)) 
                     AND (estado = 2 OR estado = 3 OR estado = 1)
@@ -123,7 +123,7 @@ class PermisosControlador {
                 const PERMISO = yield database_1.default.query(`
                     SELECT id FROM permisos 
                         WHERE ((fec_inicio::date BETWEEN $1 AND $2) OR (fec_final::date BETWEEN $1 AND $2)) 
-                        AND codigo::varchar = $3
+                        AND codigo = $3
                         AND (estado = 2 OR estado = 3 OR estado = 1) AND NOT id = $4
                     `, [fec_inicio, fec_final, codigo, id]);
                 return res.jsonp(PERMISO.rows);
@@ -141,7 +141,7 @@ class PermisosControlador {
                 const PERMISO = yield database_1.default.query(`
                 SELECT id FROM permisos 
                     WHERE ((fec_inicio::date BETWEEN $1 AND $2) OR (fec_final::date BETWEEN $1 AND $2)) 
-                    AND codigo::varchar = $3 AND dia != 0
+                    AND codigo = $3 AND dia != 0
                     AND (estado = 2 OR estado = 3 OR estado = 1) AND NOT id = $4
                 `, [fec_inicio, fec_final, codigo, id]);
                 return res.jsonp(PERMISO.rows);
@@ -160,7 +160,7 @@ class PermisosControlador {
                 SELECT id FROM permisos 
                 WHERE (($1 BETWEEN fec_inicio::date AND fec_final::date) 
                     OR ($2 BETWEEN fec_inicio::date AND fec_final::date )) 
-                    AND codigo::varchar = $5 
+                    AND codigo = $5 
                     AND dia = 0
                     AND (($3 BETWEEN hora_salida AND hora_ingreso) OR ($4 BETWEEN hora_salida AND hora_ingreso)) 
                     AND (estado = 2 OR estado = 3 OR estado = 1) AND NOT id = $6
@@ -320,7 +320,7 @@ class PermisosControlador {
                     p.documento, p.hora_salida, p.hora_ingreso, p.codigo, 
                     t.descripcion AS nom_permiso, t.tipo_descuento 
                 FROM permisos AS p, cg_tipo_permisos AS t, empleados AS e
-                WHERE p.id_tipo_permiso = t.id AND p.codigo::varchar = e.codigo AND e.id = $1 
+                WHERE p.id_tipo_permiso = t.id AND p.codigo = e.codigo AND e.id = $1 
                 ORDER BY p.num_permiso DESC
                     `, [id_empleado]);
                 return res.jsonp(PERMISO.rows);
@@ -341,7 +341,7 @@ class PermisosControlador {
                 datos_actuales_empleado AS da, empl_cargos AS ce, sucursales AS s, ciudades AS c, cg_empresa AS e,
 				tipo_cargo AS tc
             WHERE p.id_tipo_permiso = tp.id AND ec.id = p.id_empl_contrato AND cr.id = ec.id_regimen
-                AND da.codigo = p.codigo::varchar AND ce.id_empl_contrato = p.id_empl_contrato
+                AND da.codigo = p.codigo AND ce.id_empl_contrato = p.id_empl_contrato
                 AND s.id = ce.id_sucursal AND s.id_ciudad = c.id AND s.id_empresa = e.id AND tc.id = ce.cargo
                 AND p.id = $1
             `, [id]);

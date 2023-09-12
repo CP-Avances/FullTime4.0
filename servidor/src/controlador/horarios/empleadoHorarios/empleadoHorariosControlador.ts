@@ -84,6 +84,7 @@ class EmpleadoHorariosControlador {
         }
     }
 
+    //TODO Revisar tabla empl_horarios
     // METODO PARA BUSCAR HORARIOS DEL EMPLEADO EN DETERMINADA FECHA PROCESO EDICION
     public async VerificarHorariosExistentesEdicion(req: Request, res: Response): Promise<any> {
         const { fechaInicio, fechaFinal, id } = req.body;
@@ -106,15 +107,13 @@ class EmpleadoHorariosControlador {
         }
     }
 
+    //TODO Revisar empl_horarios
     // METODO PARA CONSULTAR HORARIO DEL USUARIO POR DIAS Y NUMERO DE HORAS DE TRABAJO
     public async ObtenerHorarioDias(req: Request, res: Response) {
         let { codigo, fecha_inicio, fecha_final } = req.body;
 
         // CONSULTA DE HORARIOS FIJOS DEL EMPLEADO
         let fijo = await pool.query(
-
-
-
             `
             SELECT eh.fec_inicio, eh.fec_final, ec.hora_trabaja
             FROM empl_horarios AS eh, empl_cargos AS ec
@@ -132,7 +131,7 @@ class EmpleadoHorariosControlador {
                 SELECT ph.fec_inicio, ph.fec_final, ec.hora_trabaja
                 FROM plan_horarios AS ph, empl_cargos AS ec
                 WHERE ph.id_cargo = ec.id AND ph.estado = true 
-                    AND ph.codigo::varchar = $1
+                    AND ph.codigo = $1
                     AND (($2 BETWEEN ph.fec_inicio AND ph.fec_final)
                     OR ($3 BETWEEN ph.fec_inicio AND ph.fec_final))
                 `, [codigo, fecha_inicio, fecha_final])
@@ -161,7 +160,7 @@ class EmpleadoHorariosControlador {
             `
             SELECT * FROM vista_horario_entrada AS he
             JOIN vista_horario_salida AS hs ON he.codigo = hs.codigo AND he.fecha_entrada = hs.fecha_salida 
-                AND he.id_horario = hs.id_horario AND salida_otro_dia = 0 AND he.codigo::varchar = $1
+                AND he.id_horario = hs.id_horario AND salida_otro_dia = 0 AND he.codigo = $1
 				AND he.fecha_entrada = $2
                 AND (($3 BETWEEN hora_inicio AND hora_final) AND ($4 BETWEEN hora_inicio AND hora_final))
             `
@@ -176,7 +175,7 @@ class EmpleadoHorariosControlador {
                 SELECT * FROM vista_horario_entrada AS he
                 JOIN vista_horario_salida AS hs ON he.codigo = hs.codigo 
                     AND hs.fecha_salida = (he.fecha_entrada + interval '1 day')
-                    AND he.id_horario = hs.id_horario AND salida_otro_dia = 1 AND he.codigo::varchar = $1
+                    AND he.id_horario = hs.id_horario AND salida_otro_dia = 1 AND he.codigo = $1
                     AND ($2 = he.fecha_entrada OR $2 = hs.fecha_salida)
                 `
                 , [codigo, fecha_inicio])
@@ -190,7 +189,7 @@ class EmpleadoHorariosControlador {
                     SELECT * FROM vista_horario_entrada AS he
                     JOIN vista_horario_salida AS hs ON he.codigo = hs.codigo 
 			            AND hs.fecha_salida = (he.fecha_entrada + interval '2 day')
-                        AND he.id_horario = hs.id_horario AND salida_otro_dia = 2 AND he.codigo::varchar = $1
+                        AND he.id_horario = hs.id_horario AND salida_otro_dia = 2 AND he.codigo = $1
                         AND ($2 = he.fecha_entrada OR $2 = hs.fecha_salida OR $2= (he.fecha_entrada + interval '1 day'))
                 `
                     , [codigo, fecha_inicio])
@@ -223,7 +222,7 @@ class EmpleadoHorariosControlador {
             SELECT * FROM vista_horario_entrada AS he
             JOIN vista_horario_salida AS hs ON he.codigo = hs.codigo 
 			    AND hs.fecha_salida = (he.fecha_entrada + interval '1 day')
-                AND he.id_horario = hs.id_horario AND salida_otro_dia = 1 AND he.codigo::varchar = $1
+                AND he.id_horario = hs.id_horario AND salida_otro_dia = 1 AND he.codigo = $1
 				AND $2 = he.fecha_entrada AND $3 = hs.fecha_salida
             `
             , [codigo, fecha_inicio, fecha_final])
@@ -237,7 +236,7 @@ class EmpleadoHorariosControlador {
                 SELECT * FROM vista_horario_entrada AS he
                 JOIN vista_horario_salida AS hs ON he.codigo = hs.codigo 
 			        AND hs.fecha_salida = (he.fecha_entrada + interval '2 day')
-                    AND he.id_horario = hs.id_horario AND salida_otro_dia = 2 AND he.codigo::varchar = $1
+                    AND he.id_horario = hs.id_horario AND salida_otro_dia = 2 AND he.codigo = $1
                     AND ($2 = he.fecha_entrada OR $2 = (he.fecha_entrada + interval '1 day')) 
                     AND ($3 = hs.fecha_salida OR $3 = (he.fecha_entrada + interval '1 day'))
                 `
@@ -265,7 +264,7 @@ class EmpleadoHorariosControlador {
             `
             SELECT * FROM vista_comida_inicio AS ci
             JOIN vista_comida_fin AS cf ON ci.codigo = cf.codigo AND ci.fecha_entrada = cf.fecha_salida 
-                AND ci.id_horario = cf.id_horario AND salida_otro_dia = 0 AND ci.codigo::varchar = $1
+                AND ci.id_horario = cf.id_horario AND salida_otro_dia = 0 AND ci.codigo = $1
                 AND ci.fecha_entrada = $2
                 AND (($3 BETWEEN hora_inicio AND hora_final) OR ($4 BETWEEN hora_inicio AND hora_final))
             `
@@ -280,7 +279,7 @@ class EmpleadoHorariosControlador {
                 SELECT * FROM vista_comida_inicio AS ci
                 JOIN vista_comida_fin AS cf ON ci.codigo = cf.codigo 
                     AND cf.fecha_salida = (ci.fecha_entrada + interval '1 day')
-                    AND ci.id_horario = cf.id_horario AND salida_otro_dia = 1 AND ci.codigo::varchar = $1
+                    AND ci.id_horario = cf.id_horario AND salida_otro_dia = 1 AND ci.codigo = $1
                     AND ($2 = ci.fecha_entrada OR $2 = cf.fecha_salida)
                 `
                 , [codigo, fecha_inicio])
@@ -308,7 +307,7 @@ class EmpleadoHorariosControlador {
             SELECT * FROM vista_comida_inicio AS ci
             JOIN vista_comida_fin AS cf ON ci.codigo = cf.codigo 
                 AND cf.fecha_salida = (ci.fecha_entrada + interval '1 day')
-                AND ci.id_horario = cf.id_horario AND salida_otro_dia = 1 AND ci.codigo::varchar = $1
+                AND ci.id_horario = cf.id_horario AND salida_otro_dia = 1 AND ci.codigo = $1
                 AND $2 = ci.fecha_entrada AND $3 = cf.fecha_salida
             `
             , [codigo, fecha_inicio, fecha_final])

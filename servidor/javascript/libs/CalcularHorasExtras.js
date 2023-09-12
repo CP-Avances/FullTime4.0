@@ -224,7 +224,7 @@ function PlanificacionHorasExtrasSolicitadas(id_empleado, id_cargo, fec_desde, f
 function ObtenerTimbres(id_empleado, fec_desde, fec_hasta) {
     return __awaiter(this, void 0, void 0, function* () {
         // console.log('$$$$$$$$$$$$', fec_desde, fec_hasta);
-        return yield database_1.default.query('SELECT fec_hora_timbre, accion FROM timbres WHERE id_empleado = $1 AND accion  in (\'EoS\', \'E\', \'S\') AND fec_hora_timbre BETWEEN $2 AND $3 ORDER BY fec_hora_timbre', [id_empleado, fec_desde, fec_hasta])
+        return yield database_1.default.query('SELECT fec_hora_timbre, accion FROM timbres WHERE codigo = $1 AND accion  in (\'EoS\', \'E\', \'S\') AND fec_hora_timbre BETWEEN $2 AND $3 ORDER BY fec_hora_timbre', [id_empleado, fec_desde, fec_hasta])
             .then((result) => {
             return result.rows.map((obj) => {
                 var f1 = new Date(obj.fec_hora_timbre.toJSON().split('.')[0]);

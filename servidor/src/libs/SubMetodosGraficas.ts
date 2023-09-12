@@ -36,7 +36,7 @@ export const BuscarTimbresByCodigo_Fecha = async function (codigo: number, horar
     return await Promise.all(horario.map(async(obj) => {
         return {
             fecha: obj.fecha,
-            timbresTotal: await pool.query('SELECT fec_hora_timbre FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\' AND id_empleado = $2 ORDER BY fec_hora_timbre ASC',[ obj.fecha, codigo])
+            timbresTotal: await pool.query('SELECT fec_hora_timbre FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\' AND codigo = $2 ORDER BY fec_hora_timbre ASC',[ obj.fecha, codigo])
             .then(res => {
                 return res.rowCount
             })
@@ -941,7 +941,7 @@ export const Empleado_Permisos_ModelarDatos = async function(codigo: string | nu
 }
 
 export const Empleado_Atrasos_ModelarDatos = async function(codigo: string | number, fec_desde: Date, fec_hasta: Date) {
-    let timbres = await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR), id_empleado FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) between $1 || \'%\' AND $2 || \'%\' AND accion in (\'EoS\',\'E\') AND id_empleado = $3 ORDER BY fec_hora_timbre ASC ',[ fec_desde, fec_hasta, codigo])
+    let timbres = await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR), codigo FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) between $1 || \'%\' AND $2 || \'%\' AND accion in (\'EoS\',\'E\') AND codigo = $3 ORDER BY fec_hora_timbre ASC ',[ fec_desde, fec_hasta, codigo])
         .then(res => {
             return res.rows;
         })
@@ -1087,7 +1087,7 @@ function fechaIterada(fechaIterada: Date, horario: any){
 }
 
 const BuscarTimbresSinAccionesReporte = async function (fecha: string, codigo: number) {
-    return await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR) FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\' AND id_empleado = $2 ORDER BY fec_hora_timbre ASC ',[ fecha, codigo])
+    return await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR) FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\' AND codigo = $2 ORDER BY fec_hora_timbre ASC ',[ fecha, codigo])
         .then(res => {
             return res.rows;
         })

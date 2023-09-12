@@ -45,11 +45,11 @@ function CalcularEntradaAlmuerzo(hora, tiempo_almuerzo) {
 function ListaTimbresDiarioToEmpleado(hoy) {
     return __awaiter(this, void 0, void 0, function* () {
         // aqui falta definir si es entrada, salida, entrada de almuerzo y salida de almuerzo === o crear mas funciones para cada uno
-        return yield database_1.default.query('SELECT id_empleado, CAST(fec_hora_timbre AS VARCHAR) FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\'', [hoy])
+        return yield database_1.default.query('SELECT codigo, CAST(fec_hora_timbre AS VARCHAR) FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\'', [hoy])
             .then(result => {
             return result.rows.map(obj => {
                 return {
-                    codigo: obj.id_empleado,
+                    codigo: obj.codigo,
                     fec_hora_timbre: obj.fec_hora_timbre
                 };
             });
@@ -234,7 +234,7 @@ function UltimoCargoContrato(id_empleado, desde, hasta) {
 function ListaTimbresDiario(hoy, codigo, bool, id_horarios, IhorarioLaboral, empleado) {
     return __awaiter(this, void 0, void 0, function* () {
         let timbres = yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR), accion, tecl_funcion FROM timbres ' +
-            'WHERE id_empleado = $2 AND CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\' ' +
+            'WHERE codigo = $2 AND CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\' ' +
             'ORDER BY fec_hora_timbre ASC', [hoy, codigo])
             .then(result => { return result.rows; });
         // console.log('ES EL TIMBRE: ', timbres);

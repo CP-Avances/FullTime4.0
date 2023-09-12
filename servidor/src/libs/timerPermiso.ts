@@ -26,7 +26,7 @@ export const conteoPermisos = function() {
                 console.log(permiso.rows);
                 
                 permiso.rows.forEach(async(obj) => {
-                    let timbre = await pool.query('SELECT fec_hora_timbre FROM timbres WHERE id_empleado = $1', [obj.id_empleado]);
+                    let timbre = await pool.query('SELECT fec_hora_timbre FROM timbres WHERE codigo = $1', [obj.id_empleado]);
                     console.log(timbre.rows);
                     
                 });

@@ -45,10 +45,10 @@ class TimbresControlador {
                 const id = req.userIdEmpleado;
                 let timbres = yield database_1.default.query(`
                 SELECT CAST(t.fec_hora_timbre AS VARCHAR), t.accion, t.tecl_funcion, t.observacion, 
-                    t.latitud, t.longitud, t.id_empleado, t.id_reloj, ubicacion, 
+                    t.latitud, t.longitud, t.codigo, t.id_reloj, ubicacion, 
                     CAST(fec_hora_timbre_servidor AS VARCHAR), dispositivo_timbre 
                 FROM empleados AS e, timbres AS t 
-                WHERE e.id = $1 AND CAST(e.codigo AS integer) = t.id_empleado 
+                WHERE e.id = $1 AND e.codigo = t.codigo 
                 ORDER BY t.fec_hora_timbre DESC LIMIT 100
                 `, [id]).then((result) => {
                     return result.rows
@@ -97,25 +97,25 @@ class TimbresControlador {
                         timbres_PES: yield database_1.default.query(`
                     SELECT count(*) 
                     FROM empleados AS e, timbres AS t 
-                    WHERE e.id = $1 AND CAST(e.codigo AS integer) = t.id_empleado 
+                    WHERE e.id = $1 AND e.codigo = t.codigo 
                         AND t.accion in (\'PES\', \'E/P\', \'S/P\')
                     `, [id]).then((result) => { return result.rows[0].count; }),
                         timbres_AES: yield database_1.default.query(`
                     SELECT count(*) 
                     FROM empleados AS e, timbres AS t 
-                    WHERE e.id = $1 AND CAST(e.codigo AS integer) = t.id_empleado 
+                    WHERE e.id = $1 AND e.codigo = t.codigo 
                     AND t.accion in (\'AES\', \'E/A\', \'S/A\')
                     `, [id]).then((result) => { return result.rows[0].count; }),
                         timbres_EoS: yield database_1.default.query(`
                     SELECT count(*) 
                     FROM empleados AS e, timbres AS t 
-                    WHERE e.id = $1 AND CAST(e.codigo AS integer) = t.id_empleado 
+                    WHERE e.id = $1 AND e.codigo = t.codigo 
                         AND t.accion in (\'EoS\', \'E\', \'S\')
                     `, [id]).then((result) => { return result.rows[0].count; }),
                         total_timbres: yield database_1.default.query(`
                     SELECT count(*) 
                     FROM empleados AS e, timbres AS t 
-                    WHERE e.id = $1 AND CAST(e.codigo AS integer) = t.id_empleado
+                    WHERE e.id = $1 AND e.codigo = t.codigo
                     `, [id]).then((result) => { return result.rows[0].count; })
                     }];
                 return res.status(200).jsonp({
@@ -165,9 +165,9 @@ class TimbresControlador {
                 let timbres = yield database_1.default.query(`
                 SELECT (da.nombre || ' ' || da.apellido) AS empleado, t.* 
                     FROM timbres AS t, datos_actuales_empleado AS da
-                    WHERE CAST(t.id_empleado AS VARCHAR) = $1 
+                    WHERE t.codigo = $1 
                     AND CAST(t.fec_hora_timbre AS VARCHAR) LIKE $2
-                    AND CAST(da.codigo AS integer) = t.id_empleado 
+                    AND da.codigo = t.codigo 
                     AND da.cedula = $3
                 `, [codigo, fecha, cedula]).then((result) => {
                     timbresRows = result.rowCount;
@@ -199,7 +199,7 @@ class TimbresControlador {
                 yield database_1.default.query(`
                 UPDATE timbres SET accion = $1, tecl_funcion = $2, observacion = $3 
                     WHERE id = $4 
-                    AND id_empleado = $5  
+                    AND codigo = $5  
                 `, [accion, tecla, observacion, id, codigo])
                     .then((result) => {
                     return res.status(200).jsonp({ message: 'Registro actualizado' });
@@ -233,7 +233,7 @@ class TimbresControlador {
                 var codigo = parseInt(code[0].codigo);
                 const [timbre] = yield database_1.default.query(`
                 INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, 
-                    id_empleado, fec_hora_timbre_servidor, id_reloj, ubicacion, dispositivo_timbre)
+                    codigo, fec_hora_timbre_servidor, id_reloj, ubicacion, dispositivo_timbre)
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id
                 `, [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
                     f.toLocaleString(), id_reloj, ubicacion, ip_cliente])
@@ -273,7 +273,7 @@ class TimbresControlador {
                 var codigo = parseInt(code[0].codigo);
                 yield database_1.default.query(`
                 INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, observacion, latitud, 
-                    longitud, id_empleado, id_reloj, dispositivo_timbre, fec_hora_timbre_servidor) 
+                    longitud, codigo, id_reloj, dispositivo_timbre, fec_hora_timbre_servidor) 
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                 `, [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
                     id_reloj, ip_cliente, f.toLocaleString()])
@@ -389,7 +389,7 @@ class TimbresControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const codigo = req.userCodigo;
-                let timbre = yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR) as timbre, accion FROM timbres WHERE id_empleado = $1 ORDER BY fec_hora_timbre DESC LIMIT 1', [codigo])
+                let timbre = yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR) as timbre, accion FROM timbres WHERE codigo = $1 ORDER BY fec_hora_timbre DESC LIMIT 1', [codigo])
                     .then((result) => {
                     return result.rows.map((obj) => {
                         switch (obj.accion) {
@@ -444,8 +444,8 @@ class TimbresControlador {
             try {
                 const { id } = req.params;
                 let timbres = yield database_1.default.query('SELECT CAST(t.fec_hora_timbre AS VARCHAR), t.accion, t.tecl_funcion, ' +
-                    't.observacion, t.latitud, t.longitud, t.id_empleado, t.id_reloj ' +
-                    'FROM empleados AS e, timbres AS t WHERE e.id = $1 AND CAST(e.codigo AS integer) = t.id_empleado ' +
+                    't.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj ' +
+                    'FROM empleados AS e, timbres AS t WHERE e.id = $1 AND e.codigo = t.codigo ' +
                     'ORDER BY t.fec_hora_timbre DESC LIMIT 50', [id]).then((result) => {
                     return result.rows
                         .map((obj) => {

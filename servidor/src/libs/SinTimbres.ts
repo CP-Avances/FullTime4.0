@@ -104,7 +104,7 @@ async function EmpleadosSinTimbreEntrada(fecha: String, arrayIdsEmpleadosActivos
     let IdsEmpleadosConTimbres = await pool.query(
         `
         SELECT DISTINCT e.id FROM empleados AS e, timbres AS t 
-        WHERE e.codigo::int = t.id_empleado AND e.estado = 1 AND CAST(t.fec_hora_timbre AS VARCHAR) LIKE $1 || 
+        WHERE e.codigo = t.codigo AND e.estado = 1 AND CAST(t.fec_hora_timbre AS VARCHAR) LIKE $1 || 
         '%' AND accion in ('E', 'EoS') ORDER BY id
         `, [fecha])
         .then(result => {
@@ -124,7 +124,7 @@ async function EmpleadosSinTimbreSalida(fecha: String, arrayIdsEmpleadosActivos:
     let IdsEmpleadosConTimbres = await pool.query(
         `
         SELECT DISTINCT e.id FROM empleados AS e, timbres AS t 
-        WHERE e.codigo::int = t.id_empleado AND e.estado = 1 AND 
+        WHERE e.codigo = t.codigo AND e.estado = 1 AND 
             CAST(t.fec_hora_timbre AS VARCHAR) LIKE $1 || '%' AND accion in ('S', 'EoS') ORDER BY id
         `, [fecha])
         .then(result => {

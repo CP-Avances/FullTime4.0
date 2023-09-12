@@ -46,11 +46,11 @@ class SalidasAntesControlador {
 const SALIDAS_ANTICIPADAS_CONTROLADOR = new SalidasAntesControlador();
 export default SALIDAS_ANTICIPADAS_CONTROLADOR;
 
-const BuscarTimbresS = async function (fec_inicio: string, fec_final: string, id: number) {
+const BuscarTimbresS = async function (fec_inicio: string, fec_final: string, id: string | number) {
     console.log('datos buscados---------------------*************', id)
     return await pool.query('SELECT t.fec_hora_timbre::date AS fecha, t.fec_hora_timbre::time AS hora ' +
         'FROM timbres AS t ' +
-        'WHERE t.id_empleado = $3 ' +
+        'WHERE t.codigo = $3 ' +
         'AND t.fec_hora_timbre::date BETWEEN $1 AND $2 AND t.accion = \'S\'',
         [fec_inicio, fec_final, id])
         .then((res: any) => {

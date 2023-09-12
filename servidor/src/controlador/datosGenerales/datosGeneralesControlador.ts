@@ -755,7 +755,7 @@ class DatosGeneralesControlador {
             const response: QueryResult = await pool.query(
                 `
                 SELECT da.id_departamento,  cn.* , (da.nombre || ' ' || da.apellido) as fullname, 
-                    da.cedula, da.correo, CAST (da.codigo AS INTEGER), da.estado, da.id_sucursal, 
+                    da.cedula, da.correo, da.codigo, da.estado, da.id_sucursal, 
                     da.id_contrato,
                     (SELECT cd.nombre FROM cg_departamentos AS cd WHERE cd.id = da.id_departamento) AS ndepartamento,
                     (SELECT s.nombre FROM sucursales AS s WHERE s.id = da.id_sucursal) AS nsucursal

@@ -322,7 +322,7 @@ class VacacionesControlador {
       SELECT v.id, v.fec_inicio, v.fec_final, fec_ingreso, v.estado, 
       v.dia_libre, v.dia_laborable, v.legalizado, v.id, v.id_peri_vacacion, e.id AS id_empleado, de.id_contrato
       FROM vacaciones AS v, empleados AS e, datos_actuales_empleado AS de
-	    WHERE v.id = $1 AND e.codigo::integer = v.codigo AND e.id = de.id
+	    WHERE v.id = $1 AND e.codigo = v.codigo AND e.id = de.id
       `
       , [id]);
     if (VACACIONES.rowCount > 0) {

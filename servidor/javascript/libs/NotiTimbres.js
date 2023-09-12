@@ -52,7 +52,7 @@ function CalcularHoras(fecha, hora) {
     return __awaiter(this, void 0, void 0, function* () {
         let datoConsulta = fecha + ' ' + hora;
         console.log('FECHA ====>', datoConsulta);
-        let timbres = yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR), accion, id_empleado, id FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) LIKE $1 || \'%\'', [datoConsulta])
+        let timbres = yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR), accion, codigo, id FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) LIKE $1 || \'%\'', [datoConsulta])
             .then((result) => { return result.rows; });
         console.log(timbres);
         if (timbres.length > 0) {

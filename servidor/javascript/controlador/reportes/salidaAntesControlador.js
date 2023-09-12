@@ -50,7 +50,7 @@ const BuscarTimbresS = function (fec_inicio, fec_final, id) {
         console.log('datos buscados---------------------*************', id);
         return yield database_1.default.query('SELECT t.fec_hora_timbre::date AS fecha, t.fec_hora_timbre::time AS hora ' +
             'FROM timbres AS t ' +
-            'WHERE t.id_empleado = $3 ' +
+            'WHERE t.codigo = $3 ' +
             'AND t.fec_hora_timbre::date BETWEEN $1 AND $2 AND t.accion = \'S\'', [fec_inicio, fec_final, id])
             .then((res) => {
             return res.rows;

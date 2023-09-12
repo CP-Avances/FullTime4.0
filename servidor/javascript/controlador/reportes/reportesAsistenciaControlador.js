@@ -599,7 +599,7 @@ class ReportesAsistenciaControlador {
                         codigo: o.codigo,
                         fullname: o.fullname,
                         cedula: o.cedula,
-                        timbres: yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR), accion, observacion, latitud, longitud, CAST(fec_hora_timbre_servidor AS VARCHAR), dispositivo_timbre FROM timbres WHERE id_empleado = $1 AND accion = \'HA\' AND fec_hora_timbre BETWEEN $2 AND $3 ORDER BY fec_hora_timbre DESC ', [parseInt(o.codigo), new Date(desde), new Date(hasta)])
+                        timbres: yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR), accion, observacion, latitud, longitud, CAST(fec_hora_timbre_servidor AS VARCHAR), dispositivo_timbre FROM timbres WHERE codigo = $1 AND accion = \'HA\' AND fec_hora_timbre BETWEEN $2 AND $3 ORDER BY fec_hora_timbre DESC ', [o.codigo, new Date(desde), new Date(hasta)])
                             .then(result => { return result.rows; })
                     };
                 })));
@@ -683,7 +683,7 @@ const AtrasosTimbresSinAccion = function (fec_inicio, fec_final, codigo) {
 };
 const BuscarTimbresEoSReporte = function (fec_inicio, fec_final, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR), id_empleado FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) between $1 || \'%\' AND $2 || \'%\' AND accion in (\'EoS\', \'E\') AND id_empleado = $3 ORDER BY fec_hora_timbre ASC ', [fec_inicio, fec_final, codigo])
+        return yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR), codigo FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) between $1 || \'%\' AND $2 || \'%\' AND accion in (\'EoS\', \'E\') AND codigo = $3 ORDER BY fec_hora_timbre ASC ', [fec_inicio, fec_final, codigo])
             .then(res => {
             return res.rows;
         });
@@ -743,7 +743,7 @@ const BuscarTimbres = function (fec_inicio, fec_final, codigo) {
         return yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR), id_reloj, accion, observacion, ' +
             'latitud, longitud, CAST(fec_hora_timbre_servidor AS VARCHAR) ' +
             'FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) BETWEEN $1 || \'%\' ' +
-            'AND ($2::timestamp + \'1 DAY\') || \'%\' AND id_empleado = $3 ' +
+            'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 ' +
             'ORDER BY fec_hora_timbre ASC', [fec_inicio, fec_final, codigo])
             .then(res => {
             return res.rows;
@@ -756,7 +756,7 @@ const BuscarTimbreSistemas = function (fec_inicio, fec_final, codigo) {
         return yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR), id_reloj, accion, observacion, ' +
             'latitud, longitud, CAST(fec_hora_timbre_servidor AS VARCHAR) ' +
             'FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) BETWEEN $1 || \'%\' ' +
-            'AND ($2::timestamp + \'1 DAY\') || \'%\' AND id_empleado = $3 AND id_reloj = 98 ' +
+            'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 AND id_reloj = 98 ' +
             'AND NOT accion = \'HA\' ' +
             'ORDER BY fec_hora_timbre ASC', [fec_inicio, fec_final, codigo])
             .then(res => {
@@ -770,7 +770,7 @@ const BuscarTimbreRelojVirtual = function (fec_inicio, fec_final, codigo) {
         return yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR), id_reloj, accion, observacion, ' +
             'latitud, longitud, CAST(fec_hora_timbre_servidor AS VARCHAR) ' +
             'FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) BETWEEN $1 || \'%\' ' +
-            'AND ($2::timestamp + \'1 DAY\') || \'%\' AND id_empleado = $3 AND id_reloj = 97 ' +
+            'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 AND id_reloj = 97 ' +
             'AND NOT accion = \'HA\' ' +
             'ORDER BY fec_hora_timbre ASC', [fec_inicio, fec_final, codigo])
             .then(res => {
@@ -784,7 +784,7 @@ const BuscarTimbreHorarioAbierto = function (fec_inicio, fec_final, codigo) {
         return yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR), id_reloj, accion, observacion, ' +
             'latitud, longitud, CAST(fec_hora_timbre_servidor AS VARCHAR) ' +
             'FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) BETWEEN $1 || \'%\' ' +
-            'AND ($2::timestamp + \'1 DAY\') || \'%\' AND id_empleado = $3 AND accion = \'HA\' ' +
+            'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 AND accion = \'HA\' ' +
             'ORDER BY fec_hora_timbre ASC', [fec_inicio, fec_final, codigo])
             .then(res => {
             return res.rows;
@@ -795,7 +795,7 @@ const ModelarAtrasosReporte = function (obj) {
     return __awaiter(this, void 0, void 0, function* () {
         let array = yield database_1.default.query('SELECT dh.hora, dh.minu_espera FROM empl_horarios AS eh, cg_horarios AS h, deta_horarios AS dh ' +
             'WHERE eh.codigo = $1 AND h.id = eh.id_horarios AND dh.id_horario = h.id AND eh.fec_inicio <= $2 ' +
-            'AND eh.fec_final >= $2 AND dh.orden = 1', [obj.id_empleado, new Date(obj.fec_hora_timbre.split(' ')[0])])
+            'AND eh.fec_final >= $2 AND dh.orden = 1', [obj.codigo, new Date(obj.fec_hora_timbre.split(' ')[0])])
             .then(res => { return res.rows; });
         if (array.length === 0)
             return 0;
@@ -827,7 +827,7 @@ function DiaSemana(dia) {
 }
 const BuscarTimbresReporte = function (fecha, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR), accion, observacion FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\' AND id_empleado = $2 AND accion in (\'EoS\',\'AES\',\'S\',\'E\',\'E/A\',\'S/A\') ORDER BY fec_hora_timbre ASC ', [fecha, codigo])
+        return yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR), accion, observacion FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\' AND codigo = $2 AND accion in (\'EoS\',\'AES\',\'S\',\'E\',\'E/A\',\'S/A\') ORDER BY fec_hora_timbre ASC ', [fecha, codigo])
             .then(res => {
             return res.rows;
         });
@@ -835,7 +835,7 @@ const BuscarTimbresReporte = function (fecha, codigo) {
 };
 const BuscarTimbresSinAccionesReporte = function (fecha, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR), observacion FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\' AND id_empleado = $2 ORDER BY fec_hora_timbre ASC ', [fecha, codigo])
+        return yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR), observacion FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\' AND codigo = $2 ORDER BY fec_hora_timbre ASC ', [fecha, codigo])
             .then(res => {
             return res.rows;
         });
@@ -1209,7 +1209,7 @@ const ModelarPuntualidad = function (obj) {
     return __awaiter(this, void 0, void 0, function* () {
         let array = yield database_1.default.query('SELECT DISTINCT eh.id, dh.hora FROM empl_horarios AS eh, cg_horarios AS h, deta_horarios AS dh ' +
             'WHERE eh.codigo = $1 AND h.id = eh.id_horarios AND dh.id_horario = h.id AND eh.fec_inicio <= $2 ' +
-            'AND eh.fec_final >= $2 AND dh.orden = 1', [obj.id_empleado, new Date(obj.fec_hora_timbre.split(' ')[0])])
+            'AND eh.fec_final >= $2 AND dh.orden = 1', [obj.codigo, new Date(obj.fec_hora_timbre.split(' ')[0])])
             .then(res => { return res.rows; });
         if (array.length === 0)
             return [0];
@@ -1230,7 +1230,7 @@ const ModelarPuntualidad = function (obj) {
 };
 const TimbresTabulados = function (fec_inicio, fec_final, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
-        let timbres = yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR), accion FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) between $1 || \'%\' AND $2 || \'%\' AND id_empleado = $3 ORDER BY fec_hora_timbre ASC ', [fec_inicio, fec_final, codigo])
+        let timbres = yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR), accion FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) between $1 || \'%\' AND $2 || \'%\' AND codigo = $3 ORDER BY fec_hora_timbre ASC ', [fec_inicio, fec_final, codigo])
             .then(res => {
             return res.rows;
         });
@@ -1318,7 +1318,7 @@ const TimbresIncompletos = function (fec_inicio, fec_final, codigo) {
                 return {
                     fecha: obj1.fecha,
                     timbres_hora: yield database_1.default.query('SELECT CAST(fec_hora_timbre AS VARCHAR) AS timbre, ' +
-                        'accion FROM timbres WHERE id_empleado = $1 AND CAST(fec_hora_timbre AS VARCHAR) ' +
+                        'accion FROM timbres WHERE codigo = $1 AND CAST(fec_hora_timbre AS VARCHAR) ' +
                         'like $2 || \'%\' AND accion in (\'EoS\',\'AES\', \'S\',\'E\',\'E/A\',\'S/A\')', [obj.codigo, obj1.fecha]).then(result => { return result.rows; })
                 };
             })));
@@ -1389,7 +1389,7 @@ const TimbresSinAccionesTabulados = function (fec_inicio, fec_final, codigo) {
                 var f_final = o.fecha + ' ' + (0, SubMetodosGraficas_1.SegundosToHHMM)(hora_seg + (0, SubMetodosGraficas_1.HHMMtoSegundos)('00:59:00'));
                 // console.log( f_inicio, ' || ', f_final, ' || ', codigo);
                 const query = 'SELECT CAST(fec_hora_timbre AS VARCHAR) from timbres where fec_hora_timbre >= TO_TIMESTAMP(\'' + f_inicio + '\'' + ', \'YYYY-MM-DD HH24:MI:SS\') ' +
-                    'and fec_hora_timbre <= TO_TIMESTAMP(\'' + f_final + '\'' + ', \'YYYY-MM-DD HH24:MI:SS\') and id_empleado = ' + codigo + ' order by fec_hora_timbre';
+                    'and fec_hora_timbre <= TO_TIMESTAMP(\'' + f_final + '\'' + ', \'YYYY-MM-DD HH24:MI:SS\') and codigo = ' + codigo + ' order by fec_hora_timbre';
                 return yield database_1.default.query(query).then(res => {
                     let x = res.rows.map((elemento) => {
                         elemento.accion = obj.tipo_accion;
@@ -1477,7 +1477,7 @@ const TimbresSinAccionesIncompletos = function (fec_inicio, fec_final, codigo) {
                 var f_final = o.fecha + ' ' + (0, SubMetodosGraficas_1.SegundosToHHMM)(hora_seg + (0, SubMetodosGraficas_1.HHMMtoSegundos)('00:59:00'));
                 // console.log( f_inicio, ' || ', f_final, ' || ', codigo);
                 const query = 'SELECT CAST(fec_hora_timbre AS VARCHAR) from timbres where fec_hora_timbre >= TO_TIMESTAMP(\'' + f_inicio + '\'' + ', \'YYYY-MM-DD HH24:MI:SS\') ' +
-                    'and fec_hora_timbre <= TO_TIMESTAMP(\'' + f_final + '\'' + ', \'YYYY-MM-DD HH24:MI:SS\') and id_empleado = ' + codigo + ' order by fec_hora_timbre';
+                    'and fec_hora_timbre <= TO_TIMESTAMP(\'' + f_final + '\'' + ', \'YYYY-MM-DD HH24:MI:SS\') and codigo = ' + codigo + ' order by fec_hora_timbre';
                 return yield database_1.default.query(query).then(res => {
                     if (res.rowCount === 0) {
                         return {

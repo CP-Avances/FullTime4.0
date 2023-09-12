@@ -828,7 +828,7 @@ export const horaExtraPedidasControlador = new HorasExtrasPedidasControlador();
 
 export default horaExtraPedidasControlador;
 
-const BuscarHorasExtras = async function (id: number, desde: string, hasta: string) {
+const BuscarHorasExtras = async function (id: string | number, desde: string, hasta: string) {
   return await pool.query(
     `
     SELECT p.fecha_desde, p.fecha_hasta, p.hora_inicio, p.hora_fin, p.descripcion, 

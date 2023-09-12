@@ -217,7 +217,7 @@ async function PlanificacionHorasExtrasSolicitadas(id_empleado: number, id_cargo
 
 async function ObtenerTimbres(id_empleado: number, fec_desde: string, fec_hasta: string) {
     // console.log('$$$$$$$$$$$$', fec_desde, fec_hasta);
-    return await pool.query('SELECT fec_hora_timbre, accion FROM timbres WHERE id_empleado = $1 AND accion  in (\'EoS\', \'E\', \'S\') AND fec_hora_timbre BETWEEN $2 AND $3 ORDER BY fec_hora_timbre',[id_empleado, fec_desde, fec_hasta])
+    return await pool.query('SELECT fec_hora_timbre, accion FROM timbres WHERE codigo = $1 AND accion  in (\'EoS\', \'E\', \'S\') AND fec_hora_timbre BETWEEN $2 AND $3 ORDER BY fec_hora_timbre',[id_empleado, fec_desde, fec_hasta])
     .then((result: any) => { 
         return result.rows.map((obj: any) => {
             var f1 = new Date(obj.fec_hora_timbre.toJSON().split('.')[0])

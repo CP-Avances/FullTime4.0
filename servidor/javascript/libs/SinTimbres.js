@@ -103,7 +103,7 @@ function EmpleadosSinTimbreEntrada(fecha, arrayIdsEmpleadosActivos) {
     return __awaiter(this, void 0, void 0, function* () {
         let IdsEmpleadosConTimbres = yield database_1.default.query(`
         SELECT DISTINCT e.id FROM empleados AS e, timbres AS t 
-        WHERE e.codigo::int = t.id_empleado AND e.estado = 1 AND CAST(t.fec_hora_timbre AS VARCHAR) LIKE $1 || 
+        WHERE e.codigo = t.codigo AND e.estado = 1 AND CAST(t.fec_hora_timbre AS VARCHAR) LIKE $1 || 
         '%' AND accion in ('E', 'EoS') ORDER BY id
         `, [fecha])
             .then(result => {
@@ -122,7 +122,7 @@ function EmpleadosSinTimbreSalida(fecha, arrayIdsEmpleadosActivos) {
     return __awaiter(this, void 0, void 0, function* () {
         let IdsEmpleadosConTimbres = yield database_1.default.query(`
         SELECT DISTINCT e.id FROM empleados AS e, timbres AS t 
-        WHERE e.codigo::int = t.id_empleado AND e.estado = 1 AND 
+        WHERE e.codigo = t.codigo AND e.estado = 1 AND 
             CAST(t.fec_hora_timbre AS VARCHAR) LIKE $1 || '%' AND accion in ('S', 'EoS') ORDER BY id
         `, [fecha])
             .then(result => {

@@ -149,7 +149,7 @@ function fechaIterada(fechaIterada: Date, horario: any){
 
 export const EliminarTimbres = async function(id_empleado: number) {
 
-    await pool.query('DELETE FROM timbres WHERE id_empleado = $1',[id_empleado])
+    await pool.query('DELETE FROM timbres WHERE codigo = $1',[id_empleado])
     .then(result => {
         console.log(result.command);
     });
@@ -157,7 +157,7 @@ export const EliminarTimbres = async function(id_empleado: number) {
 }
 
 export const ModificarTimbresEntrada = async function() {
-    let arrayRespuesta = await pool.query('select id, CAST(fec_hora_timbre as VARCHAR) from timbres where accion like \'E\' order by fec_hora_timbre, id_empleado ASC')
+    let arrayRespuesta = await pool.query('select id, CAST(fec_hora_timbre as VARCHAR) from timbres where accion like \'E\' order by fec_hora_timbre, codigo ASC')
     .then(result => {
         console.log(result.rowCount);
         

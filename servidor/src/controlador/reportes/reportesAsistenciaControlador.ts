@@ -736,7 +736,7 @@ class ReportesAsistenciaControlador {
                     codigo: o.codigo,
                     fullname: o.fullname,
                     cedula: o.cedula,
-                    timbres: await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR), accion, observacion, latitud, longitud, CAST(fec_hora_timbre_servidor AS VARCHAR), dispositivo_timbre FROM timbres WHERE id_empleado = $1 AND accion = \'HA\' AND fec_hora_timbre BETWEEN $2 AND $3 ORDER BY fec_hora_timbre DESC ', [parseInt(o.codigo), new Date(desde), new Date(hasta)])
+                    timbres: await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR), accion, observacion, latitud, longitud, CAST(fec_hora_timbre_servidor AS VARCHAR), dispositivo_timbre FROM timbres WHERE codigo = $1 AND accion = \'HA\' AND fec_hora_timbre BETWEEN $2 AND $3 ORDER BY fec_hora_timbre DESC ', [o.codigo, new Date(desde), new Date(hasta)])
                         .then(result => { return result.rows })
                 }
             }))
@@ -823,7 +823,7 @@ const AtrasosTimbresSinAccion = async function (fec_inicio: string, fec_final: s
 }
 
 const BuscarTimbresEoSReporte = async function (fec_inicio: string, fec_final: string, codigo: string | number) {
-    return await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR), id_empleado FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) between $1 || \'%\' AND $2 || \'%\' AND accion in (\'EoS\', \'E\') AND id_empleado = $3 ORDER BY fec_hora_timbre ASC ', [fec_inicio, fec_final, codigo])
+    return await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR), codigo FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) between $1 || \'%\' AND $2 || \'%\' AND accion in (\'EoS\', \'E\') AND codigo = $3 ORDER BY fec_hora_timbre ASC ', [fec_inicio, fec_final, codigo])
         .then(res => {
             return res.rows;
         })
@@ -882,7 +882,7 @@ const BuscarTimbres = async function (fec_inicio: string, fec_final: string, cod
     return await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR), id_reloj, accion, observacion, ' +
         'latitud, longitud, CAST(fec_hora_timbre_servidor AS VARCHAR) ' +
         'FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) BETWEEN $1 || \'%\' ' +
-        'AND ($2::timestamp + \'1 DAY\') || \'%\' AND id_empleado = $3 ' +
+        'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 ' +
         'ORDER BY fec_hora_timbre ASC', [fec_inicio, fec_final, codigo])
         .then(res => {
             return res.rows;
@@ -894,7 +894,7 @@ const BuscarTimbreSistemas = async function (fec_inicio: string, fec_final: stri
     return await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR), id_reloj, accion, observacion, ' +
         'latitud, longitud, CAST(fec_hora_timbre_servidor AS VARCHAR) ' +
         'FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) BETWEEN $1 || \'%\' ' +
-        'AND ($2::timestamp + \'1 DAY\') || \'%\' AND id_empleado = $3 AND id_reloj = 98 ' +
+        'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 AND id_reloj = 98 ' +
         'AND NOT accion = \'HA\' ' +
         'ORDER BY fec_hora_timbre ASC', [fec_inicio, fec_final, codigo])
         .then(res => {
@@ -907,7 +907,7 @@ const BuscarTimbreRelojVirtual = async function (fec_inicio: string, fec_final: 
     return await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR), id_reloj, accion, observacion, ' +
         'latitud, longitud, CAST(fec_hora_timbre_servidor AS VARCHAR) ' +
         'FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) BETWEEN $1 || \'%\' ' +
-        'AND ($2::timestamp + \'1 DAY\') || \'%\' AND id_empleado = $3 AND id_reloj = 97 ' +
+        'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 AND id_reloj = 97 ' +
         'AND NOT accion = \'HA\' ' +
         'ORDER BY fec_hora_timbre ASC', [fec_inicio, fec_final, codigo])
         .then(res => {
@@ -920,7 +920,7 @@ const BuscarTimbreHorarioAbierto = async function (fec_inicio: string, fec_final
     return await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR), id_reloj, accion, observacion, ' +
         'latitud, longitud, CAST(fec_hora_timbre_servidor AS VARCHAR) ' +
         'FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) BETWEEN $1 || \'%\' ' +
-        'AND ($2::timestamp + \'1 DAY\') || \'%\' AND id_empleado = $3 AND accion = \'HA\' ' +
+        'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 AND accion = \'HA\' ' +
         'ORDER BY fec_hora_timbre ASC', [fec_inicio, fec_final, codigo])
         .then(res => {
             return res.rows;
@@ -931,7 +931,7 @@ const ModelarAtrasosReporte = async function (obj: any) {
 
     let array = await pool.query('SELECT dh.hora, dh.minu_espera FROM empl_horarios AS eh, cg_horarios AS h, deta_horarios AS dh ' +
         'WHERE eh.codigo = $1 AND h.id = eh.id_horarios AND dh.id_horario = h.id AND eh.fec_inicio <= $2 ' +
-        'AND eh.fec_final >= $2 AND dh.orden = 1', [obj.id_empleado, new Date(obj.fec_hora_timbre.split(' ')[0])])
+        'AND eh.fec_final >= $2 AND dh.orden = 1', [obj.codigo, new Date(obj.fec_hora_timbre.split(' ')[0])])
         .then(res => { return res.rows })
 
     if (array.length === 0) return 0
@@ -962,21 +962,21 @@ function DiaSemana(dia: Date) {
     return dias[dia.getUTCDay()]
 }
 
-const BuscarTimbresReporte = async function (fecha: string, codigo: number) {
-    return await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR), accion, observacion FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\' AND id_empleado = $2 AND accion in (\'EoS\',\'AES\',\'S\',\'E\',\'E/A\',\'S/A\') ORDER BY fec_hora_timbre ASC ', [fecha, codigo])
+const BuscarTimbresReporte = async function (fecha: string, codigo: string | number) {
+    return await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR), accion, observacion FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\' AND codigo = $2 AND accion in (\'EoS\',\'AES\',\'S\',\'E\',\'E/A\',\'S/A\') ORDER BY fec_hora_timbre ASC ', [fecha, codigo])
         .then(res => {
             return res.rows;
         })
 }
 
-const BuscarTimbresSinAccionesReporte = async function (fecha: string, codigo: number) {
-    return await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR), observacion FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\' AND id_empleado = $2 ORDER BY fec_hora_timbre ASC ', [fecha, codigo])
+const BuscarTimbresSinAccionesReporte = async function (fecha: string, codigo: string | number) {
+    return await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR), observacion FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) like $1 || \'%\' AND codigo = $2 ORDER BY fec_hora_timbre ASC ', [fecha, codigo])
         .then(res => {
             return res.rows;
         })
 }
 
-const ModelarHorasTrabajaReporte = async function (codigo: number, fec_inicio: string, fec_final: string): Promise<any[]> {
+const ModelarHorasTrabajaReporte = async function (codigo: string | number, fec_inicio: string, fec_final: string): Promise<any[]> {
     console.log(codigo, fec_inicio, fec_final);
 
     let array = await pool.query('SELECT dh.hora, dh.orden, dh.id_horario, CAST(eh.fec_inicio AS VARCHAR), CAST(eh.fec_final AS VARCHAR) FROM empl_horarios AS eh, cg_horarios AS h, deta_horarios AS dh ' +
@@ -1172,7 +1172,7 @@ const ModelarHorasTrabajaReporte = async function (codigo: number, fec_inicio: s
     return arr_respuesta
 }
 
-const ModelarHorasTrabajaTimbresSinAcciones = async function (codigo: number, fec_inicio: string, fec_final: string): Promise<any[]> {
+const ModelarHorasTrabajaTimbresSinAcciones = async function (codigo: string | number, fec_inicio: string, fec_final: string): Promise<any[]> {
 
     let array = await pool.query('SELECT dh.hora, dh.orden, dh.id_horario, CAST(eh.fec_inicio AS VARCHAR), CAST(eh.fec_final AS VARCHAR) FROM empl_horarios AS eh, cg_horarios AS h, deta_horarios AS dh ' +
         'WHERE eh.codigo = $1 AND h.id = eh.id_horarios AND dh.id_horario = h.id AND CAST(eh.fec_inicio AS VARCHAR) between $2 || \'%\' AND $3 || \'%\' ' +
@@ -1398,7 +1398,7 @@ const ModelarPuntualidad = async function (obj: any): Promise<any[]> {
 
     let array = await pool.query('SELECT DISTINCT eh.id, dh.hora FROM empl_horarios AS eh, cg_horarios AS h, deta_horarios AS dh ' +
         'WHERE eh.codigo = $1 AND h.id = eh.id_horarios AND dh.id_horario = h.id AND eh.fec_inicio <= $2 ' +
-        'AND eh.fec_final >= $2 AND dh.orden = 1', [obj.id_empleado, new Date(obj.fec_hora_timbre.split(' ')[0])])
+        'AND eh.fec_final >= $2 AND dh.orden = 1', [obj.codigo, new Date(obj.fec_hora_timbre.split(' ')[0])])
         .then(res => { return res.rows })
 
     if (array.length === 0) return [0]
@@ -1419,7 +1419,7 @@ const ModelarPuntualidad = async function (obj: any): Promise<any[]> {
 
 const TimbresTabulados = async function (fec_inicio: string, fec_final: string, codigo: string | number): Promise<any[]> {
 
-    let timbres = await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR), accion FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) between $1 || \'%\' AND $2 || \'%\' AND id_empleado = $3 ORDER BY fec_hora_timbre ASC ', [fec_inicio, fec_final, codigo])
+    let timbres = await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR), accion FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) between $1 || \'%\' AND $2 || \'%\' AND codigo = $3 ORDER BY fec_hora_timbre ASC ', [fec_inicio, fec_final, codigo])
         .then(res => {
             return res.rows;
         })
@@ -1479,7 +1479,7 @@ const TimbresTabulados = async function (fec_inicio: string, fec_final: string, 
     return arrayModelado
 }
 
-const TimbresIncompletos = async function (fec_inicio: Date, fec_final: Date, codigo: number): Promise<any[]> {
+const TimbresIncompletos = async function (fec_inicio: Date, fec_final: Date, codigo: string | number): Promise<any[]> {
 
     let horarios =
         await pool.query('SELECT eh.fec_inicio, eh.fec_final, eh.lunes, eh.martes, eh.miercoles, eh.id_horarios, ' +
@@ -1514,7 +1514,7 @@ const TimbresIncompletos = async function (fec_inicio: Date, fec_final: Date, co
             return {
                 fecha: obj1.fecha,
                 timbres_hora: await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR) AS timbre, ' +
-                    'accion FROM timbres WHERE id_empleado = $1 AND CAST(fec_hora_timbre AS VARCHAR) ' +
+                    'accion FROM timbres WHERE codigo = $1 AND CAST(fec_hora_timbre AS VARCHAR) ' +
                     'like $2 || \'%\' AND accion in (\'EoS\',\'AES\', \'S\',\'E\',\'E/A\',\'S/A\')',
                     [obj.codigo, obj1.fecha]).then(result => { return result.rows })
             }
@@ -1591,7 +1591,7 @@ const TimbresSinAccionesTabulados = async function (fec_inicio: string, fec_fina
             var f_final = o.fecha + ' ' + SegundosToHHMM(hora_seg + HHMMtoSegundos('00:59:00'));
             // console.log( f_inicio, ' || ', f_final, ' || ', codigo);
             const query = 'SELECT CAST(fec_hora_timbre AS VARCHAR) from timbres where fec_hora_timbre >= TO_TIMESTAMP(\'' + f_inicio + '\'' + ', \'YYYY-MM-DD HH24:MI:SS\') ' +
-                'and fec_hora_timbre <= TO_TIMESTAMP(\'' + f_final + '\'' + ', \'YYYY-MM-DD HH24:MI:SS\') and id_empleado = ' + codigo + ' order by fec_hora_timbre'
+                'and fec_hora_timbre <= TO_TIMESTAMP(\'' + f_final + '\'' + ', \'YYYY-MM-DD HH24:MI:SS\') and codigo = ' + codigo + ' order by fec_hora_timbre'
             return await pool.query(query).then(res => {
                 let x = res.rows.map((elemento: any) => {
                     elemento.accion = obj.tipo_accion;
@@ -1666,7 +1666,7 @@ const TimbresSinAccionesTabulados = async function (fec_inicio: string, fec_fina
     return arrayModelado
 }
 
-const TimbresSinAccionesIncompletos = async function (fec_inicio: Date, fec_final: Date, codigo: number): Promise<any[]> {
+const TimbresSinAccionesIncompletos = async function (fec_inicio: Date, fec_final: Date, codigo: string | number): Promise<any[]> {
 
     let horarioEntrada = await pool.query('SELECT dt.hora, tipo_accion, CAST(eh.fec_inicio AS VARCHAR), CAST(eh.fec_final AS VARCHAR), ' +
         'eh.lunes, eh.martes, eh.miercoles, eh.jueves, eh.viernes, eh.sabado, eh.domingo ' +
@@ -1688,7 +1688,7 @@ const TimbresSinAccionesIncompletos = async function (fec_inicio: Date, fec_fina
             var f_final = o.fecha + ' ' + SegundosToHHMM(hora_seg + HHMMtoSegundos('00:59:00'));
             // console.log( f_inicio, ' || ', f_final, ' || ', codigo);
             const query = 'SELECT CAST(fec_hora_timbre AS VARCHAR) from timbres where fec_hora_timbre >= TO_TIMESTAMP(\'' + f_inicio + '\'' + ', \'YYYY-MM-DD HH24:MI:SS\') ' +
-                'and fec_hora_timbre <= TO_TIMESTAMP(\'' + f_final + '\'' + ', \'YYYY-MM-DD HH24:MI:SS\') and id_empleado = ' + codigo + ' order by fec_hora_timbre'
+                'and fec_hora_timbre <= TO_TIMESTAMP(\'' + f_final + '\'' + ', \'YYYY-MM-DD HH24:MI:SS\') and codigo = ' + codigo + ' order by fec_hora_timbre'
             return await pool.query(query).then(res => {
                 if (res.rowCount === 0) {
                     return {

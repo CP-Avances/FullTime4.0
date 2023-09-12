@@ -34,7 +34,7 @@ const conteoPermisos = function () {
             if (permiso.rowCount > 0) {
                 console.log(permiso.rows);
                 permiso.rows.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
-                    let timbre = yield database_1.default.query('SELECT fec_hora_timbre FROM timbres WHERE id_empleado = $1', [obj.id_empleado]);
+                    let timbre = yield database_1.default.query('SELECT fec_hora_timbre FROM timbres WHERE codigo = $1', [obj.id_empleado]);
                     console.log(timbre.rows);
                 }));
             }
