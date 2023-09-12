@@ -1,22 +1,28 @@
 .grid-container {
-    text-align: center;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columnas de igual ancho */
-    gap: 10px; /* Espacio entre elementos */
-  }
-  
+  text-align: center;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  /* 3 columnas de igual ancho */
+  gap: 10px;
+  /* Espacio entre elementos */
+}
+
 .item {
-    padding: 10px;
+  padding: 10px;
 }
 
-.tecla_accion{
-  width: 50%;
+.tecla_accion {
+  width: 200px;
 }
 
-.tecla_funcion{
-  width: 37%;
+.tecla_funcion {
+  width: 150px;
 }
 
-td{
+td {
   width: min-content;
+}
+
+#fuente {
+  font-size: 12px;
 }

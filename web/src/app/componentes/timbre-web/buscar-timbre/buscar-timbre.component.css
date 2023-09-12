@@ -3,24 +3,31 @@ td {
     text-align: center;
 }
 
+p {
+    font-size: x-small;
+}
+
+
 table {
     width: 100%;
     font-size: 12px;
 }
 
 mat-form-field {
-   margin: 0px 10px 0px 10px;
-   width: 200px;
+    margin: 0px 10px 0px 10px;
+    width: 200px;
 
-   input{
-    font-size: large;
-   }
+    input {
+        font-size: large;
+    }
 }
 
 mat-label {
     font-size: 15px;
 }
 
-.fas { color:green; margin-right: 15px; cursor: pointer; }
-
-.far { color:red; margin-right: 15px; cursor: pointer; }
+.btn {
+    background-color: rgb(80, 87, 97);
+    margin: 5px 10px 5px 10px;
+    color: white;
+}

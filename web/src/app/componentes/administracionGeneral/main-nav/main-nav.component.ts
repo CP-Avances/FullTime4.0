@@ -468,9 +468,9 @@ export class MainNavComponent implements OnInit {
         subtitulo: false,
         children: [
           { name: 'Dispositivos', url: '/listarRelojes', color: true },
-          { name: 'Timbres Múltiples', url: '/timbres-multiples', color: true },
           { name: 'Administrar Timbres', url: '/timbres-admin', color: true },
-          { name: 'Buscar Timbre', url: '/buscar-timbre', color: true },
+          { name: 'Registrar Timbres', url: '/timbres-multiples', color: true },
+          { name: 'Actualizar Timbres', url: '/buscar-timbre', color: true },
         ]
       },
       {

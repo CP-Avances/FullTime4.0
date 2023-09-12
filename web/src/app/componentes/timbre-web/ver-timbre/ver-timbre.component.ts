@@ -1,9 +1,7 @@
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import moment from 'moment';
 
-//Interfaces
-import { HorarioTimbre } from 'src/app/model/timbres.model';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
@@ -12,21 +10,22 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
   templateUrl: './ver-timbre.component.html',
   styleUrls: ['./ver-timbre.component.css']
 })
-export class VerTimbreComponent implements OnInit{
+
+export class VerTimbreComponent implements OnInit {
 
   timbre: any = [];
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
-   // LISTA DE ACCIONES DE TIMBRES
-   acciones: any = [
-    {item: 'E', text: 'Entrada' },
-    {item: 'S', text: 'Salida' },
-    {item: 'I/A', text: 'Inicio Alimentación' },
-    {item: 'F/A', text: 'Fin Alimentación' },
-    {item: 'S/P', text: 'Inicio Permiso' },
-    {item: 'E/P', text: 'Fin Permiso' },
-    {item: 'HA', text: 'Fin' }
+  // LISTA DE ACCIONES DE TIMBRES
+  acciones: any = [
+    { item: 'E', text: 'Entrada' },
+    { item: 'S', text: 'Salida' },
+    { item: 'I/A', text: 'Inicio Alimentación' },
+    { item: 'F/A', text: 'Fin Alimentación' },
+    { item: 'S/P', text: 'Inicio Permiso' },
+    { item: 'E/P', text: 'Fin Permiso' },
+    { item: 'HA', text: 'Fin' }
   ]
 
   rolEmpleado: any;
@@ -36,7 +35,7 @@ export class VerTimbreComponent implements OnInit{
     private validar: ValidacionesService,
     public parametro: ParametrosService,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ){
+  ) {
     this.rolEmpleado = localStorage.getItem('rol');
   }
 
@@ -45,21 +44,20 @@ export class VerTimbreComponent implements OnInit{
     this.timbre = [];
     this.accion = '';
     this.timbre = this.data.timbre
-    this.accion =  this.data.timbre.accion
+    this.accion = this.data.timbre.accion
     this.acciones.filter(elemento => {
-      if(elemento.item == this.timbre.accion){
+      if (elemento.item == this.timbre.accion) {
         this.accion = elemento.text
       }
     })
-    
     this.BuscarParametro();
   }
 
   fecha_timbre: any;
   hora_timbre: any;
-  ObtenerTimbre(formato_fecha: string, formato_hora: string){
-    this.fecha_timbre = this.validar.FormatearFecha(this.timbre.fec_hora_timbre, formato_fecha, this.validar.dia_completo);
-    this.hora_timbre = moment(this.timbre.fec_hora_timbre).format('hh:mm:ss');
+  ObtenerTimbre(formato_fecha: string, formato_hora: string) {
+    this.fecha_timbre = this.validar.FormatearFecha(this.timbre.fec_hora_timbre_servidor, formato_fecha, this.validar.dia_completo);
+    this.hora_timbre = this.validar.FormatearHora(this.timbre.fec_hora_timbre_servidor.split(' ')[1], formato_hora);
   }
 
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
@@ -87,6 +85,6 @@ export class VerTimbreComponent implements OnInit{
       });
   }
 
-  
+
 
 }

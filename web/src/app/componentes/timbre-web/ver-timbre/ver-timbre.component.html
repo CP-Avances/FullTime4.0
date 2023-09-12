@@ -1,23 +1,18 @@
 <div id="resultados">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        INFORMACIÓ DEL TIMBRE </span>
+        INFORMACIÓN DEL TIMBRE
+    </span>
     <mat-icon class="float-right" id="cerrar" (click)="ventana.close()">highlight_off</mat-icon>
 </div>
 <div class="container">
-    <div class="nota" >
-        <div class="row" style="text-align: center !important;">
-            <div class="col-md-12">
-            </div>
-        </div>
+    <div class="nota">
         <div class="row">
-            <div class="col-md-3" style="text-align: center !important;">
+            <div class="col-md-4" style="text-align: center !important;">
                 <b *ngIf="rolEmpleado == '1'">
                     {{timbre.empleado}}
                 </b>
-                <i class="fas fa-solid fa-user-clock"
-                    matSuffix matTooltipPosition="left"
-                    matTooltip="Ver timbre."
+                <i class="fas fa-solid fa-user-clock" matSuffix matTooltipPosition="left" matTooltip="Ver timbre."
                     style="font-size: 120px; color: rgb(10, 62, 110);">
                 </i>
                 <br><b>
@@ -27,64 +22,62 @@
             <div class="col-md-8">
                 <br>
                 <div class="row">
-                    <div class="col-md-6" style="text-align: right !important;">
-                        Fecha timbre:
+                    <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                        Fecha del timbre:
                     </div>
-                    <div class="col-md-6" style="text-align: left !important;">
+                    <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
                         {{fecha_timbre}}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6" style="text-align: right !important;">
-                        Hora timbre: 
+                    <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                        Hora del timbre:
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
                         {{hora_timbre}}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6" style="text-align: right !important;">
-                        Accion del timbre:
+                    <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                        Acción del timbre:
                     </div>
-                    <div class="col-md-6">
-                        {{timbre.accion}} / {{accion}}
+                    <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
+                        {{accion}} ({{timbre.accion}})
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6" style="text-align: right !important;">
-                        Tecla funcion:
+                    <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                        Tecla función:
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
                         {{timbre.tecl_funcion}}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6" style="text-align: right !important;">
-                        Ubicacion: 
+                    <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                        Ubicación:
                     </div>
-                    <div class="col-md-6">
-                        lon: {{timbre.longitud}}  / lat: {{timbre.latitud}}
+                    <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
+                        lat: {{timbre.latitud}} / long: {{timbre.longitud}}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6" style="text-align: right !important;">
-                        Observacion del timbre:
+                    <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                        Observación del timbre:
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
                         {{timbre.observacion}}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6" style="text-align: right !important;">
+                    <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
                         Novedades:
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
                         {{timbre.novedades_conexion}}
                     </div>
                 </div>
             </div>
         </div>
-       
     </div>
 </div>
-
