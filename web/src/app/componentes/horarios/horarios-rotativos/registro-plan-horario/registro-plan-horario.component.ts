@@ -20,6 +20,7 @@ import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.
 
 import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+import { HorarioMultipleEmpleadoComponent } from '../../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
 
 @Component({
   selector: 'app-registro-plan-horario',
@@ -60,6 +61,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
 
   constructor(
     public componentev: VerEmpleadoComponent,
+    public componentem: HorarioMultipleEmpleadoComponent,
     public parametro: ParametrosService,
     public feriado: FeriadosService,
     public validar: ValidacionesService,
@@ -336,7 +338,6 @@ export class RegistroPlanHorarioComponent implements OnInit {
         obj.horarios_existentes = '';
       });
     })
-
     //console.log('ver fechas ', this.fechas_mes)
   }
 
@@ -1200,6 +1201,11 @@ export class RegistroPlanHorarioComponent implements OnInit {
     if (this.datoEmpleado.pagina === 'ver-empleado') {
       this.componentev.ver_tabla_horarios = true;
       this.componentev.registrar_rotativo = false;
+    }
+    else if (this.datoEmpleado.pagina === 'mutiple-horario') {
+      this.componentem.seleccionar = true;
+      this.componentem.registrar_rotativo = false;
+      this.componentem.LimpiarFormulario();
     }
   }
 

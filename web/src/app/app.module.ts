@@ -83,7 +83,7 @@ import { MetodosComponent } from './componentes/administracionGeneral/metodoElim
 import { EditarContratoComponent } from './componentes/empleado/contrato/editar-contrato/editar-contrato.component';
 import { EditarCargoComponent } from './componentes/empleado/cargo/editar-cargo/editar-cargo.component';
 import { ListarNotiAutorizacionesComponent } from './componentes/catalogos/catNotiAutorizaciones/listar/listar-noti-autorizaciones/listar-noti-autorizaciones.component';
-import { RegistrarTimbreComponent } from './componentes/timbres/registrar-timbre/registrar-timbre.component';
+import { RegistrarTimbreComponent } from './componentes/modulos/timbreWeb/registrar-timbre/registrar-timbre.component';
 import { RegistrarAsistenciaComponent } from './componentes/registrar-asistencia/registrar-asistencia.component';
 import { EditarEstadoAutorizaccionComponent } from './componentes/autorizaciones/editar-estado-autorizaccion/editar-estado-autorizaccion.component';
 import { VerDetallePlanHorariosComponent } from './componentes/horarios/detallePlanHorario/ver-detalle-plan-horarios/ver-detalle-plan-horarios.component';
@@ -176,7 +176,7 @@ import { ListaArchivosComponent } from './componentes/documentos/lista-archivos/
 import { EmplLeafletComponent } from './componentes/modulos/geolocalizacion/empl-leaflet/empl-leaflet.component';
 import { TimbreWebComponent } from './componentes/modulos/timbreWeb/timbre-empleado/timbre-web.component';
 import { TimbreAdminComponent } from './componentes/timbres/timbre-admin/timbre-admin.component';
-import { CrearTimbreComponent } from './componentes/timbres/crear-timbre/crear-timbre.component';
+import { CrearTimbreComponent } from './componentes/timbres/acciones-timbres/crear-timbre/crear-timbre.component';
 import { SeguridadComponent } from './componentes/administracionGeneral/frase-seguridad/seguridad/seguridad.component';
 import { TipoSeguridadComponent } from './componentes/catalogos/catEmpresa/tipo-seguridad/tipo-seguridad.component';
 import { FraseSeguridadComponent } from './componentes/administracionGeneral/frase-seguridad/frase-seguridad/frase-seguridad.component';
@@ -314,9 +314,9 @@ import { HorasPlanificadasEmpleadoComponent } from './componentes/rolEmpleado/ho
 import { ComidasSolicitadasEmpleadoComponent } from './componentes/rolEmpleado/comidas-empleado/comidas-solicitadas-empleado/comidas-solicitadas-empleado.component';
 import { BrowserModule } from '@angular/platform-browser';
 import { MatPaginatorIntl } from '@angular/material/paginator';
-import { BuscarTimbreComponent } from './componentes/timbre-web/buscar-timbre/buscar-timbre.component';
-import { EditarTimbreComponent } from './componentes/timbre-web/editar-timbre/editar-timbre.component';
-import { VerTimbreComponent } from './componentes/timbre-web/ver-timbre/ver-timbre.component';
+import { BuscarTimbreComponent } from './componentes/timbres/acciones-timbres/buscar-timbre/buscar-timbre.component';
+import { EditarTimbreComponent } from './componentes/timbres/acciones-timbres/editar-timbre/editar-timbre.component';
+import { VerTimbreComponent } from './componentes/timbres/acciones-timbres/ver-timbre/ver-timbre.component';
 
 import { BuscarPlanificacionComponent } from './componentes/horarios/rango-fechas/buscar-planificacion/buscar-planificacion.component';
 import { TipoPermisosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/tipo-permisos/tipo-permisos.component';
@@ -325,6 +325,7 @@ import { EditarTipoPermisosComponent } from './componentes/modulos/permisos/conf
 import { VerTipoPermisoComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/ver-tipo-permiso/ver-tipo-permiso.component';
 import { EditarPermisoEmpleadoComponent } from './componentes/modulos/permisos/gestionar-permisos/editar-permiso-empleado/editar-permiso-empleado.component';
 import { EliminarIndividualComponent } from './componentes/horarios/eliminar-individual/eliminar-individual.component';
+import { CargarPlantillasComponent } from './componentes/horarios/cargar-plantillas/cargar-plantillas.component';
 
 
 const config: SocketIoConfig = { url: environment.url, options: {} };
@@ -588,6 +589,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     VerTimbreComponent,
     BuscarPlanificacionComponent,
     EliminarIndividualComponent,
+    CargarPlantillasComponent,
 
   ],
 

@@ -1,0 +1,33 @@
+td {
+    padding-top: 10px;
+    text-align: center;
+}
+
+p {
+    font-size: x-small;
+}
+
+
+table {
+    width: 100%;
+    font-size: 12px;
+}
+
+mat-form-field {
+    margin: 0px 10px 0px 10px;
+    width: 200px;
+
+    input {
+        font-size: large;
+    }
+}
+
+mat-label {
+    font-size: 15px;
+}
+
+.btn {
+    background-color: rgb(80, 87, 97);
+    margin: 5px 10px 5px 10px;
+    color: white;
+}

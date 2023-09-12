@@ -271,8 +271,7 @@ export class MainNavComponent implements OnInit {
         children: [
           { name: 'Feriados', url: '/listarFeriados', color: true },
           { name: 'Horarios', url: '/horario', color: true },
-          { name: 'Planificación Fija', url: '/horariosMultiples', color: true },
-          { name: 'Planificación Múltiple', url: '/horariosMultiples', color: true },
+          { name: 'Planificación', url: '/horariosMultiples', color: true },
           // { name: 'Planificación Múltiple', url: '/planificacion', color: true },
         ]
       },
@@ -423,8 +422,8 @@ export class MainNavComponent implements OnInit {
             color: true,
             subtitulo: true,
             children: [
-              { name: 'Timbre Web', url: '/timbresWeb', color: true },
-              { name: 'Timbre Teletrabajo', url: '/timbres-personal', color: true },
+              { name: 'Configurar Teletrabajo', url: '/timbresWeb', color: true },
+              { name: 'Timbrar Teletrabajo', url: '/timbres-personal', color: true },
             ]
           },
           {
@@ -468,9 +467,9 @@ export class MainNavComponent implements OnInit {
         subtitulo: false,
         children: [
           { name: 'Dispositivos', url: '/listarRelojes', color: true },
-          { name: 'Timbres Múltiples', url: '/timbres-multiples', color: true },
           { name: 'Administrar Timbres', url: '/timbres-admin', color: true },
-          { name: 'Buscar Timbre', url: '/buscar-timbre', color: true },
+          { name: 'Registrar Timbres', url: '/timbres-multiples', color: true },
+          { name: 'Actualizar Timbres', url: '/buscar-timbre', color: true },
         ]
       },
       {

@@ -88,7 +88,7 @@ import { DetallePlanificadosComponent } from './componentes/reportes/alimentacio
 import { HorarioMultipleEmpleadoComponent } from './componentes/horarios/rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
 import { AdministradorTodasComponent } from './componentes/reportes/notificaciones/administrador-todas/administrador-todas.component';
 import { PorUsuarioComponent } from './componentes/reportes/notificaciones/por-usuario/por-usuario.component';
-import { BuscarTimbreComponent } from './componentes/timbre-web/buscar-timbre/buscar-timbre.component';
+import { BuscarTimbreComponent } from './componentes/timbres/acciones-timbres/buscar-timbre/buscar-timbre.component';
 
 import { RecuperarFraseComponent } from './componentes/administracionGeneral/frase-seguridad/recuperar-frase/recuperar-frase.component';
 import { OlvidarFraseComponent } from './componentes/administracionGeneral/frase-seguridad/olvidar-frase/olvidar-frase.component';
@@ -142,6 +142,7 @@ import { ComidasSolicitadasEmpleadoComponent } from './componentes/rolEmpleado/c
 import { ListaWebComponent } from './componentes/modulos/timbreWeb/lista-web/lista-web.component';
 import { RegistroDispositivosComponent } from './componentes/modulos/appMovil/registro-dispositivos/registro-dispositivos.component';
 import { VistaElementosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/listarTipoPermisos/vista-elementos.component';
+import { TimbreMultipleComponent } from './componentes/timbres/timbre-multiple/timbre-multiple.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -337,6 +338,7 @@ const routes: Routes = [
   { path: 'registrarRelojes', component: RelojesComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   // ACCESO A RUTAS DE TIMBRES
   { path: 'timbres-personal', component: TimbreWebComponent, canActivate: [AuthGuard], data: { rolMix: 0 } },
+  { path: 'timbres-multiples', component: TimbreMultipleComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'timbres-admin', component: TimbreAdminComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'timbresWeb', component: ListaWebComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'buscar-timbre', component: BuscarTimbreComponent, canActivate: [AuthGuard], data: { rolMix: 0 } },

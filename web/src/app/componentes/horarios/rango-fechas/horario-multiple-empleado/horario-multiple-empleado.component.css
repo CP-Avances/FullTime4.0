@@ -39,6 +39,14 @@ table {
     text-align: center;
 }
 
+#multiple_ {
+    color: rgb(102, 4, 115);
+    margin-left: 15px;
+    cursor: pointer;
+    text-align: center;
+}
+
+
 #busca {
     color: rgb(188, 76, 1);
     cursor: pointer;

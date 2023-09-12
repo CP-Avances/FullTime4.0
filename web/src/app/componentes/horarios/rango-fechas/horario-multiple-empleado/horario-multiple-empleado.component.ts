@@ -414,6 +414,9 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     else if (tipo === 'e') {
       this.EliminarHorarios(usuarios);
     }
+    else if (tipo === 'm') {
+      this.PlanificarRotativos(usuarios);
+    }
   }
 
   // METODO PARA MOSTRAR DATOS DE DEPARTAMENTOS
@@ -455,6 +458,9 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     else if (tipo === 'e') {
       this.EliminarHorarios(usuarios);
     }
+    else if (tipo === 'm') {
+      this.PlanificarRotativos(usuarios);
+    }
   }
 
   // METODO PARA MOSTRAR DATOS DE EMPLEADOS
@@ -476,6 +482,9 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     }
     else if (tipo === 'e') {
       this.EliminarHorarios(respuesta);
+    }
+    else if (tipo === 'm') {
+      this.PlanificarRotativos(respuesta);
     }
   }
 
@@ -525,6 +534,27 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       this.seleccionados = seleccionados;
       this.seleccionar = false;
       this.asignar = true;
+    }
+  }
+
+  // METODO DE VALIDACION DE SELECCION MULTIPLE - ROTATIVOS
+  plan_rotativo: boolean = false;
+  data_rotativo: any = []
+  PlanificarRotativos(data: any) {
+    console.log('data rotativos ', data)
+    this.data_horario = [];
+    if (data.length > 0) {
+      this.data_horario = {
+        usuarios: data,
+        pagina: 'multiple-empleado',
+      }
+      this.seleccionar = false;
+      this.plan_rotativo = true;
+    }
+    else {
+      this.toastr.warning('No ha seleccionado usuarios.', '', {
+        timeOut: 6000,
+      });
     }
   }
 
@@ -658,6 +688,26 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
         timeOut: 6000,
       });
     }
+  }
+
+  /** **************************************************************************************** **
+   ** **                          METODO DE REGISTRO DE HORARIOS ROTATIVOS                  ** **
+   ** **************************************************************************************** **/
+
+  // VENTANA PARA REGISTRAR PLANIFICACION DE HORARIOS DEL EMPLEADO 
+  rotativo: any = []
+  registrar_rotativo: boolean = false;
+  AbrirMultipleIndividual(usuario: any): void {
+    //console.log('ver usuario ', usuario)
+    this.rotativo = {
+      idCargo: usuario.id_cargo,
+      codigo: usuario.codigo,
+      pagina: 'mutiple-horario',
+      idEmpleado: usuario.id,
+      horas_trabaja: usuario.hora_trabaja,
+    }
+    this.registrar_rotativo = true;
+    this.seleccionar = false;
   }
 
 }

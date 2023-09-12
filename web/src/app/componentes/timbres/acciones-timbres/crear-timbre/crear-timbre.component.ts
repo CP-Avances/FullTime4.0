@@ -150,6 +150,7 @@ export class CrearTimbreComponent implements OnInit {
       longitud: this.longitud,
       latitud: this.latitud,
       accion: form.accionForm,
+      tipo: 'admin',
     }
 
     if (this.data.length === undefined) {

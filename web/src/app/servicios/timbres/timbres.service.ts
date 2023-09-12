@@ -27,7 +27,7 @@ export class TimbresService {
     return this.http.post<any>(`${environment.url}/timbres/admin/`, datos);
   }
 
-  obtenerTimbresFechaEmple(datos: any){
+  ObtenerTimbresFechaEmple(datos: any){
     const params = new HttpParams()
     .set('codigo',datos.codigo)
     .set('cedula',datos.cedula)

@@ -21,12 +21,21 @@
     <app-eliminar-individual [datosEliminar]="eliminar_horarios"></app-eliminar-individual>
 </div>
 
+<!-- ************** PANTALLA DE REGISTRO DE HORARIO ROTATIVO ************************* -->
+<div style="padding-top: 20px;" *ngIf="registrar_rotativo">
+    <app-registro-plan-horario [datoEmpleado]="rotativo"></app-registro-plan-horario>
+</div>
+
+<!-- ************** PANTALLA DE REGISTRO DE HORARIO ROTATIVO ************************* -->
+<div style="padding-top: 20px;" *ngIf="plan_rotativo">
+    <app-planificacion-multiple [datosSeleccionados]="data_horario"></app-planificacion-multiple>
+</div>
 
 <!--  *********************** PANTALLA DETALLE DE HORARIOS ********************************* -->
 <app-ver-horario-detalle *ngIf="ver_horario" [idHorario]="horario_id" [pagina]="pagina"></app-ver-horario-detalle>
 
 <div style="padding-top: 20px;" *ngIf="seleccionar">
-    <div id="titulo">PLANIFICACIÓN FIJA</div>
+    <div id="titulo">PLANIFICACIÓN HORARIA</div>
     <mat-card class="example-card mat-elevation-z9">
         <mat-card-content>
             <div id="resultados">
@@ -133,7 +142,12 @@
                 <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 'b')">
                     Buscar Planificación
                 </button>
-                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 'p')">Planificar</button>
+                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 'p')">
+                    Planificación Fija
+                </button>
+                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 'm')">
+                    Planificación Múltiple
+                </button>
                 <button id="btn-raised" class="btn btn-sm" (click)="LimpiarFormulario()">Cancelar</button>
             </div>
 
@@ -182,13 +196,18 @@
                                 <td>
                                     <i (click)="GuardarRegistros(c.id, 'p')" id="plan" *ngIf="auto_individual"
                                         class="fa fa-calendar" matSuffix matTooltipPosition="right"
-                                        matTooltip="Abrir formulario de registro de horarios.">
-                                        <p>Planificar</p>
+                                        matTooltip="Abrir formulario de asignación de planificación fija.">
+                                        <p>Fija</p>
+                                    </i>
+                                    <i (click)="GuardarRegistros(c.id, 'm')" id="multiple_" *ngIf="auto_individual"
+                                        class="fa fa-files-o" matSuffix matTooltipPosition="right"
+                                        matTooltip="Abrir formulario de asignación de planificación múltiple.">
+                                        <p>Multiple</p>
                                     </i>
                                     <i (click)="GuardarRegistros(c.id, 'b')" id="busca" *ngIf="auto_individual"
                                         class="fa fa-search" matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de planificaciones asignadas.">
-                                        <p>Listar</p>
+                                        <p>Buscar</p>
                                     </i>
                                     <i (click)="GuardarRegistros(c.id, 'e')" id="elimina_" *ngIf="auto_individual"
                                         class="far fa-trash-alt" matSuffix matTooltipPosition="right"
@@ -252,13 +271,18 @@
                                 <td>
                                     <i (click)="GuardarRegistros(d.id, 'p')" id="plan" *ngIf="auto_individual"
                                         class="fa fa-calendar" matSuffix matTooltipPosition="right"
-                                        matTooltip="Abrir formulario de registro de horarios.">
-                                        <p>Planificar</p>
+                                        matTooltip="Abrir formulario de asignación de planificación fija.">
+                                        <p>Fija</p>
+                                    </i>
+                                    <i (click)="GuardarRegistros(d.id, 'm')" id="multiple_" *ngIf="auto_individual"
+                                        class="fa fa-files-o" matSuffix matTooltipPosition="right"
+                                        matTooltip="Abrir formulario de asignación de planificación múltiple.">
+                                        <p>Multiple</p>
                                     </i>
                                     <i (click)="GuardarRegistros(d.id, 'b')" id="busca" *ngIf="auto_individual"
                                         class="fa fa-search" matSuffix matTooltipPosition="right"
                                         matTooltip="Búsqueda de planificaciones asignadas.">
-                                        <p>Listar</p>
+                                        <p>Buscar</p>
                                     </i>
                                     <i (click)="GuardarRegistros(d.id, 'e')" id="elimina_" *ngIf="auto_individual"
                                         class="far fa-trash-alt" matSuffix matTooltipPosition="right"
@@ -324,13 +348,18 @@
                                 <td>
                                     <i (click)="PlanificarIndividual(e, 'p')" id="plan" *ngIf="auto_individual"
                                         class="fa fa-calendar" matSuffix matTooltipPosition="right"
-                                        matTooltip="Abrir formulario de registro de horarios.">
-                                        <p>Planificar</p>
+                                        matTooltip="Abrir formulario de asignación de planificación fija.">
+                                        <p>Fija</p>
+                                    </i>
+                                    <i (click)="AbrirMultipleIndividual(e)" id="multiple_" *ngIf="auto_individual"
+                                        class="fa fa-files-o" matSuffix matTooltipPosition="right"
+                                        matTooltip="Abrir formulario de asignación de planificación múltiple.">
+                                        <p>Múltiple</p>
                                     </i>
                                     <i (click)="PlanificarIndividual(e, 'b')" id="busca" *ngIf="auto_individual"
                                         class="fa fa-search" matSuffix matTooltipPosition="right"
-                                        matTooltip="Abrir formulario de registro de horarios.">
-                                        <p>Listar</p>
+                                        matTooltip="Búsqueda de planificaciones asignadas.">
+                                        <p>Buscar</p>
                                     </i>
                                     <i (click)="EliminarHorarios([e])" id="elimina_" *ngIf="auto_individual"
                                         class="far fa-trash-alt" matSuffix matTooltipPosition="right"

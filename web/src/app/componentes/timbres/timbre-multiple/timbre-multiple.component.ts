@@ -21,7 +21,7 @@ import { LoginService } from 'src/app/servicios/login/login.service';
 
 // IMPORTAR COMPONENTES
 import { FraseSeguridadComponent } from '../../administracionGeneral/frase-seguridad/frase-seguridad/frase-seguridad.component';
-import { CrearTimbreComponent } from '../crear-timbre/crear-timbre.component';
+import { CrearTimbreComponent } from '../acciones-timbres/crear-timbre/crear-timbre.component';
 import { SeguridadComponent } from 'src/app/componentes/administracionGeneral/frase-seguridad/seguridad/seguridad.component';
 
 // IMPORTAR PLANTILLA DE MODELO DE DATOS

@@ -142,71 +142,74 @@ class TimbresControlador {
     }
 
     //METODO PARA BUSCAR EL TIMBRE DEL EMPLEADO POR FECHA
-    public async ObtenertimbreFechaEmple(req: Request, res: Response): Promise<any>{
-        try{
+    public async ObtenertimbreFechaEmple(req: Request, res: Response): Promise<any> {
+        try {
             let { codigo, cedula, fecha } = req.query;
-            fecha = fecha+'%';
-            if(codigo === ''){
+            fecha = fecha + '%';
+            if (codigo === '') {
                 let usuario = await pool.query(
                     `SELECT * FROM datos_actuales_empleado 
                         WHERE cedula = $1
                     `
-                    ,[cedula]).then((result: any) => {
+                    , [cedula]).then((result: any) => {
                         return result.rows.map((obj: any) => {
                             codigo = obj.codigo;
                         });
                     }
-                );
-            }else if(cedula === '') {
+                    );
+            } else if (cedula === '') {
                 let usuario = await pool.query(
                     `SELECT * FROM datos_actuales_empleado 
                         WHERE codigo = $1
                     `
-                    ,[codigo]).then((result: any) => {
+                    , [codigo]).then((result: any) => {
                         return result.rows.map((obj: any) => {
                             cedula = obj.cedula;
                         });
                     }
-                );
+                    );
             }
 
             let timbresRows: any = 0;
+            //TODO merge
             let timbres = await pool.query(
                 `
-                SELECT (da.nombre || ' ' || da.apellido) AS empleado, t.* 
-                    FROM timbres AS t, datos_actuales_empleado AS da
-                    WHERE t.codigo = $1 
+                SELECT (da.nombre || ' ' || da.apellido) AS empleado, CAST(t.fec_hora_timbre AS VARCHAR), t.accion, 
+                    t.tecl_funcion, t.observacion, t.latitud, t.longitud, t.id_empleado, t.id_reloj, ubicacion, 
+                    CAST(fec_hora_timbre_servidor AS VARCHAR), dispositivo_timbre, t.id 
+                FROM timbres AS t, datos_actuales_empleado AS da
+                WHERE CAST(t.id_empleado AS VARCHAR) = $1 
                     AND CAST(t.fec_hora_timbre AS VARCHAR) LIKE $2
                     AND da.codigo = t.codigo 
                     AND da.cedula = $3
                 `
                 , [codigo, fecha, cedula]).then((result: any) => {
                     timbresRows = result.rowCount;
-                    if(result.rowCount > 0){
-                        return res.status(200).jsonp({message: 'timbres encontrados',timbres: result.rows});
+                    if (result.rowCount > 0) {
+                        return res.status(200).jsonp({ message: 'timbres encontrados', timbres: result.rows });
                     }
-                }  
-            );
-            console.log('respuesta: ',timbresRows)
-            if(timbresRows == 0){
-                return res.status(400).jsonp({ message: "No se encontraron timbres en esa fecha" })
+                }
+                );
+            console.log('respuesta: ', timbresRows)
+            if (timbresRows == 0) {
+                return res.status(400).jsonp({ message: "No se encontraron timbres en esa fecha." })
             }
-            
-        }catch(err){
-            const message = '!Ups poblemas con la peticion al servidor'
+
+        } catch (err) {
+            const message = '!Ups poblemas con la peticion al servidor.'
             return res.status(500).jsonp({ error: err, message: message })
         }
     }
 
     //METODO PARA ACTUALIZAR O EDITAR EL TIMBRE DEL EMPLEADO
-    public async EditarTimbreEmpleadoFecha(req: Request, res: Response): Promise<any>{
-        try{
+    public async EditarTimbreEmpleadoFecha(req: Request, res: Response): Promise<any> {
+        try {
             let { id, codigo, accion, tecla, observacion } = req.body;
-            console.log('id: ',id);
-            console.log('codigo: ',codigo);
-            console.log('accion: ',accion);
-            console.log('tecla: ',tecla);
-            console.log('observacion: ',observacion);
+            console.log('id: ', id);
+            console.log('codigo: ', codigo);
+            console.log('accion: ', accion);
+            console.log('tecla: ', tecla);
+            console.log('observacion: ', observacion);
             await pool.query(
                 `
                 UPDATE timbres SET accion = $1, tecl_funcion = $2, observacion = $3 
@@ -214,13 +217,13 @@ class TimbresControlador {
                     AND codigo = $5  
                 `
                 , [accion, tecla, observacion, id, codigo])
-            .then((result: any) => {
-                return res.status(200).jsonp({ message: 'Registro actualizado' });
-            });
+                .then((result: any) => {
+                    return res.status(200).jsonp({ message: 'Registro actualizado.' });
+                });
 
 
-        }catch(err){
-            const message = '!Ups poblemas con la peticion al servidor'
+        } catch (err) {
+            const message = '!Ups poblemas con la peticion al servidor.'
             return res.status(500).jsonp({ error: err, message: message })
         }
     }
@@ -290,9 +293,17 @@ class TimbresControlador {
             }
 
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud,
-                id_empleado, id_reloj } = req.body
+                id_empleado, id_reloj, tipo } = req.body
 
             let f = new Date();
+            let servidor: any;
+
+            if (tipo === 'admin') {
+                servidor = fec_hora_timbre;
+            }
+            else {
+                servidor = f.toLocaleString();
+            }
 
             let code = await pool.query(
                 `
@@ -311,7 +322,7 @@ class TimbresControlador {
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                 `
                 , [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
-                    id_reloj, ip_cliente, f.toLocaleString()])
+                    id_reloj, ip_cliente, servidor])
                 .then((result: any) => {
                     res.status(200).jsonp({ message: 'Registro guardado.' });
                 }).catch((err: any) => {

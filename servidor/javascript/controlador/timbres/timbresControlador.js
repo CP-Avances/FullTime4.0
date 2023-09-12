@@ -162,10 +162,13 @@ class TimbresControlador {
                     });
                 }
                 let timbresRows = 0;
+                //TODO merge
                 let timbres = yield database_1.default.query(`
-                SELECT (da.nombre || ' ' || da.apellido) AS empleado, t.* 
-                    FROM timbres AS t, datos_actuales_empleado AS da
-                    WHERE t.codigo = $1 
+                SELECT (da.nombre || ' ' || da.apellido) AS empleado, CAST(t.fec_hora_timbre AS VARCHAR), t.accion, 
+                    t.tecl_funcion, t.observacion, t.latitud, t.longitud, t.id_empleado, t.id_reloj, ubicacion, 
+                    CAST(fec_hora_timbre_servidor AS VARCHAR), dispositivo_timbre, t.id 
+                FROM timbres AS t, datos_actuales_empleado AS da
+                WHERE CAST(t.id_empleado AS VARCHAR) = $1 
                     AND CAST(t.fec_hora_timbre AS VARCHAR) LIKE $2
                     AND da.codigo = t.codigo 
                     AND da.cedula = $3
@@ -177,11 +180,11 @@ class TimbresControlador {
                 });
                 console.log('respuesta: ', timbresRows);
                 if (timbresRows == 0) {
-                    return res.status(400).jsonp({ message: "No se encontraron timbres en esa fecha" });
+                    return res.status(400).jsonp({ message: "No se encontraron timbres en esa fecha." });
                 }
             }
             catch (err) {
-                const message = '!Ups poblemas con la peticion al servidor';
+                const message = '!Ups poblemas con la peticion al servidor.';
                 return res.status(500).jsonp({ error: err, message: message });
             }
         });
@@ -202,11 +205,11 @@ class TimbresControlador {
                     AND codigo = $5  
                 `, [accion, tecla, observacion, id, codigo])
                     .then((result) => {
-                    return res.status(200).jsonp({ message: 'Registro actualizado' });
+                    return res.status(200).jsonp({ message: 'Registro actualizado.' });
                 });
             }
             catch (err) {
-                const message = '!Ups poblemas con la peticion al servidor';
+                const message = '!Ups poblemas con la peticion al servidor.';
                 return res.status(500).jsonp({ error: err, message: message });
             }
         });
@@ -263,8 +266,15 @@ class TimbresControlador {
                 if (clientIp != null && clientIp != '' && clientIp != undefined) {
                     ip_cliente = clientIp.split(':')[3];
                 }
-                const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_empleado, id_reloj } = req.body;
+                const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_empleado, id_reloj, tipo } = req.body;
                 let f = new Date();
+                let servidor;
+                if (tipo === 'admin') {
+                    servidor = fec_hora_timbre;
+                }
+                else {
+                    servidor = f.toLocaleString();
+                }
                 let code = yield database_1.default.query(`
                 SELECT codigo FROM empleados WHERE id = $1
                 `, [id_empleado]).then((result) => { return result.rows; });
@@ -276,7 +286,7 @@ class TimbresControlador {
                     longitud, codigo, id_reloj, dispositivo_timbre, fec_hora_timbre_servidor) 
                 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                 `, [fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, codigo,
-                    id_reloj, ip_cliente, f.toLocaleString()])
+                    id_reloj, ip_cliente, servidor])
                     .then((result) => {
                     res.status(200).jsonp({ message: 'Registro guardado.' });
                 }).catch((err) => {
