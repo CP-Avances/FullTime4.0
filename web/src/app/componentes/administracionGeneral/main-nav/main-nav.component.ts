@@ -271,8 +271,7 @@ export class MainNavComponent implements OnInit {
         children: [
           { name: 'Feriados', url: '/listarFeriados', color: true },
           { name: 'Horarios', url: '/horario', color: true },
-          { name: 'Planificación Fija', url: '/horariosMultiples', color: true },
-          { name: 'Planificación Múltiple', url: '/horariosMultiples', color: true },
+          { name: 'Planificación', url: '/horariosMultiples', color: true },
           // { name: 'Planificación Múltiple', url: '/planificacion', color: true },
         ]
       },

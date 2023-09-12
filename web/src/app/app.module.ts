@@ -325,6 +325,7 @@ import { EditarTipoPermisosComponent } from './componentes/modulos/permisos/conf
 import { VerTipoPermisoComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/ver-tipo-permiso/ver-tipo-permiso.component';
 import { EditarPermisoEmpleadoComponent } from './componentes/modulos/permisos/gestionar-permisos/editar-permiso-empleado/editar-permiso-empleado.component';
 import { EliminarIndividualComponent } from './componentes/horarios/eliminar-individual/eliminar-individual.component';
+import { CargarPlantillasComponent } from './componentes/horarios/cargar-plantillas/cargar-plantillas.component';
 
 
 const config: SocketIoConfig = { url: environment.url, options: {} };
@@ -588,6 +589,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     VerTimbreComponent,
     BuscarPlanificacionComponent,
     EliminarIndividualComponent,
+    CargarPlantillasComponent,
 
   ],
 

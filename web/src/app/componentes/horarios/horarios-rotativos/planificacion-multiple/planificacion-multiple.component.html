@@ -1,128 +1,186 @@
-<div class="container" style="padding-top: 15px; padding-bottom: 25px;">
-    <div class="row">
-        <div class="col-md">
-            <div id="titulo">
-                <span>CARGA MÚLTIPLE DE HORARIOS</span>
-            </div>
-            <mat-card class="example-card mat-elevation-z9" id="carta1">
-                <div class="row" style="text-align: center;">
-                    <div class="col-md">
-                        <form method="post" enctype="multipart/form-data">
-                            <input (change)="fileChangeHorario($event)" type="file" [formControl]="archivoHorarioForm"
-                                id="file1"
-                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                            <label for="file1" class="btn-2" matSuffix 
-                                matTooltipPosition="right"
-                                matTooltip="Presionar para seleccionar Plantilla con nombre Planificacion Multiple">
-                                Subir Varios Horarios</label>
-                        </form>
+<div class="container" style="padding-bottom: 15px;">
+    <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo">
+            <span>CALENDARIO RANGO FECHAS</span>
+            <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">
+                highlight_off
+            </mat-icon>
+        </div>
+        <mat-card-content>
+            <div class="row">
+                <div class="nota" style="margin-left: 15px; padding-top: 10px;">
+                    <span>
+                        NOTA: Al presionar Generar calendario se visualizará todos los días del mes actual. Para generar
+                        un calendario de manera personalizada ingresar mes de inicio y fin de periodo.
+                    </span>
+                </div>
+                <div class="col-md">
+                    <div class="row">
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field style="width: 165px;">
+                                    <mat-label>Mes inicio</mat-label>
+                                    <input matInput [matDatepicker]="fec1" [formControl]="fechaInicialF"
+                                        placeholder="DD/MM/YYYY">
+                                    <mat-datepicker-toggle matIconSuffix [for]="fec1"></mat-datepicker-toggle>
+                                    <mat-datepicker #fec1 startView="year"
+                                        (monthSelected)="FormatearFecha($event, fec1)" touchUi>
+                                    </mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <mat-form-field style="width: 165px;">
+                                    <mat-label>Mes final</mat-label>
+                                    <input matInput [matDatepicker]="fec2" [formControl]="fechaFinalF"
+                                        placeholder="DD/MM/YYYY" readonly>
+                                    <mat-datepicker-toggle matIconSuffix [for]="fec2"
+                                        [disabled]="true"></mat-datepicker-toggle>
+                                    <mat-datepicker #fec2 startView="year">
+                                    </mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <div style="margin: 0 auto;">
+                                <button class="btn btn-sm" (click)="GenerarCalendario()">
+                                    Generar calendario
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md">
-                        <form method="post" enctype="multipart/form-data">
-                            <input (change)="fileChangeHorarioFijo($event)" type="file" [formControl]="archivoHorarioForm"
-                                id="file2"
-                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                            <label for="file2" class="btn-2" matSuffix 
-                                matTooltipPosition="right"
-                                matTooltip="Presionar para seleccionar Plantilla con nombre MultiplesEmpleados_HorarioFijo">
-                                Subir Horario Fijo</label>
-                        </form>
-                    </div>
                 </div>
-            </mat-card>
-        </div>
-        <div class="col-sm">
-            <div id="titulo">
-                <span>DESCARGAR PLANTILLAS</span>
             </div>
-            <mat-card class="example-card mat-elevation-z9" id="carta1">
-                <div class="row" style="text-align: center;">
-                    <div class="col-md">
-                        <a mat-button type="submit" id="descargar" class="btn btn-sm" matSuffix
-                            matTooltipPosition="right" matTooltip="Dar click para ver o descargar el documento"
-                            href="{{hipervinculo}}/plantillaD/documento/Planificacion Multiple.xlsx">
-                            <span class="material-icons">cloud_download</span> Plantilla Varios Horarios
-                        </a>
-                    </div>
-                    <div class="col-md">
-                        <a mat-button type="submit" id="descargar" class="btn btn-sm" matSuffix
-                            matTooltipPosition="right" matTooltip="Dar click para ver o descargar el documento"
-                            href="{{hipervinculo}}/plantillaD/documento/MultiplesEmpleados_HorarioFijo.xlsx">
-                            <span class="material-icons">cloud_download</span> Plantilla Horario Fijo
-                        </a>
-                    </div>
+
+            <div class="mat-elevation-z8" style="background: white; padding-top: 15px;">
+                <div class="d-flex bd-highlight" id="resultados">
+                    <span class="w-100 bd-highlight">
+                        RESULTADO PLANIFICACIONES
+                    </span>
                 </div>
-            </mat-card>
-        </div>
-    </div>
-    <br>
-    <div class="row">
-        <div class="col-md">
-            <div id="titulo">
-                <span>CARGA MÚLTIPLE PERIODO VACACIONES</span>
+                <div class="table-responsive">
+                    <table id="table_horario" class="table table-hover table-sm">
+                        <thead class="thead-light">
+                            <tr style="text-align: center;">
+                                <th scope="col" id="td_horarios" rowspan="2">CÓDIGO</th>
+                                <th scope="col" id="td_horarios" rowspan="2">USUARIO</th>
+                                <th scope="col" id="td_horarios" [colSpan]="fechas_mes.length">DÍAS DEL MES
+                                    {{mes_asignar}} </th>
+                            </tr>
+
+                            <tr *ngIf="fechas_mes.length != 0">
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[0].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[1].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[2].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[3].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[4].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[5].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[6].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[7].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[8].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[9].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[10].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[11].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[12].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[13].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[14].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[15].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[16].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[17].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[18].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[19].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[20].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[21].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[22].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[23].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[24].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios">
+                                    {{fechas_mes[25].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios" *ngIf="fechas_mes.length > 26">
+                                    {{fechas_mes[26].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios" *ngIf="fechas_mes.length > 27">
+                                    {{fechas_mes[27].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios" *ngIf="fechas_mes.length > 28">
+                                    {{fechas_mes[28].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios" *ngIf="fechas_mes.length > 29">
+                                    {{fechas_mes[29].formato_}}
+                                </th>
+                                <th scope="col" id="td_horarios" *ngIf="fechas_mes.length > 30">
+                                    {{fechas_mes[30].formato_}}
+                                </th>
+                            </tr>
+
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let e of datosSeleccionados.usuarios">
+                                <td id="td_horarios">
+                                    {{e.codigo}}
+                                </td>
+                                <td id="td_horarios">
+                                    {{e.nombre}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <br>
             </div>
-            <mat-card class="example-card mat-elevation-z9" id="carta1">
-                <div class="container" style="text-align: center;">
-                    <form method="post" enctype="multipart/form-data">
-                        <input (change)="fileChangeVacacion($event)" type="file" [formControl]="archivoVacacionForm"
-                            id="file3"
-                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                        <label for="file3" class="btn-2" matSuffix 
-                            matTooltipPosition="right"
-                            matTooltip="Presionar para seleccionar Plantilla con nombre Periodo Vacaciones">Subir
-                            Periodo Vacaciones</label>
-                    </form>
-                </div>
-            </mat-card>
-        </div>
-        <div class="col-sm">
-            <div id="titulo">
-                <span>DESCARGAR PLANTILLA PERIODO VACACIONES</span>
-            </div>
-            <mat-card class="example-card mat-elevation-z9" id="carta1">
-                <div class="container" style="text-align: center;">
-                    <a mat-button type="submit" id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
-                        matTooltip="Dar click para ver o descargar el documento"
-                        href="{{hipervinculo}}/plantillaD/documento/Periodo Vacaciones.xlsx">
-                        <span class="material-icons">cloud_download</span> Plantilla Periodo Vacaciones
-                    </a>
-                </div>
-            </mat-card>
-        </div>
-    </div>
-    <br>
-    <div class="row">
-        <div class="col-md">
-            <div id="titulo">
-                <span>CARGA PLANIFICACIÓN MULTIPLES EMPLEADOS</span>
-            </div>
-            <mat-card class="example-card mat-elevation-z9" id="carta1">
-                <div class="container" style="text-align: center;">
-                    <form method="post" enctype="multipart/form-data">
-                        <input (change)="fileChangePrueba($event)" type="file" [formControl]="archivoPruebaForm"
-                            id="file4"
-                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                        <label for="file4" class="btn-2" matSuffix 
-                            matTooltipPosition="right"
-                            matTooltip="Presionar para seleccionar Plantilla con nombre PlanDetalle Multiples Empleados">Subir
-                            Planificacion Multiple</label>
-                    </form>
-                </div>
-            </mat-card>
-        </div>
-        <div class="col-md">
-            <div id="titulo">
-                <span>DESCARGAR PLANTILLA PLANIFICACIÓN EMPLEADOS</span>
-            </div>
-            <mat-card class="example-card mat-elevation-z9" id="carta1">
-                <div class="container" style="text-align: center;">
-                    <a mat-button type="submit" id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
-                        matTooltip="Dar click para ver o descargar el documento"
-                        href="{{hipervinculo}}/plantillaD/documento/PlanDetalle Multiples Empleados.xlsx">
-                        <span class="material-icons">cloud_download</span> Planificación Empleados
-                    </a>
-                </div>
-            </mat-card>
-        </div>
-    </div>
+        </mat-card-content>
+    </mat-card>
 </div>
