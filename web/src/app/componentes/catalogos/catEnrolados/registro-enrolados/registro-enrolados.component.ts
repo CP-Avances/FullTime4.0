@@ -217,7 +217,7 @@ export class RegistroEnroladosComponent implements OnInit {
       console.log(this.datosEmpleado)
       this.nuevoEnroladoForm.patchValue({
         enroladoNombreForm: this.datosEmpleado[0].nombre + ' ' + this.datosEmpleado[0].apellido,
-        codigoForm: parseInt(this.datosEmpleado[0].codigo)
+        codigoForm: this.datosEmpleado[0].codigo
       });
       if (this.datosEmpleado[0].estado === 1){
         this.selec1 = true;

@@ -162,13 +162,12 @@ class TimbresControlador {
                     });
                 }
                 let timbresRows = 0;
-                //TODO merge
                 let timbres = yield database_1.default.query(`
                 SELECT (da.nombre || ' ' || da.apellido) AS empleado, CAST(t.fec_hora_timbre AS VARCHAR), t.accion, 
-                    t.tecl_funcion, t.observacion, t.latitud, t.longitud, t.id_empleado, t.id_reloj, ubicacion, 
+                    t.tecl_funcion, t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj, ubicacion, 
                     CAST(fec_hora_timbre_servidor AS VARCHAR), dispositivo_timbre, t.id 
                 FROM timbres AS t, datos_actuales_empleado AS da
-                WHERE CAST(t.id_empleado AS VARCHAR) = $1 
+                WHERE t.codigo = $1 
                     AND CAST(t.fec_hora_timbre AS VARCHAR) LIKE $2
                     AND da.codigo = t.codigo 
                     AND da.cedula = $3
@@ -280,7 +279,8 @@ class TimbresControlador {
                 `, [id_empleado]).then((result) => { return result.rows; });
                 if (code.length === 0)
                     return { mensaje: 'El usuario no tiene un código asignado.' };
-                var codigo = parseInt(code[0].codigo);
+                // var codigo = parseInt(code[0].codigo);
+                var codigo = code[0].codigo;
                 yield database_1.default.query(`
                 INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, observacion, latitud, 
                     longitud, codigo, id_reloj, dispositivo_timbre, fec_hora_timbre_servidor) 

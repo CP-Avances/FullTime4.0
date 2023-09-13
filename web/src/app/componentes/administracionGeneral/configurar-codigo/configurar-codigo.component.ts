@@ -174,6 +174,7 @@ export class ConfigurarCodigoComponent implements OnInit {
     this.manualF = true;
   }
 
+  //TODO obtener codigo max
   // METODO PARA BUSCAR EL ULTIMO CODIGO REGISTRADO EN EL SISTEMA
   valor_codigo: any;
   VerUltimoCodigo() {

@@ -128,7 +128,7 @@ export class EditarDetallePlanComponent implements OnInit {
     let plan_fecha = {
       fec_inicio: this.data.detalle.fecha.split('T')[0],
       id_horario: this.data.detalle.id_horario,
-      codigo: parseInt(this.data.plan.codigo)
+      codigo: this.data.plan.codigo
     };
     this.restP.BuscarFecha(plan_fecha).subscribe(res => {
       this.id_planificacion_general = res;

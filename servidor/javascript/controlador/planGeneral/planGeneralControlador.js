@@ -141,7 +141,6 @@ class PlanGeneralControlador {
             }
         });
     }
-    //TODO Revisar
     // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO   --**VERIFICADO
     ListarPlanificacionHoraria(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

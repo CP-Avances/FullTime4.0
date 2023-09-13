@@ -26,7 +26,6 @@ export class PeriodoVacacionesService {
 
 
 
-
   // Período de Vacaciones
 
   ConsultarPerVacaciones() {
@@ -38,7 +37,7 @@ export class PeriodoVacacionesService {
   }
 
 
-  ObtenerPeriodoVacaciones(codigo: number) {
+  ObtenerPeriodoVacaciones(codigo: string | number) {
     return this.http.get<any>(`${environment.url}/perVacacion/infoPeriodo/${codigo}`);
   }
 

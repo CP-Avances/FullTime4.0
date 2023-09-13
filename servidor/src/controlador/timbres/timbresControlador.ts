@@ -175,10 +175,10 @@ class TimbresControlador {
             let timbres = await pool.query(
                 `
                 SELECT (da.nombre || ' ' || da.apellido) AS empleado, CAST(t.fec_hora_timbre AS VARCHAR), t.accion, 
-                    t.tecl_funcion, t.observacion, t.latitud, t.longitud, t.id_empleado, t.id_reloj, ubicacion, 
+                    t.tecl_funcion, t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj, ubicacion, 
                     CAST(fec_hora_timbre_servidor AS VARCHAR), dispositivo_timbre, t.id 
                 FROM timbres AS t, datos_actuales_empleado AS da
-                WHERE CAST(t.id_empleado AS VARCHAR) = $1 
+                WHERE t.codigo = $1 
                     AND CAST(t.fec_hora_timbre AS VARCHAR) LIKE $2
                     AND da.codigo = t.codigo 
                     AND da.cedula = $3
@@ -188,6 +188,7 @@ class TimbresControlador {
                     if (result.rowCount > 0) {
                         return res.status(200).jsonp({ message: 'timbres encontrados', timbres: result.rows });
                     }
+                   
                 }
                 );
             console.log('respuesta: ', timbresRows)
@@ -313,7 +314,8 @@ class TimbresControlador {
 
             if (code.length === 0) return { mensaje: 'El usuario no tiene un código asignado.' };
 
-            var codigo = parseInt(code[0].codigo);
+            // var codigo = parseInt(code[0].codigo);
+            var codigo = code[0].codigo;
 
             await pool.query(
                 `

@@ -76,11 +76,6 @@ export class PermisosService {
 
 
 
-
-
-
-
-
   // METODO DE BUSQUEDA DE PERMISOS POR ID DE EMPLEADO
   BuscarPermisoEmpleado(id_empleado: any) {
     return this.http.get(`${environment.url}/empleadoPermiso/permiso-usuario/${id_empleado}`);

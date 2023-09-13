@@ -276,7 +276,7 @@ export class EditarSolicitudComidaComponent implements OnInit {
       fechaInicio: form.fechaPlanificacionForm,
       fechaFinal: form.fechaPlanificacionForm
     }
-    this.restH.BuscarHorarioFechas(parseInt(this.empleados[0].codigo), datosHorario).subscribe(plan => {
+    this.restH.BuscarHorarioFechas(this.empleados[0].codigo, datosHorario).subscribe(plan => {
       this.ActualizarSolicitud(form);
     }, error => {
       this.toastr.info(this.empleados[0].nombre + ' ' + this.empleados[0].apellido + ' no tiene registro de horario laboral en las fechas indicadas.', '', {

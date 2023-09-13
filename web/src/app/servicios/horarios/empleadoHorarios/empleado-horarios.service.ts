@@ -110,8 +110,8 @@ export class EmpleadoHorariosService {
     return this.http.delete(`${environment.url}/empleadoHorario/eliminar/${id}`);
   }
 
-  ObtenerHorariosFechasEmpleado(id_empleado: number, data: any) {
-    return this.http.post(`${environment.url}/empleadoHorario/fechas_horario/${id_empleado}`, data)
+  ObtenerHorariosFechasEmpleado(codigo: string | number, data: any) {
+    return this.http.post(`${environment.url}/empleadoHorario/fechas_horario/${codigo}`, data)
   }
 
 
@@ -127,10 +127,10 @@ export class EmpleadoHorariosService {
   VerificarPlantilla_EmpleadoHorario(formData: any) {
     return this.http.post<any>(`${environment.url}/empleadoHorario/verificarPlantilla/upload`, formData)
   }
-  CreaPlanificacion(formData: any, id: number, codigo: number) {
+  CreaPlanificacion(formData: any, id: number, codigo: string | number) {
     return this.http.post<any>(`${environment.url}/empleadoHorario/plan_general/upload/${id}/${codigo}`, formData)
   }
-  SubirArchivoExcel(formData: any, id: number, codigo: number) {
+  SubirArchivoExcel(formData: any, id: number, codigo: string | number) {
     return this.http.post<any>(`${environment.url}/empleadoHorario/upload/${id}/${codigo}`, formData)
   }
 

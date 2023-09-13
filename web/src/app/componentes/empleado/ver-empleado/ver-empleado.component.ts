@@ -1206,9 +1206,9 @@ export class VerEmpleadoComponent implements OnInit {
             this.nameFileHorario = '';
           }
           else {
-            this.restEmpleHorario.SubirArchivoExcel(formData, parseInt(this.idEmpleado), parseInt(this.empleadoUno[0].codigo)).subscribe(resC => {
+            this.restEmpleHorario.SubirArchivoExcel(formData, parseInt(this.idEmpleado), this.empleadoUno[0].codigo).subscribe(resC => {
 
-              this.restEmpleHorario.CreaPlanificacion(formData, parseInt(this.idEmpleado), parseInt(this.empleadoUno[0].codigo)).subscribe(resP => {
+              this.restEmpleHorario.CreaPlanificacion(formData, parseInt(this.idEmpleado), this.empleadoUno[0].codigo).subscribe(resP => {
                 this.toastr.success('Operación exitosa.', 'Plantilla de Horario importada.', {
                   timeOut: 6000,
                 });
@@ -1293,7 +1293,7 @@ export class VerEmpleadoComponent implements OnInit {
       fec_inicio: fec_inicio.split('T')[0],
       fec_final: fec_final.split('T')[0],
       id_horario: horario,
-      codigo: parseInt(codigo)
+      codigo: codigo
     };
     this.restPlanGeneral.BuscarFechas(plan_fecha).subscribe(res => {
       this.id_planificacion_general = res;
@@ -1336,7 +1336,7 @@ export class VerEmpleadoComponent implements OnInit {
     let plan_fecha = {
       fec_inicio: fecha.split('T')[0],
       id_horario: horario,
-      codigo: parseInt(codigo)
+      codigo: codigo
     };
     this.restPlanGeneral.BuscarFecha(plan_fecha).subscribe(res => {
       this.id_planificacion_general = res;

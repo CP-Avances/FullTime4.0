@@ -63,7 +63,7 @@ class EmpleadoControlador {
       `
       SELECT MAX(codigo) AS codigo FROM empleados
       `
-    ); //TODO Revisar Instrucción SQL
+    ); //TODO Revisar Instrucción SQL max codigo
     if (VALOR.rowCount > 0) {
       return res.jsonp(VALOR.rows)
     }
@@ -630,7 +630,7 @@ class EmpleadoControlador {
     var contarLlenos = 0;
     var contador = 1;
     const VALOR = await pool.query('SELECT * FROM codigo');
-    //TODO Revisar
+    //TODO Revisar max codigo
     var codigo = parseInt(VALOR.rows[0].valor);
 
     plantilla.forEach(async (data: any) => {
@@ -681,7 +681,7 @@ class EmpleadoControlador {
         contarNacionalidad = contarNacionalidad + 1;
       }
 
-      //TODO Revisar
+      //TODO Revisar max codigo
       // Verificar que el código no se duplique en los registros
       codigo = codigo + 1;
       console.log('codigo_ver', codigo);
@@ -781,7 +781,7 @@ class EmpleadoControlador {
     const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
     const VALOR = await pool.query('SELECT * FROM codigo');
-    //TODO Revisar
+    //TODO Revisar max codigo
     var codigo = parseInt(VALOR.rows[0].valor);
     var contador = 1;
     plantilla.forEach(async (data: any) => {

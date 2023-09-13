@@ -170,31 +170,31 @@ export class ReportePermisosComponent implements OnInit {
   permisosHorarios: any = [];
   totalPermisos: any = [];
   permisosPlanificacion: any = [];
-  VerPermisosEmpleado(id_seleccionado, archivo, form) {
+  VerPermisosEmpleado(codigo, archivo, form) {
     this.permisosHorarios = [];
     this.permisosPlanificacion = [];
     this.totalPermisos = [];
-    this.restR.ObtenerPermisosHorarios(id_seleccionado).subscribe(dataH => {
+    this.restR.ObtenerPermisosHorarios(codigo).subscribe(dataH => {
       this.permisosHorarios = dataH;
-      this.VerPermisosInformacion(this.permisosHorarios, id_seleccionado, archivo, form);
+      this.VerPermisosInformacion(this.permisosHorarios, codigo, archivo, form);
     }, error => {
-      this.VerPermisosInformacion(this.permisosHorarios, id_seleccionado, archivo, form);
+      this.VerPermisosInformacion(this.permisosHorarios, codigo, archivo, form);
     });
   }
 
   // OBTENER DATOS DE PERMISOS DEL EMPLEADO DE ACUERDO A LA PLANIFICACIÓN
-  VerPermisosInformacion(permisos_horario: any, id_seleccionado: number, archivo: string, form) {
+  VerPermisosInformacion(permisos_horario: any, codigo: string | number, archivo: string, form) {
     if (permisos_horario.length != 0) {
       this.totalPermisos = permisos_horario;
       this.OrdenarDatos(this.totalPermisos);
-      this.VerDatosAutorizacion(id_seleccionado, archivo, form);
+      this.VerDatosAutorizacion(codigo, archivo, form);
     }
     else {
       this.toastr.info('En el periodo indicado el empleado no tiene registros de Permisos.', 'Dar click aquí, para obtener reporte, en el que se indica que no existen registros.', {
         timeOut: 10000,
       }).onTap.subscribe(obj => {
         if (archivo === 'pdf') {
-          this.PDF_Vacio('open', id_seleccionado, form);
+          this.PDF_Vacio('open', codigo, form);
           this.LimpiarFechas();
         }
       });
@@ -218,7 +218,7 @@ export class ReportePermisosComponent implements OnInit {
   // OBTENER DATOS DE LA AUTORIZACIÓN DE LOS PERMISOS
   consultaAutoriza: any = [];
   verificar: number = 0;
-  VerDatosAutorizacion(id_seleccionado: number, archivo: string, form) {
+  VerDatosAutorizacion(codigo: string | number, archivo: string, form) {
     this.verificar = 1;
     // RECORREMOS EL ARRAY DE DATOS PARA CAMBIAR EL ESTADO
     this.totalPermisos.map(obj => {
@@ -227,18 +227,18 @@ export class ReportePermisosComponent implements OnInit {
       if (obj.estado != 'Pendiente') {
         this.restGeneral.InformarEmpleadoAutoriza(obj.autoriza).subscribe(dataE => {
           // CREAMOS UN ARRAY DE DATO EN EL QUE INCLUIOS EL NOMBRE DEL EMPLEADO QUE AUTORIZO EL PERMISO
-          obj.autorizado_por = dataE[0].e_nombre + ' ' + dataE[0].e_apellido
+          obj.autorizado_por = dataE[0].fullname;
           // VERIFICAMOS SI YA ESTAN TODOS LOS DATOS Y PASAMOS A GENERAR LOS ARCHIVOS
           if (this.verificar === this.totalPermisos.length) {
             this.verificar = 1;
-            this.GenerarArchivo(archivo, id_seleccionado, form);
+            this.GenerarArchivo(archivo, codigo, form);
           }
           this.verificar = this.verificar + 1;
         });
       } else {
         if (this.verificar === this.totalPermisos.length) {
           this.verificar = 1;
-          this.GenerarArchivo(archivo, id_seleccionado, form);
+          this.GenerarArchivo(archivo, codigo, form);
         }
         this.verificar = this.verificar + 1;
       }
@@ -256,30 +256,30 @@ export class ReportePermisosComponent implements OnInit {
 
 
   // OBTENCIÓN DE LOS PERMISOS DE ACUERDO AL PERIODO DE FECHAS INDICADO
-  VerPermisosEmpleadoFecha(id_seleccionado, archivo, fechas, form) {
+  VerPermisosEmpleadoFecha(codigo, archivo, fechas, form) {
     this.permisosHorarios = [];
     this.totalPermisos = [];
-    this.restR.ObtenerPermisosHorariosFechas(id_seleccionado, fechas).subscribe(dataH => {
+    this.restR.ObtenerPermisosHorariosFechas(codigo, fechas).subscribe(dataH => {
       this.permisosHorarios = dataH;
-      this.VerificarInformacion(this.permisosHorarios, id_seleccionado, archivo, form);
+      this.VerificarInformacion(this.permisosHorarios, codigo, archivo, form);
     }, error => {
-      this.VerificarInformacion(this.permisosHorarios, id_seleccionado, archivo, form);
+      this.VerificarInformacion(this.permisosHorarios, codigo, archivo, form);
     });
   }
 
   // OBTENCIÓN DE LOS PERMISOS DE ACUERDO A LA PLANIFICACIÓN Y AL PERIODO DE FECHAS INDICADO 
-  VerificarInformacion(permisos_horario: any, id_seleccionado: number, archivo: string, form) {
+  VerificarInformacion(permisos_horario: any, codigo: string | number, archivo: string, form) {
     if (permisos_horario.length != 0) {
       this.totalPermisos = permisos_horario;
       this.OrdenarDatos(this.totalPermisos);
-      this.VerDatosAutorizacion(id_seleccionado, archivo, form);
+      this.VerDatosAutorizacion(codigo, archivo, form);
     }
     else {
       this.toastr.info('En el periodo indicado el empleado no tiene registros de Permisos.', 'Dar click aquí, para obtener reporte, en el que se indica que no existen registros.', {
         timeOut: 10000,
       }).onTap.subscribe(obj => {
         if (archivo === 'pdf') {
-          this.PDF_Vacio('open', id_seleccionado, form);
+          this.PDF_Vacio('open', codigo, form);
           this.LimpiarFechas();
         }
       });
@@ -287,9 +287,9 @@ export class ReportePermisosComponent implements OnInit {
   }
 
   // METODO PARA CONTROLAR INGRESO ADECUADO DE PERIODO DE FECHAS
-  VerPermisos(form, archivo, id_seleccionado) {
+  VerPermisos(form, archivo, codigo) {
     if (form.inicioForm === '' && form.finalForm === '' || form.inicioForm === null && form.finalForm === null) {
-      this.VerPermisosEmpleado(id_seleccionado, archivo, form);
+      this.VerPermisosEmpleado(codigo, archivo, form);
     }
     else {
       if (form.inicioForm === '' || form.finalForm === '') {
@@ -303,7 +303,7 @@ export class ReportePermisosComponent implements OnInit {
             fechaInicio: form.inicioForm,
             fechaFinal: form.finalForm
           }
-          this.VerPermisosEmpleadoFecha(id_seleccionado, archivo, fechas, form);
+          this.VerPermisosEmpleadoFecha(codigo, archivo, fechas, form);
           this.LimpiarFechas();
         }
         else {
@@ -346,8 +346,8 @@ export class ReportePermisosComponent implements OnInit {
    *                               PARA LA EXPORTACION DE ARCHIVOS PDF
    * ****************************************************************************************************/
 
-  generarPdf(action = 'open', id_seleccionado) {
-    const documentDefinition = this.getDocumentDefinicion(id_seleccionado);
+  generarPdf(action = 'open', codigo) {
+    const documentDefinition = this.getDocumentDefinicion(codigo);
 
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -359,7 +359,7 @@ export class ReportePermisosComponent implements OnInit {
 
   }
 
-  getDocumentDefinicion(id_seleccionado: number) {
+  getDocumentDefinicion(codigo: string | number) {
     sessionStorage.setItem('Administrador', this.empleadoLogueado);
     return {
 
@@ -415,14 +415,14 @@ export class ReportePermisosComponent implements OnInit {
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
         ...this.datosEmpleado.map(obj => {
-          if (obj.codigo === id_seleccionado) {
+          if (obj.codigo === codigo) {
             return [
               { text: obj.empresa.toUpperCase(), bold: true, fontSize: 25, alignment: 'center', margin: [0, -30, 0, 5] },
               { text: 'REPORTE GENERAL DE PERMISOS', fontSize: 17, alignment: 'center', margin: [0, 0, 0, 5] },
             ];
           }
         }),
-        this.presentarDatosGenerales(id_seleccionado),
+        this.presentarDatosGenerales(codigo),
         this.presentarPermisos(),
       ],
       // ESTILOS DEL ARCHIVO PDF
@@ -442,11 +442,11 @@ export class ReportePermisosComponent implements OnInit {
 
   // DATOS GENERALES DEL EMPLEADO DEL QUE SE OBTIENE EL REPORTE Y SUMATORIA DE CÁLCULOS REALIZADOS
   datosEmpleadoAutoriza: any = [];
-  presentarDatosGenerales(id_seleccionado) {
+  presentarDatosGenerales(codigo) {
     var ciudad, nombre, apellido, cedula, codigo, regimen, sucursal, departamento, cargo, totalDias = 0, totalHoras = 0, formatoHoras = '0', formatoMinutos;
     var horas_decimal, dias_decimal, horas_horario, minutosHoras, tDias, horasDias, horaT, horaTDecimalH;
     this.datosEmpleado.forEach(obj => {
-      if (obj.codigo === id_seleccionado) {
+      if (obj.codigo === codigo) {
         nombre = obj.nombre;
         apellido = obj.apellido;
         cedula = obj.cedula;
@@ -666,8 +666,8 @@ export class ReportePermisosComponent implements OnInit {
 
   // GENERACIÓN DE PDF AL NO CONTAR CON REGISTROS 
 
-  PDF_Vacio(action = 'open', id_seleccionado, form) {
-    const documentDefinition = this.GenerarSinRegstros(id_seleccionado, form);
+  PDF_Vacio(action = 'open', codigo, form) {
+    const documentDefinition = this.GenerarSinRegstros(codigo, form);
 
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -679,7 +679,7 @@ export class ReportePermisosComponent implements OnInit {
 
   }
 
-  GenerarSinRegstros(id_seleccionado: any, form) {
+  GenerarSinRegstros(codigo: any, form) {
 
     sessionStorage.setItem('Administrador', this.empleadoLogueado);
 
@@ -715,14 +715,14 @@ export class ReportePermisosComponent implements OnInit {
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
         ...this.datosEmpleado.map(obj => {
-          if (obj.codigo === id_seleccionado) {
+          if (obj.codigo === codigo) {
             return [
               { text: obj.empresa.toUpperCase(), bold: true, fontSize: 25, alignment: 'center', margin: [0, 50, 0, 5] },
               { text: 'REPORTE GENERAL DE PERMISOS', fontSize: 17, alignment: 'center', margin: [0, 0, 0, 5] },
             ];
           }
         }),
-        this.presentarDatosEmpleado(id_seleccionado, form)
+        this.presentarDatosEmpleado(codigo, form)
       ],
       // ESTILOS DEL ARCHIVO PDF
       styles: {
@@ -734,12 +734,12 @@ export class ReportePermisosComponent implements OnInit {
   }
 
   // DATOS GENERALES DEL PDF Y SUMATORIA TOTAL DE CALCULOS REALIZADOS
-  presentarDatosEmpleado(id_seleccionado, form) {
+  presentarDatosEmpleado(codigo, form) {
     // INICIALIZACIÓN DE VARIBLES
     var ciudad, nombre, apellido, cedula, codigo, sucursal, departamento, cargo, regimen;
     // BUSQUEDA DE LOS DATOS DEL EMPLEADO DEL CUAL SE OBTIENE EL REPORTE
     this.datosEmpleado.forEach(obj => {
-      if (obj.codigo === id_seleccionado) {
+      if (obj.codigo === codigo) {
         nombre = obj.nombre;
         apellido = obj.apellido;
         cedula = obj.cedula;

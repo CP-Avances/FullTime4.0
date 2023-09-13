@@ -17,8 +17,8 @@ export class ReportesService {
     return this.http.post(`${environment.url}/reporte/reporteTimbres/listaTimbres/${empleado_id}`, data);
   }
 
-  ObtenerPermisosHorarios(empleado_id: any) {
-    return this.http.get(`${environment.url}/reporte/reportePermisos/horarios/${empleado_id}`);
+  ObtenerPermisosHorarios(codigo: any) {
+    return this.http.get(`${environment.url}/reporte/reportePermisos/horarios/${codigo}`);
   }
 
   ObtenerPermisosPlanificacion(empleado_id: any) {
@@ -45,16 +45,16 @@ export class ReportesService {
     return this.http.post(`${environment.url}/reporte/reporteEntradaSalida/planificacion/${codigo}`, data);
   }
 
-  ObtenerPermisosHorariosFechas(empleado_id: any, data: any) {
-    return this.http.post(`${environment.url}/reporte/reportePermisos/fechas/horarios/${empleado_id}`, data);
+  ObtenerPermisosHorariosFechas(codigo: any, data: any) {
+    return this.http.post(`${environment.url}/reporte/reportePermisos/fechas/horarios/${codigo}`, data);
   }
 
   ObtenerPermisosPlanificacionFechas(empleado_id: any, data: any) {
     return this.http.post(`${environment.url}/reporte/reportePermisos/fechas/planificacion/${empleado_id}`, data);
   }
 
-  ObtenerPlanificacionEmpleado(empleado_id: any, data: any) {
-    return this.http.post(`${environment.url}/reporte/reporteTimbres/buscarPlan/${empleado_id}`, data);
+  ObtenerPlanificacionEmpleado(codigo: any, data: any) {
+    return this.http.post(`${environment.url}/reporte/reporteTimbres/buscarPlan/${codigo}`, data);
   }
 
   /**

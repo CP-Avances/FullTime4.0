@@ -281,6 +281,7 @@ export class ListaEmpleadosComponent implements OnInit {
     });
   }
 
+  //TODO ordenar Datos
   // ORDENAR LOS DATOS SEGUN EL  CODIGO
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {

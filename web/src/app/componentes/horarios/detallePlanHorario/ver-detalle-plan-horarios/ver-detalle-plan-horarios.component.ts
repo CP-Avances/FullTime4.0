@@ -147,7 +147,7 @@ export class VerDetallePlanHorariosComponent implements OnInit {
     let plan_fecha = {
       fec_inicio: fecha.split('T')[0],
       id_horario: horario,
-      codigo: parseInt(codigo)
+      codigo: codigo
     };
     this.restP.BuscarFecha(plan_fecha).subscribe(res => {
       this.id_planificacion_general = res;
@@ -164,7 +164,7 @@ export class VerDetallePlanHorariosComponent implements OnInit {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.EliminarDetalle(datos.id, datos.fecha, datos.id_horario, parseInt(this.empleado[0].codigo));
+          this.EliminarDetalle(datos.id, datos.fecha, datos.id_horario, this.empleado[0].codigo);
         } else {
           this.router.navigate(['/verDetalles/', this.idPlanH, this.idEmpleado]);
         }
@@ -239,7 +239,7 @@ export class VerDetallePlanHorariosComponent implements OnInit {
           }
           else {
             this.restDP.subirArchivoExcel(parseInt(this.idPlanH), formData).subscribe(resS => {
-              this.restDP.CrearPlanificacionGeneral(parseInt(this.idEmpleado), parseInt(this.empleado[0].codigo), formData).subscribe(resPG => {
+              this.restDP.CrearPlanificacionGeneral(parseInt(this.idEmpleado), this.empleado[0].codigo, formData).subscribe(resPG => {
                 this.toastr.success('Operación exitosa.', 'Plantilla de Horario importada.', {
                   timeOut: 6000,
                 });

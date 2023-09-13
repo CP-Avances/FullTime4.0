@@ -257,8 +257,8 @@ export class ReporteEntradaSalidaComponent implements OnInit {
   }
 
   // METODO para obtener timbres de entradas y salidas del empleado de acuerdo a la planificación
-  VerEntradasSalidasPlanificacion(entradas_salida_horario: any, id_seleccionado: number, archivo: string, datos_fechas, form, fechasTotales: any) {
-    this.restR.ObtenerEntradaSalidaPlanificacion(id_seleccionado, datos_fechas).subscribe((dataP: any) => {
+  VerEntradasSalidasPlanificacion(entradas_salida_horario: any, codigo: string | number, archivo: string, datos_fechas, form, fechasTotales: any) {
+    this.restR.ObtenerEntradaSalidaPlanificacion(codigo, datos_fechas).subscribe((dataP: any) => {
       this.entradaSalidaPlanificacion = dataP;
       if (entradas_salida_horario.length != 0) {
         entradas_salida_horario = entradas_salida_horario.concat(this.entradaSalidaPlanificacion);
@@ -274,7 +274,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
       }
       // this.totalAtrasos = this.totalAtrasos.sort((a, b) => new Date(a.fec_hora_timbre) > new Date(b.fec_hora_timbre));
 
-      this.GenerarArchivos(id_seleccionado, archivo, form, fechasTotales);
+      this.GenerarArchivos(codigo, archivo, form, fechasTotales);
       this.LimpiarFechas();
       this.LimpiarCampos();
     }, error => {
@@ -282,7 +282,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
         this.totalEntradasSalidas = entradas_salida_horario;
         // console.log('prueba2', this.totalEntradasSalidas);
         //  this.totalAtrasos = this.totalAtrasos.sort((a, b) => new Date(a.fec_hora_timbre) > new Date(b.fec_hora_timbre));
-        this.GenerarArchivos(id_seleccionado, archivo, form, fechasTotales);
+        this.GenerarArchivos(codigo, archivo, form, fechasTotales);
         this.LimpiarFechas();
         this.LimpiarCampos();
       }
@@ -291,7 +291,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
           timeOut: 10000,
         }).onTap.subscribe(obj => {
           if (archivo === 'pdf') {
-            this.PDF_Vacio('open', id_seleccionado, form);
+            this.PDF_Vacio('open', codigo, form);
             this.LimpiarFechas();
           }
         });
@@ -302,7 +302,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
   // Generación de reportes en formatos PDF - EXCEL
   empleadoHorario: any = [];
   empleadoPlan: any = [];
-  GenerarArchivos(id_seleccionado: number, archivo: string, form, fechasTotales: any) {
+  GenerarArchivos(codigo: string | number, archivo: string, form, fechasTotales: any) {
     let fechas = {
       fechaInicio: form.inicioForm,
       fechaFinal: form.finalForm
@@ -311,42 +311,42 @@ export class ReporteEntradaSalidaComponent implements OnInit {
     this.empleadoPlan = [];
 
     // BUSQUEDA de la lista de los horarios del empleado
-    this.restHorario.ObtenerHorariosFechasEmpleado(id_seleccionado, fechas).subscribe(data => {
+    this.restHorario.ObtenerHorariosFechasEmpleado(codigo, fechas).subscribe(data => {
       this.empleadoHorario = data;
       console.log('horario', this.empleadoHorario);
       // BUSQUEDA de la lista de las planificaciones del empleado
-      this.restPlan.ObtenerPlanHorarioEmpleadoFechas(id_seleccionado, fechas).subscribe(dataP => {
+      this.restPlan.ObtenerPlanHorarioEmpleadoFechas(codigo, fechas).subscribe(dataP => {
         this.empleadoPlan = dataP;
         console.log('plan', this.empleadoPlan);
         // Llamado a ver archivos
-        this.VerArchivos(id_seleccionado, archivo, form, fechasTotales);
+        this.VerArchivos(codigo, archivo, form, fechasTotales);
 
       }, error => {
         // Llamado a ver archivos cuando no existe horarios de planificación del empleado
-        this.VerArchivos(id_seleccionado, archivo, form, fechasTotales);
+        this.VerArchivos(codigo, archivo, form, fechasTotales);
       })
 
     }, error => {
       // BUSQUEDA de la lista de las planificaciones del empleado
-      this.restPlan.ObtenerPlanHorarioEmpleadoFechas(id_seleccionado, fechas).subscribe(dataP => {
+      this.restPlan.ObtenerPlanHorarioEmpleadoFechas(codigo, fechas).subscribe(dataP => {
         this.empleadoPlan = dataP;
         console.log('plan', this.empleadoPlan);
         // Llamado a ver archivos
-        this.VerArchivos(id_seleccionado, archivo, form, fechasTotales);
+        this.VerArchivos(codigo, archivo, form, fechasTotales);
 
       }, error => {
         // Llamado a ver archivos cuando no existe horarios de planifiación del empleado
-        this.VerArchivos(id_seleccionado, archivo, form, fechasTotales);
+        this.VerArchivos(codigo, archivo, form, fechasTotales);
       })
     })
   }
 
-  VerArchivos(id_seleccionado, archivo, form, fechasTotales) {
+  VerArchivos(codigo, archivo, form, fechasTotales) {
     if (archivo === 'pdf') {
-      this.generarPdf('open', id_seleccionado, form, fechasTotales);
+      this.generarPdf('open', codigo, form, fechasTotales);
     }
     else if (archivo === 'excel') {
-      this.exportToExcel(id_seleccionado, form, fechasTotales);
+      this.exportToExcel(codigo, form, fechasTotales);
     }
   }
 

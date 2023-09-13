@@ -43,15 +43,15 @@ export class PlanHorarioService {
     return this.http.delete(`${environment.url}/planHorario/eliminar/${id}`);
   }
 
-  ObtenerPlanHorarioEmpleadoFechas(id_empleado: number, datos: any) {
-    return this.http.post(`${environment.url}/planHorario/fechas_plan/${id_empleado}`, datos);
+  ObtenerPlanHorarioEmpleadoFechas(codigo: string | number, datos: any) {
+    return this.http.post(`${environment.url}/planHorario/fechas_plan/${codigo}`, datos);
   }
 
-  VerificarDuplicidadPlan(datos: any, codigo: number,) {
+  VerificarDuplicidadPlan(datos: any, codigo: string | number,) {
     return this.http.post(`${environment.url}/planHorario/validarFechas/${codigo}`, datos);
   }
 
-  VerificarDuplicidadPlanEdicion(id: number, codigo: number, datos: any) {
+  VerificarDuplicidadPlanEdicion(id: number, codigo: string | number, datos: any) {
     return this.http.post(`${environment.url}/planHorario/validarFechas/horarioEmpleado/${id}/empleado/${codigo}`, datos);
   }
 }

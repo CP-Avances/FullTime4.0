@@ -617,13 +617,13 @@ class EmpleadoHorariosControlador {
     }
     ObtenerHorariosEmpleadoFechas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.params;
+            const { codigo } = req.params;
             const { fechaInicio, fechaFinal } = req.body;
             const HORARIO = yield database_1.default.query('SELECT * FROM datos_empleado_cargo AS dec ' +
                 'INNER JOIN (SELECT * FROM empl_horarios) AS eh ' +
                 'ON dec.cargo_id = eh.id_empl_cargo AND dec.codigo = $1 AND dec.estado_empl = 1 ' +
                 'AND (eh.fec_inicio BETWEEN $2 AND $3 OR ' +
-                'eh.fec_final BETWEEN $2 AND $3)', [id_empleado, fechaInicio, fechaFinal]);
+                'eh.fec_final BETWEEN $2 AND $3)', [codigo, fechaInicio, fechaFinal]);
             if (HORARIO.rowCount > 0) {
                 return res.jsonp(HORARIO.rows);
             }

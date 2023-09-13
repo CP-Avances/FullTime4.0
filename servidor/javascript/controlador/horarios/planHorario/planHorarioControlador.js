@@ -128,7 +128,7 @@ class PlanHorarioControlador {
     }
     ObtenerPlanificacionEmpleadoFechas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.params;
+            const { codigo } = req.params;
             const { fechaInicio, fechaFinal } = req.body;
             const PLAN = yield database_1.default.query('SELECT * FROM datos_empleado_cargo AS dec INNER JOIN ' +
                 '(SELECT ph.id AS id_plan, ph.id_cargo, ph.fec_inicio, ph.fec_final, ' +
@@ -136,7 +136,7 @@ class PlanHorarioControlador {
                 'FROM plan_horarios AS ph, plan_hora_detalles AS phd ' +
                 'WHERE phd.id_plan_horario = ph.id) AS ph ON ' +
                 'dec.cargo_id = ph.id_cargo AND dec.codigo = $1 ' +
-                'AND ph.fecha_dia BETWEEN $2 AND $3', [id_empleado, fechaInicio, fechaFinal]);
+                'AND ph.fecha_dia BETWEEN $2 AND $3', [codigo, fechaInicio, fechaFinal]);
             if (PLAN.rowCount > 0) {
                 return res.jsonp(PLAN.rows);
             }

@@ -146,8 +146,6 @@ class PlanGeneralControlador {
         }
     }
 
-
-    //TODO Revisar
     // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO   --**VERIFICADO
     public async ListarPlanificacionHoraria(req: Request, res: Response) {
         try {

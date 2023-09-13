@@ -1462,7 +1462,7 @@ export class RegistroEmpleadoPermisoComponent implements OnInit {
       fec_inicio: form.fechaInicioForm,
       fec_final: form.fechaFinalForm,
       dia_libre: form.diaLibreForm,
-      codigo: parseInt(this.empleado.codigo),
+      codigo: this.empleado.codigo,
       estado: 1,
       dia: parseInt(form.diasForm),
     }

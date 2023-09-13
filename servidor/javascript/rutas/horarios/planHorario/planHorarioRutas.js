@@ -26,7 +26,7 @@ class PlanHorarioRutas {
         this.router.get('/datosPlanHorario/:id', verificarToken_1.TokenValidation, planHorarioControlador_1.default.EncontrarPlanHorarioPorId);
         this.router.put('/', verificarToken_1.TokenValidation, planHorarioControlador_1.default.ActualizarPlanHorario);
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, planHorarioControlador_1.default.EliminarRegistros);
-        this.router.post('/fechas_plan/:id_empleado', verificarToken_1.TokenValidation, planHorarioControlador_1.default.ObtenerPlanificacionEmpleadoFechas);
+        this.router.post('/fechas_plan/:codigo', verificarToken_1.TokenValidation, planHorarioControlador_1.default.ObtenerPlanificacionEmpleadoFechas);
     }
 }
 const PLAN_HORARIO_RUTAS = new PlanHorarioRutas();

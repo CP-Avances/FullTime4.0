@@ -299,12 +299,13 @@ export class RegistrarVacacionesComponent implements OnInit {
       fec_inicio: form.fecInicioForm,
       dia_libre: form.diaLibreForm + form.diasTForm,
       fec_final: form.fecFinalForm,
-      codigo: parseInt(this.empleados[0].codigo),
+      codigo: this.empleados[0].codigo,
       estado: 1,
     };
     console.log(datosVacaciones);
     this.restV.RegistrarVacaciones(datosVacaciones).subscribe(vacacion => {
       vacacion.EmpleadosSendNotiEmail.push(this.solInfo);
+      //TODO respuesta vacacion es solo un texto
       this.IngresarAutorizacion(vacacion);
       this.EnviarNotificacion(vacacion);
       this.EnviarCorreoEmpleados(vacacion);

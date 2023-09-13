@@ -154,6 +154,7 @@ export class CrearTimbreComponent implements OnInit {
     }
 
     if (this.data.length === undefined) {
+      console.log(' id' + this.data.id);
       timbre.id_empleado = this.data.id;
       this.ventana.close(timbre);
     }

@@ -106,17 +106,16 @@ class ReportesControlador {
              return res.status(404).jsonp({ text: 'error' });
          }
      }*/
-    //TODO BuscarPlan
     ////PLANIFICACION DE EMPLEADO CON FECHAS
     BuscarPlan(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.params;
+            const { codigo } = req.params;
             const { fechaInicio, fechaFinal } = req.body;
             const FECHAS = yield database_1.default.query('select pg.id, pg.codigo, pg.id_empl_cargo, pg.id_det_horario, pg.fec_horario, pg.fec_hora_horario, pg.tipo_entr_salida, pg.fec_hora_timbre, pg.id_horario' +
                 'FROM plan_general pg ' +
                 'WHERE pg.codigo = $3 and ' +
                 '( pg.fec_hora_horario::date between $1 and $2 ) ' +
-                'order by fec_hora_horario;', [fechaInicio, fechaFinal, id_empleado]);
+                'order by fec_hora_horario;', [fechaInicio, fechaFinal, codigo]);
             console.log("m: ", (FECHAS.rows));
             if (FECHAS.rowCount > 0) {
                 return res.jsonp(FECHAS.rows);
@@ -151,10 +150,9 @@ class ReportesControlador {
         });
     }
     ////FIN CAMBIO DE LISTAR TIMBRES
-    //TODO ListarPermisoHorarioEmpleado
     ListarPermisoHorarioEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.params;
+            const { codigo } = req.params;
             /* const DATOS = await pool.query('SELECT * FROM permisos AS p INNER JOIN ' +
                  '(SELECT h.id_horarios, ch.nombre AS nom_horario, h.id_empl_cargo, ch.hora_trabajo AS horario_horas, ' +
                  'cargo.hora_trabaja AS cargo_horas, cargo.cargo, ' +
@@ -173,7 +171,7 @@ class ReportesControlador {
                 'FROM permisos AS p, cg_tipo_permisos AS cp, autorizaciones AS a, empl_cargos AS ec ' +
                 'WHERE cp.id = p.id_tipo_permiso AND a.id_permiso = p.id AND ' +
                 'ec.id = (SELECT MAX(cargo_id) FROM datos_empleado_cargo WHERE codigo = $1) AND ' +
-                'p.codigo = $1 ORDER BY p.num_permiso ASC', [id_empleado]);
+                'p.codigo = $1 ORDER BY p.num_permiso ASC', [codigo]);
             if (DATOS.rowCount > 0) {
                 DATOS.rows.map((obj) => {
                     if (obj.id_documento != null && obj.id_documento != '' && obj.estado != 1) {
@@ -226,7 +224,7 @@ class ReportesControlador {
     }
     ListarPermisoHorarioEmpleadoFechas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.params;
+            const { codigo } = req.params;
             const { fechaInicio, fechaFinal } = req.body;
             /* const DATOS = await pool.query('SELECT * FROM permisos AS p INNER JOIN ' +
                  '(SELECT h.id_horarios, ch.nombre AS nom_horario, h.id_empl_cargo, ch.hora_trabajo AS horario_horas, ' +
@@ -248,7 +246,7 @@ class ReportesControlador {
                 'WHERE cp.id = p.id_tipo_permiso AND a.id_permiso = p.id AND ' +
                 'ec.id = (SELECT MAX(cargo_id) FROM datos_empleado_cargo WHERE codigo = $1) AND ' +
                 'p.fec_inicio::date BETWEEN $2 AND $3 AND p.codigo = $1 ' +
-                'ORDER BY p.num_permiso ASC', [id_empleado, fechaInicio, fechaFinal]);
+                'ORDER BY p.num_permiso ASC', [codigo, fechaInicio, fechaFinal]);
             if (DATOS.rowCount > 0) {
                 DATOS.rows.map((obj) => {
                     if (obj.id_documento != null && obj.id_documento != '' && obj.estado != 1) {
@@ -410,13 +408,13 @@ class ReportesControlador {
     }
     ListarEntradaSalidaPlanificaEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empleado } = req.params;
+            const { codigo } = req.params;
             const { fechaInicio, fechaFinal } = req.body;
             let DATOS;
             //false sin acciones || true con acciones
             if (req.acciones_timbres === false) {
                 // Resultados de timbres con 6 y 3 acciones
-                DATOS = yield EntradaSalidaPlanificacionConAcciones(id_empleado, fechaInicio, fechaFinal);
+                DATOS = yield EntradaSalidaPlanificacionConAcciones(codigo, fechaInicio, fechaFinal);
                 console.log('Entrada Salidas Planificacion Con Acciones: ', DATOS);
                 if (DATOS.length > 0) {
                     return res.status(200).jsonp(DATOS);
@@ -427,7 +425,7 @@ class ReportesControlador {
             }
             else {
                 // Resultados de timbres sin acciones
-                DATOS = yield EntradaSalidaPlanificacionSinAcciones(id_empleado, fechaInicio, fechaFinal);
+                DATOS = yield EntradaSalidaPlanificacionSinAcciones(codigo, fechaInicio, fechaFinal);
                 console.log('Entrada Salidas Planificacion Sin Acciones: ', DATOS);
                 if (DATOS.length > 0) {
                     return res.status(200).jsonp(DATOS);
@@ -623,7 +621,7 @@ function EntradaSalidaHorarioSinAcciones(id_empleado, fechaInicio, fechaFinal) {
         });
     });
 }
-function EntradaSalidaPlanificacionConAcciones(id_empleado, fechaInicio, fechaFinal) {
+function EntradaSalidaPlanificacionConAcciones(codigo, fechaInicio, fechaFinal) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query('SELECT * FROM timbres AS t INNER JOIN ' +
             '(SELECT * FROM datos_empleado_cargo AS e INNER JOIN ' +
@@ -639,13 +637,13 @@ function EntradaSalidaPlanificacionConAcciones(id_empleado, fechaInicio, fechaFi
             'ON t.codigo::varchar(15) = ph.codigo AND t.fec_hora_timbre::date BETWEEN $2 AND $3 ' +
             'AND t.fec_hora_timbre::date BETWEEN ph.fec_inicio AND ph.fec_final ' +
             'AND t.fec_hora_timbre::date = fecha AND ph.tipo_accion = t.accion ' +
-            'ORDER BY t.fec_hora_timbre ASC', [id_empleado, fechaInicio, fechaFinal])
+            'ORDER BY t.fec_hora_timbre ASC', [codigo, fechaInicio, fechaFinal])
             .then((result) => {
             return result.rows;
         });
     });
 }
-function EntradaSalidaPlanificacionSinAcciones(id_empleado, fechaInicio, fechaFinal) {
+function EntradaSalidaPlanificacionSinAcciones(codigo, fechaInicio, fechaFinal) {
     return __awaiter(this, void 0, void 0, function* () {
         const arrayModelado = yield database_1.default.query('SELECT * FROM timbres AS t INNER JOIN ' +
             '(SELECT * FROM datos_empleado_cargo AS e INNER JOIN ' +
@@ -661,7 +659,7 @@ function EntradaSalidaPlanificacionSinAcciones(id_empleado, fechaInicio, fechaFi
             'ON t.codigo::varchar(15) = ph.codigo AND t.fec_hora_timbre::date BETWEEN $2 AND $3 ' +
             'AND t.fec_hora_timbre::date BETWEEN ph.fec_inicio AND ph.fec_final ' +
             'AND t.fec_hora_timbre::date = fecha ' +
-            'ORDER BY t.fec_hora_timbre ASC', [id_empleado, fechaInicio, fechaFinal])
+            'ORDER BY t.fec_hora_timbre ASC', [codigo, fechaInicio, fechaFinal])
             .then((result) => {
             return result.rows;
         });
