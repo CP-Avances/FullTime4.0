@@ -19,6 +19,7 @@ export class ConfigurarCodigoComponent implements OnInit {
   HabilitarDescrip: boolean = true;
   automaticoF = false;
   manualF = false;
+  cedulaF = false;
   registrar: boolean = true;
 
   // CAMPOS FORMULARIO
@@ -48,14 +49,14 @@ export class ConfigurarCodigoComponent implements OnInit {
         this.ActualizarAutomatico(form);
       }
       else {
-        this.ActualizarManual();
-      }
+        this.ActualizarManualCedula();
+      } 
     }, error => {
       if (this.automaticoF === true) {
         this.CrearAutomatico(form);
       }
       else {
-        this.CrearManual();
+        this.CrearManualCedula();
       }
     });
   }
@@ -67,6 +68,7 @@ export class ConfigurarCodigoComponent implements OnInit {
       valor: form.inicioForm,
       manual: this.manualF,
       automatico: this.automaticoF,
+      cedula: this.cedulaF,
     }
     if (form.inicioForm != '') {
       this.rest.CrearCodigo(dataCodigo).subscribe(datos => {
@@ -85,12 +87,13 @@ export class ConfigurarCodigoComponent implements OnInit {
   }
 
   // METODO DE REGISTRO DE CODIGO MANUAL
-  CrearManual() {
+  CrearManualCedula() {
     let dataCodigo = {
       id: 1,
       valor: null,
       manual: this.manualF,
       automatico: this.automaticoF,
+      cedula: this.cedulaF,
     }
     this.rest.CrearCodigo(dataCodigo).subscribe(datos => {
       this.toastr.success('Configuración Registrada', '', {
@@ -101,6 +104,7 @@ export class ConfigurarCodigoComponent implements OnInit {
     this.Limpiar();
   }
 
+
   // METODO DE ACTUALIZACION DE CODIGO DE EMPLEADO AUTOMATICO
   ActualizarAutomatico(form: any) {
     let dataCodigo = {
@@ -108,10 +112,11 @@ export class ConfigurarCodigoComponent implements OnInit {
       valor: form.inicioForm,
       manual: this.manualF,
       automatico: this.automaticoF,
+      cedula: this.cedulaF,
     }
     if (form.inicioForm != '') {
       this.rest.ObtenerCodigoMAX().subscribe(datosE => {
-        if (parseInt(datosE[0].codigo) < parseInt(form.inicioForm)) {
+        if (parseInt(datosE[0].codigo) <= parseInt(form.inicioForm)) {
           this.rest.ActualizarCodigoTotal(dataCodigo).subscribe(datos => {
             this.toastr.success('Configuración Registrada', '', {
               timeOut: 6000,
@@ -136,12 +141,13 @@ export class ConfigurarCodigoComponent implements OnInit {
   }
 
   // METODO DE ACTUALIZACION DE CODIGO DE EMPLEADO MANUAL
-  ActualizarManual() {
+  ActualizarManualCedula() {
     let dataCodigo = {
       id: 1,
       valor: null,
       manual: this.manualF,
       automatico: this.automaticoF,
+      cedula: this.cedulaF,
     }
     this.rest.ActualizarCodigoTotal(dataCodigo).subscribe(datos => {
       this.toastr.success('Configuración Registrada', '', {
@@ -158,9 +164,15 @@ export class ConfigurarCodigoComponent implements OnInit {
     this.formulario.patchValue({
       inicioForm: this.valor_codigo
     })
+    if (this.valor_codigo=='') {
+      this.toastr.error('El registro automático solo funciona con valores numéricos', 'Existen códigos no numéricos ', {
+        timeOut: 6000,
+      })
+    }
     this.automaticoF = true;
     this.registrar = false;
     this.manualF = false;
+    this.cedulaF = false;
   }
 
   // METODO PARA OCULTAR CAMPO DE REGISTRO DE CODIGO
@@ -174,12 +186,27 @@ export class ConfigurarCodigoComponent implements OnInit {
     this.manualF = true;
   }
 
+  // METODO PARA OCULTAR CAMPO DE REGISTRO DE CODIGO AL SELECCIONAR CEDULA
+  QuitarCampoCedula() {
+    this.HabilitarDescrip = true;
+    this.formulario.patchValue({
+      inicioForm: ''
+    })
+    this.automaticoF = false;
+    this.registrar = false;
+    this.manualF = false;
+    this.cedulaF = true;
+  }
+
+  
+
   //TODO obtener codigo max
   // METODO PARA BUSCAR EL ULTIMO CODIGO REGISTRADO EN EL SISTEMA
   valor_codigo: any;
   VerUltimoCodigo() {
     this.rest.ObtenerCodigoMAX().subscribe(datosE => {
-      this.valor_codigo = parseInt(datosE[0].codigo) + 1;
+      this.valor_codigo = parseInt(datosE[0].codigo);
+
     }, error => {
       this.valor_codigo = '';
     })
@@ -208,7 +235,11 @@ export class ConfigurarCodigoComponent implements OnInit {
   // METODO DE RESETEAR VALORES EN EL FORMULARIO
   Limpiar() {
     this.formulario.reset();
-    this.QuitarCampo();
+    if (this.cedulaF === true) {
+      this.QuitarCampoCedula();
+    } else {
+      this.QuitarCampo();
+    }
   }
 
 }

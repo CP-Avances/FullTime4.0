@@ -29,6 +29,13 @@
                                                     <label>Registro manual</label>
                                                 </mat-radio-button>
                                             </div>
+                                            <div class="col">
+                                                <mat-radio-button ngDefaultControl [(ngModel)]="cedulaF"
+                                                    [checked]="cedulaF" [ngModelOptions]="{standalone: true}"
+                                                    (click)="QuitarCampoCedula()">
+                                                    <label>Registrar cédula</label>
+                                                </mat-radio-button>
+                                            </div>
                                         </div>
                                     </div>
                                 </mat-radio-group>

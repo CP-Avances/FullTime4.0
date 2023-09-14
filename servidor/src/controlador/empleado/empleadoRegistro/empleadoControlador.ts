@@ -59,27 +59,32 @@ class EmpleadoControlador {
 
   // BUSQUEDA DEL ULTIMO CODIGO REGISTRADO EN EL SISTEMA
   public async ObtenerMAXCodigo(req: Request, res: Response): Promise<any> {
-    const VALOR = await pool.query(
-      `
-      SELECT MAX(codigo) AS codigo FROM empleados
-      `
-    ); //TODO Revisar Instrucción SQL max codigo
-    if (VALOR.rowCount > 0) {
-      return res.jsonp(VALOR.rows)
+    try {
+      const VALOR = await pool.query(
+        `
+        SELECT MAX(codigo::BIGINT) AS codigo FROM empleados
+        `
+      ); //TODO Revisar Instrucción SQL max codigo
+      if (VALOR.rowCount > 0) {
+        return res.jsonp(VALOR.rows)
+      }
+      else {
+        return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+      }
+    } catch (error) {
+      return res.status(404).jsonp({ text: 'Error al obtener código máximo' });
     }
-    else {
-      return res.status(404).jsonp({ text: 'Registros no encontrados.' });
-    }
+    
   }
 
   // METODO PARA ACTUALIZAR INFORMACION DE CODIGOS
   public async ActualizarCodigoTotal(req: Request, res: Response) {
-    const { valor, automatico, manual, id } = req.body;
+    const { valor, automatico, manual, cedula,id } = req.body;
     await pool.query(
       `
-      UPDATE codigo SET valor = $1, automatico = $2, manual = $3 WHERE id = $4
+      UPDATE codigo SET valor = $1, automatico = $2, manual = $3 , cedula = $4 WHERE id = $5
       `
-      , [valor, automatico, manual, id]);
+      , [valor, automatico, manual, cedula,id]);
     res.jsonp({ message: 'Registro actualizado.' });
   }
 

@@ -54,7 +54,7 @@
                                 <mat-form-field>
                                     <mat-label>Código</mat-label>
                                     <input matInput type="text" formControlName="codigoForm" [readonly]="escritura"
-                                        (keypress)="IngresarSoloNumeros($event)" required>
+                                        (keypress)="IngresarSoloLetrasNumeros($event)" required maxlength="10">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar el código del colaborador.">
                                         help_outline
@@ -65,7 +65,8 @@
                                     <input matInput type="text" placeholder="1788300293" maxlength="10"
                                         formControlName="cedulaForm"
                                         oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                        (keypress)="IngresarSoloNumeros($event)" required>
+                                        (keypress)="IngresarSoloNumeros($event)" required
+                                        (input)="LlenarCodigo(primeroFormGroup.value)">
                                     <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                         matTooltip="Ingresar la cédula de identidad o pasaporte del colaborador.">
                                         help_outline

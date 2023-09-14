@@ -33,6 +33,7 @@ export class RegistroComponent implements OnInit {
   empleadoGuardado: any = [];
   nacionalidades: any = [];
   escritura = false;
+  cedula = false;
   roles: any = [];
   hide = true;
 
@@ -126,9 +127,15 @@ export class RegistroComponent implements OnInit {
         })
         this.escritura = true;
       }
+      else if (this.datosCodigo.cedula === true) {
+        this.cedula = true;
+        this.escritura = true;
+      }
       else {
         this.escritura = false;
+        
       }
+     
     }, error => {
       this.toastr.info('Configurar ingreso de código de usuarios.', '', {
         timeOut: 6000,
@@ -261,24 +268,15 @@ export class RegistroComponent implements OnInit {
   IngresarSoloLetras(e: any) {
     let key = e.keyCode || e.which;
     let tecla = String.fromCharCode(key).toString();
-    // SE DEFINE TODO EL ABECEDARIO QUE SE VA A USAR.
-    let letras = " áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-    // ES LA VALIDACION DEL KEYCODES, QUE TECLAS RECIBE EL CAMPO DE TEXTO.
-    let especiales = [8, 37, 39, 46, 6, 13];
-    let tecla_especial = false
-    for (var i in especiales) {
-      if (key == especiales[i]) {
-        tecla_especial = true;
-        break;
-      }
-    }
-    if (letras.indexOf(tecla) == -1 && !tecla_especial) {
-      this.toastr.info('No se admite datos numéricos', 'Usar solo letras', {
+    const patron = /^[a-zA-Z\s]*$/
+     if (!patron.test(tecla)) {
+      this.toastr.info('No se admite datos numéricos o caracteres especiales', 'Usar solo letras', {
         timeOut: 6000,
-      })
+      });
       return false;
     }
   }
+  
 
   // METODO DE VALIDACION DE INGRESO DE NUMEROS
   IngresarSoloNumeros(evt: any) {
@@ -299,6 +297,36 @@ export class RegistroComponent implements OnInit {
       return false;
     }
   }
+
+  IngresarSoloLetrasNumeros(e: any) {
+    let key = e.keyCode || e.which;
+    let tecla = String.fromCharCode(key).toString();
+    // SE DEFINE TODO EL CONJUNTO DE CARACTERES PERMITIDOS.
+    const patron = /^[a-zA-Z0-9]*$/;
+
+    if (!patron.test(tecla)) {
+      this.toastr.info('No se admite caracteres especiales', 'Usar solo letras y números', {
+        timeOut: 6000,
+      });
+      return false;
+    }
+
+    // this.LlenarCodigo(cedula,form1,tecla)
+    
+  }
+
+  LlenarCodigo(form1: any){
+   
+    if (this.cedula) {
+      let codigo:number = form1.cedulaForm;
+
+        this.primeroFormGroup.patchValue({
+          codigoForm: codigo 
+        })
+      
+    }
+  }
+  
 
   // METODO PARA LIMPIAR FORMULARIOS
   LimpiarCampos() {
