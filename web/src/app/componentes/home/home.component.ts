@@ -48,40 +48,40 @@ export class HomeComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // GRAFICA DE ASISTENCIA
-    echarts_asis.use(
-      [TooltipComponent, LegendComponent, PieChart, CanvasRenderer]
-    );
-    // GRAFICA INASISTENCIA
-    echarts_inas.use(
-      [TooltipComponent, LegendComponent, LineChart, GridComponent, CanvasRenderer]
-    );
-    // GRAFICA ATRASOS
-    echarts_retr.use(
-      [TooltipComponent, LegendComponent, BarChart, GridComponent, CanvasRenderer]
-    );
-    // GRAFICA SALIDA ANTICIPADA
-    echarts_sali.use(
-      [TooltipComponent, LegendComponent, LineChart, GridComponent, CanvasRenderer]
-    );
-    // GRAFICA MARCACIONES
-    echarts_marc.use(
-      [TooltipComponent, LegendComponent, LineChart, GridComponent, CanvasRenderer]
-    );
-    // GRAFICA HORAS EXTRAS
-    echarts_hora.use(
-      [TooltipComponent, LegendComponent, BarChart, GridComponent, CanvasRenderer]
-    );
-    // GRAFICA TIEMPO DE JORNADA 
-    echarts_tiem.use(
-      [TooltipComponent, LegendComponent, BarChart, CanvasRenderer]
-    );
-    // GRAFICA JORNADA EXTRA
-    echarts_jorn.use(
-      [TooltipComponent, LegendComponent, PieChart, CanvasRenderer]
-    );
+    // // GRAFICA DE ASISTENCIA
+    // echarts_asis.use(
+    //   [TooltipComponent, LegendComponent, PieChart, CanvasRenderer]
+    // );
+    // // GRAFICA INASISTENCIA
+    // echarts_inas.use(
+    //   [TooltipComponent, LegendComponent, LineChart, GridComponent, CanvasRenderer]
+    // );
+    // // GRAFICA ATRASOS
+    // echarts_retr.use(
+    //   [TooltipComponent, LegendComponent, BarChart, GridComponent, CanvasRenderer]
+    // );
+    // // GRAFICA SALIDA ANTICIPADA
+    // echarts_sali.use(
+    //   [TooltipComponent, LegendComponent, LineChart, GridComponent, CanvasRenderer]
+    // );
+    // // GRAFICA MARCACIONES
+    // echarts_marc.use(
+    //   [TooltipComponent, LegendComponent, LineChart, GridComponent, CanvasRenderer]
+    // );
+    // // GRAFICA HORAS EXTRAS
+    // echarts_hora.use(
+    //   [TooltipComponent, LegendComponent, BarChart, GridComponent, CanvasRenderer]
+    // );
+    // // GRAFICA TIEMPO DE JORNADA 
+    // echarts_tiem.use(
+    //   [TooltipComponent, LegendComponent, BarChart, CanvasRenderer]
+    // );
+    // // GRAFICA JORNADA EXTRA
+    // echarts_jorn.use(
+    //   [TooltipComponent, LegendComponent, PieChart, CanvasRenderer]
+    // );
 
-    this.ModeloGraficas();
+    // this.ModeloGraficas();
     this.BuscarParametro();
   }
 

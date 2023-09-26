@@ -14,6 +14,8 @@ class ReportesAsistenciasRutas {
     configuracion() {
         // LISTA DEPARTAMENTOS CON EMPLEADOS ACTIVOS O INACTIVOS
         this.router.get('/datos_generales/:estado', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.DatosGeneralesUsuarios);
+        // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR CARGOS
+        this.router.get(`/informacion-general-cargo/:estado`, verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.DatosGeneralesCargo);
         // Reportes de Atrasos
         this.router.put('/atrasos-empleados/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteAtrasosMultiple);
         // Reportes de Faltas

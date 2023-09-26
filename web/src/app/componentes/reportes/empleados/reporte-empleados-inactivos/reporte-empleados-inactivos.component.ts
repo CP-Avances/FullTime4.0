@@ -33,14 +33,17 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
 
   respuesta: any[];
   sucursales: any = [];
+  cargos: any = [];
   departamentos: any = [];
   empleados: any = [];
   bool_suc: boolean = false;
+  bool_car: boolean = false;
   bool_dep: boolean = false;
   bool_emp: boolean = false;
   data_pdf: any = [];
 
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
+  selectionCar = new SelectionModel<ITableEmpleados>(true, []);
   selectionDep = new SelectionModel<ITableEmpleados>(true, []);
   selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
 
@@ -54,6 +57,7 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
   cedula = new FormControl('', [Validators.minLength(2)]);
   nombre_emp = new FormControl('', [Validators.minLength(2)]);
   nombre_dep = new FormControl('', [Validators.minLength(2)]);
+  nombre_car = new FormControl('', [Validators.minLength(2)]);
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
 
   filtroCodigo: number;
@@ -61,6 +65,7 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
   filtroNombreEmp: '';
   filtroNombreDep: '';
   filtroNombreSuc: '';
+  filtroNombreCar: '';
 
   constructor(
     private toastr: ToastrService,
@@ -73,14 +78,14 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
 
   ngOnInit(): void {
     sessionStorage.removeItem('reporte_emp_inactivos');
-    this.R_asistencias.DepartamentosByEmplDesactivados().subscribe((res: any[]) => {
+    this.R_asistencias.DepartamentosByEmplEstado(2).subscribe((res: any[]) => {
       sessionStorage.setItem('reporte_emp_inactivos', JSON.stringify(res))
       this.sucursales = res.map(obj => {
         return {
           id: obj.id_suc,
           nombre: obj.name_suc
         }
-      });
+      }); 
 
       res.forEach(obj => {
         obj.departamentos.forEach(ele => {
@@ -98,7 +103,13 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
               id: r.id,
               nombre: r.name_empleado,
               codigo: r.codigo,
-              cedula: r.cedula
+              cedula: r.cedula,
+              correo: r.correo,
+              cargo: r.cargo,
+              id_contrato: r.id_contrato,
+              hora_trabaja: r.hora_trabaja,
+              sucursal: r.sucursal,
+              departamento: r.departamento,
             })
           })
         })
@@ -106,11 +117,52 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
       console.log('SUCURSALES', this.sucursales);
       console.log('DEPARTAMENTOS', this.departamentos);
       console.log('EMPLEADOS', this.empleados);
+      this.BuscarCargos();
+      console.log('CARGOS', this.cargos);
 
     }, err => {
+      console.log(' sucursales ' + err.error.message);
       this.toastr.error(err.error.message, '', {
         timeOut: 10000,
       })
+    })
+    
+    
+  }
+
+  // METODO PARA FILTRAR POR CARGOS
+  empleados_cargos: any = [];
+  origen_cargo: any = [];
+  BuscarCargos() {
+    this.R_asistencias.ObtenerInformacionCargo(2).subscribe((res: any[]) => {
+      this.origen_cargo = JSON.stringify(res);
+
+      console.log('ver res cargo ', res)
+      res.forEach(obj => {
+        this.cargos.push({
+          id: obj.id_cargo,
+          nombre: obj.name_cargo
+        })
+      })
+
+      res.forEach(obj => {
+        obj.empleados.forEach(r => {
+          this.empleados_cargos.push({
+            id: r.id,
+            nombre: r.name_empleado,
+            codigo: r.codigo,
+            cedula: r.cedula,
+            correo: r.correo,
+            cargo: r.cargo,
+            id_contrato: r.id_contrato,
+            hora_trabaja: r.hora_trabaja,
+            sucursal: r.sucursal,
+            departamento: r.departamento,
+          })
+        })
+      })
+    }, err => {
+      this.toastr.error(err.error.message)
     })
   }
 
@@ -119,16 +171,19 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
     this.opcion = parseInt(e.value);
     switch (e.value) {
       case '1':
-        this.bool_suc = true; this.bool_dep = false; this.bool_emp = false;
+        this.bool_suc = true; this.bool_car = false; this.bool_dep = false; this.bool_emp = false;
         break;
       case '2':
-        this.bool_suc = false; this.bool_dep = true; this.bool_emp = false;
+        this.bool_suc = false; this.bool_car = true; this.bool_dep = false; this.bool_emp = false;
         break;
       case '3':
-        this.bool_suc = false; this.bool_dep = false; this.bool_emp = true;
+        this.bool_suc = false; this.bool_car = false; this.bool_dep = true; this.bool_emp = false;
+        break;
+      case '4':
+        this.bool_suc = false; this.bool_car = false; this.bool_dep = false; this.bool_emp = true;
         break;
       default:
-        this.bool_suc = false; this.bool_dep = false; this.bool_emp = false;
+        this.bool_suc = false; this.bool_car = false; this.bool_dep = false; this.bool_emp = false;
         break;
     }
   }
@@ -139,7 +194,7 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
    */
   validacionReporte(action) {
 
-    if (this.bool_suc === false && this.bool_dep === false && this.bool_emp === false) return this.toastr.error('Seleccione un criterio de búsqueda')
+    if (this.bool_suc === false && this.bool_car === false && this.bool_dep === false && this.bool_emp === false) return this.toastr.error('Seleccione un criterio de búsqueda')
 
     switch (this.opcion) {
       case 1:
@@ -147,15 +202,19 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
         this.ModelarSucursal(action);
         break;
       case 2:
+        if (this.selectionCar.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione Cargo')
+        this.ModelarCargo(action);
+        break;
+      case 3:
         if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione departamentos')
         this.ModelarDepartamento(action);
         break;
-      case 3:
+      case 4:
         if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione empleados')
         this.ModelarEmpleados(action);
         break;
       default:
-        this.bool_suc = false; this.bool_dep = false; this.bool_emp = false;
+        this.bool_suc = false; this.bool_car = false; this.bool_dep = false; this.bool_emp = false;
         break;
     }
   }
@@ -176,6 +235,26 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
     this.data_pdf = suc;
     switch (accion) {
       case 'excel': this.exportToExcel(); break;
+      default: this.generarPdf(accion); break;
+    }
+  }
+
+  ModelarCargo(accion) {
+
+    let respuesta = JSON.parse(this.origen_cargo);
+
+    let car = respuesta.filter(o => {
+      var bool = this.selectionCar.selected.find(obj1 => {
+        return obj1.id === o.id_cargo
+      })
+      return bool != undefined
+    })
+
+    console.log('CARGO', car);
+    this.data_pdf = [];
+    this.data_pdf = car;
+    switch (accion) {
+      case 'excel': this.exportToExcelCargo(); break;
       default: this.generarPdf(accion); break;
     }
   }
@@ -340,6 +419,73 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
     let c = 0;
     let arr_emp: any = [];
 
+    if (this.bool_car === true) {
+      data.forEach((obj1) => {
+        // let array_car = obj1.empleados.map(o => {return o.empleados.length});
+        let arr_emp: any = [];
+
+        
+        n.push({
+          style: 'tableMarginSuc',
+          table: {
+            widths: ['*', '*'],
+            body: [
+              [
+                {
+                  border: [true, true, false, true],
+                  bold: true,
+                  text: 'CARGO: ' + obj1.name_cargo,
+                  style: 'itemsTableInfo'
+                },
+                {
+                  border: [false, true, true, true],
+                  text: 'N° Registros: ' + obj1.empleados.length,
+                  style: 'itemsTableInfo'
+                }
+              ]
+            ]
+          }
+        });
+
+        obj1.empleados.forEach(obj2 => {
+            arr_emp.push(obj2)
+        })
+
+        n.push({
+          style: 'tableMarginEmp',
+          table: {
+            widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto'],
+            body: [
+              [
+                { text: 'N°', style: 'tableHeader' },
+                { text: 'EMPLEADO', style: 'tableHeader' },
+                { text: 'CÉDULA', style: 'tableHeader' },
+                { text: 'CÓDIGO', style: 'tableHeader' },
+                { text: 'SUCURSAL', style: 'tableHeader' },
+                { text: 'CORREO', style: 'tableHeader' }
+              ],
+              ...arr_emp.map(obj3 => {
+                c = c + 1
+                return [
+                  { style: 'itemsTableCentrado', text: c },
+                  { style: 'itemsTable', text: obj3.name_empleado },
+                  { style: 'itemsTable', text: obj3.cedula },
+                  { style: 'itemsTable', text: obj3.codigo },
+                  { style: 'itemsTable', text: obj3.sucursal },
+                  { style: 'itemsTable', text: obj3.correo},
+                ]
+              }),
+            ]
+          },
+          layout: {
+            fillColor: function (rowIndex) {
+              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+            }
+          }
+        });
+      })
+    }
+
     data.forEach((obj: IReporteAtrasos) => {
 
       if (this.bool_suc === true) {
@@ -382,14 +528,15 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
         n.push({
           style: 'tableMarginEmp',
           table: {
-            widths: ['auto', '*', 'auto', 'auto', 'auto'],
+            widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto'],
             body: [
               [
                 { text: 'N°', style: 'tableHeader' },
                 { text: 'EMPLEADO', style: 'tableHeader' },
                 { text: 'CÉDULA', style: 'tableHeader' },
                 { text: 'CÓDIGO', style: 'tableHeader' },
-                { text: 'FECHA SALIDA', style: 'tableHeader' }
+                { text: 'CARGO', style: 'tableHeader' },
+                { text: 'CORREO', style: 'tableHeader' }
               ],
               ...arr_emp.map(obj3 => {
                 c = c + 1
@@ -398,7 +545,8 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
                   { style: 'itemsTable', text: obj3.name_empleado },
                   { style: 'itemsTable', text: obj3.cedula },
                   { style: 'itemsTable', text: obj3.codigo },
-                  { style: 'itemsTable', text: obj3.fec_final.split('T')[0] },
+                  { style: 'itemsTable', text: obj3.cargo},
+                  { style: 'itemsTable', text: obj3.correo},
                 ]
               }),
             ]
@@ -436,7 +584,10 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
         })
 
         obj.departamentos.forEach(obj1 => {
-
+          arr_emp = [];
+          obj1.empleado.forEach(e => {
+            arr_emp.push(e)
+          })
           let reg = obj1.empleado.length
           n.push({
             style: 'tableMarginDep',
@@ -462,14 +613,15 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
           n.push({
             style: 'tableMarginEmp',
             table: {
-              widths: ['auto', '*', 'auto', 'auto', 'auto'],
+              widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto'],
               body: [
                 [
                   { text: 'N°', style: 'tableHeader' },
                   { text: 'EMPLEADO', style: 'tableHeader' },
                   { text: 'CÉDULA', style: 'tableHeader' },
                   { text: 'CÓDIGO', style: 'tableHeader' },
-                  { text: 'FECHA SALIDA', style: 'tableHeader' }
+                  { text: 'CARGO', style: 'tableHeader' },
+                  { text: 'CORREO', style: 'tableHeader' }
                 ],
                 ...arr_emp.map(obj3 => {
                   c = c + 1
@@ -478,7 +630,8 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
                     { style: 'itemsTable', text: obj3.name_empleado },
                     { style: 'itemsTable', text: obj3.cedula },
                     { style: 'itemsTable', text: obj3.codigo },
-                    { style: 'itemsTable', text: obj3.fec_final.split('T')[0] },
+                    { style: 'itemsTable', text: obj3.cargo },
+                    { style: 'itemsTable', text: obj3.correo },
                   ]
                 }),
               ]
@@ -510,14 +663,15 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
       n.push({
         style: 'tableMarginEmp',
         table: {
-          widths: ['auto', '*', 'auto', 'auto', 'auto'],
+          widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto'],
           body: [
             [
               { text: 'N°', style: 'tableHeader' },
               { text: 'EMPLEADO', style: 'tableHeader' },
               { text: 'CÉDULA', style: 'tableHeader' },
               { text: 'CÓDIGO', style: 'tableHeader' },
-              { text: 'FECHA SALIDA', style: 'tableHeader' }
+              { text: 'CARGO', style: 'tableHeader' },
+              { text: 'CORREO', style: 'tableHeader' }
             ],
             ...arr_emp.map(obj3 => {
               c = c + 1
@@ -526,7 +680,8 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
                 { style: 'itemsTable', text: obj3.name_empleado },
                 { style: 'itemsTable', text: obj3.cedula },
                 { style: 'itemsTable', text: obj3.codigo },
-                { style: 'itemsTable', text: obj3.fec_final.split('T')[0] },
+                { style: 'itemsTable', text: obj3.cargo },
+                { style: 'itemsTable', text: obj3.cargo },
               ]
             }),
           ]
@@ -564,6 +719,7 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
 
   MapingDataPdfDefault(array: Array<any>) {
     let nuevo: Array<any> = [];
+    console.log(array);
     array.forEach((obj1: IReporteAtrasos) => {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach(obj3 => {
@@ -573,10 +729,36 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
             'Id Sucursal': obj1.id_suc, 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
             'Id Departamento': obj2.id_depa, 'Departamento': obj2.name_dep,
             'Id Empleado': obj3.id, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
-            'Género': obj3.genero, 'Fecha termino Cargo': obj3.fec_final
+            'Género': obj3.genero, 'Cargo': obj3.cargo
           }
           nuevo.push(ele)
         })
+      })
+    })
+    return nuevo
+  }
+
+  exportToExcelCargo(): void {
+
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefaultCargo(this.data_pdf));
+    const wb: xlsx.WorkBook = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(wb, wsr, 'Empleados Inactivos');
+    xlsx.writeFile(wb, "Empleados Inactivos " + new Date().getTime() + '.xlsx');
+
+  }
+
+  MapingDataPdfDefaultCargo(array: Array<any>) {
+    let nuevo: Array<any> = [];
+    array.forEach((obj1) => {
+      obj1.empleados.forEach(obj2 => {
+          let ele = {
+            'Ciudad': obj2.ciudad,
+            'Sucursal': obj2.sucursal,
+            'Departamento': obj2.departamento,
+            'Id Empleado': obj2.id, 'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
+            'Género': obj2.genero, 'Cargo': obj2.cargo
+          }
+          nuevo.push(ele)
       })
     })
     return nuevo
@@ -602,6 +784,27 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
       return `${this.isAllSelectedSuc() ? 'select' : 'deselect'} all`;
     }
     return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedCar() {
+    const numSelected = this.selectionCar.selected.length;
+    return numSelected === this.cargos.length
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterToggleCar() {
+    this.isAllSelectedCar() ?
+      this.selectionCar.clear() :
+      this.cargos.forEach(row => this.selectionCar.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelCar(row?: ITableEmpleados): string {
+    if (!row) {
+      return `${this.isAllSelectedCar() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selectionCar.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
@@ -707,6 +910,10 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
       this.nombre_dep.reset();
       this.bool_dep = false;
     }
+    if (this.bool_car) {
+      this.nombre_car.reset();
+      this.bool_car = false;
+    }
     if (this.bool_suc) {
       this.nombre_suc.reset();
       this.bool_suc = false;
@@ -720,11 +927,15 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
       this.nombre_suc.reset();
       //this.Filtrar('', 1)
     }
-    else if (this.opcion === 2) {
+    if (this.opcion === 2) {
+      this.nombre_car.reset();
+      //this.Filtrar('', 1)
+    }
+    else if (this.opcion === 3) {
       this.nombre_dep.reset();
       // this.Filtrar('', 2)
     }
-    else if (this.opcion === 3) {
+    else if (this.opcion === 4) {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();
@@ -733,5 +944,4 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
       this.Filtrar('', 5)*/
     }
   }
-
 }

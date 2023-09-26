@@ -20,15 +20,13 @@ export class ReportesAsistenciasService {
 
 
 
-
-
-
-
-
-
-  DepartamentosByEmplDesactivados() {
-    const estado = 2; // 2 = desactivo 
+  DepartamentosByEmplEstado(estado: any) {
     return this.http.get<any>(`${environment.url}/reportes-asistencias/datos_generales/${estado}`);
+  }
+
+  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR CARGOS
+  ObtenerInformacionCargo(estado: any) {
+    return this.http.get<any>(`${environment.url}/reportes-asistencias/informacion-general-cargo/${estado}`);
   }
 
   ReporteAtrasosMultiples(data: any, desde: string, hasta: string) {

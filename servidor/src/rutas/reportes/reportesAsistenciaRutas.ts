@@ -14,7 +14,8 @@ class ReportesAsistenciasRutas {
         // LISTA DEPARTAMENTOS CON EMPLEADOS ACTIVOS O INACTIVOS
         this.router.get('/datos_generales/:estado', TokenValidation, REPORTE_A_CONTROLADOR.DatosGeneralesUsuarios);
 
-
+         // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR CARGOS
+         this.router.get(`/informacion-general-cargo/:estado`, TokenValidation, REPORTE_A_CONTROLADOR.DatosGeneralesCargo);
 
 
 

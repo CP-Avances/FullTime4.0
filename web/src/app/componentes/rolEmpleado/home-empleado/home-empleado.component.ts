@@ -45,22 +45,22 @@ export class HomeEmpleadoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    echarts_hora.use(
-      [TooltipComponent, LegendComponent, BarChart, GridComponent, CanvasRenderer]
-    );
-    echarts_perm.use(
-      [TooltipComponent, LegendComponent, BarChart, GridComponent, CanvasRenderer]
-    );
-    echarts_vaca.use(
-      [TooltipComponent, LegendComponent, BarChart, GridComponent, CanvasRenderer]
-    );
-    echarts_atra.use(
-      [TooltipComponent, LegendComponent, BarChart, GridComponent, CanvasRenderer]
-    );
+    // echarts_hora.use(
+    //   [TooltipComponent, LegendComponent, BarChart, GridComponent, CanvasRenderer]
+    // );
+    // echarts_perm.use(
+    //   [TooltipComponent, LegendComponent, BarChart, GridComponent, CanvasRenderer]
+    // );
+    // echarts_vaca.use(
+    //   [TooltipComponent, LegendComponent, BarChart, GridComponent, CanvasRenderer]
+    // );
+    // echarts_atra.use(
+    //   [TooltipComponent, LegendComponent, BarChart, GridComponent, CanvasRenderer]
+    // );
 
     this.BuscarParametro();
     this.SaldoVacaciones();
-    this.ModeloGraficas();
+    // this.ModeloGraficas();
   }
 
   /** **************************************************************************************** **

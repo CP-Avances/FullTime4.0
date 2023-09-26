@@ -1,94 +1,291 @@
-<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;">
+<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;">
     <div id="titulo">
         <span>REPORTE DE USUARIOS ACTIVOS</span>
     </div>
     <br>
     <div class="row">
-        <div class="col-lg">
+        <div class="col-lg-5">
             <div id="titulo">
                 <span>OPCIONES DE DESCARGA</span>
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
-                    <button mat-icon-button (click)="ListaEmpleadosDetallado('open')">
+                    <button mat-icon-button (click)="validacionReporte('open')">
                         <mat-icon class="i-pdf" matTooltipPosition="right"
                             matTooltip="Previsualizar reporte en el navegador en fomato PDF.">picture_as_pdf
                         </mat-icon>
                     </button>
-                    <button mat-icon-button (click)="ListaEmpleadosDetallado('download')">
+                    <button mat-icon-button (click)="validacionReporte('print')">
+                        <mat-icon class="i-print" matTooltipPosition="right"
+                            matTooltip="Imprimir reporte en formato PDF.">local_printshop</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="validacionReporte('download')">
                         <mat-icon class="i-download" matTooltipPosition="right"
                             matTooltip="Descargar reporte en formato PDF.">cloud_download</mat-icon>
                     </button>
-                    <button mat-icon-button (click)="exportToExcelListaEmpleados()">
+                    <button mat-icon-button (click)="validacionReporte('excel')">
                         <mat-icon class="fas fa-file-excel i-excel" matTooltipPosition="right"
                             matTooltip="Descargar reporte en formato EXCEL."></mat-icon>
                     </button>
-                    <button id="opciones" mat-icon-button (click)="ConfiguracionReporteEmpleados()">
-                        <mat-icon style="margin-top: -8px; color: black;" matSuffix matTooltipPosition="right"
-                            matTooltip="Seleccionar datos que se visualizarán en el reporte.">settings</mat-icon>
-                    </button>
+                </div>
+            </mat-card>
+        </div>
+        <div class="col-lg-7" style="margin-bottom: 10px;">
+            <div id="titulo">
+                <span>CRÍTERIOS DE BÚSQUEDA</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9">
+                <form >
+                    <mat-radio-group class="d-flex flex-wrap justify-content-center" [formControl]="seleccion"
+                        (change)="BuscarPorTipo($event)">
+                        <mat-radio-button value="1">Sucursales</mat-radio-button>
+                        <mat-radio-button value="2">Cargo</mat-radio-button>
+                        <mat-radio-button value="3">Departamentos</mat-radio-button>
+                        <mat-radio-button value="4">Empleados</mat-radio-button>
+                    </mat-radio-group>
+                </form>
+                <!-- Form para SUCURSALES -->
+                <form  *ngIf="bool_suc">
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <mat-form-field>
+                            <mat-label>Sucursal</mat-label>
+                            <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreSuc"
+                                [formControl]="nombre_suc" type="text" (keypress)="IngresarSoloLetras($event)">
+                            <mat-error *ngIf="nombre_suc.invalid">Indispensable ingresar dos letras
+                            </mat-error>
+                            <mat-icon matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda de sucursales por nombre.">
+                                help_outline</mat-icon>
+                        </mat-form-field>
+                    </div>
+                </form>
+                <!-- Form para CARGOS -->
+                <form  *ngIf="bool_car">
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <mat-form-field>
+                            <mat-label>Cargo</mat-label>
+                            <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreCar"
+                                [formControl]="nombre_car" type="text" (keypress)="IngresarSoloLetras($event)">
+                            <mat-error *ngIf="nombre_car.invalid">Indispensable ingresar dos letras
+                            </mat-error>
+                            <mat-icon matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda de cargo por nombre.">
+                                help_outline</mat-icon>
+                        </mat-form-field>
+                    </div>
+                </form>
+                <!-- Form para DEPARTAMENTOS -->
+                <form  *ngIf="bool_dep">
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <mat-form-field>
+                            <mat-label>Departamento</mat-label>
+                            <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreDep"
+                                [formControl]="nombre_dep" type="text" (keypress)="IngresarSoloLetras($event)">
+                            <mat-error *ngIf="nombre_dep.invalid">Indispensable ingresar dos letras
+                            </mat-error>
+                            <mat-icon matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda de departamentos por nombre.">
+                                help_outline</mat-icon>
+                        </mat-form-field>
+                    </div>
+                </form>
+                <!-- Form para EMPLEADOS -->
+                <form  *ngIf="bool_emp">
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <mat-form-field>
+                            <mat-label>Código</mat-label>
+                            <input matInput placeholder="Buscar" [(ngModel)]="filtroCodigo" [formControl]="codigo"
+                                (keypress)="IngresarSoloNumeros($event)">
+                            <mat-icon matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda de datos de empleado por código.">
+                                help_outline</mat-icon>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label>CI o pasaporte</mat-label>
+                            <input matInput placeholder="Buscar" [(ngModel)]="filtroCedula" maxlength="10"
+                                oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
+                            <mat-error *ngIf="cedula.invalid">Indispensable ingresar dos valores
+                            </mat-error>
+                            <mat-icon matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda de datos de empleado por cédula de identificación o pasaporte.">
+                                help_outline</mat-icon>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label>Nombres</mat-label>
+                            <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreEmp"
+                                [formControl]="nombre_emp" type="text" (keypress)="IngresarSoloLetras($event)">
+                            <mat-error *ngIf="nombre_emp.invalid">Indispensable ingresar dos letras
+                            </mat-error>
+                            <mat-icon matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda de datos de empleado por nombre.">
+                                help_outline</mat-icon>
+                        </mat-form-field>
+                    </div>
+                </form>
+                <div class="d-flex justify-content-around" style="margin-bottom: 5px;">
+                    <button mat-raised-button id="btn-raised" type="submit" id="boton"
+                        (click)="limpiarCampos()">Cancelar</button>
                 </div>
             </mat-card>
         </div>
     </div>
 </div>
 <div class="container" style="padding-bottom: 50px; text-align: center;">
-    <div class="mat-elevation-z8" style="background: white;">
-        <div id="titulo">LISTA DE USUARIOS ACTIVOS</div>
+    <!-- TABLA PARA SUCURSALES -->
+    <div *ngIf="bool_suc" class="mat-elevation-z8" style="background: white;">
+                        <div class="d-flex bd-highlight" id="resultados">
+                    <span class="w-100 bd-highlight">
+                        RESULTADO SUCURSALES</span>
+                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                        (click)="MostrarLista()">Mostrar lista</button>
+                </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th scope="col">Código</th>
+                        <th>
+                            <mat-checkbox (change)="$event ? masterToggleSuc() : null"
+                                [checked]="selectionSuc.hasValue() && isAllSelectedSuc()"
+                                [indeterminate]="selectionSuc.hasValue() && !isAllSelectedSuc()"
+                                [aria-label]="checkboxLabelSuc()">
+                            </mat-checkbox>
+                        </th>
                         <th scope="col">Nombre</th>
-                        <th scope="col">Apellido</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let s of sucursales | emplNombre: filtroNombreSuc | paginate:tamanio_pagina:numero_pagina">
+                        <td>
+                            <mat-checkbox (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionSuc.toggle(s) : null" [checked]="selectionSuc.isSelected(s)"
+                                [aria-label]="checkboxLabelSuc(s)">
+                            </mat-checkbox>
+                        </td>
+                        <td>{{s.nombre}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
+            id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+        <br>
+    </div>
+    <!-- TABLA PARA CARGOS -->
+    <div *ngIf="bool_car" class="mat-elevation-z8" style="background: white;">
+                        <div class="d-flex bd-highlight" id="resultados">
+                    <span class="w-100 bd-highlight">
+                        RESULTADO CARGOS</span>
+                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                        (click)="MostrarLista()">Mostrar lista</button>
+                </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th>
+                            <mat-checkbox (change)="$event ? masterToggleCar() : null"
+                                [checked]="selectionCar.hasValue() && isAllSelectedCar()"
+                                [indeterminate]="selectionCar.hasValue() && !isAllSelectedCar()"
+                                [aria-label]="checkboxLabelCar()">
+                            </mat-checkbox>
+                        </th>
+                        <th scope="col">Nombre</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let c of cargos | emplNombre: filtroNombreCar | paginate:tamanio_pagina:numero_pagina">
+                        <td>
+                            <mat-checkbox (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionCar.toggle(c) : null" [checked]="selectionCar.isSelected(c)"
+                                [aria-label]="checkboxLabelCar(c)">
+                            </mat-checkbox>
+                        </td>
+                        <td>{{c.nombre}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
+            id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+        <br>
+    </div>
+    <!-- TABLA PARA DEPARTAMENTOS -->
+    <div *ngIf="bool_dep" class="mat-elevation-z8" style="background: white;">
+                        <div class="d-flex bd-highlight" id="resultados">
+                    <span class="w-100 bd-highlight">
+                        RESULTADO DEPARTAMENTOS</span>
+                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                        (click)="MostrarLista()">Mostrar lista</button>
+                </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th>
+                            <mat-checkbox (change)="$event ? masterToggleDep() : null"
+                                [checked]="selectionDep.hasValue() && isAllSelectedDep()"
+                                [indeterminate]="selectionDep.hasValue() && !isAllSelectedDep()"
+                                [aria-label]="checkboxLabelDep()">
+                            </mat-checkbox>
+                        </th>
+                        <th scope="col">Nombre</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let d of departamentos | emplNombre: filtroNombreDep | paginate:tamanio_pagina:numero_pagina">
+                        <td>
+                            <mat-checkbox (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionDep.toggle(d) : null" [checked]="selectionDep.isSelected(d)"
+                                [aria-label]="checkboxLabelDep(d)">
+                            </mat-checkbox>
+                        </td>
+                        <td>{{d.nombre}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="departamentos.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
+            id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+        <br>
+    </div>
+    <!-- TABLA PARA EMPLEADOS -->
+    <div *ngIf="bool_emp" class="mat-elevation-z8" style="background: white;">
+        <div id="titulo">LISTA DE USUARIOS</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th>
+                            <mat-checkbox (change)="$event ? masterToggleEmp() : null"
+                                [checked]="selectionEmp.hasValue() && isAllSelectedEmp()"
+                                [indeterminate]="selectionEmp.hasValue() && !isAllSelectedEmp()"
+                                [aria-label]="checkboxLabelEmp()">
+                            </mat-checkbox>
+                        </th>
+                        <th scope="col">Codigo</th>
+                        <th scope="col">Nombre</th>
                         <th scope="col">Cédula</th>
                         <th scope="col">Correo</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>
-                            <mat-form-field id="t-inputs">
-                                <mat-label>Código</mat-label>
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCodigo" [formControl]="codigo"
-                                    (keypress)="IngresarSoloNumeros($event)">
-                            </mat-form-field>
-                        </td>
-                        <td>
-                            <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombre" [formControl]="nombre"
-                                    type="text" (keypress)="IngresarSoloLetras($event)">
-                            </mat-form-field>
-                        </td>
-                        <td>
-                            <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroApellido"
-                                    [formControl]="apellido" type="text" (keypress)="IngresarSoloLetras($event)">
-                            </mat-form-field>
-                        </td>
-                        <td>
-                            <mat-form-field id="t-inputs">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCedula" maxlength="10"
-                                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
-                            </mat-form-field>
-                        </td>
-                        <td>
-                            <mat-icon id="limpiar" (click)="limpiarCampos()" matSuffix matTooltipPosition="right"
-                                matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
-                                format_clear
-                            </mat-icon>
-                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
-                                matTooltip="Búsqueda de datos de empleado de acuerdo a las columnas de la tabla.">
-                                help_outline</mat-icon>
-                        </td>
-                    </tr>
                     <tr
-                        *ngFor="let e of empleados | emplCodigo: filtroCodigo | emplCedula: filtroCedula | emplNombre: filtroNombre | emplApellido: filtroApellido | paginate:tamanio_pagina:numero_pagina">
-                        <th scope="row">{{e.codigo}}</th>
+                        *ngFor="let e of empleados | emplCodigo: filtroCodigo | emplCedula: filtroCedula | emplNombre: filtroNombreEmp | paginate:tamanio_pagina:numero_pagina">
+                        <td>
+                            <mat-checkbox (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionEmp.toggle(e) : null" [checked]="selectionEmp.isSelected(e)"
+                                [aria-label]="checkboxLabelEmp(e)">
+                            </mat-checkbox>
+                        </td>
+                        <td>{{e.codigo}}</td>
                         <td>{{e.nombre}}</td>
-                        <td>{{e.apellido}}</td>
                         <td>{{e.cedula}}</td>
                         <td>{{e.correo}}</td>
                     </tr>

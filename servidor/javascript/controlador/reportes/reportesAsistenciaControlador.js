@@ -56,33 +56,43 @@ class ReportesAsistenciaControlador {
                 obj.departamentos = yield Promise.all(obj.departamentos.map((ele) => __awaiter(this, void 0, void 0, function* () {
                     if (estado === '1') {
                         ele.empleado = yield database_1.default.query(`
-                        SELECT DISTINCT e.id, CONCAT(nombre, ' ' , apellido)
-                            name_empleado, e.codigo, e.cedula, e.genero, e.correo, cn.comunicado_mail,
-                            cn.comunicado_noti 
-                        FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
-                            config_noti AS cn 
-                        WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE da.id = e.id)  
-                            AND ca.id_departamento = $1 
-                            AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.id = e.id)  
-                            AND e.id = cn.id_empleado 
-                            AND co.id_regimen = r.id AND e.estado = $2
-                            AND (cn.comunicado_mail = true OR cn.comunicado_noti = true)
+                        SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
+                            e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo,
+                            co.id AS id_contrato, d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
+                            s.nombre AS sucursal, ca.hora_trabaja
+                        FROM empl_cargos AS ca, empl_contratos AS co, empleados AS e,
+                            tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s
+                        WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
+                            da.id = e.id) 
+                            AND tc.id = ca.cargo
+                            AND ca.id_departamento = $1
+                            AND ca.id_departamento = d.id
+                            AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
+                            da.id = e.id) 
+                            AND s.id = d.id_sucursal
+                            AND e.estado = $2
+                        ORDER BY name_empleado ASC
                         `, [ele.id_depa, estado])
                             .then((result) => { return result.rows; });
                     }
                     else {
                         ele.empleado = yield database_1.default.query(`
-                        SELECT DISTINCT e.id, CONCAT(nombre, ' ' , apellido)
-                            name_empleado, e.codigo, e.cedula, e.genero, e.correo, cn.comunicado_mail,
-                            cn.comunicado_noti, ca.fec_final
-                        FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
-                            config_noti AS cn 
-                        WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE da.id = e.id)  
-                            AND ca.id_departamento = $1 
-                            AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE da.id = e.id)  
-                            AND e.id = cn.id_empleado 
-                            AND co.id_regimen = r.id AND e.estado = $2
-                            AND (cn.comunicado_mail = true OR cn.comunicado_noti = true)
+                        SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
+                            e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo,
+                            co.id AS id_contrato, d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
+                            s.nombre AS sucursal, ca.hora_trabaja, e.estado AS estado
+                        FROM empl_cargos AS ca, empl_contratos AS co, empleados AS e,
+                            tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s
+                        WHERE ca.id = (SELECT de.cargo_id FROM datos_empleado_cargo AS de WHERE 
+                            de.empl_id = e.id) 
+                            AND tc.id = ca.cargo
+                            AND ca.id_departamento = $1
+                            AND ca.id_departamento = d.id
+                            AND co.id = (SELECT de.contrato_id FROM datos_empleado_cargo AS de WHERE 
+                                de.empl_id = e.id) 
+                            AND s.id = d.id_sucursal
+                            AND e.estado = $2
+                        ORDER BY name_empleado ASC
                         `, [ele.id_depa, estado])
                             .then((result) => { return result.rows; });
                     }
@@ -103,6 +113,72 @@ class ReportesAsistenciaControlador {
             if (respuesta.length === 0)
                 return res.status(404)
                     .jsonp({ message: 'Usuarios no han configurado recepción de notificaciones de comunicados.' });
+            return res.status(200).jsonp(respuesta);
+        });
+    }
+    DatosGeneralesCargo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let estado = req.params.estado;
+            // CONSULTA DE BUSQUEDA DE CARGOS
+            let cargo = yield database_1.default.query(`
+            SELECT tc.id AS id_cargo, tc.cargo AS name_cargo
+            FROM tipo_cargo AS tc 
+            ORDER BY tc.cargo ASC
+            `).then((result) => { return result.rows; });
+            if (cargo.length === 0)
+                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+            // CONSULTA DE BUSQUEDA DE EMPLEADOS
+            let empleados = yield Promise.all(cargo.map((empl) => __awaiter(this, void 0, void 0, function* () {
+                if (estado === '1') {
+                    empl.empleados = yield database_1.default.query(`
+                    SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
+                        e.cedula, e.genero, e.correo, e.estado, ca.id AS id_cargo, tc.cargo,
+                        d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
+                        s.nombre AS sucursal, ca.hora_trabaja, c.descripcion AS ciudad
+                    FROM empleados e, empl_cargos AS ca, tipo_cargo AS tc,
+                        cg_departamentos AS d, sucursales AS s, ciudades AS c
+                    WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
+                        da.id = e.id)
+                        AND ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
+                        da.id = e.id) 
+                        AND ca.id_departamento = d.id
+                        AND s.id = d.id_sucursal
+                        AND s.id_ciudad = c.id
+                        AND tc.id = ca.cargo
+                        AND ca.cargo = $1
+                        AND e.estado = $2
+                    ORDER BY name_empleado ASC
+                    `, [empl.id_cargo, estado]).then((result) => { return result.rows; });
+                }
+                else {
+                    empl.empleados = yield database_1.default.query(`
+                   SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
+                        e.cedula, e.genero, e.correo, e.estado, ca.id AS id_cargo, tc.cargo,
+                        d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
+                        s.nombre AS sucursal, ca.hora_trabaja, c.descripcion AS ciudad
+                    FROM empleados e, empl_cargos AS ca, tipo_cargo AS tc,
+                        cg_departamentos AS d, sucursales AS s, ciudades AS c
+                    WHERE ca.id = (SELECT de.cargo_id FROM datos_empleado_cargo AS de WHERE 
+                        de.empl_id = e.id)
+                        AND ca.id = (SELECT de.contrato_id FROM datos_empleado_cargo AS de WHERE 
+                            de.empl_id = e.id) 
+                        AND ca.id_departamento = d.id
+                        AND s.id = d.id_sucursal
+                        AND s.id_ciudad = c.id
+                        AND tc.id = ca.cargo
+                        AND ca.cargo = $1
+                        AND e.estado = $2
+                    ORDER BY name_empleado ASC
+                    `, [empl.id_cargo, estado])
+                        .then((result) => { return result.rows; });
+                }
+                return empl;
+            })));
+            let respuesta = empleados.filter((obj) => {
+                return obj.empleados.length > 0;
+            });
+            if (respuesta.length === 0)
+                return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
             return res.status(200).jsonp(respuesta);
         });
     }
