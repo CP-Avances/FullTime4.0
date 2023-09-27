@@ -19,10 +19,11 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
   nombre_emp = new FormControl('', [Validators.minLength(2)]);
   nombre_dep = new FormControl('', [Validators.minLength(2)]);
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
+  nombre_cargo = new FormControl('', [Validators.minLength(2)]);
   seleccion = new FormControl('');
 
   filtroNombreSuc: string = '';
-
+  filtroNombreCargo: string = '';
   filtroNombreDep: string = '';
 
   filtroCodigo: number;
@@ -38,6 +39,7 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
   filtroNombreInc: string = '';
 
   public _booleanOptions: FormCriteriosBusqueda = {
+    bool_cargo: false,
     bool_suc: false,
     bool_dep: false,
     bool_emp: false,
@@ -57,7 +59,7 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     console.log('atributo', this.num_option);
 
-    this.check = this.reporteService.checkOptions(this.num_option);
+    this.check = this.reporteService.checkOptionsN(this.num_option);
     console.log('CHECK ', this.check);
 
   }
@@ -71,40 +73,48 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
 
   }
 
-  opcion: number;
+  opcion: string;
   BuscarPorTipo(e: MatRadioChange) {
     console.log('CHECK ', e.value);
     this.opcion = e.value;
     switch (this.opcion) {
-      case 1:
+      case 's':
         this._booleanOptions.bool_suc = true;
         this._booleanOptions.bool_dep = false;
         this._booleanOptions.bool_emp = false;
         this._booleanOptions.bool_tab = false;
         this._booleanOptions.bool_inc = false;
         break;
-      case 2:
+      case 'c':
+        this._booleanOptions.bool_cargo = true;
+        this._booleanOptions.bool_suc = false;
+        this._booleanOptions.bool_dep = false;
+        this._booleanOptions.bool_emp = false;
+        this._booleanOptions.bool_tab = false;
+        this._booleanOptions.bool_inc = false;
+        break;
+      case 'd':
         this._booleanOptions.bool_suc = false;
         this._booleanOptions.bool_dep = true;
         this._booleanOptions.bool_emp = false;
         this._booleanOptions.bool_tab = false;
         this._booleanOptions.bool_inc = false;
         break;
-      case 3:
+      case 'e':
         this._booleanOptions.bool_suc = false;
         this._booleanOptions.bool_dep = false;
         this._booleanOptions.bool_emp = true;
         this._booleanOptions.bool_tab = false;
         this._booleanOptions.bool_inc = false;
         break;
-      case 4:
+      case 't':
         this._booleanOptions.bool_suc = false;
         this._booleanOptions.bool_dep = false;
         this._booleanOptions.bool_emp = false;
         this._booleanOptions.bool_tab = true;
         this._booleanOptions.bool_inc = false;
         break;
-      case 5:
+      case 'i':
         this._booleanOptions.bool_suc = false;
         this._booleanOptions.bool_dep = false;
         this._booleanOptions.bool_emp = false;
@@ -112,6 +122,7 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
         this._booleanOptions.bool_inc = true;
         break;
       default:
+        this._booleanOptions.bool_cargo = false;
         this._booleanOptions.bool_suc = false;
         this._booleanOptions.bool_dep = false;
         this._booleanOptions.bool_emp = false;
@@ -120,23 +131,24 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
         break;
     }
     this.reporteService.GuardarFormCriteriosBusqueda(this._booleanOptions);
-    //this.reporteService.GuardarCheckOpcion(this.opcion)
+    this.reporteService.GuardarCheckOpcion(this.opcion)
 
   }
 
   Filtrar(e, orden: number) {
     switch (orden) {
       case 1: this.reporteService.setFiltroNombreSuc(e); break;
-      case 2: this.reporteService.setFiltroNombreDep(e); break;
-      case 3: this.reporteService.setFiltroCodigo(e); break;
-      case 4: this.reporteService.setFiltroCedula(e); break;
-      case 5: this.reporteService.setFiltroNombreEmp(e); break;
-      case 6: this.reporteService.setFiltroCodigo_tab(e); break;
-      case 7: this.reporteService.setFiltroCedula_tab(e); break;
-      case 8: this.reporteService.setFiltroNombreTab(e); break;
-      case 9: this.reporteService.setFiltroCodigo_inc(e); break;
-      case 10: this.reporteService.setFiltroCedula_inc(e); break;
-      case 11: this.reporteService.setFiltroNombreInc(e); break;
+      case 2: this.reporteService.setFiltroNombreCarg(e); break;
+      case 3: this.reporteService.setFiltroNombreDep(e); break;
+      case 4: this.reporteService.setFiltroCodigo(e); break;
+      case 5: this.reporteService.setFiltroCedula(e); break;
+      case 6: this.reporteService.setFiltroNombreEmp(e); break;
+      case 7: this.reporteService.setFiltroCodigo_tab(e); break;
+      case 8: this.reporteService.setFiltroCedula_tab(e); break;
+      case 9: this.reporteService.setFiltroNombreTab(e); break;
+      case 10: this.reporteService.setFiltroCodigo_inc(e); break;
+      case 11: this.reporteService.setFiltroCedula_inc(e); break;
+      case 12: this.reporteService.setFiltroNombreInc(e); break;
       default:
         break;
     }
@@ -166,6 +178,10 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
     if (this._booleanOptions.bool_suc) {
       this.nombre_suc.reset();
       this._booleanOptions.bool_suc = false;
+    }
+    if (this._booleanOptions.bool_cargo) {
+      this.nombre_cargo.reset();
+      this._booleanOptions.bool_cargo = false;
     }
     this.seleccion.reset();
   }

@@ -99,6 +99,11 @@ export class ReportesService {
     return valores;
   }
 
+  checkOptionsN(num_items: number): checkOptions[] {
+    const valores: checkOptions[] = this._check.slice(0, num_items);
+    return valores;
+  }
+
   /**
    * EL NUMERO DE LA OPCION ESCOGIDA YA SEA (SUCURSAL, DEPARTAMENTO, EMPLEADO, TABULADO ?, INCOMPLETO ?)
    */
@@ -212,6 +217,7 @@ export class ReportesService {
 
   DefaultValoresFiltros() {
     this._filtroNombreSuc = '';
+    this._filtroNombreCarg = '';
     this._filtroNombreDep = '';
     this._filtroNombreEmp = '';
     this._filtroNombreTab = '';

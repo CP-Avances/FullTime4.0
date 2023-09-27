@@ -12,3 +12,11 @@ td { padding-top: 10px; text-align: center; }
 .mat-radio-button ~ .mat-radio-button {
     margin-left: 16px;
 }
+
+label{
+    font-size: 14px;
+    margin: 10px 0px 0px 0px;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+}

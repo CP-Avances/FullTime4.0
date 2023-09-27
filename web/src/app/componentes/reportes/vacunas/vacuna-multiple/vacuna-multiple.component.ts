@@ -137,6 +137,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   // VALIDACIONES DE REPORTES
   validacionReporte(action) {
     if (this.bool.bool_suc === false && this.bool.bool_dep === false && this.bool.bool_emp === false) return this.toastr.error('Seleccione un criterio de búsqueda.')
+    console.log('opcion',this.opcion);
     switch (this.opcion) {
       case 's':
         if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione sucursal.')
