@@ -239,9 +239,7 @@ export class ReporteEmpleadosComponent implements OnInit {
   }
 
   ModelarCargo(accion) {
-
     let respuesta = JSON.parse(this.origen_cargo);
-
     let car = respuesta.filter(o => {
       var bool = this.selectionCar.selected.find(obj1 => {
         return obj1.id === o.id_cargo
@@ -448,7 +446,7 @@ export class ReporteEmpleadosComponent implements OnInit {
 
         obj1.empleados.forEach(obj2 => {
             arr_emp.push(obj2)
-        })
+        });
 
         n.push({
           style: 'tableMarginEmp',
@@ -485,128 +483,44 @@ export class ReporteEmpleadosComponent implements OnInit {
       })
     }
 
-    data.forEach((obj: IReporteAtrasos) => {
+    else {
+      data.forEach((obj: IReporteAtrasos) => {
 
-      if (this.bool_suc === true) {
-        let arr_suc = obj.departamentos.map(o => { return o.empleado.length });
-        let suma_suc = this.SumarRegistros(arr_suc);
-        let arr_emp: any = [];
-        n.push({
-          style: 'tableMarginSuc',
-          table: {
-            widths: ['*', '*', '*'],
-            body: [
-              [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: 'CIUDAD: ' + obj.ciudad,
-                  style: 'itemsTableInfo'
-                },
-                {
-                  border: [false, true, false, true],
-                  text: 'SUCURSAL: ' + obj.name_suc,
-                  style: 'itemsTableInfo'
-                },
-                {
-                  border: [false, true, true, true],
-                  text: 'N° Registros: ' + suma_suc,
-                  style: 'itemsTableInfo'
-                }
-              ]
-            ]
-          }
-        });
-
-        obj.departamentos.forEach(o => {
-          o.empleado.forEach(e => {
-            arr_emp.push(e)
-          })
-        })
-
-        n.push({
-          style: 'tableMarginEmp',
-          table: {
-            widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto'],
-            body: [
-              [
-                { text: 'N°', style: 'tableHeader' },
-                { text: 'EMPLEADO', style: 'tableHeader' },
-                { text: 'CÉDULA', style: 'tableHeader' },
-                { text: 'CÓDIGO', style: 'tableHeader' },
-                { text: 'CARGO', style: 'tableHeader' },
-                { text: 'CORREO', style: 'tableHeader' }
-              ],
-              ...arr_emp.map(obj3 => {
-                c = c + 1
-                return [
-                  { style: 'itemsTableCentrado', text: c },
-                  { style: 'itemsTable', text: obj3.name_empleado },
-                  { style: 'itemsTable', text: obj3.cedula },
-                  { style: 'itemsTable', text: obj3.codigo },
-                  { style: 'itemsTable', text: obj3.cargo},
-                  { style: 'itemsTable', text: obj3.correo},
-                ]
-              }),
-            ]
-          },
-          layout: {
-            fillColor: function (rowIndex) {
-              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-            }
-          }
-        });
-      }
-
-      if (this.bool_dep === true) {
-
-        n.push({
-          style: 'tableMarginSuc',
-          table: {
-            widths: ['*', '*'],
-            body: [
-              [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: 'CIUDAD: ' + obj.ciudad,
-                  style: 'itemsTableInfo'
-                },
-                {
-                  border: [false, true, true, true],
-                  text: 'SUCURSAL: ' + obj.name_suc,
-                  style: 'itemsTableInfo'
-                }
-              ]
-            ]
-          }
-        })
-
-        obj.departamentos.forEach(obj1 => {
-          arr_emp = [];
-          obj1.empleado.forEach(e => {
-            arr_emp.push(e)
-          })
-          let reg = obj1.empleado.length
+        if (this.bool_suc === true) {
+          let arr_suc = obj.departamentos.map(o => { return o.empleado.length });
+          let suma_suc = this.SumarRegistros(arr_suc);
+          let arr_emp: any = [];
           n.push({
-            style: 'tableMarginDep',
+            style: 'tableMarginSuc',
             table: {
-              widths: ['*', '*'],
+              widths: ['*', '*', '*'],
               body: [
                 [
                   {
-                    border: [true, true, false, false],
-                    text: 'DEPARTAMENTO: ' + obj1.name_dep,
-                    style: 'itemsTable'
+                    border: [true, true, false, true],
+                    bold: true,
+                    text: 'CIUDAD: ' + obj.ciudad,
+                    style: 'itemsTableInfo'
                   },
                   {
-                    border: [true, true, true, false],
-                    text: 'N° EMPLEADOS DEPARTAMENTO: ' + reg,
-                    style: 'itemsTable'
+                    border: [false, true, false, true],
+                    text: 'SUCURSAL: ' + obj.name_suc,
+                    style: 'itemsTableInfo'
+                  },
+                  {
+                    border: [false, true, true, true],
+                    text: 'N° Registros: ' + suma_suc,
+                    style: 'itemsTableInfo'
                   }
                 ]
               ]
             }
+          });
+
+          obj.departamentos.forEach(o => {
+            o.empleado.forEach(e => {
+              arr_emp.push(e)
+            })
           })
 
           n.push({
@@ -629,8 +543,8 @@ export class ReporteEmpleadosComponent implements OnInit {
                     { style: 'itemsTable', text: obj3.name_empleado },
                     { style: 'itemsTable', text: obj3.cedula },
                     { style: 'itemsTable', text: obj3.codigo },
-                    { style: 'itemsTable', text: obj3.cargo },
-                    { style: 'itemsTable', text: obj3.correo },
+                    { style: 'itemsTable', text: obj3.cargo},
+                    { style: 'itemsTable', text: obj3.correo},
                   ]
                 }),
               ]
@@ -641,21 +555,107 @@ export class ReporteEmpleadosComponent implements OnInit {
               }
             }
           });
+        }
 
-        });
+        if (this.bool_dep === true) {
 
-      }
-
-      if (this.bool_emp === true) {
-
-        obj.departamentos.forEach(o => {
-          o.empleado.forEach(e => {
-            arr_emp.push(e)
+          n.push({
+            style: 'tableMarginSuc',
+            table: {
+              widths: ['*', '*'],
+              body: [
+                [
+                  {
+                    border: [true, true, false, true],
+                    bold: true,
+                    text: 'CIUDAD: ' + obj.ciudad,
+                    style: 'itemsTableInfo'
+                  },
+                  {
+                    border: [false, true, true, true],
+                    text: 'SUCURSAL: ' + obj.name_suc,
+                    style: 'itemsTableInfo'
+                  }
+                ]
+              ]
+            }
           })
-        })
-      }
 
-    })
+          obj.departamentos.forEach(obj1 => {
+            arr_emp = [];
+            obj1.empleado.forEach(e => {
+              arr_emp.push(e)
+            })
+            let reg = obj1.empleado.length
+            n.push({
+              style: 'tableMarginDep',
+              table: {
+                widths: ['*', '*'],
+                body: [
+                  [
+                    {
+                      border: [true, true, false, false],
+                      text: 'DEPARTAMENTO: ' + obj1.name_dep,
+                      style: 'itemsTable'
+                    },
+                    {
+                      border: [true, true, true, false],
+                      text: 'N° EMPLEADOS DEPARTAMENTO: ' + reg,
+                      style: 'itemsTable'
+                    }
+                  ]
+                ]
+              }
+            })
+
+            n.push({
+              style: 'tableMarginEmp',
+              table: {
+                widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto'],
+                body: [
+                  [
+                    { text: 'N°', style: 'tableHeader' },
+                    { text: 'EMPLEADO', style: 'tableHeader' },
+                    { text: 'CÉDULA', style: 'tableHeader' },
+                    { text: 'CÓDIGO', style: 'tableHeader' },
+                    { text: 'CARGO', style: 'tableHeader' },
+                    { text: 'CORREO', style: 'tableHeader' }
+                  ],
+                  ...arr_emp.map(obj3 => {
+                    c = c + 1
+                    return [
+                      { style: 'itemsTableCentrado', text: c },
+                      { style: 'itemsTable', text: obj3.name_empleado },
+                      { style: 'itemsTable', text: obj3.cedula },
+                      { style: 'itemsTable', text: obj3.codigo },
+                      { style: 'itemsTable', text: obj3.cargo },
+                      { style: 'itemsTable', text: obj3.correo },
+                    ]
+                  }),
+                ]
+              },
+              layout: {
+                fillColor: function (rowIndex) {
+                  return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+                }
+              }
+            });
+
+          });
+
+        }
+
+        if (this.bool_emp === true) {
+
+          obj.departamentos.forEach(o => {
+            o.empleado.forEach(e => {
+              arr_emp.push(e)
+            })
+          })
+        }
+
+      });
+    } 
 
     if (arr_emp.length > 0 && this.bool_emp === true) {
       c = 0

@@ -42,16 +42,49 @@ class ReportesVacunasControlador {
 
     }
 
+    public async ReporteVacunasMultipleCargos(req: Request, res: Response) {
+        console.log('datos recibidos', req.body)
+        let datos: any[] = req.body;
+        let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {      
+            obj.empleados = await Promise.all(obj.empleados.map(async (o:any) => {
+                o.vacunas = await BuscarVacunas(o.id);
+                console.log('Vacunas: ', o);
+                return o
+            })
+            )    
+            return obj
+        })
+        )
+
+        console.log('n',n)
+
+
+        let nuevo = n.map((obj: any) => {
+
+            obj.empleados = obj.empleados.filter((v: any) => { return v.vacunas.length > 0 })
+            return obj
+
+        }).filter(obj => { return obj.empleados.length > 0 })
+
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registro de vacunas.' })
+
+        return res.status(200).jsonp(nuevo)
+
+    }
+
 }
 
 const VACUNAS_REPORTE_CONTROLADOR = new ReportesVacunasControlador();
 export default VACUNAS_REPORTE_CONTROLADOR;
 
 const BuscarVacunas = async function (id: number) {
-    return await pool.query('SELECT ev.id, ev.id_empleado, ev.id_tipo_vacuna_1, ' +
-        'ev.id_tipo_vacuna_2, ev.id_tipo_vacuna_3, ev.carnet, ev.nom_carnet, ev.dosis_1, ev.dosis_2, ' +
-        'ev.dosis_3, ev.fecha_1, ev.fecha_2, ev.fecha_3 FROM empl_vacuna AS ev WHERE ev.id_empleado = $1 ' +
-        'ORDER BY ev.id DESC',
+    return await pool.query(`
+        SELECT ev.id, ev.id_empleado, tv.nombre AS tipo_vacuna, 
+            ev.carnet, ev.nom_carnet, ev.fecha, ev.descripcion
+        FROM empl_vacunas AS ev, tipo_vacuna AS tv 
+        WHERE ev.id_tipo_vacuna = tv.id
+            AND ev.id_empleado = $1 
+        ORDER BY ev.id DESC`,
         [id])
         .then((res: any) => {
             return res.rows;

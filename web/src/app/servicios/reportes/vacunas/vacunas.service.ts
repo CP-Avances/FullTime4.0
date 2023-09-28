@@ -16,4 +16,9 @@ export class VacunasService {
     return this.http.put<any>(`${environment.url}/empleado-vacunas-multiples/vacunas-multiples/`, data);
   }
 
+  ReporteVacunasMultiplesCargo(data: any) {
+    console.log('recibiendo data', data)
+    return this.http.put<any>(`${environment.url}/empleado-vacunas-multiples/vacunas-multiples-cargos/`, data);
+  }
+
 }

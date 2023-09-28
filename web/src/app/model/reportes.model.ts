@@ -356,18 +356,25 @@ interface emp_vac {
     vacunas?: Array<vacuna>
 }
 
+// export interface vacuna {
+//     id_tipo_vacuna_1: string,
+//     id_tipo_vacuna_2: string,
+//     id_tipo_vacuna_3: string,
+//     carnet: string,
+//     nom_carnet: string,
+//     dosis_1: boolean | string | null,
+//     dosis_2: boolean | string | null,
+//     dosis_3: boolean | string | null,
+//     fecha_1: string,
+//     fecha_2: string,
+//     fecha_3: string,
+// }
 export interface vacuna {
-    id_tipo_vacuna_1: string,
-    id_tipo_vacuna_2: string,
-    id_tipo_vacuna_3: string,
+    tipo_vacuna: string,
     carnet: string,
     nom_carnet: string,
-    dosis_1: boolean | string | null,
-    dosis_2: boolean | string | null,
-    dosis_3: boolean | string | null,
-    fecha_1: string,
-    fecha_2: string,
-    fecha_3: string,
+    fecha: string,
+    descripcion: string
 }
 
 // REPORTE DE SOLICITUD DE VACACIONES

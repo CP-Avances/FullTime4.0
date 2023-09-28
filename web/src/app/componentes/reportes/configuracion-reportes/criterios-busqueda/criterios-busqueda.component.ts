@@ -84,6 +84,7 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
         this._booleanOptions.bool_emp = false;
         this._booleanOptions.bool_tab = false;
         this._booleanOptions.bool_inc = false;
+        this._booleanOptions.bool_cargo = false;
         break;
       case 'c':
         this._booleanOptions.bool_cargo = true;
@@ -99,6 +100,7 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
         this._booleanOptions.bool_emp = false;
         this._booleanOptions.bool_tab = false;
         this._booleanOptions.bool_inc = false;
+        this._booleanOptions.bool_cargo = false;
         break;
       case 'e':
         this._booleanOptions.bool_suc = false;
@@ -106,6 +108,7 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
         this._booleanOptions.bool_emp = true;
         this._booleanOptions.bool_tab = false;
         this._booleanOptions.bool_inc = false;
+        this._booleanOptions.bool_cargo = false;
         break;
       case 't':
         this._booleanOptions.bool_suc = false;
@@ -113,6 +116,7 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
         this._booleanOptions.bool_emp = false;
         this._booleanOptions.bool_tab = true;
         this._booleanOptions.bool_inc = false;
+        this._booleanOptions.bool_cargo = false;
         break;
       case 'i':
         this._booleanOptions.bool_suc = false;
@@ -120,6 +124,7 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
         this._booleanOptions.bool_emp = false;
         this._booleanOptions.bool_tab = false;
         this._booleanOptions.bool_inc = true;
+        this._booleanOptions.bool_cargo = false;
         break;
       default:
         this._booleanOptions.bool_cargo = false;

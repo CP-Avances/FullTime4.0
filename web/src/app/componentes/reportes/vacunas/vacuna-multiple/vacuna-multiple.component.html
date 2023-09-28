@@ -78,6 +78,47 @@
         </mat-paginator>
         <br>
     </div>
+    <!-- TABLA PARA CARGOS -->
+    <div *ngIf="bool.bool_cargo" class="mat-elevation-z8" style="background: white;">
+                        <div class="d-flex bd-highlight" id="resultados">
+                    <span class="w-100 bd-highlight">
+                        RESULTADO CARGOS</span>
+                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                        (click)="MostrarLista()">Mostrar lista</button>
+                </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th>
+                            <mat-checkbox (change)="$event ? masterToggleCar() : null"
+                                [checked]="selectionSuc.hasValue() && isAllSelectedCar()"
+                                [indeterminate]="selectionSuc.hasValue() && !isAllSelectedCar()"
+                                [aria-label]="checkboxLabelCar()">
+                            </mat-checkbox>
+                        </th>
+                        <th scope="col">Nombre</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let c of cargos | emplNombre: filtroNombreCar | paginate:tamanio_pagina_car:numero_pagina_car">
+                        <td>
+                            <mat-checkbox (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionCar.toggle(c) : null" [checked]="selectionCar.isSelected(c)"
+                                [aria-label]="checkboxLabelCar(c)">
+                            </mat-checkbox>
+                        </td>
+                        <td>{{c.nombre}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina_suc"
+            [pageSizeOptions]="pageSizeOptions_suc" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+        <br>
+    </div>
     <!-- TABLA PARA DEPARTAMENTOS -->
     <div *ngIf="bool.bool_dep" class="mat-elevation-z8" style="background: white;">
                         <div class="d-flex bd-highlight" id="resultados">

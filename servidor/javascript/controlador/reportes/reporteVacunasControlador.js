@@ -41,15 +41,40 @@ class ReportesVacunasControlador {
             return res.status(200).jsonp(nuevo);
         });
     }
+    ReporteVacunasMultipleCargos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log('datos recibidos', req.body);
+            let datos = req.body;
+            let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
+                obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
+                    o.vacunas = yield BuscarVacunas(o.id);
+                    console.log('Vacunas: ', o);
+                    return o;
+                })));
+                return obj;
+            })));
+            console.log('n', n);
+            let nuevo = n.map((obj) => {
+                obj.empleados = obj.empleados.filter((v) => { return v.vacunas.length > 0; });
+                return obj;
+            }).filter(obj => { return obj.empleados.length > 0; });
+            if (nuevo.length === 0)
+                return res.status(400).jsonp({ message: 'No se ha encontrado registro de vacunas.' });
+            return res.status(200).jsonp(nuevo);
+        });
+    }
 }
 const VACUNAS_REPORTE_CONTROLADOR = new ReportesVacunasControlador();
 exports.default = VACUNAS_REPORTE_CONTROLADOR;
 const BuscarVacunas = function (id) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield database_1.default.query('SELECT ev.id, ev.id_empleado, ev.id_tipo_vacuna_1, ' +
-            'ev.id_tipo_vacuna_2, ev.id_tipo_vacuna_3, ev.carnet, ev.nom_carnet, ev.dosis_1, ev.dosis_2, ' +
-            'ev.dosis_3, ev.fecha_1, ev.fecha_2, ev.fecha_3 FROM empl_vacuna AS ev WHERE ev.id_empleado = $1 ' +
-            'ORDER BY ev.id DESC', [id])
+        return yield database_1.default.query(`
+        SELECT ev.id, ev.id_empleado, tv.nombre AS tipo_vacuna, 
+            ev.carnet, ev.nom_carnet, ev.fecha, ev.descripcion
+        FROM empl_vacunas AS ev, tipo_vacuna AS tv 
+        WHERE ev.id_tipo_vacuna = tv.id
+            AND ev.id_empleado = $1 
+        ORDER BY ev.id DESC`, [id])
             .then((res) => {
             return res.rows;
         });
