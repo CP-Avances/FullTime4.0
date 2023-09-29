@@ -143,6 +143,7 @@ import { ListaWebComponent } from './componentes/modulos/timbreWeb/lista-web/lis
 import { RegistroDispositivosComponent } from './componentes/modulos/appMovil/registro-dispositivos/registro-dispositivos.component';
 import { VistaElementosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/listarTipoPermisos/vista-elementos.component';
 import { TimbreMultipleComponent } from './componentes/timbres/timbre-multiple/timbre-multiple.component';
+import { VerEmpleadosActivosDetalleComponent } from './componentes/reportes/empleados/detalle/ver-empleados-activos-detalle/ver-empleados-activos-detalle.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -200,6 +201,9 @@ const routes: Routes = [
   { path: 'solicitud-vacacion', component: SolicitudVacacionComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'reporte-timbre-sistema', component: TimbreSistemaComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'reporte-timbre-reloj-virtual', component: TimbreVirtualComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+
+  //DETALLE REPORTES
+  { path: 'ver-empleados-activos-detalle/:lista', component: VerEmpleadosActivosDetalleComponent, canActivate: [AuthGuard], data: { roles: 1 } },
 
   // REPORTES ALIMENTACIÓN
   { path: 'alimentosGeneral', component: AlimentosGeneralComponent, canActivate: [AuthGuard], data: { roles: 1 } },

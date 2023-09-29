@@ -40,6 +40,8 @@ import { SolicitudVacacionComponent } from './vacaciones/solicitud-vacacion/soli
 import { HorasPlanificadasComponent } from './horas-extras/horas-planificadas/horas-planificadas.component';
 import { TimbreSistemaComponent } from './timbres/timbre-sistema/timbre-sistema.component';
 import { TimbreVirtualComponent } from './timbres/timbre-virtual/timbre-virtual.component';
+import { VerEmpleadosActivosDetalleComponent } from './empleados/detalle/ver-empleados-activos-detalle/ver-empleados-activos-detalle.component';
+import { VerEmpleadosInactivosDetalleComponent } from './empleados/detalle/ver-empleados-inactivos-detalle/ver-empleados-inactivos-detalle.component';
 @NgModule({
   declarations: [
     RangoFechasComponent,
@@ -74,6 +76,8 @@ import { TimbreVirtualComponent } from './timbres/timbre-virtual/timbre-virtual.
     HorasPlanificadasComponent,
     TimbreSistemaComponent,
     TimbreVirtualComponent,
+    VerEmpleadosActivosDetalleComponent,
+    VerEmpleadosInactivosDetalleComponent,
   ],
   exports: [
     ReporteFaltasComponent,

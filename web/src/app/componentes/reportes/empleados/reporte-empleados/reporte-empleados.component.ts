@@ -16,6 +16,9 @@ import * as xlsx from 'xlsx';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { IReporteAtrasos } from 'src/app/model/reportes.model';
 
+import { Router } from '@angular/router';
+
+
 @Component({
   selector: 'app-reporte-empleados',
   templateUrl: './reporte-empleados.component.html',
@@ -70,7 +73,8 @@ export class ReporteEmpleadosComponent implements OnInit {
   constructor(
     private toastr: ToastrService,
     private R_asistencias: ReportesAsistenciasService,
-    private restEmpre: EmpresaService
+    private restEmpre: EmpresaService,
+    private router: Router,
   ) {
     this.ObtenerLogo();
     this.ObtenerColores();
@@ -234,6 +238,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     this.data_pdf = suc;
     switch (accion) {
       case 'excel': this.exportToExcel(); break;
+      case 'ver': this.VerDatos(this.data_pdf); break;
       default: this.generarPdf(accion); break;
     }
   }
@@ -942,5 +947,10 @@ export class ReporteEmpleadosComponent implements OnInit {
       this.Filtrar('', 4)
       this.Filtrar('', 5)*/
     }
+  }
+
+  VerDatos(data: any) {
+    const encodedData = JSON.stringify(data);
+      this.router.navigate(['/ver-empleados-activos-detalle/', encodedData]);
   }
 }
