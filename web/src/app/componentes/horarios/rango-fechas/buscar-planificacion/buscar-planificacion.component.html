@@ -206,8 +206,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr
-                                *ngFor="let e of horariosEmpleado | paginate:tamanio_pagina_emp:numero_pagina_emp; index as i">
+                            <tr *ngFor="let e of horariosEmpleado | paginate:tamanio_pagina_emp:numero_pagina_emp">
                                 <td id="td_horarios" [ngStyle]="{'background':CambiarColores(e.color)}">
                                     {{e.codigo_e}}
                                 </td>
@@ -224,7 +223,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 1 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 1, e.dia1, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 1, e.dia1, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia1}}
@@ -233,7 +232,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 2 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 2, e.dia2, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 2, e.dia2, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia2}}
@@ -242,7 +241,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 3 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 3, e.dia3, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 3, e.dia3, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia3}}
@@ -251,7 +250,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 4 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 4, e.dia4, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 4, e.dia4, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia4}}
@@ -260,7 +259,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 5 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 5, e.dia5, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 5, e.dia5, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia5}}
@@ -269,7 +268,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 6 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 6, e.dia6, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 6, e.dia6, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia6}}
@@ -278,7 +277,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 7 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 7, e.dia7, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 7, e.dia7, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia7}}
@@ -287,7 +286,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 8 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 8, e.dia8, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 8, e.dia8, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia8}}
@@ -296,7 +295,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 9 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 9, e.dia9, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 9, e.dia9, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia9}}
@@ -305,7 +304,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 10 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 10, e.dia10, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 10, e.dia10, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia10}}
@@ -314,7 +313,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 11 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 11, e.dia11, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 11, e.dia11, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia11}}
@@ -323,7 +322,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 12 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 12, e.dia12, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 12, e.dia12, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia12}}
@@ -332,7 +331,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 13 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 13, e.dia13, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 13, e.dia13, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia13}}
@@ -341,7 +340,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 14 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 14, e.dia14, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 14, e.dia14, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia14}}
@@ -350,7 +349,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 15 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 15, e.dia15, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 15, e.dia15, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia15}}
@@ -359,7 +358,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 16 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 16, e.dia16, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 16, e.dia16, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia16}}
@@ -368,7 +367,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 17 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 17, e.dia17, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 17, e.dia17, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia17}}
@@ -377,7 +376,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 18 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 18, e.dia18, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 18, e.dia18, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia18}}
@@ -386,7 +385,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 19 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 19, e.dia19, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 19, e.dia19, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia19}}
@@ -395,7 +394,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 20 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 20, e.dia21, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 20, e.dia21, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia20}}
@@ -404,7 +403,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 21 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 21, e.dia21, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 21, e.dia21, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia21}}
@@ -413,7 +412,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 22 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 22, e.dia22, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 22, e.dia22, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia22}}
@@ -422,7 +421,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 23 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 23, e.dia23, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 23, e.dia23, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia23}}
@@ -431,7 +430,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 24 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 24, e.dia24, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 24, e.dia24, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia24}}
@@ -440,7 +439,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 25 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 25, e.dia25, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 25, e.dia25, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia25}}
@@ -449,7 +448,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 26 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 26, e.dia26, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 26, e.dia26, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia26}}
@@ -458,7 +457,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 27 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 27, e.dia27, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 27, e.dia27, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia27}}
@@ -467,7 +466,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 28 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 28, e.dia28, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 28, e.dia28, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia28}}
@@ -476,7 +475,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 29 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 29, e.dia29, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 29, e.dia29, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia29}}
@@ -485,7 +484,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 30 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 30, e.dia30, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 30, e.dia30, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia30}}
@@ -494,7 +493,7 @@
                                     [ngStyle]="{'background':CambiarColores(e.color), 'background-color':e.seleccionado === 31 ? '#9CF7B9' : '' }">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                         *ngIf="editar_activar"
-                                        (click)="AbrirEditarHorario(e.anio, e.mes, 31, e.dia31, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, i)">
+                                        (click)="AbrirEditarHorario(e.anio, e.mes, 31, e.dia31, e.id_empleado, e.codigo_e, e.id_cargo, e.hora_trabaja, e.index)">
                                     </i>
                                     <br *ngIf="editar_activar">
                                     {{e.dia31}}

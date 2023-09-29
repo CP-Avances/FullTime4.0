@@ -319,6 +319,7 @@ export class HorariosMultiplesComponent implements OnInit {
     let correctos = [];
     let duplicados = [];
     this.usuarios_invalidos = [];
+
     this.datos.map(dh => {
       // METODO PARA BUSCAR DATOS DUPLICADOS DE HORARIOS
       this.rest.VerificarDuplicidadHorarios(dh.codigo, fechas).subscribe(response => {
@@ -409,7 +410,6 @@ export class HorariosMultiplesComponent implements OnInit {
   horariosEmpleado: any = []
   cont3: number = 0;
   ValidarHorarioByHorasTrabaja(form: any, correctos: any) {
-    this.ControlarBotones(false, true, true, false, true);
     let horas_correctas = [];
     let horas_incorrectas = [];
     this.usuarios_validos = [];
@@ -419,8 +419,9 @@ export class HorariosMultiplesComponent implements OnInit {
 
     const { hora_trabajo } = obj_res;
     this.cont3 = 0;
+
     correctos.map(dh => {
-      //console.log('dh ************************* ', dh)
+      console.log('dh ************************* ', dh)
       // METODO PARA LECTURA DE HORARIOS DE EMPLEADO
       this.horariosEmpleado = [];
       let fechas = {
@@ -429,6 +430,8 @@ export class HorariosMultiplesComponent implements OnInit {
       };
 
       this.rest.VerificarHorariosExistentes(dh.codigo, fechas).subscribe(existe => {
+        console.log('existe ', existe)
+
         this.suma = '00:00:00';
         this.sumHoras = '00:00:00';
         this.cont3 = this.cont3 + 1;
@@ -449,6 +452,9 @@ export class HorariosMultiplesComponent implements OnInit {
 
         // METODO PARA VERIFICAR QUE LOS HORARIOS NO SE SOBREPONGAN
         let verificador = this.VerificarHorarioRangos(obj_res);
+        // LIMPIAR EXISTENCIAS
+        this.horariosEmpleado = [];
+        //console.log('ver verificador existe ', verificador)
 
         if (verificador === 2) {
           dh.observacion = 'No es posible registrar horarios con rangos de tiempo similares.';
@@ -458,6 +464,7 @@ export class HorariosMultiplesComponent implements OnInit {
           this.usuarios_invalidos = this.usuarios_invalidos.concat(dh);
           if (this.cont3 === correctos.length) {
             if (horas_incorrectas.length === correctos.length) {
+              this.ControlarBotones(false, true, true, false, true);
               this.observaciones = true;
               this.progreso = false;
             }
@@ -472,6 +479,7 @@ export class HorariosMultiplesComponent implements OnInit {
           }
         }
         else {
+          dh.observacion = 'OK';
           horas_correctas = horas_correctas.concat(dh);
           if (this.cont3 === correctos.length) {
             // FINALIZACION DEL CICLO
@@ -488,6 +496,9 @@ export class HorariosMultiplesComponent implements OnInit {
         this.IndicarNotificacionHoras(hora_trabajo, dh);
         // METODO PARA VERIFICAR QUE LOS HORARIOS NO SE SOBREPONGAN
         let verificador = this.VerificarHorarioRangos(obj_res);
+        // LIMPIAR EXISTENCIAS
+        this.horariosEmpleado = [];
+        //console.log('ver verificador no existe ', verificador)
 
         if (verificador === 2) {
           dh.observacion = 'No es posible registrar horarios con rangos de tiempo similares.';
@@ -497,6 +508,7 @@ export class HorariosMultiplesComponent implements OnInit {
           this.usuarios_invalidos = this.usuarios_invalidos.concat(dh);
           if (this.cont3 === correctos.length) {
             if (horas_incorrectas.length === correctos.length) {
+              this.ControlarBotones(false, true, true, false, true);
               this.observaciones = true;
               this.progreso = false;
             }
@@ -511,6 +523,7 @@ export class HorariosMultiplesComponent implements OnInit {
           }
         }
         else {
+          dh.observacion = 'OK';
           horas_correctas = horas_correctas.concat(dh);
           if (this.cont3 === correctos.length) {
             // FINALIZACION DEL CICLO
@@ -540,7 +553,7 @@ export class HorariosMultiplesComponent implements OnInit {
   // METODO PARA VERIFICAR QUE NO EXISTAN HORARIOS DENTRO DE LOS MISMOS RANGOS
   feriados_eliminar: any = [];
   VerificarHorarioRangos(ingresado: any) {
-    //console.log('existentes ', this.horariosEmpleado)
+    console.log('existentes ', this.horariosEmpleado)
     //console.log('horarios ', this.horarios)
     //console.log('seleccionado ', ingresado)
 
@@ -655,6 +668,7 @@ export class HorariosMultiplesComponent implements OnInit {
   empl_horario: any = [];
   validos: number = 0;
   CrearData(form: any) {
+    console.log('ver datos validos ', this.usuarios_validos)
     this.empl_horario = [];
     this.plan_general = [];
     this.validos = 0;
