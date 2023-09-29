@@ -21,6 +21,7 @@ import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.
 import { HorarioMultipleEmpleadoComponent } from '../../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
 import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+import { BuscarPlanificacionComponent } from '../../rango-fechas/buscar-planificacion/buscar-planificacion.component';
 
 @Component({
   selector: 'app-registro-plan-horario',
@@ -62,6 +63,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
   constructor(
     public componentev: VerEmpleadoComponent,
     public componentem: HorarioMultipleEmpleadoComponent,
+    public componenteb: BuscarPlanificacionComponent,
     public parametro: ParametrosService,
     public feriado: FeriadosService,
     public validar: ValidacionesService,
@@ -1232,6 +1234,13 @@ export class RegistroPlanHorarioComponent implements OnInit {
       this.componentem.seleccionar = true;
       this.componentem.registrar_rotativo = false;
       this.componentem.LimpiarFormulario();
+    }
+    else if (this.datoEmpleado.pagina === 'busqueda') {
+      this.componenteb.registrar_rotativo = false;
+      this.componenteb.seleccionar = true;
+      this.componenteb.buscar_fechas = true;
+      this.componenteb.auto_individual = true;
+      this.componenteb.multiple = true;
     }
   }
 

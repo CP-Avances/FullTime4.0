@@ -4,6 +4,11 @@
     </app-registo-empleado-horario>
 </div>
 
+<!-- *** VENTANA DE REGISTRO INDIVDUAL DE PLANIFICACION MULTIPLE *** -->
+<div style="padding-top: 20px; padding-bottom: 8px;" *ngIf="registrar_rotativo">
+    <app-registro-plan-horario [datoEmpleado]="rotativo"></app-registro-plan-horario>
+</div>
+
 <!-- *** VENTANA DE BUSQUEDA DE PLANIFICACIONES *** -->
 <div style="padding-top: 20px;" *ngIf="seleccionar">
     <div id="resultados">
@@ -54,8 +59,12 @@
                         Cargar Planificacion
                     </button>
                     <button *ngIf="multiple" id="btn-raised" class="btn btn-sm"
+                        style="float: right; margin-right: 10px;" (click)="PlanificarFija()">
+                        Planificación Fija
+                    </button>
+                    <button *ngIf="multiple" id="btn-raised" class="btn btn-sm"
                         style="float: right; margin-right: 10px;" (click)="PlanificarMultiple()">
-                        Planificar
+                        Planificación Múltiple
                     </button>
                 </div>
                 <hr>
@@ -525,4 +534,9 @@
 <div style="padding-top: 20px; padding-bottom: 8px;" *ngIf="asignar_multiple">
     <app-horarios-multiples [seleccionados]="seleccionados" pagina="buscar">
     </app-horarios-multiples>
+</div>
+
+<!-- *** VENTANA DE REGISTRO DE MULTIPLES PLANIFICACIONES ROTATIVAS *** -->
+<div style="padding-top: 20px; padding-bottom: 8px;" *ngIf="rotativo_multiple">
+    <app-planificacion-multiple [datosSeleccionados]="data_horario"></app-planificacion-multiple>
 </div>

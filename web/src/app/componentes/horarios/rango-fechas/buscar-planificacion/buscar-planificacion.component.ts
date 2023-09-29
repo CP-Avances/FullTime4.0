@@ -221,7 +221,6 @@ export class BuscarPlanificacionComponent {
    ** ************************************************************************************** **/
 
   // METODO PARA ABRIR VENTANA DE ASIGNACION DE HORARIO
-  idCargo: any;
   data_horario: any = [];
   ventana_horario_individual: boolean = false;
   PlanificarIndividual(usuario: any): void {
@@ -246,14 +245,41 @@ export class BuscarPlanificacionComponent {
     }
   }
 
+  // VENTANA PARA REGISTRAR PLANIFICACION DE HORARIOS DEL EMPLEADO 
+  rotativo: any = []
+  registrar_rotativo: boolean = false;
+  PlanificarMultipleI(usuario: any): void {
+    console.log('ver usuario ', usuario, ' ver resultados ', this.resultados)
+    for (var i = 0; i < this.resultados.length; i++) {
+      if (this.resultados[i].codigo === usuario.codigo || this.resultados[i].codigo === usuario.codigo_e) {
+        this.rotativo = {
+          idCargo: this.resultados[i].id_cargo,
+          codigo: this.resultados[i].codigo,
+          pagina: 'busqueda',
+          idEmpleado: this.resultados[i].id,
+          horas_trabaja: this.resultados[i].hora_trabaja,
+        }
+        this.registrar_rotativo = true;
+        this.buscar_fechas = false;
+        this.multiple = false;
+        // EDITAR HORARIO
+        this.ver_activar_editar = false;
+        this.auto_individual = false;
+        break;
+      }
+    }
+  }
+
+
+
   // HABILITAR O DESHABILITAR EL ICONO DE AUTORIZACION INDIVIDUAL
   multiple: boolean = false;
   buscar_fechas: boolean = true;
   seleccionados: any = [];
   auto_individual: boolean = true;
   asignar_multiple: boolean = false;
-  // METODO DE VALIDACION DE SELECCION MULTIPLE
-  PlanificarMultiple() {
+  // METODO DE VALIDACION DE SELECCION MULTIPLE HORARIOS FIJOS
+  PlanificarFija() {
     console.log('ver resultados ', this.resultados.length)
     this.auto_individual = false;
     this.multiple = false;
@@ -265,6 +291,29 @@ export class BuscarPlanificacionComponent {
     } else {
       this.seleccionados = this.resultados;
       this.asignar_multiple = true;
+      this.ver_acciones = false;
+    }
+  }
+
+
+  // METODO DE VALIDACION DE SELECCION MULTIPLE HORARIOS MULTIPLES
+  rotativo_multiple: boolean = false;
+  PlanificarMultiple() {
+    console.log('ver resultados ', this.resultados.length)
+    this.auto_individual = false;
+    this.multiple = false;
+    // EDITAR HORARIO
+    this.ver_activar_editar = false;
+    this.buscar_fechas = false;
+    if (this.resultados.length === 1) {
+      this.PlanificarMultipleI(this.resultados[0]);
+    } else {
+      this.data_horario = {
+        usuarios: this.resultados,
+        pagina: 'busqueda',
+      }
+      this.seleccionados = this.resultados;
+      this.rotativo_multiple = true;
       this.ver_acciones = false;
     }
   }
@@ -468,7 +517,6 @@ export class BuscarPlanificacionComponent {
 
   // METODO PARA CAMBIAR DE COLORES SEGUN EL MES
   CambiarColores(opcion: any) {
-    console.log('ver opcion ', opcion)
     let color: string;
     switch (opcion) {
       case 'ok':

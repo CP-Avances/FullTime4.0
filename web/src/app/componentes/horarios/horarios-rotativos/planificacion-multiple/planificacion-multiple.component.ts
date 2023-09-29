@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { ToastrService } from 'ngx-toastr';
 import { FormControl } from '@angular/forms';
@@ -8,13 +9,16 @@ import { default as _rollupMoment, Moment } from 'moment';
 import moment from 'moment';
 
 import { HorarioMultipleEmpleadoComponent } from '../../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
+import { BuscarPlanificacionComponent } from '../../rango-fechas/buscar-planificacion/buscar-planificacion.component';
 
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
+import { ThemePalette } from '@angular/material/core';
 
 @Component({
   selector: 'app-planificacion-multiple',
@@ -37,8 +41,15 @@ export class PlanificacionMultipleComponent implements OnInit {
   tamanio_pagina_emp: number = 5;
   numero_pagina_emp: number = 1;
 
+  // VARIABLES PROGRESS SPINNER
+  progreso: boolean = false;
+  color: ThemePalette = 'primary';
+  mode: ProgressSpinnerMode = 'indeterminate';
+  value = 10;
+
   constructor(
     public componentem: HorarioMultipleEmpleadoComponent,
+    public componenteb: BuscarPlanificacionComponent,
     public parametro: ParametrosService,
     public feriado: FeriadosService,
     public validar: ValidacionesService,
@@ -46,6 +57,7 @@ export class PlanificacionMultipleComponent implements OnInit {
     public router: Router,
     public restD: DetalleCatHorariosService,
     public restH: HorarioService,
+    public restP: PlanGeneralService,
     private toastr: ToastrService,
   ) { }
 
@@ -100,7 +112,7 @@ export class PlanificacionMultipleComponent implements OnInit {
   }
 
 
-  // METODO PARA SELECCIONAR TIPO DE BUSQUEDA
+  // METODO PARA GENERAR CALENDARIO
   mes_asignar: string = '';
   GenerarCalendario() {
     if (this.fechaInicialF.value === null && this.fechaFinalF.value === null) {
@@ -335,7 +347,6 @@ export class PlanificacionMultipleComponent implements OnInit {
   expansion: boolean = false;
 
   // METODO PARA INGRESAR HORARIO
-  lista_eliminar: any = [];
   IngresarHorario(index: number, dia: any) {
     //console.log('verificar existencias ', this.fechas_mes[index].registrados)
     let verificador = 0;
@@ -344,8 +355,12 @@ export class PlanificacionMultipleComponent implements OnInit {
       return o.codigo === this.horarioF.value
     })
 
+    let mes = moment(this.fechaInicialF.value).format('MM-YYYY');
+    let fecha = dia + '-' + mes;
+
     let data = [{
       dia: dia,
+      fecha: moment(fecha, 'D-MM-YYYY').format('YYYY-MM-DD'),
       horario: this.horarioF.value,
       detalles: datoHorario.detalles,
       id_horario: datoHorario.id,
@@ -473,6 +488,7 @@ export class PlanificacionMultipleComponent implements OnInit {
           }
         })
 
+        // SI EXISTEN HORARIOS LIBRES O FERIADOS REGISTRADOS SE BORRAN PARA ACTUALIZAR LOS REGISTROS
         if (existe[i].default === 'L' || existe[i].default === 'FD') {
           // PREPARAR DATA PARA ELIMINAR HORARIO
           let plan_fecha = {
@@ -610,7 +626,7 @@ export class PlanificacionMultipleComponent implements OnInit {
     }
   }
 
-  // METODO PARA INGRESAR HORARIO
+  // METODO PARA DIA COMO LIBRE O NO LABORABLE
   IngresarLibre(index: number, dia: any) {
     let verificador = 0;
     let similar = 0;
@@ -620,8 +636,12 @@ export class PlanificacionMultipleComponent implements OnInit {
       return o.default === 'L';
     })
 
+    let mes = moment(this.fechaInicialF.value).format('MM-YYYY');
+    let fecha = dia + '-' + mes;
+
     let data = [{
       dia: dia,
+      fecha: moment(fecha, 'D-MM-YYYY').format('YYYY-MM-DD'),
       horario: datoHorario.codigo,
       detalles: datoHorario.detalles,
       id_horario: datoHorario.id,
@@ -691,6 +711,7 @@ export class PlanificacionMultipleComponent implements OnInit {
       }
     }
 
+    // METODO PARA ELIMINAR REGISTROS VACIOS
     let datos: any = []
     for (var i = 0; i < this.datosSeleccionados.usuarios[index].asignado.length; i++) {
       if (this.datosSeleccionados.usuarios[index].asignado[i].dia) {
@@ -844,9 +865,12 @@ export class PlanificacionMultipleComponent implements OnInit {
     })
     feriado.forEach(d => {
       let dia = moment(d.fecha).format('D');
+      let mes = moment(this.fechaInicialF.value).format('MM-YYYY');
+      let fecha = dia + '-' + mes;
       //console.log('ver dia ', dia)
       let data = [{
         dia: parseInt(dia),
+        fecha: moment(fecha, 'D-MM-YYYY').format('YYYY-MM-DD'),
         horario: datoHorario.codigo,
         detalles: datoHorario.detalles,
         id_horario: datoHorario.id,
@@ -854,6 +878,14 @@ export class PlanificacionMultipleComponent implements OnInit {
         tipo_dia: 'FD',
       }]
       usuario.asignado = usuario.asignado.concat(data);
+      // PREPARAR DATA PARA ELIMINAR HORARIO
+      let plan_fecha = {
+        codigo: usuario.codigo,
+        fec_final: moment(fecha, 'D-MM-YYYY').format('DD-MM-YYYY'),
+        fec_inicio: moment(fecha, 'D-MM-YYYY').format('DD-MM-YYYY'),
+        id_horario: datoHorario.id,
+      };
+      this.eliminar_lista = this.eliminar_lista.concat(plan_fecha);
     })
     //console.log('ver datos de usuarios ', usuario)
   }
@@ -861,7 +893,7 @@ export class PlanificacionMultipleComponent implements OnInit {
   // METODO PARA VERIFICAR HORARIOS ASIGNADOS
   VerificarAsignados() {
     let usuarios: any = [];
-    console.log('usuarios entrantes ', this.datosSeleccionados.usuarios);
+    //console.log('usuarios entrantes ', this.datosSeleccionados.usuarios);
 
     this.datosSeleccionados.usuarios.forEach(usu => {
       if (usu.asignado.length != 0) {
@@ -895,44 +927,180 @@ export class PlanificacionMultipleComponent implements OnInit {
         feriado = fer;
         //console.log('feriados ', fer)
         feriado.forEach(f => {
-          console.log('ver val ', val.asignado)
-
-
+          //console.log('ver val ', val.asignado)
           for (var a = 0; a < val.asignado.length; a++) {
-            console.log('ver datos dia ', val.asignado[a].dia, ' dia fecha ', moment(f.fecha).format('D'))
+            //console.log('ver datos dia ', val.asignado[a].dia, ' dia fecha ', moment(f.fecha).format('D'))
             if (val.asignado[a].dia === parseInt(moment(f.fecha).format('D'))) {
-              console.log('ingresa comparar feriados')
+              //console.log('ingresa comparar feriados')
               val.asignado.splice(a, 1);
             }
           }
-
         })
 
         this.AsignarFeriado(feriado, val);
         if (cont === validos.length) {
           this.datosSeleccionados.usuario = validos;
-          console.log('usuarios validos ', validos);
+          //console.log('usuarios validos ', validos);
           //console.log('usuarios validos original ', this.datosSeleccionados.usuario);
-          console.log('usuarios eliminar ', this.eliminar_lista);
+          //console.log('usuarios eliminar ', this.eliminar_lista);
+          this.CrearDataHorario(validos);
           this.ControlarBotones(false, true);
         }
       }, vacio => {
         cont = cont + 1;
         if (cont === validos.length) {
           this.datosSeleccionados.usuario = validos;
-          console.log('usuarios validos ', validos);
+          //console.log('usuarios validos ', validos);
           //console.log('usuarios validos original ', this.datosSeleccionados.usuario);
-          console.log('usuarios eliminar ', this.eliminar_lista);
+          //console.log('usuarios eliminar ', this.eliminar_lista);
+          this.CrearDataHorario(validos);
           this.ControlarBotones(false, true);
         }
       })
     })
   }
 
+  // METODO PARA CREAR LA DATA DE REGISTRO DE HORARIO
+  plan_general: any = [];
+  CrearDataHorario(lista: any) {
+    this.plan_general = [];
+
+    if (lista.length != 0) {
+
+      lista.forEach(li => {
+
+        li.asignado.forEach(asig => {
+          let origen = 'N';
+          let tipo = null;
+          //console.log('ver data asignado ')
+
+          if (asig.tipo_dia != 'FD') {
+            origen = asig.tipo_dia
+          }
+
+          if (asig.tipo_dia === 'FD' || asig.tipo_dia === 'L') {
+            tipo = asig.tipo_dia
+          }
+
+          this.restD.ConsultarUnDetalleHorario(asig.id_horario).subscribe(det => {
+            // COLOCAR DETALLE DE DIA SEGUN HORARIO
+            det.map(element => {
+              //console.log('ver detalle ', element)
+              var accion = 0;
+              var nocturno: number = 0;
+              if (element.tipo_accion === 'E') {
+                accion = element.minu_espera;
+              }
+              if (element.segundo_dia === true) {
+                nocturno = 1;
+              }
+              else if (element.tercer_dia === true) {
+                nocturno = 2;
+              }
+              else {
+                nocturno = 0;
+              }
+
+              let plan = {
+                codigo: li.codigo,
+                tipo_dia: asig.tipo_dia,
+                min_antes: element.min_antes,
+                tolerancia: accion,
+                id_horario: element.id_horario,
+                min_despues: element.min_despues,
+                fec_horario: asig.fecha,
+                estado_origen: origen,
+                estado_timbre: tipo,
+                id_empl_cargo: li.id_cargo,
+                id_det_horario: element.id,
+                salida_otro_dia: nocturno,
+                tipo_entr_salida: element.tipo_accion,
+                fec_hora_horario: asig.fecha + ' ' + element.hora,
+              };
+              if (element.segundo_dia === true) {
+                plan.fec_hora_horario = moment(asig.fecha).add(1, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
+              }
+              if (element.tercer_dia === true) {
+                plan.fec_hora_horario = moment(asig.fecha).add(2, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
+              }
+              // ALMACENAMIENTO DE PLANIFICACION GENERAL
+              this.plan_general = this.plan_general.concat(plan);
+            })
+
+          })
+        })
+      })
+    }
+  }
+
   // METODO PARA CONTROLAR BOTONES
   ControlarBotones(verificar: boolean, guardar: boolean) {
     this.ver_verificar = verificar;
     this.ver_guardar = guardar;
+  }
+
+  // METODO PARA GURADAR DATOS EN BASE DE DATOS
+  GuardarPlanificacion() {
+    this.progreso = true;
+    let contador = 0;
+    // METODO PARA ELIMINAR HORARIOS
+    this.eliminar_lista.forEach(h => {
+      let plan_fecha = {
+        codigo: h.codigo,
+        fec_final: h.fec_final,
+        fec_inicio: h.fec_inicio,
+        id_horario: h.id_horario,
+      };
+      this.restP.BuscarFechas(plan_fecha).subscribe(res => {
+        // METODO PARA ELIMINAR DE LA BASE DE DATOS
+        this.restP.EliminarRegistro(res).subscribe(datos => {
+          contador = contador + 1;
+          //console.log('ver contador ', contador, ' tamaño ', this.eliminar_lista.length)
+          if (contador === this.eliminar_lista.length) {
+            this.RegistrarPlanificacionMultiple();
+          }
+        }, error => {
+          contador = contador + 1;
+          if (contador === this.eliminar_lista.length) {
+            this.RegistrarPlanificacionMultiple();
+          }
+        })
+      }, error => {
+        contador = contador + 1;
+        if (contador === this.eliminar_lista.length) {
+          this.RegistrarPlanificacionMultiple();
+        }
+      })
+    })
+  }
+
+  // METODO PARA GUARDAR REGISTRO DE HORARIOS
+  RegistrarPlanificacionMultiple() {
+    //console.log('ver plan ', this.plan_general);
+
+    this.restP.CrearPlanGeneral(this.plan_general).subscribe(res => {
+      if (res.message === 'OK') {
+        this.progreso = false;
+        this.toastr.success('Operación exitosa.', 'Registro guardado.', {
+          timeOut: 6000,
+        });
+        this.CerrarVentana();
+      }
+      else {
+        this.progreso = false;
+        this.toastr.error('Ups!!! se ha producido un error. Es recomendable eliminar la planificación.', 'Verificar la planificación.', {
+          timeOut: 6000,
+        });
+        this.CerrarVentana();
+      }
+    }, error => {
+      this.progreso = false;
+      this.toastr.error('Ups!!! se ha producido un error. Es recomendable eliminar la planificación.', 'Verificar la planificación.', {
+        timeOut: 6000,
+      });
+      this.CerrarVentana();
+    })
+
   }
 
   // METODO PARA SUMAR HORAS
@@ -986,6 +1154,13 @@ export class PlanificacionMultipleComponent implements OnInit {
       this.componentem.seleccionar = true;
       this.componentem.plan_rotativo = false;
       this.componentem.LimpiarFormulario();
+    }
+    else if (this.datosSeleccionados.pagina === 'busqueda') {
+      this.componenteb.rotativo_multiple = false;
+      this.componenteb.seleccionar = true;
+      this.componenteb.buscar_fechas = true;
+      this.componenteb.auto_individual = true;
+      this.componenteb.multiple = true;
     }
   }
 
