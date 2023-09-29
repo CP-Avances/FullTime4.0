@@ -76,7 +76,7 @@
                         </td>
                     </tr>
                     <tr
-                        *ngFor="let h of horas_extras_plan | emplCedula: filtroCedula | nombreApellido: filtroEmpleado | paginate:tamanio_pagina:numero_pagina; index as i">
+                        *ngFor="let h of horas_extras_plan | emplCedula: filtroCedula | nombreApellido: filtroEmpleado | paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionUno.toggle(h) : null" [checked]="selectionUno.isSelected(h)"
@@ -237,7 +237,7 @@
                 </thead>
                 <tbody>
                     <tr
-                        *ngFor="let h of horas_extras_plan_observacion | emplCedula: filtroCedulaO | paginate:tamanio_pagina_O:numero_pagina_O; index as i">
+                        *ngFor="let h of horas_extras_plan_observacion | emplCedula: filtroCedulaO | paginate:tamanio_pagina_O:numero_pagina_O">
                         <th>
                             <mat-checkbox *ngIf="btnCheckHabilitarO" (change)="$event ? masterToggleO() : null"
                                 [checked]="selectionDos.hasValue() && isAllSelectedO()"
@@ -314,7 +314,7 @@
                 </thead>
                 <tbody>
                     <tr
-                        *ngFor="let h of horas_extras_autorizadas | paginate:tamanio_pagina_auto:numero_pagina_auto; index as i">
+                        *ngFor="let h of horas_extras_autorizadas | paginate:tamanio_pagina_auto:numero_pagina_auto">
                         <td>{{h.cedula}}</td>
                         <td>{{h.nombre}} {{h.apellido}}</td>
                         <td>{{h.plan_estado}}</td>

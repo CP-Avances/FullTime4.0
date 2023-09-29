@@ -18,9 +18,9 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
 
+import { HorarioMultipleEmpleadoComponent } from '../../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
 import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { HorarioMultipleEmpleadoComponent } from '../../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
 
 @Component({
   selector: 'app-registro-plan-horario',
@@ -82,8 +82,8 @@ export class RegistroPlanHorarioComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
- ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
- ** **************************************************************************************** **/
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **************************************************************************************** **/
   formato_hora: string = 'HH:mm:ss';
 
   BuscarHora() {
@@ -552,6 +552,32 @@ export class RegistroPlanHorarioComponent implements OnInit {
           }
           else if (this.fechas_mes[index].horarios[i].detalles.entrada > data.detalles.salida) {
             verificador = 0
+          }
+          else {
+            verificador = 2;
+            break;
+          }
+        }
+        else if (this.fechas_mes[index].horarios[i].detalles.segundo_dia === true && data.detalles.segundo_dia === true) {
+          verificador = 2;
+          break;
+        }
+        else if (this.fechas_mes[index].horarios[i].detalles.segundo_dia === false && data.detalles.segundo_dia === true) {
+          if (this.fechas_mes[index].horarios[i].detalles.entrada > data.detalles.salida
+            && this.fechas_mes[index].horarios[i].detalles.salida > data.detalles.salida
+            && this.fechas_mes[index].horarios[i].detalles.salida < data.detalles.entrada) {
+            verificador = 0;
+          }
+          else {
+            verificador = 2;
+            break;
+          }
+        }
+        else if (this.fechas_mes[index].horarios[i].detalles.segundo_dia === true && data.detalles.segundo_dia === false) {
+          if (this.fechas_mes[index].horarios[i].detalles.salida < data.detalles.entrada
+            && this.fechas_mes[index].horarios[i].detalles.salida < data.detalles.salida
+            && this.fechas_mes[index].horarios[i].detalles.entrada > data.detalles.salida) {
+            verificador = 0;
           }
           else {
             verificador = 2;

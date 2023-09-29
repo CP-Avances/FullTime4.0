@@ -167,7 +167,7 @@ export class BuscarPlanificacionComponent {
     this.plan.BuscarPlanificacionHoraria(busqueda).subscribe(datos => {
       if (datos.message === 'OK') {
         this.horariosEmpleado = datos.data;
-
+        let index = 0;
         this.horariosEmpleado.forEach(obj => {
           this.resultados.forEach(r => {
             if (r.codigo === obj.codigo_e) {
@@ -176,6 +176,8 @@ export class BuscarPlanificacionComponent {
               obj.hora_trabaja = r.hora_trabaja;
               obj.seleccionado = '';
               obj.color = '';
+              obj.index = index;
+              index = index + 1;
             }
           })
         })

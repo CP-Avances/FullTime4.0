@@ -929,6 +929,11 @@ export class VerEmpleadoComponent implements OnInit {
     this.restPlanGeneral.BuscarPlanificacionHoraria(busqueda).subscribe(datos => {
       if (datos.message === 'OK') {
         this.horariosEmpleado = datos.data;
+        let index = 0;
+        this.horariosEmpleado.forEach(obj => {
+          obj.index = index;
+          index = index + 1;
+        })
         this.ver_detalle = true;
         this.ver_acciones = false;
         this.ver_activar_editar = true;
