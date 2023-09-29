@@ -11,9 +11,18 @@
             <mat-card class="example-card mat-elevation-z9">
                 <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
                     <button mat-icon-button (click)="validacionReporte('open')">
+                        <mat-icon class="ver" matTooltipPosition="right"
+                            matTooltip="Previsualizar reporte en el navegador">visibility
+                        </mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="validacionReporte('open')">
                         <mat-icon class="i-pdf" matTooltipPosition="right"
                             matTooltip="Previsualizar reporte en el navegador en fomato PDF.">picture_as_pdf
                         </mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="validacionReporte('excel')">
+                        <mat-icon class="fas fa-file-excel i-excel" matTooltipPosition="right"
+                            matTooltip="Descargar reporte en formato EXCEL."></mat-icon>
                     </button>
                     <button mat-icon-button (click)="validacionReporte('print')">
                         <mat-icon class="i-print" matTooltipPosition="right"
@@ -22,10 +31,6 @@
                     <button mat-icon-button (click)="validacionReporte('download')">
                         <mat-icon class="i-download" matTooltipPosition="right"
                             matTooltip="Descargar reporte en formato PDF.">cloud_download</mat-icon>
-                    </button>
-                    <button mat-icon-button (click)="validacionReporte('excel')">
-                        <mat-icon class="fas fa-file-excel i-excel" matTooltipPosition="right"
-                            matTooltip="Descargar reporte en formato EXCEL."></mat-icon>
                     </button>
                 </div>
             </mat-card>
