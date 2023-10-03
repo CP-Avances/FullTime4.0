@@ -114,6 +114,8 @@ export class ReporteEmpleadosComponent implements OnInit {
               hora_trabaja: r.hora_trabaja,
               sucursal: r.sucursal,
               departamento: r.departamento,
+              ciudad: r.ciudad,
+              regimen: r.regimen
             })
           })
         })
@@ -161,6 +163,8 @@ export class ReporteEmpleadosComponent implements OnInit {
             hora_trabaja: r.hora_trabaja,
             sucursal: r.sucursal,
             departamento: r.departamento,
+            ciudad: r.ciudad,
+            regimen: r.regimen,
           })
         })
       })
@@ -369,7 +373,7 @@ export class ReporteEmpleadosComponent implements OnInit {
   getDocumentDefinicion() {
     return {
       pageSize: 'A4',
-      pageOrientation: 'portrait',
+      pageOrientation: 'landscape',
       pageMargins: [40, 60, 40, 40],
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + localStorage.getItem('fullname_print'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
@@ -407,7 +411,7 @@ export class ReporteEmpleadosComponent implements OnInit {
       ],
       styles: {
         tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTable: { fontSize: 12 },
+        itemsTable: { fontSize: 10.5 },
         itemsTableInfo: { fontSize: 12, margin: [0, 3, 0, 3], fillColor: this.s_color },
         itemsTableCentrado: { fontSize: 10, alignment: 'center' },
         tableMarginSuc: { margin: [0, 10, 0, 10] },
@@ -459,24 +463,32 @@ export class ReporteEmpleadosComponent implements OnInit {
         n.push({
           style: 'tableMarginEmp',
           table: {
-            widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
             body: [
               [
                 { text: 'N°', style: 'tableHeader' },
+                { text: 'CÓDIGO', style: 'tableHeader' },
                 { text: 'EMPLEADO', style: 'tableHeader' },
                 { text: 'CÉDULA', style: 'tableHeader' },
-                { text: 'CÓDIGO', style: 'tableHeader' },
+                { text: 'GÉNERO', style: 'tableHeader' },
+                { text: 'CIUDAD', style: 'tableHeader' },
                 { text: 'SUCURSAL', style: 'tableHeader' },
+                { text: 'RÉGIMEN', style: 'tableHeader' },
+                { text: 'DEPARTAMENTO', style: 'tableHeader' },
                 { text: 'CORREO', style: 'tableHeader' }
               ],
               ...arr_emp.map(obj3 => {
                 c = c + 1
                 return [
                   { style: 'itemsTableCentrado', text: c },
+                  { style: 'itemsTable', text: obj3.codigo },
                   { style: 'itemsTable', text: obj3.name_empleado },
                   { style: 'itemsTable', text: obj3.cedula },
-                  { style: 'itemsTable', text: obj3.codigo },
+                  { style: 'itemsTable', text: obj3.genero },
+                  { style: 'itemsTable', text: obj3.ciudad },
                   { style: 'itemsTable', text: obj3.sucursal },
+                  { style: 'itemsTable', text: obj3.regimen },
+                  { style: 'itemsTable', text: obj3.departamento },
                   { style: 'itemsTable', text: obj3.correo},
                 ]
               }),
@@ -534,13 +546,16 @@ export class ReporteEmpleadosComponent implements OnInit {
           n.push({
             style: 'tableMarginEmp',
             table: {
-              widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto'],
+              widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
               body: [
                 [
                   { text: 'N°', style: 'tableHeader' },
+                  { text: 'CÓDIGO', style: 'tableHeader' },
                   { text: 'EMPLEADO', style: 'tableHeader' },
                   { text: 'CÉDULA', style: 'tableHeader' },
-                  { text: 'CÓDIGO', style: 'tableHeader' },
+                  { text: 'GÉNERO', style: 'tableHeader' },
+                  { text: 'RÉGIMEN', style: 'tableHeader' },
+                  { text: 'DEPARTAMENTO', style: 'tableHeader' },
                   { text: 'CARGO', style: 'tableHeader' },
                   { text: 'CORREO', style: 'tableHeader' }
                 ],
@@ -548,9 +563,12 @@ export class ReporteEmpleadosComponent implements OnInit {
                   c = c + 1
                   return [
                     { style: 'itemsTableCentrado', text: c },
+                    { style: 'itemsTable', text: obj3.codigo },
                     { style: 'itemsTable', text: obj3.name_empleado },
                     { style: 'itemsTable', text: obj3.cedula },
-                    { style: 'itemsTable', text: obj3.codigo },
+                    { style: 'itemsTable', text: obj3.genero },
+                    { style: 'itemsTable', text: obj3.regimen },
+                    { style: 'itemsTable', text: obj3.departamento },
                     { style: 'itemsTable', text: obj3.cargo},
                     { style: 'itemsTable', text: obj3.correo},
                   ]
@@ -619,13 +637,15 @@ export class ReporteEmpleadosComponent implements OnInit {
             n.push({
               style: 'tableMarginEmp',
               table: {
-                widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto'],
+                widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', '*'],
                 body: [
                   [
                     { text: 'N°', style: 'tableHeader' },
+                    { text: 'CÓDIGO', style: 'tableHeader' },
                     { text: 'EMPLEADO', style: 'tableHeader' },
                     { text: 'CÉDULA', style: 'tableHeader' },
-                    { text: 'CÓDIGO', style: 'tableHeader' },
+                    { text: 'GÉNERO', style: 'tableHeader' },
+                    { text: 'RÉGIMEN', style: 'tableHeader' },
                     { text: 'CARGO', style: 'tableHeader' },
                     { text: 'CORREO', style: 'tableHeader' }
                   ],
@@ -633,9 +653,11 @@ export class ReporteEmpleadosComponent implements OnInit {
                     c = c + 1
                     return [
                       { style: 'itemsTableCentrado', text: c },
+                      { style: 'itemsTable', text: obj3.codigo },
                       { style: 'itemsTable', text: obj3.name_empleado },
                       { style: 'itemsTable', text: obj3.cedula },
-                      { style: 'itemsTable', text: obj3.codigo },
+                      { style: 'itemsTable', text: obj3.genero },
+                      { style: 'itemsTable', text: obj3.regimen },
                       { style: 'itemsTable', text: obj3.cargo },
                       { style: 'itemsTable', text: obj3.correo },
                     ]
@@ -670,13 +692,17 @@ export class ReporteEmpleadosComponent implements OnInit {
       n.push({
         style: 'tableMarginEmp',
         table: {
-          widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto'],
+          widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
           body: [
             [
               { text: 'N°', style: 'tableHeader' },
+              { text: 'CÓDIGO', style: 'tableHeader' },
               { text: 'EMPLEADO', style: 'tableHeader' },
               { text: 'CÉDULA', style: 'tableHeader' },
-              { text: 'CÓDIGO', style: 'tableHeader' },
+              { text: 'GÉNERO', style: 'tableHeader' },
+              { text: 'SUCURSAL', style: 'tableHeader' },
+              { text: 'RÉGIMEN', style: 'tableHeader' },
+              { text: 'DEPARTAMENTO', style: 'tableHeader' },
               { text: 'CARGO', style: 'tableHeader' },
               { text: 'CORREO', style: 'tableHeader' }
             ],
@@ -684,11 +710,15 @@ export class ReporteEmpleadosComponent implements OnInit {
               c = c + 1
               return [
                 { style: 'itemsTableCentrado', text: c },
+                { style: 'itemsTable', text: obj3.codigo },
                 { style: 'itemsTable', text: obj3.name_empleado },
                 { style: 'itemsTable', text: obj3.cedula },
-                { style: 'itemsTable', text: obj3.codigo },
+                { style: 'itemsTable', text: obj3.genero },
+                { style: 'itemsTable', text: obj3.sucursal },
+                { style: 'itemsTable', text: obj3.regimen },
+                { style: 'itemsTable', text: obj3.departamento },
                 { style: 'itemsTable', text: obj3.cargo },
-                { style: 'itemsTable', text: obj3.cargo },
+                { style: 'itemsTable', text: obj3.correo },
               ]
             }),
           ]
@@ -727,16 +757,20 @@ export class ReporteEmpleadosComponent implements OnInit {
   MapingDataPdfDefault(array: Array<any>) {
     let nuevo: Array<any> = [];
     console.log(array);
+    let c=0;
     array.forEach((obj1: IReporteAtrasos) => {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach(obj3 => {
           console.log(obj3);
-
+          c = c + 1;
           let ele = {
-            'Id Sucursal': obj1.id_suc, 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
-            'Id Departamento': obj2.id_depa, 'Departamento': obj2.name_dep,
-            'Id Empleado': obj3.id, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
-            'Género': obj3.genero, 'Cargo': obj3.cargo
+            'N°': c, 'Código Empleado': obj3.codigo, 'Nombre Empleado': obj3.name_empleado,
+            'Cédula': obj3.cedula, 'Género': obj3.genero, 
+            'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
+            'Régimen': obj3.regimen,            
+            'Departamento': obj2.name_dep,
+            'Cargo': obj3.cargo,
+            'Correo': obj3.correo,
           }
           nuevo.push(ele)
         })
@@ -756,14 +790,18 @@ export class ReporteEmpleadosComponent implements OnInit {
 
   MapingDataPdfDefaultCargo(array: Array<any>) {
     let nuevo: Array<any> = [];
+    let c=0;
     array.forEach((obj1) => {
       obj1.empleados.forEach(obj2 => {
+        c = c + 1;
           let ele = {
-            'Ciudad': obj2.ciudad,
-            'Sucursal': obj2.sucursal,
+            'N°': c, 'Código Empleado': obj2.codigo, 'Nombre Empleado': obj2.name_empleado,
+            'Cédula': obj2.cedula, 'Género': obj2.genero, 
+            'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
+            'Régimen': obj2.regimen,            
             'Departamento': obj2.departamento,
-            'Id Empleado': obj2.id, 'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
-            'Género': obj2.genero, 'Cargo': obj2.cargo
+            'Cargo': obj2.cargo,
+            'Correo': obj2.correo,
           }
           nuevo.push(ele)
       })
@@ -952,6 +990,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     }
   }
 
+  //ENVIAR DATOS A LA VENTANA DE DETALLE
   verDatos(data: any, tipo: string) {
     const encodedData = JSON.stringify(data);
       this.router.navigate(['/ver-empleados-activos-detalle/', tipo, encodedData]);

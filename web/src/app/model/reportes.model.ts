@@ -116,12 +116,17 @@ export interface emp {
     id: number,
     name_empleado: string,
     cedula: string,
-    codigo: string | number
+    codigo: string | number,
+    correo?: string,
     timbres?: Array<tim>,
     genero?: string | number,
     fec_final?: string,
     cargo?: string,
     contrato?: string,
+    regimen?: string,
+    departamento?: string,
+    sucursal?: string,
+    ciudad?: string
     faltas?: Array<faltas>
 }
 

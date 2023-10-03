@@ -256,7 +256,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
     console.log('aca 2');
     return {
       pageSize: 'A4',
-      pageOrientation: 'portrait',
+      pageOrientation: 'landscape',
       pageMargins: [40, 60, 40, 40],
       watermark: {
         text: this.frase,
@@ -322,31 +322,21 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
         }),
       ],
       styles: {
-        tableHeader: {
-          fontSize: 12,
-          bold: true,
-          alignment: 'center',
-          fillColor: this.p_color,
-        },
-        itemsTable: { fontSize: 12 },
-        itemsTableInfo: {
-          fontSize: 12,
-          margin: [0, 3, 0, 3],
-          fillColor: this.s_color,
-        },
+        tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
+        itemsTable: { fontSize: 10.5 },
+        itemsTableInfo: { fontSize: 12, margin: [0, 3, 0, 3], fillColor: this.s_color },
         itemsTableCentrado: { fontSize: 10, alignment: 'center' },
         tableMarginSuc: { margin: [0, 10, 0, 10] },
         tableMarginDep: { margin: [0, 10, 0, 0] },
         tableMarginEmp: { margin: [0, 0, 0, 10] },
         quote: { margin: [5, -2, 0, -2], italics: true },
-        small: { fontSize: 8, color: 'blue', opacity: 0.5 },
+        small: { fontSize: 8, color: 'blue', opacity: 0.5 }
       },
     };
   }
 
   impresionDatosPDF(data: any[]): Array<any> {
-    console.log('aca 3');
-    let n: any = [];
+    let n: any = []
     let c = 0;
     let arr_emp: any = [];
 
@@ -355,6 +345,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
         // let array_car = obj1.empleados.map(o => {return o.empleados.length});
         let arr_emp: any = [];
 
+        
         n.push({
           style: 'tableMarginSuc',
           table: {
@@ -365,63 +356,70 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
                   border: [true, true, false, true],
                   bold: true,
                   text: 'CARGO: ' + obj1.name_cargo,
-                  style: 'itemsTableInfo',
+                  style: 'itemsTableInfo'
                 },
                 {
                   border: [false, true, true, true],
                   text: 'N° Registros: ' + obj1.empleados.length,
-                  style: 'itemsTableInfo',
-                },
-              ],
-            ],
-          },
+                  style: 'itemsTableInfo'
+                }
+              ]
+            ]
+          }
         });
 
-        obj1.empleados.forEach((obj2) => {
-          arr_emp.push(obj2);
+        obj1.empleados.forEach(obj2 => {
+            arr_emp.push(obj2)
         });
 
         n.push({
           style: 'tableMarginEmp',
           table: {
-            widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto'],
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
             body: [
               [
                 { text: 'N°', style: 'tableHeader' },
+                { text: 'CÓDIGO', style: 'tableHeader' },
                 { text: 'EMPLEADO', style: 'tableHeader' },
                 { text: 'CÉDULA', style: 'tableHeader' },
-                { text: 'CÓDIGO', style: 'tableHeader' },
+                { text: 'GÉNERO', style: 'tableHeader' },
+                { text: 'CIUDAD', style: 'tableHeader' },
                 { text: 'SUCURSAL', style: 'tableHeader' },
-                { text: 'CORREO', style: 'tableHeader' },
+                { text: 'RÉGIMEN', style: 'tableHeader' },
+                { text: 'DEPARTAMENTO', style: 'tableHeader' },
+                { text: 'CORREO', style: 'tableHeader' }
               ],
-              ...arr_emp.map((obj3) => {
-                c = c + 1;
+              ...arr_emp.map(obj3 => {
+                c = c + 1
                 return [
                   { style: 'itemsTableCentrado', text: c },
+                  { style: 'itemsTable', text: obj3.codigo },
                   { style: 'itemsTable', text: obj3.name_empleado },
                   { style: 'itemsTable', text: obj3.cedula },
-                  { style: 'itemsTable', text: obj3.codigo },
+                  { style: 'itemsTable', text: obj3.genero },
+                  { style: 'itemsTable', text: obj3.ciudad },
                   { style: 'itemsTable', text: obj3.sucursal },
-                  { style: 'itemsTable', text: obj3.correo },
-                ];
+                  { style: 'itemsTable', text: obj3.regimen },
+                  { style: 'itemsTable', text: obj3.departamento },
+                  { style: 'itemsTable', text: obj3.correo},
+                ]
               }),
-            ],
+            ]
           },
           layout: {
             fillColor: function (rowIndex) {
-              return rowIndex % 2 === 0 ? '#E5E7E9' : null;
-            },
-          },
+              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+            }
+          }
         });
-      });
-    } else {
+      })
+    }
+
+    else {
       data.forEach((obj: IReporteAtrasos) => {
-        console.log('aca 4');
+
         if (this.bool_suc === true) {
-          console.log('aca 5');
-          let arr_suc = obj.departamentos.map((o) => {
-            return o.empleado.length;
-          });
+          let arr_suc = obj.departamentos.map(o => { return o.empleado.length });
           let suma_suc = this.SumarRegistros(arr_suc);
           let arr_emp: any = [];
           n.push({
@@ -434,64 +432,71 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
                     border: [true, true, false, true],
                     bold: true,
                     text: 'CIUDAD: ' + obj.ciudad,
-                    style: 'itemsTableInfo',
+                    style: 'itemsTableInfo'
                   },
                   {
                     border: [false, true, false, true],
                     text: 'SUCURSAL: ' + obj.name_suc,
-                    style: 'itemsTableInfo',
+                    style: 'itemsTableInfo'
                   },
                   {
                     border: [false, true, true, true],
                     text: 'N° Registros: ' + suma_suc,
-                    style: 'itemsTableInfo',
-                  },
-                ],
-              ],
-            },
+                    style: 'itemsTableInfo'
+                  }
+                ]
+              ]
+            }
           });
 
-          obj.departamentos.forEach((o) => {
-            o.empleado.forEach((e) => {
-              arr_emp.push(e);
-            });
-          });
+          obj.departamentos.forEach(o => {
+            o.empleado.forEach(e => {
+              arr_emp.push(e)
+            })
+          })
 
           n.push({
             style: 'tableMarginEmp',
             table: {
-              widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto'],
+              widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
               body: [
                 [
                   { text: 'N°', style: 'tableHeader' },
+                  { text: 'CÓDIGO', style: 'tableHeader' },
                   { text: 'EMPLEADO', style: 'tableHeader' },
                   { text: 'CÉDULA', style: 'tableHeader' },
-                  { text: 'CÓDIGO', style: 'tableHeader' },
+                  { text: 'GÉNERO', style: 'tableHeader' },
+                  { text: 'RÉGIMEN', style: 'tableHeader' },
+                  { text: 'DEPARTAMENTO', style: 'tableHeader' },
                   { text: 'CARGO', style: 'tableHeader' },
-                  { text: 'CORREO', style: 'tableHeader' },
+                  { text: 'CORREO', style: 'tableHeader' }
                 ],
-                ...arr_emp.map((obj3) => {
-                  c = c + 1;
+                ...arr_emp.map(obj3 => {
+                  c = c + 1
                   return [
                     { style: 'itemsTableCentrado', text: c },
+                    { style: 'itemsTable', text: obj3.codigo },
                     { style: 'itemsTable', text: obj3.name_empleado },
                     { style: 'itemsTable', text: obj3.cedula },
-                    { style: 'itemsTable', text: obj3.codigo },
-                    { style: 'itemsTable', text: obj3.cargo },
-                    { style: 'itemsTable', text: obj3.correo },
-                  ];
+                    { style: 'itemsTable', text: obj3.genero },
+                    { style: 'itemsTable', text: obj3.regimen },
+                    { style: 'itemsTable', text: obj3.departamento },
+                    { style: 'itemsTable', text: obj3.cargo},
+                    { style: 'itemsTable', text: obj3.correo},
+                  ]
                 }),
-              ],
+              ]
             },
             layout: {
               fillColor: function (rowIndex) {
-                return rowIndex % 2 === 0 ? '#E5E7E9' : null;
-              },
-            },
+                return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+              }
+            }
           });
         }
 
         if (this.bool_dep === true) {
+
           n.push({
             style: 'tableMarginSuc',
             table: {
@@ -502,24 +507,24 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
                     border: [true, true, false, true],
                     bold: true,
                     text: 'CIUDAD: ' + obj.ciudad,
-                    style: 'itemsTableInfo',
+                    style: 'itemsTableInfo'
                   },
                   {
                     border: [false, true, true, true],
                     text: 'SUCURSAL: ' + obj.name_suc,
-                    style: 'itemsTableInfo',
-                  },
-                ],
-              ],
-            },
-          });
+                    style: 'itemsTableInfo'
+                  }
+                ]
+              ]
+            }
+          })
 
-          obj.departamentos.forEach((obj1) => {
+          obj.departamentos.forEach(obj1 => {
             arr_emp = [];
-            obj1.empleado.forEach((e) => {
-              arr_emp.push(e);
-            });
-            let reg = obj1.empleado.length;
+            obj1.empleado.forEach(e => {
+              arr_emp.push(e)
+            })
+            let reg = obj1.empleado.length
             n.push({
               style: 'tableMarginDep',
               table: {
@@ -529,100 +534,116 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
                     {
                       border: [true, true, false, false],
                       text: 'DEPARTAMENTO: ' + obj1.name_dep,
-                      style: 'itemsTable',
+                      style: 'itemsTable'
                     },
                     {
                       border: [true, true, true, false],
                       text: 'N° EMPLEADOS DEPARTAMENTO: ' + reg,
-                      style: 'itemsTable',
-                    },
-                  ],
-                ],
-              },
-            });
+                      style: 'itemsTable'
+                    }
+                  ]
+                ]
+              }
+            })
 
             n.push({
               style: 'tableMarginEmp',
               table: {
-                widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto'],
+                widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', '*'],
                 body: [
                   [
                     { text: 'N°', style: 'tableHeader' },
+                    { text: 'CÓDIGO', style: 'tableHeader' },
                     { text: 'EMPLEADO', style: 'tableHeader' },
                     { text: 'CÉDULA', style: 'tableHeader' },
-                    { text: 'CÓDIGO', style: 'tableHeader' },
+                    { text: 'GÉNERO', style: 'tableHeader' },
+                    { text: 'RÉGIMEN', style: 'tableHeader' },
                     { text: 'CARGO', style: 'tableHeader' },
-                    { text: 'CORREO', style: 'tableHeader' },
+                    { text: 'CORREO', style: 'tableHeader' }
                   ],
-                  ...arr_emp.map((obj3) => {
-                    c = c + 1;
+                  ...arr_emp.map(obj3 => {
+                    c = c + 1
                     return [
                       { style: 'itemsTableCentrado', text: c },
+                      { style: 'itemsTable', text: obj3.codigo },
                       { style: 'itemsTable', text: obj3.name_empleado },
                       { style: 'itemsTable', text: obj3.cedula },
-                      { style: 'itemsTable', text: obj3.codigo },
+                      { style: 'itemsTable', text: obj3.genero },
+                      { style: 'itemsTable', text: obj3.regimen },
                       { style: 'itemsTable', text: obj3.cargo },
                       { style: 'itemsTable', text: obj3.correo },
-                    ];
+                    ]
                   }),
-                ],
+                ]
               },
               layout: {
                 fillColor: function (rowIndex) {
-                  return rowIndex % 2 === 0 ? '#E5E7E9' : null;
-                },
-              },
+                  return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+                }
+              }
             });
+
           });
+
         }
 
         if (this.bool_emp === true) {
-          obj.departamentos.forEach((o) => {
-            o.empleado.forEach((e) => {
-              arr_emp.push(e);
-            });
-          });
+
+          obj.departamentos.forEach(o => {
+            o.empleado.forEach(e => {
+              arr_emp.push(e)
+            })
+          })
+        }
+
+      });
+    } 
+
+    if (arr_emp.length > 0 && this.bool_emp === true) {
+      c = 0
+      n.push({
+        style: 'tableMarginEmp',
+        table: {
+          widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+          body: [
+            [
+              { text: 'N°', style: 'tableHeader' },
+              { text: 'CÓDIGO', style: 'tableHeader' },
+              { text: 'EMPLEADO', style: 'tableHeader' },
+              { text: 'CÉDULA', style: 'tableHeader' },
+              { text: 'GÉNERO', style: 'tableHeader' },
+              { text: 'SUCURSAL', style: 'tableHeader' },
+              { text: 'RÉGIMEN', style: 'tableHeader' },
+              { text: 'DEPARTAMENTO', style: 'tableHeader' },
+              { text: 'CARGO', style: 'tableHeader' },
+              { text: 'CORREO', style: 'tableHeader' }
+            ],
+            ...arr_emp.map(obj3 => {
+              c = c + 1
+              return [
+                { style: 'itemsTableCentrado', text: c },
+                { style: 'itemsTable', text: obj3.codigo },
+                { style: 'itemsTable', text: obj3.name_empleado },
+                { style: 'itemsTable', text: obj3.cedula },
+                { style: 'itemsTable', text: obj3.genero },
+                { style: 'itemsTable', text: obj3.sucursal },
+                { style: 'itemsTable', text: obj3.regimen },
+                { style: 'itemsTable', text: obj3.departamento },
+                { style: 'itemsTable', text: obj3.cargo },
+                { style: 'itemsTable', text: obj3.correo },
+              ]
+            }),
+          ]
+        },
+        layout: {
+          fillColor: function (rowIndex) {
+            return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+          }
         }
       });
     }
 
-    if (arr_emp.length > 0 && this.bool_emp === true) {
-      c = 0;
-      n.push({
-        style: 'tableMarginEmp',
-        table: {
-          widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto'],
-          body: [
-            [
-              { text: 'N°', style: 'tableHeader' },
-              { text: 'EMPLEADO', style: 'tableHeader' },
-              { text: 'CÉDULA', style: 'tableHeader' },
-              { text: 'CÓDIGO', style: 'tableHeader' },
-              { text: 'CARGO', style: 'tableHeader' },
-              { text: 'CORREO', style: 'tableHeader' },
-            ],
-            ...arr_emp.map((obj3) => {
-              c = c + 1;
-              return [
-                { style: 'itemsTableCentrado', text: c },
-                { style: 'itemsTable', text: obj3.name_empleado },
-                { style: 'itemsTable', text: obj3.cedula },
-                { style: 'itemsTable', text: obj3.codigo },
-                { style: 'itemsTable', text: obj3.cargo },
-                { style: 'itemsTable', text: obj3.cargo },
-              ];
-            }),
-          ],
-        },
-        layout: {
-          fillColor: function (rowIndex) {
-            return rowIndex % 2 === 0 ? '#E5E7E9' : null;
-          },
-        },
-      });
-    }
-
-    return n;
+    return n
   }
 
   SumarRegistros(array: any[]) {
@@ -630,76 +651,74 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
     for (let i = 0; i < array.length; i++) {
       valor = valor + array[i];
     }
-    return valor;
+    return valor
   }
 
-  /** ************************************************************************************************** **
+  /** ************************************************************************************************** ** 
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   exportToExcel(): void {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(
-      this.MapingDataPdfDefault(this.data)
-    );
+
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefault(this.data));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Empleados Activos');
-    xlsx.writeFile(wb, 'Empleados Activos ' + new Date().getTime() + '.xlsx');
+    xlsx.writeFile(wb, "Empleados Activos " + new Date().getTime() + '.xlsx');
+
   }
 
   MapingDataPdfDefault(array: Array<any>) {
     let nuevo: Array<any> = [];
     console.log(array);
+    let c=0;
     array.forEach((obj1: IReporteAtrasos) => {
-      obj1.departamentos.forEach((obj2) => {
-        obj2.empleado.forEach((obj3) => {
+      obj1.departamentos.forEach(obj2 => {
+        obj2.empleado.forEach(obj3 => {
           console.log(obj3);
-
+          c = c + 1;
           let ele = {
-            'Id Sucursal': obj1.id_suc,
-            Ciudad: obj1.ciudad,
-            Sucursal: obj1.name_suc,
-            'Id Departamento': obj2.id_depa,
-            Departamento: obj2.name_dep,
-            'Id Empleado': obj3.id,
-            'Nombre Empleado': obj3.name_empleado,
-            Cédula: obj3.cedula,
-            Código: obj3.codigo,
-            Género: obj3.genero,
-            Cargo: obj3.cargo,
-          };
-          nuevo.push(ele);
-        });
-      });
-    });
-    return nuevo;
+            'N°': c, 'Código Empleado': obj3.codigo, 'Nombre Empleado': obj3.name_empleado,
+            'Cédula': obj3.cedula, 'Género': obj3.genero, 
+            'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
+            'Régimen': obj3.regimen,            
+            'Departamento': obj2.name_dep,
+            'Cargo': obj3.cargo,
+            'Correo': obj3.correo,
+          }
+          nuevo.push(ele)
+        })
+      })
+    })
+    return nuevo
   }
 
   exportToExcelCargo(): void {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(
-      this.MapingDataPdfDefaultCargo(this.data)
-    );
+
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefaultCargo(this.data));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Empleados Activos');
-    xlsx.writeFile(wb, 'Empleados Activos ' + new Date().getTime() + '.xlsx');
+    xlsx.writeFile(wb, "Empleados Activos " + new Date().getTime() + '.xlsx');
+
   }
 
   MapingDataPdfDefaultCargo(array: Array<any>) {
     let nuevo: Array<any> = [];
+    let c=0;
     array.forEach((obj1) => {
-      obj1.empleados.forEach((obj2) => {
-        let ele = {
-          Ciudad: obj2.ciudad,
-          Sucursal: obj2.sucursal,
-          Departamento: obj2.departamento,
-          'Id Empleado': obj2.id,
-          'Nombre Empleado': obj2.name_empleado,
-          Cédula: obj2.cedula,
-          Código: obj2.codigo,
-          Género: obj2.genero,
-          Cargo: obj2.cargo,
-        };
-        nuevo.push(ele);
-      });
-    });
-    return nuevo;
+      obj1.empleados.forEach(obj2 => {
+        c = c + 1;
+          let ele = {
+            'N°': c, 'Código Empleado': obj2.codigo, 'Nombre Empleado': obj2.name_empleado,
+            'Cédula': obj2.cedula, 'Género': obj2.genero, 
+            'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
+            'Régimen': obj2.regimen,            
+            'Departamento': obj2.departamento,
+            'Cargo': obj2.cargo,
+            'Correo': obj2.correo,
+          }
+          nuevo.push(ele)
+      })
+    })
+    return nuevo
   }
+ 
 }

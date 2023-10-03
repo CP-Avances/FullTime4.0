@@ -19,10 +19,11 @@
                 <table class="table table-hover table-sm">
                   <thead class="thead-light">
                     <tr style="text-align: center">
-                      <th scope="col" rowspan="2">N.</th>
+                      <th scope="col" rowspan="2">N°</th>
+                      <th scope="col" rowspan="2">CÓDIGO</th>
                       <th scope="col" rowspan="2">EMPLEADO</th>
-                      <th scope="col" rowspan="2">CEDULA</th>
-                      <th scope="col" rowspan="2">CODIGO</th>
+                      <th scope="col" rowspan="2">CÉDULA</th>
+                      <th scope="col" rowspan="2">DEPARTAMENTO</th>
                       <th scope="col" rowspan="2">CARGO</th>
                       <th scope="col" colspan="2">CORREO</th>
                     </tr>
@@ -35,9 +36,10 @@
                       "
                     >
                       <td>{{ e.n }}</td>
+                      <td>{{ e.codigo }}</td>
                       <td>{{ e.name_empleado.toUpperCase() }}</td>
                       <td>{{ e.cedula }}</td>
-                      <td>{{ e.codigo }}</td>
+                      <td>{{ e.departamento }}</td>
                       <td>{{ e.cargo }}</td>
                       <td>{{ e.correo }}</td>
                     </tr>
@@ -73,21 +75,23 @@
                 <table class="table table-hover table-sm">
                   <thead class="thead-light">
                     <tr style="text-align: center">
-                      <th scope="col" rowspan="2">N.</th>
+                      <th scope="col" rowspan="2">N°</th>
+                      <th scope="col" rowspan="2">CÓDIGO</th>
                       <th scope="col" rowspan="2">EMPLEADO</th>
-                      <th scope="col" rowspan="2">CEDULA</th>
-                      <th scope="col" rowspan="2">CODIGO</th>
-                      <th scope="col" rowspan="2">CARGO</th>
+                      <th scope="col" rowspan="2">CÉDULA</th>
+                      <th scope="col" rowspan="2">SUCURSAL</th>
+                      <th scope="col" rowspan="2">DEPARTAMENTO</th>
                       <th scope="col" colspan="2">CORREO</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr *ngFor="let e of car.empleados">
                       <td>{{ e.n }}</td>
+                      <td>{{ e.codigo }}</td>
                       <td>{{ e.name_empleado.toUpperCase() }}</td>
                       <td>{{ e.cedula }}</td>
-                      <td>{{ e.codigo }}</td>
-                      <td>{{ e.cargo }}</td>
+                      <td>{{ e.sucursal }}</td>
+                      <td>{{ e.departamento }}</td>
                       <td>{{ e.correo }}</td>
                     </tr>
                   </tbody>
@@ -122,10 +126,11 @@
                 <table class="table table-hover table-sm">
                   <thead class="thead-light">
                     <tr style="text-align: center">
-                      <th scope="col" rowspan="2">N.</th>
+                      <th scope="col" rowspan="2">N°</th>
+                      <th scope="col" rowspan="2">CÓDIGO</th>
                       <th scope="col" rowspan="2">EMPLEADO</th>
-                      <th scope="col" rowspan="2">CEDULA</th>
-                      <th scope="col" rowspan="2">CODIGO</th>
+                      <th scope="col" rowspan="2">CÉDULA</th>
+                      <th scope="col" rowspan="2">SUCURSAL</th>
                       <th scope="col" rowspan="2">CARGO</th>
                       <th scope="col" colspan="2">CORREO</th>
                     </tr>
@@ -138,9 +143,10 @@
                       "
                     >
                       <td>{{ e.n }}</td>
+                      <td>{{ e.codigo }}</td>
                       <td>{{ e.name_empleado.toUpperCase() }}</td>
                       <td>{{ e.cedula }}</td>
-                      <td>{{ e.codigo }}</td>
+                      <td>{{ e.sucursal }}</td>
                       <td>{{ e.cargo }}</td>
                       <td>{{ e.correo }}</td>
                     </tr>
@@ -175,10 +181,12 @@
               <table class="table table-hover table-sm">
                 <thead class="thead-light">
                   <tr style="text-align: center">
-                    <th scope="col" rowspan="2">N.</th>
+                    <th scope="col" rowspan="2">N°</th>
+                    <th scope="col" rowspan="2">CÓDIGO</th>
                     <th scope="col" rowspan="2">EMPLEADO</th>
-                    <th scope="col" rowspan="2">CEDULA</th>
-                    <th scope="col" rowspan="2">CODIGO</th>
+                    <th scope="col" rowspan="2">CÉDULA</th>
+                    <th scope="col" rowspan="2">SUCURSAL</th>
+                    <th scope="col" rowspan="2">DEPARTAMENTO</th>
                     <th scope="col" rowspan="2">CARGO</th>
                     <th scope="col" colspan="2">CORREO</th>
                   </tr>
@@ -191,9 +199,11 @@
                     "
                   >
                     <td>{{ e.n }}</td>
+                    <td>{{ e.codigo }}</td>
                     <td>{{ e.name_empleado.toUpperCase() }}</td>
                     <td>{{ e.cedula }}</td>
-                    <td>{{ e.codigo }}</td>
+                    <td>{{ e.sucursal }}</td>
+                    <td>{{ e.departamento }}</td>
                     <td>{{ e.cargo }}</td>
                     <td>{{ e.correo }}</td>
                   </tr>

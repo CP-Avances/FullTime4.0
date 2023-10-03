@@ -54,21 +54,28 @@ class ReportesAsistenciaControlador {
             obj.departamentos = await Promise.all(obj.departamentos.map(async (ele: any) => {
                 if (estado === '1') {
                     ele.empleado = await pool.query(
+                        //empl-contratos esta el id_regimen
                         `
                         SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
-                            e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo,
+                            e.cedula, e.correo, ca.id AS id_cargo, tc.cargo,
                             co.id AS id_contrato, d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
-                            s.nombre AS sucursal, ca.hora_trabaja
-                        FROM empl_cargos AS ca, empl_contratos AS co, empleados AS e,
-                            tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s
+                            s.nombre AS sucursal, ca.hora_trabaja, r.id AS id_regimen, r.descripcion AS regimen, c.descripcion AS ciudad, 
+                            CASE 
+								WHEN e.genero = 1 THEN 'Masculino'
+								WHEN e.genero = 2 THEN 'Femenino'
+							END AS genero
+                        FROM empl_cargos AS ca, empl_contratos AS co, empleados AS e, 
+                            tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s, cg_regimenes AS r, ciudades AS c
                         WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
                             da.id = e.id) 
                             AND tc.id = ca.cargo
                             AND ca.id_departamento = $1
                             AND ca.id_departamento = d.id
                             AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
-                            da.id = e.id) 
+                            da.id = e.id)
+                            AND co.id_regimen = r.id 
                             AND s.id = d.id_sucursal
+                            AND s.id_ciudad = c.id
                             AND e.estado = $2
                         ORDER BY name_empleado ASC
                         `
@@ -79,11 +86,16 @@ class ReportesAsistenciaControlador {
                     ele.empleado = await pool.query(
                         `
                         SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
-                            e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo,
+                            e.cedula, e.correo, ca.id AS id_cargo, tc.cargo,
                             co.id AS id_contrato, d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
-                            s.nombre AS sucursal, ca.hora_trabaja, e.estado AS estado
+                            s.nombre AS sucursal, ca.hora_trabaja, e.estado AS estado, r.id AS id_regimen, r.descripcion AS regimen,
+                            c.descripcion AS ciudad, 
+                            CASE 
+								WHEN e.genero = 1 THEN 'Masculino'
+								WHEN e.genero = 2 THEN 'Femenino'
+							END AS genero
                         FROM empl_cargos AS ca, empl_contratos AS co, empleados AS e,
-                            tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s
+                            tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s, cg_regimenes AS r, ciudades AS c
                         WHERE ca.id = (SELECT de.cargo_id FROM datos_empleado_cargo AS de WHERE 
                             de.empl_id = e.id) 
                             AND tc.id = ca.cargo
@@ -91,7 +103,9 @@ class ReportesAsistenciaControlador {
                             AND ca.id_departamento = d.id
                             AND co.id = (SELECT de.contrato_id FROM datos_empleado_cargo AS de WHERE 
                                 de.empl_id = e.id) 
+							AND co.id_regimen = r.id
                             AND s.id = d.id_sucursal
+                            AND s.id_ciudad = c.id
                             AND e.estado = $2
                         ORDER BY name_empleado ASC
                         `
@@ -141,41 +155,52 @@ class ReportesAsistenciaControlador {
             if (estado === '1') {
                 empl.empleados = await pool.query(
                     `
-                    SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
-                        e.cedula, e.genero, e.correo, e.estado, ca.id AS id_cargo, tc.cargo,
-                        d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
-                        s.nombre AS sucursal, ca.hora_trabaja, c.descripcion AS ciudad
-                    FROM empleados e, empl_cargos AS ca, tipo_cargo AS tc,
-                        cg_departamentos AS d, sucursales AS s, ciudades AS c
-                    WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
-                        da.id = e.id)
-                        AND ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
-                        da.id = e.id) 
-                        AND ca.id_departamento = d.id
-                        AND s.id = d.id_sucursal
-                        AND s.id_ciudad = c.id
-                        AND tc.id = ca.cargo
-                        AND ca.cargo = $1
-                        AND e.estado = $2
-                    ORDER BY name_empleado ASC
-                    `
-                    , [empl.id_cargo, estado]
+                SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
+                    e.cedula, e.correo, ca.id AS id_cargo, tc.cargo,
+                    co.id AS id_contrato, d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
+                    s.nombre AS sucursal, ca.hora_trabaja, r.id AS id_regimen, r.descripcion AS regimen, c.descripcion AS ciudad,  
+					CASE 
+						WHEN e.genero = 1 THEN 'Masculino'
+						WHEN e.genero = 2 THEN 'Femenino'
+					END AS genero
+                FROM empl_cargos AS ca, empl_contratos AS co, empleados AS e, ciudades AS c,
+                    tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s, cg_regimenes AS r
+                WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
+                    da.id = e.id) 
+                    AND tc.id = ca.cargo
+                    AND ca.id_departamento = d.id
+                    AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
+                    da.id = e.id)
+                    AND co.id_regimen = r.id 
+                    AND s.id = d.id_sucursal
+                    AND s.id_ciudad = c.id
+                    AND ca.cargo = $1
+                    AND e.estado = $2
+                ORDER BY name_empleado ASC
+                `
+                , [empl.id_cargo, estado]
 
                 ).then((result: any) => { return result.rows });
             }
             else {
                 empl.empleados = await pool.query(
                     `
-                   SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
-                        e.cedula, e.genero, e.correo, e.estado, ca.id AS id_cargo, tc.cargo,
+                    SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
+                        e.cedula, e.correo, e.estado, ca.id AS id_cargo, tc.cargo,
                         d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
-                        s.nombre AS sucursal, ca.hora_trabaja, c.descripcion AS ciudad
-                    FROM empleados e, empl_cargos AS ca, tipo_cargo AS tc,
-                        cg_departamentos AS d, sucursales AS s, ciudades AS c
+                        s.nombre AS sucursal, ca.hora_trabaja, c.descripcion AS ciudad, r.id AS id_regimen, r.descripcion AS regimen,
+						 CASE 
+								WHEN e.genero = 1 THEN 'Masculino'
+								WHEN e.genero = 2 THEN 'Femenino'
+							END AS genero
+                    FROM empleados e, empl_cargos AS ca, empl_contratos AS co, tipo_cargo AS tc,
+                        cg_departamentos AS d, sucursales AS s, ciudades AS c, cg_regimenes AS r
                     WHERE ca.id = (SELECT de.cargo_id FROM datos_empleado_cargo AS de WHERE 
                         de.empl_id = e.id)
                         AND ca.id = (SELECT de.contrato_id FROM datos_empleado_cargo AS de WHERE 
                             de.empl_id = e.id) 
+						AND ca.id_empl_contrato = co.id
+						AND co.id_regimen = r.id
                         AND ca.id_departamento = d.id
                         AND s.id = d.id_sucursal
                         AND s.id_ciudad = c.id
