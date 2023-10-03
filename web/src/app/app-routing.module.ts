@@ -203,7 +203,7 @@ const routes: Routes = [
   { path: 'reporte-timbre-reloj-virtual', component: TimbreVirtualComponent, canActivate: [AuthGuard], data: { roles: 1 } },
 
   //DETALLE REPORTES
-  { path: 'ver-empleados-activos-detalle/:lista', component: VerEmpleadosActivosDetalleComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'ver-empleados-activos-detalle/:tipo/:lista', component: VerEmpleadosActivosDetalleComponent, canActivate: [AuthGuard], data: { roles: 1 } },
 
   // REPORTES ALIMENTACIÓN
   { path: 'alimentosGeneral', component: AlimentosGeneralComponent, canActivate: [AuthGuard], data: { roles: 1 } },

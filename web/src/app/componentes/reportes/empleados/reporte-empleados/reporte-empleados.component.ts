@@ -238,7 +238,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     this.data_pdf = suc;
     switch (accion) {
       case 'excel': this.exportToExcel(); break;
-      case 'ver': this.VerDatos(this.data_pdf); break;
+      case 'ver': this.verDatos(this.data_pdf, 'suc'); break;
       default: this.generarPdf(accion); break;
     }
   }
@@ -257,6 +257,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     this.data_pdf = car;
     switch (accion) {
       case 'excel': this.exportToExcelCargo(); break;
+      case 'ver': this.verDatos(this.data_pdf,'car'); break;
       default: this.generarPdf(accion); break;
     }
   }
@@ -281,6 +282,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     this.data_pdf = dep;
     switch (accion) {
       case 'excel': this.exportToExcel(); break;
+      case 'ver': this.verDatos(this.data_pdf,'dep'); break;
       default: this.generarPdf(accion); break;
     }
   }
@@ -314,6 +316,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     this.data_pdf = emp;
     switch (accion) {
       case 'excel': this.exportToExcel(); break;
+      case 'ver': this.verDatos(this.data_pdf,'emp'); break;
       default: this.generarPdf(accion); break;
     }
 
@@ -949,8 +952,8 @@ export class ReporteEmpleadosComponent implements OnInit {
     }
   }
 
-  VerDatos(data: any) {
+  verDatos(data: any, tipo: string) {
     const encodedData = JSON.stringify(data);
-      this.router.navigate(['/ver-empleados-activos-detalle/', encodedData]);
+      this.router.navigate(['/ver-empleados-activos-detalle/', tipo, encodedData]);
   }
 }
