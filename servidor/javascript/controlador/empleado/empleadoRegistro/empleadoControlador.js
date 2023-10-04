@@ -51,6 +51,7 @@ const ObtenerRutaUsuario = function (id) {
                 ruta = ruta + separador + __dirname.split(separador)[i];
             }
         }
+        console.log('ver ruta imagen', ruta + separador + 'imagenesEmpleados' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula);
         return ruta + separador + 'imagenesEmpleados' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
     });
 };
@@ -572,7 +573,7 @@ class EmpleadoControlador {
             let separador = path_1.default.sep;
             let ruta = (yield (0, exports.ObtenerRutaUsuario)(id)) + separador + imagen;
             console.log('ver file ', ruta);
-            res.sendFile(ruta);
+            res.sendFile(path_1.default.resolve(ruta));
         });
     }
     // BUSQUEDA INFORMACIÓN DEPARTAMENTOS EMPLEADO

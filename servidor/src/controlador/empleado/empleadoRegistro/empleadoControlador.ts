@@ -42,7 +42,7 @@ export const ObtenerRutaUsuario = async function (id: any) {
       ruta = ruta + separador + __dirname.split(separador)[i];
     }
   }
-
+console.log('ver ruta imagen', ruta + separador + 'imagenesEmpleados' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula)
   return ruta + separador + 'imagenesEmpleados' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
 }
 
@@ -645,7 +645,7 @@ class EmpleadoControlador {
 
     let ruta = await ObtenerRutaUsuario(id) + separador + imagen;
     console.log('ver file ', ruta)
-    res.sendFile(ruta);
+    res.sendFile(path.resolve(ruta));
   }
 
 
