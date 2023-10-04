@@ -22,18 +22,15 @@ const catProvinciaRutas_1 = __importDefault(require("./rutas/catalogos/catProvin
 const catDepartamentoRutas_1 = __importDefault(require("./rutas/catalogos/catDepartamentoRutas"));
 const catProcesoRutas_1 = __importDefault(require("./rutas/catalogos/catProcesoRutas"));
 const catHorarioRutas_1 = __importDefault(require("./rutas/catalogos/catHorarioRutas"));
-const catEnroladoRutas_1 = __importDefault(require("./rutas/catalogos/catEnroladoRutas"));
 const usuarioRutas_1 = __importDefault(require("./rutas/usuarios/usuarioRutas"));
 const catHorasExtrasRutas_1 = __importDefault(require("./rutas/catalogos/catHorasExtrasRutas"));
 const catRolPermisosRutas_1 = __importDefault(require("./rutas/catalogos/catRolPermisosRutas"));
 const catTipoPermisosRutas_1 = __importDefault(require("./rutas/catalogos/catTipoPermisosRutas"));
 const ciudadesRutas_1 = __importDefault(require("./rutas/ciudades/ciudadesRutas"));
 const ciudadFeriadoRutas_1 = __importDefault(require("./rutas/ciudadFeriado/ciudadFeriadoRutas"));
-const catNotificacionesRutas_1 = __importDefault(require("./rutas/catalogos/catNotificacionesRutas"));
 const contratoEmpleadoRutas_1 = __importDefault(require("./rutas/empleado/empleadoContrato/contratoEmpleadoRutas"));
 const emplCargosRutas_1 = __importDefault(require("./rutas/empleado/empleadoCargos/emplCargosRutas"));
 const planComidasRutas_1 = __importDefault(require("./rutas/planComidas/planComidasRutas"));
-const enroladoRelojRutas_1 = __importDefault(require("./rutas/enroladoReloj/enroladoRelojRutas"));
 const catEmpresaRutas_1 = __importDefault(require("./rutas/catalogos/catEmpresaRutas"));
 const sucursalRutas_1 = __importDefault(require("./rutas/sucursal/sucursalRutas"));
 const nacionalidadRutas_1 = __importDefault(require("./rutas/nacionalidad/nacionalidadRutas"));
@@ -41,13 +38,10 @@ const nivelTituloRutas_1 = __importDefault(require("./rutas/nivelTitulo/nivelTit
 const periodoVacacionRutas_1 = __importDefault(require("./rutas/empleado/empleadoPeriodoVacacion/periodoVacacionRutas"));
 const vacacionesRutas_1 = __importDefault(require("./rutas/vacaciones/vacacionesRutas"));
 const empleProcesosRutas_1 = __importDefault(require("./rutas/empleado/empleadoProcesos/empleProcesosRutas"));
-const planHorarioRutas_1 = __importDefault(require("./rutas/horarios/planHorario/planHorarioRutas"));
-const detallePlanHorarioRutas_1 = __importDefault(require("./rutas/horarios/detallePlanHorario/detallePlanHorarioRutas"));
 const autorizaDepartamentoRutas_1 = __importDefault(require("./rutas/autorizaDepartamento/autorizaDepartamentoRutas"));
 const empleadoHorariosRutas_1 = __importDefault(require("./rutas/horarios/empleadoHorarios/empleadoHorariosRutas"));
 const permisosRutas_1 = __importDefault(require("./rutas/permisos/permisosRutas"));
 const detalleCatHorarioRutas_1 = __importDefault(require("./rutas/horarios/detalleCatHorario/detalleCatHorarioRutas"));
-const catNotiAutorizacionesRutas_1 = __importDefault(require("./rutas/catalogos/catNotiAutorizacionesRutas"));
 const autorizacionesRutas_1 = __importDefault(require("./rutas/autorizaciones/autorizacionesRutas"));
 const plantillaRutas_1 = __importDefault(require("./rutas/descargarPlantilla/plantillaRutas"));
 const notificacionesRutas_1 = __importDefault(require("./rutas/notificaciones/notificacionesRutas"));
@@ -133,14 +127,10 @@ class Servidor {
         // Almuerzo
         this.app.use('/planComidas', planComidasRutas_1.default);
         // Horarios
-        this.app.use('/planHorario', planHorarioRutas_1.default);
-        this.app.use('/detallePlanHorario', detallePlanHorarioRutas_1.default);
         this.app.use('/empleadoHorario', empleadoHorariosRutas_1.default);
         this.app.use('/detalleHorario', detalleCatHorarioRutas_1.default);
         // Enrolados
-        this.app.use('/enrolados', catEnroladoRutas_1.default);
         this.app.use('/relojes', catRelojesRuta_1.default);
-        this.app.use('/enroladosRelojes', enroladoRelojRutas_1.default);
         //Redireccionamiento a páginas que contienen catálogos
         this.app.use('/titulo', catTituloRutas_1.default);
         this.app.use('/discapacidad', discapacidadRutas_1.default);
@@ -158,11 +148,9 @@ class Servidor {
         this.app.use('/tipoPermisos', catTipoPermisosRutas_1.default);
         this.app.use('/ciudades', ciudadesRutas_1.default);
         this.app.use('/ciudadFeriados', ciudadFeriadoRutas_1.default);
-        this.app.use('/notificaciones', catNotificacionesRutas_1.default);
         this.app.use('/sucursales', sucursalRutas_1.default);
         this.app.use('/nacionalidades', nacionalidadRutas_1.default);
         this.app.use('/nivel-titulo', nivelTituloRutas_1.default);
-        this.app.use('/noti-autorizaciones', catNotiAutorizacionesRutas_1.default);
         this.app.use('/autorizaciones', autorizacionesRutas_1.default);
         this.app.use('/noti-real-time', notificacionesRutas_1.default);
         // Timbres

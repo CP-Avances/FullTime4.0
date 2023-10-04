@@ -1,7 +1,32 @@
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import pool from '../../../database';
+import path from 'path';
 import fs from 'fs';
+import moment from 'moment';
+
+// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE CARNET VACUNAS
+export const ObtenerRutaVacuna = async function (id: any) {
+    var ruta = '';
+    let separador = path.sep;
+    console.log('ver direccion ***** ', __dirname)
+    const usuario = await pool.query(
+        `
+        SELECT codigo, cedula FROM empleados WHERE id = $1
+        `
+        , [id]);
+
+    for (var i = 0; i < __dirname.split(separador).length - 4; i++) {
+        if (ruta === '') {
+            ruta = __dirname.split(separador)[i];
+        }
+        else {
+            ruta = ruta + separador + __dirname.split(separador)[i];
+        }
+    }
+
+    return ruta + separador + 'carnetVacuna' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
+}
 
 class VacunasControlador {
 
@@ -63,15 +88,32 @@ class VacunasControlador {
 
     // REGISTRO DE CERTIFICADO O CARNET DE VACUNACION
     public async GuardarDocumento(req: Request, res: Response): Promise<void> {
-        let list: any = req.files;
-        let documento = list.uploads[0].path.split("\\")[1];
-        let { nombre } = req.params;
+
+        // FECHA DEL SISTEMA
+        var fecha = moment();
+        var anio = fecha.format('YYYY');
+        var mes = fecha.format('MM');
+        var dia = fecha.format('DD');
+
         let id = req.params.id;
+        let id_empleado = req.params.id_empleado;
+
+        const response: QueryResult = await pool.query(
+            `
+            SELECT codigo FROM empleados WHERE id = $1
+            `
+            , [id_empleado]);
+
+        const [vacuna] = response.rows;
+
+        let documento = vacuna.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
+
         await pool.query(
             `
-            UPDATE empl_vacunas SET carnet = $2, nom_carnet = $3 WHERE id = $1
+            UPDATE empl_vacunas SET carnet = $2 WHERE id = $1
             `
-            , [id, documento, nombre]);
+            , [id, documento]);
+
         res.jsonp({ message: 'Registro guardado.' });
     }
 

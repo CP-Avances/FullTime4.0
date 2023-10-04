@@ -8,7 +8,6 @@ import { Router } from '@angular/router';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { PlanHorarioService } from 'src/app/servicios/horarios/planHorario/plan-horario.service';
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
@@ -40,7 +39,6 @@ export class HorariosEmpleadoComponent implements OnInit {
     public restEmpleado: EmpleadoService,
     public informacion: DatosGeneralesService,
     public restCargo: EmplCargosService,
-    public restPlanH: PlanHorarioService,
     public parametro: ParametrosService,
     public ventana: MatDialog,
     public validar: ValidacionesService,

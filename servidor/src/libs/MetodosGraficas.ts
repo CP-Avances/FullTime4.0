@@ -1877,8 +1877,7 @@ export const MetricaPermisosEmpleado = async function (codigo: number | string, 
 }
 
 export const MetricaAtrasosEmpleado = async function (codigo: number | string, id_empleado: number, fec_inicio: Date, fec_final: Date) {
-    
-    
+
     /*
     // console.log(id_empleado, fec_inicio, fec_final);
     

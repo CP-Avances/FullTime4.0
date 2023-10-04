@@ -1,16 +1,51 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
-const verificarToken_1 = require("../../../libs/verificarToken");
 const vacunasControlador_1 = __importDefault(require("../../../controlador/empleado/empleadoVacuna/vacunasControlador"));
-// ALMACENAMIENTO DEL CERTIFICADO DE VACUNACIÓN EN CARPETA
-const multipart = require('connect-multiparty');
-const multipartMiddleware = multipart({
-    uploadDir: './carnetVacuna',
+const vacunasControlador_2 = require("../../../controlador/empleado/empleadoVacuna/vacunasControlador");
+const verificarToken_1 = require("../../../libs/verificarToken");
+const express_1 = require("express");
+const multer_1 = __importDefault(require("multer"));
+const database_1 = __importDefault(require("../../../database"));
+const moment_1 = __importDefault(require("moment"));
+moment_1.default.locale('es');
+const storage = multer_1.default.diskStorage({
+    destination: function (req, file, cb) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let id = req.params.id_empleado;
+            var ruta = yield (0, vacunasControlador_2.ObtenerRutaVacuna)(id);
+            cb(null, ruta);
+        });
+    },
+    filename: function (req, file, cb) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // FECHA DEL SISTEMA
+            var fecha = (0, moment_1.default)();
+            var anio = fecha.format('YYYY');
+            var mes = fecha.format('MM');
+            var dia = fecha.format('DD');
+            // DATOS DOCUMENTO
+            let id = req.params.id_empleado;
+            const usuario = yield database_1.default.query(`
+            SELECT codigo FROM empleados WHERE id = $1
+            `, [id]);
+            let documento = usuario.rows[0].codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
+            cb(null, documento);
+        });
+    }
 });
+const upload = (0, multer_1.default)({ storage: storage });
 class VacunaRutas {
     constructor() {
         this.router = (0, express_1.Router)();
@@ -24,7 +59,7 @@ class VacunaRutas {
         // METODO REGISTRO DE VACUNACIÓN
         this.router.post('/', verificarToken_1.TokenValidation, vacunasControlador_1.default.CrearRegistro);
         // METODO PARA GUARDAR DOCUMENTO 
-        this.router.put('/:id/documento/:nombre', [verificarToken_1.TokenValidation, multipartMiddleware], vacunasControlador_1.default.GuardarDocumento);
+        this.router.put('/:id/documento/:id_empleado', [verificarToken_1.TokenValidation, upload.single('uploads')], vacunasControlador_1.default.GuardarDocumento);
         // METODO ACTUALIZACION DE REGISTROS DE VACUNACION
         this.router.put('/:id', verificarToken_1.TokenValidation, vacunasControlador_1.default.ActualizarRegistro);
         // ELIMINAR DOCUMENTO DE VACUNAS DEL SERVIDOR

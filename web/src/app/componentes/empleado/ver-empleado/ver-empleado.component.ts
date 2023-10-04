@@ -17,7 +17,6 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
 import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
-import { DetallePlanHorarioService } from 'src/app/servicios/horarios/detallePlanHorario/detalle-plan-horario.service';
 import { PeriodoVacacionesService } from 'src/app/servicios/periodoVacaciones/periodo-vacaciones.service';
 import { PlantillaReportesService } from '../../reportes/plantilla-reportes.service';
 import { EmpleadoProcesosService } from 'src/app/servicios/empleado/empleadoProcesos/empleado-procesos.service';
@@ -28,7 +27,6 @@ import { DiscapacidadService } from 'src/app/servicios/discapacidad/discapacidad
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { PedHoraExtraService } from 'src/app/servicios/horaExtra/ped-hora-extra.service';
 import { PlanComidasService } from 'src/app/servicios/planComidas/plan-comidas.service';
-import { PlanHorarioService } from 'src/app/servicios/horarios/planHorario/plan-horario.service';
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { VacunacionService } from 'src/app/servicios/empleado/empleadoVacunas/vacunacion.service';
 import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
@@ -44,7 +42,6 @@ import { TituloService } from 'src/app/servicios/catalogos/catTitulos/titulo.ser
 import { ScriptService } from 'src/app/servicios/empleado/script.service';
 
 // IMPORTAR COMPONENTES
-import { RegistroDetallePlanHorarioComponent } from 'src/app/componentes/horarios/detallePlanHorario/registro-detalle-plan-horario/registro-detalle-plan-horario.component';
 import { EditarVacacionesEmpleadoComponent } from 'src/app/componentes/modulos/vacaciones/editar-vacaciones-empleado/editar-vacaciones-empleado.component';
 import { RegistroAutorizacionDepaComponent } from 'src/app/componentes/autorizaciones/autorizaDepartamentos/registro-autorizacion-depa/registro-autorizacion-depa.component';
 import { EditarPeriodoVacacionesComponent } from '../../modulos/vacaciones/periodoVacaciones/editar-periodo-vacaciones/editar-periodo-vacaciones.component';
@@ -53,10 +50,8 @@ import { RegistrarEmpleProcesoComponent } from '../../modulos/accionesPersonal/p
 import { EditarEmpleadoProcesoComponent } from '../../modulos/accionesPersonal/procesos/editar-empleado-proceso/editar-empleado-proceso.component';
 import { EditarSolicitudComidaComponent } from '../../modulos/alimentacion/solicitar-comida/editar-solicitud-comida/editar-solicitud-comida.component';
 import { PlanificacionComidasComponent } from '../../modulos/alimentacion/planifica-comida/planificacion-comidas/planificacion-comidas.component';
-import { RegistroPlanHorarioComponent } from 'src/app/componentes/horarios/horarios-rotativos/registro-plan-horario/registro-plan-horario.component';
 import { EditarPlanHoraExtraComponent } from '../../modulos/horasExtras/planificacionHoraExtra/editar-plan-hora-extra/editar-plan-hora-extra.component';
 import { RegistrarVacacionesComponent } from '../../modulos/vacaciones/registrar-vacaciones/registrar-vacaciones.component';
-import { EditarPlanificacionComponent } from 'src/app/componentes/horarios/horarios-rotativos/editar-planificacion/editar-planificacion.component';
 import { CancelarVacacionesComponent } from 'src/app/componentes/rolEmpleado/vacacion-empleado/cancelar-vacaciones/cancelar-vacaciones.component';
 import { RegistrarPeriodoVComponent } from '../../modulos/vacaciones/periodoVacaciones/registrar-periodo-v/registrar-periodo-v.component';
 import { EditarPlanComidasComponent } from '../../modulos/alimentacion/planifica-comida/editar-plan-comidas/editar-plan-comidas.component';
@@ -123,7 +118,6 @@ export class VerEmpleadoComponent implements OnInit {
 
   constructor(
     public restEmpleadoProcesos: EmpleadoProcesosService, // SERVICIO DATOS PROCESOS EMPLEADO
-    public restPlanHoraDetalle: DetallePlanHorarioService, // SERVICIO DATOS EMPRESA
     public restEmpleHorario: EmpleadoHorariosService, // SERVICIO DATOS HORARIO DE EMPLEADOS
     public restDiscapacidad: DiscapacidadService, // SERVICIO DATOS DISCAPACIDAD
     public restPlanComidas: PlanComidasService, // SERVICIO DATOS DE PLANIFICACIÓN COMIDAS
@@ -134,7 +128,6 @@ export class VerEmpleadoComponent implements OnInit {
     public restEmpresa: EmpresaService, // SERVICIO DATOS EMPRESA
     public restVacuna: VacunacionService, // SERVICIO DE DATOS DE REGISTRO DE VACUNACIÓN
     public restTitulo: TituloService, // SERVICIO DATOS TÍTULO PROFESIONAL
-    public restPlanH: PlanHorarioService, // SERVICIO DATOS PLANIFICACIÓN DE HORARIO
     public plan_hora: PlanHoraExtraService,
     public restCargo: EmplCargosService, // SERVICIO DATOS CARGO
     public parametro: ParametrosService,
@@ -326,7 +319,7 @@ export class VerEmpleadoComponent implements OnInit {
    ** **                      METODO PARA MOSTRAR DATOS PERFIL DE USUARIO                        ** **                                           *
    ** ********************************************************************************************* **/
 
-  // METODO PARA VER LA INFORMACIÓN DEL USUARIO 
+  // METODO PARA VER LA INFORMACION DEL USUARIO 
   urlImagen: any;
   iniciales: any;
   mostrarImagen: boolean = false;
@@ -338,7 +331,8 @@ export class VerEmpleadoComponent implements OnInit {
       this.empleadoUno[0].fec_nacimiento_ = this.validar.FormatearFecha(this.empleadoUno[0].fec_nacimiento, formato_fecha, this.validar.dia_abreviado);
       var empleado = data[0].nombre + data[0].apellido;
       if (data[0].imagen != null) {
-        this.urlImagen = `${environment.url}/imagenesEmpleados/img/` + data[0].imagen;
+        this.urlImagen = `${environment.url}/empleado/img/` + data[0].id + '/' + data[0].imagen;
+        console.log('ver urlImagen ', this.urlImagen)
         this.mostrarImagen = true;
         this.textoBoton = 'Editar foto';
       } else {
@@ -456,7 +450,7 @@ export class VerEmpleadoComponent implements OnInit {
   SubirPlantilla() {
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
-      formData.append("image[]", this.archivoSubido[i], this.archivoSubido[i].name);
+      formData.append("image", this.archivoSubido[i], this.archivoSubido[i].name);
     }
     this.restEmpleado.SubirImagen(formData, parseInt(this.idEmpleado)).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Imagen registrada.', {
@@ -1275,21 +1269,6 @@ export class VerEmpleadoComponent implements OnInit {
     }
   }
 
-
-
-  // VENTANA PARA REGISTRAR DETALLE DE HORARIO DEL EMPLEADO
-  AbrirVentanaDetallePlanHorario(datos: any): void {
-    console.log(datos);
-    this.ventana.open(RegistroDetallePlanHorarioComponent,
-      {
-        width: '350px', data: {
-          idEmpleado: this.idEmpleado, planHorario: datos, actualizarPage: false,
-          direccionarE: false
-        }
-      }).disableClose = true;
-  }
-
-
   // BUSCAR FECHAS DE HORARIO y ELIMINAR PLANIFICACION GENERAL
   id_planificacion_general: any = [];
   EliminarPlanGeneral(fec_inicio: string, fec_final: string, horario: number, codigo: string) {
@@ -1309,31 +1288,6 @@ export class VerEmpleadoComponent implements OnInit {
     })
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO DE HORARIO ROTATIVO
-  ConfirmarHorarioRotativo(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.BuscarDatosPlanHorario(datos.id, datos.codigo)
-          //this.EliminarHorarioRotativo(datos.id);
-        } else {
-          this.router.navigate(['/verEmpleado/', this.idEmpleado]);
-        }
-      });
-  }
-
-  // BUSCAR DETALLES DEL HORARIO ROTATIVO 
-  detallesPlanificacion: any = [];
-  BuscarDatosPlanHorario(id_planificacion: any, codigo: string) {
-    this.detallesPlanificacion = [];
-    this.restPlanHoraDetalle.ObtenerPlanHoraDetallePorIdPlanHorario(id_planificacion)
-      .subscribe(datos => {
-        this.detallesPlanificacion = datos;
-        this.detallesPlanificacion.map(obj => {
-          this.EliminarPlanificacionGeneral(obj.fecha, obj.id_horario, codigo)
-        })
-      })
-  }
 
   // ELIMINAR REGISTROS DE PLANIFICACION GENERAL 
   EliminarPlanificacionGeneral(fecha: string, horario: number, codigo: string) {

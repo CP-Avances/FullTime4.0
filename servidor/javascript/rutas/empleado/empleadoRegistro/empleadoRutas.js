@@ -1,12 +1,26 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 // SECCIÓN DE LIBRERIAS
 const empleadoControlador_1 = __importDefault(require("../../../controlador/empleado/empleadoRegistro/empleadoControlador"));
+const empleadoControlador_2 = require("../../../controlador/empleado/empleadoRegistro/empleadoControlador");
 const verificarToken_1 = require("../../../libs/verificarToken");
 const express_1 = require("express");
+const multer_1 = __importDefault(require("multer"));
+const database_1 = __importDefault(require("../../../database"));
+const moment_1 = __importDefault(require("moment"));
+moment_1.default.locale('es');
 const multipart = require('connect-multiparty');
 const multipartMiddleware = multipart({
     uploadDir: './imagenesEmpleados',
@@ -14,6 +28,32 @@ const multipartMiddleware = multipart({
 const multipartMiddlewarePlantilla = multipart({
     uploadDir: './plantillas',
 });
+const storage = multer_1.default.diskStorage({
+    destination: function (req, file, cb) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let id = req.params.id_empleado;
+            var ruta = yield (0, empleadoControlador_2.ObtenerRutaUsuario)(id);
+            cb(null, ruta);
+        });
+    },
+    filename: function (req, file, cb) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // FECHA DEL SISTEMA
+            var fecha = (0, moment_1.default)();
+            var anio = fecha.format('YYYY');
+            var mes = fecha.format('MM');
+            var dia = fecha.format('DD');
+            // DATOS DOCUMENTO
+            let id = req.params.id_empleado;
+            const usuario = yield database_1.default.query(`
+            SELECT codigo FROM empleados WHERE id = $1
+            `, [id]);
+            let documento = usuario.rows[0].codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
+            cb(null, documento);
+        });
+    }
+});
+const upload = (0, multer_1.default)({ storage: storage });
 class EmpleadoRutas {
     constructor() {
         this.router = (0, express_1.Router)();
@@ -59,7 +99,7 @@ class EmpleadoRutas {
         // METODO PARA REACTIVAR EMPLEADOS
         this.router.put('/re-activar/masivo', verificarToken_1.TokenValidation, empleadoControlador_1.default.ReactivarMultiplesEmpleados);
         // METODO PARA CARGAR IMAGEN DEL USUARIO
-        this.router.put('/:id_empleado/uploadImage', [verificarToken_1.TokenValidation, multipartMiddleware], empleadoControlador_1.default.CrearImagenEmpleado);
+        this.router.put('/:id_empleado/uploadImage', [verificarToken_1.TokenValidation, upload.single('image')], empleadoControlador_1.default.CrearImagenEmpleado);
         // METODO PARA ACTUALIZAR UBICACION DE DOMICILIO
         this.router.put('/geolocalizacion/:id', verificarToken_1.TokenValidation, empleadoControlador_1.default.GeolocalizacionCrokis);
         /** **************************************************************************************** **
@@ -82,7 +122,7 @@ class EmpleadoRutas {
         // INFORMACIÓN TÍTULO PROFESIONALES
         this.router.post('/buscarDepartamento', verificarToken_1.TokenValidation, empleadoControlador_1.default.ObtenerDepartamentoEmpleado);
         // INFORMACIÓN DE LA IMAGEN
-        this.router.get('/img/:imagen', empleadoControlador_1.default.BuscarImagen);
+        this.router.get('/img/:id/:imagen', empleadoControlador_1.default.BuscarImagen);
         // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA AUTOMÁTICA 
         this.router.post('/verificar/automatico/plantillaExcel/', [verificarToken_1.TokenValidation, multipartMiddlewarePlantilla], empleadoControlador_1.default.VerificarPlantilla_Automatica);
         this.router.post('/verificar/datos/automatico/plantillaExcel/', [verificarToken_1.TokenValidation, multipartMiddlewarePlantilla], empleadoControlador_1.default.VerificarPlantilla_DatosAutomatico);

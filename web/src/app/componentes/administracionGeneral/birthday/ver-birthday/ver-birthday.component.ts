@@ -26,6 +26,7 @@ export class VerBirthdayComponent implements OnInit {
 
   ngOnInit(): void {
     this.ObtenerMensajeCumple();
+    console.log('ver APIurl ', )
   }
 
   // METODO PARA BUSCAR MENSAJE DE CUMPLEAÑOS

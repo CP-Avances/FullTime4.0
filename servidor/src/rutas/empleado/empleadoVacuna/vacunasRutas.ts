@@ -1,11 +1,43 @@
-import { Router } from 'express';
-import { TokenValidation } from '../../../libs/verificarToken';
 import VACUNA_CONTROLADOR from '../../../controlador/empleado/empleadoVacuna/vacunasControlador';
-// ALMACENAMIENTO DEL CERTIFICADO DE VACUNACIÓN EN CARPETA
-const multipart = require('connect-multiparty');
-const multipartMiddleware = multipart({
-    uploadDir: './carnetVacuna',
-});
+import { ObtenerRutaVacuna } from '../../../controlador/empleado/empleadoVacuna/vacunasControlador';
+import { TokenValidation } from '../../../libs/verificarToken';
+import { Router } from 'express';
+import multer from 'multer';
+import pool from '../../../database';
+import moment from 'moment';
+moment.locale('es');
+
+const storage = multer.diskStorage({
+
+    destination: async function (req, file, cb) {
+        let id = req.params.id_empleado;
+        var ruta = await ObtenerRutaVacuna(id);
+        cb(null, ruta)
+    },
+    filename: async function (req, file, cb) {
+
+        // FECHA DEL SISTEMA
+        var fecha = moment();
+        var anio = fecha.format('YYYY');
+        var mes = fecha.format('MM');
+        var dia = fecha.format('DD');
+
+        // DATOS DOCUMENTO
+        let id = req.params.id_empleado;
+
+        const usuario = await pool.query(
+            `
+            SELECT codigo FROM empleados WHERE id = $1
+            `
+            , [id]);
+
+        let documento = usuario.rows[0].codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
+
+        cb(null, documento)
+    }
+})
+
+const upload = multer({ storage: storage });
 
 class VacunaRutas {
     public router: Router = Router();
@@ -23,7 +55,7 @@ class VacunaRutas {
         // METODO REGISTRO DE VACUNACIÓN
         this.router.post('/', TokenValidation, VACUNA_CONTROLADOR.CrearRegistro);
         // METODO PARA GUARDAR DOCUMENTO 
-        this.router.put('/:id/documento/:nombre', [TokenValidation, multipartMiddleware], VACUNA_CONTROLADOR.GuardarDocumento);
+        this.router.put('/:id/documento/:id_empleado', [TokenValidation, upload.single('uploads')], VACUNA_CONTROLADOR.GuardarDocumento);
         // METODO ACTUALIZACION DE REGISTROS DE VACUNACION
         this.router.put('/:id', TokenValidation, VACUNA_CONTROLADOR.ActualizarRegistro);
         // ELIMINAR DOCUMENTO DE VACUNAS DEL SERVIDOR
@@ -36,7 +68,6 @@ class VacunaRutas {
         this.router.post('/tipo_vacuna', TokenValidation, VACUNA_CONTROLADOR.CrearTipoVacuna);
         // METODO PARA BUSCAR UN DOCUMENTO
         this.router.get('/documentos/:docs', VACUNA_CONTROLADOR.ObtenerDocumento);
-
 
 
 

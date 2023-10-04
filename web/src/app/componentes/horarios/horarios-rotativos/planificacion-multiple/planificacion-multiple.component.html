@@ -170,14 +170,13 @@
                                         </button>
                                     </div>
                                     <div *ngIf="ver_guardar" style="padding-top: 10px; margin: 0 auto;">
-                                        <button class="btn btn-sm">
+                                        <button class="btn btn-sm" (click)="GuardarPlanificacion()">
                                             Guardar
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -1814,5 +1813,9 @@
                 <br>
             </div>
         </mat-card-content>
+        <div class="pantalla-progress" *ngIf="progreso">
+            <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
+            </mat-progress-spinner>
+        </div>
     </mat-card>
 </div>

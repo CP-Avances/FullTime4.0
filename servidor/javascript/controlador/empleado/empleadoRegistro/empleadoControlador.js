@@ -12,12 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EMPLEADO_CONTROLADOR = void 0;
+exports.EMPLEADO_CONTROLADOR = exports.ObtenerRutaUsuario = void 0;
+// SECCION LIBRERIAS
+const vacunasControlador_1 = require("../../../controlador/empleado/empleadoVacuna/vacunasControlador");
 const ts_md5_1 = require("ts-md5");
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+const moment_1 = __importDefault(require("moment"));
 const builder = require('xmlbuilder');
 const ObtenerRuta = function (codigo, cedula) {
     var ruta = '';
@@ -32,6 +35,26 @@ const ObtenerRuta = function (codigo, cedula) {
     }
     return ruta + separador + 'permisos' + separador + codigo + '_' + cedula;
 };
+// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE IMAGENES DE USUARIO
+const ObtenerRutaUsuario = function (id) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var ruta = '';
+        let separador = path_1.default.sep;
+        const usuario = yield database_1.default.query(`
+      SELECT codigo, cedula FROM empleados WHERE id = $1
+      `, [id]);
+        for (var i = 0; i < __dirname.split(separador).length - 4; i++) {
+            if (ruta === '') {
+                ruta = __dirname.split(separador)[i];
+            }
+            else {
+                ruta = ruta + separador + __dirname.split(separador)[i];
+            }
+        }
+        return ruta + separador + 'imagenesEmpleados' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
+    });
+};
+exports.ObtenerRutaUsuario = ObtenerRutaUsuario;
 class EmpleadoControlador {
     /** ** ********************************************************************************************* **
      ** ** **                        MANEJO DE CODIGOS DE USUARIOS                                    ** **
@@ -115,17 +138,47 @@ class EmpleadoControlador {
                     telefono, id_nacionalidad, codigo]);
                 const [empleado] = response.rows;
                 if (empleado) {
+                    let verificar = 0;
                     // RUTA DE LA CARPETA PRINCIPAL PERMISOS
-                    const nuevaCarpeta = ObtenerRuta(codigo, cedula);
+                    const carpetaPermisos = ObtenerRuta(codigo, cedula);
                     // METODO MKDIR PARA CREAR LA CARPETA
-                    fs_1.default.mkdir(nuevaCarpeta, { recursive: true }, (err) => {
+                    fs_1.default.mkdir(carpetaPermisos, { recursive: true }, (err) => {
                         if (err) {
-                            console.error('Error al crear la carpeta:', err);
+                            verificar = 1;
                         }
                         else {
-                            return res.status(200).jsonp(empleado);
+                            verificar = 0;
                         }
                     });
+                    // RUTA DE LA CARPETA PRINCIPAL PERMISOS
+                    const carpetaImagenes = yield (0, exports.ObtenerRutaUsuario)(empleado.id);
+                    // METODO MKDIR PARA CREAR LA CARPETA
+                    fs_1.default.mkdir(carpetaImagenes, { recursive: true }, (err) => {
+                        if (err) {
+                            verificar = 1;
+                        }
+                        else {
+                            verificar = 0;
+                        }
+                    });
+                    // RUTA DE LA CARPETA DE ALMACENAMIENTO DE VACUNAS
+                    const carpetaVacunas = yield (0, vacunasControlador_1.ObtenerRutaVacuna)(empleado.id);
+                    // METODO MKDIR PARA CREAR LA CARPETA
+                    fs_1.default.mkdir(carpetaVacunas, { recursive: true }, (err) => {
+                        if (err) {
+                            verificar = 1;
+                        }
+                        else {
+                            verificar = 0;
+                        }
+                    });
+                    // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
+                    if (verificar === 1) {
+                        console.error('Error al crear la carpeta de imagenes.');
+                    }
+                    else {
+                        return res.status(200).jsonp(empleado);
+                    }
                 }
                 else {
                     return res.status(404).jsonp({ message: 'error' });
@@ -148,25 +201,82 @@ class EmpleadoControlador {
         telefono = $11, id_nacionalidad = $12, codigo = $13 WHERE id = $1 
         `, [id, cedula, apellido, nombre, esta_civil, genero, correo, fec_nacimiento, estado,
                     domicilio, telefono, id_nacionalidad, codigo]);
+                let verificar_permisos = 0;
                 // RUTA DE LA CARPETA PERMISOS DEL USUARIO
-                const carpeta = ObtenerRuta(codigo, cedula);
-                // VERIFICACION DE EXISTENCIA CARPETA DE USUARIO
-                fs_1.default.access(carpeta, fs_1.default.constants.F_OK, (err) => {
+                const carpetaPermisos = ObtenerRuta(codigo, cedula);
+                // VERIFICACION DE EXISTENCIA CARPETA PERMISOS DE USUARIO
+                fs_1.default.access(carpetaPermisos, fs_1.default.constants.F_OK, (err) => {
                     if (err) {
                         // METODO MKDIR PARA CREAR LA CARPETA
-                        fs_1.default.mkdir(carpeta, { recursive: true }, (err) => {
+                        fs_1.default.mkdir(carpetaPermisos, { recursive: true }, (err) => {
                             if (err) {
-                                res.jsonp({ message: 'Ups!!! no fue posible crear el directorio del usuario.' });
+                                verificar_permisos = 1;
                             }
                             else {
-                                res.jsonp({ message: 'Registro actualizado.' });
+                                verificar_permisos = 0;
                             }
                         });
                     }
                     else {
-                        res.jsonp({ message: 'Registro actualizado.' });
+                        verificar_permisos = 0;
                     }
                 });
+                let verificar_imagen = 0;
+                // RUTA DE LA CARPETA IMAGENES DEL USUARIO
+                const carpetaImagenes = yield (0, exports.ObtenerRutaUsuario)(id);
+                // VERIFICACION DE EXISTENCIA CARPETA IMAGENES DE USUARIO
+                fs_1.default.access(carpetaImagenes, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                        // METODO MKDIR PARA CREAR LA CARPETA
+                        fs_1.default.mkdir(carpetaImagenes, { recursive: true }, (err) => {
+                            if (err) {
+                                verificar_imagen = 1;
+                            }
+                            else {
+                                verificar_imagen = 0;
+                            }
+                        });
+                    }
+                    else {
+                        verificar_imagen = 0;
+                    }
+                });
+                let verificar_vacunas = 0;
+                // RUTA DE LA CARPETA VACUNAS DEL USUARIO
+                const carpetaVacunas = yield (0, vacunasControlador_1.ObtenerRutaVacuna)(id);
+                // VERIFICACION DE EXISTENCIA CARPETA PERMISOS DE USUARIO
+                fs_1.default.access(carpetaVacunas, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                        // METODO MKDIR PARA CREAR LA CARPETA
+                        fs_1.default.mkdir(carpetaVacunas, { recursive: true }, (err) => {
+                            if (err) {
+                                verificar_vacunas = 1;
+                            }
+                            else {
+                                verificar_vacunas = 0;
+                            }
+                        });
+                    }
+                    else {
+                        verificar_vacunas = 0;
+                    }
+                });
+                // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
+                if (verificar_permisos === 1 && verificar_imagen === 1 && verificar_vacunas === 1) {
+                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de permisos, de imagenes y vacunación del usuario.' });
+                }
+                else if (verificar_permisos === 1 && verificar_imagen === 0 && verificar_vacunas === 0) {
+                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de permisos del usuario.' });
+                }
+                else if (verificar_permisos === 0 && verificar_imagen === 1 && verificar_vacunas === 0) {
+                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de imagenes del usuario.' });
+                }
+                else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1) {
+                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de vacunación del usuario.' });
+                }
+                else {
+                    res.jsonp({ message: 'Registro actualizado.' });
+                }
             }
             catch (error) {
                 return res.jsonp({ message: 'error' });
@@ -311,37 +421,42 @@ class EmpleadoControlador {
     // CARGAR IMAGEN DE EMPLEADO
     CrearImagenEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let list = req.files;
-            let imagen = list.image[0].path.split("\\")[1];
+            // FECHA DEL SISTEMA
+            var fecha = (0, moment_1.default)();
+            var anio = fecha.format('YYYY');
+            var mes = fecha.format('MM');
+            var dia = fecha.format('DD');
             let id = req.params.id_empleado;
+            let separador = path_1.default.sep;
             const unEmpleado = yield database_1.default.query(`
       SELECT * FROM empleados WHERE id = $1
       `, [id]);
             if (unEmpleado.rowCount > 0) {
                 unEmpleado.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
-                    if (obj.imagen != null) {
+                    var _a;
+                    let imagen = obj.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
+                    if (obj.imagen != 'null' && obj.imagen != '' && obj.imagen != null) {
                         try {
                             // ELIMINAR IMAGEN DE SERVIDOR
-                            let filePath = `servidor\\imagenesEmpleados\\${obj.imagen}`;
-                            let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-                            fs_1.default.unlinkSync(direccionCompleta);
+                            let ruta = (yield (0, exports.ObtenerRutaUsuario)(obj.id)) + separador + obj.imagen;
+                            fs_1.default.unlinkSync(ruta);
                             yield database_1.default.query(`
               UPDATE empleados SET imagen = $2 Where id = $1
               `, [id, imagen]);
-                            res.jsonp({ message: 'Imagen Actualizada.' });
+                            res.jsonp({ message: 'Imagen actualizada.' });
                         }
                         catch (error) {
                             yield database_1.default.query(`
               UPDATE empleados SET imagen = $2 Where id = $1
               `, [id, imagen]);
-                            res.jsonp({ message: 'Imagen Actualizada.' });
+                            res.jsonp({ message: 'Imagen actualizada.' });
                         }
                     }
                     else {
                         yield database_1.default.query(`
             UPDATE empleados SET imagen = $2 Where id = $1
             `, [id, imagen]);
-                        res.jsonp({ message: 'Imagen Actualizada.' });
+                        res.jsonp({ message: 'Imagen actualizada.' });
                     }
                 }));
             }
@@ -453,8 +568,11 @@ class EmpleadoControlador {
     BuscarImagen(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const imagen = req.params.imagen;
-            let filePath = `servidor\\imagenesEmpleados\\${imagen}`;
-            res.sendFile(__dirname.split("servidor")[0] + filePath);
+            const id = req.params.id;
+            let separador = path_1.default.sep;
+            let ruta = (yield (0, exports.ObtenerRutaUsuario)(id)) + separador + imagen;
+            console.log('ver file ', ruta);
+            res.sendFile(ruta);
         });
     }
     // BUSQUEDA INFORMACIÓN DEPARTAMENTOS EMPLEADO

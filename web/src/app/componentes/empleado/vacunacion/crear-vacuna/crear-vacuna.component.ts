@@ -22,8 +22,8 @@ export class CrearVacunaComponent implements OnInit {
   constructor(
     public restVacuna: VacunacionService, // CONSULTA DE SERVICIOS DATOS DE VACUNACIÓN
     public toastr: ToastrService, // VARIABLE USADA PARA MENSAJES DE NOTIFICACIONES
-    private ventana_: MatDialogRef<CrearVacunaComponent>,
     public ventana: MatDialog,
+    private ventana_: MatDialogRef<CrearVacunaComponent>,
     @Inject(MAT_DIALOG_DATA) public datos: any
   ) { }
 
@@ -163,9 +163,9 @@ export class CrearVacunaComponent implements OnInit {
     this.restVacuna.RegistrarVacunacion(datos).subscribe(vacuna => {
       let formData = new FormData();
       for (var i = 0; i < this.archivoSubido.length; i++) {
-        formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
+        formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
       }
-      this.restVacuna.SubirDocumento(formData, vacuna.id, form.certificadoForm).subscribe(res => {
+      this.restVacuna.SubirDocumento(formData, vacuna.id, this.idEmploy).subscribe(res => {
         this.archivoF.reset();
         this.nameFile = '';
         this.toastr.success('', 'Registro guardado.', {

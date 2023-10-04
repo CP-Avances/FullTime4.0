@@ -35,8 +35,6 @@ import { ListarFeriadosComponent } from './componentes/catalogos/catFeriados/fer
 import { PrincipalDepartamentoComponent } from './componentes/catalogos/catDepartamentos/listar-departamento/principal-departamento.component';
 import { RegistroDepartamentoComponent } from './componentes/catalogos/catDepartamentos/registro-departamento/registro-departamento.component';
 import { RegistrarFeriadosComponent } from './componentes/catalogos/catFeriados/feriados/registrar-feriados/registrar-feriados.component';
-import { PrincipalEnroladosComponent } from './componentes/catalogos/catEnrolados/principal-enrolados/principal-enrolados.component';
-import { RegistroEnroladosComponent } from './componentes/catalogos/catEnrolados/registro-enrolados/registro-enrolados.component';
 import { EditarFeriadosComponent } from './componentes/catalogos/catFeriados/feriados/editar-feriados/editar-feriados.component';
 import { ListarRegimenComponent } from './componentes/catalogos/catRegimen/listar-regimen/listar-regimen.component';
 import { ListarTipoComidasComponent } from './componentes/modulos/alimentacion/catTipoComidas/tipos-comidas/listar-tipo-comidas/listar-tipo-comidas.component';
@@ -48,16 +46,12 @@ import { RegistroContratoComponent } from './componentes/empleado/contrato/regis
 import { EmplCargosComponent } from './componentes/empleado/cargo/empl-cargos/empl-cargos.component';
 import { ListarTitulosComponent } from './componentes/catalogos/catTitulos/tituloProfesional/listar-titulos/listar-titulos.component';
 import { ListarCiudadFeriadosComponent } from './componentes/catalogos/catFeriados/ciudad-feriados/listar-ciudad-feriados/listar-ciudad-feriados.component';
-import { EnroladoRelojComponent } from './componentes/catalogos/catEnrolados/enrolado-reloj/enrolado-reloj.component';
 import { ListaSucursalesComponent } from './componentes/catalogos/catSucursal/lista-sucursales/lista-sucursales.component';
 import { RegistrarSucursalesComponent } from './componentes/catalogos/catSucursal/registrar-sucursales/registrar-sucursales.component';
-import { DispositivosEnroladosComponent } from './componentes/catalogos/catEnrolados/dispositivos-enrolados/dispositivos-enrolados.component';
 import { RegistroPlanHorarioComponent } from './componentes/horarios/horarios-rotativos/registro-plan-horario/registro-plan-horario.component';
-import { RegistroDetallePlanHorarioComponent } from './componentes/horarios/detallePlanHorario/registro-detalle-plan-horario/registro-detalle-plan-horario.component';
 import { RegistroAutorizacionDepaComponent } from './componentes/autorizaciones/autorizaDepartamentos/registro-autorizacion-depa/registro-autorizacion-depa.component';
 import { RegistoEmpleadoHorarioComponent } from './componentes/horarios/rango-fechas/registo-empleado-horario/registo-empleado-horario.component';
 import { DetalleCatHorarioComponent } from './componentes/catalogos/catHorario/detalle/detalle-cat-horario/detalle-cat-horario.component';
-import { NotiAutorizacionesComponent } from './componentes/catalogos/catNotiAutorizaciones/Registro/noti-autorizaciones/noti-autorizaciones.component';
 import { EditarRelojComponent } from './componentes/catalogos/catRelojes/editar-reloj/editar-reloj.component';
 import { EditarRolComponent } from './componentes/catalogos/catRoles/editar-rol/editar-rol.component';
 import { EditarRegimenComponent } from './componentes/catalogos/catRegimen/editar-regimen/editar-regimen.component';
@@ -78,15 +72,12 @@ import { ConfirmarContraseniaComponent } from './componentes/iniciarSesion/contr
 import { EditarEmpresaComponent } from './componentes/catalogos/catEmpresa/editar-empresa/editar-empresa.component';
 import { EditarSucursalComponent } from './componentes/catalogos/catSucursal/editar-sucursal/editar-sucursal.component';
 import { EditarCatProcesosComponent } from './componentes/modulos/accionesPersonal/catProcesos/editar-cat-procesos/editar-cat-procesos.component';
-import { EditarEnroladosComponent } from './componentes/catalogos/catEnrolados/editar-enrolados/editar-enrolados.component';
 import { MetodosComponent } from './componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { EditarContratoComponent } from './componentes/empleado/contrato/editar-contrato/editar-contrato.component';
 import { EditarCargoComponent } from './componentes/empleado/cargo/editar-cargo/editar-cargo.component';
-import { ListarNotiAutorizacionesComponent } from './componentes/catalogos/catNotiAutorizaciones/listar/listar-noti-autorizaciones/listar-noti-autorizaciones.component';
 import { RegistrarTimbreComponent } from './componentes/modulos/timbreWeb/registrar-timbre/registrar-timbre.component';
 import { RegistrarAsistenciaComponent } from './componentes/registrar-asistencia/registrar-asistencia.component';
 import { EditarEstadoAutorizaccionComponent } from './componentes/autorizaciones/editar-estado-autorizaccion/editar-estado-autorizaccion.component';
-import { VerDetallePlanHorariosComponent } from './componentes/horarios/detallePlanHorario/ver-detalle-plan-horarios/ver-detalle-plan-horarios.component';
 import { EditarEstadoVacacionAutoriacionComponent } from './componentes/autorizaciones/editar-estado-vacacion-autoriacion/editar-estado-vacacion-autoriacion.component';
 import { SubirDocumentoComponent } from './componentes/documentos/subir-documento/subir-documento.component';
 import { VerDocumentosComponent } from './componentes/documentos/ver-documentos/ver-documentos.component';
@@ -97,9 +88,7 @@ import { HoraExtraAutorizacionesComponent } from './componentes/autorizaciones/h
 import { EditarEstadoHoraExtraAutorizacionComponent } from './componentes/autorizaciones/editar-estado-hora-extra-autorizacion/editar-estado-hora-extra-autorizacion.component';
 import { EditarCiudadComponent } from './componentes/catalogos/catFeriados/ciudad-feriados/editar-ciudad/editar-ciudad.component';
 import { EditarPlanificacionComponent } from './componentes/horarios/horarios-rotativos/editar-planificacion/editar-planificacion.component';
-import { EditarDetallePlanComponent } from './componentes/horarios/detallePlanHorario/editar-detalle-plan/editar-detalle-plan.component';
 import { EditarAutorizacionDepaComponent } from './componentes/autorizaciones/autorizaDepartamentos/editar-autorizacion-depa/editar-autorizacion-depa.component';
-import { EditarDispositivoEnroladoComponent } from './componentes/catalogos/catEnrolados/editar-dispositivo-enrolado/editar-dispositivo-enrolado.component';
 import { EditarDetalleCatHorarioComponent } from './componentes/catalogos/catHorario/detalle/editar-detalle-cat-horario/editar-detalle-cat-horario.component';
 import { VerDipositivoComponent } from './componentes/catalogos/catRelojes/ver-dipositivo/ver-dipositivo.component';
 import { ConfigurarCodigoComponent } from './componentes/administracionGeneral/configurar-codigo/configurar-codigo.component';
@@ -148,11 +137,9 @@ import { DiscapacidadService } from './servicios/discapacidad/discapacidad.servi
 import { ProvinciaService } from './servicios/catalogos/catProvincias/provincia.service';
 import { HorarioService } from './servicios/catalogos/catHorarios/horario.service';
 import { HorasExtrasService } from './servicios/catalogos/catHorasExtras/horas-extras.service';
-import { EnroladoService } from './servicios/catalogos/catEnrolados/enrolado.service';
 import { DepartamentosService } from './servicios/catalogos/catDepartamentos/departamentos.service';
 import { RolPermisosService } from './servicios/catalogos/catRolPermisos/rol-permisos.service';
 import { TipoPermisosService } from './servicios/catalogos/catTipoPermisos/tipo-permisos.service';
-import { NotificacionesService } from './servicios/catalogos/catNotificaciones/notificaciones.service';
 import { CiudadFeriadosService } from './servicios/ciudadFeriados/ciudad-feriados.service';
 import { EmpleadoHorariosService } from './servicios/horarios/empleadoHorarios/empleado-horarios.service';
 import { EmplCargosService } from './servicios/empleado/empleadoCargo/empl-cargos.service';
@@ -359,8 +346,6 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     PrincipalDepartamentoComponent,
     RegistroDepartamentoComponent,
     RegistrarFeriadosComponent,
-    PrincipalEnroladosComponent,
-    RegistroEnroladosComponent,
     TipoPermisosComponent,
     EditarFeriadosComponent,
     ListarRegimenComponent,
@@ -375,26 +360,22 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     EmplCargosComponent,
     ListarTitulosComponent,
     ListarCiudadFeriadosComponent,
-    EnroladoRelojComponent,
     PlanificacionComidasEmpleadoComponent,
     ListaSucursalesComponent,
     RegistrarSucursalesComponent,
     RegistrarNivelTitulosComponent,
     ListarNivelTitulosComponent,
     EditarNivelTituloComponent,
-    DispositivosEnroladosComponent,
     RegistrarPeriodoVComponent,
     RegistrarEmpleProcesoComponent,
     RegistrarVacacionesComponent,
     RegistroPlanHorarioComponent,
-    RegistroDetallePlanHorarioComponent,
     RegistroAutorizacionDepaComponent,
     RegistroEmpleadoPermisoComponent,
 
     
     RegistoEmpleadoHorarioComponent,
     DetalleCatHorarioComponent,
-    NotiAutorizacionesComponent,
     AutorizacionesComponent,
     EditarTitulosComponent,
     EditarTipoComidasComponent,
@@ -402,7 +383,6 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     EditarSucursalComponent,
     EditarCatProcesosComponent,
     EditarEmpleadoProcesoComponent,
-    EditarEnroladosComponent,
     EditarEmpleadoComponent,
     EditarTituloComponent,
     OlvidarContraseniaComponent,
@@ -431,10 +411,8 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     PedidoHoraExtraComponent,
     CalculoHoraExtraComponent,
     InformacionJefeComponent,
-    ListarNotiAutorizacionesComponent,
     VerEmpleadoPermisoComponent,
     EditarEstadoAutorizaccionComponent,
-    VerDetallePlanHorariosComponent,
     ListarVacacionesComponent,
     EstadoVacacionesComponent,
     VerVacacionComponent,
@@ -460,10 +438,8 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     CancelarPermisoComponent,
     EditarCiudadComponent,
     EditarPlanificacionComponent,
-    EditarDetallePlanComponent,
     EditarPlanComidasComponent,
     EditarAutorizacionDepaComponent,
-    EditarDispositivoEnroladoComponent,
     PlanificacionComidasEmpleadoComponent,
     EditarDetalleCatHorarioComponent,
     VerDipositivoComponent,
@@ -628,9 +604,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     DiscapacidadService,
     ProvinciaService,
     HorarioService,
-    EnroladoService,
     HorasExtrasService,
-    NotificacionesService,
     RolPermisosService,
     TipoPermisosService,
     DepartamentosService,

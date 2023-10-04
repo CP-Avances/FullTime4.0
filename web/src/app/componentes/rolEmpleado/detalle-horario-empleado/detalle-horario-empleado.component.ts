@@ -6,13 +6,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 
-import { RegistroDetallePlanHorarioComponent } from 'src/app/componentes/horarios/detallePlanHorario/registro-detalle-plan-horario/registro-detalle-plan-horario.component';
-import { EditarDetallePlanComponent } from 'src/app/componentes/horarios/detallePlanHorario/editar-detalle-plan/editar-detalle-plan.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
-import { DetallePlanHorarioService } from 'src/app/servicios/horarios/detallePlanHorario/detalle-plan-horario.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { PlanHorarioService } from 'src/app/servicios/horarios/planHorario/plan-horario.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 
@@ -42,8 +38,6 @@ export class DetalleHorarioEmpleadoComponent implements OnInit {
 
   constructor(
     private restEmpleado: EmpleadoService,
-    private restDP: DetallePlanHorarioService,
-    private restPH: PlanHorarioService,
     private toastr: ToastrService,
     public router: Router,
     public ventana: MatDialog,
@@ -103,50 +97,24 @@ export class DetalleHorarioEmpleadoComponent implements OnInit {
   }
 
   BuscarDatosPlanHorario(id_planificacion: any, formato_fecha: string) {
-    this.datosPlanificacion = [];
-    this.restPH.ObtenerPlanHorarioPorId(id_planificacion).subscribe(datos => {
-      this.datosPlanificacion = datos;
-      this.datosPlanificacion.forEach((data: any) => {
-        data.fec_inicio_ = this.validar.FormatearFecha(data.fec_inicio, formato_fecha, this.validar.dia_abreviado);
-        data.fec_final_ = this.validar.FormatearFecha(data.fec_final, formato_fecha, this.validar.dia_abreviado);
-      })
-    })
+
   }
 
   ListarDetalles(id_planificacion: any, formato_fecha: string) {
-    this.datosDetalle = [];
-    this.restDP.ObtenerPlanHoraDetallePorIdPlanHorario(id_planificacion).subscribe(datos => {
-      this.datosDetalle = datos;
-      this.datosDetalle.forEach((data: any) => {
-        data.fecha_ = this.validar.FormatearFecha(data.fecha, formato_fecha, this.validar.dia_abreviado);
-      })
-    })
+   
   }
 
   AbrirVentanaDetalles(datosSeleccionados: any): void {
-    this.ventana.open(RegistroDetallePlanHorarioComponent, { width: '350px', data: { planHorario: datosSeleccionados, actualizarPage: true, direccionarE: true } })
-      .afterClosed().subscribe(item => {
-        this.ListarDetalles(this.idPlanH, this.formato_fecha);
-      });
+    
   }
 
   AbrirVentanaEditar(datosSeleccionados: any, datosPlan: any): void {
-    console.log(datosSeleccionados);
-    this.ventana.open(EditarDetallePlanComponent,
-      { width: '350px', data: { detalle: datosSeleccionados, plan: datosPlan } })
-      .afterClosed().subscribe(item => {
-        this.ListarDetalles(this.idPlanH, this.formato_fecha);
-      });
+    
   }
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACIÓN
   EliminarDetalle(id_detalle: number) {
-    this.restDP.EliminarRegistro(id_detalle).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ListarDetalles(this.idPlanH, this.formato_fecha);
-    });
+  
   }
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
@@ -189,19 +157,7 @@ export class DetalleHorarioEmpleadoComponent implements OnInit {
   }
 
   plantillaDetalle() {
-    let formData = new FormData();
-    for (var i = 0; i < this.archivoSubido.length; i++) {
-      formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
-      console.log('ver', this.archivoSubido[i])
-    }
-    this.restDP.subirArchivoExcel(parseInt(this.idPlanH), formData).subscribe(res => {
-      this.toastr.success('Operación exitosa.', 'Plantilla de Horario importada.', {
-        timeOut: 6000,
-      });
-      this.ListarDetalles(this.idPlanH, this.formato_fecha);
-      this.archivo1Form.reset();
-      this.nameFile = '';
-    });
+   
   }
 
 }
