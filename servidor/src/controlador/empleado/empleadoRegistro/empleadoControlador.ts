@@ -645,7 +645,7 @@ class EmpleadoControlador {
 
     let ruta = await ObtenerRutaUsuario(id) + separador + imagen;
     console.log('ver file ', ruta)
-    res.sendFile(ruta);
+    res.sendFile(path.resolve(ruta));
   }
 
 

@@ -572,7 +572,7 @@ class EmpleadoControlador {
             let separador = path_1.default.sep;
             let ruta = (yield (0, exports.ObtenerRutaUsuario)(id)) + separador + imagen;
             console.log('ver file ', ruta);
-            res.sendFile(ruta);
+            res.sendFile(path_1.default.resolve(ruta));
         });
     }
     // BUSQUEDA INFORMACIÓN DEPARTAMENTOS EMPLEADO
