@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<root>
+  <empleado codigo="16">
+    <cedula>1236523655</cedula>
+    <apellido>Pazmiño</apellido>
+    <nombre>Paola A</nombre>
+    <estadoCivil>Soltero/a</estadoCivil>
+    <genero>Femenino</genero>
+    <correo>jentipan7@gmail.com</correo>
+    <fechaNacimiento>Mar. 05/04/1994</fechaNacimiento>
+    <estado>Activo</estado>
+    <domicilio>Santa Rita</domicilio>
+    <telefono>0236598566</telefono>
+    <nacionalidad>Ecuatoriana</nacionalidad>
+    <imagen>16_2023_10_04_12575cb97a22f0f.jpeg</imagen>
+  </empleado>
+</root>
