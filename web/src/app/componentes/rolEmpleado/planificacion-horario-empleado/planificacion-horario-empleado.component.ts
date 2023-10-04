@@ -7,13 +7,10 @@ import { Router } from '@angular/router';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
-import { PlanHorarioService } from 'src/app/servicios/horarios/planHorario/plan-horario.service';
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { DetallePlanHorarioService } from 'src/app/servicios/horarios/detallePlanHorario/detalle-plan-horario.service';
 
-import { RegistroDetallePlanHorarioComponent } from 'src/app/componentes/horarios/detallePlanHorario/registro-detalle-plan-horario/registro-detalle-plan-horario.component';
 import { RegistroPlanHorarioComponent } from 'src/app/componentes/horarios/horarios-rotativos/registro-plan-horario/registro-plan-horario.component';
 import { EditarPlanificacionComponent } from 'src/app/componentes/horarios/horarios-rotativos/editar-planificacion/editar-planificacion.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
@@ -35,12 +32,11 @@ export class PlanificacionHorarioEmpleadoComponent implements OnInit {
   pageSizeOptions = [5, 10, 20, 50];
 
   constructor(
-    public restPlanHoraDetalle: DetallePlanHorarioService,
+
     public restPlanGeneral: PlanGeneralService,
     public restEmpleado: EmpleadoService,
     public informacion: DatosGeneralesService,
     public restCargo: EmplCargosService,
-    public restPlanH: PlanHorarioService,
     public parametro: ParametrosService,
     public ventana: MatDialog,
     public validar: ValidacionesService,
@@ -158,9 +154,7 @@ export class PlanificacionHorarioEmpleadoComponent implements OnInit {
 
   // VENTANA PARA REGISTRAR DETALLE DE HORARIO DEL EMPLEADO
   AbrirVentanaDetallePlanHorario(datos: any): void {
-    console.log(datos);
-    this.ventana.open(RegistroDetallePlanHorarioComponent,
-      { width: '350px', data: { idEmpleado: this.idEmpleado, planHorario: datos, actualizarPage: false, direccionarE: false } }).disableClose = true;
+    
   }
 
 
@@ -185,12 +179,7 @@ export class PlanificacionHorarioEmpleadoComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO DE HORARIO ROTATIVO
   EliminarHorarioRotativo(id_plan: number) {
-    this.restPlanH.EliminarRegistro(id_plan).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ObtenerHorarioRotativo(this.datoActual.codigo, this.formato_fecha);
-    });
+   
   }
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO DE HORARIO ROTATIVO
@@ -209,14 +198,7 @@ export class PlanificacionHorarioEmpleadoComponent implements OnInit {
   // BUSCAR DETALLES DEL HORARIO ROTATIVO 
   detallesPlanificacion: any = [];
   BuscarDatosPlanHorario(id_planificacion: any, codigo: string) {
-    this.detallesPlanificacion = [];
-    this.restPlanHoraDetalle.ObtenerPlanHoraDetallePorIdPlanHorario(id_planificacion)
-      .subscribe(datos => {
-        this.detallesPlanificacion = datos;
-        this.detallesPlanificacion.map((obj: any) => {
-          this.EliminarPlanificacionGeneral(obj.fecha, obj.id_horario, codigo)
-        })
-      })
+
   }
 
   // ELIMINAR REGISTROS DE PLANIFICACION GENERAL 

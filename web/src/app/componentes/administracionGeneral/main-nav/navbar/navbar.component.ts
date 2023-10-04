@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { environment } from 'src/environments/environment';
-
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-navbar',
@@ -19,7 +19,7 @@ export class NavbarComponent implements OnInit {
 
   constructor(
     private empleadoService: EmpleadoService,
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.infoUser();
@@ -45,8 +45,9 @@ export class NavbarComponent implements OnInit {
         this.UserEmail = localStorage.getItem('correo') as string;
         this.UserName = localStorage.getItem('fullname') as string;
         if (res[0]['imagen'] != null) {
-          localStorage.setItem('view_imagen', `${environment.url}/empleado/img/` + res[0]['imagen'])
-          this.urlImagen = localStorage.getItem('view_imagen');
+          localStorage.setItem('view_imagen', `${environment.url}/empleado/img/` + res[0]['id'] + '/' + res[0]['imagen'])
+          //this.urlImagen = localStorage.getItem('view_imagen');
+          this.urlImagen = `${environment.url}/empleado/img/` + res[0]['id'] + '/' + res[0]['imagen'];
           this.mostrarImagen = true;
         } else {
           localStorage.setItem('iniciales', res[0].nombre.split(" ")[0].slice(0, 1) + res[0].apellido.split(" ")[0].slice(0, 1))

@@ -18,18 +18,15 @@ import PROVINCIA_RUTA from './rutas/catalogos/catProvinciaRutas';
 import DEPARTAMENTO_RUTA from './rutas/catalogos/catDepartamentoRutas';
 import PROCESO_RUTA from './rutas/catalogos/catProcesoRutas';
 import HORARIO_RUTA from './rutas/catalogos/catHorarioRutas';
-import ENROLADO_RUTA from './rutas/catalogos/catEnroladoRutas';
 import USUARIO_RUTA from './rutas/usuarios/usuarioRutas';
 import HORAS_EXTRAS_RUTAS from './rutas/catalogos/catHorasExtrasRutas';
 import ROL_PERMISOS_RUTAS from './rutas/catalogos/catRolPermisosRutas';
 import TIPO_PERMISOS_RUTAS from './rutas/catalogos/catTipoPermisosRutas';
 import CIUDAD_RUTAS from './rutas/ciudades/ciudadesRutas';
 import CIUDAD_FERIADOS_RUTAS from './rutas/ciudadFeriado/ciudadFeriadoRutas';
-import NOTIFICACIONES_RUTAS from './rutas/catalogos/catNotificacionesRutas';
 import CONTRATO_EMPLEADO_RUTAS from './rutas/empleado/empleadoContrato/contratoEmpleadoRutas';
 import EMPLEADO_CARGO_RUTAS from './rutas/empleado/empleadoCargos/emplCargosRutas';
 import PLAN_COMIDAS_RUTAS from './rutas/planComidas/planComidasRutas';
-import ENROLADO_RELOJ_RUTAS from './rutas/enroladoReloj/enroladoRelojRutas';
 import EMPRESA_RUTAS from './rutas/catalogos/catEmpresaRutas';
 import SUCURSAL_RUTAS from './rutas/sucursal/sucursalRutas';
 import NACIONALIDADES_RUTAS from './rutas/nacionalidad/nacionalidadRutas';
@@ -37,13 +34,10 @@ import NIVEL_TITULO_RUTAS from './rutas/nivelTitulo/nivelTituloRutas';
 import PERIODO_VACACION__RUTAS from './rutas/empleado/empleadoPeriodoVacacion/periodoVacacionRutas';
 import VACACIONES__RUTAS from './rutas/vacaciones/vacacionesRutas';
 import EMPLEADO_PROCESO_RUTAS from './rutas/empleado/empleadoProcesos/empleProcesosRutas';
-import PLAN_HORARIO_RUTAS from './rutas/horarios/planHorario/planHorarioRutas';
-import DETALLE_PLAN_HORARIO_RUTAS from './rutas/horarios/detallePlanHorario/detallePlanHorarioRutas';
 import AUTORIZA_DEPARTAMENTO_RUTAS from './rutas/autorizaDepartamento/autorizaDepartamentoRutas';
 import EMPLEADO_HORARIOS_RUTAS from './rutas/horarios/empleadoHorarios/empleadoHorariosRutas';
 import PERMISOS_RUTAS from './rutas/permisos/permisosRutas';
 import DETALLE_CATALOGO_HORARIO_RUTAS from './rutas/horarios/detalleCatHorario/detalleCatHorarioRutas';
-import NOTIFICACIONES_AUTORIZACIONES_RUTAS from './rutas/catalogos/catNotiAutorizacionesRutas';
 import AUTORIZACIONES_RUTAS from './rutas/autorizaciones/autorizacionesRutas';
 import PLANTILLA_RUTAS from './rutas/descargarPlantilla/plantillaRutas';
 import NOTIFICACION_TIEMPO_REAL_RUTAS from './rutas/notificaciones/notificacionesRutas';
@@ -145,15 +139,11 @@ class Servidor {
         this.app.use('/planComidas', PLAN_COMIDAS_RUTAS);
 
         // Horarios
-        this.app.use('/planHorario', PLAN_HORARIO_RUTAS);
-        this.app.use('/detallePlanHorario', DETALLE_PLAN_HORARIO_RUTAS);
         this.app.use('/empleadoHorario', EMPLEADO_HORARIOS_RUTAS);
         this.app.use('/detalleHorario', DETALLE_CATALOGO_HORARIO_RUTAS);
 
         // Enrolados
-        this.app.use('/enrolados', ENROLADO_RUTA);
         this.app.use('/relojes', RELOJES_RUTA);
-        this.app.use('/enroladosRelojes', ENROLADO_RELOJ_RUTAS);
 
         //Redireccionamiento a páginas que contienen catálogos
         this.app.use('/titulo', TITULO_RUTAS);
@@ -172,11 +162,9 @@ class Servidor {
         this.app.use('/tipoPermisos', TIPO_PERMISOS_RUTAS);
         this.app.use('/ciudades', CIUDAD_RUTAS);
         this.app.use('/ciudadFeriados', CIUDAD_FERIADOS_RUTAS);
-        this.app.use('/notificaciones', NOTIFICACIONES_RUTAS);
         this.app.use('/sucursales', SUCURSAL_RUTAS);
         this.app.use('/nacionalidades', NACIONALIDADES_RUTAS);
         this.app.use('/nivel-titulo', NIVEL_TITULO_RUTAS);
-        this.app.use('/noti-autorizaciones', NOTIFICACIONES_AUTORIZACIONES_RUTAS);
         this.app.use('/autorizaciones', AUTORIZACIONES_RUTAS);
         this.app.use('/noti-real-time', NOTIFICACION_TIEMPO_REAL_RUTAS);
 

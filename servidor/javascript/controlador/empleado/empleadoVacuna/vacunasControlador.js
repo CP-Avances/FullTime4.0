@@ -12,9 +12,32 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.VACUNAS_CONTROLADOR = void 0;
+exports.VACUNAS_CONTROLADOR = exports.ObtenerRutaVacuna = void 0;
 const database_1 = __importDefault(require("../../../database"));
+const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+const moment_1 = __importDefault(require("moment"));
+// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE CARNET VACUNAS
+const ObtenerRutaVacuna = function (id) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var ruta = '';
+        let separador = path_1.default.sep;
+        console.log('ver direccion ***** ', __dirname);
+        const usuario = yield database_1.default.query(`
+        SELECT codigo, cedula FROM empleados WHERE id = $1
+        `, [id]);
+        for (var i = 0; i < __dirname.split(separador).length - 4; i++) {
+            if (ruta === '') {
+                ruta = __dirname.split(separador)[i];
+            }
+            else {
+                ruta = ruta + separador + __dirname.split(separador)[i];
+            }
+        }
+        return ruta + separador + 'carnetVacuna' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
+    });
+};
+exports.ObtenerRutaVacuna = ObtenerRutaVacuna;
 class VacunasControlador {
     // LISTAR REGISTROS DE VACUNACIÓN DEL EMPLEADO POR SU ID
     ListarUnRegistro(req, res) {
@@ -68,14 +91,23 @@ class VacunasControlador {
     }
     // REGISTRO DE CERTIFICADO O CARNET DE VACUNACION
     GuardarDocumento(req, res) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            let list = req.files;
-            let documento = list.uploads[0].path.split("\\")[1];
-            let { nombre } = req.params;
+            // FECHA DEL SISTEMA
+            var fecha = (0, moment_1.default)();
+            var anio = fecha.format('YYYY');
+            var mes = fecha.format('MM');
+            var dia = fecha.format('DD');
             let id = req.params.id;
+            let id_empleado = req.params.id_empleado;
+            const response = yield database_1.default.query(`
+            SELECT codigo FROM empleados WHERE id = $1
+            `, [id_empleado]);
+            const [vacuna] = response.rows;
+            let documento = vacuna.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
             yield database_1.default.query(`
-            UPDATE empl_vacunas SET carnet = $2, nom_carnet = $3 WHERE id = $1
-            `, [id, documento, nombre]);
+            UPDATE empl_vacunas SET carnet = $2 WHERE id = $1
+            `, [id, documento]);
             res.jsonp({ message: 'Registro guardado.' });
         });
     }

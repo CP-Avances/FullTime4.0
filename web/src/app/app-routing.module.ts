@@ -15,24 +15,20 @@ import { PrincipalProcesoComponent } from './componentes/modulos/accionesPersona
 import { RegistroProcesoComponent } from './componentes/modulos/accionesPersonal/catProcesos/registro-proceso/registro-proceso.component';
 import { PrincipalProvinciaComponent } from './componentes/catalogos/catProvincia/listar-provincia/principal-provincia.component';
 import { PrincipalDepartamentoComponent } from './componentes/catalogos/catDepartamentos/listar-departamento/principal-departamento.component';
-import { VerDepartamentoComponent } from './componentes/catalogos/catDepartamentos/ver-departamento/ver-departamento.component';
 import { PrincipalHorarioComponent } from './componentes/catalogos/catHorario/horario/principal-horario/principal-horario.component';
 import { RegistroHorarioComponent } from './componentes/catalogos/catHorario/horario/registro-horario/registro-horario.component';
 import { RegistrarFeriadosComponent } from './componentes/catalogos/catFeriados/feriados/registrar-feriados/registrar-feriados.component';
 import { ListarFeriadosComponent } from './componentes/catalogos/catFeriados/feriados/listar-feriados/listar-feriados.component';
 import { RegistroDepartamentoComponent } from './componentes/catalogos/catDepartamentos/registro-departamento/registro-departamento.component';
-import { PrincipalEnroladosComponent } from './componentes/catalogos/catEnrolados/principal-enrolados/principal-enrolados.component';
 import { ListarTipoComidasComponent } from './componentes/modulos/alimentacion/catTipoComidas/tipos-comidas/listar-tipo-comidas/listar-tipo-comidas.component';
 import { ListarRelojesComponent } from './componentes/catalogos/catRelojes/listar-relojes/listar-relojes.component';
 import { EmplCargosComponent } from './componentes/empleado/cargo/empl-cargos/empl-cargos.component';
 import { ListarTitulosComponent } from './componentes/catalogos/catTitulos/tituloProfesional/listar-titulos/listar-titulos.component';
 import { ListaSucursalesComponent } from './componentes/catalogos/catSucursal/lista-sucursales/lista-sucursales.component';
-import { DispositivosEnroladosComponent } from './componentes/catalogos/catEnrolados/dispositivos-enrolados/dispositivos-enrolados.component';
 import { OlvidarContraseniaComponent } from './componentes/iniciarSesion/contrasenia/olvidar-contrasenia/olvidar-contrasenia.component';
 import { ConfirmarContraseniaComponent } from './componentes/iniciarSesion/contrasenia/confirmar-contrasenia/confirmar-contrasenia.component';
 import { PlanificacionMultipleComponent } from './componentes/horarios/horarios-rotativos/planificacion-multiple/planificacion-multiple.component';
 import { RegistrarAsistenciaComponent } from './componentes/registrar-asistencia/registrar-asistencia.component';
-import { VerDetallePlanHorariosComponent } from './componentes/horarios/detallePlanHorario/ver-detalle-plan-horarios/ver-detalle-plan-horarios.component';
 import { VerDocumentosComponent } from './componentes/documentos/ver-documentos/ver-documentos.component';
 import { ConfigurarCodigoComponent } from './componentes/administracionGeneral/configurar-codigo/configurar-codigo.component';
 import { ListaHorasExtrasComponent } from './componentes/modulos/horasExtras/catHorasExtras/lista-horas-extras/lista-horas-extras.component';
@@ -155,8 +151,7 @@ const routes: Routes = [
   { path: 'registrarDepartamento', component: RegistroDepartamentoComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'registrarHorario', component: RegistroHorarioComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'feriados', component: RegistrarFeriadosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'enrolados', component: PrincipalEnroladosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'emplCargos', component: EmplCargosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+{ path: 'emplCargos', component: EmplCargosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'planificacion', component: PlanificacionMultipleComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'asistencia', component: RegistrarAsistenciaComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'calcularHoraExtra', component: CalculoHoraExtraComponent, canActivate: [AuthGuard], data: { roles: 1 } },
@@ -165,8 +160,6 @@ const routes: Routes = [
   { path: 'verEmpleado/:id', component: VerEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 1 } },
  
  
-  { path: 'enroladoDispositivo/:id', component: DispositivosEnroladosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'verDetalles/:id/:id_empleado', component: VerDetallePlanHorariosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
 
   { path: 'planificacionesHorasExtras', component: ListaPlanHoraExtraComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'horaExtraReal', component: HoraExtraRealComponent, canActivate: [AuthGuard], data: { roles: 1 } },

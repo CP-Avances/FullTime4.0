@@ -335,7 +335,8 @@ class GraficasControlador {
             fec_final.setUTCHours(0);
             fec_final.setUTCMinutes(0);
             fec_final.setUTCSeconds(0);
-            let resultado = yield (0, MetodosGraficas_1.MetricaVacacionesEmpleado)(codigo, id_empleado, fec_inicio, fec_final);
+            //let resultado = await MetricaVacacionesEmpleado(codigo, id_empleado, fec_inicio, fec_final)
+            let resultado;
             res.status(200).jsonp(resultado);
         });
     }
@@ -345,7 +346,8 @@ class GraficasControlador {
             const fec_inicio = req.params.desde;
             const fec_final = req.params.hasta;
             const codigo = req.userCodigo;
-            let resultado = yield (0, MetodosGraficas_1.MetricaVacacionesEmpleado)(codigo, id_empleado, new Date(fec_inicio), new Date(fec_final));
+            //let resultado = await MetricaVacacionesEmpleado(codigo, id_empleado, new Date(fec_inicio), new Date(fec_final))
+            let resultado;
             res.status(200).jsonp(resultado);
         });
     }
@@ -363,7 +365,8 @@ class GraficasControlador {
             fec_final.setUTCHours(0);
             fec_final.setUTCMinutes(0);
             fec_final.setUTCSeconds(0);
-            let resultado = yield (0, MetodosGraficas_1.MetricaPermisosEmpleado)(codigo, id_empleado, fec_inicio, fec_final);
+            //let resultado = await MetricaPermisosEmpleado(codigo, id_empleado, fec_inicio, fec_final)
+            let resultado;
             res.status(200).jsonp(resultado);
         });
     }
@@ -373,7 +376,8 @@ class GraficasControlador {
             const id_empleado = req.userIdEmpleado;
             const fec_inicio = req.params.desde;
             const fec_final = req.params.hasta;
-            let resultado = yield (0, MetodosGraficas_1.MetricaPermisosEmpleado)(codigo, id_empleado, new Date(fec_inicio), new Date(fec_final));
+            //let resultado = await MetricaPermisosEmpleado(codigo, id_empleado, new Date(fec_inicio), new Date(fec_final))
+            let resultado;
             res.status(200).jsonp(resultado);
         });
     }

@@ -139,7 +139,6 @@ export class TimbreWebComponent implements OnInit {
   // METODO PARA REGISTRAR TIMBRES
   AbrirRegistrarTimbre() {
     this.ventana.open(RegistrarTimbreComponent, { width: '550px' }).afterClosed().subscribe(data => {
-
       if (data !== undefined) {
         if (!data.close) {
           this.restTimbres.RegistrarTimbreWeb(data).subscribe(res => {

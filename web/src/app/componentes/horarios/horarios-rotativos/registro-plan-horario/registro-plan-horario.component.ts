@@ -11,7 +11,6 @@ import moment from 'moment';
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { PlanHorarioService } from 'src/app/servicios/horarios/planHorario/plan-horario.service';
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
@@ -73,7 +72,6 @@ export class RegistroPlanHorarioComponent implements OnInit {
     public restD: DetalleCatHorariosService,
     public restH: HorarioService,
     public restP: PlanGeneralService,
-    public rest: PlanHorarioService,
     private toastr: ToastrService,
   ) { }
 

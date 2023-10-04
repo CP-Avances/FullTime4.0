@@ -19,7 +19,6 @@ import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHorarios/empleado-horarios.service';
-import { PlanHorarioService } from 'src/app/servicios/horarios/planHorario/plan-horario.service';
 import { CiudadFeriadosService } from 'src/app/servicios/ciudadFeriados/ciudad-feriados.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { EntradasSalidas } from 'src/app/model/timbres.model';
@@ -88,7 +87,6 @@ export class ReporteEntradaSalidaComponent implements OnInit {
     public restCF: CiudadFeriadosService,
     public restEmpre: EmpresaService,
     public restHorario: EmpleadoHorariosService,
-    public restPlan: PlanHorarioService,
     public restD: DatosGeneralesService,
     public router: Router,
     public validacionesService: ValidacionesService,
@@ -315,7 +313,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
       this.empleadoHorario = data;
       console.log('horario', this.empleadoHorario);
       // BUSQUEDA de la lista de las planificaciones del empleado
-      this.restPlan.ObtenerPlanHorarioEmpleadoFechas(codigo, fechas).subscribe(dataP => {
+      /*this.restPlan.ObtenerPlanHorarioEmpleadoFechas(codigo, fechas).subscribe(dataP => {
         this.empleadoPlan = dataP;
         console.log('plan', this.empleadoPlan);
         // Llamado a ver archivos
@@ -324,11 +322,11 @@ export class ReporteEntradaSalidaComponent implements OnInit {
       }, error => {
         // Llamado a ver archivos cuando no existe horarios de planificación del empleado
         this.VerArchivos(codigo, archivo, form, fechasTotales);
-      })
+      })*/
 
     }, error => {
       // BUSQUEDA de la lista de las planificaciones del empleado
-      this.restPlan.ObtenerPlanHorarioEmpleadoFechas(codigo, fechas).subscribe(dataP => {
+     /* this.restPlan.ObtenerPlanHorarioEmpleadoFechas(codigo, fechas).subscribe(dataP => {
         this.empleadoPlan = dataP;
         console.log('plan', this.empleadoPlan);
         // Llamado a ver archivos
@@ -337,7 +335,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
       }, error => {
         // Llamado a ver archivos cuando no existe horarios de planifiación del empleado
         this.VerArchivos(codigo, archivo, form, fechasTotales);
-      })
+      })*/
     })
   }
 
