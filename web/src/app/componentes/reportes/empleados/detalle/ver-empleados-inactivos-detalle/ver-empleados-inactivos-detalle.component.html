@@ -1,261 +1,90 @@
 <div class="container" style="padding-top: 15px">
-    <mat-card class="example-card mat-elevation-z8">
-      <div id="titulo">
-        <span>DETALLES DE EMPLEADOS INACTIVOS</span>
-      </div>
-      <mat-card-content>
-        <!--TABLA PARA SUCURSALES-->
-        <div *ngIf="bool_suc">
-          <div *ngFor="let suc of arr_suc">
-            <div
-              class="container"
-              style="padding-bottom: 25px; text-align: center; margin-top: 0.5rem"
-            >
-              <div class="mat-elevation-z8" style="background: white">
-                <div id="titulo">
-                  <span>SUCURSAL: {{ suc.name_suc }}</span>
-                </div>
-                <div class="table-responsive">
-                  <table class="table table-hover table-sm">
-                    <thead class="thead-light">
-                      <tr style="text-align: center">
-                        <th scope="col" rowspan="2">N°</th>
-                        <th scope="col" rowspan="2">CÓDIGO</th>
-                        <th scope="col" rowspan="2">EMPLEADO</th>
-                        <th scope="col" rowspan="2">CÉDULA</th>
-                        <th scope="col" rowspan="2">DEPARTAMENTO</th>
-                        <th scope="col" rowspan="2">CARGO</th>
-                        <th scope="col" colspan="2">CORREO</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr
-                        *ngFor="
-                          let e of suc.empleados
-                            | paginate : tamanio_pagina : numero_pagina
-                        "
-                      >
-                        <td>{{ e.n }}</td>
-                        <td>{{ e.codigo }}</td>
-                        <td>{{ e.name_empleado.toUpperCase() }}</td>
-                        <td>{{ e.cedula }}</td>
-                        <td>{{ e.departamento }}</td>
-                        <td>{{ e.cargo }}</td>
-                        <td>{{ e.correo }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <mat-paginator
-                  [length]="suc.empleados.length"
-                  [pageSize]="tamanio_pagina"
-                  [pageSizeOptions]="pageSizeOptions"
-                  (page)="ManejarPagina($event)"
-                  showFirstLastButtons
-                  aria-label="Seleccionar pagina"
-                >
-                </mat-paginator>
-              </div>
-            </div>
-          </div>
-        </div>
-  
-        <!--TABLA PARA CARGOS-->
-        <div *ngIf="bool_car">
-          <div *ngFor="let car of arr_car">
-            <div
-              class="container"
-              style="padding-bottom: 25px; text-align: center; margin-top: 1rem"
-            >
-              <div class="mat-elevation-z8" style="background: white">
-                <div id="titulo">
-                  <span>{{ car.name_cargo }}</span>
-                </div>
-                <div class="table-responsive">
-                  <table class="table table-hover table-sm">
-                    <thead class="thead-light">
-                      <tr style="text-align: center">
-                        <th scope="col" rowspan="2">N°</th>
-                        <th scope="col" rowspan="2">CÓDIGO</th>
-                        <th scope="col" rowspan="2">EMPLEADO</th>
-                        <th scope="col" rowspan="2">CÉDULA</th>
-                        <th scope="col" rowspan="2">SUCURSAL</th>
-                        <th scope="col" rowspan="2">DEPARTAMENTO</th>
-                        <th scope="col" colspan="2">CORREO</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr *ngFor="let e of car.empleados">
-                        <td>{{ e.n }}</td>
-                        <td>{{ e.codigo }}</td>
-                        <td>{{ e.name_empleado.toUpperCase() }}</td>
-                        <td>{{ e.cedula }}</td>
-                        <td>{{ e.sucursal }}</td>
-                        <td>{{ e.departamento }}</td>
-                        <td>{{ e.correo }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <mat-paginator
-                  [length]="car.empleados.length"
-                  [pageSize]="tamanio_pagina"
-                  [pageSizeOptions]="pageSizeOptions"
-                  (page)="ManejarPagina($event)"
-                  showFirstLastButtons
-                  aria-label="Seleccionar pagina"
-                >
-                </mat-paginator>
-              </div>
-            </div>
-          </div>
-        </div>
-  
-        <!--TABLA PARA DEPARTAMENTOS-->
-        <div *ngIf="bool_dep">
-          <div *ngFor="let dep of arr_dep">
-            <div
-              class="container"
-              style="padding-bottom: 25px; text-align: center; margin-top: 1rem"
-            >
-              <div class="mat-elevation-z8" style="background: white">
-                <div id="titulo">
-                  <span>{{ dep.name_dep }}</span>
-                </div>
-                <div class="table-responsive">
-                  <table class="table table-hover table-sm">
-                    <thead class="thead-light">
-                      <tr style="text-align: center">
-                        <th scope="col" rowspan="2">N°</th>
-                        <th scope="col" rowspan="2">CÓDIGO</th>
-                        <th scope="col" rowspan="2">EMPLEADO</th>
-                        <th scope="col" rowspan="2">CÉDULA</th>
-                        <th scope="col" rowspan="2">SUCURSAL</th>
-                        <th scope="col" rowspan="2">CARGO</th>
-                        <th scope="col" colspan="2">CORREO</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr
-                        *ngFor="
-                          let e of dep.empleados
-                            | paginate : tamanio_pagina : numero_pagina
-                        "
-                      >
-                        <td>{{ e.n }}</td>
-                        <td>{{ e.codigo }}</td>
-                        <td>{{ e.name_empleado.toUpperCase() }}</td>
-                        <td>{{ e.cedula }}</td>
-                        <td>{{ e.sucursal }}</td>
-                        <td>{{ e.cargo }}</td>
-                        <td>{{ e.correo }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <mat-paginator
-                  [length]="dep.empleados.length"
-                  [pageSize]="tamanio_pagina"
-                  [pageSizeOptions]="pageSizeOptions"
-                  (page)="ManejarPagina($event)"
-                  showFirstLastButtons
-                  aria-label="Seleccionar pagina"
-                >
-                </mat-paginator>
-              </div>
-            </div>
-          </div>
-        </div>
-  
-        <!--TABLA PARA EMPLEADOS-->
-        <div *ngIf="bool_emp">
-          <div
-            class="container"
-            style="padding-bottom: 25px; text-align: center; margin-top: 1rem"
-          >
-            <div class="mat-elevation-z8" style="background: white">
-              <div id="titulo">
-                <span>EMPLEADOS</span>
-              </div>
-              <div class="table-responsive">
-                <table class="table table-hover table-sm">
-                  <thead class="thead-light">
-                    <tr style="text-align: center">
-                      <th scope="col" rowspan="2">N°</th>
-                      <th scope="col" rowspan="2">CÓDIGO</th>
-                      <th scope="col" rowspan="2">EMPLEADO</th>
-                      <th scope="col" rowspan="2">CÉDULA</th>
-                      <th scope="col" rowspan="2">SUCURSAL</th>
-                      <th scope="col" rowspan="2">DEPARTAMENTO</th>
-                      <th scope="col" rowspan="2">CARGO</th>
-                      <th scope="col" colspan="2">CORREO</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      *ngFor="
-                        let e of arr_emp
-                          | paginate : tamanio_pagina : numero_pagina
-                      "
-                    >
-                      <td>{{ e.n }}</td>
-                      <td>{{ e.codigo }}</td>
-                      <td>{{ e.name_empleado.toUpperCase() }}</td>
-                      <td>{{ e.cedula }}</td>
-                      <td>{{ e.sucursal }}</td>
-                      <td>{{ e.departamento }}</td>
-                      <td>{{ e.cargo }}</td>
-                      <td>{{ e.correo }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <mat-paginator
-                [length]="arr_emp.length"
-                [pageSize]="tamanio_pagina"
-                [pageSizeOptions]="pageSizeOptions"
-                (page)="ManejarPagina($event)"
-                showFirstLastButtons
-                aria-label="Seleccionar pagina"
+  <mat-card class="example-card mat-elevation-z8">
+    <div id="titulo">
+      <span>DETALLES DE EMPLEADOS INACTIVOS</span>
+    </div>
+    <mat-card-content>
+      <div
+        class="container"
+        style="padding-bottom: 25px; text-align: center; margin-top: 0.5rem"
+      >
+        <div class="table-responsive">
+          <table class="table table-hover table-sm">
+            <thead class="thead-light">
+              <tr style="text-align: center">
+                <th scope="col" rowspan="2">N°</th>
+                <th scope="col" rowspan="2">CÓDIGO</th>
+                <th scope="col" rowspan="2">EMPLEADO</th>
+                <th scope="col" rowspan="2">CÉDULA</th>
+                <th scope="col" rowspan="2">RÉGIMEN</th>
+                <th scope="col" rowspan="2">SUCURSAL</th>
+                <th scope="col" rowspan="2">DEPARTAMENTO</th>
+                <th scope="col" rowspan="2">CARGO</th>
+                <th scope="col" colspan="2">CORREO</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="
+                  let e of arr_emp | paginate : tamanio_pagina : numero_pagina
+                "
               >
-              </mat-paginator>
-            </div>
-          </div>
+                <td>{{ e.n }}</td>
+                <td>{{ e.codigo }}</td>
+                <td>{{ e.name_empleado.toUpperCase() }}</td>
+                <td>{{ e.cedula }}</td>
+                <td>{{ e.regimen }}</td>
+                <td>{{ e.sucursal }}</td>
+                <td>{{ e.departamento }}</td>
+                <td>{{ e.cargo }}</td>
+                <td>{{ e.correo }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <div
-          class="d-flex justify-content-end"
-          style="margin-right: 2%; margin-top: 0.5rem"
+        <mat-paginator
+          [length]="arr_emp.length"
+          [pageSize]="tamanio_pagina"
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="ManejarPagina($event)"
+          showFirstLastButtons
+          aria-label="Seleccionar pagina"
         >
-          <i
-            id="pdf"
-            class="fas fa-file-pdf icon"
-            matSuffix
-            matTooltipPosition="right"
-            matTooltip="Descargar Lista de Niveles de Títulos en formato PDF."
-            (click)="descargarReporte('download')"
-          >
-            <p>PDF</p>
-          </i>
-          <i
-            id="excel"
-            class="fas fa-file-excel icon"
-            matSuffix
-            matTooltipPosition="right"
-            matTooltip="Descargar Lista de Niveles de Títulos en formato EXCEL."
-            (click)="descargarReporte('excel')"
-          >
-            <p>XLSL</p>
-          </i>
-          <!-- <i  id="csv" class="fas fa-file-csv icon" matSuffix matTooltipPosition="right"
-              matTooltip="Descargar Lista de Niveles de Títulos en formato CSV.">
-              <p>CSV</p>
-          </i>
-          <i  id="xml" class="fas fa-file-code icon" matSuffix matTooltipPosition="right"
-              matTooltip="Descargar Lista de Niveles de Títulos en formato XML.">
-              <p>XML</p>
-          </i> -->
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
-  
+        </mat-paginator>
+      </div>
+      <div
+        class="d-flex justify-content-end"
+        style="margin-right: 2%; margin-top: 0.5rem"
+      >
+        <i
+          id="pdf"
+          class="fas fa-file-pdf icon"
+          matSuffix
+          matTooltipPosition="right"
+          matTooltip="Descargar Lista de Niveles de Títulos en formato PDF."
+          (click)="descargarReporte('download')"
+        >
+          <p>PDF</p>
+        </i>
+        <i
+          id="excel"
+          class="fas fa-file-excel icon"
+          matSuffix
+          matTooltipPosition="right"
+          matTooltip="Descargar Lista de Niveles de Títulos en formato EXCEL."
+          (click)="descargarReporte('excel')"
+        >
+          <p>XLSL</p>
+        </i>
+        <!-- <i  id="csv" class="fas fa-file-csv icon" matSuffix matTooltipPosition="right"
+            matTooltip="Descargar Lista de Niveles de Títulos en formato CSV.">
+            <p>CSV</p>
+        </i>
+        <i  id="xml" class="fas fa-file-code icon" matSuffix matTooltipPosition="right"
+            matTooltip="Descargar Lista de Niveles de Títulos en formato XML.">
+            <p>XML</p>
+        </i> -->
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

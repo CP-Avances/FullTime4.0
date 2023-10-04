@@ -23,9 +23,6 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
   bool_dep: boolean = false;
   bool_emp: boolean = false;
 
-  arr_suc: any = [];
-  arr_car: any = [];
-  arr_dep: any = [];
   arr_emp: any = [];
   c: number;
 
@@ -64,28 +61,28 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
         this.bool_car = false;
         this.bool_dep = false;
         this.bool_emp = false;
-        this.extraerSucursales();
+        this.extraerDatos();
         break;
       case 'car':
         this.bool_suc = false;
         this.bool_car = true;
         this.bool_dep = false;
         this.bool_emp = false;
-        this.extraerCargos();
+        this.extraerDatosCargos();
         break;
       case 'dep':
         this.bool_suc = false;
         this.bool_car = false;
         this.bool_dep = true;
         this.bool_emp = false;
-        this.extraerDepartamentos();
+        this.extraerDatos();
         break;
       case 'emp':
         this.bool_suc = false;
         this.bool_car = false;
         this.bool_dep = false;
         this.bool_emp = true;
-        this.extraerEmpleados();
+        this.extraerDatos();
         break;
       default:
         this.bool_suc = false;
@@ -96,65 +93,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
     }
   }
 
-  extraerSucursales() {
-    this.arr_suc = [];
-    let n = 0;
-    this.data.forEach((obj: any) => {
-      this.arr_emp = [];
-
-      obj.departamentos.forEach((dep: any) => {
-        dep.empleado.forEach((e: any) => {
-          n = n + 1;
-          e['n'] = n;
-          this.arr_emp.push(e);
-        });
-      });
-      obj['empleados'] = this.arr_emp;
-      this.arr_suc.push(obj);
-      this.c = n;
-    });
-  }
-
-  extraerCargos() {
-    this.arr_car = [];
-    let n = 0;
-    this.data.forEach((obj: any) => {
-      this.arr_emp = [];
-
-      obj.empleados.forEach((e: any) => {
-        n = n + 1;
-        e['n'] = n;
-        this.arr_emp.push(e);
-      });
-
-      obj['empleados'] = this.arr_emp;
-      this.arr_car.push(obj);
-
-      this.c = n;
-    });
-  }
-
-  extraerDepartamentos() {
-    this.arr_dep = [];
-    let n = 0;
-    this.data.forEach((obj: any) => {
-      obj.departamentos.forEach((dep: any) => {
-        this.arr_emp = [];
-
-        dep.empleado.forEach((e: any) => {
-          n = n + 1;
-          e['n'] = n;
-          this.arr_emp.push(e);
-        });
-        dep['empleados'] = this.arr_emp;
-        this.arr_dep.push(dep);
-      });
-
-      this.c = n;
-    });
-  }
-
-  extraerEmpleados() {
+  extraerDatos() {
     this.arr_emp = [];
     let n = 0;
     this.data.forEach((obj: any) => {
@@ -165,7 +104,18 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
           this.arr_emp.push(e);
         });
       });
-      this.c = n;
+    });
+  }
+
+  extraerDatosCargos() {
+    this.arr_emp = [];
+    let n = 0;
+    this.data.forEach((obj: any) => {
+      obj.empleados.forEach((e: any) => {
+        n = n + 1;
+        e['n'] = n;
+        this.arr_emp.push(e);
+      });
     });
   }
 

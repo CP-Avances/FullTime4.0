@@ -78,7 +78,7 @@ export class VerVacunasComponent implements OnInit {
         this.bool_car = true;
         this.bool_dep = false;
         this.bool_emp = false;
-        this.extraerCargos();
+        this.extraerDatosCargos();
         break;
       case 'dep':
         this.bool_suc = false;
@@ -138,7 +138,7 @@ export class VerVacunasComponent implements OnInit {
     });
   }
 
-  extraerCargos() {
+  extraerDatosCargos() {
     this.arr_vac = [];
     let n = 0;
     this.data.forEach((obj1: any) => {
