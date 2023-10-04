@@ -145,6 +145,7 @@ import { VistaElementosComponent } from './componentes/modulos/permisos/configur
 import { TimbreMultipleComponent } from './componentes/timbres/timbre-multiple/timbre-multiple.component';
 import { VerEmpleadosActivosDetalleComponent } from './componentes/reportes/empleados/detalle/ver-empleados-activos-detalle/ver-empleados-activos-detalle.component';
 import { VerEmpleadosInactivosDetalleComponent } from './componentes/reportes/empleados/detalle/ver-empleados-inactivos-detalle/ver-empleados-inactivos-detalle.component';
+import { VerVacunasComponent } from './componentes/reportes/vacunas/detalle/ver-vacunas/ver-vacunas.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -206,6 +207,7 @@ const routes: Routes = [
   //DETALLE REPORTES
   { path: 'ver-empleados-activos-detalle/:tipo/:lista', component: VerEmpleadosActivosDetalleComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'ver-empleados-inactivos-detalle/:tipo/:lista', component: VerEmpleadosInactivosDetalleComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'ver-vacunas-detalle/:tipo/:lista', component: VerVacunasComponent, canActivate: [AuthGuard], data: { roles: 1 } },
 
   // REPORTES ALIMENTACIÓN
   { path: 'alimentosGeneral', component: AlimentosGeneralComponent, canActivate: [AuthGuard], data: { roles: 1 } },

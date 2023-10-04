@@ -10,6 +10,8 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
 
+import { Router } from '@angular/router';
+
 // IMPORTAR SERVICIOS
 import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
 import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
@@ -101,7 +103,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     private reporteService: ReportesService, // SERVICIO DATOS DE BUSQUEDA GENERALES DE REPORTE
     private restEmpre: EmpresaService, // SERVICIO DATOS GENERALES DE EMPRESA
     private R_vacuna: VacunasService, // SERVICIO DATOS PARA REPORTE DE VACUNAS
-    private toastr: ToastrService // VARIABLE DE MANEJO DE NOTIFICACIONES
+    private toastr: ToastrService, // VARIABLE DE MANEJO DE NOTIFICACIONES
+    private router: Router,
   ) {
     this.ObtenerLogo();
     this.ObtenerColores();
@@ -144,6 +147,14 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
                 nombre: r.name_empleado,
                 codigo: r.codigo,
                 cedula: r.cedula,
+                correo: r.correo,
+                cargo: r.cargo,
+                id_contrato: r.id_contrato,
+                hora_trabaja: r.hora_trabaja,
+                sucursal: r.sucursal,
+                departamento: r.departamento,
+                ciudad: r.ciudad,
+                regimen: r.regimen
               };
               this.empleados.push(elemento);
             });
@@ -195,6 +206,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
               hora_trabaja: r.hora_trabaja,
               sucursal: r.sucursal,
               departamento: r.departamento,
+              ciudad: r.ciudad,
+              regimen: r.regimen,
             });
           });
         });
@@ -274,12 +287,9 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       (res) => {
         this.data_pdf = res;
         switch (accion) {
-          case 'excel':
-            this.exportToExcel('default');
-            break;
-          default:
-            this.generarPdf(accion);
-            break;
+          case 'excel': this.exportToExcel(); break;
+          case 'ver': this.verDatos(this.data_pdf, 'suc'); break;
+          default: this.generarPdf(accion); break;
         }
       },
       (err) => {
@@ -304,12 +314,9 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       (res) => {
         this.data_pdf = res;
         switch (accion) {
-          case 'excel':
-            this.exportToExcelCargo();
-            break;
-          default:
-            this.generarPdf(accion);
-            break;
+          case 'excel': this.exportToExcelCargo(); break;
+          case 'ver': this.verDatos(this.data_pdf,'car'); break;
+          default: this.generarPdf(accion); break;
         }
       },
       (err) => {
@@ -339,12 +346,9 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       (res) => {
         this.data_pdf = res;
         switch (accion) {
-          case 'excel':
-            this.exportToExcel('default');
-            break;
-          default:
-            this.generarPdf(accion);
-            break;
+          case 'excel': this.exportToExcel(); break;
+          case 'ver': this.verDatos(this.data_pdf,'dep'); break;
+          default: this.generarPdf(accion); break;
         }
       },
       (err) => {
@@ -381,12 +385,9 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       (res) => {
         this.data_pdf = res;
         switch (accion) {
-          case 'excel':
-            this.exportToExcel('default');
-            break;
-          default:
-            this.generarPdf(accion);
-            break;
+          case 'excel': this.exportToExcel(); break;
+          case 'ver': this.verDatos(this.data_pdf,'emp'); break;
+          default: this.generarPdf(accion); break;
         }
       },
       (err) => {
@@ -637,9 +638,6 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
             },
           });
         });
-
-
-
       });
 
     } else {
@@ -768,39 +766,37 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   /** ************************************************************************************************** *
    ** *                                     METODO PARA EXPORTAR A EXCEL                                 *
    ** ************************************************************************************************** */
-  exportToExcel(tipo: string): void {
-    switch (tipo) {
-      default:
-        const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(
-          this.MapingDataPdfDefault(this.data_pdf)
-        );
-        const wb: xlsx.WorkBook = xlsx.utils.book_new();
-        xlsx.utils.book_append_sheet(wb, wsr, 'Vacunas');
-        xlsx.writeFile(wb, 'Vacunas ' + new Date().getTime() + '.xlsx');
-        break;
-    }
+  exportToExcel(): void {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(
+      this.MapingDataPdfDefault(this.data_pdf)
+    );
+    const wb: xlsx.WorkBook = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(wb, wsr, 'Vacunas');
+    xlsx.writeFile(wb, 'Vacunas ' + new Date().getTime() + '.xlsx');
   }
 
   MapingDataPdfDefault(array: Array<any>) {
     let nuevo: Array<any> = [];
+    let c=0;
     array.forEach((obj1: ReporteVacunas) => {
       obj1.departamentos.forEach((obj2) => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.vacunas.forEach((obj4: vacuna) => {
-            let ele = {
-              'Id Sucursal': obj1.id_suc,
-              Ciudad: obj1.ciudad,
-              Sucursal: obj1.name_suc,
-              'Id Departamento': obj2.id_depa,
-              Departamento: obj2.name_dep,
-              'Id Empleado': obj3.id,
-              'Nombre Empleado': obj3.name_empleado,
-              Cédula: obj3.cedula,
-              Código: obj3.codigo,
-              Vacuna: obj4.tipo_vacuna,
-              Fecha: obj4.fecha.split('T')[0],
-              Descripción: obj4.descripcion,
-            };
+          c = c + 1;
+          let ele = {
+            'N°': c, 'Código Empleado': obj3.codigo, 'Nombre Empleado': obj3.name_empleado,
+            'Cédula': obj3.cedula, 'Género': obj3.genero, 
+            'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
+            'Régimen': obj3.regimen,            
+            'Departamento': obj2.name_dep,
+            'Cargo': obj3.cargo,
+            'Correo': obj3.correo,
+            Carnet: obj4.carnet,
+            'Nombre carnet': obj4.nom_carnet,
+            Vacuna: obj4.tipo_vacuna,
+            Fecha: obj4.fecha.split('T')[0],
+            'Descripción': obj4.descripcion,
+          }
             nuevo.push(ele);
           });
         });
@@ -821,26 +817,25 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
 
   MapingDataPdfDefaultCargo(array: Array<any>) {
     let nuevo: Array<any> = [];
+    let c=0;
     array.forEach((obj) => {
-      console.log('obj',obj);
       obj.empleados.forEach((obj2) => {
         obj2.vacunas.forEach((obj3)=>{
+          c = c + 1;
           let ele = {
-            'Id Sucursal': obj2.id_suc,
-            Ciudad: obj2.ciudad,
-            Sucursal: obj2.sucursal,
-            'Id Departamento': obj2.id_depa,
-            Departamento: obj2.departamento,
-            'Id Empleado': obj2.id,
-            'Nombre Empleado': obj2.name_empleado,
-            Cédula: obj2.cedula,
-            Código: obj2.codigo,
+            'N°': c, 'Código Empleado': obj2.codigo, 'Nombre Empleado': obj2.name_empleado,
+            'Cédula': obj2.cedula, 'Género': obj2.genero, 
+            'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
+            'Régimen': obj2.regimen,            
+            'Departamento': obj2.departamento,
+            'Cargo': obj2.cargo,
+            'Correo': obj2.correo,
             Carnet: obj3.carnet,
             'Nombre carnet': obj3.nom_carnet,
             Vacuna: obj3.tipo_vacuna,
             Fecha: obj3.fecha.split('T')[0],
-            Descripción: obj3.descripcion,
-          };
+            'Descripción': obj3.descripcion,
+          }
           nuevo.push(ele);
         });
       });
@@ -850,11 +845,6 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     return nuevo;
   }
 
-  // 'Ciudad': obj2.ciudad,
-  //           'Sucursal': obj2.sucursal,
-  //           'Departamento': obj2.departamento,
-  //           'Id Empleado': obj2.id, 'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
-  //           'Género': obj2.genero, 'Cargo': obj2.cargo,
 
   /** ************************************************************************************* *
    ** *            VARIOS METODOS COMPLEMENTARIOS AL FUNCIONAMIENTO                         *
@@ -993,6 +983,12 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       this.Filtrar('', 4)
       this.Filtrar('', 5)*/
     }
+  }
+
+  //ENVIAR DATOS A LA VENTANA DE DETALLE
+  verDatos(data: any, tipo: string) {
+    const encodedData = JSON.stringify(data);
+      this.router.navigate(['/ver-vacunas-detalle/', tipo, encodedData]);
   }
 }
 

@@ -42,6 +42,10 @@ mat-icon { cursor: pointer; }
     margin-left: 16px;
 }
 
+.ver {
+    color: indianred;
+}
+
 /* .i-pdf { color: red; font-size: 30px; }
 
 .i-print { color: rgb(0, 0, 0); font-size: 30px; }
