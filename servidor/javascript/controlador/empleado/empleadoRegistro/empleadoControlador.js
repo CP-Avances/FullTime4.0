@@ -51,6 +51,7 @@ const ObtenerRutaUsuario = function (id) {
                 ruta = ruta + separador + __dirname.split(separador)[i];
             }
         }
+        console.log('ver ruta imagen', ruta + separador + 'imagenesEmpleados' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula);
         return ruta + separador + 'imagenesEmpleados' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
     });
 };
