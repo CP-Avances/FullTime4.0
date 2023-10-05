@@ -2835,7 +2835,7 @@ export class VerEmpleadoComponent implements OnInit {
         "Estado Civil": estadoCivil,
         "Genero": genero,
         "Correo": obj.correo,
-        "Fecha de Nacimiento": obj.fec_nacimiento_,
+        "Fecha de Nacimiento": obj.fec_nacimiento_.split(" ")[1],
         "Estado": estado,
         "Domicilio": obj.domicilio,
         "Telefono": obj.telefono,
@@ -2916,12 +2916,17 @@ export class VerEmpleadoComponent implements OnInit {
 
   ExportToCVS() {
     const datos: any = this.obtenerDatos();
-    const csvDataE = xlsx.utils.sheet_to_csv(xlsx.utils.json_to_sheet(datos[0]));
-    const csvDataCo = xlsx.utils.sheet_to_csv(xlsx.utils.json_to_sheet(datos[1]));
-    const csvDataCa = xlsx.utils.sheet_to_csv(xlsx.utils.json_to_sheet(datos[2]));
-    const csvDataD = xlsx.utils.sheet_to_csv(xlsx.utils.json_to_sheet(this.tituloEmpleado));
-    const csvDataT = xlsx.utils.sheet_to_csv(xlsx.utils.json_to_sheet(this.discapacidadUser));
-    const data: Blob = new Blob([csvDataE,csvDataCo,csvDataCa,csvDataD,csvDataT], { type: 'text/csv;charset=utf-8;' });
+    const datosEmpleado: any = [];
+    const objeto = {
+      ...datos[0][0],
+      ...datos[1][0],
+      ...datos[2][0],
+      ...this.tituloEmpleado[0],
+      ...this.discapacidadUser[0],
+    };
+    datosEmpleado.push(objeto);
+    const csvDataE = xlsx.utils.sheet_to_csv(xlsx.utils.json_to_sheet(datosEmpleado));
+    const data: Blob = new Blob([csvDataE], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, "EmpleadoCSV" + (datos[0])[0].Nombre +"_"+ (datos[0])[0].Apellido +"_"  + new Date().getTime() + '.csv');
   }
 
