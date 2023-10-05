@@ -1,9 +1,11 @@
+import { ObtenerRutaHorarios } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import pool from '../../database';
 import excel from 'xlsx';
 import fs from 'fs';
 import path from 'path';
+import moment from 'moment';
 const builder = require('xmlbuilder');
 
 class HorarioControlador {
@@ -58,9 +60,13 @@ class HorarioControlador {
 
     let id = req.params.id;
     let { archivo, codigo } = req.params;
-
+    // FECHA DEL SISTEMA
+    var fecha = moment();
+    var anio = fecha.format('YYYY');
+    var mes = fecha.format('MM');
+    var dia = fecha.format('DD');
     // LEER DATOS DE IMAGEN
-    let documento = id + '_' + codigo + '_' + req.file?.originalname;
+    let documento = id + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
     let separador = path.sep;
 
     await pool.query(
@@ -73,9 +79,8 @@ class HorarioControlador {
 
     if (archivo != 'null' && archivo != '' && archivo != null) {
       if (archivo != documento) {
-        let filePath = `servidor${separador}horarios${separador}${archivo}`
-        let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-        fs.unlinkSync(direccionCompleta);
+        let ruta = ObtenerRutaHorarios() + separador + archivo;
+        fs.unlinkSync(ruta);
       }
     }
   }
@@ -116,9 +121,8 @@ class HorarioControlador {
       , [id]);
 
     if (documento != 'null' && documento != '' && documento != null) {
-      let filePath = `servidor${separador}horarios${separador}${documento}`
-      let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-      fs.unlinkSync(direccionCompleta);
+      let ruta = ObtenerRutaHorarios() + separador + documento;
+      fs.unlinkSync(ruta);
     }
 
     res.jsonp({ message: 'Documento actualizado.' });
@@ -130,9 +134,8 @@ class HorarioControlador {
     let separador = path.sep;
 
     if (documento != 'null' && documento != '' && documento != null) {
-      let filePath = `servidor${separador}horarios${separador}${documento}`
-      let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-      fs.unlinkSync(direccionCompleta);
+      let ruta = ObtenerRutaHorarios() + separador + documento;
+      fs.unlinkSync(ruta);
     }
 
     res.jsonp({ message: 'Documento Actualizado' });
@@ -240,8 +243,8 @@ class HorarioControlador {
   public async ObtenerDocumento(req: Request, res: Response): Promise<any> {
     const docs = req.params.docs;
     let separador = path.sep;
-    let filePath = `servidor${separador}horarios${separador}${docs}`
-    res.sendFile(__dirname.split("servidor")[0] + filePath);
+    let ruta = ObtenerRutaHorarios() + separador + docs;
+    res.sendFile(path.resolve(ruta));
   }
 
 

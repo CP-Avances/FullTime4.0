@@ -16,7 +16,7 @@ exports.PresentarUsuarios = exports.BuscarCorreos = exports.cumpleanios = void 0
 const settingsMail_1 = require("./settingsMail");
 const database_1 = __importDefault(require("../database"));
 const path_1 = __importDefault(require("path"));
-// METODO PARA ENVIAR LOS CUMPLEAÑOS A UNA HORA DETERMINADA, VERIFICANDO A CADA HORA HASTA QUE 
+// METODO PARA ENVIAR LOS CUMPLEANIOS A UNA HORA DETERMINADA, VERIFICANDO A CADA HORA HASTA QUE 
 // SEAN LAS 12 PM Y SE ENVIE EL CORREO
 const cumpleanios = function () {
     setInterval(() => __awaiter(this, void 0, void 0, function* () {

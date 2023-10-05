@@ -1,5 +1,5 @@
 // SECCION LIBRERIAS
-import { ObtenerRutaVacuna } from '../../../controlador/empleado/empleadoVacuna/vacunasControlador'
+import { ObtenerRutaUsuario, ObtenerRutaVacuna, ObtenerRutaPermisos, ObtenerRutaContrato } from '../../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import { Md5 } from 'ts-md5';
@@ -9,42 +9,6 @@ import path from 'path';
 import fs from 'fs';
 import moment from 'moment';
 const builder = require('xmlbuilder');
-
-const ObtenerRuta = function (codigo: any, cedula: any) {
-  var ruta = '';
-  let separador = path.sep;
-  for (var i = 0; i < __dirname.split(separador).length - 4; i++) {
-    if (ruta === '') {
-      ruta = __dirname.split(separador)[i];
-    }
-    else {
-      ruta = ruta + separador + __dirname.split(separador)[i];
-    }
-  }
-  return ruta + separador + 'permisos' + separador + codigo + '_' + cedula;
-}
-
-// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE IMAGENES DE USUARIO
-export const ObtenerRutaUsuario = async function (id: any) {
-  var ruta = '';
-  let separador = path.sep;
-  const usuario = await pool.query(
-    `
-      SELECT codigo, cedula FROM empleados WHERE id = $1
-      `
-    , [id]);
-
-  for (var i = 0; i < __dirname.split(separador).length - 4; i++) {
-    if (ruta === '') {
-      ruta = __dirname.split(separador)[i];
-    }
-    else {
-      ruta = ruta + separador + __dirname.split(separador)[i];
-    }
-  }
-console.log('ver ruta imagen', ruta + separador + 'imagenesEmpleados' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula)
-  return ruta + separador + 'imagenesEmpleados' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
-}
 
 
 class EmpleadoControlador {
@@ -147,7 +111,7 @@ class EmpleadoControlador {
 
         let verificar = 0;
         // RUTA DE LA CARPETA PRINCIPAL PERMISOS
-        const carpetaPermisos = ObtenerRuta(codigo, cedula);
+        const carpetaPermisos = await ObtenerRutaPermisos(codigo);
 
         // METODO MKDIR PARA CREAR LA CARPETA
         fs.mkdir(carpetaPermisos, { recursive: true }, (err: any) => {
@@ -182,9 +146,21 @@ class EmpleadoControlador {
           }
         });
 
+        // RUTA DE LA CARPETA DE ALMACENAMIENTO DE CONTRATOS
+        const carpetaContratos = await ObtenerRutaContrato(empleado.id);
+
+        // METODO MKDIR PARA CREAR LA CARPETA
+        fs.mkdir(carpetaContratos, { recursive: true }, (err: any) => {
+          if (err) {
+            verificar = 1;
+          } else {
+            verificar = 0;
+          }
+        });
+
         // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
         if (verificar === 1) {
-          console.error('Error al crear la carpeta de imagenes.');
+          console.error('Error al crear las carpetas.');
         }
         else {
           return res.status(200).jsonp(empleado)
@@ -219,7 +195,7 @@ class EmpleadoControlador {
       let verificar_permisos = 0;
 
       // RUTA DE LA CARPETA PERMISOS DEL USUARIO
-      const carpetaPermisos = ObtenerRuta(codigo, cedula);
+      const carpetaPermisos = await ObtenerRutaPermisos(codigo);
 
       // VERIFICACION DE EXISTENCIA CARPETA PERMISOS DE USUARIO
       fs.access(carpetaPermisos, fs.constants.F_OK, (err) => {
@@ -280,18 +256,42 @@ class EmpleadoControlador {
         }
       });
 
-      // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
-      if (verificar_permisos === 1 && verificar_imagen === 1 && verificar_vacunas === 1) {
-        res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de permisos, de imagenes y vacunación del usuario.' });
+      let verificar_contrato = 0;
 
-      } else if (verificar_permisos === 1 && verificar_imagen === 0 && verificar_vacunas === 0) {
+      // RUTA DE LA CARPETA CONTRATOS DEL USUARIO
+      const carpetaContratos = await ObtenerRutaContrato(id);
+
+      // VERIFICACION DE EXISTENCIA CARPETA CONTRATOS DE USUARIO
+      fs.access(carpetaContratos, fs.constants.F_OK, (err) => {
+        if (err) {
+          // METODO MKDIR PARA CREAR LA CARPETA
+          fs.mkdir(carpetaContratos, { recursive: true }, (err: any) => {
+            if (err) {
+              verificar_contrato = 1;
+            } else {
+              verificar_contrato = 0;
+            }
+          });
+        } else {
+          verificar_contrato = 0
+        }
+      });
+
+      // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
+      if (verificar_permisos === 1 && verificar_imagen === 1 && verificar_vacunas === 1 && verificar_contrato === 1) {
+        res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos, permisos, imagenes y vacunación del usuario.' });
+
+      } else if (verificar_permisos === 1 && verificar_imagen === 0 && verificar_vacunas === 0 && verificar_contrato === 0) {
         res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de permisos del usuario.' });
 
-      } else if (verificar_permisos === 0 && verificar_imagen === 1 && verificar_vacunas === 0) {
+      } else if (verificar_permisos === 0 && verificar_imagen === 1 && verificar_vacunas === 0 && verificar_contrato === 0) {
         res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de imagenes del usuario.' });
       }
-      else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1) {
+      else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 0) {
         res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de vacunación del usuario.' });
+      }
+      else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 1) {
+        res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos del usuario.' });
       }
       else {
         res.jsonp({ message: 'Registro actualizado.' });

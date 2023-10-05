@@ -9,7 +9,7 @@ export class FiltrarNombreDocuPipe implements PipeTransform {
     if (filtroNombre === '' || filtroNombre.length < 2) return value;
     const RESULTADO_BUSQUEDAS: any = [];
     for (const resultados of value) {
-      if (resultados.doc_nombre && resultados.doc_nombre.toLowerCase().indexOf(filtroNombre.toLowerCase()) > -1) {
+      if (resultados.documento && resultados.documento.toLowerCase().indexOf(filtroNombre.toLowerCase()) > -1) {
         RESULTADO_BUSQUEDAS.push(resultados);
       }
     };

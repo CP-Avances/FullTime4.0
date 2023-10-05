@@ -180,8 +180,8 @@ export class EmpleadoService {
   }
 
   // CARGAR DOCUMENTO CONTRATO
-  SubirContrato(formData: any, id: number, nombre: string) {
-    return this.http.put(`${environment.url}/contratoEmpleado/${id}/documento/${nombre}`, formData)
+  SubirContrato(formData: any, id: number) {
+    return this.http.put(`${environment.url}/contratoEmpleado/${id}/documento-contrato`, formData)
   }
 
   // BUSCAR CONTRATOS POR ID DE EMPLEADO
@@ -307,9 +307,7 @@ export class EmpleadoService {
 
 
 
-  EditarDocumento(id: number, data: any) {
-    return this.http.put(`${environment.url}/contratoEmpleado/editar/editarDocumento/${id}`, data);
-  }
+
 
 
   BuscarFechaIdContrato(datos: any) {

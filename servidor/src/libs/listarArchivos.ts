@@ -55,76 +55,43 @@ export const ListarDocumentos = async function (nombre_carpeta: string) {
 // LISTAR ARCHIVOS DE CONTRATOS
 export const ListarContratos = async function (nombre_carpeta: string) {
 
-    let archivos: any = [];
-
     const ruta = path.resolve(nombre_carpeta)
 
     let Lista_Archivos: any = fs.readdirSync(ruta);
 
-    console.log('contratos.. ', Lista_Archivos)
-
-    // CONSULTA DE BUSQUEDA DE DOCUMENTOS
-    let documentos = await pool.query(
-        `
-        SELECT * FROM empl_contratos WHERE documento NOTNULL ORDER BY id
-        `
-    ).then(result => { return result.rows });
-
-    console.log('contratos base .. ', documentos)
-
-    if (documentos.length != 0) {
-        documentos.forEach((doc: any) => {
-            Lista_Archivos.forEach((obj: any) => {
-                if (doc.documento === obj) {
-                    let datos = {
-                        id: doc.id,
-                        file: obj,
-                        extencion: obj.split('.')[1],
-                        nombre: doc.doc_nombre
-                    }
-                    archivos = archivos.concat(datos);
-                }
-            })
-        })
-    }
-    return archivos
+    return Lista_Archivos
 }
 
 // LISTAR ARCHIVOS DE PERMISOS
 export const ListarPermisos = async function (nombre_carpeta: string) {
 
-    let archivos: any = [];
-
     const ruta = path.resolve(nombre_carpeta)
 
     let Lista_Archivos: any = fs.readdirSync(ruta);
 
-    console.log('permisos.. ', Lista_Archivos)
+    return Lista_Archivos
+}
 
-    // CONSULTA DE BUSQUEDA DE DOCUMENTOS
-    let documentos = await pool.query(
-        `
-        SELECT * FROM permisos WHERE documento NOTNULL ORDER BY id
-        `
-    ).then(result => { return result.rows });
+// LISTAR ARCHIVOS DE PERMISOS
+export const ListarDocumentosIndividuales = async function (nombre_carpeta: string, tipo: string) {
 
-    console.log('permisos base .. ', documentos)
+    let archivos: any = [];
+    let separador = path.sep;
+    let direccion = tipo + separador + nombre_carpeta
 
-    if (documentos.length != 0) {
-        documentos.forEach((doc: any) => {
-            Lista_Archivos.forEach((obj: any) => {
-                if (doc.documento === obj) {
-                    let datos = {
-                        id: doc.id,
-                        file: obj,
-                        extencion: obj.split('.')[1],
-                        nombre: doc.docu_nombre
-                    }
-                    archivos = archivos.concat(datos);
-                }
-            })
-        })
-    }
+    const ruta = path.resolve(direccion)
+
+    let Lista_Archivos: any = fs.readdirSync(ruta);
+
+    Lista_Archivos.forEach((obj: any) => {
+        let datos = {
+            file: obj,
+            extencion: obj.split('.')[1],
+            nombre: obj
+        }
+        archivos = archivos.concat(datos);
+    })
+
     return archivos
 }
 
@@ -163,11 +130,16 @@ export const ListarHorarios = async function (nombre_carpeta: string) {
 }
 
 export const DescargarArchivo = function (dir: string, filename: string) {
+    let separador = path.sep;
     const ruta = path.resolve(dir);
-    return ruta + '\\' + filename
+    return ruta + separador + filename
 }
 
-
+export const DescargarArchivoIndividuales = function (dir: string, filename: string, tipo: any) {
+    let separador = path.sep;
+    const ruta = path.resolve(dir);
+    return ruta + separador + tipo + separador + filename
+}
 
 
 

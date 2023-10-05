@@ -1,6 +1,6 @@
 // SECCIÓN DE LIBRERIAS
 import EMPLEADO_CONTROLADOR from '../../../controlador/empleado/empleadoRegistro/empleadoControlador';
-import { ObtenerRutaUsuario } from '../../../controlador/empleado/empleadoRegistro/empleadoControlador';
+import { ObtenerRutaUsuario } from '../../../libs/accesoCarpetas';
 import { TokenValidation } from '../../../libs/verificarToken';
 import { Router } from 'express';
 import multer from 'multer';
@@ -9,10 +9,6 @@ import moment from 'moment';
 moment.locale('es');
 
 const multipart = require('connect-multiparty');
-
-const multipartMiddleware = multipart({
-    uploadDir: './imagenesEmpleados',
-});
 
 const multipartMiddlewarePlantilla = multipart({
     uploadDir: './plantillas',

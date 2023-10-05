@@ -13,7 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../../../database"));
+const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+const moment_1 = __importDefault(require("moment"));
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 class ContratoEmpleadoControlador {
     // REGISTRAR CONTRATOS
     CrearContrato(req, res) {
@@ -36,23 +39,33 @@ class ContratoEmpleadoControlador {
     }
     // METODO PARA GUARDAR DOCUMENTO
     GuardarDocumentoContrato(req, res) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            let list = req.files;
-            let doc = list.uploads[0].path.split("\\")[1];
-            let { nombre } = req.params;
+            // FECHA DEL SISTEMA
+            var fecha = (0, moment_1.default)();
+            var anio = fecha.format('YYYY');
+            var mes = fecha.format('MM');
+            var dia = fecha.format('DD');
             let id = req.params.id;
+            const response = yield database_1.default.query(`
+            SELECT codigo FROM empleados AS e, empl_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
+            `, [id]);
+            const [empleado] = response.rows;
+            let documento = empleado.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
             yield database_1.default.query(`
-            UPDATE empl_contratos SET documento = $2, doc_nombre = $3  WHERE id = $1
-            `, [id, doc, nombre]);
-            res.jsonp({ message: 'Documento Actualizado.' });
+            UPDATE empl_contratos SET documento = $2 WHERE id = $1
+            `, [id, documento]);
+            res.jsonp({ message: 'Documento actualizado.' });
         });
     }
     // METODO PARA VER DOCUMENTO
     ObtenerDocumento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const docs = req.params.docs;
-            let filePath = `servidor\\contratos\\${docs}`;
-            res.sendFile(__dirname.split("servidor")[0] + filePath);
+            const id = req.params.id;
+            let separador = path_1.default.sep;
+            let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaContrato)(id)) + separador + docs;
+            res.sendFile(path_1.default.resolve(ruta));
         });
     }
     // METODO PARA LISTAR CONTRATOS POR ID DE EMPLEADO
@@ -89,13 +102,14 @@ class ContratoEmpleadoControlador {
     EliminarDocumento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let { documento, id } = req.body;
-            yield database_1.default.query(`
-            UPDATE empl_contratos SET documento = null, doc_nombre = null  WHERE id = $1
+            let separador = path_1.default.sep;
+            const response = yield database_1.default.query(`
+            UPDATE empl_contratos SET documento = null WHERE id = $1 RETURNING *
             `, [id]);
+            const [contrato] = response.rows;
             if (documento != 'null' && documento != '' && documento != null) {
-                let filePath = `servidor\\contratos\\${documento}`;
-                let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-                fs_1.default.unlinkSync(direccionCompleta);
+                let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaContrato)(contrato.id_empleado)) + separador + documento;
+                fs_1.default.unlinkSync(ruta);
             }
             res.jsonp({ message: 'Documento actualizado.' });
         });
@@ -103,13 +117,13 @@ class ContratoEmpleadoControlador {
     // ELIMINAR DOCUMENTO CONTRATO DEL SERVIDOR
     EliminarDocumentoServidor(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let { documento } = req.body;
+            let { documento, id } = req.body;
+            let separador = path_1.default.sep;
             if (documento != 'null' && documento != '' && documento != null) {
-                let filePath = `servidor\\contratos\\${documento}`;
-                let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-                fs_1.default.unlinkSync(direccionCompleta);
+                let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaContrato)(id)) + separador + documento;
+                fs_1.default.unlinkSync(ruta);
             }
-            res.jsonp({ message: 'Documento Actualizado.' });
+            res.jsonp({ message: 'Documento actualizado.' });
         });
     }
     // METODO PARA BUSCAR ID ACTUAL
@@ -139,7 +153,7 @@ class ContratoEmpleadoControlador {
             const { id } = req.params;
             const CONTRATO = yield database_1.default.query(`
             SELECT ec.id, ec.id_empleado, ec.id_regimen, ec.fec_ingreso, ec.fec_salida, ec.vaca_controla,
-                ec.asis_controla, ec.doc_nombre, ec.documento, ec.id_tipo_contrato, cr.descripcion, 
+                ec.asis_controla, ec.documento, ec.id_tipo_contrato, cr.descripcion, 
                 cr.mes_periodo, mt.descripcion AS nombre_contrato 
             FROM empl_contratos AS ec, cg_regimenes AS cr, modal_trabajo AS mt 
             WHERE ec.id = $1 AND ec.id_regimen = cr.id AND mt.id = ec.id_tipo_contrato
@@ -235,14 +249,6 @@ class ContratoEmpleadoControlador {
             else {
                 return res.status(404).jsonp({ text: 'Registro no encontrado' });
             }
-        });
-    }
-    EditarDocumento(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            const { documento } = req.body;
-            yield database_1.default.query('UPDATE empl_contratos SET documento = $1 WHERE id = $2', [documento, id]);
-            res.jsonp({ message: 'Contrato Actualizado' });
         });
     }
     EncontrarFechaContratoId(req, res) {

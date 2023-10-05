@@ -27,7 +27,6 @@ export interface vacuna {
     id_tipo_vacuna_2: string,
     id_tipo_vacuna_3: string,
     carnet: string,
-    nom_carnet: string,
     dosis_1: boolean | string | null,
     dosis_2: boolean | string | null,
     dosis_3: boolean | string | null,

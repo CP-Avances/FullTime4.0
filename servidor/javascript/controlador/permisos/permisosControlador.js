@@ -14,31 +14,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PERMISOS_CONTROLADOR = void 0;
 const settingsMail_1 = require("../../libs/settingsMail");
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const fs_1 = __importDefault(require("fs"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const moment_1 = __importDefault(require("moment"));
 moment_1.default.locale('es');
 const builder = require('xmlbuilder');
-// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO
-const ObtenerRuta = function (codigo) {
-    return __awaiter(this, void 0, void 0, function* () {
-        var ruta = '';
-        let separador = path_1.default.sep;
-        const usuario = yield database_1.default.query(`
-        SELECT cedula FROM empleados WHERE codigo = $1
-        `, [codigo]);
-        for (var i = 0; i < __dirname.split(separador).length - 3; i++) {
-            if (ruta === '') {
-                ruta = __dirname.split(separador)[i];
-            }
-            else {
-                ruta = ruta + separador + __dirname.split(separador)[i];
-            }
-        }
-        return ruta + separador + 'permisos' + separador + codigo + '_' + usuario.rows[0].cedula;
-    });
-};
 class PermisosControlador {
     // METODO PARA BUSCAR NUEMRO DE PERMISO
     ObtenerNumPermiso(req, res) {
@@ -286,7 +268,7 @@ class PermisosControlador {
             res.jsonp({ message: 'Documento actualizado.' });
             if (archivo != 'null' && archivo != '' && archivo != null) {
                 if (archivo != documento) {
-                    let ruta = (yield ObtenerRuta(codigo)) + separador + archivo;
+                    let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo)) + separador + archivo;
                     fs_1.default.unlinkSync(ruta);
                 }
             }
@@ -303,7 +285,7 @@ class PermisosControlador {
             `, [id]);
             res.jsonp({ message: 'Documento eliminado.' });
             if (archivo != 'null' && archivo != '' && archivo != null) {
-                let ruta = (yield ObtenerRuta(codigo)) + separador + archivo;
+                let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo)) + separador + archivo;
                 fs_1.default.unlinkSync(ruta);
             }
         });
@@ -369,7 +351,7 @@ class PermisosControlador {
             `, [id_permiso]);
             if (doc != 'null' && doc != '' && doc != null) {
                 console.log(id_permiso, doc, ' entra ');
-                let ruta = (yield ObtenerRuta(codigo)) + separador + doc;
+                let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo)) + separador + doc;
                 fs_1.default.unlinkSync(ruta);
             }
             const [objetoPermiso] = response.rows;
@@ -407,8 +389,8 @@ class PermisosControlador {
             const { codigo } = req.params;
             // TRATAMIENTO DE RUTAS
             let separador = path_1.default.sep;
-            let ruta = (yield ObtenerRuta(codigo)) + separador + docs;
-            res.sendFile(ruta);
+            let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo)) + separador + docs;
+            res.sendFile(path_1.default.resolve(ruta));
         });
     }
     /** ********************************************************************************************* **
@@ -932,7 +914,7 @@ class PermisosControlador {
             let { documento, codigo } = req.params;
             let separador = path_1.default.sep;
             if (documento != 'null' && documento != '' && documento != null) {
-                let ruta = (yield ObtenerRuta(codigo)) + separador + documento;
+                let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo)) + separador + documento;
                 fs_1.default.unlinkSync(ruta);
             }
             res.jsonp({ message: 'ok' });

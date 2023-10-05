@@ -1,4 +1,4 @@
-<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;">
+<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;" *ngIf="listad">
   <div id="titulo">
     <span>LISTA DE DOCUMENTOS</span>
   </div>
@@ -18,7 +18,7 @@
     </button>
   </div>
   <br *ngIf="subir">
-  <div class="table-responsive">
+  <div class="table-responsive" *ngIf="Dirname != 'permisos' && Dirname != 'contratos'">
     <table class="table table-hover table-sm">
       <thead class="thead-light">
         <tr style="text-align: center;">
@@ -52,6 +52,86 @@
               matTooltipPosition="right" matTooltip="Eliminar este documento.">
               <p>Eliminar</p>
             </i>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="table-responsive" *ngIf="Dirname === 'permisos' || Dirname === 'contratos'">
+    <table class="table table-hover table-sm">
+      <thead class="thead-light">
+        <tr style="text-align: center;">
+          <th scope="col">Carpeta</th>
+          <th scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let a of archivos">
+          <td style="padding-top: 10px; cursor: pointer; padding-left: 10px;" (click)="VerPermisos(a, 'permisos')">
+            <i class="fa fa-folder" aria-hidden="true" id="folder">
+            </i>
+            &nbsp;&nbsp; {{a}}
+          </td>
+          <td style="padding-top: 10px; text-align: center;">
+            <i class="fa fa-folder-open-o" (click)="VerPermisos(a, Dirname)" matSuffix matTooltipPosition="right"
+              matTooltip="Abrir carpeta.">
+              <p>Abrir</p>
+            </i>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;" *ngIf="listap">
+  <div id="titulo">
+    <span>LISTA DE DOCUMENTOS</span>
+  </div>
+  <br>
+  <nav aria-label="breadcrumb">
+    <a mat-buttom type="button" [routerLink]="['/archivos']">
+      <mat-icon>west</mat-icon>
+    </a>
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a [routerLink]="['/archivos']">Carpetas</a></li>
+      <li class="breadcrumb-item active" aria-current="page" (click)="VerListaIndividuales()" id="regresar">{{Dirname}}
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">{{archivoi}}</li>
+    </ol>
+  </nav>
+
+  <div class="table-responsive">
+    <table class="table table-hover table-sm">
+      <thead class="thead-light">
+        <tr style="text-align: center;">
+          <th scope="col">Tipo</th>
+          <th scope="col">Nombre</th>
+          <th scope="col">Descarga</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let a of archivos">
+          <td style="padding-top: 10px; text-align: center;" *ngIf="a.extencion === 'pdf'">
+            <mat-icon style="color: red;">picture_as_pdf</mat-icon>
+          </td>
+          <td style="padding-top: 10px; text-align: center;" *ngIf="a.extencion === 'txt'">
+            <mat-icon style="color: rgb(58, 58, 58);">text_snippet</mat-icon>
+          </td>
+          <td style="padding-top: 10px; text-align: center;" *ngIf="a.extencion === 'docx' || a.extencion === 'xlsx'">
+            <mat-icon style="color: rgb(0, 110, 255);">insert_drive_file</mat-icon>
+          </td>
+          <td style="padding-top: 10px; text-align: center;"
+            *ngIf="a.extencion === 'jpg' || a.extencion === 'jpeg' || a.extencion === 'png' || a.extencion === 'PNG'">
+            <mat-icon style="color: rgb(58, 160, 255);">photo</mat-icon>
+          </td>
+          <td style="padding-top: 10px;">{{a.nombre}}</td>
+          <td style="padding-top: 10px; text-align: center;">
+            <a mat-buttom type="button" (click)="DescargarArchivoIndividual(a.file, archivoi)"
+              href="{{hipervinculo}}/archivosCargados/download/files/{{Dirname}}/{{a.nombre}}/tipo/{{archivoi}}"
+              target="_blank">
+              <mat-icon style="color: rgb(38, 184, 46);" matTooltip="Ver documento.">cloud_download</mat-icon>
+            </a>
           </td>
         </tr>
       </tbody>

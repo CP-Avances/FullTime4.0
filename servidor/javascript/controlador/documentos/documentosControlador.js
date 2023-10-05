@@ -14,9 +14,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DOCUMENTOS_CONTROLADOR = exports.carpeta = void 0;
 const listarArchivos_1 = require("../../libs/listarArchivos");
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+const moment_1 = __importDefault(require("moment"));
 class DocumentosControlador {
     // METODO PARA MOSTRAR LISTA DE CARPETAS DEL SERVIDOR
     Carpetas(req, res) {
@@ -26,41 +28,49 @@ class DocumentosControlador {
             { nombre: 'Respaldos Permisos', filename: 'permisos' },
             { nombre: 'Documentacion', filename: 'documentacion' }
         ];
-        res.status(200).jsonp(carpetas);
+        res.jsonp(carpetas);
     }
     // METODO PARA LISTAR DOCUMENTOS 
     ListarCarpetaDocumentos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let nombre = req.params.nom_carpeta;
-            res.status(200).jsonp(yield (0, listarArchivos_1.ListarDocumentos)(nombre));
+            res.jsonp(yield (0, listarArchivos_1.ListarDocumentos)(nombre));
         });
     }
     // METODO PARA LISTAR ARCHIVOS DE LA CARPETA CONTRATOS
     ListarCarpetaContratos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let nombre = req.params.nom_carpeta;
-            res.status(200).jsonp(yield (0, listarArchivos_1.ListarContratos)(nombre));
+            res.jsonp(yield (0, listarArchivos_1.ListarContratos)(nombre));
         });
     }
     // METODO PARA LISTAR ARCHIVOS DE LA CARPETA PERMISOS
     ListarCarpetaPermisos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let nombre = req.params.nom_carpeta;
-            res.status(200).jsonp(yield (0, listarArchivos_1.ListarPermisos)(nombre));
+            res.jsonp(yield (0, listarArchivos_1.ListarPermisos)(nombre));
+        });
+    }
+    // METODO PARA LISTAR ARCHIVOS DE LA CARPETA PERMISOS
+    ListarArchivosIndividuales(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let nombre = req.params.nom_carpeta;
+            let tipo = req.params.tipo;
+            res.jsonp(yield (0, listarArchivos_1.ListarDocumentosIndividuales)(nombre, tipo));
         });
     }
     // METODO PARA LISTAR ARCHIVOS DE LA CARPETA HORARIOS
     ListarCarpetaHorarios(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let nombre = req.params.nom_carpeta;
-            res.status(200).jsonp(yield (0, listarArchivos_1.ListarHorarios)(nombre));
+            res.jsonp(yield (0, listarArchivos_1.ListarHorarios)(nombre));
         });
     }
     // METODO LISTAR ARCHIVOS DE CARPETAS
     ListarArchivosCarpeta(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let nombre = req.params.nom_carpeta;
-            res.status(200).jsonp(yield (0, listarArchivos_1.listaCarpetas)(nombre));
+            res.jsonp(yield (0, listarArchivos_1.listaCarpetas)(nombre));
         });
     }
     // METODO PARA DESCARGAR ARCHIVOS
@@ -69,7 +79,17 @@ class DocumentosControlador {
             let nombre = req.params.nom_carpeta;
             let filename = req.params.filename;
             const path = (0, listarArchivos_1.DescargarArchivo)(nombre, filename);
-            res.status(200).sendFile(path);
+            res.sendFile(path);
+        });
+    }
+    // METODO PARA DESCARGAR ARCHIVOS INDIVIDUALES
+    DescargarArchivos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let nombre = req.params.nom_carpeta;
+            let filename = req.params.filename;
+            let tipo = req.params.tipo;
+            const path = (0, listarArchivos_1.DescargarArchivoIndividuales)(nombre, filename, tipo);
+            res.sendFile(path);
         });
     }
     // METODO PARA ELIMINAR REGISTROS DE DOCUMENTACION
@@ -80,9 +100,8 @@ class DocumentosControlador {
             DELETE FROM documentacion WHERE id = $1
             `, [id]);
             let separador = path_1.default.sep;
-            let filePath = `servidor${separador}documentacion${separador}${documento}`;
-            let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-            fs_1.default.unlinkSync(direccionCompleta);
+            let ruta = (0, accesoCarpetas_1.ObtenerRutaDocumento)() + separador + documento;
+            fs_1.default.unlinkSync(ruta);
             res.jsonp({ message: 'Registro eliminado.' });
         });
     }
@@ -90,7 +109,12 @@ class DocumentosControlador {
     CrearDocumento(req, res) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            let documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+            // FECHA DEL SISTEMA
+            var fecha = (0, moment_1.default)();
+            var anio = fecha.format('YYYY');
+            var mes = fecha.format('MM');
+            var dia = fecha.format('DD');
+            let documento = anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
             yield database_1.default.query(`
             INSERT INTO documentacion (documento) VALUES ($1)
             `, [documento]);

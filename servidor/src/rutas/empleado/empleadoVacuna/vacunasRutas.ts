@@ -1,5 +1,5 @@
 import VACUNA_CONTROLADOR from '../../../controlador/empleado/empleadoVacuna/vacunasControlador';
-import { ObtenerRutaVacuna } from '../../../controlador/empleado/empleadoVacuna/vacunasControlador';
+import { ObtenerRutaVacuna } from '../../../libs/accesoCarpetas';
 import { TokenValidation } from '../../../libs/verificarToken';
 import { Router } from 'express';
 import multer from 'multer';
@@ -67,7 +67,7 @@ class VacunaRutas {
         // METODO REGISTRO DE TIPO DE VACUNA
         this.router.post('/tipo_vacuna', TokenValidation, VACUNA_CONTROLADOR.CrearTipoVacuna);
         // METODO PARA BUSCAR UN DOCUMENTO
-        this.router.get('/documentos/:docs', VACUNA_CONTROLADOR.ObtenerDocumento);
+        this.router.get('/documentos/:docs/:id', VACUNA_CONTROLADOR.ObtenerDocumento);
 
 
 

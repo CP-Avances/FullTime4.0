@@ -1,12 +1,53 @@
-import { Router } from 'express';
-import { TokenValidation } from '../../../libs/verificarToken';
 import CONTRATO_EMPLEADO_CONTROLADOR from '../../../controlador/empleado/empleadoContrato/contratoEmpleadoControlador';
+import { ObtenerRutaContrato } from '../../../libs/accesoCarpetas';
+import { TokenValidation } from '../../../libs/verificarToken';
+import { Router } from 'express';
+import multer from 'multer';
+import pool from '../../../database';
+import moment from 'moment';
 
 const multipart = require('connect-multiparty');
 
 const multipartMiddleware = multipart({
     uploadDir: './contratos',
 });
+
+const storage = multer.diskStorage({
+
+    destination: async function (req, file, cb) {
+        let id = req.params.id;
+        const usuario = await pool.query(
+            `
+            SELECT e.id FROM empleados AS e, empl_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
+            `
+            , [id]);
+        var ruta = await ObtenerRutaContrato(usuario.rows[0].id);
+        cb(null, ruta)
+    },
+    filename: async function (req, file, cb) {
+
+        // FECHA DEL SISTEMA
+        var fecha = moment();
+        var anio = fecha.format('YYYY');
+        var mes = fecha.format('MM');
+        var dia = fecha.format('DD');
+
+        // DATOS DOCUMENTO
+        let id = req.params.id;
+
+        const usuario = await pool.query(
+            `
+            SELECT codigo FROM empleados AS e, empl_contratos AS c WHERE c.id = $1 AND c.id_empleado = e.id
+            `
+            , [id]);
+
+        let documento = usuario.rows[0].codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
+
+        cb(null, documento)
+    }
+})
+
+const upload = multer({ storage: storage });
 
 class DepartamentoRutas {
     public router: Router = Router();
@@ -24,9 +65,9 @@ class DepartamentoRutas {
         // REGISTRAR DATOS DE CONTRATO
         this.router.post('/', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.CrearContrato);
         // GUARDAR DOCUMENTO 
-        this.router.put('/:id/documento/:nombre', [TokenValidation, multipartMiddleware], CONTRATO_EMPLEADO_CONTROLADOR.GuardarDocumentoContrato);
+        this.router.put('/:id/documento-contrato', [TokenValidation, upload.single('uploads')], CONTRATO_EMPLEADO_CONTROLADOR.GuardarDocumentoContrato);
         // MOSTRAR DOCUMENTO CARGADO EN EL SISTEMA
-        this.router.get('/documentos/:docs', CONTRATO_EMPLEADO_CONTROLADOR.ObtenerDocumento);
+        this.router.get('/documentos/:docs/contrato/:id', CONTRATO_EMPLEADO_CONTROLADOR.ObtenerDocumento);
         // METODO PARA BUSCAR CONTRATOS POR ID DE EMPLEADO
         this.router.get('/contrato-empleado/:id_empleado', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.BuscarContratoEmpleado);
         // EDITAR DATOS DE CONTRATO
@@ -40,7 +81,7 @@ class DepartamentoRutas {
         // METODO PARA BUSCAR DATOS DE CONTRATO POR ID
         this.router.get('/contrato/:id', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarDatosUltimoContrato);
         // METODO PARA BUSCAR FECHAS DE CONTRATOS    --**VERIFICADO
-        this.router.post('/buscarFecha', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarFechaContrato);        
+        this.router.post('/buscarFecha', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarFechaContrato);
 
 
         /** ********************************************************************************************* **
@@ -66,7 +107,6 @@ class DepartamentoRutas {
         this.router.get('/', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.ListarContratos);
         this.router.get('/:id/get', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.ObtenerUnContrato);
         this.router.get('/:id_empleado', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarIdContrato);
-       this.router.put('/editar/editarDocumento/:id', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EditarDocumento);
 
         this.router.post('/buscarFecha/contrato', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarFechaContratoId);
 

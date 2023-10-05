@@ -1,11 +1,13 @@
 import { Request, Response } from 'express';
+import { ObtenerRutaBirthday } from '../../libs/accesoCarpetas';
 import pool from '../../database';
 import path from 'path';
 import fs from 'fs';
+import moment from 'moment';
 
 class BirthdayControlador {
 
-    // METODO PARA CONSULTAR MENSAJE DE CUMPLEAÑOS
+    // METODO PARA CONSULTAR MENSAJE DE CUMPLEANIOS
     public async MensajeEmpresa(req: Request, res: Response): Promise<any> {
         const { id_empresa } = req.params;
         const DAY = await pool.query(
@@ -21,7 +23,7 @@ class BirthdayControlador {
         }
     }
 
-    // METODO PARA REGISTRAR MENSAJE DE CUMPLEAÑOS
+    // METODO PARA REGISTRAR MENSAJE DE CUMPLEANIOS
     public async CrearMensajeBirthday(req: Request, res: Response): Promise<void> {
         const { id_empresa, titulo, link, mensaje } = req.body;
         await pool.query(
@@ -38,11 +40,18 @@ class BirthdayControlador {
         res.jsonp([{ message: 'Registro guardado.', id: idMessageGuardado }]);
     }
 
-    // METODO PARA CARGAR MENSAJE DE CUMPLEAÑOS    --**VERIFICADO
+    // METODO PARA CARGAR MENSAJE DE CUMPLEANIOS    --**VERIFICADO
     public async CrearImagenEmpleado(req: Request, res: Response): Promise<void> {
-        let imagen = req.file?.originalname;;
+        // FECHA DEL SISTEMA
+        var fecha = moment();
+        var anio = fecha.format('YYYY');
+        var mes = fecha.format('MM');
+        var dia = fecha.format('DD');
+        
+        let imagen = anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
         let id = req.params.id_empresa;
         let separador = path.sep;
+        
         const unEmpleado = await pool.query(
             `
             SELECT * FROM message_birthday WHERE id = $1
@@ -54,9 +63,9 @@ class BirthdayControlador {
 
                     try {
 
-                        let filePath = `servidor${separador}cumpleanios${separador}${obj.img}`;
-                        let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-                        fs.unlinkSync(direccionCompleta);
+                        let ruta = ObtenerRutaBirthday() + separador + obj.img;
+                        fs.unlinkSync(ruta);
+
                         await pool.query(
                             `
                             UPDATE message_birthday SET img = $2 WHERE id = $1
@@ -85,26 +94,13 @@ class BirthdayControlador {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
+    // METODO PARA VER IMAGENES
     public async getImagen(req: Request, res: Response): Promise<any> {
         const imagen = req.params.imagen;
-        let filePath = `servidor\\cumpleanios\\${imagen}`
-        res.sendFile(__dirname.split("servidor")[0] + filePath);
+        let separador = path.sep;
+        let ruta = ObtenerRutaBirthday() + separador + imagen;
+        res.sendFile(path.resolve(ruta));
     }
-
-
-
-
 
 
     public async EditarMensajeBirthday(req: Request, res: Response): Promise<void> {
@@ -112,10 +108,10 @@ class BirthdayControlador {
         const { id_mensaje } = req.params;
         await pool.query(
             `
-            UPDATE Message_birthday SET titulo = $1, mensaje = $2, url = $3 WHERE id = $4
+            UPDATE message_birthday SET titulo = $1, mensaje = $2, url = $3 WHERE id = $4
             `
             , [titulo, mensaje, link, id_mensaje]);
-        res.jsonp({ message: 'Mensaje de cumpleaños actualizado' });
+        res.jsonp({ message: 'Mensaje de cumpleaños actualizado.' });
     }
 
 }

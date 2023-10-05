@@ -281,9 +281,9 @@ export class RegistroContratoComponent implements OnInit {
   CargarContrato(id: number, form: any) {
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
-      formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    this.rest.SubirContrato(formData, id, form.documentoForm).subscribe(res => {
+    this.rest.SubirContrato(formData, id).subscribe(res => {
       this.toastr.success('Operación exitosa.', 'Documento guardado.', {
         timeOut: 6000,
       });

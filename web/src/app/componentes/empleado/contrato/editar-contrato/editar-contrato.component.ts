@@ -323,7 +323,7 @@ export class EditarContratoComponent implements OnInit {
       if (form.documentoForm != '' && form.documentoForm != null) {
         this.EliminarDocumentoServidor();
         this.GuardarDatos(datos);
-        this.CargarContrato(this.contrato.id, form);
+        this.CargarContrato(this.contrato.id);
         this.Cancelar();
       }
       else {
@@ -342,6 +342,7 @@ export class EditarContratoComponent implements OnInit {
   EliminarDocumentoServidor() {
     let eliminar = {
       documento: this.contrato.documento,
+      id: this.idEmpleado
     }
     this.rest.EliminarArchivoServidor(eliminar).subscribe(res => {
     });
@@ -372,12 +373,12 @@ export class EditarContratoComponent implements OnInit {
   }
 
   // METODO PARA GUARDAR DATOS DE DOCUMENTO
-  CargarContrato(id: number, form: any) {
+  CargarContrato(id: number) {
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
-      formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    this.rest.SubirContrato(formData, id, form.documentoForm).subscribe(res => {
+    this.rest.SubirContrato(formData, id).subscribe(res => {
       this.archivoForm.reset();
       this.nameFile = '';
     });

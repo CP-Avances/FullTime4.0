@@ -1,8 +1,10 @@
-import { DescargarArchivo, listaCarpetas, ListarContratos, ListarDocumentos, ListarHorarios, ListarPermisos, VerCarpeta } from '../../libs/listarArchivos';
+import { DescargarArchivo, listaCarpetas, ListarContratos, ListarDocumentos, ListarHorarios, ListarPermisos, ListarDocumentosIndividuales, DescargarArchivoIndividuales } from '../../libs/listarArchivos';
+import { ObtenerRutaDocumento } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import pool from '../../database';
 import path from 'path';
 import fs from 'fs';
+import moment from 'moment';
 export var carpeta: any;
 
 class DocumentosControlador {
@@ -15,37 +17,44 @@ class DocumentosControlador {
             { nombre: 'Respaldos Permisos', filename: 'permisos' },
             { nombre: 'Documentacion', filename: 'documentacion' }
         ]
-        res.status(200).jsonp(carpetas)
+        res.jsonp(carpetas)
     }
 
     // METODO PARA LISTAR DOCUMENTOS 
     public async ListarCarpetaDocumentos(req: Request, res: Response) {
         let nombre = req.params.nom_carpeta;
-        res.status(200).jsonp(await ListarDocumentos(nombre));
+        res.jsonp(await ListarDocumentos(nombre));
     }
 
     // METODO PARA LISTAR ARCHIVOS DE LA CARPETA CONTRATOS
     public async ListarCarpetaContratos(req: Request, res: Response) {
         let nombre = req.params.nom_carpeta;
-        res.status(200).jsonp(await ListarContratos(nombre));
+        res.jsonp(await ListarContratos(nombre));
     }
 
     // METODO PARA LISTAR ARCHIVOS DE LA CARPETA PERMISOS
     public async ListarCarpetaPermisos(req: Request, res: Response) {
         let nombre = req.params.nom_carpeta;
-        res.status(200).jsonp(await ListarPermisos(nombre));
+        res.jsonp(await ListarPermisos(nombre));
+    }
+
+    // METODO PARA LISTAR ARCHIVOS DE LA CARPETA PERMISOS
+    public async ListarArchivosIndividuales(req: Request, res: Response) {
+        let nombre = req.params.nom_carpeta;
+        let tipo = req.params.tipo;
+        res.jsonp(await ListarDocumentosIndividuales(nombre, tipo));
     }
 
     // METODO PARA LISTAR ARCHIVOS DE LA CARPETA HORARIOS
     public async ListarCarpetaHorarios(req: Request, res: Response) {
         let nombre = req.params.nom_carpeta;
-        res.status(200).jsonp(await ListarHorarios(nombre));
+        res.jsonp(await ListarHorarios(nombre));
     }
 
     // METODO LISTAR ARCHIVOS DE CARPETAS
     public async ListarArchivosCarpeta(req: Request, res: Response) {
         let nombre = req.params.nom_carpeta;
-        res.status(200).jsonp(await listaCarpetas(nombre));
+        res.jsonp(await listaCarpetas(nombre));
     }
 
     // METODO PARA DESCARGAR ARCHIVOS
@@ -53,7 +62,16 @@ class DocumentosControlador {
         let nombre = req.params.nom_carpeta;
         let filename = req.params.filename;
         const path = DescargarArchivo(nombre, filename);
-        res.status(200).sendFile(path);
+        res.sendFile(path);
+    }
+
+    // METODO PARA DESCARGAR ARCHIVOS INDIVIDUALES
+    public async DescargarArchivos(req: Request, res: Response) {
+        let nombre = req.params.nom_carpeta;
+        let filename = req.params.filename;
+        let tipo = req.params.tipo;
+        const path = DescargarArchivoIndividuales(nombre, filename, tipo);
+        res.sendFile(path);
     }
 
     // METODO PARA ELIMINAR REGISTROS DE DOCUMENTACION
@@ -66,16 +84,23 @@ class DocumentosControlador {
             , [id]);
 
         let separador = path.sep;
-        let filePath = `servidor${separador}documentacion${separador}${documento}`
-        let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-        fs.unlinkSync(direccionCompleta);
+
+        let ruta = ObtenerRutaDocumento() + separador + documento;
+        fs.unlinkSync(ruta);
 
         res.jsonp({ message: 'Registro eliminado.' });
     }
 
     // METODO PARA REGISTRAR UN DOCUMENTO    --**VERIFICADO
     public async CrearDocumento(req: Request, res: Response): Promise<void> {
-        let documento = req.file?.originalname;
+        // FECHA DEL SISTEMA
+        var fecha = moment();
+        var anio = fecha.format('YYYY');
+        var mes = fecha.format('MM');
+        var dia = fecha.format('DD');
+
+        let documento = anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
+
         await pool.query(
             `
             INSERT INTO documentacion (documento) VALUES ($1)

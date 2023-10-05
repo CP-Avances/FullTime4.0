@@ -13,10 +13,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HORARIO_CONTROLADOR = void 0;
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const database_1 = __importDefault(require("../../database"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
+const moment_1 = __importDefault(require("moment"));
 const builder = require('xmlbuilder');
 class HorarioControlador {
     // REGISTRAR HORARIO
@@ -64,8 +66,13 @@ class HorarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             let id = req.params.id;
             let { archivo, codigo } = req.params;
+            // FECHA DEL SISTEMA
+            var fecha = (0, moment_1.default)();
+            var anio = fecha.format('YYYY');
+            var mes = fecha.format('MM');
+            var dia = fecha.format('DD');
             // LEER DATOS DE IMAGEN
-            let documento = id + '_' + codigo + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
+            let documento = id + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
             let separador = path_1.default.sep;
             yield database_1.default.query(`
       UPDATE cg_horarios SET documento = $2 WHERE id = $1
@@ -73,9 +80,8 @@ class HorarioControlador {
             res.jsonp({ message: 'Documento actualizado.' });
             if (archivo != 'null' && archivo != '' && archivo != null) {
                 if (archivo != documento) {
-                    let filePath = `servidor${separador}horarios${separador}${archivo}`;
-                    let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-                    fs_1.default.unlinkSync(direccionCompleta);
+                    let ruta = (0, accesoCarpetas_1.ObtenerRutaHorarios)() + separador + archivo;
+                    fs_1.default.unlinkSync(ruta);
                 }
             }
         });
@@ -110,9 +116,8 @@ class HorarioControlador {
             UPDATE cg_horarios SET documento = null WHERE id = $1
             `, [id]);
             if (documento != 'null' && documento != '' && documento != null) {
-                let filePath = `servidor${separador}horarios${separador}${documento}`;
-                let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-                fs_1.default.unlinkSync(direccionCompleta);
+                let ruta = (0, accesoCarpetas_1.ObtenerRutaHorarios)() + separador + documento;
+                fs_1.default.unlinkSync(ruta);
             }
             res.jsonp({ message: 'Documento actualizado.' });
         });
@@ -123,9 +128,8 @@ class HorarioControlador {
             let { documento } = req.body;
             let separador = path_1.default.sep;
             if (documento != 'null' && documento != '' && documento != null) {
-                let filePath = `servidor${separador}horarios${separador}${documento}`;
-                let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-                fs_1.default.unlinkSync(direccionCompleta);
+                let ruta = (0, accesoCarpetas_1.ObtenerRutaHorarios)() + separador + documento;
+                fs_1.default.unlinkSync(ruta);
             }
             res.jsonp({ message: 'Documento Actualizado' });
         });
@@ -230,8 +234,8 @@ class HorarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const docs = req.params.docs;
             let separador = path_1.default.sep;
-            let filePath = `servidor${separador}horarios${separador}${docs}`;
-            res.sendFile(__dirname.split("servidor")[0] + filePath);
+            let ruta = (0, accesoCarpetas_1.ObtenerRutaHorarios)() + separador + docs;
+            res.sendFile(path_1.default.resolve(ruta));
         });
     }
     CargarHorarioPlantilla(req, res) {

@@ -36,6 +36,11 @@ export class DocumentosService {
     return this.http.get<any>(`${environment.url}/archivosCargados/lista-permisos/${nom_carpeta}`)
   }
 
+  // METODO PARA LISTAR LOS ARCHIVOS DE PERMISOS
+  ListarArchivosIndividuales(nom_carpeta: string, tipo: string) {
+    return this.http.get<any>(`${environment.url}/archivosCargados/lista-archivos-individuales/${nom_carpeta}/tipo/${tipo}`)
+  }
+
   // METODO PARA LISTAR LOS ARCHIVOS DE HORARIOS
   ListarHorarios(nom_carpeta: string) {
     return this.http.get<any>(`${environment.url}/archivosCargados/lista-horarios/${nom_carpeta}`)
@@ -44,6 +49,11 @@ export class DocumentosService {
   // METODO PARA DESCARGAR LOS ARCHIVOS
   DownloadFile(nom_carpeta: string, filename: string) {
     return this.http.get<any>(`${environment.url}/archivosCargados/download/files/${nom_carpeta}/${filename}`)
+  }
+
+  // METODO PARA DESCARGAR LOS ARCHIVOS
+  DescargarIndividuales(nom_carpeta: string, filename: string, tipo: string) {
+    return this.http.get<any>(`${environment.url}/archivosCargados/download/files/${nom_carpeta}/${filename}/tipo/${tipo}`)
   }
 
   /** ********************************************************************************************* **

@@ -348,7 +348,7 @@ export class VerEmpleadoComponent implements OnInit {
     })
   }
 
-  // METODO PARA VER UBICACIÓN EN EL MAPA
+  // METODO PARA VER UBICACION EN EL MAPA
   MARKER: any;
   MAP: any;
   MapGeolocalizar(latitud: number, longitud: number, empleado: string) {
@@ -469,8 +469,6 @@ export class VerEmpleadoComponent implements OnInit {
     localStorage.removeItem('iniciales');
     localStorage.removeItem('view_imagen');
   }
-
-
 
 
 
@@ -598,10 +596,10 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   /** ********************************************************************************************* **
-   ** **                          BUSQUEDA DE DATOS DE VACUNACIÓN                                ** **                        *
+   ** **                          BUSQUEDA DE DATOS DE VACUNACION                                ** **                        *
    ** ********************************************************************************************* **/
 
-  // METODO PARA CONSULTAR DATOS DE REGISTRO DE VACUNACIÓN
+  // METODO PARA CONSULTAR DATOS DE REGISTRO DE VACUNACION
   datosVacuna: any = [];
   ObtenerDatosVacunas(formato_fecha: string) {
     this.datosVacuna = [];

@@ -19,6 +19,8 @@ export class ListaArchivosComponent implements OnInit {
   archivos: any = [];
   Dirname: string;
   subir: boolean = false;
+  listad: boolean = true;
+  listap: boolean = false;
 
   constructor(
     private rest: DocumentosService,
@@ -34,6 +36,7 @@ export class ListaArchivosComponent implements OnInit {
   MostrarArchivos() {
     this.route.params.subscribe((obj: any) => {
       this.Dirname = obj.filename
+      console.log('ver carpetas ', obj.filename)
       this.ObtenerArchivos(obj.filename)
     })
 
@@ -54,12 +57,14 @@ export class ListaArchivosComponent implements OnInit {
     }
     else if (this.Dirname === 'contratos') {
       this.rest.ListarContratos(nombre_carpeta).subscribe(res => {
-        this.archivos = res
+        this.archivos = res;
+        console.log('contratos ', res)
       })
     }
     else if (this.Dirname === 'permisos') {
       this.rest.ListarPermisos(nombre_carpeta).subscribe(res => {
         this.archivos = res
+        //console.log('permisos ', res)
       })
     }
     else if (this.Dirname === 'horarios') {
@@ -80,6 +85,12 @@ export class ListaArchivosComponent implements OnInit {
     })
   }
 
+  // METODO PARA DESCARGAR ARCHIVOS
+  DescargarArchivoIndividual(filename: string, tipo: any) {
+    this.rest.DescargarIndividuales(this.Dirname, filename, tipo).subscribe(res => {
+    })
+  }
+
   // METODO PARA ELIMINAR ARCHIVOS
   EliminarArchivo(filename: string, id: number) {
     this.rest.EliminarRegistro(id, filename).subscribe(res => {
@@ -97,6 +108,23 @@ export class ListaArchivosComponent implements OnInit {
           this.archivos = res
         })
       });
+  }
+
+  // METODO PARA VER LISTA DE ARCHIVOS DE PERMISOS
+  archivoi: any = '';
+  VerPermisos(nombre_carpeta: any, tipo: string) {
+    this.listad = false;
+    this.listap = true;
+    this.archivoi = nombre_carpeta;
+    this.rest.ListarArchivosIndividuales(nombre_carpeta, tipo).subscribe(res => {
+      this.archivos = res
+    })
+  }
+
+  VerListaIndividuales() {
+    this.listap = false;
+    this.listad = true;
+    this.ObtenerArchivos(this.Dirname);
   }
 
 }

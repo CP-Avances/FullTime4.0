@@ -1,32 +1,10 @@
 import { Request, Response } from 'express';
+import { ObtenerRutaVacuna } from '../../../libs/accesoCarpetas';
 import { QueryResult } from 'pg';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
 import moment from 'moment';
-
-// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE CARNET VACUNAS
-export const ObtenerRutaVacuna = async function (id: any) {
-    var ruta = '';
-    let separador = path.sep;
-    console.log('ver direccion ***** ', __dirname)
-    const usuario = await pool.query(
-        `
-        SELECT codigo, cedula FROM empleados WHERE id = $1
-        `
-        , [id]);
-
-    for (var i = 0; i < __dirname.split(separador).length - 4; i++) {
-        if (ruta === '') {
-            ruta = __dirname.split(separador)[i];
-        }
-        else {
-            ruta = ruta + separador + __dirname.split(separador)[i];
-        }
-    }
-
-    return ruta + separador + 'carnetVacuna' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
-}
 
 class VacunasControlador {
 
@@ -35,7 +13,7 @@ class VacunasControlador {
         const { id_empleado } = req.params;
         const VACUNA = await pool.query(
             `
-            SELECT ev.id, ev.id_empleado, ev.id_tipo_vacuna, ev.carnet, ev.nom_carnet, ev.fecha, 
+            SELECT ev.id, ev.id_empleado, ev.id_tipo_vacuna, ev.carnet, ev.fecha, 
             tv.nombre, ev.descripcion
             FROM empl_vacunas AS ev, tipo_vacuna AS tv 
             WHERE ev.id_tipo_vacuna = tv.id AND ev.id_empleado = $1
@@ -133,47 +111,55 @@ class VacunasControlador {
 
     // ELIMINAR DOCUMENTO CARNET DE VACUNACION DEL SERVIDOR
     public async EliminarDocumentoServidor(req: Request, res: Response): Promise<void> {
-        let { documento } = req.body;
+        let { documento, id } = req.body;
+        let separador = path.sep;
+
         if (documento != 'null' && documento != '' && documento != null) {
-            let filePath = `servidor\\carnetVacuna\\${documento}`
-            let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-            fs.unlinkSync(direccionCompleta);
+            let ruta = await ObtenerRutaVacuna(id) + separador + documento;
+            //console.log('vacuna ruta ', ruta)
+            fs.unlinkSync(ruta);
         }
-        res.jsonp({ message: 'Documento Actualizado' });
+        res.jsonp({ message: 'Documento actualizado.' });
     }
 
     // ELIMINAR DOCUMENTO CARNET DE VACUNACION
     public async EliminarDocumento(req: Request, res: Response): Promise<void> {
+        let separador = path.sep;
         let { documento, id } = req.body;
 
-        await pool.query(
+        const response: QueryResult = await pool.query(
             `
-            UPDATE empl_vacunas SET carnet = null, nom_carnet = null WHERE id = $1
+            UPDATE empl_vacunas SET carnet = null WHERE id = $1 RETURNING *
             `
             , [id]);
 
+        const [vacuna] = response.rows;
+
         if (documento != 'null' && documento != '' && documento != null) {
-            let filePath = `servidor\\carnetVacuna\\${documento}`
-            let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-            fs.unlinkSync(direccionCompleta);
+            let ruta = await ObtenerRutaVacuna(vacuna.id_empleado) + separador + documento;
+            //console.log('vacuna ruta ', ruta)
+            fs.unlinkSync(ruta);
         }
 
-        res.jsonp({ message: 'Documento Actualizado' });
+        res.jsonp({ message: 'Documento eliminado.' });
     }
 
-    // ELIMINAR REGISTRO DE VACUNACIÓN
+    // ELIMINAR REGISTRO DE VACUNACION
     public async EliminarRegistro(req: Request, res: Response): Promise<void> {
+        let separador = path.sep;
         const { id, documento } = req.params;
-        await pool.query(
+        const response: QueryResult = await pool.query(
             `
-            DELETE FROM empl_vacunas WHERE id = $1
+            DELETE FROM empl_vacunas WHERE id = $1 RETURNING *
             `
             , [id]);
 
+        const [vacuna] = response.rows;
+
         if (documento != 'null' && documento != '' && documento != null) {
-            let filePath = `servidor\\carnetVacuna\\${documento}`
-            let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-            fs.unlinkSync(direccionCompleta);
+            let ruta = await ObtenerRutaVacuna(vacuna.id_empleado) + separador + documento;
+            //console.log('vacuna ruta ', ruta)
+            fs.unlinkSync(ruta);
         }
         res.jsonp({ message: 'Registro eliminado.' });
     }
@@ -206,8 +192,11 @@ class VacunasControlador {
     // OBTENER CERTIFICADO DE VACUNACION
     public async ObtenerDocumento(req: Request, res: Response): Promise<any> {
         const docs = req.params.docs;
-        let filePath = `servidor\\carnetVacuna\\${docs}`
-        res.sendFile(__dirname.split("servidor")[0] + filePath);
+        const id = req.params.id;
+        // TRATAMIENTO DE RUTAS
+        let separador = path.sep;
+        let ruta = await ObtenerRutaVacuna(id) + separador + docs;
+        res.sendFile(path.resolve(ruta));
     }
 
 
@@ -236,7 +225,7 @@ class VacunasControlador {
     public async ListarRegistro(req: Request, res: Response) {
         const VACUNA = await pool.query(
             `
-            SELECT ev.id, ev.id_empleado, ev.id_tipo_vacuna, ev.carnet, ev.nom_carnet, ev.fecha, 
+            SELECT ev.id, ev.id_empleado, ev.id_tipo_vacuna, ev.carnet, ev.fecha, 
             tv.nombre, ev.descripcion
             FROM empl_vacunas AS ev, tipo_vacuna AS tv 
             WHERE ev.id_tipo_vacuna = tv.id

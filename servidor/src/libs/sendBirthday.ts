@@ -2,7 +2,7 @@ import { enviarCorreos } from './settingsMail';
 import pool from '../database';
 import path from 'path'
 
-// METODO PARA ENVIAR LOS CUMPLEAÑOS A UNA HORA DETERMINADA, VERIFICANDO A CADA HORA HASTA QUE 
+// METODO PARA ENVIAR LOS CUMPLEANIOS A UNA HORA DETERMINADA, VERIFICANDO A CADA HORA HASTA QUE 
 // SEAN LAS 12 PM Y SE ENVIE EL CORREO
 
 export const cumpleanios = function () {

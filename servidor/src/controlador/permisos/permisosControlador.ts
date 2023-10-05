@@ -3,7 +3,8 @@ import { Request, Response } from 'express';
 import {
     enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, Credenciales, fechaHora,
     FormatearFecha, FormatearHora, dia_completo
-} from '../../libs/settingsMail'
+} from '../../libs/settingsMail';
+import { ObtenerRutaPermisos } from '../../libs/accesoCarpetas';
 import fs from 'fs';
 import pool from '../../database';
 import path from 'path';
@@ -12,32 +13,9 @@ moment.locale('es');
 
 const builder = require('xmlbuilder');
 
-// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO
-const ObtenerRuta = async function (codigo: any) {
-    var ruta = '';
-    let separador = path.sep;
-
-    const usuario = await pool.query(
-        `
-        SELECT cedula FROM empleados WHERE codigo = $1
-        `
-        , [codigo]);
-
-    for (var i = 0; i < __dirname.split(separador).length - 3; i++) {
-        if (ruta === '') {
-            ruta = __dirname.split(separador)[i];
-        }
-        else {
-            ruta = ruta + separador + __dirname.split(separador)[i];
-        }
-    }
-
-    return ruta + separador + 'permisos' + separador + codigo + '_' + usuario.rows[0].cedula;
-}
-
 class PermisosControlador {
 
-    
+
     // METODO PARA BUSCAR NUEMRO DE PERMISO
     public async ObtenerNumPermiso(req: Request, res: Response): Promise<any> {
         const { id_empleado } = req.params;
@@ -324,7 +302,7 @@ class PermisosControlador {
 
         if (archivo != 'null' && archivo != '' && archivo != null) {
             if (archivo != documento) {
-                let ruta = await ObtenerRuta(codigo) + separador + archivo;
+                let ruta = await ObtenerRutaPermisos(codigo) + separador + archivo;
                 fs.unlinkSync(ruta);
             }
         }
@@ -346,7 +324,7 @@ class PermisosControlador {
         res.jsonp({ message: 'Documento eliminado.' });
 
         if (archivo != 'null' && archivo != '' && archivo != null) {
-            let ruta = await ObtenerRuta(codigo) + separador + archivo;
+            let ruta = await ObtenerRutaPermisos(codigo) + separador + archivo;
             fs.unlinkSync(ruta);
         }
     }
@@ -421,7 +399,7 @@ class PermisosControlador {
 
         if (doc != 'null' && doc != '' && doc != null) {
             console.log(id_permiso, doc, ' entra ');
-            let ruta = await ObtenerRuta(codigo) + separador + doc;
+            let ruta = await ObtenerRutaPermisos(codigo) + separador + doc;
             fs.unlinkSync(ruta);
         }
 
@@ -458,8 +436,8 @@ class PermisosControlador {
         const { codigo } = req.params;
         // TRATAMIENTO DE RUTAS
         let separador = path.sep;
-        let ruta = await ObtenerRuta(codigo) + separador + docs;
-        res.sendFile(ruta);
+        let ruta = await ObtenerRutaPermisos(codigo) + separador + docs;
+        res.sendFile(path.resolve(ruta));
     }
 
     /** ********************************************************************************************* **
@@ -1025,7 +1003,7 @@ class PermisosControlador {
         let { documento, codigo } = req.params;
         let separador = path.sep;
         if (documento != 'null' && documento != '' && documento != null) {
-            let ruta = await ObtenerRuta(codigo) + separador + documento;
+            let ruta = await ObtenerRutaPermisos(codigo) + separador + documento;
             fs.unlinkSync(ruta);
         }
         res.jsonp({ message: 'ok' });

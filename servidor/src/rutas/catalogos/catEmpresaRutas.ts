@@ -1,14 +1,25 @@
+import EMPRESA_CONTROLADOR from '../../controlador/catalogos/catEmpresaControlador';
+import { ObtenerRutaLogos } from '../../libs/accesoCarpetas';
 import { TokenValidation } from '../../libs/verificarToken';
 import { Router } from 'express';
+import moment from 'moment';
 import multer from 'multer';
-import EMPRESA_CONTROLADOR from '../../controlador/catalogos/catEmpresaControlador';
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'logos')
+        var ruta = ObtenerRutaLogos();
+        cb(null, ruta)
     },
     filename: function (req, file, cb) {
-        cb(null, file.originalname)
+        // FECHA DEL SISTEMA
+        var fecha = moment();
+        var anio = fecha.format('YYYY');
+        var mes = fecha.format('MM');
+        var dia = fecha.format('DD');
+
+        let documento = anio + '_' + mes + '_' + dia + '_' + file.originalname;
+
+        cb(null, documento);
     }
 })
 

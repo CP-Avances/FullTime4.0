@@ -13,11 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BIRTHDAY_CONTROLADOR = void 0;
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+const moment_1 = __importDefault(require("moment"));
 class BirthdayControlador {
-    // METODO PARA CONSULTAR MENSAJE DE CUMPLEAÑOS
+    // METODO PARA CONSULTAR MENSAJE DE CUMPLEANIOS
     MensajeEmpresa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empresa } = req.params;
@@ -32,7 +34,7 @@ class BirthdayControlador {
             }
         });
     }
-    // METODO PARA REGISTRAR MENSAJE DE CUMPLEAÑOS
+    // METODO PARA REGISTRAR MENSAJE DE CUMPLEANIOS
     CrearMensajeBirthday(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empresa, titulo, link, mensaje } = req.body;
@@ -46,12 +48,16 @@ class BirthdayControlador {
             res.jsonp([{ message: 'Registro guardado.', id: idMessageGuardado }]);
         });
     }
-    // METODO PARA CARGAR MENSAJE DE CUMPLEAÑOS    --**VERIFICADO
+    // METODO PARA CARGAR MENSAJE DE CUMPLEANIOS    --**VERIFICADO
     CrearImagenEmpleado(req, res) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            let imagen = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
-            ;
+            // FECHA DEL SISTEMA
+            var fecha = (0, moment_1.default)();
+            var anio = fecha.format('YYYY');
+            var mes = fecha.format('MM');
+            var dia = fecha.format('DD');
+            let imagen = anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
             let id = req.params.id_empresa;
             let separador = path_1.default.sep;
             const unEmpleado = yield database_1.default.query(`
@@ -61,9 +67,8 @@ class BirthdayControlador {
                 unEmpleado.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
                     if (obj.img != null) {
                         try {
-                            let filePath = `servidor${separador}cumpleanios${separador}${obj.img}`;
-                            let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-                            fs_1.default.unlinkSync(direccionCompleta);
+                            let ruta = (0, accesoCarpetas_1.ObtenerRutaBirthday)() + separador + obj.img;
+                            fs_1.default.unlinkSync(ruta);
                             yield database_1.default.query(`
                             UPDATE message_birthday SET img = $2 WHERE id = $1
                             `, [id, imagen]);
@@ -86,11 +91,13 @@ class BirthdayControlador {
             }
         });
     }
+    // METODO PARA VER IMAGENES
     getImagen(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const imagen = req.params.imagen;
-            let filePath = `servidor\\cumpleanios\\${imagen}`;
-            res.sendFile(__dirname.split("servidor")[0] + filePath);
+            let separador = path_1.default.sep;
+            let ruta = (0, accesoCarpetas_1.ObtenerRutaBirthday)() + separador + imagen;
+            res.sendFile(path_1.default.resolve(ruta));
         });
     }
     EditarMensajeBirthday(req, res) {
@@ -98,9 +105,9 @@ class BirthdayControlador {
             const { titulo, mensaje, link } = req.body;
             const { id_mensaje } = req.params;
             yield database_1.default.query(`
-            UPDATE Message_birthday SET titulo = $1, mensaje = $2, url = $3 WHERE id = $4
+            UPDATE message_birthday SET titulo = $1, mensaje = $2, url = $3 WHERE id = $4
             `, [titulo, mensaje, link, id_mensaje]);
-            res.jsonp({ message: 'Mensaje de cumpleaños actualizado' });
+            res.jsonp({ message: 'Mensaje de cumpleaños actualizado.' });
         });
     }
 }

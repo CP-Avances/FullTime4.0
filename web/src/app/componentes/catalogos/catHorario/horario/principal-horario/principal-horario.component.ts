@@ -430,7 +430,7 @@ export class PrincipalHorarioComponent implements OnInit {
                   { text: obj.hora_trabajo, style: 'itemsTableC' },
                   { text: obj.noturno == true ? 'Sí' : 'No', style: 'itemsTableC' },
                   { text: obj.detalle == true ? 'Sí' : 'No', style: 'itemsTableC' },
-                  { text: obj.doc_nombre, style: 'itemsTableC' },
+                  { text: obj.documento, style: 'itemsTableC' },
                 ];
               })
             ]
@@ -489,7 +489,6 @@ export class PrincipalHorarioComponent implements OnInit {
           "noturno": obj.nocturno,
           "requiere_detalle": obj.detalle,
           "documento": obj.documento,
-          "doc_nombre": obj.doc_nombre,
         }
       }
       arregloHorarios.push(objeto)

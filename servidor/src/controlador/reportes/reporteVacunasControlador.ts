@@ -80,7 +80,7 @@ export default VACUNAS_REPORTE_CONTROLADOR;
 const BuscarVacunas = async function (id: number) {
     return await pool.query(`
         SELECT ev.id, ev.id_empleado, tv.nombre AS tipo_vacuna, 
-            ev.carnet, ev.nom_carnet, ev.fecha, ev.descripcion
+            ev.carnet, ev.fecha, ev.descripcion
         FROM empl_vacunas AS ev, tipo_vacuna AS tv 
         WHERE ev.id_tipo_vacuna = tv.id
             AND ev.id_empleado = $1 

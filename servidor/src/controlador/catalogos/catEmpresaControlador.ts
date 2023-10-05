@@ -1,8 +1,11 @@
 import { ImagenBase64LogosEmpresas } from '../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';
-const builder = require('xmlbuilder');
+import { ObtenerRutaLogos } from '../../libs/accesoCarpetas';
+import path from 'path';
 import pool from '../../database';
+import moment from 'moment';
 import fs from 'fs';
+const builder = require('xmlbuilder');
 
 class EmpresaControlador {
 
@@ -33,7 +36,7 @@ class EmpresaControlador {
                 return result.rows[0];
             });
 
-            console.log('ver registro empresa ', file_name)
+        console.log('ver registro empresa ', file_name)
         if (file_name.logo === null) {
             file_name.logo = 'logo_reportes.png';
         }
@@ -51,9 +54,16 @@ class EmpresaControlador {
     // METODO PARA EDITAR LOGO DE EMPRESA
     public async ActualizarLogoEmpresa(req: Request, res: Response): Promise<any> {
 
+        // FECHA DEL SISTEMA
+        var fecha = moment();
+        var anio = fecha.format('YYYY');
+        var mes = fecha.format('MM');
+        var dia = fecha.format('DD');
+
         // LEER DATOS DE IMAGEN
-        let logo = req.file?.originalname;
+        let logo = anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
         let id = req.params.id_empresa;
+        let separador = path.sep;
 
         // CONSULTAR SI EXISTE UNA IMAGEN
         const logo_name = await pool.query(
@@ -66,14 +76,13 @@ class EmpresaControlador {
             // LA IMAGEN EXISTE
             if (obj.logo != null) {
                 try {
-                    let filePath = `servidor/logos/${obj.logo}`;
-                    let direccionCompleta = __dirname.split("servidor")[0] + filePath;
+                    let ruta = ObtenerRutaLogos() + separador + obj.logo;
 
                     // SI EL NOMBRE DE LA IMAGEN YA EXISTE SOLO SE ACTUALIZA CASO CONTRARIO SE ELIMINA
                     if (obj.logo != logo) {
 
                         // ELIMINAR LOGO DEL SERVIDOR
-                        fs.unlinkSync(direccionCompleta);
+                        fs.unlinkSync(ruta);
 
                         // ACTUALIZAR REGISTRO DE IMAGEN
                         await pool.query(
@@ -173,9 +182,16 @@ class EmpresaControlador {
     // METODO PARA ACTUALIZAR LOGO CABECERA DE CORREO
     public async ActualizarCabeceraCorreo(req: Request, res: Response): Promise<any> {
 
+        // FECHA DEL SISTEMA
+        var fecha = moment();
+        var anio = fecha.format('YYYY');
+        var mes = fecha.format('MM');
+        var dia = fecha.format('DD');
+
         // LEER DATOS DE IMAGEN
-        let logo = req.file?.originalname;
+        let logo = anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
         let id = req.params.id_empresa;
+        let separador = path.sep;
 
         const logo_name = await pool.query(
             `
@@ -187,14 +203,13 @@ class EmpresaControlador {
             if (obj.cabecera_firma != null) {
 
                 try {
-                    let filePath = `servidor/logos/${obj.cabecera_firma}`;
-                    let direccionCompleta = __dirname.split("servidor")[0] + filePath;
+                    let ruta = ObtenerRutaLogos() + separador + obj.cabecera_firma;
 
                     // SI EL NOMBRE DE LA IMAGEN YA EXISTE SOLO SE ACTUALIZA CASO CONTRARIO SE ELIMINA
                     if (obj.cabecera_firma != logo) {
 
                         // ELIMINAR LOGO DEL SERVIDOR
-                        fs.unlinkSync(direccionCompleta);
+                        fs.unlinkSync(ruta);
 
                         // ACTUALIZAR REGISTRO DE IMAGEN
                         await pool.query(
@@ -246,9 +261,16 @@ class EmpresaControlador {
     // METODO PARA ACTUALIZAR PIE DE FIRMA DE CORREO
     public async ActualizarPieCorreo(req: Request, res: Response): Promise<any> {
 
+        // FECHA DEL SISTEMA
+        var fecha = moment();
+        var anio = fecha.format('YYYY');
+        var mes = fecha.format('MM');
+        var dia = fecha.format('DD');
+
         // LEER DATOS DE IMAGEN
-        let logo = req.file?.originalname;
+        let logo = anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
         let id = req.params.id_empresa;
+        let separador = path.sep;
 
         const logo_name = await pool.query(
             `
@@ -260,14 +282,13 @@ class EmpresaControlador {
             if (obj.pie_firma != null) {
 
                 try {
-                    let filePath = `servidor/logos/${obj.pie_firma}`;
-                    let direccionCompleta = __dirname.split("servidor")[0] + filePath;
+                    let ruta = ObtenerRutaLogos() + separador + obj.pie_firma;
 
                     // SI EL NOMBRE DE LA IMAGEN YA EXISTE SOLO SE ACTUALIZA CASO CONTRARIO SE ELIMINA
                     if (obj.pie_firma != logo) {
 
                         // ELIMINAR LOGO DEL SERVIDOR
-                        fs.unlinkSync(direccionCompleta);
+                        fs.unlinkSync(ruta);
 
                         // ACTUALIZAR REGISTRO DE IMAGEN
                         await pool.query(

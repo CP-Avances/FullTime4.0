@@ -154,6 +154,7 @@ export class EditarVacunaComponent implements OnInit {
   EliminarCarnetServidor() {
     let eliminar = {
       documento: this.dvacuna.carnet,
+      id: this.idEmploy
     }
     this.restVacuna.EliminarArchivoServidor(eliminar).subscribe(res => {
     });
@@ -195,9 +196,9 @@ export class EditarVacunaComponent implements OnInit {
   CargarDocumento(form: any) {
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
-      formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    this.restVacuna.SubirDocumento(formData, this.dvacuna.id, form.certificadoForm).subscribe(res => {
+    this.restVacuna.SubirDocumento(formData, this.dvacuna.id, this.idEmploy).subscribe(res => {
       this.archivoF.reset();
       this.nameFile = '';
     });

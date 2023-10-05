@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // SECCIÓN DE LIBRERIAS
 const empleadoControlador_1 = __importDefault(require("../../../controlador/empleado/empleadoRegistro/empleadoControlador"));
-const empleadoControlador_2 = require("../../../controlador/empleado/empleadoRegistro/empleadoControlador");
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const verificarToken_1 = require("../../../libs/verificarToken");
 const express_1 = require("express");
 const multer_1 = __importDefault(require("multer"));
@@ -22,9 +22,6 @@ const database_1 = __importDefault(require("../../../database"));
 const moment_1 = __importDefault(require("moment"));
 moment_1.default.locale('es');
 const multipart = require('connect-multiparty');
-const multipartMiddleware = multipart({
-    uploadDir: './imagenesEmpleados',
-});
 const multipartMiddlewarePlantilla = multipart({
     uploadDir: './plantillas',
 });
@@ -32,7 +29,7 @@ const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
         return __awaiter(this, void 0, void 0, function* () {
             let id = req.params.id_empleado;
-            var ruta = yield (0, empleadoControlador_2.ObtenerRutaUsuario)(id);
+            var ruta = yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id);
             cb(null, ruta);
         });
     },

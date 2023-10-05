@@ -12,39 +12,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const permisosControlador_1 = __importDefault(require("../../controlador/permisos/permisosControlador"));
 const verificarPermisos_1 = require("../../libs/Modulos/verificarPermisos");
 const verificarToken_1 = require("../../libs/verificarToken");
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const express_1 = require("express");
 const multer_1 = __importDefault(require("multer"));
-const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
 const moment_1 = __importDefault(require("moment"));
 moment_1.default.locale('es');
-const permisosControlador_1 = __importDefault(require("../../controlador/permisos/permisosControlador"));
-// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO
-const ObtenerRuta = function (codigo) {
-    return __awaiter(this, void 0, void 0, function* () {
-        var ruta = '';
-        let separador = path_1.default.sep;
-        const usuario = yield database_1.default.query(`
-        SELECT cedula FROM empleados WHERE codigo = $1
-        `, [codigo]);
-        for (var i = 0; i < __dirname.split(separador).length - 3; i++) {
-            if (ruta === '') {
-                ruta = __dirname.split(separador)[i];
-            }
-            else {
-                ruta = ruta + separador + __dirname.split(separador)[i];
-            }
-        }
-        return ruta + separador + 'permisos' + separador + codigo + '_' + usuario.rows[0].cedula;
-    });
-};
 const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
         return __awaiter(this, void 0, void 0, function* () {
             let { codigo } = req.params;
-            var ruta = yield ObtenerRuta(codigo);
+            var ruta = yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo);
             cb(null, ruta);
         });
     },

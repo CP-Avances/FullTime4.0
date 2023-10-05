@@ -12,9 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EMPLEADO_CONTROLADOR = exports.ObtenerRutaUsuario = void 0;
+exports.EMPLEADO_CONTROLADOR = void 0;
 // SECCION LIBRERIAS
-const vacunasControlador_1 = require("../../../controlador/empleado/empleadoVacuna/vacunasControlador");
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const ts_md5_1 = require("ts-md5");
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../../database"));
@@ -22,40 +22,6 @@ const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const moment_1 = __importDefault(require("moment"));
 const builder = require('xmlbuilder');
-const ObtenerRuta = function (codigo, cedula) {
-    var ruta = '';
-    let separador = path_1.default.sep;
-    for (var i = 0; i < __dirname.split(separador).length - 4; i++) {
-        if (ruta === '') {
-            ruta = __dirname.split(separador)[i];
-        }
-        else {
-            ruta = ruta + separador + __dirname.split(separador)[i];
-        }
-    }
-    return ruta + separador + 'permisos' + separador + codigo + '_' + cedula;
-};
-// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE IMAGENES DE USUARIO
-const ObtenerRutaUsuario = function (id) {
-    return __awaiter(this, void 0, void 0, function* () {
-        var ruta = '';
-        let separador = path_1.default.sep;
-        const usuario = yield database_1.default.query(`
-      SELECT codigo, cedula FROM empleados WHERE id = $1
-      `, [id]);
-        for (var i = 0; i < __dirname.split(separador).length - 4; i++) {
-            if (ruta === '') {
-                ruta = __dirname.split(separador)[i];
-            }
-            else {
-                ruta = ruta + separador + __dirname.split(separador)[i];
-            }
-        }
-        console.log('ver ruta imagen', ruta + separador + 'imagenesEmpleados' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula);
-        return ruta + separador + 'imagenesEmpleados' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
-    });
-};
-exports.ObtenerRutaUsuario = ObtenerRutaUsuario;
 class EmpleadoControlador {
     /** ** ********************************************************************************************* **
      ** ** **                        MANEJO DE CODIGOS DE USUARIOS                                    ** **
@@ -141,7 +107,7 @@ class EmpleadoControlador {
                 if (empleado) {
                     let verificar = 0;
                     // RUTA DE LA CARPETA PRINCIPAL PERMISOS
-                    const carpetaPermisos = ObtenerRuta(codigo, cedula);
+                    const carpetaPermisos = yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo);
                     // METODO MKDIR PARA CREAR LA CARPETA
                     fs_1.default.mkdir(carpetaPermisos, { recursive: true }, (err) => {
                         if (err) {
@@ -152,7 +118,7 @@ class EmpleadoControlador {
                         }
                     });
                     // RUTA DE LA CARPETA PRINCIPAL PERMISOS
-                    const carpetaImagenes = yield (0, exports.ObtenerRutaUsuario)(empleado.id);
+                    const carpetaImagenes = yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(empleado.id);
                     // METODO MKDIR PARA CREAR LA CARPETA
                     fs_1.default.mkdir(carpetaImagenes, { recursive: true }, (err) => {
                         if (err) {
@@ -163,7 +129,7 @@ class EmpleadoControlador {
                         }
                     });
                     // RUTA DE LA CARPETA DE ALMACENAMIENTO DE VACUNAS
-                    const carpetaVacunas = yield (0, vacunasControlador_1.ObtenerRutaVacuna)(empleado.id);
+                    const carpetaVacunas = yield (0, accesoCarpetas_1.ObtenerRutaVacuna)(empleado.id);
                     // METODO MKDIR PARA CREAR LA CARPETA
                     fs_1.default.mkdir(carpetaVacunas, { recursive: true }, (err) => {
                         if (err) {
@@ -173,9 +139,20 @@ class EmpleadoControlador {
                             verificar = 0;
                         }
                     });
+                    // RUTA DE LA CARPETA DE ALMACENAMIENTO DE CONTRATOS
+                    const carpetaContratos = yield (0, accesoCarpetas_1.ObtenerRutaContrato)(empleado.id);
+                    // METODO MKDIR PARA CREAR LA CARPETA
+                    fs_1.default.mkdir(carpetaContratos, { recursive: true }, (err) => {
+                        if (err) {
+                            verificar = 1;
+                        }
+                        else {
+                            verificar = 0;
+                        }
+                    });
                     // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
                     if (verificar === 1) {
-                        console.error('Error al crear la carpeta de imagenes.');
+                        console.error('Error al crear las carpetas.');
                     }
                     else {
                         return res.status(200).jsonp(empleado);
@@ -204,7 +181,7 @@ class EmpleadoControlador {
                     domicilio, telefono, id_nacionalidad, codigo]);
                 let verificar_permisos = 0;
                 // RUTA DE LA CARPETA PERMISOS DEL USUARIO
-                const carpetaPermisos = ObtenerRuta(codigo, cedula);
+                const carpetaPermisos = yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo);
                 // VERIFICACION DE EXISTENCIA CARPETA PERMISOS DE USUARIO
                 fs_1.default.access(carpetaPermisos, fs_1.default.constants.F_OK, (err) => {
                     if (err) {
@@ -224,7 +201,7 @@ class EmpleadoControlador {
                 });
                 let verificar_imagen = 0;
                 // RUTA DE LA CARPETA IMAGENES DEL USUARIO
-                const carpetaImagenes = yield (0, exports.ObtenerRutaUsuario)(id);
+                const carpetaImagenes = yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id);
                 // VERIFICACION DE EXISTENCIA CARPETA IMAGENES DE USUARIO
                 fs_1.default.access(carpetaImagenes, fs_1.default.constants.F_OK, (err) => {
                     if (err) {
@@ -244,7 +221,7 @@ class EmpleadoControlador {
                 });
                 let verificar_vacunas = 0;
                 // RUTA DE LA CARPETA VACUNAS DEL USUARIO
-                const carpetaVacunas = yield (0, vacunasControlador_1.ObtenerRutaVacuna)(id);
+                const carpetaVacunas = yield (0, accesoCarpetas_1.ObtenerRutaVacuna)(id);
                 // VERIFICACION DE EXISTENCIA CARPETA PERMISOS DE USUARIO
                 fs_1.default.access(carpetaVacunas, fs_1.default.constants.F_OK, (err) => {
                     if (err) {
@@ -262,18 +239,41 @@ class EmpleadoControlador {
                         verificar_vacunas = 0;
                     }
                 });
+                let verificar_contrato = 0;
+                // RUTA DE LA CARPETA CONTRATOS DEL USUARIO
+                const carpetaContratos = yield (0, accesoCarpetas_1.ObtenerRutaContrato)(id);
+                // VERIFICACION DE EXISTENCIA CARPETA CONTRATOS DE USUARIO
+                fs_1.default.access(carpetaContratos, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                        // METODO MKDIR PARA CREAR LA CARPETA
+                        fs_1.default.mkdir(carpetaContratos, { recursive: true }, (err) => {
+                            if (err) {
+                                verificar_contrato = 1;
+                            }
+                            else {
+                                verificar_contrato = 0;
+                            }
+                        });
+                    }
+                    else {
+                        verificar_contrato = 0;
+                    }
+                });
                 // METODO DE VERIFICACION DE CREACION DE DIRECTORIOS
-                if (verificar_permisos === 1 && verificar_imagen === 1 && verificar_vacunas === 1) {
-                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de permisos, de imagenes y vacunación del usuario.' });
+                if (verificar_permisos === 1 && verificar_imagen === 1 && verificar_vacunas === 1 && verificar_contrato === 1) {
+                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos, permisos, imagenes y vacunación del usuario.' });
                 }
-                else if (verificar_permisos === 1 && verificar_imagen === 0 && verificar_vacunas === 0) {
+                else if (verificar_permisos === 1 && verificar_imagen === 0 && verificar_vacunas === 0 && verificar_contrato === 0) {
                     res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de permisos del usuario.' });
                 }
-                else if (verificar_permisos === 0 && verificar_imagen === 1 && verificar_vacunas === 0) {
+                else if (verificar_permisos === 0 && verificar_imagen === 1 && verificar_vacunas === 0 && verificar_contrato === 0) {
                     res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de imagenes del usuario.' });
                 }
-                else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1) {
+                else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 0) {
                     res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de vacunación del usuario.' });
+                }
+                else if (verificar_permisos === 0 && verificar_imagen === 0 && verificar_vacunas === 1 && verificar_contrato === 1) {
+                    res.jsonp({ message: 'Ups!!! no fue posible crear el directorio de contratos del usuario.' });
                 }
                 else {
                     res.jsonp({ message: 'Registro actualizado.' });
@@ -439,7 +439,7 @@ class EmpleadoControlador {
                     if (obj.imagen != 'null' && obj.imagen != '' && obj.imagen != null) {
                         try {
                             // ELIMINAR IMAGEN DE SERVIDOR
-                            let ruta = (yield (0, exports.ObtenerRutaUsuario)(obj.id)) + separador + obj.imagen;
+                            let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(obj.id)) + separador + obj.imagen;
                             fs_1.default.unlinkSync(ruta);
                             yield database_1.default.query(`
               UPDATE empleados SET imagen = $2 Where id = $1
@@ -571,7 +571,7 @@ class EmpleadoControlador {
             const imagen = req.params.imagen;
             const id = req.params.id;
             let separador = path_1.default.sep;
-            let ruta = (yield (0, exports.ObtenerRutaUsuario)(id)) + separador + imagen;
+            let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id)) + separador + imagen;
             console.log('ver file ', ruta);
             res.sendFile(path_1.default.resolve(ruta));
         });

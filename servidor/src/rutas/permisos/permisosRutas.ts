@@ -1,42 +1,18 @@
+import PERMISOS_CONTROLADOR from '../../controlador/permisos/permisosControlador';
 import { ModuloPermisosValidation } from '../../libs/Modulos/verificarPermisos'
 import { TokenValidation } from '../../libs/verificarToken'
+import { ObtenerRutaPermisos } from '../../libs/accesoCarpetas';
 import { Router } from 'express';
 import multer from 'multer';
-import path from 'path';
 import pool from '../../database';
 import moment from 'moment';
 moment.locale('es');
-
-import PERMISOS_CONTROLADOR from '../../controlador/permisos/permisosControlador';
-
-// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO
-const ObtenerRuta = async function (codigo: any) {
-    var ruta = '';
-    let separador = path.sep;
-
-    const usuario = await pool.query(
-        `
-        SELECT cedula FROM empleados WHERE codigo = $1
-        `
-        , [codigo]);
-
-    for (var i = 0; i < __dirname.split(separador).length - 3; i++) {
-        if (ruta === '') {
-            ruta = __dirname.split(separador)[i];
-        }
-        else {
-            ruta = ruta + separador + __dirname.split(separador)[i];
-        }
-    }
-
-    return ruta + separador + 'permisos' + separador + codigo + '_' + usuario.rows[0].cedula;
-}
 
 const storage = multer.diskStorage({
 
     destination: async function (req, file, cb) {
         let { codigo } = req.params;
-        var ruta = await ObtenerRuta(codigo);
+        var ruta = await ObtenerRutaPermisos(codigo);
         cb(null, ruta)
     },
     filename: async function (req, file, cb) {

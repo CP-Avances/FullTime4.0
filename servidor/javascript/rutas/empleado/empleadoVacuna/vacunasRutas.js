@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const vacunasControlador_1 = __importDefault(require("../../../controlador/empleado/empleadoVacuna/vacunasControlador"));
-const vacunasControlador_2 = require("../../../controlador/empleado/empleadoVacuna/vacunasControlador");
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const verificarToken_1 = require("../../../libs/verificarToken");
 const express_1 = require("express");
 const multer_1 = __importDefault(require("multer"));
@@ -24,7 +24,7 @@ const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
         return __awaiter(this, void 0, void 0, function* () {
             let id = req.params.id_empleado;
-            var ruta = yield (0, vacunasControlador_2.ObtenerRutaVacuna)(id);
+            var ruta = yield (0, accesoCarpetas_1.ObtenerRutaVacuna)(id);
             cb(null, ruta);
         });
     },
@@ -71,7 +71,7 @@ class VacunaRutas {
         // METODO REGISTRO DE TIPO DE VACUNA
         this.router.post('/tipo_vacuna', verificarToken_1.TokenValidation, vacunasControlador_1.default.CrearTipoVacuna);
         // METODO PARA BUSCAR UN DOCUMENTO
-        this.router.get('/documentos/:docs', vacunasControlador_1.default.ObtenerDocumento);
+        this.router.get('/documentos/:docs/:id', vacunasControlador_1.default.ObtenerDocumento);
         // METODO PARA LEER TODOS LOS REGISTROS DE VACUNACION
         this.router.get('/', verificarToken_1.TokenValidation, vacunasControlador_1.default.ListarRegistro);
     }

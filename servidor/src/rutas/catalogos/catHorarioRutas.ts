@@ -4,29 +4,23 @@ import multer from 'multer';
 import path from 'path';
 
 import HORARIO_CONTROLADOR from '../../controlador/catalogos/catHorarioControlador';
-
-const ObtenerRuta = function () {
-    var ruta = '';
-    let separador = path.sep;
-    for (var i = 0; i < __dirname.split(separador).length - 3; i++) {
-        if (ruta === '') {
-            ruta = __dirname.split(separador)[i];
-        }
-        else {
-            ruta = ruta + separador + __dirname.split(separador)[i];
-        }
-    }
-    return ruta + separador + 'horarios';
-}
+import { ObtenerRutaHorarios } from '../../libs/accesoCarpetas';
+import moment from 'moment';
 
 const storage = multer.diskStorage({
 
+
     destination: function (req, file, cb) {
-        cb(null, ObtenerRuta())
+        cb(null, ObtenerRutaHorarios())
     },
     filename: function (req, file, cb) {
+        // FECHA DEL SISTEMA
+        var fecha = moment();
+        var anio = fecha.format('YYYY');
+        var mes = fecha.format('MM');
+        var dia = fecha.format('DD');
         let { id, codigo } = req.params;
-        cb(null, id + '_' + codigo + '_' + file.originalname)
+        cb(null, id + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname)
     }
 })
 
@@ -39,9 +33,6 @@ const multipartMiddleware = multipart({
     uploadDir: './plantillas',
 });
 
-const multipartMiddlewareD = multipart({
-    uploadDir: './horarios',
-});
 
 class HorarioRutas {
     public router: Router = Router();

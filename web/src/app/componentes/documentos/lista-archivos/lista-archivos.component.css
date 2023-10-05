@@ -12,8 +12,23 @@ p {
     margin-left: 20px;
 }
 
+.fa {
+    color: rgb(80, 25, 245);
+    cursor: pointer;
+}
+
 table {
     width: 100%;
     font-size: 14px;
 }
 
+#regresar {
+    color: rgb(65, 112, 205);
+    cursor: pointer;
+    text-decoration: underline
+}
+
+#folder {
+    color: rgb(120, 120, 120);
+    cursor: pointer;
+}

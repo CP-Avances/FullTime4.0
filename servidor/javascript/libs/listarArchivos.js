@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.VerCarpeta = exports.DescargarArchivo = exports.ListarHorarios = exports.ListarPermisos = exports.ListarContratos = exports.ListarDocumentos = exports.listaCarpetas = void 0;
+exports.VerCarpeta = exports.DescargarArchivoIndividuales = exports.DescargarArchivo = exports.ListarHorarios = exports.ListarDocumentosIndividuales = exports.ListarPermisos = exports.ListarContratos = exports.ListarDocumentos = exports.listaCarpetas = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../database"));
@@ -59,65 +59,41 @@ exports.ListarDocumentos = ListarDocumentos;
 // LISTAR ARCHIVOS DE CONTRATOS
 const ListarContratos = function (nombre_carpeta) {
     return __awaiter(this, void 0, void 0, function* () {
-        let archivos = [];
         const ruta = path_1.default.resolve(nombre_carpeta);
         let Lista_Archivos = fs_1.default.readdirSync(ruta);
-        console.log('contratos.. ', Lista_Archivos);
-        // CONSULTA DE BUSQUEDA DE DOCUMENTOS
-        let documentos = yield database_1.default.query(`
-        SELECT * FROM empl_contratos WHERE documento NOTNULL ORDER BY id
-        `).then(result => { return result.rows; });
-        console.log('contratos base .. ', documentos);
-        if (documentos.length != 0) {
-            documentos.forEach((doc) => {
-                Lista_Archivos.forEach((obj) => {
-                    if (doc.documento === obj) {
-                        let datos = {
-                            id: doc.id,
-                            file: obj,
-                            extencion: obj.split('.')[1],
-                            nombre: doc.doc_nombre
-                        };
-                        archivos = archivos.concat(datos);
-                    }
-                });
-            });
-        }
-        return archivos;
+        return Lista_Archivos;
     });
 };
 exports.ListarContratos = ListarContratos;
 // LISTAR ARCHIVOS DE PERMISOS
 const ListarPermisos = function (nombre_carpeta) {
     return __awaiter(this, void 0, void 0, function* () {
-        let archivos = [];
         const ruta = path_1.default.resolve(nombre_carpeta);
         let Lista_Archivos = fs_1.default.readdirSync(ruta);
-        console.log('permisos.. ', Lista_Archivos);
-        // CONSULTA DE BUSQUEDA DE DOCUMENTOS
-        let documentos = yield database_1.default.query(`
-        SELECT * FROM permisos WHERE documento NOTNULL ORDER BY id
-        `).then(result => { return result.rows; });
-        console.log('permisos base .. ', documentos);
-        if (documentos.length != 0) {
-            documentos.forEach((doc) => {
-                Lista_Archivos.forEach((obj) => {
-                    if (doc.documento === obj) {
-                        let datos = {
-                            id: doc.id,
-                            file: obj,
-                            extencion: obj.split('.')[1],
-                            nombre: doc.docu_nombre
-                        };
-                        archivos = archivos.concat(datos);
-                    }
-                });
-            });
-        }
-        return archivos;
+        return Lista_Archivos;
     });
 };
 exports.ListarPermisos = ListarPermisos;
+// LISTAR ARCHIVOS DE PERMISOS
+const ListarDocumentosIndividuales = function (nombre_carpeta, tipo) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let archivos = [];
+        let separador = path_1.default.sep;
+        let direccion = tipo + separador + nombre_carpeta;
+        const ruta = path_1.default.resolve(direccion);
+        let Lista_Archivos = fs_1.default.readdirSync(ruta);
+        Lista_Archivos.forEach((obj) => {
+            let datos = {
+                file: obj,
+                extencion: obj.split('.')[1],
+                nombre: obj
+            };
+            archivos = archivos.concat(datos);
+        });
+        return archivos;
+    });
+};
+exports.ListarDocumentosIndividuales = ListarDocumentosIndividuales;
 // LISTAR ARCHIVOS DE PERMISOS
 const ListarHorarios = function (nombre_carpeta) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -148,10 +124,17 @@ const ListarHorarios = function (nombre_carpeta) {
 };
 exports.ListarHorarios = ListarHorarios;
 const DescargarArchivo = function (dir, filename) {
+    let separador = path_1.default.sep;
     const ruta = path_1.default.resolve(dir);
-    return ruta + '\\' + filename;
+    return ruta + separador + filename;
 };
 exports.DescargarArchivo = DescargarArchivo;
+const DescargarArchivoIndividuales = function (dir, filename, tipo) {
+    let separador = path_1.default.sep;
+    const ruta = path_1.default.resolve(dir);
+    return ruta + separador + tipo + separador + filename;
+};
+exports.DescargarArchivoIndividuales = DescargarArchivoIndividuales;
 // LISTAR ARCHIVOS DE CONTRATOS
 const VerCarpeta = function () {
     return __awaiter(this, void 0, void 0, function* () {

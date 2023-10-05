@@ -14,9 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EMPRESA_CONTROLADOR = void 0;
 const ImagenCodificacion_1 = require("../../libs/ImagenCodificacion");
-const builder = require('xmlbuilder');
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
+const moment_1 = __importDefault(require("moment"));
 const fs_1 = __importDefault(require("fs"));
+const builder = require('xmlbuilder');
 class EmpresaControlador {
     // BUSCAR DATOS DE EMPRESA PARA RECUPERAR CUENTA
     BuscarCadena(req, res) {
@@ -58,9 +61,15 @@ class EmpresaControlador {
     ActualizarLogoEmpresa(req, res) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            // FECHA DEL SISTEMA
+            var fecha = (0, moment_1.default)();
+            var anio = fecha.format('YYYY');
+            var mes = fecha.format('MM');
+            var dia = fecha.format('DD');
             // LEER DATOS DE IMAGEN
-            let logo = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+            let logo = anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
             let id = req.params.id_empresa;
+            let separador = path_1.default.sep;
             // CONSULTAR SI EXISTE UNA IMAGEN
             const logo_name = yield database_1.default.query(`
             SELECT nombre, logo FROM cg_empresa WHERE id = $1
@@ -69,12 +78,11 @@ class EmpresaControlador {
                 // LA IMAGEN EXISTE
                 if (obj.logo != null) {
                     try {
-                        let filePath = `servidor/logos/${obj.logo}`;
-                        let direccionCompleta = __dirname.split("servidor")[0] + filePath;
+                        let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + obj.logo;
                         // SI EL NOMBRE DE LA IMAGEN YA EXISTE SOLO SE ACTUALIZA CASO CONTRARIO SE ELIMINA
                         if (obj.logo != logo) {
                             // ELIMINAR LOGO DEL SERVIDOR
-                            fs_1.default.unlinkSync(direccionCompleta);
+                            fs_1.default.unlinkSync(ruta);
                             // ACTUALIZAR REGISTRO DE IMAGEN
                             yield database_1.default.query(`
                             UPDATE cg_empresa SET logo = $2 WHERE id = $1
@@ -163,21 +171,26 @@ class EmpresaControlador {
     ActualizarCabeceraCorreo(req, res) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            // FECHA DEL SISTEMA
+            var fecha = (0, moment_1.default)();
+            var anio = fecha.format('YYYY');
+            var mes = fecha.format('MM');
+            var dia = fecha.format('DD');
             // LEER DATOS DE IMAGEN
-            let logo = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+            let logo = anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
             let id = req.params.id_empresa;
+            let separador = path_1.default.sep;
             const logo_name = yield database_1.default.query(`
             SELECT cabecera_firma FROM cg_empresa WHERE id = $1
             `, [id]);
             logo_name.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 if (obj.cabecera_firma != null) {
                     try {
-                        let filePath = `servidor/logos/${obj.cabecera_firma}`;
-                        let direccionCompleta = __dirname.split("servidor")[0] + filePath;
+                        let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + obj.cabecera_firma;
                         // SI EL NOMBRE DE LA IMAGEN YA EXISTE SOLO SE ACTUALIZA CASO CONTRARIO SE ELIMINA
                         if (obj.cabecera_firma != logo) {
                             // ELIMINAR LOGO DEL SERVIDOR
-                            fs_1.default.unlinkSync(direccionCompleta);
+                            fs_1.default.unlinkSync(ruta);
                             // ACTUALIZAR REGISTRO DE IMAGEN
                             yield database_1.default.query(`
                             UPDATE cg_empresa SET cabecera_firma = $2 WHERE id = $1
@@ -222,21 +235,26 @@ class EmpresaControlador {
     ActualizarPieCorreo(req, res) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            // FECHA DEL SISTEMA
+            var fecha = (0, moment_1.default)();
+            var anio = fecha.format('YYYY');
+            var mes = fecha.format('MM');
+            var dia = fecha.format('DD');
             // LEER DATOS DE IMAGEN
-            let logo = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+            let logo = anio + '_' + mes + '_' + dia + '_' + ((_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname);
             let id = req.params.id_empresa;
+            let separador = path_1.default.sep;
             const logo_name = yield database_1.default.query(`
             SELECT pie_firma FROM cg_empresa WHERE id = $1
             `, [id]);
             logo_name.rows.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 if (obj.pie_firma != null) {
                     try {
-                        let filePath = `servidor/logos/${obj.pie_firma}`;
-                        let direccionCompleta = __dirname.split("servidor")[0] + filePath;
+                        let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + obj.pie_firma;
                         // SI EL NOMBRE DE LA IMAGEN YA EXISTE SOLO SE ACTUALIZA CASO CONTRARIO SE ELIMINA
                         if (obj.pie_firma != logo) {
                             // ELIMINAR LOGO DEL SERVIDOR
-                            fs_1.default.unlinkSync(direccionCompleta);
+                            fs_1.default.unlinkSync(ruta);
                             // ACTUALIZAR REGISTRO DE IMAGEN
                             yield database_1.default.query(`
                             UPDATE cg_empresa SET pie_firma = $2 WHERE id = $1
