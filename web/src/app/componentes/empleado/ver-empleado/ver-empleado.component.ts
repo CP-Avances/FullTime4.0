@@ -112,6 +112,7 @@ export class VerEmpleadoComponent implements OnInit {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   selectedIndex: number;
+  imagenEmpleado;
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
@@ -348,7 +349,6 @@ export class VerEmpleadoComponent implements OnInit {
       if (this.habilitarVacaciones === true) {
         this.ObtenerPeriodoVacaciones(formato_fecha);
       }
-      console.log('Empleado:',this.empleadoUno);
     })
   }
 
@@ -2667,6 +2667,32 @@ export class VerEmpleadoComponent implements OnInit {
     }
   }
 
+  // getBase64ImageFromURL(url) {
+  //   return new Promise((resolve, reject) => {
+  //     var img = new Image();
+  //     img.setAttribute("crossOrigin", "anonymous");
+
+  //     img.onload = () => {
+  //       var canvas = document.createElement("canvas");
+  //       canvas.width = img.width;
+  //       canvas.height = img.height;
+
+  //       var ctx = canvas.getContext("2d")!;
+  //       ctx.drawImage(img, 0, 0);
+
+  //       var dataURL = canvas.toDataURL("image/png");
+
+  //       resolve(dataURL);
+  //     };
+
+  //     img.onerror = error => {
+  //       reject(error);
+  //     };
+
+  //     img.src = url;
+  //   });
+  // }
+
 
   /** ****************************************************************************************** **
    ** **                               PARA LA GENERACION DE PDFs                             ** **                                           *
@@ -2683,10 +2709,20 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   GetDocumentDefinicion() {
+    
+    let estadoCivil = this.EstadoCivilSelect[this.empleadoLogueado[0].esta_civil - 1];
+    let genero = this.GeneroSelect[this.empleadoLogueado[0].genero - 1];
+    let estado = this.EstadoSelect[this.empleadoLogueado[0].estado - 1];
+    let nacionalidad: any;
+    this.nacionalidades.forEach(element => {
+      if (this.empleadoLogueado[0].id_nacionalidad == element.id) {
+        nacionalidad = element.nombre;
+      }
+    });
     sessionStorage.setItem('profile', this.empleadoUno);
     return {
       // ENCABEZADO DE LA PAGINA
-      pageOrientation: 'landscape',
+      pageOrientation: 'portrait',
       watermark: { text: this.frase_m, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       // PIE DE PAGINA
@@ -2710,25 +2746,37 @@ export class VerEmpleadoComponent implements OnInit {
         }
       },
       content: [
-        { image: this.logoE, width: 150, margin: [10, -25, 0, 5] },
+        // { image: this.logoE, width: 150, margin: [10, -25, 0, 5] },
         { text: 'Perfil Empleado', bold: true, fontSize: 20, alignment: 'center', margin: [0, -30, 0, 10] },
+        { text: this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido, style: 'name' },
+        // { image: this.imagenEmpleado, width: 150, margin: [10, -25, 0, 5] },
         {
           columns: [
             [
-              { text: this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido, style: 'name' },
+              { text: 'Cédula: ' + this.empleadoUno[0].cedula },
               { text: 'Fecha Nacimiento: ' + this.empleadoUno[0].fec_nacimiento_ },
-              { text: 'Corre Electronico: ' + this.empleadoUno[0].correo },
-              { text: 'Teléfono: ' + this.empleadoUno[0].telefono }
-            ]
+              { text: 'Código: ' + this.empleadoUno[0].codigo },
+              { text: 'Estado civil: ' + estadoCivil },
+              { text: 'Género: ' + genero }
+            ],
+            [
+              { text: 'Correo: ' + this.empleadoUno[0].correo },
+              { text: 'Estado: ' + estado },
+              { text: 'Domicilio: ' + this.empleadoUno[0].domicilio },
+              { text: 'Teléfono: ' + this.empleadoUno[0].telefono },
+              { text: 'Nacionalidad: ' + nacionalidad },
+            ],
           ]
         },
         { text: 'Contrato Empleado', style: 'header' },
         this.PresentarDataPDFcontratoEmpleado(),
-        { text: 'Plan de comidas', style: 'header' },
-        { text: 'Titulos', style: 'header' },
-        this.PresentarDataPDFtitulosEmpleado(),
-        { text: 'Discapacidad', style: 'header' },
-        this.PresentarDataPDFdiscapacidadEmpleado(),
+        { text: 'Cargo Empleado', style: 'header' },
+        this.PresentarDataPDFcargoEmpleado(),
+        // { text: 'Plan de comidas', style: 'header' },
+        // { text: 'Titulos', style: 'header' },
+        // this.PresentarDataPDFtitulosEmpleado(),
+        // { text: 'Discapacidad', style: 'header' },
+        // this.PresentarDataPDFdiscapacidadEmpleado(),
       ],
       info: {
         title: this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido + '_PERFIL',
@@ -2739,6 +2787,7 @@ export class VerEmpleadoComponent implements OnInit {
       styles: {
         header: { fontSize: 18, bold: true, margin: [0, 20, 0, 10], decoration: 'underline' },
         name: { fontSize: 16, bold: true },
+        item: {fontSize: 14, bold: true},
         tableHeader: { bold: true, alignment: 'center', fillColor: this.p_color }
       }
     };
@@ -2765,23 +2814,55 @@ export class VerEmpleadoComponent implements OnInit {
   PresentarDataPDFcontratoEmpleado() {
     return {
       table: {
-        widths: ['*', 'auto', 100, '*'],
+        widths: ['*', 'auto', 'auto', 'auto', 'auto', 'auto'],
         body: [
           [
-            { text: 'Descripción', style: 'tableHeader' },
-            { text: 'Dias Vacacion', style: 'tableHeader' },
+            { text: 'Régimen', style: 'tableHeader' },
             { text: 'Fecha Ingreso', style: 'tableHeader' },
-            { text: 'Fecha Salida', style: 'tableHeader' }
+            { text: 'Fecha Salida', style: 'tableHeader' },
+            { text: 'Modalidad laboral', style: 'tableHeader' },
+            { text: 'Control de asistencias', style: 'tableHeader' },
+            { text: 'Control de vacaciones', style: 'tableHeader' },
           ],
-          ...this.contratoEmpleado.map(obj => {
-            const ingreso = obj.fec_ingreso_;
-            if (obj.fec_salida === null) {
-              const salida = '';
-              return [obj.descripcion, obj.dia_anio_vacacion, ingreso, salida];
-            } else {
-              const salida = obj.fec_salida_;
-              return [obj.descripcion, obj.dia_anio_vacacion, ingreso, salida];
-            }
+          ...this.contratoEmpleado.map(contrato => {
+            return [
+              contrato.descripcion,
+              contrato.fec_ingreso_,
+              contrato.fec_salida===null?'Sin fecha':contrato.fec_salida_,
+              contrato.nombre_contrato,
+              contrato.asis_controla?'Si':'No',
+              contrato.vaca_controla?'Si':'No',
+            ]
+          })
+        ]
+      }
+    };
+  }
+
+  PresentarDataPDFcargoEmpleado() {
+    return {
+      table: {
+        widths: ['*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+        body: [
+          [
+            { text: 'Sucursal', style: 'tableHeader' },
+            { text: 'Departamento', style: 'tableHeader' },
+            { text: 'Cargo', style: 'tableHeader' },
+            { text: 'Fecha inicio', style: 'tableHeader' },
+            { text: 'Fecha fin', style: 'tableHeader' },
+            { text: 'Sueldo', style: 'tableHeader' },
+            { text: 'Horas de trabajo', style: 'tableHeader' },
+          ],
+          ...this.cargoEmpleado.map(cargo => {
+            return [
+              cargo.sucursal,
+              cargo.departamento,
+              cargo.nombre_cargo,
+              cargo.fec_inicio_,
+              cargo.fec_final===null?'Sin fecha':cargo.fec_final_,
+              cargo.sueldo,
+              cargo.hora_trabaja,
+            ]
           })
         ]
       }
@@ -2906,7 +2987,6 @@ export class VerEmpleadoComponent implements OnInit {
       const wsd: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.discapacidadUser);
       xlsx.utils.book_append_sheet(wb, wsd, 'DISCAPACIDA');
     }
-    console.log(datos[2]);
     xlsx.writeFile(wb, "Empleado_" + (datos[0])[0].Nombre +"_"+ (datos[0])[0].Apellido +"_" + new Date().getTime() + '.xlsx');
   }
 
