@@ -14,6 +14,9 @@ import * as L from 'leaflet';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import * as xml2js from 'xml2js';
+
+
 
 // IMPORTAR SERVICIOS
 import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
@@ -345,6 +348,7 @@ export class VerEmpleadoComponent implements OnInit {
       if (this.habilitarVacaciones === true) {
         this.ObtenerPeriodoVacaciones(formato_fecha);
       }
+      console.log('Empleado:',this.empleadoUno);
     })
   }
 
@@ -2806,17 +2810,104 @@ export class VerEmpleadoComponent implements OnInit {
    ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                        ** **                           *
    ** ******************************************************************************************* **/
 
+  obtenerDatos(){
+    let objeto: any;
+    let objetoContrato: any;
+    let objetoCargo: any;
+    let arregloEmpleado: any = [];
+    let arregloContrato: any = [];
+    let arregloCargo: any = [];
+    this.empleadoUno.forEach((obj:any) => {
+      let estadoCivil = this.EstadoCivilSelect[obj.esta_civil - 1];
+      let genero = this.GeneroSelect[obj.genero - 1];
+      let estado = this.EstadoSelect[obj.estado - 1];
+      let nacionalidad: any;
+      this.nacionalidades.forEach(element => {
+        if (obj.id_nacionalidad == element.id) {
+          nacionalidad = element.nombre;
+        }
+      });
+      objeto = {
+        'Codigo': obj.codigo,
+        "Apellido": obj.apellido,
+        "Nombre": obj.nombre,
+        "Cedula": obj.cedula,
+        "Estado Civil": estadoCivil,
+        "Genero": genero,
+        "Correo": obj.correo,
+        "Fecha de Nacimiento": obj.fec_nacimiento_,
+        "Estado": estado,
+        "Domicilio": obj.domicilio,
+        "Telefono": obj.telefono,
+        "Nacionalidad": nacionalidad,
+      };
+      if (obj.longitud !== null) {
+        objeto.empleado.longitud = obj.longitud;
+      }
+      if (obj.latitud !== null) {
+        objeto.empleado.latitud = obj.latitud;
+      }
+      arregloEmpleado.push(objeto);
+    });
+    if (this.contratoEmpleado !==null) {
+      this.contratoEmpleado.map((contrato: any)=>{
+        let fechaI  = contrato.fec_ingreso_.split(" ");
+        let fechaS: string = contrato.fec_salida===null?'Sin fecha':contrato.fec_salida_.split(" ")[1];
+        objetoContrato = {
+          'Regimen': contrato.descripcion,
+          'Fecha ingreso': fechaI[1],
+          'Fecha salida': fechaS,
+          'Modalidad laboral': contrato.nombre_contrato,
+          'Control asistencia': contrato.asis_controla?'Si':'No',
+          'Control vacaciones': contrato.vaca_controla?'Si':'No',
+        };
+        arregloContrato.push(objetoContrato);
+      });
+      
+    }
+    if (this.cargoEmpleado !==null) {
+      this.cargoEmpleado.map((cargo: any)=>{
+        let fechaI  = cargo.fec_inicio_.split(" ");
+        let fechaS: string = cargo.fec_final===null?'Sin fecha':cargo.fec_final_.split(" ")[1];
+        objetoCargo = {
+          'Sucursal': cargo.sucursal,
+          'Departamento': cargo.departamento,
+          'Cargo': cargo.nombre_cargo,
+          'Fecha inicio': fechaI[1],
+          'Fecha fin': fechaS,
+          'Sueldo': cargo.sueldo,
+          'Horas trabaja': cargo.hora_trabaja,
+        };
+        arregloCargo.push(objetoCargo);
+      });
+    }
+    return [arregloEmpleado, arregloContrato, arregloCargo];
+  }
+
+
   ExportToExcel() {
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.empleadoUno);
-    const wsc: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.contratoEmpleado);
-    const wsd: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.discapacidadUser);
-    const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tituloEmpleado);
+    const datos: any = this.obtenerDatos();
+    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos[0]);
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wse, 'PERFIL');
-    xlsx.utils.book_append_sheet(wb, wsc, 'CONTRATO');
-    xlsx.utils.book_append_sheet(wb, wst, 'TITULOS');
-    xlsx.utils.book_append_sheet(wb, wsd, 'DISCAPACIDA');
-    xlsx.writeFile(wb, "EmpleadoEXCEL" + new Date().getTime() + '.xlsx');
+    if (this.contratoEmpleado.length>0) {
+      const wsco: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos[1]);
+      xlsx.utils.book_append_sheet(wb, wsco, 'CONTRATO');
+    }
+    if (this.cargoEmpleado.length>0) {
+      const wsca: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos[2]);
+      xlsx.utils.book_append_sheet(wb, wsca, 'CARGO'); 
+    }
+    if (this.tituloEmpleado.length>0 ) {
+      const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tituloEmpleado);
+      xlsx.utils.book_append_sheet(wb, wst, 'TITULOS');     
+    }
+    if (this.discapacidadUser.length>0) {
+      const wsd: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.discapacidadUser);
+      xlsx.utils.book_append_sheet(wb, wsd, 'DISCAPACIDA');
+    }
+    console.log(datos[2]);
+    xlsx.writeFile(wb, "Empleado_" + (datos[0])[0].Nombre +"_"+ (datos[0])[0].Apellido +"_" + new Date().getTime() + '.xlsx');
   }
 
   /** ******************************************************************************************* **
@@ -2824,16 +2915,14 @@ export class VerEmpleadoComponent implements OnInit {
    ** ******************************************************************************************* **/
 
   ExportToCVS() {
-    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.empleadoUno);
-    const wsc: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.contratoEmpleado);
-    const wsd: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.discapacidadUser);
-    const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tituloEmpleado);
-    const csvDataE = xlsx.utils.sheet_to_csv(wse);
-    const csvDataC = xlsx.utils.sheet_to_csv(wsc);
-    const csvDataD = xlsx.utils.sheet_to_csv(wsd);
-    const csvDataT = xlsx.utils.sheet_to_csv(wst);
-    const data: Blob = new Blob([csvDataE, csvDataC, csvDataD, csvDataT], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "EmpleadoCSV" + new Date().getTime() + '.csv');
+    const datos: any = this.obtenerDatos();
+    const csvDataE = xlsx.utils.sheet_to_csv(xlsx.utils.json_to_sheet(datos[0]));
+    const csvDataCo = xlsx.utils.sheet_to_csv(xlsx.utils.json_to_sheet(datos[1]));
+    const csvDataCa = xlsx.utils.sheet_to_csv(xlsx.utils.json_to_sheet(datos[2]));
+    const csvDataD = xlsx.utils.sheet_to_csv(xlsx.utils.json_to_sheet(this.tituloEmpleado));
+    const csvDataT = xlsx.utils.sheet_to_csv(xlsx.utils.json_to_sheet(this.discapacidadUser));
+    const data: Blob = new Blob([csvDataE,csvDataCo,csvDataCa,csvDataD,csvDataT], { type: 'text/csv;charset=utf-8;' });
+    FileSaver.saveAs(data, "EmpleadoCSV" + (datos[0])[0].Nombre +"_"+ (datos[0])[0].Apellido +"_"  + new Date().getTime() + '.csv');
   }
 
   /** ******************************************************************************************* ** 
@@ -2854,24 +2943,25 @@ export class VerEmpleadoComponent implements OnInit {
   urlxml: string;
   data: any = [];
   ExportToXML() {
-    var objeto: any;
-    var arregloEmpleado: any = [];
+    let objeto: any;
+    let arregloEmpleado: any = [];
     this.empleadoUno.forEach(obj => {
-      var estadoCivil = this.EstadoCivilSelect[obj.esta_civil - 1];
-      var genero = this.GeneroSelect[obj.genero - 1];
-      var estado = this.EstadoSelect[obj.estado - 1];
+      let estadoCivil = this.EstadoCivilSelect[obj.esta_civil - 1];
+      let genero = this.GeneroSelect[obj.genero - 1];
+      let estado = this.EstadoSelect[obj.estado - 1];
       let nacionalidad: any;
       this.nacionalidades.forEach(element => {
         if (obj.id_nacionalidad == element.id) {
           nacionalidad = element.nombre;
         }
       });
+
       objeto = {
         "empleado": {
-          '@codigo': obj.codigo,
-          "cedula": obj.cedula,
+          'codigo': obj.codigo,
           "apellido": obj.apellido,
           "nombre": obj.nombre,
+          "cedula": obj.cedula,
           "estadoCivil": estadoCivil,
           "genero": genero,
           "correo": obj.correo,
@@ -2880,16 +2970,68 @@ export class VerEmpleadoComponent implements OnInit {
           "domicilio": obj.domicilio,
           "telefono": obj.telefono,
           "nacionalidad": nacionalidad,
-          "imagen": obj.imagen
         }
+      };
+      if (obj.longitud !== null) {
+        objeto.empleado.longitud = obj.longitud;
+      }
+      if (obj.latitud !== null) {
+        objeto.empleado.latitud = obj.latitud;
+      }
+      if (this.contratoEmpleado !==null) {
+        this.contratoEmpleado.map((contrato: any)=>{
+          objeto.empleado.contrato = {
+            'regimen': contrato.descripcion,
+            'fecha_ingreso': contrato.fec_ingreso_,
+            'fecha_salida': contrato.fec_salida===null?'Sin fecha':contrato.fec_salida_,
+            'modalidad_laboral': contrato.nombre_contrato,
+            'control_asistencia': contrato.asis_controla?'Si':'No',
+            'control_vacaciones': contrato.vaca_controla?'Si':'No',
+          };
+        });
+        
+      }
+      if (this.cargoEmpleado !==null) {
+        this.cargoEmpleado.map((cargo: any)=>{
+          objeto.empleado.cargo = {
+            'sucursal': cargo.sucursal,
+            'departamento': cargo.departamento,
+            'cargo': cargo.nombre_cargo,
+            'fecha_inicio': cargo.fec_inicio_,
+            'fecha_fin': cargo.fec_final===null?'Sin fecha':cargo.fec_final_,
+            'sueldo': cargo.sueldo,
+            'horas_trabaja': cargo.hora_trabaja,
+          };
+        });
       }
       arregloEmpleado.push(objeto)
     });
-    this.restEmpleado.CrearXML(arregloEmpleado).subscribe(res => {
-      this.data = res;
-      this.urlxml = `${environment.url}/empleado/download/` + this.data.name;
-      window.open(this.urlxml, "_blank");
-    });
+    const xmlBuilder = new xml2js.Builder();
+    const xml = xmlBuilder.buildObject(objeto);
+
+    if (xml === undefined) {
+      console.error('Error al construir el objeto XML.');
+      return;
+    }
+     
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const xmlUrl = URL.createObjectURL(blob);
+
+    // Abrir una nueva pestaña o ventana con el contenido XML
+    const newTab = window.open(xmlUrl, '_blank');
+    if (newTab) {
+      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
+      newTab.focus(); // Dar foco a la nueva pestaña
+    } else {
+      alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
+    }
+    // const url = window.URL.createObjectURL(blob);
+  
+    const a = document.createElement('a');
+    a.href = xmlUrl;
+    a.download = "Empleado-" + objeto.empleado.nombre + '-' + objeto.empleado.apellido + '-' + new Date().getTime() + '.xml';
+    // Simular un clic en el enlace para iniciar la descarga
+    a.click();
   }
 
 }
