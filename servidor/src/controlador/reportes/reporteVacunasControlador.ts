@@ -69,7 +69,6 @@ class ReportesVacunasControlador {
         if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registro de vacunas.' })
 
         return res.status(200).jsonp(nuevo)
-
     }
 
 }
