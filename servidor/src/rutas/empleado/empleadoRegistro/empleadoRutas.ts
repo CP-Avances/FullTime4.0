@@ -146,6 +146,9 @@ class EmpleadoRutas {
 
         // INFORMACIÓN DE LA IMAGEN
         this.router.get('/img/:id/:imagen', EMPLEADO_CONTROLADOR.BuscarImagen);
+        
+        // INFORMACIÓN DE LA IMAGEN
+        this.router.get('/img/codificado/:id/:imagen', EMPLEADO_CONTROLADOR.getImagenBase64);
 
 
         // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA AUTOMÁTICA 

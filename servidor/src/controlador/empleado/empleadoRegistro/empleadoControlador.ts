@@ -1,5 +1,6 @@
 // SECCION LIBRERIAS
 import { ObtenerRutaUsuario, ObtenerRutaVacuna, ObtenerRutaPermisos, ObtenerRutaContrato } from '../../../libs/accesoCarpetas';
+import { ImagenBase64LogosEmpresas } from '../../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import { Md5 } from 'ts-md5';
@@ -645,7 +646,23 @@ class EmpleadoControlador {
 
     let ruta = await ObtenerRutaUsuario(id) + separador + imagen;
     console.log('ver file ', ruta)
-    res.sendFile(path.resolve(ruta));
+    res.sendFile(path.resolve(ruta));   
+  }
+
+  public async getImagenBase64(req: Request, res: Response): Promise<any>{
+    const imagen = req.params.imagen;
+    const id = req.params.id;
+    let separador = path.sep;
+    
+    let ruta = await ObtenerRutaUsuario(id) + separador + imagen;
+    let path_file  = path.resolve(ruta);
+    let data = fs.readFileSync(path_file);
+    let codificado = data.toString('base64');
+    if (codificado === null) {
+      res.status(200).jsonp({ imagen: 0})
+    } else {
+      res.status(200).jsonp({ imagen: codificado})
+    }
   }
 
 

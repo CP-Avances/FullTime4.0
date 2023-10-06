@@ -29,4 +29,6 @@ export class EmpleadoProcesosService {
     return this.http.delete(`${environment.url}/empleadoProcesos/eliminar/${id}`);
   }
 
+  
+
 }

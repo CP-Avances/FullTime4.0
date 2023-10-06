@@ -120,6 +120,8 @@ class EmpleadoRutas {
         this.router.post('/buscarDepartamento', verificarToken_1.TokenValidation, empleadoControlador_1.default.ObtenerDepartamentoEmpleado);
         // INFORMACIÓN DE LA IMAGEN
         this.router.get('/img/:id/:imagen', empleadoControlador_1.default.BuscarImagen);
+        // INFORMACIÓN DE LA IMAGEN
+        this.router.get('/img/codificado/:id/:imagen', empleadoControlador_1.default.getImagenBase64);
         // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA AUTOMÁTICA 
         this.router.post('/verificar/automatico/plantillaExcel/', [verificarToken_1.TokenValidation, multipartMiddlewarePlantilla], empleadoControlador_1.default.VerificarPlantilla_Automatica);
         this.router.post('/verificar/datos/automatico/plantillaExcel/', [verificarToken_1.TokenValidation, multipartMiddlewarePlantilla], empleadoControlador_1.default.VerificarPlantilla_DatosAutomatico);
