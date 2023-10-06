@@ -2748,7 +2748,7 @@ export class VerEmpleadoComponent implements OnInit {
       content: [
         { image: this.logoE, width: 150, margin: [10, -30, 0, 5] },
         { text: this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido, 
-          bold: true, fontSize: 20,
+          bold: true, fontSize: 14,
           alignment: 'left', 
           margin: [0, 15, 0, 18] },
         {
@@ -2790,8 +2790,8 @@ export class VerEmpleadoComponent implements OnInit {
         keywords: 'Perfil, Empleado',
       },
       styles: {
-        header: { fontSize: 18, bold: true, margin: [0, 20, 0, 10]},
-        name: { fontSize: 16, bold: true },
+        header: { fontSize: 14, bold: true, margin: [0, 20, 0, 10]},
+        name: { fontSize: 14, bold: true },
         item: {fontSize: 12, bold: false},
         tableHeader: {fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
         tableCell: {fontSize: 12, alignment: 'center',},
