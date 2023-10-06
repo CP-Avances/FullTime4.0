@@ -369,6 +369,14 @@
         </ng-template>
 
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
+            <div style="padding-bottom: 35px;" *ngIf="editar_contrato">
+                <app-editar-contrato [contrato]="contrato_editar" [pagina]="pagina_contrato">
+                </app-editar-contrato>
+            </div>
+            <div style="padding-bottom: 35px;" *ngIf="!btnActualizarCargo">
+                <app-editar-cargo [idSelectCargo]="idSelectCargo" [idEmploy]="idEmpleado" id="editarCargo">
+                </app-editar-cargo>
+            </div>
             <div class="row">
                 <div class="col-md" style="padding-bottom: 20px;">
                     <mat-card class="mat-elevation-z8">
@@ -376,9 +384,12 @@
                             <div class="w-100 bd-highlight">
                                 <h5>CONTRATO ACTUAL</h5>
                             </div>
-                            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
+                            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;"
+                                *ngIf="!editar_contrato">
                                 <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                                    (click)="AbrirVentanaCrearContrato()">Añadir</button>
+                                    (click)="AbrirVentanaCrearContrato()">
+                                    Añadir
+                                </button>
                             </div>
                         </div>
                         <mat-card-content>
@@ -394,7 +405,7 @@
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Fecha ingreso:</label>
+                                            <label id="datosF">Fecha desde:</label>
                                             <label>{{ce.fec_ingreso_}}</label>
                                         </div>
                                     </div>
@@ -402,7 +413,7 @@
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Fecha salida:</label>
+                                            <label id="datosF">Fecha hasta:</label>
                                             <label *ngIf="ce.fec_salida === null; else fechaSalida">Sin
                                                 fecha</label>
                                             <ng-template #fechaSalida>
@@ -457,7 +468,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div style="text-align: right; padding-top: 3%;">
+                                <div style="text-align: right; padding-top: 3%;" *ngIf="!editar_contrato">
                                     <i type="submit" id="edit" style="margin-right: 20px;"
                                         (click)="AbrirVentanaEditarContrato(ce)" matSuffix matTooltipPosition="right"
                                         matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
@@ -507,7 +518,7 @@
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Fecha ingreso:</label>
+                                            <label id="datosF">Fecha desde:</label>
                                             <label>{{ce.fec_ingreso_}}</label>
                                         </div>
                                     </div>
@@ -515,7 +526,7 @@
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Fecha salida:</label>
+                                            <label id="datosF">Fecha hasta:</label>
                                             <label *ngIf="ce.fec_salida === null">Sin fecha</label>
                                             <label *ngIf="ce.fec_salida != null">{{ce.fec_salida_}}</label>
                                         </div>
@@ -573,16 +584,12 @@
                     </mat-card>
                 </div>
                 <div class="col-md">
-                    <div style="padding-bottom: 35px;" *ngIf="!btnActualizarCargo">
-                        <app-editar-cargo [idSelectCargo]="idSelectCargo" [idEmploy]="idEmpleado" id="editarCargo">
-                        </app-editar-cargo>
-                    </div>
                     <mat-card class="mat-elevation-z8">
                         <div class="d-flex bd-highlight" id="titulo">
                             <div class="w-100 bd-highlight">
                                 <h5>CARGO ACTUAL</h5>
                             </div>
-                            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
+                            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;" *ngIf="btnActualizarCargo">
                                 <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
                                     (click)="AbrirVentanaCargo()">{{btnTitulo}}</button>
                             </div>
@@ -608,7 +615,7 @@
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Fecha ingreso:</label>
+                                            <label id="datosF">Fecha desde:</label>
                                             <label>{{c.fec_inicio_}}</label>
                                         </div>
                                     </div>
@@ -616,7 +623,7 @@
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Fecha finalización:</label>
+                                            <label id="datosF">Fecha hasta:</label>
                                             <label>{{c.fec_final_}}</label>
                                         </div>
                                     </div>
@@ -704,7 +711,7 @@
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Fecha ingreso:</label>
+                                            <label id="datosF">Fecha desde:</label>
                                             <label>{{c.fec_inicio_}}</label>
                                         </div>
                                     </div>
@@ -712,7 +719,7 @@
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Fecha finalización:</label>
+                                            <label id="datosF">Fecha hasta:</label>
                                             <label>{{c.fec_final_}}</label>
                                         </div>
                                     </div>

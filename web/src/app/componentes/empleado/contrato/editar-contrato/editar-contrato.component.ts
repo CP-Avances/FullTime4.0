@@ -1,6 +1,5 @@
 import { FormControl, Validators, FormGroup } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { startWith, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
@@ -10,6 +9,8 @@ import { RegimenService } from 'src/app/servicios/catalogos/catRegimen/regimen.s
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
 
+import { VerEmpleadoComponent } from '../../ver-empleado/ver-empleado.component';
+
 @Component({
   selector: 'app-editar-contrato',
   templateUrl: './editar-contrato.component.html',
@@ -17,6 +18,9 @@ import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/prov
 })
 
 export class EditarContratoComponent implements OnInit {
+
+  @Input() contrato: any;
+  @Input() pagina: any;
 
   idSelectContrato: number;
   idEmpleado: number;
@@ -60,12 +64,11 @@ export class EditarContratoComponent implements OnInit {
   });
 
   constructor(
+    public componentev: VerEmpleadoComponent,
     public pais: ProvinciaService,
     private rest: EmpleadoService,
     private toastr: ToastrService,
-    private ventana: MatDialogRef<EditarContratoComponent>,
     private restRegimen: RegimenService,
-    @Inject(MAT_DIALOG_DATA) public contrato: any
   ) { }
 
   ngOnInit(): void {
@@ -317,14 +320,14 @@ export class EditarContratoComponent implements OnInit {
       this.GuardarDatos(datos);
       this.rest.EliminarArchivo(eliminar).subscribe(res => {
       });
-      this.Cancelar();
+      this.Cancelar(2);
     }
     else if (this.opcion === 2) {
       if (form.documentoForm != '' && form.documentoForm != null) {
         this.EliminarDocumentoServidor();
         this.GuardarDatos(datos);
         this.CargarContrato(this.contrato.id);
-        this.Cancelar();
+        this.Cancelar(2);
       }
       else {
         this.toastr.info('No ha seleccionado ningún archivo.', '', {
@@ -334,7 +337,7 @@ export class EditarContratoComponent implements OnInit {
     }
     else {
       this.GuardarDatos(datos);
-      this.Cancelar();
+      this.Cancelar(2);
     }
   }
 
@@ -429,8 +432,21 @@ export class EditarContratoComponent implements OnInit {
   }
 
   // CERRAR VENTA DE REGISTRO
-  Cancelar() {
-    this.ventana.close(false)
+  Cancelar(opcion: any) {
+    if (this.pagina === 'ver-empleado') {
+      this.componentev.editar_contrato = false;
+      if (opcion === 2) {
+        this.componentev.VerDatosActuales(this.componentev.formato_fecha);
+      }
+    }
+  }
+
+  // METODO PARA CERRAR VISTA DE DOCUMENTO
+  VerDocumento(opcion: any) {
+    if (opcion === false) {
+      this.activar = false;
+      this.opcion = 0;
+    }
   }
 
 }

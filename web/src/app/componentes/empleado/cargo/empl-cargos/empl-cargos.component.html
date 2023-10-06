@@ -11,7 +11,7 @@
     <form [formGroup]="formulario">
         <mat-card-content>
             <div class="container" style="text-align: center;">
-                <div class="nota">
+                <div class="nota" style="text-align: justify;">
                     <span>
                         NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
                         Guardar.
@@ -42,6 +42,29 @@
                                     <mat-option *ngFor="let d of departamento" [value]="d.id">{{d.nombre}}</mat-option>
                                 </mat-select>
                             </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-around">
+                            <mat-form-field style="width: 145px;">
+                                <mat-label>Fecha desde</mat-label>
+                                <input matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa"
+                                    [formControl]="fechaInicio" min="1950-01-31" max="2050-01-31" required>
+                                <mat-datepicker-toggle matSuffix [for]="picker" id="i-cursor" matTooltipPosition="right"
+                                    matTooltip="Indicar la fecha de ingreso del usuario. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                                </mat-datepicker-toggle>
+                                <mat-datepicker touchUi #picker></mat-datepicker>
+                            </mat-form-field>
+                            <mat-form-field style="width: 145px;">
+                                <mat-label id="letras">Fecha hasta</mat-label>
+                                <input matInput [matDatepicker]="picker2" placeholder="dd/mm/aaaa"
+                                    [formControl]="fechaFinal" required>
+                                <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor"
+                                    matTooltipPosition="right"
+                                    matTooltip="Indicar la fecha de finalización de labores del usuario. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                                </mat-datepicker-toggle>
+                                <mat-datepicker touchUi #picker2></mat-datepicker>
+                            </mat-form-field>
                             <mat-form-field *ngIf="habilitarSeleccion">
                                 <mat-label id="letras">Seleccionar cargo</mat-label>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
@@ -63,29 +86,6 @@
                                     help_outline
                                 </mat-icon>
                                 <mat-error *ngIf="cargoF.invalid">Ingresar un cargo válido</mat-error>
-                            </mat-form-field>
-                        </div>
-                    </div>
-                    <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-around">
-                            <mat-form-field>
-                                <mat-label>Fecha de inicio</mat-label>
-                                <input matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa"
-                                    [formControl]="fechaInicio" min="1950-01-31" max="2050-01-31" required>
-                                <mat-datepicker-toggle matSuffix [for]="picker" id="i-cursor" matTooltipPosition="right"
-                                    matTooltip="Indicar la fecha de ingreso del usuario. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
-                                </mat-datepicker-toggle>
-                                <mat-datepicker touchUi #picker></mat-datepicker>
-                            </mat-form-field>
-                            <mat-form-field>
-                                <mat-label id="letras">Fecha de finalización</mat-label>
-                                <input matInput [matDatepicker]="picker2" placeholder="dd/mm/aaaa"
-                                    [formControl]="fechaFinal" required>
-                                <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor"
-                                    matTooltipPosition="right"
-                                    matTooltip="Indicar la fecha de finalización de labores del usuario. Seleccione la fecha dando click en el icono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
-                                </mat-datepicker-toggle>
-                                <mat-datepicker touchUi #picker2></mat-datepicker>
                             </mat-form-field>
                         </div>
                     </div>

@@ -348,7 +348,7 @@ export class VerEmpleadoComponent implements OnInit {
       if (this.habilitarVacaciones === true) {
         this.ObtenerPeriodoVacaciones(formato_fecha);
       }
-      console.log('Empleado:',this.empleadoUno);
+      console.log('Empleado:', this.empleadoUno);
     })
   }
 
@@ -732,11 +732,14 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   // METODO DE EDICION DE CONTRATOS
+  editar_contrato: boolean = false;
+  pagina_contrato: any = '';
+  contrato_editar: any = [];
   AbrirVentanaEditarContrato(dataContrato: any) {
-    this.ventana.open(EditarContratoComponent, { data: dataContrato, width: '900px' })
-      .afterClosed().subscribe(result => {
-        this.VerDatosActuales(this.formato_fecha);
-      })
+    this.editar_contrato = true;
+    this.contrato_editar = dataContrato;
+    this.pagina_contrato = 'ver-empleado';
+    this.btnActualizarCargo = true;
   }
 
   // METODO PARA MOSTRAR VENTANA DE EDICION DE CONTRATO
@@ -753,10 +756,11 @@ export class VerEmpleadoComponent implements OnInit {
 
   // VENTANA PARA INGRESAR CONTRATO DEL EMPLEADO
   AbrirVentanaCrearContrato(): void {
-    this.ventana.open(RegistroContratoComponent, { width: '650px', data: this.idEmpleado }).
+    this.ventana.open(RegistroContratoComponent, { width: '900px', data: this.idEmpleado }).
       afterClosed().subscribe(item => {
         this.VerDatosActuales(this.formato_fecha);
       });
+    this.btnActualizarCargo = true;
   }
 
 
@@ -808,6 +812,7 @@ export class VerEmpleadoComponent implements OnInit {
   btnActualizarCargo: boolean = true;
   VerCargoEdicion(value: boolean) {
     this.btnActualizarCargo = value;
+    this.editar_contrato = false;
   }
 
   // BUSQUEDA DE ID DE CARGO SELECCIONADO
@@ -820,10 +825,11 @@ export class VerEmpleadoComponent implements OnInit {
   AbrirVentanaCargo(): void {
     if (this.datoActual.id_contrato != undefined) {
       this.ventana.open(EmplCargosComponent,
-        { width: '900px', data: { idEmpleado: this.idEmpleado, idContrato: this.datoActual.id_contrato } }).
+        { width: '1000px', data: { idEmpleado: this.idEmpleado, idContrato: this.datoActual.id_contrato } }).
         afterClosed().subscribe(item => {
           this.VerDatosActuales(this.formato_fecha);
         });
+      this.editar_contrato = false;
     }
     else {
       this.toastr.info('El usuario no tiene registrado un Contrato.', '', {
@@ -2810,14 +2816,14 @@ export class VerEmpleadoComponent implements OnInit {
    ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                        ** **                           *
    ** ******************************************************************************************* **/
 
-  obtenerDatos(){
+  obtenerDatos() {
     let objeto: any;
     let objetoContrato: any;
     let objetoCargo: any;
     let arregloEmpleado: any = [];
     let arregloContrato: any = [];
     let arregloCargo: any = [];
-    this.empleadoUno.forEach((obj:any) => {
+    this.empleadoUno.forEach((obj: any) => {
       let estadoCivil = this.EstadoCivilSelect[obj.esta_civil - 1];
       let genero = this.GeneroSelect[obj.genero - 1];
       let estado = this.EstadoSelect[obj.estado - 1];
@@ -2849,26 +2855,26 @@ export class VerEmpleadoComponent implements OnInit {
       }
       arregloEmpleado.push(objeto);
     });
-    if (this.contratoEmpleado !==null) {
-      this.contratoEmpleado.map((contrato: any)=>{
-        let fechaI  = contrato.fec_ingreso_.split(" ");
-        let fechaS: string = contrato.fec_salida===null?'Sin fecha':contrato.fec_salida_.split(" ")[1];
+    if (this.contratoEmpleado !== null) {
+      this.contratoEmpleado.map((contrato: any) => {
+        let fechaI = contrato.fec_ingreso_.split(" ");
+        let fechaS: string = contrato.fec_salida === null ? 'Sin fecha' : contrato.fec_salida_.split(" ")[1];
         objetoContrato = {
           'Regimen': contrato.descripcion,
           'Fecha ingreso': fechaI[1],
           'Fecha salida': fechaS,
           'Modalidad laboral': contrato.nombre_contrato,
-          'Control asistencia': contrato.asis_controla?'Si':'No',
-          'Control vacaciones': contrato.vaca_controla?'Si':'No',
+          'Control asistencia': contrato.asis_controla ? 'Si' : 'No',
+          'Control vacaciones': contrato.vaca_controla ? 'Si' : 'No',
         };
         arregloContrato.push(objetoContrato);
       });
-      
+
     }
-    if (this.cargoEmpleado !==null) {
-      this.cargoEmpleado.map((cargo: any)=>{
-        let fechaI  = cargo.fec_inicio_.split(" ");
-        let fechaS: string = cargo.fec_final===null?'Sin fecha':cargo.fec_final_.split(" ")[1];
+    if (this.cargoEmpleado !== null) {
+      this.cargoEmpleado.map((cargo: any) => {
+        let fechaI = cargo.fec_inicio_.split(" ");
+        let fechaS: string = cargo.fec_final === null ? 'Sin fecha' : cargo.fec_final_.split(" ")[1];
         objetoCargo = {
           'Sucursal': cargo.sucursal,
           'Departamento': cargo.departamento,
@@ -2890,24 +2896,24 @@ export class VerEmpleadoComponent implements OnInit {
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos[0]);
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wse, 'PERFIL');
-    if (this.contratoEmpleado.length>0) {
+    if (this.contratoEmpleado.length > 0) {
       const wsco: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos[1]);
       xlsx.utils.book_append_sheet(wb, wsco, 'CONTRATO');
     }
-    if (this.cargoEmpleado.length>0) {
+    if (this.cargoEmpleado.length > 0) {
       const wsca: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos[2]);
-      xlsx.utils.book_append_sheet(wb, wsca, 'CARGO'); 
+      xlsx.utils.book_append_sheet(wb, wsca, 'CARGO');
     }
-    if (this.tituloEmpleado.length>0 ) {
+    if (this.tituloEmpleado.length > 0) {
       const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tituloEmpleado);
-      xlsx.utils.book_append_sheet(wb, wst, 'TITULOS');     
+      xlsx.utils.book_append_sheet(wb, wst, 'TITULOS');
     }
-    if (this.discapacidadUser.length>0) {
+    if (this.discapacidadUser.length > 0) {
       const wsd: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.discapacidadUser);
       xlsx.utils.book_append_sheet(wb, wsd, 'DISCAPACIDA');
     }
     console.log(datos[2]);
-    xlsx.writeFile(wb, "Empleado_" + (datos[0])[0].Nombre +"_"+ (datos[0])[0].Apellido +"_" + new Date().getTime() + '.xlsx');
+    xlsx.writeFile(wb, "Empleado_" + (datos[0])[0].Nombre + "_" + (datos[0])[0].Apellido + "_" + new Date().getTime() + '.xlsx');
   }
 
   /** ******************************************************************************************* **
@@ -2921,8 +2927,8 @@ export class VerEmpleadoComponent implements OnInit {
     const csvDataCa = xlsx.utils.sheet_to_csv(xlsx.utils.json_to_sheet(datos[2]));
     const csvDataD = xlsx.utils.sheet_to_csv(xlsx.utils.json_to_sheet(this.tituloEmpleado));
     const csvDataT = xlsx.utils.sheet_to_csv(xlsx.utils.json_to_sheet(this.discapacidadUser));
-    const data: Blob = new Blob([csvDataE,csvDataCo,csvDataCa,csvDataD,csvDataT], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "EmpleadoCSV" + (datos[0])[0].Nombre +"_"+ (datos[0])[0].Apellido +"_"  + new Date().getTime() + '.csv');
+    const data: Blob = new Blob([csvDataE, csvDataCo, csvDataCa, csvDataD, csvDataT], { type: 'text/csv;charset=utf-8;' });
+    FileSaver.saveAs(data, "EmpleadoCSV" + (datos[0])[0].Nombre + "_" + (datos[0])[0].Apellido + "_" + new Date().getTime() + '.csv');
   }
 
   /** ******************************************************************************************* ** 
@@ -2978,27 +2984,27 @@ export class VerEmpleadoComponent implements OnInit {
       if (obj.latitud !== null) {
         objeto.empleado.latitud = obj.latitud;
       }
-      if (this.contratoEmpleado !==null) {
-        this.contratoEmpleado.map((contrato: any)=>{
+      if (this.contratoEmpleado !== null) {
+        this.contratoEmpleado.map((contrato: any) => {
           objeto.empleado.contrato = {
             'regimen': contrato.descripcion,
             'fecha_ingreso': contrato.fec_ingreso_,
-            'fecha_salida': contrato.fec_salida===null?'Sin fecha':contrato.fec_salida_,
+            'fecha_salida': contrato.fec_salida === null ? 'Sin fecha' : contrato.fec_salida_,
             'modalidad_laboral': contrato.nombre_contrato,
-            'control_asistencia': contrato.asis_controla?'Si':'No',
-            'control_vacaciones': contrato.vaca_controla?'Si':'No',
+            'control_asistencia': contrato.asis_controla ? 'Si' : 'No',
+            'control_vacaciones': contrato.vaca_controla ? 'Si' : 'No',
           };
         });
-        
+
       }
-      if (this.cargoEmpleado !==null) {
-        this.cargoEmpleado.map((cargo: any)=>{
+      if (this.cargoEmpleado !== null) {
+        this.cargoEmpleado.map((cargo: any) => {
           objeto.empleado.cargo = {
             'sucursal': cargo.sucursal,
             'departamento': cargo.departamento,
             'cargo': cargo.nombre_cargo,
             'fecha_inicio': cargo.fec_inicio_,
-            'fecha_fin': cargo.fec_final===null?'Sin fecha':cargo.fec_final_,
+            'fecha_fin': cargo.fec_final === null ? 'Sin fecha' : cargo.fec_final_,
             'sueldo': cargo.sueldo,
             'horas_trabaja': cargo.hora_trabaja,
           };
@@ -3013,7 +3019,7 @@ export class VerEmpleadoComponent implements OnInit {
       console.error('Error al construir el objeto XML.');
       return;
     }
-     
+
     const blob = new Blob([xml], { type: 'application/xml' });
     const xmlUrl = URL.createObjectURL(blob);
 
@@ -3026,7 +3032,7 @@ export class VerEmpleadoComponent implements OnInit {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
     // const url = window.URL.createObjectURL(blob);
-  
+
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = "Empleado-" + objeto.empleado.nombre + '-' + objeto.empleado.apellido + '-' + new Date().getTime() + '.xml';

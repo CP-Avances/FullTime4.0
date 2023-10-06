@@ -7,6 +7,7 @@
 }
 
 mat-form-field {
+    width: 250px;
     padding: 10px 10px 0px 10px;
 }
 
@@ -15,9 +16,6 @@ mat-form-field {
     display: inline-block;
 }
 
-.mat-mdc-radio-button ~ .mat-mdc-radio-button {
-    margin-left: 16px;
-  }
 
 .btn {
     background-color: rgb(80, 87, 97);
@@ -29,6 +27,10 @@ mat-radio-group {
     width: 210px;
     padding: 15px 20px 15px 20x;
     margin-bottom: 10px;
+}
+
+#fechas {
+    width: 200px;
 }
 
 

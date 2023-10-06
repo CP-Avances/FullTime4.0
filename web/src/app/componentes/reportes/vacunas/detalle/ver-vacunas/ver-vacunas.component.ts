@@ -15,6 +15,7 @@ import {
   ReporteVacunas,
   vacuna,
 } from 'src/app/model/reportes.model';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-ver-vacunas',
@@ -22,6 +23,9 @@ import {
   styleUrls: ['./ver-vacunas.component.css'],
 })
 export class VerVacunasComponent implements OnInit {
+
+  hipervinculo: string = environment.url; // VARIABLE DE MANEJO DE RUTAS CON URL
+
   data: any;
   tipo: string;
   bool_suc: boolean = false;
@@ -113,6 +117,7 @@ export class VerVacunasComponent implements OnInit {
             n = n + 1;
             let ele = {
               n: n,
+              id_empleado: obj4.id_empleado,
               codigo: obj3.codigo,
               empleado: obj3.name_empleado,
               cedula: obj3.cedula,
@@ -124,7 +129,6 @@ export class VerVacunasComponent implements OnInit {
               cargo: obj3.cargo,
               correo: obj3.correo,
               carnet: obj4.carnet,
-              nom_carnet: obj4.carnet,
               vacuna: obj4.tipo_vacuna,
               fecha: obj4.fecha.split('T')[0],
               descripcion: obj4.descripcion,
@@ -147,6 +151,7 @@ export class VerVacunasComponent implements OnInit {
           n = n + 1;
           let ele = {
             n: n,
+            id_empleado: obj3.id_empleado,
             codigo: obj2.codigo,
             empleado: obj2.name_empleado,
             cedula: obj2.cedula,
@@ -158,12 +163,12 @@ export class VerVacunasComponent implements OnInit {
             cargo: obj2.cargo,
             correo: obj2.correo,
             carnet: obj3.carnet,
-            nom_carnet: obj3.carnet,
             vacuna: obj3.tipo_vacuna,
             fecha: obj3.fecha.split('T')[0],
             descripcion: obj3.descripcion,
           };
           this.arr_vac.push(ele);
+          console.log('ver arra_vac ', this.arr_vac)
         });
       });
     });

@@ -1,114 +1,106 @@
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        MODIFICAR DATOS VACUNA</span>
-    <mat-icon class="float-right" id="cerrar" (click)="CerrarRegistro()" matSuffix matTooltipPosition="right" matTooltip="Salir">
-        highlight_off</mat-icon>
+        MODIFICAR DATOS VACUNA
+    </span>
+    <mat-icon class="float-right" id="cerrar" (click)="CerrarRegistro()" matSuffix matTooltipPosition="right"
+        matTooltip="Salir">
+        highlight_off
+    </mat-icon>
 </div>
 <!-- FORMULARIO COMPLETO -->
 <form [formGroup]="formulario">
     <mat-card-content>
-        <div class="container">
-            <div class="nota">
-                <span>
-                    NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
-                    Guardar.
-                </span>
-            </div>
-            <div class="row">
-                <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-around">
-                        <mat-form-field>
-                            <mat-label>Descripción</mat-label>
-                            <input matInput placeholder="Primera dosis" [formControl]="nombreF" required>
-                            <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar una descripción.">
-                                help_outline
-                            </mat-icon>
-                        </mat-form-field>
-                        <mat-form-field>
-                            <mat-label>Fecha de vacuna</mat-label>
-                            <input matInput [matDatepicker]="picker1" placeholder="dd/mm/aaaa" [formControl]="fechaF"
-                                required>
-                            <mat-datepicker-toggle matSuffix [for]="picker1" id="i-cursor" matTooltipPosition="right"
-                                matTooltip="Ingresar fecha de registro de vacuna. Seleccionar fecha o escribir fecha con formato día/mes/año. Ejemplo: 12/04/1993">
-                            </mat-datepicker-toggle>
-                            <mat-datepicker touchUi #picker1></mat-datepicker>
-                        </mat-form-field>
-                        <mat-form-field>
-                            <mat-label>Vacuna</mat-label>
-                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                matTooltip="Seleccionar tipo de vacuna.">
-                                help_outline
-                            </mat-icon>
-                            <mat-select [formControl]="vacunaF" required>
-                                <mat-option *ngFor="let tv of tipoVacuna" [value]="tv.id"
-                                    (click)="AbrirVentana(formulario.value)">
-                                    {{tv.nombre}}
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </div>
+        <div class="nota">
+            <span>
+                NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                Guardar.
+            </span>
+        </div>
+        <div class="row">
+            <div class="col-md">
+                <div class="d-flex flex-wrap justify-content-around">
+                    <mat-form-field>
+                        <mat-label>Descripción</mat-label>
+                        <input matInput placeholder="Primera dosis" [formControl]="nombreF" required>
+                        <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar una descripción.">
+                            help_outline
+                        </mat-icon>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Fecha de vacuna</mat-label>
+                        <input matInput [matDatepicker]="picker1" placeholder="dd/mm/aaaa" [formControl]="fechaF"
+                            required>
+                        <mat-datepicker-toggle matSuffix [for]="picker1" id="i-cursor" matTooltipPosition="right"
+                            matTooltip="Ingresar fecha de registro de vacuna. Seleccionar fecha o escribir fecha con formato día/mes/año. Ejemplo: 12/04/1993">
+                        </mat-datepicker-toggle>
+                        <mat-datepicker touchUi #picker1></mat-datepicker>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Vacuna</mat-label>
+                        <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                            matTooltip="Seleccionar tipo de vacuna.">
+                            help_outline
+                        </mat-icon>
+                        <mat-select [formControl]="vacunaF" required>
+                            <mat-option *ngFor="let tv of tipoVacuna" [value]="tv.id"
+                                (click)="AbrirVentana(formulario.value)">
+                                {{tv.nombre}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
                 </div>
-                <div class="col-md">
-                    <div class="d-flex flex-wrap justify-content-around">
-                        <section class="d-flex flex-column bd-highlight" style="padding-top: 20px;">
-                            <mat-radio-group aria-label="Select an option" [formControl]="seleccion">
-                                <div class="bd-highlight">
-                                    <div class="row">
-                                        <div class="col-md">
-                                            <mat-radio-button value=1 (click)="QuitarArchivo()">Retirar archivo
-                                            </mat-radio-button>
-                                        </div>
-                                        <div class="col-md">
-                                            <mat-radio-button value=2 (click)="ActivarArchivo()">Actualizar archivo
-                                            </mat-radio-button>
-                                        </div>
-                                        <div class="col-md" *ngIf="acciones">
-                                            <mat-radio-button value=3 (click)="LimpiarAcciones()">Cancelar
-                                            </mat-radio-button>
-                                        </div>
+            </div>
+            <div class="col-md">
+                <div class="d-flex flex-wrap justify-content-around">
+                    <section class="d-flex flex-column bd-highlight" style="padding-top: 20px;">
+                        <mat-radio-group aria-label="Select an option" [formControl]="seleccion">
+                            <div class="bd-highlight">
+                                <div class="row">
+                                    <div class="col-md">
+                                        <mat-radio-button value=1 (click)="QuitarArchivo()">Retirar archivo
+                                        </mat-radio-button>
+                                    </div>
+                                    <div class="col-md">
+                                        <mat-radio-button value=2 (click)="ActivarArchivo()">Actualizar archivo
+                                        </mat-radio-button>
+                                    </div>
+                                    <div class="col-md" *ngIf="acciones">
+                                        <mat-radio-button value=3 (click)="LimpiarAcciones()">Cancelar
+                                        </mat-radio-button>
                                     </div>
                                 </div>
-                            </mat-radio-group>
-                        </section>
+                            </div>
+                        </mat-radio-group>
+                    </section>
 
-                        <section class="d-flex flex-column bd-highlight" style="padding-top: 20px;" *ngIf="activar">
-                            <div class="bd-highlight">
-                                <form method="post" enctype="multipart/form-data">
-                                    <input (change)="fileChange($event)" type="file" [formControl]="archivoF" id="file">
-                                    <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()" matSuffix
-                                        matTooltipPosition="right"
-                                        matTooltip="Subir certificado o carnet de vacunación.">
-                                        Subir Carnet
-                                    </label>
-                                </form>
-                            </div>
-                            <div class="bd-highlight" style="text-align: center;">
-                                <input type="text" readonly id="respaldo" placeholder="Ningún archivo seleccionado."
-                                    class="form-control" style="width: 200px;" [formControl]="certificadoF">
-                                <i *ngIf="HabilitarBtn" class="far fa-trash-alt" style="color:red; margin-left: 5px;"
-                                    id="i-cursor" (click)="RetirarArchivo()" matSuffix matTooltipPosition="right"
-                                    matTooltip="Eliminar archivo seleccionado.">
-                                </i>
-                            </div>
-                        </section>
-                    </div>
+                    <section class="d-flex flex-column bd-highlight" style="padding-top: 20px;" *ngIf="activar">
+                        <div class="bd-highlight">
+                            <form method="post" enctype="multipart/form-data">
+                                <input (change)="fileChange($event)" type="file" [formControl]="archivoF" id="file">
+                                <label for="file" class="btn-2" (click)="LimpiarNombreArchivo()" matSuffix
+                                    matTooltipPosition="right" matTooltip="Subir certificado o carnet de vacunación.">
+                                    Subir Carnet
+                                </label>
+                            </form>
+                        </div>
+                        <div class="bd-highlight" style="text-align: center;">
+                            <input type="text" readonly id="respaldo" placeholder="Ningún archivo seleccionado."
+                                class="form-control" style="width: 200px;" [formControl]="certificadoF">
+                            <i *ngIf="HabilitarBtn" class="far fa-trash-alt" style="color:red; margin-left: 5px;"
+                                id="i-cursor" (click)="RetirarArchivo()" matSuffix matTooltipPosition="right"
+                                matTooltip="Eliminar archivo seleccionado.">
+                            </i>
+                        </div>
+                    </section>
                 </div>
             </div>
         </div>
     </mat-card-content>
+    <div style="text-align: center; margin-bottom: 2%;">
+        <button id="btn-raised" class="btn btn-sm" (click)="GuardarDatosCarnet(formulario.value)"
+            [disabled]="!formulario.valid" type="submit">
+            Guardar
+        </button>
+    </div>
 </form>
-<div style="text-align: center; margin-bottom: 3%;">
-    <button type="submit" class="btn" (click)="GuardarDatosCarnet(formulario.value)" [disabled]="!formulario.valid">
-        <span class="material-icons alinear" matSuffix matTooltipPosition="right"
-            matTooltip="Guardar datos registrados.">save</span>
-    </button>
-    <button type="submit" class="btn" (click)="LimpiarCampos()">
-        <span class="material-icons alinear" matSuffix matTooltipPosition="right"
-            matTooltip="Borrar datos ingresados.">backspace</span>
-    </button>
-    <!--button type="submit" class="btn" (click)="CerrarRegistro()">
-        <span class="material-icons alinear" matSuffix matTooltipPosition="right"
-            matTooltip="Cerrar ventana de registro de vacunación.">close</span>
-    </button-->
-</div>

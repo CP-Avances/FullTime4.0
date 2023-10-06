@@ -1,8 +1,3 @@
-mat-form-field {
-    width: 200px;
-    margin: 10px;
-}
-
 .mat-mdc-radio-button ~ .mat-mdc-radio-button {
     margin-left: 16px;
   }

@@ -1,14 +1,17 @@
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        MODIFICAR TÍTULO PROFESIONAL</span>
-    <mat-icon class="float-right" id="cerrar" (click)="Cancelar()" matSuffix matTooltipPosition="right" matTooltip="Salir">
-        highlight_off</mat-icon>
+        MODIFICAR TÍTULO PROFESIONAL
+    </span>
+    <mat-icon class="float-right" id="cerrar" (click)="Cancelar()" matSuffix matTooltipPosition="right"
+        matTooltip="Salir">
+        highlight_off
+    </mat-icon>
 </div>
 <form [formGroup]="formulario">
     <mat-card-content>
         <div class="container" style="text-align: center;">
-            <div class="nota">
+            <div class="nota" style="text-align: justify;">
                 <span>
                     NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
                     Guardar.
@@ -38,19 +41,14 @@
             </mat-form-field>
         </div>
     </mat-card-content>
+    <div style="text-align: center; margin-bottom: 2%;">
+        <button id="btn-raised" class="btn btn-sm" (click)="ActualizarTituloEmpleado(formulario.value)"
+            [disabled]="!formulario.valid" type="submit">
+            Guardar
+        </button>
+        <button type="submit" id="btn-raised" class="btn btn-sm" (click)="VerificarTitulo()"
+            matTooltip="Verificar título profesional del empleado antes de registrarlo.">
+            Verificar
+        </button>
+    </div>
 </form>
-<div style="text-align: center; margin: 2% 0% 3% 0%">
-    <button mat-button type="submit" class="btn" (click)="ActualizarTituloEmpleado(formulario.value); Cancelar();"
-        [disabled]="!formulario.valid">
-        <span class="material-icons alinear" matSuffix matTooltipPosition="right"
-            matTooltip="Guardar registro">save</span>
-    </button>
-    <!--button mat-button type="submit" class="btn" (click)="Cancelar()">
-        <span class="material-icons alinear" matSuffix matTooltipPosition="right"
-            matTooltip="Cancelar registro">close</span>
-    </button-->
-    <button mat-button type="submit" class="btn" (click)="VerificarTitulo()">
-        <span class="material-icons alinear" matSuffix matTooltipPosition="right"
-            matTooltip="Verificar título profesional del empleado antes de registrarlo">insert_link</span>
-    </button>
-</div>

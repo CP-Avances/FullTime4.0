@@ -22,7 +22,7 @@ export class DiscapacidadComponent implements OnInit {
 
   HabilitarDescrip: boolean = true;
 
-  porcentaje = new FormControl('', [Validators.required, Validators.maxLength(6)]);
+  porcentaje = new FormControl('', Validators.required);
   nombreF = new FormControl('', [Validators.minLength(5)])
   carnet = new FormControl('', [Validators.required, Validators.maxLength(8)]);
   tipo = new FormControl('', [Validators.maxLength(10)])
