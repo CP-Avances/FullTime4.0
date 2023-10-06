@@ -576,6 +576,23 @@ class EmpleadoControlador {
             res.sendFile(path_1.default.resolve(ruta));
         });
     }
+    getImagenBase64(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const imagen = req.params.imagen;
+            const id = req.params.id;
+            let separador = path_1.default.sep;
+            let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id)) + separador + imagen;
+            let path_file = path_1.default.resolve(ruta);
+            let data = fs_1.default.readFileSync(path_file);
+            let codificado = data.toString('base64');
+            if (codificado === null) {
+                res.status(200).jsonp({ imagen: 0 });
+            }
+            else {
+                res.status(200).jsonp({ imagen: codificado });
+            }
+        });
+    }
     // BUSQUEDA INFORMACIÓN DEPARTAMENTOS EMPLEADO
     ObtenerDepartamentoEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

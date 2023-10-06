@@ -115,6 +115,10 @@ export class EmpleadoService {
     return this.http.put(`${environment.url}/empleado/${idEmpleado}/uploadImage`, formData)
   }
 
+  obtenerImagen(id: any, imagen: any){
+    return this.http.get<any>(`${environment.url}/empleado/img/codificado/${id}/${imagen}`)
+  }
+
 
   /** *********************************************************************** **
    ** **       METODOS PARA MANEJO DE DATOS DE TITULO PROFESIONAL             **
