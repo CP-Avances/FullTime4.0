@@ -268,7 +268,13 @@ td {
     word-wrap: break-word;
 }
 
-#table_horario {
+#table_horario1 {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 11px;
+}
+
+#table_horario2 {
     border-collapse: collapse;
     width: 100%;
     font-size: 11px;
@@ -353,3 +359,24 @@ td {
 #fuente_ {
     font-family: Roboto, "Helvetica Neue", sans-serif;
 }
+
+
+.static-columns {
+    min-width: 300px; /* Ajusta el ancho según tus necesidades */
+    border-right: 1px solid #ccc; /* Agrega un borde derecho para separar las columnas estáticas */
+  }
+
+ .table-responsive{
+    overflow-x: scroll; /* Habilita el desplazamiento horizontal en el contenedor de las columnas desplazables */
+}
+
+  .table_content {
+    display: flex;
+    flex-direction: row; /* Los elementos se colocarán en una fila horizontal */
+    justify-content: space-between; /* Espaciado uniforme entre los elementos */
+    width: 100%;
+  }
+
+  .fondo{
+    background-color: rgb(238, 238, 238);
+  }

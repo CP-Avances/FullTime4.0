@@ -5,15 +5,20 @@
 
 #table_horario {
     border-collapse: collapse;
-    width: 100%;
+    width: 90%;
     font-size: 11px;
 }
 
 #td_horarios {
     border: 1px solid #ccc;
-    padding: 8px;
+    padding: 8.5px;
     text-align: center;
     vertical-align: middle;
+}
+
+#td_separador{
+    border: 1px solid #ccc;
+    padding: 8px 0px 8px 0px;
 }
 
 #td_horarios_ {
@@ -77,3 +82,24 @@ mat-progress-spinner {
     background: transparent;
     z-index: 100;
 }
+
+.static-columns {
+    min-width: 300px; /* Ajusta el ancho según tus necesidades */
+    border-right: 1px solid #ccc; /* Agrega un borde derecho para separar las columnas estáticas */
+  }
+
+ .table-responsive{
+    overflow-x: scroll; /* Habilita el desplazamiento horizontal en el contenedor de las columnas desplazables */
+
+}
+
+  .container {
+    display: flex;
+    flex-direction: row; /* Los elementos se colocarán en una fila horizontal */
+    justify-content: space-between; /* Espaciado uniforme entre los elementos */
+    width: 100%;
+  }
+
+  .fondo{
+    background-color: rgb(238, 238, 238);
+  }

@@ -9,6 +9,9 @@ import { AppComponent } from './app.component';
 import { ToastrModule } from 'ngx-toastr';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatTableModule } from '@angular/material/table';
 
 // COMPONENTES ADMINISTRADOR
 import { VistaRolesComponent } from './componentes/catalogos/catRoles/vista-roles/vista-roles.component';
@@ -606,6 +609,9 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     ScrollingModule,
     FiltrosModule,
     MaterialModule,
+    MatButtonModule,
+    MatPaginatorModule,
+    MatTableModule,
     MatDatepickerModule,
     MatNativeDateModule,
     ReportesModule,
