@@ -47,6 +47,9 @@ export class PlanificacionMultipleComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  displayedColumns = ['codigo', 'usuario', 'jornada', 'dias_mes'];
+  dataSource: any;
+
   constructor(
     public componentem: HorarioMultipleEmpleadoComponent,
     public componenteb: BuscarPlanificacionComponent,
@@ -59,7 +62,7 @@ export class PlanificacionMultipleComponent implements OnInit {
     public restH: HorarioService,
     public restP: PlanGeneralService,
     private toastr: ToastrService,
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.BuscarHorarios();
@@ -77,6 +80,9 @@ export class PlanificacionMultipleComponent implements OnInit {
       obj.index = index;
       index = index + 1;
     })
+
+    this.dataSource = this.datosSeleccionados
+    console.log('this.datosSeleccionados: ',this.datosSeleccionados.usuarios!);
   }
 
   /** **************************************************************************************** **

@@ -1,7 +1,7 @@
 // IMPORTAR LIBRERIAS
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
@@ -90,6 +90,9 @@ import { default as _rollupMoment, Moment } from 'moment';
 })
 
 export class VerEmpleadoComponent implements OnInit {
+
+  @ViewChild('tabla1') tabla1: ElementRef;
+  @ViewChild('tabla2') tabla2: ElementRef;
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS CONSULTADOS
   discapacidadUser: any = [];
@@ -956,11 +959,19 @@ export class VerEmpleadoComponent implements OnInit {
     }
     this.restPlanGeneral.BuscarPlanificacionHoraria(busqueda).subscribe(datos => {
       if (datos.message === 'OK') {
+        var tabla1TBody: any = ''
+        var tabla2TBody: any = ''
         this.horariosEmpleado = datos.data;
         let index = 0;
         this.horariosEmpleado.forEach(obj => {
           obj.index = index;
           index = index + 1;
+          tabla1TBody = this.tabla1.nativeElement.querySelector('tbody');
+          tabla2TBody = this.tabla2.nativeElement.querySelector('tbody');
+          console.log(tabla1TBody,' = ',tabla2TBody)
+
+          tabla1TBody.style.height = tabla2TBody.offsetHeight + 'px';
+          console.log(tabla1TBody.style.height,' = ',tabla2TBody.offsetHeight + 'px')
         })
         this.ver_detalle = true;
         this.ver_acciones = false;
