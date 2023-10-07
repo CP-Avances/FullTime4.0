@@ -213,7 +213,7 @@ export class HomeEmpleadoComponent implements OnInit {
       case 5: // ACCIONES DE PERSONAL
         this.router.navigate(['/procesosEmpleado'], { relativeTo: this.route, skipLocationChange: false });
         break;
-      case 6: // GEOLOCALIZACION
+      case 6: // GEOLOCALIZACION NO ADMINISTRA EL EMPLEADO
         this.router.navigate(['/'], { relativeTo: this.route, skipLocationChange: false });
         break;
       case 7: // APLICACION MOVIL
