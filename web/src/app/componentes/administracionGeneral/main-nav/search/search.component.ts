@@ -69,6 +69,7 @@ export class SearchComponent implements OnInit {
           { relativeTo: this.route, skipLocationChange: false });
       }
     });
+
   }
 
 }

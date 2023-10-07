@@ -1,111 +1,176 @@
 <div class="container" style="padding-top: 20px; padding-bottom: 25px;">
   <div class="d-flex bd-highlight" id="titulo">
     <div class="w-100 bd-highlight">
-      <h5>GRÁFICAS ESTADÍSTICAS</h5>
-    </div>
-    <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
-      <button class="btn btn-primary btn-sm d-flex justify-content-center" (click)="RefrescarGraficas()">
-        <mat-icon class="align-self-center" style="color: white; margin-right: 7px; font-size: 20px;"
-          matTooltipPosition="right" matTooltip="Presione aquí para actualizar los datos de las gráficas">cached
-        </mat-icon>
-        <span class="align-self-center">Actualizar</span>
-      </button>
-    </div>
-  </div>
-  <br>
-  <div class="row">
-    <div class="col-md" style="margin-top: 3px; text-align: center;">
-      <span class="text-titulo-fecha">Acceso: {{fecha}}</span>
-    </div>
-    <div class="col-md" style="text-align: center;">
-      <span class="text-titulo-fecha">Último Timbre: {{ultimoTimbre.fecha}}</span>
-    </div>
-    <div class="col-md" style="text-align: center;">
-      <span class="text-titulo-fecha">Acción: {{ultimoTimbre.accion}}</span>
+      <h5>MÓDULOS DEL SISTEMA</h5>
     </div>
   </div>
   <br>
   <div class="row" style="text-align: center;">
-    <div class="col-md d-flex justify-content-center flex-wrap">
-      <button class="btn btn-lg d-flex justify-content-center boton-dos" (click)="MenuRapido(1)">
-        <mat-icon class="icon-menu align-self-center">work</mat-icon>
-        <span class="align-self-center">Horas Extras</span>
-      </button>
-      <button class="btn btn-lg d-flex justify-content-center boton-tre" (click)="MenuRapido(2)">
-        <mat-icon class="icon-menu align-self-center">flight_takeoff</mat-icon>
-        <span class="align-self-center">Vacaciones</span>
-      </button>
-      <button class="btn btn-lg d-flex justify-content-center boton-cua" (click)="MenuRapido(3)">
-        <mat-icon class="icon-menu align-self-center">pan_tool</mat-icon>
-        <span class="align-self-center">Permisos</span>
-      </button>
-      <button class="btn btn-lg d-flex justify-content-center boton-cin" (click)="MenuRapido(4)">
-        <mat-icon class="icon-menu align-self-center">pending_actions</mat-icon>
-        <span class="align-self-center">Atrasos</span>
-      </button>
-      <button class="btn btn-lg d-flex justify-content-center boton-uno" (click)="MenuRapido(5)">
-        <mat-icon class="icon-menu align-self-center">fingerprint</mat-icon>
-        <span class="align-self-center">Timbres</span>
-      </button>
+    <div class="col-md">
+      <div class="d-flex justify-content-center flex-wrap">
+        <button class="btn btn-lg d-flex justify-content-center boton-uno" (click)="MenuRapido(1)" *ngIf="permisos">
+          <mat-icon class="icon-menu align-self-center">insert_emoticon</mat-icon>
+          <span class="align-self-center">Permisos</span>
+        </button>
+        <button class="btn btn-lg d-flex justify-content-center boton-inactivo" (click)="MenuRapido(1)"
+          *ngIf="!permisos">
+          <mat-icon class="icon-menu align-self-center">insert_emoticon</mat-icon>
+          <span class="align-self-center">Permisos</span>
+        </button>
+
+        <button class="btn btn-lg d-flex justify-content-center boton-dos" (click)="MenuRapido(2)" *ngIf="vacaciones">
+          <mat-icon class="icon-menu align-self-center">flight</mat-icon>
+          <span class="align-self-center">Vacaciones</span>
+        </button>
+        <button class="btn btn-lg d-flex justify-content-center boton-inactivo" (click)="MenuRapido(2)"
+          *ngIf="!vacaciones">
+          <mat-icon class="icon-menu align-self-center">flight</mat-icon>
+          <span class="align-self-center">Vacaciones</span>
+        </button>
+
+        <button class="btn btn-lg d-flex justify-content-center boton-tre" (click)="MenuRapido(3)" *ngIf="horasExtras">
+          <mat-icon class="icon-menu align-self-center">schedule</mat-icon>
+          <span class="align-self-center">Horas Extras</span>
+        </button>
+        <button class="btn btn-lg d-flex justify-content-center boton-inactivo" (click)="MenuRapido(3)"
+          *ngIf="!horasExtras">
+          <mat-icon class="icon-menu align-self-center">schedule</mat-icon>
+          <span class="align-self-center">Horas Extras</span>
+        </button>
+
+        <button class="btn btn-lg d-flex justify-content-center boton-cua" (click)="MenuRapido(4)" *ngIf="alimentacion">
+          <mat-icon class="icon-menu align-self-center">local_dining</mat-icon>
+          <span class="align-self-center">Alimentación</span>
+        </button>
+        <button class="btn btn-lg d-flex justify-content-center boton-inactivo" (click)="MenuRapido(4)"
+          *ngIf="!alimentacion">
+          <mat-icon class="icon-menu align-self-center">local_dining</mat-icon>
+          <span class="align-self-center">Alimentación</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="col-md">
+      <div class="d-flex justify-content-center flex-wrap">
+        <button class="btn btn-lg d-flex justify-content-center boton-cin" (click)="MenuRapido(5)" *ngIf="accion">
+          <mat-icon class="icon-menu align-self-center">how_to_reg</mat-icon>
+          <span class="align-self-center">Acciones Personal</span>
+        </button>
+        <button class="btn btn-lg d-flex justify-content-center boton-inactivo" (click)="MenuRapido(5)" *ngIf="!accion">
+          <mat-icon class="icon-menu align-self-center">how_to_reg</mat-icon>
+          <span class="align-self-center">Acciones Personal</span>
+        </button>
+
+        <button class="btn btn-lg d-flex justify-content-center boton-sei" (click)="MenuRapido(6)"
+          *ngIf="geolocalizacion">
+          <mat-icon class="icon-menu align-self-center">my_location</mat-icon>
+          <span class="align-self-center">Geolocalización</span>
+        </button>
+        <button class="btn btn-lg d-flex justify-content-center boton-inactivo" (click)="MenuRapido(6)"
+          *ngIf="!geolocalizacion">
+          <mat-icon class="icon-menu align-self-center">my_location</mat-icon>
+          <span class="align-self-center">Geolocalización</span>
+        </button>
+
+        <button class="btn btn-lg d-flex justify-content-center boton-sie" (click)="MenuRapido(7)" *ngIf="movil">
+          <mat-icon class="icon-menu align-self-center">phone_android</mat-icon>
+          <span class="align-self-center">Aplicación Móvil</span>
+        </button>
+        <button class="btn btn-lg d-flex justify-content-center boton-inactivo" (click)="MenuRapido(7)" *ngIf="!movil">
+          <mat-icon class="icon-menu align-self-center">phone_android</mat-icon>
+          <span class="align-self-center">Aplicación Móvil</span>
+        </button>
+
+        <button class="btn btn-lg d-flex justify-content-center boton-ocho" (click)="MenuRapido(8)" *ngIf="teletrabajo">
+          <mat-icon class="icon-menu align-self-center">computer</mat-icon>
+          <span class="align-self-center">Timbre Teletrabajo</span>
+        </button>
+        <button class="btn btn-lg d-flex justify-content-center boton-inactivo" (click)="MenuRapido(8)"
+          *ngIf="!teletrabajo">
+          <mat-icon class="icon-menu align-self-center">computer</mat-icon>
+          <span class="align-self-center">Timbre Teletrabajo</span>
+        </button>
+      </div>
     </div>
   </div>
 
-  <div class="row">
-    <div class="col-md-6">
-      <mat-card class="example-card mat-elevation-z8">
-        <div class="d-flex bd-highlight">
-          <h4 class="p-2 w-100 bd-highlight"><b>Horas Extras</b></h4>
-          <a mat-button [routerLink]="['/macro/user/horas-extras']" class="p-2 flex-shrink-1 bd-highlight">
-            <mat-icon matTooltipPosition="right" matTooltip="Ver más opciones de la gráfica"> open_in_full </mat-icon>
-          </a>
-        </div>
-        <mat-card-content class="scroll-box">
-          <div id="charts_horas_extras" style="width: 100%; height: 350px;"></div>
-        </mat-card-content>
-      </mat-card>
+  <div class="container" style="padding-top: 20px;">
+    <div class="d-flex bd-highlight" id="titulo">
+      <div class="w-100 bd-highlight">
+        <h5>GRÁFICAS ESTADÍSTICAS</h5>
+      </div>
+      <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
+        <button class="btn btn-primary btn-sm d-flex justify-content-center" (click)="RefrescarGraficas()">
+          <mat-icon class="align-self-center" style="color: white; margin-right: 7px; font-size: 20px;"
+            matTooltipPosition="right" matTooltip="Presione aquí para actualizar los datos de las gráficas">
+            cached
+          </mat-icon>
+          <span class="align-self-center">Actualizar</span>
+        </button>
+      </div>
     </div>
-    <div class="col-md-6">
-      <mat-card class="example-card mat-elevation-z8">
-        <div class="d-flex bd-highlight">
-          <h4 class="p-2 w-100 bd-highlight"><b>Vacaciones</b></h4>
-          <a mat-button [routerLink]="['/macro/user/vacaciones']" class="p-2 flex-shrink-1 bd-highlight">
-            <mat-icon matTooltipPosition="right" matTooltip="Ver más opciones de la gráfica"> open_in_full </mat-icon>
-          </a>
-        </div>
-        <mat-card-content class="scroll-box">
-          <div id="charts_vacaciones" style="width: 100%; height: 350px;"></div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  </div>
-  <br>
-  <div class="row">
-    <div class="col-md-6">
-      <mat-card class="example-card mat-elevation-z8">
-        <div class="d-flex bd-highlight">
-          <h4 class="p-2 w-100 bd-highlight"><b>Permisos</b></h4>
-          <a mat-button [routerLink]="['/macro/user/permisos']" class="p-2 flex-shrink-1 bd-highlight">
-            <mat-icon matTooltipPosition="right" matTooltip="Ver más opciones de la gráfica"> open_in_full </mat-icon>
-          </a>
-        </div>
-        <mat-card-content class="scroll-box">
-          <div id="charts_permisos" style="width: 100%; height: 350px;"></div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-    <div class="col-md-6">
-      <mat-card class="example-card mat-elevation-z8">
-        <div class="d-flex bd-highlight">
-          <h4 class="p-2 w-100 bd-highlight"><b>Atrasos</b></h4>
-          <a mat-button [routerLink]="['/macro/user/atrasos']" class="p-2 flex-shrink-1 bd-highlight">
-            <mat-icon matTooltipPosition="right" matTooltip="Ver más opciones de la gráfica"> open_in_full </mat-icon>
-          </a>
-        </div>
-        <mat-card-content class="scroll-box">
-          <div id="charts_atraso" style="width: 100%; height: 350px;"></div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  </div>
 
-</div>
+    <div class="container" style="padding-top: 20px;">
+      <div class="row">
+        <div class="col-md-6">
+          <mat-card class="example-card mat-elevation-z8">
+            <div class="d-flex bd-highlight">
+              <h4 class="p-2 w-100 bd-highlight"><b>Horas Extras</b></h4>
+              <a mat-button [routerLink]="['/macro/user/horas-extras']" class="p-2 flex-shrink-1 bd-highlight">
+                <mat-icon matTooltipPosition="right" matTooltip="Ver más opciones de la gráfica"> open_in_full
+                </mat-icon>
+              </a>
+            </div>
+            <mat-card-content class="scroll-box">
+              <div id="charts_horas_extras" style="width: 100%; height: 350px;"></div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+        <div class="col-md-6">
+          <mat-card class="example-card mat-elevation-z8">
+            <div class="d-flex bd-highlight">
+              <h4 class="p-2 w-100 bd-highlight"><b>Vacaciones</b></h4>
+              <a mat-button [routerLink]="['/macro/user/vacaciones']" class="p-2 flex-shrink-1 bd-highlight">
+                <mat-icon matTooltipPosition="right" matTooltip="Ver más opciones de la gráfica"> open_in_full
+                </mat-icon>
+              </a>
+            </div>
+            <mat-card-content class="scroll-box">
+              <div id="charts_vacaciones" style="width: 100%; height: 350px;"></div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+      <br>
+      <div class="row">
+        <div class="col-md-6">
+          <mat-card class="example-card mat-elevation-z8">
+            <div class="d-flex bd-highlight">
+              <h4 class="p-2 w-100 bd-highlight"><b>Permisos</b></h4>
+              <a mat-button [routerLink]="['/macro/user/permisos']" class="p-2 flex-shrink-1 bd-highlight">
+                <mat-icon matTooltipPosition="right" matTooltip="Ver más opciones de la gráfica"> open_in_full
+                </mat-icon>
+              </a>
+            </div>
+            <mat-card-content class="scroll-box">
+              <div id="charts_permisos" style="width: 100%; height: 350px;"></div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+        <div class="col-md-6">
+          <mat-card class="example-card mat-elevation-z8">
+            <div class="d-flex bd-highlight">
+              <h4 class="p-2 w-100 bd-highlight"><b>Atrasos</b></h4>
+              <a mat-button [routerLink]="['/macro/user/atrasos']" class="p-2 flex-shrink-1 bd-highlight">
+                <mat-icon matTooltipPosition="right" matTooltip="Ver más opciones de la gráfica"> open_in_full
+                </mat-icon>
+              </a>
+            </div>
+            <mat-card-content class="scroll-box">
+              <div id="charts_atraso" style="width: 100%; height: 350px;"></div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </div>
+  </div>

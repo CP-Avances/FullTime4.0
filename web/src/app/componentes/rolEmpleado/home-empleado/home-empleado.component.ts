@@ -10,10 +10,10 @@ import * as echarts_vaca from 'echarts/core';
 import * as echarts_atra from 'echarts/core';
 import * as moment from 'moment';
 
-import { GraficasService } from 'src/app/servicios/graficas/graficas.service';
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { GraficasService } from 'src/app/servicios/graficas/graficas.service';
+import { MainNavService } from '../../administracionGeneral/main-nav/main-nav.service';
 
 @Component({
   selector: 'app-home-empleado',
@@ -24,19 +24,20 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 export class HomeEmpleadoComponent implements OnInit {
 
   fecha: string;
-  horas_extras: any;
-  vacaciones: any;
-  permisos: any;
-  atrasos: any;
 
-  ultimoTimbre: any = {
-    timbre: '',
-    accion: ''
-  };
+  // BUSQUEDA DE FUNCIONES ACTIVAS
+  get geolocalizacion(): boolean { return this.funciones.geolocalizacion; }
+  get alimentacion(): boolean { return this.funciones.alimentacion; }
+  get horasExtras(): boolean { return this.funciones.horasExtras; }
+  get teletrabajo(): boolean { return this.funciones.timbre_web; }
+  get vacaciones(): boolean { return this.funciones.vacaciones; }
+  get permisos(): boolean { return this.funciones.permisos; }
+  get accion(): boolean { return this.funciones.accionesPersonal; }
+  get movil(): boolean { return this.funciones.app_movil; }
 
   constructor(
     private restGraficas: GraficasService,
-    private restTimbres: TimbresService,
+    private funciones: MainNavService,
     private toastr: ToastrService,
     private router: Router,
     private route: ActivatedRoute,
@@ -88,35 +89,25 @@ export class HomeEmpleadoComponent implements OnInit {
     this.parametro.ListarDetalleParametros(26).subscribe(
       res => {
         this.formato_hora = res[0].descripcion;
-        this.FormatearFechas(fecha, this.formato_hora);
+        this.FormatearFechas(fecha);
       },
       vacio => {
-        this.FormatearFechas(fecha, this.formato_hora);
+        this.FormatearFechas(fecha);
       });
   }
 
-  FormatearFechas(formato_fecha: string, formatear_hora: string) {
+  // METODO PARA FORMATEAR FECHAS
+  FormatearFechas(formato_fecha: string) {
     var f = moment();
     this.fecha = this.validar.FormatearFecha(moment(f).format('YYYY-MM-DD'), formato_fecha, this.validar.dia_completo);
-    this.UltimoTimbre(formato_fecha, formatear_hora);
   }
 
-  async UltimoTimbre(formato_fecha: string, formato_hora: string) {
-    await this.restTimbres.UltimoTimbreEmpleado().subscribe(res => {
-      console.log('ULTIMO TIMBRE:', res.timbre);
-      var fecha = this.validar.FormatearFecha(res.timbre.split(' ')[0], formato_fecha, this.validar.dia_abreviado);
-      var hora = this.validar.FormatearHora(res.timbre.split(' ')[1], formato_hora);
-      this.ultimoTimbre = res;
-      this.ultimoTimbre.fecha = fecha + ' ' + hora;
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
 
   SaldoVacaciones() {
     console.log('SALDO DE VACACIONES: ');
   }
 
+  // METODO PARA PRESENTAR GRAFICAS
   ModeloGraficas() {
     this.GraficaUno()
     this.GraficaDos();
@@ -204,23 +195,31 @@ export class HomeEmpleadoComponent implements OnInit {
     this.ModeloGraficas();
   }
 
+  // METODO DE MENU RAPIDO
   MenuRapido(num: number) {
-    console.log(num);
-
     switch (num) {
-      case 1: //Horas Extras
-        this.router.navigate(['/horaExtraEmpleado'], { relativeTo: this.route, skipLocationChange: false });
-        break;
-      case 2: //Vacaciones
-        this.router.navigate(['/vacacionesEmpleado'], { relativeTo: this.route, skipLocationChange: false });
-        break;
-      case 3: //Permisos
+      case 1: // PERMISOS
         this.router.navigate(['/solicitarPermiso'], { relativeTo: this.route, skipLocationChange: false });
         break;
-      case 4: //Retrasos
-        this.router.navigate(['/macro/user/atrasos'], { relativeTo: this.route, skipLocationChange: false });
+      case 2: // VACACIONES
+        this.router.navigate(['/vacacionesEmpleado'], { relativeTo: this.route, skipLocationChange: false });
         break;
-      case 5: //Timbres
+      case 3: // HORAS EXTRAS
+        this.router.navigate(['/horaExtraEmpleado'], { relativeTo: this.route, skipLocationChange: false });
+        break;
+      case 4: // ALIMENTACION
+        this.router.navigate(['/comidasEmpleado'], { relativeTo: this.route, skipLocationChange: false });
+        break;
+      case 5: // ACCIONES DE PERSONAL
+        this.router.navigate(['/procesosEmpleado'], { relativeTo: this.route, skipLocationChange: false });
+        break;
+      case 6: // GEOLOCALIZACION
+        this.router.navigate(['/'], { relativeTo: this.route, skipLocationChange: false });
+        break;
+      case 7: // APLICACION MOVIL
+        this.router.navigate(['/'], { relativeTo: this.route, skipLocationChange: false });
+        break;
+      case 8: // TIMBRE TELETRABAJO
         this.router.navigate(['/timbres-personal'], { relativeTo: this.route, skipLocationChange: false });
         break;
       default:
