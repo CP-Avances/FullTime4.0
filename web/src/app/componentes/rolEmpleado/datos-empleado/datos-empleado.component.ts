@@ -45,6 +45,7 @@ export class DatosEmpleadoComponent implements OnInit {
   tituloEmpleado: any = [];
   discapacidadUser: any = [];
   contratoEmpleado: any = [];
+  empresa: string = '';
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS DE BOTONES
   idEmpleado: string = ''; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO SELECCIONADO PARA VER DATOS
@@ -59,7 +60,6 @@ export class DatosEmpleadoComponent implements OnInit {
 
   hipervinculo: string = environment.url; // VARIABLE DE MANEJO DE RUTAS CON URL
 
-  empresa: string = '';
 
   constructor(
     public restDiscapacidad: DiscapacidadService,
