@@ -2,6 +2,13 @@
   <mat-card class="example-card mat-elevation-z8">
     <div id="titulo">
       <span>DETALLES DE EMPLEADOS ACTIVOS</span>
+      <button
+        class="btn btn-outline-light btn-sm"
+        style="float: left; margin-left: 10px"
+        (click)="regresar()"
+      >
+        REGRESAR
+      </button>
     </div>
     <mat-card-content>
       <div
@@ -77,13 +84,13 @@
           <p>XLSL</p>
         </i>
         <!-- <i  id="csv" class="fas fa-file-csv icon" matSuffix matTooltipPosition="right"
-            matTooltip="Descargar Lista de Niveles de Títulos en formato CSV.">
-            <p>CSV</p>
-        </i>
-        <i  id="xml" class="fas fa-file-code icon" matSuffix matTooltipPosition="right"
-            matTooltip="Descargar Lista de Niveles de Títulos en formato XML.">
-            <p>XML</p>
-        </i> -->
+              matTooltip="Descargar Lista de Niveles de Títulos en formato CSV.">
+              <p>CSV</p>
+          </i>
+          <i  id="xml" class="fas fa-file-code icon" matSuffix matTooltipPosition="right"
+              matTooltip="Descargar Lista de Niveles de Títulos en formato XML.">
+              <p>XML</p>
+          </i> -->
       </div>
     </mat-card-content>
   </mat-card>

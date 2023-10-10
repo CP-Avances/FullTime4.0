@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PageEvent } from '@angular/material/paginator';
 
@@ -9,6 +9,7 @@ import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
+import { ReporteEmpleadosInactivosComponent } from '../../reporte-empleados-inactivos/reporte-empleados-inactivos.component';
 
 @Component({
   selector: 'app-ver-empleados-inactivos-detalle',
@@ -16,8 +17,9 @@ import * as xlsx from 'xlsx';
   styleUrls: ['./ver-empleados-inactivos-detalle.component.css']
 })
 export class VerEmpleadosInactivosDetalleComponent implements OnInit{
-  data: any;
-  tipo: string;
+  @Input() data: any;
+  @Input() tipo: string;
+  @Input() verDetalle: boolean;
   bool_suc: boolean = false;
   bool_car: boolean = false;
   bool_dep: boolean = false;
@@ -39,19 +41,15 @@ export class VerEmpleadosInactivosDetalleComponent implements OnInit{
 
   constructor(
     private route: ActivatedRoute,
-    private restEmpre: EmpresaService
+    private restEmpre: EmpresaService,
+    private reporte: ReporteEmpleadosInactivosComponent,
   ) {
     this.ObtenerLogo();
     this.ObtenerColores();
   }
 
   ngOnInit(): void {
-    this.tipo = this.route.snapshot.paramMap.get('tipo')!;
-    const data_param: string = this.route.snapshot.paramMap.get('lista')!;
-    this.data = JSON.parse(data_param);
-    console.log(this.data);
     this.validarTipo(this.tipo);
-    console.log('n registros', this.c);
   }
 
   validarTipo(tipo: string) {
@@ -670,4 +668,9 @@ export class VerEmpleadosInactivosDetalleComponent implements OnInit{
     })
     return nuevo
   }
+
+  regresar(){
+    this.reporte.verDetalle = false;
+  }
+  
 }
