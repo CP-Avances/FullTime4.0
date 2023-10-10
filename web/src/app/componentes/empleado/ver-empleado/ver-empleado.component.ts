@@ -102,7 +102,7 @@ export class VerEmpleadoComponent implements OnInit {
   idPerVacacion: any = [];
   empleadoUno: any = [];
 
-  // VARIABLES DE ALMACENAMIENTO DE DATOS DE BOTONES
+  // VARIABLES DE ALMACENAMIENTO DE DATOS DE BOTONESimagenEmpleado
   btnTitulo = 'Añadir';
   btnDisc = 'Añadir';
   idEmpleado: string; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO SELECCIONADO PARA VER DATOS
@@ -365,6 +365,7 @@ export class VerEmpleadoComponent implements OnInit {
     })
   }
 
+  // METODO PARA MOSTRAR IMAGEN EN PDF
   getImageDataUrlFromLocalPath1(localPath: string): Promise<string> {
     return new Promise((resolve, reject) => {
       let canvas = document.createElement('canvas');

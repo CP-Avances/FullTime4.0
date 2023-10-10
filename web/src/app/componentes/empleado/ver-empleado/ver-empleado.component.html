@@ -12,8 +12,9 @@
                 <div class="col-md">
                     <mat-card class="mat-elevation-z8">
                         <div class="d-flex bd-highlight" id="resultados">
-                            <h5 class="w-100 bd-highlight align-self-center">{{e.nombre.toUpperCase()}}
-                                {{e.apellido.toUpperCase()}}</h5>
+                            <h5 class="w-100 bd-highlight align-self-center">
+                                {{e.nombre.toUpperCase()}} {{e.apellido.toUpperCase()}}
+                            </h5>
                         </div>
                         <mat-card-content>
                             <div class="container" style="padding-top: 15px;">
@@ -334,16 +335,14 @@
 
                                     </div>
                                     <div style="text-align: right;">
-
                                         <i type="submit" id="edit" style="margin-right: 20px;"
                                             (click)="AbrirVentanaEditar(dv)" matSuffix matTooltipPosition="right"
                                             matTooltip="Modificar los datos generales de este registro"
                                             class="fas fa-edit">
                                             <p>Editar</p>
                                         </i>
-                                        <i class="fas fa-backspace" id="cancel" (click)="ConfirmarEliminarVacuna(dv)"
-                                            matSuffix matTooltipPosition="right"
-                                            matTooltip="Cancelar solicitud de permiso">
+                                        <i class="far fa-trash-alt" id="delete" (click)="ConfirmarEliminarVacuna(dv)"
+                                            matSuffix matTooltipPosition="right" matTooltip="Eliminar registro.">
                                             <p>Eliminar</p>
                                         </i>
                                     </div>
@@ -589,7 +588,8 @@
                             <div class="w-100 bd-highlight">
                                 <h5>CARGO ACTUAL</h5>
                             </div>
-                            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;" *ngIf="btnActualizarCargo">
+                            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;"
+                                *ngIf="btnActualizarCargo">
                                 <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
                                     (click)="AbrirVentanaCargo()">{{btnTitulo}}</button>
                             </div>
@@ -961,13 +961,15 @@
                             <tbody>
                                 <tr *ngFor="let h of horariosEmpleado | paginate:tamanio_pagina:numero_pagina"
                                     style="text-align: center;">
-                                    <td id="td_horarios" [ngStyle]="{'background':CambiarColores(h.color)}">{{h.anio}}</td>
-                                    <td id="td_horarios" [ngStyle]="{'background':CambiarColores(h.color)}">{{h.mes}}</td>
+                                    <td id="td_horarios" [ngStyle]="{'background':CambiarColores(h.color)}">{{h.anio}}
+                                    </td>
+                                    <td id="td_horarios" [ngStyle]="{'background':CambiarColores(h.color)}">{{h.mes}}
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                
+
                     <div class="table-responsive" #tabla2>
                         <table id="table_horario2" class="table table-hover table-sm ">
                             <thead class="thead-light">
@@ -1007,8 +1009,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let h of horariosEmpleado | paginate:tamanio_pagina:numero_pagina"
-                                    >    
+                                <tr *ngFor="let h of horariosEmpleado | paginate:tamanio_pagina:numero_pagina">
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 1 ? '#9CF7B9' : '' }">
                                         <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
@@ -1292,10 +1293,10 @@
                             </tbody>
                         </table>
                     </div>
-                
+
                 </div>
-                
-                
+
+
                 <div class="d-flex flex-wrap justify-content-around" style="margin-top: 1%;" *ngIf="ver_detalle">
                     <button id="btn-raised" class="btn btn-sm" (click)="ObtenerDetallesPlanificacion()">
                         Detalle Planificación
