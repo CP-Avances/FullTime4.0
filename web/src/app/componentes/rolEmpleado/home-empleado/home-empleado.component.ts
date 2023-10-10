@@ -60,7 +60,6 @@ export class HomeEmpleadoComponent implements OnInit {
     // );
 
     this.BuscarParametro();
-    this.SaldoVacaciones();
     // this.ModeloGraficas();
   }
 
@@ -100,11 +99,6 @@ export class HomeEmpleadoComponent implements OnInit {
   FormatearFechas(formato_fecha: string) {
     var f = moment();
     this.fecha = this.validar.FormatearFecha(moment(f).format('YYYY-MM-DD'), formato_fecha, this.validar.dia_completo);
-  }
-
-
-  SaldoVacaciones() {
-    console.log('SALDO DE VACACIONES: ');
   }
 
   // METODO PARA PRESENTAR GRAFICAS
@@ -212,12 +206,6 @@ export class HomeEmpleadoComponent implements OnInit {
         break;
       case 5: // ACCIONES DE PERSONAL
         this.router.navigate(['/procesosEmpleado'], { relativeTo: this.route, skipLocationChange: false });
-        break;
-      case 6: // GEOLOCALIZACION NO ADMINISTRA EL EMPLEADO
-        this.router.navigate(['/'], { relativeTo: this.route, skipLocationChange: false });
-        break;
-      case 7: // APLICACION MOVIL
-        this.router.navigate(['/'], { relativeTo: this.route, skipLocationChange: false });
         break;
       case 8: // TIMBRE TELETRABAJO
         this.router.navigate(['/timbres-personal'], { relativeTo: this.route, skipLocationChange: false });

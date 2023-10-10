@@ -11,6 +11,7 @@ import { PedidoHoraExtraComponent } from 'src/app/componentes/modulos/horasExtra
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { environment } from 'src/environments/environment';
+import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 
 @Component({
   selector: 'app-hora-extra-empleado',
@@ -19,6 +20,8 @@ import { environment } from 'src/environments/environment';
 })
 
 export class HoraExtraEmpleadoComponent implements OnInit {
+
+  get habilitarHoraExtra(): boolean { return this.funciones.horasExtras; }
 
   idEmpleado: number;
   // ITEMS DE PAGINACION DE LA TABLA 
@@ -33,13 +36,25 @@ export class HoraExtraEmpleadoComponent implements OnInit {
     private ventana: MatDialog,
     private validar: ValidacionesService,
     public parametro: ParametrosService,
+    public funciones: MainNavService,
     public informacion: DatosGeneralesService,
   ) {
     this.idEmpleado = parseInt(localStorage.getItem("empleado") as string);
   }
 
   ngOnInit(): void {
-    this.BuscarParametro();
+    if (this.habilitarHoraExtra === false) {
+      let mensaje = {
+        access: false,
+        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Horas Extras. \n`,
+        message: '¿Te gustaría activarlo? Comunícate con nosotros.',
+        url: 'www.casapazmino.com.ec'
+      }
+      return this.validar.RedireccionarHomeEmpleado(mensaje);
+    }
+    else {
+      this.BuscarParametro();
+    }
   }
 
   /** **************************************************************************************** **
@@ -119,7 +134,7 @@ export class HoraExtraEmpleadoComponent implements OnInit {
       })
 
     }, err => {
-      return this.validar.RedireccionarEstadisticas(err.error);
+      return this.validar.RedireccionarHomeEmpleado(err.error);
     });
   }
 

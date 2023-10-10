@@ -650,12 +650,12 @@ export class MainNavComponent implements OnInit {
         name: 'Perfil',
         accion: true,
         estado: true,
+        color: true,
         subtitulo: false,
         icono: 'account_circle',
-        color: true,
         children: [
-          { name: 'Datos Generales', url: '/datosEmpleado' },
-          { name: 'Contrato de Trabajo', url: '/cargoEmpleado' },
+          { name: 'Datos Generales', url: '/datosEmpleado', color: true },
+          { name: 'Contrato de Trabajo', url: '/cargoEmpleado', color: true },
         ]
       },
       {
@@ -666,8 +666,8 @@ export class MainNavComponent implements OnInit {
         subtitulo: false,
         icono: 'mobile_friendly',
         children: [
-          { name: 'Planificación RangoFecha', url: '/horariosEmpleado' },
-          { name: 'Planificación Rotativa', url: '/planificacionHorario' },
+          { name: 'Planificación RangoFecha', url: '/horariosEmpleado', color: true },
+          { name: 'Planificación Rotativa', url: '/planificacionHorario', color: true },
         ]
       },
       {
@@ -780,6 +780,26 @@ export class MainNavComponent implements OnInit {
             icono: 'how_to_reg',
             url: '/procesosEmpleado'
           },
+          {
+            name: 'Timbre Teletrabajo',
+            accion: this.HabilitarTimbreWeb,
+            estado: this.HabilitarTimbreWeb,
+            icono: 'computer',
+            color: true,
+            subtitulo: true,
+            children: [
+              { name: 'Timbrar Teletrabajo', url: '/timbres-personal', color: true },
+            ]
+          },
+          {
+            name: 'Timbre Teletrabajo',
+            accion: !this.HabilitarTimbreWeb,
+            estado: !this.HabilitarTimbreWeb,
+            activo: this.HabilitarTimbreWeb,
+            icono: 'computer',
+            color: false,
+            url: '/timbres-personal'
+          },
         ]
       },
       {
@@ -790,8 +810,7 @@ export class MainNavComponent implements OnInit {
         subtitulo: false,
         icono: 'fingerprint',
         children: [
-          { name: 'Timbre Teletrabajo', url: '/timbres-personal', color: true },
-          { name: 'Buscar Timbre', url: '/buscar-timbre', color: true },
+          { name: 'Actualizar Timbres', url: '/buscar-timbre', color: true },
         ]
       },
       {

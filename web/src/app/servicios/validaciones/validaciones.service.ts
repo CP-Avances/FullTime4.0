@@ -40,18 +40,21 @@ export class ValidacionesService {
     }
   }
 
-  RedireccionarEstadisticas(error) {
-    const { access, message, text } = error;
-    console.log(error);
-    console.log(access, message);
+  RedireccionarHomeEmpleado(error: any) {
+    const { access, message, url, title } = error;
     if (access === false) {
-      this.toastr.error(message);
+      this.toastr.info(message + ' ' + url, title, {
+        timeOut: 6000,
+        positionClass: 'toast-top-center',
+
+      })
+        .onTap.subscribe(items => {
+          if (url) {
+            window.open(`https://${url}`, "_blank");
+          }
+        });
       this.router.navigate(['/estadisticas']);
     }
-    if (text) {
-      this.toastr.info(text)
-    }
-    // this.router.navigate(['/estadisticas', { relativeTo: this.route, skipLocationChange: false }]);
   }
 
 

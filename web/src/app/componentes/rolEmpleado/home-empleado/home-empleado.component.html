@@ -38,6 +38,11 @@
           <span class="align-self-center">Horas Extras</span>
         </button>
 
+      </div>
+    </div>
+
+    <div class="col-md">
+      <div class="d-flex justify-content-center flex-wrap">
         <button class="btn btn-lg d-flex justify-content-center boton-cua" (click)="MenuRapido(4)" *ngIf="alimentacion">
           <mat-icon class="icon-menu align-self-center">local_dining</mat-icon>
           <span class="align-self-center">Alimentación</span>
@@ -46,39 +51,6 @@
           *ngIf="!alimentacion">
           <mat-icon class="icon-menu align-self-center">local_dining</mat-icon>
           <span class="align-self-center">Alimentación</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="col-md">
-      <div class="d-flex justify-content-center flex-wrap">
-        <button class="btn btn-lg d-flex justify-content-center boton-cin" (click)="MenuRapido(5)" *ngIf="accion">
-          <mat-icon class="icon-menu align-self-center">how_to_reg</mat-icon>
-          <span class="align-self-center">Acciones Personal</span>
-        </button>
-        <button class="btn btn-lg d-flex justify-content-center boton-inactivo" (click)="MenuRapido(5)" *ngIf="!accion">
-          <mat-icon class="icon-menu align-self-center">how_to_reg</mat-icon>
-          <span class="align-self-center">Acciones Personal</span>
-        </button>
-
-        <button class="btn btn-lg d-flex justify-content-center boton-sei" (click)="MenuRapido(6)"
-          *ngIf="geolocalizacion">
-          <mat-icon class="icon-menu align-self-center">my_location</mat-icon>
-          <span class="align-self-center">Geolocalización</span>
-        </button>
-        <button class="btn btn-lg d-flex justify-content-center boton-inactivo" (click)="MenuRapido(6)"
-          *ngIf="!geolocalizacion">
-          <mat-icon class="icon-menu align-self-center">my_location</mat-icon>
-          <span class="align-self-center">Geolocalización</span>
-        </button>
-
-        <button class="btn btn-lg d-flex justify-content-center boton-sie" (click)="MenuRapido(7)" *ngIf="movil">
-          <mat-icon class="icon-menu align-self-center">phone_android</mat-icon>
-          <span class="align-self-center">Aplicación Móvil</span>
-        </button>
-        <button class="btn btn-lg d-flex justify-content-center boton-inactivo" (click)="MenuRapido(7)" *ngIf="!movil">
-          <mat-icon class="icon-menu align-self-center">phone_android</mat-icon>
-          <span class="align-self-center">Aplicación Móvil</span>
         </button>
 
         <button class="btn btn-lg d-flex justify-content-center boton-ocho" (click)="MenuRapido(8)" *ngIf="teletrabajo">
@@ -90,6 +62,16 @@
           <mat-icon class="icon-menu align-self-center">computer</mat-icon>
           <span class="align-self-center">Timbre Teletrabajo</span>
         </button>
+
+        <button class="btn btn-lg d-flex justify-content-center boton-cin" (click)="MenuRapido(5)" *ngIf="accion">
+          <mat-icon class="icon-menu align-self-center">how_to_reg</mat-icon>
+          <span class="align-self-center">Acciones Personal</span>
+        </button>
+        <button class="btn btn-lg d-flex justify-content-center boton-inactivo" (click)="MenuRapido(5)" *ngIf="!accion">
+          <mat-icon class="icon-menu align-self-center">how_to_reg</mat-icon>
+          <span class="align-self-center">Acciones Personal</span>
+        </button>
+
       </div>
     </div>
   </div>

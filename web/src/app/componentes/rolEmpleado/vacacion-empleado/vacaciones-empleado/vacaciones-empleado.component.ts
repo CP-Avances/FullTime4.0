@@ -14,6 +14,7 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { EditarVacacionesEmpleadoComponent } from '../../../modulos/vacaciones/editar-vacaciones-empleado/editar-vacaciones-empleado.component';
 import { CancelarVacacionesComponent } from '../cancelar-vacaciones/cancelar-vacaciones.component';
 import { RegistrarVacacionesComponent } from 'src/app/componentes/modulos/vacaciones/registrar-vacaciones/registrar-vacaciones.component';
+import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 
 @Component({
   selector: 'app-vacaciones-empleado',
@@ -22,6 +23,8 @@ import { RegistrarVacacionesComponent } from 'src/app/componentes/modulos/vacaci
 })
 
 export class VacacionesEmpleadoComponent implements OnInit {
+
+  get habilitarVacacion(): boolean { return this.funciones.vacaciones; }
 
   idEmpleado: string;
   idPerVacacion: any = [];
@@ -37,6 +40,7 @@ export class VacacionesEmpleadoComponent implements OnInit {
     public informacion: DatosGeneralesService,
     public parametro: ParametrosService,
     public restCargo: EmplCargosService,
+    public funciones: MainNavService,
     public restPerV: PeriodoVacacionesService,
     public ventana: MatDialog,
     public validar: ValidacionesService,
@@ -46,7 +50,18 @@ export class VacacionesEmpleadoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.BuscarParametro();
+    if (this.habilitarVacacion === false) {
+      let mensaje = {
+        access: false,
+        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Vacaciones. \n`,
+        message: '¿Te gustaría activarlo? Comunícate con nosotros.',
+        url: 'www.casapazmino.com.ec'
+      }
+      return this.validar.RedireccionarHomeEmpleado(mensaje);
+    }
+    else {
+      this.BuscarParametro();
+    }
   }
 
   /** **************************************************************************************** **

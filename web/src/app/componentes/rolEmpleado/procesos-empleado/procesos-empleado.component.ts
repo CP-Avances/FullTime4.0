@@ -12,6 +12,7 @@ import { EmpleadoProcesosService } from 'src/app/servicios/empleado/empleadoProc
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { MainNavService } from '../../administracionGeneral/main-nav/main-nav.service';
 
 @Component({
   selector: 'app-procesos-empleado',
@@ -28,6 +29,10 @@ export class ProcesosEmpleadoComponent implements OnInit {
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
 
+  get habilitarPermiso(): boolean {
+    return this.funciones.accionesPersonal;
+  }
+
   constructor(
     public restEmpleadoProcesos: EmpleadoProcesosService,
     public informacion: DatosGeneralesService,
@@ -36,6 +41,7 @@ export class ProcesosEmpleadoComponent implements OnInit {
     public validar: ValidacionesService,
     public router: Router,
     private toastr: ToastrService,
+    private funciones: MainNavService,
   ) {
 
     // LEER ID DE USUARIO QUE INICIA SESION
@@ -46,7 +52,19 @@ export class ProcesosEmpleadoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.BuscarParametro();
+    if (this.habilitarPermiso === false) {
+      let mensaje = {
+        access: false,
+        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Acciones de Personal. \n`,
+        message: '¿Te gustaría activarlo? Comunícate con nosotros.',
+        url: 'www.casapazmino.com.ec'
+      }
+      return this.validar.RedireccionarHomeEmpleado(mensaje);
+    }
+    else {
+      this.BuscarParametro();
+    }
+
   }
 
   /** **************************************************************************************** **

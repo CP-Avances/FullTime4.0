@@ -11,6 +11,7 @@ import { CancelarComidaComponent } from '../cancelar-comida/cancelar-comida.comp
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { PlanComidasService } from 'src/app/servicios/planComidas/plan-comidas.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 
 @Component({
   selector: 'app-comidas-solicitadas-empleado',
@@ -19,6 +20,8 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 })
 
 export class ComidasSolicitadasEmpleadoComponent implements OnInit {
+
+  get habilitarComida(): boolean { return this.funciones.alimentacion; }
 
   departamento: any; // VARIABLE DE ALMACENAMIENTO DE ID DE DEPARTAMENTO DE EMPLEADO QUE INICIO SESIÓN
   idEmpleado: string = ''; // VARIABLE QUE ALMACENA ID DEL EMPLEADO QUE INICIA SESIÓN
@@ -31,6 +34,7 @@ export class ComidasSolicitadasEmpleadoComponent implements OnInit {
 
   constructor(
     public parametro: ParametrosService,
+    public funciones: MainNavService,
     public ventana: MatDialog, // VARIABLE DE VENTANA DE DIÁLOGO
     public validar: ValidacionesService,
     public router: Router, // VARIABLE PARA NAVEGAR ENTRE PÁGINAS
@@ -51,9 +55,20 @@ export class ComidasSolicitadasEmpleadoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    var f = moment();
-    this.FechaActual = f.format('YYYY-MM-DD');
-    this.BuscarParametro();
+    if (this.habilitarComida === false) {
+      let mensaje = {
+        access: false,
+        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Alimentación. \n`,
+        message: '¿Te gustaría activarlo? Comunícate con nosotros.',
+        url: 'www.casapazmino.com.ec'
+      }
+      return this.validar.RedireccionarHomeEmpleado(mensaje);
+    }
+    else {
+      var f = moment();
+      this.FechaActual = f.format('YYYY-MM-DD');
+      this.BuscarParametro();
+    }
   }
 
   /** **************************************************************************************** **

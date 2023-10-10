@@ -14,6 +14,7 @@ import { ValidacionesService } from '../../../../servicios/validaciones/validaci
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { PermisosService } from 'src/app/servicios/permisos/permisos.service';
 import { EditarPermisoEmpleadoComponent } from 'src/app/componentes/modulos/permisos/gestionar-permisos/editar-permiso-empleado/editar-permiso-empleado.component';
+import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 
 @Component({
   selector: 'app-solicitar-permisos-empleado',
@@ -22,6 +23,8 @@ import { EditarPermisoEmpleadoComponent } from 'src/app/componentes/modulos/perm
 })
 
 export class SolicitarPermisosEmpleadoComponent implements OnInit {
+
+  get habilitarAccion(): boolean { return this.funciones.permisos; }
 
   idEmpleado: string = '';
 
@@ -43,6 +46,7 @@ export class SolicitarPermisosEmpleadoComponent implements OnInit {
     public ventana: MatDialog,
     private toastr: ToastrService,
     private validar: ValidacionesService,
+    private funciones: MainNavService,
     private informacion: DatosGeneralesService,
   ) {
     // LEER ID DE USUARIO QUE INICIA SESION
@@ -53,7 +57,18 @@ export class SolicitarPermisosEmpleadoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.BuscarParametro();
+    if (this.habilitarAccion === false) {
+      let mensaje = {
+        access: false,
+        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Permisos. \n`,
+        message: '¿Te gustaría activarlo? Comunícate con nosotros.',
+        url: 'www.casapazmino.com.ec'
+      }
+      return this.validar.RedireccionarHomeEmpleado(mensaje);
+    }
+    else {
+      this.BuscarParametro();
+    }
   }
 
   /** **************************************************************************************** **
@@ -115,7 +130,7 @@ export class SolicitarPermisosEmpleadoComponent implements OnInit {
 
       })
     }, err => {
-      return this.validar.RedireccionarEstadisticas(err.error)
+      return this.validar.RedireccionarHomeEmpleado(err.error)
     });
   }
 

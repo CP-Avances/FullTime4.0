@@ -8,7 +8,8 @@ export const ModuloAlimentacionValidation = (req: Request, res: Response, next: 
 
     if (!alimentacion) return res.status(401).jsonp({
         access: false,
-        message: 'Ups! Al parecer no tienes activado en tu plan el módulo de alimentación. Te gustaría activarlo? Comunícate con nosotros',
+        title: `Ups!!! al parecer no tienes activado en tu plan el Módulo de Alimentación. \n`,
+        message: '¿Te gustaría activarlo? Comunícate con nosotros.',
         url: 'www.casapazmino.com.ec'
     })
 

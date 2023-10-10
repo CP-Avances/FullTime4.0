@@ -112,7 +112,7 @@ export class HorasPlanificadasEmpleadoComponent implements OnInit {
       })
 
     }, err => {
-      return this.validar.RedireccionarEstadisticas(err.error);
+      return this.validar.RedireccionarHomeEmpleado(err.error);
     });
   }
 
