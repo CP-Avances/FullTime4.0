@@ -198,7 +198,7 @@ const routes: Routes = [
   { path: 'reporte-timbre-reloj-virtual', component: TimbreVirtualComponent, canActivate: [AuthGuard], data: { roles: 1 } },
 
   //DETALLE REPORTES
-  { path: 'ver-empleados-activos-detalle/:tipo/:lista', component: VerEmpleadosActivosDetalleComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'ver-empleados-activos-detalle/:tipo', component: VerEmpleadosActivosDetalleComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'ver-empleados-inactivos-detalle/:tipo/:lista', component: VerEmpleadosInactivosDetalleComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'ver-vacunas-detalle/:tipo/:lista', component: VerVacunasComponent, canActivate: [AuthGuard], data: { roles: 1 } },
 

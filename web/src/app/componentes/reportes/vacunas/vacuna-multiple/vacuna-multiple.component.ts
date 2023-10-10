@@ -45,6 +45,10 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   // VARIABLE DE ALMACENAMIENTO DE DATOS DE PDF
   data_pdf: any = [];
 
+  //VARIABLES PARA MOSTRAR DETALLES
+  tipo: string;
+  verDetalle: boolean = false;
+
   // VARIABLES DE ALMACENAMIENTO DE DATOS SELECCIONADOS EN LA BUSQUEDA
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
   selectionCar = new SelectionModel<ITableEmpleados>(true, []);
@@ -987,8 +991,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
 
   //ENVIAR DATOS A LA VENTANA DE DETALLE
   verDatos(data: any, tipo: string) {
-    const encodedData = JSON.stringify(data);
-      this.router.navigate(['/ver-vacunas-detalle/', tipo, encodedData]);
+    this.verDetalle = true;
+    this.tipo = tipo;
   }
 }
 

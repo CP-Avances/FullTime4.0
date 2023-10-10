@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PageEvent } from '@angular/material/paginator';
 
@@ -16,6 +16,7 @@ import {
   vacuna,
 } from 'src/app/model/reportes.model';
 import { environment } from 'src/environments/environment';
+import { VacunaMultipleComponent } from '../../vacuna-multiple/vacuna-multiple.component';
 
 @Component({
   selector: 'app-ver-vacunas',
@@ -26,8 +27,9 @@ export class VerVacunasComponent implements OnInit {
 
   hipervinculo: string = environment.url; // VARIABLE DE MANEJO DE RUTAS CON URL
 
-  data: any;
-  tipo: string;
+  @Input() data: any;
+  @Input() tipo: string;
+  @Input() verDetalle: boolean;
   bool_suc: boolean = false;
   bool_car: boolean = false;
   bool_dep: boolean = false;
@@ -53,19 +55,15 @@ export class VerVacunasComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private restEmpre: EmpresaService
+    private restEmpre: EmpresaService,
+    private vacuna: VacunaMultipleComponent,
   ) {
     this.ObtenerLogo();
     this.ObtenerColores();
   }
 
   ngOnInit(): void {
-    this.tipo = this.route.snapshot.paramMap.get('tipo')!;
-    const data_param: string = this.route.snapshot.paramMap.get('lista')!;
-    this.data = JSON.parse(data_param);
-    console.log(this.data);
     this.validarTipo(this.tipo);
-    console.log('n registros', this.c);
   }
 
   validarTipo(tipo: string) {
@@ -649,4 +647,9 @@ export class VerVacunasComponent implements OnInit {
 
     return nuevo;
   }
+
+  regresar(){
+    this.vacuna.verDetalle = false;
+  }
+
 }

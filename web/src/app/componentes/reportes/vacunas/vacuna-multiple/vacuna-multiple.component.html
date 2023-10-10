@@ -1,4 +1,4 @@
-<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;">
+<div *ngIf="!verDetalle" class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;">
     <div id="titulo">
         <span>REPORTE DE VACUNACIÓN</span>
     </div>
@@ -41,7 +41,7 @@
         </div>
     </div>
 </div>
-<div class="container" style="padding-bottom: 50px; text-align: center;">
+<div *ngIf="!verDetalle" class="container" style="padding-bottom: 50px; text-align: center;">
     <!-- TABLA PARA SUCURSALES -->
     <div *ngIf="bool.bool_suc" class="mat-elevation-z8" style="background: white;">
                         <div class="d-flex bd-highlight" id="resultados">
@@ -170,8 +170,8 @@
                         <div class="d-flex bd-highlight" id="resultados">
                     <span class="w-100 bd-highlight">
                         RESULTADO USUARIOS</span>
-                    <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                        (click)="MostrarLista()">Mostrar lista</button>
+                    <!-- <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                        (click)="MostrarLista()">Mostrar lista</button> -->
                 </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
@@ -211,3 +211,5 @@
         <br>
     </div>
 </div>
+
+<app-ver-vacunas *ngIf="verDetalle" [tipo]="tipo" [data]="data_pdf"></app-ver-vacunas>

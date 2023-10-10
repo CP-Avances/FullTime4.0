@@ -44,6 +44,8 @@ export class ReporteEmpleadosComponent implements OnInit {
   bool_dep: boolean = false;
   bool_emp: boolean = false;
   data_pdf: any = [];
+  tipo: string;
+  verDetalle: boolean = false;
 
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
   selectionCar = new SelectionModel<ITableEmpleados>(true, []);
@@ -242,7 +244,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     this.data_pdf = suc;
     switch (accion) {
       case 'excel': this.exportToExcel(); break;
-      case 'ver': this.verDatos(this.data_pdf, 'suc'); break;
+      case 'ver': this.verDatos('suc'); break;
       default: this.generarPdf(accion); break;
     }
   }
@@ -261,7 +263,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     this.data_pdf = car;
     switch (accion) {
       case 'excel': this.exportToExcelCargo(); break;
-      case 'ver': this.verDatos(this.data_pdf,'car'); break;
+      case 'ver': this.verDatos('car'); break;
       default: this.generarPdf(accion); break;
     }
   }
@@ -286,7 +288,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     this.data_pdf = dep;
     switch (accion) {
       case 'excel': this.exportToExcel(); break;
-      case 'ver': this.verDatos(this.data_pdf,'dep'); break;
+      case 'ver': this.verDatos('dep'); break;
       default: this.generarPdf(accion); break;
     }
   }
@@ -320,7 +322,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     this.data_pdf = emp;
     switch (accion) {
       case 'excel': this.exportToExcel(); break;
-      case 'ver': this.verDatos(this.data_pdf,'emp'); break;
+      case 'ver': this.verDatos('emp'); break;
       default: this.generarPdf(accion); break;
     }
 
@@ -991,8 +993,8 @@ export class ReporteEmpleadosComponent implements OnInit {
   }
 
   //ENVIAR DATOS A LA VENTANA DE DETALLE
-  verDatos(data: any, tipo: string) {
-    const encodedData = JSON.stringify(data);
-      this.router.navigate(['/ver-empleados-activos-detalle/', tipo, encodedData]);
+  verDatos(tipo: string) {
+    this.verDetalle = true;
+    this.tipo = tipo;
   }
 }
