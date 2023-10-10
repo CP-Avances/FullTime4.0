@@ -1,13 +1,3 @@
-.col-sm {
-    font-weight: bold;
-}
-
-#boton {
-    background-color: rgb(80, 87, 97);
-    color: white;
-    margin-top: 10px;
-}
-
 #datosF {
     font-weight: bold;
     font-size: 15px;
@@ -98,16 +88,6 @@ p {
     text-align: center;
 }
 
-table {
-    width: 100%;
-    font-size: 13px;
-}
-
-td {
-    padding-top: 10px;
-    text-align: center;
-}
-
 #cancel {
     color: red;
     cursor: pointer;
@@ -167,4 +147,11 @@ td {
 
 [type="file"]+label.btn-2:hover::before {
     right: 80%
+}
+
+#geolocalizacion {
+    height: 400px;
+    width: 100%;
+    border: 2px solid white;
+    margin-bottom: 50px;
 }

@@ -11,8 +11,10 @@
             <div class="row">
                 <div class="col-md">
                     <mat-card class="mat-elevation-z8">
-                        <div id="titulo">
-                            <h5>{{e.nombre.toUpperCase()}} {{e.apellido.toUpperCase()}}</h5>
+                        <div class="d-flex bd-highlight" id="resultados">
+                            <h5 class="w-100 bd-highlight align-self-center">
+                                {{e.nombre.toUpperCase()}} {{e.apellido.toUpperCase()}}
+                            </h5>
                         </div>
                         <mat-card-content>
                             <div class="container" style="padding-top: 15px;">
@@ -25,7 +27,8 @@
                                             <div mat-card-avatar id="avatar">
                                                 <span
                                                     class="btn iniciales d-flex align-items-center justify-content-center">
-                                                    {{iniciales}}</span>
+                                                    {{iniciales}}
+                                                </span>
                                             </div>
                                         </ng-template>
                                     </div>
@@ -38,60 +41,55 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col">
-                                        <label class="col-sm col-form-label">Código:</label>
-                                    </div>
-                                    <div class="col">
-                                        <label class="col col-form-label">{{e.codigo}}</label>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <label class="col-sm col-form-label">Cédula:</label>
-                                    </div>
-                                    <div class="col">
-                                        <label class="col col-form-label">{{e.cedula}}</label>
+                                    <div class="col-md">
+                                        <div class="espacio d-flex justify-content-start">
+                                            <label id="datosF">Código:</label>
+                                            <label>{{e.codigo}}</label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col">
-                                        <label class="col-sm col-form-label">Correo electrónico:</label>
-                                    </div>
-                                    <div class="col">
-                                        <label class="col col-form-label">{{e.correo}}</label>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <label class="col-sm col-form-label">Domicilio:</label>
-                                    </div>
-                                    <div class="col">
-                                        <label class="col col-form-label">{{e.domicilio | titlecase}}</label>
+                                    <div class="col-md">
+                                        <div class="espacio d-flex justify-content-start">
+                                            <label id="datosF">Cédula:</label>
+                                            <label>{{e.cedula}}</label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col">
-                                        <label class="col-sm col-form-label">Teléfono:</label>
-                                    </div>
-                                    <div class="col">
-                                        <label class="col col-form-label">{{e.telefono}}</label>
+                                    <div class="col-md">
+                                        <div class="espacio d-flex justify-content-start">
+                                            <label id="datosF">Domicilio:</label>
+                                            <label>{{e.domicilio | titlecase}}</label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col">
-                                        <label class="col-sm col-form-label">Fecha de Nacimiento:</label>
+                                    <div class="col-md">
+                                        <div class="espacio d-flex justify-content-start">
+                                            <label id="datosF">Teléfono:</label>
+                                            <label>{{e.telefono}}</label>
+                                        </div>
                                     </div>
-                                    <div class="col">
-                                        <label class="col col-form-label"> {{ e.fec_nacimiento_ }}
-                                        </label>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md">
+                                        <div class="espacio d-flex justify-content-start">
+                                            <label id="datosF">Fecha de nacimiento:</label>
+                                            <label>{{ e.fec_nacimiento_ }}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md">
+                                        <div class="espacio d-flex justify-content-start">
+                                            <label id="datosF">E-mail:</label>
+                                            <label>{{e.correo}}</label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </mat-card-content>
-                        <div class="col" style="text-align: right;">
-                            <button type="submit" class="btn" id="boton" (click)="CambiarContrasena()">Modificar
-                                contraseña</button>
-                        </div>
                     </mat-card>
                 </div>
                 <br>
@@ -140,12 +138,22 @@
                                     <i class="material-icons fas fa-file-csv"></i><span>Exportar a CSV</span>
                                 </button>
                             </mat-grid-tile>
+                            <mat-grid-tile>
+                                <button type="submit" (click)="CambiarContrasena()"
+                                    class="btn btn-block d-flex align-items-center justify-content-center"
+                                    id="Selector">
+                                    <i class="material-icons">create</i><span>Modificar contraseña</span>
+                                </button>
+                            </mat-grid-tile>
                         </mat-grid-list>
                     </mat-card>
                 </div>
             </div>
         </div>
-        <br><br>
+        <br>
+        <div class="container">
+            <div id="geolocalizacion"></div>
+        </div>
     </mat-tab>
 
     <!-- DISCAPACIDAD Y TITULO DEL EMPLEADO -->
@@ -164,7 +172,9 @@
                             </div>
                             <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
                                 <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                                    (click)="AbrirVentanaRegistarTituloEmpleado()">Añadir</button>
+                                    (click)="AbrirVentanaRegistarTituloEmpleado()">
+                                    Añadir
+                                </button>
                             </div>
                         </div>
                         <mat-card-content>
@@ -187,15 +197,15 @@
                                 </div>
                                 <div class="row" style="margin-top: 5px;">
                                     <div class="col" style="text-align: right;">
-                                        <a mat-button type="submit" class="btn" matSuffix matTooltipPosition="right"
+                                        <i type="submit" id="edit" (click)="AbrirVentanaEditarTitulo(rte)" matSuffix
+                                            matTooltipPosition="right"
                                             matTooltip="Editar los datos generales de este registro."
-                                            (click)="AbrirVentanaEditarTitulo(rte)">
-                                            <i class="fas fa-edit" id="edit">
-                                                <p>Editar</p>
-                                            </i>
-                                        </a>
-                                        <i class="far fa-trash-alt" (click)="ConfirmarDeleteTitulo(rte.id)"
-                                            matTooltipPosition="right" id="delete" matTooltip="Eliminar este registro">
+                                            class="fas fa-edit">
+                                            <p>Editar</p>
+                                        </i>
+                                        <i style="margin-left: 2%;" class="far fa-trash-alt"
+                                            (click)="ConfirmarDeleteTitulo(rte.id)" matSuffix matTooltipPosition="right"
+                                            id="delete" matTooltip="Eliminar este registro">
                                             <p>Eliminar</p>
                                         </i>
                                     </div>
@@ -236,13 +246,11 @@
                                 </div>
                                 <div class="row" style="margin-top: 5px;">
                                     <div class="col" style="text-align: right;">
-                                        <a mat-button type="submit" (click)="ConfirmarDeleteDiscapacidad(d.id_empleado)"
-                                            matSuffix>
-                                            <i class="far fa-trash-alt" matTooltipPosition="right" id="delete"
-                                                matTooltip="Eliminar registro">
-                                                <p>Eliminar</p>
-                                            </i>
-                                        </a>
+                                        <i type="submit" style="margin-left: 2%;" class="far fa-trash-alt"
+                                            (click)="ConfirmarDeleteDiscapacidad(d.id_empleado)" matSuffix
+                                            matTooltipPosition="right" id="delete" matTooltip="Eliminar registro">
+                                            <p>Eliminar</p>
+                                        </i>
                                     </div>
                                 </div>
                             </div>
@@ -269,7 +277,9 @@
                             </div>
                             <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
                                 <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                                    (click)="MostrarVentanaVacuna()">Añadir</button>
+                                    (click)="MostrarVentanaVacuna()">
+                                    Añadir
+                                </button>
                             </div>
                         </div>
                         <mat-card-content>
@@ -309,8 +319,9 @@
                                             matTooltip="Modificar los datos generales de este registro.">
                                             <p>Editar</p>
                                         </i>
-                                        <i class="fas fa-backspace" id="cancel" (click)="ConfirmarEliminarVacuna(dv)"
-                                            matSuffix matTooltipPosition="right" matTooltip="Eliminar registro.">
+                                        <i  class="far fa-trash-alt" id="delete"
+                                            (click)="ConfirmarEliminarVacuna(dv)" matSuffix matTooltipPosition="right"
+                                            matTooltip="Eliminar registro.">
                                             <p>Eliminar</p>
                                         </i>
                                     </div>
