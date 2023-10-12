@@ -358,7 +358,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
       objeto = {
         "departamento": {
           "$": { "id": obj.id },
-          "empresa": obj.nomempresa,
           "establecimiento": obj.nomsucursal,
           "departamento": obj.nombre,
           "nivel": obj.nivel,
