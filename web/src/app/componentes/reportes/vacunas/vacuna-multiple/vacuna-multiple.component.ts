@@ -442,8 +442,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       documentDefinition = this.getDocumentDefinicion();
     }
 
-    var f = new Date();
-    let doc_name = 'Reporte Vacunas' + f.toLocaleString() + '.pdf';
+    let doc_name = 'Reporte_vacunas.pdf';
     switch (action) {
       case 'open':
         pdfMake.createPdf(documentDefinition).open();
@@ -776,7 +775,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     );
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Vacunas');
-    xlsx.writeFile(wb, 'Vacunas ' + new Date().getTime() + '.xlsx');
+    xlsx.writeFile(wb, 'Vacunas.xlsx');
   }
 
   MapingDataPdfDefault(array: Array<any>) {
@@ -816,7 +815,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     );
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Vacunas');
-    xlsx.writeFile(wb, 'Vacunas ' + new Date().getTime() + '.xlsx');
+    xlsx.writeFile(wb, 'Vacunas.xlsx');
   }
 
   MapingDataPdfDefaultCargo(array: Array<any>) {

@@ -13,6 +13,7 @@ import * as FileSaver from 'file-saver';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import * as xml2js from 'xml2js';
 
 import { RegistrarSucursalesComponent } from '../registrar-sucursales/registrar-sucursales.component';
 import { EditarSucursalComponent } from 'src/app/componentes/catalogos/catSucursal/editar-sucursal/editar-sucursal.component';
@@ -196,7 +197,7 @@ export class ListaSucursalesComponent implements OnInit {
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('Establecimientos.pdf'); break;
 
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
@@ -287,7 +288,7 @@ export class ListaSucursalesComponent implements OnInit {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.sucursales);
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Establecimientos');
-    xlsx.writeFile(wb, "Establecimientos" + new Date().getTime() + '.xlsx');
+    xlsx.writeFile(wb, "Establecimientos" + '.xlsx');
   }
 
   /** ************************************************************************************************** ** 
@@ -298,7 +299,7 @@ export class ListaSucursalesComponent implements OnInit {
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.sucursales);
     const csvDataH = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "EstablecimientosCSV" + new Date().getTime() + '.csv');
+    FileSaver.saveAs(data, "EstablecimientosCSV" + '.csv');
   }
 
   /** ************************************************************************************************* **
@@ -313,7 +314,7 @@ export class ListaSucursalesComponent implements OnInit {
     this.sucursales.forEach(obj => {
       objeto = {
         "establecimiento": {
-          '@id': obj.id,
+          "$": { "id": obj.id },
           "empresa": obj.nomempresa,
           "establecimiento": obj.nombre,
           "ciudad": obj.descripcion,
@@ -322,12 +323,32 @@ export class ListaSucursalesComponent implements OnInit {
       arregloSucursales.push(objeto)
     });
 
-    this.rest.CrearXML(arregloSucursales).subscribe(res => {
-      this.data = res;
-      console.log("prueba data", res)
-      this.urlxml = `${environment.url}/sucursales/download/` + this.data.name;
-      window.open(this.urlxml, "_blank");
-    });
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Establecimientos' });
+    const xml = xmlBuilder.buildObject(arregloSucursales);
+
+    if (xml === undefined) {
+      console.error('Error al construir el objeto XML.');
+      return;
+    }
+
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const xmlUrl = URL.createObjectURL(blob);
+
+    // Abrir una nueva pestaña o ventana con el contenido XML
+    const newTab = window.open(xmlUrl, '_blank');
+    if (newTab) {
+      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
+      newTab.focus(); // Dar foco a la nueva pestaña
+    } else {
+      alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
+    }
+    // const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = xmlUrl;
+    a.download = 'Estamblecimientos.xml';
+    // Simular un clic en el enlace para iniciar la descarga
+    a.click();
   }
 
 }

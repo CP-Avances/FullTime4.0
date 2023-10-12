@@ -12,6 +12,7 @@ import * as xlsx from 'xlsx';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import * as xml2js from 'xml2js';
 
 // IMPORTAR COMPONENTES
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
@@ -189,7 +190,7 @@ export class ListarNivelTitulosComponent implements OnInit {
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('Niveles_titulos.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
     this.ObtenerNiveles();
@@ -289,7 +290,7 @@ export class ListarNivelTitulosComponent implements OnInit {
     wst["!cols"] = wscols;
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wst, 'LISTAR NIVELES TITULOS');
-    xlsx.writeFile(wb, "NivelesTitulosEXCEL" + new Date().getTime() + '.xlsx');
+    xlsx.writeFile(wb, "NivelesTitulosEXCEL" + '.xlsx');
     this.ObtenerNiveles();
   }
 
@@ -305,17 +306,38 @@ export class ListarNivelTitulosComponent implements OnInit {
     this.nivelTitulos.forEach(obj => {
       objeto = {
         "titulos": {
-          '@id': obj.id,
+          "$": { "id": obj.id },
           "nivel": obj.nombre,
         }
       }
       arregloTitulos.push(objeto)
     });
-    this.nivel.CrearXML(arregloTitulos).subscribe(res => {
-      this.data = res;
-      this.urlxml = `${environment.url}/nivel-titulo/download/` + this.data.name;
-      window.open(this.urlxml, "_blank");
-    });
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Niveles_titulos' });
+    const xml = xmlBuilder.buildObject(arregloTitulos);
+
+    if (xml === undefined) {
+      console.error('Error al construir el objeto XML.');
+      return;
+    }
+
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const xmlUrl = URL.createObjectURL(blob);
+
+    // Abrir una nueva pestaña o ventana con el contenido XML
+    const newTab = window.open(xmlUrl, '_blank');
+    if (newTab) {
+      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
+      newTab.focus(); // Dar foco a la nueva pestaña
+    } else {
+      alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
+    }
+    // const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = xmlUrl;
+    a.download = 'Niveles_titulos.xml';
+    // Simular un clic en el enlace para iniciar la descarga
+    a.click();
     this.ObtenerNiveles();
   }
 
@@ -328,7 +350,7 @@ export class ListarNivelTitulosComponent implements OnInit {
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.nivelTitulos);
     const csvDataC = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "NivelesTitulosCSV" + new Date().getTime() + '.csv');
+    FileSaver.saveAs(data, "NivelesTitulosCSV" + '.csv');
     this.ObtenerNiveles();
   }
 }

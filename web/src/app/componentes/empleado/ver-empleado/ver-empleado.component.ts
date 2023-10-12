@@ -2722,7 +2722,7 @@ export class VerEmpleadoComponent implements OnInit {
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download( this.empleadoUno[0].nombre + '_' + this.empleadoUno[0].apellido + "_" + new Date().getTime() + '.pdf'); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download( this.empleadoUno[0].nombre + '_' + this.empleadoUno[0].apellido + '.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }
@@ -3041,7 +3041,7 @@ export class VerEmpleadoComponent implements OnInit {
       const wsca: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos[2]);
       xlsx.utils.book_append_sheet(wb, wsca, 'CARGO');
     }
-    xlsx.writeFile(wb, (datos[0])[0].Nombre +"_"+ (datos[0])[0].Apellido +"_" + new Date().getTime() + '.xlsx');
+    xlsx.writeFile(wb, (datos[0])[0].Nombre +"_"+ (datos[0])[0].Apellido +'.xlsx');
   }
 
   /** ******************************************************************************************* **
@@ -3061,7 +3061,7 @@ export class VerEmpleadoComponent implements OnInit {
     datosEmpleado.push(objeto);
     const csvDataE = xlsx.utils.sheet_to_csv(xlsx.utils.json_to_sheet(datosEmpleado));
     const data: Blob = new Blob([csvDataE], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, (datos[0])[0].Nombre +"_"+ (datos[0])[0].Apellido +"_"  + new Date().getTime() + '.csv');
+    FileSaver.saveAs(data, (datos[0])[0].Nombre +"_"+ (datos[0])[0].Apellido +'.csv');
   }
 
   /** ******************************************************************************************* ** 
@@ -3097,7 +3097,7 @@ export class VerEmpleadoComponent implements OnInit {
 
       objeto = {
         "empleado": {
-          'codigo': obj.codigo,
+          "$": { "codigo": obj.codigo },
           "apellido": obj.apellido,
           "nombre": obj.nombre,
           "cedula": obj.cedula,
@@ -3185,7 +3185,7 @@ export class VerEmpleadoComponent implements OnInit {
 
     const a = document.createElement('a');
     a.href = xmlUrl;
-    a.download = objeto.empleado.nombre + '-' + objeto.empleado.apellido + '-' + new Date().getTime() + '.xml';
+    a.download = objeto.empleado.nombre + '-' + objeto.empleado.apellido +'.xml';
     // Simular un clic en el enlace para iniciar la descarga
     a.click();
   }

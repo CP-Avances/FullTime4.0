@@ -11,6 +11,7 @@ import * as xlsx from 'xlsx';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import * as xml2js from 'xml2js';
 
 // IMPORTACION DE COMPONENTES
 import { EditarFeriadosComponent } from 'src/app/componentes/catalogos/catFeriados/feriados/editar-feriados/editar-feriados.component';
@@ -383,7 +384,7 @@ export class ListarFeriadosComponent implements OnInit {
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('Feriados.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
     this.BuscarParametro();
@@ -488,7 +489,7 @@ export class ListarFeriadosComponent implements OnInit {
     wsr["!cols"] = wscols;
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'LISTA FERIADOS');
-    xlsx.writeFile(wb, "FeriadosEXCEL" + new Date().getTime() + '.xlsx');
+    xlsx.writeFile(wb, "FeriadosEXCEL" + '.xlsx');
     this.BuscarParametro();
   }
 
@@ -505,7 +506,7 @@ export class ListarFeriadosComponent implements OnInit {
     this.feriados.forEach(obj => {
       objeto = {
         "roles": {
-          '@id': obj.id,
+          "$": { "id": obj.id },
           "descripcion": obj.descripcion,
           "fecha": obj.fecha_,
           "fec_recuperacion": obj.fec_recuperacion_,
@@ -514,11 +515,33 @@ export class ListarFeriadosComponent implements OnInit {
       arregloFeriados.push(objeto)
     });
 
-    this.rest.CrearXML(arregloFeriados).subscribe(res => {
-      this.data = res;
-      this.urlxml = `${environment.url}/feriados/download/` + this.data.name;
-      window.open(this.urlxml, "_blank");
-    });
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Feriados' });
+    const xml = xmlBuilder.buildObject(arregloFeriados);
+
+    if (xml === undefined) {
+      console.error('Error al construir el objeto XML.');
+      return;
+    }
+
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const xmlUrl = URL.createObjectURL(blob);
+
+    // Abrir una nueva pestaña o ventana con el contenido XML
+    const newTab = window.open(xmlUrl, '_blank');
+    if (newTab) {
+      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
+      newTab.focus(); // Dar foco a la nueva pestaña
+    } else {
+      alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
+    }
+    // const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = xmlUrl;
+    a.download = 'Feriados.xml';
+    // Simular un clic en el enlace para iniciar la descarga
+    a.click();
+
     this.BuscarParametro();
   }
 
@@ -538,7 +561,7 @@ export class ListarFeriadosComponent implements OnInit {
     }));
     const csvDataC = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "FeriadosCSV" + new Date().getTime() + '.csv');
+    FileSaver.saveAs(data, "FeriadosCSV" + '.csv');
     this.BuscarParametro();
   }
 

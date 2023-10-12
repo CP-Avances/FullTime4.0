@@ -361,8 +361,7 @@ export class ReporteEmpleadosComponent implements OnInit {
 
   generarPdf(action) {
     const documentDefinition = this.getDocumentDefinicion();
-    var f = new Date()
-    let doc_name = "Reporte empleados activos" + f.toLocaleString() + ".pdf";
+    let doc_name = "Reporte_usuarios_activos.pdf";
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -752,7 +751,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefault(this.data_pdf));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Empleados Activos');
-    xlsx.writeFile(wb, "Empleados Activos " + new Date().getTime() + '.xlsx');
+    xlsx.writeFile(wb, 'Usuarios_activos.xlsx');
 
   }
 
@@ -786,7 +785,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefaultCargo(this.data_pdf));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Empleados Activos');
-    xlsx.writeFile(wb, "Empleados Activos " + new Date().getTime() + '.xlsx');
+    xlsx.writeFile(wb, "Usuarios_activos.xlsx");
 
   }
 
