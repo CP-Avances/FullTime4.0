@@ -404,15 +404,15 @@ export class ReporteEmpleadosComponent implements OnInit {
       },
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
-        { text: localStorage.getItem('name_empresa'), bold: true, fontSize: 21, alignment: 'center', margin: [0, -35, 0, 10] },
-        { text: 'Reporte - Empleados Activos', bold: true, fontSize: 13, alignment: 'center' },
+        { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 21, alignment: 'center', margin: [0, -35, 0, 10] },
+        { text: 'REPORTE - EMPLEADOS ACTIVOS', bold: true, fontSize: 13, alignment: 'center' },
         ...this.impresionDatosPDF(this.data_pdf).map(obj => {
           return obj
         })
       ],
       styles: {
         tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTable: { fontSize: 10.5 },
+        itemsTable: { fontSize: 10.5},
         itemsTableInfo: { fontSize: 12, margin: [0, 3, 0, 3], fillColor: this.s_color },
         itemsTableCentrado: { fontSize: 10, alignment: 'center' },
         tableMarginSuc: { margin: [0, 10, 0, 10] },
@@ -425,15 +425,12 @@ export class ReporteEmpleadosComponent implements OnInit {
   }
 
   impresionDatosPDF(data: any[]): Array<any> {
-    let n: any = []
-    let c = 0;
+    let n: any = [];
     let arr_emp: any = [];
 
     if (this.bool_car === true) {
       data.forEach((obj1) => {
-        // let array_car = obj1.empleados.map(o => {return o.empleados.length});
-        let arr_emp: any = [];
-
+        arr_emp = [];
         
         n.push({
           style: 'tableMarginSuc',
@@ -479,10 +476,9 @@ export class ReporteEmpleadosComponent implements OnInit {
                 { text: 'CORREO', style: 'tableHeader' }
               ],
               ...arr_emp.map(obj3 => {
-                c = c + 1
                 return [
-                  { style: 'itemsTableCentrado', text: c },
-                  { style: 'itemsTable', text: obj3.codigo },
+                  { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
+                  { style: 'itemsTableCentrado', text: obj3.codigo},
                   { style: 'itemsTable', text: obj3.name_empleado },
                   { style: 'itemsTable', text: obj3.cedula },
                   { style: 'itemsTable', text: obj3.genero },
@@ -506,11 +502,10 @@ export class ReporteEmpleadosComponent implements OnInit {
 
     else {
       data.forEach((obj: IReporteAtrasos) => {
-
         if (this.bool_suc === true) {
           let arr_suc = obj.departamentos.map(o => { return o.empleado.length });
           let suma_suc = this.SumarRegistros(arr_suc);
-          let arr_emp: any = [];
+          arr_emp = [];
           n.push({
             style: 'tableMarginSuc',
             table: {
@@ -545,6 +540,7 @@ export class ReporteEmpleadosComponent implements OnInit {
           })
 
           n.push({
+            
             style: 'tableMarginEmp',
             table: {
               widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
@@ -561,10 +557,9 @@ export class ReporteEmpleadosComponent implements OnInit {
                   { text: 'CORREO', style: 'tableHeader' }
                 ],
                 ...arr_emp.map(obj3 => {
-                  c = c + 1
                   return [
-                    { style: 'itemsTableCentrado', text: c },
-                    { style: 'itemsTable', text: obj3.codigo },
+                    { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
+                    { style: 'itemsTableCentrado', text: obj3.codigo },
                     { style: 'itemsTable', text: obj3.name_empleado },
                     { style: 'itemsTable', text: obj3.cedula },
                     { style: 'itemsTable', text: obj3.genero },
@@ -651,10 +646,9 @@ export class ReporteEmpleadosComponent implements OnInit {
                     { text: 'CORREO', style: 'tableHeader' }
                   ],
                   ...arr_emp.map(obj3 => {
-                    c = c + 1
                     return [
-                      { style: 'itemsTableCentrado', text: c },
-                      { style: 'itemsTable', text: obj3.codigo },
+                      { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
+                      { style: 'itemsTableCentrado', text: obj3.codigo },
                       { style: 'itemsTable', text: obj3.name_empleado },
                       { style: 'itemsTable', text: obj3.cedula },
                       { style: 'itemsTable', text: obj3.genero },
@@ -677,7 +671,7 @@ export class ReporteEmpleadosComponent implements OnInit {
         }
 
         if (this.bool_emp === true) {
-
+          arr_emp = [];
           obj.departamentos.forEach(o => {
             o.empleado.forEach(e => {
               arr_emp.push(e)
@@ -689,7 +683,6 @@ export class ReporteEmpleadosComponent implements OnInit {
     } 
 
     if (arr_emp.length > 0 && this.bool_emp === true) {
-      c = 0
       n.push({
         style: 'tableMarginEmp',
         table: {
@@ -708,10 +701,9 @@ export class ReporteEmpleadosComponent implements OnInit {
               { text: 'CORREO', style: 'tableHeader' }
             ],
             ...arr_emp.map(obj3 => {
-              c = c + 1
               return [
-                { style: 'itemsTableCentrado', text: c },
-                { style: 'itemsTable', text: obj3.codigo },
+                { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
+                { style: 'itemsTableCentrado', text: obj3.codigo },
                 { style: 'itemsTable', text: obj3.name_empleado },
                 { style: 'itemsTable', text: obj3.cedula },
                 { style: 'itemsTable', text: obj3.genero },

@@ -235,10 +235,8 @@ export class VerVacunasComponent implements OnInit {
    *******************************************/
 
   generarPdf(action) {
-    console.log('aca 1', this.data);
     const documentDefinition = this.getDocumentDefinicion();
-    var f = new Date();
-    let doc_name = 'Reporte empleados activos' + f.toLocaleString() + '.pdf';
+    let doc_name = 'Reporte_vacunas.pdf';
     switch (action) {
       case 'open':
         pdfMake.createPdf(documentDefinition).open();
@@ -256,7 +254,6 @@ export class VerVacunasComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
-    console.log('aca 2');
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -308,14 +305,14 @@ export class VerVacunasComponent implements OnInit {
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
         {
-          text: localStorage.getItem('name_empresa'),
+          text: localStorage.getItem('name_empresa')?.toUpperCase(),
           bold: true,
           fontSize: 21,
           alignment: 'center',
           margin: [0, -35, 0, 10],
         },
         {
-          text: 'Reporte - Empleados Activos',
+          text: 'REPORTE - REGISTRO DE VACUNACIÓN',
           bold: true,
           fontSize: 13,
           alignment: 'center',
@@ -353,7 +350,6 @@ export class VerVacunasComponent implements OnInit {
 
   impresionDatosPDF(data: any[]): Array<any> {
     let n: any = [];
-    let c = 0;
 
     if (this.bool_car === true) {
       data.forEach((obj1) => {
@@ -417,9 +413,8 @@ export class VerVacunasComponent implements OnInit {
                   { text: 'Descripción', style: 'tableHeader' },
                 ],
                 ...obj2.vacunas.map((obj3) => {
-                  c = c + 1;
                   return [
-                    { style: 'itemsTableCentrado', text: c },
+                    { style: 'itemsTableCentrado', text: obj2.vacunas.indexOf(obj3)+1 },
                     { style: 'itemsTable', text: obj3.tipo_vacuna },
                     { style: 'itemsTable', text: obj3.fecha.split('T')[0] },
                     { style: 'itemsTable', text: obj3.descripcion },
@@ -527,9 +522,8 @@ export class VerVacunasComponent implements OnInit {
                     { text: 'Descripción', style: 'tableHeader' },
                   ],
                   ...obj2.vacunas.map((obj3) => {
-                    c = c + 1;
                     return [
-                      { style: 'itemsTableCentrado', text: c },
+                      { style: 'itemsTableCentrado', text: obj2.vacunas.indexOf(obj3)+1 },
                       { style: 'itemsTable', text: obj3.tipo_vacuna },
                       { style: 'itemsTable', text: obj3.fecha.split('T')[0] },
                       { style: 'itemsTable', text: obj3.descripcion },

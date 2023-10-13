@@ -180,10 +180,8 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
    *******************************************/
 
   generarPdf(action) {
-    console.log('aca 1', this.data);
     const documentDefinition = this.getDocumentDefinicion();
-    var f = new Date();
-    let doc_name = 'Reporte empleados activos' + f.toLocaleString() + '.pdf';
+    let doc_name = 'Reporte_usuarios_activos.pdf';
     switch (action) {
       case 'open':
         pdfMake.createPdf(documentDefinition).open();
@@ -201,7 +199,6 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
-    console.log('aca 2');
     return {
       pageSize: 'A4',
       pageOrientation: 'landscape',
@@ -253,14 +250,14 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
         {
-          text: localStorage.getItem('name_empresa'),
+          text: localStorage.getItem('name_empresa')?.toUpperCase(),
           bold: true,
           fontSize: 21,
           alignment: 'center',
           margin: [0, -35, 0, 10],
         },
         {
-          text: 'Reporte - Empleados Activos',
+          text: 'REPORTE - EMPLEADOS ACTIVOS',
           bold: true,
           fontSize: 13,
           alignment: 'center',
@@ -285,13 +282,12 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
 
   impresionDatosPDF(data: any[]): Array<any> {
     let n: any = []
-    let c = 0;
     let arr_emp: any = [];
 
     if (this.bool_car === true) {
       data.forEach((obj1) => {
         // let array_car = obj1.empleados.map(o => {return o.empleados.length});
-        let arr_emp: any = [];
+        arr_emp= [];
 
         
         n.push({
@@ -338,10 +334,9 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
                 { text: 'CORREO', style: 'tableHeader' }
               ],
               ...arr_emp.map(obj3 => {
-                c = c + 1
                 return [
-                  { style: 'itemsTableCentrado', text: c },
-                  { style: 'itemsTable', text: obj3.codigo },
+                  { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
+                  { style: 'itemsTableCentrado', text: obj3.codigo },
                   { style: 'itemsTable', text: obj3.name_empleado },
                   { style: 'itemsTable', text: obj3.cedula },
                   { style: 'itemsTable', text: obj3.genero },
@@ -369,7 +364,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
         if (this.bool_suc === true) {
           let arr_suc = obj.departamentos.map(o => { return o.empleado.length });
           let suma_suc = this.SumarRegistros(arr_suc);
-          let arr_emp: any = [];
+          arr_emp = [];
           n.push({
             style: 'tableMarginSuc',
             table: {
@@ -420,10 +415,9 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
                   { text: 'CORREO', style: 'tableHeader' }
                 ],
                 ...arr_emp.map(obj3 => {
-                  c = c + 1
                   return [
-                    { style: 'itemsTableCentrado', text: c },
-                    { style: 'itemsTable', text: obj3.codigo },
+                    { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
+                    { style: 'itemsTableCentrado', text: obj3.codigo },
                     { style: 'itemsTable', text: obj3.name_empleado },
                     { style: 'itemsTable', text: obj3.cedula },
                     { style: 'itemsTable', text: obj3.genero },
@@ -510,10 +504,9 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
                     { text: 'CORREO', style: 'tableHeader' }
                   ],
                   ...arr_emp.map(obj3 => {
-                    c = c + 1
                     return [
-                      { style: 'itemsTableCentrado', text: c },
-                      { style: 'itemsTable', text: obj3.codigo },
+                      { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
+                      { style: 'itemsTableCentrado', text: obj3.codigo },
                       { style: 'itemsTable', text: obj3.name_empleado },
                       { style: 'itemsTable', text: obj3.cedula },
                       { style: 'itemsTable', text: obj3.genero },
@@ -536,7 +529,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
         }
 
         if (this.bool_emp === true) {
-
+          arr_emp = [];
           obj.departamentos.forEach(o => {
             o.empleado.forEach(e => {
               arr_emp.push(e)
@@ -548,7 +541,6 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
     } 
 
     if (arr_emp.length > 0 && this.bool_emp === true) {
-      c = 0
       n.push({
         style: 'tableMarginEmp',
         table: {
@@ -567,10 +559,9 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
               { text: 'CORREO', style: 'tableHeader' }
             ],
             ...arr_emp.map(obj3 => {
-              c = c + 1
               return [
-                { style: 'itemsTableCentrado', text: c },
-                { style: 'itemsTable', text: obj3.codigo },
+                { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
+                { style: 'itemsTableCentrado', text: obj3.codigo },
                 { style: 'itemsTable', text: obj3.name_empleado },
                 { style: 'itemsTable', text: obj3.cedula },
                 { style: 'itemsTable', text: obj3.genero },

@@ -520,7 +520,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
           margin: [0, -30, 0, 10],
         },
         {
-          text: 'Reporte - Registro de Vacunación',
+          text: 'REPORTE - REGISTRO DE VACUNACIÓN',
           bold: true,
           fontSize: 16,
           alignment: 'center',
@@ -559,7 +559,6 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
 
   impresionDatosPDF(data: any[]): Array<any> {
     let n: any = [];
-    let c = 0;
 
     if (this.bool.bool_cargo === true) {
       data.forEach((obj1)=>{
@@ -624,9 +623,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
                   { text: 'Descripción', style: 'tableHeader' },
                 ],
                 ...obj2.vacunas.map((obj3) => {
-                  c = c + 1;
                   return [
-                    { style: 'itemsTableCentrado', text: c },
+                    { style: 'itemsTableCentrado', text: obj2.vacunas.indexOf(obj3)+1 },
                     { style: 'itemsTable', text: obj3.tipo_vacuna },
                     { style: 'itemsTable', text: obj3.fecha.split('T')[0] },
                     { style: 'itemsTable', text: obj3.descripcion },
@@ -735,9 +733,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
                     { text: 'Descripción', style: 'tableHeader' },
                   ],
                   ...obj2.vacunas.map((obj3) => {
-                    c = c + 1;
                     return [
-                      { style: 'itemsTableCentrado', text: c },
+                      { style: 'itemsTableCentrado', text: obj2.vacunas.indexOf(obj3)+1 },
                       { style: 'itemsTable', text: obj3.tipo_vacuna },
                       { style: 'itemsTable', text: obj3.fecha.split('T')[0] },
                       { style: 'itemsTable', text: obj3.descripcion },
