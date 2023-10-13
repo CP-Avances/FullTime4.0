@@ -555,14 +555,14 @@ export class MainNavComponent implements OnInit {
             ]
           },
           {
-            name: 'Timbre Teletrabajo',
+            name: 'Timbre Virtual',
             accion: this.HabilitarTimbreWeb,
             estado: this.HabilitarTimbreWeb,
             icono: 'computer',
             subtitulo: true,
             color: true,
             children: [
-              { name: 'Timbre Teletrabajo', url: '/reporte-timbre-sistema', color: true },
+              { name: 'Timbre Virtual', url: '/reporte-timbre-sistema', color: true },
             ]
           },
           {
@@ -590,7 +590,7 @@ export class MainNavComponent implements OnInit {
               { name: 'Faltas', url: '/reporte-faltas', color: true },
               { name: 'Atrasos', url: '/reporte-atrasos-multiples', color: true },
               { name: 'Timbres', url: '/reporte-timbres-multiples', color: true },
-              { name: 'Timbre Horario Abierto', url: '/reporte-timbre-abierto', color: true },
+              { name: 'Timbres Libres', url: '/reporte-timbre-abierto', color: true },
               { name: 'Puntualidad', url: '/reporte-puntualidad', color: true },
               //{ name: 'Horas Trabajadas', url: '/reporte-horas-trabaja', color: true },
               { name: 'Empleados Activos', url: '/reporteEmpleados', color: true },
