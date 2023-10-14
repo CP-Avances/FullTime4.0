@@ -912,6 +912,7 @@ export class EditarPlanificacionComponent implements OnInit {
     }
     else if (this.datos_horarios.pagina === 'lista-planificar') {
       this.componenteb.editar_horario = false;
+      this.componenteb.columnAccion = true;
       this.componenteb.multiple = true;
       this.componenteb.auto_individual = true;
       this.componenteb.ver_activar_editar = true;

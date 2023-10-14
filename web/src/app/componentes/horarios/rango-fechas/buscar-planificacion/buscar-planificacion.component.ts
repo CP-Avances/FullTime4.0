@@ -36,7 +36,7 @@ export class BuscarPlanificacionComponent {
   seleccionar: boolean = true;
 
   idEmpleadoLogueado: any;
-
+  columnAccion: boolean = true;
   constructor(
     public informacion: DatosGeneralesService, // SERVICIO DE DATOS INFORMATIVOS DE USUARIOS
     public componente: HorarioMultipleEmpleadoComponent,
@@ -149,6 +149,7 @@ export class BuscarPlanificacionComponent {
   ObtenerHorariosEmpleado(fec_inicio: any, fec_final: any, opcion: number, codigo: any) {
     this.editar_activar = false;
     this.editar_horario = false;
+    this.columnAccion = true;
     this.horariosEmpleado = [];
     if (opcion === 1) {
       this.mes_inicio = fec_inicio.format("YYYY-MM-DD");
@@ -513,6 +514,7 @@ export class BuscarPlanificacionComponent {
     this.editar_activar = false;
     this.auto_individual = false;
     this.ver_activar_editar = false;
+    this.columnAccion = false;
   }
 
   // METODO PARA CAMBIAR DE COLORES SEGUN EL MES

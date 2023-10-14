@@ -26,8 +26,7 @@
                                             <div mat-card-avatar id="avatar">
                                                 <span
                                                     class="btn iniciales d-flex align-items-center justify-content-center">
-                                                    {{iniciales}}
-                                                </span>
+                                                    {{iniciales}}</span>
                                             </div>
                                         </ng-template>
                                     </div>
@@ -325,9 +324,9 @@
                                                 <label id="datosF">Carnet:</label>
                                                 <a matSuffix matTooltipPosition="right"
                                                     matTooltip="Dar click para descargar carnet de vacunación."
-                                                    href="{{hipervinculo}}/vacunas/documentos/{{dv.carnet}}/{{dv.id_empleado}}"
+                                                    href="{{hipervinculo}}/vacunas/documentos/{{dv.carnet}}"
                                                     target="_blank">
-                                                    <label style="font-size: 13px;">{{dv.carnet}}</label>
+                                                    <label style="font-size: 13px;">{{dv.nom_carnet}}</label>
                                                 </a>
                                             </div>
                                         </div>
@@ -369,14 +368,6 @@
         </ng-template>
 
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
-            <div style="padding-bottom: 35px;" *ngIf="editar_contrato">
-                <app-editar-contrato [contrato]="contrato_editar" [pagina]="pagina_contrato">
-                </app-editar-contrato>
-            </div>
-            <div style="padding-bottom: 35px;" *ngIf="!btnActualizarCargo">
-                <app-editar-cargo [idSelectCargo]="idSelectCargo" [idEmploy]="idEmpleado" id="editarCargo">
-                </app-editar-cargo>
-            </div>
             <div class="row">
                 <div class="col-md" style="padding-bottom: 20px;">
                     <mat-card class="mat-elevation-z8">
@@ -384,12 +375,9 @@
                             <div class="w-100 bd-highlight">
                                 <h5>CONTRATO ACTUAL</h5>
                             </div>
-                            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;"
-                                *ngIf="!editar_contrato">
+                            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
                                 <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                                    (click)="AbrirVentanaCrearContrato()">
-                                    Añadir
-                                </button>
+                                    (click)="AbrirVentanaCrearContrato()">Añadir</button>
                             </div>
                         </div>
                         <mat-card-content>
@@ -405,7 +393,7 @@
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Fecha desde:</label>
+                                            <label id="datosF">Fecha ingreso:</label>
                                             <label>{{ce.fec_ingreso_}}</label>
                                         </div>
                                     </div>
@@ -413,7 +401,7 @@
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Fecha hasta:</label>
+                                            <label id="datosF">Fecha salida:</label>
                                             <label *ngIf="ce.fec_salida === null; else fechaSalida">Sin
                                                 fecha</label>
                                             <ng-template #fechaSalida>
@@ -450,14 +438,14 @@
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
                                             <label id="datosF">Documento contrato:</label>
-                                            <a *ngIf="ce.documento != null && ce.documento != ''; else ContratoCargar"
+                                            <a *ngIf="ce.doc_nombre != null && ce.doc_nombre != ''; else ContratoCargar"
                                                 class="fas fa-file-alt"
                                                 style="color:rgb(11, 70, 197); text-align: center; margin-left: 20px;"
                                                 matSuffix matTooltipPosition="right"
                                                 matTooltip="Dar click para descargar contrato de trabajo"
-                                                href="{{hipervinculo}}/contratoEmpleado/documentos/{{ce.documento}}/contrato/{{ce.id_empleado}}"
+                                                href="{{hipervinculo}}/contratoEmpleado/documentos/{{ce.documento}}"
                                                 target="_blank">
-                                                <p>{{ce.documento}}</p>
+                                                <p>{{ce.doc_nombre}}</p>
                                             </a>
                                             <ng-template #ContratoCargar>
                                                 <a mat-raised-button id="btndocumento" type="submit"
@@ -468,7 +456,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div style="text-align: right; padding-top: 3%;" *ngIf="!editar_contrato">
+                                <div style="text-align: right; padding-top: 3%;">
                                     <i type="submit" id="edit" style="margin-right: 20px;"
                                         (click)="AbrirVentanaEditarContrato(ce)" matSuffix matTooltipPosition="right"
                                         matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
@@ -518,7 +506,7 @@
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Fecha desde:</label>
+                                            <label id="datosF">Fecha ingreso:</label>
                                             <label>{{ce.fec_ingreso_}}</label>
                                         </div>
                                     </div>
@@ -526,7 +514,7 @@
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Fecha hasta:</label>
+                                            <label id="datosF">Fecha salida:</label>
                                             <label *ngIf="ce.fec_salida === null">Sin fecha</label>
                                             <label *ngIf="ce.fec_salida != null">{{ce.fec_salida_}}</label>
                                         </div>
@@ -554,16 +542,16 @@
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
                                             <label id="datosF">Documento contrato:</label>
-                                            <a *ngIf="ce.documento != null && ce.documento != ''"
+                                            <a *ngIf="ce.doc_nombre != null && ce.doc_nombre != ''"
                                                 class="fas fa-file-alt"
                                                 style="color:rgb(11, 70, 197); text-align: center; margin-left: 20px; font-size: 13px;"
                                                 matSuffix matTooltipPosition="right"
                                                 matTooltip="Dar click para descargar contrato de trabajo"
                                                 href="{{hipervinculo}}/contratoEmpleado/documentos/{{ce.documento}}"
                                                 target="_blank">
-                                                <p>{{ce.documento}}</p>
+                                                <p>{{ce.doc_nombre}}</p>
                                             </a>
-                                            <a *ngIf="ce.documento === null || ce.documento === ''" mat-raised-button
+                                            <a *ngIf="ce.doc_nombre === null || ce.doc_nombre === ''" mat-raised-button
                                                 id="btndocumento" type="submit"
                                                 (click)="VerContratoEdicion(false); ObtenerIdContratoSeleccionado(ce.id)"
                                                 [disabled]="!btnActualizarContrato">
@@ -584,12 +572,16 @@
                     </mat-card>
                 </div>
                 <div class="col-md">
+                    <div style="padding-bottom: 35px;" *ngIf="!btnActualizarCargo">
+                        <app-editar-cargo [idSelectCargo]="idSelectCargo" [idEmploy]="idEmpleado" id="editarCargo">
+                        </app-editar-cargo>
+                    </div>
                     <mat-card class="mat-elevation-z8">
                         <div class="d-flex bd-highlight" id="titulo">
                             <div class="w-100 bd-highlight">
                                 <h5>CARGO ACTUAL</h5>
                             </div>
-                            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;" *ngIf="btnActualizarCargo">
+                            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
                                 <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
                                     (click)="AbrirVentanaCargo()">{{btnTitulo}}</button>
                             </div>
@@ -615,7 +607,7 @@
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Fecha desde:</label>
+                                            <label id="datosF">Fecha ingreso:</label>
                                             <label>{{c.fec_inicio_}}</label>
                                         </div>
                                     </div>
@@ -623,7 +615,7 @@
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Fecha hasta:</label>
+                                            <label id="datosF">Fecha finalización:</label>
                                             <label>{{c.fec_final_}}</label>
                                         </div>
                                     </div>
@@ -711,7 +703,7 @@
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Fecha desde:</label>
+                                            <label id="datosF">Fecha ingreso:</label>
                                             <label>{{c.fec_inicio_}}</label>
                                         </div>
                                     </div>
@@ -719,7 +711,7 @@
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
-                                            <label id="datosF">Fecha hasta:</label>
+                                            <label id="datosF">Fecha finalización:</label>
                                             <label>{{c.fec_final_}}</label>
                                         </div>
                                     </div>
@@ -826,7 +818,7 @@
                                 <div class="col-md" id="verticalLine">
                                     <div class="row">
                                         <div class="col-md" style="text-align: center;">
-                                            <div style="padding-top: 5px; margin: 0 auto;">
+                                            <div style="padding-top: 5px;">
                                                 <button id="boton_redondo" class="btn btn-sm"
                                                     (click)="AbrirPlanificarHorario()">
                                                     Horario Fijo
@@ -834,7 +826,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md" style="text-align: center;">
-                                            <div style="padding-top: 5px; margin: 0 auto;">
+                                            <div style="padding-top: 5px;">
                                                 <button id="boton_redondo" class="btn btn-sm"
                                                     (click)="AbrirVentanaHorarioRotativo()">
                                                     Horario Múltiple
@@ -843,7 +835,7 @@
                                         </div>
                                         <div class="col-md" style="text-align: center;">
                                             <div style="padding-top: 5px; margin: 0 auto;">
-                                                <button id="boton_redondo" class="btn btn-sm"
+                                                <button id="boton_redondoElimi" class="btn btn-sm"
                                                     (click)="EliminarHorarios()">
                                                     Eliminar
                                                 </button>
@@ -947,31 +939,17 @@
                         LISTA DE HORARIOS DEL USUARIO
                     </span>
                 </div>
-
-                <div class="table_content">
-
-                    <div class="table'container">
-                        <table id="table_horario1" #tabla1>
-                            <thead class="thead-light table table-hover table-sm fondo">
-                                <tr style="text-align: center; height: 67px;">
-                                    <th scope="col" id="td_horarios" rowspan="2">AÑO</th>
-                                    <th scope="col" id="td_horarios" rowspan="2">MES</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let h of horariosEmpleado | paginate:tamanio_pagina:numero_pagina"
-                                    style="text-align: center;">
-                                    <td id="td_horarios" [ngStyle]="{'background':CambiarColores(h.color)}">{{h.anio}}</td>
-                                    <td id="td_horarios" [ngStyle]="{'background':CambiarColores(h.color)}">{{h.mes}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+<!--https://www.google.com/search?q=como+hacer+que+una+columna+se+quede+estatica+en+html+y+css&rlz=1C1ALOY_esEC950EC950&oq=como+hacer+que+una+columna+se+quede+estatica+en+html+y+css&gs_lcrp=EgZjaHJvbWUyBggAEEUYOdIBCTIwMTQ3ajBqN6gCALACAA&sourceid=chrome&ie=UTF-8#fpstate=ive&vld=cid:8eb6592c,vid:xedl472XwKc,st:0-->
                 
+                <div class="table_content">                
                     <div class="table-responsive" #tabla2>
-                        <table id="table_horario2" class="table table-hover table-sm ">
+                        <table id="table_horario2" class="table table-hover table-sm">
                             <thead class="thead-light">
-                                <th scope="col" id="td_horarios" colspan="31">DÍAS DEL MES</th>
+                                <tr style="text-align: center;">
+                                    <th class="sticky colum_1" scope="col" id="td_horarios" rowspan="2">AÑO</th>
+                                    <th class="sticky-2 colum_1" scope="col" id="td_horarios" rowspan="2">MES</th>
+                                    <th scope="col" id="td_horarios" colspan="31">DÍAS DEL MES</th>
+                                </tr>
                                 <tr style="text-align: center;">
                                     <th scope="col" id="td_horarios">01</th>
                                     <th scope="col" id="td_horarios">02</th>
@@ -1007,8 +985,9 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let h of horariosEmpleado | paginate:tamanio_pagina:numero_pagina"
-                                    >    
+                                <tr *ngFor="let h of horariosEmpleado | paginate:tamanio_pagina:numero_pagina">    
+                                    <td class="sticky colum_1" id="td_horarios" [ngStyle]="{'background':CambiarColores(h.color)}">{{h.anio}}</td>
+                                    <td class="sticky-2 colum_1" id="td_horarios" [ngStyle]="{'background':CambiarColores(h.color)}">{{h.mes}}</td>
                                     <td id="td_horarios"
                                         [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 1 ? '#9CF7B9' : '' }">
                                         <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
