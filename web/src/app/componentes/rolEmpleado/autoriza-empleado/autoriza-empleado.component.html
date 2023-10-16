@@ -12,25 +12,22 @@
                     </div>
                 </div>
                 <mat-card-content>
-                    <div class="container" *ngFor="let autoD of autorizacionesTotales" style="padding-top: 15px;">
-                        <div class="container">
-                            <div class="row">
-                                <div class="col-md">
-                                    <div class="caja1 d-flex justify-content-start">
-                                        <label id="datosF">Departamento de:</label>
-                                        <label>{{autoD.nom_depar}}</label>
-                                    </div>
-                                </div>
-                                <div class="col-md">
-                                    <div class="caja1 d-flex justify-content-start">
-                                        <label id="datosF">Autoriza:</label>
-                                        <label *ngIf="autoD.estado == true">Sí</label>
-                                        <label *ngIf="autoD.estado == false">No</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <mat-divider style="margin-bottom: 10px;"></mat-divider>
+                    <div class="table-responsive" style="padding-top: 10px;">
+                        <table class="table table-hover table-sm">
+                            <thead class="thead-light">
+                                <tr style="text-align: center;">
+                                    <th scope="col">Departamento</th>
+                                    <th scope="col">Proceso</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let autoD of autorizacionesTotales">
+                                    <td>{{autoD.nom_depar}}</td>
+                                    <td *ngIf="autoD.preautorizar == false">Autorizar</td>
+                                    <td *ngIf="autoD.preautorizar == true">Preautorizar</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </mat-card-content>
             </mat-card>

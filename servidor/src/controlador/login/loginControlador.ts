@@ -46,6 +46,8 @@ class LoginControlador {
       // SI EXISTE USUARIOS
       if (USUARIO.rowCount != 0) {
 
+        console.log('usuario existe')
+
         const { id, id_empleado, id_rol, usuario: user } = USUARIO.rows[0];
 
         let ACTIVO = await pool.query(
@@ -60,13 +62,14 @@ class LoginControlador {
 
         const { empleado, usuario, codigo, web_access } = ACTIVO[0];
 
+        console.log('estado del usuario ', empleado, ' ', usuario)
         // SI EL USUARIO NO SE ENCUENTRA ACTIVO
         if (empleado === 2 && usuario === false) {
-          return res.jsonp({ message: 'EL usuario se encuentra con estado inactivo.' });
+          return res.jsonp({ message: 'inactivo' });
         }
 
         // SI LOS USUARIOS NO TIENEN PERMISO DE ACCESO
-        if (!web_access) return res.status(404).jsonp({ message: "Sistema deshabilitado para usuarios." })
+        if (!web_access) return res.status(404).jsonp({ message: "sin_permiso_acceso" })
 
         // BUSQUEDA DE MODULOS DEL SISTEMA
         const [modulos] = await pool.query(
@@ -84,7 +87,7 @@ class LoginControlador {
 
         const { public_key, id_empresa } = EMPRESA.rows[0];
 
-        // BUSQUEDA DE LICENCIA DE USO DE APLICACIÓN
+        // BUSQUEDA DE LICENCIA DE USO DE APLICACION
         const data = fs.readFileSync('licencia.conf.json', 'utf8')
         const FileLicencias = JSON.parse(data);
 
@@ -97,12 +100,12 @@ class LoginControlador {
         })
 
         if (ok_licencias.length === 0) return res.status(404)
-          .jsonp({ message: 'La licencia no existe, consulte con el administrador del sistema.' });
+          .jsonp({ message: 'licencia_no_existe' });
 
         const hoy = new Date();
         const { fec_activacion, fec_desactivacion } = ok_licencias[0];
-        if (hoy > fec_desactivacion) return res.status(404).jsonp({ message: 'La licencia a expirado.' });
-        if (hoy < fec_activacion) return res.status(404).jsonp({ message: 'La licencia a expirado.' });
+        if (hoy > fec_desactivacion) return res.status(404).jsonp({ message: 'licencia_expirada' });
+        if (hoy < fec_activacion) return res.status(404).jsonp({ message: 'licencia_expirada' });
         caducidad_licencia = fec_desactivacion
 
         // BUSQUEDA DE INFORMACION
@@ -124,6 +127,7 @@ class LoginControlador {
 
         // VALIDACION DE ACCESO CON LICENCIA 
         if (INFORMACION.rowCount > 0) {
+          console.log('ingresa a validacion de licencia')
 
           try {
             const { id_contrato, id_cargo, id_departamento, acciones_timbres, id_sucursal, id_empresa,
@@ -170,7 +174,7 @@ class LoginControlador {
             }
 
           } catch (error) {
-            return res.status(404).jsonp({ message: 'No existe registro de licencias.' });
+            return res.status(404).jsonp({ message: 'licencia_no_existe' });
           }
         }
         else {

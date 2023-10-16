@@ -742,7 +742,7 @@ class PermisosControlador {
      ** *         METODO PARA ENVIO DE CORREO ELECTRONICO DE SOLICITUDES DE PERMISOS                * ** 
      ** ********************************************************************************************* **/
 
-    // METODO PARA ENVIAR CORREO ELECTRONICO DESDE APLICACION WEB
+    // METODO PARA ENVIAR CORREO ELECTRONICO DESDE APLICACION WEB -- verificar estado
     public async EnviarCorreoWebMultiple(req: Request, res: Response): Promise<void> {
 
         const usuarios = req.body.usuarios;
@@ -872,6 +872,7 @@ class PermisosControlador {
         }
     }
 
+    // verificar estado
     public async ListarEstadosPermisos(req: Request, res: Response) {
         const PERMISOS = await pool.query('SELECT p.id, p.fec_creacion, p.descripcion, p.fec_inicio, ' +
             'p.documento, p.fec_final, p.estado, p.id_empl_cargo, e.id AS id_emple_solicita, e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, ' +
@@ -889,6 +890,8 @@ class PermisosControlador {
         }
     }
 
+
+// verificar estado
     public async ListarPermisosAutorizados(req: Request, res: Response) {
         const PERMISOS = await pool.query('SELECT p.id, p.fec_creacion, p.descripcion, p.fec_inicio, ' +
             'p.documento,  p.fec_final, p.estado, p.id_empl_cargo, e.id AS id_emple_solicita, e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, ' +

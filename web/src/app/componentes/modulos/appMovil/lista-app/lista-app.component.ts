@@ -1,4 +1,4 @@
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
@@ -23,14 +23,13 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 export class ListaAppComponent implements OnInit {
 
-  buscador !: FormGroup;
-
   // CONTROL DE CRITERIOS DE BUSQUEDA
   codigo = new FormControl('');
   cedula = new FormControl('', [Validators.minLength(2)]);
   nombre_emp = new FormControl('', [Validators.minLength(2)]);
   nombre_dep = new FormControl('', [Validators.minLength(2)]);
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
+  nombre_reg = new FormControl('', [Validators.minLength(2)]);
   nombre_carg = new FormControl('', [Validators.minLength(2)]);
   seleccion = new FormControl('');
 
@@ -38,6 +37,7 @@ export class ListaAppComponent implements OnInit {
     bool_suc: false,
     bool_dep: false,
     bool_emp: false,
+    bool_reg: false,
     bool_cargo: false,
   };
 
@@ -46,19 +46,26 @@ export class ListaAppComponent implements OnInit {
   // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA HABILITADOS
   departamentos: any = [];
   sucursales: any = [];
-  respuesta: any[];
   empleados: any = [];
+  respuesta: any[];
+  regimen: any = [];
   habilitados: any = [];
 
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
   selectionCarg = new SelectionModel<ITableEmpleados>(true, []);
   selectionDep = new SelectionModel<ITableEmpleados>(true, []);
   selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
+  selectionReg = new SelectionModel<ITableEmpleados>(true, []);
 
   // ITEMS DE PAGINACION DE LA TABLA SUCURSAL
   pageSizeOptions_suc = [5, 10, 20, 50];
   tamanio_pagina_suc: number = 5;
   numero_pagina_suc: number = 1;
+
+  // ITEMS DE PAGINACION DE LA TABLA REGIMEN
+  pageSizeOptions_reg = [5, 10, 20, 50];
+  tamanio_pagina_reg: number = 5;
+  numero_pagina_reg: number = 1;
 
   // ITEMS DE PAGINACION DE LA TABLA CARGO
   pageSizeOptions_car = [5, 10, 20, 50];
@@ -91,10 +98,13 @@ export class ListaAppComponent implements OnInit {
   get filtroCodigo() { return this.restR.filtroCodigo };
   get filtroCedula() { return this.restR.filtroCedula };
 
-
   // FILTRO CARGOS
   filtroNombreCarg_: string = '';
   get filtroNombreCarg() { return this.restR.filtroNombreCarg };
+
+  // FILTRO REGIMEN
+  filtroNombreReg_: string = '';
+  get filtroNombreReg() { return this.restR.filtroNombreReg };
 
 
   /** ********************************************************************************************************************** **
@@ -107,6 +117,7 @@ export class ListaAppComponent implements OnInit {
   nombre_emp_dh = new FormControl('', [Validators.minLength(2)]);
   nombre_dep_dh = new FormControl('', [Validators.minLength(2)]);
   nombre_suc_dh = new FormControl('', [Validators.minLength(2)]);
+  nombre_reg_dh = new FormControl('', [Validators.minLength(2)]);
   nombre_carg_dh = new FormControl('', [Validators.minLength(2)]);
   seleccion_dh = new FormControl('');
 
@@ -114,6 +125,7 @@ export class ListaAppComponent implements OnInit {
     bool_suc: false,
     bool_dep: false,
     bool_emp: false,
+    bool_reg: false,
     bool_cargo: false,
   };
 
@@ -122,19 +134,26 @@ export class ListaAppComponent implements OnInit {
   // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA DESHABILITADOS
   departamentos_dh: any = [];
   sucursales_dh: any = [];
-  respuesta_dh: any[];
   empleados_dh: any = [];
+  respuesta_dh: any[];
+  regimen_dh: any = [];
   deshabilitados: any = [];
 
   selectionSuc_dh = new SelectionModel<ITableEmpleados>(true, []);
   selectionCarg_dh = new SelectionModel<ITableEmpleados>(true, []);
   selectionDep_dh = new SelectionModel<ITableEmpleados>(true, []);
   selectionEmp_dh = new SelectionModel<ITableEmpleados>(true, []);
+  selectionReg_dh = new SelectionModel<ITableEmpleados>(true, []);
 
   // ITEMS DE PAGINACION DE LA TABLA SUCURSAL
   pageSizeOptions_suc_dh = [5, 10, 20, 50];
   tamanio_pagina_suc_dh: number = 5;
   numero_pagina_suc_dh: number = 1;
+
+  // ITEMS DE PAGINACION DE LA TABLA REGIMEN
+  pageSizeOptions_reg_dh = [5, 10, 20, 50];
+  tamanio_pagina_reg_dh: number = 5;
+  numero_pagina_reg_dh: number = 1;
 
   // ITEMS DE PAGINACION DE LA TABLA CARGO
   pageSizeOptions_car_dh = [5, 10, 20, 50];
@@ -171,6 +190,10 @@ export class ListaAppComponent implements OnInit {
   dh_filtroNombreCarg_: string = '';
   get dh_filtroNombreCarg() { return this.restR.filtroNombreCarg };
 
+  // FILTRO REGIMEN
+  dh_filtroNombreReg_: string = '';
+  get dh_filtroNombreReg() { return this.restR.filtroNombreReg };
+
   // HABILITAR O DESHABILITAR EL ICONO DE PROCESO INDIVIDUAL
   individual: boolean = true;
   individual_dh: boolean = true;
@@ -196,8 +219,8 @@ export class ListaAppComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
-      this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
-      this.check_dh = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);;
+      this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
+      this.check_dh = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);;
       this.BuscarInformacionHabilitados();
       this.BuscarInformacioDeshabilitados();
       this.BuscarCargos();
@@ -241,7 +264,8 @@ export class ListaAppComponent implements OnInit {
     this.deshabilitados = [];
     this.sucursales_dh = [];
     this.empleados_dh = [];
-    this.informacion.UsuariosTimbreMovil(false).subscribe((res: any[]) => {
+    this.regimen_dh = [];
+    this.informacion.UsuariosTimbreMovil(1, false).subscribe((res: any[]) => {
       this.inactivar = true;
       this.deshabilitados = JSON.stringify(res);
 
@@ -277,6 +301,24 @@ export class ListaAppComponent implements OnInit {
           })
         })
       })
+
+      res.forEach(obj => {
+        obj.departamentos.forEach(ele => {
+          ele.empleado.forEach(reg => {
+            reg.regimen.forEach(r => {
+              this.regimen_dh.push({
+                id: r.id_regimen,
+                nombre: r.name_regimen
+              })
+            })
+          })
+        })
+      })
+
+      this.regimen_dh = this.regimen_dh.filter((obj, index, self) =>
+        index === self.findIndex((o) => o.id === obj.id)
+      );
+
     }, err => {
       this.inactivar = false;
     })
@@ -290,7 +332,7 @@ export class ListaAppComponent implements OnInit {
     this.origen_cargo_dh = [];
     this.cargos_dh = [];
     this.empleados_cargos_dh = [];
-    this.informacion.UsuariosTimbreMovilCargos(false).subscribe((res: any[]) => {
+    this.informacion.UsuariosTimbreMovilCargos(1, false).subscribe((res: any[]) => {
       this.inactivar = true;
       this.origen_cargo_dh = JSON.stringify(res);
 
@@ -339,24 +381,27 @@ export class ListaAppComponent implements OnInit {
     this.MostrarLista_DH();
     switch (this.opcion_dh) {
       case 's':
-        this.ControlarOpcionesDeshabilitados(true, false, false, false);
+        this.ControlarOpcionesDeshabilitados(true, false, false, false, false);
         this.ControlarBotonesDeshabilitados(true, false, true);
-
+        break;
+      case 'r':
+        this.ControlarOpcionesDeshabilitados(false, false, false, false, true);
+        this.ControlarBotonesDeshabilitados(true, false, true);
         break;
       case 'c':
-        this.ControlarOpcionesDeshabilitados(false, true, false, false);
+        this.ControlarOpcionesDeshabilitados(false, true, false, false, false);
         this.ControlarBotonesDeshabilitados(true, false, true);
         break;
       case 'd':
-        this.ControlarOpcionesDeshabilitados(false, false, true, false);
+        this.ControlarOpcionesDeshabilitados(false, false, true, false, false);
         this.ControlarBotonesDeshabilitados(true, false, true);
         break;
       case 'e':
-        this.ControlarOpcionesDeshabilitados(false, false, false, true);
+        this.ControlarOpcionesDeshabilitados(false, false, false, true, false);
         this.ControlarBotonesDeshabilitados(true, false, true);
         break;
       default:
-        this.ControlarOpcionesDeshabilitados(false, false, false, false);
+        this.ControlarOpcionesDeshabilitados(false, false, false, false, false);
         this.ControlarBotonesDeshabilitados(true, false, true);
         break;
     }
@@ -365,8 +410,9 @@ export class ListaAppComponent implements OnInit {
   }
 
   // METODO PARA CONTROLAR OPCIONES DE BUSQUEDA
-  ControlarOpcionesDeshabilitados(sucursal: boolean, cargo: boolean, departamento: boolean, empleado: boolean,) {
+  ControlarOpcionesDeshabilitados(sucursal: boolean, cargo: boolean, departamento: boolean, empleado: boolean, regimen: boolean) {
     this._booleanOptions_dh.bool_suc = sucursal;
+    this._booleanOptions_dh.bool_reg = regimen;
     this._booleanOptions_dh.bool_cargo = cargo;
     this._booleanOptions_dh.bool_dep = departamento;
     this._booleanOptions_dh.bool_emp = empleado;
@@ -384,6 +430,9 @@ export class ListaAppComponent implements OnInit {
   GuardarRegistros_DH(id: number) {
     if (this.opcion_dh === 's') {
       this.ModelarSucursal_DH(id);
+    }
+    else if (this.opcion_dh === 'r') {
+      this.ModelarRegimen_DH(id);
     }
     else if (this.opcion_dh === 'c') {
       this.ModelarCargo_DH(id);
@@ -422,6 +471,42 @@ export class ListaAppComponent implements OnInit {
             })
           })
         }
+      })
+    }
+
+    this.RegistrarMultiple(usuarios, 1);
+  }
+
+  // METODO PARA PRESENTAR DATOS DE SUCURSALES
+  ModelarRegimen_DH(id: number) {
+    let usuarios: any = [];
+    let respuesta = JSON.parse(this.deshabilitados)
+    if (id === 0) {
+      respuesta.forEach((obj: any) => {
+        obj.departamentos.forEach((obj1: any) => {
+          obj1.empleado.forEach((obj2: any) => {
+            this.selectionReg.selected.find(obj3 => {
+              obj2.regimen.forEach((obj4: any) => {
+                if (obj3.id === obj4.id_regimen) {
+                  usuarios.push(obj2);
+                }
+              })
+            })
+          })
+        })
+      })
+    }
+    else {
+      respuesta.forEach((obj: any) => {
+        obj.departamentos.forEach((obj2: any) => {
+          obj2.empleado.forEach((obj3: any) => {
+            obj3.regimen.forEach((obj4: any) => {
+              if (obj4.id_regimen === id) {
+                usuarios.push(obj3)
+              }
+            })
+          })
+        })
       })
     }
 
@@ -509,7 +594,17 @@ export class ListaAppComponent implements OnInit {
       this.selectionEmp_dh.clear();
       this.selectionCarg_dh.clear();
       this.selectionSuc_dh.clear();
+      this.selectionReg_dh.clear();
       this.Filtrar_DH('', 1)
+    }
+    else if (this.opcion === 'r') {
+      this.nombre_reg_dh.reset();
+      this.dh_filtroNombreReg_ = '';
+      this.selectionDep_dh.clear();
+      this.selectionCarg_dh.clear();
+      this.selectionEmp_dh.clear();
+      this.selectionSuc_dh.clear();
+      this.Filtrar_DH('', 12)
     }
     else if (this.opcion_dh === 'c') {
       this.nombre_carg_dh.reset();
@@ -517,6 +612,7 @@ export class ListaAppComponent implements OnInit {
       this.selectionEmp_dh.clear();
       this.selectionDep_dh.clear();
       this.selectionSuc_dh.clear();
+      this.selectionReg_dh.clear();
       this.Filtrar_DH('', 2)
     }
     else if (this.opcion_dh === 'd') {
@@ -527,6 +623,7 @@ export class ListaAppComponent implements OnInit {
       this.selectionEmp_dh.clear();
       this.selectionCarg_dh.clear();
       this.selectionSuc_dh.clear();
+      this.selectionReg_dh.clear();
       this.Filtrar_DH('', 1)
       this.Filtrar_DH('', 3)
     }
@@ -540,6 +637,7 @@ export class ListaAppComponent implements OnInit {
       this.selectionDep_dh.clear();
       this.selectionCarg_dh.clear();
       this.selectionSuc_dh.clear();
+      this.selectionReg_dh.clear();
       this.Filtrar_DH('', 4)
       this.Filtrar_DH('', 5)
       this.Filtrar_DH('', 6)
@@ -556,6 +654,7 @@ export class ListaAppComponent implements OnInit {
       case 4: this.restR.setFiltroCodigo(e); break;
       case 5: this.restR.setFiltroCedula(e); break;
       case 6: this.restR.setFiltroNombreEmp(e); break;
+      case 12: this.restR.setFiltroNombreReg(e); break;
       default:
         break;
     }
@@ -609,6 +708,27 @@ export class ListaAppComponent implements OnInit {
       return `${this.isAllSelectedSuc_DH() ? 'select' : 'deselect'} all`;
     }
     return `${this.selectionSuc_dh.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  isAllSelectedReg_DH() {
+    const numSelected = this.selectionReg_dh.selected.length;
+    return numSelected === this.regimen_dh.length
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  masterToggleReg_DH() {
+    this.isAllSelectedReg_DH() ?
+      this.selectionReg_dh.clear() :
+      this.regimen_dh.forEach(row => this.selectionReg_dh.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelReg_DH(row?: ITableEmpleados): string {
+    if (!row) {
+      return `${this.isAllSelectedReg_DH() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selectionReg_dh.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
@@ -692,6 +812,10 @@ export class ListaAppComponent implements OnInit {
       this.tamanio_pagina_car_dh = e.pageSize;
       this.numero_pagina_car_dh = e.pageIndex + 1;
     }
+    else if (this._booleanOptions_dh.bool_reg === true) {
+      this.tamanio_pagina_reg_dh = e.pageSize;
+      this.numero_pagina_reg_dh = e.pageIndex + 1;
+    }
   }
 
 
@@ -706,7 +830,8 @@ export class ListaAppComponent implements OnInit {
     this.habilitados = [];
     this.sucursales = [];
     this.empleados = [];
-    this.informacion.UsuariosTimbreMovil(true).subscribe((res: any[]) => {
+    this.regimen = [];
+    this.informacion.UsuariosTimbreMovil(1, true).subscribe((res: any[]) => {
       this.activar = true;
       this.habilitados = JSON.stringify(res);
 
@@ -742,6 +867,25 @@ export class ListaAppComponent implements OnInit {
           })
         })
       })
+
+
+      res.forEach(obj => {
+        obj.departamentos.forEach(ele => {
+          ele.empleado.forEach(reg => {
+            reg.regimen.forEach(r => {
+              this.regimen.push({
+                id: r.id_regimen,
+                nombre: r.name_regimen
+              })
+            })
+          })
+        })
+      })
+
+      this.regimen = this.regimen.filter((obj, index, self) =>
+        index === self.findIndex((o) => o.id === obj.id)
+      );
+
     }, err => {
       this.activar = false;
     })
@@ -755,7 +899,7 @@ export class ListaAppComponent implements OnInit {
     this.origen_cargo = [];
     this.cargos = [];
     this.empleados_cargos = [];
-    this.informacion.UsuariosTimbreMovilCargos(true).subscribe((res: any[]) => {
+    this.informacion.UsuariosTimbreMovilCargos(1, true).subscribe((res: any[]) => {
       this.activar = true;
       this.origen_cargo = JSON.stringify(res);
 
@@ -804,23 +948,27 @@ export class ListaAppComponent implements OnInit {
     this.MostrarLista();
     switch (this.opcion) {
       case 's':
-        this.ControlarOpciones(true, false, false, false);
+        this.ControlarOpciones(true, false, false, false, false);
+        this.ControlarBotones(true, false, true);
+        break;
+      case 'r':
+        this.ControlarOpciones(false, false, false, false, true);
         this.ControlarBotones(true, false, true);
         break;
       case 'c':
-        this.ControlarOpciones(false, true, false, false);
+        this.ControlarOpciones(false, true, false, false, false);
         this.ControlarBotones(true, false, true);
         break;
       case 'd':
-        this.ControlarOpciones(false, false, true, false);
+        this.ControlarOpciones(false, false, true, false, false);
         this.ControlarBotones(true, false, true);
         break;
       case 'e':
-        this.ControlarOpciones(false, false, false, true);
+        this.ControlarOpciones(false, false, false, true, false);
         this.ControlarBotones(true, false, true);
         break;
       default:
-        this.ControlarOpciones(false, false, false, false);
+        this.ControlarOpciones(false, false, false, false, false);
         this.ControlarBotones(true, false, true);
         break;
     }
@@ -829,8 +977,9 @@ export class ListaAppComponent implements OnInit {
   }
 
   // METODO PARA CONTROLAR OPCIONES DE BUSQUEDA
-  ControlarOpciones(sucursal: boolean, cargo: boolean, departamento: boolean, empleado: boolean,) {
+  ControlarOpciones(sucursal: boolean, cargo: boolean, departamento: boolean, empleado: boolean, regimen: any) {
     this._booleanOptions.bool_suc = sucursal;
+    this._booleanOptions.bool_reg = regimen;;
     this._booleanOptions.bool_cargo = cargo;
     this._booleanOptions.bool_dep = departamento;
     this._booleanOptions.bool_emp = empleado;
@@ -854,6 +1003,7 @@ export class ListaAppComponent implements OnInit {
       case 9: this.restR.setFiltroCodigo(e); break;
       case 10: this.restR.setFiltroCedula(e); break;
       case 11: this.restR.setFiltroNombreEmp(e); break;
+      case 13: this.restR.setFiltroNombreReg(e); break;
       default:
         break;
     }
@@ -907,6 +1057,27 @@ export class ListaAppComponent implements OnInit {
       return `${this.isAllSelectedSuc() ? 'select' : 'deselect'} all`;
     }
     return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  isAllSelectedReg() {
+    const numSelected = this.selectionReg.selected.length;
+    return numSelected === this.regimen.length
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  masterToggleReg() {
+    this.isAllSelectedReg() ?
+      this.selectionReg.clear() :
+      this.regimen.forEach(row => this.selectionReg.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelReg(row?: ITableEmpleados): string {
+    if (!row) {
+      return `${this.isAllSelectedReg() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
@@ -990,6 +1161,10 @@ export class ListaAppComponent implements OnInit {
       this.tamanio_pagina_car = e.pageSize;
       this.numero_pagina_car = e.pageIndex + 1;
     }
+    else if (this._booleanOptions.bool_reg === true) {
+      this.tamanio_pagina_reg = e.pageSize;
+      this.numero_pagina_reg = e.pageIndex + 1;
+    }
   }
 
   // METODO PARA PRESENTAR DATOS DE SUCURSALES
@@ -1018,6 +1193,42 @@ export class ListaAppComponent implements OnInit {
             })
           })
         }
+      })
+    }
+
+    this.RegistrarMultiple(usuarios, 2);
+  }
+
+  // CONSULTA DE LOS DATOS REGIMEN
+  ModelarRegimen(id: number) {
+    let usuarios: any = [];
+    let respuesta = JSON.parse(this.habilitados)
+    if (id === 0) {
+      respuesta.forEach((obj: any) => {
+        obj.departamentos.forEach((obj1: any) => {
+          obj1.empleado.forEach((obj2: any) => {
+            this.selectionReg.selected.find(obj3 => {
+              obj2.regimen.forEach((obj4: any) => {
+                if (obj3.id === obj4.id_regimen) {
+                  usuarios.push(obj2);
+                }
+              })
+            })
+          })
+        })
+      })
+    }
+    else {
+      respuesta.forEach((obj: any) => {
+        obj.departamentos.forEach((obj2: any) => {
+          obj2.empleado.forEach((obj3: any) => {
+            obj3.regimen.forEach((obj4: any) => {
+              if (obj4.id_regimen === id) {
+                usuarios.push(obj3)
+              }
+            })
+          })
+        })
       })
     }
 
@@ -1141,6 +1352,9 @@ export class ListaAppComponent implements OnInit {
     if (this.opcion === 's') {
       this.ModelarSucursal(id);
     }
+    if (this.opcion === 'r') {
+      this.ModelarRegimen(id);
+    }
     else if (this.opcion === 'c') {
       this.ModelarCargo(id);
     }
@@ -1195,6 +1409,14 @@ export class ListaAppComponent implements OnInit {
         this.selectionCarg.clear();
       }
 
+
+      if (this._booleanOptions.bool_reg) {
+        this.nombre_reg.reset();
+        this._booleanOptions.bool_reg = false;
+        this.selectionReg.deselect();
+        this.selectionReg.clear();
+      }
+
       this.seleccion.reset();
       this.activar_boton = false;
     }
@@ -1228,6 +1450,14 @@ export class ListaAppComponent implements OnInit {
         this.selectionCarg_dh.clear();
       }
 
+
+      if (this._booleanOptions_dh.bool_reg) {
+        this.nombre_reg_dh.reset();
+        this._booleanOptions_dh.bool_reg = false;
+        this.selectionReg_dh.deselect();
+        this.selectionReg_dh.clear();
+      }
+
       this.seleccion_dh.reset();
       this.activar_boton_dh = false;
     }
@@ -1240,7 +1470,17 @@ export class ListaAppComponent implements OnInit {
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionEmp.clear();
+      this.selectionReg.clear();
       this.Filtrar('', 6)
+    }
+    else if (this.opcion === 'r') {
+      this.nombre_reg.reset();
+      this.filtroNombreReg_ = '';
+      this.selectionDep.clear();
+      this.selectionCarg.clear();
+      this.selectionEmp.clear();
+      this.selectionSuc.clear();
+      this.Filtrar('', 13)
     }
     else if (this.opcion === 'c') {
       this.nombre_carg.reset();
@@ -1248,6 +1488,7 @@ export class ListaAppComponent implements OnInit {
       this.selectionEmp.clear();
       this.selectionDep.clear();
       this.selectionSuc.clear();
+      this.selectionReg.clear();
       this.Filtrar('', 7)
     }
     else if (this.opcion === 'd') {
@@ -1258,6 +1499,7 @@ export class ListaAppComponent implements OnInit {
       this.selectionEmp.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();
+      this.selectionReg.clear();
       this.Filtrar('', 6)
       this.Filtrar('', 8)
     }
@@ -1271,6 +1513,7 @@ export class ListaAppComponent implements OnInit {
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();
+      this.selectionReg.clear();
       this.Filtrar('', 9)
       this.Filtrar('', 10)
       this.Filtrar('', 11)

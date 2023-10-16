@@ -155,6 +155,7 @@ export class LoginComponent implements OnInit {
 
     // VALIDACION DEL LOGIN
     this.rest.ValidarCredenciales(dataUsuario).subscribe(datos => {
+      console.log('ver datos ', datos)
       if (datos.message === 'error') {
         var f = moment();
         var espera = '00:01:00';
@@ -175,6 +176,30 @@ export class LoginComponent implements OnInit {
 
       else if (datos.message === 'error_') {
         this.toastr.error('Usuario no cumple con todos los requerimientos necesarios para acceder al sistema.', 'Oops!', {
+          timeOut: 6000,
+        })
+      }
+
+      else if (datos.message === 'inactivo') {
+        this.toastr.error('Usuario no se encuentra activo en el sistema.', 'Oops!', {
+          timeOut: 6000,
+        })
+      }
+
+      else if (datos.message === 'licencia_expirada') {
+        this.toastr.error('Licencia del sistema ha expirado.', 'Oops!', {
+          timeOut: 6000,
+        })
+      }
+
+      else if (datos.message === 'sin_permiso_acceso') {
+        this.toastr.error('Usuario no tiene permisos de acceso al sistema.', 'Oops!', {
+          timeOut: 6000,
+        })
+      }
+
+      else if (datos.message === 'licencia_no_existe') {
+        this.toastr.error('No se ha encontrado registro de licencia del sistema.', 'Oops!', {
           timeOut: 6000,
         })
       }

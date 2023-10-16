@@ -249,7 +249,7 @@ class PlanHoraExtraControlador {
     res.jsonp({ message: 'Registro eliminado.' });
   }
 
-  // BUSQUEDA DE PLANIFICACIONES POR ID DE USUARIO
+  // BUSQUEDA DE PLANIFICACIONES POR ID DE USUARIO -- verificar si se requiere estado
   public async BuscarPlanUsuario(req: Request, res: Response) {
     const { id } = req.params;
     const PLAN = await pool.query(
@@ -291,7 +291,7 @@ class PlanHoraExtraControlador {
    ** *             ENVIO DE CORREOS ELECTRONICOS DE PLANIFICACIÓN DE HORAS EXTRAS                  **
    ** ********************************************************************************************* **/
 
-  // METODO ENVIO CORREO DESDE APLICACIÓN WEB CREACIÓN DE PLANIFICACIÓN DE HORAS EXTRAS
+  // METODO ENVIO CORREO DESDE APLICACIÓN WEB CREACIÓN DE PLANIFICACIÓN DE HORAS EXTRAS -- verificar si se requiere estado
   public async EnviarCorreoPlanificacion(req: Request, res: Response): Promise<void> {
     var tiempo = fechaHora();
     var fecha = await FormatearFecha(tiempo.fecha_formato, dia_completo);

@@ -1411,18 +1411,8 @@ export class VerEmpleadoComponent implements OnInit {
     this.ver_activar_editar = false;
   }
 
-  ControlExpandir() {
-    if (this.expansion === true) {
-      this.expansion = false;
-    }
-    else {
-      this.expansion = true;
-    }
-  }
-
   // METODO PARA CAMBIAR DE COLORES SEGUN EL MES
   CambiarColores(opcion: any) {
-    console.log('ver opcion ', opcion)
     let color: string;
     switch (opcion) {
       case 'ok':

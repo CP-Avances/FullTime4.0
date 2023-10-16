@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
 import { RestarPeriodoVacacionAutorizada } from '../../libs/CargarVacacion';
-import { enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, fechaHora, Credenciales,
-  FormatearFecha, FormatearHora, dia_completo }
+import {
+  enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, fechaHora, Credenciales,
+  FormatearFecha, FormatearHora, dia_completo
+}
   from '../../libs/settingsMail'
 import { QueryResult } from 'pg';
 import fs from 'fs';
@@ -31,6 +33,7 @@ class VacacionesControlador {
   }
 
   public async ListarVacaciones(req: Request, res: Response) {
+    const { estado } = req.body;
     const VACACIONES = await pool.query(
       `
       SELECT v.fec_inicio, v.fec_final, v.fec_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado, 
@@ -42,8 +45,10 @@ class VacacionesControlador {
 	      AND da.id_contrato = dc.contrato_id
         AND depa.id = da.id_departamento
 	      AND (v.estado = 1 OR v.estado = 2) 
+        AND da.estado = $1
       ORDER BY id DESC
       `
+      , [estado]
     );
 
     if (VACACIONES.rowCount > 0) {
@@ -314,17 +319,18 @@ class VacacionesControlador {
     }
   }
 
-  // BUSCAR VACACIONES MEDIANTE ID DE VACACION
+  // BUSCAR VACACIONES MEDIANTE ID DE VACACION *** revisar toma de estado
   public async ListarVacacionId(req: Request, res: Response) {
     const { id } = req.params;
+    const { estado } = req.body; // ---
     const VACACIONES = await pool.query(
       `
       SELECT v.id, v.fec_inicio, v.fec_final, fec_ingreso, v.estado, 
       v.dia_libre, v.dia_laborable, v.legalizado, v.id, v.id_peri_vacacion, e.id AS id_empleado, de.id_contrato
       FROM vacaciones AS v, empleados AS e, datos_actuales_empleado AS de
-	    WHERE v.id = $1 AND e.codigo = v.codigo AND e.id = de.id
+	    WHERE v.id = $1 AND e.codigo = v.codigo AND e.id = de.id AND de.estado = $2
       `
-      , [id]);
+      , [id, estado]);
     if (VACACIONES.rowCount > 0) {
       return res.jsonp(VACACIONES.rows)
     }

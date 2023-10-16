@@ -39,6 +39,7 @@ class VacacionesControlador {
     }
     ListarVacaciones(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            const { estado } = req.body;
             const VACACIONES = yield database_1.default.query(`
       SELECT v.fec_inicio, v.fec_final, v.fec_ingreso, v.estado, v.dia_libre, v.dia_laborable, v.legalizado, 
         v.id, v.id_peri_vacacion, v.id_empl_cargo, dc.contrato_id, e.id AS id_empl_solicita, da.id_departamento, 
@@ -49,8 +50,9 @@ class VacacionesControlador {
 	      AND da.id_contrato = dc.contrato_id
         AND depa.id = da.id_departamento
 	      AND (v.estado = 1 OR v.estado = 2) 
+        AND da.estado = $1
       ORDER BY id DESC
-      `);
+      `, [estado]);
             if (VACACIONES.rowCount > 0) {
                 return res.jsonp(VACACIONES.rows);
             }
@@ -288,16 +290,17 @@ class VacacionesControlador {
             }
         });
     }
-    // BUSCAR VACACIONES MEDIANTE ID DE VACACION
+    // BUSCAR VACACIONES MEDIANTE ID DE VACACION *** revisar toma de estado
     ListarVacacionId(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
+            const { estado } = req.body; // ---
             const VACACIONES = yield database_1.default.query(`
       SELECT v.id, v.fec_inicio, v.fec_final, fec_ingreso, v.estado, 
       v.dia_libre, v.dia_laborable, v.legalizado, v.id, v.id_peri_vacacion, e.id AS id_empleado, de.id_contrato
       FROM vacaciones AS v, empleados AS e, datos_actuales_empleado AS de
-	    WHERE v.id = $1 AND e.codigo = v.codigo AND e.id = de.id
-      `, [id]);
+	    WHERE v.id = $1 AND e.codigo = v.codigo AND e.id = de.id AND de.estado = $2
+      `, [id, estado]);
             if (VACACIONES.rowCount > 0) {
                 return res.jsonp(VACACIONES.rows);
             }

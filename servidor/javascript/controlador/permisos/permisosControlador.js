@@ -669,7 +669,7 @@ class PermisosControlador {
     /** ********************************************************************************************* **
      ** *         METODO PARA ENVIO DE CORREO ELECTRONICO DE SOLICITUDES DE PERMISOS                * **
      ** ********************************************************************************************* **/
-    // METODO PARA ENVIAR CORREO ELECTRONICO DESDE APLICACION WEB
+    // METODO PARA ENVIAR CORREO ELECTRONICO DESDE APLICACION WEB -- verificar estado
     EnviarCorreoWebMultiple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const usuarios = req.body.usuarios;
@@ -784,6 +784,7 @@ class PermisosControlador {
             }
         });
     }
+    // verificar estado
     ListarEstadosPermisos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const PERMISOS = yield database_1.default.query('SELECT p.id, p.fec_creacion, p.descripcion, p.fec_inicio, ' +
@@ -801,6 +802,7 @@ class PermisosControlador {
             }
         });
     }
+    // verificar estado
     ListarPermisosAutorizados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const PERMISOS = yield database_1.default.query('SELECT p.id, p.fec_creacion, p.descripcion, p.fec_inicio, ' +

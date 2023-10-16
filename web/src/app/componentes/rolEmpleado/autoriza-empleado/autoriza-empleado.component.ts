@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 
-import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { AutorizaDepartamentoService } from 'src/app/servicios/autorizaDepartamento/autoriza-departamento.service';
 
 @Component({
@@ -15,7 +14,6 @@ export class AutorizaEmpleadoComponent implements OnInit {
   cont: number = 0;
 
   constructor(
-    public restCargo: EmplCargosService,
     public restAutoridad: AutorizaDepartamentoService,
   ) {
     // LEER ID DE USUARIO QUE INICIA SESION
@@ -26,44 +24,22 @@ export class AutorizaEmpleadoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.ObtenerAutorizaciones(parseInt(this.idEmpleado));
+    this.ObtenerAutorizaciones();
   }
 
-  /* 
-   * ***************************************************************************************************
-   *                               METODO PARA MOSTRAR DATOS
-   * ***************************************************************************************************
-  */
+  /** ******************************************************************************************* **
+   ** **                METODO DE PRESENTACION DE DATOS DE AUTORIZACION                        ** ** 
+   ** ******************************************************************************************* **/
 
-  /* METODO para mostrar datos de autoridad departamentos */
-  autorizacionEmpleado: any;
-  autorizacionesTotales: any;
-  ObtenerAutorizaciones(id_empleado: number) {
-    this.autorizacionEmpleado = [];
+  // METODO PARA MOSTRAR DATOS DE AUTORIDAD DEPARTAMENTOS 
+  autorizacionesTotales: any = [];
+  ObtenerAutorizaciones() {
     this.autorizacionesTotales = [];
-    this.restCargo.BuscarIDCargo(id_empleado).subscribe(datos => {
-      this.idCargo = datos;
-      console.log("idCargo ", this.idCargo[0].id);
-      for (let i = 0; i <= this.idCargo.length - 1; i++) {
-        // revisar
-        this.restAutoridad.BuscarAutoridadEmpleado(this.idCargo[i]['id']).subscribe(datos => {
-          this.autorizacionEmpleado = datos;
-          if (this.autorizacionEmpleado.length === 0) {
-            console.log("No se encuentran registros")
-          }
-          else {
-            if (this.cont === 0) {
-              this.autorizacionesTotales = datos
-              this.cont++;
-            }
-            else {
-              this.autorizacionesTotales = this.autorizacionesTotales.concat(datos);
-              console.log("Datos autorizacion" + i + '', this.autorizacionesTotales)
-            }
-          }
-        })
-      }
-    });
+    this.restAutoridad.BuscarAutoridadEmpleado(parseInt(this.idEmpleado)).subscribe(datos => {
+      this.autorizacionesTotales = datos;
+      console.log('ver datos ', this.autorizacionesTotales)
+    })
   }
 
+  
 }

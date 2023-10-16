@@ -107,8 +107,6 @@ import { LogosComponent } from './componentes/catalogos/catEmpresa/logos/logos.c
 import { DatosEmpleadoComponent } from './componentes/rolEmpleado/datos-empleado/datos-empleado.component';
 import { CambiarContrasenaComponent } from './componentes/iniciarSesion/contrasenia/cambiar-contrasena/cambiar-contrasena.component';
 import { ContratoCargoEmpleadoComponent } from './componentes/rolEmpleado/contrato-cargo-empleado/contrato-cargo-empleado.component';
-import { PlanificacionHorarioEmpleadoComponent } from './componentes/rolEmpleado/planificacion-horario-empleado/planificacion-horario-empleado.component';
-import { DetalleHorarioEmpleadoComponent } from './componentes/rolEmpleado/detalle-horario-empleado/detalle-horario-empleado.component';
 import { HorariosEmpleadoComponent } from './componentes/rolEmpleado/horarios-empleado/horarios-empleado.component';
 import { VacacionesEmpleadoComponent } from './componentes/rolEmpleado/vacacion-empleado/vacaciones-empleado/vacaciones-empleado.component';
 import { SolicitarPermisosEmpleadoComponent } from './componentes/rolEmpleado/permisos-empleado/solicitar-permisos-empleado/solicitar-permisos-empleado.component';
@@ -421,8 +419,6 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     VerVacacionComponent,
     EditarEstadoVacacionAutoriacionComponent,
     ContratoCargoEmpleadoComponent,
-    PlanificacionHorarioEmpleadoComponent,
-    DetalleHorarioEmpleadoComponent,
     HorariosEmpleadoComponent,
     VacacionesEmpleadoComponent,
     SolicitarPermisosEmpleadoComponent,
@@ -640,6 +636,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     VistaElementosComponent,
     ListaSucursalesComponent,
     VerEmpresaComponent,
+    HorariosEmpleadoComponent,
   ],
 
   bootstrap: [AppComponent]

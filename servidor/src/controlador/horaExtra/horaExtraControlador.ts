@@ -14,6 +14,7 @@ import fs from 'fs';
 const builder = require('xmlbuilder');
 
 class HorasExtrasPedidasControlador {
+  // verificar uso de estado
   public async ListarHorasExtrasPedidas(req: Request, res: Response) {
     const HORAS_EXTRAS_PEDIDAS = await pool.query('SELECT h.id, h.fec_inicio, h.fec_final, h.estado, ' +
       'h.fec_solicita, h.descripcion, h.num_hora, h.tiempo_autorizado, e.id AS id_usua_solicita, h.id_empl_cargo, ' +
@@ -30,6 +31,7 @@ class HorasExtrasPedidasControlador {
     }
   }
 
+  // verificar si se requiere uso de estado
   public async ListarHorasExtrasPedidasObservacion(req: Request, res: Response) {
     const HORAS_EXTRAS_PEDIDAS = await pool.query('SELECT h.id, h.fec_inicio, h.fec_final, h.estado, ' +
       'h.fec_solicita, h.descripcion, h.num_hora, h.tiempo_autorizado, e.id AS id_usua_solicita, h.id_empl_cargo, ' +
@@ -46,6 +48,7 @@ class HorasExtrasPedidasControlador {
     }
   }
 
+  // verificar si se requiere estado
   public async ListarHorasExtrasPedidasAutorizadas(req: Request, res: Response) {
     const HORAS_EXTRAS_PEDIDAS = await pool.query('SELECT h.id, h.fec_inicio, h.fec_final, h.estado, ' +
       'h.fec_solicita, h.descripcion, h.num_hora, h.tiempo_autorizado, e.id AS id_usua_solicita, h.id_empl_cargo, ' +

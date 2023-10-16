@@ -71,7 +71,7 @@ class DatosGeneralesControlador {
                     empl.empleado = await pool.query(
                         `
                         SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
-                            e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo,
+                            e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo, tc.id AS id_tipo_cargo,
                             co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
                             d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
                             s.nombre AS sucursal, ca.hora_trabaja
@@ -95,7 +95,7 @@ class DatosGeneralesControlador {
                     empl.empleado = await pool.query(
                         `
                         SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
-                            e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo,
+                            e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo, tc.id AS id_tipo_cargo,
                             co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
                             d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
                             s.nombre AS sucursal, ca.fec_final, ca.hora_trabaja
@@ -124,7 +124,7 @@ class DatosGeneralesControlador {
         if (lista.length === 0) return res.status(404)
             .jsonp({ message: 'No se han encontrado registros.' });
 
-        let respuesta = lista.map((obj: any) => {
+        let empleados = lista.map((obj: any) => {
             obj.departamentos = obj.departamentos.filter((ele: any) => {
                 return ele.empleado.length > 0;
             })
@@ -132,6 +132,46 @@ class DatosGeneralesControlador {
         }).filter((obj: any) => {
             return obj.departamentos.length > 0;
         });
+
+
+        // CONSULTA DE BUSQUEDA DE COLABORADORES POR REGIMEN
+        let regimen = await Promise.all(empleados.map(async (obj: any) => {
+            obj.departamentos = await Promise.all(obj.departamentos.map(async (empl: any) => {
+                empl.empleado = await Promise.all(empl.empleado.map(async (reg: any) => {
+                    //console.log('variables car ', reg)
+                    reg.regimen = await pool.query(
+                        `
+                            SELECT r.id AS id_regimen, r.descripcion AS name_regimen
+                            FROM cg_regimenes AS r
+                            WHERE r.id = $1
+                            ORDER BY r.descripcion ASC
+                            `,
+                        [reg.id_regimen])
+                        .then((result: any) => { return result.rows });
+                    return reg;
+                }))
+                return empl;
+            }));
+            return obj;
+        }))
+
+        if (regimen.length === 0) return res.status(404)
+            .jsonp({ message: 'No se han encontrado registros.' });
+
+        let respuesta = regimen.map((obj: any) => {
+            obj.departamentos = obj.departamentos.filter((ele: any) => {
+                ele.empleado = ele.empleado.filter((reg: any) => {
+                    return reg.regimen.length > 0;
+                })
+                return ele;
+            }).filter((ele: any) => {
+                return ele.empleado.length > 0;
+            });
+            return obj;
+        }).filter((obj: any) => {
+            return obj.departamentos.length > 0;
+        });
+
 
         if (respuesta.length === 0) return res.status(404)
             .jsonp({ message: 'No se han encontrado registros.' })
@@ -224,7 +264,6 @@ class DatosGeneralesControlador {
         return res.status(200).jsonp(respuesta);
     }
 
-
     /**
      * METODO DE CONSULTA DE DATOS GENERALES DE USUARIOS CON CONFIGURACION DE COMUNICADOS
      * REALIZA UN ARRAY DE SUCURSALES CON DEPARTAMENTOS Y EMPLEADOS DEPENDIENDO DEL ESTADO DEL 
@@ -276,7 +315,7 @@ class DatosGeneralesControlador {
                         `
                         SELECT DISTINCT e.id, CONCAT(nombre, ' ' , apellido)
                             name_empleado, e.codigo, e.cedula, e.genero, e.correo, cn.comunicado_mail,
-                            cn.comunicado_noti 
+                            cn.comunicado_noti, r.id AS id_regimen 
                         FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
                             config_noti AS cn 
                         WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE da.id = e.id)  
@@ -294,7 +333,7 @@ class DatosGeneralesControlador {
                         `
                         SELECT DISTINCT e.id, CONCAT(nombre, ' ' , apellido)
                             name_empleado, e.codigo, e.cedula, e.genero, e.correo, cn.comunicado_mail,
-                            cn.comunicado_noti, ca.fec_final
+                            cn.comunicado_noti, ca.fec_final, r.id AS id_regimen 
                         FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
                             config_noti AS cn 
                         WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE da.id = e.id)  
@@ -314,13 +353,52 @@ class DatosGeneralesControlador {
 
         if (lista.length === 0) return res.status(404).jsonp({ message: 'No se ha encontrado registros de usuarios.' })
 
-        let respuesta = lista.map((obj: any) => {
+        let empleados = lista.map((obj: any) => {
             obj.departamentos = obj.departamentos.filter((ele: any) => {
-                return ele.empleado.length > 0
+                return ele.empleado.length > 0;
             })
-            return obj
+            return obj;
         }).filter((obj: any) => {
-            return obj.departamentos.length > 0
+            return obj.departamentos.length > 0;
+        });
+
+
+        // CONSULTA DE BUSQUEDA DE COLABORADORES POR REGIMEN
+        let regimen = await Promise.all(empleados.map(async (obj: any) => {
+            obj.departamentos = await Promise.all(obj.departamentos.map(async (empl: any) => {
+                empl.empleado = await Promise.all(empl.empleado.map(async (reg: any) => {
+                    //console.log('variables car ', reg)
+                    reg.regimen = await pool.query(
+                        `
+                            SELECT r.id AS id_regimen, r.descripcion AS name_regimen
+                            FROM cg_regimenes AS r
+                            WHERE r.id = $1
+                            ORDER BY r.descripcion ASC
+                            `,
+                        [reg.id_regimen])
+                        .then((result: any) => { return result.rows });
+                    return reg;
+                }))
+                return empl;
+            }));
+            return obj;
+        }))
+
+        if (regimen.length === 0) return res.status(404)
+            .jsonp({ message: 'No se han encontrado registros.' });
+
+        let respuesta = regimen.map((obj: any) => {
+            obj.departamentos = obj.departamentos.filter((ele: any) => {
+                ele.empleado = ele.empleado.filter((reg: any) => {
+                    return reg.regimen.length > 0;
+                })
+                return ele;
+            }).filter((ele: any) => {
+                return ele.empleado.length > 0;
+            });
+            return obj;
+        }).filter((obj: any) => {
+            return obj.departamentos.length > 0;
         });
 
         if (respuesta.length === 0) return res.status(404)
@@ -328,6 +406,7 @@ class DatosGeneralesControlador {
 
         return res.status(200).jsonp(respuesta)
     }
+
 
     /**
      * METODO DE CONSULTA DE DATOS GENERALES DE USUARIOS CON CONFIGURACION DE COMUNICADOS
@@ -528,7 +607,7 @@ class DatosGeneralesControlador {
         if (lista.length === 0) return res.status(404)
             .jsonp({ message: 'No se han encontrado registros.' });
 
-        let respuesta = lista.map((obj: any) => {
+        let empleados = lista.map((obj: any) => {
             obj.departamentos = obj.departamentos.filter((ele: any) => {
                 return ele.empleado.length > 0;
             })
@@ -536,6 +615,45 @@ class DatosGeneralesControlador {
         }).filter((obj: any) => {
             return obj.departamentos.length > 0;
         });
+
+        // CONSULTA DE BUSQUEDA DE COLABORADORES POR REGIMEN
+        let regimen = await Promise.all(empleados.map(async (obj: any) => {
+            obj.departamentos = await Promise.all(obj.departamentos.map(async (empl: any) => {
+                empl.empleado = await Promise.all(empl.empleado.map(async (reg: any) => {
+                    //console.log('variables car ', reg)
+                    reg.regimen = await pool.query(
+                        `
+                    SELECT r.id AS id_regimen, r.descripcion AS name_regimen
+                    FROM cg_regimenes AS r
+                    WHERE r.id = $1
+                    ORDER BY r.descripcion ASC
+                    `,
+                        [reg.id_regimen])
+                        .then((result: any) => { return result.rows });
+                    return reg;
+                }))
+                return empl;
+            }));
+            return obj;
+        }))
+
+        if (regimen.length === 0) return res.status(404)
+            .jsonp({ message: 'No se han encontrado registros.' });
+
+        let respuesta = regimen.map((obj: any) => {
+            obj.departamentos = obj.departamentos.filter((ele: any) => {
+                ele.empleado = ele.empleado.filter((reg: any) => {
+                    return reg.regimen.length > 0;
+                })
+                return ele;
+            }).filter((ele: any) => {
+                return ele.empleado.length > 0;
+            });
+            return obj;
+        }).filter((obj: any) => {
+            return obj.departamentos.length > 0;
+        });
+
 
         if (respuesta.length === 0) return res.status(404)
             .jsonp({ message: 'No se han encontrado registros.' })

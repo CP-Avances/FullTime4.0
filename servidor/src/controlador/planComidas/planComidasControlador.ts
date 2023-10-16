@@ -946,7 +946,7 @@ class PlanComidasControlador {
    ** **    METODOS DE ENVIO DE CORREO ELECTRONICO DE PLANIFICACION DE SERVICIOS DE ALIMENTACION    ** ** 
    ** ************************************************************************************************ **/
 
-  // ENVIAR CORREO ELECTRÓNICO DE PLANIFICACIÓN DE COMIDA APLICACION WEB
+  // ENVIAR CORREO ELECTRÓNICO DE PLANIFICACIÓN DE COMIDA APLICACION WEB  -- verificar si se requiere estado
   public async EnviarCorreoPlanComidas(req: Request, res: Response): Promise<void> {
 
     var tiempo = fechaHora();

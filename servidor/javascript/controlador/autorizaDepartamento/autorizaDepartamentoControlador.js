@@ -138,6 +138,7 @@ class AutorizaDepartamentoControlador {
     ObtenerListaAutorizaDepa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_depar } = req.params;
+            const { estado } = req.body;
             const EMPLEADOS = yield database_1.default.query(`
             SELECT n.id_departamento, cg.nombre, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel,
                 da.estado, dae.id_contrato, da.id_empl_cargo, da.id_empleado, (dae.nombre || ' ' || dae.apellido) as fullname, 
@@ -150,8 +151,9 @@ class AutorizaDepartamentoControlador {
                 AND dae.id_cargo = da.id_empl_cargo 
                 AND dae.id_contrato = c.id_empleado 
                 AND cg.id = $1
+                AND dae.estado = $2
             ORDER BY nivel ASC
-            `, [id_depar]);
+            `, [id_depar, estado]);
             if (EMPLEADOS.rowCount > 0) {
                 return res.jsonp(EMPLEADOS.rows);
             }

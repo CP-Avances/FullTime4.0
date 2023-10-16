@@ -4,6 +4,7 @@ import { HHMMtoSegundos } from '../../libs/SubMetodosGraficas';
 
 class ReportesControlador {
 
+    // -- poner en consulta el estado del usuario
     public async ListarDatosContractoA(req: Request, res: Response) {
         const DATOS = await pool.query('SELECT * FROM datos_contrato_actual');
         if (DATOS.rowCount > 0) {

@@ -18,6 +18,7 @@ import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriado
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
 
 import { BuscarPlanificacionComponent } from '../../rango-fechas/buscar-planificacion/buscar-planificacion.component';
+import { HorariosEmpleadoComponent } from 'src/app/componentes/rolEmpleado/horarios-empleado/horarios-empleado.component';
 import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
@@ -53,6 +54,7 @@ export class EditarPlanificacionComponent implements OnInit {
   constructor(
     public componentev: VerEmpleadoComponent,
     public componenteb: BuscarPlanificacionComponent,
+    public componentep: HorariosEmpleadoComponent,
     public parametro: ParametrosService,
     public ventanae: MatDialog,
     public feriado: FeriadosService,
@@ -920,6 +922,17 @@ export class EditarPlanificacionComponent implements OnInit {
       this.componenteb.horariosEmpleado[this.datos_horarios.index].seleccionado = 0;
       if (opcion === 2) {
         this.componenteb.VerPlanificacion();
+      }
+    }
+    else if (this.datos_horarios.pagina === 'perfil-empleado') {
+      this.componentep.editar_horario = false;
+      this.componentep.expansion = true;
+      this.componentep.editar_activar = true;
+      this.componentep.ver_activar_editar = true;
+      this.componentep.horariosEmpleado[this.datos_horarios.index].color = '';
+      this.componentep.horariosEmpleado[this.datos_horarios.index].seleccionado = 0;
+      if (opcion === 2) {
+        this.componentep.BuscarHorarioPeriodo();
       }
     }
   }

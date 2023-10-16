@@ -125,7 +125,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   origen_cargo: any = [];
   cargos: any = [];
   BuscarCargos() {
-    this.informacion.ObtenerInformacionCargo().subscribe((res: any[]) => {
+    this.informacion.ObtenerInformacionCargo(1).subscribe((res: any[]) => {
       this.origen_cargo = JSON.stringify(res);
 
       res.forEach(obj => {
@@ -157,7 +157,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   // METODO PARA BUSCAR INFORMACION DE USUARIOS
   BuscarInformacion() {
     this.origen = [];
-    this.informacion.ObtenerInformacion().subscribe((res: any[]) => {
+    this.informacion.ObtenerInformacion(1).subscribe((res: any[]) => {
       this.origen = JSON.stringify(res);
 
       res.forEach(obj => {
