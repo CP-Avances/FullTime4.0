@@ -155,10 +155,10 @@ class UsuarioControlador {
                 obj.departamentos = yield Promise.all(obj.departamentos.map((empl) => __awaiter(this, void 0, void 0, function* () {
                     empl.empleado = yield database_1.default.query(`
           SELECT DISTINCT e.id, (e.nombre || ' ' || e.apellido) AS nombre, e.cedula, e.codigo, u.usuario, 
-            u.web_habilita, u.id AS userid, d.nombre AS departamento
-          FROM usuarios AS u, datos_actuales_empleado AS e, cg_departamentos AS d
+            u.web_habilita, u.id AS userid, d.nombre AS departamento, ec.id_regimen
+          FROM usuarios AS u, datos_actuales_empleado AS e, cg_departamentos AS d, empl_contratos AS ec
           WHERE e.id = u.id_empleado AND d.id = e.id_departamento AND e.id_departamento = $1 AND e.estado = $2
-            AND u.web_habilita = $3
+            AND u.web_habilita = $3 AND ec.id = e.id_contrato
           ORDER BY nombre
           `, [empl.id_depa, estado, habilitado])
                         .then((result) => { return result.rows; });
@@ -169,7 +169,7 @@ class UsuarioControlador {
             if (lista.length === 0)
                 return res.status(404)
                     .jsonp({ message: 'No se han encontrado registros.' });
-            let respuesta = lista.map((obj) => {
+            let empleados = lista.map((obj) => {
                 obj.departamentos = obj.departamentos.filter((ele) => {
                     return ele.empleado.length > 0;
                 });
@@ -177,9 +177,40 @@ class UsuarioControlador {
             }).filter((obj) => {
                 return obj.departamentos.length > 0;
             });
-            if (respuesta.length === 0)
+            // CONSULTA DE BUSQUEDA DE COLABORADORES POR REGIMEN
+            let regimen = yield Promise.all(empleados.map((obj) => __awaiter(this, void 0, void 0, function* () {
+                obj.departamentos = yield Promise.all(obj.departamentos.map((empl) => __awaiter(this, void 0, void 0, function* () {
+                    empl.empleado = yield Promise.all(empl.empleado.map((reg) => __awaiter(this, void 0, void 0, function* () {
+                        //console.log('variables car ', reg)
+                        reg.regimen = yield database_1.default.query(`
+                          SELECT r.id AS id_regimen, r.descripcion AS name_regimen
+                          FROM cg_regimenes AS r
+                          WHERE r.id = $1
+                          ORDER BY r.descripcion ASC
+                          `, [reg.id_regimen])
+                            .then((result) => { return result.rows; });
+                        return reg;
+                    })));
+                    return empl;
+                })));
+                return obj;
+            })));
+            if (regimen.length === 0)
                 return res.status(404)
                     .jsonp({ message: 'No se han encontrado registros.' });
+            let respuesta = regimen.map((obj) => {
+                obj.departamentos = obj.departamentos.filter((ele) => {
+                    ele.empleado = ele.empleado.filter((reg) => {
+                        return reg.regimen.length > 0;
+                    });
+                    return ele;
+                }).filter((ele) => {
+                    return ele.empleado.length > 0;
+                });
+                return obj;
+            }).filter((obj) => {
+                return obj.departamentos.length > 0;
+            });
             return res.status(200).jsonp(respuesta);
         });
     }
@@ -300,10 +331,10 @@ class UsuarioControlador {
                 obj.departamentos = yield Promise.all(obj.departamentos.map((empl) => __awaiter(this, void 0, void 0, function* () {
                     empl.empleado = yield database_1.default.query(`
           SELECT DISTINCT e.id, (e.nombre || ' ' || e.apellido) AS nombre, e.cedula, e.codigo, u.usuario, 
-            u.app_habilita, u.id AS userid, d.nombre AS departamento
-          FROM usuarios AS u, datos_actuales_empleado AS e, cg_departamentos AS d
+            u.app_habilita, u.id AS userid, d.nombre AS departamento, ec.id_regimen
+          FROM usuarios AS u, datos_actuales_empleado AS e, cg_departamentos AS d, empl_contratos AS ec
           WHERE e.id = u.id_empleado AND d.id = e.id_departamento AND e.id_departamento = $1 AND e.estado = $2
-            AND u.app_habilita = $3
+            AND u.app_habilita = $3 AND ec.id = e.id_contrato
           ORDER BY nombre
           `, [empl.id_depa, estado, habilitado])
                         .then((result) => { return result.rows; });
@@ -314,8 +345,42 @@ class UsuarioControlador {
             if (lista.length === 0)
                 return res.status(404)
                     .jsonp({ message: 'No se han encontrado registros.' });
-            let respuesta = lista.map((obj) => {
+            let empleados = lista.map((obj) => {
                 obj.departamentos = obj.departamentos.filter((ele) => {
+                    return ele.empleado.length > 0;
+                });
+                return obj;
+            }).filter((obj) => {
+                return obj.departamentos.length > 0;
+            });
+            // CONSULTA DE BUSQUEDA DE COLABORADORES POR REGIMEN
+            let regimen = yield Promise.all(empleados.map((obj) => __awaiter(this, void 0, void 0, function* () {
+                obj.departamentos = yield Promise.all(obj.departamentos.map((empl) => __awaiter(this, void 0, void 0, function* () {
+                    empl.empleado = yield Promise.all(empl.empleado.map((reg) => __awaiter(this, void 0, void 0, function* () {
+                        //console.log('variables car ', reg)
+                        reg.regimen = yield database_1.default.query(`
+                            SELECT r.id AS id_regimen, r.descripcion AS name_regimen
+                            FROM cg_regimenes AS r
+                            WHERE r.id = $1
+                            ORDER BY r.descripcion ASC
+                            `, [reg.id_regimen])
+                            .then((result) => { return result.rows; });
+                        return reg;
+                    })));
+                    return empl;
+                })));
+                return obj;
+            })));
+            if (regimen.length === 0)
+                return res.status(404)
+                    .jsonp({ message: 'No se han encontrado registros.' });
+            let respuesta = regimen.map((obj) => {
+                obj.departamentos = obj.departamentos.filter((ele) => {
+                    ele.empleado = ele.empleado.filter((reg) => {
+                        return reg.regimen.length > 0;
+                    });
+                    return ele;
+                }).filter((ele) => {
                     return ele.empleado.length > 0;
                 });
                 return obj;

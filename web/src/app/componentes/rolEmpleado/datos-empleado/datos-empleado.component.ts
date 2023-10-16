@@ -45,6 +45,7 @@ export class DatosEmpleadoComponent implements OnInit {
   tituloEmpleado: any = [];
   discapacidadUser: any = [];
   contratoEmpleado: any = [];
+  empresa: string = '';
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS DE BOTONES
   idEmpleado: string = ''; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO SELECCIONADO PARA VER DATOS
@@ -59,7 +60,6 @@ export class DatosEmpleadoComponent implements OnInit {
 
   hipervinculo: string = environment.url; // VARIABLE DE MANEJO DE RUTAS CON URL
 
-  empresa: string = '';
 
   constructor(
     public restDiscapacidad: DiscapacidadService,
@@ -92,6 +92,7 @@ export class DatosEmpleadoComponent implements OnInit {
     this.ObtenerLogo();
     this.ObtenerColores();
     this.BuscarParametro();
+    this.ObtenerNacionalidades()
     this.ObtenerTituloEmpleado();
     this.ObtenerDiscapacidadEmpleado();
   }
@@ -605,7 +606,7 @@ export class DatosEmpleadoComponent implements OnInit {
             ],
             [
               { text: 'Cédula: ' + this.empleadoUno[0].cedula, style: 'item' },
-              { text: 'Nacionalidad: ' + nacionalidad },
+              { text: 'Nacionalidad: ' + nacionalidad, style: 'item' },
               { text: 'Fecha Nacimiento: ' + this.empleadoUno[0].fec_nacimiento_, style: 'item' },
               { text: 'Estado civil: ' + estadoCivil, style: 'item' },
               { text: 'Género: ' + genero, style: 'item' },
@@ -619,16 +620,14 @@ export class DatosEmpleadoComponent implements OnInit {
             ],
           ]
         },
-        { text: 'Contrato Empleado', style: 'header' },
-        this.PresentarDataPDFcontratoEmpleado(),
-        { text: 'Cargo Empleado', style: 'header' },
-        this.PresentarDataPDFcargoEmpleado(),
-        // { text: 'Plan de comidas', style: 'header' },
-        // { text: 'Titulos', style: 'header' },
-        { text: (this.tituloEmpleado.length > 0 ? 'Títulos' : ''), style: 'header' },
-        this.PresentarDataPDFtitulosEmpleado(),
-        { text: (this.discapacidadUser.length > 0 ? 'Discapacidad' : ''), style: 'header' },
+        { text: (this.discapacidadUser.length > 0 ? 'DISCAPACIDAD' : ''), style: 'header' },
         this.PresentarDataPDFdiscapacidadEmpleado(),
+        { text: (this.tituloEmpleado.length > 0 ? 'TÍTULOS' : ''), style: 'header' },
+        this.PresentarDataPDFtitulosEmpleado(),
+        { text: 'CONTRATO', style: 'header' },
+        this.PresentarDataPDFcontratoEmpleado(),
+        { text: 'CARGO', style: 'header' },
+        this.PresentarDataPDFcargoEmpleado(),
       ],
       info: {
         title: this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido + '_PERFIL',
@@ -637,11 +636,11 @@ export class DatosEmpleadoComponent implements OnInit {
         keywords: 'Perfil, Empleado',
       },
       styles: {
-        header: { fontSize: 14, bold: true, margin: [0, 20, 0, 10] },
-        name: { fontSize: 14, bold: true },
-        item: { fontSize: 12, bold: false },
-        tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        tableCell: { fontSize: 12, alignment: 'center', },
+        header: { fontSize: 12, bold: true, margin: [0, 20, 0, 10] },
+        name: { fontSize: 12, bold: true },
+        item: { fontSize: 11, bold: false },
+        tableHeader: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color },
+        tableCell: { fontSize: 11, alignment: 'center', },
       }
     };
   }
@@ -653,8 +652,8 @@ export class DatosEmpleadoComponent implements OnInit {
           widths: ['*', '*'],
           body: [
             [
-              { text: 'Nombre', style: 'tableHeader' },
-              { text: 'Nivel', style: 'tableHeader' }
+              { text: 'NOMBRE', style: 'tableHeader' },
+              { text: 'NIVEL', style: 'tableHeader' }
             ],
             ...this.tituloEmpleado.map(obj => {
               return [{ text: obj.nombre, style: 'tableCell' }, { text: obj.nivel, style: 'tableCell' }];
@@ -673,12 +672,12 @@ export class DatosEmpleadoComponent implements OnInit {
         widths: ['*', 'auto', 'auto', 'auto', 'auto', 'auto'],
         body: [
           [
-            { text: 'Régimen', style: 'tableHeader' },
-            { text: 'Fecha Ingreso', style: 'tableHeader' },
-            { text: 'Fecha Salida', style: 'tableHeader' },
-            { text: 'Modalidad laboral', style: 'tableHeader' },
-            { text: 'Control de asistencias', style: 'tableHeader' },
-            { text: 'Control de vacaciones', style: 'tableHeader' },
+            { text: 'RÉGIMEN', style: 'tableHeader' },
+            { text: 'FECHA DESDE', style: 'tableHeader' },
+            { text: 'FECHA HASTA', style: 'tableHeader' },
+            { text: 'MODALIDAD LABORAL', style: 'tableHeader' },
+            { text: 'CONTROL ASISTENCIA', style: 'tableHeader' },
+            { text: 'CONTROL VACACIONES', style: 'tableHeader' },
           ],
           ...this.contratoEmpleado.map(contrato => {
             return [
@@ -701,13 +700,13 @@ export class DatosEmpleadoComponent implements OnInit {
         widths: ['*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
         body: [
           [
-            { text: 'Sucursal', style: 'tableHeader' },
-            { text: 'Departamento', style: 'tableHeader' },
-            { text: 'Cargo', style: 'tableHeader' },
-            { text: 'Fecha inicio', style: 'tableHeader' },
-            { text: 'Fecha fin', style: 'tableHeader' },
-            { text: 'Horas de trabajo', style: 'tableHeader' },
-            { text: 'Sueldo', style: 'tableHeader' },
+            { text: 'SUCURSAL', style: 'tableHeader' },
+            { text: 'DEPARTAMENTO', style: 'tableHeader' },
+            { text: 'CARGO', style: 'tableHeader' },
+            { text: 'FECHA DESDE', style: 'tableHeader' },
+            { text: 'FECHA HASTA', style: 'tableHeader' },
+            { text: 'HORAS TRABAJO', style: 'tableHeader' },
+            { text: 'SUELDO', style: 'tableHeader' },
           ],
           ...this.cargoEmpleado.map(cargo => {
             return [
@@ -717,7 +716,7 @@ export class DatosEmpleadoComponent implements OnInit {
               { text: cargo.fec_inicio_, style: 'tableCell' },
               { text: cargo.fec_final === null ? 'Sin fecha' : cargo.fec_final_, style: 'tableCell' },
               { text: cargo.hora_trabaja, style: 'tableCell' },
-              { text: cargo.sueldo, style: 'tableCell' },
+              { text: '$' + cargo.sueldo, style: 'tableCell' },
             ]
           })
         ]
@@ -732,9 +731,9 @@ export class DatosEmpleadoComponent implements OnInit {
           widths: ['*', '*', '*'],
           body: [
             [
-              { text: 'Carnet conadis', style: 'tableHeader' },
-              { text: 'Tipo', style: 'tableHeader' },
-              { text: 'Porcentaje', style: 'tableHeader' },
+              { text: 'CARNET CONADIS', style: 'tableHeader' },
+              { text: 'PORCENTAJE', style: 'tableHeader' },
+              { text: 'TIPO', style: 'tableHeader' },
             ],
             ...this.discapacidadUser.map(obj => {
               return [
@@ -753,7 +752,7 @@ export class DatosEmpleadoComponent implements OnInit {
    ** **                          PARA LA EXPORTACION DE ARCHIVOS EXCEL                        ** **                           *
    ** ******************************************************************************************* **/
 
-  obtenerDatos() {
+  ObtenerDatos() {
     let objeto: any;
     let objetoContrato: any;
     let objetoCargo: any;
@@ -798,8 +797,8 @@ export class DatosEmpleadoComponent implements OnInit {
         let fechaS: string = contrato.fec_salida === null ? 'Sin fecha' : contrato.fec_salida_.split(" ")[1];
         objetoContrato = {
           'Regimen': contrato.descripcion,
-          'Fecha ingreso': fechaI[1],
-          'Fecha salida': fechaS,
+          'Fecha desde': fechaI[1],
+          'Fecha hasta': fechaS,
           'Modalidad laboral': contrato.nombre_contrato,
           'Control asistencia': contrato.asis_controla ? 'Si' : 'No',
           'Control vacaciones': contrato.vaca_controla ? 'Si' : 'No',
@@ -816,8 +815,8 @@ export class DatosEmpleadoComponent implements OnInit {
           'Sucursal': cargo.sucursal,
           'Departamento': cargo.departamento,
           'Cargo': cargo.nombre_cargo,
-          'Fecha inicio': fechaI[1],
-          'Fecha fin': fechaS,
+          'Fecha desde': fechaI[1],
+          'Fecha hasta': fechaS,
           'Sueldo': cargo.sueldo,
           'Horas trabaja': cargo.hora_trabaja,
         };
@@ -829,7 +828,7 @@ export class DatosEmpleadoComponent implements OnInit {
 
 
   ExportToExcel() {
-    const datos: any = this.obtenerDatos();
+    const datos: any = this.ObtenerDatos();
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos[0]);
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wse, 'PERFIL');
@@ -857,7 +856,7 @@ export class DatosEmpleadoComponent implements OnInit {
    ** ******************************************************************************************* **/
 
   ExportToCVS() {
-    const datos: any = this.obtenerDatos();
+    const datos: any = this.ObtenerDatos();
     const datosEmpleado: any = [];
     const objeto = {
       ...datos[0][0],
@@ -929,8 +928,8 @@ export class DatosEmpleadoComponent implements OnInit {
         this.contratoEmpleado.map((contrato: any) => {
           objeto.empleado.contrato = {
             'regimen': contrato.descripcion,
-            'fecha_ingreso': contrato.fec_ingreso_,
-            'fecha_salida': contrato.fec_salida === null ? 'Sin fecha' : contrato.fec_salida_,
+            'fecha_desde': contrato.fec_ingreso_,
+            'fecha_hasta': contrato.fec_salida === null ? 'Sin fecha' : contrato.fec_salida_,
             'modalidad_laboral': contrato.nombre_contrato,
             'control_asistencia': contrato.asis_controla ? 'Si' : 'No',
             'control_vacaciones': contrato.vaca_controla ? 'Si' : 'No',
@@ -944,8 +943,8 @@ export class DatosEmpleadoComponent implements OnInit {
             'sucursal': cargo.sucursal,
             'departamento': cargo.departamento,
             'cargo': cargo.nombre_cargo,
-            'fecha_inicio': cargo.fec_inicio_,
-            'fecha_fin': cargo.fec_final === null ? 'Sin fecha' : cargo.fec_final_,
+            'fecha_desde': cargo.fec_inicio_,
+            'fecha_hasta': cargo.fec_final === null ? 'Sin fecha' : cargo.fec_final_,
             'sueldo': cargo.sueldo,
             'horas_trabaja': cargo.hora_trabaja,
           };
@@ -964,20 +963,19 @@ export class DatosEmpleadoComponent implements OnInit {
     const blob = new Blob([xml], { type: 'application/xml' });
     const xmlUrl = URL.createObjectURL(blob);
 
-    // Abrir una nueva pestaña o ventana con el contenido XML
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
     const newTab = window.open(xmlUrl, '_blank');
     if (newTab) {
-      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
-      newTab.focus(); // Dar foco a la nueva pestaña
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
     } else {
-      alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
+      alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir el uso de ventanas emergentes.');
     }
-    // const url = window.URL.createObjectURL(blob);
 
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = "Empleado-" + objeto.empleado.nombre + '-' + objeto.empleado.apellido + '-' + new Date().getTime() + '.xml';
-    // Simular un clic en el enlace para iniciar la descarga
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
   }
 }

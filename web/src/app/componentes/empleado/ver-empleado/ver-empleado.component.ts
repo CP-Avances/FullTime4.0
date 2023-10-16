@@ -163,6 +163,8 @@ export class VerEmpleadoComponent implements OnInit {
     var cadena = this.router.url.split('#')[0];
     this.idEmpleado = cadena.split("/")[2];
     this.scriptService.load('pdfMake', 'vfsFonts');
+
+    console.log('cadena: ',cadena);
   }
 
   ngOnInit(): void {
@@ -173,14 +175,15 @@ export class VerEmpleadoComponent implements OnInit {
         switchMap(({ id }) => this.idEmpleado = id)
       )
       .subscribe(() => {
+        this.ObtenerEmpleadoLogueado(this.idEmpleadoLogueado);
+        this.ObtenerTituloEmpleado();
+        this.ObtenerDiscapacidadEmpleado();
+        this.VerAccionContrasena();
+        this.ObtenerNacionalidades();
+        this.VerFuncionalidades();
+        this.VerEmpresa();
       });
-    this.ObtenerEmpleadoLogueado(this.idEmpleadoLogueado);
-    this.ObtenerTituloEmpleado();
-    this.ObtenerDiscapacidadEmpleado();
-    this.VerAccionContrasena();
-    this.ObtenerNacionalidades();
-    this.VerFuncionalidades();
-    this.VerEmpresa();
+
   }
 
   /** ***************************************************************************************** **
@@ -960,24 +963,18 @@ export class VerEmpleadoComponent implements OnInit {
     }
     this.restPlanGeneral.BuscarPlanificacionHoraria(busqueda).subscribe(datos => {
       if (datos.message === 'OK') {
-        var tabla1TBody: any = ''
-        var tabla2TBody: any = ''
         this.horariosEmpleado = datos.data;
         let index = 0;
-        this.horariosEmpleado.forEach(obj => {
-          obj.index = index;
-          index = index + 1;
-          tabla1TBody = this.tabla1.nativeElement.querySelector('tbody');
-          tabla2TBody = this.tabla2.nativeElement.querySelector('tbody');
-          console.log(tabla1TBody,' = ',tabla2TBody)
 
-          tabla1TBody.style.height = tabla2TBody.offsetHeight + 'px';
-          console.log(tabla1TBody.style.height,' = ',tabla2TBody.offsetHeight + 'px')
-        })
         this.ver_detalle = true;
         this.ver_acciones = false;
         this.ver_activar_editar = true;
         this.editar_activar = false;
+
+        this.horariosEmpleado.forEach(obj => {
+          obj.index = index;
+          index = index + 1;
+        })
       }
       else {
         this.toastr.info('Ups no se han encontrado registros!!!', 'No existe planificación.', {
@@ -987,6 +984,7 @@ export class VerEmpleadoComponent implements OnInit {
         this.ver_activar_editar = false;
         this.editar_activar = false;
       }
+
     })
   }
 
@@ -1411,18 +1409,8 @@ export class VerEmpleadoComponent implements OnInit {
     this.ver_activar_editar = false;
   }
 
-  ControlExpandir() {
-    if (this.expansion === true) {
-      this.expansion = false;
-    }
-    else {
-      this.expansion = true;
-    }
-  }
-
   // METODO PARA CAMBIAR DE COLORES SEGUN EL MES
   CambiarColores(opcion: any) {
-    console.log('ver opcion ', opcion)
     let color: string;
     switch (opcion) {
       case 'ok':

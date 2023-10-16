@@ -5,7 +5,7 @@
     <mat-tab>
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">person_pin</mat-icon>
-            Perfil
+            <h6 id="items">Perfil Usuario</h6>
         </ng-template>
         <div class="container" *ngFor="let e of empleadoUno" style="padding-top: 15px; padding-bottom: 25px;">
             <div class="row">
@@ -160,7 +160,7 @@
     <mat-tab>
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">school</mat-icon>
-            Asignaciones
+            <h6 id="items">Asignaciones</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
             <div class="row">
@@ -265,7 +265,7 @@
     <mat-tab>
         <ng-template mat-tab-label>
             <mat-icon class="example-tab-icon">local_hospital</mat-icon>
-            Vacunación
+            <h6 id="items">Vacunación</h6>
         </ng-template>
         <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
             <div class="row">
@@ -319,9 +319,8 @@
                                             matTooltip="Modificar los datos generales de este registro.">
                                             <p>Editar</p>
                                         </i>
-                                        <i  class="far fa-trash-alt" id="delete"
-                                            (click)="ConfirmarEliminarVacuna(dv)" matSuffix matTooltipPosition="right"
-                                            matTooltip="Eliminar registro.">
+                                        <i class="far fa-trash-alt" id="delete" (click)="ConfirmarEliminarVacuna(dv)"
+                                            matSuffix matTooltipPosition="right" matTooltip="Eliminar registro.">
                                             <p>Eliminar</p>
                                         </i>
                                     </div>

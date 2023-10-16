@@ -242,7 +242,7 @@ class NotificacionTiempoRealControlador {
     /** ******************************************************************************************** **
      ** **                      METODOS PARA ENVIOS DE COMUNICADOS                                ** **
      ** ******************************************************************************************** **/
-    // METODO PARA ENVÍO DE CORREO ELECTRÓNICO DE COMUNICADOS MEDIANTE APLICACIÓN MÓVIL
+    // METODO PARA ENVÍO DE CORREO ELECTRÓNICO DE COMUNICADOS MEDIANTE APLICACIÓN MÓVIL  -- verificar si se requiere estado
     EnviarCorreoComunicadoMovil(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var tiempo = (0, settingsMail_1.fechaHora)();
@@ -321,7 +321,7 @@ class NotificacionTiempoRealControlador {
     /** ***************************************************************************************** **
      ** **                          MANEJO DE COMUNICADOS                                      ** **
      ** ***************************************************************************************** **/
-    // METODO PARA ENVIO DE CORREO ELECTRONICO DE COMUNICADOS MEDIANTE SISTEMA WEB
+    // METODO PARA ENVIO DE CORREO ELECTRONICO DE COMUNICADOS MEDIANTE SISTEMA WEB  -- verificar si se requiere estado
     EnviarCorreoComunicado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var tiempo = (0, settingsMail_1.fechaHora)();
@@ -423,7 +423,7 @@ class NotificacionTiempoRealControlador {
     /** ***************************************************************************************** **
      ** **                      MANEJO DE ENVIO DE CORREOS DE SOLICITUDES                      ** **
      ** ***************************************************************************************** **/
-    // METODO PARA ENVIO DE CORREO ELECTRONICO DE COMUNICADOS MEDIANTE SISTEMA WEB
+    // METODO PARA ENVIO DE CORREO ELECTRONICO DE COMUNICADOS MEDIANTE SISTEMA WEB -- veriifcar si se requiere estado
     EnviarCorreoSolicitudes(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var tablaHTML = '';

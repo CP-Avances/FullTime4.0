@@ -20,6 +20,7 @@ const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const builder = require('xmlbuilder');
 class HorasExtrasPedidasControlador {
+    // verificar uso de estado
     ListarHorasExtrasPedidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const HORAS_EXTRAS_PEDIDAS = yield database_1.default.query('SELECT h.id, h.fec_inicio, h.fec_final, h.estado, ' +
@@ -37,6 +38,7 @@ class HorasExtrasPedidasControlador {
             }
         });
     }
+    // verificar si se requiere uso de estado
     ListarHorasExtrasPedidasObservacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const HORAS_EXTRAS_PEDIDAS = yield database_1.default.query('SELECT h.id, h.fec_inicio, h.fec_final, h.estado, ' +
@@ -54,6 +56,7 @@ class HorasExtrasPedidasControlador {
             }
         });
     }
+    // verificar si se requiere estado
     ListarHorasExtrasPedidasAutorizadas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const HORAS_EXTRAS_PEDIDAS = yield database_1.default.query('SELECT h.id, h.fec_inicio, h.fec_final, h.estado, ' +

@@ -31,11 +31,12 @@ const cumpleanios = function () {
         if (hora === 15 && minutos === 0) {
             const felizCumple = yield database_1.default.query(`
                 SELECT da.nombre, da.apellido, da.correo, da.fec_nacimiento, s.id_empresa, 
-                ce.correo AS correo_empresa, ce.puerto, ce.password_correo, ce.servidor, 
-                ce.pie_firma, ce.cabecera_firma, m.titulo, m.mensaje, m.img, m.url  
+                    ce.correo AS correo_empresa, ce.puerto, ce.password_correo, ce.servidor, 
+                    ce.pie_firma, ce.cabecera_firma, m.titulo, m.mensaje, m.img, m.url  
                 FROM datos_actuales_empleado AS da, sucursales AS s, message_birthday AS m,
-                cg_empresa AS ce 
+                    cg_empresa AS ce 
                 WHERE CAST(da.fec_nacimiento AS VARCHAR) LIKE '%' || $1 AND da.id_sucursal = s.id
+                    AND da.estado = 1
                 `, [fecha]);
             if (felizCumple.rowCount > 0) {
                 var correos = (0, exports.BuscarCorreos)(felizCumple);

@@ -40,6 +40,7 @@ export class ValidacionesService {
     }
   }
 
+  // REDIRECCIONAMIENTO A LA PAGINA PRINCIPAL DEL EMPLEADO
   RedireccionarHomeEmpleado(error: any) {
     const { access, message, url, title } = error;
     if (access === false) {
@@ -57,14 +58,14 @@ export class ValidacionesService {
     }
   }
 
-
-
-  RedireccionarMixto(error) {
-    const { access, message, text, url } = error;
-    console.log(error);
-    console.log(access, message);
+  // REDIRECCIONAMIENTO AL HOME DE LA RUTA ACTUAL
+  RedireccionarMixto(error: any) {
+    const { access, message, url, title } = error;
     if (access === false) {
-      this.toastr.error(message)
+      this.toastr.info(message + ' ' + url, title, {
+        timeOut: 6000,
+        positionClass: 'toast-top-center',
+      })
         .onTap.subscribe(items => {
           if (url) {
             window.open(`https://${url}`, "_blank");
@@ -73,20 +74,18 @@ export class ValidacionesService {
       this.router.navigate(['/']);
       // this.router.navigate(['/', { relativeTo: this.route, skipLocationChange: false }]);
     }
-    if (text) {
-      this.toastr.error(text)
-    }
+
   }
 
   /** ******************************************************************** *
    *                  METODO PARA CONTROLAR INGRESO DE LETRAS              *
    *  ******************************************************************** */
-  IngresarSoloLetras(e) {
+  IngresarSoloLetras(e: any) {
     let key = e.keyCode || e.which;
     let tecla = String.fromCharCode(key).toString();
     // SE DEFINE TODO EL ABECEDARIO QUE SE VA A USAR.
     let letras = " áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-    // ES LA VALIDACIÓN DEL KEYCODES, QUE TECLAS RECIBE EL CAMPO DE TEXTO.
+    // ES LA VALIDACION DEL KEYCODES, QUE TECLAS RECIBE EL CAMPO DE TEXTO.
     let especiales = [8, 37, 39, 46, 6, 13];
     let tecla_especial = false
     for (var i in especiales) {
@@ -103,10 +102,10 @@ export class ValidacionesService {
     }
   }
 
-  /** ******************************************************************** *
-   *                  METODO PARA CONTROLAR INGRESO DE NÚMEROS             *
-   *  ******************************************************************** */
-  IngresarSoloNumeros(evt) {
+  /** ******************************************************************** **
+   ** **                 METODO PARA CONTROLAR INGRESO DE NUMEROS          **
+   ** ** ***************************************************************** **/
+  IngresarSoloNumeros(evt: any) {
     if (window.event) {
       var keynum = evt.keyCode;
     }

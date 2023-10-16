@@ -40,6 +40,7 @@ export class ComunicadosComponent implements OnInit {
   nombre_emp = new FormControl('', [Validators.minLength(2)]);
   nombre_dep = new FormControl('', [Validators.minLength(2)]);
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
+  nombre_reg = new FormControl('', [Validators.minLength(2)]);
   nombre_carg = new FormControl('', [Validators.minLength(2)]);
   seleccion = new FormControl('');
 
@@ -50,6 +51,7 @@ export class ComunicadosComponent implements OnInit {
     bool_suc: false,
     bool_dep: false,
     bool_emp: false,
+    bool_reg: false,
     bool_cargo: false,
   };
 
@@ -64,6 +66,11 @@ export class ComunicadosComponent implements OnInit {
   pageSizeOptions_dep = [5, 10, 20, 50];
   tamanio_pagina_dep: number = 5;
   numero_pagina_dep: number = 1;
+
+  // ITEMS DE PAGINACION DE LA TABLA REGIMEN
+  pageSizeOptions_reg = [5, 10, 20, 50];
+  tamanio_pagina_reg: number = 5;
+  numero_pagina_reg: number = 1;
 
   // ITEMS DE PAGINACION DE LA TABLA EMPLEADOS
   pageSizeOptions_emp = [5, 10, 20, 50];
@@ -95,17 +102,23 @@ export class ComunicadosComponent implements OnInit {
   filtroNombreCarg_: string = '';
   get filtroNombreCarg() { return this.restR.filtroNombreCarg };
 
+  // FILTRO REGIMEN
+  filtroNombreReg_: string = '';
+  get filtroNombreReg() { return this.restR.filtroNombreReg };
+
   // MODELO DE SELECCION DE DATOS
   selectionCarg = new SelectionModel<ITableEmpleados>(true, []);
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
   selectionDep = new SelectionModel<ITableEmpleados>(true, []);
   selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
+  selectionReg = new SelectionModel<ITableEmpleados>(true, []);
 
   // METODO DE VARIABLES DE ALMACENAMIENTO
   departamentos: any = [];
   sucursales: any = [];
   respuesta: any = [];
   empleados: any = [];
+  regimen: any = [];
 
   // FORMULARIO DE MENSAJE DE COMUNICADO
   tituloF = new FormControl('', [Validators.required]);
@@ -131,7 +144,7 @@ export class ComunicadosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.check = this.restR.checkOptions([{ opcion: 'c' }, { opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
+    this.check = this.restR.checkOptions([{ opcion: 'c' }, { opcion: 'r' }, { opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
     this.BuscarDatos();
     this.BuscarCargos();
     this.BuscarParametro();
@@ -151,8 +164,10 @@ export class ComunicadosComponent implements OnInit {
   origen_cargo: any = [];
   cargos: any = [];
   BuscarCargos() {
+    this.empleados_cargos = [];
+    this.cargos = [];
     this.origen_cargo = [];
-    this.informacion.ObtenerCargosComunicados().subscribe((res: any[]) => {
+    this.informacion.ObtenerCargosComunicados(1).subscribe((res: any[]) => {
       this.origen_cargo = JSON.stringify(res);
 
       res.forEach(obj => {
@@ -177,15 +192,18 @@ export class ComunicadosComponent implements OnInit {
           }
         })
       })
-    }, err => {
-      this.toastr.error(err.error.message)
     })
   }
 
   // METODO PARA CARGAR DATOS DE USUARIO
   BuscarDatos() {
+    this.departamentos = [];
+    this.sucursales = [];
+    this.respuesta = [];
+    this.empleados = [];
+    this.regimen = [];
     this.comunicados = [];
-    this.informacion.ObtenerInformacionComunicados().subscribe((res: any[]) => {
+    this.informacion.ObtenerInformacionComunicados(1).subscribe((res: any[]) => {
       this.comunicados = JSON.stringify(res);
 
       res.forEach(obj => {
@@ -223,6 +241,24 @@ export class ComunicadosComponent implements OnInit {
           })
         })
       })
+
+      res.forEach(obj => {
+        obj.departamentos.forEach(ele => {
+          ele.empleado.forEach(reg => {
+            reg.regimen.forEach(r => {
+              this.regimen.push({
+                id: r.id_regimen,
+                nombre: r.name_regimen
+              })
+            })
+          })
+        })
+      })
+
+      this.regimen = this.regimen.filter((obj, index, self) =>
+        index === self.findIndex((o) => o.id === obj.id)
+      );
+
     }, err => {
       this.toastr.info(err.error.message)
     })
@@ -235,23 +271,27 @@ export class ComunicadosComponent implements OnInit {
     this.MostrarLista();
     switch (this.opcion) {
       case 's':
-        this.ControlarOpciones(true, false, false, false);
+        this.ControlarOpciones(true, false, false, false, false);
+        this.ControlarBotones(true, false);
+        break;
+      case 'r':
+        this.ControlarOpciones(false, false, false, false, true);
         this.ControlarBotones(true, false);
         break;
       case 'c':
-        this.ControlarOpciones(false, true, false, false);
+        this.ControlarOpciones(false, true, false, false, false);
         this.ControlarBotones(true, false);
         break;
       case 'd':
-        this.ControlarOpciones(false, false, true, false);
+        this.ControlarOpciones(false, false, true, false, false);
         this.ControlarBotones(true, false);
         break;
       case 'e':
-        this.ControlarOpciones(false, false, false, true);
+        this.ControlarOpciones(false, false, false, true, false);
         this.ControlarBotones(true, false);
         break;
       default:
-        this.ControlarOpciones(false, false, false, false);
+        this.ControlarOpciones(false, false, false, false, false);
         this.ControlarBotones(true, false);
         break;
     }
@@ -260,8 +300,9 @@ export class ComunicadosComponent implements OnInit {
   }
 
   // METODO PARA CONTROLAR VISUALIZACION DE OPCIONES
-  ControlarOpciones(sucursal: boolean, cargo: boolean, departamento: boolean, empleado: boolean) {
+  ControlarOpciones(sucursal: boolean, cargo: boolean, departamento: boolean, empleado: boolean, regimen: boolean) {
     this._booleanOptions.bool_suc = sucursal;
+    this._booleanOptions.bool_reg = regimen;
     this._booleanOptions.bool_cargo = cargo;
     this._booleanOptions.bool_dep = departamento;
     this._booleanOptions.bool_emp = empleado;
@@ -284,6 +325,7 @@ export class ComunicadosComponent implements OnInit {
       case 4: this.restR.setFiltroCodigo(e); break;
       case 5: this.restR.setFiltroCedula(e); break;
       case 6: this.restR.setFiltroNombreEmp(e); break;
+      case 7: this.restR.setFiltroNombreReg(e); break;
       default:
         break;
     }
@@ -346,6 +388,28 @@ export class ComunicadosComponent implements OnInit {
       return `${this.isAllSelectedSuc() ? 'select' : 'deselect'} all`;
     }
     return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
+
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  isAllSelectedReg() {
+    const numSelected = this.selectionReg.selected.length;
+    return numSelected === this.regimen.length
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  masterToggleReg() {
+    this.isAllSelectedSuc() ?
+      this.selectionReg.clear() :
+      this.regimen.forEach(row => this.selectionReg.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelReg(row?: ITableEmpleados): string {
+    if (!row) {
+      return `${this.isAllSelectedReg() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
@@ -416,16 +480,22 @@ export class ComunicadosComponent implements OnInit {
     if (this._booleanOptions.bool_suc === true) {
       this.tamanio_pagina_suc = e.pageSize;
       this.numero_pagina_suc = e.pageIndex + 1;
-    } else if (this._booleanOptions.bool_dep === true) {
+    }
+    else if (this._booleanOptions.bool_dep === true) {
       this.tamanio_pagina_dep = e.pageSize;
       this.numero_pagina_dep = e.pageIndex + 1;
-    } else if (this._booleanOptions.bool_emp === true) {
+    }
+    else if (this._booleanOptions.bool_emp === true) {
       this.tamanio_pagina_emp = e.pageSize;
       this.numero_pagina_emp = e.pageIndex + 1;
     }
     else if (this._booleanOptions.bool_cargo === true) {
       this.tamanio_pagina_car = e.pageSize;
       this.numero_pagina_car = e.pageIndex + 1;
+    }
+    else if (this._booleanOptions.bool_reg === true) {
+      this.tamanio_pagina_reg = e.pageSize;
+      this.numero_pagina_reg = e.pageIndex + 1;
     }
   }
 
@@ -447,6 +517,26 @@ export class ComunicadosComponent implements OnInit {
       })
     })
     this.EnviarNotificaciones(usuarios, form);
+  }
+
+  // CONSULTA DE LOS DATOS REGIMEN
+  ModelarRegimen(form: any) {
+    let usuarios: any = [];
+    let respuesta = JSON.parse(this.comunicados)
+    respuesta.forEach((obj: any) => {
+      obj.departamentos.forEach((obj1: any) => {
+        obj1.empleado.forEach((obj2: any) => {
+          this.selectionReg.selected.find(obj3 => {
+            obj2.regimen.forEach((obj4: any) => {
+              if (obj3.id === obj4.id_regimen) {
+                usuarios.push(obj2);
+              }
+            })
+          })
+        })
+      })
+    })
+    this.EnviarNotificaciones(respuesta, form);
   }
 
   // METODO PARA MOSTRAR DATOS DE EMPLEADO
@@ -586,6 +676,9 @@ export class ComunicadosComponent implements OnInit {
     else if (this.opcion === 'd') {
       this.ModelarDepartamentos(form);
     }
+    else if (this.opcion === 'r') {
+      this.ModelarRegimen(form);
+    }
     else {
       this.ModelarEmpleados(form);
     }
@@ -615,6 +708,12 @@ export class ComunicadosComponent implements OnInit {
       this.selectionSuc.deselect();
       this.selectionSuc.clear();
     }
+    if (this._booleanOptions.bool_reg) {
+      this.nombre_reg.reset();
+      this._booleanOptions.bool_reg = false;
+      this.selectionReg.deselect();
+      this.selectionReg.clear();
+    }
     if (this._booleanOptions.bool_cargo) {
       this._booleanOptions.bool_cargo = false;
       this.selectionCarg.deselect();
@@ -631,7 +730,17 @@ export class ComunicadosComponent implements OnInit {
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionEmp.clear();
+      this.selectionReg.clear();
       this.Filtrar('', 1)
+    }
+    else if (this.opcion === 'r') {
+      this.nombre_reg.reset();
+      this.filtroNombreReg_ = '';
+      this.selectionDep.clear();
+      this.selectionCarg.clear();
+      this.selectionEmp.clear();
+      this.selectionSuc.clear();
+      this.Filtrar('', 7)
     }
     else if (this.opcion === 'c') {
       this.nombre_carg.reset();
@@ -639,6 +748,7 @@ export class ComunicadosComponent implements OnInit {
       this.selectionEmp.clear();
       this.selectionDep.clear();
       this.selectionSuc.clear();
+      this.selectionReg.clear();
       this.Filtrar('', 2)
     }
     else if (this.opcion === 'd') {
@@ -649,6 +759,7 @@ export class ComunicadosComponent implements OnInit {
       this.selectionEmp.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();
+      this.selectionReg.clear();
       this.Filtrar('', 1)
       this.Filtrar('', 3)
     }
@@ -662,6 +773,7 @@ export class ComunicadosComponent implements OnInit {
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();
+      this.selectionReg.clear();
       this.Filtrar('', 4)
       this.Filtrar('', 5)
       this.Filtrar('', 6)

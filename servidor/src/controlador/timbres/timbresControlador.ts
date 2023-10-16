@@ -141,7 +141,7 @@ class TimbresControlador {
         }
     }
 
-    //METODO PARA BUSCAR EL TIMBRE DEL EMPLEADO POR FECHA
+    //METODO PARA BUSCAR EL TIMBRE DEL EMPLEADO POR FECHA // COLOCAR ESTADO
     public async ObtenertimbreFechaEmple(req: Request, res: Response): Promise<any> {
         try {
             let { codigo, cedula, fecha } = req.query;

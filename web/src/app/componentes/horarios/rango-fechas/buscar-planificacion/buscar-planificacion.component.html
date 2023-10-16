@@ -172,13 +172,13 @@
                     <table id="table_horario" class="table table-hover table-sm">
                         <thead class="thead-light">
                             <tr style="text-align: center;">
-                                <th scope="col" id="td_horarios" rowspan="2">CÓDIGO</th>
-                                <th scope="col" id="td_horarios" rowspan="2">USUARIO</th>
-                                <th scope="col" id="td_horarios" rowspan="2">AÑO</th>
-                                <th scope="col" id="td_horarios" rowspan="2">MES</th>
+                                <th class="sticky colum_1"  scope="col" id="td_horarios" rowspan="2">CÓDIGO</th>
+                                <th class="sticky-2 colum_1"  scope="col" id="td_horarios" rowspan="2">USUARIO</th>
+                                <th class="sticky-3 colum_2"  scope="col" id="td_horarios" rowspan="2">AÑO</th>
+                                <th class="sticky-4 colum_2"  scope="col" id="td_horarios" rowspan="2">MES</th>
+
                                 <th scope="col" id="td_horarios" colspan="31">DÍAS DEL MES</th>
-                                <th scope="col" id="td_horarios" rowspan="2">CÓDIGO</th>
-                                <th scope="col" id="td_horarios" rowspan="2">ACCIONES</th>
+                                <th *ngIf="columnAccion"  class="sticky-5 colum_1"  scope="col" id="td_horarios" rowspan="2">ACCIONES</th>
                             </tr>
                             <tr style="text-align: center;">
                                 <th scope="col" id="td_horarios">01</th>
@@ -216,16 +216,16 @@
                         </thead>
                         <tbody>
                             <tr *ngFor="let e of horariosEmpleado | paginate:tamanio_pagina_emp:numero_pagina_emp">
-                                <td id="td_horarios" [ngStyle]="{'background':CambiarColores(e.color)}">
+                                <td class="sticky colum_1"  id="td_horarios" [ngStyle]="{'background':CambiarColores(e.color)}">
                                     {{e.codigo_e}}
                                 </td>
-                                <td id="td_horarios" [ngStyle]="{'background':CambiarColores(e.color)}">
+                                <td class="sticky-2 colum_1"  id="td_horarios" [ngStyle]="{'background':CambiarColores(e.color)}">
                                     {{e.nombre_e}}
                                 </td>
-                                <td id="td_horarios" [ngStyle]="{'background':CambiarColores(e.color)}">
+                                <td class="sticky-3 colum_2"  id="td_horarios" [ngStyle]="{'background':CambiarColores(e.color)}">
                                     {{e.anio}}
                                 </td>
-                                <td id="td_horarios" [ngStyle]="{'background':CambiarColores(e.color)}">
+                                <td class="sticky-4 colum_2"  id="td_horarios" [ngStyle]="{'background':CambiarColores(e.color)}">
                                     {{e.mes}}
                                 </td>
                                 <td id="td_horarios"
@@ -507,9 +507,7 @@
                                     <br *ngIf="editar_activar">
                                     {{e.dia31}}
                                 </td>
-                                <td id="td_horarios" [ngStyle]="{'background':CambiarColores(e.color)}">{{e.codigo_e}}
-                                </td>
-                                <td id="td_horarios">
+                                <td *ngIf="columnAccion" class="sticky-5 colum_1"  id="td_horarios">
                                     <i (click)="PlanificarIndividual(e)" id="plan" *ngIf="auto_individual"
                                         class="fa fa-calendar" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de horarios.">

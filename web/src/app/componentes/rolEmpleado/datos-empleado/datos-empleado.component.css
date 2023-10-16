@@ -78,22 +78,19 @@ mat-grid-tile:hover {
     text-align: center;
 }
 
-p {
-    font-size: x-small;
-}
-
 #delete {
     color: red;
     cursor: pointer;
     text-align: center;
 }
 
-#cancel {
-    color: red;
-    cursor: pointer;
-    font-size: 15px;
-    text-align: center;
-    margin-right: 20px;
+#items {
+    font-size: 14px;
+    margin-top: 8%;
+    font-style: normal;
+    font-weight: 900;
+    letter-spacing: 1px;
+    word-wrap: break-word;
 }
 
 [type="file"] {

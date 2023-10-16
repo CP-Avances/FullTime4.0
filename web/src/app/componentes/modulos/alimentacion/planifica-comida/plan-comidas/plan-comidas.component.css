@@ -1,21 +1,33 @@
-.btn { margin-left: 15px; background-color: rgb(80,87,97); color: white; } 
+.btn {
+    margin-left: 15px;
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
 
-td { padding-top: 10px; text-align: center; }
+td {
+    padding-top: 10px;
+    text-align: center;
+}
 
-table { width: 100%; font-size: 14px;}
+table {
+    width: 100%;
+    font-size: 13px;
+}
 
-.mat-mdc-radio-button ~ .mat-mdc-radio-button {
+.mat-mdc-radio-button~.mat-mdc-radio-button {
     margin-left: 20px;
-  }
+}
 
-mat-icon { cursor: pointer; }
+mat-icon {
+    cursor: pointer;
+}
 
 #SelectCheck {
     cursor: pointer;
     margin-left: 10px;
 }
 
-#menu { 
+#menu {
     color: green;
     cursor: pointer;
     margin-right: 5px;
@@ -23,6 +35,10 @@ mat-icon { cursor: pointer; }
     text-align: center;
 }
 
-p { font-size: x-small; }
+p {
+    font-size: x-small;
+}
 
-mat-form-field { padding: 10px 15px 0px 15px;}
+mat-form-field {
+    padding: 10px 15px 0px 15px;
+}

@@ -85,3 +85,80 @@ p {
     color: white;
     cursor: pointer
 }
+
+.table{
+    border-spacing: 0;
+}
+
+.table th,
+.table td{
+    border-right: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    min-width: 100px;
+}
+
+.table th:last-child,
+.table td:last-child{
+    border-right: 0;
+}
+
+.table tbody tr{
+    background-color: #fbfbfb;
+}
+
+.table tbody tr:nth-child(2n) {
+    background-color: #e6f3ff;
+}
+
+.colum_1{
+    border-right: 0px solid #a1a1a1;
+    border-left: 0px solid #979797;
+    min-width: 100px !important;
+}
+
+.colum_2{
+    border-right: 0px solid #a1a1a1;
+    border-left: 0px solid #979797;
+    min-width: 70px !important;
+}
+
+.table .sticky{
+    position: sticky;
+    left: 0;
+}
+
+.table .sticky-2{
+    position: sticky;
+    left: 100px;
+}
+
+.table .sticky-3{
+    position: sticky;
+    left: 200px;
+}
+
+.table .sticky-4{
+    position: sticky;
+    left: 270px;
+}
+
+.table .sticky-5{
+    position: sticky;
+    right:0;
+}
+
+.table tbody tr .sticky,
+.table tbody tr .sticky-2,
+.table tbody tr .sticky-3,
+.table tbody tr .sticky-4,
+.table tbody tr .sticky-5{
+    background-color: #fbfbfb;
+}
+
+.table tbody tr:nth-child(2n) .sticky,
+.table tbody tr:nth-child(2n) .sticky-2,
+.table tbody tr:nth-child(2n) .sticky-3,
+.table tbody tr:nth-child(2n) .sticky-4,
+.table tbody tr:nth-child(2n) .sticky-5{
+    background-color: #e6f3ff;
+}

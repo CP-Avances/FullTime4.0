@@ -838,7 +838,7 @@ class PlanComidasControlador {
     /** ************************************************************************************************ **
      ** **    METODOS DE ENVIO DE CORREO ELECTRONICO DE PLANIFICACION DE SERVICIOS DE ALIMENTACION    ** **
      ** ************************************************************************************************ **/
-    // ENVIAR CORREO ELECTRÓNICO DE PLANIFICACIÓN DE COMIDA APLICACION WEB
+    // ENVIAR CORREO ELECTRÓNICO DE PLANIFICACIÓN DE COMIDA APLICACION WEB  -- verificar si se requiere estado
     EnviarCorreoPlanComidas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var tiempo = (0, settingsMail_1.fechaHora)();

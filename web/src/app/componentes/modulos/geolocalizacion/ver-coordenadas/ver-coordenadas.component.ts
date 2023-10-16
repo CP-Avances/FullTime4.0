@@ -14,14 +14,14 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 
 // SECCION DE SERVICIOS
 import { EmpleadoUbicacionService } from 'src/app/servicios/empleadoUbicacion/empleado-ubicacion.service';
+import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 
 import { EditarCoordenadasComponent } from '../editar-coordenadas/editar-coordenadas.component';
-import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ListarCoordenadasComponent } from '../listar-coordenadas/listar-coordenadas.component';
+import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
 export interface EmpleadoElemento {
   id_emplu: number;
@@ -49,12 +49,14 @@ export class VerCoordenadasComponent implements OnInit {
   nombre_dep = new FormControl('', [Validators.minLength(2)]);
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
   nombre_carg = new FormControl('', [Validators.minLength(2)]);
+  nombre_reg = new FormControl('', [Validators.minLength(2)]);
   seleccion = new FormControl('');
 
   public _booleanOptions: FormCriteriosBusqueda = {
     bool_suc: false,
     bool_dep: false,
     bool_emp: false,
+    bool_reg: false,
     bool_cargo: false,
   };
 
@@ -63,12 +65,15 @@ export class VerCoordenadasComponent implements OnInit {
   selectionCarg = new SelectionModel<ITableEmpleados>(true, []);
   selectionDep = new SelectionModel<ITableEmpleados>(true, []);
   selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
+  selectionReg = new SelectionModel<ITableEmpleados>(true, []);
+
   public check: checkOptions[];
 
   departamentos: any = [];
   sucursales: any = [];
-  respuesta: any[];
   empleados: any = [];
+  respuesta: any[];
+  regimen: any = [];
   origen: any = [];
   data_pdf: any = [];
 
@@ -76,6 +81,11 @@ export class VerCoordenadasComponent implements OnInit {
   pageSizeOptions_suc = [5, 10, 20, 50];
   tamanio_pagina_suc: number = 5;
   numero_pagina_suc: number = 1;
+
+  // ITEMS DE PAGINACION DE LA TABLA REGIMEN
+  pageSizeOptions_reg = [5, 10, 20, 50];
+  tamanio_pagina_reg: number = 5;
+  numero_pagina_reg: number = 1;
 
   // ITEMS DE PAGINACION DE LA TABLA CARGO
   pageSizeOptions_car = [5, 10, 20, 50];
@@ -112,6 +122,10 @@ export class VerCoordenadasComponent implements OnInit {
   filtroNombreCarg_: string = '';
   get filtroNombreCarg() { return this.filtros.filtroNombreCarg };
 
+  // FILTRO REGIMEN
+  filtroNombreReg_: string = '';
+  get filtroNombreReg() { return this.filtros.filtroNombreReg };
+
   coordenadas: any = [];
   datosUsuarios: any = [];
 
@@ -133,7 +147,7 @@ export class VerCoordenadasComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.check = this.filtros.checkOptions([{ opcion: 's' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
+    this.check = this.filtros.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
     this.ConsultarDatos();
   }
 
@@ -160,7 +174,8 @@ export class VerCoordenadasComponent implements OnInit {
     if (this.btnCheckHabilitar === false) {
       this.btnCheckHabilitar = true;
       this.auto_individual = false;
-    } else if (this.btnCheckHabilitar === true) {
+    }
+    else if (this.btnCheckHabilitar === true) {
       this.btnCheckHabilitar = false;
       this.auto_individual = true;
     }
@@ -236,10 +251,11 @@ export class VerCoordenadasComponent implements OnInit {
     this.sucursales = [];
     this.empleados = [];
     this.origen = [];
+    this.regimen = [];
     let ubicacion = {
       ubicacion: this.idUbicacion
     }
-    this.informacion.ObtenerInformacionUbicacion(ubicacion).subscribe((res: any[]) => {
+    this.informacion.ObtenerInformacionUbicacion(1, ubicacion).subscribe((res: any[]) => {
       this.origen = JSON.stringify(res);
 
       res.forEach(obj => {
@@ -275,7 +291,25 @@ export class VerCoordenadasComponent implements OnInit {
           })
         })
       })
-    }, err => { })
+
+      res.forEach(obj => {
+        obj.departamentos.forEach(ele => {
+          ele.empleado.forEach(reg => {
+            reg.regimen.forEach(r => {
+              this.regimen.push({
+                id: r.id_regimen,
+                nombre: r.name_regimen
+              })
+            })
+          })
+        })
+      })
+
+      this.regimen = this.regimen.filter((obj, index, self) =>
+        index === self.findIndex((o) => o.id === obj.id)
+      );
+
+    })
   }
 
   // METODO PARA FILTRAR POR CARGOS
@@ -289,7 +323,7 @@ export class VerCoordenadasComponent implements OnInit {
     let ubicacion = {
       ubicacion: this.idUbicacion
     }
-    this.informacion.ObtenerInformacionCargosUbicacion(ubicacion).subscribe((res: any[]) => {
+    this.informacion.ObtenerInformacionCargosUbicacion(1, ubicacion).subscribe((res: any[]) => {
       this.origen_cargo = JSON.stringify(res);
 
       res.forEach(obj => {
@@ -313,7 +347,7 @@ export class VerCoordenadasComponent implements OnInit {
           })
         })
       })
-    }, err => { })
+    })
   }
 
   // METODO PARA ACTIVAR SELECCION MULTIPLE
@@ -333,23 +367,27 @@ export class VerCoordenadasComponent implements OnInit {
     this.MostrarLista();
     switch (this.opcion) {
       case 's':
-        this.ControlarOpciones(true, false, false, false);
+        this.ControlarOpciones(true, false, false, false, false);
+        this.ControlarBotones(true, false);
+        break;
+      case 'r':
+        this.ControlarOpciones(false, false, false, false, true);
         this.ControlarBotones(true, false);
         break;
       case 'c':
-        this.ControlarOpciones(false, true, false, false);
+        this.ControlarOpciones(false, true, false, false, false);
         this.ControlarBotones(true, false);
         break;
       case 'd':
-        this.ControlarOpciones(false, false, true, false);
+        this.ControlarOpciones(false, false, true, false, false);
         this.ControlarBotones(true, false);
         break;
       case 'e':
-        this.ControlarOpciones(false, false, false, true);
+        this.ControlarOpciones(false, false, false, true, false);
         this.ControlarBotones(true, false);
         break;
       default:
-        this.ControlarOpciones(false, false, false, false);
+        this.ControlarOpciones(false, false, false, false, false);
         this.ControlarBotones(true, false);
         break;
     }
@@ -357,12 +395,13 @@ export class VerCoordenadasComponent implements OnInit {
     this.filtros.GuardarCheckOpcion(this.opcion)
   }
 
-  // METODO PARA CONTROLAR VISUALIZACION DE OPCIONES
-  ControlarOpciones(sucursal: boolean, cargo: boolean, departamento: boolean, empleado: boolean) {
+  // METODO PARA CONTROLAR OPCIONES DE BUSQUEDA
+  ControlarOpciones(sucursal: boolean, cargo: boolean, departamento: boolean, empleado: boolean, regimen: boolean) {
     this._booleanOptions.bool_suc = sucursal;
     this._booleanOptions.bool_cargo = cargo;
     this._booleanOptions.bool_dep = departamento;
     this._booleanOptions.bool_emp = empleado;
+    this._booleanOptions.bool_reg = regimen;
   }
 
   // METODO PARA CONTROLAR VISTA DE BOTONES
@@ -382,6 +421,7 @@ export class VerCoordenadasComponent implements OnInit {
       case 4: this.filtros.setFiltroCodigo(e); break;
       case 5: this.filtros.setFiltroCedula(e); break;
       case 6: this.filtros.setFiltroNombreEmp(e); break;
+      case 7: this.filtros.setFiltroNombreReg(e); break;
       default:
         break;
     }
@@ -430,6 +470,13 @@ export class VerCoordenadasComponent implements OnInit {
       this.selectionEmp.clear();
     }
 
+    if (this._booleanOptions.bool_reg) {
+      this.nombre_reg.reset();
+      this._booleanOptions.bool_reg = false;
+      this.selectionReg.deselect();
+      this.selectionReg.clear();
+    }
+
     if (this._booleanOptions.bool_dep) {
       this.nombre_dep.reset();
       this._booleanOptions.bool_dep = false;
@@ -462,7 +509,17 @@ export class VerCoordenadasComponent implements OnInit {
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionEmp.clear();
+      this.selectionReg.clear();
       this.Filtrar('', 1)
+    }
+    else if (this.opcion === 'r') {
+      this.nombre_reg.reset();
+      this.filtroNombreReg_ = '';
+      this.selectionDep.clear();
+      this.selectionCarg.clear();
+      this.selectionEmp.clear();
+      this.selectionSuc.clear();
+      this.Filtrar('', 7)
     }
     else if (this.opcion === 'c') {
       this.nombre_carg.reset();
@@ -470,6 +527,7 @@ export class VerCoordenadasComponent implements OnInit {
       this.selectionEmp.clear();
       this.selectionDep.clear();
       this.selectionSuc.clear();
+      this.selectionReg.clear();
       this.Filtrar('', 2)
     }
     else if (this.opcion === 'd') {
@@ -480,6 +538,7 @@ export class VerCoordenadasComponent implements OnInit {
       this.selectionEmp.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();
+      this.selectionReg.clear();
       this.Filtrar('', 1)
       this.Filtrar('', 3)
     }
@@ -493,6 +552,7 @@ export class VerCoordenadasComponent implements OnInit {
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();
+      this.selectionReg.clear();
       this.Filtrar('', 4)
       this.Filtrar('', 5)
       this.Filtrar('', 6)
@@ -522,6 +582,27 @@ export class VerCoordenadasComponent implements OnInit {
       return `${this.isAllSelectedCarg() ? 'select' : 'deselect'} all`;
     }
     return `${this.selectionCarg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  isAllSelectedReg() {
+    const numSelected = this.selectionReg.selected.length;
+    return numSelected === this.regimen.length
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  masterToggleReg() {
+    this.isAllSelectedReg() ?
+      this.selectionReg.clear() :
+      this.regimen.forEach(row => this.selectionReg.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelReg(row?: ITableEmpleados): string {
+    if (!row) {
+      return `${this.isAllSelectedReg() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
@@ -605,6 +686,10 @@ export class VerCoordenadasComponent implements OnInit {
       this.tamanio_pagina_car = e.pageSize;
       this.numero_pagina_car = e.pageIndex + 1;
     }
+    else if (this._booleanOptions.bool_reg === true) {
+      this.tamanio_pagina_reg = e.pageSize;
+      this.numero_pagina_reg = e.pageIndex + 1;
+    }
   }
 
   // METODO PARA PRESENTAR DATOS DE SUCURSALES
@@ -623,6 +708,26 @@ export class VerCoordenadasComponent implements OnInit {
       })
     })
 
+    this.RegistrarUbicacionUsuario(usuarios);
+  }
+
+  // CONSULTA DE LOS DATOS REGIMEN
+  ModelarRegimen() {
+    let usuarios: any = [];
+    let respuesta = JSON.parse(this.origen)
+    respuesta.forEach((obj: any) => {
+      obj.departamentos.forEach((obj1: any) => {
+        obj1.empleado.forEach((obj2: any) => {
+          this.selectionReg.selected.find(obj3 => {
+            obj2.regimen.forEach((obj4: any) => {
+              if (obj3.id === obj4.id_regimen) {
+                usuarios.push(obj2);
+              }
+            })
+          })
+        })
+      })
+    })
     this.RegistrarUbicacionUsuario(usuarios);
   }
 
@@ -712,6 +817,9 @@ export class VerCoordenadasComponent implements OnInit {
   GuardarRegistros() {
     if (this.opcion === 's') {
       this.ModelarSucursal();
+    }
+    else if (this.opcion === 'r') {
+      this.ModelarRegimen();
     }
     else if (this.opcion === 'c') {
       this.ModelarCargo();

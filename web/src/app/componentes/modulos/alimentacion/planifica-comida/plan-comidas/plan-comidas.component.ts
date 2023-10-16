@@ -19,7 +19,6 @@ import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 
 import { ITableEmpleados } from 'src/app/model/reportes.model';
-import { PlanificacionComidasComponent } from '../planificacion-comidas/planificacion-comidas.component';
 
 @Component({
   selector: 'app-plan-comidas',
@@ -34,48 +33,41 @@ export class PlanComidasComponent implements OnInit {
   nombre_emp = new FormControl('', [Validators.minLength(2)]);
   nombre_dep = new FormControl('', [Validators.minLength(2)]);
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
+  nombre_reg = new FormControl('', [Validators.minLength(2)]);
   nombre_carg = new FormControl('', [Validators.minLength(2)]);
   seleccion = new FormControl('');
-
-  filtroNombreSuc_: string = '';
-  get filtroNombreSuc() { return this.restR.filtroNombreSuc }
-
-  filtroNombreCarg_: string = '';
-  get filtroNombreCarg() { return this.restR.filtroNombreCarg };
-
-  filtroNombreDep_: string = '';
-  get filtroNombreDep() { return this.restR.filtroNombreDep }
-
-  filtroCodigo_: any;
-  filtroCedula_: string = '';
-  filtroNombreEmp_: string = '';
-  get filtroNombreEmp() { return this.restR.filtroNombreEmp };
-  get filtroCodigo() { return this.restR.filtroCodigo };
-  get filtroCedula() { return this.restR.filtroCedula };
 
   public _booleanOptions: FormCriteriosBusqueda = {
     bool_suc: false,
     bool_dep: false,
     bool_emp: false,
+    bool_reg: false,
     bool_cargo: false,
   };
 
   // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA
   departamentos: any = [];
   sucursales: any = [];
-  respuesta: any[];
   empleados: any = [];
+  respuesta: any[];
+  regimen: any = [];
   origen: any = [];
 
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
   selectionCarg = new SelectionModel<ITableEmpleados>(true, []);
   selectionDep = new SelectionModel<ITableEmpleados>(true, []);
   selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
+  selectionReg = new SelectionModel<ITableEmpleados>(true, []);
 
   // ITEMS DE PAGINACION DE LA TABLA SUCURSAL
   pageSizeOptions_suc = [5, 10, 20, 50];
   tamanio_pagina_suc: number = 5;
   numero_pagina_suc: number = 1;
+
+  // ITEMS DE PAGINACION DE LA TABLA REGIMEN
+  pageSizeOptions_reg = [5, 10, 20, 50];
+  tamanio_pagina_reg: number = 5;
+  numero_pagina_reg: number = 1;
 
   // ITEMS DE PAGINACION DE LA TABLA CARGO
   pageSizeOptions_car = [5, 10, 20, 50];
@@ -91,6 +83,30 @@ export class PlanComidasComponent implements OnInit {
   pageSizeOptions_emp = [5, 10, 20, 50];
   tamanio_pagina_emp: number = 5;
   numero_pagina_emp: number = 1;
+
+  // FILTROS SUCURSALES
+  filtroNombreSuc_: string = '';
+  get filtroNombreSuc() { return this.restR.filtroNombreSuc }
+
+  // FILTROS DEPARTAMENTOS
+  filtroNombreDep_: string = '';
+  get filtroNombreDep() { return this.restR.filtroNombreDep }
+
+  // FILTROS EMPLEADO
+  filtroCodigo_: any;
+  filtroCedula_: string = '';
+  filtroNombreEmp_: string = '';
+  get filtroNombreEmp() { return this.restR.filtroNombreEmp };
+  get filtroCodigo() { return this.restR.filtroCodigo };
+  get filtroCedula() { return this.restR.filtroCedula };
+
+  // FILTRO CARGOS
+  filtroNombreCarg_: string = '';
+  get filtroNombreCarg() { return this.restR.filtroNombreCarg };
+
+  // FILTRO REGIMEN
+  filtroNombreReg_: string = '';
+  get filtroNombreReg() { return this.restR.filtroNombreReg };
 
   habilitado: any;
   public check: checkOptions[];
@@ -119,7 +135,7 @@ export class PlanComidasComponent implements OnInit {
       return this.validar.RedireccionarHomeAdmin(mensaje);
     }
     else {
-      this.check = this.restR.checkOptions([{ opcion: 'c' }, { opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
+      this.check = this.restR.checkOptions([{ opcion: 'c' }, { opcion: 'r' }, { opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
       this.BuscarInformacion();
       this.BuscarCargos();
     }
@@ -139,7 +155,10 @@ export class PlanComidasComponent implements OnInit {
   origen_cargo: any = [];
   cargos: any = [];
   BuscarCargos() {
-    this.informacion.ObtenerInformacionCargo().subscribe((res: any[]) => {
+    this.empleados_cargos = [];
+    this.origen_cargo = [];
+    this.cargos = [];
+    this.informacion.ObtenerInformacionCargo(1).subscribe((res: any[]) => {
       this.origen_cargo = JSON.stringify(res);
 
       res.forEach(obj => {
@@ -170,8 +189,13 @@ export class PlanComidasComponent implements OnInit {
 
   // METODO PARA BUSCAR INFORMACION DE USUARIOS
   BuscarInformacion() {
+    this.departamentos = [];
+    this.sucursales = [];
+    this.respuesta = [];
+    this.empleados = [];
+    this.regimen = [];
     this.origen = [];
-    this.informacion.ObtenerInformacion().subscribe((res: any[]) => {
+    this.informacion.ObtenerInformacion(1).subscribe((res: any[]) => {
       this.origen = JSON.stringify(res);
 
       res.forEach(obj => {
@@ -207,6 +231,24 @@ export class PlanComidasComponent implements OnInit {
           })
         })
       })
+
+      res.forEach(obj => {
+        obj.departamentos.forEach(ele => {
+          ele.empleado.forEach(reg => {
+            reg.regimen.forEach(r => {
+              this.regimen.push({
+                id: r.id_regimen,
+                nombre: r.name_regimen
+              })
+            })
+          })
+        })
+      })
+
+      this.regimen = this.regimen.filter((obj, index, self) =>
+        index === self.findIndex((o) => o.id === obj.id)
+      );
+
     }, err => {
       this.toastr.error(err.error.message)
     })
@@ -232,23 +274,27 @@ export class PlanComidasComponent implements OnInit {
     this.MostrarLista();
     switch (this.opcion) {
       case 's':
-        this.ControlarOpciones(true, false, false, false);
+        this.ControlarOpciones(true, false, false, false, false);
         this.ControlarBotones(true, false, true);
         break;
       case 'c':
-        this.ControlarOpciones(false, true, false, false);
+        this.ControlarOpciones(false, true, false, false, false);
         this.ControlarBotones(true, false, true);
         break;
       case 'd':
-        this.ControlarOpciones(false, false, true, false);
+        this.ControlarOpciones(false, false, true, false, false);
         this.ControlarBotones(true, false, true);
         break;
       case 'e':
-        this.ControlarOpciones(false, false, false, true);
+        this.ControlarOpciones(false, false, false, true, false);
+        this.ControlarBotones(true, false, true);
+        break;
+      case 'r':
+        this.ControlarOpciones(false, false, false, false, true);
         this.ControlarBotones(true, false, true);
         break;
       default:
-        this.ControlarOpciones(false, false, false, false);
+        this.ControlarOpciones(false, false, false, false, false);
         this.ControlarBotones(true, false, true);
         break;
     }
@@ -257,11 +303,12 @@ export class PlanComidasComponent implements OnInit {
   }
 
   // METODO PARA CONTROLAR OPCIONES DE BUSQUEDA
-  ControlarOpciones(sucursal: boolean, cargo: boolean, departamento: boolean, empleado: boolean,) {
+  ControlarOpciones(sucursal: boolean, cargo: boolean, departamento: boolean, empleado: boolean, regimen: boolean) {
     this._booleanOptions.bool_suc = sucursal;
     this._booleanOptions.bool_cargo = cargo;
     this._booleanOptions.bool_dep = departamento;
     this._booleanOptions.bool_emp = empleado;
+    this._booleanOptions.bool_reg = regimen;
   }
 
   // METODO PARA CONTROLAR VISTA DE BOTONES
@@ -282,6 +329,7 @@ export class PlanComidasComponent implements OnInit {
       case 4: this.restR.setFiltroCodigo(e); break;
       case 5: this.restR.setFiltroCedula(e); break;
       case 6: this.restR.setFiltroNombreEmp(e); break;
+      case 7: this.restR.setFiltroNombreReg(e); break;
       default:
         break;
     }
@@ -336,6 +384,27 @@ export class PlanComidasComponent implements OnInit {
       return `${this.isAllSelectedSuc() ? 'select' : 'deselect'} all`;
     }
     return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  isAllSelectedReg() {
+    const numSelected = this.selectionReg.selected.length;
+    return numSelected === this.regimen.length
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  masterToggleReg() {
+    this.isAllSelectedReg() ?
+      this.selectionReg.clear() :
+      this.regimen.forEach(row => this.selectionReg.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelReg(row?: ITableEmpleados): string {
+    if (!row) {
+      return `${this.isAllSelectedReg() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
@@ -419,6 +488,10 @@ export class PlanComidasComponent implements OnInit {
       this.tamanio_pagina_car = e.pageSize;
       this.numero_pagina_car = e.pageIndex + 1;
     }
+    else if (this._booleanOptions.bool_reg === true) {
+      this.tamanio_pagina_reg = e.pageSize;
+      this.numero_pagina_reg = e.pageIndex + 1;
+    }
   }
 
   // METODO PARA MOSTRAR DATOS DE SUCURSALES
@@ -450,6 +523,41 @@ export class PlanComidasComponent implements OnInit {
       })
     }
 
+    this.PlanificarMultiple(usuarios);
+  }
+
+  // CONSULTA DE LOS DATOS REGIMEN
+  ModelarRegimen(id: number) {
+    let usuarios: any = [];
+    let respuesta = JSON.parse(this.origen)
+    if (id === 0) {
+      respuesta.forEach((obj: any) => {
+        obj.departamentos.forEach((obj1: any) => {
+          obj1.empleado.forEach((obj2: any) => {
+            this.selectionReg.selected.find(obj3 => {
+              obj2.regimen.forEach((obj4: any) => {
+                if (obj3.id === obj4.id_regimen) {
+                  usuarios.push(obj2);
+                }
+              })
+            })
+          })
+        })
+      })
+    }
+    else {
+      respuesta.forEach((obj: any) => {
+        obj.departamentos.forEach((obj2: any) => {
+          obj2.empleado.forEach((obj3: any) => {
+            obj3.regimen.forEach((obj4: any) => {
+              if (obj4.id_regimen === id) {
+                usuarios.push(obj3)
+              }
+            })
+          })
+        })
+      })
+    }
     this.PlanificarMultiple(usuarios);
   }
 
@@ -551,6 +659,9 @@ export class PlanComidasComponent implements OnInit {
     if (this.opcion === 's') {
       this.ModelarSucursal(id);
     }
+    else if (this.opcion === 'r') {
+      this.ModelarRegimen(id);
+    }
     else if (this.opcion === 'c') {
       this.ModelarCargo(id);
     }
@@ -589,6 +700,13 @@ export class PlanComidasComponent implements OnInit {
       this.selectionSuc.clear();
     }
 
+    if (this._booleanOptions.bool_reg) {
+      this.nombre_reg.reset();
+      this._booleanOptions.bool_reg = false;
+      this.selectionReg.deselect();
+      this.selectionReg.clear();
+    }
+
     if (this._booleanOptions.bool_cargo) {
       this._booleanOptions.bool_cargo = false;
       this.selectionCarg.deselect();
@@ -607,7 +725,17 @@ export class PlanComidasComponent implements OnInit {
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionEmp.clear();
+      this.selectionReg.clear();
       this.Filtrar('', 1)
+    }
+    else if (this.opcion === 'r') {
+      this.nombre_reg.reset();
+      this.filtroNombreReg_ = '';
+      this.selectionDep.clear();
+      this.selectionCarg.clear();
+      this.selectionEmp.clear();
+      this.selectionSuc.clear();
+      this.Filtrar('', 7)
     }
     else if (this.opcion === 'c') {
       this.nombre_carg.reset();
@@ -615,6 +743,7 @@ export class PlanComidasComponent implements OnInit {
       this.selectionEmp.clear();
       this.selectionDep.clear();
       this.selectionSuc.clear();
+      this.selectionReg.clear();
       this.Filtrar('', 2)
     }
     else if (this.opcion === 'd') {
@@ -625,6 +754,7 @@ export class PlanComidasComponent implements OnInit {
       this.selectionEmp.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();
+      this.selectionReg.clear();
       this.Filtrar('', 1)
       this.Filtrar('', 3)
     }
@@ -638,6 +768,7 @@ export class PlanComidasComponent implements OnInit {
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();
+      this.selectionReg.clear();
       this.Filtrar('', 4)
       this.Filtrar('', 5)
       this.Filtrar('', 6)

@@ -33,6 +33,21 @@
                         </mat-form-field>
                     </div>
                 </form>
+                <!-- FORM PARA REGIMEN -->
+                <form *ngIf="_booleanOptions.bool_reg">
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <mat-form-field>
+                            <mat-label>Régimen laboral</mat-label>
+                            <input matInput placeholder="Buscar" [(ngModel)]="filtroNombreReg_"
+                                (input)="Filtrar(filtroNombreReg_, 13)" [formControl]="nombre_reg" type="text"
+                                (keypress)="IngresarSoloLetras($event)">
+                            <mat-icon matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda de régim laboral por nombre.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                    </div>
+                </form>
                 <!-- FORM PARA CARGOS -->
                 <form *ngIf="_booleanOptions.bool_cargo">
                     <div class="d-flex flex-wrap justify-content-center">
@@ -185,6 +200,65 @@
                     </div>
                     <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina_suc"
                         [pageSizeOptions]="pageSizeOptions_suc" (page)="ManejarPaginaResultados($event)"
+                        showFirstLastButtons>
+                    </mat-paginator>
+                    <br>
+                </div>
+                <!-- TABLA PARA REGIMEN -->
+                <div *ngIf="_booleanOptions.bool_reg" class="mat-elevation-z8" style="background: white;">
+                    <div class="d-flex bd-highlight" id="resultados">
+                        <span class="w-100 bd-highlight">
+                            RESULTADO REGIMEN LABORAL
+                        </span>
+                        <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
+                            (click)="MostrarLista()">
+                            Mostrar lista
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead class="thead-light">
+                                <tr style="text-align: center;">
+                                    <th>
+                                        <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
+                                            matTooltipPosition="right"
+                                            matTooltip="Dar clic para activar selección múltiple." id="SelectCheck"
+                                            (click)="HabilitarSeleccion()">
+                                            library_add_check
+                                        </mat-icon>
+                                        <mat-checkbox *ngIf="multiple" (change)="$event ? masterToggleReg() : null"
+                                            [checked]="selectionReg.hasValue() && isAllSelectedReg()"
+                                            [indeterminate]="selectionReg.hasValue() && !isAllSelectedReg()"
+                                            [aria-label]="checkboxLabelReg()">
+                                        </mat-checkbox>
+                                    </th>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Proceso</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    *ngFor="let r of regimen | emplNombre: filtroNombreReg | paginate:tamanio_pagina_reg:numero_pagina_reg">
+                                    <td>
+                                        <mat-checkbox *ngIf="multiple_" (click)="$event.stopPropagation()"
+                                            (change)="$event ? selectionReg.toggle(r) : null"
+                                            [checked]="selectionReg.isSelected(r)" [aria-label]="checkboxLabelReg(r)">
+                                        </mat-checkbox>
+                                    </td>
+                                    <td>{{r.nombre}}</td>
+                                    <td class="justify-content-center">
+                                        <i (click)="GuardarRegistros(r.id)" id="plan" *ngIf="individual"
+                                            class="fa fa-thumbs-down" matSuffix matTooltipPosition="right"
+                                            matTooltip="Deshabilitar usuarios para uso de timbre de teletrabajo.">
+                                            <p>Deshabilitar</p>
+                                        </i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <mat-paginator id="pagina" [length]="regimen.length" [pageSize]="tamanio_pagina_reg"
+                        [pageSizeOptions]="pageSizeOptions_reg" (page)="ManejarPaginaResultados($event)"
                         showFirstLastButtons>
                     </mat-paginator>
                     <br>
@@ -408,6 +482,24 @@
                         </mat-form-field>
                     </div>
                 </form>
+                <!-- FORM PARA REGIMEN -->
+                <form *ngIf="_booleanOptions_dh.bool_reg">
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <mat-form-field>
+                            <mat-label>Régimen laboral</mat-label>
+                            <input matInput placeholder="Buscar" [(ngModel)]="dh_filtroNombreReg_"
+                                (input)="Filtrar_DH(dh_filtroNombreReg_, 12)" [formControl]="nombre_reg_dh" type="text"
+                                (keypress)="IngresarSoloLetras($event)">
+                            <mat-error *ngIf="nombre_suc_dh.invalid">
+                                Indispensable ingresar dos letras
+                            </mat-error>
+                            <mat-icon matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda de régimen laboral por nombre.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                    </div>
+                </form>
                 <!-- FORM PARA CARGOS -->
                 <form *ngIf="_booleanOptions_dh.bool_cargo">
                     <div class="d-flex flex-wrap justify-content-center">
@@ -566,6 +658,68 @@
                     </div>
                     <mat-paginator id="pagina" [length]="sucursales_dh.length" [pageSize]="tamanio_pagina_suc_dh"
                         [pageSizeOptions]="pageSizeOptions_suc_dh" (page)="ManejarPaginaResultados_DH($event)"
+                        showFirstLastButtons>
+                    </mat-paginator>
+                    <br>
+                </div>
+                <!-- TABLA PARA REGIMEN -->
+                <div *ngIf="_booleanOptions_dh.bool_reg" class="mat-elevation-z8" style="background: white;">
+                    <div class="d-flex bd-highlight" id="resultados_dh">
+                        <span class="w-100 bd-highlight">
+                            RESULTADO RÉGIMEN LABORAL
+                        </span>
+                        <button class="btn btn-outline-light btn-sm" matSuffix matTooltipPosition="right"
+                            matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos."
+                            style="float: right; margin-right: 10px;" (click)="MostrarLista_DH()">
+                            Mostrar lista
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead class="thead-light">
+                                <tr style="text-align: center;">
+                                    <th>
+                                        <mat-icon *ngIf="activar_seleccion_dh" class="flex-shrink-1 bd-highlight"
+                                            matSuffix matTooltipPosition="right"
+                                            matTooltip="Dar clic para activar selección múltiple." id="SelectCheck"
+                                            (click)="HabilitarSeleccion_dh()">
+                                            library_add_check
+                                        </mat-icon>
+                                        <mat-checkbox *ngIf="multiple_dh"
+                                            (change)="$event ? masterToggleReg_DH() : null"
+                                            [checked]="selectionReg_dh.hasValue() && isAllSelectedReg_DH()"
+                                            [indeterminate]="selectionReg_dh.hasValue() && !isAllSelectedReg_DH()"
+                                            [aria-label]="checkboxLabelReg_DH()">
+                                        </mat-checkbox>
+                                    </th>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Proceso</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    *ngFor="let rdh of regimen_dh | emplNombre: dh_filtroNombreReg | paginate:tamanio_pagina_reg_dh:numero_pagina_reg_dh">
+                                    <td>
+                                        <mat-checkbox *ngIf="multiple_dh_" (click)="$event.stopPropagation()"
+                                            (change)="$event ? selectionReg_dh.toggle(rdh) : null"
+                                            [checked]="selectionReg_dh.isSelected(rdh)"
+                                            [aria-label]="checkboxLabelReg_DH(rdh)">
+                                        </mat-checkbox>
+                                    </td>
+                                    <td>{{rdh.nombre}}</td>
+                                    <td class="justify-content-center">
+                                        <i (click)="GuardarRegistros_DH(rdh.id)" id="plan_dh" *ngIf="individual_dh"
+                                            class="fa fa-thumbs-up" matSuffix matTooltipPosition="right"
+                                            matTooltip="Habilitar usuarios para uso de timbre de teletrabajo.">
+                                            <p>Habilitar</p>
+                                        </i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <mat-paginator id="pagina" [length]="regimen_dh.length" [pageSize]="tamanio_pagina_reg_dh"
+                        [pageSizeOptions]="pageSizeOptions_reg_dh" (page)="ManejarPaginaResultados_DH($event)"
                         showFirstLastButtons>
                     </mat-paginator>
                     <br>

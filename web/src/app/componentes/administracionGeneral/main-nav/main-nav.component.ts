@@ -271,7 +271,7 @@ export class MainNavComponent implements OnInit {
         children: [
           { name: 'Feriados', url: '/listarFeriados', color: true },
           { name: 'Horarios', url: '/horario', color: true },
-          { name: 'Planificación', url: '/horariosMultiples', color: true },
+          { name: 'Planificación Horaria', url: '/horariosMultiples', color: true },
           // { name: 'Planificación Múltiple', url: '/planificacion', color: true },
         ]
       },
@@ -494,16 +494,39 @@ export class MainNavComponent implements OnInit {
         icono: 'description',
         color: true,
         children: [
+          /*  {
+              name: 'Generales',
+              accion: true,
+              estado: true,
+              icono: 'grid_view',
+              color: true,
+              subtitulo: true,
+              children: [
+                { name: 'Entradas Salidas', url: '/reporteEntradaSalida', color: true },
+                { name: 'Asistencia Detalle Consolidado', url: '/reporteAsistenciaConsolidado', color: true },
+              ]
+            },*/
+
           {
             name: 'Generales',
             accion: true,
             estado: true,
-            icono: 'grid_view',
-            color: true,
             subtitulo: true,
+            icono: 'group',
+            color: true,
             children: [
-              { name: 'Entradas Salidas', url: '/reporteEntradaSalida', color: true },
-              { name: 'Asistencia Detalle Consolidado', url: '/reporteAsistenciaConsolidado', color: true },
+              { name: 'Usuarios Activos', url: '/reporteEmpleados', color: true },
+              { name: 'Usuarios Inactivos', url: '/reporte-emp-inactivos', color: true },
+              { name: 'Registro Vacunación', url: '/lista-vacunados', color: true },
+              { name: 'Timbres', url: '/reporte-timbres-multiples', color: true },
+              { name: 'Timbre Horario Abierto', url: '/reporte-timbre-abierto', color: true },
+              { name: 'Puntualidad', url: '/reporte-puntualidad', color: true },
+              { name: 'Atrasos', url: '/reporte-atrasos-multiples', color: true },
+              { name: 'Faltas', url: '/reporte-faltas', color: true },
+              // { name: 'Atrasos', url: '/reporteAtrasos', color: true },
+              //{ name: 'Horas Trabajadas', url: '/reporte-horas-trabaja', color: true },
+              //{ name: 'Timbre Incompleto', url: '/reporte-timbre-incompleto', color: true },
+              //{ name: 'Salidas Anticipadas', url: '/salidas-anticipadas', color: true },
             ]
           },
           {
@@ -578,66 +601,44 @@ export class MainNavComponent implements OnInit {
               { name: 'Servicios Invitados', url: '/alimentosInvitados', color: true },
             ]
           },
-          {
-            name: 'Múltiples',
-            accion: true,
-            estado: true,
-            subtitulo: true,
-            icono: 'group',
-            color: true,
-            children: [
-              // { name: 'Atrasos', url: '/reporteAtrasos', color: true },
-              { name: 'Faltas', url: '/reporte-faltas', color: true },
-              { name: 'Atrasos', url: '/reporte-atrasos-multiples', color: true },
-              { name: 'Timbres', url: '/reporte-timbres-multiples', color: true },
-              { name: 'Timbres Libres', url: '/reporte-timbre-abierto', color: true },
-              { name: 'Puntualidad', url: '/reporte-puntualidad', color: true },
-              //{ name: 'Horas Trabajadas', url: '/reporte-horas-trabaja', color: true },
-              { name: 'Empleados Activos', url: '/reporteEmpleados', color: true },
-              { name: 'Empleados Inactivos', url: '/reporte-emp-inactivos', color: true },
-              { name: 'Empleados Vacunados', url: '/lista-vacunados', color: true },
-              //{ name: 'Timbre Incompleto', url: '/reporte-timbre-incompleto', color: true },
-              //{ name: 'Salidas Anticipadas', url: '/salidas-anticipadas', color: true },
-            ]
-          },
-          {
-            name: 'Estadísticos',
-            accion: true,
-            estado: true,
-            subtitulo: true,
-            icono: 'leaderboard',
-            color: true,
-            children: [
-              { name: 'Atrasos', url: '/macro/retrasos', color: true },
-              { name: 'Timbres', url: '/macro/marcaciones', color: true },
-              { name: 'Asistencia', url: '/macro/asistencia', color: true },
-              { name: 'Inasistencia', url: '/macro/inasistencia', color: true },
-              { name: 'Salidas antes', url: '/macro/tiempo-jornada-vs-hora-ext', color: true },
-            ]
-          },
-          {
-            name: 'Notificaciones',
-            accion: true,
-            estado: true,
-            subtitulo: true,
-            icono: 'notifications_active',
-            color: true,
-            children: [
-              { name: 'Todos', url: '/listaAllNotificaciones', color: true },
-              { name: 'Usuarios', url: '/listaNotifacionUsuario', color: true },
-            ]
-          },
-          {
-            name: 'Auditoría',
-            accion: true,
-            estado: true,
-            subtitulo: true,
-            icono: 'gavel',
-            color: true,
-            children: [
-              { name: 'Auditoria', url: '/auditoria', color: true },
-            ]
-          },
+          /*   {
+               name: 'Estadísticos',
+               accion: true,
+               estado: true,
+               subtitulo: true,
+               icono: 'leaderboard',
+               color: true,
+               children: [
+                 { name: 'Atrasos', url: '/macro/retrasos', color: true },
+                 { name: 'Timbres', url: '/macro/marcaciones', color: true },
+                 { name: 'Asistencia', url: '/macro/asistencia', color: true },
+                 { name: 'Inasistencia', url: '/macro/inasistencia', color: true },
+                 { name: 'Salidas antes', url: '/macro/tiempo-jornada-vs-hora-ext', color: true },
+               ]
+             },
+             {
+               name: 'Notificaciones',
+               accion: true,
+               estado: true,
+               subtitulo: true,
+               icono: 'notifications_active',
+               color: true,
+               children: [
+                 { name: 'Todos', url: '/listaAllNotificaciones', color: true },
+                 { name: 'Usuarios', url: '/listaNotifacionUsuario', color: true },
+               ]
+             },
+             {
+               name: 'Auditoría',
+               accion: true,
+               estado: true,
+               subtitulo: true,
+               icono: 'gavel',
+               color: true,
+               children: [
+                 { name: 'Auditoria', url: '/auditoria', color: true },
+               ]
+             },*/
         ]
       },
     ];
@@ -654,8 +655,8 @@ export class MainNavComponent implements OnInit {
         subtitulo: false,
         icono: 'account_circle',
         children: [
-          { name: 'Datos Generales', url: '/datosEmpleado', color: true },
-          { name: 'Contrato de Trabajo', url: '/cargoEmpleado', color: true },
+          { name: 'Datos Personales', url: '/datosEmpleado', color: true },
+          { name: 'Datos Laborales', url: '/cargoEmpleado', color: true },
         ]
       },
       {
@@ -664,10 +665,9 @@ export class MainNavComponent implements OnInit {
         estado: true,
         color: true,
         subtitulo: false,
-        icono: 'mobile_friendly',
+        icono: 'event',
         children: [
-          { name: 'Planificación RangoFecha', url: '/horariosEmpleado', color: true },
-          { name: 'Planificación Rotativa', url: '/planificacionHorario', color: true },
+          { name: 'Planificación Horaria', url: '/horariosEmpleado', color: true },
         ]
       },
       {
@@ -781,18 +781,18 @@ export class MainNavComponent implements OnInit {
             url: '/procesosEmpleado'
           },
           {
-            name: 'Timbre Teletrabajo',
+            name: 'Timbre Virtual',
             accion: this.HabilitarTimbreWeb,
             estado: this.HabilitarTimbreWeb,
             icono: 'computer',
             color: true,
             subtitulo: true,
             children: [
-              { name: 'Timbrar Teletrabajo', url: '/timbres-personal', color: true },
+              { name: 'Timbre Virtual', url: '/timbres-personal', color: true },
             ]
           },
           {
-            name: 'Timbre Teletrabajo',
+            name: 'Timbre Virtual',
             accion: !this.HabilitarTimbreWeb,
             estado: !this.HabilitarTimbreWeb,
             activo: this.HabilitarTimbreWeb,
@@ -814,39 +814,29 @@ export class MainNavComponent implements OnInit {
         ]
       },
       {
-        name: 'Autorización',
-        accion: true,
-        estado: true,
-        color: true,
-        subtitulo: false,
-        icono: 'lock_open',
-        children: [
-          { name: 'Autoridad', url: '/autorizaEmpleado', color: true },
-        ]
-      },
-      {
         name: 'Información',
         accion: true,
         estado: true,
-        icono: 'info',
+        icono: 'check_circle_outline',
         color: true,
         subtitulo: false,
         children: [
-          { name: 'Autoridades', url: '/informacion', color: true },
+          { name: 'Jefes', url: '/informacion', color: true },
           { name: 'Documentos', url: '/verDocumentacion', color: true },
+          { name: 'Aprobación departamental', url: '/autorizaEmpleado', color: true },
         ]
       },
-      {
-        name: 'Notificaciones',
-        accion: true,
-        estado: true,
-        color: true,
-        subtitulo: false,
-        icono: 'notifications',
-        children: [
-          { name: 'Lista notificaciones', url: '/lista-notificaciones', color: true },
-        ]
-      },
+      /*  {
+          name: 'Notificaciones',
+          accion: true,
+          estado: true,
+          color: true,
+          subtitulo: false,
+          icono: 'notifications',
+          children: [
+            { name: 'Lista notificaciones', url: '/lista-notificaciones', color: true },
+          ]
+        },*/
     ]
   }
 }

@@ -1,9 +1,9 @@
-#datosF {
-    font-weight: bold;
-    font-size: 15px;
-    padding-right: 5px;
+table {
+    width: 100%;
+    font-size: 14px;
 }
 
-.caja1 {
-    padding: 0px 10px 0px 10px;
+td {
+    padding-top: 10px;
+    text-align: center;
 }

@@ -328,6 +328,7 @@ export interface checkOptions {
 
 export interface FormCriteriosBusqueda {
     bool_suc?: boolean;
+    bool_reg?: boolean;
     bool_dep: boolean;
     bool_emp: boolean;
     bool_tab?: boolean;

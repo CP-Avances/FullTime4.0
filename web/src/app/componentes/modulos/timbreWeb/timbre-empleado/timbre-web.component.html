@@ -2,12 +2,12 @@
     <div class="row">
         <div class="col-md" *ngFor="let c of cuenta">
             <mat-card style="background-color: rgb(220, 240, 245);">
-                <mat-card-header>
-                    <mat-card-title style="font-weight: bold; text-align: center;">
-                        TIMBRES TOTALES
-                    </mat-card-title>
-                </mat-card-header>
                 <mat-card-content>
+                    <div style="text-align: center;">
+                        <span>
+                            <b>TIMBRES TOTALES</b>
+                        </span>
+                    </div>
                     <b>No. timbres asistencia: </b> <span>{{c.timbres_EoS}}</span> <br>
                     <b>No. timbres alimentación: </b> <span>{{c.timbres_AES}}</span> <br>
                     <b>No. timbres permisos: </b> <span>{{c.timbres_PES}}</span> <br>
@@ -17,16 +17,16 @@
         </div>
         <div class="col-md" *ngFor="let i of info">
             <mat-card style="background-color: rgb(232, 243, 225);">
-                <mat-card-header>
-                    <mat-card-title style="font-weight: bold; text-align: center;">
-                        INFORMACIÓN PERSONAL
-                    </mat-card-title>
-                </mat-card-header>
                 <mat-card-content>
+                    <div style="text-align: center;">
+                        <span>
+                            <b>INFORMACIÓN PERSONAL</b>
+                        </span>
+                    </div>
                     <b>Departamento: </b> <span>{{i.departamento}}</span> <br>
                     <b>Cargo: </b> <span>{{i.cargo}}</span> <br>
-                    <b>Sueldo: </b> <span>{{i.sueldo}}</span> <br>
-                    <b>Horas trabaja: </b> <span>{{i.hora_trabaja}}</span>
+                    <b>Horas trabajo: </b> <span>{{i.hora_trabaja}}</span> <br>
+                    <b>Sueldo: </b> $ <span>{{i.sueldo}}</span>
                 </mat-card-content>
             </mat-card>
         </div>

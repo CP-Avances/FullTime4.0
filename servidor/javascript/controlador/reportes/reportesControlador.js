@@ -16,6 +16,7 @@ exports.REPORTES_CONTROLADOR = void 0;
 const database_1 = __importDefault(require("../../database"));
 const SubMetodosGraficas_1 = require("../../libs/SubMetodosGraficas");
 class ReportesControlador {
+    // -- poner en consulta el estado del usuario
     ListarDatosContractoA(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const DATOS = yield database_1.default.query('SELECT * FROM datos_contrato_actual');

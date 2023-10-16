@@ -80,8 +80,9 @@ export class ReportesService {
 
   private _check: checkOptions[] = [
     { opcion: 's', valor: 'Sucursal' },
-    { opcion: 'c', valor: 'Cargo' },
+    { opcion: 'r', valor: 'Régimen Laboral' },
     { opcion: 'd', valor: 'Departamento' },
+    { opcion: 'c', valor: 'Cargo' },
     { opcion: 'e', valor: 'Empleado' },
     { opcion: 't', valor: 'Tabulado' },
     { opcion: 'i', valor: 'Incompletos' },
@@ -128,6 +129,7 @@ export class ReportesService {
     bool_tab: false,
     bool_inc: false,
     bool_cargo: false,
+    bool_reg: false,
   }
 
   GuardarFormCriteriosBusqueda(bool: FormCriteriosBusqueda): void {
@@ -145,78 +147,87 @@ export class ReportesService {
     this._formCriteriosBusqueda.bool_tab = false;
     this._formCriteriosBusqueda.bool_inc = false;
     this._formCriteriosBusqueda.bool_cargo = false;
+    this._formCriteriosBusqueda.bool_reg = false;
   }
 
-  /********************************
-   * 
-   * Get y Set filtros de los formularios componentes de reportes multiples
-   * 
-   ********************************/
-  // Filtro formulario nombre de sucursal
+  /***************************************************************************
+   ** 
+   ** GET Y SET FILTROS DE LOS FORMULARIOS COMPONENTES DE REPORTES MULTIPLES
+   ** 
+   ***************************************************************************/
+
+  // FILTRO FORMULARIO NOMBRE DE SUCURSAL
   private _filtroNombreSuc: string = '';
 
   get filtroNombreSuc() { return this._filtroNombreSuc; }
-  setFiltroNombreSuc(arr) { this._filtroNombreSuc = arr }
+  setFiltroNombreSuc(arr: any) { this._filtroNombreSuc = arr }
+
+  // FILTRO FORMULARIO NOMBRE DE REGIMEN LABORAL
+  private _filtroNombreReg: string = '';
+
+  get filtroNombreReg() { return this._filtroNombreReg; }
+  setFiltroNombreReg(arr: any) { this._filtroNombreReg = arr }
 
 
   // FILTRO FORMULARIO NOMBRE DEL CARGO
   private _filtroNombreCarg: string = '';
 
   get filtroNombreCarg() { return this._filtroNombreCarg; }
-  setFiltroNombreCarg(arr) { this._filtroNombreCarg = arr }
+  setFiltroNombreCarg(arr: any) { this._filtroNombreCarg = arr }
 
 
-  // Filtro formulario nombre de departamento
+  // FILTRO FORMULARIO NOMBRE DE DEPARTAMENTO
   private _filtroNombreDep: string = '';
 
   get filtroNombreDep() { return this._filtroNombreDep; }
-  setFiltroNombreDep(arr) { this._filtroNombreDep = arr }
+  setFiltroNombreDep(arr: any) { this._filtroNombreDep = arr }
 
-  // Filtro formulario del empleado 
+  // FILTRO FORMULARIO DEL EMPLEADO 
   private _filtroCodigo: string = '';
   private _filtroCedula: string = '';
   private _filtroNombreEmp: string = '';
 
   get filtroCodigo() { return this._filtroCodigo; }
-  setFiltroCodigo(arr) { this._filtroCodigo = arr; }
+  setFiltroCodigo(arr: any) { this._filtroCodigo = arr; }
 
   get filtroCedula() { return this._filtroCedula; }
-  setFiltroCedula(arr) { this._filtroCedula = arr; }
+  setFiltroCedula(arr: any) { this._filtroCedula = arr; }
 
   get filtroNombreEmp() { return this._filtroNombreEmp; }
-  setFiltroNombreEmp(arr) { this._filtroNombreEmp = arr; }
+  setFiltroNombreEmp(arr: any) { this._filtroNombreEmp = arr; }
 
-  // Filtro formulario de tabulacion
+  // FILTRO FORMULARIO DE TABULACION
   private _filtroCodigo_tab: number = 0;
   private _filtroCedula_tab: string = '';
   private _filtroNombreTab: string = '';
 
   get filtroCodigo_tab() { return this._filtroCodigo_tab; }
-  setFiltroCodigo_tab(arr) { this._filtroCodigo_tab = arr; }
+  setFiltroCodigo_tab(arr: any) { this._filtroCodigo_tab = arr; }
 
   get filtroCedula_tab() { return this._filtroCedula_tab; }
-  setFiltroCedula_tab(arr) { this._filtroCedula_tab = arr; }
+  setFiltroCedula_tab(arr: any) { this._filtroCedula_tab = arr; }
 
   get filtroNombreTab() { return this._filtroNombreTab; }
-  setFiltroNombreTab(arr) { this._filtroNombreTab = arr; }
+  setFiltroNombreTab(arr: any) { this._filtroNombreTab = arr; }
 
-  // Filtro formulario de incompletos
+  // FILTRO FORMULARIO DE INCOMPLETOS
   private _filtroCodigo_inc: number = 0;
   private _filtroCedula_inc: string = '';
   private _filtroNombreInc: string = '';
 
   get filtroCodigo_inc() { return this._filtroCodigo_inc; }
-  setFiltroCodigo_inc(arr) { this._filtroCodigo_inc = arr; }
+  setFiltroCodigo_inc(arr: any) { this._filtroCodigo_inc = arr; }
 
   get filtroCedula_inc() { return this._filtroCedula_inc; }
-  setFiltroCedula_inc(arr) { this._filtroCedula_inc = arr; }
+  setFiltroCedula_inc(arr: any) { this._filtroCedula_inc = arr; }
 
   get filtroNombreInc() { return this._filtroNombreInc; }
-  setFiltroNombreInc(arr) { this._filtroNombreInc = arr; }
+  setFiltroNombreInc(arr: any) { this._filtroNombreInc = arr; }
 
 
   DefaultValoresFiltros() {
     this._filtroNombreSuc = '';
+    this._filtroNombreReg = '';
     this._filtroNombreCarg = '';
     this._filtroNombreDep = '';
     this._filtroNombreEmp = '';
@@ -240,7 +251,7 @@ export class ReportesService {
   private _valueTimbreServidor: Boolean = false;
 
   get mostrarTimbreServidor() { return this._valueTimbreServidor }
-  setMostrarTimbreServidor(value) { this._valueTimbreServidor = value; }
+  setMostrarTimbreServidor(value: any) { this._valueTimbreServidor = value; }
 
   DefaultTimbreServidor() { this._valueTimbreServidor = false; }
 

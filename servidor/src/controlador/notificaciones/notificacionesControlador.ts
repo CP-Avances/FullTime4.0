@@ -289,7 +289,7 @@ class NotificacionTiempoRealControlador {
 
 
 
-  // METODO PARA ENVÍO DE CORREO ELECTRÓNICO DE COMUNICADOS MEDIANTE APLICACIÓN MÓVIL
+  // METODO PARA ENVÍO DE CORREO ELECTRÓNICO DE COMUNICADOS MEDIANTE APLICACIÓN MÓVIL  -- verificar si se requiere estado
   public async EnviarCorreoComunicadoMovil(req: Request, res: Response) {
 
     var tiempo = fechaHora();
@@ -388,7 +388,7 @@ class NotificacionTiempoRealControlador {
    ** **                          MANEJO DE COMUNICADOS                                      ** ** 
    ** ***************************************************************************************** **/
 
-  // METODO PARA ENVIO DE CORREO ELECTRONICO DE COMUNICADOS MEDIANTE SISTEMA WEB
+  // METODO PARA ENVIO DE CORREO ELECTRONICO DE COMUNICADOS MEDIANTE SISTEMA WEB  -- verificar si se requiere estado
   public async EnviarCorreoComunicado(req: Request, res: Response): Promise<void> {
 
     var tiempo = fechaHora();
@@ -508,7 +508,7 @@ class NotificacionTiempoRealControlador {
    ** **                      MANEJO DE ENVIO DE CORREOS DE SOLICITUDES                      ** ** 
    ** ***************************************************************************************** **/
 
-  // METODO PARA ENVIO DE CORREO ELECTRONICO DE COMUNICADOS MEDIANTE SISTEMA WEB
+  // METODO PARA ENVIO DE CORREO ELECTRONICO DE COMUNICADOS MEDIANTE SISTEMA WEB -- veriifcar si se requiere estado
   public async EnviarCorreoSolicitudes(req: Request, res: Response): Promise<void> {
 
     var tablaHTML = '';

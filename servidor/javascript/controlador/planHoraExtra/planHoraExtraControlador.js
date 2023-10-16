@@ -242,7 +242,7 @@ class PlanHoraExtraControlador {
             res.jsonp({ message: 'Registro eliminado.' });
         });
     }
-    // BUSQUEDA DE PLANIFICACIONES POR ID DE USUARIO
+    // BUSQUEDA DE PLANIFICACIONES POR ID DE USUARIO -- verificar si se requiere estado
     BuscarPlanUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
@@ -284,7 +284,7 @@ class PlanHoraExtraControlador {
     /** ********************************************************************************************* **
      ** *             ENVIO DE CORREOS ELECTRONICOS DE PLANIFICACIÓN DE HORAS EXTRAS                  **
      ** ********************************************************************************************* **/
-    // METODO ENVIO CORREO DESDE APLICACIÓN WEB CREACIÓN DE PLANIFICACIÓN DE HORAS EXTRAS
+    // METODO ENVIO CORREO DESDE APLICACIÓN WEB CREACIÓN DE PLANIFICACIÓN DE HORAS EXTRAS -- verificar si se requiere estado
     EnviarCorreoPlanificacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var tiempo = (0, settingsMail_1.fechaHora)();

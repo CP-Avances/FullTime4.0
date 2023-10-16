@@ -31,6 +31,7 @@ export class ListaNotificacionComponent implements OnInit {
     nombre_emp = new FormControl('', [Validators.minLength(2)]);
     nombre_dep = new FormControl('', [Validators.minLength(2)]);
     nombre_suc = new FormControl('', [Validators.minLength(2)]);
+    nombre_reg = new FormControl('', [Validators.minLength(2)]);
     nombre_carg = new FormControl('', [Validators.minLength(2)]);
     seleccion = new FormControl('');
 
@@ -38,6 +39,7 @@ export class ListaNotificacionComponent implements OnInit {
         bool_suc: false,
         bool_dep: false,
         bool_emp: false,
+        bool_reg: false,
         bool_cargo: false,
     };
 
@@ -48,6 +50,7 @@ export class ListaNotificacionComponent implements OnInit {
     sucursales: any = [];
     respuesta: any[];
     empleados: any = [];
+    regimen: any = [];
     origen: any = [];
 
     // MODELO DE SELECCION DE DATOS
@@ -55,11 +58,17 @@ export class ListaNotificacionComponent implements OnInit {
     selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
     selectionDep = new SelectionModel<ITableEmpleados>(true, []);
     selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
+    selectionReg = new SelectionModel<ITableEmpleados>(true, []);
 
     // ITEMS DE PAGINACION DE LA TABLA SUCURSAL
     pageSizeOptions_suc = [5, 10, 20, 50];
     tamanio_pagina_suc: number = 5;
     numero_pagina_suc: number = 1;
+
+    // ITEMS DE PAGINACION DE LA TABLA REGIMEN
+    pageSizeOptions_reg = [5, 10, 20, 50];
+    tamanio_pagina_reg: number = 5;
+    numero_pagina_reg: number = 1;
 
     // ITEMS DE PAGINACION DE LA TABLA DEPARTAMENTO
     pageSizeOptions_dep = [5, 10, 20, 50];
@@ -96,6 +105,10 @@ export class ListaNotificacionComponent implements OnInit {
     filtroNombreCarg_: string = '';
     get filtroNombreCarg() { return this.restR.filtroNombreCarg }
 
+    // FILTRO REGIMEN
+    filtroNombreReg_: string = '';
+    get filtroNombreReg() { return this.restR.filtroNombreReg };
+
     // HABILITAR O DESHABILITAR EL ICONO DE PROCESO INDIVIDUAL
     individual: boolean = true;
 
@@ -109,7 +122,7 @@ export class ListaNotificacionComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.check = this.restR.checkOptions([{ opcion: 'c' }, { opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
+        this.check = this.restR.checkOptions([{ opcion: 'c' }, { opcion: 'r' }, { opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
         this.BuscarInformacion();
         this.BuscarCargos();
     }
@@ -127,7 +140,10 @@ export class ListaNotificacionComponent implements OnInit {
     origen_cargo: any = [];
     cargos: any = [];
     BuscarCargos() {
-        this.informacion.ObtenerInformacionCargo().subscribe((res: any[]) => {
+        this.empleados_cargos = [];
+        this.origen_cargo = [];
+        this.cargos = [];
+        this.informacion.ObtenerInformacionCargo(1).subscribe((res: any[]) => {
             this.origen_cargo = JSON.stringify(res);
 
             res.forEach(obj => {
@@ -158,8 +174,13 @@ export class ListaNotificacionComponent implements OnInit {
 
     // METODO PARA BUSCAR DATOS DE EMPRESA
     BuscarInformacion() {
+        this.departamentos = [];
+        this.sucursales = [];
+        this.respuesta = [];
+        this.empleados = [];
+        this.regimen = [];
         this.origen = [];
-        this.informacion.ObtenerInformacion().subscribe((res: any[]) => {
+        this.informacion.ObtenerInformacion(1).subscribe((res: any[]) => {
 
             this.origen = JSON.stringify(res);
 
@@ -197,6 +218,24 @@ export class ListaNotificacionComponent implements OnInit {
                     })
                 })
             })
+
+            res.forEach(obj => {
+                obj.departamentos.forEach(ele => {
+                    ele.empleado.forEach(reg => {
+                        reg.regimen.forEach(r => {
+                            this.regimen.push({
+                                id: r.id_regimen,
+                                nombre: r.name_regimen
+                            })
+                        })
+                    })
+                })
+            })
+
+            this.regimen = this.regimen.filter((obj, index, self) =>
+                index === self.findIndex((o) => o.id === obj.id)
+            );
+
         }, err => {
             this.toastr.error(err.error.message)
         })
@@ -222,23 +261,27 @@ export class ListaNotificacionComponent implements OnInit {
         this.MostrarLista();
         switch (this.opcion) {
             case 's':
-                this.ControlarOpciones(true, false, false, false);
+                this.ControlarOpciones(true, false, false, false, false);
+                this.ControlarBotones(true, false, true);
+                break;
+            case 'r':
+                this.ControlarOpciones(false, false, false, false, true);
                 this.ControlarBotones(true, false, true);
                 break;
             case 'c':
-                this.ControlarOpciones(false, true, false, false);
+                this.ControlarOpciones(false, true, false, false, false);
                 this.ControlarBotones(true, false, true);
                 break;
             case 'd':
-                this.ControlarOpciones(false, false, true, false);
+                this.ControlarOpciones(false, false, true, false, false);
                 this.ControlarBotones(true, false, true);
                 break;
             case 'e':
-                this.ControlarOpciones(false, false, false, true);
+                this.ControlarOpciones(false, false, false, true, false);
                 this.ControlarBotones(true, false, true);
                 break;
             default:
-                this.ControlarOpciones(false, false, false, false);
+                this.ControlarOpciones(false, false, false, false, false);
                 this.ControlarBotones(true, false, true);
                 break;
         }
@@ -247,8 +290,9 @@ export class ListaNotificacionComponent implements OnInit {
     }
 
     // METODO PARA CONTROLAR VISUALIZACION DE OPCIONES
-    ControlarOpciones(sucursal: boolean, cargo: boolean, departamento: boolean, empleado: boolean) {
+    ControlarOpciones(sucursal: boolean, cargo: boolean, departamento: boolean, empleado: boolean, regimen: boolean) {
         this._booleanOptions.bool_suc = sucursal;
+        this._booleanOptions.bool_reg = regimen;
         this._booleanOptions.bool_cargo = cargo;
         this._booleanOptions.bool_dep = departamento;
         this._booleanOptions.bool_emp = empleado;
@@ -272,6 +316,7 @@ export class ListaNotificacionComponent implements OnInit {
             case 4: this.restR.setFiltroCodigo(e); break;
             case 5: this.restR.setFiltroCedula(e); break;
             case 6: this.restR.setFiltroNombreEmp(e); break;
+            case 7: this.restR.setFiltroNombreReg(e); break;
             default:
                 break;
         }
@@ -325,6 +370,27 @@ export class ListaNotificacionComponent implements OnInit {
             return `${this.isAllSelectedCarg() ? 'select' : 'deselect'} all`;
         }
         return `${this.selectionCarg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+    }
+
+    // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+    isAllSelectedReg() {
+        const numSelected = this.selectionReg.selected.length;
+        return numSelected === this.regimen.length
+    }
+
+    // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+    masterToggleReg() {
+        this.isAllSelectedReg() ?
+            this.selectionReg.clear() :
+            this.regimen.forEach(row => this.selectionReg.select(row));
+    }
+
+    // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+    checkboxLabelReg(row?: ITableEmpleados): string {
+        if (!row) {
+            return `${this.isAllSelectedReg() ? 'select' : 'deselect'} all`;
+        }
+        return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
     }
 
     // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
@@ -408,6 +474,10 @@ export class ListaNotificacionComponent implements OnInit {
             this.tamanio_pagina_car = e.pageSize;
             this.numero_pagina_car = e.pageIndex + 1;
         }
+        else if (this._booleanOptions.bool_reg === true) {
+            this.tamanio_pagina_reg = e.pageSize;
+            this.numero_pagina_reg = e.pageIndex + 1;
+        }
     }
 
     // METODO PARA PRESENTAR DATOS DE SUCURSALES
@@ -436,6 +506,42 @@ export class ListaNotificacionComponent implements OnInit {
                         })
                     })
                 }
+            })
+        }
+
+        this.RegistrarMultiple(usuarios);
+    }
+
+    // CONSULTA DE LOS DATOS REGIMEN
+    ModelarRegimen(id: number) {
+        let usuarios: any = [];
+        let respuesta = JSON.parse(this.origen)
+        if (id === 0) {
+            respuesta.forEach((obj: any) => {
+                obj.departamentos.forEach((obj1: any) => {
+                    obj1.empleado.forEach((obj2: any) => {
+                        this.selectionReg.selected.find(obj3 => {
+                            obj2.regimen.forEach((obj4: any) => {
+                                if (obj3.id === obj4.id_regimen) {
+                                    usuarios.push(obj2);
+                                }
+                            })
+                        })
+                    })
+                })
+            })
+        }
+        else {
+            respuesta.forEach((obj: any) => {
+                obj.departamentos.forEach((obj2: any) => {
+                    obj2.empleado.forEach((obj3: any) => {
+                        obj3.regimen.forEach((obj4: any) => {
+                            if (obj4.id_regimen === id) {
+                                usuarios.push(obj3)
+                            }
+                        })
+                    })
+                })
             })
         }
 
@@ -552,6 +658,9 @@ export class ListaNotificacionComponent implements OnInit {
         if (this.opcion === 's') {
             this.ModelarSucursal(id);
         }
+        else if (this.opcion === 'r') {
+            this.ModelarRegimen(id);
+        }
         else if (this.opcion === 'c') {
             this.ModelarCargo(id);
         }
@@ -594,6 +703,13 @@ export class ListaNotificacionComponent implements OnInit {
             this.selectionCarg.clear();
         }
 
+        if (this._booleanOptions.bool_reg) {
+            this.nombre_reg.reset();
+            this._booleanOptions.bool_reg = false;
+            this.selectionReg.deselect();
+            this.selectionReg.clear();
+        }
+
         this.seleccion.reset();
         this.activar_boton = false;
     }
@@ -606,14 +722,25 @@ export class ListaNotificacionComponent implements OnInit {
             this.selectionDep.clear();
             this.selectionCarg.clear();
             this.selectionEmp.clear();
+            this.selectionReg.clear();
             this.Filtrar('', 1)
         }
+        else if (this.opcion === 'r') {
+            this.nombre_reg.reset();
+            this.filtroNombreReg_ = '';
+            this.selectionDep.clear();
+            this.selectionCarg.clear();
+            this.selectionEmp.clear();
+            this.selectionSuc.clear();
+            this.Filtrar('', 7)
+          }
         else if (this.opcion === 'c') {
             this.nombre_carg.reset();
             this.filtroNombreCarg_ = '';
             this.selectionEmp.clear();
             this.selectionDep.clear();
             this.selectionSuc.clear();
+            this.selectionReg.clear();
             this.Filtrar('', 2)
         }
         else if (this.opcion === 'd') {
@@ -624,6 +751,7 @@ export class ListaNotificacionComponent implements OnInit {
             this.selectionEmp.clear();
             this.selectionCarg.clear();
             this.selectionSuc.clear();
+            this.selectionReg.clear();
             this.Filtrar('', 1)
             this.Filtrar('', 3)
         }
@@ -637,6 +765,7 @@ export class ListaNotificacionComponent implements OnInit {
             this.selectionDep.clear();
             this.selectionCarg.clear();
             this.selectionSuc.clear();
+            this.selectionReg.clear();
             this.Filtrar('', 4)
             this.Filtrar('', 5)
             this.Filtrar('', 6)

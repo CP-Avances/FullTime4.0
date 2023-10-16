@@ -56,14 +56,12 @@ export class UsuarioService {
   }
 
   // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB
-  UsuariosTimbreWeb(habilitado: boolean) {
-    const estado = 1; // 1 = activo 
+  UsuariosTimbreWeb(estado: any, habilitado: boolean) {
     return this.http.get<any>(`${environment.url}/usuarios/lista-web/${estado}/activo/${habilitado}`);
   }
 
   // METODO PARA BUSCAR DATOS DE USUARIOS Y CARGOS TIMBRE WEB
-  UsuariosTimbreWebCargos(habilitado: boolean) {
-    const estado = 1; // 1 = activo 
+  UsuariosTimbreWebCargos(estado: any, habilitado: boolean) {
     return this.http.get<any>(`${environment.url}/usuarios/lista-web-cargos/${estado}/activo/${habilitado}`);
   }
 
@@ -73,14 +71,12 @@ export class UsuarioService {
   }
 
   // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
-  UsuariosTimbreMovil(habilitado: boolean) {
-    const estado = 1; // 1 = activo 
+  UsuariosTimbreMovil(estado: any, habilitado: boolean) {
     return this.http.get<any>(`${environment.url}/usuarios/lista-app-movil/${estado}/activo/${habilitado}`);
   }
 
     // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
-    UsuariosTimbreMovilCargos(habilitado: boolean) {
-      const estado = 1; // 1 = activo 
+    UsuariosTimbreMovilCargos(estado: any, habilitado: boolean) {
       return this.http.get<any>(`${environment.url}/usuarios/lista-app-movil-cargos/${estado}/activo/${habilitado}`);
     }
 
