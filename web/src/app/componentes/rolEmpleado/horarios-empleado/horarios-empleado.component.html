@@ -180,33 +180,14 @@
         </div>
 
         <div class="table_content">
-
-            <div class="table'container">
-                <table id="table_horario1" #tabla1>
-                    <thead class="thead-light table table-hover table-sm fondo">
-                        <tr style="text-align: center; height: 67px;">
-                            <th scope="col" id="td_horarios" rowspan="2">AÑO</th>
-                            <th scope="col" id="td_horarios" rowspan="2">MES</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let h of horariosEmpleado | paginate:tamanio_pagina:numero_pagina"
-                            style="text-align: center;">
-                            <td id="td_horarios" [ngStyle]="{'background':CambiarColores(h.color)}">
-                                {{h.anio}}
-                            </td>
-                            <td id="td_horarios" [ngStyle]="{'background':CambiarColores(h.color)}">
-                                {{h.mes}}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
             <div class="table-responsive" #tabla2>
                 <table id="table_horario2" class="table table-hover table-sm ">
                     <thead class="thead-light">
-                        <th scope="col" id="td_horarios" colspan="31">DÍAS DEL MES</th>
+                        <tr style="text-align: center;">
+                            <th class="sticky colum_1" scope="col" id="td_horarios" rowspan="2">AÑO</th>
+                            <th class="sticky-2 colum_1" scope="col" id="td_horarios" rowspan="2">MES</th>
+                            <th scope="col" id="td_horarios" colspan="31">DÍAS DEL MES</th>
+                        </tr>
                         <tr style="text-align: center;">
                             <th scope="col" id="td_horarios">01</th>
                             <th scope="col" id="td_horarios">02</th>
@@ -243,6 +224,10 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let h of horariosEmpleado | paginate:tamanio_pagina:numero_pagina">
+                            <td class="sticky colum_1" id="td_horarios"
+                                [ngStyle]="{'background':CambiarColores(h.color)}">{{h.anio}}</td>
+                            <td class="sticky-2 colum_1" id="td_horarios"
+                                [ngStyle]="{'background':CambiarColores(h.color)}">{{h.mes}}</td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 1 ? '#9CF7B9' : '' }">
                                 <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
@@ -250,16 +235,22 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 1, h.dia1, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia1}}
+                                <div *ngFor="let dia of h.dia1.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
-                            <td id="td_horarios"
+                            <td id="td_horarios" style="white-space: pre;"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 2 ? '#9CF7B9' : '' }">
                                 <i class="fa fa-pencil-square-o" aria-hidden="true" id="editar_horario"
                                     *ngIf="editar_activar"
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 2, h.dia2, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia2}}
+                                <div *ngFor="let dia of h.dia2.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 3 ? '#9CF7B9' : '' }">
@@ -268,7 +259,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 3, h.dia3, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia3}}
+                                <div *ngFor="let dia of h.dia3.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 4 ? '#9CF7B9' : '' }">
@@ -277,7 +271,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 4, h.dia4, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia4}}
+                                <div *ngFor="let dia of h.dia4.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 5 ? '#9CF7B9' : '' }">
@@ -286,7 +283,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 5, h.dia5, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia5}}
+                                <div *ngFor="let dia of h.dia5.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 6 ? '#9CF7B9' : '' }">
@@ -295,7 +295,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 6, h.dia6, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia6}}
+                                <div *ngFor="let dia of h.dia6.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 7 ? '#9CF7B9' : '' }">
@@ -304,7 +307,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 7, h.dia7, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia7}}
+                                <div *ngFor="let dia of h.dia7.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 8 ? '#9CF7B9' : '' }">
@@ -313,7 +319,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 8, h.dia8, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia8}}
+                                <div *ngFor="let dia of h.dia8.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 9 ? '#9CF7B9' : '' }">
@@ -322,7 +331,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 9, h.dia9, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia9}}
+                                <div *ngFor="let dia of h.dia9.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 10 ? '#9CF7B9' : '' }">
@@ -331,7 +343,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 10, h.dia10, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia10}}
+                                <div *ngFor="let dia of h.dia10.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 11 ? '#9CF7B9' : '' }">
@@ -340,7 +355,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 11, h.dia11, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia11}}
+                                <div *ngFor="let dia of h.dia11.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 12 ? '#9CF7B9' : '' }">
@@ -349,7 +367,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 12, h.dia12, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia12}}
+                                <div *ngFor="let dia of h.dia12.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 13 ? '#9CF7B9' : '' }">
@@ -358,7 +379,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 13, h.dia13, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia13}}
+                                <div *ngFor="let dia of h.dia13.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 14 ? '#9CF7B9' : '' }">
@@ -367,7 +391,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 14, h.dia14, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia14}}
+                                <div *ngFor="let dia of h.dia14.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 15 ? '#9CF7B9' : '' }">
@@ -385,7 +412,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 16, h.dia16, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia16}}
+                                <div *ngFor="let dia of h.dia16.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 17 ? '#9CF7B9' : '' }">
@@ -394,7 +424,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 17, h.dia17, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia17}}
+                                <div *ngFor="let dia of h.dia17.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 18 ? '#9CF7B9' : '' }">
@@ -403,7 +436,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 18, h.dia18, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia18}}
+                                <div *ngFor="let dia of h.dia18.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 19 ? '#9CF7B9' : '' }">
@@ -412,7 +448,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 19, h.dia19, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia19}}
+                                <div *ngFor="let dia of h.dia19.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 20 ? '#9CF7B9' : '' }">
@@ -421,7 +460,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 20, h.dia20, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia20}}
+                                <div *ngFor="let dia of h.dia20.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 21 ? '#9CF7B9' : '' }">
@@ -430,7 +472,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 21, h.dia21, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia21}}
+                                <div *ngFor="let dia of h.dia21.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 22 ? '#9CF7B9' : '' }">
@@ -439,7 +484,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 22, h.dia22, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia22}}
+                                <div *ngFor="let dia of h.dia22.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 23 ? '#9CF7B9' : '' }">
@@ -448,7 +496,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 23, h.dia23, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia23}}
+                                <div *ngFor="let dia of h.dia23.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 24 ? '#9CF7B9' : '' }">
@@ -457,7 +508,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 24, h.dia24, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia24}}
+                                <div *ngFor="let dia of h.dia24.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 25 ? '#9CF7B9' : '' }">
@@ -466,7 +520,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 25, h.dia25, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia25}}
+                                <div *ngFor="let dia of h.dia25.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 26 ? '#9CF7B9' : '' }">
@@ -475,7 +532,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 26, h.dia26, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia26}}
+                                <div *ngFor="let dia of h.dia26.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 27 ? '#9CF7B9' : '' }">
@@ -484,7 +544,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 27, h.dia27, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia27}}
+                                <div *ngFor="let dia of h.dia27.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 28 ? '#9CF7B9' : '' }">
@@ -493,7 +556,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 28, h.dia28, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia28}}
+                                <div *ngFor="let dia of h.dia28.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 29 ? '#9CF7B9' : '' }">
@@ -502,7 +568,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 29, h.dia29, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia29}}
+                                <div *ngFor="let dia of h.dia29.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 30 ? '#9CF7B9' : '' }">
@@ -511,7 +580,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 30, h.dia30, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia30}}
+                                <div *ngFor="let dia of h.dia30.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                             <td id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(h.color), 'background-color':h.seleccionado === 31 ? '#9CF7B9' : '' }">
@@ -520,7 +592,10 @@
                                     (click)="AbrirEditarHorario(h.anio, h.mes, 31, h.dia31, h.index)">
                                 </i>
                                 <br *ngIf="editar_activar">
-                                {{h.dia31}}
+                                <div *ngFor="let dia of h.dia31.split(','); let ultimo = last">
+                                    {{ dia }}
+                                    <br *ngIf="!ultimo">
+                                </div>
                             </td>
                         </tr>
                     </tbody>

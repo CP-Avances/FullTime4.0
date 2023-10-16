@@ -210,19 +210,11 @@ export class HorariosEmpleadoComponent implements OnInit {
     }
     this.restPlanGeneral.BuscarPlanificacionHoraria(busqueda).subscribe(datos => {
       if (datos.message === 'OK') {
-        var tabla1TBody: any = ''
-        var tabla2TBody: any = ''
         this.horariosEmpleado = datos.data;
         let index = 0;
         this.horariosEmpleado.forEach(obj => {
           obj.index = index;
           index = index + 1;
-          tabla1TBody = this.tabla1.nativeElement.querySelector('tbody');
-          tabla2TBody = this.tabla2.nativeElement.querySelector('tbody');
-          console.log(tabla1TBody, ' = ', tabla2TBody)
-
-          tabla1TBody.style.height = tabla2TBody.offsetHeight + 'px';
-          console.log(tabla1TBody.style.height, ' = ', tabla2TBody.offsetHeight + 'px')
         })
         this.ver_detalle = true;
         this.ver_acciones = false;

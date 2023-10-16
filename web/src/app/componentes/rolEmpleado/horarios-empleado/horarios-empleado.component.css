@@ -156,12 +156,6 @@ td {
     border-left: 1px solid rgb(52, 65, 84);
 }
 
-.static-columns {
-    min-width: 300px;
-    /* Ajusta el ancho según tus necesidades */
-    border-right: 1px solid #ccc;
-    /* Agrega un borde derecho para separar las columnas estáticas */
-}
 
 .table-responsive {
     overflow-x: scroll;
@@ -179,4 +173,46 @@ td {
 
 .fondo {
     background-color: rgb(238, 238, 238);
+}
+
+.table {
+    border-spacing: 0;
+}
+
+.table th,
+.table td {
+    border-right: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    min-width: 100px;
+}
+
+.table th:last-child,
+.table td:last-child {
+    border-right: 0;
+}
+
+.table tbody tr {
+    background-color: #fbfbfb;
+}
+
+.table tbody tr:nth-child(2n) {
+    background-color: #e6f3ff;
+}
+
+.colum_1 {
+    border-right: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    min-width: 70px !important;
+}
+
+.table .sticky {
+    position: sticky;
+    left: 0;
+    background-color: #f0f0f0;
+}
+
+.table .sticky-2 {
+    position: sticky;
+    left: 70px;
+    background-color: #f0f0f0;
 }
