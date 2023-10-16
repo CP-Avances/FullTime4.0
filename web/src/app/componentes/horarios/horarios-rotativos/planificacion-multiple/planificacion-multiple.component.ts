@@ -62,7 +62,7 @@ export class PlanificacionMultipleComponent implements OnInit {
     public restH: HorarioService,
     public restP: PlanGeneralService,
     private toastr: ToastrService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.BuscarHorarios();
@@ -82,7 +82,7 @@ export class PlanificacionMultipleComponent implements OnInit {
     })
 
     this.dataSource = this.datosSeleccionados
-    console.log('this.datosSeleccionados: ',this.datosSeleccionados.usuarios!);
+    console.log('this.datosSeleccionados: ', this.datosSeleccionados.usuarios!);
   }
 
   /** **************************************************************************************** **
@@ -1048,36 +1048,45 @@ export class PlanificacionMultipleComponent implements OnInit {
   // METODO PARA GURADAR DATOS EN BASE DE DATOS
   GuardarPlanificacion() {
     this.progreso = true;
+    //console.log('eliminar ', this.eliminar_lista)
     let contador = 0;
-    // METODO PARA ELIMINAR HORARIOS
-    this.eliminar_lista.forEach(h => {
-      let plan_fecha = {
-        codigo: h.codigo,
-        fec_final: h.fec_final,
-        fec_inicio: h.fec_inicio,
-        id_horario: h.id_horario,
-      };
-      this.restP.BuscarFechas(plan_fecha).subscribe(res => {
-        // METODO PARA ELIMINAR DE LA BASE DE DATOS
-        this.restP.EliminarRegistro(res).subscribe(datos => {
-          contador = contador + 1;
-          //console.log('ver contador ', contador, ' tamaño ', this.eliminar_lista.length)
-          if (contador === this.eliminar_lista.length) {
-            this.RegistrarPlanificacionMultiple();
-          }
+
+    if (this.eliminar_lista.length === 0) {
+      this.RegistrarPlanificacionMultiple();
+    }
+    else {
+      // METODO PARA ELIMINAR HORARIOS
+      this.eliminar_lista.forEach(h => {
+        //console.log('ingresa a eliminar horarios')
+        let plan_fecha = {
+          codigo: h.codigo,
+          fec_final: h.fec_final,
+          fec_inicio: h.fec_inicio,
+          id_horario: h.id_horario,
+        };
+        this.restP.BuscarFechas(plan_fecha).subscribe(res => {
+          // METODO PARA ELIMINAR DE LA BASE DE DATOS
+          this.restP.EliminarRegistro(res).subscribe(datos => {
+            contador = contador + 1;
+            //console.log('ver contador ', contador, ' tamaño ', this.eliminar_lista.length)
+            if (contador === this.eliminar_lista.length) {
+              this.RegistrarPlanificacionMultiple();
+            }
+          }, error => {
+            contador = contador + 1;
+            if (contador === this.eliminar_lista.length) {
+              this.RegistrarPlanificacionMultiple();
+            }
+          })
         }, error => {
           contador = contador + 1;
+          //console.log('ver contador error ', contador, ' tamaño ', this.eliminar_lista.length)
           if (contador === this.eliminar_lista.length) {
             this.RegistrarPlanificacionMultiple();
           }
         })
-      }, error => {
-        contador = contador + 1;
-        if (contador === this.eliminar_lista.length) {
-          this.RegistrarPlanificacionMultiple();
-        }
       })
-    })
+    }
   }
 
   // METODO PARA GUARDAR REGISTRO DE HORARIOS
