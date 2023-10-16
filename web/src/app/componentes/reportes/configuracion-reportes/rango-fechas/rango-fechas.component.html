@@ -4,30 +4,17 @@
 <mat-card class="example-card mat-elevation-z9">
     <div class="d-flex flex-wrap justify-content-center">
         <form [formGroup]="fechasForm" class="d-flex flex-wrap justify-content-center">
-            <mat-form-field>
-                <mat-label>Desde</mat-label>
-                <input matInput [matDatepicker]="pickerInicial" placeholder="dd/mm/aaaa" [disabled]="habilitar"
-                    [formControl]="fec_inicio_mes" required>
-                <mat-datepicker-toggle matSuffix [for]="pickerInicial" matTooltipPosition="right" id="ayuda_fec"
-                    matTooltip="Ingresa la fecha inicial del mes que deseas consultar el reporte. Ejm: 01/08/2020.">
-                </mat-datepicker-toggle>
-                <mat-datepicker touchUi #pickerInicial></mat-datepicker>
-            </mat-form-field>
-            <mat-form-field>
-                <mat-label>Hasta</mat-label>
-                <input matInput [matDatepicker]="pickerFinal" placeholder="dd/mm/aaaa" [disabled]="habilitar"
-                    [formControl]="fec_final_mes" required>
-                <mat-datepicker-toggle matSuffix [for]="pickerFinal" matTooltipPosition="right" id="ayuda_fec"
-                    matTooltip="Ingresa la fecha final del mes que deseas consultar el reporte. Ejm: 31/08/2020.">
-                </mat-datepicker-toggle>
-                <mat-datepicker touchUi #pickerFinal></mat-datepicker>
+            <mat-form-field class="fechas">
+                <mat-label>Ingrese el rango de fechas</mat-label>
+                <mat-date-range-input [formGroup]="fechasForm" [rangePicker]="picker" matTooltipPosition="right"  matTooltip="Ingrese el rango de fechas que deseas consultar el reporte. Ejm: 01/08/2023 - 01/09/2023">
+                  <input matStartDate formControlName="fec_inicio" placeholder="dd/mm/aaaa" class="ayuda_fec">
+                  <input matEndDate formControlName="fec_final" placeholder="dd/mm/aaaa" class="ayuda_fec" (dateChange)="ValidarRangofechas(fechasForm.value)">
+                </mat-date-range-input>
+                <mat-hint>Desde – Hasta</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-date-range-picker #picker></mat-date-range-picker>
+                <mat-datepicker touchUi #picker></mat-datepicker>
             </mat-form-field>
         </form>
-        <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
-            <button mat-button type="submit" class="btn btn-sm" id="botones" [disabled]="fechasForm.invalid"
-                (click)="ValidarRangofechas(fechasForm.value)">Aceptar</button>
-            <button mat-button type="submit" class="btn btn-sm" id="botones"
-                (click)="limpiarCamposRango()">Cancelar</button>
-        </div>
     </div>
 </mat-card>

@@ -60,14 +60,22 @@ mat-icon { cursor: pointer; }
     margin-left: 16px;
 }
 
-.i-pdf { color: red; font-size: 30px; }
+.ver {
+    color: indianred;
+}
+
+/* .i-pdf { color: red; font-size: 30px; }
 
 .i-print { color: rgb(0, 0, 0); font-size: 30px; }
 
 .i-download { color: rgb(0, 102, 255); font-size: 30px; }
 
-.i-excel { color: rgb(19, 172, 19); font-size: 30px; }
+.i-excel { color: rgb(19, 172, 19); font-size: 30px; } */
   
 .example-radio-button {
     margin: 5px;
+}
+
+#busqueda{
+    margin-top: 10px;
 }

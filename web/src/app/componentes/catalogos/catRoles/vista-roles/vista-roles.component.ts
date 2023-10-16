@@ -12,6 +12,7 @@ import * as xlsx from 'xlsx';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import * as xml2js from 'xml2js';
 
 // IMPORTACION DE COMPONENTES
 import { RegistroRolComponent } from 'src/app/componentes/catalogos/catRoles/registro-rol/registro-rol.component';
@@ -168,7 +169,7 @@ export class VistaRolesComponent implements OnInit {
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('Roles' + '.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
     this.ObtenerRoles();
@@ -267,7 +268,7 @@ export class VistaRolesComponent implements OnInit {
     wsr["!cols"] = wscols;
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'LISTA ROLES');
-    xlsx.writeFile(wb, "RolesEXCEL" + new Date().getTime() + '.xlsx');
+    xlsx.writeFile(wb, "RolesEXCEL" + '.xlsx');
     this.ObtenerRoles();
   }
 
@@ -284,17 +285,38 @@ export class VistaRolesComponent implements OnInit {
     this.roles.forEach(obj => {
       objeto = {
         "rol": {
-          '@id': obj.id,
+          "$": { "id": obj.id },
           "nombre": obj.nombre,
         }
       }
       arregloRoles.push(objeto)
     });
-    this.rest.CrearXML(arregloRoles).subscribe(res => {
-      this.data = res;
-      this.urlxml = `${environment.url}/rol/download/` + this.data.name;
-      window.open(this.urlxml, "_blank");
-    });
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Roles' });
+    const xml = xmlBuilder.buildObject(arregloRoles);
+
+    if (xml === undefined) {
+      console.error('Error al construir el objeto XML.');
+      return;
+    }
+
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const xmlUrl = URL.createObjectURL(blob);
+
+    // Abrir una nueva pestaña o ventana con el contenido XML
+    const newTab = window.open(xmlUrl, '_blank');
+    if (newTab) {
+      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
+      newTab.focus(); // Dar foco a la nueva pestaña
+    } else {
+      alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
+    }
+    // const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = xmlUrl;
+    a.download = 'Roles.xml';
+    // Simular un clic en el enlace para iniciar la descarga
+    a.click();
     this.ObtenerRoles();
   }
 
@@ -307,7 +329,7 @@ export class VistaRolesComponent implements OnInit {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.roles);
     const csvDataC = xlsx.utils.sheet_to_csv(wsr);
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "RolesCSV" + new Date().getTime() + '.csv');
+    FileSaver.saveAs(data, "RolesCSV" + '.csv');
     this.ObtenerRoles();
   }
 }

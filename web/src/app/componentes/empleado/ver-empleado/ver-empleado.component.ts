@@ -2712,7 +2712,7 @@ export class VerEmpleadoComponent implements OnInit {
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download( this.empleadoUno[0].nombre + '_' + this.empleadoUno[0].apellido + '.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }
@@ -2755,7 +2755,7 @@ export class VerEmpleadoComponent implements OnInit {
       },
       content: [
         { image: this.logoE, width: 150, margin: [10, -30, 0, 5] },
-        { text: this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido, 
+        { text: (this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido).toUpperCase(), 
           bold: true, fontSize: 14,
           alignment: 'left', 
           margin: [0, 15, 0, 18] },
@@ -2780,16 +2780,14 @@ export class VerEmpleadoComponent implements OnInit {
             ],
           ]
         },
-        { text: 'Contrato Empleado', style: 'header' },
-        this.PresentarDataPDFcontratoEmpleado(),
-        { text: 'Cargo Empleado', style: 'header' },
-        this.PresentarDataPDFcargoEmpleado(),
-        // { text: 'Plan de comidas', style: 'header' },
-        // { text: 'Titulos', style: 'header' },
-        { text: (this.tituloEmpleado.length>0?'Títulos':''), style: 'header' },
-        this.PresentarDataPDFtitulosEmpleado(),
-        { text: (this.discapacidadUser.length>0?'Discapacidad':''), style: 'header' },
+        { text: (this.discapacidadUser.length>0?'DISCAPACIDAD':''), style: 'header' },
         this.PresentarDataPDFdiscapacidadEmpleado(),
+        { text: (this.tituloEmpleado.length>0?'TÍTULOS':''), style: 'header' },
+        this.PresentarDataPDFtitulosEmpleado(),
+        { text: 'CONTRATO', style: 'header' },
+        this.PresentarDataPDFcontratoEmpleado(),
+        { text: 'CARGO', style: 'header' },
+        this.PresentarDataPDFcargoEmpleado(),
       ],
       info: {
         title: this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido + '_PERFIL',
@@ -2814,8 +2812,8 @@ export class VerEmpleadoComponent implements OnInit {
           widths: ['*', '*'],
           body: [
             [
-              { text: 'Nombre', style: 'tableHeader' },
-              { text: 'Nivel', style: 'tableHeader' }
+              { text: 'NOMBRE', style: 'tableHeader' },
+              { text: 'NIVEL', style: 'tableHeader' }
             ],
             ...this.tituloEmpleado.map(obj => {
               return [ {text:obj.nombre, style: 'tableCell'}, {text:obj.nivel, style: 'tableCell'}];
@@ -2834,12 +2832,12 @@ export class VerEmpleadoComponent implements OnInit {
         widths: ['*', 'auto', 'auto', 'auto', 'auto', 'auto'],
         body: [
           [
-            { text: 'Régimen', style: 'tableHeader' },
-            { text: 'Fecha Ingreso', style: 'tableHeader' },
-            { text: 'Fecha Salida', style: 'tableHeader' },
-            { text: 'Modalidad laboral', style: 'tableHeader' },
-            { text: 'Control de asistencias', style: 'tableHeader' },
-            { text: 'Control de vacaciones', style: 'tableHeader' },
+            { text: 'RÉGIMEN', style: 'tableHeader' },
+            { text: 'FECHA DESDE', style: 'tableHeader' },
+            { text: 'FECHA HASTA', style: 'tableHeader' },
+            { text: 'MODALIDAD LABORAL', style: 'tableHeader' },
+            { text: 'CONTROL ASISTENCIA', style: 'tableHeader' },
+            { text: 'CONTROL VACACIONES', style: 'tableHeader' },
           ],
           ...this.contratoEmpleado.map(contrato => {
             return [
@@ -2862,13 +2860,13 @@ export class VerEmpleadoComponent implements OnInit {
         widths: ['*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
         body: [
           [
-            { text: 'Sucursal', style: 'tableHeader' },
-            { text: 'Departamento', style: 'tableHeader' },
-            { text: 'Cargo', style: 'tableHeader' },
-            { text: 'Fecha inicio', style: 'tableHeader' },
-            { text: 'Fecha fin', style: 'tableHeader' },
-            { text: 'Horas de trabajo', style: 'tableHeader' },
-            { text: 'Sueldo', style: 'tableHeader' },
+            { text: 'SUCURSAL', style: 'tableHeader' },
+            { text: 'DEPARTAMENTO', style: 'tableHeader' },
+            { text: 'CARGO', style: 'tableHeader' },
+            { text: 'FECHA DESDE', style: 'tableHeader' },
+            { text: 'FECHA HASTA', style: 'tableHeader' },
+            { text: 'HORAS DE TRABAJO', style: 'tableHeader' },
+            { text: 'SUELDO', style: 'tableHeader' },
           ],
           ...this.cargoEmpleado.map(cargo => {
             return [
@@ -2893,15 +2891,15 @@ export class VerEmpleadoComponent implements OnInit {
           widths: ['*', '*', '*'],
           body: [
             [
-              { text: 'Carnet conadis', style: 'tableHeader' },
-              { text: 'Tipo', style: 'tableHeader' },
-              { text: 'Porcentaje', style: 'tableHeader' },
+              { text: 'CARNET CONADIS', style: 'tableHeader' },
+              { text: 'TIPO', style: 'tableHeader' },
+              { text: 'PORCENTAJE', style: 'tableHeader' },
             ],
             ...this.discapacidadUser.map(obj => {
               return [
                 { text: obj.carn_conadis, style: 'tableCell' },
-                { text: obj.porcentaje + ' %', style: 'tableCell' },
                 { text: obj.tipo, style: 'tableCell' },
+                { text: obj.porcentaje + ' %', style: 'tableCell' },
               ];
             })
           ]
@@ -2916,9 +2914,13 @@ export class VerEmpleadoComponent implements OnInit {
 
   obtenerDatos() {
     let objeto: any;
+    let objetoTitulo: any;
+    let objetoDiscapacidad: any;
     let objetoContrato: any;
     let objetoCargo: any;
     let arregloEmpleado: any = [];
+    let arregloDiscapacidad: any = [];
+    let arregloTitulo: any = [];
     let arregloContrato: any = [];
     let arregloCargo: any = [];
     this.empleadoUno.forEach((obj: any) => {
@@ -2953,22 +2955,41 @@ export class VerEmpleadoComponent implements OnInit {
       }
       arregloEmpleado.push(objeto);
     });
+
+    if (this.discapacidadUser !== null) {
+      this.discapacidadUser.map(discapacidad =>{
+        objetoDiscapacidad = {
+          'Carnet Conadis' : discapacidad.carn_conadis,
+          'Tipo': discapacidad.tipo,
+          'Porcentaje': discapacidad.porcentaje + '%',
+        };
+        arregloDiscapacidad.push(objetoDiscapacidad);
+      });
+    };
+    if (this.tituloEmpleado !== null) {
+      this.tituloEmpleado.map(titulo => {
+        objetoTitulo = {
+          'Nombre': titulo.nombre,
+          'Nivel': titulo.nivel,
+        };
+        arregloTitulo.push(objetoTitulo);
+      });
+    };
     if (this.contratoEmpleado !== null) {
       this.contratoEmpleado.map((contrato: any) => {
         let fechaI = contrato.fec_ingreso_.split(" ");
         let fechaS: string = contrato.fec_salida === null ? 'Sin fecha' : contrato.fec_salida_.split(" ")[1];
         objetoContrato = {
           'Regimen': contrato.descripcion,
-          'Fecha ingreso': fechaI[1],
-          'Fecha salida': fechaS,
+          'Fecha desde': fechaI[1],
+          'Fecha hasta': fechaS,
           'Modalidad laboral': contrato.nombre_contrato,
           'Control asistencia': contrato.asis_controla ? 'Si' : 'No',
           'Control vacaciones': contrato.vaca_controla ? 'Si' : 'No',
         };
         arregloContrato.push(objetoContrato);
       });
-
-    }
+    };
     if (this.cargoEmpleado !== null) {
       this.cargoEmpleado.map((cargo: any) => {
         let fechaI = cargo.fec_inicio_.split(" ");
@@ -2977,14 +2998,14 @@ export class VerEmpleadoComponent implements OnInit {
           'Sucursal': cargo.sucursal,
           'Departamento': cargo.departamento,
           'Cargo': cargo.nombre_cargo,
-          'Fecha inicio': fechaI[1],
-          'Fecha fin': fechaS,
+          'Fecha desde': fechaI[1],
+          'Fecha hasta': fechaS,
           'Sueldo': cargo.sueldo,
           'Horas trabaja': cargo.hora_trabaja,
         };
         arregloCargo.push(objetoCargo);
       });
-    }
+    };
     return [arregloEmpleado, arregloContrato, arregloCargo];
   }
 
@@ -2994,6 +3015,14 @@ export class VerEmpleadoComponent implements OnInit {
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos[0]);
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wse, 'PERFIL');
+    if (this.discapacidadUser.length > 0) {
+      const wsd: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.discapacidadUser);
+      xlsx.utils.book_append_sheet(wb, wsd, 'DISCAPACIDA');
+    }
+    if (this.tituloEmpleado.length > 0) {
+      const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tituloEmpleado);
+      xlsx.utils.book_append_sheet(wb, wst, 'TITULOS');
+    }
     if (this.contratoEmpleado.length > 0) {
       const wsco: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos[1]);
       xlsx.utils.book_append_sheet(wb, wsco, 'CONTRATO');
@@ -3002,15 +3031,7 @@ export class VerEmpleadoComponent implements OnInit {
       const wsca: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos[2]);
       xlsx.utils.book_append_sheet(wb, wsca, 'CARGO');
     }
-    if (this.tituloEmpleado.length > 0) {
-      const wst: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.tituloEmpleado);
-      xlsx.utils.book_append_sheet(wb, wst, 'TITULOS');
-    }
-    if (this.discapacidadUser.length > 0) {
-      const wsd: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.discapacidadUser);
-      xlsx.utils.book_append_sheet(wb, wsd, 'DISCAPACIDA');
-    }
-    xlsx.writeFile(wb, "Empleado_" + (datos[0])[0].Nombre +"_"+ (datos[0])[0].Apellido +"_" + new Date().getTime() + '.xlsx');
+    xlsx.writeFile(wb, (datos[0])[0].Nombre +"_"+ (datos[0])[0].Apellido +'.xlsx');
   }
 
   /** ******************************************************************************************* **
@@ -3022,15 +3043,15 @@ export class VerEmpleadoComponent implements OnInit {
     const datosEmpleado: any = [];
     const objeto = {
       ...datos[0][0],
+      ...this.discapacidadUser[0],
+      ...this.tituloEmpleado[0],
       ...datos[1][0],
       ...datos[2][0],
-      ...this.tituloEmpleado[0],
-      ...this.discapacidadUser[0],
     };
     datosEmpleado.push(objeto);
     const csvDataE = xlsx.utils.sheet_to_csv(xlsx.utils.json_to_sheet(datosEmpleado));
     const data: Blob = new Blob([csvDataE], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "EmpleadoCSV" + (datos[0])[0].Nombre +"_"+ (datos[0])[0].Apellido +"_"  + new Date().getTime() + '.csv');
+    FileSaver.saveAs(data, (datos[0])[0].Nombre +"_"+ (datos[0])[0].Apellido +'.csv');
   }
 
   /** ******************************************************************************************* ** 
@@ -3066,7 +3087,7 @@ export class VerEmpleadoComponent implements OnInit {
 
       objeto = {
         "empleado": {
-          'codigo': obj.codigo,
+          "$": { "codigo": obj.codigo },
           "apellido": obj.apellido,
           "nombre": obj.nombre,
           "cedula": obj.cedula,
@@ -3086,12 +3107,29 @@ export class VerEmpleadoComponent implements OnInit {
       if (obj.latitud !== null) {
         objeto.empleado.latitud = obj.latitud;
       }
+      if (this.discapacidadUser !== null) {
+        this.discapacidadUser.map(discapacidad => {
+          objeto.empleado.discapacidad = {
+            'carnet_conadis' : discapacidad.carn_conadis,
+            'tipo': discapacidad.tipo,
+            'porcentaje': discapacidad.porcentaje + '%',
+          }
+        });
+      };
+      if (this.tituloEmpleado !== null) {
+        this.tituloEmpleado.map(titulo =>{
+          objeto.empleado.titulos = {
+            'nombre': titulo.nombre,
+            'Nivel': titulo.nivel,
+          }
+        });
+      };
       if (this.contratoEmpleado !== null) {
         this.contratoEmpleado.map((contrato: any) => {
           objeto.empleado.contrato = {
             'regimen': contrato.descripcion,
-            'fecha_ingreso': contrato.fec_ingreso_,
-            'fecha_salida': contrato.fec_salida === null ? 'Sin fecha' : contrato.fec_salida_,
+            'fecha_desde': contrato.fec_ingreso_,
+            'fecha_hasta': contrato.fec_salida === null ? 'Sin fecha' : contrato.fec_salida_,
             'modalidad_laboral': contrato.nombre_contrato,
             'control_asistencia': contrato.asis_controla ? 'Si' : 'No',
             'control_vacaciones': contrato.vaca_controla ? 'Si' : 'No',
@@ -3105,8 +3143,8 @@ export class VerEmpleadoComponent implements OnInit {
             'sucursal': cargo.sucursal,
             'departamento': cargo.departamento,
             'cargo': cargo.nombre_cargo,
-            'fecha_inicio': cargo.fec_inicio_,
-            'fecha_fin': cargo.fec_final === null ? 'Sin fecha' : cargo.fec_final_,
+            'fecha_desde': cargo.fec_inicio_,
+            'fecha_hasta': cargo.fec_final === null ? 'Sin fecha' : cargo.fec_final_,
             'sueldo': cargo.sueldo,
             'horas_trabaja': cargo.hora_trabaja,
           };
@@ -3137,7 +3175,7 @@ export class VerEmpleadoComponent implements OnInit {
 
     const a = document.createElement('a');
     a.href = xmlUrl;
-    a.download = "Empleado-" + objeto.empleado.nombre + '-' + objeto.empleado.apellido + '-' + new Date().getTime() + '.xml';
+    a.download = objeto.empleado.nombre + '-' + objeto.empleado.apellido +'.xml';
     // Simular un clic en el enlace para iniciar la descarga
     a.click();
   }

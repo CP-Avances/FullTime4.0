@@ -16,22 +16,22 @@
                                     <div class="container">
                                         <div class="row">
                                             <div class="col">
-                                                <mat-radio-button ngDefaultControl [(ngModel)]="automaticoF"
-                                                    [checked]="automaticoF" [ngModelOptions]="{standalone: true}"
+                                                <mat-radio-button ngDefaultControl 
+                                                    [checked]="automaticoF" 
                                                     (click)="VerCampo()">
                                                     <label>Registro automático</label>
                                                 </mat-radio-button>
                                             </div>
                                             <div class="col">
-                                                <mat-radio-button ngDefaultControl [(ngModel)]="manualF"
-                                                    [checked]="manualF" [ngModelOptions]="{standalone: true}"
+                                                <mat-radio-button ngDefaultControl 
+                                                    [checked]="manualF" 
                                                     (click)="QuitarCampo()">
                                                     <label>Registro manual</label>
                                                 </mat-radio-button>
                                             </div>
                                             <div class="col">
-                                                <mat-radio-button ngDefaultControl [(ngModel)]="cedulaF"
-                                                    [checked]="cedulaF" [ngModelOptions]="{standalone: true}"
+                                                <mat-radio-button ngDefaultControl 
+                                                    [checked]="cedulaF"
                                                     (click)="QuitarCampoCedula()">
                                                     <label>Registrar cédula</label>
                                                 </mat-radio-button>

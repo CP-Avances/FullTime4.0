@@ -97,8 +97,8 @@
                     <tr style="text-align: center;">
                         <th>
                             <mat-checkbox (change)="$event ? masterToggleCar() : null"
-                                [checked]="selectionSuc.hasValue() && isAllSelectedCar()"
-                                [indeterminate]="selectionSuc.hasValue() && !isAllSelectedCar()"
+                                [checked]="selectionCar.hasValue() && isAllSelectedCar()"
+                                [indeterminate]="selectionCar.hasValue() && !isAllSelectedCar()"
                                 [aria-label]="checkboxLabelCar()">
                             </mat-checkbox>
                         </th>

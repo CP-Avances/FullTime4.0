@@ -13,6 +13,7 @@ import * as xlsx from "xlsx";
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import * as xml2js from 'xml2js';
 
 // IMPORTAR COMPONENTES
 import { MetodosComponent } from "src/app/componentes/administracionGeneral/metodoEliminar/metodos.component";
@@ -194,7 +195,7 @@ export class ListarRegimenComponent implements OnInit {
         pdfMake.createPdf(documentDefinition).print();
         break;
       case "download":
-        pdfMake.createPdf(documentDefinition).download();
+        pdfMake.createPdf(documentDefinition).download('Regimen_laboral' + '.pdf');
         break;
       default:
         pdfMake.createPdf(documentDefinition).open();
@@ -378,7 +379,7 @@ export class ListarRegimenComponent implements OnInit {
     wsr["!cols"] = wscols;
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, "LISTAR REGIMEN");
-    xlsx.writeFile(wb, "RegimenEXCEL" + new Date().getTime() + ".xlsx");
+    xlsx.writeFile(wb, "RegimenEXCEL" + ".xlsx");
     this.ObtenerRegimen();
   }
 
@@ -395,7 +396,7 @@ export class ListarRegimenComponent implements OnInit {
     this.regimen.forEach((obj) => {
       objeto = {
         regimen_laboral: {
-          "@id": obj.id,
+          "$": { "id": obj.id },
           descripcion: obj.descripcion,
           pais: obj.pais,
           meses_periodo: obj.mes_periodo,
@@ -416,12 +417,32 @@ export class ListarRegimenComponent implements OnInit {
       };
       arregloRegimen.push(objeto);
     });
-    this.rest.CrearXML(arregloRegimen).subscribe((res) => {
-      this.data = res;
-      this.urlxml =
-        `${environment.url}/regimenLaboral/download/` + this.data.name;
-      window.open(this.urlxml, "_blank");
-    });
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Regimen_laboral' });
+    const xml = xmlBuilder.buildObject(arregloRegimen);
+
+    if (xml === undefined) {
+      console.error('Error al construir el objeto XML.');
+      return;
+    }
+
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const xmlUrl = URL.createObjectURL(blob);
+
+    // Abrir una nueva pestaña o ventana con el contenido XML
+    const newTab = window.open(xmlUrl, '_blank');
+    if (newTab) {
+      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
+      newTab.focus(); // Dar foco a la nueva pestaña
+    } else {
+      alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
+    }
+    // const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = xmlUrl;
+    a.download = 'Regimen_laboral.xml';
+    // Simular un clic en el enlace para iniciar la descarga
+    a.click();
     this.ObtenerRegimen();
   }
 
@@ -436,7 +457,7 @@ export class ListarRegimenComponent implements OnInit {
     const data: Blob = new Blob([csvDataC], {
       type: "text/csv;charset=utf-8;",
     });
-    FileSaver.saveAs(data, "RegimenCSV" + new Date().getTime() + ".csv");
+    FileSaver.saveAs(data, "RegimenCSV" + ".csv");
     this.ObtenerRegimen();
   }
 }

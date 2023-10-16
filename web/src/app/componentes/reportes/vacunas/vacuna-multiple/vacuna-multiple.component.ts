@@ -442,8 +442,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       documentDefinition = this.getDocumentDefinicion();
     }
 
-    var f = new Date();
-    let doc_name = 'Reporte Vacunas' + f.toLocaleString() + '.pdf';
+    let doc_name = 'Reporte_vacunas.pdf';
     switch (action) {
       case 'open':
         pdfMake.createPdf(documentDefinition).open();
@@ -521,7 +520,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
           margin: [0, -30, 0, 10],
         },
         {
-          text: 'Reporte - Registro de Vacunación',
+          text: 'REPORTE - REGISTRO DE VACUNACIÓN',
           bold: true,
           fontSize: 16,
           alignment: 'center',
@@ -560,7 +559,6 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
 
   impresionDatosPDF(data: any[]): Array<any> {
     let n: any = [];
-    let c = 0;
 
     if (this.bool.bool_cargo === true) {
       data.forEach((obj1)=>{
@@ -625,9 +623,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
                   { text: 'Descripción', style: 'tableHeader' },
                 ],
                 ...obj2.vacunas.map((obj3) => {
-                  c = c + 1;
                   return [
-                    { style: 'itemsTableCentrado', text: c },
+                    { style: 'itemsTableCentrado', text: obj2.vacunas.indexOf(obj3)+1 },
                     { style: 'itemsTable', text: obj3.tipo_vacuna },
                     { style: 'itemsTable', text: obj3.fecha.split('T')[0] },
                     { style: 'itemsTable', text: obj3.descripcion },
@@ -736,9 +733,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
                     { text: 'Descripción', style: 'tableHeader' },
                   ],
                   ...obj2.vacunas.map((obj3) => {
-                    c = c + 1;
                     return [
-                      { style: 'itemsTableCentrado', text: c },
+                      { style: 'itemsTableCentrado', text: obj2.vacunas.indexOf(obj3)+1 },
                       { style: 'itemsTable', text: obj3.tipo_vacuna },
                       { style: 'itemsTable', text: obj3.fecha.split('T')[0] },
                       { style: 'itemsTable', text: obj3.descripcion },
@@ -776,7 +772,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     );
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Vacunas');
-    xlsx.writeFile(wb, 'Vacunas ' + new Date().getTime() + '.xlsx');
+    xlsx.writeFile(wb, 'Vacunas.xlsx');
   }
 
   MapingDataPdfDefault(array: Array<any>) {
@@ -816,7 +812,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     );
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Vacunas');
-    xlsx.writeFile(wb, 'Vacunas ' + new Date().getTime() + '.xlsx');
+    xlsx.writeFile(wb, 'Vacunas.xlsx');
   }
 
   MapingDataPdfDefaultCargo(array: Array<any>) {

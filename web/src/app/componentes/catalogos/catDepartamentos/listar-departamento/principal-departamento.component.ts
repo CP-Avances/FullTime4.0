@@ -14,6 +14,7 @@ import * as FileSaver from 'file-saver';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import * as xml2js from 'xml2js';
 
 import { DepartamentosService } from 'src/app/servicios/catalogos/catDepartamentos/departamentos.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
@@ -234,7 +235,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('Departamentos.pdf'); break;
 
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
@@ -330,7 +331,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.departamentos);
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Departamentos');
-    xlsx.writeFile(wb, "Departamentos" + new Date().getTime() + '.xlsx');
+    xlsx.writeFile(wb, "Departamentos" + '.xlsx');
   }
 
   /** ************************************************************************************************** ** 
@@ -341,7 +342,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.departamentos);
     const csvDataH = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "DepartamentosCSV" + new Date().getTime() + '.csv');
+    FileSaver.saveAs(data, "DepartamentosCSV" + '.csv');
   }
 
   /** ************************************************************************************************* **
@@ -356,8 +357,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.departamentos.forEach(obj => {
       objeto = {
         "departamento": {
-          '@id': obj.id,
-          "empresa": obj.nomempresa,
+          "$": { "id": obj.id },
           "establecimiento": obj.nomsucursal,
           "departamento": obj.nombre,
           "nivel": obj.nivel,
@@ -367,11 +367,32 @@ export class PrincipalDepartamentoComponent implements OnInit {
       arregloDepartamentos.push(objeto)
     });
 
-    this.rest.CrearXML(arregloDepartamentos).subscribe(res => {
-      this.data = res;
-      this.urlxml = `${environment.url}/departamento/download/` + this.data.name;
-      window.open(this.urlxml, "_blank");
-    });
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Departamentos' });
+    const xml = xmlBuilder.buildObject(arregloDepartamentos);
+
+    if (xml === undefined) {
+      console.error('Error al construir el objeto XML.');
+      return;
+    }
+
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const xmlUrl = URL.createObjectURL(blob);
+
+    // Abrir una nueva pestaña o ventana con el contenido XML
+    const newTab = window.open(xmlUrl, '_blank');
+    if (newTab) {
+      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
+      newTab.focus(); // Dar foco a la nueva pestaña
+    } else {
+      alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
+    }
+    // const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = xmlUrl;
+    a.download = 'Departamentos.xml';
+    // Simular un clic en el enlace para iniciar la descarga
+    a.click();
   }
 
 }

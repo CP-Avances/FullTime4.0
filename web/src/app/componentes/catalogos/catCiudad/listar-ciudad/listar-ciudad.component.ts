@@ -12,6 +12,7 @@ import * as FileSaver from 'file-saver';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import * as xml2js from 'xml2js';
 
 import { RegistrarCiudadComponent } from 'src/app/componentes/catalogos/catCiudad/registrar-ciudad/registrar-ciudad.component'
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
@@ -171,7 +172,7 @@ export class ListarCiudadComponent implements OnInit {
         pdfMake.createPdf(documentDefinition).print();
         break;
       case "download":
-        pdfMake.createPdf(documentDefinition).download();
+        pdfMake.createPdf(documentDefinition).download('Ciudades' + '.pdf');
         break;
 
       default:
@@ -184,7 +185,7 @@ export class ListarCiudadComponent implements OnInit {
     sessionStorage.setItem("Ciudades", this.datosCiudades);
     return {
       // ENCABEZADO DE LA PAGINA
-      pageOrientation: "landscape",
+      pageOrientation: "portrait",
       watermark: {
         text: this.frase,
         color: "blue",
@@ -294,7 +295,7 @@ export class ListarCiudadComponent implements OnInit {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.datosCiudades);
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, "Ciudades");
-    xlsx.writeFile(wb, "Ciudades" + new Date().getTime() + ".xlsx");
+    xlsx.writeFile(wb, "Ciudades" + ".xlsx");
   }
 
   /** ************************************************************************************************** **
@@ -309,7 +310,7 @@ export class ListarCiudadComponent implements OnInit {
     });
     FileSaver.saveAs(
       data,
-      "CiudadesCSV" + new Date().getTime() + ".csv"
+      "CiudadesCSV" + ".csv"
     );
   }
 
@@ -325,7 +326,7 @@ export class ListarCiudadComponent implements OnInit {
     this.datosCiudades.forEach((obj) => {
       objeto = {
         ciudad: {
-          "@id": obj.id,
+          "$": { "id": obj.id },
           nombre: obj.nombre,
           provincia: obj.provincia
         },
@@ -333,13 +334,33 @@ export class ListarCiudadComponent implements OnInit {
       arregloCiudades.push(objeto);
     });
 
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Ciudades' });
+    const xml = xmlBuilder.buildObject(arregloCiudades);
 
-    this.rest.CrearXML(arregloCiudades).subscribe((res) => {
-      this.data = res;
-      console.log("prueba data", res);
-      this.urlxml = `${environment.url}/ciudades/download/` + this.data.name;
-      window.open(this.urlxml, "_blank");
-    });
+    if (xml === undefined) {
+      console.error('Error al construir el objeto XML.');
+      return;
+    }
+
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const xmlUrl = URL.createObjectURL(blob);
+
+    // Abrir una nueva pestaña o ventana con el contenido XML
+    const newTab = window.open(xmlUrl, '_blank');
+    if (newTab) {
+      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
+      newTab.focus(); // Dar foco a la nueva pestaña
+    } else {
+      alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
+    }
+    // const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = xmlUrl;
+    a.download = 'Ciudades.xml';
+    // Simular un clic en el enlace para iniciar la descarga
+    a.click();
+    
   }
 
 

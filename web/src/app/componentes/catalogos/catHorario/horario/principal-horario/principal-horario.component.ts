@@ -12,6 +12,7 @@ import * as xlsx from 'xlsx';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import * as xml2js from 'xml2js';
 
 // IMPORTAR SERVICIOS
 import { DetalleCatHorariosService } from 'src/app/servicios/horarios/detalleCatHorarios/detalle-cat-horarios.service';
@@ -356,7 +357,7 @@ export class PrincipalHorarioComponent implements OnInit {
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('Horarios.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
 
@@ -456,7 +457,7 @@ export class PrincipalHorarioComponent implements OnInit {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.horarios);
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'horarios');
-    xlsx.writeFile(wb, "CatHorariosEXCEL" + new Date().getTime() + '.xlsx');
+    xlsx.writeFile(wb, "HorariosEXCEL" + '.xlsx');
   }
 
   /** ************************************************************************************************* ** 
@@ -467,7 +468,7 @@ export class PrincipalHorarioComponent implements OnInit {
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.horarios);
     const csvDataH = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataH], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "CatHorarioCSV" + new Date().getTime() + '.csv');
+    FileSaver.saveAs(data, "HorariosCSV" + '.csv');
   }
 
   /** ************************************************************************************************* **
@@ -482,7 +483,7 @@ export class PrincipalHorarioComponent implements OnInit {
     this.horarios.forEach(obj => {
       objeto = {
         "horario": {
-          '@id': obj.id,
+          "$": { "id": obj.id },
           "nombre": obj.nombre,
           "min_almuerzo": obj.min_almuerzo,
           "hora_trabajo": obj.hora_trabajo,
@@ -494,11 +495,32 @@ export class PrincipalHorarioComponent implements OnInit {
       arregloHorarios.push(objeto)
     });
 
-    this.rest.CrearXML(arregloHorarios).subscribe(res => {
-      this.data = res;
-      this.urlxml = `${environment.url}/horario/xmlDownload/${this.data.name}`;
-      window.open(this.urlxml, "_blank");
-    });
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Horarios' });
+    const xml = xmlBuilder.buildObject(arregloHorarios);
+
+    if (xml === undefined) {
+      console.error('Error al construir el objeto XML.');
+      return;
+    }
+
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const xmlUrl = URL.createObjectURL(blob);
+
+    // Abrir una nueva pestaña o ventana con el contenido XML
+    const newTab = window.open(xmlUrl, '_blank');
+    if (newTab) {
+      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
+      newTab.focus(); // Dar foco a la nueva pestaña
+    } else {
+      alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
+    }
+    // const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = xmlUrl;
+    a.download = 'Horarios.xml';
+    // Simular un clic en el enlace para iniciar la descarga
+    a.click();
   }
 
 }

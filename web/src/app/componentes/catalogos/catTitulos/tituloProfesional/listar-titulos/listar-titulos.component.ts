@@ -13,6 +13,7 @@ import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as FileSaver from 'file-saver';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import * as xml2js from 'xml2js';
 
 // IMPORTAR COMPONENTES
 import { EditarTitulosComponent } from '../editar-titulos/editar-titulos.component'
@@ -194,7 +195,7 @@ export class ListarTitulosComponent implements OnInit {
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download(); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download('Titulos.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
     this.ObtenerTitulos();
@@ -297,7 +298,7 @@ export class ListarTitulosComponent implements OnInit {
     wst["!cols"] = wscols;
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wst, 'LISTAR TITULOS');
-    xlsx.writeFile(wb, "TitulosEXCEL" + new Date().getTime() + '.xlsx');
+    xlsx.writeFile(wb, "TitulosEXCEL" + '.xlsx');
     this.ObtenerTitulos();
   }
 
@@ -313,18 +314,40 @@ export class ListarTitulosComponent implements OnInit {
     this.verTitulos.forEach(obj => {
       objeto = {
         "titulos": {
-          '@id': obj.id,
+          "$": { "id": obj.id },
           "nombre": obj.nombre,
           "nivel": obj.nivel,
         }
       }
       arregloTitulos.push(objeto)
     });
-    this.rest.CrearXML(arregloTitulos).subscribe(res => {
-      this.data = res;
-      this.urlxml = `${environment.url}/titulo/download/` + this.data.name;
-      window.open(this.urlxml, "_blank");
-    });
+
+    const xmlBuilder = new xml2js.Builder({ rootName: 'Titulos' });
+    const xml = xmlBuilder.buildObject(arregloTitulos);
+
+    if (xml === undefined) {
+      console.error('Error al construir el objeto XML.');
+      return;
+    }
+
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const xmlUrl = URL.createObjectURL(blob);
+
+    // Abrir una nueva pestaña o ventana con el contenido XML
+    const newTab = window.open(xmlUrl, '_blank');
+    if (newTab) {
+      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
+      newTab.focus(); // Dar foco a la nueva pestaña
+    } else {
+      alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
+    }
+    // const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = xmlUrl;
+    a.download = 'Titulos.xml';
+    // Simular un clic en el enlace para iniciar la descarga
+    a.click();
     this.ObtenerTitulos();
   }
 
@@ -337,7 +360,7 @@ export class ListarTitulosComponent implements OnInit {
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.verTitulos);
     const csvDataC = xlsx.utils.sheet_to_csv(wse);
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, "TitulosCSV" + new Date().getTime() + '.csv');
+    FileSaver.saveAs(data, "TitulosCSV" + '.csv');
     this.ObtenerTitulos();
   }
 

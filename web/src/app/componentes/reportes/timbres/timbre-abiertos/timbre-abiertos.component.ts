@@ -393,7 +393,7 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
       },
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
-        { text: localStorage.getItem('name_empresa'), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
+        { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
         { text: 'REPORTE TIMBRES HORARIO ABIERTO', bold: true, fontSize: 16, alignment: 'center', margin: [0, -5, 0, 5] },
         { text: 'PERIODO DEL: ' + this.rangoFechas.fec_inico + " AL " + this.rangoFechas.fec_final, bold: true, fontSize: 15, alignment: 'center', margin: [0, 10, 0, 10] },
         ...this.impresionDatosPDF(this.data_pdf).map(obj => {
@@ -504,7 +504,7 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
             n.push({
               style: 'tableMargin',
               table: {
-                widths: [25, 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', '*'],
+                widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', '*'],
                 body: [
                   [
                     { rowSpan: 2, text: 'N°', style: 'centrado' },
@@ -534,16 +534,16 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
                       servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
                     }
                     switch (obj3.accion) {
-                      case 'EoS': accionT = 'Entrada o Salida'; break;
-                      case 'AES': accionT = 'Inicio o Fin Alimentación'; break;
-                      case 'PES': accionT = 'Inicio o Fin Permiso'; break;
+                      case 'EoS': accionT = 'Entrada o salida'; break;
+                      case 'AES': accionT = 'Inicio o fin alimentación'; break;
+                      case 'PES': accionT = 'Inicio o fin permiso'; break;
                       case 'E': accionT = 'Entrada'; break;
                       case 'S': accionT = 'Salida'; break;
-                      case 'F/A': accionT = 'Fin Alimentación'; break;
-                      case 'I/A': accionT = 'Inicio Alimentación'; break;
-                      case 'E/P': accionT = 'Fin Permiso'; break;
-                      case 'S/P': accionT = 'Inicio Permiso'; break;
-                      case 'HA': accionT = 'HA'; break;
+                      case 'F/A': accionT = 'Fin alimentación'; break;
+                      case 'I/A': accionT = 'Inicio alimentación'; break;
+                      case 'E/P': accionT = 'Fin permiso'; break;
+                      case 'S/P': accionT = 'Inicio permiso'; break;
+                      case 'HA': accionT = 'Timbre libre'; break;
                       default: accionT = 'Desconocido'; break;
                     }
 
@@ -574,7 +574,7 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
             n.push({
               style: 'tableMargin',
               table: {
-                widths: ['*', '*', '*', 'auto', 'auto', 'auto', '*', '*'],
+                widths: ['auto', '*', '*', 'auto', 'auto', 'auto', '*', '*'],
                 body: [
                   [
                     { rowSpan: 2, text: 'N°', style: 'centrado' },
@@ -595,16 +595,16 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
                   ],
                   ...obj2.timbres.map(obj3 => {
                     switch (obj3.accion) {
-                      case 'EoS': accionT = 'Entrada o Salida'; break;
-                      case 'AES': accionT = 'Inicio o Fin Alimentación'; break;
-                      case 'PES': accionT = 'Inicio o Fin Permiso'; break;
+                      case 'EoS': accionT = 'Entrada o salida'; break;
+                      case 'AES': accionT = 'Inicio o fin alimentación'; break;
+                      case 'PES': accionT = 'Inicio o fin permiso'; break;
                       case 'E': accionT = 'Entrada'; break;
                       case 'S': accionT = 'Salida'; break;
-                      case 'F/A': accionT = 'Fin Alimentación'; break;
-                      case 'I/A': accionT = 'Inicio Alimentación'; break;
-                      case 'E/P': accionT = 'Fin Permiso'; break;
-                      case 'S/P': accionT = 'Inicio Permiso'; break;
-                      case 'HA': accionT = 'HA'; break;
+                      case 'F/A': accionT = 'Fin alimentación'; break;
+                      case 'I/A': accionT = 'Inicio alimentación'; break;
+                      case 'E/P': accionT = 'Fin permiso'; break;
+                      case 'S/P': accionT = 'Inicio permiso'; break;
+                      case 'HA': accionT = 'Timbre libre'; break;
                       default: accionT = 'Desconocido'; break;
                     }
                     c = c + 1

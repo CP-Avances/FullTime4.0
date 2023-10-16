@@ -1,7 +1,5 @@
 <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
-    <mat-slide-toggle [(ngModel)]="showTimbre" (change)="ChangeValue($event)">
-        Visualizar hora del servidor <mat-icon class="flex-shrink-1 bd-highlight i-barra" matTooltipPosition="right"
-            matTooltip="Los timbres con hora tomada del servidor solo se reflejará en los reportes con opción Sucursal, Departamento o Empleado.">
-            help_outline</mat-icon>
+    <mat-slide-toggle class="servidor" [(ngModel)]="showTimbre" (change)="ChangeValue($event)">
     </mat-slide-toggle>
+    <mat-label class="servidor">Información del servidor</mat-label>
 </div>
