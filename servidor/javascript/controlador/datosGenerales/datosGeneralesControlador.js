@@ -73,9 +73,9 @@ class DatosGeneralesControlador {
                             e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo, tc.id AS id_tipo_cargo,
                             co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
                             d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
-                            s.nombre AS sucursal, ca.hora_trabaja
+                            s.nombre AS sucursal, c.descripcion AS ciudad, ca.hora_trabaja
                         FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
-                            tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s
+                            tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s, ciudades AS c
                         WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
                             da.id = e.id) 
                             AND tc.id = ca.cargo
@@ -84,6 +84,7 @@ class DatosGeneralesControlador {
                             AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
                             da.id = e.id) 
                             AND s.id = d.id_sucursal
+                            AND s.id_ciudad = c.id
                             AND co.id_regimen = r.id AND e.estado = $2
                         ORDER BY name_empleado ASC
                         `, [empl.id_depa, estado])
@@ -95,9 +96,9 @@ class DatosGeneralesControlador {
                             e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo, tc.id AS id_tipo_cargo,
                             co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
                             d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
-                            s.nombre AS sucursal, ca.fec_final, ca.hora_trabaja
+                            s.nombre AS sucursal, c.descripcion AS ciudad, ca.fec_final, ca.hora_trabaja
                         FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
-                            tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s
+                            tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s, ciudades AS c
                         WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
                             da.id = e.id) 
                             AND tc.id = ca.cargo
@@ -106,6 +107,7 @@ class DatosGeneralesControlador {
                             AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
                             da.id = e.id) 
                             AND s.id = d.id_sucursal
+                            AND s.id_ciudad = c.id
                             AND co.id_regimen = r.id AND e.estado = $2
                         ORDER BY name_empleado ASC
                         `, [empl.id_depa, estado])
@@ -191,9 +193,9 @@ class DatosGeneralesControlador {
                         e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo,
                         co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
                         d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
-                        s.nombre AS sucursal, ca.hora_trabaja
+                        s.nombre AS sucursal, c.descripcion AS ciudad, ca.hora_trabaja
                     FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
-                        tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s
+                        tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s, ciudades AS c
                     WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
                         da.id = e.id) 
                         AND tc.id = ca.cargo
@@ -202,6 +204,7 @@ class DatosGeneralesControlador {
                         AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
                         da.id = e.id) 
                         AND s.id = d.id_sucursal
+                        AND s.id_ciudad = c.id
                         AND co.id_regimen = r.id AND e.estado = $2
                     ORDER BY name_empleado ASC
                     `, [empl.id_cargo, estado]).then((result) => { return result.rows; });
@@ -212,9 +215,9 @@ class DatosGeneralesControlador {
                         e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo,
                         co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
                         d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
-                        s.nombre AS sucursal, ca.fec_final, ca.hora_trabaja
+                        s.nombre AS sucursal, c.descripcion AS ciudad, ca.fec_final, ca.hora_trabaja
                     FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
-                        tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s
+                        tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s, ciudades AS c
                     WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
                         da.id = e.id) 
                         AND tc.id = ca.cargo
@@ -223,6 +226,7 @@ class DatosGeneralesControlador {
                         AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
                         da.id = e.id) 
                         AND s.id = d.id_sucursal
+                        AND s.id_ciudad = c.id
                         AND co.id_regimen = r.id AND e.estado = $2
                     ORDER BY name_empleado ASC
                     `, [empl.id_cargo, estado])

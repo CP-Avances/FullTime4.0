@@ -19,11 +19,13 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
   nombre_emp = new FormControl('', [Validators.minLength(2)]);
   nombre_dep = new FormControl('', [Validators.minLength(2)]);
   nombre_suc = new FormControl('', [Validators.minLength(2)]);
+  nombre_reg = new FormControl('', [Validators.minLength(2)]);
   nombre_cargo = new FormControl('', [Validators.minLength(2)]);
   seleccion = new FormControl('');
 
   filtroNombreSuc: string = '';
   filtroNombreCargo: string = '';
+  filtroNombreReg: string = '';
   filtroNombreDep: string = '';
 
   filtroCodigo: number;
@@ -43,6 +45,7 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
     bool_suc: false,
     bool_dep: false,
     bool_emp: false,
+    bool_reg: false,
     bool_tab: false,
     bool_inc: false
   };
@@ -82,6 +85,7 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
         this._booleanOptions.bool_suc = true;
         this._booleanOptions.bool_dep = false;
         this._booleanOptions.bool_emp = false;
+        this._booleanOptions.bool_reg = false;
         this._booleanOptions.bool_tab = false;
         this._booleanOptions.bool_inc = false;
         this._booleanOptions.bool_cargo = false;
@@ -91,6 +95,7 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
         this._booleanOptions.bool_suc = false;
         this._booleanOptions.bool_dep = false;
         this._booleanOptions.bool_emp = false;
+        this._booleanOptions.bool_reg = false;
         this._booleanOptions.bool_tab = false;
         this._booleanOptions.bool_inc = false;
         break;
@@ -98,6 +103,7 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
         this._booleanOptions.bool_suc = false;
         this._booleanOptions.bool_dep = true;
         this._booleanOptions.bool_emp = false;
+        this._booleanOptions.bool_reg = false;
         this._booleanOptions.bool_tab = false;
         this._booleanOptions.bool_inc = false;
         this._booleanOptions.bool_cargo = false;
@@ -106,6 +112,16 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
         this._booleanOptions.bool_suc = false;
         this._booleanOptions.bool_dep = false;
         this._booleanOptions.bool_emp = true;
+        this._booleanOptions.bool_reg = false;
+        this._booleanOptions.bool_tab = false;
+        this._booleanOptions.bool_inc = false;
+        this._booleanOptions.bool_cargo = false;
+        break;
+      case 'r':
+        this._booleanOptions.bool_suc = false;
+        this._booleanOptions.bool_dep = false;
+        this._booleanOptions.bool_emp = false;
+        this._booleanOptions.bool_reg = true;
         this._booleanOptions.bool_tab = false;
         this._booleanOptions.bool_inc = false;
         this._booleanOptions.bool_cargo = false;
@@ -114,6 +130,7 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
         this._booleanOptions.bool_suc = false;
         this._booleanOptions.bool_dep = false;
         this._booleanOptions.bool_emp = false;
+        this._booleanOptions.bool_reg = false;
         this._booleanOptions.bool_tab = true;
         this._booleanOptions.bool_inc = false;
         this._booleanOptions.bool_cargo = false;
@@ -122,6 +139,7 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
         this._booleanOptions.bool_suc = false;
         this._booleanOptions.bool_dep = false;
         this._booleanOptions.bool_emp = false;
+        this._booleanOptions.bool_reg = false;
         this._booleanOptions.bool_tab = false;
         this._booleanOptions.bool_inc = true;
         this._booleanOptions.bool_cargo = false;
@@ -131,6 +149,7 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
         this._booleanOptions.bool_suc = false;
         this._booleanOptions.bool_dep = false;
         this._booleanOptions.bool_emp = false;
+        this._booleanOptions.bool_reg = false;
         this._booleanOptions.bool_tab = false;
         this._booleanOptions.bool_inc = false;
         break;
@@ -143,17 +162,18 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
   Filtrar(e, orden: number) {
     switch (orden) {
       case 1: this.reporteService.setFiltroNombreSuc(e); break;
-      case 2: this.reporteService.setFiltroNombreCarg(e); break;
-      case 3: this.reporteService.setFiltroNombreDep(e); break;
-      case 4: this.reporteService.setFiltroCodigo(e); break;
-      case 5: this.reporteService.setFiltroCedula(e); break;
-      case 6: this.reporteService.setFiltroNombreEmp(e); break;
-      case 7: this.reporteService.setFiltroCodigo_tab(e); break;
-      case 8: this.reporteService.setFiltroCedula_tab(e); break;
-      case 9: this.reporteService.setFiltroNombreTab(e); break;
-      case 10: this.reporteService.setFiltroCodigo_inc(e); break;
-      case 11: this.reporteService.setFiltroCedula_inc(e); break;
-      case 12: this.reporteService.setFiltroNombreInc(e); break;
+      case 2: this.reporteService.setFiltroNombreReg(e); break;
+      case 3: this.reporteService.setFiltroNombreCarg(e); break;
+      case 4: this.reporteService.setFiltroNombreDep(e); break;
+      case 5: this.reporteService.setFiltroCodigo(e); break;
+      case 6: this.reporteService.setFiltroCedula(e); break;
+      case 7: this.reporteService.setFiltroNombreEmp(e); break;
+      case 8: this.reporteService.setFiltroCodigo_tab(e); break;
+      case 9: this.reporteService.setFiltroCedula_tab(e); break;
+      case 10: this.reporteService.setFiltroNombreTab(e); break;
+      case 11: this.reporteService.setFiltroCodigo_inc(e); break;
+      case 12: this.reporteService.setFiltroCedula_inc(e); break;
+      case 13: this.reporteService.setFiltroNombreInc(e); break;
       default:
         break;
     }
@@ -183,6 +203,10 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
     if (this._booleanOptions.bool_suc) {
       this.nombre_suc.reset();
       this._booleanOptions.bool_suc = false;
+    }
+    if (this._booleanOptions.bool_reg) {
+      this.nombre_reg.reset();
+      this._booleanOptions.bool_reg = false;
     }
     if (this._booleanOptions.bool_cargo) {
       this.nombre_cargo.reset();

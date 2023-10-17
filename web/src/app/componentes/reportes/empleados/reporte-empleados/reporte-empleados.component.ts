@@ -1,3 +1,4 @@
+// IMPORTAR LIBRERIAS
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MAT_MOMENT_DATE_FORMATS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -6,18 +7,21 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
 import { MatRadioChange } from '@angular/material/radio';
 import { ToastrService } from 'ngx-toastr';
-import { ITableEmpleados } from 'src/app/model/reportes.model';
-import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { IReporteAtrasos } from 'src/app/model/reportes.model';
+import { ITableEmpleados } from 'src/app/model/reportes.model';
 
-import { Router } from '@angular/router';
 
+// IMPORTAR SERVICIOS
+import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
+import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
+import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
 
 @Component({
   selector: 'app-reporte-empleados',
@@ -32,80 +36,150 @@ import { Router } from '@angular/router';
 })
 export class ReporteEmpleadosComponent implements OnInit {
 
+   // METODO QUE INDICA OPCIONES DE BUSQUEDA SELECCIONADOS
+   get bool() {
+    return this.reporteService.criteriosBusqueda;
+  }
+
+  // VARIABLE QUE INDICA NÚMERO DE OPCIONES DE BUSQUEDA
+  get opcion() {
+    return this.reporteService.opcion;
+  }
+
   buscador !: FormGroup;
 
-  respuesta: any[];
-  sucursales: any = [];
-  cargos: any = [];
+  // VARIABLES DE ALMACENAMIENTO DE RESULTADOS
   departamentos: any = [];
+  sucursales: any = [];
+  regimen: any = [];
+  cargos: any = [];
   empleados: any = [];
-  bool_suc: boolean = false;
-  bool_car: boolean = false;
-  bool_dep: boolean = false;
-  bool_emp: boolean = false;
+  respuesta: any[];
+  origen: any = [];
+
+  // VARIABLE DE ALMACENAMIENTO DE DATOS DE PDF
   data_pdf: any = [];
+
+  //VARIABLES PARA MOSTRAR DETALLES
   tipo: string;
   verDetalle: boolean = false;
 
+  // VARIABLES DE ALMACENAMIENTO DE DATOS SELECCIONADOS EN LA BUSQUEDA
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
+  selectionReg = new SelectionModel<any>(true, []);
   selectionCar = new SelectionModel<ITableEmpleados>(true, []);
   selectionDep = new SelectionModel<ITableEmpleados>(true, []);
   selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
 
-  // ITEMS DE PAGINACION DE LA TABLA
-  tamanio_pagina: number = 5;
-  numero_pagina: number = 1;
-  pageSizeOptions = [5, 10, 20, 50];
+  // ITEMS DE PAGINACION DE LA TABLA SUCURSAL
+  numero_pagina_suc: number = 1;
+  tamanio_pagina_suc: number = 5;
+  pageSizeOptions_suc = [5, 10, 20, 50];
 
-  seleccion = new FormControl('');
-  codigo = new FormControl('');
-  cedula = new FormControl('', [Validators.minLength(2)]);
-  nombre_emp = new FormControl('', [Validators.minLength(2)]);
-  nombre_dep = new FormControl('', [Validators.minLength(2)]);
-  nombre_car = new FormControl('', [Validators.minLength(2)]);
-  nombre_suc = new FormControl('', [Validators.minLength(2)]);
+  // ITEMS DE PAGINACION DE LA TABLA REGIMEN
+  numero_pagina_reg: number = 1;
+  tamanio_pagina_reg: number = 5;
+  pageSizeOptions_reg = [5, 10, 20, 50];
 
-  filtroCodigo: number;
-  filtroCedula: '';
-  filtroNombreEmp: '';
-  filtroNombreDep: '';
-  filtroNombreSuc: '';
-  filtroNombreCar: '';
+  // ITEMS DE PAGINACION DE LA TABLA CARGO
+  numero_pagina_car: number = 1;
+  tamanio_pagina_car: number = 5;
+  pageSizeOptions_car = [5, 10, 20, 50];
+
+  // ITEMS DE PAGINACION DE LA TABLA DEPARTAMENTO
+  numero_pagina_dep: number = 1;
+  tamanio_pagina_dep: number = 5;
+  pageSizeOptions_dep = [5, 10, 20, 50];
+
+  // ITEMS DE PAGINACION DE LA TABLA EMPLEADOS
+  numero_pagina_emp: number = 1;
+  tamanio_pagina_emp: number = 5;
+  pageSizeOptions_emp = [5, 10, 20, 50];
+
+  // METODOS PARA BUSQUEDA DE DATOS POR FILTROS SUCURSAL
+  get filtroNombreSuc() {
+    return this.reporteService.filtroNombreSuc;
+  }
+
+  // METODOS PARA BUSQUEDA DE DATOS POR FILTROS REGIMEN
+  get filtroNombreReg() {
+    return this.reporteService.filtroNombreReg;
+  }
+
+  // METODOS PARA BUSQUEDA DE DATOS POR FILTROS CARGOS
+  get filtroNombreCar() {
+    return this.reporteService.filtroNombreCarg;
+  }
+
+  // METODOS PARA BUSQUEDA DE DATOS POR FILTROS DEPARTAMENTO
+  get filtroNombreDep() {
+    return this.reporteService.filtroNombreDep;
+  }
+
+  // METODOS PARA BUSQUEDA DE DATOS POR FILTROS EMPLEADO
+  get filtroCodigo() {
+    return this.reporteService.filtroCodigo;
+  }
+  get filtroCedula() {
+    return this.reporteService.filtroCedula;
+  }
+  get filtroNombreEmp() {
+    return this.reporteService.filtroNombreEmp;
+  }
 
   constructor(
-    private toastr: ToastrService,
-    private R_asistencias: ReportesAsistenciasService,
+    private validacionService: ValidacionesService, // VARIABLE DE VALIDACIONES DE INGRESO DE LETRAS O NÚMEROS
+    private informacion: DatosGeneralesService,
+    private reporteService: ReportesService, // SERVICIO DATOS DE BUSQUEDA GENERALES DE REPORTE
     private restEmpre: EmpresaService,
-    private router: Router,
+    private toastr: ToastrService,
   ) {
     this.ObtenerLogo();
     this.ObtenerColores();
   }
 
   ngOnInit(): void {
-    sessionStorage.removeItem('reporte_emp_activos');
-    this.R_asistencias.DepartamentosByEmplEstado(1).subscribe((res: any[]) => {
-      sessionStorage.setItem('reporte_emp_activos', JSON.stringify(res))
-      this.sucursales = res.map(obj => {
-        return {
-          id: obj.id_suc,
-          nombre: obj.name_suc
-        }
-      }); 
+    this.BuscarInformacion();
+    this.BuscarCargos();
+  }
 
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
+ // METODO DE BUSQUEDA DE DATOS
+ BuscarInformacion() {
+  this.departamentos = [];
+  this.sucursales = [];
+  this.respuesta = [];
+  this.empleados = [];
+  this.regimen = [];
+  this.origen = [];
+  this.informacion.ObtenerInformacion(1).subscribe(
+    (res: any[]) => {
+      this.origen = JSON.stringify(res);
+      sessionStorage.setItem(
+        'reporte_emp_activos',
+        JSON.stringify(res)
+      );
+
+      res.forEach((obj) => {
+        this.sucursales.push({
+          id: obj.id_suc,
+          nombre: obj.name_suc,
+        });
+      });
+
+      res.forEach((obj) => {
+        obj.departamentos.forEach((ele) => {
           this.departamentos.push({
             id: ele.id_depa,
-            nombre: ele.name_dep
-          })
-        })
-      })
+            departamento: ele.name_dep,
+            nombre: ele.sucursal,
+          });
+        });
+      });
 
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
-          ele.empleado.forEach(r => {
-            this.empleados.push({
+      res.forEach((obj) => {
+        obj.departamentos.forEach((ele) => {
+          ele.empleado.forEach((r) => {
+            let elemento = {
               id: r.id,
               nombre: r.name_empleado,
               codigo: r.codigo,
@@ -117,116 +191,138 @@ export class ReporteEmpleadosComponent implements OnInit {
               sucursal: r.sucursal,
               departamento: r.departamento,
               ciudad: r.ciudad,
-              regimen: r.regimen
-            })
-          })
-        })
-      })
-      console.log('SUCURSALES', this.sucursales);
-      console.log('DEPARTAMENTOS', this.departamentos);
-      console.log('EMPLEADOS', this.empleados);
-      this.BuscarCargos();
-      console.log('CARGOS', this.cargos);
+              regimen: r.regimen,
+            };
+            this.empleados.push(elemento);
+          });
+        });
+      });
 
-    }, err => {
-      console.log(' sucursales ' + err.error.message);
-      this.toastr.error(err.error.message, '', {
-        timeOut: 10000,
-      })
-    })
-    
-  }
+      res.forEach((obj) => {
+        obj.departamentos.forEach((ele) => {
+          ele.empleado.forEach((reg) => {
+            reg.regimen.forEach((r) => {
+              this.regimen.push({
+                id: r.id_regimen,
+                nombre: r.name_regimen,
+              });
+            });
+          });
+        });
+      });
 
-  // METODO PARA FILTRAR POR CARGOS
-  empleados_cargos: any = [];
-  origen_cargo: any = [];
-  BuscarCargos() {
-    this.R_asistencias.ObtenerInformacionCargo(1).subscribe((res: any[]) => {
+      this.regimen = this.regimen.filter(
+        (obj, index, self) => index === self.findIndex((o) => o.id === obj.id)
+      );
+    },
+    (err) => {
+      this.toastr.error(err.error.message);
+    }
+  );
+}
+
+// METODO PARA FILTRAR POR CARGOS
+empleados_cargos: any = [];
+origen_cargo: any = [];
+BuscarCargos() {
+  this.empleados_cargos = [];
+  this.origen_cargo = [];
+  this.cargos = [];
+  this.informacion.ObtenerInformacionCargo(1).subscribe(
+    (res: any[]) => {
       this.origen_cargo = JSON.stringify(res);
 
-      console.log('ver res cargo ', res)
-      res.forEach(obj => {
+      res.forEach((obj) => {
         this.cargos.push({
           id: obj.id_cargo,
-          nombre: obj.name_cargo
-        })
-      })
+          nombre: obj.name_cargo,
+        });
+      });
 
-      res.forEach(obj => {
-        obj.empleados.forEach(r => {
+      res.forEach((obj) => {
+        obj.empleados.forEach((r) => {
           this.empleados_cargos.push({
             id: r.id,
             nombre: r.name_empleado,
             codigo: r.codigo,
             cedula: r.cedula,
             correo: r.correo,
-            cargo: r.cargo,
+            ciudad: r.ciudad,
+            id_cargo: r.id_cargo,
             id_contrato: r.id_contrato,
             hora_trabaja: r.hora_trabaja,
-            sucursal: r.sucursal,
-            departamento: r.departamento,
-            ciudad: r.ciudad,
-            regimen: r.regimen,
-          })
-        })
-      })
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
-
-  opcion: number;
-  BuscarPorTipo(e: MatRadioChange) {
-    this.opcion = parseInt(e.value);
-    switch (e.value) {
-      case '1':
-        this.bool_suc = true; this.bool_car = false; this.bool_dep = false; this.bool_emp = false;
-        break;
-      case '2':
-        this.bool_suc = false; this.bool_car = true; this.bool_dep = false; this.bool_emp = false;
-        break;
-      case '3':
-        this.bool_suc = false; this.bool_car = false; this.bool_dep = true; this.bool_emp = false;
-        break;
-      case '4':
-        this.bool_suc = false; this.bool_car = false; this.bool_dep = false; this.bool_emp = true;
-        break;
-      default:
-        this.bool_suc = false; this.bool_car = false; this.bool_dep = false; this.bool_emp = false;
-        break;
+          });
+        });
+      });
+    },
+    (err) => {
+      this.toastr.error(err.error.message);
     }
-  }
+  );
+}
 
-
-  /**
-   * VALIDACIONES REPORT
-   */
+  // VALIDACIONES DE REPORTES
   validacionReporte(action) {
-
-    if (this.bool_suc === false && this.bool_car === false && this.bool_dep === false && this.bool_emp === false) return this.toastr.error('Seleccione un criterio de búsqueda')
-
+    if (
+      this.bool.bool_suc === false &&
+      this.bool.bool_reg === false &&
+      this.bool.bool_cargo === false &&
+      this.bool.bool_dep === false &&
+      this.bool.bool_emp === false
+    )
+      return this.toastr.error('Seleccione un criterio de búsqueda.');
+    console.log('opcion', this.opcion);
     switch (this.opcion) {
-      case 1:
-        if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione sucursal')
+      case 's':
+        if (this.selectionSuc.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione sucursal.'
+          );
         this.ModelarSucursal(action);
         break;
-      case 2:
-        if (this.selectionCar.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione Cargo')
+      case 'r':
+        if (this.selectionReg.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione régimen.'
+          );
+        this.ModelarRegimen(action);
+        break;
+      case 'c':
+        if (this.selectionCar.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno',
+            'Seleccione Cargo'
+          );
         this.ModelarCargo(action);
         break;
-      case 3:
-        if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione departamentos')
+      case 'd':
+        if (this.selectionDep.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione departamentos.'
+          );
         this.ModelarDepartamento(action);
         break;
-      case 4:
-        if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione empleados')
+      case 'e':
+        if (this.selectionEmp.selected.length === 0)
+          return this.toastr.error(
+            'No a seleccionado ninguno.',
+            'Seleccione empleados.'
+          );
         this.ModelarEmpleados(action);
         break;
       default:
-        this.bool_suc = false; this.bool_car = false; this.bool_dep = false; this.bool_emp = false;
+        this.toastr.error(
+          'UPS! Al parecer algo falló.',
+          'Seleccione criterio de búsqueda.'
+        );
+        this.reporteService.DefaultFormCriterios();
         break;
     }
   }
+
 
   ModelarSucursal(accion) {
 
@@ -249,6 +345,47 @@ export class ReporteEmpleadosComponent implements OnInit {
     }
   }
 
+  
+
+  ModelarRegimen(accion) {
+    let respuesta = JSON.parse(
+      sessionStorage.getItem('reporte_vacunas_multiples') as any
+    );
+    let empleados: any = [];
+    let reg: any = [];
+    let objeto: any;
+    respuesta.forEach((obj: any) => {
+      this.selectionReg.selected.find((regimen) => {
+        objeto = {
+          regimen: {
+            id: regimen.id,
+            nombre: regimen.nombre,
+          },
+        };
+        empleados = [];
+        obj.departamentos.forEach((departamento: any) => {
+          departamento.empleado.forEach((empleado: any) => {
+            empleado.regimen.forEach((r) => {
+              if (regimen.id === r.id_regimen) {
+                empleados.push(empleado);
+              }
+            });
+          });
+        });
+        objeto.empleados = empleados;
+        reg.push(objeto);
+      });
+    });
+    console.log('Regimen', reg);
+    this.data_pdf = [];
+    this.data_pdf = reg;
+    switch (accion) {
+      case 'excel': this.exportToExcelCargoRegimen(); break;
+      case 'ver': this.verDatos('reg'); break;
+      default: this.generarPdf(accion); break;
+    }
+  }
+
   ModelarCargo(accion) {
     let respuesta = JSON.parse(this.origen_cargo);
     let car = respuesta.filter(o => {
@@ -262,7 +399,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     this.data_pdf = [];
     this.data_pdf = car;
     switch (accion) {
-      case 'excel': this.exportToExcelCargo(); break;
+      case 'excel': this.exportToExcelCargoRegimen(); break;
       case 'ver': this.verDatos('car'); break;
       default: this.generarPdf(accion); break;
     }
@@ -357,7 +494,7 @@ export class ReporteEmpleadosComponent implements OnInit {
    * 
    *          PDF
    * 
-   *******************************************/
+   *****************************************************/
 
   generarPdf(action) {
     const documentDefinition = this.getDocumentDefinicion();
@@ -426,33 +563,58 @@ export class ReporteEmpleadosComponent implements OnInit {
 
   impresionDatosPDF(data: any[]): Array<any> {
     let n: any = [];
+    let regimen = '';
     let arr_emp: any = [];
 
-    if (this.bool_car === true) {
+    if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
       data.forEach((obj1) => {
         arr_emp = [];
         
-        n.push({
-          style: 'tableMarginSuc',
-          table: {
-            widths: ['*', '*'],
-            body: [
-              [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: 'CARGO: ' + obj1.name_cargo,
-                  style: 'itemsTableInfo'
-                },
-                {
-                  border: [false, true, true, true],
-                  text: 'N° Registros: ' + obj1.empleados.length,
-                  style: 'itemsTableInfo'
-                }
-              ]
-            ]
-          }
-        });
+        if (this.bool.bool_cargo === true) {
+          n.push({
+            style: 'tableMarginSuc',
+            table: {
+              widths: ['*', '*'],
+              body: [
+                [
+                  {
+                    border: [true, true, false, true],
+                    bold: true,
+                    text: 'CARGO: ' + obj1.name_cargo,
+                    style: 'itemsTableInfo',
+                  },
+                  {
+                    border: [false, true, true, true],
+                    text: 'N° Registros: ' + obj1.empleados.length,
+                    style: 'itemsTableInfo',
+                  },
+                ],
+              ],
+            },
+          });
+        } else {
+          n.push({
+            style: 'tableMarginSuc',
+            table: {
+              widths: ['*', '*'],
+              body: [
+                [
+                  {
+                    border: [true, true, false, true],
+                    bold: true,
+                    text: 'RÉGIMEN: ' + obj1.regimen.nombre,
+                    style: 'itemsTableInfo',
+                  },
+                  {
+                    border: [false, true, true, true],
+                    text: 'N° Registros: ' + obj1.empleados.length,
+                    style: 'itemsTableInfo',
+                  },
+                ],
+              ],
+            },
+          });
+        }
 
         obj1.empleados.forEach(obj2 => {
             arr_emp.push(obj2)
@@ -484,7 +646,7 @@ export class ReporteEmpleadosComponent implements OnInit {
                   { style: 'itemsTable', text: obj3.genero },
                   { style: 'itemsTable', text: obj3.ciudad },
                   { style: 'itemsTable', text: obj3.sucursal },
-                  { style: 'itemsTable', text: obj3.regimen },
+                  { style: 'itemsTable', text: this.bool.bool_cargo? obj3.regimen : obj3.regimen[0].name_regimen },
                   { style: 'itemsTable', text: obj3.departamento },
                   { style: 'itemsTable', text: obj3.correo},
                 ]
@@ -502,9 +664,10 @@ export class ReporteEmpleadosComponent implements OnInit {
 
     else {
       data.forEach((obj: IReporteAtrasos) => {
-        if (this.bool_suc === true) {
+        if (this.bool.bool_suc === true) {
           let arr_suc = obj.departamentos.map(o => { return o.empleado.length });
           let suma_suc = this.SumarRegistros(arr_suc);
+          
           arr_emp = [];
           n.push({
             style: 'tableMarginSuc',
@@ -557,13 +720,14 @@ export class ReporteEmpleadosComponent implements OnInit {
                   { text: 'CORREO', style: 'tableHeader' }
                 ],
                 ...arr_emp.map(obj3 => {
+                  obj3.regimen.forEach((r) => (regimen = r.name_regimen));
                   return [
                     { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
                     { style: 'itemsTableCentrado', text: obj3.codigo },
                     { style: 'itemsTable', text: obj3.name_empleado },
                     { style: 'itemsTable', text: obj3.cedula },
                     { style: 'itemsTable', text: obj3.genero },
-                    { style: 'itemsTable', text: obj3.regimen },
+                    { style: 'itemsTable', text: regimen },
                     { style: 'itemsTable', text: obj3.departamento },
                     { style: 'itemsTable', text: obj3.cargo},
                     { style: 'itemsTable', text: obj3.correo},
@@ -579,7 +743,7 @@ export class ReporteEmpleadosComponent implements OnInit {
           });
         }
 
-        if (this.bool_dep === true) {
+        if (this.bool.bool_dep === true) {
 
           n.push({
             style: 'tableMarginSuc',
@@ -646,13 +810,14 @@ export class ReporteEmpleadosComponent implements OnInit {
                     { text: 'CORREO', style: 'tableHeader' }
                   ],
                   ...arr_emp.map(obj3 => {
+                    obj3.regimen.forEach((r) => (regimen = r.name_regimen));
                     return [
                       { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
                       { style: 'itemsTableCentrado', text: obj3.codigo },
                       { style: 'itemsTable', text: obj3.name_empleado },
                       { style: 'itemsTable', text: obj3.cedula },
                       { style: 'itemsTable', text: obj3.genero },
-                      { style: 'itemsTable', text: obj3.regimen },
+                      { style: 'itemsTable', text: regimen },
                       { style: 'itemsTable', text: obj3.cargo },
                       { style: 'itemsTable', text: obj3.correo },
                     ]
@@ -670,7 +835,7 @@ export class ReporteEmpleadosComponent implements OnInit {
 
         }
 
-        if (this.bool_emp === true) {
+        if (this.bool.bool_emp === true) {
           arr_emp = [];
           obj.departamentos.forEach(o => {
             o.empleado.forEach(e => {
@@ -682,7 +847,7 @@ export class ReporteEmpleadosComponent implements OnInit {
       });
     } 
 
-    if (arr_emp.length > 0 && this.bool_emp === true) {
+    if (arr_emp.length > 0 && this.bool.bool_emp === true) {
       n.push({
         style: 'tableMarginEmp',
         table: {
@@ -701,6 +866,7 @@ export class ReporteEmpleadosComponent implements OnInit {
               { text: 'CORREO', style: 'tableHeader' }
             ],
             ...arr_emp.map(obj3 => {
+              obj3.regimen.forEach((r) => (regimen = r.name_regimen));
               return [
                 { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
                 { style: 'itemsTableCentrado', text: obj3.codigo },
@@ -708,7 +874,7 @@ export class ReporteEmpleadosComponent implements OnInit {
                 { style: 'itemsTable', text: obj3.cedula },
                 { style: 'itemsTable', text: obj3.genero },
                 { style: 'itemsTable', text: obj3.sucursal },
-                { style: 'itemsTable', text: obj3.regimen },
+                { style: 'itemsTable', text: regimen },
                 { style: 'itemsTable', text: obj3.departamento },
                 { style: 'itemsTable', text: obj3.cargo },
                 { style: 'itemsTable', text: obj3.correo },
@@ -749,18 +915,18 @@ export class ReporteEmpleadosComponent implements OnInit {
 
   MapingDataPdfDefault(array: Array<any>) {
     let nuevo: Array<any> = [];
-    console.log(array);
     let c=0;
+    let regimen = '';
     array.forEach((obj1: IReporteAtrasos) => {
       obj1.departamentos.forEach(obj2 => {
-        obj2.empleado.forEach(obj3 => {
-          console.log(obj3);
+        obj2.empleado.forEach((obj3:any) => {
+          obj3.regimen.forEach((r) => (regimen = r.name_regimen));
           c = c + 1;
           let ele = {
             'N°': c, 'Código Empleado': obj3.codigo, 'Nombre Empleado': obj3.name_empleado,
             'Cédula': obj3.cedula, 'Género': obj3.genero, 
             'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
-            'Régimen': obj3.regimen,            
+            'Régimen': regimen,            
             'Departamento': obj2.name_dep,
             'Cargo': obj3.cargo,
             'Correo': obj3.correo,
@@ -772,16 +938,16 @@ export class ReporteEmpleadosComponent implements OnInit {
     return nuevo
   }
 
-  exportToExcelCargo(): void {
+  exportToExcelCargoRegimen(): void {
 
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefaultCargo(this.data_pdf));
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefaultCargoRegimen(this.data_pdf));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Empleados Activos');
     xlsx.writeFile(wb, "Usuarios_activos.xlsx");
 
   }
 
-  MapingDataPdfDefaultCargo(array: Array<any>) {
+  MapingDataPdfDefaultCargoRegimen(array: Array<any>) {
     let nuevo: Array<any> = [];
     let c=0;
     array.forEach((obj1) => {
@@ -791,7 +957,7 @@ export class ReporteEmpleadosComponent implements OnInit {
             'N°': c, 'Código Empleado': obj2.codigo, 'Nombre Empleado': obj2.name_empleado,
             'Cédula': obj2.cedula, 'Género': obj2.genero, 
             'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
-            'Régimen': obj2.regimen,            
+            'Régimen': this.bool.bool_cargo? obj2.regimen : obj2.regimen[0].name_regimen,            
             'Departamento': obj2.departamento,
             'Cargo': obj2.cargo,
             'Correo': obj2.correo,
@@ -822,6 +988,29 @@ export class ReporteEmpleadosComponent implements OnInit {
       return `${this.isAllSelectedSuc() ? 'select' : 'deselect'} all`;
     }
     return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedReg() {
+    const numSelected = this.selectionReg.selected.length;
+    return numSelected === this.regimen.length;
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterToggleReg() {
+    this.isAllSelectedReg()
+      ? this.selectionReg.clear()
+      : this.regimen.forEach((row) => this.selectionReg.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
+  checkboxLabelReg(row?: ITableEmpleados): string {
+    if (!row) {
+      return `${this.isAllSelectedReg() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${
+      row.id + 1
+    }`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
@@ -887,101 +1076,56 @@ export class ReporteEmpleadosComponent implements OnInit {
     return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
+  // METODO DE CONTROL DE PAGINACIÓN
   ManejarPagina(e: PageEvent) {
-    this.tamanio_pagina = e.pageSize;
-    this.numero_pagina = e.pageIndex + 1;
+    if (this.bool.bool_suc === true) {
+      this.tamanio_pagina_suc = e.pageSize;
+      this.numero_pagina_suc = e.pageIndex + 1;
+    } else if (this.bool.bool_reg === true) {
+      this.tamanio_pagina_reg = e.pageSize;
+      this.numero_pagina_reg = e.pageIndex + 1;
+    } else if (this.bool.bool_dep === true) {
+      this.tamanio_pagina_dep = e.pageSize;
+      this.numero_pagina_dep = e.pageIndex + 1;
+    } else if (this.bool.bool_cargo === true) {
+      this.tamanio_pagina_dep = e.pageSize;
+      this.numero_pagina_dep = e.pageIndex + 1;
+    } else if (this.bool.bool_emp === true) {
+      this.tamanio_pagina_emp = e.pageSize;
+      this.numero_pagina_emp = e.pageIndex + 1;
+    }
+
   }
+
+    // METODO PARA INGRESAR DATOS DE LETRAS O NÚMEROS
+    IngresarSoloLetras(e) {
+      return this.validacionService.IngresarSoloLetras(e);
+    }
+  
+    IngresarSoloNumeros(evt) {
+      return this.validacionService.IngresarSoloNumeros(evt);
+    }
+  
+    MostrarLista() {
+      if (this.opcion === 's') {
+        /* this.nombre_suc.reset();
+        this.Filtrar('', 1)*/
+      } else if (this.opcion === 'd') {
+        /*this.nombre_dep.reset();
+        this.Filtrar('', 2)*/
+      } else if (this.opcion === 'e') {
+        /* this.codigo.reset();
+        this.cedula.reset();
+        this.nombre_emp.reset();
+        this.Filtrar('', 3)
+        this.Filtrar('', 4)
+        this.Filtrar('', 5)*/
+      }
+    }
 
   /**
    * METODOS PARA CONTROLAR INGRESO DE LETRAS
    */
-
-  IngresarSoloLetras(e) {
-    let key = e.keyCode || e.which;
-    let tecla = String.fromCharCode(key).toString();
-    //Se define todo el abecedario que se va a usar.
-    let letras = " áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-    //Es la validación del KeyCodes, que teclas recibe el campo de texto.
-    let especiales = [8, 37, 39, 46, 6, 13];
-    let tecla_especial = false
-    for (var i in especiales) {
-      if (key == especiales[i]) {
-        tecla_especial = true;
-        break;
-      }
-    }
-    if (letras.indexOf(tecla) == -1 && !tecla_especial) {
-      this.toastr.info('No se admite datos numéricos', 'Usar solo letras', {
-        timeOut: 6000,
-      })
-      return false;
-    }
-  }
-
-  IngresarSoloNumeros(evt) {
-    if (window.event) {
-      var keynum = evt.keyCode;
-    }
-    else {
-      keynum = evt.which;
-    }
-    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
-    if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6) {
-      return true;
-    }
-    else {
-      this.toastr.info('No se admite el ingreso de letras', 'Usar solo números', {
-        timeOut: 6000,
-      })
-      return false;
-    }
-  }
-
-  limpiarCampos() {
-    if (this.bool_emp) {
-      this.codigo.reset();
-      this.cedula.reset();
-      this.nombre_emp.reset();
-      this.bool_emp = false;
-    }
-    if (this.bool_dep) {
-      this.nombre_dep.reset();
-      this.bool_dep = false;
-    }
-    if (this.bool_car) {
-      this.nombre_car.reset();
-      this.bool_car = false;
-    }
-    if (this.bool_suc) {
-      this.nombre_suc.reset();
-      this.bool_suc = false;
-    }
-    this.seleccion.reset();
-  }
-
-
-  MostrarLista() {
-    if (this.opcion === 1) {
-      this.nombre_suc.reset();
-      //this.Filtrar('', 1)
-    }
-    if (this.opcion === 2) {
-      this.nombre_car.reset();
-      //this.Filtrar('', 1)
-    }
-    else if (this.opcion === 3) {
-      this.nombre_dep.reset();
-      // this.Filtrar('', 2)
-    }
-    else if (this.opcion === 4) {
-      this.codigo.reset();
-      this.cedula.reset();
-      this.nombre_emp.reset();
-      /*this.Filtrar('', 3)
-      this.Filtrar('', 4)
-      this.Filtrar('', 5)*/
-    }
-  }
 
   //ENVIAR DATOS A LA VENTANA DE DETALLE
   verDatos(tipo: string) {

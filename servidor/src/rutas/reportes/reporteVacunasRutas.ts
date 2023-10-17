@@ -14,9 +14,8 @@ class ReportesAsistenciasRutas {
         this.router.put('/vacunas-multiples/', TokenValidation, VACUNAS_REPORTE_CONTROLADOR.ReporteVacunasMultiple);
 
 
-        // REPORTE DE VACUNAS MÚLTIPLES
-        this.router.put('/vacunas-multiples-cargos/', TokenValidation, VACUNAS_REPORTE_CONTROLADOR.ReporteVacunasMultipleCargos);
-
+        // REPORTE DE VACUNAS MÚLTIPLES CARGOS
+        this.router.put('/vacunas-multiples-cargos-regimen/', TokenValidation, VACUNAS_REPORTE_CONTROLADOR.ReporteVacunasMultipleCargosRegimen);
     }
 }
 
