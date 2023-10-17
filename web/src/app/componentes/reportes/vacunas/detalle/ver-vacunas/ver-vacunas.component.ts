@@ -24,18 +24,19 @@ import { VacunaMultipleComponent } from '../../vacuna-multiple/vacuna-multiple.c
   styleUrls: ['./ver-vacunas.component.css'],
 })
 export class VerVacunasComponent implements OnInit {
-
   hipervinculo: string = environment.url; // VARIABLE DE MANEJO DE RUTAS CON URL
 
   @Input() data: any;
   @Input() tipo: string;
   @Input() verDetalle: boolean;
   bool_suc: boolean = false;
+  bool_reg: boolean = false;
   bool_car: boolean = false;
   bool_dep: boolean = false;
   bool_emp: boolean = false;
 
   arr_suc: any = [];
+  arr_reg: any = [];
   arr_car: any = [];
   arr_dep: any = [];
   arr_emp: any = [];
@@ -56,7 +57,7 @@ export class VerVacunasComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private restEmpre: EmpresaService,
-    private vacuna: VacunaMultipleComponent,
+    private vacuna: VacunaMultipleComponent
   ) {
     this.ObtenerLogo();
     this.ObtenerColores();
@@ -70,20 +71,31 @@ export class VerVacunasComponent implements OnInit {
     switch (tipo) {
       case 'suc':
         this.bool_suc = true;
+        this.bool_reg = false;
         this.bool_car = false;
         this.bool_dep = false;
         this.bool_emp = false;
         this.extraerDatos();
         break;
+      case 'reg':
+        this.bool_suc = false;
+        this.bool_reg = true;
+        this.bool_car = false;
+        this.bool_dep = false;
+        this.bool_emp = false;
+        this.extraerDatosCargosRegimen();
+        break;
       case 'car':
         this.bool_suc = false;
+        this.bool_reg = false;
         this.bool_car = true;
         this.bool_dep = false;
         this.bool_emp = false;
-        this.extraerDatosCargos();
+        this.extraerDatosCargosRegimen();
         break;
       case 'dep':
         this.bool_suc = false;
+        this.bool_reg = false;
         this.bool_car = false;
         this.bool_dep = true;
         this.bool_emp = false;
@@ -91,6 +103,7 @@ export class VerVacunasComponent implements OnInit {
         break;
       case 'emp':
         this.bool_suc = false;
+        this.bool_reg = false;
         this.bool_car = false;
         this.bool_dep = false;
         this.bool_emp = true;
@@ -98,6 +111,7 @@ export class VerVacunasComponent implements OnInit {
         break;
       default:
         this.bool_suc = false;
+        this.bool_reg = false;
         this.bool_car = false;
         this.bool_dep = false;
         this.bool_emp = false;
@@ -136,11 +150,10 @@ export class VerVacunasComponent implements OnInit {
           });
         });
       });
-      console.log('SUC', this.arr_vac);
     });
   }
 
-  extraerDatosCargos() {
+  extraerDatosCargosRegimen() {
     this.arr_vac = [];
     let n = 0;
     this.data.forEach((obj1: any) => {
@@ -166,7 +179,6 @@ export class VerVacunasComponent implements OnInit {
             descripcion: obj3.descripcion,
           };
           this.arr_vac.push(ele);
-          console.log('ver arra_vac ', this.arr_vac)
         });
       });
     });
@@ -179,10 +191,10 @@ export class VerVacunasComponent implements OnInit {
   }
 
   descargarReporte(accion: any) {
-    if (this.bool_car) {
+    if (this.bool_car || this.bool_reg) {
       switch (accion) {
         case 'excel':
-          this.exportToExcelCargo();
+          this.exportToExcelCargoRegimen();
           break;
         default:
           this.generarPdf(accion);
@@ -351,29 +363,53 @@ export class VerVacunasComponent implements OnInit {
   impresionDatosPDF(data: any[]): Array<any> {
     let n: any = [];
 
-    if (this.bool_car === true) {
+    if (this.bool_car === true || this.bool_reg === true) {
       data.forEach((obj1) => {
-        n.push({
-          style: 'tableMarginSuc',
-          table: {
-            widths: ['*', '*'],
-            body: [
-              [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: 'CARGO: ' + obj1.name_cargo,
-                  style: 'itemsTableInfo',
-                },
-                {
-                  border: [false, true, true, true],
-                  text: 'N° Registros: ' + obj1.empleados.length,
-                  style: 'itemsTableInfo',
-                },
+        if (this.bool_car === true) {
+          n.push({
+            style: 'tableMarginSuc',
+            table: {
+              widths: ['*', '*'],
+              body: [
+                [
+                  {
+                    border: [true, true, false, true],
+                    bold: true,
+                    text: 'CARGO: ' + obj1.name_cargo,
+                    style: 'itemsTableInfo',
+                  },
+                  {
+                    border: [false, true, true, true],
+                    text: 'N° Registros: ' + obj1.empleados.length,
+                    style: 'itemsTableInfo',
+                  },
+                ],
               ],
-            ],
-          },
-        });
+            },
+          });
+        } else {
+          n.push({
+            style: 'tableMarginSuc',
+            table: {
+              widths: ['*', '*'],
+              body: [
+                [
+                  {
+                    border: [true, true, false, true],
+                    bold: true,
+                    text: 'RÉGIMEN: ' + obj1.regimen.nombre,
+                    style: 'itemsTableInfo',
+                  },
+                  {
+                    border: [false, true, true, true],
+                    text: 'N° Registros: ' + obj1.empleados.length,
+                    style: 'itemsTableInfo',
+                  },
+                ],
+              ],
+            },
+          });
+        }
 
         obj1.empleados.forEach((obj2: any) => {
           n.push({
@@ -414,7 +450,10 @@ export class VerVacunasComponent implements OnInit {
                 ],
                 ...obj2.vacunas.map((obj3) => {
                   return [
-                    { style: 'itemsTableCentrado', text: obj2.vacunas.indexOf(obj3)+1 },
+                    {
+                      style: 'itemsTableCentrado',
+                      text: obj2.vacunas.indexOf(obj3) + 1,
+                    },
                     { style: 'itemsTable', text: obj3.tipo_vacuna },
                     { style: 'itemsTable', text: obj3.fecha.split('T')[0] },
                     { style: 'itemsTable', text: obj3.descripcion },
@@ -523,7 +562,10 @@ export class VerVacunasComponent implements OnInit {
                   ],
                   ...obj2.vacunas.map((obj3) => {
                     return [
-                      { style: 'itemsTableCentrado', text: obj2.vacunas.indexOf(obj3)+1 },
+                      {
+                        style: 'itemsTableCentrado',
+                        text: obj2.vacunas.indexOf(obj3) + 1,
+                      },
                       { style: 'itemsTable', text: obj3.tipo_vacuna },
                       { style: 'itemsTable', text: obj3.fecha.split('T')[0] },
                       { style: 'itemsTable', text: obj3.descripcion },
@@ -561,15 +603,17 @@ export class VerVacunasComponent implements OnInit {
     );
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Vacunas');
-    xlsx.writeFile(wb, 'Vacunas ' + new Date().getTime() + '.xlsx');
+    xlsx.writeFile(wb, 'Vacunas.xlsx');
   }
 
   MapingDataPdfDefault(array: Array<any>) {
     let nuevo: Array<any> = [];
     let c = 0;
+    let regimen = '';
     array.forEach((obj1: ReporteVacunas) => {
       obj1.departamentos.forEach((obj2) => {
         obj2.empleado.forEach((obj3: any) => {
+          obj3.regimen.forEach(r=> regimen=r.name_regimen);
           obj3.vacunas.forEach((obj4: vacuna) => {
             c = c + 1;
             let ele = {
@@ -580,7 +624,7 @@ export class VerVacunasComponent implements OnInit {
               Género: obj3.genero,
               Ciudad: obj1.ciudad,
               Sucursal: obj1.name_suc,
-              Régimen: obj3.regimen,
+              Régimen: regimen,
               Departamento: obj2.name_dep,
               Cargo: obj3.cargo,
               Correo: obj3.correo,
@@ -598,21 +642,19 @@ export class VerVacunasComponent implements OnInit {
     return nuevo;
   }
 
-  exportToExcelCargo(): void {
-    console.log('dats p', this.data);
+  exportToExcelCargoRegimen(): void {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(
-      this.MapingDataPdfDefaultCargo(this.data)
+      this.MapingDataPdfDefaultCargoRegimen(this.data)
     );
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Vacunas');
-    xlsx.writeFile(wb, 'Vacunas ' + new Date().getTime() + '.xlsx');
+    xlsx.writeFile(wb, 'Vacunas.xlsx');
   }
 
-  MapingDataPdfDefaultCargo(array: Array<any>) {
+  MapingDataPdfDefaultCargoRegimen(array: Array<any>) {
     let nuevo: Array<any> = [];
     let c = 0;
     array.forEach((obj) => {
-      console.log('obj', obj);
       obj.empleados.forEach((obj2) => {
         obj2.vacunas.forEach((obj3) => {
           c = c + 1;
@@ -624,7 +666,7 @@ export class VerVacunasComponent implements OnInit {
             Género: obj2.genero,
             Ciudad: obj2.ciudad,
             Sucursal: obj2.sucursal,
-            Régimen: obj2.regimen,
+            Régimen: this.bool_car? obj2.regimen : obj2.regimen[0].name_regimen,
             Departamento: obj2.departamento,
             Cargo: obj2.cargo,
             Correo: obj2.correo,
@@ -642,8 +684,7 @@ export class VerVacunasComponent implements OnInit {
     return nuevo;
   }
 
-  regresar(){
+  regresar() {
     this.vacuna.verDetalle = false;
   }
-
 }

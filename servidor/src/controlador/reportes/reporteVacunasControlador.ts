@@ -42,7 +42,7 @@ class ReportesVacunasControlador {
 
     }
 
-    public async ReporteVacunasMultipleCargos(req: Request, res: Response) {
+    public async ReporteVacunasMultipleCargosRegimen(req: Request, res: Response) {
         console.log('datos recibidos', req.body)
         let datos: any[] = req.body;
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {      

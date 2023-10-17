@@ -537,7 +537,7 @@ export class TimbreMultipleComponent implements OnInit {
   // CONSULTA DE LOS DATOS REGIMEN
   ModelarRegimen(id: number) {
     let usuarios: any = [];
-    let respuesta = JSON.parse(this.origen)
+    let respuesta = JSON.parse(this.origen);
     if (id === 0) {
       respuesta.forEach((obj: any) => {
         obj.departamentos.forEach((obj1: any) => {

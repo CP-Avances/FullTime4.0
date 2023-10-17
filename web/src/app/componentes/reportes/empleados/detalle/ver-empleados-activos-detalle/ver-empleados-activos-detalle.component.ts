@@ -21,6 +21,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
   @Input() tipo: string;
   @Input() verDetalle: boolean;
   bool_suc: boolean = false;
+  bool_reg: boolean = false;
   bool_car: boolean = false;
   bool_dep: boolean = false;
   bool_emp: boolean = false;
@@ -40,7 +41,6 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
   logo: any = String;
 
   constructor(
-    private route: ActivatedRoute,
     private restEmpre: EmpresaService,
     private reporte: ReporteEmpleadosComponent
   ) {
@@ -56,20 +56,31 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
     switch (tipo) {
       case 'suc':
         this.bool_suc = true;
+        this.bool_reg = false;
         this.bool_car = false;
         this.bool_dep = false;
         this.bool_emp = false;
         this.extraerDatos();
         break;
+      case 'reg':
+        this.bool_suc = false;
+        this.bool_reg = true;
+        this.bool_car = false;
+        this.bool_dep = false;
+        this.bool_emp = false;
+        this.extraerDatosCargosRegimen();
+        break;
       case 'car':
         this.bool_suc = false;
+        this.bool_reg = false;
         this.bool_car = true;
         this.bool_dep = false;
         this.bool_emp = false;
-        this.extraerDatosCargos();
+        this.extraerDatosCargosRegimen();
         break;
       case 'dep':
         this.bool_suc = false;
+        this.bool_reg = false;
         this.bool_car = false;
         this.bool_dep = true;
         this.bool_emp = false;
@@ -77,6 +88,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
         break;
       case 'emp':
         this.bool_suc = false;
+        this.bool_reg = false;
         this.bool_car = false;
         this.bool_dep = false;
         this.bool_emp = true;
@@ -84,6 +96,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
         break;
       default:
         this.bool_suc = false;
+        this.bool_reg = false;
         this.bool_car = false;
         this.bool_dep = false;
         this.bool_emp = false;
@@ -105,7 +118,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
     });
   }
 
-  extraerDatosCargos() {
+  extraerDatosCargosRegimen() {
     this.arr_emp = [];
     let n = 0;
     this.data.forEach((obj: any) => {
@@ -124,10 +137,10 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
   }
 
   descargarReporte(accion: any) {
-    if (this.bool_car) {
+    if (this.bool_car || this.bool_reg) {
       switch (accion) {
         case 'excel':
-          this.exportToExcelCargo();
+          this.exportToExcelCargoRegimen();
           break;
         default:
           this.generarPdf(accion);
@@ -281,36 +294,59 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
   }
 
   impresionDatosPDF(data: any[]): Array<any> {
-    let n: any = []
+    let n: any = [];
+    let regimen = '';
     let arr_emp: any = [];
 
-    if (this.bool_car === true) {
+    if (this.bool_car === true || this.bool_reg === true) {
       data.forEach((obj1) => {
-        // let array_car = obj1.empleados.map(o => {return o.empleados.length});
-        arr_emp= [];
-
+        arr_emp = [];
         
-        n.push({
-          style: 'tableMarginSuc',
-          table: {
-            widths: ['*', '*'],
-            body: [
-              [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: 'CARGO: ' + obj1.name_cargo,
-                  style: 'itemsTableInfo'
-                },
-                {
-                  border: [false, true, true, true],
-                  text: 'N° Registros: ' + obj1.empleados.length,
-                  style: 'itemsTableInfo'
-                }
-              ]
-            ]
-          }
-        });
+        if (this.bool_car === true) {
+          n.push({
+            style: 'tableMarginSuc',
+            table: {
+              widths: ['*', '*'],
+              body: [
+                [
+                  {
+                    border: [true, true, false, true],
+                    bold: true,
+                    text: 'CARGO: ' + obj1.name_cargo,
+                    style: 'itemsTableInfo',
+                  },
+                  {
+                    border: [false, true, true, true],
+                    text: 'N° Registros: ' + obj1.empleados.length,
+                    style: 'itemsTableInfo',
+                  },
+                ],
+              ],
+            },
+          });
+        } else {
+          n.push({
+            style: 'tableMarginSuc',
+            table: {
+              widths: ['*', '*'],
+              body: [
+                [
+                  {
+                    border: [true, true, false, true],
+                    bold: true,
+                    text: 'RÉGIMEN: ' + obj1.regimen.nombre,
+                    style: 'itemsTableInfo',
+                  },
+                  {
+                    border: [false, true, true, true],
+                    text: 'N° Registros: ' + obj1.empleados.length,
+                    style: 'itemsTableInfo',
+                  },
+                ],
+              ],
+            },
+          });
+        }
 
         obj1.empleados.forEach(obj2 => {
             arr_emp.push(obj2)
@@ -336,13 +372,13 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
               ...arr_emp.map(obj3 => {
                 return [
                   { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
-                  { style: 'itemsTableCentrado', text: obj3.codigo },
+                  { style: 'itemsTableCentrado', text: obj3.codigo},
                   { style: 'itemsTable', text: obj3.name_empleado },
                   { style: 'itemsTable', text: obj3.cedula },
                   { style: 'itemsTable', text: obj3.genero },
                   { style: 'itemsTable', text: obj3.ciudad },
                   { style: 'itemsTable', text: obj3.sucursal },
-                  { style: 'itemsTable', text: obj3.regimen },
+                  { style: 'itemsTable', text: this.bool_car? obj3.regimen : obj3.regimen[0].name_regimen },
                   { style: 'itemsTable', text: obj3.departamento },
                   { style: 'itemsTable', text: obj3.correo},
                 ]
@@ -360,10 +396,10 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
 
     else {
       data.forEach((obj: IReporteAtrasos) => {
-
         if (this.bool_suc === true) {
           let arr_suc = obj.departamentos.map(o => { return o.empleado.length });
           let suma_suc = this.SumarRegistros(arr_suc);
+          
           arr_emp = [];
           n.push({
             style: 'tableMarginSuc',
@@ -399,6 +435,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
           })
 
           n.push({
+            
             style: 'tableMarginEmp',
             table: {
               widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
@@ -415,13 +452,14 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
                   { text: 'CORREO', style: 'tableHeader' }
                 ],
                 ...arr_emp.map(obj3 => {
+                  obj3.regimen.forEach((r) => (regimen = r.name_regimen));
                   return [
                     { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
                     { style: 'itemsTableCentrado', text: obj3.codigo },
                     { style: 'itemsTable', text: obj3.name_empleado },
                     { style: 'itemsTable', text: obj3.cedula },
                     { style: 'itemsTable', text: obj3.genero },
-                    { style: 'itemsTable', text: obj3.regimen },
+                    { style: 'itemsTable', text: regimen },
                     { style: 'itemsTable', text: obj3.departamento },
                     { style: 'itemsTable', text: obj3.cargo},
                     { style: 'itemsTable', text: obj3.correo},
@@ -504,13 +542,14 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
                     { text: 'CORREO', style: 'tableHeader' }
                   ],
                   ...arr_emp.map(obj3 => {
+                    obj3.regimen.forEach((r) => (regimen = r.name_regimen));
                     return [
                       { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
                       { style: 'itemsTableCentrado', text: obj3.codigo },
                       { style: 'itemsTable', text: obj3.name_empleado },
                       { style: 'itemsTable', text: obj3.cedula },
                       { style: 'itemsTable', text: obj3.genero },
-                      { style: 'itemsTable', text: obj3.regimen },
+                      { style: 'itemsTable', text: regimen },
                       { style: 'itemsTable', text: obj3.cargo },
                       { style: 'itemsTable', text: obj3.correo },
                     ]
@@ -559,6 +598,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
               { text: 'CORREO', style: 'tableHeader' }
             ],
             ...arr_emp.map(obj3 => {
+              obj3.regimen.forEach((r) => (regimen = r.name_regimen));
               return [
                 { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
                 { style: 'itemsTableCentrado', text: obj3.codigo },
@@ -566,7 +606,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
                 { style: 'itemsTable', text: obj3.cedula },
                 { style: 'itemsTable', text: obj3.genero },
                 { style: 'itemsTable', text: obj3.sucursal },
-                { style: 'itemsTable', text: obj3.regimen },
+                { style: 'itemsTable', text: regimen },
                 { style: 'itemsTable', text: obj3.departamento },
                 { style: 'itemsTable', text: obj3.cargo },
                 { style: 'itemsTable', text: obj3.correo },
@@ -609,16 +649,17 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
     let nuevo: Array<any> = [];
     console.log(array);
     let c=0;
+    let regimen = '';
     array.forEach((obj1: IReporteAtrasos) => {
       obj1.departamentos.forEach(obj2 => {
-        obj2.empleado.forEach(obj3 => {
-          console.log(obj3);
+        obj2.empleado.forEach((obj3:any) => {
+          obj3.regimen.forEach((r) => (regimen = r.name_regimen));
           c = c + 1;
           let ele = {
             'N°': c, 'Código Empleado': obj3.codigo, 'Nombre Empleado': obj3.name_empleado,
             'Cédula': obj3.cedula, 'Género': obj3.genero, 
             'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
-            'Régimen': obj3.regimen,            
+            'Régimen': regimen,            
             'Departamento': obj2.name_dep,
             'Cargo': obj3.cargo,
             'Correo': obj3.correo,
@@ -630,16 +671,16 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
     return nuevo
   }
 
-  exportToExcelCargo(): void {
+  exportToExcelCargoRegimen(): void {
 
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefaultCargo(this.data));
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefaultCargoRegimen(this.data));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'Empleados Activos');
-    xlsx.writeFile(wb, "Empleados Activos " + new Date().getTime() + '.xlsx');
+    xlsx.utils.book_append_sheet(wb, wsr, 'Usuarios Activos');
+    xlsx.writeFile(wb, "Usuarios_activos.xlsx");
 
   }
 
-  MapingDataPdfDefaultCargo(array: Array<any>) {
+  MapingDataPdfDefaultCargoRegimen(array: Array<any>) {
     let nuevo: Array<any> = [];
     let c=0;
     array.forEach((obj1) => {
@@ -649,7 +690,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
             'N°': c, 'Código Empleado': obj2.codigo, 'Nombre Empleado': obj2.name_empleado,
             'Cédula': obj2.cedula, 'Género': obj2.genero, 
             'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
-            'Régimen': obj2.regimen,            
+            'Régimen': this.bool_car? obj2.regimen : obj2.regimen[0].name_regimen,            
             'Departamento': obj2.departamento,
             'Cargo': obj2.cargo,
             'Correo': obj2.correo,
