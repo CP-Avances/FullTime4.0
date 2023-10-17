@@ -303,7 +303,14 @@ class PermisosControlador {
         if (archivo != 'null' && archivo != '' && archivo != null) {
             if (archivo != documento) {
                 let ruta = await ObtenerRutaPermisos(codigo) + separador + archivo;
-                fs.unlinkSync(ruta);
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs.access(ruta, fs.constants.F_OK, (err) => {
+                    if (err) {
+                    } else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs.unlinkSync(ruta);
+                    }
+                });
             }
         }
     }
@@ -325,7 +332,14 @@ class PermisosControlador {
 
         if (archivo != 'null' && archivo != '' && archivo != null) {
             let ruta = await ObtenerRutaPermisos(codigo) + separador + archivo;
-            fs.unlinkSync(ruta);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs.access(ruta, fs.constants.F_OK, (err) => {
+                if (err) {
+                } else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs.unlinkSync(ruta);
+                }
+            });
         }
     }
 
@@ -400,7 +414,14 @@ class PermisosControlador {
         if (doc != 'null' && doc != '' && doc != null) {
             console.log(id_permiso, doc, ' entra ');
             let ruta = await ObtenerRutaPermisos(codigo) + separador + doc;
-            fs.unlinkSync(ruta);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs.access(ruta, fs.constants.F_OK, (err) => {
+                if (err) {
+                } else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs.unlinkSync(ruta);
+                }
+            });
         }
 
         const [objetoPermiso] = response.rows;
@@ -891,7 +912,7 @@ class PermisosControlador {
     }
 
 
-// verificar estado
+    // verificar estado
     public async ListarPermisosAutorizados(req: Request, res: Response) {
         const PERMISOS = await pool.query('SELECT p.id, p.fec_creacion, p.descripcion, p.fec_inicio, ' +
             'p.documento,  p.fec_final, p.estado, p.id_empl_cargo, e.id AS id_emple_solicita, e.nombre, e.apellido, (e.nombre || \' \' || e.apellido) AS fullname, ' +
@@ -1007,7 +1028,14 @@ class PermisosControlador {
         let separador = path.sep;
         if (documento != 'null' && documento != '' && documento != null) {
             let ruta = await ObtenerRutaPermisos(codigo) + separador + documento;
-            fs.unlinkSync(ruta);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs.access(ruta, fs.constants.F_OK, (err) => {
+                if (err) {
+                } else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs.unlinkSync(ruta);
+                }
+            });
         }
         res.jsonp({ message: 'ok' });
     }

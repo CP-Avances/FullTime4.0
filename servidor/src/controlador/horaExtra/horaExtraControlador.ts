@@ -253,7 +253,7 @@ class HorasExtrasPedidasControlador {
       ecn.id_empleado = e.id AND 
       e.id = c.id_empleado
       `, [depa_user_loggin])
-        .then((result: any)=> {
+        .then((result: any) => {
           return result.rows
         })
 
@@ -400,7 +400,14 @@ class HorasExtrasPedidasControlador {
     if (documento != 'null' && documento != '' && documento != null) {
       let filePath = `servidor\\horasExtras\\${documento}`
       let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-      fs.unlinkSync(direccionCompleta);
+      // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+      fs.access(direccionCompleta, fs.constants.F_OK, (err) => {
+        if (err) {
+        } else {
+          // ELIMINAR DEL SERVIDOR
+          fs.unlinkSync(direccionCompleta);
+        }
+      });
     }
 
     const [objetoHoraExtra] = response.rows;
@@ -561,7 +568,14 @@ class HorasExtrasPedidasControlador {
     if (documento != 'null' && documento != '' && documento != null) {
       let filePath = `servidor\\horasExtras\\${documento}`
       let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-      fs.unlinkSync(direccionCompleta);
+      // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+      fs.access(direccionCompleta, fs.constants.F_OK, (err) => {
+        if (err) {
+        } else {
+          // ELIMINAR DEL SERVIDOR
+          fs.unlinkSync(direccionCompleta);
+        }
+      });
     }
 
     res.jsonp({ message: 'Documento Actualizado' });
@@ -573,7 +587,14 @@ class HorasExtrasPedidasControlador {
     if (documento != 'null' && documento != '' && documento != null) {
       let filePath = `servidor\\horasExtras\\${documento}`
       let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-      fs.unlinkSync(direccionCompleta);
+       // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+       fs.access(direccionCompleta, fs.constants.F_OK, (err) => {
+        if (err) {
+        } else {
+          // ELIMINAR DEL SERVIDOR
+          fs.unlinkSync(direccionCompleta);
+        }
+      });
     }
     res.jsonp({ message: 'ok' });
   }

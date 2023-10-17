@@ -269,7 +269,15 @@ class PermisosControlador {
             if (archivo != 'null' && archivo != '' && archivo != null) {
                 if (archivo != documento) {
                     let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo)) + separador + archivo;
-                    fs_1.default.unlinkSync(ruta);
+                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                    fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                        if (err) {
+                        }
+                        else {
+                            // ELIMINAR DEL SERVIDOR
+                            fs_1.default.unlinkSync(ruta);
+                        }
+                    });
                 }
             }
         });
@@ -286,7 +294,15 @@ class PermisosControlador {
             res.jsonp({ message: 'Documento eliminado.' });
             if (archivo != 'null' && archivo != '' && archivo != null) {
                 let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo)) + separador + archivo;
-                fs_1.default.unlinkSync(ruta);
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                    }
+                    else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs_1.default.unlinkSync(ruta);
+                    }
+                });
             }
         });
     }
@@ -352,7 +368,15 @@ class PermisosControlador {
             if (doc != 'null' && doc != '' && doc != null) {
                 console.log(id_permiso, doc, ' entra ');
                 let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo)) + separador + doc;
-                fs_1.default.unlinkSync(ruta);
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                    }
+                    else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs_1.default.unlinkSync(ruta);
+                    }
+                });
             }
             const [objetoPermiso] = response.rows;
             if (objetoPermiso) {
@@ -917,7 +941,15 @@ class PermisosControlador {
             let separador = path_1.default.sep;
             if (documento != 'null' && documento != '' && documento != null) {
                 let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo)) + separador + documento;
-                fs_1.default.unlinkSync(ruta);
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                    }
+                    else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs_1.default.unlinkSync(ruta);
+                    }
+                });
             }
             res.jsonp({ message: 'ok' });
         });

@@ -1,7 +1,7 @@
 // IMPORTAR LIBRERIAS
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup } from '@angular/forms';
-import { Component, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
@@ -67,7 +67,6 @@ import { CancelarPermisoComponent } from '../../rolEmpleado/permisos-empleado/ca
 import { EditarEmpleadoComponent } from '../datos-empleado/editar-empleado/editar-empleado.component';
 import { FraseSeguridadComponent } from '../../administracionGeneral/frase-seguridad/frase-seguridad/frase-seguridad.component';
 import { TituloEmpleadoComponent } from '../titulos/titulo-empleado/titulo-empleado.component';
-import { EditarContratoComponent } from '../contrato/editar-contrato/editar-contrato.component';
 import { PlanHoraExtraComponent } from '../../modulos/horasExtras/planificacionHoraExtra/plan-hora-extra/plan-hora-extra.component';
 import { DiscapacidadComponent } from '../discapacidad/discapacidad.component';
 import { EditarTituloComponent } from '../titulos/editar-titulo/editar-titulo.component';
@@ -82,7 +81,6 @@ import { AutorizacionService } from 'src/app/servicios/autorizacion/autorizacion
 import { MatDatepicker } from '@angular/material/datepicker';
 import { default as _rollupMoment, Moment } from 'moment';
 
-
 @Component({
   selector: 'app-ver-empleado',
   templateUrl: './ver-empleado.component.html',
@@ -91,7 +89,6 @@ import { default as _rollupMoment, Moment } from 'moment';
 
 export class VerEmpleadoComponent implements OnInit {
 
-  @ViewChild('tabla1') tabla1: ElementRef;
   @ViewChild('tabla2') tabla2: ElementRef;
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS CONSULTADOS
@@ -164,7 +161,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.idEmpleado = cadena.split("/")[2];
     this.scriptService.load('pdfMake', 'vfsFonts');
 
-    console.log('cadena: ',cadena);
+    console.log('cadena: ', cadena);
   }
 
   ngOnInit(): void {
@@ -345,19 +342,26 @@ export class VerEmpleadoComponent implements OnInit {
       var empleado = data[0].nombre + data[0].apellido;
       if (data[0].imagen != null) {
         this.urlImagen = `${environment.url}/empleado/img/` + data[0].id + '/' + data[0].imagen;
-        this.restEmpleado.obtenerImagen(data[0].id,data[0].imagen).subscribe(data=>{
-          this.imagenEmpleado = 'data:image/jpeg;base64,' + data.imagen;
+        this.restEmpleado.obtenerImagen(data[0].id, data[0].imagen).subscribe(data => {
+          console.log('ver imagen data ', data)
+          if (data.imagen != 0) {
+            this.imagenEmpleado = 'data:image/jpeg;base64,' + data.imagen;
+          }
+          else {
+            this.ImagenLocalUsuario("assets/imagenes/user.png").then(
+              (result) => (this.imagenEmpleado = result)
+            );
+          }
         });
-        console.log('ver urlImagen ', this.urlImagen)
+        //console.log('ver urlImagen ', this.urlImagen)
         this.mostrarImagen = true;
         this.textoBoton = 'Editar foto';
       } else {
         this.iniciales = data[0].nombre.split(" ")[0].slice(0, 1) + data[0].apellido.split(" ")[0].slice(0, 1);
         this.mostrarImagen = false;
         this.textoBoton = 'Subir foto';
-        this.getImageDataUrlFromLocalPath1("assets/imagenes/user.png").then(
+        this.ImagenLocalUsuario("assets/imagenes/user.png").then(
           (result) => (this.imagenEmpleado = result)
-          
         );
       }
       this.MapGeolocalizar(data[0].latitud, data[0].longitud, empleado);
@@ -369,7 +373,7 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   // METODO PARA MOSTRAR IMAGEN EN PDF
-  getImageDataUrlFromLocalPath1(localPath: string): Promise<string> {
+  ImagenLocalUsuario(localPath: string): Promise<string> {
     return new Promise((resolve, reject) => {
       let canvas = document.createElement('canvas');
       let img = new Image();
@@ -383,7 +387,7 @@ export class VerEmpleadoComponent implements OnInit {
       img.onerror = () => reject('Imagen no disponible')
       img.src = localPath;
     });
-} 
+  }
 
   // METODO PARA VER UBICACION EN EL MAPA
   MARKER: any;
@@ -2710,12 +2714,12 @@ export class VerEmpleadoComponent implements OnInit {
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
-      case 'download': pdfMake.createPdf(documentDefinition).download( this.empleadoUno[0].nombre + '_' + this.empleadoUno[0].apellido + '.pdf'); break;
+      case 'download': pdfMake.createPdf(documentDefinition).download(this.empleadoUno[0].nombre + '_' + this.empleadoUno[0].apellido + '.pdf'); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
   }
 
-  GetDocumentDefinicion() {  
+  GetDocumentDefinicion() {
     let estadoCivil = this.EstadoCivilSelect[this.empleadoUno[0].esta_civil - 1];
     let genero = this.GeneroSelect[this.empleadoUno[0].genero - 1];
     let estado = this.EstadoSelect[this.empleadoUno[0].estado - 1];
@@ -2753,10 +2757,12 @@ export class VerEmpleadoComponent implements OnInit {
       },
       content: [
         { image: this.logoE, width: 150, margin: [10, -30, 0, 5] },
-        { text: (this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido).toUpperCase(), 
+        {
+          text: (this.empleadoUno[0].nombre + ' ' + this.empleadoUno[0].apellido).toUpperCase(),
           bold: true, fontSize: 14,
-          alignment: 'left', 
-          margin: [0, 15, 0, 18] },
+          alignment: 'left',
+          margin: [0, 15, 0, 18]
+        },
         {
           columns: [
             [
@@ -2778,9 +2784,9 @@ export class VerEmpleadoComponent implements OnInit {
             ],
           ]
         },
-        { text: (this.discapacidadUser.length>0?'DISCAPACIDAD':''), style: 'header' },
+        { text: (this.discapacidadUser.length > 0 ? 'DISCAPACIDAD' : ''), style: 'header' },
         this.PresentarDataPDFdiscapacidadEmpleado(),
-        { text: (this.tituloEmpleado.length>0?'TÍTULOS':''), style: 'header' },
+        { text: (this.tituloEmpleado.length > 0 ? 'TÍTULOS' : ''), style: 'header' },
         this.PresentarDataPDFtitulosEmpleado(),
         { text: 'CONTRATO', style: 'header' },
         this.PresentarDataPDFcontratoEmpleado(),
@@ -2794,17 +2800,17 @@ export class VerEmpleadoComponent implements OnInit {
         keywords: 'Perfil, Empleado',
       },
       styles: {
-        header: { fontSize: 14, bold: true, margin: [0, 20, 0, 10]},
+        header: { fontSize: 14, bold: true, margin: [0, 20, 0, 10] },
         name: { fontSize: 14, bold: true },
-        item: {fontSize: 12, bold: false},
-        tableHeader: {fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        tableCell: {fontSize: 12, alignment: 'center',},
+        item: { fontSize: 12, bold: false },
+        tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
+        tableCell: { fontSize: 12, alignment: 'center', },
       }
     };
   }
 
   PresentarDataPDFtitulosEmpleado() {
-    if (this.tituloEmpleado.length>0) {
+    if (this.tituloEmpleado.length > 0) {
       return {
         table: {
           widths: ['*', '*'],
@@ -2814,7 +2820,7 @@ export class VerEmpleadoComponent implements OnInit {
               { text: 'NIVEL', style: 'tableHeader' }
             ],
             ...this.tituloEmpleado.map(obj => {
-              return [ {text:obj.nombre, style: 'tableCell'}, {text:obj.nivel, style: 'tableCell'}];
+              return [{ text: obj.nombre, style: 'tableCell' }, { text: obj.nivel, style: 'tableCell' }];
             })
           ]
         }
@@ -2872,7 +2878,7 @@ export class VerEmpleadoComponent implements OnInit {
               { text: cargo.departamento, style: 'tableCell' },
               { text: cargo.nombre_cargo, style: 'tableCell' },
               { text: cargo.fec_inicio_, style: 'tableCell' },
-              { text: cargo.fec_final===null?'Sin fecha':cargo.fec_final_, style: 'tableCell' },
+              { text: cargo.fec_final === null ? 'Sin fecha' : cargo.fec_final_, style: 'tableCell' },
               { text: cargo.hora_trabaja, style: 'tableCell' },
               { text: cargo.sueldo, style: 'tableCell' },
             ]
@@ -2883,7 +2889,7 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   PresentarDataPDFdiscapacidadEmpleado() {
-    if (this.discapacidadUser.length>0) {
+    if (this.discapacidadUser.length > 0) {
       return {
         table: {
           widths: ['*', '*', '*'],
@@ -2955,9 +2961,9 @@ export class VerEmpleadoComponent implements OnInit {
     });
 
     if (this.discapacidadUser !== null) {
-      this.discapacidadUser.map(discapacidad =>{
+      this.discapacidadUser.map(discapacidad => {
         objetoDiscapacidad = {
-          'Carnet Conadis' : discapacidad.carn_conadis,
+          'Carnet Conadis': discapacidad.carn_conadis,
           'Tipo': discapacidad.tipo,
           'Porcentaje': discapacidad.porcentaje + '%',
         };
@@ -3029,7 +3035,7 @@ export class VerEmpleadoComponent implements OnInit {
       const wsca: xlsx.WorkSheet = xlsx.utils.json_to_sheet(datos[2]);
       xlsx.utils.book_append_sheet(wb, wsca, 'CARGO');
     }
-    xlsx.writeFile(wb, (datos[0])[0].Nombre +"_"+ (datos[0])[0].Apellido +'.xlsx');
+    xlsx.writeFile(wb, (datos[0])[0].Nombre + "_" + (datos[0])[0].Apellido + '.xlsx');
   }
 
   /** ******************************************************************************************* **
@@ -3049,7 +3055,7 @@ export class VerEmpleadoComponent implements OnInit {
     datosEmpleado.push(objeto);
     const csvDataE = xlsx.utils.sheet_to_csv(xlsx.utils.json_to_sheet(datosEmpleado));
     const data: Blob = new Blob([csvDataE], { type: 'text/csv;charset=utf-8;' });
-    FileSaver.saveAs(data, (datos[0])[0].Nombre +"_"+ (datos[0])[0].Apellido +'.csv');
+    FileSaver.saveAs(data, (datos[0])[0].Nombre + "_" + (datos[0])[0].Apellido + '.csv');
   }
 
   /** ******************************************************************************************* ** 
@@ -3108,14 +3114,14 @@ export class VerEmpleadoComponent implements OnInit {
       if (this.discapacidadUser !== null) {
         this.discapacidadUser.map(discapacidad => {
           objeto.empleado.discapacidad = {
-            'carnet_conadis' : discapacidad.carn_conadis,
+            'carnet_conadis': discapacidad.carn_conadis,
             'tipo': discapacidad.tipo,
             'porcentaje': discapacidad.porcentaje + '%',
           }
         });
       };
       if (this.tituloEmpleado !== null) {
-        this.tituloEmpleado.map(titulo =>{
+        this.tituloEmpleado.map(titulo => {
           objeto.empleado.titulos = {
             'nombre': titulo.nombre,
             'Nivel': titulo.nivel,
@@ -3173,7 +3179,7 @@ export class VerEmpleadoComponent implements OnInit {
 
     const a = document.createElement('a');
     a.href = xmlUrl;
-    a.download = objeto.empleado.nombre + '-' + objeto.empleado.apellido +'.xml';
+    a.download = objeto.empleado.nombre + '-' + objeto.empleado.apellido + '.xml';
     // Simular un clic en el enlace para iniciar la descarga
     a.click();
   }

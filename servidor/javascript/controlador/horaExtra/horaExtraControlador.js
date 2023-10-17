@@ -365,7 +365,15 @@ class HorasExtrasPedidasControlador {
             if (documento != 'null' && documento != '' && documento != null) {
                 let filePath = `servidor\\horasExtras\\${documento}`;
                 let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-                fs_1.default.unlinkSync(direccionCompleta);
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs_1.default.access(direccionCompleta, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                    }
+                    else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs_1.default.unlinkSync(direccionCompleta);
+                    }
+                });
             }
             const [objetoHoraExtra] = response.rows;
             if (objetoHoraExtra) {
@@ -505,7 +513,15 @@ class HorasExtrasPedidasControlador {
             if (documento != 'null' && documento != '' && documento != null) {
                 let filePath = `servidor\\horasExtras\\${documento}`;
                 let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-                fs_1.default.unlinkSync(direccionCompleta);
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs_1.default.access(direccionCompleta, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                    }
+                    else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs_1.default.unlinkSync(direccionCompleta);
+                    }
+                });
             }
             res.jsonp({ message: 'Documento Actualizado' });
         });
@@ -517,7 +533,15 @@ class HorasExtrasPedidasControlador {
             if (documento != 'null' && documento != '' && documento != null) {
                 let filePath = `servidor\\horasExtras\\${documento}`;
                 let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-                fs_1.default.unlinkSync(direccionCompleta);
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs_1.default.access(direccionCompleta, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                    }
+                    else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs_1.default.unlinkSync(direccionCompleta);
+                    }
+                });
             }
             res.jsonp({ message: 'ok' });
         });

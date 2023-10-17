@@ -194,7 +194,15 @@ class RelojesControlador {
                     tiene_funciones, id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], codigo_reloj, accion]);
                 res.jsonp({ message: 'correcto' });
             }));
-            fs_1.default.unlinkSync(filePath);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
         });
     }
     VerificarDatos(req, res) {
@@ -277,7 +285,15 @@ class RelojesControlador {
                 }
                 contador = contador + 1;
             }));
-            fs_1.default.unlinkSync(filePath);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
         });
     }
     VerificarPlantilla(req, res) {
@@ -332,7 +348,15 @@ class RelojesControlador {
                     return res.jsonp({ message: 'error' });
                 }
             }
-            fs_1.default.unlinkSync(filePath);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
         });
     }
 }

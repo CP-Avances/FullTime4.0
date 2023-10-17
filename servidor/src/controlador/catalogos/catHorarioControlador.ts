@@ -80,7 +80,14 @@ class HorarioControlador {
     if (archivo != 'null' && archivo != '' && archivo != null) {
       if (archivo != documento) {
         let ruta = ObtenerRutaHorarios() + separador + archivo;
-        fs.unlinkSync(ruta);
+        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+        fs.access(ruta, fs.constants.F_OK, (err) => {
+          if (err) {
+          } else {
+            // ELIMINAR DEL SERVIDOR
+            fs.unlinkSync(ruta);
+          }
+        });
       }
     }
   }
@@ -122,7 +129,14 @@ class HorarioControlador {
 
     if (documento != 'null' && documento != '' && documento != null) {
       let ruta = ObtenerRutaHorarios() + separador + documento;
-      fs.unlinkSync(ruta);
+      // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+      fs.access(ruta, fs.constants.F_OK, (err) => {
+        if (err) {
+        } else {
+          // ELIMINAR DEL SERVIDOR
+          fs.unlinkSync(ruta);
+        }
+      });
     }
 
     res.jsonp({ message: 'Documento actualizado.' });
@@ -135,10 +149,17 @@ class HorarioControlador {
 
     if (documento != 'null' && documento != '' && documento != null) {
       let ruta = ObtenerRutaHorarios() + separador + documento;
-      fs.unlinkSync(ruta);
+      // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+      fs.access(ruta, fs.constants.F_OK, (err) => {
+        if (err) {
+        } else {
+          // ELIMINAR DEL SERVIDOR
+          fs.unlinkSync(ruta);
+        }
+      });
     }
 
-    res.jsonp({ message: 'Documento Actualizado' });
+    res.jsonp({ message: 'Documento actualizado.' });
   }
 
   // BUSCAR LISTA DE CATALOGO HORARIOS  --**VERIFICADO
@@ -273,7 +294,16 @@ class HorarioControlador {
         res.jsonp({ message: 'correcto' });
       }
     });
-    fs.unlinkSync(filePath);
+
+    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+      if (err) {
+      } else {
+        // ELIMINAR DEL SERVIDOR
+        fs.unlinkSync(filePath);
+      }
+    });
+
   }
 
 
@@ -319,7 +349,15 @@ class HorarioControlador {
       }
       contador = contador + 1;
     });
-    fs.unlinkSync(filePath);
+    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+      if (err) {
+      } else {
+        // ELIMINAR DEL SERVIDOR
+        fs.unlinkSync(filePath);
+      }
+    });
+
   }
 
   /** Verificar que los datos dentro de la plantilla no se encuntren duplicados */
@@ -363,7 +401,15 @@ class HorarioControlador {
         return res.jsonp({ message: 'error' });
       }
     }
-    fs.unlinkSync(filePath);
+    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+      if (err) {
+      } else {
+        // ELIMINAR DEL SERVIDOR
+        fs.unlinkSync(filePath);
+      }
+    });
+
   }
 
 }

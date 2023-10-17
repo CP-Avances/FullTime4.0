@@ -81,8 +81,14 @@ class EmpresaControlador {
                     // SI EL NOMBRE DE LA IMAGEN YA EXISTE SOLO SE ACTUALIZA CASO CONTRARIO SE ELIMINA
                     if (obj.logo != logo) {
 
-                        // ELIMINAR LOGO DEL SERVIDOR
-                        fs.unlinkSync(ruta);
+                        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                        fs.access(ruta, fs.constants.F_OK, (err) => {
+                            if (err) {
+                            } else {
+                                // ELIMINAR LOGO DEL SERVIDOR
+                                fs.unlinkSync(ruta);
+                            }
+                        });
 
                         // ACTUALIZAR REGISTRO DE IMAGEN
                         await pool.query(
@@ -208,8 +214,15 @@ class EmpresaControlador {
                     // SI EL NOMBRE DE LA IMAGEN YA EXISTE SOLO SE ACTUALIZA CASO CONTRARIO SE ELIMINA
                     if (obj.cabecera_firma != logo) {
 
-                        // ELIMINAR LOGO DEL SERVIDOR
-                        fs.unlinkSync(ruta);
+                        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                        fs.access(ruta, fs.constants.F_OK, (err) => {
+                            if (err) {
+                            } else {
+                                // ELIMINAR LOGO DEL SERVIDOR
+                                fs.unlinkSync(ruta)
+                            }
+                        });
+                        ;
 
                         // ACTUALIZAR REGISTRO DE IMAGEN
                         await pool.query(
@@ -287,8 +300,14 @@ class EmpresaControlador {
                     // SI EL NOMBRE DE LA IMAGEN YA EXISTE SOLO SE ACTUALIZA CASO CONTRARIO SE ELIMINA
                     if (obj.pie_firma != logo) {
 
-                        // ELIMINAR LOGO DEL SERVIDOR
-                        fs.unlinkSync(ruta);
+                        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                        fs.access(ruta, fs.constants.F_OK, (err) => {
+                            if (err) {
+                            } else {
+                                // ELIMINAR LOGO DEL SERVIDOR
+                                fs.unlinkSync(ruta);
+                            }
+                        });
 
                         // ACTUALIZAR REGISTRO DE IMAGEN
                         await pool.query(

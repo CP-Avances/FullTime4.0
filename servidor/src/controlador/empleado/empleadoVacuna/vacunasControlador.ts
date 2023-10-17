@@ -116,8 +116,14 @@ class VacunasControlador {
 
         if (documento != 'null' && documento != '' && documento != null) {
             let ruta = await ObtenerRutaVacuna(id) + separador + documento;
-            //console.log('vacuna ruta ', ruta)
-            fs.unlinkSync(ruta);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs.access(ruta, fs.constants.F_OK, (err) => {
+                if (err) {
+                } else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs.unlinkSync(ruta);
+                }
+            });
         }
         res.jsonp({ message: 'Documento actualizado.' });
     }
@@ -137,8 +143,14 @@ class VacunasControlador {
 
         if (documento != 'null' && documento != '' && documento != null) {
             let ruta = await ObtenerRutaVacuna(vacuna.id_empleado) + separador + documento;
-            //console.log('vacuna ruta ', ruta)
-            fs.unlinkSync(ruta);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs.access(ruta, fs.constants.F_OK, (err) => {
+                if (err) {
+                } else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs.unlinkSync(ruta);
+                }
+            });
         }
 
         res.jsonp({ message: 'Documento eliminado.' });
@@ -158,8 +170,14 @@ class VacunasControlador {
 
         if (documento != 'null' && documento != '' && documento != null) {
             let ruta = await ObtenerRutaVacuna(vacuna.id_empleado) + separador + documento;
-            //console.log('vacuna ruta ', ruta)
-            fs.unlinkSync(ruta);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs.access(ruta, fs.constants.F_OK, (err) => {
+                if (err) {
+                } else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs.unlinkSync(ruta);
+                }
+            });
         }
         res.jsonp({ message: 'Registro eliminado.' });
     }

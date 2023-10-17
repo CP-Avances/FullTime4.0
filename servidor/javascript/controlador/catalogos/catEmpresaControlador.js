@@ -81,8 +81,15 @@ class EmpresaControlador {
                         let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + obj.logo;
                         // SI EL NOMBRE DE LA IMAGEN YA EXISTE SOLO SE ACTUALIZA CASO CONTRARIO SE ELIMINA
                         if (obj.logo != logo) {
-                            // ELIMINAR LOGO DEL SERVIDOR
-                            fs_1.default.unlinkSync(ruta);
+                            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                                if (err) {
+                                }
+                                else {
+                                    // ELIMINAR LOGO DEL SERVIDOR
+                                    fs_1.default.unlinkSync(ruta);
+                                }
+                            });
                             // ACTUALIZAR REGISTRO DE IMAGEN
                             yield database_1.default.query(`
                             UPDATE cg_empresa SET logo = $2 WHERE id = $1
@@ -189,8 +196,16 @@ class EmpresaControlador {
                         let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + obj.cabecera_firma;
                         // SI EL NOMBRE DE LA IMAGEN YA EXISTE SOLO SE ACTUALIZA CASO CONTRARIO SE ELIMINA
                         if (obj.cabecera_firma != logo) {
-                            // ELIMINAR LOGO DEL SERVIDOR
-                            fs_1.default.unlinkSync(ruta);
+                            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                                if (err) {
+                                }
+                                else {
+                                    // ELIMINAR LOGO DEL SERVIDOR
+                                    fs_1.default.unlinkSync(ruta);
+                                }
+                            });
+                            ;
                             // ACTUALIZAR REGISTRO DE IMAGEN
                             yield database_1.default.query(`
                             UPDATE cg_empresa SET cabecera_firma = $2 WHERE id = $1
@@ -253,8 +268,15 @@ class EmpresaControlador {
                         let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + obj.pie_firma;
                         // SI EL NOMBRE DE LA IMAGEN YA EXISTE SOLO SE ACTUALIZA CASO CONTRARIO SE ELIMINA
                         if (obj.pie_firma != logo) {
-                            // ELIMINAR LOGO DEL SERVIDOR
-                            fs_1.default.unlinkSync(ruta);
+                            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                                if (err) {
+                                }
+                                else {
+                                    // ELIMINAR LOGO DEL SERVIDOR
+                                    fs_1.default.unlinkSync(ruta);
+                                }
+                            });
                             // ACTUALIZAR REGISTRO DE IMAGEN
                             yield database_1.default.query(`
                             UPDATE cg_empresa SET pie_firma = $2 WHERE id = $1

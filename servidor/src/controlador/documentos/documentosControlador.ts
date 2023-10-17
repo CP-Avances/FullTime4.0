@@ -86,7 +86,14 @@ class DocumentosControlador {
         let separador = path.sep;
 
         let ruta = ObtenerRutaDocumento() + separador + documento;
-        fs.unlinkSync(ruta);
+        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+        fs.access(ruta, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+                // ELIMINAR DEL SERVIDOR
+                fs.unlinkSync(ruta);
+            }
+        });
 
         res.jsonp({ message: 'Registro eliminado.' });
     }

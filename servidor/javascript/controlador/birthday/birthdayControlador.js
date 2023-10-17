@@ -68,7 +68,15 @@ class BirthdayControlador {
                     if (obj.img != null) {
                         try {
                             let ruta = (0, accesoCarpetas_1.ObtenerRutaBirthday)() + separador + obj.img;
-                            fs_1.default.unlinkSync(ruta);
+                            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                                if (err) {
+                                }
+                                else {
+                                    // ELIMINAR DEL SERVIDOR
+                                    fs_1.default.unlinkSync(ruta);
+                                }
+                            });
                             yield database_1.default.query(`
                             UPDATE message_birthday SET img = $2 WHERE id = $1
                             `, [id, imagen]);

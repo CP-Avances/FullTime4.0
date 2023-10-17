@@ -489,7 +489,14 @@ class EmpleadoControlador {
           try {
             // ELIMINAR IMAGEN DE SERVIDOR
             let ruta = await ObtenerRutaUsuario(obj.id) + separador + obj.imagen;
-            fs.unlinkSync(ruta);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs.access(ruta, fs.constants.F_OK, (err) => {
+              if (err) {
+              } else {
+                // ELIMINAR DEL SERVIDOR
+                fs.unlinkSync(ruta);
+              }
+            });
 
             await pool.query(
               `
@@ -646,23 +653,36 @@ class EmpleadoControlador {
 
     let ruta = await ObtenerRutaUsuario(id) + separador + imagen;
     console.log('ver file ', ruta)
-    res.sendFile(path.resolve(ruta));   
+
+    fs.access(ruta, fs.constants.F_OK, (err) => {
+      if (err) {
+      } else {
+        res.sendFile(path.resolve(ruta));
+      }
+    });
   }
 
-  public async getImagenBase64(req: Request, res: Response): Promise<any>{
+  public async getImagenBase64(req: Request, res: Response): Promise<any> {
     const imagen = req.params.imagen;
     const id = req.params.id;
     let separador = path.sep;
-    
+
     let ruta = await ObtenerRutaUsuario(id) + separador + imagen;
-    let path_file  = path.resolve(ruta);
-    let data = fs.readFileSync(path_file);
-    let codificado = data.toString('base64');
-    if (codificado === null) {
-      res.status(200).jsonp({ imagen: 0})
-    } else {
-      res.status(200).jsonp({ imagen: codificado})
-    }
+
+    fs.access(ruta, fs.constants.F_OK, (err) => {
+      if (err) {
+        res.status(200).jsonp({ imagen: 0 })
+      } else {
+        let path_file = path.resolve(ruta);
+        let data = fs.readFileSync(path_file);
+        let codificado = data.toString('base64');
+        if (codificado === null) {
+          res.status(200).jsonp({ imagen: 0 })
+        } else {
+          res.status(200).jsonp({ imagen: codificado })
+        }
+      }
+    });
   }
 
 
@@ -873,7 +893,14 @@ class EmpleadoControlador {
       }
       contador = contador + 1;
     });
-    fs.unlinkSync(filePath);
+    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+      if (err) {
+      } else {
+        // ELIMINAR DEL SERVIDOR
+        fs.unlinkSync(filePath);
+      }
+    });
   }
 
   public async VerificarPlantilla_DatosAutomatico(req: Request, res: Response) {
@@ -923,7 +950,14 @@ class EmpleadoControlador {
         return res.jsonp({ message: 'error' });
       }
     }
-    fs.unlinkSync(filePath);
+    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+      if (err) {
+      } else {
+        // ELIMINAR DEL SERVIDOR
+        fs.unlinkSync(filePath);
+      }
+    });
   }
 
   public async CargarPlantilla_Automatico(req: Request, res: Response): Promise<void> {
@@ -1045,7 +1079,14 @@ class EmpleadoControlador {
       }
       contador = contador + 1;
     });
-    fs.unlinkSync(filePath);
+    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+      if (err) {
+      } else {
+        // ELIMINAR DEL SERVIDOR
+        fs.unlinkSync(filePath);
+      }
+    });
   }
 
   /** METODOS PARA VERIFICAR PLANTILLA CON CÓDIGO INGRESADO DE FORMA MANUAL */
@@ -1149,7 +1190,14 @@ class EmpleadoControlador {
       }
       contador = contador + 1;
     });
-    fs.unlinkSync(filePath);
+    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+      if (err) {
+      } else {
+        // ELIMINAR DEL SERVIDOR
+        fs.unlinkSync(filePath);
+      }
+    });
   }
 
   public async VerificarPlantilla_DatosManual(req: Request, res: Response) {
@@ -1206,7 +1254,14 @@ class EmpleadoControlador {
         return res.jsonp({ message: 'error' });
       }
     }
-    fs.unlinkSync(filePath);
+    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+      if (err) {
+      } else {
+        // ELIMINAR DEL SERVIDOR
+        fs.unlinkSync(filePath);
+      }
+    });
   }
 
   public async CargarPlantilla_Manual(req: Request, res: Response): Promise<void> {
@@ -1320,7 +1375,14 @@ class EmpleadoControlador {
       }
       contador = contador + 1;
     });
-    fs.unlinkSync(filePath);
+    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+      if (err) {
+      } else {
+        // ELIMINAR DEL SERVIDOR
+        fs.unlinkSync(filePath);
+      }
+    });
   }
 
 

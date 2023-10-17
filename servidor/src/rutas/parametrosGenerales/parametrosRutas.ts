@@ -32,9 +32,6 @@ class ParametrosRutas {
         // METODO PARA COMPARAR COORDENADAS
         this.router.post('/coordenadas', TokenValidation, PARAMETROS_CONTROLADOR.CompararCoordenadas);
 
-        this.router.post('/xmlDownload/', TokenValidation, PARAMETROS_CONTROLADOR.FileXML);
-        this.router.get('/download/:nameXML', PARAMETROS_CONTROLADOR.downloadXML);
-
     }
 }
 

@@ -440,7 +440,15 @@ class EmpleadoControlador {
                         try {
                             // ELIMINAR IMAGEN DE SERVIDOR
                             let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(obj.id)) + separador + obj.imagen;
-                            fs_1.default.unlinkSync(ruta);
+                            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                                if (err) {
+                                }
+                                else {
+                                    // ELIMINAR DEL SERVIDOR
+                                    fs_1.default.unlinkSync(ruta);
+                                }
+                            });
                             yield database_1.default.query(`
               UPDATE empleados SET imagen = $2 Where id = $1
               `, [id, imagen]);
@@ -573,7 +581,13 @@ class EmpleadoControlador {
             let separador = path_1.default.sep;
             let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id)) + separador + imagen;
             console.log('ver file ', ruta);
-            res.sendFile(path_1.default.resolve(ruta));
+            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    res.sendFile(path_1.default.resolve(ruta));
+                }
+            });
         });
     }
     getImagenBase64(req, res) {
@@ -582,15 +596,22 @@ class EmpleadoControlador {
             const id = req.params.id;
             let separador = path_1.default.sep;
             let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id)) + separador + imagen;
-            let path_file = path_1.default.resolve(ruta);
-            let data = fs_1.default.readFileSync(path_file);
-            let codificado = data.toString('base64');
-            if (codificado === null) {
-                res.status(200).jsonp({ imagen: 0 });
-            }
-            else {
-                res.status(200).jsonp({ imagen: codificado });
-            }
+            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                    res.status(200).jsonp({ imagen: 0 });
+                }
+                else {
+                    let path_file = path_1.default.resolve(ruta);
+                    let data = fs_1.default.readFileSync(path_file);
+                    let codificado = data.toString('base64');
+                    if (codificado === null) {
+                        res.status(200).jsonp({ imagen: 0 });
+                    }
+                    else {
+                        res.status(200).jsonp({ imagen: codificado });
+                    }
+                }
+            });
         });
     }
     // BUSQUEDA INFORMACIÓN DEPARTAMENTOS EMPLEADO
@@ -777,7 +798,15 @@ class EmpleadoControlador {
                 }
                 contador = contador + 1;
             }));
-            fs_1.default.unlinkSync(filePath);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
         });
     }
     VerificarPlantilla_DatosAutomatico(req, res) {
@@ -826,7 +855,15 @@ class EmpleadoControlador {
                     return res.jsonp({ message: 'error' });
                 }
             }
-            fs_1.default.unlinkSync(filePath);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
         });
     }
     CargarPlantilla_Automatico(req, res) {
@@ -931,7 +968,15 @@ class EmpleadoControlador {
                 }
                 contador = contador + 1;
             }));
-            fs_1.default.unlinkSync(filePath);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
         });
     }
     /** METODOS PARA VERIFICAR PLANTILLA CON CÓDIGO INGRESADO DE FORMA MANUAL */
@@ -1023,7 +1068,15 @@ class EmpleadoControlador {
                 }
                 contador = contador + 1;
             }));
-            fs_1.default.unlinkSync(filePath);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
         });
     }
     VerificarPlantilla_DatosManual(req, res) {
@@ -1079,7 +1132,15 @@ class EmpleadoControlador {
                     return res.jsonp({ message: 'error' });
                 }
             }
-            fs_1.default.unlinkSync(filePath);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
         });
     }
     CargarPlantilla_Manual(req, res) {
@@ -1178,7 +1239,15 @@ class EmpleadoControlador {
                 }
                 contador = contador + 1;
             }));
-            fs_1.default.unlinkSync(filePath);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
         });
     }
 }

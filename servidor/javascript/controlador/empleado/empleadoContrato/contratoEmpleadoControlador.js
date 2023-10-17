@@ -109,7 +109,15 @@ class ContratoEmpleadoControlador {
             const [contrato] = response.rows;
             if (documento != 'null' && documento != '' && documento != null) {
                 let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaContrato)(contrato.id_empleado)) + separador + documento;
-                fs_1.default.unlinkSync(ruta);
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                    }
+                    else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs_1.default.unlinkSync(ruta);
+                    }
+                });
             }
             res.jsonp({ message: 'Documento actualizado.' });
         });
@@ -121,7 +129,16 @@ class ContratoEmpleadoControlador {
             let separador = path_1.default.sep;
             if (documento != 'null' && documento != '' && documento != null) {
                 let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaContrato)(id)) + separador + documento;
-                fs_1.default.unlinkSync(ruta);
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                    }
+                    else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs_1.default.unlinkSync(ruta);
+                    }
+                });
+                ;
             }
             res.jsonp({ message: 'Documento actualizado.' });
         });

@@ -124,7 +124,14 @@ class PeriodoVacacionControlador {
             }
             contador = contador + 1;
         });
-        fs.unlinkSync(filePath);
+             // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+             fs.access(filePath, fs.constants.F_OK, (err) => {
+                if (err) {
+                } else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs.unlinkSync(filePath);
+                }
+            });
     }
 
     /** Verificar que no exista cedulas duplicadas en el registro */
@@ -170,7 +177,14 @@ class PeriodoVacacionControlador {
                 return res.jsonp({ message: 'error' });
             }
         }
-        fs.unlinkSync(filePath);
+        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+        fs.access(filePath, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+                // ELIMINAR DEL SERVIDOR
+                fs.unlinkSync(filePath);
+            }
+        });
     }
 
     public async CargarPeriodoVacaciones(req: Request, res: Response) {
@@ -211,7 +225,14 @@ class PeriodoVacacionControlador {
                 fecha_fin_periodo, dias_perdidos, horas_vacacion, minutos_vacacion, datosEmpleado.rows[0]['codigo']]);
             return res.jsonp({ message: 'correcto' });
         });
+   // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+   fs.access(filePath, fs.constants.F_OK, (err) => {
+    if (err) {
+    } else {
+        // ELIMINAR DEL SERVIDOR
         fs.unlinkSync(filePath);
+    }
+});
     }
 }
 

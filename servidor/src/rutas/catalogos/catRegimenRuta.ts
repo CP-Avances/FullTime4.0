@@ -29,8 +29,7 @@ class RegimenRuta {
         this.router.delete('/eliminar/:id', TokenValidation, REGIMEN_CONTROLADOR.EliminarRegistros);
         // BUSCAR REGIMEN LABORAL POR ID DE PAIS
         this.router.get('/pais-regimen/:nombre', TokenValidation, REGIMEN_CONTROLADOR.ListarRegimenPais);
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', TokenValidation, REGIMEN_CONTROLADOR.FileXML);
+
 
         /** ** ******************************************************************************************* **
          ** **                           CONSULTA PERIODO DE VACACIONES                                 ** **
@@ -63,9 +62,6 @@ class RegimenRuta {
 
 
 
-
-
-        this.router.get('/download/:nameXML', REGIMEN_CONTROLADOR.downloadXML);
         this.router.get('/sucursal-regimen/:id', TokenValidation, REGIMEN_CONTROLADOR.ListarRegimenSucursal);
     }
 }

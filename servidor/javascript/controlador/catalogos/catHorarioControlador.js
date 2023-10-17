@@ -81,7 +81,15 @@ class HorarioControlador {
             if (archivo != 'null' && archivo != '' && archivo != null) {
                 if (archivo != documento) {
                     let ruta = (0, accesoCarpetas_1.ObtenerRutaHorarios)() + separador + archivo;
-                    fs_1.default.unlinkSync(ruta);
+                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                    fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                        if (err) {
+                        }
+                        else {
+                            // ELIMINAR DEL SERVIDOR
+                            fs_1.default.unlinkSync(ruta);
+                        }
+                    });
                 }
             }
         });
@@ -117,7 +125,15 @@ class HorarioControlador {
             `, [id]);
             if (documento != 'null' && documento != '' && documento != null) {
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaHorarios)() + separador + documento;
-                fs_1.default.unlinkSync(ruta);
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                    }
+                    else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs_1.default.unlinkSync(ruta);
+                    }
+                });
             }
             res.jsonp({ message: 'Documento actualizado.' });
         });
@@ -129,9 +145,17 @@ class HorarioControlador {
             let separador = path_1.default.sep;
             if (documento != 'null' && documento != '' && documento != null) {
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaHorarios)() + separador + documento;
-                fs_1.default.unlinkSync(ruta);
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                    }
+                    else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs_1.default.unlinkSync(ruta);
+                    }
+                });
             }
-            res.jsonp({ message: 'Documento Actualizado' });
+            res.jsonp({ message: 'Documento actualizado.' });
         });
     }
     // BUSCAR LISTA DE CATALOGO HORARIOS  --**VERIFICADO
@@ -260,7 +284,15 @@ class HorarioControlador {
                     res.jsonp({ message: 'correcto' });
                 }
             }));
-            fs_1.default.unlinkSync(filePath);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
         });
     }
     /** Verificar si existen datos duplicados dentro del sistema */
@@ -301,7 +333,15 @@ class HorarioControlador {
                 }
                 contador = contador + 1;
             }));
-            fs_1.default.unlinkSync(filePath);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
         });
     }
     /** Verificar que los datos dentro de la plantilla no se encuntren duplicados */
@@ -345,7 +385,15 @@ class HorarioControlador {
                     return res.jsonp({ message: 'error' });
                 }
             }
-            fs_1.default.unlinkSync(filePath);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
         });
     }
 }

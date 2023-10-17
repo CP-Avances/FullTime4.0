@@ -320,7 +320,15 @@ class FeriadosControlador {
                 }
                 contador = contador + 1;
             }));
-            fs_1.default.unlinkSync(filePath);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
         });
     }
     // REVISAR DATOS DUPLICADOS DENTRO DE LA MISMA PLANTILLA
@@ -358,7 +366,15 @@ class FeriadosControlador {
                 };
                 datos_totales.push(fila_datos);
             }));
-            fs_1.default.unlinkSync(filePath);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
             ver_fecha = ver_recuperacion = datos_totales;
             // VERIFICACIÓN DE FECHAS DUPLICADAS DENTRO DE LA MISMA PLANTILLA
             for (var i = 0; i <= datos_totales.length - 1; i++) {
@@ -443,7 +459,15 @@ class FeriadosControlador {
                 }
                 contador = contador + 1;
             }));
-            fs_1.default.unlinkSync(filePath);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
         });
     }
 }
