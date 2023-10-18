@@ -1350,6 +1350,7 @@ export class ReporteTimbresComponent implements OnInit {
       form.laboralForm === '' && form.cargosForm != '') {
       this.VerInformacionCargo(form);
     }*/
+    
   }
 
 }
