@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TITULO_CONTROLADOR = void 0;
 const database_1 = __importDefault(require("../../database"));
-const fs_1 = __importDefault(require("fs"));
 const builder = require('xmlbuilder');
 class TituloControlador {
     // METODO PARA LISTAR TITULOS
@@ -37,24 +36,6 @@ class TituloControlador {
       DELETE FROM cg_titulos WHERE id = $1
       `, [id]);
             res.jsonp({ message: 'Registro eliminado.' });
-        });
-    }
-    // METODO PARA CREAR ARCHIVO XML
-    FileXML(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var xml = builder.create('root').ele(req.body).end({ pretty: true });
-            let filename = "Titulos-" + req.body.userName + '-' + req.body.userId + '-' + new Date().getTime() + '.xml';
-            fs_1.default.writeFile(`xmlDownload/${filename}`, xml, function (err) {
-            });
-            res.jsonp({ text: 'XML creado', name: filename });
-        });
-    }
-    // METODO PARA DECARGAR ARCHIVO XML
-    downloadXML(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const name = req.params.nameXML;
-            let filePath = `servidor\\xmlDownload\\${name}`;
-            res.sendFile(__dirname.split("servidor")[0] + filePath);
         });
     }
     // METODO PARA ACTUALIZAR REGISTRO

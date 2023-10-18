@@ -379,115 +379,13 @@ class EmpresaControlador {
                 `
                 , [bool_acciones, id]);
             res.status(200).jsonp({
-                message: 'Empresa actualizada exitosamente',
-                title: 'Ingrese nuevamente al sistema'
+                message: 'Empresa actualizada exitosamente.',
+                title: 'Ingrese nuevamente al sistema.'
             });
         } catch (error) {
             res.status(404).jsonp(error)
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public async ListarEmpresa(req: Request, res: Response) {
-        const EMPRESA = await pool.query('SELECT id, nombre, ruc, direccion, telefono, correo, ' +
-            'representante, tipo_empresa, establecimiento, logo, color_p, color_s, num_partida, marca_agua, ' +
-            'correo_empresa FROM cg_empresa ORDER BY nombre ASC');
-        if (EMPRESA.rowCount > 0) {
-            return res.jsonp(EMPRESA.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros' });
-        }
-    }
-
-    public async ListarUnaEmpresa(req: Request, res: Response) {
-        const { nombre } = req.params;
-        const EMPRESA = await pool.query('SELECT id, nombre, ruc, direccion, telefono, correo, representante, ' +
-            'tipo_empresa, establecimiento, logo, color_p, color_s, num_partida, marca_agua, correo_empresa ' +
-            'FROM cg_empresa WHERE nombre = $1', [nombre]);
-        if (EMPRESA.rowCount > 0) {
-            return res.jsonp(EMPRESA.rows)
-        }
-        else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros' });
-        }
-    }
-
-    public async CrearEmpresa(req: Request, res: Response): Promise<void> {
-        const { nombre, ruc, direccion, telefono, tipo_empresa, representante,
-            establecimiento, color_p, color_s, correo_empresa } = req.body;
-        await pool.query('INSERT INTO cg_empresa (nombre, ruc, direccion, telefono, tipo_empresa, ' +
-            'representante, establecimiento, color_p, color_s, correo_empresa) ' +
-            'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',
-            [nombre, ruc, direccion, telefono, tipo_empresa, representante, establecimiento,
-                color_p, color_s, correo_empresa]);
-        res.jsonp({ message: 'La Empresa se registró con éxito' });
-    }
-
-
-
-    public async FileXML(req: Request, res: Response): Promise<any> {
-        var xml = builder.create('root').ele(req.body).end({ pretty: true });
-        console.log(req.body.userName);
-        let filename = "Empresas-" + req.body.userName + '-' + req.body.userId + '-' + new Date().getTime() +
-            '.xml';
-        fs.writeFile(`xmlDownload/${filename}`, xml, function (err) {
-            if (err) {
-                return console.log(err);
-            }
-            console.log("Archivo guardado");
-        });
-        res.jsonp({ text: 'XML creado', name: filename });
-    }
-
-    public async downloadXML(req: Request, res: Response): Promise<any> {
-        const name = req.params.nameXML;
-        let filePath = `servidor\\xmlDownload\\${name}`
-        res.sendFile(__dirname.split("servidor")[0] + filePath);
-    }
-
-    public async EliminarRegistros(req: Request, res: Response): Promise<void> {
-        const id = req.params.id;
-        await pool.query('DELETE FROM cg_empresa WHERE id = $1', [id]);
-        res.jsonp({ message: 'Registro eliminado.' });
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
 

@@ -12,7 +12,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs_1 = __importDefault(require("fs"));
 const builder = require('xmlbuilder');
 const database_1 = __importDefault(require("../../database"));
 class TipoComidasControlador {
@@ -93,27 +92,6 @@ class TipoComidasControlador {
             yield database_1.default.query('UPDATE cg_tipo_comidas SET nombre = $1, tipo_comida = $2, hora_inicio = $3, hora_fin = $4 ' +
                 'WHERE id = $5', [nombre, tipo_comida, hora_inicio, hora_fin, id]);
             res.jsonp({ message: 'Registro actualizado exitosamente' });
-        });
-    }
-    FileXML(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var xml = builder.create('root').ele(req.body).end({ pretty: true });
-            console.log(req.body.userName);
-            let filename = "Comidas-" + req.body.userName + '-' + req.body.userId + '-' + new Date().getTime() + '.xml';
-            fs_1.default.writeFile(`xmlDownload/${filename}`, xml, function (err) {
-                if (err) {
-                    return console.log(err);
-                }
-                console.log("Archivo guardado");
-            });
-            res.jsonp({ text: 'XML creado', name: filename });
-        });
-    }
-    downloadXML(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const name = req.params.nameXML;
-            let filePath = `servidor\\xmlDownload\\${name}`;
-            res.sendFile(__dirname.split("servidor")[0] + filePath);
         });
     }
     EliminarRegistros(req, res) {

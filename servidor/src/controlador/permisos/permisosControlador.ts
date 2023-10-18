@@ -434,23 +434,6 @@ class PermisosControlador {
         }
     }
 
-    // METODO PARA CREAR ARCHIVO XML
-    public async FileXML(req: Request, res: Response): Promise<any> {
-        var xml = builder.create('root').ele(req.body).end({ pretty: true });
-        console.log(req.body.userName);
-        let filename = "Permisos-" + req.body.userName + '-' + req.body.userId + '-' + new Date().getTime() + '.xml';
-        fs.writeFile(`xmlDownload/${filename}`, xml, function (err) {
-        });
-        res.jsonp({ text: 'XML creado', name: filename });
-    }
-
-    // METODO PARA DESCARGAR ARCHIVO XML
-    public async downloadXML(req: Request, res: Response): Promise<any> {
-        const name = req.params.nameXML;
-        let filePath = `servidor\\xmlDownload\\${name}`
-        res.sendFile(__dirname.split("servidor")[0] + filePath);
-    }
-
     // BUSQUEDA DE DOCUMENTO PERMISO
     public async ObtenerDocumentoPermiso(req: Request, res: Response): Promise<any> {
         const docs = req.params.docs;
@@ -458,7 +441,12 @@ class PermisosControlador {
         // TRATAMIENTO DE RUTAS
         let separador = path.sep;
         let ruta = await ObtenerRutaPermisos(codigo) + separador + docs;
-        res.sendFile(path.resolve(ruta));
+        fs.access(ruta, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+              res.sendFile(path.resolve(ruta));
+            }
+          });
     }
 
     /** ********************************************************************************************* **

@@ -75,11 +75,6 @@ class DepartamentoRutas {
         this.router.get('/comida-empleado/plan/:id', TokenValidation, PLAN_COMIDAS_CONTROLADOR.EncontrarPlanComidaIdPlan);
         // BUSQUEDA DE PLANIFICACIONES DE ALIMENTACION POR ID DE USUARIO
         this.router.get('/infoComida/plan/:id_empleado', TokenValidation, PLAN_COMIDAS_CONTROLADOR.EncontrarPlanComidaIdEmpleado);
-
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', TokenValidation, PLAN_COMIDAS_CONTROLADOR.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', PLAN_COMIDAS_CONTROLADOR.downloadXML);
                 
 
         /** ************************************************************************************************ **

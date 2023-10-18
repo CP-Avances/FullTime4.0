@@ -35,10 +35,6 @@ class UbicacionRutas {
         this.router.get('/determinada/:id', emplUbicacionControlador_1.default.ListarUnaCoordenada);
         this.router.get('/ultimo-registro', emplUbicacionControlador_1.default.BuscarUltimoRegistro);
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, emplUbicacionControlador_1.default.EliminarCoordenadas);
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', verificarToken_1.TokenValidation, emplUbicacionControlador_1.default.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', emplUbicacionControlador_1.default.downloadXML);
     }
 }
 const UBICACION_RUTAS = new UbicacionRutas();

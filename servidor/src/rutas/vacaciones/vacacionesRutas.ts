@@ -38,11 +38,6 @@ class VacacionesRutas {
         // BUSCAR DATOS DE VACACIONES POR ID DE VACACION
         this.router.get('/one/:id', TokenValidation, VACACIONES_CONTROLADOR.ListarUnaVacacion);
 
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', TokenValidation, VACACIONES_CONTROLADOR.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', VACACIONES_CONTROLADOR.downloadXML);
-
 
         /** ************************************************************************************************* **
          ** **                        METODO DE ENVIO DE NOTIFICACIONES                                    ** ** 

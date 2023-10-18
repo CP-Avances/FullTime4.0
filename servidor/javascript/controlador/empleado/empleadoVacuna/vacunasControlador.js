@@ -200,7 +200,13 @@ class VacunasControlador {
             // TRATAMIENTO DE RUTAS
             let separador = path_1.default.sep;
             let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaVacuna)(id)) + separador + docs;
-            res.sendFile(path_1.default.resolve(ruta));
+            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    res.sendFile(path_1.default.resolve(ruta));
+                }
+            });
         });
     }
     // LISTAR TODOS LOS REGISTROS DE VACUNACIÓN

@@ -333,24 +333,6 @@ class EmpleadoControlador {
             res.jsonp(empleado.rows);
         });
     }
-    // CREAR INFORMACION DEL EMPLEADO EN FORMATO XML
-    FileXML(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var xml = builder.create('root').ele(req.body).end({ pretty: true });
-            let filename = "Empleado-" + req.body.userName + '-' + req.body.userId + '-' + new Date().getTime() + '.xml';
-            fs_1.default.writeFile(`xmlDownload/${filename}`, xml, function (err) {
-            });
-            res.jsonp({ text: 'XML creado', name: filename });
-        });
-    }
-    // DESCARGAR INFORMACION DEL EMPLEADO EN FORMATO XML
-    downloadXML(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const name = req.params.nameXML;
-            let filePath = `servidor\\xmlDownload\\${name}`;
-            res.sendFile(__dirname.split("servidor")[0] + filePath);
-        });
-    }
     // METODO PARA INHABILITAR USUARIOS EN EL SISTEMA
     DesactivarMultiplesEmpleados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -16,8 +16,6 @@ class ProcesoRutas {
         this.router.post('/', TokenValidation, PROCESO_CONTROLADOR.create);
         this.router.put('/', TokenValidation, PROCESO_CONTROLADOR.ActualizarProceso);  
         this.router.delete('/eliminar/:id', TokenValidation, PROCESO_CONTROLADOR.EliminarProceso);
-        this.router.post('/xmlDownload/', TokenValidation, PROCESO_CONTROLADOR.FileXML);
-        this.router.get('/download/:nameXML', PROCESO_CONTROLADOR.downloadXML);
     }
 }
 

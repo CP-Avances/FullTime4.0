@@ -67,10 +67,6 @@ class HorasExtrasPedidasRutas {
         // ELIMINAR DOCUMENTO DE RESPALDO DE HORAS EXTRAS WEB
         this.router.delete('/eliminar-documento-web/:documento', [TokenValidation, ModuloHoraExtraValidation], HorasExtrasPedidasControlador.EliminarArchivoMovil);
 
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', TokenValidation, HorasExtrasPedidasControlador.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', HorasExtrasPedidasControlador.downloadXML);
          
 
         /** ************************************************************************************************** ** 

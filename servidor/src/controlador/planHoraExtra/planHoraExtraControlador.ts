@@ -270,22 +270,6 @@ class PlanHoraExtraControlador {
     }
   }
 
-    // METODO PARA CREAR ARCHIVO XML
-    public async FileXML(req: Request, res: Response): Promise<any> {
-      var xml = builder.create('root').ele(req.body).end({ pretty: true });
-      console.log(req.body.userName);
-      let filename = "Roles-" + req.body.userName + '-' + req.body.userId + '-' + new Date().getTime() + '.xml';
-      fs.writeFile(`xmlDownload/${filename}`, xml, function (err) {
-      });
-      res.jsonp({ text: 'XML creado', name: filename });
-    }
-  
-    // METODO PARA DESCARGAR ARCHIVO XML
-    public async downloadXML(req: Request, res: Response): Promise<any> {
-      const name = req.params.nameXML;
-      let filePath = `servidor\\xmlDownload\\${name}`
-      res.sendFile(__dirname.split("servidor")[0] + filePath);
-    }
 
   /** ********************************************************************************************* **
    ** *             ENVIO DE CORREOS ELECTRONICOS DE PLANIFICACIÓN DE HORAS EXTRAS                  **

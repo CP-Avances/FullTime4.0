@@ -63,41 +63,8 @@ class DepartamentoRutas {
         // METODO PARA ACTUALIZAR USO DE ACCIONES
         this.router.put('/acciones-timbre', TokenValidation, EMPRESA_CONTROLADOR.ActualizarAccionesTimbres);
 
-
-
-
-
-
-
-
-
-
-
-
-
-        this.router.get('/', TokenValidation, EMPRESA_CONTROLADOR.ListarEmpresa);
-        this.router.get('/buscar/:nombre', TokenValidation, EMPRESA_CONTROLADOR.ListarUnaEmpresa);
-        this.router.post('/', TokenValidation, EMPRESA_CONTROLADOR.CrearEmpresa);
-
-        this.router.post('/xmlDownload/', TokenValidation, EMPRESA_CONTROLADOR.FileXML);
-        this.router.get('/download/:nameXML', EMPRESA_CONTROLADOR.downloadXML);
-        this.router.delete('/eliminar/:id', TokenValidation, EMPRESA_CONTROLADOR.EliminarRegistros);
-
-
-
-
-
-
-        // CONSULTA USADA EN MÓDULO DE ALMUERZOS
+        // CONSULTA USADA EN MODULO DE ALMUERZOS
         this.router.get('/logo/codificados/:id_empresa', EMPRESA_CONTROLADOR.getImagenBase64);
-
-
-
-
-
-
-
-
 
     }
 }

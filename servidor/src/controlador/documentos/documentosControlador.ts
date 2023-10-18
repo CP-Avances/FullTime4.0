@@ -61,8 +61,13 @@ class DocumentosControlador {
     public async DownLoadFile(req: Request, res: Response) {
         let nombre = req.params.nom_carpeta;
         let filename = req.params.filename;
-        const path = DescargarArchivo(nombre, filename);
-        res.sendFile(path);
+        const path_ = DescargarArchivo(nombre, filename);
+        fs.access(path_, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+                res.sendFile(path.resolve(path_));
+            }
+        });
     }
 
     // METODO PARA DESCARGAR ARCHIVOS INDIVIDUALES
@@ -70,8 +75,13 @@ class DocumentosControlador {
         let nombre = req.params.nom_carpeta;
         let filename = req.params.filename;
         let tipo = req.params.tipo;
-        const path = DescargarArchivoIndividuales(nombre, filename, tipo);
-        res.sendFile(path);
+        const path_ = DescargarArchivoIndividuales(nombre, filename, tipo);
+        fs.access(path_, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+                res.sendFile(path.resolve(path_));
+            }
+        });
     }
 
     // METODO PARA ELIMINAR REGISTROS DE DOCUMENTACION

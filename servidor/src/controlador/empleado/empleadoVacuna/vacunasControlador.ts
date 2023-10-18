@@ -214,7 +214,12 @@ class VacunasControlador {
         // TRATAMIENTO DE RUTAS
         let separador = path.sep;
         let ruta = await ObtenerRutaVacuna(id) + separador + docs;
-        res.sendFile(path.resolve(ruta));
+        fs.access(ruta, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+              res.sendFile(path.resolve(ruta));
+            }
+          });
     }
 
 

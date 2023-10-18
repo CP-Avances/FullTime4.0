@@ -387,25 +387,6 @@ class PermisosControlador {
             }
         });
     }
-    // METODO PARA CREAR ARCHIVO XML
-    FileXML(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var xml = builder.create('root').ele(req.body).end({ pretty: true });
-            console.log(req.body.userName);
-            let filename = "Permisos-" + req.body.userName + '-' + req.body.userId + '-' + new Date().getTime() + '.xml';
-            fs_1.default.writeFile(`xmlDownload/${filename}`, xml, function (err) {
-            });
-            res.jsonp({ text: 'XML creado', name: filename });
-        });
-    }
-    // METODO PARA DESCARGAR ARCHIVO XML
-    downloadXML(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const name = req.params.nameXML;
-            let filePath = `servidor\\xmlDownload\\${name}`;
-            res.sendFile(__dirname.split("servidor")[0] + filePath);
-        });
-    }
     // BUSQUEDA DE DOCUMENTO PERMISO
     ObtenerDocumentoPermiso(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -414,7 +395,13 @@ class PermisosControlador {
             // TRATAMIENTO DE RUTAS
             let separador = path_1.default.sep;
             let ruta = (yield (0, accesoCarpetas_1.ObtenerRutaPermisos)(codigo)) + separador + docs;
-            res.sendFile(path_1.default.resolve(ruta));
+            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    res.sendFile(path_1.default.resolve(ruta));
+                }
+            });
         });
     }
     /** ********************************************************************************************* **

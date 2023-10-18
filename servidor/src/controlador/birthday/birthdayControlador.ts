@@ -65,7 +65,7 @@ class BirthdayControlador {
 
                         let ruta = ObtenerRutaBirthday() + separador + obj.img;
 
-                          // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                         fs.access(ruta, fs.constants.F_OK, (err) => {
                             if (err) {
                             } else {
@@ -106,7 +106,12 @@ class BirthdayControlador {
         const imagen = req.params.imagen;
         let separador = path.sep;
         let ruta = ObtenerRutaBirthday() + separador + imagen;
-        res.sendFile(path.resolve(ruta));
+        fs.access(ruta, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+                res.sendFile(path.resolve(ruta));
+            }
+        });
     }
 
 

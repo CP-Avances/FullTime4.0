@@ -105,7 +105,13 @@ class BirthdayControlador {
             const imagen = req.params.imagen;
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_1.ObtenerRutaBirthday)() + separador + imagen;
-            res.sendFile(path_1.default.resolve(ruta));
+            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    res.sendFile(path_1.default.resolve(ruta));
+                }
+            });
         });
     }
     EditarMensajeBirthday(req, res) {

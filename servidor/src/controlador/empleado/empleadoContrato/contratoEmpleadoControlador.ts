@@ -68,7 +68,12 @@ class ContratoEmpleadoControlador {
         const id = req.params.id;
         let separador = path.sep;
         let ruta = await ObtenerRutaContrato(id) + separador + docs;
-        res.sendFile(path.resolve(ruta));
+        fs.access(ruta, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+              res.sendFile(path.resolve(ruta));
+            }
+          });
     }
 
 
