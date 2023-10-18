@@ -152,11 +152,11 @@ export class RegistrarTimbreComponent implements OnInit {
         this.teclaFuncionF = 3;
         break;
       case 5:
-        this.accionF = 'S/P';
+        this.accionF = 'I/P';
         this.teclaFuncionF = 4;
         break;
       case 6:
-        this.accionF = 'E/P';
+        this.accionF = 'F/P';
         this.teclaFuncionF = 5;
         break;
       case 7:
@@ -164,7 +164,7 @@ export class RegistrarTimbreComponent implements OnInit {
         this.teclaFuncionF = 7;
         break;
       default:
-        this.accionF = 'code 99';
+        this.accionF = 'D';
         break;
     }
     this.InsertarTimbre(form);

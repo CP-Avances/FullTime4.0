@@ -47,7 +47,8 @@
                                 <mat-label>Acción timbre</mat-label>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Acciónes de la marcación.">
-                                    help_outline</mat-icon>
+                                    help_outline
+                                </mat-icon>
                                 <mat-select formControlName="accionTimbre" [(value)]="seleccion"
                                     (selectionChange)="SelectedAccion($event)">
                                     <mat-option *ngFor="let accion of acciones" [value]="accion.item">
@@ -61,7 +62,8 @@
                                 <mat-label>Tecla funcion</mat-label>
                                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                     matTooltip="Tecla marcada en el biométrico.">
-                                    help_outline</mat-icon>
+                                    help_outline
+                                </mat-icon>
                                 <mat-select formControlName="teclaFunTimbre" [(value)]="SeleccionTecla"
                                     (selectionChange)="SelectedTecla($event)">
                                     <mat-option *ngFor="let teclaFun of tecl_funcio" [value]="teclaFun.value">

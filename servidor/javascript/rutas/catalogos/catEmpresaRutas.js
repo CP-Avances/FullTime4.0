@@ -59,6 +59,8 @@ class DepartamentoRutas {
         this.router.put('/credenciales/:id_empresa', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.EditarPassword);
         // METODO PARA ACTUALIZAR USO DE ACCIONES
         this.router.put('/acciones-timbre', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.ActualizarAccionesTimbres);
+        // METODO PARA BUSCAR DATOS DE EMPRESA
+        this.router.get('/', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.ListarEmpresa);
         // CONSULTA USADA EN MODULO DE ALMUERZOS
         this.router.get('/logo/codificados/:id_empresa', catEmpresaControlador_1.default.getImagenBase64);
     }
