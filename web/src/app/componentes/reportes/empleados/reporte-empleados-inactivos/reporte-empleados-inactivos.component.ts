@@ -37,15 +37,11 @@ import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-
 })
 export class ReporteEmpleadosInactivosComponent implements OnInit {
 
-     // METODO QUE INDICA OPCIONES DE BUSQUEDA SELECCIONADOS
-     get bool() {
-      return this.reporteService.criteriosBusqueda;
-    }
+    // METODO QUE INDICA OPCIONES DE BUSQUEDA SELECCIONADOS
+    get bool() { return this.reporteService.criteriosBusqueda; }
   
     // VARIABLE QUE INDICA NÚMERO DE OPCIONES DE BUSQUEDA
-    get opcion() {
-      return this.reporteService.opcion;
-    }
+    get opcion() { return this.reporteService.opcion; }
   
     buscador !: FormGroup;
   
@@ -158,7 +154,7 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
     (res: any[]) => {
       this.origen = JSON.stringify(res);
       sessionStorage.setItem(
-        'reporte_emp_activos',
+        'reporte_emp_inactivos',
         JSON.stringify(res)
       );
 
@@ -219,7 +215,6 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
       );
     },
     (err) => {
-      console.log('hola')
       this.toastr.error(err.error.message);
     }
   );
@@ -332,6 +327,8 @@ BuscarCargos() {
 
     let respuesta = JSON.parse(sessionStorage.getItem('reporte_emp_inactivos') as any)
 
+    console.log('respuesta',respuesta);
+
     let suc = respuesta.filter(o => {
       var bool = this.selectionSuc.selected.find(obj1 => {
         return obj1.id === o.id_suc
@@ -351,8 +348,9 @@ BuscarCargos() {
 
   ModelarRegimen(accion) {
     let respuesta = JSON.parse(
-      sessionStorage.getItem('reporte_vacunas_multiples') as any
+      sessionStorage.getItem('reporte_emp_inactivos') as any
     );
+    console.log('respuesta',respuesta);
     let empleados: any = [];
     let reg: any = [];
     let objeto: any;
