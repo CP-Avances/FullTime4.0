@@ -684,6 +684,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
 
     if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
       data.forEach((obj1) => {
+        let arr_reg = obj1.empleados.map((o: any) => { return o.vacunas.length })
+        let reg = this.SumarRegistros(arr_reg);
         if (this.bool.bool_cargo === true) {
           n.push({
             style: 'tableMarginSuc',
@@ -699,7 +701,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
                   },
                   {
                     border: [false, true, true, true],
-                    text: 'N° Registros: ' + obj1.empleados.length,
+                    text: 'N° Registros: ' + reg,
                     style: 'itemsTableInfo',
                   },
                 ],
@@ -721,7 +723,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
                   },
                   {
                     border: [false, true, true, true],
-                    text: 'N° Registros: ' + obj1.empleados.length,
+                    text: 'N° Registros: ' + reg,
                     style: 'itemsTableInfo',
                   },
                 ],

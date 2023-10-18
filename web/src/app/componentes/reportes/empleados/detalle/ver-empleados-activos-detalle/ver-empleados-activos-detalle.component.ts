@@ -116,6 +116,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
         });
       });
     });
+    console.log('array',this.arr_emp);
   }
 
   extraerDatosCargosRegimen() {
@@ -375,7 +376,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
                   { style: 'itemsTableCentrado', text: obj3.codigo},
                   { style: 'itemsTable', text: obj3.name_empleado },
                   { style: 'itemsTable', text: obj3.cedula },
-                  { style: 'itemsTable', text: obj3.genero },
+                  { style: 'itemsTableCentrado', text: obj3.genero == 1 ? 'M' : 'F' },
                   { style: 'itemsTable', text: obj3.ciudad },
                   { style: 'itemsTable', text: obj3.sucursal },
                   { style: 'itemsTable', text: this.bool_car? obj3.regimen : obj3.regimen[0].name_regimen },
@@ -458,7 +459,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
                     { style: 'itemsTableCentrado', text: obj3.codigo },
                     { style: 'itemsTable', text: obj3.name_empleado },
                     { style: 'itemsTable', text: obj3.cedula },
-                    { style: 'itemsTable', text: obj3.genero },
+                    { style: 'itemsTableCentrado', text: obj3.genero == 1 ? 'M' : 'F' },
                     { style: 'itemsTable', text: regimen },
                     { style: 'itemsTable', text: obj3.departamento },
                     { style: 'itemsTable', text: obj3.cargo},
@@ -548,7 +549,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
                       { style: 'itemsTableCentrado', text: obj3.codigo },
                       { style: 'itemsTable', text: obj3.name_empleado },
                       { style: 'itemsTable', text: obj3.cedula },
-                      { style: 'itemsTable', text: obj3.genero },
+                      { style: 'itemsTableCentrado', text: obj3.genero == 1 ? 'M' : 'F' },
                       { style: 'itemsTable', text: regimen },
                       { style: 'itemsTable', text: obj3.cargo },
                       { style: 'itemsTable', text: obj3.correo },
@@ -604,7 +605,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
                 { style: 'itemsTableCentrado', text: obj3.codigo },
                 { style: 'itemsTable', text: obj3.name_empleado },
                 { style: 'itemsTable', text: obj3.cedula },
-                { style: 'itemsTable', text: obj3.genero },
+                { style: 'itemsTableCentrado', text: obj3.genero == 1 ? 'M' : 'F' },
                 { style: 'itemsTable', text: obj3.sucursal },
                 { style: 'itemsTable', text: regimen },
                 { style: 'itemsTable', text: obj3.departamento },
@@ -657,7 +658,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
           c = c + 1;
           let ele = {
             'N°': c, 'Código Empleado': obj3.codigo, 'Nombre Empleado': obj3.name_empleado,
-            'Cédula': obj3.cedula, 'Género': obj3.genero, 
+            'Cédula': obj3.cedula, 'Género': obj3.genero == 1 ? 'M' : 'F', 
             'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
             'Régimen': regimen,            
             'Departamento': obj2.name_dep,
@@ -688,7 +689,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
         c = c + 1;
           let ele = {
             'N°': c, 'Código Empleado': obj2.codigo, 'Nombre Empleado': obj2.name_empleado,
-            'Cédula': obj2.cedula, 'Género': obj2.genero, 
+            'Cédula': obj2.cedula, 'Género': obj2.genero == 1 ? 'M' : 'F', 
             'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
             'Régimen': this.bool_car? obj2.regimen : obj2.regimen[0].name_regimen,            
             'Departamento': obj2.departamento,

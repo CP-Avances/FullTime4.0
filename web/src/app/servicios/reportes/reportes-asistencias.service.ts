@@ -65,8 +65,16 @@ export class ReportesAsistenciasService {
     return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres/${desde}/${hasta}`, data);
   }
 
+  ReporteTimbresMultipleRegimenCargo(data: any, desde: string, hasta: string) {
+    return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-regimen-cargo/${desde}/${hasta}`, data);
+  }
+
   ReporteTimbreSistema(data: any, desde: string, hasta: string) {
     return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-sistema/${desde}/${hasta}`, data);
+  }
+
+  ReporteTimbreSistemaRegimenCargo(data: any, desde: string, hasta: string) {
+    return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-sistema-regimen-cargo/${desde}/${hasta}`, data);
   }
 
   ReporteTimbreRelojVirtual(data: any, desde: string, hasta: string) {
@@ -75,6 +83,10 @@ export class ReportesAsistenciasService {
 
   ReporteTimbreHorarioAbierto(data: any, desde: string, hasta: string) {
     return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-horario-abierto/${desde}/${hasta}`, data);
+  }
+
+  ReporteTimbreHorarioAbiertoRegimenCargo(data: any, desde: string, hasta: string) {
+    return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-horario-abierto-regimen-cargo/${desde}/${hasta}`, data);
   }
 
   ReporteTimbrestabulados(data: any, desde: string, hasta: string) {
