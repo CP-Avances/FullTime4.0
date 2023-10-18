@@ -44,15 +44,24 @@ class ReportesAsistenciasRutas {
 
         // Reportes de Timbres Multiple
         this.router.put('/timbres/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbresMultiple);
+        
+        // REPORTES DE TIMBRES MULTIPLES PARA REGIMEN Y CARGO
+        this.router.put('/timbres-regimen-cargo/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbresMultipleRegimenCargo);
 
         // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL SISTEMA 
         this.router.put('/timbres-sistema/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbreSistema);
+        
+        // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL SISTEMA PARA REGIMEN Y CARGO
+        this.router.put('/timbres-sistema-regimen-cargo/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbreSistemaRegimenCargo);
 
         // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL RELOJ VIRTUAL 
         this.router.put('/timbres-reloj-virtual/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbreRelojVirtual);
 
         // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL RELOJ VIRTUAL 
         this.router.put('/timbres-horario-abierto/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbreHorarioAbierto);
+        
+        // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL RELOJ VIRTUAL PARA REGIMEN Y CARGO
+        this.router.put('/timbres-horario-abierto-regimen-cargo/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbreHorarioAbiertoRegimenCargo);
 
         // REPORTES DE TIMBRES DE HORARIO ABIERTO
         this.router.get('/timbres-abiertos', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbresAbiertos);

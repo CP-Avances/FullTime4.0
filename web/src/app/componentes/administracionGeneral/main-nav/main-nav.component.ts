@@ -519,7 +519,7 @@ export class MainNavComponent implements OnInit {
               { name: 'Usuarios Inactivos', url: '/reporte-emp-inactivos', color: true },
               { name: 'Registro Vacunación', url: '/lista-vacunados', color: true },
               { name: 'Timbres', url: '/reporte-timbres-multiples', color: true },
-              { name: 'Timbre Horario Abierto', url: '/reporte-timbre-abierto', color: true },
+              { name: 'Timbres Libres', url: '/reporte-timbre-abierto', color: true },
               { name: 'Puntualidad', url: '/reporte-puntualidad', color: true },
               { name: 'Atrasos', url: '/reporte-atrasos-multiples', color: true },
               { name: 'Faltas', url: '/reporte-faltas', color: true },
