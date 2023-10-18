@@ -150,3 +150,18 @@ export const ObtenerRutaContrato = async function (id: any) {
 
     return ruta + separador + 'contratos' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
 }
+
+// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO
+export const ObtenerRutaPlatilla = function () {
+    var ruta = '';
+    let separador = path.sep;
+    for (var i = 0; i < __dirname.split(separador).length - 2; i++) {
+        if (ruta === '') {
+            ruta = __dirname.split(separador)[i];
+        }
+        else {
+            ruta = ruta + separador + __dirname.split(separador)[i];
+        }
+    }
+    return ruta + separador + 'plantillasRegistro';
+}

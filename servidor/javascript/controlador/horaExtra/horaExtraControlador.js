@@ -365,7 +365,15 @@ class HorasExtrasPedidasControlador {
             if (documento != 'null' && documento != '' && documento != null) {
                 let filePath = `servidor\\horasExtras\\${documento}`;
                 let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-                fs_1.default.unlinkSync(direccionCompleta);
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs_1.default.access(direccionCompleta, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                    }
+                    else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs_1.default.unlinkSync(direccionCompleta);
+                    }
+                });
             }
             const [objetoHoraExtra] = response.rows;
             if (objetoHoraExtra) {
@@ -505,7 +513,15 @@ class HorasExtrasPedidasControlador {
             if (documento != 'null' && documento != '' && documento != null) {
                 let filePath = `servidor\\horasExtras\\${documento}`;
                 let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-                fs_1.default.unlinkSync(direccionCompleta);
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs_1.default.access(direccionCompleta, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                    }
+                    else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs_1.default.unlinkSync(direccionCompleta);
+                    }
+                });
             }
             res.jsonp({ message: 'Documento Actualizado' });
         });
@@ -517,7 +533,15 @@ class HorasExtrasPedidasControlador {
             if (documento != 'null' && documento != '' && documento != null) {
                 let filePath = `servidor\\horasExtras\\${documento}`;
                 let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-                fs_1.default.unlinkSync(direccionCompleta);
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs_1.default.access(direccionCompleta, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                    }
+                    else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs_1.default.unlinkSync(direccionCompleta);
+                    }
+                });
             }
             res.jsonp({ message: 'ok' });
         });
@@ -528,25 +552,12 @@ class HorasExtrasPedidasControlador {
             const docs = req.params.docs;
             let filePath = `servidor\\horasExtras\\${docs}`;
             res.sendFile(__dirname.split("servidor")[0] + filePath);
-        });
-    }
-    // METODO PARA CREAR ARCHIVO XML
-    FileXML(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var xml = builder.create('root').ele(req.body).end({ pretty: true });
-            console.log(req.body.userName);
-            let filename = "SolicitudesHorasExtras-" + req.body.userName + '-' + req.body.userId + '-' + new Date().getTime() + '.xml';
-            fs_1.default.writeFile(`xmlDownload/${filename}`, xml, function (err) {
-            });
-            res.jsonp({ text: 'XML creado', name: filename });
-        });
-    }
-    // METODO PARA DESCARGAR ARCHIVO XML
-    downloadXML(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const name = req.params.nameXML;
-            let filePath = `servidor\\xmlDownload\\${name}`;
-            res.sendFile(__dirname.split("servidor")[0] + filePath);
+            /* fs.access(ruta, fs.constants.F_OK, (err) => {
+               if (err) {
+               } else {
+                 res.sendFile(path.resolve(ruta));
+               }
+             });*/
         });
     }
     /** ************************************************************************************************* **

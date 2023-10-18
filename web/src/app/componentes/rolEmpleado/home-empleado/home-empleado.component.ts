@@ -46,21 +46,7 @@ export class HomeEmpleadoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // echarts_hora.use(
-    //   [TooltipComponent, LegendComponent, BarChart, GridComponent, CanvasRenderer]
-    // );
-    // echarts_perm.use(
-    //   [TooltipComponent, LegendComponent, BarChart, GridComponent, CanvasRenderer]
-    // );
-    // echarts_vaca.use(
-    //   [TooltipComponent, LegendComponent, BarChart, GridComponent, CanvasRenderer]
-    // );
-    // echarts_atra.use(
-    //   [TooltipComponent, LegendComponent, BarChart, GridComponent, CanvasRenderer]
-    // );
-
     this.BuscarParametro();
-    // this.ModeloGraficas();
   }
 
   /** **************************************************************************************** **
@@ -99,94 +85,6 @@ export class HomeEmpleadoComponent implements OnInit {
   FormatearFechas(formato_fecha: string) {
     var f = moment();
     this.fecha = this.validar.FormatearFecha(moment(f).format('YYYY-MM-DD'), formato_fecha, this.validar.dia_completo);
-  }
-
-  // METODO PARA PRESENTAR GRAFICAS
-  ModeloGraficas() {
-    this.GraficaUno()
-    this.GraficaDos();
-    this.GraficaTres();
-    this.GraficaCuatro();
-  }
-
-  GraficaUno() {
-    let local = sessionStorage.getItem('horasExtras');
-    var chartDom = document.getElementById('charts_horas_extras') as HTMLCanvasElement;
-    var thisChart = echarts_hora.init(chartDom, 'light', { width: 350, renderer: 'svg', devicePixelRatio: 5 });
-
-    if (local === null) {
-      this.restGraficas.EmpleadoHoraExtra().subscribe(res => {
-        // console.log('************* Horas extras **************');
-        sessionStorage.setItem('horasExtras', JSON.stringify(res))
-        // console.log(res);
-        thisChart.setOption(res);
-      });
-    } else {
-      var data_JSON = JSON.parse(local);
-      thisChart.setOption(data_JSON);
-    }
-  }
-
-  GraficaDos() {
-    let local = sessionStorage.getItem('vacaciones');
-    var chartDom = document.getElementById('charts_vacaciones') as HTMLCanvasElement;
-    var thisChart = echarts_hora.init(chartDom, 'light', { width: 350, renderer: 'svg', devicePixelRatio: 5 });
-
-    if (local === null) {
-      this.restGraficas.EmpleadoVacaciones().subscribe(res => {
-        // console.log('************* Vacaciones **************');
-        sessionStorage.setItem('vacaciones', JSON.stringify(res))
-        // console.log(res);
-        thisChart.setOption(res);
-      });
-    } else {
-      var data_JSON = JSON.parse(local);
-      thisChart.setOption(data_JSON);
-    }
-  }
-
-  GraficaTres() {
-    let local = sessionStorage.getItem('permisos');
-    var chartDom = document.getElementById('charts_permisos') as HTMLCanvasElement;
-    var thisChart = echarts_hora.init(chartDom, 'light', { width: 350, renderer: 'svg', devicePixelRatio: 5 });
-
-    if (local === null) {
-      this.restGraficas.EmpleadoPermisos().subscribe(res => {
-        // console.log('************* Permisos **************');
-        // console.log(res);
-        sessionStorage.setItem('permisos', JSON.stringify(res))
-        thisChart.setOption(res);
-      });
-    } else {
-      var data_JSON = JSON.parse(local);
-      thisChart.setOption(data_JSON);
-    }
-  }
-
-  GraficaCuatro() {
-    let local = sessionStorage.getItem('atrasos');
-    var chartDom = document.getElementById('charts_atraso') as HTMLCanvasElement;
-    var thisChart = echarts_hora.init(chartDom, 'light', { width: 350, renderer: 'svg', devicePixelRatio: 5 });
-
-    if (local === null) {
-      this.restGraficas.EmpleadoAtrasos().subscribe(res => {
-        // console.log('*************  ATRASOS **************');
-        // console.log(res);
-        sessionStorage.setItem('atrasos', JSON.stringify(res))
-        thisChart.setOption(res);
-      });
-    } else {
-      var data_JSON = JSON.parse(local);
-      thisChart.setOption(data_JSON);
-    }
-  }
-
-  RefrescarGraficas() {
-    sessionStorage.removeItem('atrasos');
-    sessionStorage.removeItem('permisos');
-    sessionStorage.removeItem('vacaciones');
-    sessionStorage.removeItem('horasExtras');
-    this.ModeloGraficas();
   }
 
   // METODO DE MENU RAPIDO

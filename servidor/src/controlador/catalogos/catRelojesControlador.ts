@@ -39,22 +39,6 @@ class RelojesControlador {
         res.jsonp({ message: 'Registro eliminado.' });
     }
 
-    // METODO PARA CREAR ARCHIVO XML
-    public async FileXML(req: Request, res: Response): Promise<any> {
-        var xml = builder.create('root').ele(req.body).end({ pretty: true });
-        let filename = "Relojes-" + req.body.userName + '-' + req.body.userId + '-' + new Date().getTime() + '.xml';
-        fs.writeFile(`xmlDownload/${filename}`, xml, function (err) {
-        });
-        res.jsonp({ text: 'XML creado', name: filename });
-    }
-
-    // METODO PARA DESCARGAR ARCHIVO XML
-    public async downloadXML(req: Request, res: Response): Promise<any> {
-        const name = req.params.nameXML;
-        let filePath = `servidor/xmlDownload/${name}`
-        res.sendFile(__dirname.split("servidor")[0] + filePath);
-    }
-
     // METODO PARA REGISTRAR DISPOSITIVO
     public async CrearRelojes(req: Request, res: Response) {
         try {
@@ -145,23 +129,6 @@ class RelojesControlador {
         }
     }
 
-        // METODO PARA CREAR ARCHIVO XML REGISTRO DISPOSITIVOS
-        public async FileXMLDispositivos(req: Request, res: Response): Promise<any> {
-            var xml = builder.create('root').ele(req.body).end({ pretty: true });
-            let filename = "IDDispositivos-" + req.body.userName + '-' + req.body.userId + '-' + new Date().getTime() + '.xml';
-            fs.writeFile(`xmlDownload/${filename}`, xml, function (err) {
-            console.log(err);
-            }
-            );
-            res.jsonp({ text: 'XML creado', name: filename });
-        }
-
-        // METODO PARA DESCARGAR ARCHIVO XML
-        public async downloadXMLIdDispositivos(req: Request, res: Response): Promise<any> {
-            const name = req.params.nameXML;
-            let filePath = `servidor/xmlDownload/${name}`
-            res.sendFile(__dirname.split("servidor")[0] + filePath);
-        }
 
 
 
@@ -225,7 +192,15 @@ class RelojesControlador {
                     tiene_funciones, id_sucursal.rows[0]['id'], id_departamento.rows[0]['id'], codigo_reloj, accion]);
             res.jsonp({ message: 'correcto' });
         });
-        fs.unlinkSync(filePath);
+        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+        fs.access(filePath, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+                // ELIMINAR DEL SERVIDOR
+                fs.unlinkSync(filePath);
+            }
+        });
+
     }
 
     public async VerificarDatos(req: Request, res: Response): Promise<void> {
@@ -315,7 +290,14 @@ class RelojesControlador {
             }
             contador = contador + 1;
         });
-        fs.unlinkSync(filePath);
+        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+        fs.access(filePath, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+                // ELIMINAR DEL SERVIDOR
+                fs.unlinkSync(filePath);
+            }
+        });
     }
 
     public async VerificarPlantilla(req: Request, res: Response) {
@@ -371,7 +353,14 @@ class RelojesControlador {
                 return res.jsonp({ message: 'error' });
             }
         }
-        fs.unlinkSync(filePath);
+        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+        fs.access(filePath, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+                // ELIMINAR DEL SERVIDOR
+                fs.unlinkSync(filePath);
+            }
+        });
     }
 
 

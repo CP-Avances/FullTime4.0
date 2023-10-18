@@ -15,10 +15,6 @@ class TituloRutas {
         this.router.get('/', TokenValidation, TITULO_CONTROLADOR.ListarTitulos);
         // METODO PARA ELIMINAR REGISTRO
         this.router.delete('/eliminar/:id', TokenValidation, TITULO_CONTROLADOR.EliminarRegistros);
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', TokenValidation, TITULO_CONTROLADOR.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', TITULO_CONTROLADOR.downloadXML);
         // METODO PARA ACTUALIZAR REGISTRO DE TITULO
         this.router.put('/', TokenValidation, TITULO_CONTROLADOR.ActualizarTitulo);
 

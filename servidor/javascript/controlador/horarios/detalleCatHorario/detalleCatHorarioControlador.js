@@ -145,7 +145,15 @@ class DetalleCatalogoHorarioControlador {
                 }
                 contador = contador + 1;
             }));
-            fs_1.default.unlinkSync(filePath);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
         });
     }
     CrearDetallePlantilla(req, res) {
@@ -173,7 +181,15 @@ class DetalleCatalogoHorarioControlador {
                     res.jsonp({ message: 'correcto' });
                 }
             }));
-            fs_1.default.unlinkSync(filePath);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
         });
     }
 }

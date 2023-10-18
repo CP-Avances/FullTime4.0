@@ -87,10 +87,6 @@ class EmpleadoRutas {
         this.router.get('/', TokenValidation, EMPLEADO_CONTROLADOR.Listar);
         // METODO PARA LISTAR EMPLEADOS INACTIVOS
         this.router.get('/desactivados/empleados', TokenValidation, EMPLEADO_CONTROLADOR.ListarEmpleadosDesactivados);
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', TokenValidation, EMPLEADO_CONTROLADOR.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', EMPLEADO_CONTROLADOR.downloadXML);
         // METODO PARA DESACTIVAR EMPLEADOS
         this.router.put('/desactivar/masivo', TokenValidation, EMPLEADO_CONTROLADOR.DesactivarMultiplesEmpleados);
         // METODO PARA ACTIVAR EMPLEADOS

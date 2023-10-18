@@ -16,10 +16,6 @@ class TipoPermisosRutas {
         this.router.get('/', TokenValidation, TIPO_PERMISOS_CONTROLADOR.Listar);
         // METODO PARA ELIMINAR REGISTROS
         this.router.delete('/eliminar/:id', TokenValidation, TIPO_PERMISOS_CONTROLADOR.EliminarRegistros);
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', TokenValidation, TIPO_PERMISOS_CONTROLADOR.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', TIPO_PERMISOS_CONTROLADOR.downloadXML);
         // METODO PARA BUSCAR DATOS DE UN TIPO DE PERMISO
         this.router.get('/:id', TokenValidation, TIPO_PERMISOS_CONTROLADOR.BuscarUnTipoPermiso);
         // METODO PARA REGISTRAR TIPO DE PERMISO

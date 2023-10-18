@@ -81,8 +81,15 @@ class EmpresaControlador {
                         let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + obj.logo;
                         // SI EL NOMBRE DE LA IMAGEN YA EXISTE SOLO SE ACTUALIZA CASO CONTRARIO SE ELIMINA
                         if (obj.logo != logo) {
-                            // ELIMINAR LOGO DEL SERVIDOR
-                            fs_1.default.unlinkSync(ruta);
+                            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                                if (err) {
+                                }
+                                else {
+                                    // ELIMINAR LOGO DEL SERVIDOR
+                                    fs_1.default.unlinkSync(ruta);
+                                }
+                            });
                             // ACTUALIZAR REGISTRO DE IMAGEN
                             yield database_1.default.query(`
                             UPDATE cg_empresa SET logo = $2 WHERE id = $1
@@ -189,8 +196,16 @@ class EmpresaControlador {
                         let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + obj.cabecera_firma;
                         // SI EL NOMBRE DE LA IMAGEN YA EXISTE SOLO SE ACTUALIZA CASO CONTRARIO SE ELIMINA
                         if (obj.cabecera_firma != logo) {
-                            // ELIMINAR LOGO DEL SERVIDOR
-                            fs_1.default.unlinkSync(ruta);
+                            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                                if (err) {
+                                }
+                                else {
+                                    // ELIMINAR LOGO DEL SERVIDOR
+                                    fs_1.default.unlinkSync(ruta);
+                                }
+                            });
+                            ;
                             // ACTUALIZAR REGISTRO DE IMAGEN
                             yield database_1.default.query(`
                             UPDATE cg_empresa SET cabecera_firma = $2 WHERE id = $1
@@ -253,8 +268,15 @@ class EmpresaControlador {
                         let ruta = (0, accesoCarpetas_1.ObtenerRutaLogos)() + separador + obj.pie_firma;
                         // SI EL NOMBRE DE LA IMAGEN YA EXISTE SOLO SE ACTUALIZA CASO CONTRARIO SE ELIMINA
                         if (obj.pie_firma != logo) {
-                            // ELIMINAR LOGO DEL SERVIDOR
-                            fs_1.default.unlinkSync(ruta);
+                            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                                if (err) {
+                                }
+                                else {
+                                    // ELIMINAR LOGO DEL SERVIDOR
+                                    fs_1.default.unlinkSync(ruta);
+                                }
+                            });
                             // ACTUALIZAR REGISTRO DE IMAGEN
                             yield database_1.default.query(`
                             UPDATE cg_empresa SET pie_firma = $2 WHERE id = $1
@@ -316,79 +338,13 @@ class EmpresaControlador {
                 UPDATE cg_empresa SET acciones_timbres = $1 WHERE id = $2
                 `, [bool_acciones, id]);
                 res.status(200).jsonp({
-                    message: 'Empresa actualizada exitosamente',
-                    title: 'Ingrese nuevamente al sistema'
+                    message: 'Empresa actualizada exitosamente.',
+                    title: 'Ingrese nuevamente al sistema.'
                 });
             }
             catch (error) {
                 res.status(404).jsonp(error);
             }
-        });
-    }
-    ListarEmpresa(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const EMPRESA = yield database_1.default.query('SELECT id, nombre, ruc, direccion, telefono, correo, ' +
-                'representante, tipo_empresa, establecimiento, logo, color_p, color_s, num_partida, marca_agua, ' +
-                'correo_empresa FROM cg_empresa ORDER BY nombre ASC');
-            if (EMPRESA.rowCount > 0) {
-                return res.jsonp(EMPRESA.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
-            }
-        });
-    }
-    ListarUnaEmpresa(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { nombre } = req.params;
-            const EMPRESA = yield database_1.default.query('SELECT id, nombre, ruc, direccion, telefono, correo, representante, ' +
-                'tipo_empresa, establecimiento, logo, color_p, color_s, num_partida, marca_agua, correo_empresa ' +
-                'FROM cg_empresa WHERE nombre = $1', [nombre]);
-            if (EMPRESA.rowCount > 0) {
-                return res.jsonp(EMPRESA.rows);
-            }
-            else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
-            }
-        });
-    }
-    CrearEmpresa(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { nombre, ruc, direccion, telefono, tipo_empresa, representante, establecimiento, color_p, color_s, correo_empresa } = req.body;
-            yield database_1.default.query('INSERT INTO cg_empresa (nombre, ruc, direccion, telefono, tipo_empresa, ' +
-                'representante, establecimiento, color_p, color_s, correo_empresa) ' +
-                'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)', [nombre, ruc, direccion, telefono, tipo_empresa, representante, establecimiento,
-                color_p, color_s, correo_empresa]);
-            res.jsonp({ message: 'La Empresa se registró con éxito' });
-        });
-    }
-    FileXML(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var xml = builder.create('root').ele(req.body).end({ pretty: true });
-            console.log(req.body.userName);
-            let filename = "Empresas-" + req.body.userName + '-' + req.body.userId + '-' + new Date().getTime() +
-                '.xml';
-            fs_1.default.writeFile(`xmlDownload/${filename}`, xml, function (err) {
-                if (err) {
-                    return console.log(err);
-                }
-                console.log("Archivo guardado");
-            });
-            res.jsonp({ text: 'XML creado', name: filename });
-        });
-    }
-    downloadXML(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const name = req.params.nameXML;
-            let filePath = `servidor\\xmlDownload\\${name}`;
-            res.sendFile(__dirname.split("servidor")[0] + filePath);
-        });
-    }
-    EliminarRegistros(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query('DELETE FROM cg_empresa WHERE id = $1', [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
         });
     }
 }

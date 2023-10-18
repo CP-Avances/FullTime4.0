@@ -23,13 +23,8 @@ class CiudadRutas {
         this.router.get('/', TokenValidation, CIUDAD_CONTROLADOR.ListarNombreCiudad);
         // METODO PARA ELIMINAR REGISTRO
         this.router.delete('/eliminar/:id', TokenValidation, CIUDAD_CONTROLADOR.EliminarCiudad);
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', TokenValidation, CIUDAD_CONTROLADOR.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', CIUDAD_CONTROLADOR.downloadXML);
         // METODO PARA BUSCAR DATOS DE UNA CIUDAD
         this.router.get('/:id', TokenValidation, CIUDAD_CONTROLADOR.ConsultarUnaCiudad);
-
     }
 }
 

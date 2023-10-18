@@ -78,8 +78,14 @@ class DocumentosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             let nombre = req.params.nom_carpeta;
             let filename = req.params.filename;
-            const path = (0, listarArchivos_1.DescargarArchivo)(nombre, filename);
-            res.sendFile(path);
+            const path_ = (0, listarArchivos_1.DescargarArchivo)(nombre, filename);
+            fs_1.default.access(path_, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    res.sendFile(path_1.default.resolve(path_));
+                }
+            });
         });
     }
     // METODO PARA DESCARGAR ARCHIVOS INDIVIDUALES
@@ -88,8 +94,14 @@ class DocumentosControlador {
             let nombre = req.params.nom_carpeta;
             let filename = req.params.filename;
             let tipo = req.params.tipo;
-            const path = (0, listarArchivos_1.DescargarArchivoIndividuales)(nombre, filename, tipo);
-            res.sendFile(path);
+            const path_ = (0, listarArchivos_1.DescargarArchivoIndividuales)(nombre, filename, tipo);
+            fs_1.default.access(path_, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    res.sendFile(path_1.default.resolve(path_));
+                }
+            });
         });
     }
     // METODO PARA ELIMINAR REGISTROS DE DOCUMENTACION
@@ -101,7 +113,15 @@ class DocumentosControlador {
             `, [id]);
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_1.ObtenerRutaDocumento)() + separador + documento;
-            fs_1.default.unlinkSync(ruta);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(ruta);
+                }
+            });
             res.jsonp({ message: 'Registro eliminado.' });
         });
     }

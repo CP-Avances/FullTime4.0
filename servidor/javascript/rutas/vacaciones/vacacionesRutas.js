@@ -33,10 +33,6 @@ class VacacionesRutas {
         this.router.put('/:id/estado', verificarToken_1.TokenValidation, vacacionesControlador_1.default.ActualizarEstado);
         // BUSCAR DATOS DE VACACIONES POR ID DE VACACION
         this.router.get('/one/:id', verificarToken_1.TokenValidation, vacacionesControlador_1.default.ListarUnaVacacion);
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', verificarToken_1.TokenValidation, vacacionesControlador_1.default.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', vacacionesControlador_1.default.downloadXML);
         /** ************************************************************************************************* **
          ** **                        METODO DE ENVIO DE NOTIFICACIONES                                    ** **
          ** ************************************************************************************************* **/

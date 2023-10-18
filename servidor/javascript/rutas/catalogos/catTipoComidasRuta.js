@@ -23,8 +23,6 @@ class TipoComidasRuta {
         this.router.post('/', verificarToken_1.TokenValidation, catTipoComidasControlador_1.default.CrearTipoComidas);
         this.router.put('/', verificarToken_1.TokenValidation, catTipoComidasControlador_1.default.ActualizarComida);
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, catTipoComidasControlador_1.default.EliminarRegistros);
-        this.router.post('/xmlDownload/', verificarToken_1.TokenValidation, catTipoComidasControlador_1.default.FileXML);
-        this.router.get('/download/:nameXML', catTipoComidasControlador_1.default.downloadXML);
         this.router.get('/registro/ultimo', verificarToken_1.TokenValidation, catTipoComidasControlador_1.default.VerUltimoRegistro);
         // Consultar datos de tabla detalle_menu
         this.router.post('/detalle/menu', verificarToken_1.TokenValidation, catTipoComidasControlador_1.default.CrearDetalleMenu);

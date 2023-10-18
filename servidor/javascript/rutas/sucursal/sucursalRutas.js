@@ -24,10 +24,6 @@ class SucursalRutas {
         this.router.get('/', verificarToken_1.TokenValidation, sucursalControlador_1.default.ListarSucursales);
         // ELIMINAR REGISTRO
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, sucursalControlador_1.default.EliminarRegistros);
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', verificarToken_1.TokenValidation, sucursalControlador_1.default.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', sucursalControlador_1.default.downloadXML);
         // METODO PARA BUSCAR DATOS DE UNA SUCURSAL
         this.router.get('/unaSucursal/:id', verificarToken_1.TokenValidation, sucursalControlador_1.default.ObtenerUnaSucursal);
     }

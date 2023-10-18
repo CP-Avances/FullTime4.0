@@ -367,7 +367,7 @@
                                     {{e.hora_trabaja}}
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 1)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -394,16 +394,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 1">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 1"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -413,7 +413,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 2)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -430,7 +430,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 2">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -440,16 +440,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 2">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 2"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -459,7 +459,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 3)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -476,7 +476,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 3">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -486,16 +486,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 3">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 3"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -505,7 +505,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 4)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -522,7 +522,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 4">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -532,16 +532,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 4">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 4"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -551,7 +551,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 5)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -568,7 +568,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 5">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -578,16 +578,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 5">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 5"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -597,7 +597,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 6)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -614,7 +614,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 6">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -624,16 +624,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 6">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 6"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -643,7 +643,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 7)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -660,7 +660,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 7">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -670,16 +670,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 7">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 7"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -689,7 +689,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 8)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -706,7 +706,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 8">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -716,16 +716,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 8">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 8"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -735,7 +735,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 9)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -752,7 +752,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 9">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -762,16 +762,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 9">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 9"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -781,7 +781,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 10)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -798,7 +798,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 10">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -808,16 +808,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 10">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 10"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -827,7 +827,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 11)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -844,7 +844,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 11">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -854,16 +854,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 11">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 11"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -873,7 +873,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 12)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -890,7 +890,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 12">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -900,16 +900,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 12">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 12"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -919,7 +919,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 13)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -936,7 +936,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 13">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -946,16 +946,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 13">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 13"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -965,7 +965,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 14)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -982,7 +982,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 14">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -992,16 +992,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 14">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 14"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -1011,7 +1011,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 15)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -1028,7 +1028,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 15">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -1038,16 +1038,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 15">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 15"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -1057,7 +1057,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 16)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -1074,7 +1074,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 16">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -1084,16 +1084,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 16">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 16"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -1103,7 +1103,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 17)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -1120,7 +1120,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 17">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -1130,16 +1130,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 17">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 17"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -1149,7 +1149,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 18)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -1166,7 +1166,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 18">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -1176,16 +1176,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 18">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 18"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -1195,7 +1195,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 19)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -1212,7 +1212,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 19">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -1222,16 +1222,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 19">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 19"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -1241,7 +1241,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 20)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -1258,7 +1258,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 20">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -1268,16 +1268,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 20">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 20"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -1287,7 +1287,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 21)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -1304,7 +1304,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 21">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -1314,16 +1314,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 21">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 21"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -1333,7 +1333,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 22)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -1350,7 +1350,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 22">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -1360,16 +1360,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 22">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 22"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -1379,7 +1379,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 23)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -1396,7 +1396,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 23">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -1406,16 +1406,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 23">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 23"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -1425,7 +1425,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 24)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -1442,7 +1442,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 24">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -1452,16 +1452,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 24">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 24"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -1471,7 +1471,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 25)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -1488,7 +1488,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 25">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -1498,16 +1498,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 25">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 25"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -1517,7 +1517,7 @@
 
                                 </td>
                                 <td id="td_horarios_">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 26)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -1534,7 +1534,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 26">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -1544,16 +1544,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 26">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 26"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -1563,7 +1563,7 @@
 
                                 </td>
                                 <td id="td_horarios_" *ngIf="fechas_mes.length > 26">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 27)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -1580,7 +1580,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 27">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -1590,16 +1590,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 27">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 27"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -1609,7 +1609,7 @@
 
                                 </td>
                                 <td id="td_horarios_" *ngIf="fechas_mes.length > 27">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 28)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -1626,7 +1626,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 28">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -1636,16 +1636,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 28">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 28"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -1655,7 +1655,7 @@
 
                                 </td>
                                 <td id="td_horarios_" *ngIf="fechas_mes.length > 28">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 29)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -1672,7 +1672,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 29">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -1682,16 +1682,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 29">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 29"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -1701,7 +1701,7 @@
 
                                 </td>
                                 <td id="td_horarios_" *ngIf="fechas_mes.length > 29">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 30)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -1718,7 +1718,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 30">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -1728,16 +1728,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 30">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 30"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}
@@ -1747,7 +1747,7 @@
 
                                 </td>
                                 <td id="td_horarios_" *ngIf="fechas_mes.length > 30">
-                                    <div style="width: 100px;">
+                                    <div style="width: 130px;">
                                         <mat-icon id="iconos" class="float-left" (click)="IngresarHorario(e.index, 31)"
                                             *ngIf="ver_registrar">
                                             add_circle
@@ -1764,7 +1764,7 @@
                                     <div *ngIf="e.existencias">
                                         <div *ngIf="e.existencias.dia === 31">
                                             <div class="container" *ngFor="let ex of e.existencias.existe"
-                                                style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                                style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                                 <span style="font-size: 9px;"
                                                     *ngIf="ex.default != 'L' && ex.default != 'FD'">
                                                     ({{ex.hora_trabajo}}) {{ex.codigo}} <b style="color:red">****</b>
@@ -1774,16 +1774,16 @@
                                     </div>
 
                                     <div class="container" *ngFor="let h of e.asignado"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <span style="font-size: 11px; color:blue" *ngIf="h.dia === 31">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
                                     <div class="container" *ngFor="let t of e.totalizador"
-                                        style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                        style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 31"
-                                            style="width: 100px; text-align: center;display: flex;justify-content: center;">
+                                            style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                             <span style="font-size: 9px; color:blueviolet"
                                                 *ngIf="t.suma > e.hora_trabaja">
                                                 Jornada superada: {{t.suma}}

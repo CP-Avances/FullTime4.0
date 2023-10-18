@@ -23,8 +23,6 @@ class TipoComidasRuta {
         this.router.post('/', TokenValidation, TIPO_COMIDAS_CONTROLADOR.CrearTipoComidas);
         this.router.put('/', TokenValidation, TIPO_COMIDAS_CONTROLADOR.ActualizarComida);
         this.router.delete('/eliminar/:id', TokenValidation, TIPO_COMIDAS_CONTROLADOR.EliminarRegistros);
-        this.router.post('/xmlDownload/', TokenValidation, TIPO_COMIDAS_CONTROLADOR.FileXML);
-        this.router.get('/download/:nameXML', TIPO_COMIDAS_CONTROLADOR.downloadXML);
         this.router.get('/registro/ultimo', TokenValidation, TIPO_COMIDAS_CONTROLADOR.VerUltimoRegistro);
 
         // Consultar datos de tabla detalle_menu

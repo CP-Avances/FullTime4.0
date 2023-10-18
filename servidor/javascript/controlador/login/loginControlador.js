@@ -38,7 +38,7 @@ class LoginControlador {
         `, [nombre_usuario, pass]);
                 // SI EXISTE USUARIOS
                 if (USUARIO.rowCount != 0) {
-                    console.log('usuario existe');
+                    //console.log('usuario existe')
                     const { id, id_empleado, id_rol, usuario: user } = USUARIO.rows[0];
                     let ACTIVO = yield database_1.default.query(`
           SELECT e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access 
@@ -48,7 +48,7 @@ class LoginControlador {
                         return result.rows;
                     });
                     const { empleado, usuario, codigo, web_access } = ACTIVO[0];
-                    console.log('estado del usuario ', empleado, ' ', usuario);
+                    //console.log('estado del usuario ', empleado, ' ', usuario)
                     // SI EL USUARIO NO SE ENCUENTRA ACTIVO
                     if (empleado === 2 && usuario === false) {
                         return res.jsonp({ message: 'inactivo' });

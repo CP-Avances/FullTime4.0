@@ -40,11 +40,6 @@ class UbicacionRutas {
         this.router.get('/determinada/:id', UBICACION_CONTROLADOR.ListarUnaCoordenada);
         this.router.get('/ultimo-registro', UBICACION_CONTROLADOR.BuscarUltimoRegistro);
         this.router.delete('/eliminar/:id', TokenValidation, UBICACION_CONTROLADOR.EliminarCoordenadas);
-
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', TokenValidation, UBICACION_CONTROLADOR.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', UBICACION_CONTROLADOR.downloadXML);
     }
 }
 

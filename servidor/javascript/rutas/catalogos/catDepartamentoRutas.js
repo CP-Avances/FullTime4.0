@@ -30,10 +30,6 @@ class DepartamentoRutas {
         this.router.get('/buscar/datosDepartamento/:id_sucursal', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.ListarDepartamentosSucursal);
         // METODO PARA ELIMINAR REGISTRO
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.EliminarRegistros);
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', catDepartamentoControlador_1.default.downloadXML);
         // REGISTRAR NIVELDEPARTAMENTO   --**VERIFICADO
         this.router.post('/crearnivel', verificarToken_1.TokenValidation, catDepartamentoControlador_1.default.CrearNivelDepa);
         // BUSCAR NIVEL DEPARTAMENTO POR ID_DEPARTAMENTO Y ID_SUCURSAL   --**VERIFICADO
