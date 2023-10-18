@@ -1117,7 +1117,7 @@ export class ReporteTimbresComponent implements OnInit {
     this.LimpiarCampos3();
   }
 
-  VerInformacionSucursal(form: any) {
+ /* VerInformacionSucursal(form: any) {
     this.datosEmpleado = [];
     this.restD.VerDatosSucursal(form.sucursalForm).subscribe(res => {
       this.datosEmpleado = res;
@@ -1280,11 +1280,11 @@ export class ReporteTimbresComponent implements OnInit {
         timeOut: 6000,
       })
     });
-  }
+  }*/
 
   VerificarBusquedas(form: any) {
     console.log('form', form.depaForm, form.sucursalForm, form.cargosForm, form.laboralForm)
-    if (form.sucursalForm === '' && form.depaForm === '' &&
+   /* if (form.sucursalForm === '' && form.depaForm === '' &&
       form.laboralForm === '' && form.cargosForm === '') {
       this.toastr.info('Ingresar un criterio de búsqueda.', 'Verficar Información', {
         timeOut: 6000,
@@ -1349,7 +1349,7 @@ export class ReporteTimbresComponent implements OnInit {
     else if (form.sucursalForm === '' && form.depaForm === '' &&
       form.laboralForm === '' && form.cargosForm != '') {
       this.VerInformacionCargo(form);
-    }
+    }*/
   }
 
 }

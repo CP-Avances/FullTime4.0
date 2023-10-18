@@ -4,7 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
 
-// SECCIÓN DE SERVICIOS
+// SECCION DE SERVICIOS
 import { EmpleadoUbicacionService } from 'src/app/servicios/empleadoUbicacion/empleado-ubicacion.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { FuncionesService } from 'src/app/servicios/funciones/funciones.service';
@@ -161,7 +161,7 @@ export class RegistrarTimbreComponent implements OnInit {
         break;
       case 7:
         this.accionF = 'HA';
-        this.teclaFuncionF = 6;
+        this.teclaFuncionF = 7;
         break;
       default:
         this.accionF = 'code 99';

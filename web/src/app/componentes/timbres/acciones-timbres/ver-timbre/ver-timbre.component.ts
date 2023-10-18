@@ -21,11 +21,11 @@ export class VerTimbreComponent implements OnInit {
   acciones: any = [
     { item: 'E', text: 'Entrada' },
     { item: 'S', text: 'Salida' },
-    { item: 'I/A', text: 'Inicio Alimentación' },
-    { item: 'F/A', text: 'Fin Alimentación' },
-    { item: 'S/P', text: 'Inicio Permiso' },
-    { item: 'E/P', text: 'Fin Permiso' },
-    { item: 'HA', text: 'Fin' }
+    { item: 'I/A', text: 'Inicio alimentación' },
+    { item: 'F/A', text: 'Fin alimentación' },
+    { item: 'S/P', text: 'Inicio permiso' },
+    { item: 'E/P', text: 'Fin permiso' },
+    { item: 'HA', text: 'Timbre libre' }
   ]
 
   rolEmpleado: any;
