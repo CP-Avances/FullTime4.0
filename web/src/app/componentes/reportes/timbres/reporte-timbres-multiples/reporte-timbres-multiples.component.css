@@ -24,6 +24,11 @@ tr { text-align: center; }
 
 td { padding-top: 10px; text-align: center; }
 
+p {
+    font-size: x-small;
+}
+
+
 
 
 .mat-expansion-panel-header-description {
@@ -64,13 +69,6 @@ mat-icon { cursor: pointer; }
     color: indianred;
 }
 
-/* .i-pdf { color: red; font-size: 30px; }
-
-.i-print { color: rgb(0, 0, 0); font-size: 30px; }
-
-.i-download { color: rgb(0, 102, 255); font-size: 30px; }
-
-.i-excel { color: rgb(19, 172, 19); font-size: 30px; } */
   
 .example-radio-button {
     margin: 5px;
@@ -78,4 +76,9 @@ mat-icon { cursor: pointer; }
 
 #busqueda{
     margin-top: 10px;
+}
+
+#detalle{
+    width: 100%;
+    font-size: 12px;
 }

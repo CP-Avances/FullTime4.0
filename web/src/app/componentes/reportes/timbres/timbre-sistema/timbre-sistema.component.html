@@ -1,4 +1,4 @@
-<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;">
+<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;" [hidden]="verDetalle">
     <div id="titulo">
         <span>REPORTE DE TIMBRE VIRTUAL</span>
     </div>
@@ -12,37 +12,35 @@
                 <span>OPCIONES DE DESCARGA</span>
             </div>
            <mat-card class="example-card mat-elevation-z9">
-                <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
-                    <button mat-icon-button (click)="validacionReporte('ver')">
-                        <mat-icon class="ver" matTooltipPosition="right"
-                            matTooltip="Previsualizar reporte en el navegador">visibility
-                        </mat-icon>
-                    </button>
-                    <button mat-icon-button (click)="validacionReporte('open')">
-                        <mat-icon class="i-pdf" matTooltipPosition="right"
-                            matTooltip="Previsualizar reporte en el navegador en fomato PDF.">picture_as_pdf
-                        </mat-icon>
-                    </button>
-                    <button mat-icon-button (click)="validacionReporte('excel')">
-                        <mat-icon class="fas fa-file-excel i-excel" matTooltipPosition="right"
-                            matTooltip="Descargar reporte en formato EXCEL."></mat-icon>
-                    </button>
-                    <button mat-icon-button (click)="validacionReporte('print')">
-                        <mat-icon class="i-print" matTooltipPosition="right"
-                            matTooltip="Imprimir reporte en formato PDF.">local_printshop</mat-icon>
-                    </button>
-                    <button mat-icon-button (click)="validacionReporte('download')">
-                        <mat-icon class="i-download" matTooltipPosition="right"
-                            matTooltip="Descargar reporte en formato PDF.">cloud_download</mat-icon>
-                    </button>
-                    <app-option-timbre-servidor *ngIf="servidor"></app-option-timbre-servidor>
-                </div>
+            <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
+                <button mat-icon-button (click)="validacionReporte('ver')" 
+                matTooltipPosition="right" matTooltip="Previsualizar reporte en el navegador">
+                    <mat-icon class="ver">visibility</mat-icon>
+                </button>
+                <button mat-icon-button (click)="validacionReporte('open')" 
+                    matTooltipPosition="right" matTooltip="Previsualizar reporte en el navegador en fomato PDF.">
+                    <mat-icon class="i-pdf">picture_as_pdf</mat-icon>
+                </button>
+                <button mat-icon-button (click)="validacionReporte('excel')" 
+                    matTooltipPosition="right" matTooltip="Descargar reporte en formato EXCEL.">
+                    <mat-icon class="fas fa-file-excel i-excel" ></mat-icon>
+                </button>
+                <button mat-icon-button (click)="validacionReporte('print')"
+                    matTooltipPosition="right" matTooltip="Imprimir reporte en formato PDF.">
+                    <mat-icon class="i-print">local_printshop</mat-icon>
+                </button>
+                <button mat-icon-button (click)="validacionReporte('download')"
+                    matTooltipPosition="right" matTooltip="Descargar reporte en formato PDF.">
+                    <mat-icon class="i-download">cloud_download</mat-icon>
+                </button>
+                <app-option-timbre-servidor *ngIf="servidor"></app-option-timbre-servidor>
+            </div>
             </mat-card>
         </div>
         <app-criterios-busqueda [num_option]="5" id="busqueda"></app-criterios-busqueda>
     </div>
 </div>
-<div class="container" style="padding-bottom: 50px; text-align: center;">
+<div class="container" style="padding-bottom: 50px; text-align: center;" [hidden]="verDetalle">
     <!-- TABLA PARA SUCURSALES -->
     <div *ngIf="bool.bool_suc" class="mat-elevation-z8" style="background: white;">
                         <div class="d-flex bd-highlight" id="resultados">
@@ -295,4 +293,86 @@
         </mat-paginator>
         <br>
     </div>
+</div>
+<div class="container" style="padding-top: 15px" [hidden]="!verDetalle">
+    <mat-card class="example-card mat-elevation-z8">
+      <div id="titulo">
+        <span>DETALLES DE TIMBRES LIBRES</span>
+        <button
+        class="btn btn-outline-light btn-sm"
+        style="float: left; margin-left: 10px"
+        (click)="regresar()"
+        matTooltip="Regresar"
+      >
+      <i class="fas fa-arrow-left"></i>
+      </button>
+      </div>
+      <mat-card-content>
+        <div class="container" style="padding-bottom: 25px; text-align: center; margin-top: 0.5rem">
+          <div class="table-responsive">
+            <table class="table table-hover table-sm" id="detalle">
+              <thead class="thead-light">
+                <tr style="text-align: center">
+                  <th scope="col" rowspan="2">N°</th>
+                  <th scope="col" rowspan="2">CÓDIGO</th>
+                  <th scope="col" rowspan="2">EMPLEADO</th>
+                  <th scope="col" rowspan="1" colspan="2">TIMBRE</th>
+                  <th scope="col" rowspan="1" colspan="2" *ngIf="timbreServidor">SERVIDOR</th>
+                  <th scope="col" rowspan="2">RELOJ</th>
+                  <th scope="col" rowspan="2">ACCIÓN</th>
+                  <th scope="col" rowspan="2">OBSERVACION</th>
+                  <th scope="col" rowspan="2">LONGITUD</th>
+                  <th scope="col" rowspan="2">LATITUD</th>
+                </tr>
+                <tr style="text-align: center">
+                  <th scope="col" rowspan="1">FECHA</th>
+                  <th scope="col" rowspan="1">HORA</th>
+                  <th scope="col" rowspan="1" *ngIf="timbreServidor">FECHA</th>
+                  <th scope="col" rowspan="1" *ngIf="timbreServidor">HORA</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="
+                      let t of timbres | paginate : tamanio_pagina : numero_pagina
+                    ">
+                  <td>{{ t.n }}</td>
+                  <td>{{ t.codigo }}</td>
+                  <td>{{ t.empleado }}</td>
+                  <td>{{ t.fechaTimbre }}</td>
+                  <td>{{ t.horaTimbre }}</td>
+                  <td *ngIf="timbreServidor">{{ t.fechaTimbreServidor }}</td>
+                  <td *ngIf="timbreServidor">{{ t.horaTimbreServidor }}</td>
+                  <td>{{ t.reloj }}</td>
+                  <td>{{ t.accion }}</td>
+                  <td>{{ t.observacion }}</td>
+                  <td>{{ t.longitud }}</td>
+                  <td>{{ t.latitud }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <mat-paginator [length]="timbres.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
+            (page)="ManejarPaginaDetalle($event)" showFirstLastButtons aria-label="Seleccionar pagina">
+          </mat-paginator>
+        </div>
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 0.5rem">
+          <i id="pdf" class="fas fa-file-pdf icon" matSuffix matTooltipPosition="right"
+            matTooltip="Descargar Lista de Niveles de Títulos en formato PDF." (click)="generarPdf('download')">
+            <p>PDF</p>
+          </i>
+          <i id="excel" class="fas fa-file-excel icon" matSuffix matTooltipPosition="right"
+            matTooltip="Descargar Lista de Niveles de Títulos en formato EXCEL." (click)="exportToExcel(tipo)">
+            <p>XLSL</p>
+          </i>
+          <!-- <i  id="csv" class="fas fa-file-csv icon" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Niveles de Títulos en formato CSV.">
+                <p>CSV</p>
+            </i>
+            <i  id="xml" class="fas fa-file-code icon" matSuffix matTooltipPosition="right"
+                matTooltip="Descargar Lista de Niveles de Títulos en formato XML.">
+                <p>XML</p>
+            </i> -->
+        </div>
+      </mat-card-content>
+    </mat-card>
 </div>
