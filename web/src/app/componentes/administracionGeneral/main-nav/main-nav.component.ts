@@ -43,6 +43,7 @@ export class MainNavComponent implements OnInit {
   idEmpresa: number;
   datosEmpresa: any = [];
   id_empleado_logueado: number;
+  rol: any
 
   // VERIFICAR LICENCIA
   fec_caducidad_licencia: Date;
@@ -60,7 +61,7 @@ export class MainNavComponent implements OnInit {
     private funciones: MainNavService,
     private plantillaPDF: PlantillaReportesService,
     private breakpointObserver: BreakpointObserver,
-  ) { }
+  ) {}
 
   hasChild = (_: number, node: MenuNode) => !!node.children && node.children.length > 0;
 

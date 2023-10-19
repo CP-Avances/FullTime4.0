@@ -17,7 +17,7 @@ export class SearchComponent implements OnInit {
   filteredOptions: Observable<string[]>;
   options: string[] = [];
   buscar_empl: any = [];
-
+  rol: any
   myControl = new FormControl();
 
   private _filter(value: string): string[] {
@@ -29,7 +29,10 @@ export class SearchComponent implements OnInit {
     private empleadoService: EmpleadoService,
     private router: Router,
     private route: ActivatedRoute
-  ) { }
+  ) { 
+    this.rol = localStorage.getItem('rol');
+    console.log('rolll: ',this.rol)
+  }
 
   ngOnInit(): void {
     this.filteredOptions = this.myControl.valueChanges.pipe(

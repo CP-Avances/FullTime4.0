@@ -12,8 +12,15 @@
       <li class="breadcrumb-item active" aria-current="page">{{Dirname}}</li>
     </ol>
   </nav>
-  <div class="d-flex flex-wrap justify-content-end" *ngIf="subir">
-    <button type="submit" class="btn btn-sm btn-primary" (click)="AbrirVentanaRegistrar()">
+  <div style="width: 100%;" >
+    <div style="float: left;" *ngIf="Dirname != 'permisos' && Dirname != 'contratos'">
+      <mat-form-field id="t-inputs">
+        <input matInput placeholder="Buscar archivo" minlength="2" [formControl]="nombreF"
+        [(ngModel)]="filtroDescripcion" (input)="Filtrar($event, 'archivo')">
+      </mat-form-field>
+    </div>
+
+    <button  *ngIf="subir" style="float: right;" type="submit" class="btn btn-sm btn-primary" (click)="AbrirVentanaRegistrar()">
       Subir documento
     </button>
   </div>
@@ -28,7 +35,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let a of archivos">
+        <tr *ngFor="let a of archivosFiltro">
           <td style="padding-top: 10px; text-align: center;" *ngIf="a.extencion === 'pdf'">
             <mat-icon style="color: red;">picture_as_pdf</mat-icon>
           </td>
@@ -57,7 +64,16 @@
       </tbody>
     </table>
   </div>
+
   <div class="table-responsive" *ngIf="Dirname === 'permisos' || Dirname === 'contratos'">
+
+    <div>
+      <mat-form-field id="t-inputs">
+        <input matInput placeholder="Buscar Carpeta"   minlength="2" [formControl]="nombreF"
+        [(ngModel)]="filtroDescripcion" (input)="Filtrar($event, 'carpeta')">
+      </mat-form-field>
+    </div>
+
     <table class="table table-hover table-sm">
       <thead class="thead-light">
         <tr style="text-align: center;">
@@ -66,7 +82,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let a of archivos">
+        <tr *ngFor="let a of archivosFiltro">
           <td style="padding-top: 10px; cursor: pointer; padding-left: 10px;" (click)="VerPermisos(a, 'permisos')">
             <i class="fa fa-folder" aria-hidden="true" id="folder">
             </i>
@@ -100,8 +116,13 @@
       <li class="breadcrumb-item active" aria-current="page">{{archivoi}}</li>
     </ol>
   </nav>
-
   <div class="table-responsive">
+    <div *ngIf="listap">
+      <mat-form-field id="t-inputs">
+        <input matInput placeholder="Buscar archivo" minlength="2" [formControl]="nombreF"
+        [(ngModel)]="filtroDescripcion" (input)="Filtrar($event, 'archivo')">
+      </mat-form-field>
+    </div>
     <table class="table table-hover table-sm">
       <thead class="thead-light">
         <tr style="text-align: center;">
@@ -111,7 +132,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let a of archivos">
+        <tr *ngFor="let a of archivosFiltro">
           <td style="padding-top: 10px; text-align: center;" *ngIf="a.extencion === 'pdf'">
             <mat-icon style="color: red;">picture_as_pdf</mat-icon>
           </td>

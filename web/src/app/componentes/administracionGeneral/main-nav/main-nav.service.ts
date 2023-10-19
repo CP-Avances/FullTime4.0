@@ -8,10 +8,10 @@ import { environment } from 'src/environments/environment';
 export class MainNavService {
 
   private consultarFuncionalidad: any;
-
+ 
   constructor(
     private http: HttpClient,
-  ) { }
+  ) {}
 
   // CONSULTAS DE FUNCIONES
   LogicaFunciones() {
