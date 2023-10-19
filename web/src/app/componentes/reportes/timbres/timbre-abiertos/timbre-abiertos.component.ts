@@ -550,7 +550,6 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
       documentDefinition = this.getDocumentDefinicionTabulado();
     }
 
-    var f = new Date()
     let doc_name = "Timbres_libres.pdf";
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -1251,7 +1250,6 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
         xlsx.writeFile(wb, 'Timbres_libres.xlsx');
         break;
     }
-
   }
 
   MapingDataPdfDefault(array: Array<any>) {
@@ -1664,7 +1662,7 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
     }
   }
 
-   //MOSTRAR DETALLES
+  //MOSTRAR DETALLES
   verDatos() {
     this.verDetalle = true;
     if (this.bool.bool_cargo || this.bool.bool_reg) {

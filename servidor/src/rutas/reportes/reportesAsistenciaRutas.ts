@@ -57,6 +57,9 @@ class ReportesAsistenciasRutas {
         // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL RELOJ VIRTUAL 
         this.router.put('/timbres-reloj-virtual/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbreRelojVirtual);
 
+        // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL RELOJ VIRTUAL PARA REGIMEN Y CARGO
+        this.router.put('/timbres-reloj-virtual-regimen-cargo/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbreRelojVirtualRegimenCargo);
+
         // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL RELOJ VIRTUAL 
         this.router.put('/timbres-horario-abierto/:desde/:hasta', TokenValidation, REPORTE_A_CONTROLADOR.ReporteTimbreHorarioAbierto);
         

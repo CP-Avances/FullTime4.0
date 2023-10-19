@@ -17,6 +17,7 @@ import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-
 import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 
 @Component({
   selector: 'app-timbre-virtual',
@@ -39,34 +40,73 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
   respuesta: any[];
   empleados: any = [];
   tabulado: any = [];
+  regimen: any = [];
+  timbres: any = [];
+  cargos: any = [];
+  origen: any = [];
+
 
   data_pdf: any = [];
 
+  //VARIABLES PARA MOSTRAR DETALLES
+  tipo: string;
+  verDetalle: boolean = false;
+
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
+  selectionReg = new SelectionModel<any>(true, []);
+  selectionCar = new SelectionModel<ITableEmpleados>(true, []);
   selectionDep = new SelectionModel<ITableEmpleados>(true, []);
   selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
   selectionTab = new SelectionModel<ITableEmpleados>(true, []);
 
   // ITEMS DE PAGINACION DE LA TABLA SUCURSAL
-  pageSizeOptions_suc = [5, 10, 20, 50];
-  tamanio_pagina_suc: number = 5;
   numero_pagina_suc: number = 1;
+  tamanio_pagina_suc: number = 5;
+  pageSizeOptions_suc = [5, 10, 20, 50];
+
+  // ITEMS DE PAGINACION DE LA TABLA REGIMEN
+  numero_pagina_reg: number = 1;
+  tamanio_pagina_reg: number = 5;
+  pageSizeOptions_reg = [5, 10, 20, 50];
+
+  // ITEMS DE PAGINACION DE LA TABLA CARGO
+  numero_pagina_car: number = 1;
+  tamanio_pagina_car: number = 5;
+  pageSizeOptions_car = [5, 10, 20, 50];
+
   // ITEMS DE PAGINACION DE LA TABLA DEPARTAMENTO
-  pageSizeOptions_dep = [5, 10, 20, 50];
-  tamanio_pagina_dep: number = 5;
   numero_pagina_dep: number = 1;
+  tamanio_pagina_dep: number = 5;
+  pageSizeOptions_dep = [5, 10, 20, 50];
+
   // ITEMS DE PAGINACION DE LA TABLA EMPLEADOS
-  pageSizeOptions_emp = [5, 10, 20, 50];
-  tamanio_pagina_emp: number = 5;
   numero_pagina_emp: number = 1;
+  tamanio_pagina_emp: number = 5;
+  pageSizeOptions_emp = [5, 10, 20, 50];
+
   // ITEMS DE PAGINACION DE LA TABLA TABULACIÓN
   pageSizeOptions_tab = [5, 10, 20, 50];
   tamanio_pagina_tab: number = 5;
   numero_pagina_tab: number = 1;
 
+  // ITEMS DE PAGINACION DE LA TABLA INCOMPLETOS
+  pageSizeOptions_inc = [5, 10, 20, 50];
+  tamanio_pagina_inc: number = 5;
+  numero_pagina_inc: number = 1;
+
+  // ITEMS DE PAGINACION DE LA TABLA DETALLE
+  pageSizeOptions = [5, 10, 20, 50];
+  tamanio_pagina: number = 5;
+  numero_pagina: number = 1;
+
+  //FILTROS
   get filtroNombreSuc() { return this.reporteService.filtroNombreSuc }
 
   get filtroNombreDep() { return this.reporteService.filtroNombreDep }
+
+  get filtroNombreReg() { return this.reporteService.filtroNombreReg };
+
+  get filtroNombreCar() { return this.reporteService.filtroNombreCarg };
 
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
@@ -81,6 +121,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
 
   constructor(
     private validacionService: ValidacionesService,
+    private informacion: DatosGeneralesService,
     private reporteService: ReportesService,
     private R_asistencias: ReportesAsistenciasService,
     private restEmpre: EmpresaService,
@@ -94,75 +135,162 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
     if (parseInt(localStorage.getItem('rol') as string) === 1) {
       this.servidor = true;
     }
-    sessionStorage.removeItem('reporte_timbres_multiple');
-    this.R_asistencias.DatosGeneralesUsuarios().subscribe((res: any[]) => {
-      sessionStorage.setItem('reporte_timbres_multiple', JSON.stringify(res))
-      this.sucursales = res.map(obj => {
-        return {
-          id: obj.id_suc,
-          nombre: obj.name_suc
-        }
-      });
+    this.BuscarInformacion();
+    this.BuscarCargos();
+  }
 
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
-          this.departamentos.push({
-            id: ele.id_depa,
-            nombre: ele.name_dep
-          })
-        })
-      })
+  // METODO DE BUSQUEDA DE DATOS
+  BuscarInformacion() {
+    this.departamentos = [];
+    this.sucursales = [];
+    this.respuesta = [];
+    this.empleados = [];
+    this.regimen = [];
+    this.origen = [];
+    this.informacion.ObtenerInformacion(1).subscribe(
+      (res: any[]) => {
+        this.origen = JSON.stringify(res);
+        sessionStorage.setItem(
+          'reporte_timbres_multiple',
+          JSON.stringify(res)
+        );
 
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
-          ele.empleado.forEach(r => {
-            let elemento = {
+        res.forEach((obj) => {
+          this.sucursales.push({
+            id: obj.id_suc,
+            nombre: obj.name_suc,
+          });
+        });
+
+        res.forEach((obj) => {
+          obj.departamentos.forEach((ele) => {
+            this.departamentos.push({
+              id: ele.id_depa,
+              departamento: ele.name_dep,
+              nombre: ele.sucursal,
+            });
+          });
+        });
+
+        res.forEach((obj) => {
+          obj.departamentos.forEach((ele) => {
+            ele.empleado.forEach((r) => {
+              let elemento = {
+                id: r.id,
+                nombre: r.name_empleado,
+                codigo: r.codigo,
+                cedula: r.cedula,
+                correo: r.correo,
+                cargo: r.cargo,
+                id_contrato: r.id_contrato,
+                hora_trabaja: r.hora_trabaja,
+                sucursal: r.sucursal,
+                departamento: r.departamento,
+                ciudad: r.ciudad,
+                regimen: r.regimen,
+              };
+              this.empleados.push(elemento);
+            });
+          });
+        });
+
+        res.forEach((obj) => {
+          obj.departamentos.forEach((ele) => {
+            ele.empleado.forEach((reg) => {
+              reg.regimen.forEach((r) => {
+                this.regimen.push({
+                  id: r.id_regimen,
+                  nombre: r.name_regimen,
+                });
+              });
+            });
+          });
+        });
+
+        this.regimen = this.regimen.filter(
+          (obj, index, self) => index === self.findIndex((o) => o.id === obj.id)
+        );
+      },
+      (err) => {
+        this.toastr.error(err.error.message);
+      }
+    );
+  }
+
+// METODO PARA FILTRAR POR CARGOS
+  empleados_cargos: any = [];
+  origen_cargo: any = [];
+  BuscarCargos() {
+    this.empleados_cargos = [];
+    this.origen_cargo = [];
+    this.cargos = [];
+    this.informacion.ObtenerInformacionCargo(1).subscribe(
+      (res: any[]) => {
+        this.origen_cargo = JSON.stringify(res);
+
+        res.forEach((obj) => {
+          this.cargos.push({
+            id: obj.id_cargo,
+            nombre: obj.name_cargo,
+          });
+        });
+
+        res.forEach((obj) => {
+          obj.empleados.forEach((r) => {
+            this.empleados_cargos.push({
               id: r.id,
               nombre: r.name_empleado,
               codigo: r.codigo,
-              cedula: r.cedula
-            }
-            this.empleados.push(elemento)
-            this.tabulado.push(elemento)
-          })
-        })
-      })
-      // console.log('SUCURSALES',this.sucursales);
-      // console.log('DEPARTAMENTOS',this.departamentos);
-      // console.log('EMPLEADOS',this.empleados);
-      // console.log('TABULADO',this.tabulado);
-      // console.log('INCOMPLETOS',this.incompletos);
-
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
+              cedula: r.cedula,
+              correo: r.correo,
+              ciudad: r.ciudad,
+              id_cargo: r.id_cargo,
+              id_contrato: r.id_contrato,
+              hora_trabaja: r.hora_trabaja,
+            });
+          });
+        });
+      },
+      (err) => {
+        this.toastr.error(err.error.message);
+      }
+    );
   }
 
   ngOnDestroy() {
     this.respuesta = [];
     this.sucursales = [];
     this.departamentos = [];
+    this.regimen = [];
+    this.timbres = [];
+    this.cargos = [];
     this.empleados = [];
     this.tabulado = [];
   }
 
-  // VALIDACIONES REPORT
-
+  // VALIDACIONES REPORTES
   validacionReporte(action) {
-    console.log('Rango de fechas', this.rangoFechas);
-
-    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de busqueda')
-    if (this.bool.bool_suc === false && this.bool.bool_dep === false && this.bool.bool_emp === false
+    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de busqueda');
+    if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
       && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda')
     console.log('opcion:', this.opcion);
+    console.log('ver rol -----------------------***********', localStorage.getItem('rol'))
     switch (this.opcion) {
       case 's':
         if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione sucursal')
         this.ModelarSucursal(action);
         break;
+      case 'r':
+        if (this.selectionReg.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione régimen')
+        this.ModelarRegimen(action);
+        break;
       case 'd':
         if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione departamentos')
         this.ModelarDepartamento(action);
+        break;
+      case 'c':
+        if (this.selectionCar.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione cargos')
+        this.ModelarCargo(action);
         break;
       case 'e':
         if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione empleados')
@@ -180,7 +308,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
   }
 
   ModelarSucursal(accion) {
-
+    this.tipo = 'default';
     let respuesta = JSON.parse(sessionStorage.getItem('reporte_timbres_multiple') as any)
 
     let suc = respuesta.filter(o => {
@@ -197,6 +325,74 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
       // console.log('DATA PDF', this.data_pdf);
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
+        case 'ver': this.verDatos(); break;
+        default: this.generarPdf(accion); break;
+      }
+    }, err => {
+      this.toastr.error(err.error.message)
+    })
+  }
+
+  ModelarRegimen(accion) {
+    this.tipo = 'RegimenCargo';
+    let respuesta = JSON.parse(sessionStorage.getItem('reporte_timbres_multiple') as any)
+    let empleados: any = [];
+    let reg: any = [];
+    let objeto: any;
+    respuesta.forEach((obj: any) => {
+      this.selectionReg.selected.find((regimen) => {
+        objeto = {
+          regimen: {
+            id: regimen.id,
+            nombre: regimen.nombre,
+          },
+        };
+        empleados = [];
+        obj.departamentos.forEach((departamento: any) => {
+          departamento.empleado.forEach((empleado: any) => {
+            empleado.regimen.forEach((r) => {
+              if (regimen.id === r.id_regimen) {
+                empleados.push(empleado);
+              }
+            });
+          });
+        });
+        objeto.empleados = empleados;
+        reg.push(objeto);
+      });
+    });
+
+    this.data_pdf = [];
+    this.R_asistencias.ReporteTimbreRelojVirtualRegimenCargo(reg, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+      this.data_pdf = res
+      console.log('DATA PDF', this.data_pdf);
+      switch (accion) {
+        case 'excel': this.exportToExcel('RegimenCargo'); break;
+        case 'ver': this.verDatos(); break;
+        default: this.generarPdf(accion); break;
+      }
+    }, err => {
+      this.toastr.error(err.error.message)
+    })
+  }
+
+  ModelarCargo(accion) {
+    this.tipo = 'RegimenCargo';
+    let respuesta = JSON.parse(this.origen_cargo);
+    let car = respuesta.filter((o) => {
+      var bool = this.selectionCar.selected.find((obj1) => {
+        return obj1.id === o.id_cargo;
+      });
+      return bool != undefined;
+    });
+
+    this.data_pdf = [];
+    this.R_asistencias.ReporteTimbreRelojVirtualRegimenCargo(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+      this.data_pdf = res
+      console.log('DATA PDF',this.data_pdf);
+      switch (accion) {
+        case 'excel': this.exportToExcel('RegimenCargo'); break;
+        case 'ver': this.verDatos(); break;
         default: this.generarPdf(accion); break;
       }
     }, err => {
@@ -205,7 +401,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
   }
 
   ModelarDepartamento(accion) {
-
+    this.tipo = 'default';
     let respuesta = JSON.parse(sessionStorage.getItem('reporte_timbres_multiple') as any)
 
     respuesta.forEach((obj: any) => {
@@ -226,6 +422,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
       // console.log('DATA PDF',this.data_pdf);
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
+        case 'ver': this.verDatos(); break;
         default: this.generarPdf(accion); break;
       }
     }, err => {
@@ -234,7 +431,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
   }
 
   ModelarEmpleados(accion) {
-
+    this.tipo = 'default';
     let respuesta = JSON.parse(sessionStorage.getItem('reporte_timbres_multiple') as any)
 
     respuesta.forEach((obj: any) => {
@@ -264,6 +461,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
       // console.log('DATA PDF',this.data_pdf);
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
+        case 'ver': this.verDatos(); break;
         default: this.generarPdf(accion); break;
       }
     }, err => {
@@ -343,14 +541,13 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
   generarPdf(action) {
     let documentDefinition;
 
-    if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true) {
+    if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true || this.bool.bool_cargo === true || this.bool.bool_reg === true) {
       documentDefinition = this.getDocumentDefinicion();
     } else if (this.bool.bool_tab === true) {
       documentDefinition = this.getDocumentDefinicionTabulado();
     }
 
-    var f = new Date()
-    let doc_name = "Reporte Timbres" + f.toLocaleString() + ".pdf";
+    let doc_name = "Timbres_virtuales_movil.pdf";
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -394,7 +591,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
         { text: localStorage.getItem('name_empresa'), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
-        { text: 'REPORTE TIMBRES RELOJ VIRTUAL', bold: true, fontSize: 16, alignment: 'center', margin: [0, -5, 0, 5] },
+        { text: 'REPORTE TIMBRES (APLICACIÓN MÓVIL)', bold: true, fontSize: 16, alignment: 'center', margin: [0, -5, 0, 5] },
         { text: 'PERIODO DEL: ' + this.rangoFechas.fec_inico + " AL " + this.rangoFechas.fec_final, bold: true, fontSize: 15, alignment: 'center', margin: [0, 10, 0, 10] },
         ...this.impresionDatosPDF(this.data_pdf).map(obj => {
           return obj
@@ -419,61 +616,58 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
     let n: any = []
     let c = 0;
     var accionT: string = '';
-    data.forEach((obj: IReporteTimbres) => {
 
-      if (this.bool.bool_suc === true || this.bool.bool_dep === true) {
-        n.push({
-          table: {
-            widths: ['*', '*'],
-            body: [
-              [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: 'CIUDAD: ' + obj.ciudad,
-                  style: 'itemsTableInfo'
-                },
-                {
-                  border: [false, true, true, true],
-                  text: 'SUCURSAL: ' + obj.name_suc,
-                  style: 'itemsTableInfo'
-                }
-              ]
-            ]
-          }
-        })
-      }
-
-      obj.departamentos.forEach(obj1 => {
-
-        // LA CABECERA CUANDO SE GENERA EL PDF POR DEPARTAMENTOS
-        if (this.bool.bool_dep === true) {
-          let arr_reg = obj1.empleado.map((o: any) => { return o.timbres.length })
-          let reg = this.SumarRegistros(arr_reg);
+    if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
+      data.forEach((obj1) => {
+        let arr_reg = obj1.empleados.map((o: any) => { return o.timbres.length })
+        let reg = this.SumarRegistros(arr_reg);
+        if (this.bool.bool_cargo === true) {
           n.push({
-            style: 'tableMarginCabecera',
+            style: 'tableMarginSuc',
             table: {
               widths: ['*', '*'],
               body: [
                 [
                   {
                     border: [true, true, false, true],
-                    text: 'DEPARTAMENTO: ' + obj1.name_dep,
-                    style: 'itemsTableInfoBlanco'
+                    bold: true,
+                    text: 'CARGO: ' + obj1.name_cargo,
+                    style: 'itemsTableInfo',
                   },
                   {
-                    border: [true, true, true, true],
-                    text: 'N° REGISTROS: ' + reg,
-                    style: 'itemsTableInfoBlanco'
-                  }
-                ]
-              ]
-            }
-          })
+                    border: [false, true, true, true],
+                    text: 'N° Registros: ' + reg,
+                    style: 'itemsTableInfo',
+                  },
+                ],
+              ],
+            },
+          });
+        } else {
+          n.push({
+            style: 'tableMarginSuc',
+            table: {
+              widths: ['*', '*'],
+              body: [
+                [
+                  {
+                    border: [true, true, false, true],
+                    bold: true,
+                    text: 'RÉGIMEN: ' + obj1.regimen.nombre,
+                    style: 'itemsTableInfo',
+                  },
+                  {
+                    border: [false, true, true, true],
+                    text: 'N° Registros: ' + reg,
+                    style: 'itemsTableInfo',
+                  },
+                ],
+              ],
+            },
+          });
         }
 
-        obj1.empleado.forEach((obj2: any) => {
-
+        obj1.empleados.forEach((obj2: any) => {
           n.push({
             style: 'tableMarginCabecera',
             table: {
@@ -483,28 +677,28 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                   {
                     border: [true, true, false, false],
                     text: 'EMPLEADO: ' + obj2.name_empleado,
-                    style: 'itemsTableInfoBlanco'
+                    style: 'itemsTableInfoBlanco',
                   },
                   {
                     border: [false, true, false, false],
                     text: 'C.C.: ' + obj2.cedula,
-                    style: 'itemsTableInfoBlanco'
+                    style: 'itemsTableInfoBlanco',
                   },
                   {
                     border: [false, true, true, false],
                     text: 'COD: ' + obj2.codigo,
-                    style: 'itemsTableInfoBlanco'
-                  }
-                ]
-              ]
-            }
+                    style: 'itemsTableInfoBlanco',
+                  },
+                ],
+              ],
+            },
           });
           c = 0;
           if (this.timbreServidor === true) {
             n.push({
               style: 'tableMargin',
               table: {
-                widths: [25, 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', '*'],
+                widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', '*'],
                 body: [
                   [
                     { rowSpan: 2, text: 'N°', style: 'centrado' },
@@ -534,15 +728,16 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                       servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
                     }
                     switch (obj3.accion) {
-                      case 'EoS': accionT = 'Entrada o Salida'; break;
-                      case 'AES': accionT = 'Inicio o Fin Alimentación'; break;
-                      case 'PES': accionT = 'Inicio o Fin Permiso'; break;
+                      case 'EoS': accionT = 'Entrada o salida'; break;
+                      case 'AES': accionT = 'Inicio o fin alimentación'; break;
+                      case 'PES': accionT = 'Inicio o fin permiso'; break;
                       case 'E': accionT = 'Entrada'; break;
                       case 'S': accionT = 'Salida'; break;
-                      case 'F/A': accionT = 'Fin Alimentación'; break;
-                      case 'I/A': accionT = 'Inicio Alimentación'; break;
-                      case 'E/P': accionT = 'Fin Permiso'; break;
-                      case 'S/P': accionT = 'Inicio Permiso'; break;
+                      case 'F/A': accionT = 'Fin alimentación'; break;
+                      case 'I/A': accionT = 'Inicio alimentación'; break;
+                      case 'E/P': accionT = 'Fin permiso'; break;
+                      case 'S/P': accionT = 'Inicio permiso'; break;
+                      case 'HA': accionT = 'Timbre libre'; break;
                       default: accionT = 'Desconocido'; break;
                     }
 
@@ -573,7 +768,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
             n.push({
               style: 'tableMargin',
               table: {
-                widths: ['*', '*', '*', 'auto', 'auto', 'auto', '*', '*'],
+                widths: ['auto', '*', '*', 'auto', 'auto', 'auto', '*', '*'],
                 body: [
                   [
                     { rowSpan: 2, text: 'N°', style: 'centrado' },
@@ -594,15 +789,16 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                   ],
                   ...obj2.timbres.map(obj3 => {
                     switch (obj3.accion) {
-                      case 'EoS': accionT = 'Entrada o Salida'; break;
-                      case 'AES': accionT = 'Inicio o Fin Alimentación'; break;
-                      case 'PES': accionT = 'Inicio o Fin Permiso'; break;
+                      case 'EoS': accionT = 'Entrada o salida'; break;
+                      case 'AES': accionT = 'Inicio o fin alimentación'; break;
+                      case 'PES': accionT = 'Inicio o fin permiso'; break;
                       case 'E': accionT = 'Entrada'; break;
                       case 'S': accionT = 'Salida'; break;
-                      case 'F/A': accionT = 'Fin Alimentación'; break;
-                      case 'I/A': accionT = 'Inicio Alimentación'; break;
-                      case 'E/P': accionT = 'Fin Permiso'; break;
-                      case 'S/P': accionT = 'Inicio Permiso'; break;
+                      case 'F/A': accionT = 'Fin alimentación'; break;
+                      case 'I/A': accionT = 'Inicio alimentación'; break;
+                      case 'E/P': accionT = 'Fin permiso'; break;
+                      case 'S/P': accionT = 'Inicio permiso'; break;
+                      case 'HA': accionT = 'Timbre libre'; break;
                       default: accionT = 'Desconocido'; break;
                     }
                     c = c + 1
@@ -625,15 +821,225 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                   return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
                 }
               }
+            });
+          };
+        });
+      });
+    } else {
+      data.forEach((obj: IReporteTimbres) => {
+  
+        if (this.bool.bool_suc === true || this.bool.bool_dep === true) {
+          n.push({
+            table: {
+              widths: ['*', '*'],
+              body: [
+                [
+                  {
+                    border: [true, true, false, true],
+                    bold: true,
+                    text: 'CIUDAD: ' + obj.ciudad,
+                    style: 'itemsTableInfo'
+                  },
+                  {
+                    border: [false, true, true, true],
+                    text: 'SUCURSAL: ' + obj.name_suc,
+                    style: 'itemsTableInfo'
+                  }
+                ]
+              ]
+            }
+          })
+        }
+  
+        obj.departamentos.forEach(obj1 => {
+  
+          // LA CABECERA CUANDO SE GENERA EL PDF POR DEPARTAMENTOS
+          if (this.bool.bool_dep === true) {
+            let arr_reg = obj1.empleado.map((o: any) => { return o.timbres.length })
+            let reg = this.SumarRegistros(arr_reg);
+            n.push({
+              style: 'tableMarginCabecera',
+              table: {
+                widths: ['*', '*'],
+                body: [
+                  [
+                    {
+                      border: [true, true, false, true],
+                      text: 'DEPARTAMENTO: ' + obj1.name_dep,
+                      style: 'itemsTableInfoBlanco'
+                    },
+                    {
+                      border: [true, true, true, true],
+                      text: 'N° REGISTROS: ' + reg,
+                      style: 'itemsTableInfoBlanco'
+                    }
+                  ]
+                ]
+              }
             })
           }
-
+  
+          obj1.empleado.forEach((obj2: any) => {
+  
+            n.push({
+              style: 'tableMarginCabecera',
+              table: {
+                widths: ['*', 'auto', 'auto'],
+                body: [
+                  [
+                    {
+                      border: [true, true, false, false],
+                      text: 'EMPLEADO: ' + obj2.name_empleado,
+                      style: 'itemsTableInfoBlanco'
+                    },
+                    {
+                      border: [false, true, false, false],
+                      text: 'C.C.: ' + obj2.cedula,
+                      style: 'itemsTableInfoBlanco'
+                    },
+                    {
+                      border: [false, true, true, false],
+                      text: 'COD: ' + obj2.codigo,
+                      style: 'itemsTableInfoBlanco'
+                    }
+                  ]
+                ]
+              }
+            });
+            c = 0;
+            if (this.timbreServidor === true) {
+              n.push({
+                style: 'tableMargin',
+                table: {
+                  widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', '*'],
+                  body: [
+                    [
+                      { rowSpan: 2, text: 'N°', style: 'centrado' },
+                      { colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                      '',
+                      { colSpan: 2, text: 'SERVIDOR', style: 'tableHeader' },
+                      '',
+                      { rowSpan: 2, text: 'RELOJ', style: 'centrado' },
+                      { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
+                      { rowSpan: 2, text: 'OBSERVACIÓN', style: 'centrado' },
+                      { rowSpan: 2, text: 'LONGITUD', style: 'centrado' },
+                      { rowSpan: 2, text: 'LATITUD', style: 'centrado' }
+                    ],
+                    [
+                      '',
+                      { text: 'FECHA', style: 'tableHeader' },
+                      { text: 'HORA', style: 'tableHeader' },
+                      { text: 'FECHA', style: 'tableHeader' },
+                      { text: 'HORA', style: 'tableHeader' },
+                      '', '', '', '', ''
+                    ],
+                    ...obj2.timbres.map(obj3 => {
+                      let servidor_fecha = '';
+                      let servidor_hora = '';
+                      if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
+                        servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
+                        servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
+                      }
+                      switch (obj3.accion) {
+                        case 'EoS': accionT = 'Entrada o salida'; break;
+                        case 'AES': accionT = 'Inicio o fin alimentación'; break;
+                        case 'PES': accionT = 'Inicio o fin permiso'; break;
+                        case 'E': accionT = 'Entrada'; break;
+                        case 'S': accionT = 'Salida'; break;
+                        case 'F/A': accionT = 'Fin alimentación'; break;
+                        case 'I/A': accionT = 'Inicio alimentación'; break;
+                        case 'E/P': accionT = 'Fin permiso'; break;
+                        case 'S/P': accionT = 'Inicio permiso'; break;
+                        case 'HA': accionT = 'Timbre libre'; break;
+                        default: accionT = 'Desconocido'; break;
+                      }
+  
+                      c = c + 1
+                      return [
+                        { style: 'itemsTableCentrado', text: c },
+                        { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[0] },
+                        { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[1] },
+                        { style: 'itemsTable', text: servidor_fecha },
+                        { style: 'itemsTable', text: servidor_hora },
+                        { style: 'itemsTable', text: obj3.id_reloj },
+                        { style: 'itemsTable', text: accionT },
+                        { style: 'itemsTable', text: obj3.observacion },
+                        { style: 'itemsTable', text: obj3.longitud },
+                        { style: 'itemsTable', text: obj3.latitud },
+                      ]
+                    })
+  
+                  ]
+                },
+                layout: {
+                  fillColor: function (rowIndex) {
+                    return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+                  }
+                }
+              })
+            } else {
+              n.push({
+                style: 'tableMargin',
+                table: {
+                  widths: ['auto', '*', '*', 'auto', 'auto', 'auto', '*', '*'],
+                  body: [
+                    [
+                      { rowSpan: 2, text: 'N°', style: 'centrado' },
+                      { colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                      '',
+                      { rowSpan: 2, text: 'RELOJ', style: 'centrado' },
+                      { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
+                      { rowSpan: 2, text: 'OBSERVACIÓN', style: 'centrado' },
+                      { rowSpan: 2, text: 'LONGITUD', style: 'centrado' },
+                      { rowSpan: 2, text: 'LATITUD', style: 'centrado' }
+                    ],
+                    [
+                      '',
+                      { text: 'FECHA', style: 'tableHeader' },
+                      { text: 'HORA', style: 'tableHeader' },
+                      '', '', '', '', '',
+  
+                    ],
+                    ...obj2.timbres.map(obj3 => {
+                      switch (obj3.accion) {
+                        case 'EoS': accionT = 'Entrada o salida'; break;
+                        case 'AES': accionT = 'Inicio o fin alimentación'; break;
+                        case 'PES': accionT = 'Inicio o fin permiso'; break;
+                        case 'E': accionT = 'Entrada'; break;
+                        case 'S': accionT = 'Salida'; break;
+                        case 'F/A': accionT = 'Fin alimentación'; break;
+                        case 'I/A': accionT = 'Inicio alimentación'; break;
+                        case 'E/P': accionT = 'Fin permiso'; break;
+                        case 'S/P': accionT = 'Inicio permiso'; break;
+                        case 'HA': accionT = 'Timbre libre'; break;
+                        default: accionT = 'Desconocido'; break;
+                      }
+                      c = c + 1
+                      return [
+                        { style: 'itemsTableCentrado', text: c },
+                        { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[0] },
+                        { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[1] },
+                        { style: 'itemsTable', text: obj3.id_reloj },
+                        { style: 'itemsTable', text: accionT },
+                        { style: 'itemsTable', text: obj3.observacion },
+                        { style: 'itemsTable', text: obj3.longitud },
+                        { style: 'itemsTable', text: obj3.latitud },
+                      ]
+                    })
+  
+                  ]
+                },
+                layout: {
+                  fillColor: function (rowIndex) {
+                    return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+                  }
+                }
+              })
+            }
+          });
         });
-
       });
-
-    })
-
+    }
     return n
   }
 
@@ -820,22 +1226,21 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
   /** ************************************************************************************************** ** 
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
-  exportToExcel(tipo: string): void {
+   exportToExcel(tipo: string): void {
     switch (tipo) {
-      case 'tabulado':
-        const wsr_tab: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfTabulado(this.data_pdf));
-        const wb_tab: xlsx.WorkBook = xlsx.utils.book_new();
-        xlsx.utils.book_append_sheet(wb_tab, wsr_tab, 'Timbres');
-        xlsx.writeFile(wb_tab, "Timbres_Tabulado" + new Date().getTime() + '.xlsx');
+      case 'RegimenCargo':
+        const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfRegimenCargo(this.data_pdf));
+        const wb_regimen_cargo: xlsx.WorkBook = xlsx.utils.book_new();
+        xlsx.utils.book_append_sheet(wb_regimen_cargo, wsr_regimen_cargo, 'Timbres');
+        xlsx.writeFile(wb_regimen_cargo, 'Timbres_virtuales_movil.xlsx');
         break;
       default:
         const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefault(this.data_pdf));
         const wb: xlsx.WorkBook = xlsx.utils.book_new();
         xlsx.utils.book_append_sheet(wb, wsr, 'Timbres');
-        xlsx.writeFile(wb, "Timbres_default" + new Date().getTime() + '.xlsx');
+        xlsx.writeFile(wb, 'Timbres_virtuales_movil.xlsx');
         break;
     }
-
   }
 
   MapingDataPdfDefault(array: Array<any>) {
@@ -843,19 +1248,78 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
     array.forEach((obj1: IReporteTimbres) => {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
-          obj3.timbres.forEach((obj4: timbre) => {
-            let ele = {
-              'Id Sucursal': obj1.id_suc, 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
-              'Id Departamento': obj2.id_depa, 'Departamento': obj2.name_dep,
-              'Id Empleado': obj3.id, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
-              'Fecha Timbre': obj4.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj4.fec_hora_timbre.split(' ')[1],
-              'Acción': obj4.accion, 'Id Reloj': obj4.id_reloj,
-              'Latitud': obj4.latitud, 'Longitud': obj4.longitud, 'Observación': obj4.observacion
+          obj3.timbres.forEach((obj4: any) => {
+            let ele;
+            if (this.timbreServidor) {
+              let servidor_fecha = '';
+              let servidor_hora = '';
+              if (obj4.fec_hora_timbre_servidor != '' && obj4.fec_hora_timbre_servidor != null) {
+                servidor_fecha = obj4.fec_hora_timbre_servidor.split(' ')[0];
+                servidor_hora = obj4.fec_hora_timbre_servidor.split(' ')[1]
+              }
+              ele = {
+                'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
+                'Departamento': obj2.name_dep,
+                'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
+                'Fecha Timbre': obj4.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj4.fec_hora_timbre.split(' ')[1],
+                'Fecha Timbre Servidor': servidor_fecha, 'Hora Timbre Servidor': servidor_hora,
+                'Acción': obj4.accion=='HA'?'Timbre libre': obj4.accion, 'Reloj': obj4.id_reloj,
+                'Latitud': obj4.latitud, 'Longitud': obj4.longitud, 'Observación': obj4.observacion
+              }
+            } else{
+              ele = {
+                'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
+                'Departamento': obj2.name_dep,
+                'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
+                'Fecha Timbre': obj4.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj4.fec_hora_timbre.split(' ')[1],
+                'Acción': obj4.accion=='HA'?'Timbre libre': obj4.accion, 'Reloj': obj4.id_reloj,
+                'Latitud': obj4.latitud, 'Longitud': obj4.longitud, 'Observación': obj4.observacion
+              }
             }
             nuevo.push(ele)
           })
         })
       })
+    })
+    return nuevo
+  }
+
+  MapingDataPdfRegimenCargo(array: Array<any>) {
+    let nuevo: Array<any> = [];
+    array.forEach((obj1: any) => {
+        obj1.empleados.forEach((obj2: any) => {
+          obj2.timbres.forEach((obj3: any) => {
+            let ele;
+            if (this.timbreServidor) {
+              let servidor_fecha = '';
+              let servidor_hora = '';
+              if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
+                servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
+                servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
+              }
+              ele = {
+                'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
+                'Departamento': obj2.departamento,
+                'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
+                'Fecha Timbre': obj3.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj3.fec_hora_timbre.split(' ')[1],
+                'Fecha Timbre Servidor': servidor_fecha, 'Hora Timbre Servidor': servidor_hora,
+                'Acción': obj3.accion=='HA'?'Timbre libre': obj3.accion, 'Reloj': obj3.id_reloj,
+                'Latitud': obj3.latitud, 'Longitud': obj3.longitud, 'Observación': obj3.observacion
+              }
+            } else{
+              ele = {
+                'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
+                'Departamento': obj2.departamento,
+                'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
+                'Fecha Timbre': obj3.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj3.fec_hora_timbre.split(' ')[1],
+                'Acción': obj3.accion=='HA'?'Timbre libre': obj3.accion, 'Reloj': obj3.id_reloj,
+                'Latitud': obj3.latitud, 'Longitud': obj3.longitud, 'Observación': obj3.observacion
+              }
+            }
+            
+            nuevo.push(ele)
+          })
+        })
     })
     return nuevo
   }
@@ -881,6 +1345,122 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
       })
     })
     return nuevo
+  }
+
+  //METODOS PARA EXTRAER LOS TIMBRES EN UNA LISTA Y VISUALIZARLOS
+  extraerTimbres() {
+    this.timbres = [];
+    let n = 0;
+    let accionT = '';
+    this.data_pdf.forEach((obj1: IReporteTimbres) => {
+      obj1.departamentos.forEach(obj2 => {
+        obj2.empleado.forEach((obj3: any) => {
+          obj3.timbres.forEach((obj4: any) => {
+            let ele: any;
+            n = n + 1;
+            switch (obj4.accion) {
+              case 'EoS': accionT = 'Entrada o salida'; break;
+              case 'AES': accionT = 'Inicio o fin alimentación'; break;
+              case 'PES': accionT = 'Inicio o fin permiso'; break;
+              case 'E': accionT = 'Entrada'; break;
+              case 'S': accionT = 'Salida'; break;
+              case 'F/A': accionT = 'Fin alimentación'; break;
+              case 'I/A': accionT = 'Inicio alimentación'; break;
+              case 'E/P': accionT = 'Fin permiso'; break;
+              case 'S/P': accionT = 'Inicio permiso'; break;
+              case 'HA': accionT = 'Timbre libre'; break;
+              default: accionT = 'Desconocido'; break;
+            }
+            if (this.timbreServidor) {
+              let servidor_fecha = '';
+              let servidor_hora = '';
+              if (obj4.fec_hora_timbre_servidor != '' && obj4.fec_hora_timbre_servidor != null) {
+                servidor_fecha = obj4.fec_hora_timbre_servidor.split(' ')[0];
+                servidor_hora = obj4.fec_hora_timbre_servidor.split(' ')[1]
+              }
+              ele = {
+                n: n,
+                ciudad: obj1.ciudad, sucursal: obj1.name_suc,
+                departamento: obj2.name_dep,
+                empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
+                fechaTimbre: obj4.fec_hora_timbre.split(' ')[0], horaTimbre: obj4.fec_hora_timbre.split(' ')[1],
+                fechaTimbreServidor: servidor_fecha, horaTimbreServidor: servidor_hora,
+                accion: accionT, reloj: obj4.id_reloj,
+                latitud: obj4.latitud, longitud: obj4.longitud, observacion: obj4.observacion
+              }
+            } else{
+              ele = {
+                n: n,
+                ciudad: obj1.ciudad, sucursal: obj1.name_suc,
+                departamento: obj2.name_dep,
+                empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
+                fechaTimbre: obj4.fec_hora_timbre.split(' ')[0], horaTimbre: obj4.fec_hora_timbre.split(' ')[1],
+                accion: accionT, reloj: obj4.id_reloj,
+                latitud: obj4.latitud, longitud: obj4.longitud, observacion: obj4.observacion
+              }
+            }
+            this.timbres.push(ele)
+          })
+        })
+      })
+    })
+  }
+
+  extraerTimbresRegimenCargo() {
+    this.timbres = [];
+    let n = 0;
+    let accionT = '';
+    this.data_pdf.forEach((obj1: any) => {
+        obj1.empleados.forEach((obj2: any) => {
+          obj2.timbres.forEach((obj3: any) => {
+            let ele;
+            n = n + 1;
+            switch (obj3.accion) {
+              case 'EoS': accionT = 'Entrada o salida'; break;
+              case 'AES': accionT = 'Inicio o fin alimentación'; break;
+              case 'PES': accionT = 'Inicio o fin permiso'; break;
+              case 'E': accionT = 'Entrada'; break;
+              case 'S': accionT = 'Salida'; break;
+              case 'F/A': accionT = 'Fin alimentación'; break;
+              case 'I/A': accionT = 'Inicio alimentación'; break;
+              case 'E/P': accionT = 'Fin permiso'; break;
+              case 'S/P': accionT = 'Inicio permiso'; break;
+              case 'HA': accionT = 'Timbre libre'; break;
+              default: accionT = 'Desconocido'; break;
+            }
+            if (this.timbreServidor) {
+              let servidor_fecha = '';
+              let servidor_hora = '';
+              if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
+                servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
+                servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
+              }
+              ele = {
+                n: n,
+                ciudad: obj2.ciudad, sucursal: obj2.sucursal,
+                departamento: obj2.departamento,
+                empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
+                fechaTimbre: obj3.fec_hora_timbre.split(' ')[0], horaTimbre: obj3.fec_hora_timbre.split(' ')[1],
+                fechaTimbreServidor: servidor_fecha, horaTimbreServidor: servidor_hora,
+                accion: accionT, reloj: obj3.id_reloj,
+                latitud: obj3.latitud, longitud: obj3.longitud, observacion: obj3.observacion
+              }
+            } else{
+              ele = {
+                n: n,
+                ciudad: obj2.ciudad, sucursal: obj2.sucursal,
+                departamento: obj2.departamento,
+                empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
+                fechaTimbre: obj3.fec_hora_timbre.split(' ')[0], horaTimbre: obj3.fec_hora_timbre.split(' ')[1],
+                accion: accionT, reloj: obj3.id_reloj,
+                latitud: obj3.latitud, longitud: obj3.longitud, observacion: obj3.observacion
+              }
+            }
+            
+            this.timbres.push(ele)
+          })
+        })
+    })
   }
 
   /*****************************************************************************
@@ -910,6 +1490,50 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
       return `${this.isAllSelectedSuc() ? 'select' : 'deselect'} all`;
     }
     return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedReg() {
+    const numSelected = this.selectionReg.selected.length;
+    return numSelected === this.regimen.length;
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterToggleReg() {
+    this.isAllSelectedReg()
+      ? this.selectionReg.clear()
+      : this.regimen.forEach((row) => this.selectionReg.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
+  checkboxLabelReg(row?: ITableEmpleados): string {
+    if (!row) {
+      return `${this.isAllSelectedReg() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${
+      row.id + 1
+    }`;
+  }
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedCar() {
+    const numSelected = this.selectionCar.selected.length;
+    return numSelected === this.cargos.length
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterToggleCar() {
+    this.isAllSelectedCar() ?
+      this.selectionCar.clear() :
+      this.cargos.forEach(row => this.selectionCar.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelCar(row?: ITableEmpleados): string {
+    if (!row) {
+      return `${this.isAllSelectedCar() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selectionCar.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
@@ -991,6 +1615,12 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
     }
   }
 
+  // METODO PARA MANEJAR PAGINACION DETALLE
+  ManejarPaginaDetalle(e: PageEvent) {
+    this.numero_pagina = e.pageIndex + 1;
+    this.tamanio_pagina = e.pageSize;
+  }
+
   /**
    * METODOS PARA CONTROLAR INGRESO DE LETRAS
    */
@@ -1021,4 +1651,19 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
       this.Filtrar('', 5)*/
     }
   }
+
+   //MOSTRAR DETALLES
+   verDatos() {
+    this.verDetalle = true;
+    if (this.bool.bool_cargo || this.bool.bool_reg) {
+      this.extraerTimbresRegimenCargo();
+    } else{
+      this.extraerTimbres();
+    }
+  }
+
+  regresar(){
+    this.verDetalle = false;
+  }
+  
 }

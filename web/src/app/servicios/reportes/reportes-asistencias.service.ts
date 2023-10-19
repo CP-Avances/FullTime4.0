@@ -81,6 +81,10 @@ export class ReportesAsistenciasService {
     return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-reloj-virtual/${desde}/${hasta}`, data);
   }
 
+  ReporteTimbreRelojVirtualRegimenCargo(data: any, desde: string, hasta: string) {
+    return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-reloj-virtual-regimen-cargo/${desde}/${hasta}`, data);
+  }
+
   ReporteTimbreHorarioAbierto(data: any, desde: string, hasta: string) {
     return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-horario-abierto/${desde}/${hasta}`, data);
   }
