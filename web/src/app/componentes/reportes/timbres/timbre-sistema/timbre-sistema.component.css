@@ -21,4 +21,8 @@ p {
     font-size: 12px;
 }
 
+#accion {
+    color: rgb(53, 95, 209);
+    cursor: pointer;
+}
 

@@ -364,6 +364,7 @@
                   <th scope="col" rowspan="2">OBSERVACION</th>
                   <th scope="col" rowspan="2">LONGITUD</th>
                   <th scope="col" rowspan="2">LATITUD</th>
+                  <th scope="col" rowspan="2">MAPS</th>
                 </tr>
                 <tr style="text-align: center">
                   <th scope="col" rowspan="1">FECHA</th>
@@ -388,6 +389,14 @@
                   <td>{{ t.observacion }}</td>
                   <td>{{ t.longitud }}</td>
                   <td>{{ t.latitud }}</td>
+                  <td>
+                    <mat-icon aria-hidden="false" id="accion" (click)="AbrirMapa(t.latitud, t.longitud)"
+                        matSuffix matTooltipPtosition="right"
+                        matTooltip="Direccionar al mapa con ubicación del timbre seleccionado."
+                        *ngIf="t.longitud && t.latitud">
+                        location_on
+                    </mat-icon>
+                  </td>
                 </tr>
               </tbody>
             </table>

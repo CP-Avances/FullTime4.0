@@ -34,9 +34,6 @@ export class RangoFechasComponent implements OnInit, OnDestroy {
     var f_i = new Date(form.fec_inicio);
     var f_f = new Date(form.fec_final);
     if (f_i<f_f) {
-      this.toastr.success('Fechas validas', '', {
-        timeOut: 6000,
-      });
       this.f_inicio_req = f_i.toJSON().split('T')[0];
       this.f_final_req = f_f.toJSON().split('T')[0];
       this.reporteService.guardarRangoFechas(this.f_inicio_req, this.f_final_req);

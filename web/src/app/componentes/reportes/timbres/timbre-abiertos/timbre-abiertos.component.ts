@@ -1631,6 +1631,12 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
     this.tamanio_pagina = e.pageSize;
   }
 
+  // METODO PARA VER UBICACION DE TIMBRE
+  AbrirMapa(latitud: string, longitud: string) {
+    const rutaMapa = "https://www.google.com/maps/search/+" + latitud + "+" + longitud;
+    window.open(rutaMapa);
+  }
+
   /**
    * METODOS PARA CONTROLAR INGRESO DE LETRAS
    */
