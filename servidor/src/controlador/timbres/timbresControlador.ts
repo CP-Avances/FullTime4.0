@@ -73,8 +73,8 @@ class TimbresControlador {
                                 case 'S': obj.accion = 'Salida'; break;
                                 case 'I/A': obj.accion = 'Inicio alimentación'; break;
                                 case 'F/A': obj.accion = 'Fin alimentación'; break;
-                                case 'I/P': obj.accion = 'Fin permiso'; break;
-                                case 'F/P': obj.accion = 'Inicio permiso'; break;
+                                case 'I/P': obj.accion = 'Inicio permiso'; break;
+                                case 'F/P': obj.accion = 'Fin permiso'; break;
                                 case 'HA': obj.accion = 'Timbre libre'; break;
                                 default: obj.accion = 'Desconocido'; break;
                             }
@@ -478,8 +478,8 @@ class TimbresControlador {
                             case 'S': obj.accion = 'Salida'; break;
                             case 'I/A': obj.accion = 'Inicio alimentación'; break;
                             case 'F/A': obj.accion = 'Fin alimentación'; break;
-                            case 'I/P': obj.accion = 'Fin permiso'; break;
-                            case 'F/P': obj.accion = 'Inicio permiso'; break;
+                            case 'I/P': obj.accion = 'Inicio permiso'; break;
+                            case 'F/P': obj.accion = 'Fin permiso'; break;
                             case 'HA': obj.accion = 'Timbre libre'; break;
                             default: obj.accion = 'Desconocido'; break;
                         }

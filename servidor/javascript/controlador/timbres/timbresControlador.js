@@ -76,10 +76,10 @@ class TimbresControlador {
                                 obj.accion = 'Fin alimentación';
                                 break;
                             case 'I/P':
-                                obj.accion = 'Fin permiso';
+                                obj.accion = 'Inicio permiso';
                                 break;
                             case 'F/P':
-                                obj.accion = 'Inicio permiso';
+                                obj.accion = 'Fin permiso';
                                 break;
                             case 'HA':
                                 obj.accion = 'Timbre libre';
@@ -427,10 +427,10 @@ class TimbresControlador {
                                 obj.accion = 'Fin alimentación';
                                 break;
                             case 'I/P':
-                                obj.accion = 'Fin permiso';
+                                obj.accion = 'Inicio permiso';
                                 break;
                             case 'F/P':
-                                obj.accion = 'Inicio permiso';
+                                obj.accion = 'Fin permiso';
                                 break;
                             case 'HA':
                                 obj.accion = 'Timbre libre';

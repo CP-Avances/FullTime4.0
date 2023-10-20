@@ -37,8 +37,8 @@ export class CrearTimbreComponent implements OnInit {
     { value: 'S', name: 'Salida' },
     { value: 'I/A', name: 'Inicio alimentación' },
     { value: 'F/A', name: 'Fin alimentación' },
-    { value: 'S/P', name: 'Inicio permiso' },
-    { value: 'E/P', name: 'Fin permiso' },
+    { value: 'I/P', name: 'Inicio permiso' },
+    { value: 'F/P', name: 'Fin permiso' },
   ]
 
   // AGREGAR CAMPOS DE FORMULARIO A UN GRUPO

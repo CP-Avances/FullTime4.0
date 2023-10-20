@@ -39,7 +39,6 @@ import { VerSucursalComponent } from './componentes/catalogos/catSucursal/ver-su
 import { AuthGuard } from "./servicios/guards/auth.guard";
 
 //Reportes
-import { ReporteTimbresComponent } from './componentes/reportes/timbres/reporte-timbres/reporte-timbres.component';
 import { ReportePermisosComponent } from './componentes/reportes/reporte-permisos/reporte-permisos.component';
 import { ReporteAtrasosComponent } from './componentes/reportes/atrasos/reporte-atrasos/reporte-atrasos.component';
 import { ReporteEntradaSalidaComponent } from './componentes/reportes/entradas-salidas/reporte-entrada-salida/reporte-entrada-salida.component';
@@ -62,14 +61,14 @@ import { PlanificacionComidasEmpleadoComponent } from './componentes/rolEmpleado
 import { ProcesosEmpleadoComponent } from './componentes/rolEmpleado/procesos-empleado/procesos-empleado.component';
 import { AutorizaEmpleadoComponent } from './componentes/rolEmpleado/autoriza-empleado/autoriza-empleado.component';
 import { ReporteKardexComponent } from './componentes/reportes/vacaciones/reporte-kardex/reporte-kardex.component';
-import { ReporteEmpleadosComponent } from './componentes/reportes/empleados/reporte-empleados/reporte-empleados.component';
+import { ReporteEmpleadosComponent } from './componentes/reportes/generales/empleados/activos/reporte-empleados/reporte-empleados.component';
 import { ListaArchivosComponent } from './componentes/documentos/lista-archivos/lista-archivos.component';
 import { TimbreWebComponent } from './componentes/modulos/timbreWeb/timbre-empleado/timbre-web.component';
 import { TimbreAdminComponent } from './componentes/timbres/timbre-admin/timbre-admin.component';
 import { ReporteHorasExtrasComponent } from './componentes/reportes/horas-extras/reporte-horas-extras/reporte-horas-extras.component';
 import { AlimentosGeneralComponent } from './componentes/reportes/alimentacion/alimentos-general/alimentos-general.component';
 import { ReporteAtrasosMultiplesComponent } from './componentes/reportes/atrasos/reporte-atrasos-multiples/reporte-atrasos-multiples.component';
-import { ReporteEmpleadosInactivosComponent } from './componentes/reportes/empleados/reporte-empleados-inactivos/reporte-empleados-inactivos.component';
+import { ReporteEmpleadosInactivosComponent } from './componentes/reportes/generales/empleados/inactivos/reporte-empleados-inactivos/reporte-empleados-inactivos.component';
 import { ReporteFaltasComponent } from './componentes/reportes/reporte-faltas/reporte-faltas.component';
 import { ReporteHorasTrabajadasComponent } from './componentes/reportes/reporte-horas-trabajadas/reporte-horas-trabajadas.component';
 import { ReporteTimbresMultiplesComponent } from './componentes/reportes/timbres/reporte-timbres-multiples/reporte-timbres-multiples.component';
@@ -86,7 +85,7 @@ import { BuscarTimbreComponent } from './componentes/timbres/acciones-timbres/bu
 
 import { RecuperarFraseComponent } from './componentes/administracionGeneral/frase-seguridad/recuperar-frase/recuperar-frase.component';
 import { OlvidarFraseComponent } from './componentes/administracionGeneral/frase-seguridad/olvidar-frase/olvidar-frase.component';
-import { VacunaMultipleComponent } from './componentes/reportes/vacunas/vacuna-multiple/vacuna-multiple.component';
+import { VacunaMultipleComponent } from './componentes/reportes/generales/vacunas/vacuna-multiple/vacuna-multiple.component';
 import { AlimentosInvitadosComponent } from './componentes/reportes/alimentacion/alimentos-invitados/alimentos-invitados.component';
 import { TimbreIncompletoComponent } from './componentes/reportes/timbres/timbre-incompleto/timbre-incompleto.component';
 import { SalidasAntesComponent } from './componentes/reportes/entradas-salidas/salidas-antes/salidas-antes.component';
@@ -137,9 +136,9 @@ import { ListaWebComponent } from './componentes/modulos/timbreWeb/lista-web/lis
 import { RegistroDispositivosComponent } from './componentes/modulos/appMovil/registro-dispositivos/registro-dispositivos.component';
 import { VistaElementosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/listarTipoPermisos/vista-elementos.component';
 import { TimbreMultipleComponent } from './componentes/timbres/timbre-multiple/timbre-multiple.component';
-import { VerEmpleadosActivosDetalleComponent } from './componentes/reportes/empleados/detalle/ver-empleados-activos-detalle/ver-empleados-activos-detalle.component';
-import { VerEmpleadosInactivosDetalleComponent } from './componentes/reportes/empleados/detalle/ver-empleados-inactivos-detalle/ver-empleados-inactivos-detalle.component';
-import { VerVacunasComponent } from './componentes/reportes/vacunas/detalle/ver-vacunas/ver-vacunas.component';
+import { VerEmpleadosActivosDetalleComponent } from './componentes/reportes/generales/empleados/activos/ver-empleados-activos-detalle/ver-empleados-activos-detalle.component';
+import { VerEmpleadosInactivosDetalleComponent } from './componentes/reportes/generales/empleados/inactivos/ver-empleados-inactivos-detalle/ver-empleados-inactivos-detalle.component';
+import { VerVacunasComponent } from './componentes/reportes/generales/vacunas/ver-vacunas/ver-vacunas.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -175,7 +174,6 @@ const routes: Routes = [
   { path: 'reporteAsistenciaConsolidado', component: AsistenciaConsolidadoComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'reporteEmpleados', component: ReporteEmpleadosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'reporteKardex', component: ReporteKardexComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'reporteTimbres', component: ReporteTimbresComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'reportePermisos', component: ReportePermisosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'reporteAtrasos', component: ReporteAtrasosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'reporteEntradaSalida', component: ReporteEntradaSalidaComponent, canActivate: [AuthGuard], data: { roles: 1 } },

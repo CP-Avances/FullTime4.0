@@ -731,10 +731,10 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
                       case 'PES': accionT = 'Inicio o fin permiso'; break;
                       case 'E': accionT = 'Entrada'; break;
                       case 'S': accionT = 'Salida'; break;
-                      case 'F/A': accionT = 'Fin alimentación'; break;
                       case 'I/A': accionT = 'Inicio alimentación'; break;
-                      case 'E/P': accionT = 'Fin permiso'; break;
-                      case 'S/P': accionT = 'Inicio permiso'; break;
+                      case 'F/A': accionT = 'Fin alimentación'; break;
+                      case 'I/P': accionT = 'Inicio permiso'; break;
+                      case 'F/P': accionT = 'Fin permiso'; break;
                       case 'HA': accionT = 'Timbre libre'; break;
                       default: accionT = 'Desconocido'; break;
                     }
@@ -792,10 +792,10 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
                       case 'PES': accionT = 'Inicio o fin permiso'; break;
                       case 'E': accionT = 'Entrada'; break;
                       case 'S': accionT = 'Salida'; break;
-                      case 'F/A': accionT = 'Fin alimentación'; break;
                       case 'I/A': accionT = 'Inicio alimentación'; break;
-                      case 'E/P': accionT = 'Fin permiso'; break;
-                      case 'S/P': accionT = 'Inicio permiso'; break;
+                      case 'F/A': accionT = 'Fin alimentación'; break;
+                      case 'I/P': accionT = 'Inicio permiso'; break;
+                      case 'F/P': accionT = 'Fin permiso'; break;
                       case 'HA': accionT = 'Timbre libre'; break;
                       default: accionT = 'Desconocido'; break;
                     }
@@ -944,10 +944,10 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
                         case 'PES': accionT = 'Inicio o fin permiso'; break;
                         case 'E': accionT = 'Entrada'; break;
                         case 'S': accionT = 'Salida'; break;
-                        case 'F/A': accionT = 'Fin alimentación'; break;
                         case 'I/A': accionT = 'Inicio alimentación'; break;
-                        case 'E/P': accionT = 'Fin permiso'; break;
-                        case 'S/P': accionT = 'Inicio permiso'; break;
+                        case 'F/A': accionT = 'Fin alimentación'; break;
+                        case 'I/P': accionT = 'Inicio permiso'; break;
+                        case 'F/P': accionT = 'Fin permiso'; break;
                         case 'HA': accionT = 'Timbre libre'; break;
                         default: accionT = 'Desconocido'; break;
                       }
@@ -1005,10 +1005,10 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
                         case 'PES': accionT = 'Inicio o fin permiso'; break;
                         case 'E': accionT = 'Entrada'; break;
                         case 'S': accionT = 'Salida'; break;
-                        case 'F/A': accionT = 'Fin alimentación'; break;
                         case 'I/A': accionT = 'Inicio alimentación'; break;
-                        case 'E/P': accionT = 'Fin permiso'; break;
-                        case 'S/P': accionT = 'Inicio permiso'; break;
+                        case 'F/A': accionT = 'Fin alimentación'; break;
+                        case 'I/P': accionT = 'Inicio permiso'; break;
+                        case 'F/P': accionT = 'Fin permiso'; break;
                         case 'HA': accionT = 'Timbre libre'; break;
                         default: accionT = 'Desconocido'; break;
                       }
@@ -1262,10 +1262,10 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
               case 'PES': accionT = 'Inicio o fin permiso'; break;
               case 'E': accionT = 'Entrada'; break;
               case 'S': accionT = 'Salida'; break;
-              case 'F/A': accionT = 'Fin alimentación'; break;
               case 'I/A': accionT = 'Inicio alimentación'; break;
-              case 'E/P': accionT = 'Fin permiso'; break;
-              case 'S/P': accionT = 'Inicio permiso'; break;
+              case 'F/A': accionT = 'Fin alimentación'; break;
+              case 'I/P': accionT = 'Inicio permiso'; break;
+              case 'F/P': accionT = 'Fin permiso'; break;
               case 'HA': accionT = 'Timbre libre'; break;
               default: accionT = 'Desconocido'; break;
             }
@@ -1316,10 +1316,10 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
               case 'PES': accionT = 'Inicio o fin permiso'; break;
               case 'E': accionT = 'Entrada'; break;
               case 'S': accionT = 'Salida'; break;
-              case 'F/A': accionT = 'Fin alimentación'; break;
               case 'I/A': accionT = 'Inicio alimentación'; break;
-              case 'E/P': accionT = 'Fin permiso'; break;
-              case 'S/P': accionT = 'Inicio permiso'; break;
+              case 'F/A': accionT = 'Fin alimentación'; break;
+              case 'I/P': accionT = 'Inicio permiso'; break;
+              case 'F/P': accionT = 'Fin permiso'; break;
               case 'HA': accionT = 'Timbre libre'; break;
               default: accionT = 'Desconocido'; break;
             }
@@ -1397,10 +1397,10 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
               case 'PES': accionT = 'Inicio o fin permiso'; break;
               case 'E': accionT = 'Entrada'; break;
               case 'S': accionT = 'Salida'; break;
-              case 'F/A': accionT = 'Fin alimentación'; break;
               case 'I/A': accionT = 'Inicio alimentación'; break;
-              case 'E/P': accionT = 'Fin permiso'; break;
-              case 'S/P': accionT = 'Inicio permiso'; break;
+              case 'F/A': accionT = 'Fin alimentación'; break;
+              case 'I/P': accionT = 'Inicio permiso'; break;
+              case 'F/P': accionT = 'Fin permiso'; break;
               case 'HA': accionT = 'Timbre libre'; break;
               default: accionT = 'Desconocido'; break;
             }
@@ -1454,10 +1454,10 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
               case 'PES': accionT = 'Inicio o fin permiso'; break;
               case 'E': accionT = 'Entrada'; break;
               case 'S': accionT = 'Salida'; break;
-              case 'F/A': accionT = 'Fin alimentación'; break;
               case 'I/A': accionT = 'Inicio alimentación'; break;
-              case 'E/P': accionT = 'Fin permiso'; break;
-              case 'S/P': accionT = 'Inicio permiso'; break;
+              case 'F/A': accionT = 'Fin alimentación'; break;
+              case 'I/P': accionT = 'Inicio permiso'; break;
+              case 'F/P': accionT = 'Fin permiso'; break;
               case 'HA': accionT = 'Timbre libre'; break;
               default: accionT = 'Desconocido'; break;
             }

@@ -16,7 +16,7 @@ import {
   vacuna,
 } from 'src/app/model/reportes.model';
 import { environment } from 'src/environments/environment';
-import { VacunaMultipleComponent } from '../../vacuna-multiple/vacuna-multiple.component';
+import { VacunaMultipleComponent } from '../vacuna-multiple/vacuna-multiple.component';
 
 @Component({
   selector: 'app-ver-vacunas',

@@ -9,7 +9,7 @@ import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
-import { ReporteEmpleadosComponent } from '../../reporte-empleados/reporte-empleados.component';
+import { ReporteEmpleadosComponent } from '../reporte-empleados/reporte-empleados.component';
 
 @Component({
   selector: 'app-ver-empleados-activos-detalle',

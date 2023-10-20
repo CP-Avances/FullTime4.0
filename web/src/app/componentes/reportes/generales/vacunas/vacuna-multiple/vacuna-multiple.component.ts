@@ -2,28 +2,30 @@
 import { ITableEmpleados, ReporteVacunas, vacuna, } from 'src/app/model/reportes.model';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
-import { PageEvent } from '@angular/material/paginator';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import { ToastrService } from 'ngx-toastr';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import { PageEvent } from '@angular/material/paginator';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
 import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
+import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
+import { ValidacionesService } from '../../../../../servicios/validaciones/validaciones.service';
+import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { VacunasService } from 'src/app/servicios/reportes/vacunas/vacunas.service';
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
 
 @Component({
   selector: 'app-vacuna-multiple',
   templateUrl: './vacuna-multiple.component.html',
   styleUrls: ['./vacuna-multiple.component.css'],
 })
+
 export class VacunaMultipleComponent implements OnInit, OnDestroy {
+
   // METODO QUE INDICA OPCIONES DE BUSQUEDA SELECCIONADOS
   get bool() {
     return this.reporteService.criteriosBusqueda;
@@ -114,10 +116,9 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   }
 
   constructor(
-    private R_asistencias: ReportesAsistenciasService, // SERVICIO BUSQUEDA DE DATOS DE DEPARTAMENTOS
     private validacionService: ValidacionesService, // VARIABLE DE VALIDACIONES DE INGRESO DE LETRAS O NÚMEROS
-    private informacion: DatosGeneralesService,
     private reporteService: ReportesService, // SERVICIO DATOS DE BUSQUEDA GENERALES DE REPORTE
+    private informacion: DatosGeneralesService,
     private restEmpre: EmpresaService, // SERVICIO DATOS GENERALES DE EMPRESA
     private R_vacuna: VacunasService, // SERVICIO DATOS PARA REPORTE DE VACUNAS
     private toastr: ToastrService // VARIABLE DE MANEJO DE NOTIFICACIONES
@@ -132,12 +133,14 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.respuesta = [];
+    this.departamentos = [];
+    this.origen_cargo = [];
     this.sucursales = [];
+    this.respuesta = [];
+    this.empleados = [];
     this.regimen = [];
     this.cargos = [];
-    this.departamentos = [];
-    this.empleados = [];
+    this.origen = [];
   }
 
   // METODO DE BUSQUEDA DE DATOS
@@ -151,10 +154,6 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     this.informacion.ObtenerInformacion(1).subscribe(
       (res: any[]) => {
         this.origen = JSON.stringify(res);
-        sessionStorage.setItem(
-          'reporte_vacunas_multiples',
-          JSON.stringify(res)
-        );
 
         res.forEach((obj) => {
           this.sucursales.push({
@@ -251,15 +250,11 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
             });
           });
         });
-      },
-      (err) => {
-        this.toastr.error(err.error.message);
-      }
-    );
+      });
   }
 
-  // VALIDACIONES DE REPORTES
-  validacionReporte(action) {
+  // VALIDACIONES DE SELECCION DE BUSQUEDA
+  validacionReporte(action: any) {
     if (
       this.bool.bool_suc === false &&
       this.bool.bool_reg === false &&
@@ -321,10 +316,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   }
 
   // MODELAMIENTO DE DATOS DE ACUERDO A LAS SUCURSALES
-  ModelarSucursal(accion) {
-    let respuesta = JSON.parse(
-      sessionStorage.getItem('reporte_vacunas_multiples') as any
-    );
+  ModelarSucursal(accion: any) {
+    let respuesta = JSON.parse(this.origen);
     let suc = respuesta.filter((o) => {
       var bool = this.selectionSuc.selected.find((obj1) => {
         return obj1.id === o.id_suc;
@@ -340,7 +333,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
             this.exportToExcel();
             break;
           case 'ver':
-            this.verDatos(this.data_pdf, 'suc');
+            this.verDatos('suc');
             break;
           default:
             this.generarPdf(accion);
@@ -354,10 +347,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   }
 
   // MODELAMIENTO DE DATOS DE ACUERDO AL REGIMEN
-  ModelarRegimen(accion) {
-    let respuesta = JSON.parse(
-      sessionStorage.getItem('reporte_vacunas_multiples') as any
-    );
+  ModelarRegimen(accion: any) {
+    let respuesta = JSON.parse(this.origen);
     let empleados: any = [];
     let reg: any = [];
     let objeto: any;
@@ -393,7 +384,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
             this.exportToExcelCargoRegimen();
             break;
           case 'ver':
-            this.verDatos(this.data_pdf, 'reg');
+            this.verDatos('reg');
             break;
           default:
             this.generarPdf(accion);
@@ -407,7 +398,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   }
 
   // MODELAMIENTO DE DATOS DE ACUERDO AL CARGO
-  ModelarCargo(accion) {
+  ModelarCargo(accion: any) {
     let respuesta = JSON.parse(this.origen_cargo);
     let car = respuesta.filter((o) => {
       var bool = this.selectionCar.selected.find((obj1) => {
@@ -425,7 +416,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
             this.exportToExcelCargoRegimen();
             break;
           case 'ver':
-            this.verDatos(this.data_pdf, 'car');
+            this.verDatos('car');
             break;
           default:
             this.generarPdf(accion);
@@ -439,10 +430,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   }
 
   // MODELAMIENTO DE DATOS DE ACUERDO A LOS DEPARTAMENTOS
-  ModelarDepartamento(accion) {
-    let respuesta = JSON.parse(
-      sessionStorage.getItem('reporte_vacunas_multiples') as any
-    );
+  ModelarDepartamento(accion: any) {
+    let respuesta = JSON.parse(this.origen);
     respuesta.forEach((obj: any) => {
       obj.departamentos = obj.departamentos.filter((o) => {
         var bool = this.selectionDep.selected.find((obj1) => {
@@ -463,7 +452,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
             this.exportToExcel();
             break;
           case 'ver':
-            this.verDatos(this.data_pdf, 'dep');
+            this.verDatos('dep');
             break;
           default:
             this.generarPdf(accion);
@@ -477,10 +466,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   }
 
   // MODELAMIENTO DE DATOS DE ACUERDO A LOS EMPLEADOS
-  ModelarEmpleados(accion) {
-    let respuesta = JSON.parse(
-      sessionStorage.getItem('reporte_vacunas_multiples') as any
-    );
+  ModelarEmpleados(accion: any) {
+    let respuesta = JSON.parse(this.origen);
     respuesta.forEach((obj: any) => {
       obj.departamentos.forEach((element) => {
         element.empleado = element.empleado.filter((o) => {
@@ -508,7 +495,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
             this.exportToExcel();
             break;
           case 'ver':
-            this.verDatos(this.data_pdf, 'emp');
+            this.verDatos('emp');
             break;
           default:
             this.generarPdf(accion);
@@ -520,6 +507,10 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       }
     );
   }
+
+  /** *************************************************************************************** **
+   ** **                        COLORES Y LOGO PARA EL REPORTE                             ** **
+   ** *************************************************************************************** **/
 
   // OBTENER LOGO PARA EL REPORTE
   logo: any = String;
@@ -547,12 +538,12 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       });
   }
 
-  /* **************************************************************************** *
-   *                                   PDF                                        *
-   * **************************************************************************** */
+  /** ************************************************************************************ **
+   ** **                               GENERACION DE PDF                                ** **
+   ** ************************************************************************************ **/
 
-  generarPdf(action) {
-    let documentDefinition;
+  generarPdf(action: any) {
+    let documentDefinition: any;
 
     if (
       this.bool.bool_emp === true ||
@@ -607,16 +598,14 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
         fecha: any,
         hora: any
       ) {
-        var h = new Date();
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
-        h.setUTCHours(h.getHours());
-        var time = h.toJSON().split('T')[1].split('.')[0];
+        hora = f.format('HH:mm:ss');
 
         return {
           margin: 10,
           columns: [
-            { text: 'Fecha: ' + fecha + ' Hora: ' + time, opacity: 0.3 },
+            { text: 'Fecha: ' + fecha + ' Hora: ' + hora, opacity: 0.3 },
             {
               text: [
                 {
@@ -907,6 +896,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     return n;
   }
 
+  // METODO PARA SUMAR REGISTROS
   SumarRegistros(array: any[]) {
     let valor = 0;
     for (let i = 0; i < array.length; i++) {
@@ -918,6 +908,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   /** ************************************************************************************************** *
    ** *                                     METODO PARA EXPORTAR A EXCEL                                 *
    ** ************************************************************************************************** */
+
   exportToExcel(): void {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(
       this.MapingDataPdfDefault(this.data_pdf)
@@ -987,7 +978,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
             Género: obj2.genero,
             Ciudad: obj2.ciudad,
             Sucursal: obj2.sucursal,
-            Régimen: this.bool.bool_cargo? obj2.regimen : obj2.regimen[0].name_regimen,
+            Régimen: this.bool.bool_cargo ? obj2.regimen : obj2.regimen[0].name_regimen,
             Departamento: obj2.departamento,
             Cargo: obj2.cargo,
             Correo: obj2.correo,
@@ -1027,9 +1018,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     if (!row) {
       return `${this.isAllSelectedSuc() ? 'select' : 'deselect'} all`;
     }
-    return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${
-      row.id + 1
-    }`;
+    return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1
+      }`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
@@ -1050,9 +1040,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     if (!row) {
       return `${this.isAllSelectedReg() ? 'select' : 'deselect'} all`;
     }
-    return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${
-      row.id + 1
-    }`;
+    return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1
+      }`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
@@ -1073,9 +1062,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     if (!row) {
       return `${this.isAllSelectedCar() ? 'select' : 'deselect'} all`;
     }
-    return `${this.selectionCar.isSelected(row) ? 'deselect' : 'select'} row ${
-      row.id + 1
-    }`;
+    return `${this.selectionCar.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1
+      }`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
@@ -1096,9 +1084,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     if (!row) {
       return `${this.isAllSelectedDep() ? 'select' : 'deselect'} all`;
     }
-    return `${this.selectionDep.isSelected(row) ? 'deselect' : 'select'} row ${
-      row.id + 1
-    }`;
+    return `${this.selectionDep.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1
+      }`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
@@ -1119,9 +1106,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     if (!row) {
       return `${this.isAllSelectedEmp() ? 'select' : 'deselect'} all`;
     }
-    return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${
-      row.id + 1
-    }`;
+    return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1
+      }`;
   }
 
   // METODO DE CONTROL DE PAGINACIÓN
@@ -1129,49 +1115,36 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     if (this.bool.bool_suc === true) {
       this.tamanio_pagina_suc = e.pageSize;
       this.numero_pagina_suc = e.pageIndex + 1;
-    } else if (this.bool.bool_reg === true) {
+    }
+    else if (this.bool.bool_reg === true) {
       this.tamanio_pagina_reg = e.pageSize;
       this.numero_pagina_reg = e.pageIndex + 1;
-    } else if (this.bool.bool_dep === true) {
+    }
+    else if (this.bool.bool_dep === true) {
       this.tamanio_pagina_dep = e.pageSize;
       this.numero_pagina_dep = e.pageIndex + 1;
-    } else if (this.bool.bool_cargo === true) {
+    }
+    else if (this.bool.bool_cargo === true) {
       this.tamanio_pagina_dep = e.pageSize;
       this.numero_pagina_dep = e.pageIndex + 1;
-    } else if (this.bool.bool_emp === true) {
+    }
+    else if (this.bool.bool_emp === true) {
       this.tamanio_pagina_emp = e.pageSize;
       this.numero_pagina_emp = e.pageIndex + 1;
     }
   }
 
-  // METODO PARA INGRESAR DATOS DE LETRAS O NÚMEROS
-  IngresarSoloLetras(e) {
+  // METODO PARA INGRESAR DATOS DE LETRAS O NUMEROS
+  IngresarSoloLetras(e: any) {
     return this.validacionService.IngresarSoloLetras(e);
   }
 
-  IngresarSoloNumeros(evt) {
+  IngresarSoloNumeros(evt: any) {
     return this.validacionService.IngresarSoloNumeros(evt);
   }
 
-  MostrarLista() {
-    if (this.opcion === 's') {
-      /* this.nombre_suc.reset();
-      this.Filtrar('', 1)*/
-    } else if (this.opcion === 'd') {
-      /*this.nombre_dep.reset();
-      this.Filtrar('', 2)*/
-    } else if (this.opcion === 'e') {
-      /* this.codigo.reset();
-      this.cedula.reset();
-      this.nombre_emp.reset();
-      this.Filtrar('', 3)
-      this.Filtrar('', 4)
-      this.Filtrar('', 5)*/
-    }
-  }
-
   //ENVIAR DATOS A LA VENTANA DE DETALLE
-  verDatos(data: any, tipo: string) {
+  verDatos(tipo: string) {
     this.verDetalle = true;
     this.tipo = tipo;
   }

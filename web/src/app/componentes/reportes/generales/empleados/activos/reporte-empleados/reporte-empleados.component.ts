@@ -1,27 +1,24 @@
 // IMPORTAR LIBRERIAS
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MAT_MOMENT_DATE_FORMATS, MomentDateAdapter } from '@angular/material-moment-adapter';
-import { SelectionModel } from '@angular/cdk/collections';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { PageEvent } from '@angular/material/paginator';
-import { MatRadioChange } from '@angular/material/radio';
+import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
+import { PageEvent } from '@angular/material/paginator';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
 import { IReporteAtrasos } from 'src/app/model/reportes.model';
 import { ITableEmpleados } from 'src/app/model/reportes.model';
-
 
 // IMPORTAR SERVICIOS
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
+import { ValidacionesService } from '../../../../../../servicios/validaciones/validaciones.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
 
 @Component({
   selector: 'app-reporte-empleados',
@@ -36,8 +33,8 @@ import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-
 })
 export class ReporteEmpleadosComponent implements OnInit {
 
-   // METODO QUE INDICA OPCIONES DE BUSQUEDA SELECCIONADOS
-   get bool() {
+  // METODO QUE INDICA OPCIONES DE BUSQUEDA SELECCIONADOS
+  get bool() {
     return this.reporteService.criteriosBusqueda;
   }
 
@@ -45,8 +42,6 @@ export class ReporteEmpleadosComponent implements OnInit {
   get opcion() {
     return this.reporteService.opcion;
   }
-
-  buscador !: FormGroup;
 
   // VARIABLES DE ALMACENAMIENTO DE RESULTADOS
   departamentos: any = [];
@@ -129,8 +124,8 @@ export class ReporteEmpleadosComponent implements OnInit {
 
   constructor(
     private validacionService: ValidacionesService, // VARIABLE DE VALIDACIONES DE INGRESO DE LETRAS O NÚMEROS
-    private informacion: DatosGeneralesService,
     private reporteService: ReportesService, // SERVICIO DATOS DE BUSQUEDA GENERALES DE REPORTE
+    private informacion: DatosGeneralesService,
     private restEmpre: EmpresaService,
     private toastr: ToastrService,
   ) {
@@ -143,126 +138,120 @@ export class ReporteEmpleadosComponent implements OnInit {
     this.BuscarCargos();
   }
 
- // METODO DE BUSQUEDA DE DATOS
- BuscarInformacion() {
-  this.departamentos = [];
-  this.sucursales = [];
-  this.respuesta = [];
-  this.empleados = [];
-  this.regimen = [];
-  this.origen = [];
-  this.informacion.ObtenerInformacion(1).subscribe(
-    (res: any[]) => {
-      this.origen = JSON.stringify(res);
-      sessionStorage.setItem(
-        'reporte_emp_activos',
-        JSON.stringify(res)
-      );
-
-      res.forEach((obj) => {
-        this.sucursales.push({
-          id: obj.id_suc,
-          nombre: obj.name_suc,
-        });
-      });
-
-      res.forEach((obj) => {
-        obj.departamentos.forEach((ele) => {
-          this.departamentos.push({
-            id: ele.id_depa,
-            departamento: ele.name_dep,
-            nombre: ele.sucursal,
+  // METODO DE BUSQUEDA DE DATOS
+  BuscarInformacion() {
+    this.departamentos = [];
+    this.sucursales = [];
+    this.respuesta = [];
+    this.empleados = [];
+    this.regimen = [];
+    this.origen = [];
+    this.informacion.ObtenerInformacion(1).subscribe(
+      (res: any[]) => {
+        this.origen = JSON.stringify(res);
+        res.forEach((obj) => {
+          this.sucursales.push({
+            id: obj.id_suc,
+            nombre: obj.name_suc,
           });
         });
-      });
 
-      res.forEach((obj) => {
-        obj.departamentos.forEach((ele) => {
-          ele.empleado.forEach((r) => {
-            let elemento = {
+        res.forEach((obj) => {
+          obj.departamentos.forEach((ele) => {
+            this.departamentos.push({
+              id: ele.id_depa,
+              departamento: ele.name_dep,
+              nombre: ele.sucursal,
+            });
+          });
+        });
+
+        res.forEach((obj) => {
+          obj.departamentos.forEach((ele) => {
+            ele.empleado.forEach((r) => {
+              let elemento = {
+                id: r.id,
+                nombre: r.name_empleado,
+                codigo: r.codigo,
+                cedula: r.cedula,
+                correo: r.correo,
+                cargo: r.cargo,
+                id_contrato: r.id_contrato,
+                hora_trabaja: r.hora_trabaja,
+                sucursal: r.sucursal,
+                departamento: r.departamento,
+                ciudad: r.ciudad,
+                regimen: r.regimen,
+              };
+              this.empleados.push(elemento);
+            });
+          });
+        });
+
+        res.forEach((obj) => {
+          obj.departamentos.forEach((ele) => {
+            ele.empleado.forEach((reg) => {
+              reg.regimen.forEach((r) => {
+                this.regimen.push({
+                  id: r.id_regimen,
+                  nombre: r.name_regimen,
+                });
+              });
+            });
+          });
+        });
+
+        this.regimen = this.regimen.filter(
+          (obj, index, self) => index === self.findIndex((o) => o.id === obj.id)
+        );
+      },
+      (err) => {
+        this.toastr.error(err.error.message);
+      }
+    );
+  }
+
+  // METODO PARA FILTRAR POR CARGOS
+  empleados_cargos: any = [];
+  origen_cargo: any = [];
+  BuscarCargos() {
+    this.empleados_cargos = [];
+    this.origen_cargo = [];
+    this.cargos = [];
+    this.informacion.ObtenerInformacionCargo(1).subscribe(
+      (res: any[]) => {
+        this.origen_cargo = JSON.stringify(res);
+        res.forEach((obj) => {
+          this.cargos.push({
+            id: obj.id_cargo,
+            nombre: obj.name_cargo,
+          });
+        });
+
+        res.forEach((obj) => {
+          obj.empleados.forEach((r) => {
+            this.empleados_cargos.push({
               id: r.id,
               nombre: r.name_empleado,
               codigo: r.codigo,
               cedula: r.cedula,
               correo: r.correo,
-              cargo: r.cargo,
+              ciudad: r.ciudad,
+              id_cargo: r.id_cargo,
               id_contrato: r.id_contrato,
               hora_trabaja: r.hora_trabaja,
-              sucursal: r.sucursal,
-              departamento: r.departamento,
-              ciudad: r.ciudad,
-              regimen: r.regimen,
-            };
-            this.empleados.push(elemento);
-          });
-        });
-      });
-
-      res.forEach((obj) => {
-        obj.departamentos.forEach((ele) => {
-          ele.empleado.forEach((reg) => {
-            reg.regimen.forEach((r) => {
-              this.regimen.push({
-                id: r.id_regimen,
-                nombre: r.name_regimen,
-              });
             });
           });
         });
-      });
+      },
+      (err) => {
+        this.toastr.error(err.error.message);
+      }
+    );
+  }
 
-      this.regimen = this.regimen.filter(
-        (obj, index, self) => index === self.findIndex((o) => o.id === obj.id)
-      );
-    },
-    (err) => {
-      this.toastr.error(err.error.message);
-    }
-  );
-}
-
-// METODO PARA FILTRAR POR CARGOS
-empleados_cargos: any = [];
-origen_cargo: any = [];
-BuscarCargos() {
-  this.empleados_cargos = [];
-  this.origen_cargo = [];
-  this.cargos = [];
-  this.informacion.ObtenerInformacionCargo(1).subscribe(
-    (res: any[]) => {
-      this.origen_cargo = JSON.stringify(res);
-
-      res.forEach((obj) => {
-        this.cargos.push({
-          id: obj.id_cargo,
-          nombre: obj.name_cargo,
-        });
-      });
-
-      res.forEach((obj) => {
-        obj.empleados.forEach((r) => {
-          this.empleados_cargos.push({
-            id: r.id,
-            nombre: r.name_empleado,
-            codigo: r.codigo,
-            cedula: r.cedula,
-            correo: r.correo,
-            ciudad: r.ciudad,
-            id_cargo: r.id_cargo,
-            id_contrato: r.id_contrato,
-            hora_trabaja: r.hora_trabaja,
-          });
-        });
-      });
-    },
-    (err) => {
-      this.toastr.error(err.error.message);
-    }
-  );
-}
-
-  // VALIDACIONES DE REPORTES
-  validacionReporte(action) {
+  // VALIDACIONES DE SELECCION DE BUSQUEDA
+  validacionReporte(action: any) {
     if (
       this.bool.bool_suc === false &&
       this.bool.bool_reg === false &&
@@ -271,7 +260,7 @@ BuscarCargos() {
       this.bool.bool_emp === false
     )
       return this.toastr.error('Seleccione un criterio de búsqueda.');
-    console.log('opcion', this.opcion);
+    //console.log('opcion', this.opcion);
     switch (this.opcion) {
       case 's':
         if (this.selectionSuc.selected.length === 0)
@@ -323,10 +312,10 @@ BuscarCargos() {
     }
   }
 
+  // TRATAMIENTO DE DATOS DE SUCURSALES
+  ModelarSucursal(accion: any) {
 
-  ModelarSucursal(accion) {
-
-    let respuesta = JSON.parse(sessionStorage.getItem('reporte_emp_activos') as any)
+    let respuesta = JSON.parse(this.origen);
 
     let suc = respuesta.filter(o => {
       var bool = this.selectionSuc.selected.find(obj1 => {
@@ -345,12 +334,10 @@ BuscarCargos() {
     }
   }
 
-  
-
-  ModelarRegimen(accion) {
-    let respuesta = JSON.parse(
-      sessionStorage.getItem('reporte_vacunas_multiples') as any
-    );
+  // TRAMIENTO DE DATOS POR REGIMEN
+  ModelarRegimen(accion: any) {
+    let respuesta = JSON.parse(this.origen);
+    //console.log('ver respuesta ', respuesta)
     let empleados: any = [];
     let reg: any = [];
     let objeto: any;
@@ -386,7 +373,8 @@ BuscarCargos() {
     }
   }
 
-  ModelarCargo(accion) {
+  // TRATAMIENTO DE DATOS POR CARGO
+  ModelarCargo(accion: any) {
     let respuesta = JSON.parse(this.origen_cargo);
     let car = respuesta.filter(o => {
       var bool = this.selectionCar.selected.find(obj1 => {
@@ -405,9 +393,9 @@ BuscarCargos() {
     }
   }
 
-  ModelarDepartamento(accion) {
-
-    let respuesta = JSON.parse(sessionStorage.getItem('reporte_emp_activos') as any)
+  // TRATAMIENTO DE DATOS POR DEPARTAMENTO
+  ModelarDepartamento(accion: any) {
+    let respuesta = JSON.parse(this.origen)
 
     respuesta.forEach((obj: any) => {
       obj.departamentos = obj.departamentos.filter(o => {
@@ -430,9 +418,10 @@ BuscarCargos() {
     }
   }
 
-  ModelarEmpleados(accion) {
+  // TRATAMIENTO DE DATOS POR EMPLEADO
+  ModelarEmpleados(accion: any) {
 
-    let respuesta = JSON.parse(sessionStorage.getItem('reporte_emp_activos') as any)
+    let respuesta = JSON.parse(this.origen)
 
     respuesta.forEach((obj: any) => {
       obj.departamentos.forEach(element => {
@@ -465,11 +454,9 @@ BuscarCargos() {
 
   }
 
-  /***************************
-   * 
-   * COLORES Y LOGO PARA EL REPORTE
-   * 
-   *****************************/
+  /** *************************************************************************************** **
+   ** **                        COLORES Y LOGO PARA EL REPORTE                             ** **
+   ** *************************************************************************************** **/
 
   logo: any = String;
   ObtenerLogo() {
@@ -490,13 +477,11 @@ BuscarCargos() {
     });
   }
 
-  /******************************************************
-   * 
-   *          PDF
-   * 
-   *****************************************************/
+  /** ************************************************************************************ **
+   ** **                               GENERACION DE PDF                                ** **
+   ** ************************************************************************************ **/
 
-  generarPdf(action) {
+  generarPdf(action: any) {
     const documentDefinition = this.getDocumentDefinicion();
     let doc_name = "Reporte_usuarios_activos.pdf";
     switch (action) {
@@ -505,7 +490,6 @@ BuscarCargos() {
       case 'download': pdfMake.createPdf(documentDefinition).download(doc_name); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
-
   }
 
   getDocumentDefinicion() {
@@ -517,16 +501,14 @@ BuscarCargos() {
       header: { text: 'Impreso por:  ' + localStorage.getItem('fullname_print'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var h = new Date();
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
-        h.setUTCHours(h.getHours());
-        var time = h.toJSON().split("T")[1].split(".")[0];
+       hora = f.format('HH:mm:ss');
 
         return {
           margin: 10,
           columns: [
-            { text: 'Fecha: ' + fecha + ' Hora: ' + time, opacity: 0.3 },
+            { text: 'Fecha: ' + fecha + ' Hora: ' + hora, opacity: 0.3 },
             {
               text: [
                 {
@@ -549,7 +531,7 @@ BuscarCargos() {
       ],
       styles: {
         tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTable: { fontSize: 10.5},
+        itemsTable: { fontSize: 10.5 },
         itemsTableInfo: { fontSize: 12, margin: [0, 3, 0, 3], fillColor: this.s_color },
         itemsTableCentrado: { fontSize: 10, alignment: 'center' },
         tableMarginSuc: { margin: [0, 10, 0, 10] },
@@ -569,7 +551,7 @@ BuscarCargos() {
     if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
       data.forEach((obj1) => {
         arr_emp = [];
-        
+
         if (this.bool.bool_cargo === true) {
           n.push({
             style: 'tableMarginSuc',
@@ -617,7 +599,7 @@ BuscarCargos() {
         }
 
         obj1.empleados.forEach(obj2 => {
-            arr_emp.push(obj2)
+          arr_emp.push(obj2)
         });
 
         n.push({
@@ -639,16 +621,16 @@ BuscarCargos() {
               ],
               ...arr_emp.map(obj3 => {
                 return [
-                  { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
-                  { style: 'itemsTableCentrado', text: obj3.codigo},
+                  { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
+                  { style: 'itemsTableCentrado', text: obj3.codigo },
                   { style: 'itemsTable', text: obj3.name_empleado },
                   { style: 'itemsTable', text: obj3.cedula },
                   { style: 'itemsTableCentrado', text: obj3.genero == 1 ? 'M' : 'F' },
                   { style: 'itemsTable', text: obj3.ciudad },
                   { style: 'itemsTable', text: obj3.sucursal },
-                  { style: 'itemsTable', text: this.bool.bool_cargo? obj3.regimen : obj3.regimen[0].name_regimen },
+                  { style: 'itemsTable', text: this.bool.bool_cargo ? obj3.regimen : obj3.regimen[0].name_regimen },
                   { style: 'itemsTable', text: obj3.departamento },
-                  { style: 'itemsTable', text: obj3.correo},
+                  { style: 'itemsTable', text: obj3.correo },
                 ]
               }),
             ]
@@ -667,7 +649,7 @@ BuscarCargos() {
         if (this.bool.bool_suc === true) {
           let arr_suc = obj.departamentos.map(o => { return o.empleado.length });
           let suma_suc = this.SumarRegistros(arr_suc);
-          
+
           arr_emp = [];
           n.push({
             style: 'tableMarginSuc',
@@ -703,7 +685,7 @@ BuscarCargos() {
           })
 
           n.push({
-            
+
             style: 'tableMarginEmp',
             table: {
               widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
@@ -722,15 +704,15 @@ BuscarCargos() {
                 ...arr_emp.map(obj3 => {
                   obj3.regimen.forEach((r) => (regimen = r.name_regimen));
                   return [
-                    { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
+                    { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
                     { style: 'itemsTableCentrado', text: obj3.codigo },
                     { style: 'itemsTable', text: obj3.name_empleado },
                     { style: 'itemsTable', text: obj3.cedula },
                     { style: 'itemsTableCentrado', text: obj3.genero == 1 ? 'M' : 'F' },
                     { style: 'itemsTable', text: regimen },
                     { style: 'itemsTable', text: obj3.departamento },
-                    { style: 'itemsTable', text: obj3.cargo},
-                    { style: 'itemsTable', text: obj3.correo},
+                    { style: 'itemsTable', text: obj3.cargo },
+                    { style: 'itemsTable', text: obj3.correo },
                   ]
                 }),
               ]
@@ -812,7 +794,7 @@ BuscarCargos() {
                   ...arr_emp.map(obj3 => {
                     obj3.regimen.forEach((r) => (regimen = r.name_regimen));
                     return [
-                      { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
+                      { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
                       { style: 'itemsTableCentrado', text: obj3.codigo },
                       { style: 'itemsTable', text: obj3.name_empleado },
                       { style: 'itemsTable', text: obj3.cedula },
@@ -845,7 +827,7 @@ BuscarCargos() {
         }
 
       });
-    } 
+    }
 
     if (arr_emp.length > 0 && this.bool.bool_emp === true) {
       n.push({
@@ -868,7 +850,7 @@ BuscarCargos() {
             ...arr_emp.map(obj3 => {
               obj3.regimen.forEach((r) => (regimen = r.name_regimen));
               return [
-                { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
+                { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
                 { style: 'itemsTableCentrado', text: obj3.codigo },
                 { style: 'itemsTable', text: obj3.name_empleado },
                 { style: 'itemsTable', text: obj3.cedula },
@@ -893,40 +875,39 @@ BuscarCargos() {
     return n
   }
 
+  // METODO PARA SUMAR REGISTROS
   SumarRegistros(array: any[]) {
     let valor = 0;
     for (let i = 0; i < array.length; i++) {
       valor = valor + array[i];
     }
-    return valor
+    return valor;
   }
 
   /** ************************************************************************************************** ** 
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   exportToExcel(): void {
-
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefault(this.data_pdf));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Empleados Activos');
     xlsx.writeFile(wb, 'Usuarios_activos.xlsx');
-
   }
 
   MapingDataPdfDefault(array: Array<any>) {
     let nuevo: Array<any> = [];
-    let c=0;
+    let c = 0;
     let regimen = '';
     array.forEach((obj1: IReporteAtrasos) => {
       obj1.departamentos.forEach(obj2 => {
-        obj2.empleado.forEach((obj3:any) => {
+        obj2.empleado.forEach((obj3: any) => {
           obj3.regimen.forEach((r) => (regimen = r.name_regimen));
           c = c + 1;
           let ele = {
             'N°': c, 'Código Empleado': obj3.codigo, 'Nombre Empleado': obj3.name_empleado,
-            'Cédula': obj3.cedula, 'Género': obj3.genero == 1 ? 'M' : 'F', 
+            'Cédula': obj3.cedula, 'Género': obj3.genero == 1 ? 'M' : 'F',
             'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
-            'Régimen': regimen,            
+            'Régimen': regimen,
             'Departamento': obj2.name_dep,
             'Cargo': obj3.cargo,
             'Correo': obj3.correo,
@@ -939,35 +920,36 @@ BuscarCargos() {
   }
 
   exportToExcelCargoRegimen(): void {
-
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefaultCargoRegimen(this.data_pdf));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Empleados Activos');
     xlsx.writeFile(wb, "Usuarios_activos.xlsx");
-
   }
 
   MapingDataPdfDefaultCargoRegimen(array: Array<any>) {
     let nuevo: Array<any> = [];
-    let c=0;
+    let c = 0;
     array.forEach((obj1) => {
       obj1.empleados.forEach(obj2 => {
         c = c + 1;
-          let ele = {
-            'N°': c, 'Código Empleado': obj2.codigo, 'Nombre Empleado': obj2.name_empleado,
-            'Cédula': obj2.cedula, 'Género': obj2.genero == 1 ? 'M' : 'F', 
-            'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
-            'Régimen': this.bool.bool_cargo? obj2.regimen : obj2.regimen[0].name_regimen,            
-            'Departamento': obj2.departamento,
-            'Cargo': obj2.cargo,
-            'Correo': obj2.correo,
-          }
-          nuevo.push(ele)
+        let ele = {
+          'N°': c, 'Código Empleado': obj2.codigo, 'Nombre Empleado': obj2.name_empleado,
+          'Cédula': obj2.cedula, 'Género': obj2.genero == 1 ? 'M' : 'F',
+          'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
+          'Régimen': this.bool.bool_cargo ? obj2.regimen : obj2.regimen[0].name_regimen,
+          'Departamento': obj2.departamento,
+          'Cargo': obj2.cargo,
+          'Correo': obj2.correo,
+        }
+        nuevo.push(ele)
       })
     })
     return nuevo
   }
 
+  /** ************************************************************************************** **
+   ** **                   METODOS DE SELECCION DE DATOS DE USUARIOS                      ** **
+   ** ************************************************************************************** **/
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc() {
@@ -1008,9 +990,8 @@ BuscarCargos() {
     if (!row) {
       return `${this.isAllSelectedReg() ? 'select' : 'deselect'} all`;
     }
-    return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${
-      row.id + 1
-    }`;
+    return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1
+      }`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
@@ -1081,51 +1062,33 @@ BuscarCargos() {
     if (this.bool.bool_suc === true) {
       this.tamanio_pagina_suc = e.pageSize;
       this.numero_pagina_suc = e.pageIndex + 1;
-    } else if (this.bool.bool_reg === true) {
+    }
+    else if (this.bool.bool_reg === true) {
       this.tamanio_pagina_reg = e.pageSize;
       this.numero_pagina_reg = e.pageIndex + 1;
-    } else if (this.bool.bool_dep === true) {
+    }
+    else if (this.bool.bool_dep === true) {
       this.tamanio_pagina_dep = e.pageSize;
       this.numero_pagina_dep = e.pageIndex + 1;
-    } else if (this.bool.bool_cargo === true) {
+    }
+    else if (this.bool.bool_cargo === true) {
       this.tamanio_pagina_dep = e.pageSize;
       this.numero_pagina_dep = e.pageIndex + 1;
-    } else if (this.bool.bool_emp === true) {
+    }
+    else if (this.bool.bool_emp === true) {
       this.tamanio_pagina_emp = e.pageSize;
       this.numero_pagina_emp = e.pageIndex + 1;
     }
-
   }
 
-    // METODO PARA INGRESAR DATOS DE LETRAS O NÚMEROS
-    IngresarSoloLetras(e) {
-      return this.validacionService.IngresarSoloLetras(e);
-    }
-  
-    IngresarSoloNumeros(evt) {
-      return this.validacionService.IngresarSoloNumeros(evt);
-    }
-  
-    MostrarLista() {
-      if (this.opcion === 's') {
-        /* this.nombre_suc.reset();
-        this.Filtrar('', 1)*/
-      } else if (this.opcion === 'd') {
-        /*this.nombre_dep.reset();
-        this.Filtrar('', 2)*/
-      } else if (this.opcion === 'e') {
-        /* this.codigo.reset();
-        this.cedula.reset();
-        this.nombre_emp.reset();
-        this.Filtrar('', 3)
-        this.Filtrar('', 4)
-        this.Filtrar('', 5)*/
-      }
-    }
+  // METODO PARA INGRESAR DATOS DE LETRAS O NUMEROS
+  IngresarSoloLetras(e: any) {
+    return this.validacionService.IngresarSoloLetras(e);
+  }
 
-  /**
-   * METODOS PARA CONTROLAR INGRESO DE LETRAS
-   */
+  IngresarSoloNumeros(evt: any) {
+    return this.validacionService.IngresarSoloNumeros(evt);
+  }
 
   //ENVIAR DATOS A LA VENTANA DE DETALLE
   verDatos(tipo: string) {
