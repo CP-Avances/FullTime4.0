@@ -236,6 +236,7 @@ class TimbresControlador {
             var ip_cliente = '';
             var requestIp = require('request-ip');
             var clientIp = requestIp.getClientIp(req);
+
             if (clientIp != null && clientIp != '' && clientIp != undefined) {
                 ip_cliente = clientIp.split(':')[3];
             }
@@ -243,6 +244,7 @@ class TimbresControlador {
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj,
                 ubicacion } = req.body;
 
+            //console.log('ingresa informacion ', req.body)
             let f = new Date();
             const id_empleado = req.userIdEmpleado;
 
@@ -289,6 +291,7 @@ class TimbresControlador {
             var ip_cliente = '';
             var requestIp = require('request-ip');
             var clientIp = requestIp.getClientIp(req);
+
             if (clientIp != null && clientIp != '' && clientIp != undefined) {
                 ip_cliente = clientIp.split(':')[3];
             }

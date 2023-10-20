@@ -415,19 +415,19 @@ export class MainNavComponent implements OnInit {
             url: '/coordenadas'
           },
           {
-            name: 'Timbre Teletrabajo',
+            name: 'Timbre Virtual',
             accion: this.HabilitarTimbreWeb,
             estado: this.HabilitarTimbreWeb,
             icono: 'computer',
             color: true,
             subtitulo: true,
             children: [
-              { name: 'Configurar Teletrabajo', url: '/timbresWeb', color: true },
-              { name: 'Timbrar Teletrabajo', url: '/timbres-personal', color: true },
+              { name: 'Configurar Timbre Virtual', url: '/timbresWeb', color: true },
+              { name: 'Timbrar', url: '/timbres-personal', color: true },
             ]
           },
           {
-            name: 'Timbre Teletrabajo',
+            name: 'Timbre Virtual',
             accion: !this.HabilitarTimbreWeb,
             estado: !this.HabilitarTimbreWeb,
             activo: this.HabilitarTimbreWeb,

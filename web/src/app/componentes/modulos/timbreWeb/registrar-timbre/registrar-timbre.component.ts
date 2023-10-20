@@ -200,6 +200,7 @@ export class RegistrarTimbreComponent implements OnInit {
       latitud: this.latitud,
       accion: this.accionF,
     }
+    console.log('ver data timbre ', dataTimbre)
     this.ventana.close(dataTimbre);
   }
 
