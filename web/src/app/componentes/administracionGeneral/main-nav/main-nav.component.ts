@@ -520,12 +520,12 @@ export class MainNavComponent implements OnInit {
               { name: 'Registro Vacunación', url: '/lista-vacunados', color: true },
               { name: 'Timbres', url: '/reporte-timbres-multiples', color: true },
               { name: 'Timbres Libres', url: '/reporte-timbre-abierto', color: true },
+              { name: 'Timbres Incompletos', url: '/reporte-timbre-incompleto', color: true },
               { name: 'Puntualidad', url: '/reporte-puntualidad', color: true },
               { name: 'Atrasos', url: '/reporte-atrasos-multiples', color: true },
               { name: 'Faltas', url: '/reporte-faltas', color: true },
               // { name: 'Atrasos', url: '/reporteAtrasos', color: true },
               //{ name: 'Horas Trabajadas', url: '/reporte-horas-trabaja', color: true },
-              //{ name: 'Timbre Incompleto', url: '/reporte-timbre-incompleto', color: true },
               //{ name: 'Salidas Anticipadas', url: '/salidas-anticipadas', color: true },
             ]
           },

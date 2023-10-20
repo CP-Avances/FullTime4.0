@@ -16,16 +16,16 @@ class ReportesAsistenciasRutas {
         this.router.get('/datos_generales/:estado', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.DatosGeneralesUsuarios);
         // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR CARGOS
         this.router.get(`/informacion-general-cargo/:estado`, verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.DatosGeneralesCargo);
-        // Reportes de Atrasos
+        // REPORTES DE ATRASOS
         this.router.put('/atrasos-empleados/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteAtrasosMultiple);
-        // Reportes de Faltas
+        // REPORTES DE FALTAS
         this.router.put('/faltas-empleados/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteFaltasMultiple);
         this.router.put('/faltas-tabulado/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteFaltasMultipleTabulado);
         // Reportes de Horas Trabajadas
         this.router.put('/horas-trabaja/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteHorasTrabajaMultiple);
-        // Reportes de Puntualidad
+        // REPORTES DE PUNTUALIDAD
         this.router.put('/puntualidad/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReportePuntualidad);
-        // Reportes de Timbres Multiple
+        // REPORTES DE TIMBRES MULTIPLE
         this.router.put('/timbres/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresMultiple);
         // REPORTES DE TIMBRES MULTIPLES PARA REGIMEN Y CARGO
         this.router.put('/timbres-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresMultipleRegimenCargo);
@@ -43,10 +43,14 @@ class ReportesAsistenciasRutas {
         this.router.put('/timbres-horario-abierto-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreHorarioAbiertoRegimenCargo);
         // REPORTES DE TIMBRES DE HORARIO ABIERTO
         this.router.get('/timbres-abiertos', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresAbiertos);
-        // Reportes de Timbres Tabulado
-        this.router.put('/timbres-tabulados/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresTabulado);
-        // Reportes de Timbres incompletos
+        // REPORTES DE TIMBRES INCOMPLETOS
         this.router.put('/timbres-incompletos/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresIncompletos);
+        // REPORTES DE TIMBRES INCOMPLETOS PARA REGIMEN Y CARGO
+        this.router.put('/timbres-incompletos-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresIncompletosRegimenCargo);
+        // REPORTES DE TIMBRES TABULADO
+        this.router.put('/timbres-tabulados/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresTabulado);
+        // REPORTES DE TIMBRES TABULADO INCOMPLETOS
+        this.router.put('/timbres-tabulados-incompletos/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresTabuladosIncompletos);
     }
 }
 const REPORTES_A_RUTAS = new ReportesAsistenciasRutas();

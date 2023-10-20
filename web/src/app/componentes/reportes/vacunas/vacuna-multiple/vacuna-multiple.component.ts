@@ -671,8 +671,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
           fillColor: '#E3E3E3',
         },
         itemsTableCentrado: { fontSize: 10, alignment: 'center' },
-        tableMargin: { margin: [0, 0, 0, 20] },
-        tableMarginCabecera: { margin: [0, 10, 0, 0] },
+        tableMargin: { margin: [0, 0, 0, 10] },
+        tableMarginCabecera: { margin: [0, 15, 0, 0] },
         quote: { margin: [5, -2, 0, -2], italics: true },
         small: { fontSize: 8, color: 'blue', opacity: 0.5 },
       },
@@ -688,7 +688,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
         let reg = this.SumarRegistros(arr_reg);
         if (this.bool.bool_cargo === true) {
           n.push({
-            style: 'tableMarginSuc',
+            style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
               body: [
@@ -710,7 +710,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
           });
         } else {
           n.push({
-            style: 'tableMarginSuc',
+            style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
               body: [

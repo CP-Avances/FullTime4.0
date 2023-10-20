@@ -265,7 +265,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
   }
 
 
-  // VALIDACIONES REPORT
+  // VALIDACIONES REPORTES
 
   validacionReporte(action) {
     if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de busqueda')
@@ -602,8 +602,8 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
         itemsTableInfoBlanco: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
-        tableMargin: { margin: [0, 2, 0, 18] },
-        tableMarginCabecera: { margin: [0, 10, 0, 0] },
+        tableMargin: { margin: [0, 0, 0, 10] },
+        tableMarginCabecera: { margin: [0, 15, 0, 0] },
         quote: { margin: [5, -2, 0, -2], italics: true },
         small: { fontSize: 8, color: 'blue', opacity: 0.5 }
       }
@@ -621,7 +621,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
         let reg = this.SumarRegistros(arr_reg);
         if (this.bool.bool_cargo === true) {
           n.push({
-            style: 'tableMarginSuc',
+            style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
               body: [
@@ -643,7 +643,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
           });
         } else {
           n.push({
-            style: 'tableMarginSuc',
+            style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
               body: [
@@ -1250,11 +1250,25 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
 
   MapingDataPdfDefault(array: Array<any>) {
     let nuevo: Array<any> = [];
+    let accionT = '';
     array.forEach((obj1: IReporteTimbres) => {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
-            let ele;
+            let ele: any;
+            switch (obj4.accion) {
+              case 'EoS': accionT = 'Entrada o salida'; break;
+              case 'AES': accionT = 'Inicio o fin alimentación'; break;
+              case 'PES': accionT = 'Inicio o fin permiso'; break;
+              case 'E': accionT = 'Entrada'; break;
+              case 'S': accionT = 'Salida'; break;
+              case 'F/A': accionT = 'Fin alimentación'; break;
+              case 'I/A': accionT = 'Inicio alimentación'; break;
+              case 'E/P': accionT = 'Fin permiso'; break;
+              case 'S/P': accionT = 'Inicio permiso'; break;
+              case 'HA': accionT = 'Timbre libre'; break;
+              default: accionT = 'Desconocido'; break;
+            }
             if (this.timbreServidor) {
               let servidor_fecha = '';
               let servidor_hora = '';
@@ -1268,7 +1282,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
                 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
                 'Fecha Timbre': obj4.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj4.fec_hora_timbre.split(' ')[1],
                 'Fecha Timbre Servidor': servidor_fecha, 'Hora Timbre Servidor': servidor_hora,
-                'Acción': obj4.accion=='HA'?'Timbre libre': obj4.accion=='HA'?'Timbre libre': obj4.accion, 'Reloj': obj4.id_reloj,
+                'Acción': accionT, 'Reloj': obj4.id_reloj,
                 'Latitud': obj4.latitud, 'Longitud': obj4.longitud, 'Observación': obj4.observacion
               }
             } else{
@@ -1277,7 +1291,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
                 'Departamento': obj2.name_dep,
                 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
                 'Fecha Timbre': obj4.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj4.fec_hora_timbre.split(' ')[1],
-                'Acción': obj4.accion=='HA'?'Timbre libre': obj4.accion, 'Reloj': obj4.id_reloj,
+                'Acción': accionT, 'Reloj': obj4.id_reloj,
                 'Latitud': obj4.latitud, 'Longitud': obj4.longitud, 'Observación': obj4.observacion
               }
             }
@@ -1291,10 +1305,24 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
 
   MapingDataPdfRegimenCargo(array: Array<any>) {
     let nuevo: Array<any> = [];
+    let accionT = '';
     array.forEach((obj1: any) => {
         obj1.empleados.forEach((obj2: any) => {
           obj2.timbres.forEach((obj3: any) => {
-            let ele;
+            let ele: any;
+            switch (obj3.accion) {
+              case 'EoS': accionT = 'Entrada o salida'; break;
+              case 'AES': accionT = 'Inicio o fin alimentación'; break;
+              case 'PES': accionT = 'Inicio o fin permiso'; break;
+              case 'E': accionT = 'Entrada'; break;
+              case 'S': accionT = 'Salida'; break;
+              case 'F/A': accionT = 'Fin alimentación'; break;
+              case 'I/A': accionT = 'Inicio alimentación'; break;
+              case 'E/P': accionT = 'Fin permiso'; break;
+              case 'S/P': accionT = 'Inicio permiso'; break;
+              case 'HA': accionT = 'Timbre libre'; break;
+              default: accionT = 'Desconocido'; break;
+            }
             if (this.timbreServidor) {
               let servidor_fecha = '';
               let servidor_hora = '';
@@ -1308,7 +1336,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
                 'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
                 'Fecha Timbre': obj3.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj3.fec_hora_timbre.split(' ')[1],
                 'Fecha Timbre Servidor': servidor_fecha, 'Hora Timbre Servidor': servidor_hora,
-                'Acción': obj3.accion=='HA'?'Timbre libre': obj3.accion, 'Reloj': obj3.id_reloj,
+                'Acción': accionT, 'Reloj': obj3.id_reloj,
                 'Latitud': obj3.latitud, 'Longitud': obj3.longitud, 'Observación': obj3.observacion
               }
             } else{
@@ -1317,7 +1345,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
                 'Departamento': obj2.departamento,
                 'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
                 'Fecha Timbre': obj3.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj3.fec_hora_timbre.split(' ')[1],
-                'Acción': obj3.accion=='HA'?'Timbre libre': obj3.accion, 'Reloj': obj3.id_reloj,
+                'Acción': accionT, 'Reloj': obj3.id_reloj,
                 'Latitud': obj3.latitud, 'Longitud': obj3.longitud, 'Observación': obj3.observacion
               }
             }
@@ -1609,6 +1637,12 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
     if (this.bool.bool_suc === true) {
       this.tamanio_pagina_suc = e.pageSize;
       this.numero_pagina_suc = e.pageIndex + 1;
+    } else if (this.bool.bool_reg === true) {
+      this.tamanio_pagina_reg = e.pageSize;
+      this.numero_pagina_reg = e.pageIndex + 1;
+    } else if (this.bool.bool_cargo === true) {
+      this.tamanio_pagina_car = e.pageSize;
+      this.numero_pagina_car = e.pageIndex + 1;
     } else if (this.bool.bool_dep === true) {
       this.tamanio_pagina_dep = e.pageSize;
       this.numero_pagina_dep = e.pageIndex + 1;
