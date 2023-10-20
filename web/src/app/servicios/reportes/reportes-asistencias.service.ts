@@ -81,6 +81,10 @@ export class ReportesAsistenciasService {
     return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-reloj-virtual/${desde}/${hasta}`, data);
   }
 
+  ReporteTimbreRelojVirtualRegimenCargo(data: any, desde: string, hasta: string) {
+    return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-reloj-virtual-regimen-cargo/${desde}/${hasta}`, data);
+  }
+
   ReporteTimbreHorarioAbierto(data: any, desde: string, hasta: string) {
     return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-horario-abierto/${desde}/${hasta}`, data);
   }
@@ -89,12 +93,20 @@ export class ReportesAsistenciasService {
     return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-horario-abierto-regimen-cargo/${desde}/${hasta}`, data);
   }
 
+  ReporteTimbresIncompletos(data: any, desde: string, hasta: string) {
+    return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-incompletos/${desde}/${hasta}`, data);
+  }
+
+  ReporteTimbresIncompletosRegimenCargo(data: any, desde: string, hasta: string) {
+    return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-incompletos-regimen-cargo/${desde}/${hasta}`, data);
+  }
+
   ReporteTimbrestabulados(data: any, desde: string, hasta: string) {
     return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-tabulados/${desde}/${hasta}`, data);
   }
 
   ReporteTabuladoTimbresIncompletos(data: any, desde: string, hasta: string) {
-    return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-incompletos/${desde}/${hasta}`, data);
+    return this.http.put<any>(`${environment.url}/reportes-asistencias/timbres-tabulados-incompletos/${desde}/${hasta}`, data);
   }
 
 }

@@ -1,3 +1,13 @@
+table { width: 100%; font-size: 14px;}
+
+tr { text-align: center; }
+
+td { padding-top: 10px; text-align: center; }
+
+p {
+    font-size: x-small;
+}
+
 .ver {
     color: indianred;
 }
@@ -6,8 +16,13 @@
     margin-top: 10px;
 }
 
-table { width: 100%; font-size: 14px;}
+#detalle{
+    width: 100%;
+    font-size: 12px;
+}
 
-tr { text-align: center; }
+#accion {
+    color: rgb(53, 95, 209);
+    cursor: pointer;
+}
 
-td { padding-top: 10px; text-align: center; }

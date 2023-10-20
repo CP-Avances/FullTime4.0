@@ -1,4 +1,12 @@
-table { width: 100%; font-size: 13px;}
+table { width: 100%; font-size: 14px;}
+
+tr { text-align: center; }
+
+td { padding-top: 10px; text-align: center; }
+
+p {
+    font-size: x-small;
+}
 
 #limpiar { cursor: pointer; padding-top: 10px; margin-right: 20px;}
 
@@ -9,9 +17,12 @@ table { width: 100%; font-size: 13px;}
 #busqueda{
     margin-top: 10px;
 }
+#detalle{
+    width: 100%;
+    font-size: 12px;
+}
 
-table { width: 100%; font-size: 14px;}
-
-tr { text-align: center; }
-
-td { padding-top: 10px; text-align: center; }
+#accion {
+    color: rgb(53, 95, 209);
+    cursor: pointer;
+}
