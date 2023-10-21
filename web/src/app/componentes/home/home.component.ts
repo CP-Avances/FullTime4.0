@@ -17,6 +17,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { GraficasService } from 'src/app/servicios/graficas/graficas.service';
 import { MainNavService } from '../administracionGeneral/main-nav/main-nav.service';
+import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 
 @Component({
   selector: 'app-home',
@@ -38,6 +39,9 @@ export class HomeComponent implements OnInit {
   get accion(): boolean { return this.funciones.accionesPersonal; }
   get movil(): boolean { return this.funciones.app_movil; }
 
+  datosEmpleado: any;
+  idEmpleado: any = 0;
+
   constructor(
     private funciones: MainNavService,
     private graficar: GraficasService,
@@ -45,10 +49,11 @@ export class HomeComponent implements OnInit {
     private route: ActivatedRoute,
     public validar: ValidacionesService,
     public parametro: ParametrosService,
+    public restEmpleado: EmpleadoService,
   ) { }
 
   ngOnInit(): void {
-
+    this.idEmpleado = localStorage.getItem('empleado');
     this.BuscarParametro();
   }
 
@@ -61,11 +66,14 @@ export class HomeComponent implements OnInit {
 
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
+
+    this.VerEmpleado(this.formato_fecha)
+
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
       res => {
         this.formato_fecha = res[0].descripcion;
-        this.FormatearFechas(this.formato_fecha)
+        this.FormatearFechas(this.formato_fecha);
       },
       vacio => {
         this.FormatearFechas(this.formato_fecha)
@@ -76,6 +84,15 @@ export class HomeComponent implements OnInit {
   FormatearFechas(formato_fecha: string) {
     var f = moment();
     this.fecha = this.validar.FormatearFecha(moment(f).format('YYYY-MM-DD'), formato_fecha, this.validar.dia_completo);
+  }
+
+  VerEmpleado(formato_fecha: string) {
+    this.datosEmpleado = [];
+    this.restEmpleado.BuscarUnEmpleado(parseInt(this.idEmpleado)).subscribe(data => {
+      this.datosEmpleado = data[0];
+      this.datosEmpleado.fec_nacimiento_ = this.validar.FormatearFecha(this.datosEmpleado.fec_nacimiento, formato_fecha, this.validar.dia_abreviado);
+      console.log('this.datosEmpleado: ',this.datosEmpleado);
+    })
   }
 
   // METODO DE MENU RAPIDO

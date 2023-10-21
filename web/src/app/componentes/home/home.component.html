@@ -8,6 +8,37 @@
   <div class="row" style="text-align: center;">
     <div class="col-md">
       <div class="d-flex justify-content-center flex-wrap">
+       
+        <mat-card class="example-card">
+          <mat-card-content>
+            <label>
+              {{datosEmpleado.cedula}}
+            </label>
+            <label>
+              {{datosEmpleado.codigo}}
+            </label>
+            <label>
+              {{datosEmpleado.correo}}
+            </label>
+            <label>
+              {{datosEmpleado.domicilio}}
+            </label>
+            <label>
+              {{datosEmpleado.telefono}}
+            </label>
+            <label>
+              {{datosEmpleado.telefono}}
+            </label>
+            <label>
+              {{datosEmpleado.fec_nacimiento_}}
+            </label>
+          </mat-card-content>
+        </mat-card>
+       
+       
+       
+       
+       
         <button class="btn btn-lg d-flex justify-content-center boton-cua" (click)="MenuRapido(4)" *ngIf="permisos">
           <mat-icon class="icon-menu align-self-center">insert_emoticon</mat-icon>
           <span class="align-self-center">Permisos</span>
