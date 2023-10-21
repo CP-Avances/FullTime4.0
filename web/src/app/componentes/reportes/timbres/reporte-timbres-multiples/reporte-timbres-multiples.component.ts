@@ -497,7 +497,6 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
       case 'download': pdfMake.createPdf(documentDefinition).download(doc_name); break;
       default: pdfMake.createPdf(documentDefinition).open(); break;
     }
-
   }
 
   getDocumentDefinicion() {
