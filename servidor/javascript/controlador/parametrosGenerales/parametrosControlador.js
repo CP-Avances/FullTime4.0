@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PARAMETROS_CONTROLADOR = void 0;
 const database_1 = __importDefault(require("../../database"));
-const fs_1 = __importDefault(require("fs"));
 const builder = require('xmlbuilder');
 class ParametrosControlador {
     // METODO PARA LISTAR PARAMETROS GENERALES
@@ -163,30 +162,6 @@ class ParametrosControlador {
                 return res.status(500)
                     .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
             }
-        });
-    }
-    // METODO PARA CREAR FORMATO XML
-    FileXML(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var xml = builder.create('root').ele(req.body).end({ pretty: true });
-            console.log(req.body.userName);
-            let filename = "ParametrosGenerales-" + req.body.userName + '-' +
-                req.body.userId + '-' + new Date().getTime() + '.xml';
-            fs_1.default.writeFile(`xmlDownload/${filename}`, xml, function (err) {
-                if (err) {
-                    return console.log(err);
-                }
-                console.log("Archivo guardado");
-            });
-            res.jsonp({ text: 'XML creado', name: filename });
-        });
-    }
-    // METODO PARA DESCARGAR FORMATO XML
-    downloadXML(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const name = req.params.nameXML;
-            let filePath = `servidor\\xmlDownload\\${name}`;
-            res.sendFile(__dirname.split("servidor")[0] + filePath);
         });
     }
 }

@@ -61,7 +61,13 @@ class CargaMultipleControlador {
                 }));
             }));
             res.jsonp({ message: 'La plantilla a sido receptada' });
-            fs_1.default.unlinkSync(filePath);
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
         });
     }
     // **************** verificar empl_horario
@@ -99,7 +105,13 @@ class CargaMultipleControlador {
                 }));
             }));
             res.jsonp({ message: 'La plantilla a sido receptada' });
-            fs_1.default.unlinkSync(filePath);
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
         });
     }
 }

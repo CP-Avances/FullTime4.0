@@ -47,11 +47,11 @@ class BirthdayControlador {
         var anio = fecha.format('YYYY');
         var mes = fecha.format('MM');
         var dia = fecha.format('DD');
-        
+
         let imagen = anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
         let id = req.params.id_empresa;
         let separador = path.sep;
-        
+
         const unEmpleado = await pool.query(
             `
             SELECT * FROM message_birthday WHERE id = $1
@@ -64,8 +64,15 @@ class BirthdayControlador {
                     try {
 
                         let ruta = ObtenerRutaBirthday() + separador + obj.img;
-                        fs.unlinkSync(ruta);
 
+                        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                        fs.access(ruta, fs.constants.F_OK, (err) => {
+                            if (err) {
+                            } else {
+                                // ELIMINAR DEL SERVIDOR
+                                fs.unlinkSync(ruta);
+                            }
+                        });
                         await pool.query(
                             `
                             UPDATE message_birthday SET img = $2 WHERE id = $1
@@ -99,7 +106,12 @@ class BirthdayControlador {
         const imagen = req.params.imagen;
         let separador = path.sep;
         let ruta = ObtenerRutaBirthday() + separador + imagen;
-        res.sendFile(path.resolve(ruta));
+        fs.access(ruta, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+                res.sendFile(path.resolve(ruta));
+            }
+        });
     }
 
 

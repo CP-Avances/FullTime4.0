@@ -62,10 +62,6 @@ class HorarioRutas {
         this.router.post('/buscar_horario/edicion', TokenValidation, HORARIO_CONTROLADOR.BuscarHorarioNombre_);
         // METODO PARA ELIMINAR REGISTRO
         this.router.delete('/eliminar/:id', TokenValidation, HORARIO_CONTROLADOR.EliminarRegistros);
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', TokenValidation, HORARIO_CONTROLADOR.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/xmlDownload/:nameXML', HORARIO_CONTROLADOR.downloadXML);
         // METODO PARA BUSCAR DATOS DE UN HORARIO
         this.router.get('/:id', TokenValidation, HORARIO_CONTROLADOR.ObtenerUnHorario);
         // METODO PARA ACTUALIZAR HORAS TRABAJADAS

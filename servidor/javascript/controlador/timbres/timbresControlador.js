@@ -55,37 +55,37 @@ class TimbresControlador {
                         .map((obj) => {
                         switch (obj.accion) {
                             case 'EoS':
-                                obj.accion = 'Entrada o Salida';
+                                obj.accion = 'Entrada o salida';
                                 break;
                             case 'AES':
-                                obj.accion = 'Entrada o Salida Alimentación';
+                                obj.accion = 'Inicio o fin alimentación';
                                 break;
                             case 'PES':
-                                obj.accion = 'Entrada o Salida Permiso';
+                                obj.accion = 'Inicio o fin permiso';
                                 break;
                             case 'E':
-                                obj.accion = 'Entrada o Salida';
+                                obj.accion = 'Entrada';
                                 break;
                             case 'S':
-                                obj.accion = 'Entrada o Salida';
-                                break;
-                            case 'F/A':
-                                obj.accion = 'Entrada o Salida Alimentación';
+                                obj.accion = 'Salida';
                                 break;
                             case 'I/A':
-                                obj.accion = 'Entrada o Salida Alimentación';
+                                obj.accion = 'Inicio alimentación';
                                 break;
-                            case 'E/P':
-                                obj.accion = 'Entrada o Salida Permiso';
+                            case 'F/A':
+                                obj.accion = 'Fin alimentación';
                                 break;
-                            case 'S/P':
-                                obj.accion = 'Entrada o Salida Permiso';
+                            case 'I/P':
+                                obj.accion = 'Fin permiso';
+                                break;
+                            case 'F/P':
+                                obj.accion = 'Inicio permiso';
                                 break;
                             case 'HA':
-                                obj.accion = 'Horario Abierto';
+                                obj.accion = 'Timbre libre';
                                 break;
                             default:
-                                obj.accion = 'codigo 99';
+                                obj.accion = 'Desconocido';
                                 break;
                         }
                         return obj;
@@ -226,6 +226,7 @@ class TimbresControlador {
                     ip_cliente = clientIp.split(':')[3];
                 }
                 const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj, ubicacion } = req.body;
+                //console.log('ingresa informacion ', req.body)
                 let f = new Date();
                 const id_empleado = req.userIdEmpleado;
                 let code = yield database_1.default.query(`
@@ -405,37 +406,37 @@ class TimbresControlador {
                     return result.rows.map((obj) => {
                         switch (obj.accion) {
                             case 'EoS':
-                                obj.accion = 'Entrada o Salida';
+                                obj.accion = 'Entrada o salida';
                                 break;
                             case 'AES':
-                                obj.accion = 'Entrada o Salida Almuerzo';
+                                obj.accion = 'Inicio o fin alimentación';
                                 break;
                             case 'PES':
-                                obj.accion = 'Entrada o Salida Permiso';
+                                obj.accion = 'Inicio o fin permiso';
                                 break;
                             case 'E':
-                                obj.accion = 'Entrada o Salida';
+                                obj.accion = 'Entrada';
                                 break;
                             case 'S':
-                                obj.accion = 'Entrada o Salida';
-                                break;
-                            case 'F/A':
-                                obj.accion = 'Entrada o Salida Almuerzo';
+                                obj.accion = 'Salida';
                                 break;
                             case 'I/A':
-                                obj.accion = 'Entrada o Salida Almuerzo';
+                                obj.accion = 'Inicio alimentación';
                                 break;
-                            case 'E/P':
-                                obj.accion = 'Entrada o Salida Permiso';
+                            case 'F/A':
+                                obj.accion = 'Fin alimentación';
                                 break;
-                            case 'S/P':
-                                obj.accion = 'Entrada o Salida Permiso';
+                            case 'I/P':
+                                obj.accion = 'Fin permiso';
+                                break;
+                            case 'F/P':
+                                obj.accion = 'Inicio permiso';
                                 break;
                             case 'HA':
-                                obj.accion = 'Horario Abierto';
+                                obj.accion = 'Timbre libre';
                                 break;
                             default:
-                                obj.accion = 'codigo 99';
+                                obj.accion = 'Desconocido';
                                 break;
                         }
                         return obj;
@@ -462,13 +463,13 @@ class TimbresControlador {
                         .map((obj) => {
                         switch (obj.accion) {
                             case 'EoS':
-                                obj.accion = 'Entrada o Salida';
+                                obj.accion = 'Entrada o salida';
                                 break;
                             case 'AES':
-                                obj.accion = '  Inicio o Fin Comida';
+                                obj.accion = ' Inicio o fin alimentación';
                                 break;
                             case 'PES':
-                                obj.accion = 'Inicio o Fin Permiso';
+                                obj.accion = 'Inicio o fin permiso';
                                 break;
                             case 'E':
                                 obj.accion = 'Entrada';
@@ -476,23 +477,23 @@ class TimbresControlador {
                             case 'S':
                                 obj.accion = 'Salida';
                                 break;
-                            case 'F/A':
-                                obj.accion = 'Fin Comida';
-                                break;
                             case 'I/A':
-                                obj.accion = 'Inicio Comida';
+                                obj.accion = 'Inicio alimentación';
                                 break;
-                            case 'E/P':
-                                obj.accion = 'Fin Permiso';
+                            case 'F/A':
+                                obj.accion = 'Fin alimentación';
                                 break;
-                            case 'S/P':
-                                obj.accion = 'Inicio Permiso';
+                            case 'I/P':
+                                obj.accion = 'Inicio permiso';
+                                break;
+                            case 'F/P':
+                                obj.accion = 'Fin permiso';
                                 break;
                             case 'HA':
-                                obj.accion = 'Horario Abierto';
+                                obj.accion = 'Timbre libre';
                                 break;
                             default:
-                                obj.accion = 'codigo 99';
+                                obj.accion = 'Desconocido';
                                 break;
                         }
                         return obj;

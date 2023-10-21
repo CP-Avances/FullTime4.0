@@ -126,10 +126,10 @@ export class CrearTimbreComponent implements OnInit {
     else if (opcion == 'F/A') {
       return 3
     }
-    else if (opcion == 'S/P') {
+    else if (opcion == 'I/P') {
       return 4
     }
-    else if (opcion == 'E/P') {
+    else if (opcion == 'F/P') {
       return 5
     }
   }

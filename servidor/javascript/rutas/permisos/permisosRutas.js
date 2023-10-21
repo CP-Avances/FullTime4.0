@@ -83,10 +83,6 @@ class PermisosRutas {
         this.router.get('/informe-un-permiso/:id_permiso', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.InformarUnPermiso);
         // ELIMINAR PERMISO
         this.router.delete('/eliminar/:id_permiso/:doc/verificar/:codigo', [verificarToken_1.TokenValidation, verificarPermisos_1.ModuloPermisosValidation], permisosControlador_1.default.EliminarPermiso);
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', verificarToken_1.TokenValidation, permisosControlador_1.default.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', permisosControlador_1.default.downloadXML);
         // BUSQUEDA DE RESPALDOS DE PERMISOS
         this.router.get('/documentos/:docs/visualizar/:codigo', permisosControlador_1.default.ObtenerDocumentoPermiso);
         // ENVIAR CORREO MEDIANTE APLICACION WEB

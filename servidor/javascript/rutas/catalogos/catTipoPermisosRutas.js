@@ -16,10 +16,6 @@ class TipoPermisosRutas {
         this.router.get('/', verificarToken_1.TokenValidation, catTipoPermisosControlador_1.default.Listar);
         // METODO PARA ELIMINAR REGISTROS
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, catTipoPermisosControlador_1.default.EliminarRegistros);
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', verificarToken_1.TokenValidation, catTipoPermisosControlador_1.default.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', catTipoPermisosControlador_1.default.downloadXML);
         // METODO PARA BUSCAR DATOS DE UN TIPO DE PERMISO
         this.router.get('/:id', verificarToken_1.TokenValidation, catTipoPermisosControlador_1.default.BuscarUnTipoPermiso);
         // METODO PARA REGISTRAR TIPO DE PERMISO

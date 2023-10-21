@@ -41,7 +41,7 @@
                 <td>{{ e.codigo }}</td>
                 <td>{{ e.name_empleado.toUpperCase() }}</td>
                 <td>{{ e.cedula }}</td>
-                <td>{{ e.regimen }}</td>
+                <td>{{ bool_car? e.regimen : e.regimen[0].name_regimen }}</td>
                 <td>{{ e.sucursal }}</td>
                 <td>{{ e.departamento }}</td>
                 <td>{{ e.cargo }}</td>

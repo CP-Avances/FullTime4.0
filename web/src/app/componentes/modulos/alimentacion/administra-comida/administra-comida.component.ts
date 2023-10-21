@@ -20,12 +20,10 @@ export class AdministraComidaComponent implements OnInit {
   selec2: boolean = false;
 
   // VARIABLES DE FORMULARIO
-  nombreEmpleadoF = new FormControl('', [Validators.required]);
   comidaF = new FormControl('', Validators.required);
 
   // ASIGNACION DE CAMPOS DE FORMULARIO
   public formulario = new FormGroup({
-    nombreEmpleadoForm: this.nombreEmpleadoF,
     comidaForm: this.comidaF,
   });
 
@@ -43,13 +41,13 @@ export class AdministraComidaComponent implements OnInit {
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  nombre: string = '';
   ObtenerEmpleados(idemploy: any) {
     this.empleados = [];
     this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
       this.empleados = data;
-      this.formulario.patchValue({
-        nombreEmpleadoForm: this.empleados[0].nombre + ' ' + this.empleados[0].apellido,
-      })
+      this.nombre = this.empleados[0].nombre + ' ' + this.empleados[0].apellido;
+      this.nombre = this.nombre.toUpperCase();
     })
   }
 

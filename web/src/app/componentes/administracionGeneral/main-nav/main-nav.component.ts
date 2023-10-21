@@ -416,19 +416,19 @@ export class MainNavComponent implements OnInit {
             url: '/coordenadas'
           },
           {
-            name: 'Timbre Teletrabajo',
+            name: 'Timbre Virtual',
             accion: this.HabilitarTimbreWeb,
             estado: this.HabilitarTimbreWeb,
             icono: 'computer',
             color: true,
             subtitulo: true,
             children: [
-              { name: 'Configurar Teletrabajo', url: '/timbresWeb', color: true },
-              { name: 'Timbrar Teletrabajo', url: '/timbres-personal', color: true },
+              { name: 'Configurar Timbre Virtual', url: '/timbresWeb', color: true },
+              { name: 'Timbrar', url: '/timbres-personal', color: true },
             ]
           },
           {
-            name: 'Timbre Teletrabajo',
+            name: 'Timbre Virtual',
             accion: !this.HabilitarTimbreWeb,
             estado: !this.HabilitarTimbreWeb,
             activo: this.HabilitarTimbreWeb,
@@ -520,7 +520,7 @@ export class MainNavComponent implements OnInit {
               { name: 'Usuarios Inactivos', url: '/reporte-emp-inactivos', color: true },
               { name: 'Registro Vacunación', url: '/lista-vacunados', color: true },
               { name: 'Timbres', url: '/reporte-timbres-multiples', color: true },
-              { name: 'Timbre Horario Abierto', url: '/reporte-timbre-abierto', color: true },
+              { name: 'Timbres Libres', url: '/reporte-timbre-abierto', color: true },
               { name: 'Puntualidad', url: '/reporte-puntualidad', color: true },
               { name: 'Atrasos', url: '/reporte-atrasos-multiples', color: true },
               { name: 'Faltas', url: '/reporte-faltas', color: true },

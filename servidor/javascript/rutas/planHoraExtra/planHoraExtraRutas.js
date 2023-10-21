@@ -39,10 +39,6 @@ class DepartamentoRutas {
         this.router.delete('/eliminar/plan-hora/:id/:id_empleado', verificarToken_1.TokenValidation, planHoraExtraControlador_1.default.EliminarPlanEmpleado);
         // BUSQUEDA DE DATOS DE PLANIFICACION POR ID DE USUARIO
         this.router.get('/listar-plan/:id', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation], planHoraExtraControlador_1.default.BuscarPlanUsuario);
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', verificarToken_1.TokenValidation, planHoraExtraControlador_1.default.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', planHoraExtraControlador_1.default.downloadXML);
         /** ******************************************************************************************** **
          ** *             ENVIO DE CORREO ELECTRONICO DE PLANIFICACIONES DE HORAS EXTRAS               * **
          ** ******************************************************************************************** **/

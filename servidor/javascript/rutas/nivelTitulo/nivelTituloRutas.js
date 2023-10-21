@@ -16,10 +16,6 @@ class NivelTituloRutas {
         this.router.get('/', verificarToken_1.TokenValidation, nivelTituloControlador_1.default.ListarNivel);
         // METODO PARA ELIMINAR REGISTROS
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, nivelTituloControlador_1.default.EliminarNivelTitulo);
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', verificarToken_1.TokenValidation, nivelTituloControlador_1.default.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', nivelTituloControlador_1.default.downloadXML);
         // METODO PARA REGISTRAR NIVEL DE TITULO
         this.router.post('/', verificarToken_1.TokenValidation, nivelTituloControlador_1.default.CrearNivel);
         // METODO PARA ACTUALIZAR REGISTRO DE NIVEL

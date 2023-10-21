@@ -22,10 +22,6 @@ class ProvinciaRutas {
         this.router.get('/', verificarToken_1.TokenValidation, catProvinciaControlador_1.default.ListarProvincia);
         // METODO PARA ELIMINAR REGISTROS
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, catProvinciaControlador_1.default.EliminarProvincia);
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', verificarToken_1.TokenValidation, catProvinciaControlador_1.default.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', catProvinciaControlador_1.default.downloadXML);
         // METODO PARA REGISTRAR PROVINCIA
         this.router.post('/', verificarToken_1.TokenValidation, catProvinciaControlador_1.default.CrearProvincia);
         // METODO PARA BUSCAR DATOS DE UNA PROVINCIA

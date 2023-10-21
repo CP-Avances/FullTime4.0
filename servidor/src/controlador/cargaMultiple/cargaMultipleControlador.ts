@@ -52,11 +52,18 @@ class CargaMultipleControlador {
             });
         });
         res.jsonp({ message: 'La plantilla a sido receptada' });
-        fs.unlinkSync(filePath);
+
+        fs.access(filePath, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+                fs.unlinkSync(filePath);
+            }
+        });
+
     }
 
 
-// **************** verificar empl_horario
+    // **************** verificar empl_horario
     public async CargarHorarioMultiplesEmpleados(req: Request, res: Response): Promise<void> {
         let list: any = req.files;
         let cadena = list.uploads[0].path;
@@ -93,7 +100,13 @@ class CargaMultipleControlador {
             });
         });
         res.jsonp({ message: 'La plantilla a sido receptada' });
-        fs.unlinkSync(filePath);
+        
+        fs.access(filePath, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+                fs.unlinkSync(filePath);
+            }
+        });
     }
 
 }

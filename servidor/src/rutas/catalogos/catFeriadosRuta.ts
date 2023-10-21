@@ -21,10 +21,6 @@ class FeriadosRuta {
         this.router.get('/', TokenValidation, FERIADOS_CONTROLADOR.ListarFeriados);
         // METODO PARA ELIMINAR REGISTRO
         this.router.delete('/delete/:id', TokenValidation, FERIADOS_CONTROLADOR.EliminarFeriado);
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', TokenValidation, FERIADOS_CONTROLADOR.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', FERIADOS_CONTROLADOR.downloadXML);
         // METODO PARA CREAR REGISTRO DE FERIADO
         this.router.post('/', TokenValidation, FERIADOS_CONTROLADOR.CrearFeriados);
         // METODO PARA BUSCAR FERIADOS EXCEPTO REGISTRO EDITADO

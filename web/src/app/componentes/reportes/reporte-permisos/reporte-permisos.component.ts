@@ -1083,6 +1083,7 @@ export class ReportePermisosComponent implements OnInit {
     this.LimpiarCampos3();
   }
 
+  /*
   VerInformacionSucursal(form: any) {
     this.datosEmpleado = [];
     this.restGeneral.VerDatosSucursal(form.sucursalForm).subscribe(res => {
@@ -1247,10 +1248,11 @@ export class ReportePermisosComponent implements OnInit {
       })
     });
   }
+  */
 
   VerificarBusquedas(form: any) {
     console.log('form', form.depaForm, form.sucursalForm, form.cargosForm, form.laboralForm)
-    if (form.sucursalForm === '' && form.depaForm === '' &&
+   /* if (form.sucursalForm === '' && form.depaForm === '' &&
       form.laboralForm === '' && form.cargosForm === '') {
       this.toastr.info('Ingresar un criterio de búsqueda.', 'Verficar Información', {
         timeOut: 6000,
@@ -1315,7 +1317,8 @@ export class ReportePermisosComponent implements OnInit {
     else if (form.sucursalForm === '' && form.depaForm === '' &&
       form.laboralForm === '' && form.cargosForm != '') {
       this.VerInformacionCargo(form);
-    }
+    }*/
   }
+  
 
 }

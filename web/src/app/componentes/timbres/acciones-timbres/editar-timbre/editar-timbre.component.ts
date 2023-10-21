@@ -23,11 +23,12 @@ export class EditarTimbreComponent implements OnInit {
   acciones: any = [
     { value: '0', item: 'E', text: 'Entrada' },
     { value: '1', item: 'S', text: 'Salida' },
-    { value: '2', item: 'I/A', text: 'Inicio Alimentación' },
-    { value: '3', item: 'F/A', text: 'Fin Alimentación' },
-    { value: '4', item: 'S/P', text: 'Inicio Permiso' },
-    { value: '5', item: 'HA', text: 'Fin' },
-    { value: '6', item: 'E/P', text: 'Fin Permiso' }
+    { value: '2', item: 'I/A', text: 'Inicio alimentación' },
+    { value: '3', item: 'F/A', text: 'Fin alimentación' },
+    { value: '4', item: 'I/P', text: 'Inicio permiso' },
+    { value: '5', item: 'F/P', text: 'Fin permiso' },
+    { value: '7', item: 'HA', text: 'Timbre libre' },
+    { value: '99', item: 'D', text: 'Desconocido' },
   ]
 
   tecl_funcio: any = [
@@ -37,7 +38,8 @@ export class EditarTimbreComponent implements OnInit {
     { value: '3' },
     { value: '4' },
     { value: '5' },
-    { value: '6' },
+    { value: '7' },
+    { value: '99' },
   ]
 
   EditartimbreForm: FormGroup;
@@ -93,8 +95,8 @@ export class EditarTimbreComponent implements OnInit {
     this.datosTimbre = [];
     this.datosTimbre = this.data.timbre;
     console.log('ver timbre ', this.datosTimbre)
-      this.datosTimbre.fecha = this.validar.FormatearFecha(this.datosTimbre.fec_hora_timbre_servidor, this.formato_fecha, this.validar.dia_abreviado);
-      this.datosTimbre.hora = this.validar.FormatearHora(this.datosTimbre.fec_hora_timbre_servidor.split(' ')[1], this.formato_hora);
+    this.datosTimbre.fecha = this.validar.FormatearFecha(this.datosTimbre.fec_hora_timbre_servidor, this.formato_fecha, this.validar.dia_abreviado);
+    this.datosTimbre.hora = this.validar.FormatearHora(this.datosTimbre.fec_hora_timbre_servidor.split(' ')[1], this.formato_hora);
 
     this.EditartimbreForm = this.formBuilder.group({
       accionTimbre: [this.datosTimbre.accion, Validators.required],
@@ -137,7 +139,7 @@ export class EditarTimbreComponent implements OnInit {
       observacion: formTimbre.ObservacionForm
     }
 
-    console.log('data: ',data);
+    console.log('data: ', data);
 
     this.timbreServicio.EditarTimbreEmpleado(data).subscribe(res => {
       const mensaje: any = res

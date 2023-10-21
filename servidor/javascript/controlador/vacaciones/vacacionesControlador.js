@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.VACACIONES_CONTROLADOR = void 0;
 const CargarVacacion_1 = require("../../libs/CargarVacacion");
 const settingsMail_1 = require("../../libs/settingsMail");
-const fs_1 = __importDefault(require("fs"));
 const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
 const builder = require('xmlbuilder');
@@ -339,25 +338,6 @@ class VacacionesControlador {
             else {
                 return res.status(404).jsonp({ text: 'No se encuentran registros' });
             }
-        });
-    }
-    // METODO PARA CREAR ARCHIVO XML
-    FileXML(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var xml = builder.create('root').ele(req.body).end({ pretty: true });
-            console.log(req.body.userName);
-            let filename = "Vacaciones-" + req.body.userName + '-' + req.body.userId + '-' + new Date().getTime() + '.xml';
-            fs_1.default.writeFile(`xmlDownload/${filename}`, xml, function (err) {
-            });
-            res.jsonp({ text: 'XML creado', name: filename });
-        });
-    }
-    // METODO PARA DESCARGAR ARCHIVO XML
-    downloadXML(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const name = req.params.nameXML;
-            let filePath = `servidor\\xmlDownload\\${name}`;
-            res.sendFile(__dirname.split("servidor")[0] + filePath);
         });
     }
     /** ********************************************************************************************** **

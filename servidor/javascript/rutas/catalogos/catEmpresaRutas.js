@@ -59,13 +59,9 @@ class DepartamentoRutas {
         this.router.put('/credenciales/:id_empresa', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.EditarPassword);
         // METODO PARA ACTUALIZAR USO DE ACCIONES
         this.router.put('/acciones-timbre', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.ActualizarAccionesTimbres);
+        // METODO PARA BUSCAR DATOS DE EMPRESA
         this.router.get('/', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.ListarEmpresa);
-        this.router.get('/buscar/:nombre', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.ListarUnaEmpresa);
-        this.router.post('/', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.CrearEmpresa);
-        this.router.post('/xmlDownload/', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.FileXML);
-        this.router.get('/download/:nameXML', catEmpresaControlador_1.default.downloadXML);
-        this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, catEmpresaControlador_1.default.EliminarRegistros);
-        // CONSULTA USADA EN MÓDULO DE ALMUERZOS
+        // CONSULTA USADA EN MODULO DE ALMUERZOS
         this.router.get('/logo/codificados/:id_empresa', catEmpresaControlador_1.default.getImagenBase64);
     }
 }

@@ -66,17 +66,17 @@ class TimbresControlador {
                     return result.rows
                         .map((obj: any) => {
                             switch (obj.accion) {
-                                case 'EoS': obj.accion = 'Entrada o Salida'; break;
-                                case 'AES': obj.accion = 'Entrada o Salida Alimentación'; break;
-                                case 'PES': obj.accion = 'Entrada o Salida Permiso'; break;
-                                case 'E': obj.accion = 'Entrada o Salida'; break;
-                                case 'S': obj.accion = 'Entrada o Salida'; break;
-                                case 'F/A': obj.accion = 'Entrada o Salida Alimentación'; break;
-                                case 'I/A': obj.accion = 'Entrada o Salida Alimentación'; break;
-                                case 'E/P': obj.accion = 'Entrada o Salida Permiso'; break;
-                                case 'S/P': obj.accion = 'Entrada o Salida Permiso'; break;
-                                case 'HA': obj.accion = 'Horario Abierto'; break;
-                                default: obj.accion = 'codigo 99'; break;
+                                case 'EoS': obj.accion = 'Entrada o salida'; break;
+                                case 'AES': obj.accion = 'Inicio o fin alimentación'; break;
+                                case 'PES': obj.accion = 'Inicio o fin permiso'; break;
+                                case 'E': obj.accion = 'Entrada'; break;
+                                case 'S': obj.accion = 'Salida'; break;
+                                case 'I/A': obj.accion = 'Inicio alimentación'; break;
+                                case 'F/A': obj.accion = 'Fin alimentación'; break;
+                                case 'I/P': obj.accion = 'Fin permiso'; break;
+                                case 'F/P': obj.accion = 'Inicio permiso'; break;
+                                case 'HA': obj.accion = 'Timbre libre'; break;
+                                default: obj.accion = 'Desconocido'; break;
                             }
                             return obj
                         })
@@ -188,7 +188,7 @@ class TimbresControlador {
                     if (result.rowCount > 0) {
                         return res.status(200).jsonp({ message: 'timbres encontrados', timbres: result.rows });
                     }
-                   
+
                 }
                 );
             console.log('respuesta: ', timbresRows)
@@ -236,6 +236,7 @@ class TimbresControlador {
             var ip_cliente = '';
             var requestIp = require('request-ip');
             var clientIp = requestIp.getClientIp(req);
+
             if (clientIp != null && clientIp != '' && clientIp != undefined) {
                 ip_cliente = clientIp.split(':')[3];
             }
@@ -243,6 +244,7 @@ class TimbresControlador {
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj,
                 ubicacion } = req.body;
 
+            //console.log('ingresa informacion ', req.body)
             let f = new Date();
             const id_empleado = req.userIdEmpleado;
 
@@ -289,6 +291,7 @@ class TimbresControlador {
             var ip_cliente = '';
             var requestIp = require('request-ip');
             var clientIp = requestIp.getClientIp(req);
+
             if (clientIp != null && clientIp != '' && clientIp != undefined) {
                 ip_cliente = clientIp.split(':')[3];
             }
@@ -468,17 +471,17 @@ class TimbresControlador {
                 .then((result: any) => {
                     return result.rows.map((obj: any) => {
                         switch (obj.accion) {
-                            case 'EoS': obj.accion = 'Entrada o Salida'; break;
-                            case 'AES': obj.accion = 'Entrada o Salida Almuerzo'; break;
-                            case 'PES': obj.accion = 'Entrada o Salida Permiso'; break;
-                            case 'E': obj.accion = 'Entrada o Salida'; break;
-                            case 'S': obj.accion = 'Entrada o Salida'; break;
-                            case 'F/A': obj.accion = 'Entrada o Salida Almuerzo'; break;
-                            case 'I/A': obj.accion = 'Entrada o Salida Almuerzo'; break;
-                            case 'E/P': obj.accion = 'Entrada o Salida Permiso'; break;
-                            case 'S/P': obj.accion = 'Entrada o Salida Permiso'; break;
-                            case 'HA': obj.accion = 'Horario Abierto'; break;
-                            default: obj.accion = 'codigo 99'; break;
+                            case 'EoS': obj.accion = 'Entrada o salida'; break;
+                            case 'AES': obj.accion = 'Inicio o fin alimentación'; break;
+                            case 'PES': obj.accion = 'Inicio o fin permiso'; break;
+                            case 'E': obj.accion = 'Entrada'; break;
+                            case 'S': obj.accion = 'Salida'; break;
+                            case 'I/A': obj.accion = 'Inicio alimentación'; break;
+                            case 'F/A': obj.accion = 'Fin alimentación'; break;
+                            case 'I/P': obj.accion = 'Fin permiso'; break;
+                            case 'F/P': obj.accion = 'Inicio permiso'; break;
+                            case 'HA': obj.accion = 'Timbre libre'; break;
+                            default: obj.accion = 'Desconocido'; break;
                         }
                         return obj
                     })
@@ -502,17 +505,17 @@ class TimbresControlador {
                     return result.rows
                         .map((obj: any) => {
                             switch (obj.accion) {
-                                case 'EoS': obj.accion = 'Entrada o Salida'; break;
-                                case 'AES': obj.accion = '  Inicio o Fin Comida'; break;
-                                case 'PES': obj.accion = 'Inicio o Fin Permiso'; break;
+                                case 'EoS': obj.accion = 'Entrada o salida'; break;
+                                case 'AES': obj.accion = ' Inicio o fin alimentación'; break;
+                                case 'PES': obj.accion = 'Inicio o fin permiso'; break;
                                 case 'E': obj.accion = 'Entrada'; break;
                                 case 'S': obj.accion = 'Salida'; break;
-                                case 'F/A': obj.accion = 'Fin Comida'; break;
-                                case 'I/A': obj.accion = 'Inicio Comida'; break;
-                                case 'E/P': obj.accion = 'Fin Permiso'; break;
-                                case 'S/P': obj.accion = 'Inicio Permiso'; break;
-                                case 'HA': obj.accion = 'Horario Abierto'; break;
-                                default: obj.accion = 'codigo 99'; break;
+                                case 'I/A': obj.accion = 'Inicio alimentación'; break;
+                                case 'F/A': obj.accion = 'Fin alimentación'; break;
+                                case 'I/P': obj.accion = 'Inicio permiso'; break;
+                                case 'F/P': obj.accion = 'Fin permiso'; break;
+                                case 'HA': obj.accion = 'Timbre libre'; break;
+                                default: obj.accion = 'Desconocido'; break;
                             }
                             return obj
                         })

@@ -49,11 +49,7 @@ class DepartamentoRutas {
         this.router.get('/pedidos/ciudad/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.EncontrarDatosCiudades);
         this.router.get('/pedido/informacion/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.EncontrarPedidoAccion);
         this.router.get('/lista/procesos/:id', TokenValidation, ACCION_PERSONAL_CONTROLADOR.EncontrarProcesosRecursivos);
-        
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', TokenValidation, ACCION_PERSONAL_CONTROLADOR.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', ACCION_PERSONAL_CONTROLADOR.downloadXML);
+
     }
 }
 

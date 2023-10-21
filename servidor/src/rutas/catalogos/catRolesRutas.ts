@@ -15,10 +15,6 @@ class PruebasRutas {
         this.router.get('/', TokenValidation, ROLES_CONTROLADOR.ListarRoles);
         // METODO PARA ELIMINAR REGISTRO
         this.router.delete('/eliminar/:id', TokenValidation, ROLES_CONTROLADOR.EliminarRol);
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', TokenValidation, ROLES_CONTROLADOR.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', ROLES_CONTROLADOR.downloadXML);
         // METODO PARA REGISTRAR ROL
         this.router.post('/', TokenValidation, ROLES_CONTROLADOR.CrearRol);
 

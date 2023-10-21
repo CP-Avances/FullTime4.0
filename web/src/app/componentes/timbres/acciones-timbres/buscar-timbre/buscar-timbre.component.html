@@ -13,8 +13,7 @@
                 <div class="nota" id="espacio" style="margin-left: 15px;">
                     <span>
                         NOTA: Por favor llenar todos los campos obligatorios (*) del formulario y dar click en
-                        Buscar
-                        para continuar.
+                        Buscar para continuar.
                     </span>
                 </div>
                 <div style="text-align: center">
@@ -28,7 +27,8 @@
                                         <input matInput [formControl]="codigo" (keypress)="IngresarSoloNumeros($event)">
                                         <mat-icon matSuffix matTooltipPosition="right"
                                             matTooltip="Ingresar el código de usuario.">
-                                            help_outline</mat-icon>
+                                            help_outline
+                                        </mat-icon>
                                     </mat-form-field>
                                     <mat-form-field>
                                         <mat-label>Cédula</mat-label>
@@ -64,8 +64,7 @@
 
                                 <div class="d-flex flex-wrap justify-content-center">
                                     <button class="btn btn-sm" id="btn-raised" type="submit"
-                                        (click)="BuscarTimbresFecha(formulario.value)"
-                                        [disabled]="!formulario.valid">
+                                        (click)="BuscarTimbresFecha(formulario.value)" [disabled]="!formulario.valid">
                                         Buscar
                                     </button>
 

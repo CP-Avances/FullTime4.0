@@ -81,7 +81,15 @@ class HorarioControlador {
             if (archivo != 'null' && archivo != '' && archivo != null) {
                 if (archivo != documento) {
                     let ruta = (0, accesoCarpetas_1.ObtenerRutaHorarios)() + separador + archivo;
-                    fs_1.default.unlinkSync(ruta);
+                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                    fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                        if (err) {
+                        }
+                        else {
+                            // ELIMINAR DEL SERVIDOR
+                            fs_1.default.unlinkSync(ruta);
+                        }
+                    });
                 }
             }
         });
@@ -117,7 +125,15 @@ class HorarioControlador {
             `, [id]);
             if (documento != 'null' && documento != '' && documento != null) {
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaHorarios)() + separador + documento;
-                fs_1.default.unlinkSync(ruta);
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                    }
+                    else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs_1.default.unlinkSync(ruta);
+                    }
+                });
             }
             res.jsonp({ message: 'Documento actualizado.' });
         });
@@ -129,9 +145,17 @@ class HorarioControlador {
             let separador = path_1.default.sep;
             if (documento != 'null' && documento != '' && documento != null) {
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaHorarios)() + separador + documento;
-                fs_1.default.unlinkSync(ruta);
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                    if (err) {
+                    }
+                    else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs_1.default.unlinkSync(ruta);
+                    }
+                });
             }
-            res.jsonp({ message: 'Documento Actualizado' });
+            res.jsonp({ message: 'Documento actualizado.' });
         });
     }
     // BUSCAR LISTA DE CATALOGO HORARIOS  --**VERIFICADO
@@ -177,24 +201,6 @@ class HorarioControlador {
             res.jsonp({ message: 'Registro eliminado.' });
         });
     }
-    // METODO PARA CREAR ARCHIVO XML
-    FileXML(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var xml = builder.create('root').ele(req.body).end({ pretty: true });
-            let filename = "Horarios-" + req.body.userName + '-' + req.body.userId + '-' + new Date().getTime() + '.xml';
-            fs_1.default.writeFile(`xmlDownload/${filename}`, xml, function (err) {
-            });
-            res.jsonp({ text: 'XML creado', name: filename });
-        });
-    }
-    // METODO PARA DESCARGAR ARCHIVO XML
-    downloadXML(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const name = req.params.nameXML;
-            let filePath = `servidor/xmlDownload/${name}`;
-            res.sendFile(__dirname.split("servidor")[0] + filePath);
-        });
-    }
     // METODO PARA BUSCAR DATOS DE UN HORARIO
     ObtenerUnHorario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -235,7 +241,13 @@ class HorarioControlador {
             const docs = req.params.docs;
             let separador = path_1.default.sep;
             let ruta = (0, accesoCarpetas_1.ObtenerRutaHorarios)() + separador + docs;
-            res.sendFile(path_1.default.resolve(ruta));
+            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    res.sendFile(path_1.default.resolve(ruta));
+                }
+            });
         });
     }
     CargarHorarioPlantilla(req, res) {
@@ -260,7 +272,15 @@ class HorarioControlador {
                     res.jsonp({ message: 'correcto' });
                 }
             }));
-            fs_1.default.unlinkSync(filePath);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
         });
     }
     /** Verificar si existen datos duplicados dentro del sistema */
@@ -301,7 +321,15 @@ class HorarioControlador {
                 }
                 contador = contador + 1;
             }));
-            fs_1.default.unlinkSync(filePath);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
         });
     }
     /** Verificar que los datos dentro de la plantilla no se encuntren duplicados */
@@ -345,7 +373,15 @@ class HorarioControlador {
                     return res.jsonp({ message: 'error' });
                 }
             }
-            fs_1.default.unlinkSync(filePath);
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(filePath);
+                }
+            });
         });
     }
 }

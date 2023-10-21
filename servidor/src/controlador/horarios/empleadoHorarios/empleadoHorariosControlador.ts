@@ -445,7 +445,14 @@ class EmpleadoHorariosControlador {
             }
             contador = contador + 1;
         });
-        fs.unlinkSync(filePath);
+        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+        fs.access(filePath, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+                // ELIMINAR DEL SERVIDOR
+                fs.unlinkSync(filePath);
+            }
+        });
     }
 
     /** Verificar que los datos de la plantilla no se encuentren duplicados */
@@ -567,7 +574,14 @@ class EmpleadoHorariosControlador {
                 [id_empl_cargo, id_hora, fecha_inicio, fecha_final, lunes, martes, miercoles, jueves, viernes, sabado, domingo, id_horarios, estado.split("-")[0], codigo]);
             res.jsonp({ message: 'correcto' });
         });
-        fs.unlinkSync(filePath);
+        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+        fs.access(filePath, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+                // ELIMINAR DEL SERVIDOR
+                fs.unlinkSync(filePath);
+            }
+        });
     }
 
     /** Crear Planificacion General con los datos de la plantilla ingresada */
@@ -645,7 +659,14 @@ class EmpleadoHorariosControlador {
             return res.jsonp({ message: 'correcto' });
         });
 
-        fs.unlinkSync(filePath);
+        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+        fs.access(filePath, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+                // ELIMINAR DEL SERVIDOR
+                fs.unlinkSync(filePath);
+            }
+        });
     }
 
     public async CargarMultiplesHorariosEmpleadosPlantilla(req: Request, res: Response): Promise<void> {
@@ -670,7 +691,14 @@ class EmpleadoHorariosControlador {
             console.log("carga exitosa");
         });
         res.jsonp({ message: 'La plantilla a sido receptada' });
-        fs.unlinkSync(filePath);
+        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+        fs.access(filePath, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+                // ELIMINAR DEL SERVIDOR
+                fs.unlinkSync(filePath);
+            }
+        });
     }
 
 

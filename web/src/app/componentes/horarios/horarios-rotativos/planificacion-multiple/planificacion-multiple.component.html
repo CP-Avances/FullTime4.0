@@ -165,16 +165,20 @@
                                         </mat-form-field>
                                     </div>
 
-                                    <div *ngIf="ver_verificar" style="padding-top: 10px; margin: 0 auto;">
-                                        <button class="btn btn-sm" (click)="VerificarAsignados()">
-                                            Verificar
-                                        </button>
-                                    </div>
+                                    <div style="text-align: center;">
 
-                                    <div *ngIf="ver_guardar" style="padding-top: 10px; margin: 0 auto;">
-                                        <button class="btn btn-sm" (click)="GuardarPlanificacion()">
-                                            Guardar
-                                        </button>
+                                        <div *ngIf="ver_verificar" style="padding-top: 10px; margin: 0 auto;">
+                                            <button class="btn btn-sm" (click)="VerificarAsignados()">
+                                                Verificar
+                                            </button>
+                                        </div>
+
+                                        <div *ngIf="ver_guardar" style="padding-top: 10px; margin: 0 auto;">
+                                            <button class="btn btn-sm" (click)="GuardarPlanificacion()">
+                                                Guardar
+                                            </button>
+                                        </div>
+
                                     </div>
 
                                 </div>
@@ -395,8 +399,12 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 1">
+                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 1 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 1 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -441,8 +449,12 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 2">
+                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 2 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 2 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -487,8 +499,12 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 3">
+                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 3 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 3 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -533,8 +549,12 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 4">
+                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 4 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 4 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -579,8 +599,12 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 5">
+                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 5 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 5 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -625,8 +649,12 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 6">
+                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 6 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 6 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -671,8 +699,12 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 7">
+                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 7 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 7 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -717,8 +749,12 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 8">
+                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 8 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 8 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -763,8 +799,12 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 9">
+                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 9 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 9 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -809,8 +849,13 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 10">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 10 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 10 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -855,8 +900,13 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 11">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 11 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 11 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -901,8 +951,13 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 12">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 12 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 12 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -947,8 +1002,13 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 13">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 13 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 13 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -993,8 +1053,13 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 14">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 14 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 14 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -1039,8 +1104,13 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 15">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 15 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 15 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -1085,8 +1155,13 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 16">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 16 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 16 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -1131,8 +1206,13 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 17">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 17 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 17 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -1177,8 +1257,13 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 18">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 18 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 18 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -1223,8 +1308,13 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 19">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 19 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 19 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -1269,8 +1359,13 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 20">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 20 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 20 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -1315,8 +1410,13 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 21">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 21 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 21 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -1361,8 +1461,13 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 22">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 22 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 22 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -1407,8 +1512,13 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 23">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 23 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 23 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -1453,8 +1563,13 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 24">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 24 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 24 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -1499,8 +1614,13 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 25">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 25 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 25 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -1545,8 +1665,13 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 26">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 26 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 26 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -1591,11 +1716,15 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 27">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 27 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
                                         </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 27 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
+                                        </span>
                                     </div>
-
                                     <div class="container" *ngFor="let t of e.totalizador"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
                                         <div class="container" *ngIf="t.dia === 27"
@@ -1637,8 +1766,13 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 28">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 28 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 28 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -1683,8 +1817,13 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 29">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 29 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 29 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -1729,8 +1868,13 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 30">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 30 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 30 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 
@@ -1775,8 +1919,13 @@
 
                                     <div class="container" *ngFor="let h of e.asignado"
                                         style="width: 130px; text-align: center;display: flex;justify-content: center;">
-                                        <span style="font-size: 11px; color:blue" *ngIf="h.dia === 31">
+                                        <span style="font-size: 11px; color:blue"
+                                            *ngIf="h.dia === 31 && h.rango === ''">
                                             <span style="font-size: 10px;">({{h.hora_trabajo}})</span> {{h.horario}}
+                                        </span>
+                                        <span style="font-size: 11px; color:rgb(255, 0, 0)"
+                                            *ngIf="h.dia === 31 && h.rango != ''">
+                                            <span style="font-size: 10px;">({{h.rango}})</span> {{h.horario}}
                                         </span>
                                     </div>
 

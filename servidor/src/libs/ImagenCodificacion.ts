@@ -8,7 +8,6 @@ export const ImagenBase64LogosEmpresas: any = async function (path_file: string)
         path_file = path.resolve('logos') + separador + path_file
         console.log('ver si ingresa ', path_file)
         let data = fs.readFileSync(path_file);
-
         return data.toString('base64');
     } catch (error) {
         return 0

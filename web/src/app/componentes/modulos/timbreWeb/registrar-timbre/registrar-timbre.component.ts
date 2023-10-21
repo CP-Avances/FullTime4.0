@@ -4,7 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
 
-// SECCIÓN DE SERVICIOS
+// SECCION DE SERVICIOS
 import { EmpleadoUbicacionService } from 'src/app/servicios/empleadoUbicacion/empleado-ubicacion.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { FuncionesService } from 'src/app/servicios/funciones/funciones.service';
@@ -152,19 +152,19 @@ export class RegistrarTimbreComponent implements OnInit {
         this.teclaFuncionF = 3;
         break;
       case 5:
-        this.accionF = 'S/P';
+        this.accionF = 'I/P';
         this.teclaFuncionF = 4;
         break;
       case 6:
-        this.accionF = 'E/P';
+        this.accionF = 'F/P';
         this.teclaFuncionF = 5;
         break;
       case 7:
         this.accionF = 'HA';
-        this.teclaFuncionF = 6;
+        this.teclaFuncionF = 7;
         break;
       default:
-        this.accionF = 'code 99';
+        this.accionF = 'D';
         break;
     }
     this.InsertarTimbre(form);
@@ -200,6 +200,7 @@ export class RegistrarTimbreComponent implements OnInit {
       latitud: this.latitud,
       accion: this.accionF,
     }
+    console.log('ver data timbre ', dataTimbre)
     this.ventana.close(dataTimbre);
   }
 

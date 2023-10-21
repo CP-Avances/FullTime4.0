@@ -24,10 +24,6 @@ class CiudadRutas {
         this.router.get('/', verificarToken_1.TokenValidation, ciudadControlador_1.default.ListarNombreCiudad);
         // METODO PARA ELIMINAR REGISTRO
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, ciudadControlador_1.default.EliminarCiudad);
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', verificarToken_1.TokenValidation, ciudadControlador_1.default.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', ciudadControlador_1.default.downloadXML);
         // METODO PARA BUSCAR DATOS DE UNA CIUDAD
         this.router.get('/:id', verificarToken_1.TokenValidation, ciudadControlador_1.default.ConsultarUnaCiudad);
     }

@@ -226,6 +226,9 @@ export class EditarPlanificacionComponent implements OnInit {
       this.nota_ = 'feriado';
     }
     console.log('ver horarios asignados ', this.horas)
+
+    this.BuscarPlanificacionAntes();
+    this.BuscarPlanificacionDespues();
   }
 
   // METODO PARA BUSCAR PLANIFICACION
@@ -273,6 +276,74 @@ export class EditarPlanificacionComponent implements OnInit {
         }
       }
       //console.log('ver horario libre ', this.lista_libres);
+    })
+  }
+
+  // METODO PARA BUSCAR PLANIFICACION DIA ANTES
+  antes: any = [];
+  BuscarPlanificacionAntes() {
+    let formato = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
+    var restar = moment(formato, 'YYYY-MM-DD').subtract(1, 'days');
+    var fecha = moment(restar, 'YYYY-MM-DD').format('YYYY-MM-DD');
+    //console.log('ver dia anterior ', fecha);
+
+    let busqueda = {
+      fecha_inicio: fecha,
+      fecha_final: fecha,
+      codigo: '\'' + this.datos_horarios.codigo + '\''
+    }
+    this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
+      //console.log('ver datos horarios ', datos)
+      if (datos.message === 'OK') {
+        for (var j = 0; j < this.horarios.length; j++) {
+          for (var k = 0; k < datos.data.length; k++) {
+            // COMPARAR HORARIOS (SE RETIRA ESPACIOS)
+            if (this.horarios[j].id === datos.data[k].id_horario) {
+              if (this.horarios[j].detalles.segundo_dia === true) {
+                let data = {
+                  horarios: this.horarios[j].detalles,
+                }
+                this.antes = this.antes.concat(data);
+              }
+              break;
+            }
+          }
+        }
+      }
+      console.log('antes ', this.antes);
+    })
+  }
+
+  // METODO PARA BUSCAR PLANIFICACION DIA DESPUES
+  despues: any = [];
+  BuscarPlanificacionDespues() {
+    let formato = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
+    var restar = moment(formato, 'YYYY-MM-DD').add(1, 'days');
+    var fecha = moment(restar, 'YYYY-MM-DD').format('YYYY-MM-DD');
+    //console.log('ver dia anterior ', fecha);
+
+    let busqueda = {
+      fecha_inicio: fecha,
+      fecha_final: fecha,
+      codigo: '\'' + this.datos_horarios.codigo + '\''
+    }
+    this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
+      //console.log('ver datos horarios ', datos)
+      if (datos.message === 'OK') {
+        for (var j = 0; j < this.horarios.length; j++) {
+          for (var k = 0; k < datos.data.length; k++) {
+            // COMPARAR HORARIOS (SE RETIRA ESPACIOS)
+            if (this.horarios[j].id === datos.data[k].id_horario) {
+              let data = {
+                horarios: this.horarios[j].detalles,
+              }
+              this.despues = this.despues.concat(data);
+              break;
+            }
+          }
+        }
+      }
+      console.log('depues ', this.despues);
     })
   }
 
@@ -457,10 +528,49 @@ export class EditarPlanificacionComponent implements OnInit {
       });
     }
     else {
-      this.horas = this.horas.concat(data);
-      this.ver_horario_ = true;
-      this.ver_guardar = false;
-      this.ver_nota = false;
+
+      // VERIFICAR SI EXISTEN HORARIOS CON SALIDAS AL DIA SIGUIENTE (UN DIA ANTES)
+      for (var t = 0; t < this.antes.length; t++) {
+        if (moment(this.antes[i].horarios.salida, 'HH:mm:ss').format('HH:mm:ss') <= moment(data.horarios.detalles.entrada, 'HH:mm:ss').format('HH:mm:ss')) {
+          verificador = 3;
+          break;
+        }
+      }
+
+      if (verificador === 3) {
+        this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups!!! VERIFICAR.', {
+          timeOut: 6000,
+        });
+      }
+      else {
+
+        // SI EL HORARIO TIENE SALIDA AL SIGUIENTE DIA
+        if (data.horarios.detalles.segundo_dia === true) {
+          // VALIDAR SI EXISTEN HORARIOS DEL DIA SIGUIENTE
+          for (var t = 0; t < this.despues.length; t++) {
+            if (moment(this.despues[i].horarios.entrada, 'HH:mm:ss').format('HH:mm:ss') >= moment(data.horarios.detalles.salida, 'HH:mm:ss').format('HH:mm:ss')) {
+              verificador = 4;
+              break;
+            }
+          }
+        }
+        else {
+          verificador === 5
+        }
+
+        // FIN DE LAS VALIDACIONES
+        if (verificador === 4) {
+          this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups!!! VERIFICAR.', {
+            timeOut: 6000,
+          });
+        }
+        else {
+          this.horas = this.horas.concat(data);
+          this.ver_horario_ = true;
+          this.ver_guardar = false;
+          this.ver_nota = false;
+        }
+      }
     }
 
     //console.log('horarios agregados ', this.horas)

@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.horaExtraControlador = void 0;
-const fs_1 = __importDefault(require("fs"));
 const database_1 = __importDefault(require("../../database"));
 const builder = require('xmlbuilder');
 class HorasExtrasControlador {
@@ -62,27 +61,6 @@ class HorasExtrasControlador {
             const id = req.params.id;
             yield database_1.default.query('DELETE FROM cg_hora_extras WHERE id = $1', [id]);
             res.jsonp({ message: 'Registro eliminado.' });
-        });
-    }
-    FileXML(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var xml = builder.create('root').ele(req.body).end({ pretty: true });
-            console.log(req.body.userName);
-            let filename = "HorasExtras-" + req.body.userName + '-' + req.body.userId + '-' + new Date().getTime() + '.xml';
-            fs_1.default.writeFile(`xmlDownload/${filename}`, xml, function (err) {
-                if (err) {
-                    return console.log(err);
-                }
-                console.log("Archivo guardado");
-            });
-            res.jsonp({ text: 'XML creado', name: filename });
-        });
-    }
-    downloadXML(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const name = req.params.nameXML;
-            let filePath = `servidor\\xmlDownload\\${name}`;
-            res.sendFile(__dirname.split("servidor")[0] + filePath);
         });
     }
     ActualizarHoraExtra(req, res) {

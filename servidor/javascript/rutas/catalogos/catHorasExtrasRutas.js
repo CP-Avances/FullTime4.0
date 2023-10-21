@@ -17,8 +17,6 @@ class HorasExtrasRutas {
         this.router.get('/:id', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation], catHorasExtrasControlador_1.default.ObtenerUnaHoraExtra);
         this.router.post('/', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation], catHorasExtrasControlador_1.default.CrearHoraExtra);
         this.router.delete('/eliminar/:id', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation], catHorasExtrasControlador_1.default.EliminarRegistros);
-        this.router.post('/xmlDownload/', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation], catHorasExtrasControlador_1.default.FileXML);
-        this.router.get('/download/:nameXML', catHorasExtrasControlador_1.default.downloadXML);
         this.router.put('/', [verificarToken_1.TokenValidation, verificarHoraExtra_1.ModuloHoraExtraValidation], catHorasExtrasControlador_1.default.ActualizarHoraExtra);
     }
 }

@@ -47,9 +47,6 @@ export class PlanificacionMultipleComponent implements OnInit {
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
-  displayedColumns = ['codigo', 'usuario', 'jornada', 'dias_mes'];
-  dataSource: any;
-
   constructor(
     public componentem: HorarioMultipleEmpleadoComponent,
     public componenteb: BuscarPlanificacionComponent,
@@ -80,8 +77,6 @@ export class PlanificacionMultipleComponent implements OnInit {
       obj.index = index;
       index = index + 1;
     })
-
-    this.dataSource = this.datosSeleccionados
     console.log('this.datosSeleccionados: ', this.datosSeleccionados.usuarios!);
   }
 
@@ -361,11 +356,14 @@ export class PlanificacionMultipleComponent implements OnInit {
       return o.codigo === this.horarioF.value
     })
 
+    if (!datoHorario) return this.toastr.warning('No ha seleccionado un horario.');
+
     let mes = moment(this.fechaInicialF.value).format('MM-YYYY');
     let fecha = dia + '-' + mes;
 
     let data = [{
       dia: dia,
+      rango: '',
       fecha: moment(fecha, 'D-MM-YYYY').format('YYYY-MM-DD'),
       horario: this.horarioF.value,
       detalles: datoHorario.detalles,
@@ -647,6 +645,7 @@ export class PlanificacionMultipleComponent implements OnInit {
 
     let data = [{
       dia: dia,
+      rango: '',
       fecha: moment(fecha, 'D-MM-YYYY').format('YYYY-MM-DD'),
       horario: datoHorario.codigo,
       detalles: datoHorario.detalles,
@@ -846,6 +845,7 @@ export class PlanificacionMultipleComponent implements OnInit {
       if (this.datosSeleccionados.usuarios[index].asignado[i].dia === dia) {
         if (this.datosSeleccionados.usuarios[index].asignado[i].horario === this.horarioF.value) {
           this.datosSeleccionados.usuarios[index].asignado.splice(i, 1);
+          this.ActualizarTotalizador(index, dia);
           break;
         }
       }
@@ -950,7 +950,6 @@ export class PlanificacionMultipleComponent implements OnInit {
           //console.log('usuarios validos original ', this.datosSeleccionados.usuario);
           //console.log('usuarios eliminar ', this.eliminar_lista);
           this.CrearDataHorario(validos);
-          this.ControlarBotones(false, true);
         }
       }, vacio => {
         cont = cont + 1;
@@ -960,7 +959,6 @@ export class PlanificacionMultipleComponent implements OnInit {
           //console.log('usuarios validos original ', this.datosSeleccionados.usuario);
           //console.log('usuarios eliminar ', this.eliminar_lista);
           this.CrearDataHorario(validos);
-          this.ControlarBotones(false, true);
         }
       })
     })
@@ -969,6 +967,16 @@ export class PlanificacionMultipleComponent implements OnInit {
   // METODO PARA CREAR LA DATA DE REGISTRO DE HORARIO
   plan_general: any = [];
   CrearDataHorario(lista: any) {
+
+    //console.log('validos ', lista)
+    var contador = 0;
+
+    var asignados = 0;
+
+    lista.forEach(li => {
+      asignados = asignados + li.asignado.length;
+    })
+
     this.plan_general = [];
 
     if (lista.length != 0) {
@@ -976,6 +984,7 @@ export class PlanificacionMultipleComponent implements OnInit {
       lista.forEach(li => {
 
         li.asignado.forEach(asig => {
+          asig.rango = '';
           let origen = 'N';
           let tipo = null;
           //console.log('ver data asignado ')
@@ -989,6 +998,7 @@ export class PlanificacionMultipleComponent implements OnInit {
           }
 
           this.restD.ConsultarUnDetalleHorario(asig.id_horario).subscribe(det => {
+            contador = contador + 1;
             // COLOCAR DETALLE DE DIA SEGUN HORARIO
             det.map(element => {
               //console.log('ver detalle ', element)
@@ -1031,11 +1041,74 @@ export class PlanificacionMultipleComponent implements OnInit {
               }
               // ALMACENAMIENTO DE PLANIFICACION GENERAL
               this.plan_general = this.plan_general.concat(plan);
+              //console.log('ver plan_general ', this.plan_general)
             })
+
+            if (contador === asignados) {
+              this.ValidarRangos(this.plan_general)
+            }
 
           })
         })
       })
+    }
+  }
+
+  // METODO PARA VALIDAR RANGOS DE TIEMPOS EN HORARIOS
+  ValidarRangos(lista: any) {
+    var datos_o: any = [];
+    var datos: any = [];
+    var contador = 0;
+    lista.forEach(obj => {
+      if (obj.salida_otro_dia === 1) {
+        datos = datos.concat(obj)
+      }
+      else {
+        datos_o = datos_o.concat(obj);
+      }
+    })
+
+    datos.forEach(ele => {
+
+      for (var i = 0; i < datos_o.length; i++) {
+
+        if (ele.codigo === datos_o[i].codigo) {
+
+          if ((moment(datos_o[i].fec_hora_horario).format('YYYY-MM-DD') === moment(ele.fec_hora_horario).format('YYYY-MM-DD')) &&
+            datos_o[i].tipo_entr_salida === 'E' && ele.tipo_entr_salida === 'S' && datos_o[i].tipo_dia === 'N') {
+
+            if (moment(datos_o[i].fec_hora_horario).format('HH:mm:ss') <= moment(ele.fec_hora_horario).format('HH:mm:ss')) {
+              contador = 1;
+              //console.log('existen horarios en rangos de tiempo similares ', contador)
+              this.datosSeleccionados.usuario.forEach(li => {
+                if (li.codigo === ele.codigo) {
+                  li.asignado.forEach(asig => {
+                    if (asig.fecha === moment(ele.fec_hora_horario).format('YYYY-MM-DD')) {
+                      asig.rango = 'RANGOS DE TIEMPO SIMILARES'
+                    }
+                  })
+                }
+              })
+              break;
+            }
+            /*
+                        console.log(obj.codigo)
+                        console.log(moment(obj.fec_hora_horario).format('YYYY-MM-DD'))
+                        console.log(moment(obj.fec_hora_horario).format('HH:mm:ss'))
+                        console.log('datos ')
+                        console.log(moment(ele.fec_hora_horario).format('YYYY-MM-DD'))
+                        console.log(moment(ele.fec_hora_horario).format('HH:mm:ss'))
+                        console.log('-------------------------------------------------- ')*/
+          }
+        }
+      }
+    })
+    //console.log('validos ', this.datosSeleccionados.usuario)
+    if (contador === 0) {
+      this.ControlarBotones(false, true);
+    }
+    else {
+      this.ControlarBotones(true, false);
     }
   }
 

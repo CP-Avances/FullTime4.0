@@ -46,7 +46,7 @@ class LoginControlador {
       // SI EXISTE USUARIOS
       if (USUARIO.rowCount != 0) {
 
-        console.log('usuario existe')
+        //console.log('usuario existe')
 
         const { id, id_empleado, id_rol, usuario: user } = USUARIO.rows[0];
 
@@ -62,7 +62,7 @@ class LoginControlador {
 
         const { empleado, usuario, codigo, web_access } = ACTIVO[0];
 
-        console.log('estado del usuario ', empleado, ' ', usuario)
+        //console.log('estado del usuario ', empleado, ' ', usuario)
         // SI EL USUARIO NO SE ENCUENTRA ACTIVO
         if (empleado === 2 && usuario === false) {
           return res.jsonp({ message: 'inactivo' });

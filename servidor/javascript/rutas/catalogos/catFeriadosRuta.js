@@ -20,10 +20,6 @@ class FeriadosRuta {
         this.router.get('/', verificarToken_1.TokenValidation, catFeriadosControlador_1.default.ListarFeriados);
         // METODO PARA ELIMINAR REGISTRO
         this.router.delete('/delete/:id', verificarToken_1.TokenValidation, catFeriadosControlador_1.default.EliminarFeriado);
-        // METODO PARA CREAR ARCHIVO XML
-        this.router.post('/xmlDownload/', verificarToken_1.TokenValidation, catFeriadosControlador_1.default.FileXML);
-        // METODO PARA DESCARGAR ARCHIVO XML
-        this.router.get('/download/:nameXML', catFeriadosControlador_1.default.downloadXML);
         // METODO PARA CREAR REGISTRO DE FERIADO
         this.router.post('/', verificarToken_1.TokenValidation, catFeriadosControlador_1.default.CrearFeriados);
         // METODO PARA BUSCAR FERIADOS EXCEPTO REGISTRO EDITADO

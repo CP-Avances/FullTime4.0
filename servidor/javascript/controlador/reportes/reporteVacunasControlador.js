@@ -41,7 +41,7 @@ class ReportesVacunasControlador {
             return res.status(200).jsonp(nuevo);
         });
     }
-    ReporteVacunasMultipleCargos(req, res) {
+    ReporteVacunasMultipleCargosRegimen(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log('datos recibidos', req.body);
             let datos = req.body;

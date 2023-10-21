@@ -34,23 +34,6 @@ class FeriadosControlador {
         res.jsonp({ text: 'Registro eliminado.' });
     }
 
-    // METODO PARA CREAR ARCHIVO EN FORMATO XML
-    public async FileXML(req: Request, res: Response): Promise<any> {
-        var xml = builder.create('root').ele(req.body).end({ pretty: true });
-        let filename = "Feriados-" + req.body.userName + '-' + req.body.userId + '-' +
-            new Date().getTime() + '.xml';
-        fs.writeFile(`xmlDownload/${filename}`, xml, function (err) {
-        });
-        res.jsonp({ text: 'XML creado', name: filename });
-    }
-
-    // METODO PARA DESCARGAR ARCHIVO XML DE FERIADOS
-    public async downloadXML(req: Request, res: Response): Promise<any> {
-        const name = req.params.nameXML;
-        let filePath = `servidor\\xmlDownload\\${name}`
-        res.sendFile(__dirname.split("servidor")[0] + filePath);
-    }
-
     // METODO PARA CREAR REGISTRO DE FERIADO
     public async CrearFeriados(req: Request, res: Response): Promise<Response> {
         try {
@@ -343,7 +326,15 @@ class FeriadosControlador {
             }
             contador = contador + 1;
         });
-        fs.unlinkSync(filePath);
+
+        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+        fs.access(filePath, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+                // ELIMINAR DEL SERVIDOR
+                fs.unlinkSync(filePath);
+            }
+        });
     }
 
     // REVISAR DATOS DUPLICADOS DENTRO DE LA MISMA PLANTILLA
@@ -386,7 +377,16 @@ class FeriadosControlador {
             }
             datos_totales.push(fila_datos);
         });
-        fs.unlinkSync(filePath);
+
+        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+        fs.access(filePath, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+                // ELIMINAR DEL SERVIDOR
+                fs.unlinkSync(filePath);
+            }
+        });
+
         ver_fecha = ver_recuperacion = datos_totales;
         // VERIFICACIÓN DE FECHAS DUPLICADAS DENTRO DE LA MISMA PLANTILLA
         for (var i = 0; i <= datos_totales.length - 1; i++) {
@@ -473,7 +473,15 @@ class FeriadosControlador {
             }
             contador = contador + 1;
         });
-        fs.unlinkSync(filePath);
+
+        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+        fs.access(filePath, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+                // ELIMINAR DEL SERVIDOR
+                fs.unlinkSync(filePath);
+            }
+        });
     }
 
 

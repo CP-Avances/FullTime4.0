@@ -717,6 +717,30 @@ class ReportesAsistenciaControlador {
 
     }
 
+    public async ReporteTimbresMultipleRegimenCargo(req: Request, res: Response) {
+        console.log('datos recibidos', req.body)
+        let { desde, hasta } = req.params;
+        let datos: any[] = req.body;
+        let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {      
+            obj.empleados = await Promise.all(obj.empleados.map(async (o:any) => {
+                o.timbres = await BuscarTimbres(desde, hasta, o.codigo);
+                console.log('Timbres: ', o);
+                return o;
+            }));    
+            return obj;
+        }));
+
+        let nuevo = n.map((e: any) => {
+            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 })
+            return e
+        }).filter(e => { return e.empleados.length > 0 })
+
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo' })
+
+        return res.status(200).jsonp(nuevo)
+
+    }
+
     // REPORTE DE TIMBRES REALIZADOS EN EL SISTEMA
     public async ReporteTimbreSistema(req: Request, res: Response) {
 
@@ -751,6 +775,29 @@ class ReportesAsistenciaControlador {
             return obj
 
         }).filter(obj => { return obj.departamentos.length > 0 })
+
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo' })
+
+        return res.status(200).jsonp(nuevo)
+    }
+
+    // REPORTE DE TIMBRES REALIZADOS EN EL SISTEMA PARA REGIMEN Y CARGO
+    public async ReporteTimbreSistemaRegimenCargo(req: Request, res: Response) {
+        let { desde, hasta } = req.params;
+        let datos: any[] = req.body;
+        let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {      
+            obj.empleados = await Promise.all(obj.empleados.map(async (o:any) => {
+                o.timbres = await BuscarTimbreSistemas(desde, hasta, o.codigo);
+                console.log('Timbres: ', o);
+                return o;
+            }));    
+            return obj;
+        }));
+
+        let nuevo = n.map((e: any) => {
+            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 })
+            return e
+        }).filter(e => { return e.empleados.length > 0 })
 
         if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo' })
 
@@ -831,6 +878,31 @@ class ReportesAsistenciaControlador {
             return obj
 
         }).filter(obj => { return obj.departamentos.length > 0 })
+
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo' })
+
+        return res.status(200).jsonp(nuevo)
+    }
+
+    // REPORTE DE TIMBRES HORARIO ABIERTO
+    public async ReporteTimbreHorarioAbiertoRegimenCargo(req: Request, res: Response) {
+        console.log('datos recibidos', req.body)
+        let { desde, hasta } = req.params;
+        let datos: any[] = req.body;
+        let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {      
+            obj.empleados = await Promise.all(obj.empleados.map(async (o:any) => {
+                o.timbres = await BuscarTimbreHorarioAbierto(desde, hasta, o.codigo);
+                console.log('Timbres: ', o);
+                return o;
+            }));    
+            return obj;
+        }));
+
+        let nuevo = n.map((e: any) => {
+            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 })
+            return e
+        }).filter(e => { return e.empleados.length > 0 })
+
 
         if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo' })
 
@@ -1010,7 +1082,7 @@ const BuscarTimbreSistemas = async function (fec_inicio: string, fec_final: stri
     return await pool.query('SELECT CAST(fec_hora_timbre AS VARCHAR), id_reloj, accion, observacion, ' +
         'latitud, longitud, CAST(fec_hora_timbre_servidor AS VARCHAR) ' +
         'FROM timbres WHERE CAST(fec_hora_timbre AS VARCHAR) BETWEEN $1 || \'%\' ' +
-        'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 AND id_reloj = 98 ' +
+        'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 AND id_reloj = \'98\' ' +
         'AND NOT accion = \'HA\' ' +
         'ORDER BY fec_hora_timbre ASC', [fec_inicio, fec_final, codigo])
         .then(res => {

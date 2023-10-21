@@ -1,10 +1,19 @@
 import { Request, Response } from 'express';
+import { ObtenerRutaPlatilla } from '../../libs/accesoCarpetas';
+import path from 'path';
+import fs from 'fs';
 
 class PlantillasControlador {
     public async DescargarPlantilla(req: Request, res: Response): Promise<any> {
-        const docs = req.params.docs;
-        let filePath = `servidor/plantillasVacias/${docs}`
-        res.sendFile(__dirname.split("servidor")[0] + filePath);
+        const documento = req.params.docs;
+        let separador = path.sep;
+        let ruta = ObtenerRutaPlatilla() + separador + documento;
+        fs.access(ruta, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+                res.sendFile(path.resolve(ruta));
+            }
+        });
     }
 }
 
