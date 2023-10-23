@@ -75,17 +75,17 @@ class TimbresControlador {
                             case 'F/A':
                                 obj.accion = 'Fin alimentación';
                                 break;
-                            case 'S/P':
+                            case 'I/P':
                                 obj.accion = 'Inicio permiso';
                                 break;
-                            case 'E/P':
+                            case 'F/P':
                                 obj.accion = 'Fin permiso';
                                 break;
                             case 'HA':
                                 obj.accion = 'Timbre libre';
                                 break;
                             default:
-                                obj.accion = 'codigo 99';
+                                obj.accion = 'Desconocido';
                                 break;
                         }
                         return obj;
@@ -226,6 +226,7 @@ class TimbresControlador {
                     ip_cliente = clientIp.split(':')[3];
                 }
                 const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj, ubicacion } = req.body;
+                //console.log('ingresa informacion ', req.body)
                 let f = new Date();
                 const id_empleado = req.userIdEmpleado;
                 let code = yield database_1.default.query(`
@@ -425,17 +426,17 @@ class TimbresControlador {
                             case 'F/A':
                                 obj.accion = 'Fin alimentación';
                                 break;
-                            case 'S/P':
+                            case 'I/P':
                                 obj.accion = 'Inicio permiso';
                                 break;
-                            case 'E/P':
+                            case 'F/P':
                                 obj.accion = 'Fin permiso';
                                 break;
                             case 'HA':
                                 obj.accion = 'Timbre libre';
                                 break;
                             default:
-                                obj.accion = 'codigo 99';
+                                obj.accion = 'Desconocido';
                                 break;
                         }
                         return obj;
@@ -482,17 +483,17 @@ class TimbresControlador {
                             case 'F/A':
                                 obj.accion = 'Fin alimentación';
                                 break;
-                            case 'S/P':
+                            case 'I/P':
                                 obj.accion = 'Inicio permiso';
                                 break;
-                            case 'E/P':
+                            case 'F/P':
                                 obj.accion = 'Fin permiso';
                                 break;
                             case 'HA':
                                 obj.accion = 'Timbre libre';
                                 break;
                             default:
-                                obj.accion = 'codigo 99';
+                                obj.accion = 'Desconocido';
                                 break;
                         }
                         return obj;

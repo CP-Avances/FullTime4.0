@@ -25,9 +25,10 @@ export class EditarTimbreComponent implements OnInit {
     { value: '1', item: 'S', text: 'Salida' },
     { value: '2', item: 'I/A', text: 'Inicio alimentación' },
     { value: '3', item: 'F/A', text: 'Fin alimentación' },
-    { value: '4', item: 'S/P', text: 'Inicio permiso' },
-    { value: '5', item: 'E/P', text: 'Fin permiso' },
+    { value: '4', item: 'I/P', text: 'Inicio permiso' },
+    { value: '5', item: 'F/P', text: 'Fin permiso' },
     { value: '7', item: 'HA', text: 'Timbre libre' },
+    { value: '99', item: 'D', text: 'Desconocido' },
   ]
 
   tecl_funcio: any = [
@@ -38,6 +39,7 @@ export class EditarTimbreComponent implements OnInit {
     { value: '4' },
     { value: '5' },
     { value: '7' },
+    { value: '99' },
   ]
 
   EditartimbreForm: FormGroup;

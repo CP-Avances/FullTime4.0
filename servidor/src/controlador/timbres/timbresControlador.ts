@@ -73,10 +73,10 @@ class TimbresControlador {
                                 case 'S': obj.accion = 'Salida'; break;
                                 case 'I/A': obj.accion = 'Inicio alimentación'; break;
                                 case 'F/A': obj.accion = 'Fin alimentación'; break;
-                                case 'S/P': obj.accion = 'Inicio permiso'; break;
-                                case 'E/P': obj.accion = 'Fin permiso'; break;
+                                case 'I/P': obj.accion = 'Inicio permiso'; break;
+                                case 'F/P': obj.accion = 'Fin permiso'; break;
                                 case 'HA': obj.accion = 'Timbre libre'; break;
-                                default: obj.accion = 'codigo 99'; break;
+                                default: obj.accion = 'Desconocido'; break;
                             }
                             return obj
                         })
@@ -236,6 +236,7 @@ class TimbresControlador {
             var ip_cliente = '';
             var requestIp = require('request-ip');
             var clientIp = requestIp.getClientIp(req);
+
             if (clientIp != null && clientIp != '' && clientIp != undefined) {
                 ip_cliente = clientIp.split(':')[3];
             }
@@ -243,6 +244,7 @@ class TimbresControlador {
             const { fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_reloj,
                 ubicacion } = req.body;
 
+            //console.log('ingresa informacion ', req.body)
             let f = new Date();
             const id_empleado = req.userIdEmpleado;
 
@@ -289,6 +291,7 @@ class TimbresControlador {
             var ip_cliente = '';
             var requestIp = require('request-ip');
             var clientIp = requestIp.getClientIp(req);
+
             if (clientIp != null && clientIp != '' && clientIp != undefined) {
                 ip_cliente = clientIp.split(':')[3];
             }
@@ -475,10 +478,10 @@ class TimbresControlador {
                             case 'S': obj.accion = 'Salida'; break;
                             case 'I/A': obj.accion = 'Inicio alimentación'; break;
                             case 'F/A': obj.accion = 'Fin alimentación'; break;
-                            case 'S/P': obj.accion = 'Inicio permiso'; break;
-                            case 'E/P': obj.accion = 'Fin permiso'; break;
+                            case 'I/P': obj.accion = 'Inicio permiso'; break;
+                            case 'F/P': obj.accion = 'Fin permiso'; break;
                             case 'HA': obj.accion = 'Timbre libre'; break;
-                            default: obj.accion = 'codigo 99'; break;
+                            default: obj.accion = 'Desconocido'; break;
                         }
                         return obj
                     })
@@ -509,10 +512,10 @@ class TimbresControlador {
                                 case 'S': obj.accion = 'Salida'; break;
                                 case 'I/A': obj.accion = 'Inicio alimentación'; break;
                                 case 'F/A': obj.accion = 'Fin alimentación'; break;
-                                case 'S/P': obj.accion = 'Inicio permiso'; break;
-                                case 'E/P': obj.accion = 'Fin permiso'; break;
+                                case 'I/P': obj.accion = 'Inicio permiso'; break;
+                                case 'F/P': obj.accion = 'Fin permiso'; break;
                                 case 'HA': obj.accion = 'Timbre libre'; break;
-                                default: obj.accion = 'codigo 99'; break;
+                                default: obj.accion = 'Desconocido'; break;
                             }
                             return obj
                         })

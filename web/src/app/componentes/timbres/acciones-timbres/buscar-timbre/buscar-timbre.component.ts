@@ -6,12 +6,12 @@ import { MatDialog } from '@angular/material/dialog';
 import moment from 'moment';
 
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
 import { EditarTimbreComponent } from '../editar-timbre/editar-timbre.component';
 import { VerTimbreComponent } from '../ver-timbre/ver-timbre.component';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 
 @Component({
   selector: 'app-buscar-timbre',
@@ -111,6 +111,7 @@ export class BuscarTimbreComponent implements OnInit {
     this.numero_pagina_e = e.pageIndex + 1;
   }
 
+  // METODO PARA BUSCAR TIMBRES
   BuscarTimbresFecha(form: any) {
     this.timbres = [];
 
@@ -133,6 +134,7 @@ export class BuscarTimbreComponent implements OnInit {
       }
 
       this.timbresServicio.ObtenerTimbresFechaEmple(datos).subscribe(timbres => {
+        //console.log('ver timbres ', timbres)
         this.timbres = timbres.timbres;
         this.timbres.forEach(data => {
           data.fecha = this.validar.FormatearFecha(data.fec_hora_timbre_servidor, this.formato_fecha, this.validar.dia_abreviado);
@@ -143,31 +145,30 @@ export class BuscarTimbreComponent implements OnInit {
 
       }, error => {
         //console.log('error: ', error);
-        return this.toastr.error(error.error.message, 'Notificacion', {
+        return this.toastr.error(error.error.message, 'Notificación', {
           timeOut: 6000,
         })
       })
     }
   }
 
+  // METODO PARA ABRIR VENTANA EDITAR TIMBRE
   AbrirVentanaEditar(timbre: any, form: any): void {
     this.ventana.open(EditarTimbreComponent,
       { width: '650px', data: { timbre: timbre } })
       .afterClosed().subscribe(item => {
-        if(item){
-          if (item === 2){
-            this.BuscarTimbresFecha(form); 
+        if (item) {
+          if (item === 2) {
+            this.BuscarTimbresFecha(form);
           }
         }
       });
   }
 
+  // METODO PARA VER LA INFORMACION DEL TIMBRE
   AbrirVentanaVerInfoTimbre(timbre: any): void {
     this.ventana.open(VerTimbreComponent,
       { width: '750px', data: { timbre: timbre } })
-      .afterClosed().subscribe(item => {
-
-      });
   }
 
   // METODO PARA LIMPIAR CAMPOS DE FORMULARIO

@@ -1,0 +1,58 @@
+<div class="container" style="padding-top: 15px">
+  <mat-card class="example-card mat-elevation-z8">
+    <div id="titulo">
+      <span>DETALLES DE EMPLEADOS ACTIVOS</span>
+      <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
+        matTooltip="Regresar">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+    </div>
+    <mat-card-content>
+      <div class="container" style="padding-bottom: 25px; text-align: center; margin-top: 0.5rem">
+        <div class="table-responsive">
+          <table class="table table-hover table-sm">
+            <thead class="thead-light">
+              <tr style="text-align: center">
+                <th scope="col" rowspan="2">N°</th>
+                <th scope="col" rowspan="2">CÓDIGO</th>
+                <th scope="col" rowspan="2">EMPLEADO</th>
+                <th scope="col" rowspan="2">CÉDULA</th>
+                <th scope="col" rowspan="2">RÉGIMEN</th>
+                <th scope="col" rowspan="2">SUCURSAL</th>
+                <th scope="col" rowspan="2">DEPARTAMENTO</th>
+                <th scope="col" rowspan="2">CARGO</th>
+                <th scope="col" colspan="2">CORREO</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let e of arr_emp | paginate : tamanio_pagina : numero_pagina">
+                <td>{{ e.n }}</td>
+                <td>{{ e.codigo }}</td>
+                <td>{{ e.name_empleado.toUpperCase() }}</td>
+                <td>{{ e.cedula }}</td>
+                <td>{{ bool_car? e.regimen : e.regimen[0].name_regimen }}</td>
+                <td>{{ e.sucursal }}</td>
+                <td>{{ e.departamento }}</td>
+                <td>{{ e.cargo }}</td>
+                <td>{{ e.correo }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <mat-paginator [length]="arr_emp.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
+          (page)="ManejarPagina($event)" showFirstLastButtons aria-label="Seleccionar pagina">
+        </mat-paginator>
+      </div>
+      <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 0.5rem">
+        <i id="pdf" class="fas fa-file-pdf icon" matSuffix matTooltipPosition="right"
+          matTooltip="Descargar reporte en formato PDF." (click)="descargarReporte('download')">
+          <p>PDF</p>
+        </i>
+        <i id="excel" class="fas fa-file-excel icon" matSuffix matTooltipPosition="right"
+          matTooltip="Descargar reporte en formato EXCEL." (click)="descargarReporte('excel')">
+          <p>XLSL</p>
+        </i>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

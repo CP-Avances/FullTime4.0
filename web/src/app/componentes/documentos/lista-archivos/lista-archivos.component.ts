@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { MatDialog } from '@angular/material/dialog';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 import { SubirDocumentoComponent } from '../subir-documento/subir-documento.component';
 
@@ -22,6 +23,18 @@ export class ListaArchivosComponent implements OnInit {
   listad: boolean = true;
   listap: boolean = false;
 
+  filtroDescripcion = '';
+
+  // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
+  nombreF = new FormControl('', [Validators.minLength(2)]);
+
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
+  public BuscarTipoPermisoForm = new FormGroup({
+    nombreForm: this.nombreF,
+  });
+
+
+  archivosFiltro: any;
   constructor(
     private rest: DocumentosService,
     private route: ActivatedRoute,
@@ -53,28 +66,38 @@ export class ListaArchivosComponent implements OnInit {
     if (this.Dirname === 'documentacion') {
       this.rest.ListarDocumentacion(nombre_carpeta).subscribe(res => {
         this.archivos = res
+        this.archivosFiltro = [...this.archivos];
+        console.log('archivosFiltro: ',this.archivosFiltro);
       })
     }
     else if (this.Dirname === 'contratos') {
       this.rest.ListarContratos(nombre_carpeta).subscribe(res => {
         this.archivos = res;
+        this.archivosFiltro = [...this.archivos];
+        console.log('archivosFiltro: ',this.archivosFiltro);
         console.log('contratos ', res)
       })
     }
     else if (this.Dirname === 'permisos') {
       this.rest.ListarPermisos(nombre_carpeta).subscribe(res => {
         this.archivos = res
+        this.archivosFiltro = [...this.archivos];
+        console.log('archivosFiltro: ',this.archivosFiltro);
         //console.log('permisos ', res)
       })
     }
     else if (this.Dirname === 'horarios') {
       this.rest.ListarHorarios(nombre_carpeta).subscribe(res => {
         this.archivos = res
+        this.archivosFiltro = [...this.archivos];
+        console.log('archivosFiltro: ',this.archivosFiltro);
       })
     }
     else {
       this.rest.ListarArchivosDeCarpeta(nombre_carpeta).subscribe(res => {
         this.archivos = res
+        this.archivosFiltro = [...this.archivos];
+        console.log('archivosFiltro: ',this.archivosFiltro);
       })
     }
   }
@@ -106,6 +129,8 @@ export class ListaArchivosComponent implements OnInit {
         this.MostrarArchivos();
         this.rest.ListarDocumentacion('documentacion').subscribe(res => {
           this.archivos = res
+          this.archivosFiltro = [...this.archivos];
+          console.log('archivosFiltro: ',this.archivosFiltro);
         })
       });
   }
@@ -118,6 +143,8 @@ export class ListaArchivosComponent implements OnInit {
     this.archivoi = nombre_carpeta;
     this.rest.ListarArchivosIndividuales(nombre_carpeta, tipo).subscribe(res => {
       this.archivos = res
+      this.archivosFiltro = [...this.archivos];
+      console.log('archivosFiltro: ',this.archivosFiltro);
     })
   }
 
@@ -125,6 +152,22 @@ export class ListaArchivosComponent implements OnInit {
     this.listap = false;
     this.listad = true;
     this.ObtenerArchivos(this.Dirname);
+  }
+
+
+  Filtrar(e: any, tipo: string){
+    console.log('e: ',e.target.value);
+    const query: string = e.target.value;
+    const filtro = this.archivos.filter((o:any) => {
+      console.log('o: ',o);
+      if(tipo == 'carpeta'){
+        return (o.indexOf(query) > -1);
+      }else{
+        return (o.nombre.indexOf(query) > -1);
+      }
+      
+    })
+    this.archivosFiltro = filtro;
   }
 
 }

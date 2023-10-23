@@ -347,6 +347,21 @@ class EmpresaControlador {
             }
         });
     }
+    ListarEmpresa(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const EMPRESA = yield database_1.default.query(`
+            SELECT id, nombre, ruc, direccion, telefono, correo,
+            representante, tipo_empresa, establecimiento, logo, color_p, color_s, num_partida, marca_agua,
+            correo_empresa FROM cg_empresa ORDER BY nombre ASC
+            `);
+            if (EMPRESA.rowCount > 0) {
+                return res.jsonp(EMPRESA.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            }
+        });
+    }
 }
 exports.EMPRESA_CONTROLADOR = new EmpresaControlador();
 exports.default = exports.EMPRESA_CONTROLADOR;

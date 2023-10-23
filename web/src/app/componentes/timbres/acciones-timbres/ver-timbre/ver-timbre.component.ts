@@ -23,9 +23,10 @@ export class VerTimbreComponent implements OnInit {
     { item: 'S', text: 'Salida' },
     { item: 'I/A', text: 'Inicio alimentación' },
     { item: 'F/A', text: 'Fin alimentación' },
-    { item: 'S/P', text: 'Inicio permiso' },
-    { item: 'E/P', text: 'Fin permiso' },
-    { item: 'HA', text: 'Timbre libre' }
+    { item: 'I/P', text: 'Inicio permiso' },
+    { item: 'F/P', text: 'Fin permiso' },
+    { item: 'HA', text: 'Timbre libre' },
+    { item: 'D', text: 'Desconocido' }
   ]
 
   rolEmpleado: any;
