@@ -1,24 +1,15 @@
-mat-form-field { padding: 10px 15px 0px 15px;}
-
-table { width: 100%; font-size: 14px;}
-
-tr { text-align: center; }
-
-td { padding-top: 10px; text-align: center; }
-
-
-#boton { background-color: rgb(80,87,97); color: white; margin-top: 10px;}
-
-.mat-radio-button ~ .mat-radio-button {
-    margin-left: 16px;
+table {
+    width: 100%;
+    font-size: 14px;
 }
 
-label{
-    font-size: 14px;
-    margin: 10px 0px 0px 0px;
-    font-style: normal;
-    font-weight: 500;
-    letter-spacing: 0.1px;
+tr {
+    text-align: center;
+}
+
+td {
+    padding-top: 10px;
+    text-align: center;
 }
 
 .ver {

@@ -1,84 +1,113 @@
-// IMPORTACION DE LIBRERIAS
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { Validators, FormControl, FormGroup } from '@angular/forms';
+import { PageEvent } from '@angular/material/paginator';
 import { MAT_MOMENT_DATE_FORMATS, MAT_MOMENT_DATE_ADAPTER_OPTIONS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
-import { Validators, FormControl, FormGroup } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
-import { Router } from '@angular/router';
-
-// LIBRERÍA FORMATO DE FECHAS
+// Librería para formato de fechas
 import * as moment from 'moment';
 moment.locale('es');
-
-// LIBRERÍA PARA GENERAR ARCHIVOS PDF
+// Librería para generar archivos PDF
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
-// LIBRERÍA PARA GENERAR ARCHIVOS EXCEL
+// Librería para generar archivos EXCEL
 import * as xlsx from 'xlsx';
-
-// IMPORTACION DE SERVICIOS
-import { AlimentacionService } from 'src/app/servicios/reportes/alimentacion/alimentacion.service';
+// Llamada de servicios Generales
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
+import { HorasExtrasRealesService } from 'src/app/servicios/reportes/horasExtrasReales/horas-extras-reales.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
+// Servicios Módulo de Alimentación
+import { AlimentacionService } from 'src/app/servicios/reportes/alimentacion/alimentacion.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { ValidacionesService } from '../../../../../servicios/validaciones/validaciones.service';
 
 @Component({
-  selector: 'app-alimentos-invitados',
-  templateUrl: './alimentos-invitados.component.html',
-  styleUrls: ['./alimentos-invitados.component.css'],
+  selector: 'app-alimentos-general',
+  templateUrl: './alimentos-general.component.html',
+  styleUrls: ['./alimentos-general.component.css'],
   providers: [
     { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
     { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
     { provide: MAT_DATE_LOCALE, useValue: 'es' },
+    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
   ]
 })
 
-export class AlimentosInvitadosComponent implements OnInit {
+export class AlimentosGeneralComponent implements OnInit {
 
-  // DATOS DE SERVICIOS DE INVITADOS
-  invitados: any = [];
+  // Datos del Empleado Timbre
+  empleado: any = [];
 
-  // DATOS DEL FORMULARIO DE PERIODO
-  fechaInicialF = new FormControl('', Validators.required);
-  fechaFinalF = new FormControl('', Validators.required);
+  // Arreglo datos del empleado
+  datosEmpleado: any = [];
 
-  // FORMULARIO DE PERIODO
+  // Datos del Formulario de BUSQUEDA
+  codigo = new FormControl('');
+  cedula = new FormControl('', [Validators.minLength(2)]);
+  nombre = new FormControl('', [Validators.minLength(2)]);
+  apellido = new FormControl('', [Validators.minLength(2)]);
+  departamentoF = new FormControl('', [Validators.minLength(2)]);
+  regimenF = new FormControl('', [Validators.minLength(2)]);
+  cargoF = new FormControl('', [Validators.minLength(2)]);
+
+  // Datos del Formulario de Periodo
+  fechaInicialF = new FormControl('', [Validators.required]);
+  fechaFinalF = new FormControl('', [Validators.required]);
+
+  // Formulario de Periodo
   public fechasForm = new FormGroup({
     inicioForm: this.fechaInicialF,
     finalForm: this.fechaFinalF,
   });
 
-  // DATOS DEL EMPLEADO LOGUEADO
+  // Datos de filtros de BUSQUEDA
+  filtroCodigo: number;
+  filtroCedula: '';
+  filtroNombre: '';
+  filtroApellido: '';
+  filtroDepartamento: '';
+  filtroRegimen: '';
+  filtroCargo: '';
+
+  // ITEMS DE PAGINACION DE LA TABLA
+  tamanio_pagina: number = 5;
+  numero_pagina: number = 1;
+  pageSizeOptions = [5, 10, 20, 50];
+
+  // Datos del empleado Logueado
   empleadoLogueado: any = [];
   idEmpleado: number;
 
   constructor(
-    public restA: AlimentacionService,
     public rest: EmpleadoService,
-    public validacionesService: ValidacionesService,
+    public restH: HorasExtrasRealesService,
     public restR: ReportesService,
     public restEmpre: EmpresaService,
+    public restD: DatosGeneralesService,
+    public restA: AlimentacionService,
     public router: Router,
     private toastr: ToastrService,
+    private validacionesService: ValidacionesService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
 
   ngOnInit(): void {
     this.ObtenerEmpleadoLogueado(this.idEmpleado);
+    this.VerDatosEmpleado();
     this.ObtenerLogo();
     this.ObtenerColores();
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO QUE INICIA SESIÓN
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
   ObtenerEmpleadoLogueado(idemploy: any) {
     this.empleadoLogueado = [];
     this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
       this.empleadoLogueado = data;
+      console.log('emple', this.empleadoLogueado)
     })
   }
 
@@ -90,7 +119,7 @@ export class AlimentosInvitadosComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES DE EMPRESA
+  // METODO para obtener colores de empresa
   p_color: any;
   s_color: any;
   empresa: any;
@@ -104,7 +133,26 @@ export class AlimentosInvitadosComponent implements OnInit {
     });
   }
 
-  // CONTROL PARA VERIFICAR INGRESO DE FECHAS
+  // EVENTO PARA MANEJAR LA PAGINACION
+  ManejarPagina(e: PageEvent) {
+    this.tamanio_pagina = e.pageSize;
+    this.numero_pagina = e.pageIndex + 1;
+  }
+
+  // Lista de datos de empleados
+  VerDatosEmpleado() {
+    this.datosEmpleado = [];
+    this.restD.ListarInformacionActual().subscribe(data => {
+      this.datosEmpleado = data;
+      console.log('datos_actuales', this.datosEmpleado)
+    });
+  }
+
+  // Control para verificar ingreso de fechas
+  timbres: any = [];
+  planificados: any = [];
+  solicitados: any = [];
+  extras: any = [];
   inicio: any;
   fin: any;
   VerFechas(form, archivo) {
@@ -115,21 +163,37 @@ export class AlimentosInvitadosComponent implements OnInit {
       }
       this.inicio = moment(form.inicioForm).format('YYYY-MM-DD');
       this.fin = moment(form.finalForm).format('YYYY-MM-DD');
-      this.invitados = [];
-      // BUSQUEDA DE DATOS DE SERVICIOS DE INVITADOS
-      this.restA.ObtenerDetallesInvitados(fechas).subscribe(plan => {
-        this.invitados = plan;
-        this.ImprimirArchivo(archivo, form);
-      }, err => {
-        // MENSAJE INDICANDO QUE NO EXISTEN REGISTROS
-        this.toastr.info('No existen registros en el periodo indicado.', 'Dar click aquí, para obtener reporte, en el que se indica que no existen registros.', {
-          timeOut: 10000,
-        }).onTap.subscribe(obj => {
-          // LLAMADO A METODO DE IMPRESIÓN DE ARCHIVO SIN REGISTROS
-          this.generarPdf('open');
-          this.LimpiarFechas();
+      console.log('fechas', moment(this.inicio).format('YYYY-MM-DD'), this.fin)
+      // Limpiar array de datos
+      this.planificados = [];
+      this.solicitados = [];
+      this.extras = [];
+      // 1. Buscamos registros de servicios planificados
+      this.restA.ObtenerPlanificadosConsumidos(fechas).subscribe(plan => {
+        this.planificados = plan;
+        // 2. Buscamos registros de servicios solicitados
+        this.restA.ObtenerSolicitadosConsumidos(fechas).subscribe(sol => {
+          this.solicitados = sol;
+          // 3. METODO de BUSQUEDA de registros de servicios extras 
+          this.ObtenerExtrasConsumidos(fechas, archivo, form);
+        }, err => {
+          // 4. METODO de BUSQUEDA de registros de servicios extras 
+          this.ObtenerExtrasConsumidos(fechas, archivo, form);
+          return this.validacionesService.RedireccionarHomeAdmin(err.error) 
         });
-       // return this.validacionesService.RedireccionarHomeAdmin(err.error)
+      }, err => {
+        // 5. Buscamos registros de servicios solicitados
+        this.restA.ObtenerSolicitadosConsumidos(fechas).subscribe(sol => {
+          this.solicitados = sol;
+          // 6. METODO de BUSQUEDA de registros de servicios extras 
+          this.ObtenerExtrasConsumidos(fechas, archivo, form);
+        }, err => {
+          // 7. METODO de BUSQUEDA de registros de servicios extras 
+          this.ObtenerExtrasConsumidos(fechas, archivo, form);
+          return this.validacionesService.RedireccionarHomeAdmin(err.error) 
+        });
+        
+        return this.validacionesService.RedireccionarHomeAdmin(err.error) 
       });
     }
     else {
@@ -137,6 +201,54 @@ export class AlimentosInvitadosComponent implements OnInit {
         timeOut: 6000,
       });
     }
+  }
+
+  // METODO de BUSQUEDA de registros de servicios extras
+  ObtenerExtrasConsumidos(fecha, archivo, form) {
+    // 1. BUSQUEDA de servicios extras planificados
+    this.restA.ObtenerExtrasPlanConsumidos(fecha).subscribe(plan => {
+      this.extras = plan;
+      console.log('comidas 1', this.extras);
+      // 2. BUSQUEDA de servicios extras solicitados
+      this.restA.ObtenerExtrasSolConsumidos(fecha).subscribe(sol => {
+        this.extras = this.extras.concat(sol);
+        console.log('comidas 2', this.extras);
+        // Llamado a METODO de impresión de archivos
+        this.ImprimirArchivo(archivo, form);
+      }, err => {
+        // Llamado a METODO de impresión de archivos
+        this.ImprimirArchivo(archivo, form);
+        return this.validacionesService.RedireccionarHomeAdmin(err.error) 
+      });
+    }, err => {
+      // 3. BUSQUEDA de servicios extras solicitados
+      this.restA.ObtenerExtrasSolConsumidos(fecha).subscribe(sol2 => {
+        this.extras = sol2;
+        console.log('comidas 3', this.extras);
+        // Llamado a METODO de impresión de archivos
+        this.ImprimirArchivo(archivo, form);
+      }, err => {
+        // Revisamos si todos los datos son vacios
+        if (this.planificados.length === 0 && this.solicitados.length === 0 && this.extras.length === 0) {
+          // Mensaje indicando que no existen registros
+          this.toastr.info('No existen registros en el periodo indicado.', 'Dar click aquí, para obtener reporte, en el que se indica que no existen registros.', {
+            timeOut: 10000,
+          }).onTap.subscribe(obj => {
+            // Llamado a METODO de impresión de archivo sin registros
+            this.generarPdf('open');
+            this.LimpiarFechas();
+          });
+        }
+        else {
+          // Llamado a METODO de impresión de archivos
+          this.ImprimirArchivo(archivo, form);
+        }
+
+        return this.validacionesService.RedireccionarHomeAdmin(err.error) 
+      });
+
+      return this.validacionesService.RedireccionarHomeAdmin(err.error) 
+    });
   }
 
   ImprimirArchivo(archivo: string, form) {
@@ -150,6 +262,24 @@ export class AlimentosInvitadosComponent implements OnInit {
     }
   }
 
+  IngresarSoloLetras(e) {
+    return this.validacionesService.IngresarSoloLetras(e) 
+  }
+
+  IngresarSoloNumeros(evt) {
+    return this.validacionesService.IngresarSoloNumeros(evt)
+  }
+
+  LimpiarCampos() {
+    this.codigo.reset();
+    this.cedula.reset();
+    this.nombre.reset();
+    this.apellido.reset();
+    this.departamentoF.reset();
+    this.regimenF.reset();
+    this.cargoF.reset();
+  }
+
   LimpiarFechas() {
     this.fechaInicialF.reset();
     this.fechaFinalF.reset();
@@ -160,8 +290,8 @@ export class AlimentosInvitadosComponent implements OnInit {
    * ****************************************************************************************************/
 
   generarPdf(action = 'open') {
-    if (this.invitados.length === 0) {
-      const documentDefinition_ = this.GenerarSinRegistros();
+    if (this.planificados.length === 0 && this.solicitados.length === 0 && this.extras.length === 0) {
+      const documentDefinition_ = this.GenerarSinRegstros();
       switch (action) {
         case 'open': pdfMake.createPdf(documentDefinition_).open(); break;
         case 'print': pdfMake.createPdf(documentDefinition_).print(); break;
@@ -183,23 +313,34 @@ export class AlimentosInvitadosComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
+
     sessionStorage.setItem('Administrador', this.empleadoLogueado);
+
     return {
+
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
+
       // PIE DE LA PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
+        var h = new Date();
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        // Formato de hora actual
+        if (h.getMinutes() < 10) {
+          var time = h.getHours() + ':0' + h.getMinutes();
+        }
+        else {
+          var time = h.getHours() + ':' + h.getMinutes();
+        }
         return {
           margin: 10,
           columns: [
             {
               text: [{
-                text: 'Fecha: ' + fecha + ' Hora: ' + hora,
+                text: 'Fecha: ' + fecha + ' Hora: ' + time,
                 alignment: 'left', opacity: 0.3
               }]
             },
@@ -213,14 +354,21 @@ export class AlimentosInvitadosComponent implements OnInit {
       },
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-
         { text: this.empresa.toUpperCase(), bold: true, fontSize: 25, alignment: 'center', margin: [0, -30, 0, 5] },
-        { text: 'REPORTE SERVICIOS INVITADOS', fontSize: 17, alignment: 'center', margin: [0, 0, 0, 5] },
+        { text: 'REPORTE ALIMENTOS CONSUMIDOS', fontSize: 17, alignment: 'center', margin: [0, 0, 0, 5] },
         this.presentarEncabezado('TOTAL DE ALIMENTOS PLANIFICADOS CONSUMIDOS'),
-        this.presentarAlimentacion(this.invitados),
-        this.presentarTotales(this.invitados),
+        this.presentarAlimentacion(this.planificados),
+        this.presentarTotales(this.planificados),
         this.presentarEspacio(),
-        this.presentarSumatoriaTotal(this.invitados),
+        this.presentarEncabezado('TOTAL DE ALIMENTOS SOLICITADOS CONSUMIDOS'),
+        this.presentarAlimentacion(this.solicitados),
+        this.presentarTotales(this.solicitados),
+        this.presentarEspacio(),
+        this.presentarEncabezado('TOTAL DE ALIMENTOS EXTRAS CONSUMIDOS'),
+        this.presentarAlimentacion(this.extras),
+        this.presentarTotales(this.extras),
+        this.presentarEspacio_(),
+        this.presentarSumatoriaTotal(this.planificados, this.solicitados, this.extras),
       ],
       styles: {
         tableHeader: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color },
@@ -264,6 +412,19 @@ export class AlimentosInvitadosComponent implements OnInit {
       table: {
         widths: ['*'],
         body: [
+          [{ text: '', style: 'ver', margin: [0, 10, 0, 10] },],
+        ]
+      },
+      layout:
+        'noBorders'
+    }
+  }
+
+  presentarEspacio_() {
+    return {
+      table: {
+        widths: ['*'],
+        body: [
           [{ text: '', style: 'ver', margin: [0, 5, 0, 5] },],
         ]
       },
@@ -281,11 +442,11 @@ export class AlimentosInvitadosComponent implements OnInit {
     })
     return {
       table: {
-        widths: ['*', '*', '*', '*', '*', '*', '*', '*', '*', '*'],
+        widths: ['*', '*', '*', '*', '*', '*', '*'],
         body: [
           [
-            { colSpan: 7, text: 'TOTAL: ', style: 'itemsTableT', fillColor: this.s_color },
-            '', '', '', '', '', '',
+            { colSpan: 4, text: 'TOTAL: ', style: 'itemsTableT', fillColor: this.s_color },
+            '', '', '',
             { text: t_cantida, style: 'itemsTableT', fillColor: this.s_color },
             { text: '$ ' + t_costo.toFixed(2), style: 'itemsTableT', fillColor: this.s_color },
             { text: '$ ' + t_total.toFixed(2), style: 'itemsTableT', fillColor: this.s_color },
@@ -307,22 +468,30 @@ export class AlimentosInvitadosComponent implements OnInit {
     }
   }
 
-  presentarSumatoriaTotal(arreglo1: any) {
+  presentarSumatoriaTotal(arreglo1: any, arreglo2: any, arreglo3: any) {
     var t_total1 = 0;
+    var t_total2 = 0;
+    var t_total3 = 0;
     var suma_total = 0;
     arreglo1.forEach(obj1 => {
       t_total1 = t_total1 + parseFloat(obj1.total)
     })
-    suma_total = t_total1
+    arreglo2.forEach(obj2 => {
+      t_total2 = t_total2 + parseFloat(obj2.total)
+    })
+    arreglo3.forEach(obj3 => {
+      t_total3 = t_total3 + parseFloat(obj3.total)
+    })
+    suma_total = t_total1 + t_total2 + t_total3;
+    console.log('totales', t_total1, ' ', t_total2, ' ', t_total3, ' ', suma_total)
     return {
       table: {
-        widths: ['*', '*', '*', '*', '*', '*', '*', '*', '*', '*'],
+        widths: ['*', '*', '*', '*', '*', '*', '*'],
         body: [
           [
-            { colSpan: 8, text: 'SUMATORIA TOTAL DE ALIMENTOS CONSUMIDOS: ', style: 'itemsTableT', fillColor: this.s_color, fontSize: 12 },
-            '', '', '', '', '', '', '',
-            { colSpan: 2, text: '$ ' + suma_total.toFixed(2), style: 'itemsTableT', fillColor: this.s_color, fontSize: 11 },
-            '',
+            { colSpan: 6, text: 'SUMATORIA TOTAL DE ALIMENTOS CONSUMIDOS: ', style: 'itemsTableT', fillColor: this.s_color, fontSize: 12 },
+            '', '', '', '', '',
+            { text: '$ ' + suma_total.toFixed(2), style: 'itemsTableT', fillColor: this.s_color, fontSize: 12 }
           ]
         ]
       },
@@ -346,12 +515,9 @@ export class AlimentosInvitadosComponent implements OnInit {
   presentarAlimentacion(arreglo: any) {
     return {
       table: {
-        widths: ['*', '*', '*', '*', '*', '*', 'auto', '*', '*', '*'],
+        widths: ['*', '*', '*', 'auto', '*', '*', '*'],
         body: [
           [
-            { text: 'TICKET', style: 'centrado' },
-            { text: 'INVITADO', style: 'centrado' },
-            { text: 'CÉDULA', style: 'centrado' },
             { text: 'TIPO COMIDA', style: 'centrado' },
             { text: 'MENÚ', style: 'centrado' },
             { text: 'PLATO', style: 'centrado' },
@@ -362,9 +528,6 @@ export class AlimentosInvitadosComponent implements OnInit {
           ],
           ...arreglo.map(obj => {
             return [
-              { text: obj.ticket, style: 'itemsTableD' },
-              { text: obj.apellido_invitado + ' ' + obj.nombre_invitado, style: 'itemsTableD' },
-              { text: obj.cedula_invitado, style: 'itemsTableD' },
               { text: obj.comida_tipo, style: 'itemsTableD' },
               { text: obj.menu, style: 'itemsTableD' },
               { text: obj.plato, style: 'itemsTableD' },
@@ -386,10 +549,14 @@ export class AlimentosInvitadosComponent implements OnInit {
   }
 
   /** GENERACIÓN DE PDF AL NO CONTAR CON REGISTROS */
-  GenerarSinRegistros() {
+  GenerarSinRegstros() {
+
     sessionStorage.setItem('Administrador', this.empleadoLogueado);
+
     return {
+
       // ENCABEZADO DE LA PAGINA
+      //pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
@@ -398,13 +565,19 @@ export class AlimentosInvitadosComponent implements OnInit {
         var h = new Date();
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
-        hora = f.format('HH:mm:ss');
+        // Formato de hora actual
+        if (h.getMinutes() < 10) {
+          var time = h.getHours() + ':0' + h.getMinutes();
+        }
+        else {
+          var time = h.getHours() + ':' + h.getMinutes();
+        }
         return {
           margin: 10,
           columns: [
             {
               text: [{
-                text: 'Fecha: ' + fecha + ' Hora: ' + hora,
+                text: 'Fecha: ' + fecha + ' Hora: ' + time,
                 alignment: 'left', opacity: 0.3
               }]
             },
@@ -418,8 +591,8 @@ export class AlimentosInvitadosComponent implements OnInit {
       },
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
-        { text: this.empresa.toUpperCase(), bold: true, fontSize: 25, alignment: 'center', margin: [0, 20, 0, 5] },
-        { text: 'REPORTE ALIMENTOS INVITADOS', fontSize: 17, alignment: 'center', margin: [0, 0, 0, 5] },
+        { text: this.empresa.toUpperCase(), bold: true, fontSize: 25, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'REPORTE ALIMENTOS CONSUMIDOS', fontSize: 17, alignment: 'center', margin: [0, 0, 0, 5] },
         this.presentarEspacio(),
         {
           text: [{ text: 'FECHA INICIO: ' + this.inicio, alignment: 'center', margin: [0, 0, 0, 5] },
@@ -432,16 +605,13 @@ export class AlimentosInvitadosComponent implements OnInit {
   }
 
   /****************************************************************************************************** 
-     *                                       METODO PARA EXPORTAR A EXCEL
-     ******************************************************************************************************/
+    *                                       METODO PARA EXPORTAR A EXCEL
+    ******************************************************************************************************/
   exportToExcelAlimentacion(form: any) {
     var j = 0;
-    const wsp: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.invitados.map(obj => {
+    const wsp: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificados.map(obj => {
       return {
         N_REGISTROS: j = j + 1,
-        TICKET: obj.ticket,
-        CEDULA: obj.cedula_invitado,
-        INVITADO: obj.apellido_invitado + ' ' + obj.nombre_invitado,
         TIPO_COMIDA: obj.comida_tipo,
         MENU: obj.menu,
         PLATO: obj.plato,
@@ -451,18 +621,68 @@ export class AlimentosInvitadosComponent implements OnInit {
         COSTO_TOTAL: obj.total,
       }
     }));
-    if (this.invitados.length != 0) {
-      const header = Object.keys(this.invitados[0]); // COLUMNS NAME
+    if (this.planificados.length != 0) {
+      const header = Object.keys(this.planificados[0]); // columns name
       var wscols : any = [];
-      for (var i = 0; i < header.length; i++) {  // COLUMNS LENGTH ADDED
+      for (var i = 0; i < header.length; i++) {  // columns length added
         wscols.push({ wpx: 110 })
       }
       wsp["!cols"] = wscols;
     }
 
+    var i = 0;
+    const wss: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.solicitados.map(obj => {
+      return {
+        N_REGISTROS: i = i + 1,
+        TIPO_COMIDA: obj.comida_tipo,
+        MENU: obj.menu,
+        PLATO: obj.plato,
+        DESCRIPCION: obj.observacion,
+        CANTIDAD: parseInt(obj.cantidad),
+        COSTO: obj.valor,
+        COSTO_TOTAL: obj.total,
+      }
+    }));
+    if (this.solicitados.length != 0) {
+      const header2 = Object.keys(this.solicitados[0]); // columns name
+      var wscols2 : any = [];
+      for (var i = 0; i < header2.length; i++) {  // columns length added
+        wscols2.push({ wpx: 110 })
+      }
+      wss["!cols"] = wscols2;
+    }
+
+    var k = 0;
+    const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.extras.map(obj => {
+      return {
+        N_REGISTROS: k = k + 1,
+        TIPO_COMIDA: obj.comida_tipo,
+        MENU: obj.menu,
+        PLATO: obj.plato,
+        DESCRIPCION: obj.observacion,
+        CANTIDAD: parseInt(obj.cantidad),
+        COSTO: obj.valor,
+        COSTO_TOTAL: obj.total,
+      }
+    }));
+    if (this.extras.length != 0) {
+      const header3 = Object.keys(this.extras[0]); // columns name
+      var wscols3 : any = [];
+      for (var i = 0; i < header3.length; i++) {  // columns length added
+        wscols3.push({ wpx: 110 })
+      }
+      wse["!cols"] = wscols3;
+    }
+
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    if (this.invitados.length != 0) {
-      xlsx.utils.book_append_sheet(wb, wsp, 'Alimentos Invitados');
+    if (this.planificados.length != 0) {
+      xlsx.utils.book_append_sheet(wb, wsp, 'Alimentos Planificados');
+    }
+    if (this.solicitados.length != 0) {
+      xlsx.utils.book_append_sheet(wb, wss, 'Alimentos Solicitados');
+    }
+    if (this.extras.length != 0) {
+      xlsx.utils.book_append_sheet(wb, wse, 'Alimentos Extras');
     }
     xlsx.writeFile(wb, "Alimentacion - " + String(moment(form.inicioForm, "YYYY/MM/DD").format("DD/MM/YYYY")) + ' - ' + String(moment(form.finalForm, "YYYY/MM/DD").format("DD/MM/YYYY")) + '.xlsx');
   }

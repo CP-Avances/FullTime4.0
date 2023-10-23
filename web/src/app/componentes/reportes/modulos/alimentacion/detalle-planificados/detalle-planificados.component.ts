@@ -14,20 +14,19 @@ import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 // Librería para generar archivos EXCEL
 import * as xlsx from 'xlsx';
-// Llamada de servicios Generales
+
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { HorasExtrasRealesService } from 'src/app/servicios/reportes/horasExtrasReales/horas-extras-reales.service';
+import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-// Servicios Módulo de Alimentación
 import { AlimentacionService } from 'src/app/servicios/reportes/alimentacion/alimentacion.service';
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
+import { ValidacionesService } from '../../../../../servicios/validaciones/validaciones.service';
 
 @Component({
-  selector: 'app-alimentos-general',
-  templateUrl: './alimentos-general.component.html',
-  styleUrls: ['./alimentos-general.component.css'],
+  selector: 'app-detalle-planificados',
+  templateUrl: './detalle-planificados.component.html',
+  styleUrls: ['./detalle-planificados.component.css'],
   providers: [
     { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
     { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
@@ -36,7 +35,7 @@ import { ValidacionesService } from '../../../../servicios/validaciones/validaci
   ]
 })
 
-export class AlimentosGeneralComponent implements OnInit {
+export class DetallePlanificadosComponent implements OnInit {
 
   // Datos del Empleado Timbre
   empleado: any = [];
@@ -169,31 +168,31 @@ export class AlimentosGeneralComponent implements OnInit {
       this.solicitados = [];
       this.extras = [];
       // 1. Buscamos registros de servicios planificados
-      this.restA.ObtenerPlanificadosConsumidos(fechas).subscribe(plan => {
+      this.restA.ObtenerDetallesPlanificadosConsumidos(fechas).subscribe(plan => {
         this.planificados = plan;
         // 2. Buscamos registros de servicios solicitados
-        this.restA.ObtenerSolicitadosConsumidos(fechas).subscribe(sol => {
+        this.restA.ObtenerDetallesSolicitadosConsumidos(fechas).subscribe(sol => {
           this.solicitados = sol;
           // 3. METODO de BUSQUEDA de registros de servicios extras 
           this.ObtenerExtrasConsumidos(fechas, archivo, form);
         }, err => {
           // 4. METODO de BUSQUEDA de registros de servicios extras 
           this.ObtenerExtrasConsumidos(fechas, archivo, form);
-          return this.validacionesService.RedireccionarHomeAdmin(err.error) 
+          return this.validacionesService.RedireccionarHomeAdmin(err.error)
         });
       }, err => {
         // 5. Buscamos registros de servicios solicitados
-        this.restA.ObtenerSolicitadosConsumidos(fechas).subscribe(sol => {
+        this.restA.ObtenerDetallesSolicitadosConsumidos(fechas).subscribe(sol => {
           this.solicitados = sol;
           // 6. METODO de BUSQUEDA de registros de servicios extras 
           this.ObtenerExtrasConsumidos(fechas, archivo, form);
         }, err => {
           // 7. METODO de BUSQUEDA de registros de servicios extras 
           this.ObtenerExtrasConsumidos(fechas, archivo, form);
-          return this.validacionesService.RedireccionarHomeAdmin(err.error) 
+          return this.validacionesService.RedireccionarHomeAdmin(err.error)
         });
-        
-        return this.validacionesService.RedireccionarHomeAdmin(err.error) 
+
+        return this.validacionesService.RedireccionarHomeAdmin(err.error)
       });
     }
     else {
@@ -206,11 +205,11 @@ export class AlimentosGeneralComponent implements OnInit {
   // METODO de BUSQUEDA de registros de servicios extras
   ObtenerExtrasConsumidos(fecha, archivo, form) {
     // 1. BUSQUEDA de servicios extras planificados
-    this.restA.ObtenerExtrasPlanConsumidos(fecha).subscribe(plan => {
+    this.restA.ObtenerDetallesExtrasPlanConsumidos(fecha).subscribe(plan => {
       this.extras = plan;
       console.log('comidas 1', this.extras);
       // 2. BUSQUEDA de servicios extras solicitados
-      this.restA.ObtenerExtrasSolConsumidos(fecha).subscribe(sol => {
+      this.restA.ObtenerDetallesExtrasSolConsumidos(fecha).subscribe(sol => {
         this.extras = this.extras.concat(sol);
         console.log('comidas 2', this.extras);
         // Llamado a METODO de impresión de archivos
@@ -218,11 +217,11 @@ export class AlimentosGeneralComponent implements OnInit {
       }, err => {
         // Llamado a METODO de impresión de archivos
         this.ImprimirArchivo(archivo, form);
-        return this.validacionesService.RedireccionarHomeAdmin(err.error) 
+        return this.validacionesService.RedireccionarHomeAdmin(err.error)
       });
     }, err => {
       // 3. BUSQUEDA de servicios extras solicitados
-      this.restA.ObtenerExtrasSolConsumidos(fecha).subscribe(sol2 => {
+      this.restA.ObtenerDetallesExtrasSolConsumidos(fecha).subscribe(sol2 => {
         this.extras = sol2;
         console.log('comidas 3', this.extras);
         // Llamado a METODO de impresión de archivos
@@ -243,11 +242,11 @@ export class AlimentosGeneralComponent implements OnInit {
           // Llamado a METODO de impresión de archivos
           this.ImprimirArchivo(archivo, form);
         }
-
-        return this.validacionesService.RedireccionarHomeAdmin(err.error) 
+        
+        return this.validacionesService.RedireccionarHomeAdmin(err.error)
       });
 
-      return this.validacionesService.RedireccionarHomeAdmin(err.error) 
+      return this.validacionesService.RedireccionarHomeAdmin(err.error)
     });
   }
 
@@ -263,11 +262,44 @@ export class AlimentosGeneralComponent implements OnInit {
   }
 
   IngresarSoloLetras(e) {
-    return this.validacionesService.IngresarSoloLetras(e) 
+    let key = e.keyCode || e.which;
+    let tecla = String.fromCharCode(key).toString();
+    //Se define todo el abecedario que se va a usar.
+    let letras = " áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
+    //Es la validación del KeyCodes, que teclas recibe el campo de texto.
+    let especiales = [8, 37, 39, 46, 6, 13];
+    let tecla_especial = false
+    for (var i in especiales) {
+      if (key == especiales[i]) {
+        tecla_especial = true;
+        break;
+      }
+    }
+    if (letras.indexOf(tecla) == -1 && !tecla_especial) {
+      this.toastr.info('No se admite datos numéricos', 'Usar solo letras', {
+        timeOut: 6000,
+      })
+      return false;
+    }
   }
 
   IngresarSoloNumeros(evt) {
-    return this.validacionesService.IngresarSoloNumeros(evt)
+    if (window.event) {
+      var keynum = evt.keyCode;
+    }
+    else {
+      keynum = evt.which;
+    }
+    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
+    if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6) {
+      return true;
+    }
+    else {
+      this.toastr.info('No se admite el ingreso de letras', 'Usar solo números', {
+        timeOut: 6000,
+      })
+      return false;
+    }
   }
 
   LimpiarCampos() {
@@ -313,16 +345,12 @@ export class AlimentosGeneralComponent implements OnInit {
   }
 
   getDocumentDefinicion() {
-
     sessionStorage.setItem('Administrador', this.empleadoLogueado);
-
     return {
-
       // ENCABEZADO DE LA PAGINA
       pageOrientation: 'landscape',
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + this.empleadoLogueado[0].nombre + ' ' + this.empleadoLogueado[0].apellido, margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
-
       // PIE DE LA PAGINA
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var h = new Date();
@@ -354,6 +382,7 @@ export class AlimentosGeneralComponent implements OnInit {
       },
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
+
         { text: this.empresa.toUpperCase(), bold: true, fontSize: 25, alignment: 'center', margin: [0, -30, 0, 5] },
         { text: 'REPORTE ALIMENTOS CONSUMIDOS', fontSize: 17, alignment: 'center', margin: [0, 0, 0, 5] },
         this.presentarEncabezado('TOTAL DE ALIMENTOS PLANIFICADOS CONSUMIDOS'),
@@ -367,7 +396,7 @@ export class AlimentosGeneralComponent implements OnInit {
         this.presentarEncabezado('TOTAL DE ALIMENTOS EXTRAS CONSUMIDOS'),
         this.presentarAlimentacion(this.extras),
         this.presentarTotales(this.extras),
-        this.presentarEspacio_(),
+        this.presentarEspacio(),
         this.presentarSumatoriaTotal(this.planificados, this.solicitados, this.extras),
       ],
       styles: {
@@ -412,19 +441,6 @@ export class AlimentosGeneralComponent implements OnInit {
       table: {
         widths: ['*'],
         body: [
-          [{ text: '', style: 'ver', margin: [0, 10, 0, 10] },],
-        ]
-      },
-      layout:
-        'noBorders'
-    }
-  }
-
-  presentarEspacio_() {
-    return {
-      table: {
-        widths: ['*'],
-        body: [
           [{ text: '', style: 'ver', margin: [0, 5, 0, 5] },],
         ]
       },
@@ -442,11 +458,11 @@ export class AlimentosGeneralComponent implements OnInit {
     })
     return {
       table: {
-        widths: ['*', '*', '*', '*', '*', '*', '*'],
+        widths: ['*', '*', '*', '*', '*', '*', '*', '*', '*', '*'],
         body: [
           [
-            { colSpan: 4, text: 'TOTAL: ', style: 'itemsTableT', fillColor: this.s_color },
-            '', '', '',
+            { colSpan: 7, text: 'TOTAL: ', style: 'itemsTableT', fillColor: this.s_color },
+            '', '', '', '', '', '',
             { text: t_cantida, style: 'itemsTableT', fillColor: this.s_color },
             { text: '$ ' + t_costo.toFixed(2), style: 'itemsTableT', fillColor: this.s_color },
             { text: '$ ' + t_total.toFixed(2), style: 'itemsTableT', fillColor: this.s_color },
@@ -486,12 +502,13 @@ export class AlimentosGeneralComponent implements OnInit {
     console.log('totales', t_total1, ' ', t_total2, ' ', t_total3, ' ', suma_total)
     return {
       table: {
-        widths: ['*', '*', '*', '*', '*', '*', '*'],
+        widths: ['*', '*', '*', '*', '*', '*', '*', '*', '*', '*'],
         body: [
           [
-            { colSpan: 6, text: 'SUMATORIA TOTAL DE ALIMENTOS CONSUMIDOS: ', style: 'itemsTableT', fillColor: this.s_color, fontSize: 12 },
-            '', '', '', '', '',
-            { text: '$ ' + suma_total.toFixed(2), style: 'itemsTableT', fillColor: this.s_color, fontSize: 12 }
+            { colSpan: 8, text: 'SUMATORIA TOTAL DE ALIMENTOS CONSUMIDOS: ', style: 'itemsTableT', fillColor: this.s_color, fontSize: 12 },
+            '', '', '', '', '', '', '',
+            { colSpan: 2, text: '$ ' + suma_total.toFixed(2), style: 'itemsTableT', fillColor: this.s_color, fontSize: 11 },
+            '',
           ]
         ]
       },
@@ -515,9 +532,12 @@ export class AlimentosGeneralComponent implements OnInit {
   presentarAlimentacion(arreglo: any) {
     return {
       table: {
-        widths: ['*', '*', '*', 'auto', '*', '*', '*'],
+        widths: ['*', '*', '*', '*', '*', '*', 'auto', '*', '*', '*'],
         body: [
           [
+            { text: 'TICKET', style: 'centrado' },
+            { text: 'EMPLEADO', style: 'centrado' },
+            { text: 'CÉDULA', style: 'centrado' },
             { text: 'TIPO COMIDA', style: 'centrado' },
             { text: 'MENÚ', style: 'centrado' },
             { text: 'PLATO', style: 'centrado' },
@@ -528,6 +548,9 @@ export class AlimentosGeneralComponent implements OnInit {
           ],
           ...arreglo.map(obj => {
             return [
+              { text: '', style: 'itemsTableD' },
+              { text: obj.apellido + ' ' + obj.nombre, style: 'itemsTableD' },
+              { text: obj.cedula, style: 'itemsTableD' },
               { text: obj.comida_tipo, style: 'itemsTableD' },
               { text: obj.menu, style: 'itemsTableD' },
               { text: obj.plato, style: 'itemsTableD' },
@@ -605,13 +628,16 @@ export class AlimentosGeneralComponent implements OnInit {
   }
 
   /****************************************************************************************************** 
-    *                                       METODO PARA EXPORTAR A EXCEL
-    ******************************************************************************************************/
+     *                                       METODO PARA EXPORTAR A EXCEL
+     ******************************************************************************************************/
   exportToExcelAlimentacion(form: any) {
     var j = 0;
     const wsp: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.planificados.map(obj => {
       return {
         N_REGISTROS: j = j + 1,
+        TICKET: '',
+        CEDULA: obj.cedula,
+        EMPLEADO: obj.apellido + ' ' + obj.nombre,
         TIPO_COMIDA: obj.comida_tipo,
         MENU: obj.menu,
         PLATO: obj.plato,
@@ -634,6 +660,9 @@ export class AlimentosGeneralComponent implements OnInit {
     const wss: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.solicitados.map(obj => {
       return {
         N_REGISTROS: i = i + 1,
+        TICKET: '',
+        CEDULA: obj.cedula,
+        EMPLEADO: obj.apellido + ' ' + obj.nombre,
         TIPO_COMIDA: obj.comida_tipo,
         MENU: obj.menu,
         PLATO: obj.plato,
@@ -656,6 +685,9 @@ export class AlimentosGeneralComponent implements OnInit {
     const wse: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.extras.map(obj => {
       return {
         N_REGISTROS: k = k + 1,
+        TICKET: '',
+        CEDULA: obj.cedula,
+        EMPLEADO: obj.apellido + ' ' + obj.nombre,
         TIPO_COMIDA: obj.comida_tipo,
         MENU: obj.menu,
         PLATO: obj.plato,

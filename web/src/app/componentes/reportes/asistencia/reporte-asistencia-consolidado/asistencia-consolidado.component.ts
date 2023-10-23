@@ -11,18 +11,18 @@ import * as moment from 'moment';
 import * as xlsx from 'xlsx';
 
 // IMPORTAR SERVICIOS
-import { PlantillaReportesService } from '../plantilla-reportes.service';
+import { PlantillaReportesService } from '../../plantilla-reportes.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { KardexService } from 'src/app/servicios/reportes/kardex.service';
 
 // IMPORTAR COMPONENTES
-import { ConfigAsistenciaComponent } from '../configuracion-reportes/config-report-asistencia/config-asistencia.component';
+import { ConfigAsistenciaComponent } from '../../configuracion-reportes/config-report-asistencia/config-asistencia.component';
 import { EmpleadoElemento } from 'src/app/model/empleado.model';
 import { SelectionModel } from '@angular/cdk/collections';
 
 // IMPORTAR MODELOS
-import { IReporteAsistenciaConsolidada, IRestAsisteConsoli, IRestTotalAsisteConsoli } from '../../../model/reportes.model'
+import { IReporteAsistenciaConsolidada, IRestAsisteConsoli, IRestTotalAsisteConsoli } from '../../../../model/reportes.model'
 
 @Component({
   selector: 'app-asistencia-consolidado',

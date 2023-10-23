@@ -9,8 +9,8 @@ import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfigReportFirmasHorasExtrasComponent } from '../../configuracion-reportes/config-report-firmas-horas-extras/config-report-firmas-horas-extras.component';
-import { PlantillaReportesService } from '../../plantilla-reportes.service';
+import { ConfigReportFirmasHorasExtrasComponent } from '../../../configuracion-reportes/config-report-firmas-horas-extras/config-report-firmas-horas-extras.component';
+import { PlantillaReportesService } from '../../../plantilla-reportes.service';
 
 @Component({
   selector: 'app-reporte-horas-extras',

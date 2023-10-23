@@ -1,8 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { PageEvent } from '@angular/material/paginator';
-import { ToastrService} from 'ngx-toastr';
-import { ITableEmpleados, IReportePuntualidad, model_pdf_puntualidad } from 'src/app/model/reportes.model';
+import { ToastrService } from 'ngx-toastr';
+import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
@@ -10,15 +9,17 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { IReporteHorasTrabaja } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
-import { ReportesService } from '../../../servicios/reportes/reportes.service';
+import { ReportesService } from '../../../../servicios/reportes/reportes.service';
+import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
 
 @Component({
-  selector: 'app-reporte-puntualidad',
-  templateUrl: './reporte-puntualidad.component.html',
-  styleUrls: ['./reporte-puntualidad.component.css']
+  selector: 'app-reporte-horas-trabajadas',
+  templateUrl: './reporte-horas-trabajadas.component.html',
+  styleUrls: ['./reporte-horas-trabajadas.component.css']
 })
-export class ReportePuntualidadComponent implements OnInit, OnDestroy {
+export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
 
   get rangoFechas () { return this.reporteService.rangoFechas; }
 
@@ -26,17 +27,11 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
 
   get bool() { return this.reporteService.criteriosBusqueda; }
   
-  public ParametrosForm = new FormGroup({
-    menor: new FormControl('', Validators.required),
-    intermedio: new FormControl(''),
-    mayor: new FormControl('', Validators.required)
-  })
-  
   respuesta: any [];
   sucursales: any = [];
   departamentos: any = [];
   empleados: any = [];
-  
+
   data_pdf: any = [];
 
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
@@ -47,7 +42,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
-
+  
   get filtroNombreSuc() { return this.reporteService.filtroNombreSuc }
   
   get filtroNombreDep() { return this.reporteService.filtroNombreDep }
@@ -59,6 +54,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
   constructor(
     private toastr: ToastrService,
     private reporteService: ReportesService,
+    private validacionService: ValidacionesService,
     private R_asistencias: ReportesAsistenciasService,
     private restEmpre: EmpresaService
   ) { 
@@ -67,9 +63,9 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    sessionStorage.removeItem('reporte_puntualidad');
+    sessionStorage.removeItem('reporte_horas_trab');
     this.R_asistencias.DatosGeneralesUsuarios().subscribe((res: any[]) => {
-      sessionStorage.setItem('reporte_puntualidad', JSON.stringify(res))
+      sessionStorage.setItem('reporte_horas_trab', JSON.stringify(res))
       this.sucursales = res.map(obj => {
         return {
           id: obj.id_suc,
@@ -114,17 +110,6 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     this.empleados = [];
   }
 
-  parametrizacion: any = '';
-  onSubmitParametros(){
-    this.parametrizacion = this.ParametrosForm.value; 
-    // console.log(this.ParametrosForm.value);
-    this.toastr.success('Parametros Guardados')
-  }
-
-  /**
-   * Funciones para validar los campos y las fechas de rangos del reporte
-   */
-
   /**
    * VALIDACIONES REPORT
    */
@@ -132,8 +117,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
 
     if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de busqueda') 
     if (this.bool.bool_suc === false && this.bool.bool_dep === false && this.bool.bool_emp === false) return this.toastr.error('Seleccione un criterio de búsqueda') 
-    if (this.parametrizacion === '') return this.toastr.error('Ingrese rango de semaforización para generar Reporte','Falta Semaforización') 
-    
+
     switch (this.opcion) {
       case 's':
         if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione sucursal')
@@ -148,14 +132,14 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
         this.ModelarEmpleados(action);
       break;
       default:
-        this.bool.bool_suc = false; this.bool.bool_dep = false; this.bool.bool_emp = false;
+        this.reporteService.DefaultFormCriterios()
         break;
     }
   }
 
   ModelarSucursal(accion) {
 
-    let respuesta = JSON.parse(sessionStorage.getItem('reporte_puntualidad') as any)
+    let respuesta = JSON.parse(sessionStorage.getItem('reporte_horas_trab') as any)
 
     let suc = respuesta.filter(o => {
       var bool =  this.selectionSuc.selected.find(obj1 => {
@@ -165,8 +149,8 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     })
 
     console.log('SUCURSAL', suc);
-    this.data_pdf = [];
-    this.R_asistencias.ReportePuntualidadMultiple(suc, this.rangoFechas.fec_inico, this.rangoFechas.fec_final, this.parametrizacion).subscribe(res => {
+    this.data_pdf = []
+    this.R_asistencias.ReporteHorasTrabajadasMultiple(suc, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       console.log(this.data_pdf);
       switch (accion) {
@@ -180,7 +164,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
 
   ModelarDepartamento(accion) {
     
-    let respuesta = JSON.parse(sessionStorage.getItem('reporte_puntualidad') as any)
+    let respuesta = JSON.parse(sessionStorage.getItem('reporte_horas_trab') as any)
 
     respuesta.forEach((obj: any) => {
       obj.departamentos =  obj.departamentos.filter(o => {
@@ -194,9 +178,8 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
       return obj.departamentos.length > 0
     });
     console.log('DEPARTAMENTOS', dep);
-    this.data_pdf = [];
-
-    this.R_asistencias.ReportePuntualidadMultiple(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final, this.parametrizacion).subscribe(res => {
+    this.data_pdf = []
+    this.R_asistencias.ReporteHorasTrabajadasMultiple(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       console.log(this.data_pdf);
       switch (accion) {
@@ -210,7 +193,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
 
   ModelarEmpleados(accion) {
 
-    let respuesta = JSON.parse(sessionStorage.getItem('reporte_puntualidad') as any)
+    let respuesta = JSON.parse(sessionStorage.getItem('reporte_horas_trab') as any)
 
     respuesta.forEach((obj: any) => {
       obj.departamentos.forEach(element => {
@@ -233,8 +216,8 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     });
     
     console.log('EMPLEADOS', emp);
-    this.data_pdf = [];
-    this.R_asistencias.ReportePuntualidadMultiple(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final, this.parametrizacion).subscribe(res => {
+    this.data_pdf = []
+    this.R_asistencias.ReporteHorasTrabajadasMultiple(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       console.log(this.data_pdf);
       switch (accion) {
@@ -281,7 +264,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
   generarPdf(action) {
     const documentDefinition = this.getDocumentDefinicion();
     var f = new Date()
-    let doc_name = "Reporte puntualidad" + f.toLocaleString() + ".pdf";
+    let doc_name = "Reporte horas trabajadas" + f.toLocaleString() + ".pdf";
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -294,7 +277,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
   getDocumentDefinicion() {
     return {
       pageSize: 'A4',
-      pageOrientation: 'landscape',
+      pageOrientation: 'portrait',
       pageMargins: [ 40, 60, 40, 40 ],
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + localStorage.getItem('fullname_print'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
@@ -306,36 +289,59 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
         h.setUTCHours(h.getHours());
         var time = h.toJSON().split("T")[1].split(".")[0];
         
-        return {
-          margin: 10,
-          columns: [
-            { text: 'Fecha: ' + fecha + ' Hora: ' + time, opacity: 0.3 },
-            { text: [
-                {
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
-                  alignment: 'right', opacity: 0.3
-                }
-              ],
+        return [
+          {
+            table: {
+              widths: ['auto','auto','auto','auto','auto','auto'],
+              body: [
+                [
+                  { text: 'EoS: ', bold: true, border: [false, false, false, false], style: ['quote', 'small'] },
+                  { text: 'Entrada o Salida.', border: [false, false, false, false], style: ['quote', 'small'] },
+                  { text: 'AES: ', bold: true, border: [false, false, false, false], style: ['quote', 'small'] },
+                  { text: 'Entrada o Salida de almuerzo.', border: [false, false, false, false], style: ['quote', 'small'] },
+                  { text: 'PES: ', bold: true, border: [false, false, false, false], style: ['quote', 'small'] },
+                  { text: 'Entrada o Salida de permisos.', border: [false, false, false, false], style: ['quote', 'small'] }
+                ]
+              ]
             }
-          ],
-          fontSize: 10
-        }
+          },
+          {
+            margin: 10,
+            columns: [
+              { text: 'Fecha: ' + fecha + ' Hora: ' + time, opacity: 0.3 },
+              { text: [
+                  {
+                    text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
+                    alignment: 'right', opacity: 0.3
+                  }
+                ],
+              }
+            ],
+            fontSize: 10
+          }
+        ]
       },
-      //  | 
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
-        { text: localStorage.getItem('name_empresa'), bold: true, fontSize: 21, alignment: 'center', margin: [0, -40, 0, 10] },
-        { text: 'Reporte de Empleados Puntuales', bold: true, fontSize: 13, alignment: 'center', margin: [0, 0, 0, 10] },
-        { text: 'Periodo del: ' + this.rangoFechas.fec_inico  + " al " + this.rangoFechas.fec_final , bold: true, fontSize: 13, alignment: 'center' },
+        { text: localStorage.getItem('name_empresa'), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
+        { text: 'Horas Registradas Según Timbres', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 10] },
+        { text: 'Periodo del: ' + this.rangoFechas.fec_inico + " al " + this.rangoFechas.fec_final, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 10]  },
+        { text: 'Nota: El siguiente reporte muestra el horario de los empleados y sus timbres realizados. Estos timbres no refieren a horas suplementarias ni horas extras autorizadas.' , bold: true, fontSize: 7 },
         ...this.impresionDatosPDF(this.data_pdf).map(obj => {
           return obj
         })
       ],
       styles: {
+        tableTotal: { fontSize: 13, bold: true, alignment: 'center', fillColor: this.s_color},
         tableHeader: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color },
         itemsTable: { fontSize: 10 },
+        itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
+        itemsTableInfoBlanco: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.p_color},
         itemsTableCentrado: { fontSize: 10, alignment: 'center' },
-        tableMarginDep: { margin: [0, 10, 0, 0] },
+        subtitulos: { fontSize: 16, alignment: 'center', margin: [0, 5, 0, 10] },
+        tableMargin: { margin: [0, 0, 0, 20] },
+        tableMarginCabecera: { margin: [0, 10, 0, 0] },
+        CabeceraTabla: { fontSize: 12, alignment: 'center', margin: [0, 8, 0, 8], fillColor: this.p_color },
         quote: { margin: [5, -2, 0, -2], italics: true },
         small: { fontSize: 8, color: 'blue', opacity: 0.5 }
       }
@@ -345,149 +351,153 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
   impresionDatosPDF(data: any []): Array<any>{    
     let n: any = []
     let c = 0;
-    let arr_aux: Array<model_pdf_puntualidad> = [];
-    let cont_color_verde = 0;
-    let cont_color_naranja = 0;
-    let cont_color_rojo = 0;
 
-    data.forEach((obj: IReportePuntualidad) => {
-      obj.departamentos.forEach(obj1 => {
-        obj1.empleado.forEach(obj2 => {
-          let e = {
-            cargo: obj2.cargo,
-            cedula: obj2.cedula,
-            ciudad: obj.ciudad,
-            codigo: obj2.codigo,
-            color: obj2.color,
-            contrato: obj2.contrato,
-            name_dep: obj1.name_dep,
-            name_empleado: obj2.name_empleado,
-            puntualidad: obj2.puntualidad
-          } as model_pdf_puntualidad;
-          
-          console.log(e);
-          if (e.color === '#06F313') {
-            cont_color_verde = cont_color_verde + 1;
-          } else if (e.color === '#EC2E05') {
-            cont_color_rojo = cont_color_rojo + 1;
-          } else if (e.color === '#F38306') {
-            cont_color_naranja = cont_color_naranja + 1;
-          }
-          
-          arr_aux.push(e);
-        });
-      });
-    })
-
-    n.push({
-      style: 'tableMarginDep',
-      table: {
-        widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
-        body: [
-          [
-            { text: 'N°', style: 'tableHeader'},
-            { text: 'Empleado', style: 'tableHeader'},
-            { text: 'Cédula', style: 'tableHeader'},
-            { text: 'Código', style: 'tableHeader'},
-            { text: 'Ciudad', style: 'tableHeader'},
-            { text: 'Departamento', style: 'tableHeader'},
-            { text: 'Cargo', style: 'tableHeader'},
-            { text: 'Contrato', style: 'tableHeader'},
-            { text: 'Color', style: 'tableHeader'},
-            { text: 'Días Puntuales', style: 'tableHeader'}
-          ],
-          ...arr_aux.map(obj => {
-            c = c + 1
-            return [
-              { style: 'itemsTableCentrado', text: c },
-              { style: 'itemsTable', text: obj.name_empleado },
-              { style: 'itemsTableCentrado', text: obj.cedula },
-              { style: 'itemsTableCentrado', text: obj.codigo },
-              { style: 'itemsTableCentrado', text: obj.ciudad },
-              { style: 'itemsTable', text: obj.name_dep },
-              { style: 'itemsTable', text: obj.cargo },
-              { style: 'itemsTable', text: obj.contrato},
-              { style: 'itemsTableCentrado', text: '', fillColor: obj.color },
-              { style: 'itemsTableCentrado', text: obj.puntualidad }
-            ]
-          })
-        ]
-      }
-    });
-
-    n.push({
-      columns: [
-				{ width: 'auto',
-          bold: true, fontSize: 8, margin: [0, 5, 2, 5],
-          text: 'Color Verde:', color: '#06F313'
-        },
-				{ 
-          bold: true, fontSize: 8, margin: [0, 5, 0, 5],
-          text: 'Mayor o igual a ' + this.parametrizacion.mayor +' días significa que el o los empleados con esta cantidad de días son muy putuales.' 
-        }
-			]
-    })
-    n.push({ 
-      columns: [
-				{ width: 'auto',
-          bold: true, fontSize: 8, margin: [0, 5, 2, 5],
-          text: 'Color Naranja:', color: '#F38306'
-        },
-				{ 
-          bold: true, fontSize: 8, margin: [0, 5, 0, 5],
-          text: ' Días entre ' + this.parametrizacion.mayor + ' y ' +  this.parametrizacion.menor +' son empleados que tienen un margen de puntualidad aceptable' 
-        }
-			]
-    })
-    n.push({ 
-      columns: [
-				{ width: 'auto',
-          bold: true, fontSize: 8, margin: [0, 5, 2, 5],
-          text: 'Color Rojo:', color: '#EC2E05'
-        },
-				{ 
-          bold: true, fontSize: 8, margin: [0, 5, 0, 5],
-          text: 'Menor o igual a ' + this.parametrizacion.menor + ' días significa que el o los empleados con esta cantidad de días tienen más atrasos laborales que días puntuales.'
-        }
-			]
-    })
-
-    n.push({ 
-      columns: [
-				{ width: 250, text: '' },
-        {
-          style: 'tableMarginDep',
+    data.forEach((obj: IReporteHorasTrabaja) => {
+      
+      if (this.bool.bool_dep === true || this.bool.bool_suc === true) {
+        n.push({
           table: {
-            widths: [30, 'auto', 'auto'],
+            widths: ['*', '*'],
             body: [
               [
-                { text: 'Color', style: 'tableHeader'},
-                { text: 'Parámetro', style: 'tableHeader'},
-                { text: 'Cantidad Colaboradores', style: 'tableHeader'}
-              ],
-              [ // parametro verde
-                { text: '', fillColor: '#06F313'},
-                { text: '>= ' + this.parametrizacion.mayor, style: 'itemsTableCentrado'},
-                { text: cont_color_verde, style: 'itemsTableCentrado'}
-              ],
-              [ // parametro naranja
-                { text: '', fillColor: '#F38306'},
-                { text: 'Entre ' + this.parametrizacion.mayor + ' días y ' + this.parametrizacion.menor + ' días.', style: 'itemsTableCentrado'},
-                { text: cont_color_naranja, style: 'itemsTableCentrado'}
-              ],
-              [ // parametro rojo
-                { text: '', fillColor: '#EC2E05'},
-                { text: '<= ' + this.parametrizacion.menor, style: 'itemsTableCentrado'},
-                { text: cont_color_rojo, style: 'itemsTableCentrado'}
+                {
+                  border: [true, true, false, true],
+                  bold: true,
+                  text: 'CIUDAD: ' + obj.ciudad,
+                  style: 'itemsTableInfo'
+                },
+                {
+                  border: [false, true, true, true],
+                  text: 'SUCURSAL: ' + obj.name_suc,
+                  style: 'itemsTableInfo'
+                }
               ]
             ]
           }
-        },
-				{ width: 250, text: '' }
-			]
+        })
+      }
+
+      obj.departamentos.forEach(obj1 => {
+
+        // LA CABECERA CUANDO SE GENERA EL PDF POR DEPARTAMENTOS
+        if (this.bool.bool_dep === true) {
+          let arr_reg = obj1.empleado.map((o: any) => { return o.timbres.length})
+          let reg = this.SumarRegistros(arr_reg);
+          n.push({
+            style: 'tableMarginCabecera',
+            table: {
+              widths: ['*','*'],
+              body: [
+                [
+                  {
+                    border: [true, true, false, true],
+                    text: 'DEPARTAMENTO: ' + obj1.name_dep,
+                    style: 'itemsTableInfoBlanco'
+                  },
+                  {
+                    border: [true, false, true, true],
+                    text: 'N° REGISTROS: ' + reg,
+                    style: 'itemsTableInfoBlanco'
+                  }
+                ]
+              ]
+            }
+          })
+        }
+
+        obj1.empleado.forEach((obj2: any) => {
+
+          n.push({
+            style: 'tableMarginCabecera',
+            table: {
+              widths: ['*', 'auto', 'auto'],
+              body: [
+                [
+                  {
+                    border: [true, true, false, false],
+                    text: 'EMPLEADO: ' + obj2.name_empleado,
+                    style: 'itemsTableInfoBlanco'
+                  },
+                  {
+                    border: [false, true, false, false],
+                    text: 'C.C.: ' + obj2.cedula,
+                    style: 'itemsTableInfoBlanco'
+                  },
+                  {
+                    border: [false, true, true, false],
+                    text: 'COD: ' + obj2.codigo,
+                    style: 'itemsTableInfoBlanco'
+                  }
+                ]
+              ]
+            }
+          });
+
+          obj2.timbres.forEach((obj3) => {
+            let item_color_total = (obj3.total_diferencia.includes('-')) ? 'red':'black';
+
+            n.push({
+              style: 'tableMargin',
+              table: {
+                widths: ['auto', '*', '*', '*', '*', '*'],
+                body: [
+                  [
+                    { colSpan: 6, text: 'FECHA: ' + obj3.fecha },
+                    '', '', '', '',''
+                  ],                  
+                  [
+                    { text: 'N°', style: 'tableHeader' },
+                    { text: 'Observación', style: 'tableHeader' },
+                    { text: 'Acción', style: 'tableHeader' },
+                    { text: 'Horario Trabajo', style: 'tableHeader' },
+                    { text: 'Timbre', style: 'tableHeader' },
+                    { text: 'Diferencia', style: 'tableHeader' },
+                  ],                  
+                  ...obj3.horarios.map(obj4 => {
+                    let item_color = (obj4.hora_diferencia.includes('-')) ? 'red':'black';
+                    c = c + 1
+                    return [
+                      { style: 'itemsTableCentrado', text: c },
+                      { style: 'itemsTable', text: obj4.observacion },
+                      { style: 'itemsTableCentrado', text: obj4.accion },
+                      { style: 'itemsTableCentrado', text: obj4.hora_horario },
+                      { style: 'itemsTableCentrado', text: obj4.hora_timbre },
+                      { style: 'itemsTableCentrado', text: obj4.hora_diferencia, color: item_color},
+                    ]
+                  }),
+                  [
+                    { colSpan: 3, text: 'TOTAL', style: 'tableTotal' },
+                    '', '',
+                    { text: obj3.total_horario, bold: true, alignment: 'center' },
+                    { text: obj3.total_timbres, bold: true, alignment: 'center' },
+                    { text: obj3.total_diferencia, bold: true, alignment: 'center', color: item_color_total},
+                  ]
+                ]
+              },
+              layout: {
+                fillColor: function (rowIndex) {
+                  return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+                }
+              }
+            });
+
+          })
+
+        });
+
+      });
+
     });
-   
+    
     return n
+  }
+  
+  SumarRegistros(array: any []) {
+    let valor = 0;
+    for (let i = 0; i < array.length; i++) {
+        valor = valor + array[i];
+    }
+    return valor
   }
 
   /** ************************************************************************************************** ** 
@@ -497,29 +507,33 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
 
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefault(this.data_pdf));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'Puntualidad');
-    xlsx.writeFile(wb, "Puntualidad " + new Date().getTime() + '.xlsx');
+    xlsx.utils.book_append_sheet(wb, wsr, 'Horas Trabajadas');
+    xlsx.writeFile(wb, "Horas Trabajadas" + new Date().getTime() + '.xlsx');
     
   }
 
   MapingDataPdfDefault(array: Array<any>) {
     let nuevo: Array<any> = [];
-    array.forEach((obj1: IReportePuntualidad) => {
+    array.forEach((obj1:IReporteHorasTrabaja ) => {
       obj1.departamentos.forEach(obj2 => {
-        obj2.empleado.forEach(obj3 => {
-          let ele = {
-            'Id Sucursal': obj1.id_suc, 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc, 
-            'Id Departamento': obj2.id_depa, 'Departamento': obj2.name_dep,
-            'Id Empleado': obj3.id, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
-            'Género': obj3.genero, 'Contrato': obj3.contrato, 'Cargo': obj3.cargo, 'Puntualidad': obj3.puntualidad
-          }
-          nuevo.push(ele)
+        obj2.empleado.forEach((obj3: any) => {
+          obj3.timbres.forEach((obj4) => {
+            obj4.horarios.forEach(obj5 => {
+              let ele = {
+                'Id Sucursal': obj1.id_suc, 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc, 
+                'Id Departamento': obj2.id_depa, 'Departamento': obj2.name_dep,
+                'Id Empleado': obj3.id, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
+                'Género': obj3.genero, 'Fecha': obj4.fecha, 'Hora Horario': obj5.hora_horario, 'Hora Timbre': obj5.hora_timbre, 
+                'Observación': obj5.observacion, 'Acción': obj5.accion, 'Diferencia': obj5.hora_diferencia,
+              }
+              nuevo.push(ele)
+            })
+          })
         })
       })
     })
     return nuevo
   }
-
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc() {
@@ -589,49 +603,17 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     this.numero_pagina = e.pageIndex + 1;
   }
 
+
   /**
    * METODOS PARA CONTROLAR INGRESO DE LETRAS
    */
 
   IngresarSoloLetras(e) {
-    let key = e.keyCode || e.which;
-    let tecla = String.fromCharCode(key).toString();
-    //Se define todo el abecedario que se va a usar.
-    let letras = " áéíóúabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
-    //Es la validación del KeyCodes, que teclas recibe el campo de texto.
-    let especiales = [8, 37, 39, 46, 6, 13];
-    let tecla_especial = false
-    for (var i in especiales) {
-      if (key == especiales[i]) {
-        tecla_especial = true;
-        break;
-      }
-    }
-    if (letras.indexOf(tecla) == -1 && !tecla_especial) {
-      this.toastr.info('No se admite datos numéricos', 'Usar solo letras', {
-        timeOut: 6000,
-      })
-      return false;
-    }
+    return this.validacionService.IngresarSoloLetras(e);
   }
 
   IngresarSoloNumeros(evt) {
-    if (window.event) {
-      var keynum = evt.keyCode;
-    }
-    else {
-      keynum = evt.which;
-    }
-    // COMPROBAMOS SI SE ENCUENTRA EN EL RANGO NUMERICO Y QUE TECLAS NO RECIBIRA.
-    if ((keynum > 47 && keynum < 58) || keynum == 8 || keynum == 13 || keynum == 6) {
-      return true;
-    }
-    else {
-      this.toastr.info('No se admite el ingreso de letras', 'Usar solo números', {
-        timeOut: 6000,
-      })
-      return false;
-    }
+    return this.validacionService.IngresarSoloNumeros(evt)
   }
 
   MostrarLista() {
@@ -640,7 +622,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
       this.Filtrar('', 1)*/
     }
     else if (this.opcion === 'd') {
-     /* this.nombre_dep.reset();
+      /*this.nombre_dep.reset();
       this.Filtrar('', 2)*/
     }
     else if (this.opcion === 'e') {

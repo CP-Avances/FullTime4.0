@@ -1,5 +1,5 @@
 // IMPORTAR LIBRERIAS
-import { ITableEmpleados, ReporteHoraExtra, hora } from 'src/app/model/reportes.model';
+import { ITableEmpleados, ReporteVacacion, vacacion, vacuna } from 'src/app/model/reportes.model';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { PageEvent } from '@angular/material/paginator';
@@ -12,18 +12,17 @@ import * as xlsx from 'xlsx';
 
 // IMPORTAR SERVICIOS
 import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
-import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
+import { ValidacionesService } from '../../../../../servicios/validaciones/validaciones.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { VacacionesService } from 'src/app/servicios/vacaciones/vacaciones.service';
-import { PedHoraExtraService } from 'src/app/servicios/horaExtra/ped-hora-extra.service';
 
 @Component({
-  selector: 'app-horas-planificadas',
-  templateUrl: './horas-planificadas.component.html',
-  styleUrls: ['./horas-planificadas.component.css']
+  selector: 'app-solicitud-vacacion',
+  templateUrl: './solicitud-vacacion.component.html',
+  styleUrls: ['./solicitud-vacacion.component.css']
 })
-export class HorasPlanificadasComponent implements OnInit, OnDestroy {
+export class SolicitudVacacionComponent implements OnInit, OnDestroy {
 
   // CRITERIOS DE BUSQUEDA POR FECHAS
   get rangoFechas() { return this.reporteService.rangoFechas };
@@ -79,7 +78,7 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
     private validacionService: ValidacionesService, // VARIABLE DE VALIDACIONES DE INGRESO DE LETRAS O NÚMEROS
     private reporteService: ReportesService, // SERVICIO DATOS DE BUSQUEDA GENERALES DE REPORTE
     private restEmpre: EmpresaService, // SERVICIO DATOS GENERALES DE EMPRESA
-    private R_hora: PedHoraExtraService, // SERVICIO DATOS PARA REPORTE DE VACACIONES
+    private R_vacacion: VacacionesService, // SERVICIO DATOS PARA REPORTE DE VACUNAS
     private toastr: ToastrService, // VARIABLE DE MANEJO DE NOTIFICACIONES
   ) {
     this.ObtenerLogo();
@@ -172,7 +171,7 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
       return bool != undefined
     })
     this.data_pdf = []
-    this.R_hora.BuscarHorasPlanificadas(suc, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.R_vacacion.BuscarSolicitudVacacion(suc, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
@@ -198,7 +197,7 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
       return obj.departamentos.length > 0
     });
     this.data_pdf = []
-    this.R_hora.BuscarHorasPlanificadas(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.R_vacacion.BuscarSolicitudVacacion(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
@@ -231,7 +230,7 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
       return obj.departamentos.length > 0
     });
     this.data_pdf = []
-    this.R_hora.BuscarHorasPlanificadas(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.R_vacacion.BuscarSolicitudVacacion(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
@@ -341,7 +340,9 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
     let n: any = []
     let c = 0;
 
-    data.forEach((obj: ReporteHoraExtra) => {
+    var reviso: string = '';
+
+    data.forEach((obj: ReporteVacacion) => {
 
       if (this.bool.bool_suc === true || this.bool.bool_dep === true) {
         n.push({
@@ -370,7 +371,7 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
 
         // LA CABECERA CUANDO SE GENERA EL PDF POR DEPARTAMENTOS
         if (this.bool.bool_dep === true) {
-          let arr_reg = obj1.empleado.map((o: any) => { return o.horaE.length })
+          let arr_reg = obj1.empleado.map((o: any) => { return o.vacaciones.length })
           let reg = this.SumarRegistros(arr_reg);
           n.push({
             style: 'tableMarginCabecera',
@@ -432,10 +433,13 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
                   { text: 'Fecha Inicio', style: 'tableHeader' },
                   { text: 'Fecha Final', style: 'tableHeader' },
                   { text: 'Fecha Ingreso', style: 'tableHeader' },
-                  { text: 'Aprobado', style: 'tableHeader' },
+                  { text: 'Revisado por', style: 'tableHeader' },
                   { text: 'Estado', style: 'tableHeader' },
                 ],
-                ...obj2.horaE.map(obj3 => {
+                ...obj2.vacaciones.map(obj3 => {
+                  if (obj3.estado === 'Autorizado') {
+                    reviso = 'Luis Altamirano Taco'
+                  }
                   c = c + 1
                   return [
                     { style: 'itemsTableCentrado', text: c },
@@ -443,8 +447,8 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
                     { style: 'itemsTable', text: obj3.fec_inicio.split('T')[0] },
                     { style: 'itemsTable', text: obj3.fec_final.split('T')[0] },
                     { style: 'itemsTable', text: obj3.fec_ingreso.split('T')[0] },
-                    { style: 'itemsTable', text: 'Jose Luis Altamirano Taco' },
-                    { style: 'itemsTable', text: 'Autorizado' },
+                    { style: 'itemsTable', text: reviso },
+                    { style: 'itemsTable', text: obj3.estado },
                   ]
                 })
 
@@ -487,19 +491,19 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
 
   MapingDataPdfDefault(array: Array<any>) {
     let nuevo: Array<any> = [];
-    array.forEach((obj1: ReporteHoraExtra) => {
+    array.forEach((obj1: ReporteVacacion) => {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
-          obj3.horaE.forEach((obj4: hora) => {
-            /* let ele = {
-               'Id Sucursal': obj1.id_suc, 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
-               'Id Departamento': obj2.id_depa, 'Departamento': obj2.name_dep,
-               'Id Empleado': obj3.id, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
-               'Descripcion': 'Vacaciones', 'fec_inicio': obj4.fec_inicio.split('T')[0], 'fec_final': obj4.fec_final.split('T')[0],
-               'fec_ingreso': obj4.fec_ingreso.split('T')[0], 'Aprobacion': 'Jose Luis Altamirano Taco',
-               'Estado': 'Autorizado'
-             }*/
-            // nuevo.push(ele)
+          obj3.vacaciones.forEach((obj4: vacacion) => {
+            let ele = {
+              'Id Sucursal': obj1.id_suc, 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
+              'Id Departamento': obj2.id_depa, 'Departamento': obj2.name_dep,
+              'Id Empleado': obj3.id, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
+              'Descripcion': 'Vacaciones', 'fec_inicio': obj4.fec_inicio.split('T')[0], 'fec_final': obj4.fec_final.split('T')[0],
+              'fec_ingreso': obj4.fec_ingreso.split('T')[0], 'Aprobacion': 'Jose Luis Altamirano Taco',
+              'Estado': 'Autorizado'
+            }
+            nuevo.push(ele)
           })
         })
       })
@@ -615,4 +619,5 @@ export class HorasPlanificadasComponent implements OnInit, OnDestroy {
       this.Filtrar('', 5)*/
     }
   }
+
 }

@@ -37,11 +37,9 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
 
 
   departamentos: any = [];
-  incompletos: any = [];
   sucursales: any = [];
   empleados: any = [];
   respuesta: any = [];
-  tabulado: any = [];
   regimen: any = [];
   timbres: any = [];
   cargos: any = [];
@@ -234,61 +232,56 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
             });
           });
         });
-      },
-      (err) => {
-        this.toastr.error(err.error.message);
-      }
-    );
+      });
   }
 
   ngOnDestroy() {
-    this.respuesta = [];
-    this.sucursales = [];
     this.departamentos = [];
+    this.sucursales = [];
+    this.respuesta = [];
+    this.empleados = [];
     this.regimen = [];
     this.timbres = [];
     this.cargos = [];
-    this.empleados = [];
-    this.tabulado = [];
-    this.incompletos = [];
   }
 
   // VALIDACIONES DE OPCIONES DE REPORTE
   validacionReporte(action: any) {
-    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de busqueda');
+    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de búsqueda.');
     if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
-      && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda')
+      && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.')
     //console.log('opcion:', this.opcion);
     //console.log('ver rol -----------------------***********', localStorage.getItem('rol'))
     switch (this.opcion) {
       case 's':
-        if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione sucursal')
+        if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione sucursal.')
         this.ModelarSucursal(action);
         break;
       case 'r':
-        if (this.selectionReg.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione régimen')
+        if (this.selectionReg.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione régimen.')
         this.ModelarRegimen(action);
         break;
       case 'd':
-        if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione departamentos')
+        if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione departamentos.')
         this.ModelarDepartamento(action);
         break;
       case 'c':
-        if (this.selectionCar.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione cargos')
+        if (this.selectionCar.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione cargos.')
         this.ModelarCargo(action);
         break;
       case 'e':
-        if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione empleados')
+        if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione empleados.')
         this.ModelarEmpleados(action);
         break;
       default:
-        this.toastr.error('Algo a pasado', 'Seleccione criterio de busqueda')
+        this.toastr.error('Ups !!! algo salio mal.', 'Seleccione criterio de búsqueda.')
         this.reporteService.DefaultFormCriterios()
         break;
     }
   }
 
-  ModelarSucursal(accion) {
+  // TRATAMIENTO DE DATOS POR SUCURSAL
+  ModelarSucursal(accion: any) {
     this.tipo = 'default';
     let respuesta = JSON.parse(this.origen)
 
@@ -314,7 +307,8 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     })
   }
 
-  ModelarRegimen(accion) {
+  // TRATAMIENTO DE DATOS POR REGIMEN
+  ModelarRegimen(accion: any) {
     this.tipo = 'RegimenCargo';
     let respuesta = JSON.parse(this.origen);
     let empleados: any = [];
@@ -357,7 +351,8 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     })
   }
 
-  ModelarDepartamento(accion) {
+  // TRATAMIENTO DE DATOS POR DEPARTAMENTO
+  ModelarDepartamento(accion: any) {
     this.tipo = 'default';
     let respuesta = JSON.parse(this.origen);
 
@@ -387,7 +382,8 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     })
   }
 
-  ModelarCargo(accion) {
+  // TRATAMIENTO DE DATOS POR CARGO
+  ModelarCargo(accion: any) {
     this.tipo = 'RegimenCargo';
     let respuesta = JSON.parse(this.origen_cargo);
     let car = respuesta.filter((o) => {
@@ -411,7 +407,8 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     })
   }
 
-  ModelarEmpleados(accion) {
+  // TRATAMIENTO DE DATOS POR EMPLEADO
+  ModelarEmpleados(accion: any) {
     this.tipo = 'default';
     let respuesta = JSON.parse(this.origen)
 
@@ -451,11 +448,9 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
   }
 
 
-  /***********************************
-   * 
-   * COLORES Y LOGO PARA EL REPORTE
-   * 
-   ***********************************/
+  /** **************************************************************************************** **
+   ** **                       COLORES Y LOGO PARA EL REPORTE                               ** **
+   ** **************************************************************************************** **/
 
   logo: any = String;
   ObtenerLogo() {
@@ -476,20 +471,17 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     });
   }
 
-  /******************************************************
-   * 
-   *          PDF
-   * 
-   ******************************************************/
+  /** *********************************************************************************** **
+   ** **                        GENERACION DE ARCHIVOS PDF                             ** **
+   ** *********************************************************************************** **/
 
-  generarPdf(action) {
-    let documentDefinition;
+  generarPdf(action: any) {
+    let documentDefinition: any;
 
     if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true || this.bool.bool_cargo === true || this.bool.bool_reg === true) {
       documentDefinition = this.getDocumentDefinicion();
     }
 
-    var f = new Date()
     let doc_name = "Timbres.pdf";
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -508,16 +500,14 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
       header: { text: 'Impreso por:  ' + localStorage.getItem('fullname_print'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var h = new Date();
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
-        h.setUTCHours(h.getHours());
-        var time = h.toJSON().split("T")[1].split(".")[0];
+        hora = f.format('HH:mm:ss');
 
         return {
           margin: 10,
           columns: [
-            { text: 'Fecha: ' + fecha + ' Hora: ' + time, opacity: 0.3 },
+            { text: 'Fecha: ' + fecha + ' Hora: ' + hora, opacity: 0.3 },
             {
               text: [
                 {
@@ -982,42 +972,17 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
         });
       });
     }
-    return n
+    return n;
   }
 
+  // METODO PARA SUMAR REGIATROS
   SumarRegistros(array: any[]) {
     let valor = 0;
     for (let i = 0; i < array.length; i++) {
       valor = valor + array[i];
     }
-    return valor
+    return valor;
   }
-
-  HorasDecimalToHHMM(dato: number) {
-    // console.log('Hora decimal a HHMM ======>',dato);
-    var h = parseInt(dato.toString());
-    var x = (dato - h) * 60;
-    var m = parseInt(x.toString());
-
-    let hora;
-    let min;
-    if (h < 10 && m < 10) {
-      hora = '0' + h;
-      min = '0' + m;
-    } else if (h < 10 && m >= 10) {
-      hora = '0' + h;
-      min = m;
-    } else if (h >= 10 && m < 10) {
-      hora = h;
-      min = '0' + m;
-    } else if (h >= 10 && m >= 10) {
-      hora = h;
-      min = m;
-    }
-
-    return hora + ':' + min + ':00'
-  }
-
 
   /** ************************************************************************************************** ** 
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
@@ -1086,12 +1051,12 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
                 'Latitud': obj4.latitud, 'Longitud': obj4.longitud, 'Observación': obj4.observacion
               }
             }
-            nuevo.push(ele)
+            nuevo.push(ele);
           })
         })
       })
     })
-    return nuevo
+    return nuevo;
   }
 
   MapingDataPdfRegimenCargo(array: Array<any>) {
@@ -1140,15 +1105,14 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
               'Latitud': obj3.latitud, 'Longitud': obj3.longitud, 'Observación': obj3.observacion
             }
           }
-
-          nuevo.push(ele)
+          nuevo.push(ele);
         })
       })
     })
-    return nuevo
+    return nuevo;
   }
 
-  //METODOS PARA EXTRAER LOS TIMBRES EN UNA LISTA Y VISUALIZARLOS
+  // METODOS PARA EXTRAER LOS TIMBRES EN UNA LISTA Y VISUALIZARLOS
   extraerTimbres() {
     this.timbres = [];
     let n = 0;
@@ -1200,7 +1164,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
                 latitud: obj4.latitud, longitud: obj4.longitud, observacion: obj4.observacion
               }
             }
-            this.timbres.push(ele)
+            this.timbres.push(ele);
           })
         })
       })
@@ -1214,7 +1178,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     this.data_pdf.forEach((obj1: any) => {
       obj1.empleados.forEach((obj2: any) => {
         obj2.timbres.forEach((obj3: any) => {
-          let ele;
+          let ele: any;
           n = n + 1;
           switch (obj3.accion) {
             case 'EoS': accionT = 'Entrada o salida'; break;
@@ -1257,21 +1221,16 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
               latitud: obj3.latitud, longitud: obj3.longitud, observacion: obj3.observacion
             }
           }
-
-          this.timbres.push(ele)
+          this.timbres.push(ele);
         })
       })
     })
   }
 
 
-  /*****************************************************************************
-   * 
-   * 
-   * Varios Metodos Complementarios al funcionamiento. 
-   * 
-   * 
-   **************************************************************************/
+  /** ************************************************************************************** **
+   ** **                   METODOS DE SELECCION DE DATOS DE USUARIOS                      ** **
+   ** ************************************************************************************** **/
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc() {
@@ -1379,7 +1338,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-
+  // METODO PARA EVENTOS DE PAGINACION
   ManejarPagina(e: PageEvent) {
     if (this.bool.bool_suc === true) {
       this.tamanio_pagina_suc = e.pageSize;
@@ -1415,19 +1374,17 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     window.open(rutaMapa);
   }
 
-  /**
-   * METODOS PARA CONTROLAR INGRESO DE LETRAS
-   */
+  // METODOS PARA CONTROLAR INGRESO DE LETRAS
 
-  IngresarSoloLetras(e) {
+  IngresarSoloLetras(e: any) {
     return this.validacionService.IngresarSoloLetras(e)
   }
 
-  IngresarSoloNumeros(evt) {
+  IngresarSoloNumeros(evt: any) {
     return this.validacionService.IngresarSoloNumeros(evt)
   }
 
-  //MOSTRAR DETALLES
+  // MOSTRAR DETALLES
   verDatos() {
     this.verDetalle = true;
     if (this.bool.bool_cargo || this.bool.bool_reg) {
@@ -1437,7 +1394,8 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     }
   }
 
-  regresar() {
+  // METODO PARA REGRESAR A LA PAGINA ANTERIOR
+  Regresar() {
     this.verDetalle = false;
   }
 

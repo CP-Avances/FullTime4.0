@@ -299,7 +299,7 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
         break;
       default:
         this.toastr.error(
-          'UPS! Al parecer algo falló.',
+          'Ups !!! algo salio mal.',
           'Seleccione criterio de búsqueda.'
         );
         this.reporteService.DefaultFormCriterios();
@@ -498,16 +498,14 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
       header: { text: 'Impreso por:  ' + localStorage.getItem('fullname_print'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var h = new Date();
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
-        h.setUTCHours(h.getHours());
-        var time = h.toJSON().split("T")[1].split(".")[0];
+        hora = f.format('HH:mm:ss');
 
         return {
           margin: 10,
           columns: [
-            { text: 'Fecha: ' + fecha + ' Hora: ' + time, opacity: 0.3 },
+            { text: 'Fecha: ' + fecha + ' Hora: ' + hora, opacity: 0.3 },
             {
               text: [
                 {
@@ -870,8 +868,7 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
         }
       });
     }
-
-    return n
+    return n;
   }
 
   // METODO PARA SUMAR REGISTROS
@@ -941,10 +938,10 @@ export class ReporteEmpleadosInactivosComponent implements OnInit {
           'Cargo': obj2.cargo,
           'Correo': obj2.correo,
         }
-        nuevo.push(ele)
+        nuevo.push(ele);
       })
     })
-    return nuevo
+    return nuevo;
   }
 
   /** ************************************************************************************** **
