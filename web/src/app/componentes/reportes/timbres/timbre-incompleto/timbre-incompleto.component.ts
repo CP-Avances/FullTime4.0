@@ -534,7 +534,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
         centrado: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 10, 0, 10] },
         itemsTable: { fontSize: 8 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
-        itemsTableInfoBlanco: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: '#E3E3E3' },
+        itemsTableInfoBlanco: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
         tableMargin: { margin: [0, 0, 0, 10] },
         tableMarginCabecera: { margin: [0, 15, 0, 0] },
@@ -775,7 +775,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
                   [
                     {
                       border: [true, false, false, false],
-                      text: this.bool.bool_suc?'DEPARTAMENTO: ' + obj2.departamento:'',
+                      text: this.bool.bool_suc || this.bool.bool_emp?'DEPARTAMENTO: ' + obj2.departamento:'',
                       style: 'itemsTableInfoBlanco'
                     },
                     {
