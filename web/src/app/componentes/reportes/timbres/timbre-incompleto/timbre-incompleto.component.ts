@@ -276,7 +276,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
   // TRATAMIENTO DE DATOS POR SUCURSAL
   ModelarSucursal(accion: any) {
     this.tipo = 'default';
-    let respuesta = JSON.parse(sessionStorage.getItem('reporte_timbres_incompleto') as any)
+    let respuesta = JSON.parse(this.origen);
     let suc = respuesta.filter(o => {
       var bool = this.selectionSuc.selected.find(obj1 => {
         return obj1.id === o.id_suc
@@ -300,7 +300,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
   // TRATAMIENTO DE DATOS POR REGIMEN
   ModelarRegimen(accion: any) {
     this.tipo = 'RegimenCargo';
-    let respuesta = JSON.parse(sessionStorage.getItem('reporte_timbres_incompleto') as any)
+    let respuesta = JSON.parse(this.origen);
     let empleados: any = [];
     let reg: any = [];
     let objeto: any;
