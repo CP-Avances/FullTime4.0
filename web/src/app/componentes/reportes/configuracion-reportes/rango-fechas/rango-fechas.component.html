@@ -6,13 +6,14 @@
         <form [formGroup]="fechasForm" class="d-flex flex-wrap justify-content-center">
             <mat-form-field class="fechas">
                 <mat-label>Rango de fechas</mat-label>
-                <mat-date-range-input [formGroup]="fechasForm" [rangePicker]="picker" matTooltipPosition="right"  matTooltip="Ingrese el rango de fechas que deseas consultar el reporte. Ejm: 01/08/2023 - 01/09/2023">
+                <mat-date-range-input [formGroup]="fechasForm" [rangePicker]="picker" matTooltipPosition="right" [max]="maxDate"
+                    matTooltip="Ingrese el rango de fechas que deseas consultar el reporte. Ejm: 01/08/2023 - 01/09/2023">
                   <input matStartDate formControlName="fec_inicio" placeholder="dd/mm/aaaa" class="ayuda_fec">
                   <input matEndDate formControlName="fec_final" placeholder="dd/mm/aaaa" class="ayuda_fec" (dateChange)="ValidarRangofechas(fechasForm.value)">
                 </mat-date-range-input>
                 <mat-hint>Desde – Hasta</mat-hint>
                 <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-date-range-picker #picker></mat-date-range-picker>
+                <mat-date-range-picker #picker ></mat-date-range-picker>
                 <mat-datepicker touchUi #picker></mat-datepicker>
             </mat-form-field>
         </form>

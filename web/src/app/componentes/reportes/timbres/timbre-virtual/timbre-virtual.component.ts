@@ -27,7 +27,7 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 
 export class TimbreVirtualComponent implements OnInit, OnDestroy {
 
-  get timbreServidor() { return this.reporteService.mostrarTimbreServidor };
+  get timbreDispositivo() { return this.reporteService.mostrarTimbreDispositivo };
 
   get rangoFechas() { return this.reporteService.rangoFechas };
 
@@ -100,7 +100,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
   get filtroCedula() { return this.reporteService.filtroCedula };
 
   // ESTADO HORA SERVIDOR
-  servidor: boolean = false;
+  dispositivo: boolean = false;
 
   constructor(
     private validacionService: ValidacionesService,
@@ -116,7 +116,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (parseInt(localStorage.getItem('rol') as string) === 1) {
-      this.servidor = true;
+      this.dispositivo = true;
     }
     this.BuscarInformacion();
     this.BuscarCargos();
@@ -537,7 +537,8 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
         centrado: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 10, 0, 10] },
         itemsTable: { fontSize: 8 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
-        itemsTableInfoBlanco: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: '#E3E3E3' },
+        itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0],fillColor: '#E3E3E3' },
+        itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
         tableMargin: { margin: [0, 0, 0, 10] },
         tableMarginCabecera: { margin: [0, 15, 0, 0] },
@@ -561,6 +562,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
             style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
+              headerRows: 1,
               body: [
                 [
                   {
@@ -583,6 +585,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
             style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
+              headerRows: 1,
               body: [
                 [
                   {
@@ -607,40 +610,59 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
             style: 'tableMarginCabecera',
             table: {
               widths: ['*', 'auto', 'auto'],
+              headerRows: 2,
               body: [
                 [
                   {
                     border: [true, true, false, false],
                     text: 'EMPLEADO: ' + obj2.name_empleado,
-                    style: 'itemsTableInfoBlanco',
+                    style: 'itemsTableInfoEmpleado',
                   },
                   {
                     border: [false, true, false, false],
                     text: 'C.C.: ' + obj2.cedula,
-                    style: 'itemsTableInfoBlanco',
+                    style: 'itemsTableInfoEmpleado',
                   },
                   {
                     border: [false, true, true, false],
                     text: 'COD: ' + obj2.codigo,
-                    style: 'itemsTableInfoBlanco',
+                    style: 'itemsTableInfoEmpleado',
                   },
                 ],
-              ],
+                [
+                  {
+                    border: [true, false, false, false],
+                    text: 'DEPARTAMENTO: ' + obj2.departamento,
+                    style: 'itemsTableInfoEmpleado'
+                  },
+                  {
+                    border: [false, false, false, false],
+                    text: this.bool.bool_reg ? 'CARGO: ' + obj2.cargo : '',
+                    style: 'itemsTableInfoEmpleado'
+                  },
+                  {
+                    border: [false, false, true, false],
+                    text: '',
+                    style: 'itemsTableInfoEmpleado'
+                  }
+                ]
+              ]
             },
           });
           c = 0;
-          if (this.timbreServidor === true) {
+          if (this.timbreDispositivo === true) {
             n.push({
               style: 'tableMargin',
               table: {
-                widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', '*'],
+                widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto'],
+                headerRows: 2,
                 body: [
                   [
                     { rowSpan: 2, text: 'N°', style: 'centrado' },
-                    { colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
-                    '',
-                    { colSpan: 2, text: 'SERVIDOR', style: 'tableHeader' },
-                    '',
+                    { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                    {},
+                    { colSpan: 2, text: 'DISPOSITIVO', style: 'tableHeader' },
+                    {},
                     { rowSpan: 2, text: 'RELOJ', style: 'centrado' },
                     { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
                     { rowSpan: 2, text: 'OBSERVACIÓN', style: 'centrado' },
@@ -648,12 +670,12 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                     { rowSpan: 2, text: 'LATITUD', style: 'centrado' }
                   ],
                   [
-                    '',
-                    { text: 'FECHA', style: 'tableHeader' },
-                    { text: 'HORA', style: 'tableHeader' },
-                    { text: 'FECHA', style: 'tableHeader' },
-                    { text: 'HORA', style: 'tableHeader' },
-                    '', '', '', '', ''
+                    {},
+                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                    {},{},{},{},{}
                   ],
                   ...obj2.timbres.map(obj3 => {
                     let servidor_fecha = '';
@@ -679,10 +701,10 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                     c = c + 1
                     return [
                       { style: 'itemsTableCentrado', text: c },
-                      { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[0] },
-                      { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[1] },
                       { style: 'itemsTable', text: servidor_fecha },
                       { style: 'itemsTable', text: servidor_hora },
+                      { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[0] },
+                      { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[1] },
                       { style: 'itemsTable', text: obj3.id_reloj },
                       { style: 'itemsTable', text: accionT },
                       { style: 'itemsTable', text: obj3.observacion },
@@ -703,26 +725,32 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
             n.push({
               style: 'tableMargin',
               table: {
-                widths: ['auto', '*', '*', 'auto', 'auto', 'auto', '*', '*'],
+                widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto'],
+                headerRows: 2,
                 body: [
                   [
                     { rowSpan: 2, text: 'N°', style: 'centrado' },
-                    { colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
-                    '',
+                    { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                    {},
                     { rowSpan: 2, text: 'RELOJ', style: 'centrado' },
                     { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
                     { rowSpan: 2, text: 'OBSERVACIÓN', style: 'centrado' },
                     { rowSpan: 2, text: 'LONGITUD', style: 'centrado' },
-                    { rowSpan: 2, text: 'LATITUD', style: 'centrado' }
+                    { rowSpan: 2, text: 'LATITUD', style: 'centrado' },
                   ],
                   [
-                    '',
-                    { text: 'FECHA', style: 'tableHeader' },
-                    { text: 'HORA', style: 'tableHeader' },
-                    '', '', '', '', '',
-
+                    {},
+                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                    {},{},{},{},{}
                   ],
                   ...obj2.timbres.map(obj3 => {
+                    let servidor_fecha = '';
+                    let servidor_hora = '';
+                    if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
+                      servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
+                      servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
+                    }
                     switch (obj3.accion) {
                       case 'EoS': accionT = 'Entrada o salida'; break;
                       case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -735,21 +763,20 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                       case 'F/P': accionT = 'Fin permiso'; break;
                       case 'HA': accionT = 'Timbre libre'; break;
                       default: accionT = 'Desconocido'; break;
-                    }
+                    };
                     c = c + 1
                     return [
                       { style: 'itemsTableCentrado', text: c },
-                      { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[0] },
-                      { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[1] },
+                      { style: 'itemsTable', text: servidor_fecha },
+                      { style: 'itemsTable', text: servidor_hora },
                       { style: 'itemsTable', text: obj3.id_reloj },
                       { style: 'itemsTable', text: accionT },
                       { style: 'itemsTable', text: obj3.observacion },
                       { style: 'itemsTable', text: obj3.longitud },
                       { style: 'itemsTable', text: obj3.latitud },
-                    ]
-                  })
-
-                ]
+                    ];
+                  }),
+                ],
               },
               layout: {
                 fillColor: function (rowIndex) {
@@ -767,6 +794,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
           n.push({
             table: {
               widths: ['*', '*'],
+              headerRows: 1,
               body: [
                 [
                   {
@@ -796,6 +824,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
               style: 'tableMarginCabecera',
               table: {
                 widths: ['*', '*'],
+                headerRows: 1,
                 body: [
                   [
                     {
@@ -820,40 +849,59 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
               style: 'tableMarginCabecera',
               table: {
                 widths: ['*', 'auto', 'auto'],
+                headerRows: 2,
                 body: [
                   [
                     {
                       border: [true, true, false, false],
                       text: 'EMPLEADO: ' + obj2.name_empleado,
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfoEmpleado'
                     },
                     {
                       border: [false, true, false, false],
                       text: 'C.C.: ' + obj2.cedula,
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfoEmpleado'
                     },
                     {
                       border: [false, true, true, false],
                       text: 'COD: ' + obj2.codigo,
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfoEmpleado'
+                    }
+                  ],
+                  [
+                    {
+                      border: [true, false, false, false],
+                      text: this.bool.bool_suc || this.bool.bool_emp?'DEPARTAMENTO: ' + obj2.departamento:'',
+                      style: 'itemsTableInfoEmpleado'
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: 'CARGO: ' + obj2.cargo,
+                      style: 'itemsTableInfoEmpleado'
+                    },
+                    {
+                      border: [false, false, true, false],
+                      text: '',
+                      style: 'itemsTableInfoEmpleado'
                     }
                   ]
                 ]
               }
             });
             c = 0;
-            if (this.timbreServidor === true) {
+            if (this.timbreDispositivo === true) {
               n.push({
                 style: 'tableMargin',
                 table: {
-                  widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', '*'],
+                  widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto'],
+                  headerRows: 2,
                   body: [
                     [
                       { rowSpan: 2, text: 'N°', style: 'centrado' },
-                      { colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
-                      '',
-                      { colSpan: 2, text: 'SERVIDOR', style: 'tableHeader' },
-                      '',
+                      { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                      {},
+                      { colSpan: 2, text: 'DISPOSITIVO', style: 'tableHeader' },
+                      {},
                       { rowSpan: 2, text: 'RELOJ', style: 'centrado' },
                       { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
                       { rowSpan: 2, text: 'OBSERVACIÓN', style: 'centrado' },
@@ -861,12 +909,12 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                       { rowSpan: 2, text: 'LATITUD', style: 'centrado' }
                     ],
                     [
-                      '',
-                      { text: 'FECHA', style: 'tableHeader' },
-                      { text: 'HORA', style: 'tableHeader' },
-                      { text: 'FECHA', style: 'tableHeader' },
-                      { text: 'HORA', style: 'tableHeader' },
-                      '', '', '', '', ''
+                      {},
+                      { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                      { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                      { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                      { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                      {},{},{},{},{}
                     ],
                     ...obj2.timbres.map(obj3 => {
                       let servidor_fecha = '';
@@ -874,7 +922,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                       if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
                         servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
                         servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
-                      }
+                      };
                       switch (obj3.accion) {
                         case 'EoS': accionT = 'Entrada o salida'; break;
                         case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -887,55 +935,60 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                         case 'F/P': accionT = 'Fin permiso'; break;
                         case 'HA': accionT = 'Timbre libre'; break;
                         default: accionT = 'Desconocido'; break;
-                      }
+                      };
 
                       c = c + 1
                       return [
                         { style: 'itemsTableCentrado', text: c },
-                        { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[0] },
-                        { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[1] },
                         { style: 'itemsTable', text: servidor_fecha },
                         { style: 'itemsTable', text: servidor_hora },
+                        { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[0] },
+                        { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[1] },
                         { style: 'itemsTable', text: obj3.id_reloj },
                         { style: 'itemsTable', text: accionT },
                         { style: 'itemsTable', text: obj3.observacion },
                         { style: 'itemsTable', text: obj3.longitud },
                         { style: 'itemsTable', text: obj3.latitud },
-                      ]
-                    })
-
-                  ]
+                      ];
+                    }),
+                  ],
                 },
                 layout: {
                   fillColor: function (rowIndex) {
                     return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-                  }
-                }
-              })
+                  },
+                },
+              });
             } else {
               n.push({
                 style: 'tableMargin',
                 table: {
-                  widths: ['auto', '*', '*', 'auto', 'auto', 'auto', '*', '*'],
+                  widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto'],
+                  headerRows: 2,
                   body: [
                     [
                       { rowSpan: 2, text: 'N°', style: 'centrado' },
-                      { colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
-                      '',
+                      { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                      {},
                       { rowSpan: 2, text: 'RELOJ', style: 'centrado' },
                       { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
                       { rowSpan: 2, text: 'OBSERVACIÓN', style: 'centrado' },
                       { rowSpan: 2, text: 'LONGITUD', style: 'centrado' },
-                      { rowSpan: 2, text: 'LATITUD', style: 'centrado' }
+                      { rowSpan: 2, text: 'LATITUD', style: 'centrado' },
                     ],
                     [
-                      '',
-                      { text: 'FECHA', style: 'tableHeader' },
-                      { text: 'HORA', style: 'tableHeader' },
-                      '', '', '', '', '',
-
+                      {},
+                      { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                      { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                      {},{},{},{},{}
                     ],
                     ...obj2.timbres.map(obj3 => {
+                      let servidor_fecha = '';
+                      let servidor_hora = '';
+                      if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
+                        servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
+                        servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
+                      };
                       switch (obj3.accion) {
                         case 'EoS': accionT = 'Entrada o salida'; break;
                         case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -952,8 +1005,8 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                       c = c + 1
                       return [
                         { style: 'itemsTableCentrado', text: c },
-                        { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[0] },
-                        { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[1] },
+                        { style: 'itemsTable', text: servidor_fecha },
+                        { style: 'itemsTable', text: servidor_hora },
                         { style: 'itemsTable', text: obj3.id_reloj },
                         { style: 'itemsTable', text: accionT },
                         { style: 'itemsTable', text: obj3.observacion },
@@ -1016,6 +1069,12 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
             let ele: any;
+            let servidor_fecha = '';
+            let servidor_hora = '';
+            if (obj4.fec_hora_timbre_servidor != '' && obj4.fec_hora_timbre_servidor != null) {
+              servidor_fecha = obj4.fec_hora_timbre_servidor.split(' ')[0];
+              servidor_hora = obj4.fec_hora_timbre_servidor.split(' ')[1]
+            }
             switch (obj4.accion) {
               case 'EoS': accionT = 'Entrada o salida'; break;
               case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -1029,19 +1088,13 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
               case 'HA': accionT = 'Timbre libre'; break;
               default: accionT = 'Desconocido'; break;
             }
-            if (this.timbreServidor) {
-              let servidor_fecha = '';
-              let servidor_hora = '';
-              if (obj4.fec_hora_timbre_servidor != '' && obj4.fec_hora_timbre_servidor != null) {
-                servidor_fecha = obj4.fec_hora_timbre_servidor.split(' ')[0];
-                servidor_hora = obj4.fec_hora_timbre_servidor.split(' ')[1]
-              }
+            if (this.timbreDispositivo) {
               ele = {
                 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
                 'Departamento': obj2.name_dep,
                 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
-                'Fecha Timbre': obj4.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj4.fec_hora_timbre.split(' ')[1],
-                'Fecha Timbre Servidor': servidor_fecha, 'Hora Timbre Servidor': servidor_hora,
+                'Fecha Timbre': servidor_fecha, 'Hora Timbre': servidor_hora,
+                'Fecha Timbre Dispositivo': obj4.fec_hora_timbre.split(' ')[0], 'Hora Timbre Dispositivo': obj4.fec_hora_timbre.split(' ')[1],
                 'Acción': accionT, 'Reloj': obj4.id_reloj,
                 'Latitud': obj4.latitud, 'Longitud': obj4.longitud, 'Observación': obj4.observacion
               }
@@ -1050,7 +1103,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
                 'Departamento': obj2.name_dep,
                 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
-                'Fecha Timbre': obj4.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj4.fec_hora_timbre.split(' ')[1],
+                'Fecha Timbre': servidor_fecha, 'Hora Timbre': servidor_hora,
                 'Acción': accionT, 'Reloj': obj4.id_reloj,
                 'Latitud': obj4.latitud, 'Longitud': obj4.longitud, 'Observación': obj4.observacion
               }
@@ -1070,6 +1123,12 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
       obj1.empleados.forEach((obj2: any) => {
         obj2.timbres.forEach((obj3: any) => {
           let ele: any;
+          let servidor_fecha = '';
+          let servidor_hora = '';
+          if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
+            servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
+            servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
+          }
           switch (obj3.accion) {
             case 'EoS': accionT = 'Entrada o salida'; break;
             case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -1083,19 +1142,13 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
             case 'HA': accionT = 'Timbre libre'; break;
             default: accionT = 'Desconocido'; break;
           }
-          if (this.timbreServidor) {
-            let servidor_fecha = '';
-            let servidor_hora = '';
-            if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
-              servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
-              servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
-            }
+          if (this.timbreDispositivo) {
             ele = {
               'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
               'Departamento': obj2.departamento,
               'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
-              'Fecha Timbre': obj3.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj3.fec_hora_timbre.split(' ')[1],
-              'Fecha Timbre Servidor': servidor_fecha, 'Hora Timbre Servidor': servidor_hora,
+              'Fecha Timbre': servidor_fecha, 'Hora Timbre': servidor_hora,
+              'Fecha Timbre Dispositivo': obj3.fec_hora_timbre.split(' ')[0], 'Hora Timbre Dispositivo': obj3.fec_hora_timbre.split(' ')[1],
               'Acción': accionT, 'Reloj': obj3.id_reloj,
               'Latitud': obj3.latitud, 'Longitud': obj3.longitud, 'Observación': obj3.observacion
             }
@@ -1104,7 +1157,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
               'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
               'Departamento': obj2.departamento,
               'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
-              'Fecha Timbre': obj3.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj3.fec_hora_timbre.split(' ')[1],
+              'Fecha Timbre': servidor_fecha, 'Hora Timbre': servidor_hora,
               'Acción': accionT, 'Reloj': obj3.id_reloj,
               'Latitud': obj3.latitud, 'Longitud': obj3.longitud, 'Observación': obj3.observacion
             }
@@ -1116,7 +1169,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
     return nuevo;
   }
 
-  //METODOS PARA EXTRAER LOS TIMBRES EN UNA LISTA Y VISUALIZARLOS
+  // METODOS PARA EXTRAER LOS TIMBRES EN UNA LISTA Y VISUALIZARLOS
   extraerTimbres() {
     this.timbres = [];
     let n = 0;
@@ -1125,8 +1178,13 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
-            let ele: any;
             n = n + 1;
+            let servidor_fecha = '';
+            let servidor_hora = '';
+            if (obj4.fec_hora_timbre_servidor != '' && obj4.fec_hora_timbre_servidor != null) {
+              servidor_fecha = obj4.fec_hora_timbre_servidor.split(' ')[0];
+              servidor_hora = obj4.fec_hora_timbre_servidor.split(' ')[1]
+            }
             switch (obj4.accion) {
               case 'EoS': accionT = 'Entrada o salida'; break;
               case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -1140,14 +1198,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
               case 'HA': accionT = 'Timbre libre'; break;
               default: accionT = 'Desconocido'; break;
             }
-            if (this.timbreServidor) {
-              let servidor_fecha = '';
-              let servidor_hora = '';
-              if (obj4.fec_hora_timbre_servidor != '' && obj4.fec_hora_timbre_servidor != null) {
-                servidor_fecha = obj4.fec_hora_timbre_servidor.split(' ')[0];
-                servidor_hora = obj4.fec_hora_timbre_servidor.split(' ')[1]
-              }
-              ele = {
+              let ele = {
                 n: n,
                 ciudad: obj1.ciudad, sucursal: obj1.name_suc,
                 departamento: obj2.name_dep,
@@ -1157,17 +1208,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                 accion: accionT, reloj: obj4.id_reloj,
                 latitud: obj4.latitud, longitud: obj4.longitud, observacion: obj4.observacion
               }
-            } else {
-              ele = {
-                n: n,
-                ciudad: obj1.ciudad, sucursal: obj1.name_suc,
-                departamento: obj2.name_dep,
-                empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
-                fechaTimbre: obj4.fec_hora_timbre.split(' ')[0], horaTimbre: obj4.fec_hora_timbre.split(' ')[1],
-                accion: accionT, reloj: obj4.id_reloj,
-                latitud: obj4.latitud, longitud: obj4.longitud, observacion: obj4.observacion
-              }
-            }
+
             this.timbres.push(ele);
           })
         })
@@ -1182,8 +1223,13 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
     this.data_pdf.forEach((obj1: any) => {
       obj1.empleados.forEach((obj2: any) => {
         obj2.timbres.forEach((obj3: any) => {
-          let ele;
           n = n + 1;
+          let servidor_fecha = '';
+          let servidor_hora = '';
+          if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
+            servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
+            servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
+          }
           switch (obj3.accion) {
             case 'EoS': accionT = 'Entrada o salida'; break;
             case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -1196,34 +1242,16 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
             case 'F/P': accionT = 'Fin permiso'; break;
             case 'HA': accionT = 'Timbre libre'; break;
             default: accionT = 'Desconocido'; break;
-          }
-          if (this.timbreServidor) {
-            let servidor_fecha = '';
-            let servidor_hora = '';
-            if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
-              servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
-              servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
-            }
-            ele = {
-              n: n,
-              ciudad: obj2.ciudad, sucursal: obj2.sucursal,
-              departamento: obj2.departamento,
-              empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
-              fechaTimbre: obj3.fec_hora_timbre.split(' ')[0], horaTimbre: obj3.fec_hora_timbre.split(' ')[1],
-              fechaTimbreServidor: servidor_fecha, horaTimbreServidor: servidor_hora,
-              accion: accionT, reloj: obj3.id_reloj,
-              latitud: obj3.latitud, longitud: obj3.longitud, observacion: obj3.observacion
-            }
-          } else {
-            ele = {
-              n: n,
-              ciudad: obj2.ciudad, sucursal: obj2.sucursal,
-              departamento: obj2.departamento,
-              empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
-              fechaTimbre: obj3.fec_hora_timbre.split(' ')[0], horaTimbre: obj3.fec_hora_timbre.split(' ')[1],
-              accion: accionT, reloj: obj3.id_reloj,
-              latitud: obj3.latitud, longitud: obj3.longitud, observacion: obj3.observacion
-            }
+          }  
+          let ele = {
+            n: n,
+            ciudad: obj2.ciudad, sucursal: obj2.sucursal,
+            departamento: obj2.departamento,
+            empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
+            fechaTimbre: obj3.fec_hora_timbre.split(' ')[0], horaTimbre: obj3.fec_hora_timbre.split(' ')[1],
+            fechaTimbreServidor: servidor_fecha, horaTimbreServidor: servidor_hora,
+            accion: accionT, reloj: obj3.id_reloj,
+            latitud: obj3.latitud, longitud: obj3.longitud, observacion: obj3.observacion
           }
           this.timbres.push(ele);
         })

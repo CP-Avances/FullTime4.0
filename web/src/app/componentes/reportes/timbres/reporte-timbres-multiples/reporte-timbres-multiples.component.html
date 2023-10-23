@@ -33,7 +33,7 @@
                         matTooltip="Descargar reporte en formato PDF.">
                         <mat-icon class="i-download">cloud_download</mat-icon>
                     </button>
-                    <app-option-timbre-servidor *ngIf="servidor"></app-option-timbre-servidor>
+                    <app-option-timbre-dispositivo *ngIf="dispositivo"></app-option-timbre-dispositivo>
                 </div>
             </mat-card>
         </div>
@@ -270,7 +270,7 @@
                                 <th scope="col" rowspan="2">CÓDIGO</th>
                                 <th scope="col" rowspan="2">EMPLEADO</th>
                                 <th scope="col" rowspan="1" colspan="2">TIMBRE</th>
-                                <th scope="col" rowspan="1" colspan="2" *ngIf="timbreServidor">SERVIDOR</th>
+                                <th scope="col" rowspan="1" colspan="2" *ngIf="timbreDispositivo">DISPOSITIVO</th>
                                 <th scope="col" rowspan="2">RELOJ</th>
                                 <th scope="col" rowspan="2">ACCIÓN</th>
                                 <th scope="col" rowspan="2">OBSERVACION</th>
@@ -281,8 +281,8 @@
                             <tr style="text-align: center">
                                 <th scope="col" rowspan="1">FECHA</th>
                                 <th scope="col" rowspan="1">HORA</th>
-                                <th scope="col" rowspan="1" *ngIf="timbreServidor">FECHA</th>
-                                <th scope="col" rowspan="1" *ngIf="timbreServidor">HORA</th>
+                                <th scope="col" rowspan="1" *ngIf="timbreDispositivo">FECHA</th>
+                                <th scope="col" rowspan="1" *ngIf="timbreDispositivo">HORA</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -290,10 +290,10 @@
                                 <td>{{ t.n }}</td>
                                 <td>{{ t.codigo }}</td>
                                 <td>{{ t.empleado }}</td>
-                                <td>{{ t.fechaTimbre }}</td>
-                                <td>{{ t.horaTimbre }}</td>
-                                <td *ngIf="timbreServidor">{{ t.fechaTimbreServidor }}</td>
-                                <td *ngIf="timbreServidor">{{ t.horaTimbreServidor }}</td>
+                                <td>{{ t.fechaTimbreServidor }}</td>
+                                <td>{{ t.horaTimbreServidor }}</td>
+                                <td *ngIf="timbreDispositivo">{{ t.fechaTimbre }}</td>
+                                <td *ngIf="timbreDispositivo">{{ t.horaTimbre }}</td>
                                 <td>{{ t.reloj }}</td>
                                 <td>{{ t.accion }}</td>
                                 <td>{{ t.observacion }}</td>

@@ -27,7 +27,7 @@ import { ReporteEntradaSalidaComponent } from './asistencia/reporte-entrada-sali
 import { AppRoutingModule } from '../../app-routing.module';
 import { AdministradorTodasComponent } from './notificaciones/administrador-todas/administrador-todas.component';
 import { PorUsuarioComponent } from './notificaciones/por-usuario/por-usuario.component';
-import { OptionTimbreServidorComponent } from './configuracion-reportes/option-timbre-servidor/option-timbre-servidor.component';
+import { OptionTimbreDispositivoComponent } from './configuracion-reportes/option-timbre-dispositivo/option-timbre-dispositivo.component';
 import { TimbreAbiertosComponent } from './timbres/timbre-abiertos/timbre-abiertos.component';
 import { VacunaMultipleComponent } from './generales/vacunas/vacuna-multiple/vacuna-multiple.component';
 import { AlimentosInvitadosComponent } from './modulos/alimentacion/alimentos-invitados/alimentos-invitados.component';
@@ -62,7 +62,7 @@ import { VerVacunasComponent } from './generales/vacunas/ver-vacunas/ver-vacunas
     ReporteEntradaSalidaComponent,
     AdministradorTodasComponent,
     PorUsuarioComponent,
-    OptionTimbreServidorComponent,
+    OptionTimbreDispositivoComponent,
     TimbreAbiertosComponent,
     VacunaMultipleComponent,
     AlimentosInvitadosComponent,

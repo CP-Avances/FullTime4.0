@@ -518,7 +518,8 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
         centrado: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 10, 0, 10] },
         itemsTable: { fontSize: 8 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
-        itemsTableInfoBlanco: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
+        itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0],fillColor: '#E3E3E3' },
+        itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
         tableMargin: { margin: [0, 0, 0, 10] },
         tableMarginCabecera: { margin: [0, 15, 0, 0] },
@@ -542,6 +543,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
             style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
+              headerRows: 1,
               body: [
                 [
                   {
@@ -564,6 +566,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
             style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
+              headerRows: 1,
               body: [
                 [
                   {
@@ -588,39 +591,40 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
             style: 'tableMarginCabecera',
             table: {
               widths: ['*', 'auto', 'auto'],
+              headerRows: 2,
               body: [
                 [
                   {
                     border: [true, true, false, false],
                     text: 'EMPLEADO: ' + obj2.name_empleado,
-                    style: 'itemsTableInfoBlanco',
+                    style: 'itemsTableInfoEmpleado',
                   },
                   {
                     border: [false, true, false, false],
                     text: 'C.C.: ' + obj2.cedula,
-                    style: 'itemsTableInfoBlanco',
+                    style: 'itemsTableInfoEmpleado',
                   },
                   {
                     border: [false, true, true, false],
                     text: 'COD: ' + obj2.codigo,
-                    style: 'itemsTableInfoBlanco',
+                    style: 'itemsTableInfoEmpleado',
                   },
                 ],
                 [
                   {
                     border: [true, false, false, false],
                     text: 'DEPARTAMENTO: ' + obj2.departamento,
-                    style: 'itemsTableInfoBlanco'
+                    style: 'itemsTableInfoEmpleado'
                   },
                   {
                     border: [false, false, false, false],
                     text: this.bool.bool_reg ? 'CARGO: ' + obj2.cargo : '',
-                    style: 'itemsTableInfoBlanco'
+                    style: 'itemsTableInfoEmpleado'
                   },
                   {
                     border: [false, false, true, false],
                     text: '',
-                    style: 'itemsTableInfoBlanco'
+                    style: 'itemsTableInfoEmpleado'
                   }
                 ]
               ],
@@ -631,18 +635,19 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
             style: 'tableMargin',
             table: {
               widths: ['auto', '*', '*', '*'],
+              headerRows: 2,
               body: [
                 [
                   { rowSpan: 2, text: 'N°', style: 'centrado' },
-                  { colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
-                  '',
+                  { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                  {},
                   { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
                 ],
                 [
-                  '',
-                  { text: 'FECHA', style: 'tableHeader' },
-                  { text: 'HORA', style: 'tableHeader' },
-                  '',
+                  {},
+                  { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                  { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                  {},
 
                 ],
                 ...obj2.timbres.map(obj3 => {
@@ -685,6 +690,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
           n.push({
             table: {
               widths: ['*', '*'],
+              headerRows: 1,
               body: [
                 [
                   {
@@ -714,6 +720,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
               style: 'tableMarginCabecera',
               table: {
                 widths: ['*', '*'],
+                headerRows: 1,
                 body: [
                   [
                     {
@@ -738,39 +745,40 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
               style: 'tableMarginCabecera',
               table: {
                 widths: ['*', 'auto', 'auto',],
+                headerRows: 2,
                 body: [
                   [
                     {
                       border: [true, true, false, false],
                       text: 'EMPLEADO: ' + obj2.name_empleado,
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfoEmpleado'
                     },
                     {
                       border: [false, true, false, false],
                       text: 'C.C.: ' + obj2.cedula,
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfoEmpleado'
                     },
                     {
                       border: [false, true, true, false],
                       text: 'COD: ' + obj2.codigo,
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfoEmpleado'
                     }
                   ],
                   [
                     {
                       border: [true, false, false, false],
                       text: this.bool.bool_suc || this.bool.bool_emp?'DEPARTAMENTO: ' + obj2.departamento:'',
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfoEmpleado'
                     },
                     {
                       border: [false, false, false, false],
                       text: 'CARGO: ' + obj2.cargo,
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfoEmpleado'
                     },
                     {
                       border: [false, false, true, false],
                       text: '',
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfoEmpleado'
                     }
                   ]
                 ]
@@ -781,18 +789,19 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
               style: 'tableMargin',
               table: {
                 widths: ['auto', '*', '*', '*'],
+                headerRows: 2,
                 body: [
                   [
                     { rowSpan: 2, text: 'N°', style: 'centrado' },
-                    { colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
-                    '',
+                    { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                    {},
                     { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
                   ],
                   [
-                    '',
-                    { text: 'FECHA', style: 'tableHeader' },
-                    { text: 'HORA', style: 'tableHeader' },
-                    '',
+                    {},
+                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                    {},
 
                   ],
                   ...obj2.timbres.map(obj3 => {
