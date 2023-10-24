@@ -519,7 +519,6 @@ export class MainNavComponent implements OnInit {
               { name: 'Salidas Anticipadas', url: '/salidas-anticipadas', color: true },
               { name: 'Puntualidad', url: '/reporte-puntualidad', color: true },
               { name: 'Atrasos', url: '/reporte-atrasos-multiples', color: true },
-              { name: 'Salidas Anticipadas', url: '/salidas-anticipadas', color: true },
               { name: 'Faltas', url: '/reporte-faltas', color: true },
               //{ name: 'Horas Trabajadas', url: '/reporte-horas-trabaja', color: true },
               //{ name: 'Entradas Salidas', url: '/reporteEntradaSalida', color: true },
