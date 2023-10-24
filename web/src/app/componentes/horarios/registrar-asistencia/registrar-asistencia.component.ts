@@ -39,6 +39,7 @@ export class RegistrarAsistenciaComponent implements OnInit {
   }
 
 
+  asistencia: any = [];
   BuscarDatosAsistencia(form: any) {
     let datos = {
       codigo: form.codigoForm,

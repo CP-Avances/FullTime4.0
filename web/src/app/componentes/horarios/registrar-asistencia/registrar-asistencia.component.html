@@ -77,5 +77,59 @@
                 </div>
             </div>
         </form>
+
+
+        <div class="container" style="padding-bottom: 50px; text-align: center;">
+            <div class="mat-elevation-z8" style="background: white;">
+                <div id="resultados">RESULTADO DE BÚSQUEDA</div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col">Establecimiento</th>
+                                <th scope="col">Departamento</th>
+                                <th scope="col">Niveles</th>
+                                <th scope="col">Departamento Superior</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let departamento of asistencia ">
+                                <td>{{departamento.nomsucursal}}</td>
+                                <td>{{departamento.nombre | titlecase}}</td>
+                                <td>{{departamento.nivel}}</td>
+                                <td>{{departamento.departamento_padre | titlecase}}
+                                </td>
+                                <td class="justify-content-center">
+                                    <i class="fa fa-arrows-v" matSuffix matTooltipPosition="right" id="t-detalles"
+                                        matTooltip="Registrar niveles de autorización.">
+                                        <p>Niveles</p>
+                                    </i>
+                                    <i id="t-editar" matSuffix matTooltipPosition="right"
+                                        matTooltip="Modificar datos de este registro" class="fas fa-edit">
+                                        <p>Editar</p>
+                                    </i>
+                                    <i class="far fa-trash-alt" id="t-eliminar" matSuffix matTooltipPosition="right"
+                                        matTooltip="Eliminar este registro.">
+                                        <p>Eliminar</p>
+                                    </i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--
+                <mat-paginator id="pagina" [length]="departamentos.length" [pageSize]="tamanio_pagina"
+                    [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
+                </mat-paginator>
+-->
+                <div class="d-flex justify-content-end"
+                    style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
+                    <p> Reporte de departamentos. </p>
+                </div>
+            </div>
+        </div>
+
+
     </mat-card>
 </div>
