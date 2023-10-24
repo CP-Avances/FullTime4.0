@@ -31,39 +31,102 @@
 }
 
 .icon-menu {
-    margin-right: 10px;
-    margin-left: -7px;
+    margin: auto;
+    vertical-align: middle;
+    margin-right: 8px !important;
     color: white;
 }
 
+.titulo-card{
+    margin: auto;
+    vertical-align: middle;
+    margin-right: 8px !important;
+    color: white;
+    font-size: 16px !important;
+}
+
+/*Infotmacion Usuario*/
+.card-info{
+    height: 215px;
+    background: linear-gradient(to right, rgb(32, 119, 150), rgb(18, 96, 125));
+    font-size: 14px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+    margin-left: 5px;
+}
+.card-info:hover{
+    cursor: pointer;
+    transform: scale(1.03); 
+}
+
 /* PERMISOS */
-.boton-uno {
+.card-permi {
+    height: 215px;
     background: linear-gradient(to right, rgb(235, 212, 8), rgb(177, 159, 2));
-    font-size: 16px;
+    font-size: 14px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+}
+.card-permi:hover{
+    cursor: pointer;
+    transform: scale(1.03); 
 }
 
 /* VACACIONES */
-.boton-dos {
-    background: linear-gradient(to right, rgb(1, 168, 23), rgb(0, 107, 14));
-    font-size: 16px;
+.card-vaca{
+    height: 215px;
+    background: linear-gradient(to right, rgb(27, 135, 52), rgb(13, 94, 32));
+    font-size: 14px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+    margin-right: 5px;
+}
+.card-vaca:hover{
+    cursor: pointer;
+    transform: scale(1.03); 
 }
 
 /* HORAS EXTRAS */
-.boton-tre {
-    background: linear-gradient(to right, rgb(15, 206, 171), rgb(2, 100, 82));
-    font-size: 16px;
+.card-horasExtras{
+    height: 215px;
+    background: linear-gradient(to right, rgb(138, 71, 213), rgb(113, 47, 189));
+    font-size: 14px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+    margin-left: 5px;
+}
+.card-horasExtras:hover{
+    cursor: pointer;
+    transform: scale(1.03); 
 }
 
 /* ALIMENTACION */
-.boton-cua {
+.card-alimentacion {
+    height: 215px;
     background: linear-gradient(to right, rgb(241, 160, 67), rgb(148, 81, 4));
-    font-size: 16px;
+    font-size: 14px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+}
+.card-alimentacion:hover{
+    cursor: pointer;
+    transform: scale(1.03); 
 }
 
 /* ACCIONES PERSONAL */
-.boton-cin {
-    background: linear-gradient(to right, rgb(255, 67, 224), rgb(185, 45, 162));
-    font-size: 15px;
+.card-accionPerso {
+    background: linear-gradient(to right, rgb(180, 87, 160), rgb(119, 51, 104));
+    height: 200px;
+    width: 225px;
+    font-size: 14px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+    margin-left: 6px;
+    margin-right: 6px;
+}
+.card-accionPerso:hover{
+    cursor: pointer;
+    transform: scale(1.03); 
 }
 
 /* GEOLOCALIZACION */
@@ -78,15 +141,26 @@
     font-size: 15px;
 }
 
-/* TELETRABAJO */
-.boton-ocho {
-    background: linear-gradient(to right, rgb(245, 4, 96), rgb(173, 4, 69));
-    font-size: 16px;
+/* REPORTES */
+.card-timbreTele{
+    background: linear-gradient(to right, rgb(100, 159, 28), rgb(74, 124, 12));
+    height: 200px;
+    width: 225px;
+    font-size: 14px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+    margin-left: 6px;
+    margin-right: 6px;
+}
+.card-timbreTele:hover{
+    cursor: pointer;
+    transform: scale(1.03); 
 }
 
-.boton-inactivo {
-    background: linear-gradient(to right, rgb(164, 166, 167), rgb(131, 132, 133));
-    font-size: 16px;
+.card-inactivo {
+    background: linear-gradient(to right, rgb(105, 106, 107), rgb(88, 89, 89));
+    font-size: 14px;
+    border-radius: 10px;
 }
 
 #charts_atraso {

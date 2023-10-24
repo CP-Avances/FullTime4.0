@@ -5,125 +5,187 @@
     </div>
   </div>
   <br>
-  <div class="row" style="text-align: center;">
-    <div class="col-md">
-      <div class="d-flex justify-content-center flex-wrap">
-       
-        <mat-card class="example-card">
-          <mat-card-content>
-            <label>
-              {{datosEmpleado.cedula}}
-            </label>
-            <label>
-              {{datosEmpleado.codigo}}
-            </label>
-            <label>
-              {{datosEmpleado.correo}}
-            </label>
-            <label>
-              {{datosEmpleado.domicilio}}
-            </label>
-            <label>
-              {{datosEmpleado.telefono}}
-            </label>
-            <label>
-              {{datosEmpleado.telefono}}
-            </label>
-            <label>
-              {{datosEmpleado.fec_nacimiento_}}
-            </label>
-          </mat-card-content>
-        </mat-card>
-       
-       
-       
-       
-       
-        <button class="btn btn-lg d-flex justify-content-center boton-cua" (click)="MenuRapido(4)" *ngIf="permisos">
-          <mat-icon class="icon-menu align-self-center">insert_emoticon</mat-icon>
-          <span class="align-self-center">Permisos</span>
-        </button>
-        <button class="btn btn-lg d-flex justify-content-center boton-inactivo" (click)="MenuRapido(4)"
-          *ngIf="!permisos">
-          <mat-icon class="icon-menu align-self-center">insert_emoticon</mat-icon>
-          <span class="align-self-center">Permisos</span>
-        </button>
 
-        <button class="btn btn-lg d-flex justify-content-center boton-tre" (click)="MenuRapido(3)" *ngIf="vacaciones">
-          <mat-icon class="icon-menu align-self-center">flight</mat-icon>
-          <span class="align-self-center">Vacaciones</span>
-        </button>
-        <button class="btn btn-lg d-flex justify-content-center boton-inactivo" (click)="MenuRapido(3)"
-          *ngIf="!vacaciones">
-          <mat-icon class="icon-menu align-self-center">flight</mat-icon>
-          <span class="align-self-center">Vacaciones</span>
-        </button>
-
-        <button class="btn btn-lg d-flex justify-content-center boton-dos" (click)="MenuRapido(2)" *ngIf="horasExtras">
-          <mat-icon class="icon-menu align-self-center">schedule</mat-icon>
-          <span class="align-self-center">Horas Extras</span>
-        </button>
-        <button class="btn btn-lg d-flex justify-content-center boton-inactivo" (click)="MenuRapido(2)"
-          *ngIf="!horasExtras">
-          <mat-icon class="icon-menu align-self-center">schedule</mat-icon>
-          <span class="align-self-center">Horas Extras</span>
-        </button>
-
-        <button class="btn btn-lg d-flex justify-content-center boton-sie" (click)="MenuRapido(7)" *ngIf="alimentacion">
-          <mat-icon class="icon-menu align-self-center">local_dining</mat-icon>
-          <span class="align-self-center">Alimentación</span>
-        </button>
-        <button class="btn btn-lg d-flex justify-content-center boton-inactivo" (click)="MenuRapido(7)"
-          *ngIf="!alimentacion">
-          <mat-icon class="icon-menu align-self-center">local_dining</mat-icon>
-          <span class="align-self-center">Alimentación</span>
-        </button>
-      </div>
+  <!--Modulos-->
+  <div class="row" style="text-align:justify;">
+    <div class="col-4" (click)="MenuRapido(0)">
+      <mat-card class="mat-elevation-z8 card-info"  style="color: antiquewhite;">
+        <mat-card-title style="text-align: center; padding: 3px;"> 
+          <mat-label  class="titulo-card">Informacion Usuario</mat-label>
+        </mat-card-title>
+        <mat-card-content>
+          <div class="row">
+                <div class="col-md">
+                  <label>
+                    <mat-icon class="icon-menu">assignment_ind</mat-icon>
+                    <mat-label  class="icon-menu">{{datosEmpleado.cedula}}</mat-label>
+                  </label><br>
+                  <label>
+                    <mat-icon class="icon-menu">location_on</mat-icon>
+                    <mat-label  class="icon-menu">{{datosEmpleado.domicilio}}</mat-label>
+                  </label><br>
+                  <label>
+                    <mat-icon class="icon-menu">phone</mat-icon>
+                    <mat-label  class="icon-menu">{{datosEmpleado.telefono}}</mat-label>
+                  </label><br>
+                  <label>
+                    <mat-icon class="icon-menu">cake</mat-icon>
+                    <mat-label  class="icon-menu">{{datosEmpleado.fec_nacimiento_}}</mat-label>
+                  </label><br>
+                  <label>
+                    <mat-icon class="icon-menu"> contact_mail</mat-icon>
+                    <mat-label  class="icon-menu">{{datosEmpleado.correo}}</mat-label>
+                  </label>
+                </div>
+              </div>
+            </mat-card-content>
+      </mat-card>
     </div>
-
-    <div class="col-md">
-      <div class="d-flex justify-content-center flex-wrap">
-        <button class="btn btn-lg d-flex justify-content-center boton-cin" (click)="MenuRapido(5)" *ngIf="accion">
-          <mat-icon class="icon-menu align-self-center">how_to_reg</mat-icon>
-          <span class="align-self-center">Acciones Personal</span>
-        </button>
-        <button class="btn btn-lg d-flex justify-content-center boton-inactivo" (click)="MenuRapido(5)" *ngIf="!accion">
-          <mat-icon class="icon-menu align-self-center">how_to_reg</mat-icon>
-          <span class="align-self-center">Acciones Personal</span>
-        </button>
-
-        <button class="btn btn-lg d-flex justify-content-center boton-ocho" (click)="MenuRapido(8)"
-          *ngIf="geolocalizacion">
-          <mat-icon class="icon-menu align-self-center">my_location</mat-icon>
-          <span class="align-self-center">Geolocalización</span>
-        </button>
-        <button class="btn btn-lg d-flex justify-content-center boton-inactivo" (click)="MenuRapido(8)"
-          *ngIf="!geolocalizacion">
-          <mat-icon class="icon-menu align-self-center">my_location</mat-icon>
-          <span class="align-self-center">Geolocalización</span>
-        </button>
-
-        <button class="btn btn-lg d-flex justify-content-center boton-sei" (click)="MenuRapido(6)" *ngIf="movil">
-          <mat-icon class="icon-menu align-self-center">phone_android</mat-icon>
-          <span class="align-self-center">Aplicación Móvil</span>
-        </button>
-        <button class="btn btn-lg d-flex justify-content-center boton-inactivo" (click)="MenuRapido(6)" *ngIf="!movil">
-          <mat-icon class="icon-menu align-self-center">phone_android</mat-icon>
-          <span class="align-self-center">Aplicación Móvil</span>
-        </button>
-
-        <button class="btn btn-lg d-flex justify-content-center boton-uno" (click)="MenuRapido(1)" *ngIf="teletrabajo">
-          <mat-icon class="icon-menu align-self-center">computer</mat-icon>
-          <span class="align-self-center">Timbre Teletrabajo</span>
-        </button>
-        <button class="btn btn-lg d-flex justify-content-center boton-inactivo" (click)="MenuRapido(1)"
-          *ngIf="!teletrabajo">
-          <mat-icon class="icon-menu align-self-center">computer</mat-icon>
-          <span class="align-self-center">Timbre Teletrabajo</span>
-        </button>
-      </div>
+    <div class="col-4" (click)="MenuRapido(4)">
+          <mat-card [ngClass]="!permisos ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-permi'" 
+           style="color: antiquewhite;">
+            <mat-card-title style="text-align: center; padding: 3px;"> 
+              <mat-label  cla
+              ss="titulo-card">Permisos</mat-label>
+            </mat-card-title>
+            <mat-card-content>
+              <div class="row">
+                <div class="col-md">
+                  <label>
+                    <mat-icon class="icon-menu align-self-center">insert_emoticon</mat-icon>
+                  </label>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+    </div>
+    <div class="col-4" (click)="MenuRapido(3)">
+          <mat-card [ngClass]="!vacaciones ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-vaca'" 
+            style="color: antiquewhite;">
+            <mat-card-title style="text-align: center; padding: 3px;"> 
+              <mat-label  class="titulo-card">Vacaciones</mat-label>
+            </mat-card-title>
+            <mat-card-content>
+              <div class="row">
+                <div class="col-md">
+                  <label>
+                    <mat-icon class="icon-menu align-self-center">flight</mat-icon>
+                  </label>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
     </div>
   </div>
+  <br>
+  <div class="row" style="text-align:justify;">
+    <div class="col-4" (click)="MenuRapido(2)"> <!--Horas Extras-->
+      <mat-card [ngClass]="!horasExtras ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-horasExtras'" 
+        style="color: antiquewhite;"><!--boton-inactivo-->
+        <mat-card-title style="text-align: center; padding: 3px;"> 
+          <mat-label  class="titulo-card">Horas Extras</mat-label>
+        </mat-card-title>
+        <mat-card-content>
+          <div class="row">
+                <div class="col-md">
+                  <label>
+                    <mat-icon class="icon-menu">schedule</mat-icon>
+                  </label>
+                </div>
+              </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+    <div class="col-4" (click)="MenuRapido(7)">
+      <mat-card [ngClass]="!alimentacion ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-alimentacion'"  
+        style="color: antiquewhite;">
+        <mat-card-title style="text-align: center; padding: 3px;"> 
+              <mat-label  class="titulo-card">Alimentación</mat-label>
+        </mat-card-title>
+        <mat-card-content>
+              <div class="row">
+                <div class="col-md">
+                  <label>
+                    <mat-icon class="icon-menu align-self-center">local_dining</mat-icon>
+                  </label>
+                </div>
+              </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+  <br><br>
+  <div class="col-md">
+      <div class="d-flex justify-content-center flex-wrap">
+        <mat-card (click)="MenuRapido(5)" 
+          [ngClass]="!accion ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-accionPerso'"  style="color: antiquewhite;"><!--boton-inactivo-->
+          <mat-card-title style="text-align: center; padding: 3px;">
+            <mat-label  class="titulo-card">Acciones Personal</mat-label>
+          </mat-card-title>
+          <mat-card-content>
+            <div class="row">
+                  <div class="col-md">
+                    <label>
+                      <mat-icon class="icon-menu align-self-center">how_to_reg</mat-icon>
+                    </label>
+                  </div>
+                </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card (click)="MenuRapido(8)" 
+          [ngClass]="!geolocalizacion ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-geolocali'"
+          style="color: antiquewhite;"><!--boton-inactivo-->
+          <mat-card-title style="text-align: center; padding: 3px;">
+            <mat-label  class="titulo-card">Geolocalización</mat-label>
+          </mat-card-title>
+          <mat-card-content>
+            <div class="row">
+                  <div class="col-md">
+                    <label>
+                      <mat-icon class="icon-menu align-self-center">my_location</mat-icon>
+                    </label>
+                  </div>
+                </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card (click)="MenuRapido(6)" 
+          [ngClass]="!movil ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-aplicacionMovil'"
+          style="color: antiquewhite;"><!--boton-inactivo-->
+          <mat-card-title style="text-align: center; padding: 3px;">
+            <mat-label  class="titulo-card">Aplicación Móvil</mat-label>
+          </mat-card-title>
+          <mat-card-content>
+            <div class="row">
+                  <div class="col-md">
+                    <label>
+                      <mat-icon class="icon-menu align-self-center">phone_android</mat-icon>
+                    </label>
+                  </div>
+                </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card (click)="MenuRapido(1)" 
+          [ngClass]="!teletrabajo ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-timbreTele'"  
+          style="color: antiquewhite;"><!--boton-inactivo-->
+          <mat-card-title style="text-align: center; padding: 3px;">
+            <mat-label  class="titulo-card">Timbre Teletrabajo</mat-label>
+          </mat-card-title>
+          <mat-card-content>
+            <div class="row">
+                  <div class="col-md">
+                    <label>
+                      <mat-icon class="icon-menu align-self-center">computer</mat-icon>
+                    </label>
+                  </div>
+                </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+  </div>
+
 </div>
 
  

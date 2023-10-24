@@ -14,6 +14,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { GraficasService } from 'src/app/servicios/graficas/graficas.service';
 import { MainNavService } from '../../administracionGeneral/main-nav/main-nav.service';
+import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 
 @Component({
   selector: 'app-home-empleado',
@@ -35,6 +36,9 @@ export class HomeEmpleadoComponent implements OnInit {
   get accion(): boolean { return this.funciones.accionesPersonal; }
   get movil(): boolean { return this.funciones.app_movil; }
 
+  datosEmpleado: any;
+  idEmpleado: any = 0;
+
   constructor(
     private restGraficas: GraficasService,
     private funciones: MainNavService,
@@ -43,9 +47,11 @@ export class HomeEmpleadoComponent implements OnInit {
     private route: ActivatedRoute,
     public validar: ValidacionesService,
     public parametro: ParametrosService,
+    public restEmpleado: EmpleadoService
   ) { }
 
   ngOnInit(): void {
+    this.idEmpleado = localStorage.getItem('empleado');
     this.BuscarParametro();
   }
 
@@ -58,6 +64,7 @@ export class HomeEmpleadoComponent implements OnInit {
 
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
+    this.VerEmpleado(this.formato_fecha)
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
       res => {
@@ -87,9 +94,21 @@ export class HomeEmpleadoComponent implements OnInit {
     this.fecha = this.validar.FormatearFecha(moment(f).format('YYYY-MM-DD'), formato_fecha, this.validar.dia_completo);
   }
 
+  VerEmpleado(formato_fecha: string) {
+    this.datosEmpleado = [];
+    this.restEmpleado.BuscarUnEmpleado(parseInt(this.idEmpleado)).subscribe(data => {
+      this.datosEmpleado = data[0];
+      this.datosEmpleado.fec_nacimiento_ = this.validar.FormatearFecha(this.datosEmpleado.fec_nacimiento, formato_fecha, this.validar.dia_abreviado);
+      console.log('this.datosEmpleado: ',this.datosEmpleado);
+    })
+  }
+
   // METODO DE MENU RAPIDO
   MenuRapido(num: number) {
     switch (num) {
+      case 0: //Info Empleado
+        this.router.navigate(['/datosEmpleado'], { relativeTo: this.route, skipLocationChange: false });
+        break;
       case 1: // PERMISOS
         this.router.navigate(['/solicitarPermiso'], { relativeTo: this.route, skipLocationChange: false });
         break;

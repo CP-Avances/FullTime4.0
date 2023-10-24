@@ -98,6 +98,9 @@ export class HomeComponent implements OnInit {
   // METODO DE MENU RAPIDO
   MenuRapido(num: number) {
     switch (num) {
+      case 0: // Info Usuario
+        this.router.navigate(['/verEmpleado/'+this.idEmpleado], { relativeTo: this.route, skipLocationChange: false });
+        break; 
       case 1: // REPORTES
         this.router.navigate(['/timbres-personal'], { relativeTo: this.route, skipLocationChange: false });
         break;
