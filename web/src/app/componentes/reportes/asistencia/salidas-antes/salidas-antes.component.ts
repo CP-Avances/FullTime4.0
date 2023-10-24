@@ -13,10 +13,11 @@ import * as xlsx from 'xlsx';
 
 // IMPORTAR SERVICIOS
 import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
+import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
+import { SalidasAntesService } from 'src/app/servicios/reportes/salidas-antes/salidas-antes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { SalidasAntesService } from 'src/app/servicios/reportes/salidas-antes/salidas-antes.service';
 
 @Component({
   selector: 'app-salidas-antes',
@@ -39,168 +40,254 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   departamentos: any = [];
   sucursales: any = [];
   empleados: any = [];
+  respuesta: any = [];
   data_pdf: any = [];
-  tabulado: any = [];
-  respuesta: any[];
+  regimen: any = [];
+  timbres: any = [];
+  cargos: any = [];
+  origen: any = [];
 
-  // VARIABLES DE ALMACENAMIENTO DE DATOS SELECCIONADOS SEGÚN OPCIÓN
+  //VARIABLES PARA MOSTRAR DETALLES
+  tipo: string;
+  verDetalle: boolean = false;
+
+  // VARIABLES DE ALMACENAMIENTO DE DATOS SELECCIONADOS EN LA BUSQUEDA
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
+  selectionReg = new SelectionModel<any>(true, []);
+  selectionCar = new SelectionModel<ITableEmpleados>(true, []);
   selectionDep = new SelectionModel<ITableEmpleados>(true, []);
   selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
-  selectionTab = new SelectionModel<ITableEmpleados>(true, []);
 
   // ITEMS DE PAGINACION DE LA TABLA SUCURSAL
-  tamanio_pagina_suc: number = 5;
   numero_pagina_suc: number = 1;
+  tamanio_pagina_suc: number = 5;
   pageSizeOptions_suc = [5, 10, 20, 50];
-  // ITEMS DE PAGINACION DE LA TABLA DEPARTAMENTO
-  tamanio_pagina_dep: number = 5;
-  numero_pagina_dep: number = 1;
-  pageSizeOptions_dep = [5, 10, 20, 50];
-  // ITEMS DE PAGINACION DE LA TABLA EMPLEADOS
-  tamanio_pagina_emp: number = 5;
-  numero_pagina_emp: number = 1;
-  pageSizeOptions_emp = [5, 10, 20, 50];
-  // ITEMS DE PAGINACION DE LA TABLA TABULACION
-  tamanio_pagina_tab: number = 5;
-  numero_pagina_tab: number = 1;
-  pageSizeOptions_tab = [5, 10, 20, 50];
 
-  // FILTRO DE DATOS DE SUCURSAL
-  get filtroNombreSuc() { return this.reporteService.filtroNombreSuc }
-  // FILTRO DE DATOS DE DEPARTAMENTOS
-  get filtroNombreDep() { return this.reporteService.filtroNombreDep }
-  // FILTRO DE DATOS DE EMPLEADO
+  // ITEMS DE PAGINACION DE LA TABLA REGIMEN
+  numero_pagina_reg: number = 1;
+  tamanio_pagina_reg: number = 5;
+  pageSizeOptions_reg = [5, 10, 20, 50];
+
+  // ITEMS DE PAGINACION DE LA TABLA CARGO
+  numero_pagina_car: number = 1;
+  tamanio_pagina_car: number = 5;
+  pageSizeOptions_car = [5, 10, 20, 50];
+
+  // ITEMS DE PAGINACION DE LA TABLA DEPARTAMENTO
+  numero_pagina_dep: number = 1;
+  tamanio_pagina_dep: number = 5;
+  pageSizeOptions_dep = [5, 10, 20, 50];
+
+  // ITEMS DE PAGINACION DE LA TABLA EMPLEADOS
+  numero_pagina_emp: number = 1;
+  tamanio_pagina_emp: number = 5;
+  pageSizeOptions_emp = [5, 10, 20, 50];
+
+  // ITEMS DE PAGINACION DE LA TABLA DETALLE
+  pageSizeOptions = [5, 10, 20, 50];
+  tamanio_pagina: number = 5;
+  numero_pagina: number = 1;
+
+  //FILTROS
+  get filtroNombreSuc() { return this.reporteService.filtroNombreSuc };
+
+  get filtroNombreDep() { return this.reporteService.filtroNombreDep };
+
+  get filtroNombreReg() { return this.reporteService.filtroNombreReg };
+
+  get filtroNombreCar() { return this.reporteService.filtroNombreCarg };
+
+  get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
-  get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
-  // FILTRO DE DATOS TABULADOS
-  get filtroCodigo_tab() { return this.reporteService.filtroCodigo_tab };
-  get filtroCedula_tab() { return this.reporteService.filtroCedula_tab };
-  get filtroNombreTab() { return this.reporteService.filtroNombreTab };
 
   constructor(
     private R_asistencias: ReportesAsistenciasService,
     private validacionService: ValidacionesService,
+    private informacion: DatosGeneralesService,
     private reporteService: ReportesService,
+    private restSalida: SalidasAntesService,
     private restEmpre: EmpresaService,
     private toastr: ToastrService,
-
-
-    public restSalida: SalidasAntesService,
-
-
   ) {
     this.ObtenerLogo();
     this.ObtenerColores();
   }
 
   ngOnInit(): void {
-    sessionStorage.removeItem('reporte_timbres_multiple');
-    this.R_asistencias.DatosGeneralesUsuarios().subscribe((res: any[]) => {
-      sessionStorage.setItem('reporte_timbres_multiple', JSON.stringify(res))
-      this.sucursales = res.map(obj => {
-        return {
-          id: obj.id_suc,
-          nombre: obj.name_suc
-        }
-      });
+    this.BuscarInformacion();
+    this.BuscarCargos();
+  }
 
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
-          this.departamentos.push({
-            id: ele.id_depa,
-            nombre: ele.name_dep
-          })
-        })
-      })
+  // METODO DE BUSQUEDA DE DATOS
+  BuscarInformacion() {
+    this.departamentos = [];
+    this.sucursales = [];
+    this.respuesta = [];
+    this.empleados = [];
+    this.regimen = [];
+    this.origen = [];
+    this.informacion.ObtenerInformacion(1).subscribe(
+      (res: any[]) => {
+        this.origen = JSON.stringify(res);
+        res.forEach((obj) => {
+          this.sucursales.push({
+            id: obj.id_suc,
+            nombre: obj.name_suc,
+          });
+        });
 
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
-          ele.empleado.forEach(r => {
-            let elemento = {
+        res.forEach((obj) => {
+          obj.departamentos.forEach((ele) => {
+            this.departamentos.push({
+              id: ele.id_depa,
+              departamento: ele.name_dep,
+              nombre: ele.sucursal,
+            });
+          });
+        });
+
+        res.forEach((obj) => {
+          obj.departamentos.forEach((ele) => {
+            ele.empleado.forEach((r) => {
+              let elemento = {
+                id: r.id,
+                nombre: r.name_empleado,
+                codigo: r.codigo,
+                cedula: r.cedula,
+                correo: r.correo,
+                cargo: r.cargo,
+                id_contrato: r.id_contrato,
+                hora_trabaja: r.hora_trabaja,
+                sucursal: r.sucursal,
+                departamento: r.departamento,
+                ciudad: r.ciudad,
+                regimen: r.regimen,
+              };
+              this.empleados.push(elemento);
+            });
+          });
+        });
+
+        res.forEach((obj) => {
+          obj.departamentos.forEach((ele) => {
+            ele.empleado.forEach((reg) => {
+              reg.regimen.forEach((r) => {
+                this.regimen.push({
+                  id: r.id_regimen,
+                  nombre: r.name_regimen,
+                });
+              });
+            });
+          });
+        });
+
+        this.regimen = this.regimen.filter(
+          (obj, index, self) => index === self.findIndex((o) => o.id === obj.id)
+        );
+      },
+      (err) => {
+        this.toastr.error(err.error.message);
+      }
+    );
+  }
+
+  // METODO PARA FILTRAR POR CARGOS
+  empleados_cargos: any = [];
+  origen_cargo: any = [];
+  BuscarCargos() {
+    this.empleados_cargos = [];
+    this.origen_cargo = [];
+    this.cargos = [];
+    this.informacion.ObtenerInformacionCargo(1).subscribe(
+      (res: any[]) => {
+        this.origen_cargo = JSON.stringify(res);
+
+        res.forEach((obj) => {
+          this.cargos.push({
+            id: obj.id_cargo,
+            nombre: obj.name_cargo,
+          });
+        });
+
+        res.forEach((obj) => {
+          obj.empleados.forEach((r) => {
+            this.empleados_cargos.push({
               id: r.id,
               nombre: r.name_empleado,
               codigo: r.codigo,
-              cedula: r.cedula
-            }
-            this.empleados.push(elemento)
-            this.tabulado.push(elemento)
-          })
-        })
-      })
-      // console.log('SUCURSALES',this.sucursales);
-      // console.log('DEPARTAMENTOS',this.departamentos);
-      // console.log('EMPLEADOS',this.empleados);
-      // console.log('TABULADO',this.tabulado);
-      // console.log('INCOMPLETOS',this.incompletos);
-
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-
+              cedula: r.cedula,
+              correo: r.correo,
+              ciudad: r.ciudad,
+              id_cargo: r.id_cargo,
+              id_contrato: r.id_contrato,
+              hora_trabaja: r.hora_trabaja,
+            });
+          });
+        });
+      },
+    );
   }
 
 
   ngOnDestroy() {
-    this.respuesta = [];
-    this.sucursales = [];
     this.departamentos = [];
+    this.sucursales = [];
+    this.respuesta = [];
     this.empleados = [];
-    this.tabulado = [];
+    this.regimen = [];
+    this.timbres = [];
+    this.cargos = [];
   }
 
-  /**
-   * VALIDACIONES REPORT
-   */
-  validacionReporte(action) {
-    console.log('Rango de fechas', this.rangoFechas);
-
-    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de busqueda')
-    if (this.bool.bool_suc === false && this.bool.bool_dep === false && this.bool.bool_emp === false
-      && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda')
-    console.log('opcion:', this.opcion);
-
+  // VALIDACIONES DE OPCIONES DE REPORTE
+  validacionReporte(action: any) {
+    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de búsqueda.');
+    if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
+      && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.');
     switch (this.opcion) {
       case 's':
-        if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione sucursal')
+        if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione sucursal.')
         this.ModelarSucursal(action);
         break;
+      case 'r':
+        if (this.selectionReg.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione régimen.')
+        // this.ModelarRegimen(action);
+        break;
       case 'd':
-        if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione departamentos')
+        if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione departamentos.')
         this.ModelarDepartamento(action);
         break;
+      case 'c':
+        if (this.selectionCar.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione cargos.')
+        // this.ModelarCargo(action);
+        break;
       case 'e':
-        if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione empleados')
+        if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione empleados.')
         this.ModelarEmpleados(action);
         break;
-      case 't':
-        if (this.selectionTab.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione empleados')
-        this.ModelarTabulado(action);
-        break;
       default:
-        this.toastr.error('Algo a pasado', 'Seleccione criterio de busqueda')
+        this.toastr.error('Ups !!! algo salio mal.', 'Seleccione criterio de búsqueda.')
         this.reporteService.DefaultFormCriterios()
         break;
     }
   }
 
   ModelarSucursal(accion) {
-
-    let respuesta = JSON.parse(sessionStorage.getItem('reporte_timbres_multiple') as any)
+    this.tipo = 'default';
+    let respuesta = JSON.parse(this.origen)
 
     let suc = respuesta.filter(o => {
       var bool = this.selectionSuc.selected.find(obj1 => {
         return obj1.id === o.id_suc
-      })
+      });
       return bool != undefined
-    })
+    });
 
-    // console.log('SUCURSAL', suc);
     this.data_pdf = []
-    this.restSalida.BuscarTimbresAccionS(suc, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.restSalida.BuscarTimbresSalidasAnticipadas(suc, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
-      // console.log('DATA PDF', this.data_pdf);
+      console.log('DATA PDF', this.data_pdf);
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
         default: this.generarPdf(accion); break;
@@ -227,7 +314,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     });
     // console.log('DEPARTAMENTOS', dep);
     this.data_pdf = []
-    this.restSalida.BuscarTimbresAccionS(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.restSalida.BuscarTimbresSalidasAnticipadas(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       // console.log('DATA PDF',this.data_pdf);
       switch (accion) {
@@ -265,7 +352,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
 
     // console.log('EMPLEADOS', emp);
     this.data_pdf = []
-    this.restSalida.BuscarTimbresAccionS(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.restSalida.BuscarTimbresSalidasAnticipadas(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       console.log('DATA PDF-------------------------------------', this.data_pdf);
 
@@ -282,45 +369,6 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
       this.toastr.error(err.error.message)
     })
   }
-
-  ModelarTabulado(accion) {
-
-    let respuesta = JSON.parse(sessionStorage.getItem('reporte_timbres_multiple') as any)
-
-    respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach(element => {
-        element.empleado = element.empleado.filter(o => {
-          var bool = this.selectionTab.selected.find(obj1 => {
-            return obj1.id === o.id
-          })
-          return bool != undefined
-        })
-      });
-    })
-    respuesta.forEach(obj => {
-      obj.departamentos = obj.departamentos.filter(e => {
-        return e.empleado.length > 0
-      })
-    });
-
-    let tab = respuesta.filter(obj => {
-      return obj.departamentos.length > 0
-    });
-
-    // console.log('TABULADO', tab);
-    this.data_pdf = []
-    this.restSalida.BuscarTimbresAccionS(tab, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      // console.log('TABULADO PDF',this.data_pdf
-      switch (accion) {
-        case 'excel': this.exportToExcel('tabulado'); break;
-        default: this.generarPdf(accion); break;
-      }
-    }, err => {
-      this.toastr.error(err.error.message)
-    })
-  }
-
 
   /***********************************
    * 
@@ -356,14 +404,11 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   generarPdf(action) {
     let documentDefinition;
 
-    if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true) {
+    if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true || this.bool.bool_cargo === true || this.bool.bool_reg === true) {
       documentDefinition = this.getDocumentDefinicion();
-    } else if (this.bool.bool_tab === true) {
-      documentDefinition = this.getDocumentDefinicionTabulado();
-    }
+    };
 
-    var f = new Date()
-    let doc_name = "Reporte Timbres" + f.toLocaleString() + ".pdf";
+    let doc_name = "Salidas_anticipadas.pdf";
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -373,21 +418,17 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
 
   }
 
-  getDocumentDefinicion() {
+   getDocumentDefinicion() {
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',
       pageMargins: [40, 50, 40, 50],
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + localStorage.getItem('fullname_print'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
-
-      footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var h = new Date();
+      footer: function (currentPage: any, pageCount: any, fecha: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
-        h.setUTCHours(h.getHours());
-        var time = h.toJSON().split("T")[1].split(".")[0];
-
+        var time = f.format('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -406,21 +447,23 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
       },
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
-        { text: localStorage.getItem('name_empresa'), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
-        { text: 'Reporte - Timbres', bold: true, fontSize: 18, alignment: 'center', margin: [0, -10, 0, 5] },
-        { text: 'Periodo del: ' + this.rangoFechas.fec_inico + " al " + this.rangoFechas.fec_final, bold: true, fontSize: 15, alignment: 'center', margin: [0, 10, 0, 10] },
+        { text: (localStorage.getItem('name_empresa') as string).toUpperCase(), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
+        { text: 'SALIDAS ANTICIPADAS', bold: true, fontSize: 16, alignment: 'center', margin: [0, -10, 0, 5] },
+        { text: 'PERIODO DEL: ' + this.rangoFechas.fec_inico + " AL " + this.rangoFechas.fec_final, bold: true, fontSize: 15, alignment: 'center', margin: [0, 10, 0, 10] },
         ...this.impresionDatosPDF(this.data_pdf).map(obj => {
           return obj
         })
       ],
       styles: {
-        tableHeader: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color },
+        tableHeader: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color },
+        centrado: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 10, 0, 10] },
         itemsTable: { fontSize: 8 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
-        itemsTableInfoBlanco: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: '#E3E3E3' },
-        itemsTableCentrado: { fontSize: 10, alignment: 'center' },
-        tableMargin: { margin: [0, 0, 0, 20] },
-        tableMarginCabecera: { margin: [0, 10, 0, 0] },
+        itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0],fillColor: '#E3E3E3' },
+        itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
+        itemsTableCentrado: { fontSize: 8, alignment: 'center' },
+        tableMargin: { margin: [0, 0, 0, 10] },
+        tableMarginCabecera: { margin: [0, 15, 0, 0] },
         quote: { margin: [5, -2, 0, -2], italics: true },
         small: { fontSize: 8, color: 'blue', opacity: 0.5 }
       }
@@ -430,279 +473,343 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   impresionDatosPDF(data: any[]): Array<any> {
     let n: any = []
     let c = 0;
+    var accionT: string = '';
 
-    data.forEach((obj: ReporteSalidaAntes) => {
-
-      if (this.bool.bool_suc === true || this.bool.bool_dep === true) {
-        n.push({
-          table: {
-            widths: ['*', '*'],
-            body: [
-              [
-                {
-                  border: [true, true, false, true],
-                  bold: true,
-                  text: 'CIUDAD: ' + obj.ciudad,
-                  style: 'itemsTableInfo'
-                },
-                {
-                  border: [false, true, true, true],
-                  text: 'SUCURSAL: ' + obj.name_suc,
-                  style: 'itemsTableInfo'
-                }
-              ]
-            ]
-          }
-        })
-      }
-
-      obj.departamentos.forEach(obj1 => {
-
-        // LA CABECERA CUANDO SE GENERA EL PDF POR DEPARTAMENTOS
-        if (this.bool.bool_dep === true) {
-          let arr_reg = obj1.empleado.map((o: any) => { return o.timbres.length })
-          let reg = this.SumarRegistros(arr_reg);
+    if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
+      data.forEach((obj1) => {
+        let arr_reg = obj1.empleados.map((o: any) => { return o.timbres.length })
+        let reg = this.SumarRegistros(arr_reg);
+        if (this.bool.bool_cargo === true) {
           n.push({
             style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
+              headerRows: 1,
               body: [
                 [
                   {
                     border: [true, true, false, true],
-                    text: 'DEPARTAMENTO: ' + obj1.name_dep,
-                    style: 'itemsTableInfoBlanco'
+                    bold: true,
+                    text: 'CARGO: ' + obj1.name_cargo,
+                    style: 'itemsTableInfo',
                   },
                   {
-                    border: [true, true, true, true],
-                    text: 'N° REGISTROS: ' + reg,
-                    style: 'itemsTableInfoBlanco'
-                  }
-                ]
-              ]
-            }
-          })
+                    border: [false, true, true, true],
+                    text: 'N° Registros: ' + reg,
+                    style: 'itemsTableInfo',
+                  },
+                ],
+              ],
+            },
+          });
+        } else {
+          n.push({
+            style: 'tableMarginCabecera',
+            table: {
+              widths: ['*', '*'],
+              headerRows: 1,
+              body: [
+                [
+                  {
+                    border: [true, true, false, true],
+                    bold: true,
+                    text: 'RÉGIMEN: ' + obj1.regimen.nombre,
+                    style: 'itemsTableInfo',
+                  },
+                  {
+                    border: [false, true, true, true],
+                    text: 'N° Registros: ' + reg,
+                    style: 'itemsTableInfo',
+                  },
+                ],
+              ],
+            },
+          });
         }
 
-        obj1.empleado.forEach((obj2: any) => {
-
+        obj1.empleados.forEach((obj2: any) => {
           n.push({
             style: 'tableMarginCabecera',
             table: {
               widths: ['*', 'auto', 'auto'],
+              headerRows: 2,
               body: [
                 [
                   {
                     border: [true, true, false, false],
                     text: 'EMPLEADO: ' + obj2.name_empleado,
-                    style: 'itemsTableInfoBlanco'
+                    style: 'itemsTableInfoEmpleado',
                   },
                   {
                     border: [false, true, false, false],
                     text: 'C.C.: ' + obj2.cedula,
-                    style: 'itemsTableInfoBlanco'
+                    style: 'itemsTableInfoEmpleado',
                   },
                   {
                     border: [false, true, true, false],
                     text: 'COD: ' + obj2.codigo,
-                    style: 'itemsTableInfoBlanco'
+                    style: 'itemsTableInfoEmpleado',
+                  },
+                ],
+                [
+                  {
+                    border: [true, false, false, false],
+                    text: 'DEPARTAMENTO: ' + obj2.departamento,
+                    style: 'itemsTableInfoEmpleado'
+                  },
+                  {
+                    border: [false, false, false, false],
+                    text: this.bool.bool_reg ? 'CARGO: ' + obj2.cargo : '',
+                    style: 'itemsTableInfoEmpleado'
+                  },
+                  {
+                    border: [false, false, true, false],
+                    text: '',
+                    style: 'itemsTableInfoEmpleado'
                   }
                 ]
-              ]
-            }
+              ],
+            },
           });
+          c = 0;
           n.push({
             style: 'tableMargin',
             table: {
-              widths: ['auto', '*', 'auto', 'auto', 'auto', '*', '*'],
+              widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto'],
+              headerRows: 2,
               body: [
                 [
-                  { text: 'N°', style: 'tableHeader' },
-                  { text: 'Timbre', style: 'tableHeader' },
-                  { text: 'Reloj', style: 'tableHeader' },
-                  { text: 'Accion', style: 'tableHeader' },
-                  { text: 'Observacion', style: 'tableHeader' },
-                  { text: 'Longuitud', style: 'tableHeader' },
-                  { text: 'Latitud', style: 'tableHeader' }
+                  { rowSpan: 2, text: 'N°', style: 'centrado' },
+                  { rowSpan: 1, colSpan: 2, text: 'HORARIO', style: 'tableHeader' },
+                  {},
+                  { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                  {},
+                  { rowSpan: 2, text: 'TIPO PERMISO', style: 'centrado' },
+                  { rowSpan: 2, text: 'DESDE', style: 'centrado' },
+                  { rowSpan: 2, text: 'HASTA', style: 'centrado' },
+                  { rowSpan: 2, colSpan: 2, text: 'PERMISO', style: 'tableHeader' },
+                  { rowSpan: 2, colSpan: 2, text: 'SALIDA ANTICIPADA', style: 'tableHeader' },
+                ],
+                [
+                  {},
+                  { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                  { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                  { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                  { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                  {},{},{},
+                  {},
+                  {}
+
                 ],
                 ...obj2.timbres.map(obj3 => {
                   c = c + 1
                   return [
                     { style: 'itemsTableCentrado', text: c },
-                    { style: 'itemsTable', text: obj3.fec_hora_timbre },
-                    { style: 'itemsTable', text: obj3.id_reloj },
-                    { style: 'itemsTable', text: obj3.accion },
-                    { style: 'itemsTable', text: obj3.observacion },
-                    { style: 'itemsTable', text: obj3.longitud },
-                    { style: 'itemsTable', text: obj3.latitud },
-                  ]
-                })
-
-              ]
+                    { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[0] },
+                    { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[1] },
+                    { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[0] },
+                    { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[1] },
+                    {},
+                    {},
+                    {},
+                    {},{},
+                    {style: 'itemsTableCentrado', text: obj3.diferencia },
+                    {style: 'itemsTableCentrado', text: obj3.diferencia },
+                  ];
+                }),
+              ],
             },
             layout: {
               fillColor: function (rowIndex) {
                 return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
               }
             }
-          })
-
-
+          });
         });
-
       });
+    } else {
+      data.forEach((obj: ReporteSalidaAntes) => {
 
-    })
+        if (this.bool.bool_suc === true || this.bool.bool_dep === true) {
+          n.push({
+            table: {
+              widths: ['*', '*'],
+              headerRows: 1,
+              body: [
+                [
+                  {
+                    border: [true, true, false, true],
+                    bold: true,
+                    text: 'CIUDAD: ' + obj.ciudad,
+                    style: 'itemsTableInfo'
+                  },
+                  {
+                    border: [false, true, true, true],
+                    text: 'SUCURSAL: ' + obj.name_suc,
+                    style: 'itemsTableInfo'
+                  }
+                ]
+              ]
+            }
+          })
+        }
 
-    return n
-  }
+        obj.departamentos.forEach(obj1 => {
 
-  getDocumentDefinicionTabulado() {
-    return {
-      pageSize: 'A4',
-      pageOrientation: 'landscape',
-      pageMargins: [40, 50, 40, 50],
-      watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
-      header: { text: 'Impreso por:  ' + localStorage.getItem('fullname_print'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
+          // LA CABECERA CUANDO SE GENERA EL PDF POR DEPARTAMENTOS
+          if (this.bool.bool_dep === true) {
+            let arr_reg = obj1.empleado.map((o: any) => { return o.timbres.length })
+            let reg = this.SumarRegistros(arr_reg);
+            n.push({
+              style: 'tableMarginCabecera',
+              table: {
+                widths: ['*', '*'],
+                headerRows: 1,
+                body: [
+                  [
+                    {
+                      border: [true, true, false, true],
+                      text: 'DEPARTAMENTO: ' + obj1.name_dep,
+                      style: 'itemsTableInfoBlanco'
+                    },
+                    {
+                      border: [true, true, true, true],
+                      text: 'N° REGISTROS: ' + reg,
+                      style: 'itemsTableInfoBlanco'
+                    }
+                  ]
+                ]
+              }
+            })
+          }
 
-      footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var h = new Date();
-        var f = moment();
-        fecha = f.format('YYYY-MM-DD');
-        h.setUTCHours(h.getHours());
-        var time = h.toJSON().split("T")[1].split(".")[0];
+          obj1.empleado.forEach((obj2: any) => {
 
-        return {
-          margin: 10,
-          columns: [
-            { text: 'Fecha: ' + fecha + ' Hora: ' + time, opacity: 0.3 },
-            {
-              text: [
-                {
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
-                  alignment: 'right', opacity: 0.3
+            n.push({
+              style: 'tableMarginCabecera',
+              table: {
+                widths: ['*', 'auto', 'auto',],
+                headerRows: 2,
+                body: [
+                  [
+                    {
+                      border: [true, true, false, false],
+                      text: 'EMPLEADO: ' + obj2.name_empleado,
+                      style: 'itemsTableInfoEmpleado'
+                    },
+                    {
+                      border: [false, true, false, false],
+                      text: 'C.C.: ' + obj2.cedula,
+                      style: 'itemsTableInfoEmpleado'
+                    },
+                    {
+                      border: [false, true, true, false],
+                      text: 'COD: ' + obj2.codigo,
+                      style: 'itemsTableInfoEmpleado'
+                    }
+                  ],
+                  [
+                    {
+                      border: [true, false, false, false],
+                      text: this.bool.bool_suc || this.bool.bool_emp?'DEPARTAMENTO: ' + obj2.departamento:'',
+                      style: 'itemsTableInfoEmpleado'
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: 'CARGO: ' + obj2.cargo,
+                      style: 'itemsTableInfoEmpleado'
+                    },
+                    {
+                      border: [false, false, true, false],
+                      text: '',
+                      style: 'itemsTableInfoEmpleado'
+                    }
+                  ]
+                ]
+              }
+            });
+            c = 0;
+            n.push({
+              style: 'tableMargin',
+              table: {
+                widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
+                headerRows: 2,
+                body: [
+                  [
+                    { rowSpan: 2, text: 'N°', style: 'centrado' },
+                    { rowSpan: 1, colSpan: 2, text: 'HORARIO', style: 'tableHeader' },
+                    {},
+                    { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                    {},
+                    { rowSpan: 2, text: 'TIPO PERMISO', style: 'centrado' },
+                    { rowSpan: 2, text: 'DESDE', style: 'centrado' },
+                    { rowSpan: 2, text: 'HASTA', style: 'centrado' },
+                    { rowSpan: 2, colSpan: 2, text: 'PERMISO', style: 'centrado' },
+                    {},
+                    { rowSpan: 2, colSpan: 2, text: 'SALIDA ANTICIPADA', style: 'centrado' },
+                    {}
+                  ],
+                  [
+                    {},
+                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                    {},{},{},
+                    {},
+                    {},
+                    {},
+                    {},
+  
+                  ],
+                  ...obj2.timbres.map(obj3 => {
+                    c = c + 1
+                    return [
+                      { style: 'itemsTableCentrado', text: c },
+                      { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[0] },
+                      { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[1] },
+                      { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[0] },
+                      { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[1] },
+                      {},
+                      {},
+                      {},
+                      {},{},
+                      {style: 'itemsTableCentrado', text: this.segundosAMinutosSegundos(obj3.diferencia)},
+                      {style: 'itemsTableCentrado', text: this.segundosAMinutosSegundos(obj3.diferencia) },
+                    ];
+                  }),
+                  [
+                    {},{},{},{},{},{},{},
+                    {style: 'itemsTableCentrado', text: 'TOTAL'},
+                    {},{},{},{}
+                  ],
+                  [
+                    {},{},{},{},{},{},{},
+                    {style: 'itemsTableCentrado', text: 'TOTAL'},
+                    {},{},{},{}
+                  ],
+                ],
+              },
+              layout: {
+                fillColor: function (rowIndex) {
+                  return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
                 }
-              ],
-            }
-          ],
-          fontSize: 10
-        }
-      },
-      content: [
-        { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
-        { text: localStorage.getItem('name_empresa'), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
-        { text: 'Reporte Tabulado de Timbres', bold: true, fontSize: 15, alignment: 'center', margin: [0, 10, 0, 10] },
-        { text: 'Periodo del: ' + this.rangoFechas.fec_inico + " al " + this.rangoFechas.fec_final, bold: true, fontSize: 15, alignment: 'center', margin: [0, 10, 0, 10] },
-        this.impresionDatosPDFtabulado(this.data_pdf)
-      ],
-      styles: {
-        tableHeader: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTable: { fontSize: 8 },
-        itemsTableCentrado: { fontSize: 10, alignment: 'center' },
-        tableMargin: { margin: [0, 0, 0, 20] },
-        tableMarginCabecera: { margin: [0, 10, 0, 0] },
-        quote: { margin: [5, -2, 0, -2], italics: true },
-        small: { fontSize: 8, color: 'blue', opacity: 0.5 }
-      }
-    };
-  }
-
-  impresionDatosPDFtabulado(data: any[]) {
-    let n = []
-    let c = 0;
-    let arrayTab: any = [];
-
-    data.forEach((obj: ReporteSalidaAntes) => {
-      obj.departamentos.forEach(obj1 => {
-        obj1.empleado.forEach((obj2: any) => {
-          let cont_emp = 0;
-
-          obj2.timbres.map((obj3: tim_tabulado) => {
-            c = c + 1;
-            cont_emp = cont_emp + 1;
-            if (cont_emp === 1) {
-              let ret = [
-                { style: 'itemsTableCentrado', text: c },
-                { rowSpan: obj2.timbres.length, style: 'itemsTable', text: obj2.name_empleado },
-                { rowSpan: obj2.timbres.length, style: 'itemsTable', text: obj2.cedula },
-                { rowSpan: obj2.timbres.length, style: 'itemsTable', text: obj2.codigo },
-                { rowSpan: obj2.timbres.length, style: 'itemsTable', text: obj.ciudad },
-                { rowSpan: obj2.timbres.length, style: 'itemsTable', text: obj1.name_dep },
-                { rowSpan: obj2.timbres.length, style: 'itemsTable', text: obj2.cargo },
-                { rowSpan: obj2.timbres.length, style: 'itemsTable', text: obj2.contrato },
-                { style: 'itemsTable', text: obj3.fecha },
-              ]
-              arrayTab.push(ret)
-              return ret
-            } else {
-              let ret = [
-                { style: 'itemsTableCentrado', text: c },
-                { style: 'itemsTable', text: '' },
-                { style: 'itemsTable', text: '' },
-                { style: 'itemsTable', text: '' },
-                { style: 'itemsTable', text: '' },
-                { style: 'itemsTable', text: '' },
-                { style: 'itemsTable', text: '' },
-                { style: 'itemsTable', text: '' },
-                { style: 'itemsTable', text: obj3.fecha },
-
-              ]
-              arrayTab.push(ret)
-              return ret
-            }
-
-          })
-
+              }
+            });
+          });
         });
-
       });
-
-    })
-
-    return {
-      style: 'tableMargin',
-      table: {
-        widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
-        body: [
-          [
-            { text: 'N°', style: 'tableHeader' },
-            { text: 'Empleado', style: 'tableHeader' },
-            { text: 'Cédula', style: 'tableHeader' },
-            { text: 'Cod.', style: 'tableHeader' },
-            { text: 'Ciudad', style: 'tableHeader' },
-            { text: 'Departamento', style: 'tableHeader' },
-            { text: 'Cargo', style: 'tableHeader' },
-            { text: 'Contrato', style: 'tableHeader' },
-            { text: 'Fecha', style: 'tableHeader' },
-            { text: 'Entrada', style: 'tableHeader' },
-            { text: 'Sal.Alm', style: 'tableHeader' },
-            { text: 'Ent.Alm', style: 'tableHeader' },
-            { text: 'Salida', style: 'tableHeader' },
-            { text: 'Desco.', style: 'tableHeader' }
-          ],
-          ...arrayTab.map(obj3 => {
-            return obj3
-          })
-
-        ]
-      },
-      layout: {
-        fillColor: function (rowIndex) {
-          return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-        }
-      }
     }
+    return n;
   }
 
-
-
-
+  // METODO PARA SUMAR REGISTROS
   SumarRegistros(array: any[]) {
     let valor = 0;
     for (let i = 0; i < array.length; i++) {
       valor = valor + array[i];
     }
-    return valor
+    return valor;
   }
 
   HorasDecimalToHHMM(dato: number) {
@@ -728,6 +835,13 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     }
 
     return hora + ':' + min + ':00'
+  }
+
+  segundosAMinutosSegundos(segundos) {
+    console.log(segundos);
+    const minutos = Math.floor(segundos / 60);
+    const segundosRestantes = segundos % 60;
+    return `${minutos}:${segundosRestantes}`;
   }
 
 
@@ -824,6 +938,49 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedReg() {
+    const numSelected = this.selectionReg.selected.length;
+    return numSelected === this.regimen.length;
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterToggleReg() {
+    this.isAllSelectedReg()
+      ? this.selectionReg.clear()
+      : this.regimen.forEach((row) => this.selectionReg.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
+  checkboxLabelReg(row?: ITableEmpleados): string {
+    if (!row) {
+      return `${this.isAllSelectedReg() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1
+      }`;
+  }
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedCar() {
+    const numSelected = this.selectionCar.selected.length;
+    return numSelected === this.cargos.length
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterToggleCar() {
+    this.isAllSelectedCar() ?
+      this.selectionCar.clear() :
+      this.cargos.forEach(row => this.selectionCar.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelCar(row?: ITableEmpleados): string {
+    if (!row) {
+      return `${this.isAllSelectedCar() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selectionCar.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedDep() {
     const numSelected = this.selectionDep.selected.length;
     return numSelected === this.departamentos.length
@@ -865,41 +1022,35 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
-  isAllSelectedTab() {
-    const numSelected = this.selectionTab.selected.length;
-    return numSelected === this.tabulado.length
-  }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
-  masterToggleTab() {
-    this.isAllSelectedTab() ?
-      this.selectionTab.clear() :
-      this.tabulado.forEach(row => this.selectionTab.select(row));
-  }
-
-  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
-  checkboxLabelTab(row?: ITableEmpleados): string {
-    if (!row) {
-      return `${this.isAllSelectedTab() ? 'select' : 'deselect'} all`;
-    }
-    return `${this.selectionTab.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
-  }
-
+  // METODO PARA EVENTOS DE PAGINACION
   ManejarPagina(e: PageEvent) {
     if (this.bool.bool_suc === true) {
       this.tamanio_pagina_suc = e.pageSize;
       this.numero_pagina_suc = e.pageIndex + 1;
-    } else if (this.bool.bool_dep === true) {
+    }
+    else if (this.bool.bool_reg === true) {
+      this.tamanio_pagina_reg = e.pageSize;
+      this.numero_pagina_reg = e.pageIndex + 1;
+    }
+    else if (this.bool.bool_cargo === true) {
+      this.tamanio_pagina_car = e.pageSize;
+      this.numero_pagina_car = e.pageIndex + 1;
+    }
+    else if (this.bool.bool_dep === true) {
       this.tamanio_pagina_dep = e.pageSize;
       this.numero_pagina_dep = e.pageIndex + 1;
-    } else if (this.bool.bool_emp === true) {
+    }
+    else if (this.bool.bool_emp === true) {
       this.tamanio_pagina_emp = e.pageSize;
       this.numero_pagina_emp = e.pageIndex + 1;
-    } else if (this.bool.bool_tab === true) {
-      this.tamanio_pagina_tab = e.pageSize;
-      this.numero_pagina_tab = e.pageIndex + 1;
     }
+  }
+
+  // METODO PARA MANEJAR PAGINACION DETALLE
+  ManejarPaginaDetalle(e: PageEvent) {
+    this.numero_pagina = e.pageIndex + 1;
+    this.tamanio_pagina = e.pageSize;
   }
 
   /**
@@ -914,22 +1065,18 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     return this.validacionService.IngresarSoloNumeros(evt)
   }
 
-  MostrarLista() {
-    if (this.opcion === 's') {
-      /*this.nombre_suc.reset();
-      this.Filtrar('', 1)*/
+  // MOSTRAR DETALLES
+  verDatos() {
+    this.verDetalle = true;
+    if (this.bool.bool_cargo || this.bool.bool_reg) {
+      // this.extraerTimbresRegimenCargo();
+    } else {
+      // this.extraerTimbres();
     }
-    else if (this.opcion === 'd') {
-      /*this.nombre_dep.reset();
-      this.Filtrar('', 2)*/
-    }
-    else if (this.opcion === 'e') {
-      /*this.codigo.reset();
-      this.cedula.reset();
-      this.nombre_emp.reset();
-      this.Filtrar('', 3)
-      this.Filtrar('', 4)
-      this.Filtrar('', 5)*/
-    }
+  }
+
+  // METODO PARA REGRESAR A LA PAGINA ANTERIOR
+  Regresar() {
+    this.verDetalle = false;
   }
 }
