@@ -249,9 +249,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
   validacionReporte(action: any) {
     if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de búsqueda.');
     if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
-      && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.')
-    //console.log('opcion:', this.opcion);
-    //console.log('ver rol -----------------------***********', localStorage.getItem('rol'))
+      && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.');
     switch (this.opcion) {
       case 's':
         if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione sucursal.')
@@ -288,9 +286,9 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     let suc = respuesta.filter(o => {
       var bool = this.selectionSuc.selected.find(obj1 => {
         return obj1.id === o.id_suc
-      })
+      });
       return bool != undefined
-    })
+    });
 
     // console.log('SUCURSAL', suc);
     this.data_pdf = []
@@ -658,7 +656,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
                     { rowSpan: 2, text: 'N°', style: 'centrado' },
                     { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
                     {},
-                    { colSpan: 2, text: 'DISPOSITIVO', style: 'tableHeader' },
+                    { rowSpan: 1, colSpan: 2, text: 'DISPOSITIVO', style: 'tableHeader' },
                     {},
                     { rowSpan: 2, text: 'RELOJ', style: 'centrado' },
                     { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
