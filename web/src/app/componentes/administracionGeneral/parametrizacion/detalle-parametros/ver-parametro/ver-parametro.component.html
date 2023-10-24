@@ -19,7 +19,7 @@
 
             <!-- CONTENIDO DISPOSITIVOS REGISTRADOS -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="dispositivos">
-                <div class="nota" id="espacio">
+                <div class="nota" id="espacio" style="text-align: justify;">
                     <span>
                         NOTA: Definir el número de dispositivos que pueden usar los usuarios para registrar sus timbres
                         en la aplicación móvil.
@@ -29,7 +29,7 @@
 
             <!-- CONTENIDO TOLERANCIA DE UBICACION -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="ubicacion">
-                <div class="nota" id="espacio">
+                <div class="nota" id="espacio" style="text-align: justify;">
                     <span>
                         NOTA: El usuario podrá realizar su marcación o timbre dentro del perímetro definido.
                     </span>
@@ -38,7 +38,7 @@
 
             <!-- CONTENIDO LIMITE DE CORREOS -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="limite_correo">
-                <div class="nota" id="espacio">
+                <div class="nota" id="espacio" style="text-align: justify;">
                     <span>
                         NOTA: El sistema solo permitirá enviar el número límite definido de mensajes por correo
                         electrónico.
@@ -48,7 +48,7 @@
 
             <!-- CONTENIDO DE SELECCION DE FORMATO DE FECHAS -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="formato_fecha">
-                <div class="nota" id="espacio">
+                <div class="nota" id="espacio" style="text-align: justify;">
                     <span>
                         NOTA: Seleccionar el tipo de formato de fecha con el cual se va a trabajar en el
                         sistema.
@@ -80,7 +80,7 @@
             </div>
             <!-- CONTENIDO DE SELECCION DE FORMATO DE HORAS -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="formato_hora">
-                <div class="nota" id="espacio">
+                <div class="nota" id="espacio" style="text-align: justify;">
                     <span>
                         NOTA: Seleccionar el tipo de formato de hora con el cual se va a trabajar en el
                         sistema.
@@ -105,7 +105,7 @@
             </div>
             <!-- CONTENIDO DE SELECCION DE TIPO DE CARGA DE VACACIONES -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="carga">
-                <div class="nota" id="espacio">
+                <div class="nota" id="espacio" style="text-align: justify;">
                     <span>NOTA: Seleccionar el tipo de carga de días de vacaciones.</span>
                 </div>
                 <div class="row">
@@ -155,7 +155,7 @@
             </div>
             <!-- CONTENIDO DE SELECCION DE TIPO DE DESCARGA DE KARDEX DE VACACIONES -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="kardex">
-                <div class="nota" id="espacio">
+                <div class="nota" id="espacio" style="text-align: justify;">
                     <span>NOTA: Seleccionar el tipo de descarga de Kardex de vacaciones.</span>
                 </div>
                 <div class="row">
@@ -185,7 +185,7 @@
             </div>
             <!-- CONTENIDO HABILITAR OPCIONES FORMATO LABORAL - CALENDARIO -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="laboral_calendario">
-                <div class="nota" id="espacio">
+                <div class="nota" id="espacio" style="text-align: justify;">
                     <span>NOTA: Seleccionar tipo de formato laboral o calendario para visualización de datos.</span>
                 </div>
                 <div class="row">
@@ -213,6 +213,17 @@
                     <div class="col-md"></div>
                 </div>
             </div>
+
+            <!-- CONTENIDO CONSIDERAR SEGUNDOS EN MARCACIONES -->
+            <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="segundos_timbres">
+                <div class="nota" id="espacio" style="text-align: justify;">
+                    <span>
+                        NOTA: De los timbres realizados por los usuarios considerar o no los segundos para realizar
+                        cálculos referentes a la asistencia.
+                    </span>
+                </div>
+            </div>
+
             <div class="container" style="padding-bottom: 25px; text-align: center; padding-top: 5px;">
                 <div class="mat-elevation-z8" style="background: white;">
                     <div id="titulo">

@@ -1,13 +1,16 @@
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        SOLICITUD SERVICIO ALIMENTACIÓN</span>
+        SOLICITUD SERVICIO ALIMENTACIÓN
+    </span>
     <mat-icon class="float-right" id="cerrar" (click)="CerrarRegistroPlanificacion()">highlight_off</mat-icon>
 </div>
 <div>
     <div class="nota">
-        <span>NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
-            Guardar.</span>
+        <span>
+            NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+            Guardar.
+        </span>
     </div>
     <form [formGroup]="PlanificacionComidasForm">
         <div class="d-flex flex-wrap justify-content-center">
@@ -24,7 +27,8 @@
                 <mat-label id="selecAlmuerzo">Tipo de Servicio</mat-label>
                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                     matTooltip="Lista de tipos de servicios registrados.">
-                    help_outline</mat-icon>
+                    help_outline
+                </mat-icon>
                 <mat-select formControlName="tipoForm" required>
                     <mat-option *ngFor="let s of servicios" [value]="s.id"
                         (click)="ObtenerPlatosComidas(PlanificacionComidasForm.value)">
@@ -36,7 +40,8 @@
                 <mat-label id="selecAlmuerzo">Menú</mat-label>
                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                     matTooltip="Lista de menús de acuerdo al tipo de servicio.">
-                    help_outline</mat-icon>
+                    help_outline
+                </mat-icon>
                 <mat-select formControlName="idComidaForm" required>
                     <mat-option *ngFor="let m of tipoComidas" [value]="m.id"
                         (click)="ObtenerDetalleMenu(PlanificacionComidasForm.value)">
@@ -48,7 +53,8 @@
                 <mat-label id="selecAlmuerzo">Alimentación</mat-label>
                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                     matTooltip="Lista de alimentos registrados en el sistema.">
-                    help_outline</mat-icon>
+                    help_outline
+                </mat-icon>
                 <mat-select formControlName="platosForm" required>
                     <mat-option *ngFor="let d of detalle" [value]="d.id_detalle">
                         {{d.plato}}
@@ -61,7 +67,8 @@
                     (keypress)="IngresarSoloLetras($event)" required>
                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                     matTooltip="Descripción u observación de la solicitud.">
-                    help_outline</mat-icon>
+                    help_outline
+                </mat-icon>
                 <mat-error *ngIf="observacionF.invalid">{{ObtenerMensajeErrorObservacion()}}</mat-error>
             </mat-form-field>
             <mat-form-field>
@@ -87,20 +94,24 @@
                 <input matInput type="time" formControlName="horaInicioForm" required readonly>
                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                     matTooltip="Hora en la que inicia el servicio.">
-                    help_outline</mat-icon>
+                    help_outline
+                </mat-icon>
             </mat-form-field>
             <mat-form-field>
                 <mat-label id="selecAlmuerzo">Hora de fin</mat-label>
                 <input matInput type="time" placeholder="Ejm: 1" formControlName="horaFinForm" required readonly>
                 <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                     matTooltip="Hora en la que finaliza el servicio.">
-                    help_outline</mat-icon>
+                    help_outline
+                </mat-icon>
             </mat-form-field>
 
         </div>
     </form>
     <div class="d-flex flex-wrap justify-content-center" style="padding-top: 1%; margin-bottom: 2%;">
-        <button id="btn-raised"  class="btn btn-sm" (click)="InsertarPlanificacion(PlanificacionComidasForm.value)"
-            [disabled]="!PlanificacionComidasForm.valid" value="Guardar">Guardar</button>
+        <button id="btn-raised" class="btn btn-sm" (click)="InsertarPlanificacion(PlanificacionComidasForm.value)"
+            [disabled]="!PlanificacionComidasForm.valid" value="Guardar">
+            Guardar
+        </button>
     </div>
 </div>

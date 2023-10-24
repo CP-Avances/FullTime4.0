@@ -1,0 +1,81 @@
+<div class="container" style="padding-top: 15px;">
+    <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo">
+            <span>ASISTENCIA</span>
+        </div>
+        <form [formGroup]="formulario">
+            <div class="container">
+                <div class="nota" id="espacio">
+                    <span>
+                        NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                        Buscar.
+                    </span>
+                </div>
+                <div class="row">
+                    <div class="col-md">
+                        <mat-form-field>
+                            <mat-label>Nombre</mat-label>
+                            <input matInput [formControl]="nombre">
+                            <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar el nombre del usuario.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label>Apellido</mat-label>
+                            <input matInput [formControl]="apellido">
+                            <mat-icon matSuffix matTooltipPosition="right"
+                                matTooltip="Ingresar el apellido del usuario.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md">
+                        <mat-form-field>
+                            <mat-label>Código</mat-label>
+                            <input matInput [formControl]="codigo">
+                            <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar el código de usuario.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label>Cédula</mat-label>
+                            <input matInput [formControl]="cedula">
+                            <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar la cédula del usuario.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Fecha desde:</mat-label>
+                                <input matInput [matDatepicker]="picker1" [formControl]="fechaInicio" required>
+                                <mat-datepicker-toggle matSuffix [for]="picker1" id="i-cursor"
+                                    matTooltipPosition="right" matTooltip="Fecha inicial del registro de asistencia.">
+                                </mat-datepicker-toggle>
+                                <mat-datepicker touchUi #picker1></mat-datepicker>
+                            </mat-form-field>
+                            <mat-form-field>
+                                <mat-label>Fecha hasta:</mat-label>
+                                <input matInput [matDatepicker]="picker2" [formControl]="fechaFin" required>
+                                <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor"
+                                    matTooltipPosition="right" matTooltip="Fecha final del registro de asistencia.">
+                                </mat-datepicker-toggle>
+                                <mat-datepicker touchUi #picker2></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <button class="btn btn-sm" id="btn-raised" type="submit" [disabled]="!formulario.valid"
+                            (click)="BuscarDatosAsistencia(formulario.value)">
+                            Buscar
+                        </button>
+                        <button class="btn btn-sm" id="btn-raised" type="submit">
+                            Limpiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </mat-card>
+</div>
