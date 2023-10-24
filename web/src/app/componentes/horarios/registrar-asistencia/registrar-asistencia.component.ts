@@ -56,13 +56,16 @@ export class RegistrarAsistenciaComponent implements OnInit {
         console.log('ver respuesta ', data.respuesta)
       }
       else {
-        this.toastr.error('No se han encontrado registros.', '', {
+        this.toastr.warning('No se han encontrado registros.', '', {
           timeOut: 6000,
         });
       }
 
+    }, vacio => {
+      this.toastr.warning('No se han encontrado registros.', '', {
+        timeOut: 6000,
+      });
     })
-
   }
 
 }
