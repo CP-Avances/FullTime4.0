@@ -61,7 +61,7 @@ export class MainNavComponent implements OnInit {
     private funciones: MainNavService,
     private plantillaPDF: PlantillaReportesService,
     private breakpointObserver: BreakpointObserver,
-  ) {}
+  ) { }
 
   hasChild = (_: number, node: MenuNode) => !!node.children && node.children.length > 0;
 
@@ -273,7 +273,7 @@ export class MainNavComponent implements OnInit {
           { name: 'Feriados', url: '/listarFeriados', color: true },
           { name: 'Horarios', url: '/horario', color: true },
           { name: 'Planificación Horaria', url: '/horariosMultiples', color: true },
-          // { name: 'Planificación Múltiple', url: '/planificacion', color: true },
+          { name: 'Actualizar Asistencia', url: '/asistencia', color: true },
         ]
       },
       {
@@ -495,19 +495,6 @@ export class MainNavComponent implements OnInit {
         icono: 'description',
         color: true,
         children: [
-          /*  {
-              name: 'Generales',
-              accion: true,
-              estado: true,
-              icono: 'grid_view',
-              color: true,
-              subtitulo: true,
-              children: [
-                { name: 'Entradas Salidas', url: '/reporteEntradaSalida', color: true },
-                { name: 'Asistencia Detalle Consolidado', url: '/reporteAsistenciaConsolidado', color: true },
-              ]
-            },*/
-
           {
             name: 'Generales',
             accion: true,
@@ -519,15 +506,37 @@ export class MainNavComponent implements OnInit {
               { name: 'Usuarios Activos', url: '/reporteEmpleados', color: true },
               { name: 'Usuarios Inactivos', url: '/reporte-emp-inactivos', color: true },
               { name: 'Registro Vacunación', url: '/lista-vacunados', color: true },
-              { name: 'Timbres', url: '/reporte-timbres-multiples', color: true },
-              { name: 'Timbres Libres', url: '/reporte-timbre-abierto', color: true },
-              { name: 'Timbres Incompletos', url: '/reporte-timbre-incompleto', color: true },
+            ]
+          },
+          {
+            name: 'Asistencia',
+            accion: true,
+            estado: true,
+            subtitulo: true,
+            icono: 'check_circle_outline',
+            color: true,
+            children: [
+              { name: 'Salidas Anticipadas', url: '/salidas-anticipadas', color: true },
               { name: 'Puntualidad', url: '/reporte-puntualidad', color: true },
               { name: 'Atrasos', url: '/reporte-atrasos-multiples', color: true },
               { name: 'Salidas Anticipadas', url: '/salidas-anticipadas', color: true },
               { name: 'Faltas', url: '/reporte-faltas', color: true },
-              // { name: 'Atrasos', url: '/reporteAtrasos', color: true },
               //{ name: 'Horas Trabajadas', url: '/reporte-horas-trabaja', color: true },
+              //{ name: 'Entradas Salidas', url: '/reporteEntradaSalida', color: true },
+              //{ name: 'Asistencia Detalle Consolidado', url: '/reporteAsistenciaConsolidado', color: true },
+            ]
+          },
+          {
+            name: 'Timbres',
+            accion: true,
+            estado: true,
+            subtitulo: true,
+            icono: 'touch_app',
+            color: true,
+            children: [
+              { name: 'Timbres', url: '/reporte-timbres-multiples', color: true },
+              { name: 'Timbres Libres', url: '/reporte-timbre-abierto', color: true },
+              { name: 'Timbres Incompletos', url: '/reporte-timbre-incompleto', color: true },
             ]
           },
           {

@@ -68,6 +68,7 @@ import AUDITORIA_RUTAS from './rutas/auditoria/auditoriaRutas';
 import VACACIONES_REPORTES_RUTAS from './rutas/reportes/solicitudVacacionesRutas';
 import PARAMETROS_RUTAS from './rutas/parametrosGenerales/parametrosRutas';
 import UBICACION_RUTAS from './rutas/empleado/empleadoUbicacion/emplUbicacionRutas';
+import ASISTENCIA_USUARIOS_RUTAS from './rutas/asistencia/asistenciaRutas';
 
 import { createServer, Server } from 'http';
 
@@ -98,13 +99,13 @@ class Servidor {
         this.app.use(morgan('dev'));
         this.app.use(cors());
         //this.app.use(express.json());
-        this.app.use(express.json({limit: '50mb'}));
-        this.app.use(express.urlencoded({limit: '50mb', extended: true}));
+        this.app.use(express.json({ limit: '50mb' }));
+        this.app.use(express.urlencoded({ limit: '50mb', extended: true }));
         this.app.use(express.raw({ type: 'image/*', limit: '2Mb' }));
         this.app.set('trust proxy', true);
-        this.app.get('/',(req, res)=> {
+        this.app.get('/', (req, res) => {
             res.status(200).json({
-                status:'success'
+                status: 'success'
             });
         });
     }
@@ -141,6 +142,9 @@ class Servidor {
         // Horarios
         this.app.use('/empleadoHorario', EMPLEADO_HORARIOS_RUTAS);
         this.app.use('/detalleHorario', DETALLE_CATALOGO_HORARIO_RUTAS);
+
+        // ASISTENCIA
+        this.app.use('/asistencia-usuarios', ASISTENCIA_USUARIOS_RUTAS);
 
         // Enrolados
         this.app.use('/relojes', RELOJES_RUTA);
