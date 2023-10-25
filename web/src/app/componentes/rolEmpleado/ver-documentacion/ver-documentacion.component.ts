@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DocumentosService } from 'src/app/servicios/documentos/documentos.service';
 import { environment } from '../../../../environments/environment';
 import { SubirDocumentoComponent } from '../../documentos/subir-documento/subir-documento.component';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-ver-documentacion',
@@ -15,6 +16,14 @@ export class VerDocumentacionComponent implements OnInit {
   Dirname: string;
   hipervinculo: string = environment.url
   subir: boolean = false;
+
+  // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
+  nombreF = new FormControl('', [Validators.minLength(2)]);
+
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
+  public BuscarTipoPermisoForm = new FormGroup({
+    nombreForm: this.nombreF,
+  });
 
   constructor(
     private rest: DocumentosService,
@@ -35,6 +44,8 @@ export class VerDocumentacionComponent implements OnInit {
     this.rest.ListarDocumentacion(nombre_carpeta).subscribe(res => {
       console.log(res);
       this.archivos = res
+      this.archivosFiltro = [...this.archivos];
+        console.log('archivosFiltro: ',this.archivosFiltro);
     })
   }
 
@@ -58,6 +69,22 @@ export class VerDocumentacionComponent implements OnInit {
       .afterClosed().subscribe(item => {
         this.MostrarArchivos();
       });
+  }
+  filtroDescripcion = '';
+  archivosFiltro: any;
+  Filtrar(e: any, tipo: string){
+    console.log('e: ',e.target.value);
+    const query: string = e.target.value;
+    const filtro = this.archivos.filter((o:any) => {
+      console.log('o: ',o);
+      if(tipo == 'carpeta'){
+        return (o.indexOf(query) > -1);
+      }else{
+        return (o.nombre.indexOf(query) > -1);
+      }
+      
+    })
+    this.archivosFiltro = filtro;
   }
 
 }
