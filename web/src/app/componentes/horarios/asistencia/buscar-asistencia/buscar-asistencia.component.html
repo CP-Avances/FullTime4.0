@@ -1,4 +1,4 @@
-<div class="container" style="padding-top: 15px;">
+<div class="container" style="padding-top: 15px;" *ngIf="ver_asistencia">
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
             <span>ASISTENCIA</span>
@@ -70,7 +70,7 @@
                             (click)="BuscarDatosAsistencia(formulario.value)">
                             Buscar
                         </button>
-                        <button class="btn btn-sm" id="btn-raised" type="submit">
+                        <button class="btn btn-sm" id="btn-raised" type="submit" (click)="Limpiar()">
                             Limpiar
                         </button>
                     </div>
@@ -78,58 +78,58 @@
             </div>
         </form>
 
-
-        <div class="container" style="padding-bottom: 50px; text-align: center;">
+        <hr>
+        <div class="container" style="padding-top: 5px; text-align: center;">
             <div class="mat-elevation-z8" style="background: white;">
                 <div id="resultados">RESULTADO DE BÚSQUEDA</div>
                 <div class="table-responsive">
                     <table class="table table-hover table-sm">
                         <thead class="thead-light">
                             <tr>
-                                <th scope="col">Establecimiento</th>
-                                <th scope="col">Departamento</th>
-                                <th scope="col">Niveles</th>
-                                <th scope="col">Departamento Superior</th>
-                                <th scope="col">Acciones</th>
+                                <th scope="col" id="centrar" rowspan="2">CÓDIGO</th>
+                                <th scope="col" id="centrar" rowspan="2">NOMBRE</th>
+                                <th scope="col" id="centrar" rowspan="2">APELLIDO</th>
+                                <th scope="col" id="centrar" rowspan="2">FECHA</th>
+                                <th scope="col" id="centrar" colspan="2">HORARIO</th>
+                                <th scope="col" id="centrar" colspan="2">TIMBRE</th>
+                                <th scope="col" id="centrar" rowspan="2">TIPO</th>
+                                <th scope="col" id="centrar" rowspan="2">ACCIONES</th>
+                            </tr>
+                            <tr>
+                                <th id="centrar" scope="col">Fecha</th>
+                                <th id="centrar" scope="col">Hora</th>
+                                <th id="centrar" scope="col">Fecha</th>
+                                <th id="centrar" scope="col">Hora</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let departamento of asistencia ">
-                                <td>{{departamento.nomsucursal}}</td>
-                                <td>{{departamento.nombre | titlecase}}</td>
-                                <td>{{departamento.nivel}}</td>
-                                <td>{{departamento.departamento_padre | titlecase}}
-                                </td>
+                            <tr *ngFor="let a of asistencia | paginate:tamanio_pagina:numero_pagina">
+                                <td>{{a.codigo}}</td>
+                                <td>{{a.nombre}}</td>
+                                <td>{{a.apellido}}</td>
+                                <td>{{a.fecha_general_}}</td>
+                                <td>{{a.fecha_horario_}}</td>
+                                <td>{{a.hora_horario_}}</td>
+                                <td>{{a.fecha_timbre_}}</td>
+                                <td>{{a.hora_timbre_}}</td>
+                                <td>{{a.tipo_}}</td>
                                 <td class="justify-content-center">
-                                    <i class="fa fa-arrows-v" matSuffix matTooltipPosition="right" id="t-detalles"
-                                        matTooltip="Registrar niveles de autorización.">
-                                        <p>Niveles</p>
-                                    </i>
-                                    <i id="t-editar" matSuffix matTooltipPosition="right"
-                                        matTooltip="Modificar datos de este registro" class="fas fa-edit">
-                                        <p>Editar</p>
-                                    </i>
-                                    <i class="far fa-trash-alt" id="t-eliminar" matSuffix matTooltipPosition="right"
-                                        matTooltip="Eliminar este registro.">
-                                        <p>Eliminar</p>
+                                    <i class="fas fa-eye" id="t-ver" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ver detalle del registro." (click)="VerDetalle(a)">
+                                        <p>Revisar</p>
                                     </i>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <!--
-                <mat-paginator id="pagina" [length]="departamentos.length" [pageSize]="tamanio_pagina"
+                <mat-paginator id="pagina" [length]="asistencia.length" [pageSize]="tamanio_pagina"
                     [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
                 </mat-paginator>
--->
-                <div class="d-flex justify-content-end"
-                    style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
-                    <p> Reporte de departamentos. </p>
-                </div>
             </div>
         </div>
-
-
     </mat-card>
 </div>
+
+<!--  ***************************  PANTALLA REVISION DE ASISTENCIA  ********************************  -->
+<app-registrar-asistencia *ngIf="ver_detalle" [informacion]="informacion"></app-registrar-asistencia>

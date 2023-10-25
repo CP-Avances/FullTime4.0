@@ -28,12 +28,10 @@ import { ListaSucursalesComponent } from './componentes/catalogos/catSucursal/li
 import { OlvidarContraseniaComponent } from './componentes/iniciarSesion/contrasenia/olvidar-contrasenia/olvidar-contrasenia.component';
 import { ConfirmarContraseniaComponent } from './componentes/iniciarSesion/contrasenia/confirmar-contrasenia/confirmar-contrasenia.component';
 import { PlanificacionMultipleComponent } from './componentes/horarios/horarios-rotativos/planificacion-multiple/planificacion-multiple.component';
-import { RegistrarAsistenciaComponent } from './componentes/horarios/registrar-asistencia/registrar-asistencia.component';
 import { VerDocumentosComponent } from './componentes/documentos/ver-documentos/ver-documentos.component';
 import { ConfigurarCodigoComponent } from './componentes/administracionGeneral/configurar-codigo/configurar-codigo.component';
 import { ListaHorasExtrasComponent } from './componentes/modulos/horasExtras/catHorasExtras/lista-horas-extras/lista-horas-extras.component';
 import { VerEmpresaComponent } from './componentes/catalogos/catEmpresa/ver-empresa/ver-empresa.component';
-import { VerSucursalComponent } from './componentes/catalogos/catSucursal/ver-sucursal/ver-sucursal.component';
 
 // Seguridad
 import { AuthGuard } from "./servicios/guards/auth.guard";
@@ -138,6 +136,7 @@ import { TimbreMultipleComponent } from './componentes/timbres/timbre-multiple/t
 import { VerEmpleadosActivosDetalleComponent } from './componentes/reportes/generales/empleados/activos/ver-empleados-activos-detalle/ver-empleados-activos-detalle.component';
 import { VerEmpleadosInactivosDetalleComponent } from './componentes/reportes/generales/empleados/inactivos/ver-empleados-inactivos-detalle/ver-empleados-inactivos-detalle.component';
 import { VerVacunasComponent } from './componentes/reportes/generales/vacunas/ver-vacunas/ver-vacunas.component';
+import { BuscarAsistenciaComponent } from './componentes/horarios/asistencia/buscar-asistencia/buscar-asistencia.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -152,7 +151,7 @@ const routes: Routes = [
   { path: 'feriados', component: RegistrarFeriadosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
 { path: 'emplCargos', component: EmplCargosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'planificacion', component: PlanificacionMultipleComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'asistencia', component: RegistrarAsistenciaComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'asistencia', component: BuscarAsistenciaComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'calcularHoraExtra', component: CalculoHoraExtraComponent, canActivate: [AuthGuard], data: { roles: 1 } },
 
 
