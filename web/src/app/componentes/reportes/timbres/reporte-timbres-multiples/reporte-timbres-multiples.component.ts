@@ -338,7 +338,6 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     this.data_pdf = [];
     this.R_asistencias.ReporteTimbresMultipleRegimenCargo(reg, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
-      console.log('DATA PDF', this.data_pdf);
       switch (accion) {
         case 'excel': this.exportToExcel('RegimenCargo'); break;
         case 'ver': this.verDatos(); break;

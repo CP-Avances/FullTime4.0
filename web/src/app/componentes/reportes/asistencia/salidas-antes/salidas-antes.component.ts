@@ -47,6 +47,12 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   cargos: any = [];
   origen: any = [];
 
+  //VARIABLES PARA ALMACENAR TIEMPOS DE SALIDAS ANTICIPADAS
+  tiempoDepartamentos: any = [];
+  tiempoSucursales: any = [];
+  tiempoRegimen: any = [];
+  tiempoCargos: any = [];
+
   //VARIABLES PARA MOSTRAR DETALLES
   tipo: string;
   verDetalle: boolean = false;
@@ -252,7 +258,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
         break;
       case 'r':
         if (this.selectionReg.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione régimen.')
-        // this.ModelarRegimen(action);
+        this.ModelarRegimen(action);
         break;
       case 'd':
         if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione departamentos.')
@@ -260,7 +266,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
         break;
       case 'c':
         if (this.selectionCar.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione cargos.')
-        // this.ModelarCargo(action);
+        this.ModelarCargo(action);
         break;
       case 'e':
         if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione empleados.')
@@ -278,7 +284,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     let respuesta = JSON.parse(this.origen)
 
     let suc = respuesta.filter(o => {
-      var bool = this.selectionSuc.selected.find(obj1 => {
+      let bool = this.selectionSuc.selected.find(obj1 => {
         return obj1.id === o.id_suc
       });
       return bool != undefined
@@ -290,6 +296,50 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
       console.log('DATA PDF', this.data_pdf);
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
+        case 'ver': this.verDatos(); break;
+        default: this.generarPdf(accion); break;
+      }
+    }, err => {
+      this.toastr.error(err.error.message)
+    })
+  }
+
+  // TRATAMIENTO DE DATOS POR REGIMEN
+  ModelarRegimen(accion: any) {
+    this.tipo = 'RegimenCargo';
+    let respuesta = JSON.parse(this.origen);
+    let empleados: any = [];
+    let reg: any = [];
+    let objeto: any;
+    respuesta.forEach((obj: any) => {
+      this.selectionReg.selected.find((regimen) => {
+        objeto = {
+          regimen: {
+            id: regimen.id,
+            nombre: regimen.nombre,
+          },
+        };
+        empleados = [];
+        obj.departamentos.forEach((departamento: any) => {
+          departamento.empleado.forEach((empleado: any) => {
+            empleado.regimen.forEach((r) => {
+              if (regimen.id === r.id_regimen) {
+                empleados.push(empleado);
+              }
+            });
+          });
+        });
+        objeto.empleados = empleados;
+        reg.push(objeto);
+      });
+    });
+
+    this.data_pdf = [];
+    this.restSalida.BuscarTimbresSalidasAnticipadasRegimenCargo(reg, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+      this.data_pdf = res
+      switch (accion) {
+        case 'excel': this.exportToExcel('RegimenCargo'); break;
+        case 'ver': this.verDatos(); break;
         default: this.generarPdf(accion); break;
       }
     }, err => {
@@ -298,12 +348,12 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   }
 
   ModelarDepartamento(accion) {
-
-    let respuesta = JSON.parse(sessionStorage.getItem('reporte_timbres_multiple') as any)
+    this.tipo = 'default';
+    let respuesta = JSON.parse(this.origen)
 
     respuesta.forEach((obj: any) => {
       obj.departamentos = obj.departamentos.filter(o => {
-        var bool = this.selectionDep.selected.find(obj1 => {
+        let bool = this.selectionDep.selected.find(obj1 => {
           return obj1.id === o.id_depa
         })
         return bool != undefined
@@ -312,13 +362,36 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     let dep = respuesta.filter(obj => {
       return obj.departamentos.length > 0
     });
-    // console.log('DEPARTAMENTOS', dep);
     this.data_pdf = []
-    this.restSalida.BuscarTimbresSalidasAnticipadas(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.restSalida.BuscarTimbresSalidasAnticipadasRegimenCargo(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
-      // console.log('DATA PDF',this.data_pdf);
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
+        case 'ver': this.verDatos(); break;
+        default: this.generarPdf(accion); break;
+      }
+    }, err => {
+      this.toastr.error(err.error.message)
+    })
+  }
+
+  // TRATAMIENTO DE DATOS POR CARGO
+  ModelarCargo(accion: any) {
+    this.tipo = 'RegimenCargo';
+    let respuesta = JSON.parse(this.origen_cargo);
+    let car = respuesta.filter((o) => {
+      var bool = this.selectionCar.selected.find((obj1) => {
+        return obj1.id === o.id_cargo;
+      });
+      return bool != undefined;
+    });
+
+    this.data_pdf = [];
+    this.restSalida.BuscarTimbresSalidasAnticipadas(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+      this.data_pdf = res
+      switch (accion) {
+        case 'excel': this.exportToExcel('RegimenCargo'); break;
+        case 'ver': this.verDatos(); break;
         default: this.generarPdf(accion); break;
       }
     }, err => {
@@ -327,8 +400,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   }
 
   ModelarEmpleados(accion) {
-
-    let respuesta = JSON.parse(sessionStorage.getItem('reporte_timbres_multiple') as any)
+    this.tipo = 'default';
+    let respuesta = JSON.parse(this.origen)
 
     respuesta.forEach((obj: any) => {
       obj.departamentos.forEach(element => {
@@ -350,19 +423,12 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
       return obj.departamentos.length > 0
     });
 
-    // console.log('EMPLEADOS', emp);
     this.data_pdf = []
     this.restSalida.BuscarTimbresSalidasAnticipadas(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
-      console.log('DATA PDF-------------------------------------', this.data_pdf);
-
-
-
-
-
-
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
+        case 'ver': this.verDatos(); break;
         default: this.generarPdf(accion); break;
       }
     }, err => {
@@ -426,9 +492,9 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + localStorage.getItem('fullname_print'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       footer: function (currentPage: any, pageCount: any, fecha: any) {
-        var f = moment();
+        let f = moment();
         fecha = f.format('YYYY-MM-DD');
-        var time = f.format('HH:mm:ss');
+        let time = f.format('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -462,8 +528,11 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
         itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0],fillColor: '#E3E3E3' },
         itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
+        itemsTableInfoTotal: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.s_color  },
+        itemsTableCentradoTotal: { fontSize: 8, bold: true, alignment: 'center', fillColor: '#E3E3E3' },
         tableMargin: { margin: [0, 0, 0, 10] },
         tableMarginCabecera: { margin: [0, 15, 0, 0] },
+        tableMarginCabeceraTotal: { margin: [0, 15, 0, 15] },
         quote: { margin: [5, -2, 0, -2], italics: true },
         small: { fontSize: 8, color: 'blue', opacity: 0.5 }
       }
@@ -473,13 +542,23 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   impresionDatosPDF(data: any[]): Array<any> {
     let n: any = []
     let c = 0;
-    var accionT: string = '';
+    let accionT: string = '';
+    let totalTiempoEmpleado: number = 0;
+    let totalTiempoSucursal: number = 0;
+    let totalTiempoCargo = 0;
+    let totalTiempoRegimen = 0;
+    let totalTiempoDepartamento = 0;
+    this.tiempoDepartamentos = [];
+    this.tiempoSucursales = [];
+    this.tiempoRegimen = [];
+    this.tiempoCargos = [];
 
     if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
       data.forEach((obj1) => {
         let arr_reg = obj1.empleados.map((o: any) => { return o.timbres.length })
         let reg = this.SumarRegistros(arr_reg);
         if (this.bool.bool_cargo === true) {
+          totalTiempoCargo = 0;
           n.push({
             style: 'tableMarginCabecera',
             table: {
@@ -503,6 +582,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
             },
           });
         } else {
+          totalTiempoRegimen = 0;
           n.push({
             style: 'tableMarginCabecera',
             table: {
@@ -572,10 +652,11 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
             },
           });
           c = 0;
+          totalTiempoEmpleado = 0;
           n.push({
             style: 'tableMargin',
             table: {
-              widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto'],
+              widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
               headerRows: 2,
               body: [
                 [
@@ -587,8 +668,10 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                   { rowSpan: 2, text: 'TIPO PERMISO', style: 'centrado' },
                   { rowSpan: 2, text: 'DESDE', style: 'centrado' },
                   { rowSpan: 2, text: 'HASTA', style: 'centrado' },
-                  { rowSpan: 2, colSpan: 2, text: 'PERMISO', style: 'tableHeader' },
-                  { rowSpan: 2, colSpan: 2, text: 'SALIDA ANTICIPADA', style: 'tableHeader' },
+                  { rowSpan: 2, colSpan: 2, text: 'PERMISO', style: 'centrado' },
+                  {},
+                  { rowSpan: 2, colSpan: 2, text: 'SALIDA ANTICIPADA', style: 'centrado' },
+                  {}
                 ],
                 [
                   {},
@@ -598,10 +681,17 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                   { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
                   {},{},{},
                   {},
-                  {}
+                  {},
+                  {},
+                  {},
 
                 ],
                 ...obj2.timbres.map(obj3 => {
+                  const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
+                  const tiempo = this.minutosAHorasMinutosSegundos(minutos);
+                  totalTiempoEmpleado += Number(minutos);
+                  totalTiempoRegimen += Number(minutos); 
+                  totalTiempoCargo += Number(minutos); 
                   c = c + 1
                   return [
                     { style: 'itemsTableCentrado', text: c },
@@ -609,14 +699,58 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[1] },
                     { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[0] },
                     { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[1] },
-                    {},
-                    {},
-                    {},
-                    {},{},
-                    {style: 'itemsTableCentrado', text: obj3.diferencia },
-                    {style: 'itemsTableCentrado', text: obj3.diferencia },
+                    {},{},{},{},{},
+                    {style: 'itemsTableCentrado', text: minutos},
+                    {style: 'itemsTableCentrado', text: tiempo},
                   ];
                 }),
+                [
+                  {
+                    border: [true, true, false, true],
+                    text: '',
+                    style: 'itemsTableCentradoTotal'
+                  },
+                  {
+                    border: [false, true, false, true],
+                    text: '',
+                    style: 'itemsTableCentradoTotal'
+                  },
+                  {
+                    border: [false, true, false, true],
+                    text: '',
+                    style: 'itemsTableCentradoTotal'
+                  },
+                  {
+                    border: [false, true, false, true],
+                    text: '',
+                    style: 'itemsTableCentradoTotal'},
+                  {
+                    border: [false, true, false, true],
+                    text: '',
+                    style: 'itemsTableCentradoTotal'
+                  },
+                  {
+                    border: [false, true, false, true],
+                    text: '',
+                    style: 'itemsTableCentradoTotal'
+                  },
+                  {
+                    border: [false, true, false, true],
+                    text: '',
+                    style: 'itemsTableCentradoTotal'
+                  },
+                  {style: 'itemsTableCentradoTotal', text: 'TOTAL'},
+                  {
+                    text: '',
+                    style: 'itemsTableCentradoTotal'
+                  },
+                  {
+                    text: '',
+                    style: 'itemsTableCentradoTotal'
+                  },
+                  {style: 'itemsTableCentradoTotal', text: totalTiempoEmpleado},
+                  {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado)}
+                ],
               ],
             },
             layout: {
@@ -626,11 +760,107 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
             }
           });
         });
+        if (this.bool.bool_cargo) {
+          totalTiempoCargo = Number(totalTiempoCargo.toFixed(2));
+          let cargo = {
+            cargo: obj1.name_cargo,
+            minutos: totalTiempoCargo,
+            tiempo: this.minutosAHorasMinutosSegundos(totalTiempoCargo)
+          }
+          this.tiempoCargos.push(cargo);
+        };
+
+        if (this.bool.bool_reg) {
+          totalTiempoRegimen = Number(totalTiempoRegimen.toFixed(2));
+          let regimen = {
+            regimen: obj1.regimen.nombre,
+            minutos: totalTiempoRegimen,
+            tiempo: this.minutosAHorasMinutosSegundos(totalTiempoRegimen)
+          }
+          this.tiempoRegimen.push(regimen);
+        };
       });
+
+      if (this.bool.bool_cargo) {    
+        n.push({
+          style: 'tableMarginCabeceraTotal',
+          table: {
+            widths: ['*', 'auto', 'auto', 'auto', 'auto'],
+            headerRows: 1,
+            body: [
+              [
+                {
+                  border: [true, true, false, true],
+                  bold: true,
+                  text: 'TOTAL CARGOS',
+                  style: 'itemsTableInfoTotal'
+                },
+                { colSpan: 2, text: 'PERMISO', style: 'itemsTableInfoTotal' },
+                {},
+                { colSpan: 2, text: 'SALIDA ANTICIPADA', style: 'itemsTableInfoTotal' },
+                {},
+              ],
+              ...this.tiempoCargos.map((cargo: any) => {
+                return [
+                  {
+                    border: [true, true, false, true],
+                    bold: true,
+                    text: cargo.cargo,
+                    style: 'itemsTableCentradoTotal'
+                  },
+                  { text: '', style: 'itemsTableCentradoTotal' },
+                  { text: '', style: 'itemsTableCentradoTotal' },
+                  { text: cargo.minutos, style: 'itemsTableCentradoTotal'},
+                  { text: cargo.tiempo, style: 'itemsTableCentradoTotal'},
+                ]
+              })    
+            ]
+          }
+        });
+      };
+  
+      if (this.bool.bool_reg) {    
+        n.push({
+          style: 'tableMarginCabeceraTotal',
+          table: {
+            widths: ['*', 'auto', 'auto', 'auto', 'auto'],
+            headerRows: 1,
+            body: [
+              [
+                {
+                  border: [true, true, false, true],
+                  bold: true,
+                  text: 'TOTAL REGIMENES',
+                  style: 'itemsTableInfoTotal'
+                },
+                { colSpan: 2, text: 'PERMISO', style: 'itemsTableInfoTotal' },
+                {},
+                { colSpan: 2, text: 'SALIDA ANTICIPADA', style: 'itemsTableInfoTotal' },
+                {},
+              ],
+              ...this.tiempoRegimen.map((regimen: any) => {
+                return [
+                  {
+                    border: [true, true, false, true],
+                    bold: true,
+                    text: regimen.regimen,
+                    style: 'itemsTableCentradoTotal'
+                  },
+                  { text: '', style: 'itemsTableCentradoTotal' },
+                  { text: '', style: 'itemsTableCentradoTotal' },
+                  { text: regimen.minutos, style: 'itemsTableCentradoTotal'},
+                  { text: regimen.tiempo, style: 'itemsTableCentradoTotal'},
+                ]
+              })    
+            ]
+          }
+        });
+      };
     } else {
       data.forEach((obj: ReporteSalidaAntes) => {
 
         if (this.bool.bool_suc === true || this.bool.bool_dep === true) {
+          totalTiempoSucursal = 0;
           n.push({
             table: {
               widths: ['*', '*'],
@@ -655,7 +885,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
         }
 
         obj.departamentos.forEach(obj1 => {
-
+          totalTiempoDepartamento = 0;
           // LA CABECERA CUANDO SE GENERA EL PDF POR DEPARTAMENTOS
           if (this.bool.bool_dep === true) {
             let arr_reg = obj1.empleado.map((o: any) => { return o.timbres.length })
@@ -729,6 +959,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
               }
             });
             c = 0;
+            totalTiempoEmpleado = 0;
             n.push({
               style: 'tableMargin',
               table: {
@@ -763,6 +994,11 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   
                   ],
                   ...obj2.timbres.map(obj3 => {
+                    const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
+                    const tiempo = this.minutosAHorasMinutosSegundos(minutos);
+                    totalTiempoEmpleado += Number(minutos);
+                    totalTiempoSucursal += Number(minutos); 
+                    totalTiempoDepartamento += Number(minutos); 
                     c = c + 1
                     return [
                       { style: 'itemsTableCentrado', text: c },
@@ -770,23 +1006,51 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                       { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[1] },
                       { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[0] },
                       { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[1] },
-                      {},
-                      {},
-                      {},
-                      {},{},
-                      {style: 'itemsTableCentrado', text: this.segundosAMinutosSegundos(obj3.diferencia)},
-                      {style: 'itemsTableCentrado', text: this.segundosAMinutosSegundos(obj3.diferencia) },
+                      {},{},{},{},{},
+                      {style: 'itemsTableCentrado', text: minutos},
+                      {style: 'itemsTableCentrado', text: tiempo},
                     ];
                   }),
                   [
-                    {},{},{},{},{},{},{},
-                    {style: 'itemsTableCentrado', text: 'TOTAL'},
-                    {},{},{},{}
-                  ],
-                  [
-                    {},{},{},{},{},{},{},
-                    {style: 'itemsTableCentrado', text: 'TOTAL'},
-                    {},{},{},{}
+                    {
+                      border: [true, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {
+                      border: [false, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {
+                      border: [false, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {
+                      border: [false, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'},
+                    {
+                      border: [false, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {
+                      border: [false, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {
+                      border: [false, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    { style: 'itemsTableCentradoTotal', text: 'TOTAL'},
+                    { text: '', style: 'itemsTableCentradoTotal'},
+                    { text: '', style: 'itemsTableCentradoTotal'},
+                    { style: 'itemsTableCentradoTotal', text: totalTiempoEmpleado},
+                    { style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado)}
                   ],
                 ],
               },
@@ -797,9 +1061,103 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
               }
             });
           });
+          if (this.bool.bool_dep) {
+            let departamento = {
+              departamento: obj1.name_dep,
+              minutos: totalTiempoDepartamento,
+              tiempo: this.minutosAHorasMinutosSegundos(totalTiempoDepartamento)
+            }
+            this.tiempoDepartamentos.push(departamento);
+          };
         });
+
+        if (this.bool.bool_suc) {
+          let sucursal = {
+            sucursal: obj.name_suc,
+            minutos: totalTiempoSucursal,
+            tiempo: this.minutosAHorasMinutosSegundos(totalTiempoSucursal)
+          }
+          this.tiempoSucursales.push(sucursal);
+        };
       });
     }
+
+    if (this.bool.bool_dep) {    
+      n.push({
+        style: 'tableMarginCabeceraTotal',
+        table: {
+          widths: ['*', 'auto', 'auto', 'auto', 'auto'],
+          headerRows: 1,
+          body: [
+            [
+              {
+                border: [true, true, false, true],
+                bold: true,
+                text: 'TOTAL DEPARTAMENTOS',
+                style: 'itemsTableInfoTotal'
+              },
+              { colSpan: 2, text: 'PERMISO', style: 'itemsTableInfoTotal' },
+              {},
+              { colSpan: 2, text: 'SALIDA ANTICIPADA', style: 'itemsTableInfoTotal' },
+              {},
+            ],
+            ...this.tiempoDepartamentos.map((departamento: any) => {
+              return [
+                {
+                  border: [true, true, false, true],
+                  bold: true,
+                  text: departamento.departamento,
+                  style: 'itemsTableCentradoTotal'
+                },
+                { text: '', style: 'itemsTableCentradoTotal' },
+                { text: '', style: 'itemsTableCentradoTotal' },
+                { text: departamento.minutos, style: 'itemsTableCentradoTotal'},
+                { text: departamento.tiempo, style: 'itemsTableCentradoTotal'},
+              ]
+            })    
+          ]
+        }
+      });
+    };
+
+    if (this.bool.bool_suc) {    
+      n.push({
+        style: 'tableMarginCabeceraTotal',
+        table: {
+          widths: ['*', 'auto', 'auto', 'auto', 'auto'],
+          headerRows: 1,
+          body: [
+            [
+              {
+                border: [true, true, false, true],
+                bold: true,
+                text: 'TOTAL SUCURSALES',
+                style: 'itemsTableInfoTotal'
+              },
+              { colSpan: 2, text: 'PERMISO', style: 'itemsTableInfoTotal' },
+              {},
+              { colSpan: 2, text: 'SALIDA ANTICIPADA', style: 'itemsTableInfoTotal' },
+              {},
+            ],
+            ...this.tiempoSucursales.map((sucursal: any) => {
+              return [
+                {
+                  border: [true, true, false, true],
+                  bold: true,
+                  text: sucursal.sucursal,
+                  style: 'itemsTableCentradoTotal'
+                },
+                { text: '', style: 'itemsTableCentradoTotal' },
+                { text: '', style: 'itemsTableCentradoTotal' },
+                { text: sucursal.minutos, style: 'itemsTableCentradoTotal'},
+                { text: sucursal.tiempo, style: 'itemsTableCentradoTotal'},
+              ]
+            })    
+          ]
+        }
+      });
+    };
+
     return n;
   }
 
@@ -812,11 +1170,27 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     return valor;
   }
 
+  segundosAMinutosConDecimales(segundos) {
+    return (segundos / 60).toFixed(2);
+  }
+
+  minutosAHorasMinutosSegundos(minutos) {
+    let seconds = minutos * 60;
+    let hour: string | number = Math.floor(seconds / 3600);
+    hour = (hour < 10)? '0' + hour : hour;
+    let minute: string | number = Math.floor((seconds / 60) % 60);
+    minute = (minute < 10)? '0' + minute : minute;
+    let second: string | number = Number((seconds % 60).toFixed(0));
+    second = (second < 10)? '0' + second : second;
+    return `${hour}:${minute}:${second}`;
+  }
+  
+
   HorasDecimalToHHMM(dato: number) {
     // console.log('Hora decimal a HHMM ======>',dato);
-    var h = parseInt(dato.toString());
-    var x = (dato - h) * 60;
-    var m = parseInt(x.toString());
+    let h = parseInt(dato.toString());
+    let x = (dato - h) * 60;
+    let m = parseInt(x.toString());
 
     let hora;
     let min;
@@ -835,13 +1209,6 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     }
 
     return hora + ':' + min + ':00'
-  }
-
-  segundosAMinutosSegundos(segundos) {
-    console.log(segundos);
-    const minutos = Math.floor(segundos / 60);
-    const segundosRestantes = segundos % 60;
-    return `${minutos}:${segundosRestantes}`;
   }
 
 
