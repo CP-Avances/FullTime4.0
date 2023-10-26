@@ -1062,6 +1062,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
             });
           });
           if (this.bool.bool_dep) {
+            totalTiempoDepartamento = Number(totalTiempoDepartamento.toFixed(2));
             let departamento = {
               departamento: obj1.name_dep,
               minutos: totalTiempoDepartamento,
@@ -1072,6 +1073,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
         });
 
         if (this.bool.bool_suc) {
+          totalTiempoSucursal = Number(totalTiempoSucursal.toFixed(2));
           let sucursal = {
             sucursal: obj.name_suc,
             minutos: totalTiempoSucursal,
@@ -1215,22 +1217,21 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   /** ************************************************************************************************** ** 
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
-  exportToExcel(tipo: string): void {
+   exportToExcel(tipo: string): void {
     switch (tipo) {
-      case 'tabulado':
-        const wsr_tab: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfTabulado(this.data_pdf));
-        const wb_tab: xlsx.WorkBook = xlsx.utils.book_new();
-        xlsx.utils.book_append_sheet(wb_tab, wsr_tab, 'Timbres');
-        xlsx.writeFile(wb_tab, "Timbres_Tabulado" + new Date().getTime() + '.xlsx');
+      case 'RegimenCargo':
+        const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfRegimenCargo(this.data_pdf));
+        const wb_regimen_cargo: xlsx.WorkBook = xlsx.utils.book_new();
+        xlsx.utils.book_append_sheet(wb_regimen_cargo, wsr_regimen_cargo, 'Salidas Anticipadas');
+        xlsx.writeFile(wb_regimen_cargo, 'Salidas_anticipadas.xlsx');
         break;
       default:
         const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefault(this.data_pdf));
         const wb: xlsx.WorkBook = xlsx.utils.book_new();
-        xlsx.utils.book_append_sheet(wb, wsr, 'Timbres');
-        xlsx.writeFile(wb, "Timbres_default" + new Date().getTime() + '.xlsx');
+        xlsx.utils.book_append_sheet(wb, wsr, 'Salidas Anticipadas');
+        xlsx.writeFile(wb, 'Salidas_anticipadas.xlsx');
         break;
     }
-
   }
 
   MapingDataPdfDefault(array: Array<any>) {
@@ -1238,41 +1239,98 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     array.forEach((obj1: ReporteSalidaAntes) => {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
-          obj3.timbres.forEach((obj4: timbre) => {
-            let ele = {
-              'Id Sucursal': obj1.id_suc, 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
-              'Id Departamento': obj2.id_depa, 'Departamento': obj2.name_dep,
-              'Id Empleado': obj3.id, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
+          obj3.timbres.forEach((obj4: any) => {
+            const minutos = this.segundosAMinutosConDecimales(obj4.diferencia);
+            const tiempo = this.minutosAHorasMinutosSegundos(minutos);
+            let ele = { 
+              'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
+              'Departamento': obj2.name_dep,
+              'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
+              'Fecha Horario': obj4.fec_hora_horario.split(' ')[0], 'Hora Horario': obj4.fec_hora_horario.split(' ')[1],
+              'Fecha Timbre': obj4.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj4.fec_hora_timbre.split(' ')[1],
+              'Salida Anticipada Minutos': minutos, 'Salida Anticipada hh:mm:ss': tiempo,
             }
-            nuevo.push(ele)
+            nuevo.push(ele);
           })
         })
       })
     })
-    return nuevo
+    return nuevo;
   }
 
-  MapingDataPdfTabulado(array: Array<any>) {
+  MapingDataPdfRegimenCargo(array: Array<any>) {
     let nuevo: Array<any> = [];
-    array.forEach((obj1: ReporteSalidaAntes) => {
+    array.forEach((obj1: any) => {
+      obj1.empleados.forEach((obj2: any) => {
+        obj2.timbres.forEach((obj3: any) => {
+          const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
+          const tiempo = this.minutosAHorasMinutosSegundos(minutos);
+          let ele = {
+            'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
+            'Departamento': obj2.departamento,
+            'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
+            'Fecha Horario': obj3.fec_hora_horario.split(' ')[0], 'Hora Horario': obj3.fec_hora_horario.split(' ')[1],
+            'Fecha Timbre': obj3.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj3.fec_hora_timbre.split(' ')[1],
+            'Salida Anticipada Minutos': minutos, 'Salida Anticipada hh:mm:ss': tiempo,
+          }
+          nuevo.push(ele);
+        })
+      })
+    })
+    return nuevo;
+  }
+
+  //METODOS PARA EXTRAER LOS TIMBRES EN UNA LISTA Y VISUALIZARLOS
+  extraerTimbres() {
+    this.timbres = [];
+    let n = 0;
+    this.data_pdf.forEach((obj1: ReporteSalidaAntes) => {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
-          obj3.timbres.forEach((obj4: tim_tabulado) => {
+          obj3.timbres.forEach((obj4: any) => {
+            const minutos = this.segundosAMinutosConDecimales(obj4.diferencia);
+            const tiempo = this.minutosAHorasMinutosSegundos(minutos);
+            n = n + 1;
             let ele = {
-              'Id Sucursal': obj1.id_suc, 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
-              'Id Departamento': obj2.id_depa, 'Departamento': obj2.name_dep,
-              'Id Empleado': obj3.id, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
-              'Contrado': obj3.contrato, 'Cargo': obj3.cargo,
-              'Fecha Timbre': obj4.fecha.split(' ')[0], 'Hora Timbre': obj4.fecha.split(' ')[1], 'Género': obj3.genero,
-
+              n: n,
+              ciudad: obj1.ciudad, sucursal: obj1.name_suc,
+              departamento: obj2.name_dep,
+              empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
+              fechaHorario: obj4.fec_hora_horario.split(' ')[0], horaHorario: obj4.fec_hora_horario.split(' ')[1],
+              fechaTimbre: obj4.fec_hora_timbre.split(' ')[0], horaTimbre: obj4.fec_hora_timbre.split(' ')[1],
+              salidaAnticipadaM: minutos, salidaAnticipadaT: tiempo,
             }
-            nuevo.push(ele)
+            this.timbres.push(ele);
           })
         })
       })
     })
-    return nuevo
   }
+
+  extraerTimbresRegimenCargo() {
+    this.timbres = [];
+    let n = 0;
+    this.data_pdf.forEach((obj1: any) => {
+      obj1.empleados.forEach((obj2: any) => {
+        obj2.timbres.forEach((obj3: any) => {
+          const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
+          const tiempo = this.minutosAHorasMinutosSegundos(minutos);
+          n = n + 1;
+          let ele = {
+            n: n,
+            ciudad: obj2.ciudad, sucursal: obj2.sucursal,
+            departamento: obj2.departamento,
+            empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
+            fechaHorario: obj3.fec_hora_horario.split(' ')[0], horaHorario: obj3.fec_hora_horario.split(' ')[1],
+            fechaTimbre: obj3.fec_hora_timbre.split(' ')[0], horaTimbre: obj3.fec_hora_timbre.split(' ')[1],
+            salidaAnticipadaM: minutos, salidaAnticipadaT: tiempo,
+          }
+          this.timbres.push(ele);
+        })
+      })
+    })
+  }
+
 
 
   /*****************************************************************************
@@ -1436,9 +1494,9 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   verDatos() {
     this.verDetalle = true;
     if (this.bool.bool_cargo || this.bool.bool_reg) {
-      // this.extraerTimbresRegimenCargo();
+      this.extraerTimbresRegimenCargo();
     } else {
-      // this.extraerTimbres();
+      this.extraerTimbres();
     }
   }
 
