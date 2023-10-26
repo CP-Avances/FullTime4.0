@@ -11,7 +11,6 @@ import * as xlsx from 'xlsx';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
-import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from '../../../../../servicios/validaciones/validaciones.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
@@ -307,7 +306,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
         break;
       default:
         this.toastr.error(
-          'UPS! Al parecer algo falló.',
+          'Ups !!! algo salio mal.',
           'Seleccione criterio de búsqueda.'
         );
         this.reporteService.DefaultFormCriterios();

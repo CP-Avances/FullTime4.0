@@ -1,21 +1,17 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
-
-import { IReporteAtrasos } from 'src/app/model/reportes.model';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-import {
-  ITableEmpleados,
-  ReporteVacunas,
-  vacuna,
-} from 'src/app/model/reportes.model';
-import { environment } from 'src/environments/environment';
+import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+
+import { ReporteVacunas, vacuna, } from 'src/app/model/reportes.model';
+
 import { VacunaMultipleComponent } from '../vacuna-multiple/vacuna-multiple.component';
 
 @Component({
@@ -23,12 +19,15 @@ import { VacunaMultipleComponent } from '../vacuna-multiple/vacuna-multiple.comp
   templateUrl: './ver-vacunas.component.html',
   styleUrls: ['./ver-vacunas.component.css'],
 })
+
 export class VerVacunasComponent implements OnInit {
+
   hipervinculo: string = environment.url; // VARIABLE DE MANEJO DE RUTAS CON URL
 
   @Input() data: any;
   @Input() tipo: string;
   @Input() verDetalle: boolean;
+
   bool_suc: boolean = false;
   bool_reg: boolean = false;
   bool_car: boolean = false;
@@ -55,7 +54,6 @@ export class VerVacunasComponent implements OnInit {
   logo: any = String;
 
   constructor(
-    private route: ActivatedRoute,
     private restEmpre: EmpresaService,
     private vacuna: VacunaMultipleComponent
   ) {
@@ -145,7 +143,6 @@ export class VerVacunasComponent implements OnInit {
               fecha: obj4.fecha.split('T')[0],
               descripcion: obj4.descripcion,
             };
-
             this.arr_vac.push(ele);
           });
         });
@@ -212,11 +209,9 @@ export class VerVacunasComponent implements OnInit {
     }
   }
 
-  /***************************
-   *
-   * COLORES Y LOGO PARA EL REPORTE
-   *
-   *****************************/
+  /** *************************************************************************************** **
+   ** **                        COLORES Y LOGO PARA EL REPORTE                             ** **
+   ** *************************************************************************************** **/
 
   ObtenerLogo() {
     this.restEmpre
@@ -240,13 +235,11 @@ export class VerVacunasComponent implements OnInit {
       });
   }
 
-  /******************************************************
-   *
-   *          PDF
-   *
-   *******************************************/
+  /** ************************************************************************************ **
+   ** **                               GENERACION DE PDF                                ** **
+   ** ************************************************************************************ **/
 
-  generarPdf(action) {
+  generarPdf(action: any) {
     const documentDefinition = this.getDocumentDefinicion();
     let doc_name = 'Reporte_vacunas.pdf';
     switch (action) {
@@ -291,16 +284,14 @@ export class VerVacunasComponent implements OnInit {
         fecha: any,
         hora: any
       ) {
-        var h = new Date();
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
-        h.setUTCHours(h.getHours());
-        var time = h.toJSON().split('T')[1].split('.')[0];
+        hora = f.format('HH:mm:ss');
 
         return {
           margin: 10,
           columns: [
-            { text: 'Fecha: ' + fecha + ' Hora: ' + time, opacity: 0.3 },
+            { text: 'Fecha: ' + fecha + ' Hora: ' + hora, opacity: 0.3 },
             {
               text: [
                 {
@@ -586,6 +577,7 @@ export class VerVacunasComponent implements OnInit {
     return n;
   }
 
+  // METODO PARA SUMAR REGISTROS
   SumarRegistros(array: any[]) {
     let valor = 0;
     for (let i = 0; i < array.length; i++) {
@@ -597,6 +589,7 @@ export class VerVacunasComponent implements OnInit {
   /** ************************************************************************************************** *
    ** *                                     METODO PARA EXPORTAR A EXCEL                                 *
    ** ************************************************************************************************** */
+
   exportToExcel(): void {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(
       this.MapingDataPdfDefault(this.data)
@@ -613,7 +606,7 @@ export class VerVacunasComponent implements OnInit {
     array.forEach((obj1: ReporteVacunas) => {
       obj1.departamentos.forEach((obj2) => {
         obj2.empleado.forEach((obj3: any) => {
-          obj3.regimen.forEach(r=> regimen=r.name_regimen);
+          obj3.regimen.forEach(r => regimen = r.name_regimen);
           obj3.vacunas.forEach((obj4: vacuna) => {
             c = c + 1;
             let ele = {
@@ -666,7 +659,7 @@ export class VerVacunasComponent implements OnInit {
             Género: obj2.genero,
             Ciudad: obj2.ciudad,
             Sucursal: obj2.sucursal,
-            Régimen: this.bool_car? obj2.regimen : obj2.regimen[0].name_regimen,
+            Régimen: this.bool_car ? obj2.regimen : obj2.regimen[0].name_regimen,
             Departamento: obj2.departamento,
             Cargo: obj2.cargo,
             Correo: obj2.correo,
@@ -680,11 +673,11 @@ export class VerVacunasComponent implements OnInit {
         });
       });
     });
-
     return nuevo;
   }
 
-  regresar() {
+  // METODO PARA REGRESAR A LA PAGINA ANTERIOR
+  Regresar() {
     this.vacuna.verDetalle = false;
   }
 }

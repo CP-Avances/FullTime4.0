@@ -1,22 +1,24 @@
 
 // IMPORTACION DE LIBRERIAS
-import { ITableEmpleados, IReporteTimbresIncompletos, IReporteTimbres } from 'src/app/model/reportes.model';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
-import { PageEvent } from '@angular/material/paginator';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import { ToastrService } from 'ngx-toastr';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import { PageEvent } from '@angular/material/paginator';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
+// IMPORTAR MODELOS
+import { ITableEmpleados, IReporteTimbres } from 'src/app/model/reportes.model';
 
 // IMPORTACION DE SERVICIOS
 import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
-import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
+import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
+import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 
 @Component({
   selector: 'app-timbre-incompleto',
@@ -35,7 +37,6 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS
   departamentos: any = [];
-  incompletos: any = [];
   sucursales: any = [];
   empleados: any = [];
   respuesta: any = [];
@@ -57,7 +58,6 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
   selectionCar = new SelectionModel<ITableEmpleados>(true, []);
   selectionDep = new SelectionModel<ITableEmpleados>(true, []);
   selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
-  selectionTab = new SelectionModel<ITableEmpleados>(true, []);
 
   // ITEMS DE PAGINACION DE LA TABLA SUCURSAL
   numero_pagina_suc: number = 1;
@@ -84,17 +84,12 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
   tamanio_pagina_emp: number = 5;
   pageSizeOptions_emp = [5, 10, 20, 50];
 
-  // ITEMS DE PAGINACION DE LA TABLA TABULACIÓN
-  pageSizeOptions_tab = [5, 10, 20, 50];
-  tamanio_pagina_tab: number = 5;
-  numero_pagina_tab: number = 1;
-
   // ITEMS DE PAGINACION DE LA TABLA DETALLE
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
 
-  //FILTROS
+  // FILTROS
   get filtroNombreSuc() { return this.reporteService.filtroNombreSuc };
 
   get filtroNombreDep() { return this.reporteService.filtroNombreDep };
@@ -107,22 +102,18 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
 
-  get filtroCodigo_tab() { return this.reporteService.filtroCodigo_tab };
-  get filtroCedula_tab() { return this.reporteService.filtroCedula_tab };
-  get filtroNombreTab() { return this.reporteService.filtroNombreTab };
 
   constructor(
-    private R_asistencias: ReportesAsistenciasService, // SERVICIO DATOS DE TIMBRES
     private validacionService: ValidacionesService, // VALIDACIONES LETRAS Y NÚMEROS
-    private informacion: DatosGeneralesService,
     private reporteService: ReportesService, // SERVICIO DATOS DE FILTRADOS
+    private R_asistencias: ReportesAsistenciasService, // SERVICIO DATOS DE TIMBRES
+    private informacion: DatosGeneralesService,
     private restEmpre: EmpresaService, // SERVICIO DATOS DE EMPRESA
     private toastr: ToastrService, // VARIABLE MANEJO DE NOTIFICACIONES
   ) {
     this.ObtenerLogo();
     this.ObtenerColores();
   }
-
 
   ngOnInit(): void {
     this.BuscarInformacion();
@@ -140,11 +131,6 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     this.informacion.ObtenerInformacion(1).subscribe(
       (res: any[]) => {
         this.origen = JSON.stringify(res);
-        sessionStorage.setItem(
-          'reporte_timbres_incompleto',
-          JSON.stringify(res)
-        );
-
         res.forEach((obj) => {
           this.sucursales.push({
             id: obj.id_suc,
@@ -207,7 +193,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     );
   }
 
-// METODO PARA FILTRAR POR CARGOS
+  // METODO PARA FILTRAR POR CARGOS
   empleados_cargos: any = [];
   origen_cargo: any = [];
   BuscarCargos() {
@@ -240,61 +226,57 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
             });
           });
         });
-      },
-      (err) => {
-        this.toastr.error(err.error.message);
-      }
-    );
+      });
   }
 
   ngOnDestroy() {
-    this.respuesta = [];
-    this.sucursales = [];
     this.departamentos = [];
+    this.sucursales = [];
+    this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.timbres = [];
     this.cargos = [];
-    this.empleados = [];
   }
 
   // VALIDACIONES REPORTES
-  validacionReporte(action) {
-    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de busqueda')
+  validacionReporte(action: any) {
+    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de búsqueda.')
     if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
-      && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda')
-    console.log('opcion:', this.opcion);
+      && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.')
+    // console.log('opcion:', this.opcion);
     switch (this.opcion) {
       case 's':
-        if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione sucursal')
+        if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione sucursal.')
         this.ModelarSucursal(action);
         break;
       case 'r':
-        if (this.selectionReg.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione régimen')
+        if (this.selectionReg.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione régimen.')
         this.ModelarRegimen(action);
         break;
       case 'd':
-        if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione departamentos')
+        if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione departamentos.')
         this.ModelarDepartamento(action);
         break;
       case 'c':
-        if (this.selectionCar.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione cargos')
+        if (this.selectionCar.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione cargos.')
         this.ModelarCargo(action);
         break;
       case 'e':
-        if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione empleados')
+        if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione empleados.')
         this.ModelarEmpleados(action);
         break;
       default:
-        this.toastr.error('Algo a pasado', 'Seleccione criterio de busqueda')
+        this.toastr.error('Ups !!! algo salio mal.', 'Seleccione criterio de búsqueda.')
         this.reporteService.DefaultFormCriterios()
         break;
     }
   }
 
-  ModelarSucursal(accion) {
+  // TRATAMIENTO DE DATOS POR SUCURSAL
+  ModelarSucursal(accion: any) {
     this.tipo = 'default';
-    let respuesta = JSON.parse(sessionStorage.getItem('reporte_timbres_incompleto') as any)
+    let respuesta = JSON.parse(this.origen);
     let suc = respuesta.filter(o => {
       var bool = this.selectionSuc.selected.find(obj1 => {
         return obj1.id === o.id_suc
@@ -315,9 +297,10 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     })
   }
 
-  ModelarRegimen(accion) {
+  // TRATAMIENTO DE DATOS POR REGIMEN
+  ModelarRegimen(accion: any) {
     this.tipo = 'RegimenCargo';
-    let respuesta = JSON.parse(sessionStorage.getItem('reporte_timbres_incompleto') as any)
+    let respuesta = JSON.parse(this.origen);
     let empleados: any = [];
     let reg: any = [];
     let objeto: any;
@@ -358,7 +341,8 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     })
   }
 
-  ModelarCargo(accion) {
+  // TRATAMIENTO DE DATOS POR CARGO
+  ModelarCargo(accion: any) {
     this.tipo = 'RegimenCargo';
     let respuesta = JSON.parse(this.origen_cargo);
     let car = respuesta.filter((o) => {
@@ -371,7 +355,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     this.data_pdf = [];
     this.R_asistencias.ReporteTimbresIncompletosRegimenCargo(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
-      console.log('DATA PDF',this.data_pdf);
+      console.log('DATA PDF', this.data_pdf);
       switch (accion) {
         case 'excel': this.exportToExcel('RegimenCargo'); break;
         case 'ver': this.verDatos(); break;
@@ -382,9 +366,10 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     })
   }
 
-  ModelarDepartamento(accion) {
+  // TRATAMIENTO DE DATOS POR DEPARTAMENTO
+  ModelarDepartamento(accion: any) {
     this.tipo = 'default';
-    let respuesta = JSON.parse(sessionStorage.getItem('reporte_timbres_incompleto') as any)
+    let respuesta = JSON.parse(this.origen);
     respuesta.forEach((obj: any) => {
       obj.departamentos = obj.departamentos.filter(o => {
         var bool = this.selectionDep.selected.find(obj1 => {
@@ -409,9 +394,10 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     })
   }
 
-  ModelarEmpleados(accion) {
+  // TRATAMIENTO DE DATOS POR EMPLEADO
+  ModelarEmpleados(accion: any) {
     this.tipo = 'default';
-    let respuesta = JSON.parse(sessionStorage.getItem('reporte_timbres_incompleto') as any)
+    let respuesta = JSON.parse(this.origen);
 
     respuesta.forEach((obj: any) => {
       obj.departamentos.forEach(element => {
@@ -450,9 +436,9 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
 
 
 
-  /** ******************************** *
-   *   COLORES Y LOGO PARA EL REPORTE  *
-   ** ******************************** */
+  /** *************************************************************************************** **
+   ** **                        COLORES Y LOGO PARA EL REPORTE                             ** **
+   ** *************************************************************************************** **/
 
   logo: any = String;
   ObtenerLogo() {
@@ -473,12 +459,12 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     });
   }
 
-  /* **************************************************** *
-   *          GENERACIÓN DE ARCHIVOS PDF                    *
-   * **************************************************** */
+  /** ************************************************************************************ **
+   ** **                               GENERACION DE PDF                                ** **
+   ** ************************************************************************************ **/
 
-  generarPdf(action) {
-    let documentDefinition;
+  generarPdf(action: any) {
+    let documentDefinition: any;
     if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true || this.bool.bool_cargo === true || this.bool.bool_reg === true) {
       documentDefinition = this.getDocumentDefinicion();
     }
@@ -499,11 +485,9 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
       watermark: { text: this.frase, color: 'blue', opacity: 0.1, bold: true, italics: false },
       header: { text: 'Impreso por:  ' + localStorage.getItem('fullname_print'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
       footer: function (currentPage: any, pageCount: any, fecha: any) {
-        var h = new Date();
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
-        h.setUTCHours(h.getHours());
-        var time = h.toJSON().split("T")[1].split(".")[0];
+        var time = f.format('HH:mm:ss');
         return {
           margin: 10,
           columns: [
@@ -534,7 +518,8 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
         centrado: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 10, 0, 10] },
         itemsTable: { fontSize: 8 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
-        itemsTableInfoBlanco: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: '#E3E3E3' },
+        itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0],fillColor: '#E3E3E3' },
+        itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
         tableMargin: { margin: [0, 0, 0, 10] },
         tableMarginCabecera: { margin: [0, 15, 0, 0] },
@@ -558,6 +543,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
             style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
+              headerRows: 1,
               body: [
                 [
                   {
@@ -580,6 +566,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
             style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
+              headerRows: 1,
               body: [
                 [
                   {
@@ -604,103 +591,106 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
             style: 'tableMarginCabecera',
             table: {
               widths: ['*', 'auto', 'auto'],
+              headerRows: 2,
               body: [
                 [
                   {
                     border: [true, true, false, false],
                     text: 'EMPLEADO: ' + obj2.name_empleado,
-                    style: 'itemsTableInfoBlanco',
+                    style: 'itemsTableInfoEmpleado',
                   },
                   {
                     border: [false, true, false, false],
                     text: 'C.C.: ' + obj2.cedula,
-                    style: 'itemsTableInfoBlanco',
+                    style: 'itemsTableInfoEmpleado',
                   },
                   {
                     border: [false, true, true, false],
                     text: 'COD: ' + obj2.codigo,
-                    style: 'itemsTableInfoBlanco',
+                    style: 'itemsTableInfoEmpleado',
                   },
                 ],
                 [
                   {
                     border: [true, false, false, false],
                     text: 'DEPARTAMENTO: ' + obj2.departamento,
-                    style: 'itemsTableInfoBlanco'
+                    style: 'itemsTableInfoEmpleado'
                   },
                   {
                     border: [false, false, false, false],
-                    text: this.bool.bool_reg?'CARGO: ' + obj2.cargo:'',
-                    style: 'itemsTableInfoBlanco'
+                    text: this.bool.bool_reg ? 'CARGO: ' + obj2.cargo : '',
+                    style: 'itemsTableInfoEmpleado'
                   },
                   {
                     border: [false, false, true, false],
                     text: '',
-                    style: 'itemsTableInfoBlanco'
+                    style: 'itemsTableInfoEmpleado'
                   }
                 ]
               ],
             },
           });
           c = 0;
-            n.push({
-              style: 'tableMargin',
-              table: {
-                widths: ['auto', '*','*', '*'],
-                  body: [
-                    [
-                      { rowSpan: 2, text: 'N°', style: 'centrado' },
-                      { colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
-                      '',
-                      { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
-                    ],
-                    [
-                      '',
-                      { text: 'FECHA', style: 'tableHeader' },
-                      { text: 'HORA', style: 'tableHeader' },
-                      '',
-  
-                    ],
-                    ...obj2.timbres.map(obj3 => {
-                      switch (obj3.accion) {
-                        case 'EoS': accionT = 'Entrada o salida'; break;
-                        case 'AES': accionT = 'Inicio o fin alimentación'; break;
-                        case 'PES': accionT = 'Inicio o fin permiso'; break;
-                        case 'E': accionT = 'Entrada'; break;
-                        case 'S': accionT = 'Salida'; break;
-                        case 'I/A': accionT = 'Inicio alimentación'; break;
-                        case 'F/A': accionT = 'Fin alimentación'; break;
-                        case 'I/P': accionT = 'Inicio permiso'; break;
-                        case 'F/P': accionT = 'Fin permiso'; break;
-                        case 'HA': accionT = 'Timbre libre'; break;
-                        default: accionT = 'Desconocido'; break;
-                      }
-                      c = c + 1
-                      return [
-                        { style: 'itemsTableCentrado', text: c },
-                        { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[0] },
-                        { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[1] },
-                        { style: 'itemsTableCentrado', text: accionT },
-                      ]
-                    })
-  
+          n.push({
+            style: 'tableMargin',
+            table: {
+              widths: ['auto', '*', '*', '*'],
+              headerRows: 2,
+              body: [
+                [
+                  { rowSpan: 2, text: 'N°', style: 'centrado' },
+                  { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                  {},
+                  { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
+                ],
+                [
+                  {},
+                  { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                  { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                  {},
+
+                ],
+                ...obj2.timbres.map(obj3 => {
+                  switch (obj3.accion) {
+                    case 'EoS': accionT = 'Entrada o salida'; break;
+                    case 'AES': accionT = 'Inicio o fin alimentación'; break;
+                    case 'PES': accionT = 'Inicio o fin permiso'; break;
+                    case 'E': accionT = 'Entrada'; break;
+                    case 'S': accionT = 'Salida'; break;
+                    case 'I/A': accionT = 'Inicio alimentación'; break;
+                    case 'F/A': accionT = 'Fin alimentación'; break;
+                    case 'I/P': accionT = 'Inicio permiso'; break;
+                    case 'F/P': accionT = 'Fin permiso'; break;
+                    case 'HA': accionT = 'Timbre libre'; break;
+                    default: accionT = 'Desconocido'; break;
+                  }
+                  c = c + 1
+                  return [
+                    { style: 'itemsTableCentrado', text: c },
+                    { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[0] },
+                    { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[1] },
+                    { style: 'itemsTableCentrado', text: accionT },
                   ]
-              },
-              layout: {
-                fillColor: function (rowIndex) {
-                  return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-                }
+                })
+
+              ]
+            },
+            layout: {
+              fillColor: function (rowIndex) {
+                return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
               }
-            });
+            }
+          });
         });
       });
     } else {
       data.forEach((obj: IReporteTimbres) => {
-  
+
         if (this.bool.bool_suc === true || this.bool.bool_dep === true) {
           n.push({
             table: {
               widths: ['*', '*'],
+              headerRows: 1,
               body: [
                 [
                   {
@@ -719,9 +709,9 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
             }
           })
         }
-  
+
         obj.departamentos.forEach(obj1 => {
-  
+
           // LA CABECERA CUANDO SE GENERA EL PDF POR DEPARTAMENTOS
           if (this.bool.bool_dep === true) {
             let arr_reg = obj1.empleado.map((o: any) => { return o.timbres.length })
@@ -730,6 +720,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
               style: 'tableMarginCabecera',
               table: {
                 widths: ['*', '*'],
+                headerRows: 1,
                 body: [
                   [
                     {
@@ -747,121 +738,124 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
               }
             })
           }
-  
+
           obj1.empleado.forEach((obj2: any) => {
-  
+
             n.push({
               style: 'tableMarginCabecera',
               table: {
                 widths: ['*', 'auto', 'auto',],
+                headerRows: 2,
                 body: [
                   [
                     {
                       border: [true, true, false, false],
                       text: 'EMPLEADO: ' + obj2.name_empleado,
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfoEmpleado'
                     },
                     {
                       border: [false, true, false, false],
                       text: 'C.C.: ' + obj2.cedula,
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfoEmpleado'
                     },
                     {
                       border: [false, true, true, false],
                       text: 'COD: ' + obj2.codigo,
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfoEmpleado'
                     }
                   ],
                   [
                     {
                       border: [true, false, false, false],
-                      text: this.bool.bool_suc?'DEPARTAMENTO: ' + obj2.departamento:'',
-                      style: 'itemsTableInfoBlanco'
+                      text: this.bool.bool_suc || this.bool.bool_emp?'DEPARTAMENTO: ' + obj2.departamento:'',
+                      style: 'itemsTableInfoEmpleado'
                     },
                     {
                       border: [false, false, false, false],
                       text: 'CARGO: ' + obj2.cargo,
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfoEmpleado'
                     },
                     {
                       border: [false, false, true, false],
                       text: '',
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfoEmpleado'
                     }
                   ]
                 ]
               }
             });
             c = 0;
-              n.push({
-                style: 'tableMargin',
-                table: {
-                  widths: ['auto', '*','*', '*'],
-                  body: [
-                    [
-                      { rowSpan: 2, text: 'N°', style: 'centrado' },
-                      { colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
-                      '',
-                      { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
-                    ],
-                    [
-                      '',
-                      { text: 'FECHA', style: 'tableHeader' },
-                      { text: 'HORA', style: 'tableHeader' },
-                      '',
-  
-                    ],
-                    ...obj2.timbres.map(obj3 => {
-                      switch (obj3.accion) {
-                        case 'EoS': accionT = 'Entrada o salida'; break;
-                        case 'AES': accionT = 'Inicio o fin alimentación'; break;
-                        case 'PES': accionT = 'Inicio o fin permiso'; break;
-                        case 'E': accionT = 'Entrada'; break;
-                        case 'S': accionT = 'Salida'; break;
-                        case 'I/A': accionT = 'Inicio alimentación'; break;
-                        case 'F/A': accionT = 'Fin alimentación'; break;
-                        case 'I/P': accionT = 'Inicio permiso'; break;
-                        case 'F/P': accionT = 'Fin permiso'; break;
-                        case 'HA': accionT = 'Timbre libre'; break;
-                        default: accionT = 'Desconocido'; break;
-                      }
-                      c = c + 1
-                      return [
-                        { style: 'itemsTableCentrado', text: c },
-                        { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[0] },
-                        { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[1] },
-                        { style: 'itemsTableCentrado', text: accionT },
-                      ]
-                    })
-  
-                  ]
-                },
-                layout: {
-                  fillColor: function (rowIndex) {
-                    return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-                  }
+            n.push({
+              style: 'tableMargin',
+              table: {
+                widths: ['auto', '*', '*', '*'],
+                headerRows: 2,
+                body: [
+                  [
+                    { rowSpan: 2, text: 'N°', style: 'centrado' },
+                    { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                    {},
+                    { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
+                  ],
+                  [
+                    {},
+                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                    {},
+
+                  ],
+                  ...obj2.timbres.map(obj3 => {
+                    switch (obj3.accion) {
+                      case 'EoS': accionT = 'Entrada o salida'; break;
+                      case 'AES': accionT = 'Inicio o fin alimentación'; break;
+                      case 'PES': accionT = 'Inicio o fin permiso'; break;
+                      case 'E': accionT = 'Entrada'; break;
+                      case 'S': accionT = 'Salida'; break;
+                      case 'I/A': accionT = 'Inicio alimentación'; break;
+                      case 'F/A': accionT = 'Fin alimentación'; break;
+                      case 'I/P': accionT = 'Inicio permiso'; break;
+                      case 'F/P': accionT = 'Fin permiso'; break;
+                      case 'HA': accionT = 'Timbre libre'; break;
+                      default: accionT = 'Desconocido'; break;
+                    }
+                    c = c + 1
+                    return [
+                      { style: 'itemsTableCentrado', text: c },
+                      { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[0] },
+                      { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[1] },
+                      { style: 'itemsTableCentrado', text: accionT },
+                    ]
+                  })
+
+                ]
+              },
+              layout: {
+                fillColor: function (rowIndex) {
+                  return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
                 }
-              })
+              }
+            })
           });
         });
       });
     }
-    return n
+    return n;
   }
 
+  // METODO PARA SUMAR REGISTROS
   SumarRegistros(array: any[]) {
     let valor = 0;
     for (let i = 0; i < array.length; i++) {
       valor = valor + array[i];
     }
-    return valor
+    return valor;
   }
 
 
   /** ************************************************************************************************** ** 
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
-   exportToExcel(tipo: string): void {
+  exportToExcel(tipo: string): void {
     switch (tipo) {
       case 'RegimenCargo':
         const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfRegimenCargo(this.data_pdf));
@@ -876,7 +870,6 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
         xlsx.writeFile(wb, 'Timbres_incompletos.xlsx');
         break;
     }
-
   }
 
   MapingDataPdfDefault(array: Array<any>) {
@@ -886,65 +879,65 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
-              switch (obj4.accion) {
-                case 'EoS': accionT = 'Entrada o salida'; break;
-                case 'AES': accionT = 'Inicio o fin alimentación'; break;
-                case 'PES': accionT = 'Inicio o fin permiso'; break;
-                case 'E': accionT = 'Entrada'; break;
-                case 'S': accionT = 'Salida'; break;
-                case 'I/A': accionT = 'Inicio alimentación'; break;
-                case 'F/A': accionT = 'Fin alimentación'; break;
-                case 'I/P': accionT = 'Inicio permiso'; break;
-                case 'F/P': accionT = 'Fin permiso'; break;
-                case 'HA': accionT = 'Timbre libre'; break;
-                default: accionT = 'Desconocido'; break;
-              }
-              let ele = {
-                'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
-                'Departamento': obj2.name_dep,
-                'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
-                'Fecha Timbre': obj4.fec_hora_horario.split(' ')[0], 'Hora Timbre': obj4.fec_hora_horario.split(' ')[1],
-                'Acción': accionT
-              }
-            nuevo.push(ele)
+            switch (obj4.accion) {
+              case 'EoS': accionT = 'Entrada o salida'; break;
+              case 'AES': accionT = 'Inicio o fin alimentación'; break;
+              case 'PES': accionT = 'Inicio o fin permiso'; break;
+              case 'E': accionT = 'Entrada'; break;
+              case 'S': accionT = 'Salida'; break;
+              case 'I/A': accionT = 'Inicio alimentación'; break;
+              case 'F/A': accionT = 'Fin alimentación'; break;
+              case 'I/P': accionT = 'Inicio permiso'; break;
+              case 'F/P': accionT = 'Fin permiso'; break;
+              case 'HA': accionT = 'Timbre libre'; break;
+              default: accionT = 'Desconocido'; break;
+            }
+            let ele = {
+              'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
+              'Departamento': obj2.name_dep,
+              'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
+              'Fecha Timbre': obj4.fec_hora_horario.split(' ')[0], 'Hora Timbre': obj4.fec_hora_horario.split(' ')[1],
+              'Acción': accionT
+            }
+            nuevo.push(ele);
           })
         })
       })
     })
-    return nuevo
+    return nuevo;
   }
 
   MapingDataPdfRegimenCargo(array: Array<any>) {
     let nuevo: Array<any> = [];
     let accionT = '';
     array.forEach((obj1: any) => {
-        obj1.empleados.forEach((obj2: any) => {
-          obj2.timbres.forEach((obj3: any) => {
-              switch (obj3.accion) {
-                case 'EoS': accionT = 'Entrada o salida'; break;
-                case 'AES': accionT = 'Inicio o fin alimentación'; break;
-                case 'PES': accionT = 'Inicio o fin permiso'; break;
-                case 'E': accionT = 'Entrada'; break;
-                case 'S': accionT = 'Salida'; break;
-                case 'I/A': accionT = 'Inicio alimentación'; break;
-                case 'F/A': accionT = 'Fin alimentación'; break;
-                case 'I/P': accionT = 'Inicio permiso'; break;
-                case 'F/P': accionT = 'Fin permiso'; break;
-                case 'HA': accionT = 'Timbre libre'; break;
-                default: accionT = 'Desconocido'; break;
-              }
-              let ele = {
-                'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
-                'Departamento': obj2.departamento,
-                'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
-                'Fecha Timbre': obj3.fec_hora_horario.split(' ')[0], 'Hora Timbre': obj3.fec_hora_horario.split(' ')[1],
-                'Acción': accionT
-              }
-            nuevo.push(ele)
-          })
+      obj1.empleados.forEach((obj2: any) => {
+        obj2.timbres.forEach((obj3: any) => {
+          switch (obj3.accion) {
+            case 'EoS': accionT = 'Entrada o salida'; break;
+            case 'AES': accionT = 'Inicio o fin alimentación'; break;
+            case 'PES': accionT = 'Inicio o fin permiso'; break;
+            case 'E': accionT = 'Entrada'; break;
+            case 'S': accionT = 'Salida'; break;
+            case 'I/A': accionT = 'Inicio alimentación'; break;
+            case 'F/A': accionT = 'Fin alimentación'; break;
+            case 'I/P': accionT = 'Inicio permiso'; break;
+            case 'F/P': accionT = 'Fin permiso'; break;
+            case 'HA': accionT = 'Timbre libre'; break;
+            default: accionT = 'Desconocido'; break;
+          }
+          let ele = {
+            'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
+            'Departamento': obj2.departamento,
+            'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
+            'Fecha Timbre': obj3.fec_hora_horario.split(' ')[0], 'Hora Timbre': obj3.fec_hora_horario.split(' ')[1],
+            'Acción': accionT
+          }
+          nuevo.push(ele);
         })
+      })
     })
-    return nuevo
+    return nuevo;
   }
 
   //METODOS PARA EXTRAER LOS TIMBRES EN UNA LISTA Y VISUALIZARLOS
@@ -979,7 +972,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
               fechaTimbre: obj4.fec_hora_horario.split(' ')[0], horaTimbre: obj4.fec_hora_horario.split(' ')[1],
               accion: accionT
             }
-            this.timbres.push(ele)
+            this.timbres.push(ele);
           })
         })
       })
@@ -991,39 +984,39 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     let n = 0;
     let accionT = '';
     this.data_pdf.forEach((obj1: any) => {
-        obj1.empleados.forEach((obj2: any) => {
-          obj2.timbres.forEach((obj3: any) => {
-            n = n + 1;
-            switch (obj3.accion) {
-              case 'EoS': accionT = 'Entrada o salida'; break;
-              case 'AES': accionT = 'Inicio o fin alimentación'; break;
-              case 'PES': accionT = 'Inicio o fin permiso'; break;
-              case 'E': accionT = 'Entrada'; break;
-              case 'S': accionT = 'Salida'; break;
-              case 'I/A': accionT = 'Inicio alimentación'; break;
-              case 'F/A': accionT = 'Fin alimentación'; break;
-              case 'I/P': accionT = 'Inicio permiso'; break;
-              case 'F/P': accionT = 'Fin permiso'; break;
-              case 'HA': accionT = 'Timbre libre'; break;
-              default: accionT = 'Desconocido'; break;
-            }
-            let ele = {
-              n: n,
-              ciudad: obj2.ciudad, sucursal: obj2.sucursal,
-              departamento: obj2.departamento,
-              empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
-              fechaTimbre: obj3.fec_hora_horario.split(' ')[0], horaTimbre: obj3.fec_hora_horario.split(' ')[1],
-              accion: accionT
-            }
-            this.timbres.push(ele)
-          })
+      obj1.empleados.forEach((obj2: any) => {
+        obj2.timbres.forEach((obj3: any) => {
+          n = n + 1;
+          switch (obj3.accion) {
+            case 'EoS': accionT = 'Entrada o salida'; break;
+            case 'AES': accionT = 'Inicio o fin alimentación'; break;
+            case 'PES': accionT = 'Inicio o fin permiso'; break;
+            case 'E': accionT = 'Entrada'; break;
+            case 'S': accionT = 'Salida'; break;
+            case 'I/A': accionT = 'Inicio alimentación'; break;
+            case 'F/A': accionT = 'Fin alimentación'; break;
+            case 'I/P': accionT = 'Inicio permiso'; break;
+            case 'F/P': accionT = 'Fin permiso'; break;
+            case 'HA': accionT = 'Timbre libre'; break;
+            default: accionT = 'Desconocido'; break;
+          }
+          let ele = {
+            n: n,
+            ciudad: obj2.ciudad, sucursal: obj2.sucursal,
+            departamento: obj2.departamento,
+            empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
+            fechaTimbre: obj3.fec_hora_horario.split(' ')[0], horaTimbre: obj3.fec_hora_horario.split(' ')[1],
+            accion: accionT
+          }
+          this.timbres.push(ele);
         })
+      })
     })
   }
 
-  /* *************************************************************************** *
-   *             VARIOS METODOS COMPLEMENTARIOS AL FUNCIONAMIENTO.               *
-   * *************************************************************************** */
+  /** ************************************************************************************** **
+   ** **                   METODOS DE SELECCION DE DATOS DE USUARIOS                      ** **
+   ** ************************************************************************************** **/
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
   isAllSelectedSuc() {
@@ -1064,9 +1057,8 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     if (!row) {
       return `${this.isAllSelectedReg() ? 'select' : 'deselect'} all`;
     }
-    return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${
-      row.id + 1
-    }`;
+    return `${this.selectionReg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1
+      }`;
   }
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
@@ -1132,21 +1124,25 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // METODO PARA MANEJO DE PIE DE PÁGINA
+  // METODO PARA MANEJO DE PIE DE PAGINA
   ManejarPagina(e: PageEvent) {
     if (this.bool.bool_suc === true) {
       this.tamanio_pagina_suc = e.pageSize;
       this.numero_pagina_suc = e.pageIndex + 1;
-    } else if (this.bool.bool_reg === true) {
+    }
+    else if (this.bool.bool_reg === true) {
       this.tamanio_pagina_reg = e.pageSize;
       this.numero_pagina_reg = e.pageIndex + 1;
-    } else if (this.bool.bool_cargo === true) {
+    }
+    else if (this.bool.bool_cargo === true) {
       this.tamanio_pagina_car = e.pageSize;
       this.numero_pagina_car = e.pageIndex + 1;
-    } else if (this.bool.bool_dep === true) {
+    }
+    else if (this.bool.bool_dep === true) {
       this.tamanio_pagina_dep = e.pageSize;
       this.numero_pagina_dep = e.pageIndex + 1;
-    } else if (this.bool.bool_emp === true) {
+    }
+    else if (this.bool.bool_emp === true) {
       this.tamanio_pagina_emp = e.pageSize;
       this.numero_pagina_emp = e.pageIndex + 1;
     }
@@ -1164,32 +1160,13 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     window.open(rutaMapa);
   }
 
-  // METODOS DE VALIDACIONES DE INGRESO DE LETRAS Y NÚMEROS
-  IngresarSoloLetras(e) {
+  // METODOS DE VALIDACIONES DE INGRESO DE LETRAS Y NUMEROS
+  IngresarSoloLetras(e: any) {
     return this.validacionService.IngresarSoloLetras(e)
   }
 
-  IngresarSoloNumeros(evt) {
+  IngresarSoloNumeros(evt: any) {
     return this.validacionService.IngresarSoloNumeros(evt)
-  }
-
-  MostrarLista() {
-    if (this.opcion === 's') {
-     /* this.nombre_suc.reset();
-      this.Filtrar('', 1)*/
-    }
-    else if (this.opcion === 'd') {
-     /* this.nombre_dep.reset();
-      this.Filtrar('', 2)*/
-    }
-    else if (this.opcion === 'e') {
-     /* this.codigo.reset();
-      this.cedula.reset();
-      this.nombre_emp.reset();
-      this.Filtrar('', 3)
-      this.Filtrar('', 4)
-      this.Filtrar('', 5)*/
-    }
   }
 
   //MOSTRAR DETALLES
@@ -1197,12 +1174,13 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     this.verDetalle = true;
     if (this.bool.bool_cargo || this.bool.bool_reg) {
       this.extraerTimbresRegimenCargo();
-    } else{
+    } else {
       this.extraerTimbres();
     }
   }
 
-  regresar(){
+  // METODO PARA REGRESAR A LA PANTALLA ANTERIOR
+  Regresar() {
     this.verDetalle = false;
   }
 

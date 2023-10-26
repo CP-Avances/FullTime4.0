@@ -1,8 +1,16 @@
-table { width: 100%; font-size: 14px;}
+table {
+    width: 100%;
+    font-size: 14px;
+}
 
-tr { text-align: center; }
+tr {
+    text-align: center;
+}
 
-td { padding-top: 10px; text-align: center; }
+td {
+    padding-top: 10px;
+    text-align: center;
+}
 
 p {
     font-size: x-small;
@@ -12,11 +20,11 @@ p {
     color: indianred;
 }
 
-#busqueda{
+#busqueda {
     margin-top: 10px;
 }
 
-#detalle{
+#detalle {
     width: 100%;
     font-size: 12px;
 }
@@ -25,4 +33,3 @@ p {
     color: rgb(53, 95, 209);
     cursor: pointer;
 }
-

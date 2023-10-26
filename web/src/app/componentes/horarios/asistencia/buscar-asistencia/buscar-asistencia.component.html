@@ -1,0 +1,135 @@
+<div class="container" style="padding-top: 15px;" *ngIf="ver_asistencia">
+    <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo">
+            <span>ASISTENCIA</span>
+        </div>
+        <form [formGroup]="formulario">
+            <div class="container">
+                <div class="nota" id="espacio">
+                    <span>
+                        NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                        Buscar.
+                    </span>
+                </div>
+                <div class="row">
+                    <div class="col-md">
+                        <mat-form-field>
+                            <mat-label>Nombre</mat-label>
+                            <input matInput [formControl]="nombre">
+                            <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar el nombre del usuario.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label>Apellido</mat-label>
+                            <input matInput [formControl]="apellido">
+                            <mat-icon matSuffix matTooltipPosition="right"
+                                matTooltip="Ingresar el apellido del usuario.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md">
+                        <mat-form-field>
+                            <mat-label>Código</mat-label>
+                            <input matInput [formControl]="codigo">
+                            <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar el código de usuario.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                        <mat-form-field>
+                            <mat-label>Cédula</mat-label>
+                            <input matInput [formControl]="cedula">
+                            <mat-icon matSuffix matTooltipPosition="right" matTooltip="Ingresar la cédula del usuario.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field>
+                                <mat-label>Fecha desde:</mat-label>
+                                <input matInput [matDatepicker]="picker1" [formControl]="fechaInicio" required>
+                                <mat-datepicker-toggle matSuffix [for]="picker1" id="i-cursor"
+                                    matTooltipPosition="right" matTooltip="Fecha inicial del registro de asistencia.">
+                                </mat-datepicker-toggle>
+                                <mat-datepicker touchUi #picker1></mat-datepicker>
+                            </mat-form-field>
+                            <mat-form-field>
+                                <mat-label>Fecha hasta:</mat-label>
+                                <input matInput [matDatepicker]="picker2" [formControl]="fechaFin" required>
+                                <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor"
+                                    matTooltipPosition="right" matTooltip="Fecha final del registro de asistencia.">
+                                </mat-datepicker-toggle>
+                                <mat-datepicker touchUi #picker2></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <button class="btn btn-sm" id="btn-raised" type="submit" [disabled]="!formulario.valid"
+                            (click)="BuscarDatosAsistencia(formulario.value)">
+                            Buscar
+                        </button>
+                        <button class="btn btn-sm" id="btn-raised" type="submit" (click)="Limpiar()">
+                            Limpiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <hr>
+        <div class="container" style="padding-top: 5px; text-align: center;">
+            <div class="mat-elevation-z8" style="background: white;">
+                <div id="resultados">RESULTADO DE BÚSQUEDA</div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col" id="centrar" rowspan="2">CÓDIGO</th>
+                                <th scope="col" id="centrar" rowspan="2">NOMBRE</th>
+                                <th scope="col" id="centrar" rowspan="2">APELLIDO</th>
+                                <th scope="col" id="centrar" rowspan="2">FECHA</th>
+                                <th scope="col" id="centrar" colspan="2">HORARIO</th>
+                                <th scope="col" id="centrar" colspan="2">TIMBRE</th>
+                                <th scope="col" id="centrar" rowspan="2">TIPO</th>
+                                <th scope="col" id="centrar" rowspan="2">ACCIONES</th>
+                            </tr>
+                            <tr>
+                                <th id="centrar" scope="col">Fecha</th>
+                                <th id="centrar" scope="col">Hora</th>
+                                <th id="centrar" scope="col">Fecha</th>
+                                <th id="centrar" scope="col">Hora</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let a of asistencia | paginate:tamanio_pagina:numero_pagina">
+                                <td>{{a.codigo}}</td>
+                                <td>{{a.nombre}}</td>
+                                <td>{{a.apellido}}</td>
+                                <td>{{a.fecha_general_}}</td>
+                                <td>{{a.fecha_horario_}}</td>
+                                <td>{{a.hora_horario_}}</td>
+                                <td>{{a.fecha_timbre_}}</td>
+                                <td>{{a.hora_timbre_}}</td>
+                                <td>{{a.tipo_}}</td>
+                                <td class="justify-content-center">
+                                    <i class="fas fa-eye" id="t-ver" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ver detalle del registro." (click)="VerDetalle(a)">
+                                        <p>Revisar</p>
+                                    </i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <mat-paginator id="pagina" [length]="asistencia.length" [pageSize]="tamanio_pagina"
+                    [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
+                </mat-paginator>
+            </div>
+        </div>
+    </mat-card>
+</div>
+
+<!--  ***************************  PANTALLA REVISION DE ASISTENCIA  ********************************  -->
+<app-registrar-asistencia *ngIf="ver_detalle" [informacion]="informacion"></app-registrar-asistencia>

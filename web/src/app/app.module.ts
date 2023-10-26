@@ -79,7 +79,7 @@ import { MetodosComponent } from './componentes/administracionGeneral/metodoElim
 import { EditarContratoComponent } from './componentes/empleado/contrato/editar-contrato/editar-contrato.component';
 import { EditarCargoComponent } from './componentes/empleado/cargo/editar-cargo/editar-cargo.component';
 import { RegistrarTimbreComponent } from './componentes/modulos/timbreWeb/registrar-timbre/registrar-timbre.component';
-import { RegistrarAsistenciaComponent } from './componentes/registrar-asistencia/registrar-asistencia.component';
+import { RegistrarAsistenciaComponent } from './componentes/horarios/asistencia/registrar-asistencia/registrar-asistencia.component';
 import { EditarEstadoAutorizaccionComponent } from './componentes/autorizaciones/editar-estado-autorizaccion/editar-estado-autorizaccion.component';
 import { EditarEstadoVacacionAutoriacionComponent } from './componentes/autorizaciones/editar-estado-vacacion-autoriacion/editar-estado-vacacion-autoriacion.component';
 import { SubirDocumentoComponent } from './componentes/documentos/subir-documento/subir-documento.component';
@@ -314,6 +314,7 @@ import { VerTipoPermisoComponent } from './componentes/modulos/permisos/configur
 import { EditarPermisoEmpleadoComponent } from './componentes/modulos/permisos/gestionar-permisos/editar-permiso-empleado/editar-permiso-empleado.component';
 import { EliminarIndividualComponent } from './componentes/horarios/eliminar-individual/eliminar-individual.component';
 import { CargarPlantillasComponent } from './componentes/horarios/cargar-plantillas/cargar-plantillas.component';
+import { BuscarAsistenciaComponent } from './componentes/horarios/asistencia/buscar-asistencia/buscar-asistencia.component';
 
 
 const config: SocketIoConfig = { url: environment.url, options: {} };
@@ -565,6 +566,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     BuscarPlanificacionComponent,
     EliminarIndividualComponent,
     CargarPlantillasComponent,
+    BuscarAsistenciaComponent,
 
   ],
 

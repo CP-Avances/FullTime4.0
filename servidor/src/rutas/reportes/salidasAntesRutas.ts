@@ -10,8 +10,11 @@ class SalidasAnticipadasRutas {
     }
 
     configuracion(): void {
-        // CONSULTA DE TIMBRES DE SALIDAS ACCION S
-        this.router.put('/timbre-accions/:desde/:hasta', TokenValidation, SALIDAS_ANTICIPADAS_CONTROLADOR.BuscarTimbres_AccionS);
+        // CONSULTA DE TIMBRES CON SALIDAS ANTICIPADAS
+        this.router.put('/timbre-salida-anticipada/:desde/:hasta', TokenValidation, SALIDAS_ANTICIPADAS_CONTROLADOR.ReporteSalidasAnticipadas);
+        
+        // CONSULTA DE TIMBRES CON SALIDAS ANTICIPADAS PARA REGIMEN CARGO
+        this.router.put('/timbre-salida-anticipada-regimen-cargo/:desde/:hasta', TokenValidation, SALIDAS_ANTICIPADAS_CONTROLADOR.ReporteSalidasAnticipadasRegimenCargo);
 
     }
 }

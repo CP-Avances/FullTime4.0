@@ -304,7 +304,7 @@ export class ReporteEmpleadosComponent implements OnInit {
         break;
       default:
         this.toastr.error(
-          'UPS! Al parecer algo falló.',
+          'Ups !!! algo salio mal.',
           'Seleccione criterio de búsqueda.'
         );
         this.reporteService.DefaultFormCriterios();
@@ -503,7 +503,7 @@ export class ReporteEmpleadosComponent implements OnInit {
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
-       hora = f.format('HH:mm:ss');
+        hora = f.format('HH:mm:ss');
 
         return {
           margin: 10,
@@ -872,7 +872,7 @@ export class ReporteEmpleadosComponent implements OnInit {
       });
     }
 
-    return n
+    return n;
   }
 
   // METODO PARA SUMAR REGISTROS

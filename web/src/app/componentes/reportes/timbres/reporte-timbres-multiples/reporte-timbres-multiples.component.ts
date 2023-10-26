@@ -27,7 +27,7 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 
 export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
 
-  get timbreServidor() { return this.reporteService.mostrarTimbreServidor };
+  get timbreDispositivo() { return this.reporteService.mostrarTimbreDispositivo };
 
   get rangoFechas() { return this.reporteService.rangoFechas };
 
@@ -37,11 +37,9 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
 
 
   departamentos: any = [];
-  incompletos: any = [];
   sucursales: any = [];
   empleados: any = [];
   respuesta: any = [];
-  tabulado: any = [];
   regimen: any = [];
   timbres: any = [];
   cargos: any = [];
@@ -106,7 +104,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
 
 
   // ESTADO HORA SERVIDOR
-  servidor: boolean = false;
+  dispositivo: boolean = false;
 
   constructor(
     private validacionService: ValidacionesService,
@@ -122,7 +120,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (parseInt(localStorage.getItem('rol') as string) === 1) {
-      this.servidor = true;
+      this.dispositivo = true;
     }
     this.BuscarInformacion();
     this.BuscarCargos();
@@ -234,70 +232,63 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
             });
           });
         });
-      },
-      (err) => {
-        this.toastr.error(err.error.message);
-      }
-    );
+      });
   }
 
   ngOnDestroy() {
-    this.respuesta = [];
-    this.sucursales = [];
     this.departamentos = [];
+    this.sucursales = [];
+    this.respuesta = [];
+    this.empleados = [];
     this.regimen = [];
     this.timbres = [];
     this.cargos = [];
-    this.empleados = [];
-    this.tabulado = [];
-    this.incompletos = [];
   }
 
   // VALIDACIONES DE OPCIONES DE REPORTE
   validacionReporte(action: any) {
-    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de busqueda');
+    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de búsqueda.');
     if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
-      && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda')
-    //console.log('opcion:', this.opcion);
-    //console.log('ver rol -----------------------***********', localStorage.getItem('rol'))
+      && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.');
     switch (this.opcion) {
       case 's':
-        if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione sucursal')
+        if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione sucursal.')
         this.ModelarSucursal(action);
         break;
       case 'r':
-        if (this.selectionReg.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione régimen')
+        if (this.selectionReg.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione régimen.')
         this.ModelarRegimen(action);
         break;
       case 'd':
-        if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione departamentos')
+        if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione departamentos.')
         this.ModelarDepartamento(action);
         break;
       case 'c':
-        if (this.selectionCar.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione cargos')
+        if (this.selectionCar.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione cargos.')
         this.ModelarCargo(action);
         break;
       case 'e':
-        if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione empleados')
+        if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione empleados.')
         this.ModelarEmpleados(action);
         break;
       default:
-        this.toastr.error('Algo a pasado', 'Seleccione criterio de busqueda')
+        this.toastr.error('Ups !!! algo salio mal.', 'Seleccione criterio de búsqueda.')
         this.reporteService.DefaultFormCriterios()
         break;
     }
   }
 
-  ModelarSucursal(accion) {
+  // TRATAMIENTO DE DATOS POR SUCURSAL
+  ModelarSucursal(accion: any) {
     this.tipo = 'default';
     let respuesta = JSON.parse(this.origen)
 
     let suc = respuesta.filter(o => {
       var bool = this.selectionSuc.selected.find(obj1 => {
         return obj1.id === o.id_suc
-      })
+      });
       return bool != undefined
-    })
+    });
 
     // console.log('SUCURSAL', suc);
     this.data_pdf = []
@@ -314,7 +305,8 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     })
   }
 
-  ModelarRegimen(accion) {
+  // TRATAMIENTO DE DATOS POR REGIMEN
+  ModelarRegimen(accion: any) {
     this.tipo = 'RegimenCargo';
     let respuesta = JSON.parse(this.origen);
     let empleados: any = [];
@@ -346,7 +338,6 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     this.data_pdf = [];
     this.R_asistencias.ReporteTimbresMultipleRegimenCargo(reg, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
-      console.log('DATA PDF', this.data_pdf);
       switch (accion) {
         case 'excel': this.exportToExcel('RegimenCargo'); break;
         case 'ver': this.verDatos(); break;
@@ -357,7 +348,8 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     })
   }
 
-  ModelarDepartamento(accion) {
+  // TRATAMIENTO DE DATOS POR DEPARTAMENTO
+  ModelarDepartamento(accion: any) {
     this.tipo = 'default';
     let respuesta = JSON.parse(this.origen);
 
@@ -387,7 +379,8 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     })
   }
 
-  ModelarCargo(accion) {
+  // TRATAMIENTO DE DATOS POR CARGO
+  ModelarCargo(accion: any) {
     this.tipo = 'RegimenCargo';
     let respuesta = JSON.parse(this.origen_cargo);
     let car = respuesta.filter((o) => {
@@ -411,7 +404,8 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     })
   }
 
-  ModelarEmpleados(accion) {
+  // TRATAMIENTO DE DATOS POR EMPLEADO
+  ModelarEmpleados(accion: any) {
     this.tipo = 'default';
     let respuesta = JSON.parse(this.origen)
 
@@ -451,11 +445,9 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
   }
 
 
-  /***********************************
-   * 
-   * COLORES Y LOGO PARA EL REPORTE
-   * 
-   ***********************************/
+  /** **************************************************************************************** **
+   ** **                       COLORES Y LOGO PARA EL REPORTE                               ** **
+   ** **************************************************************************************** **/
 
   logo: any = String;
   ObtenerLogo() {
@@ -476,20 +468,17 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     });
   }
 
-  /******************************************************
-   * 
-   *          PDF
-   * 
-   ******************************************************/
+  /** *********************************************************************************** **
+   ** **                        GENERACION DE ARCHIVOS PDF                             ** **
+   ** *********************************************************************************** **/
 
-  generarPdf(action) {
-    let documentDefinition;
+  generarPdf(action: any) {
+    let documentDefinition: any;
 
     if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true || this.bool.bool_cargo === true || this.bool.bool_reg === true) {
       documentDefinition = this.getDocumentDefinicion();
     }
 
-    var f = new Date()
     let doc_name = "Timbres.pdf";
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -508,16 +497,14 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
       header: { text: 'Impreso por:  ' + localStorage.getItem('fullname_print'), margin: 10, fontSize: 9, opacity: 0.3, alignment: 'right' },
 
       footer: function (currentPage: any, pageCount: any, fecha: any, hora: any) {
-        var h = new Date();
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
-        h.setUTCHours(h.getHours());
-        var time = h.toJSON().split("T")[1].split(".")[0];
+        hora = f.format('HH:mm:ss');
 
         return {
           margin: 10,
           columns: [
-            { text: 'Fecha: ' + fecha + ' Hora: ' + time, opacity: 0.3 },
+            { text: 'Fecha: ' + fecha + ' Hora: ' + hora, opacity: 0.3 },
             {
               text: [
                 {
@@ -544,7 +531,8 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
         centrado: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 10, 0, 10] },
         itemsTable: { fontSize: 8 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
-        itemsTableInfoBlanco: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: '#E3E3E3' },
+        itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0],fillColor: '#E3E3E3' },
+        itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
         tableMargin: { margin: [0, 0, 0, 10] },
         tableMarginCabecera: { margin: [0, 15, 0, 0] },
@@ -568,6 +556,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
             style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
+              headerRows: 1,
               body: [
                 [
                   {
@@ -590,6 +579,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
             style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
+              headerRows: 1,
               body: [
                 [
                   {
@@ -614,40 +604,59 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
             style: 'tableMarginCabecera',
             table: {
               widths: ['*', 'auto', 'auto'],
+              headerRows: 2,
               body: [
                 [
                   {
                     border: [true, true, false, false],
                     text: 'EMPLEADO: ' + obj2.name_empleado,
-                    style: 'itemsTableInfoBlanco',
+                    style: 'itemsTableInfoEmpleado',
                   },
                   {
                     border: [false, true, false, false],
                     text: 'C.C.: ' + obj2.cedula,
-                    style: 'itemsTableInfoBlanco',
+                    style: 'itemsTableInfoEmpleado',
                   },
                   {
                     border: [false, true, true, false],
                     text: 'COD: ' + obj2.codigo,
-                    style: 'itemsTableInfoBlanco',
+                    style: 'itemsTableInfoEmpleado',
                   },
                 ],
-              ],
+                [
+                  {
+                    border: [true, false, false, false],
+                    text: 'DEPARTAMENTO: ' + obj2.departamento,
+                    style: 'itemsTableInfoEmpleado'
+                  },
+                  {
+                    border: [false, false, false, false],
+                    text: this.bool.bool_reg ? 'CARGO: ' + obj2.cargo : '',
+                    style: 'itemsTableInfoEmpleado'
+                  },
+                  {
+                    border: [false, false, true, false],
+                    text: '',
+                    style: 'itemsTableInfoEmpleado'
+                  }
+                ]
+              ]
             },
           });
           c = 0;
-          if (this.timbreServidor === true) {
+          if (this.timbreDispositivo === true) {
             n.push({
               style: 'tableMargin',
               table: {
-                widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', '*'],
+                widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto'],
+                headerRows: 2,
                 body: [
                   [
                     { rowSpan: 2, text: 'N°', style: 'centrado' },
-                    { colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
-                    '',
-                    { colSpan: 2, text: 'SERVIDOR', style: 'tableHeader' },
-                    '',
+                    { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                    {},
+                    { rowSpan: 1, colSpan: 2, text: 'DISPOSITIVO', style: 'tableHeader' },
+                    {},
                     { rowSpan: 2, text: 'RELOJ', style: 'centrado' },
                     { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
                     { rowSpan: 2, text: 'OBSERVACIÓN', style: 'centrado' },
@@ -655,12 +664,12 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
                     { rowSpan: 2, text: 'LATITUD', style: 'centrado' }
                   ],
                   [
-                    '',
-                    { text: 'FECHA', style: 'tableHeader' },
-                    { text: 'HORA', style: 'tableHeader' },
-                    { text: 'FECHA', style: 'tableHeader' },
-                    { text: 'HORA', style: 'tableHeader' },
-                    '', '', '', '', ''
+                    {},
+                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                    {},{},{},{},{}
                   ],
                   ...obj2.timbres.map(obj3 => {
                     let servidor_fecha = '';
@@ -686,10 +695,10 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
                     c = c + 1
                     return [
                       { style: 'itemsTableCentrado', text: c },
-                      { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[0] },
-                      { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[1] },
                       { style: 'itemsTable', text: servidor_fecha },
                       { style: 'itemsTable', text: servidor_hora },
+                      { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[0] },
+                      { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[1] },
                       { style: 'itemsTable', text: obj3.id_reloj },
                       { style: 'itemsTable', text: accionT },
                       { style: 'itemsTable', text: obj3.observacion },
@@ -710,26 +719,32 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
             n.push({
               style: 'tableMargin',
               table: {
-                widths: ['auto', '*', '*', 'auto', 'auto', 'auto', '*', '*'],
+                widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto'],
+                headerRows: 2,
                 body: [
                   [
                     { rowSpan: 2, text: 'N°', style: 'centrado' },
-                    { colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
-                    '',
+                    { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                    {},
                     { rowSpan: 2, text: 'RELOJ', style: 'centrado' },
                     { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
                     { rowSpan: 2, text: 'OBSERVACIÓN', style: 'centrado' },
                     { rowSpan: 2, text: 'LONGITUD', style: 'centrado' },
-                    { rowSpan: 2, text: 'LATITUD', style: 'centrado' }
+                    { rowSpan: 2, text: 'LATITUD', style: 'centrado' },
                   ],
                   [
-                    '',
-                    { text: 'FECHA', style: 'tableHeader' },
-                    { text: 'HORA', style: 'tableHeader' },
-                    '', '', '', '', '',
-
+                    {},
+                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                    {},{},{},{},{}
                   ],
                   ...obj2.timbres.map(obj3 => {
+                    let servidor_fecha = '';
+                    let servidor_hora = '';
+                    if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
+                      servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
+                      servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
+                    }
                     switch (obj3.accion) {
                       case 'EoS': accionT = 'Entrada o salida'; break;
                       case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -742,21 +757,20 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
                       case 'F/P': accionT = 'Fin permiso'; break;
                       case 'HA': accionT = 'Timbre libre'; break;
                       default: accionT = 'Desconocido'; break;
-                    }
+                    };
                     c = c + 1
                     return [
                       { style: 'itemsTableCentrado', text: c },
-                      { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[0] },
-                      { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[1] },
+                      { style: 'itemsTable', text: servidor_fecha },
+                      { style: 'itemsTable', text: servidor_hora },
                       { style: 'itemsTable', text: obj3.id_reloj },
                       { style: 'itemsTable', text: accionT },
                       { style: 'itemsTable', text: obj3.observacion },
                       { style: 'itemsTable', text: obj3.longitud },
                       { style: 'itemsTable', text: obj3.latitud },
-                    ]
-                  })
-
-                ]
+                    ];
+                  }),
+                ],
               },
               layout: {
                 fillColor: function (rowIndex) {
@@ -774,6 +788,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
           n.push({
             table: {
               widths: ['*', '*'],
+              headerRows: 1,
               body: [
                 [
                   {
@@ -803,6 +818,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
               style: 'tableMarginCabecera',
               table: {
                 widths: ['*', '*'],
+                headerRows: 1,
                 body: [
                   [
                     {
@@ -827,40 +843,59 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
               style: 'tableMarginCabecera',
               table: {
                 widths: ['*', 'auto', 'auto'],
+                headerRows: 2,
                 body: [
                   [
                     {
                       border: [true, true, false, false],
                       text: 'EMPLEADO: ' + obj2.name_empleado,
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfoEmpleado'
                     },
                     {
                       border: [false, true, false, false],
                       text: 'C.C.: ' + obj2.cedula,
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfoEmpleado'
                     },
                     {
                       border: [false, true, true, false],
                       text: 'COD: ' + obj2.codigo,
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfoEmpleado'
+                    }
+                  ],
+                  [
+                    {
+                      border: [true, false, false, false],
+                      text: this.bool.bool_suc || this.bool.bool_emp?'DEPARTAMENTO: ' + obj2.departamento:'',
+                      style: 'itemsTableInfoEmpleado'
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: 'CARGO: ' + obj2.cargo,
+                      style: 'itemsTableInfoEmpleado'
+                    },
+                    {
+                      border: [false, false, true, false],
+                      text: '',
+                      style: 'itemsTableInfoEmpleado'
                     }
                   ]
                 ]
               }
             });
             c = 0;
-            if (this.timbreServidor === true) {
+            if (this.timbreDispositivo === true) {
               n.push({
                 style: 'tableMargin',
                 table: {
-                  widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', '*'],
+                  widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto'],
+                  headerRows: 2,
                   body: [
                     [
                       { rowSpan: 2, text: 'N°', style: 'centrado' },
-                      { colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
-                      '',
-                      { colSpan: 2, text: 'SERVIDOR', style: 'tableHeader' },
-                      '',
+                      { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                      {},
+                      { colSpan: 2, text: 'DISPOSITIVO', style: 'tableHeader' },
+                      {},
                       { rowSpan: 2, text: 'RELOJ', style: 'centrado' },
                       { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
                       { rowSpan: 2, text: 'OBSERVACIÓN', style: 'centrado' },
@@ -868,12 +903,12 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
                       { rowSpan: 2, text: 'LATITUD', style: 'centrado' }
                     ],
                     [
-                      '',
-                      { text: 'FECHA', style: 'tableHeader' },
-                      { text: 'HORA', style: 'tableHeader' },
-                      { text: 'FECHA', style: 'tableHeader' },
-                      { text: 'HORA', style: 'tableHeader' },
-                      '', '', '', '', ''
+                      {},
+                      { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                      { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                      { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                      { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                      {},{},{},{},{}
                     ],
                     ...obj2.timbres.map(obj3 => {
                       let servidor_fecha = '';
@@ -881,7 +916,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
                       if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
                         servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
                         servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
-                      }
+                      };
                       switch (obj3.accion) {
                         case 'EoS': accionT = 'Entrada o salida'; break;
                         case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -894,55 +929,60 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
                         case 'F/P': accionT = 'Fin permiso'; break;
                         case 'HA': accionT = 'Timbre libre'; break;
                         default: accionT = 'Desconocido'; break;
-                      }
+                      };
 
                       c = c + 1
                       return [
                         { style: 'itemsTableCentrado', text: c },
-                        { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[0] },
-                        { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[1] },
                         { style: 'itemsTable', text: servidor_fecha },
                         { style: 'itemsTable', text: servidor_hora },
+                        { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[0] },
+                        { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[1] },
                         { style: 'itemsTable', text: obj3.id_reloj },
                         { style: 'itemsTable', text: accionT },
                         { style: 'itemsTable', text: obj3.observacion },
                         { style: 'itemsTable', text: obj3.longitud },
                         { style: 'itemsTable', text: obj3.latitud },
-                      ]
-                    })
-
-                  ]
+                      ];
+                    }),
+                  ],
                 },
                 layout: {
                   fillColor: function (rowIndex) {
                     return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-                  }
-                }
-              })
+                  },
+                },
+              });
             } else {
               n.push({
                 style: 'tableMargin',
                 table: {
-                  widths: ['auto', '*', '*', 'auto', 'auto', 'auto', '*', '*'],
+                  widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto'],
+                  headerRows: 2,
                   body: [
                     [
                       { rowSpan: 2, text: 'N°', style: 'centrado' },
-                      { colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
-                      '',
+                      { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                      {},
                       { rowSpan: 2, text: 'RELOJ', style: 'centrado' },
                       { rowSpan: 2, text: 'ACCIÓN', style: 'centrado' },
                       { rowSpan: 2, text: 'OBSERVACIÓN', style: 'centrado' },
                       { rowSpan: 2, text: 'LONGITUD', style: 'centrado' },
-                      { rowSpan: 2, text: 'LATITUD', style: 'centrado' }
+                      { rowSpan: 2, text: 'LATITUD', style: 'centrado' },
                     ],
                     [
-                      '',
-                      { text: 'FECHA', style: 'tableHeader' },
-                      { text: 'HORA', style: 'tableHeader' },
-                      '', '', '', '', '',
-
+                      {},
+                      { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                      { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                      {},{},{},{},{}
                     ],
                     ...obj2.timbres.map(obj3 => {
+                      let servidor_fecha = '';
+                      let servidor_hora = '';
+                      if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
+                        servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
+                        servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
+                      };
                       switch (obj3.accion) {
                         case 'EoS': accionT = 'Entrada o salida'; break;
                         case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -959,8 +999,8 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
                       c = c + 1
                       return [
                         { style: 'itemsTableCentrado', text: c },
-                        { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[0] },
-                        { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[1] },
+                        { style: 'itemsTable', text: servidor_fecha },
+                        { style: 'itemsTable', text: servidor_hora },
                         { style: 'itemsTable', text: obj3.id_reloj },
                         { style: 'itemsTable', text: accionT },
                         { style: 'itemsTable', text: obj3.observacion },
@@ -982,42 +1022,17 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
         });
       });
     }
-    return n
+    return n;
   }
 
+  // METODO PARA SUMAR REGIATROS
   SumarRegistros(array: any[]) {
     let valor = 0;
     for (let i = 0; i < array.length; i++) {
       valor = valor + array[i];
     }
-    return valor
+    return valor;
   }
-
-  HorasDecimalToHHMM(dato: number) {
-    // console.log('Hora decimal a HHMM ======>',dato);
-    var h = parseInt(dato.toString());
-    var x = (dato - h) * 60;
-    var m = parseInt(x.toString());
-
-    let hora;
-    let min;
-    if (h < 10 && m < 10) {
-      hora = '0' + h;
-      min = '0' + m;
-    } else if (h < 10 && m >= 10) {
-      hora = '0' + h;
-      min = m;
-    } else if (h >= 10 && m < 10) {
-      hora = h;
-      min = '0' + m;
-    } else if (h >= 10 && m >= 10) {
-      hora = h;
-      min = m;
-    }
-
-    return hora + ':' + min + ':00'
-  }
-
 
   /** ************************************************************************************************** ** 
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
@@ -1047,6 +1062,12 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
             let ele: any;
+            let servidor_fecha = '';
+            let servidor_hora = '';
+            if (obj4.fec_hora_timbre_servidor != '' && obj4.fec_hora_timbre_servidor != null) {
+              servidor_fecha = obj4.fec_hora_timbre_servidor.split(' ')[0];
+              servidor_hora = obj4.fec_hora_timbre_servidor.split(' ')[1]
+            }
             switch (obj4.accion) {
               case 'EoS': accionT = 'Entrada o salida'; break;
               case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -1060,19 +1081,13 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
               case 'HA': accionT = 'Timbre libre'; break;
               default: accionT = 'Desconocido'; break;
             }
-            if (this.timbreServidor) {
-              let servidor_fecha = '';
-              let servidor_hora = '';
-              if (obj4.fec_hora_timbre_servidor != '' && obj4.fec_hora_timbre_servidor != null) {
-                servidor_fecha = obj4.fec_hora_timbre_servidor.split(' ')[0];
-                servidor_hora = obj4.fec_hora_timbre_servidor.split(' ')[1]
-              }
+            if (this.timbreDispositivo) {
               ele = {
                 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
                 'Departamento': obj2.name_dep,
                 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
-                'Fecha Timbre': obj4.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj4.fec_hora_timbre.split(' ')[1],
-                'Fecha Timbre Servidor': servidor_fecha, 'Hora Timbre Servidor': servidor_hora,
+                'Fecha Timbre': servidor_fecha, 'Hora Timbre': servidor_hora,
+                'Fecha Timbre Dispositivo': obj4.fec_hora_timbre.split(' ')[0], 'Hora Timbre Dispositivo': obj4.fec_hora_timbre.split(' ')[1],
                 'Acción': accionT, 'Reloj': obj4.id_reloj,
                 'Latitud': obj4.latitud, 'Longitud': obj4.longitud, 'Observación': obj4.observacion
               }
@@ -1081,17 +1096,17 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
                 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
                 'Departamento': obj2.name_dep,
                 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
-                'Fecha Timbre': obj4.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj4.fec_hora_timbre.split(' ')[1],
+                'Fecha Timbre': servidor_fecha, 'Hora Timbre': servidor_hora,
                 'Acción': accionT, 'Reloj': obj4.id_reloj,
                 'Latitud': obj4.latitud, 'Longitud': obj4.longitud, 'Observación': obj4.observacion
               }
             }
-            nuevo.push(ele)
+            nuevo.push(ele);
           })
         })
       })
     })
-    return nuevo
+    return nuevo;
   }
 
   MapingDataPdfRegimenCargo(array: Array<any>) {
@@ -1101,6 +1116,12 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
       obj1.empleados.forEach((obj2: any) => {
         obj2.timbres.forEach((obj3: any) => {
           let ele: any;
+          let servidor_fecha = '';
+          let servidor_hora = '';
+          if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
+            servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
+            servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
+          }
           switch (obj3.accion) {
             case 'EoS': accionT = 'Entrada o salida'; break;
             case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -1114,19 +1135,13 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
             case 'HA': accionT = 'Timbre libre'; break;
             default: accionT = 'Desconocido'; break;
           }
-          if (this.timbreServidor) {
-            let servidor_fecha = '';
-            let servidor_hora = '';
-            if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
-              servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
-              servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
-            }
+          if (this.timbreDispositivo) {
             ele = {
               'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
               'Departamento': obj2.departamento,
               'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
-              'Fecha Timbre': obj3.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj3.fec_hora_timbre.split(' ')[1],
-              'Fecha Timbre Servidor': servidor_fecha, 'Hora Timbre Servidor': servidor_hora,
+              'Fecha Timbre': servidor_fecha, 'Hora Timbre': servidor_hora,
+              'Fecha Timbre Dispositivo': obj3.fec_hora_timbre.split(' ')[0], 'Hora Timbre Dispositivo': obj3.fec_hora_timbre.split(' ')[1],
               'Acción': accionT, 'Reloj': obj3.id_reloj,
               'Latitud': obj3.latitud, 'Longitud': obj3.longitud, 'Observación': obj3.observacion
             }
@@ -1135,20 +1150,19 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
               'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
               'Departamento': obj2.departamento,
               'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
-              'Fecha Timbre': obj3.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj3.fec_hora_timbre.split(' ')[1],
+              'Fecha Timbre': servidor_fecha, 'Hora Timbre': servidor_hora,
               'Acción': accionT, 'Reloj': obj3.id_reloj,
               'Latitud': obj3.latitud, 'Longitud': obj3.longitud, 'Observación': obj3.observacion
             }
           }
-
-          nuevo.push(ele)
+          nuevo.push(ele);
         })
       })
     })
-    return nuevo
+    return nuevo;
   }
 
-  //METODOS PARA EXTRAER LOS TIMBRES EN UNA LISTA Y VISUALIZARLOS
+  // METODOS PARA EXTRAER LOS TIMBRES EN UNA LISTA Y VISUALIZARLOS
   extraerTimbres() {
     this.timbres = [];
     let n = 0;
@@ -1157,8 +1171,13 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
-            let ele: any;
             n = n + 1;
+            let servidor_fecha = '';
+            let servidor_hora = '';
+            if (obj4.fec_hora_timbre_servidor != '' && obj4.fec_hora_timbre_servidor != null) {
+              servidor_fecha = obj4.fec_hora_timbre_servidor.split(' ')[0];
+              servidor_hora = obj4.fec_hora_timbre_servidor.split(' ')[1]
+            }
             switch (obj4.accion) {
               case 'EoS': accionT = 'Entrada o salida'; break;
               case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -1172,14 +1191,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
               case 'HA': accionT = 'Timbre libre'; break;
               default: accionT = 'Desconocido'; break;
             }
-            if (this.timbreServidor) {
-              let servidor_fecha = '';
-              let servidor_hora = '';
-              if (obj4.fec_hora_timbre_servidor != '' && obj4.fec_hora_timbre_servidor != null) {
-                servidor_fecha = obj4.fec_hora_timbre_servidor.split(' ')[0];
-                servidor_hora = obj4.fec_hora_timbre_servidor.split(' ')[1]
-              }
-              ele = {
+              let ele = {
                 n: n,
                 ciudad: obj1.ciudad, sucursal: obj1.name_suc,
                 departamento: obj2.name_dep,
@@ -1189,18 +1201,8 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
                 accion: accionT, reloj: obj4.id_reloj,
                 latitud: obj4.latitud, longitud: obj4.longitud, observacion: obj4.observacion
               }
-            } else {
-              ele = {
-                n: n,
-                ciudad: obj1.ciudad, sucursal: obj1.name_suc,
-                departamento: obj2.name_dep,
-                empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
-                fechaTimbre: obj4.fec_hora_timbre.split(' ')[0], horaTimbre: obj4.fec_hora_timbre.split(' ')[1],
-                accion: accionT, reloj: obj4.id_reloj,
-                latitud: obj4.latitud, longitud: obj4.longitud, observacion: obj4.observacion
-              }
-            }
-            this.timbres.push(ele)
+
+            this.timbres.push(ele);
           })
         })
       })
@@ -1214,8 +1216,13 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     this.data_pdf.forEach((obj1: any) => {
       obj1.empleados.forEach((obj2: any) => {
         obj2.timbres.forEach((obj3: any) => {
-          let ele;
           n = n + 1;
+          let servidor_fecha = '';
+          let servidor_hora = '';
+          if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
+            servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
+            servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
+          }
           switch (obj3.accion) {
             case 'EoS': accionT = 'Entrada o salida'; break;
             case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -1228,50 +1235,27 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
             case 'F/P': accionT = 'Fin permiso'; break;
             case 'HA': accionT = 'Timbre libre'; break;
             default: accionT = 'Desconocido'; break;
+          }  
+          let ele = {
+            n: n,
+            ciudad: obj2.ciudad, sucursal: obj2.sucursal,
+            departamento: obj2.departamento,
+            empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
+            fechaTimbre: obj3.fec_hora_timbre.split(' ')[0], horaTimbre: obj3.fec_hora_timbre.split(' ')[1],
+            fechaTimbreServidor: servidor_fecha, horaTimbreServidor: servidor_hora,
+            accion: accionT, reloj: obj3.id_reloj,
+            latitud: obj3.latitud, longitud: obj3.longitud, observacion: obj3.observacion
           }
-          if (this.timbreServidor) {
-            let servidor_fecha = '';
-            let servidor_hora = '';
-            if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
-              servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
-              servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
-            }
-            ele = {
-              n: n,
-              ciudad: obj2.ciudad, sucursal: obj2.sucursal,
-              departamento: obj2.departamento,
-              empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
-              fechaTimbre: obj3.fec_hora_timbre.split(' ')[0], horaTimbre: obj3.fec_hora_timbre.split(' ')[1],
-              fechaTimbreServidor: servidor_fecha, horaTimbreServidor: servidor_hora,
-              accion: accionT, reloj: obj3.id_reloj,
-              latitud: obj3.latitud, longitud: obj3.longitud, observacion: obj3.observacion
-            }
-          } else {
-            ele = {
-              n: n,
-              ciudad: obj2.ciudad, sucursal: obj2.sucursal,
-              departamento: obj2.departamento,
-              empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
-              fechaTimbre: obj3.fec_hora_timbre.split(' ')[0], horaTimbre: obj3.fec_hora_timbre.split(' ')[1],
-              accion: accionT, reloj: obj3.id_reloj,
-              latitud: obj3.latitud, longitud: obj3.longitud, observacion: obj3.observacion
-            }
-          }
-
-          this.timbres.push(ele)
+          this.timbres.push(ele);
         })
       })
     })
   }
 
 
-  /*****************************************************************************
-   * 
-   * 
-   * Varios Metodos Complementarios al funcionamiento. 
-   * 
-   * 
-   **************************************************************************/
+  /** ************************************************************************************** **
+   ** **                   METODOS DE SELECCION DE DATOS DE USUARIOS                      ** **
+   ** ************************************************************************************** **/
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc() {
@@ -1379,7 +1363,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-
+  // METODO PARA EVENTOS DE PAGINACION
   ManejarPagina(e: PageEvent) {
     if (this.bool.bool_suc === true) {
       this.tamanio_pagina_suc = e.pageSize;
@@ -1415,19 +1399,17 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     window.open(rutaMapa);
   }
 
-  /**
-   * METODOS PARA CONTROLAR INGRESO DE LETRAS
-   */
+  // METODOS PARA CONTROLAR INGRESO DE LETRAS
 
-  IngresarSoloLetras(e) {
+  IngresarSoloLetras(e: any) {
     return this.validacionService.IngresarSoloLetras(e)
   }
 
-  IngresarSoloNumeros(evt) {
+  IngresarSoloNumeros(evt: any) {
     return this.validacionService.IngresarSoloNumeros(evt)
   }
 
-  //MOSTRAR DETALLES
+  // MOSTRAR DETALLES
   verDatos() {
     this.verDetalle = true;
     if (this.bool.bool_cargo || this.bool.bool_reg) {
@@ -1437,7 +1419,8 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     }
   }
 
-  regresar() {
+  // METODO PARA REGRESAR A LA PAGINA ANTERIOR
+  Regresar() {
     this.verDetalle = false;
   }
 

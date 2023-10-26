@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../../database"));
 class SalidasAntesControlador {
-    BuscarTimbres_AccionS(req, res) {
+    ReporteSalidasAnticipadas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log('datos recibidos', req.body);
             let { desde, hasta } = req.params;
@@ -22,7 +22,7 @@ class SalidasAntesControlador {
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.departamentos = yield Promise.all(obj.departamentos.map((ele) => __awaiter(this, void 0, void 0, function* () {
                     ele.empleado = yield Promise.all(ele.empleado.map((o) => __awaiter(this, void 0, void 0, function* () {
-                        o.timbres = yield BuscarTimbresS(desde, hasta, o.codigo);
+                        o.timbres = yield BuscarSalidasAnticipadas(desde, hasta, o.codigo);
                         console.log('timbres:-------------------- ', o);
                         return o;
                     })));
@@ -42,29 +42,42 @@ class SalidasAntesControlador {
             return res.status(200).jsonp(nuevo);
         });
     }
+    ReporteSalidasAnticipadasRegimenCargo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log('datos recibidos', req.body);
+            let { desde, hasta } = req.params;
+            let datos = req.body;
+            let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
+                obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
+                    o.timbres = yield BuscarSalidasAnticipadas(desde, hasta, o.codigo);
+                    console.log('Timbres: ', o);
+                    return o;
+                })));
+                return obj;
+            })));
+            let nuevo = n.map((e) => {
+                e.empleados = e.empleados.filter((t) => { return t.timbres.length > 0; });
+                return e;
+            }).filter(e => { return e.empleados.length > 0; });
+            if (nuevo.length === 0)
+                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo' });
+            return res.status(200).jsonp(nuevo);
+        });
+    }
 }
 const SALIDAS_ANTICIPADAS_CONTROLADOR = new SalidasAntesControlador();
 exports.default = SALIDAS_ANTICIPADAS_CONTROLADOR;
-const BuscarTimbresS = function (fec_inicio, fec_final, id) {
+const BuscarSalidasAnticipadas = function (fec_inicio, fec_final, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log('datos buscados---------------------*************', id);
-        return yield database_1.default.query('SELECT t.fec_hora_timbre::date AS fecha, t.fec_hora_timbre::time AS hora ' +
-            'FROM timbres AS t ' +
-            'WHERE t.codigo = $3 ' +
-            'AND t.fec_hora_timbre::date BETWEEN $1 AND $2 AND t.accion = \'S\'', [fec_inicio, fec_final, id])
-            .then((res) => {
-            return res.rows;
-        });
-    });
-};
-const BuscarHoraHorario = function (fecha, codigo) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return yield database_1.default.query('SELECT eh.codigo, eh.id_horarios, hora ' +
-            'FROM empl_horarios AS eh, deta_horarios AS dh ' +
-            'WHERE eh.codigo = $2 ' +
-            'AND $1 BETWEEN eh.fec_inicio AND eh.fec_final ' +
-            'AND dh.id_horario = eh.id_horarios AND dh.orden = 4', [fecha, codigo])
-            .then((res) => {
+        return yield database_1.default.query('SELECT CAST(fec_hora_horario AS VARCHAR), CAST(fec_hora_timbre AS VARCHAR), ' +
+            'EXTRACT(epoch FROM (fec_hora_horario - fec_hora_timbre)) AS diferencia, ' +
+            'codigo, estado_timbre, tipo_entr_salida AS accion, tipo_dia ' +
+            'FROM plan_general WHERE CAST(fec_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' ' +
+            'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 ' +
+            'AND fec_hora_timbre < fec_hora_horario AND tipo_dia NOT IN (\'L\', \'FD\')' +
+            'AND tipo_entr_salida = \'S\' ' +
+            'ORDER BY fec_hora_horario ASC', [fec_inicio, fec_final, codigo])
+            .then(res => {
             return res.rows;
         });
     });

@@ -242,18 +242,18 @@ export class ReportesService {
   }
 
 
-  /**********************************************************************
-   * 
-   * VALIDACION DE FUNCIONALIDAD DE MOSTRAR O NO EL CAMPO DE LOS TIMBRES DEL SERVIDOR.
-   * 
-   **********************************************************************/
+  /***************************************************************************************
+   *                                                                                     *
+   * VALIDACION DE FUNCIONALIDAD DE MOSTRAR O NO EL CAMPO DE LOS TIMBRES DEL DISPOSITIVO *
+   *                                                                                     *
+   ***************************************************************************************/
 
-  private _valueTimbreServidor: Boolean = false;
+  private _valueTimbreDispositivo: Boolean = false;
 
-  get mostrarTimbreServidor() { return this._valueTimbreServidor }
-  setMostrarTimbreServidor(value: any) { this._valueTimbreServidor = value; }
+  get mostrarTimbreDispositivo() { return this._valueTimbreDispositivo }
+  setMostrarTimbreDispositivo(value: any) { this._valueTimbreDispositivo = value; }
 
-  DefaultTimbreServidor() { this._valueTimbreServidor = false; }
+  DefaultTimbreDispositivo() { this._valueTimbreDispositivo = false; }
 
 
 }

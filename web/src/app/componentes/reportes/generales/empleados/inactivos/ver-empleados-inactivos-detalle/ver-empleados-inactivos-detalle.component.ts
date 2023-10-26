@@ -1,14 +1,15 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { PageEvent } from '@angular/material/paginator';
-
-import { IReporteAtrasos } from 'src/app/model/reportes.model';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
+import { IReporteAtrasos } from 'src/app/model/reportes.model';
+
+import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+
 import { ReporteEmpleadosInactivosComponent } from '../reporte-empleados-inactivos/reporte-empleados-inactivos.component';
 
 @Component({
@@ -16,10 +17,13 @@ import { ReporteEmpleadosInactivosComponent } from '../reporte-empleados-inactiv
   templateUrl: './ver-empleados-inactivos-detalle.component.html',
   styleUrls: ['./ver-empleados-inactivos-detalle.component.css']
 })
-export class VerEmpleadosInactivosDetalleComponent implements OnInit{
+
+export class VerEmpleadosInactivosDetalleComponent implements OnInit {
+
   @Input() data: any;
   @Input() tipo: string;
   @Input() verDetalle: boolean;
+
   bool_suc: boolean = false;
   bool_reg: boolean = false;
   bool_car: boolean = false;
@@ -158,11 +162,9 @@ export class VerEmpleadosInactivosDetalleComponent implements OnInit{
     }
   }
 
-  /***************************
-   *
-   * COLORES Y LOGO PARA EL REPORTE
-   *
-   *****************************/
+  /** *************************************************************************************** **
+   ** **                        COLORES Y LOGO PARA EL REPORTE                             ** **
+   ** *************************************************************************************** **/
 
   ObtenerLogo() {
     this.restEmpre
@@ -186,13 +188,11 @@ export class VerEmpleadosInactivosDetalleComponent implements OnInit{
       });
   }
 
-  /******************************************************
-   *
-   *          PDF
-   *
-   *******************************************/
+  /** ************************************************************************************ **
+   ** **                               GENERACION DE PDF                                ** **
+   ** ************************************************************************************ **/
 
-  generarPdf(action) {
+  generarPdf(action: any) {
     const documentDefinition = this.getDocumentDefinicion();
     let doc_name = 'Reporte_usuarios_inactivos.pdf';
     switch (action) {
@@ -237,16 +237,14 @@ export class VerEmpleadosInactivosDetalleComponent implements OnInit{
         fecha: any,
         hora: any
       ) {
-        var h = new Date();
         var f = moment();
         fecha = f.format('YYYY-MM-DD');
-        h.setUTCHours(h.getHours());
-        var time = h.toJSON().split('T')[1].split('.')[0];
+        hora = f.format('HH:mm:ss');
 
         return {
           margin: 10,
           columns: [
-            { text: 'Fecha: ' + fecha + ' Hora: ' + time, opacity: 0.3 },
+            { text: 'Fecha: ' + fecha + ' Hora: ' + hora, opacity: 0.3 },
             {
               text: [
                 {
@@ -301,7 +299,7 @@ export class VerEmpleadosInactivosDetalleComponent implements OnInit{
     if (this.bool_car === true || this.bool_reg === true) {
       data.forEach((obj1) => {
         arr_emp = [];
-        
+
         if (this.bool_car === true) {
           n.push({
             style: 'tableMarginSuc',
@@ -349,7 +347,7 @@ export class VerEmpleadosInactivosDetalleComponent implements OnInit{
         }
 
         obj1.empleados.forEach(obj2 => {
-            arr_emp.push(obj2)
+          arr_emp.push(obj2)
         });
 
         n.push({
@@ -371,16 +369,16 @@ export class VerEmpleadosInactivosDetalleComponent implements OnInit{
               ],
               ...arr_emp.map(obj3 => {
                 return [
-                  { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
-                  { style: 'itemsTableCentrado', text: obj3.codigo},
+                  { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
+                  { style: 'itemsTableCentrado', text: obj3.codigo },
                   { style: 'itemsTable', text: obj3.name_empleado },
                   { style: 'itemsTable', text: obj3.cedula },
                   { style: 'itemsTableCentrado', text: obj3.genero == 1 ? 'M' : 'F' },
                   { style: 'itemsTable', text: obj3.ciudad },
                   { style: 'itemsTable', text: obj3.sucursal },
-                  { style: 'itemsTable', text: this.bool_car? obj3.regimen : obj3.regimen[0].name_regimen },
+                  { style: 'itemsTable', text: this.bool_car ? obj3.regimen : obj3.regimen[0].name_regimen },
                   { style: 'itemsTable', text: obj3.departamento },
-                  { style: 'itemsTable', text: obj3.correo},
+                  { style: 'itemsTable', text: obj3.correo },
                 ]
               }),
             ]
@@ -399,7 +397,7 @@ export class VerEmpleadosInactivosDetalleComponent implements OnInit{
         if (this.bool_suc === true) {
           let arr_suc = obj.departamentos.map(o => { return o.empleado.length });
           let suma_suc = this.SumarRegistros(arr_suc);
-          
+
           arr_emp = [];
           n.push({
             style: 'tableMarginSuc',
@@ -435,7 +433,7 @@ export class VerEmpleadosInactivosDetalleComponent implements OnInit{
           })
 
           n.push({
-            
+
             style: 'tableMarginEmp',
             table: {
               widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
@@ -454,15 +452,15 @@ export class VerEmpleadosInactivosDetalleComponent implements OnInit{
                 ...arr_emp.map(obj3 => {
                   obj3.regimen.forEach((r) => (regimen = r.name_regimen));
                   return [
-                    { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
+                    { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
                     { style: 'itemsTableCentrado', text: obj3.codigo },
                     { style: 'itemsTable', text: obj3.name_empleado },
                     { style: 'itemsTable', text: obj3.cedula },
                     { style: 'itemsTableCentrado', text: obj3.genero == 1 ? 'M' : 'F' },
                     { style: 'itemsTable', text: regimen },
                     { style: 'itemsTable', text: obj3.departamento },
-                    { style: 'itemsTable', text: obj3.cargo},
-                    { style: 'itemsTable', text: obj3.correo},
+                    { style: 'itemsTable', text: obj3.cargo },
+                    { style: 'itemsTable', text: obj3.correo },
                   ]
                 }),
               ]
@@ -544,7 +542,7 @@ export class VerEmpleadosInactivosDetalleComponent implements OnInit{
                   ...arr_emp.map(obj3 => {
                     obj3.regimen.forEach((r) => (regimen = r.name_regimen));
                     return [
-                      { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
+                      { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
                       { style: 'itemsTableCentrado', text: obj3.codigo },
                       { style: 'itemsTable', text: obj3.name_empleado },
                       { style: 'itemsTable', text: obj3.cedula },
@@ -562,9 +560,7 @@ export class VerEmpleadosInactivosDetalleComponent implements OnInit{
                 }
               }
             });
-
           });
-
         }
 
         if (this.bool_emp === true) {
@@ -575,9 +571,8 @@ export class VerEmpleadosInactivosDetalleComponent implements OnInit{
             })
           })
         }
-
       });
-    } 
+    }
 
     if (arr_emp.length > 0 && this.bool_emp === true) {
       n.push({
@@ -600,7 +595,7 @@ export class VerEmpleadosInactivosDetalleComponent implements OnInit{
             ...arr_emp.map(obj3 => {
               obj3.regimen.forEach((r) => (regimen = r.name_regimen));
               return [
-                { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3)+1 },
+                { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
                 { style: 'itemsTableCentrado', text: obj3.codigo },
                 { style: 'itemsTable', text: obj3.name_empleado },
                 { style: 'itemsTable', text: obj3.cedula },
@@ -621,88 +616,85 @@ export class VerEmpleadosInactivosDetalleComponent implements OnInit{
         }
       });
     }
-
-    return n
+    return n;
   }
 
+  // METODO PARA SUMAR REGISTROS
   SumarRegistros(array: any[]) {
     let valor = 0;
     for (let i = 0; i < array.length; i++) {
       valor = valor + array[i];
     }
-    return valor
+    return valor;
   }
 
   /** ************************************************************************************************** ** 
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
   exportToExcel(): void {
-
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefault(this.data));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Empleados Inactivos');
     xlsx.writeFile(wb, "Empleados Inactivos " + new Date().getTime() + '.xlsx');
-
   }
 
   MapingDataPdfDefault(array: Array<any>) {
     let nuevo: Array<any> = [];
     console.log(array);
-    let c=0;
+    let c = 0;
     let regimen = '';
     array.forEach((obj1: IReporteAtrasos) => {
       obj1.departamentos.forEach(obj2 => {
-        obj2.empleado.forEach((obj3:any) => {
+        obj2.empleado.forEach((obj3: any) => {
           obj3.regimen.forEach((r) => (regimen = r.name_regimen));
           c = c + 1;
           let ele = {
             'N°': c, 'Código Empleado': obj3.codigo, 'Nombre Empleado': obj3.name_empleado,
-            'Cédula': obj3.cedula, 'Género': obj3.genero == 1 ? 'M' : 'F', 
+            'Cédula': obj3.cedula, 'Género': obj3.genero == 1 ? 'M' : 'F',
             'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
-            'Régimen': regimen,            
+            'Régimen': regimen,
             'Departamento': obj2.name_dep,
             'Cargo': obj3.cargo,
             'Correo': obj3.correo,
           }
-          nuevo.push(ele)
+          nuevo.push(ele);
         })
       })
     })
-    return nuevo
+    return nuevo;
   }
 
   exportToExcelCargoRegimen(): void {
-
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefaultCargoRegimen(this.data));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Usuario Inactivos');
     xlsx.writeFile(wb, 'Usuarios_inactivos.xlsx');
-
   }
 
   MapingDataPdfDefaultCargoRegimen(array: Array<any>) {
     let nuevo: Array<any> = [];
-    let c=0;
+    let c = 0;
     array.forEach((obj1) => {
       obj1.empleados.forEach(obj2 => {
         c = c + 1;
-          let ele = {
-            'N°': c, 'Código Empleado': obj2.codigo, 'Nombre Empleado': obj2.name_empleado,
-            'Cédula': obj2.cedula, 'Género': obj2.genero == 1 ? 'M' : 'F', 
-            'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
-            'Régimen': this.bool_car? obj2.regimen : obj2.regimen[0].name_regimen,            
-            'Departamento': obj2.departamento,
-            'Cargo': obj2.cargo,
-            'Correo': obj2.correo,
-          }
-          nuevo.push(ele)
+        let ele = {
+          'N°': c, 'Código Empleado': obj2.codigo, 'Nombre Empleado': obj2.name_empleado,
+          'Cédula': obj2.cedula, 'Género': obj2.genero == 1 ? 'M' : 'F',
+          'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
+          'Régimen': this.bool_car ? obj2.regimen : obj2.regimen[0].name_regimen,
+          'Departamento': obj2.departamento,
+          'Cargo': obj2.cargo,
+          'Correo': obj2.correo,
+        }
+        nuevo.push(ele);
       })
     })
-    return nuevo
+    return nuevo;
   }
 
-  regresar(){
+  // METODO PARA REGRESAR A LA PAGINA ANTERIOR
+  Regresar() {
     this.reporte.verDetalle = false;
   }
-  
+
 }

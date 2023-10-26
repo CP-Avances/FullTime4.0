@@ -12,8 +12,12 @@ export class SalidasAntesService {
     private http: HttpClient
   ) { }
 
-  BuscarTimbresAccionS(data: any, inicio: string, fin: string) {
-    return this.http.put<any>(`${environment.url}/reporte-salidas-antes/timbre-accions/${inicio}/${fin}`, data);
+  BuscarTimbresSalidasAnticipadas(data: any, inicio: string, fin: string) {
+    return this.http.put<any>(`${environment.url}/reporte-salidas-antes/timbre-salida-anticipada/${inicio}/${fin}`, data);
+  }
+
+  BuscarTimbresSalidasAnticipadasRegimenCargo(data: any, inicio: string, fin: string) {
+    return this.http.put<any>(`${environment.url}/reporte-salidas-antes/timbre-salida-anticipada-regimen-cargo/${inicio}/${fin}`, data);
   }
 
 }

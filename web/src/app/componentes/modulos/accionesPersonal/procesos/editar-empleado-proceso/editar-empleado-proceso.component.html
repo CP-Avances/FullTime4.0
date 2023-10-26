@@ -1,17 +1,20 @@
 <div id="titulo">
     <mat-icon id="movilidad" class="float-left">open_with</mat-icon>
     <span cdkDrag cdkDragRootElement=".cdk-overlay-pane">
-        MODIFICAR ASIGNACIÓN DE PROCESOS</span>
+        MODIFICAR ASIGNACIÓN DE PROCESOS
+    </span>
     <mat-icon class="float-right" id="cerrar" (click)="Salir()">highlight_off</mat-icon>
 </div>
-<div>    
+<div>
     <!-- Formulario Completo -->
     <form [formGroup]="EmpleProcesoForm">
         <mat-card-content>
             <div class="container" style="text-align: center;">
-                <div class="nota">
-                    <span>NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
-                        Guardar.</span>
+                <div class="nota" style="text-align: justify;">
+                    <span>
+                        NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para activar el botón
+                        Guardar.
+                    </span>
                 </div>
                 <div class="row">
                     <div class="col-sm">
@@ -21,13 +24,15 @@
                                 readonly="readonly" required>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
                                 matTooltip="Nombre de identifiacción del empleado">
-                                help_outline</mat-icon>
+                                help_outline
+                            </mat-icon>
                         </mat-form-field>
                         <br>
                         <mat-form-field>
                             <mat-label>Seleccionar Proceso</mat-label>
                             <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Lista de Procesos">
-                                help_outline</mat-icon>
+                                help_outline
+                            </mat-icon>
                             <mat-select [formControl]="idProcesoF" required>
                                 <mat-option *ngFor="let pro of procesos" [value]="pro.id">
                                     {{pro.nombre}}
@@ -61,7 +66,9 @@
         </mat-card-content>
     </form>
     <div class="d-flex flex-wrap justify-content-center" style="padding-top: 20px; margin-bottom: 2%;">
-        <button id="btn-raised"  class="btn btn-sm" [disabled]="!EmpleProcesoForm.valid"
-        (click)="ValidarDatosProeso(EmpleProcesoForm.value)" value="Guardar"> Guardar</button>
+        <button id="btn-raised" class="btn btn-sm" [disabled]="!EmpleProcesoForm.valid"
+            (click)="ValidarDatosProeso(EmpleProcesoForm.value)" value="Guardar">
+            Guardar
+        </button>
     </div>
 </div>

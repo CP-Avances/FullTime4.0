@@ -10,24 +10,24 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
-                    <button mat-icon-button (click)="validacionReporte('ver')" 
-                    matTooltipPosition="right" matTooltip="Previsualizar reporte en el navegador">
+                    <button mat-icon-button (click)="validacionReporte('ver')" matTooltipPosition="right"
+                        matTooltip="Previsualizar reporte en el navegador">
                         <mat-icon class="ver">visibility</mat-icon>
                     </button>
-                    <button mat-icon-button (click)="validacionReporte('open')" 
-                        matTooltipPosition="right" matTooltip="Previsualizar reporte en el navegador en fomato PDF.">
+                    <button mat-icon-button (click)="validacionReporte('open')" matTooltipPosition="right"
+                        matTooltip="Previsualizar reporte en el navegador en fomato PDF.">
                         <mat-icon class="i-pdf">picture_as_pdf</mat-icon>
                     </button>
-                    <button mat-icon-button (click)="validacionReporte('excel')" 
-                        matTooltipPosition="right" matTooltip="Descargar reporte en formato EXCEL.">
-                        <mat-icon class="fas fa-file-excel i-excel" ></mat-icon>
+                    <button mat-icon-button (click)="validacionReporte('excel')" matTooltipPosition="right"
+                        matTooltip="Descargar reporte en formato EXCEL.">
+                        <mat-icon class="fas fa-file-excel i-excel"></mat-icon>
                     </button>
-                    <button mat-icon-button (click)="validacionReporte('print')"
-                        matTooltipPosition="right" matTooltip="Imprimir reporte en formato PDF.">
+                    <button mat-icon-button (click)="validacionReporte('print')" matTooltipPosition="right"
+                        matTooltip="Imprimir reporte en formato PDF.">
                         <mat-icon class="i-print">local_printshop</mat-icon>
                     </button>
-                    <button mat-icon-button (click)="validacionReporte('download')"
-                        matTooltipPosition="right" matTooltip="Descargar reporte en formato PDF.">
+                    <button mat-icon-button (click)="validacionReporte('download')" matTooltipPosition="right"
+                        matTooltip="Descargar reporte en formato PDF.">
                         <mat-icon class="i-download">cloud_download</mat-icon>
                     </button>
                 </div>
@@ -42,12 +42,11 @@
 <div *ngIf="!verDetalle" class="container" style="padding-bottom: 50px; text-align: center;">
     <!-- TABLA PARA SUCURSALES -->
     <div *ngIf="bool.bool_suc" class="mat-elevation-z8" style="background: white;">
-                        <div class="d-flex bd-highlight" id="resultados">
-                    <span class="w-100 bd-highlight">
-                        RESULTADO SUCURSALES</span>
-                    <!-- <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                        (click)="MostrarLista()">Mostrar lista</button> -->
-                </div>
+        <div class="d-flex bd-highlight" id="resultados">
+            <span class="w-100 bd-highlight">
+                RESULTADO SUCURSALES
+            </span>
+        </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
@@ -84,12 +83,11 @@
 
     <!-- TABLA PARA REGIMEN -->
     <div *ngIf="bool.bool_reg" class="mat-elevation-z8" style="background: white;">
-                        <div class="d-flex bd-highlight" id="resultados">
-                    <span class="w-100 bd-highlight">
-                        RESULTADO REGIMEN LABORAL</span>
-                    <!-- <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                        (click)="MostrarLista()">Mostrar lista</button> -->
-                </div>
+        <div class="d-flex bd-highlight" id="resultados">
+            <span class="w-100 bd-highlight">
+                RESULTADO REGIMEN LABORAL
+            </span>
+        </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
@@ -126,12 +124,11 @@
 
     <!-- TABLA PARA CARGOS -->
     <div *ngIf="bool.bool_cargo" class="mat-elevation-z8" style="background: white;">
-                        <div class="d-flex bd-highlight" id="resultados">
-                    <span class="w-100 bd-highlight">
-                        RESULTADO CARGOS</span>
-                    <!-- <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                        (click)="MostrarLista()">Mostrar lista</button> -->
-                </div>
+        <div class="d-flex bd-highlight" id="resultados">
+            <span class="w-100 bd-highlight">
+                RESULTADO CARGOS
+            </span>
+        </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
@@ -168,12 +165,11 @@
 
     <!-- TABLA PARA DEPARTAMENTOS -->
     <div *ngIf="bool.bool_dep" class="mat-elevation-z8" style="background: white;">
-                        <div class="d-flex bd-highlight" id="resultados">
-                    <span class="w-100 bd-highlight">
-                        RESULTADO DEPARTAMENTOS</span>
-                    <!-- <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                        (click)="MostrarLista()">Mostrar lista</button> -->
-                </div>
+        <div class="d-flex bd-highlight" id="resultados">
+            <span class="w-100 bd-highlight">
+                RESULTADO DEPARTAMENTOS
+            </span>
+        </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
@@ -209,12 +205,11 @@
     </div>
     <!-- TABLA PARA EMPLEADOS -->
     <div *ngIf="bool.bool_emp" class="mat-elevation-z8" style="background: white;">
-                        <div class="d-flex bd-highlight" id="resultados">
-                    <span class="w-100 bd-highlight">
-                        RESULTADO USUARIOS</span>
-                    <!-- <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;"
-                        (click)="MostrarLista()">Mostrar lista</button> -->
-                </div>
+        <div class="d-flex bd-highlight" id="resultados">
+            <span class="w-100 bd-highlight">
+                RESULTADO USUARIOS
+            </span>
+        </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
                 <thead class="thead-light">

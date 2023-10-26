@@ -48,6 +48,7 @@ export class VerParametroComponent implements OnInit {
   limite_correo: boolean = false;
   ubicacion: boolean = false;
   dispositivos: boolean = false;
+  segundos_timbres: boolean = false;
 
   ingreso: number = 0;
 
@@ -96,6 +97,10 @@ export class VerParametroComponent implements OnInit {
     if (this.idParametro === '32') {
       this.formato = false;
       this.dispositivos = true;
+    }
+    if (this.idParametro === '1') {
+      this.formato = false;
+      this.segundos_timbres = true;
     }
   }
 
