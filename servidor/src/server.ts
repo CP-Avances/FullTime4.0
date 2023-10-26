@@ -64,6 +64,7 @@ import RELOJ_VIRTUAL_RUTAS from './utils/reloj_virtual';
 import VACUNA_RUTAS from './rutas/empleado/empleadoVacuna/vacunasRutas';
 import VACUNAS_REPORTE_RUTAS from './rutas/reportes/reporteVacunasRutas';
 import SALIDAS_ANTICIPADAS_RUTAS from './rutas/reportes/salidasAntesRutas';
+import REPORTES_ATRASOS_RUTAS from './rutas/reportes/reportesAtrasosRutas';
 import AUDITORIA_RUTAS from './rutas/auditoria/auditoriaRutas';
 import VACACIONES_REPORTES_RUTAS from './rutas/reportes/solicitudVacacionesRutas';
 import PARAMETROS_RUTAS from './rutas/parametrosGenerales/parametrosRutas';
@@ -194,6 +195,7 @@ class Servidor {
         this.app.use('/reporte', REPORTES_RUTAS);
         this.app.use('/reportes-asistencias/', REPORTES_A_RUTAS);
         this.app.use('/reporte-salidas-antes/', SALIDAS_ANTICIPADAS_RUTAS);
+        this.app.use('/reporte-atrasos/', REPORTES_ATRASOS_RUTAS);
 
         // REPORTES DE AUDITORIA
         this.app.use('/reportes-auditoria', AUDITORIA_RUTAS);

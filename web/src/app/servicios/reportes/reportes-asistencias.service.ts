@@ -29,10 +29,6 @@ export class ReportesAsistenciasService {
     return this.http.get<any>(`${environment.url}/reportes-asistencias/informacion-general-cargo/${estado}`);
   }
 
-  ReporteAtrasosMultiples(data: any, desde: string, hasta: string) {
-    return this.http.put<any>(`${environment.url}/reportes-asistencias/atrasos-empleados/${desde}/${hasta}`, data);
-  }
-
   ReporteFaltasMultiples(data: any, desde: string, hasta: string) {
     return this.http.put<any>(`${environment.url}/reportes-asistencias/faltas-empleados/${desde}/${hasta}`, data);
   }

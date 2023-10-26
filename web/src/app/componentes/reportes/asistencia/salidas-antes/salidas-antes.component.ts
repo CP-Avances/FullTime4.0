@@ -1,18 +1,17 @@
 // IMPORTAR LIBRERIAS
-import { ReporteSalidaAntes, tim_tabulado, timbre } from 'src/app/model/salida-antes.model';
+import { ReporteSalidaAntes } from 'src/app/model/salida-antes.model';
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { PageEvent } from '@angular/material/paginator';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import { ToastrService } from 'ngx-toastr';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
 
 // IMPORTAR SERVICIOS
-import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
 import { SalidasAntesService } from 'src/app/servicios/reportes/salidas-antes/salidas-antes.service';
@@ -108,7 +107,6 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   get filtroCedula() { return this.reporteService.filtroCedula };
 
   constructor(
-    private R_asistencias: ReportesAsistenciasService,
     private validacionService: ValidacionesService,
     private informacion: DatosGeneralesService,
     private reporteService: ReportesService,
@@ -528,7 +526,9 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
         itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0],fillColor: '#E3E3E3' },
         itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
+        itemsTableDerecha: { fontSize: 8, alignment: 'right' },
         itemsTableInfoTotal: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.s_color  },
+        itemsTableTotal: { fontSize: 8, bold: true, alignment: 'right', fillColor: '#E3E3E3' },
         itemsTableCentradoTotal: { fontSize: 8, bold: true, alignment: 'center', fillColor: '#E3E3E3' },
         tableMargin: { margin: [0, 0, 0, 10] },
         tableMarginCabecera: { margin: [0, 15, 0, 0] },
@@ -656,7 +656,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
           n.push({
             style: 'tableMargin',
             table: {
-              widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
+              widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
               headerRows: 2,
               body: [
                 [
@@ -700,7 +700,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[0] },
                     { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[1] },
                     {},{},{},{},{},
-                    {style: 'itemsTableCentrado', text: minutos},
+                    {style: 'itemsTableDerecha', text: minutos},
                     {style: 'itemsTableCentrado', text: tiempo},
                   ];
                 }),
@@ -748,8 +748,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     text: '',
                     style: 'itemsTableCentradoTotal'
                   },
-                  {style: 'itemsTableCentradoTotal', text: totalTiempoEmpleado},
-                  {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado)}
+                  {style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
+                  {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))}
                 ],
               ],
             },
@@ -806,15 +806,20 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     border: [true, true, false, true],
                     bold: true,
                     text: cargo.cargo,
-                    style: 'itemsTableCentradoTotal'
+                    style: 'itemsTableCentrado'
                   },
-                  { text: '', style: 'itemsTableCentradoTotal' },
-                  { text: '', style: 'itemsTableCentradoTotal' },
-                  { text: cargo.minutos, style: 'itemsTableCentradoTotal'},
-                  { text: cargo.tiempo, style: 'itemsTableCentradoTotal'},
+                  { text: '', style: 'itemsTableDerecha' },
+                  { text: '', style: 'itemsTableCentrado' },
+                  { text: cargo.minutos, style: 'itemsTableDerecha'},
+                  { text: cargo.tiempo, style: 'itemsTableCentrado'},
                 ]
               })    
             ]
+          },
+          layout: {
+            fillColor: function (rowIndex) {
+              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+            }
           }
         });
       };
@@ -844,15 +849,20 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     border: [true, true, false, true],
                     bold: true,
                     text: regimen.regimen,
-                    style: 'itemsTableCentradoTotal'
+                    style: 'itemsTableCentrado'
                   },
-                  { text: '', style: 'itemsTableCentradoTotal' },
-                  { text: '', style: 'itemsTableCentradoTotal' },
-                  { text: regimen.minutos, style: 'itemsTableCentradoTotal'},
-                  { text: regimen.tiempo, style: 'itemsTableCentradoTotal'},
+                  { text: '', style: 'itemsTableDerecha' },
+                  { text: '', style: 'itemsTableCentrado' },
+                  { text: regimen.minutos, style: 'itemsTableDerecha'},
+                  { text: regimen.tiempo, style: 'itemsTableCentrado'},
                 ]
               })    
             ]
+          },
+          layout: {
+            fillColor: function (rowIndex) {
+              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+            }
           }
         });
       };
@@ -963,7 +973,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
             n.push({
               style: 'tableMargin',
               table: {
-                widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
+                widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
                 headerRows: 2,
                 body: [
                   [
@@ -1007,7 +1017,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                       { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[0] },
                       { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[1] },
                       {},{},{},{},{},
-                      {style: 'itemsTableCentrado', text: minutos},
+                      {style: 'itemsTableDerecha', text: minutos},
                       {style: 'itemsTableCentrado', text: tiempo},
                     ];
                   }),
@@ -1049,8 +1059,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     { style: 'itemsTableCentradoTotal', text: 'TOTAL'},
                     { text: '', style: 'itemsTableCentradoTotal'},
                     { text: '', style: 'itemsTableCentradoTotal'},
-                    { style: 'itemsTableCentradoTotal', text: totalTiempoEmpleado},
-                    { style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado)}
+                    { style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
+                    { style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))}
                   ],
                 ],
               },
@@ -1109,15 +1119,20 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                   border: [true, true, false, true],
                   bold: true,
                   text: departamento.departamento,
-                  style: 'itemsTableCentradoTotal'
+                  style: 'itemsTableCentrado'
                 },
-                { text: '', style: 'itemsTableCentradoTotal' },
-                { text: '', style: 'itemsTableCentradoTotal' },
-                { text: departamento.minutos, style: 'itemsTableCentradoTotal'},
-                { text: departamento.tiempo, style: 'itemsTableCentradoTotal'},
+                { text: '', style: 'itemsTableDerecha' },
+                { text: '', style: 'itemsTableCentrado' },
+                { text: departamento.minutos, style: 'itemsTableDerecha'},
+                { text: departamento.tiempo, style: 'itemsTableCentrado'},
               ]
             })    
           ]
+        },
+        layout: {
+          fillColor: function (rowIndex) {
+            return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+          }
         }
       });
     };
@@ -1147,15 +1162,20 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                   border: [true, true, false, true],
                   bold: true,
                   text: sucursal.sucursal,
-                  style: 'itemsTableCentradoTotal'
+                  style: 'itemsTableCentrado'
                 },
-                { text: '', style: 'itemsTableCentradoTotal' },
-                { text: '', style: 'itemsTableCentradoTotal' },
-                { text: sucursal.minutos, style: 'itemsTableCentradoTotal'},
-                { text: sucursal.tiempo, style: 'itemsTableCentradoTotal'},
+                { text: '', style: 'itemsTableDerecha' },
+                { text: '', style: 'itemsTableCentrado' },
+                { text: sucursal.minutos, style: 'itemsTableDerecha'},
+                { text: sucursal.tiempo, style: 'itemsTableCentrado'},
               ]
             })    
           ]
+        },
+        layout: {
+          fillColor: function (rowIndex) {
+            return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+          }
         }
       });
     };
@@ -1248,7 +1268,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
               'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
               'Fecha Horario': obj4.fec_hora_horario.split(' ')[0], 'Hora Horario': obj4.fec_hora_horario.split(' ')[1],
               'Fecha Timbre': obj4.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj4.fec_hora_timbre.split(' ')[1],
-              'Salida Anticipada Minutos': minutos, 'Salida Anticipada hh:mm:ss': tiempo,
+              'Salida Anticipada Minutos': minutos, 'Salida Anticipada HH:MM:SS': tiempo,
             }
             nuevo.push(ele);
           })
@@ -1271,7 +1291,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
             'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
             'Fecha Horario': obj3.fec_hora_horario.split(' ')[0], 'Hora Horario': obj3.fec_hora_horario.split(' ')[1],
             'Fecha Timbre': obj3.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj3.fec_hora_timbre.split(' ')[1],
-            'Salida Anticipada Minutos': minutos, 'Salida Anticipada hh:mm:ss': tiempo,
+            'Salida Anticipada Minutos': minutos, 'Salida Anticipada HH:MM:SS': tiempo,
           }
           nuevo.push(ele);
         })

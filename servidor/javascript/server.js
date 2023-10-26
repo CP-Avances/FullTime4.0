@@ -68,6 +68,7 @@ const reloj_virtual_1 = __importDefault(require("./utils/reloj_virtual"));
 const vacunasRutas_1 = __importDefault(require("./rutas/empleado/empleadoVacuna/vacunasRutas"));
 const reporteVacunasRutas_1 = __importDefault(require("./rutas/reportes/reporteVacunasRutas"));
 const salidasAntesRutas_1 = __importDefault(require("./rutas/reportes/salidasAntesRutas"));
+const reportesAtrasosRutas_1 = __importDefault(require("./rutas/reportes/reportesAtrasosRutas"));
 const auditoriaRutas_1 = __importDefault(require("./rutas/auditoria/auditoriaRutas"));
 const solicitudVacacionesRutas_1 = __importDefault(require("./rutas/reportes/solicitudVacacionesRutas"));
 const parametrosRutas_1 = __importDefault(require("./rutas/parametrosGenerales/parametrosRutas"));
@@ -173,6 +174,7 @@ class Servidor {
         this.app.use('/reporte', reportesRutas_1.default);
         this.app.use('/reportes-asistencias/', reportesAsistenciaRutas_1.default);
         this.app.use('/reporte-salidas-antes/', salidasAntesRutas_1.default);
+        this.app.use('/reporte-atrasos/', reportesAtrasosRutas_1.default);
         // REPORTES DE AUDITORIA
         this.app.use('/reportes-auditoria', auditoriaRutas_1.default);
         // REPORTE MÚLTIPLE DE VACUNAS
