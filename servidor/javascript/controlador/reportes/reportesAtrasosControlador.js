@@ -71,10 +71,42 @@ const BuscarAtrasos = function (fec_inicio, fec_final, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query('SELECT CAST(fec_hora_horario AS VARCHAR), CAST(fec_hora_timbre AS VARCHAR), ' +
             'EXTRACT(epoch FROM (fec_hora_timbre - fec_hora_horario)) AS diferencia, ' +
-            'codigo, estado_timbre, tipo_entr_salida AS accion, tipo_dia ' +
+            'codigo, estado_timbre, tipo_entr_salida AS accion, tolerancia, tipo_dia ' +
             'FROM plan_general WHERE CAST(fec_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' ' +
             'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 ' +
             'AND fec_hora_timbre > fec_hora_horario AND tipo_dia NOT IN (\'L\', \'FD\')' +
+            'AND tipo_entr_salida = \'E\' ' +
+            'ORDER BY fec_hora_horario ASC', [fec_inicio, fec_final, codigo])
+            .then(res => {
+            return res.rows;
+        });
+    });
+};
+const BuscarAtrasosToleranciaHorario = function (fec_inicio, fec_final, codigo) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield database_1.default.query('SELECT CAST(fec_hora_horario AS VARCHAR), CAST(fec_hora_timbre AS VARCHAR), ' +
+            'EXTRACT(epoch FROM (fec_hora_timbre - fec_hora_horario)) AS diferencia, ' +
+            'codigo, estado_timbre, tipo_entr_salida AS accion, tolerancia, tipo_dia ' +
+            'FROM plan_general WHERE CAST(fec_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' ' +
+            'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 ' +
+            'AND EXTRACT(epoch FROM(fec_hora_timbre)) > (EXTRACT(epoch FROM(fec_hora_horario))+(tolerancia * 60)) ' +
+            'AND tipo_dia NOT IN (\'L\', \'FD\')' +
+            'AND tipo_entr_salida = \'E\' ' +
+            'ORDER BY fec_hora_horario ASC', [fec_inicio, fec_final, codigo])
+            .then(res => {
+            return res.rows;
+        });
+    });
+};
+const BuscarAtrasosToleranciaTolerancia = function (fec_inicio, fec_final, codigo) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield database_1.default.query('SELECT CAST(fec_hora_horario AS VARCHAR), CAST(fec_hora_timbre AS VARCHAR), ' +
+            'EXTRACT(epoch FROM (fec_hora_timbre - fec_hora_horario)) AS diferencia, ' +
+            'codigo, estado_timbre, tipo_entr_salida AS accion, tolerancia, tipo_dia ' +
+            'FROM plan_general WHERE CAST(fec_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' ' +
+            'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 ' +
+            'AND EXTRACT(epoch FROM(fec_hora_timbre)) > (EXTRACT(epoch FROM(fec_hora_horario))+(tolerancia*60)) ' +
+            'AND tipo_dia NOT IN (\'L\', \'FD\')' +
             'AND tipo_entr_salida = \'E\' ' +
             'ORDER BY fec_hora_horario ASC', [fec_inicio, fec_final, codigo])
             .then(res => {

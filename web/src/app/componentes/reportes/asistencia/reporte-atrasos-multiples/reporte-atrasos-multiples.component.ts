@@ -3,12 +3,17 @@ import { ITableEmpleados, tim } from 'src/app/model/reportes.model';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { PageEvent } from '@angular/material/paginator';
+import { MatDialog } from '@angular/material/dialog';
+import { ToastrService } from 'ngx-toastr';
+
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import { ToastrService } from 'ngx-toastr';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
+
+// IMPORTAR COMPONENTES
+import { ConfigurarAtrasosComponent } from '../../configuracion-reportes/configurar-atrasos/configurar-atrasos.component';
 
 // IMPORTAR SERVICIOS
 import { AtrasosService } from 'src/app/servicios/reportes/atrasos/atrasos.service';
@@ -45,15 +50,19 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
   cargos: any = [];
   origen: any = [];
 
-  //VARIABLES PARA ALMACENAR TIEMPOS DE SALIDAS ANTICIPADAS
+  // VARIABLES PARA ALMACENAR TIEMPOS DE SALIDAS ANTICIPADAS
   tiempoDepartamentos: any = [];
   tiempoSucursales: any = [];
   tiempoRegimen: any = [];
   tiempoCargos: any = [];
 
-  //VARIABLES PARA MOSTRAR DETALLES
+  // VARIABLES PARA MOSTRAR DETALLES
   tipo: string;
   verDetalle: boolean = false;
+
+  // VARIABLES PARA ADMINISTRAR TOLERANCIA
+  tolerancia: string = 'no_considerar';
+  tipoTolerancia: string = '';
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS SELECCIONADOS EN LA BUSQUEDA
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
@@ -113,6 +122,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     private reporteService: ReportesService,
     private restEmpre: EmpresaService,
     private toastr: ToastrService,
+    private dialog: MatDialog
   ) { 
     this.ObtenerLogo();
     this.ObtenerColores();
@@ -249,32 +259,48 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de búsqueda.');
     if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
       && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.');
-    switch (this.opcion) {
-      case 's':
-        if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione sucursal.')
-        this.ModelarSucursal(action);
-        break;
-      case 'r':
-        if (this.selectionReg.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione régimen.')
-        this.ModelarRegimen(action);
-        break;
-      case 'd':
-        if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione departamentos.')
-        this.ModelarDepartamento(action);
-        break;
-      case 'c':
-        if (this.selectionCar.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione cargos.')
-        this.ModelarCargo(action);
-        break;
-      case 'e':
-        if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione empleados.')
-        this.ModelarEmpleados(action);
-        break;
-      default:
-        this.toastr.error('Ups !!! algo salio mal.', 'Seleccione criterio de búsqueda.')
-        this.reporteService.DefaultFormCriterios()
-        break;
-    }
+
+      const dialogRef = this.dialog.open(ConfigurarAtrasosComponent, {
+        width: '30rem',
+        height: '28rem',
+     });
+    
+     dialogRef.afterClosed().subscribe(result => {
+        if (result=='cancelar') {
+          return;
+        }
+        this.tolerancia = result.tolerancia;
+        this.tipoTolerancia = result.tipoTolerancia;
+        
+        switch (this.opcion) {
+          case 's':
+            if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione sucursal.')
+            this.ModelarSucursal(action);
+            break;
+          case 'r':
+            if (this.selectionReg.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione régimen.')
+            this.ModelarRegimen(action);
+            break;
+          case 'd':
+            if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione departamentos.')
+            this.ModelarDepartamento(action);
+            break;
+          case 'c':
+            if (this.selectionCar.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione cargos.')
+            this.ModelarCargo(action);
+            break;
+          case 'e':
+            if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione empleados.')
+            this.ModelarEmpleados(action);
+            break;
+          default:
+            this.toastr.error('Ups !!! algo salio mal.', 'Seleccione criterio de búsqueda.')
+            this.reporteService.DefaultFormCriterios()
+            break;
+        }
+
+      });
+
   }
 
   ModelarSucursal(accion) {
@@ -1196,7 +1222,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
   }
 
   segundosAMinutosConDecimales(segundos) {
-    return (segundos / 60).toFixed(2);
+    return Number((segundos / 60).toFixed(2));
   }
 
   minutosAHorasMinutosSegundos(minutos) {
@@ -1208,6 +1234,16 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     let second: string | number = Number((seconds % 60).toFixed(0));
     second = (second < 10)? '0' + second : second;
     return `${hour}:${minute}:${second}`;
+  }
+
+  validarTolerancia(minutos: number, tolerancia:number){
+    if (this.tolerancia === 'no_considerar') {
+      return minutos;
+    }
+    if (minutos <= tolerancia) {
+      return null;
+    }
+    return this.tipoTolerancia === 'horario' ? minutos : minutos - tolerancia;
   }
   
 
@@ -1314,6 +1350,11 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
           obj3.timbres.forEach((obj4: any) => {
             const minutos = this.segundosAMinutosConDecimales(obj4.diferencia);
             const tiempo = this.minutosAHorasMinutosSegundos(minutos);
+            const resultado = this.validarTolerancia(minutos, obj3.tolerancia);
+            if (resultado!==null) {
+              console.log('resultado',resultado);
+            }
+            console.log('resultado',resultado);
             n = n + 1;
             let ele = {
               n: n,
