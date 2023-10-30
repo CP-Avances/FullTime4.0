@@ -7,84 +7,87 @@
 
         <div class="container">
             <div class="nota">
+                <div style="text-align: center !important;">
+                    <i class="fas fa-solid fa-user-clock" matSuffix matTooltipPosition="left" matTooltip="Ver timbre."
+                        style="font-size: 50px; color: rgb(10, 62, 110);">
+                    </i>
+                    <br>
+                    <b>
+                        {{informacion.detalle.nombre}} {{informacion.detalle.apellido}}
+                    </b>
+                </div>
+                <div class="col-md-4">
+                    <br>
+                    <div class="row">
+                        <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                            Código:
+                        </div>
+                        <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
+                            {{informacion.detalle.codigo}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                            Cédula:
+                        </div>
+                        <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
+                            {{informacion.detalle.cedula}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                            Fecha:
+                        </div>
+                        <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
+                            {{informacion.detalle.fecha_general_}}
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row">
-                    <div class="col-md-3" style="text-align: center !important;">
-                        <i class="fas fa-solid fa-user-clock" matSuffix matTooltipPosition="left"
-                            matTooltip="Ver timbre." style="font-size: 120px; color: rgb(10, 62, 110);">
-                        </i>
-                        <br><b>
-                            {{informacion.detalle.nombre}} {{informacion.detalle.apellido}}
-                        </b>
-                    </div>
-                    <div class="col-md-3">
+
+                    <div class="col-md-4">
                         <br>
                         <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
-                                Código:
-                            </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
-                                {{informacion.detalle.codigo}}
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
-                                Cédula:
-                            </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
-                                {{informacion.detalle.cedula}}
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
-                                Fecha:
-                            </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
-                                {{informacion.detalle.fecha_general_}}
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
-                                Tipo:
-                            </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
-                                {{informacion.detalle.tipo_}}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <br>
-                        <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                            <div class="col-md-4" style="text-align: right !important; color: rgb(3, 5, 123);">
                                 Fecha horario:
                             </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
+                            <div class="col-md-8" style="text-align: left !important; color: rgb(3, 5, 123);">
                                 {{informacion.detalle.fecha_horario_}}
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                            <div class="col-md-4" style="text-align: right !important; color: rgb(3, 5, 123);">
                                 Hora horario:
                             </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
+                            <div class="col-md-8" style="text-align: left !important; color: rgb(3, 5, 123);">
                                 {{informacion.detalle.hora_horario_}}
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-4" style="text-align: right !important; color: rgb(3, 5, 123);">
+                                Tipo:
+                            </div>
+                            <div class="col-md-8" style="text-align: left !important; color: rgb(3, 5, 123);">
+                                {{informacion.detalle.tipo_}}
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <br>
                         <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                            <div class="col-md-4" style="text-align: right !important; color: rgb(20, 98, 2);">
                                 Fecha timbre:
                             </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
+                            <div class="col-md-8" style="text-align: left !important; color: rgb(20, 98, 2);">
                                 {{informacion.detalle.fecha_timbre_}}
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                            <div class="col-md-4" style="text-align: right !important; color: rgb(20, 98, 2);">
                                 Hora timbre:
                             </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
+                            <div class="col-md-8" style="text-align: left !important; color: rgb(20, 98, 2);">
                                 {{informacion.detalle.hora_timbre_}}
                             </div>
                         </div>
@@ -92,19 +95,5 @@
                 </div>
             </div>
         </div>
-
-        <div class="container">
-            <div style="text-align: right;">
-                <i type="submit" id="edit" style="margin-right: 20px;" matSuffix matTooltipPosition="right"
-                    matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
-                    <p>Editar</p>
-                </i>
-                <i class="far fa-trash-alt" id="delete" matSuffix matTooltipPosition="right"
-                    matTooltip="Eliminar registro.">
-                    <p>Eliminar</p>
-                </i>
-            </div>
-        </div>
-
     </mat-card>
 </div>
