@@ -896,7 +896,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
               'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
               'Departamento': obj2.name_dep,
               'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
-              'Fecha Timbre': obj4.fec_hora_horario.split(' ')[0], 'Hora Timbre': obj4.fec_hora_horario.split(' ')[1],
+              'Fecha Timbre': new Date(obj4.fec_hora_horario), 'Hora Timbre': obj4.fec_hora_horario.split(' ')[1],
               'Acción': accionT
             }
             nuevo.push(ele);
@@ -930,7 +930,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
             'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
             'Departamento': obj2.departamento,
             'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
-            'Fecha Timbre': obj3.fec_hora_horario.split(' ')[0], 'Hora Timbre': obj3.fec_hora_horario.split(' ')[1],
+            'Fecha Timbre': new Date(obj3.fec_hora_horario), 'Hora Timbre': obj3.fec_hora_horario.split(' ')[1],
             'Acción': accionT
           }
           nuevo.push(ele);

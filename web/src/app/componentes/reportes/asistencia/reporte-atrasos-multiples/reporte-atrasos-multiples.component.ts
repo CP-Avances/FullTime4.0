@@ -316,8 +316,10 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
     this.data_pdf = []
     this.reportesAtrasos.ReporteAtrasos(suc, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      console.log(this.data_pdf);
+      this.data_pdf = res;
+      if (this.tolerancia === 'considerar') {
+        this.filtrarTolerancia();
+      }
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
         case 'ver': this.verDatos(); break;
@@ -360,7 +362,10 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
     this.data_pdf = [];
     this.reportesAtrasos.ReporteAtrasosRegimenCargo(reg, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
+      this.data_pdf = res;
+      if (this.tolerancia === 'considerar') {
+        this.filtrarToleranciaRegimenCargo();
+      };
       switch (accion) {
         case 'excel': this.exportToExcel('RegimenCargo'); break;
         case 'ver': this.verDatos(); break;
@@ -388,8 +393,10 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     });
     this.data_pdf = []
     this.reportesAtrasos.ReporteAtrasos(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      console.log(this.data_pdf);
+      this.data_pdf = res;
+      if (this.tolerancia === 'considerar') {
+        this.filtrarTolerancia();
+      };
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
         case 'ver': this.verDatos(); break;
@@ -413,7 +420,11 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
     this.data_pdf = [];
     this.reportesAtrasos.ReporteAtrasosRegimenCargo(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
+      this.data_pdf = res;
+      if (this.tolerancia === 'considerar') {
+        this.filtrarToleranciaRegimenCargo();
+      };
+      
       switch (accion) {
         case 'excel': this.exportToExcel('RegimenCargo'); break;
         case 'ver': this.verDatos(); break;
@@ -450,8 +461,10 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
     this.data_pdf = []
     this.reportesAtrasos.ReporteAtrasos(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      console.log(this.data_pdf);
+      this.data_pdf = res;
+      if (this.tolerancia === 'considerar') {
+        this.filtrarTolerancia();
+      };
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
         case 'ver': this.verDatos(); break;
@@ -682,112 +695,227 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
           });
           c = 0;
           totalTiempoEmpleado = 0;
-          n.push({
-            style: 'tableMargin',
-            table: {
-              widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
-              headerRows: 2,
-              body: [
-                [
-                  { rowSpan: 2, text: 'N°', style: 'centrado' },
-                  { rowSpan: 1, colSpan: 2, text: 'HORARIO', style: 'tableHeader' },
-                  {},
-                  { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
-                  {},
-                  { rowSpan: 2, text: 'TIPO PERMISO', style: 'centrado' },
-                  { rowSpan: 2, text: 'DESDE', style: 'centrado' },
-                  { rowSpan: 2, text: 'HASTA', style: 'centrado' },
-                  { rowSpan: 2, colSpan: 2, text: 'PERMISO', style: 'centrado' },
-                  {},
-                  { rowSpan: 2, colSpan: 2, text: 'ATRASO', style: 'centrado' },
-                  {}
+          if (this.tolerancia==='considerar') {
+            n.push({
+              style: 'tableMargin',
+              table: {
+                widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+                headerRows: 2,
+                body: [
+                  [
+                    { rowSpan: 2, text: 'N°', style: 'centrado' },
+                    { rowSpan: 1, colSpan: 2, text: 'HORARIO', style: 'tableHeader' },
+                    {},
+                    { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                    {},
+                    { rowSpan: 2, text: 'TIPO PERMISO', style: 'centrado' },
+                    { rowSpan: 2, text: 'DESDE', style: 'centrado' },
+                    { rowSpan: 2, text: 'HASTA', style: 'centrado' },
+                    { rowSpan: 2, colSpan: 2, text: 'PERMISO', style: 'centrado' },
+                    {},
+                    { rowSpan: 2, text: 'TOLERANCIA', style: 'centrado' },
+                    { rowSpan: 2, colSpan: 2, text: 'ATRASO', style: 'centrado' },
+                    {}
+                  ],
+                  [
+                    {},
+                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                    {},{},{},{},
+                    {},
+                    {},
+                    {},
+                    {},
+  
+                  ],
+                  ...obj2.timbres.map(obj3 => {
+                    const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
+                    const tiempo = this.minutosAHorasMinutosSegundos(minutos);
+                    totalTiempoEmpleado += Number(minutos);
+                    totalTiempoRegimen += Number(minutos); 
+                    totalTiempoCargo += Number(minutos); 
+                    c = c + 1
+                    return [
+                      { style: 'itemsTableCentrado', text: c },
+                      { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[0] },
+                      { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[1] },
+                      { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[0] },
+                      { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[1] },
+                      {},{},{},{},{},
+                      {style: 'itemsTableCentrado', text: obj3.tolerancia},
+                      {style: 'itemsTableCentrado', text: tiempo},
+                      {style: 'itemsTableDerecha', text: minutos},
+                    ];
+                  }),
+                  [
+                    {
+                      border: [true, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {
+                      border: [false, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {
+                      border: [false, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {
+                      border: [false, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'},
+                    {
+                      border: [false, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {
+                      border: [false, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {
+                      border: [false, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {style: 'itemsTableCentradoTotal', text: 'TOTAL'},
+                    {
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))},
+                    {style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
+                  ],
                 ],
-                [
-                  {},
-                  { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
-                  { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
-                  { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
-                  { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
-                  {},{},{},
-                  {},
-                  {},
-                  {},
-                  {},
-
-                ],
-                ...obj2.timbres.map(obj3 => {
-                  const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
-                  const tiempo = this.minutosAHorasMinutosSegundos(minutos);
-                  totalTiempoEmpleado += Number(minutos);
-                  totalTiempoRegimen += Number(minutos); 
-                  totalTiempoCargo += Number(minutos); 
-                  c = c + 1
-                  return [
-                    { style: 'itemsTableCentrado', text: c },
-                    { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[0] },
-                    { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[1] },
-                    { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[0] },
-                    { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[1] },
-                    {},{},{},{},{},
-                    {style: 'itemsTableDerecha', text: minutos},
-                    {style: 'itemsTableCentrado', text: tiempo},
-                  ];
-                }),
-                [
-                  {
-                    border: [true, true, false, true],
-                    text: '',
-                    style: 'itemsTableCentradoTotal'
-                  },
-                  {
-                    border: [false, true, false, true],
-                    text: '',
-                    style: 'itemsTableCentradoTotal'
-                  },
-                  {
-                    border: [false, true, false, true],
-                    text: '',
-                    style: 'itemsTableCentradoTotal'
-                  },
-                  {
-                    border: [false, true, false, true],
-                    text: '',
-                    style: 'itemsTableCentradoTotal'},
-                  {
-                    border: [false, true, false, true],
-                    text: '',
-                    style: 'itemsTableCentradoTotal'
-                  },
-                  {
-                    border: [false, true, false, true],
-                    text: '',
-                    style: 'itemsTableCentradoTotal'
-                  },
-                  {
-                    border: [false, true, false, true],
-                    text: '',
-                    style: 'itemsTableCentradoTotal'
-                  },
-                  {style: 'itemsTableCentradoTotal', text: 'TOTAL'},
-                  {
-                    text: '',
-                    style: 'itemsTableCentradoTotal'
-                  },
-                  {
-                    text: '',
-                    style: 'itemsTableCentradoTotal'
-                  },
-                  {style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
-                  {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))}
-                ],
-              ],
-            },
-            layout: {
-              fillColor: function (rowIndex) {
-                return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+              },
+              layout: {
+                fillColor: function (rowIndex) {
+                  return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+                }
               }
-            }
-          });
+            });
+          } else{
+            n.push({
+              style: 'tableMargin',
+              table: {
+                widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+                headerRows: 2,
+                body: [
+                  [
+                    { rowSpan: 2, text: 'N°', style: 'centrado' },
+                    { rowSpan: 1, colSpan: 2, text: 'HORARIO', style: 'tableHeader' },
+                    {},
+                    { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                    {},
+                    { rowSpan: 2, text: 'TIPO PERMISO', style: 'centrado' },
+                    { rowSpan: 2, text: 'DESDE', style: 'centrado' },
+                    { rowSpan: 2, text: 'HASTA', style: 'centrado' },
+                    { rowSpan: 2, colSpan: 2, text: 'PERMISO', style: 'centrado' },
+                    {},
+                    { rowSpan: 2, colSpan: 2, text: 'ATRASO', style: 'centrado' },
+                    {}
+                  ],
+                  [
+                    {},
+                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                    {},{},{},
+                    {},
+                    {},
+                    {},
+                    {},
+  
+                  ],
+                  ...obj2.timbres.map(obj3 => {
+                    const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
+                    const tiempo = this.minutosAHorasMinutosSegundos(minutos);
+                    totalTiempoEmpleado += Number(minutos);
+                    totalTiempoRegimen += Number(minutos); 
+                    totalTiempoCargo += Number(minutos); 
+                    c = c + 1
+                    return [
+                      { style: 'itemsTableCentrado', text: c },
+                      { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[0] },
+                      { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[1] },
+                      { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[0] },
+                      { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[1] },
+                      {},{},{},{},{},
+                      {style: 'itemsTableDerecha', text: minutos},
+                      {style: 'itemsTableCentrado', text: tiempo},
+                    ];
+                  }),
+                  [
+                    {
+                      border: [true, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {
+                      border: [false, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {
+                      border: [false, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {
+                      border: [false, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'},
+                    {
+                      border: [false, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {
+                      border: [false, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {
+                      border: [false, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {style: 'itemsTableCentradoTotal', text: 'TOTAL'},
+                    {
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    {style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
+                    {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))}
+                  ],
+                ],
+              },
+              layout: {
+                fillColor: function (rowIndex) {
+                  return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+                }
+              }
+            });
+          }
         });
         if (this.bool.bool_cargo) {
           totalTiempoCargo = Number(totalTiempoCargo.toFixed(2));
@@ -839,8 +967,8 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                   },
                   { text: '', style: 'itemsTableDerecha' },
                   { text: '', style: 'itemsTableCentrado' },
-                  { text: cargo.minutos, style: 'itemsTableDerecha'},
                   { text: cargo.tiempo, style: 'itemsTableCentrado'},
+                  { text: cargo.minutos, style: 'itemsTableDerecha'},
                 ]
               })    
             ]
@@ -882,8 +1010,8 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                   },
                   { text: '', style: 'itemsTableDerecha' },
                   { text: '', style: 'itemsTableCentrado' },
-                  { text: regimen.minutos, style: 'itemsTableDerecha'},
                   { text: regimen.tiempo, style: 'itemsTableCentrado'},
+                  { text: regimen.minutos, style: 'itemsTableDerecha'},
                 ]
               })    
             ]
@@ -999,106 +1127,212 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
             });
             c = 0;
             totalTiempoEmpleado = 0;
-            n.push({
-              style: 'tableMargin',
-              table: {
-                widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
-                headerRows: 2,
-                body: [
-                  [
-                    { rowSpan: 2, text: 'N°', style: 'centrado' },
-                    { rowSpan: 1, colSpan: 2, text: 'HORARIO', style: 'tableHeader' },
-                    {},
-                    { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
-                    {},
-                    { rowSpan: 2, text: 'TIPO PERMISO', style: 'centrado' },
-                    { rowSpan: 2, text: 'DESDE', style: 'centrado' },
-                    { rowSpan: 2, text: 'HASTA', style: 'centrado' },
-                    { rowSpan: 2, colSpan: 2, text: 'PERMISO', style: 'centrado' },
-                    {},
-                    { rowSpan: 2, colSpan: 2, text: 'ATRASO', style: 'centrado' },
-                    {}
+            if (this.tolerancia === 'considerar') {
+              n.push({
+                style: 'tableMargin',
+                table: {
+                  widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+                  headerRows: 2,
+                  body: [
+                    [
+                      { rowSpan: 2, text: 'N°', style: 'centrado' },
+                      { rowSpan: 1, colSpan: 2, text: 'HORARIO', style: 'tableHeader' },
+                      {},
+                      { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                      {},
+                      { rowSpan: 2, text: 'TIPO PERMISO', style: 'centrado' },
+                      { rowSpan: 2, text: 'DESDE', style: 'centrado' },
+                      { rowSpan: 2, text: 'HASTA', style: 'centrado' },
+                      { rowSpan: 2, colSpan: 2, text: 'PERMISO', style: 'centrado' },
+                      {},
+                      { rowSpan: 2, text: 'TOLERANCIA', style: 'centrado' },
+                      { rowSpan: 2, colSpan: 2, text: 'ATRASO', style: 'centrado' },
+                      {}
+                    ],
+                    [
+                      {},
+                      { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                      { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                      { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                      { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                      {},{},{},{},
+                      {},
+                      {},
+                      {},
+                      {},
+    
+                    ],
+                    ...obj2.timbres.map(obj3 => {
+                      const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
+                      const tiempo = this.minutosAHorasMinutosSegundos(minutos);
+                      totalTiempoEmpleado += Number(minutos);
+                      totalTiempoSucursal += Number(minutos); 
+                      totalTiempoDepartamento += Number(minutos); 
+                      c = c + 1
+                      return [
+                        { style: 'itemsTableCentrado', text: c },
+                        { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[0] },
+                        { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[1] },
+                        { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[0] },
+                        { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[1] },
+                        {},{},{},{},{},
+                        {style: 'itemsTableCentrado', text: obj3.tolerancia},
+                        {style: 'itemsTableCentrado', text: tiempo},
+                        {style: 'itemsTableDerecha', text: minutos},
+                      ];
+                    }),
+                    [
+                      {
+                        border: [true, true, false, true],
+                        text: '',
+                        style: 'itemsTableCentradoTotal'
+                      },
+                      {
+                        border: [false, true, false, true],
+                        text: '',
+                        style: 'itemsTableCentradoTotal'
+                      },
+                      {
+                        border: [false, true, false, true],
+                        text: '',
+                        style: 'itemsTableCentradoTotal'
+                      },
+                      {
+                        border: [false, true, false, true],
+                        text: '',
+                        style: 'itemsTableCentradoTotal'},
+                      {
+                        border: [false, true, false, true],
+                        text: '',
+                        style: 'itemsTableCentradoTotal'
+                      },
+                      {
+                        border: [false, true, false, true],
+                        text: '',
+                        style: 'itemsTableCentradoTotal'
+                      },
+                      {
+                        border: [false, true, false, true],
+                        text: '',
+                        style: 'itemsTableCentradoTotal'
+                      },
+                      { style: 'itemsTableCentradoTotal', text: 'TOTAL'},
+                      { text: '', style: 'itemsTableCentradoTotal'},
+                      { text: '', style: 'itemsTableCentradoTotal'},
+                      { text: '', style: 'itemsTableCentradoTotal'},
+                      { style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))},
+                      { style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
+                    ],
                   ],
-                  [
-                    {},
-                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
-                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
-                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
-                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
-                    {},{},{},
-                    {},
-                    {},
-                    {},
-                    {},
-  
-                  ],
-                  ...obj2.timbres.map(obj3 => {
-                    const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
-                    const tiempo = this.minutosAHorasMinutosSegundos(minutos);
-                    totalTiempoEmpleado += Number(minutos);
-                    totalTiempoSucursal += Number(minutos); 
-                    totalTiempoDepartamento += Number(minutos); 
-                    c = c + 1
-                    return [
-                      { style: 'itemsTableCentrado', text: c },
-                      { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[0] },
-                      { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[1] },
-                      { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[0] },
-                      { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[1] },
-                      {},{},{},{},{},
-                      {style: 'itemsTableDerecha', text: minutos},
-                      {style: 'itemsTableCentrado', text: tiempo},
-                    ];
-                  }),
-                  [
-                    {
-                      border: [true, true, false, true],
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    {
-                      border: [false, true, false, true],
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    {
-                      border: [false, true, false, true],
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    {
-                      border: [false, true, false, true],
-                      text: '',
-                      style: 'itemsTableCentradoTotal'},
-                    {
-                      border: [false, true, false, true],
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    {
-                      border: [false, true, false, true],
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    {
-                      border: [false, true, false, true],
-                      text: '',
-                      style: 'itemsTableCentradoTotal'
-                    },
-                    { style: 'itemsTableCentradoTotal', text: 'TOTAL'},
-                    { text: '', style: 'itemsTableCentradoTotal'},
-                    { text: '', style: 'itemsTableCentradoTotal'},
-                    { style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
-                    { style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))}
-                  ],
-                ],
-              },
-              layout: {
-                fillColor: function (rowIndex) {
-                  return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+                },
+                layout: {
+                  fillColor: function (rowIndex) {
+                    return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+                  }
                 }
-              }
-            });
+              });
+            } else {
+              n.push({
+                style: 'tableMargin',
+                table: {
+                  widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+                  headerRows: 2,
+                  body: [
+                    [
+                      { rowSpan: 2, text: 'N°', style: 'centrado' },
+                      { rowSpan: 1, colSpan: 2, text: 'HORARIO', style: 'tableHeader' },
+                      {},
+                      { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                      {},
+                      { rowSpan: 2, text: 'TIPO PERMISO', style: 'centrado' },
+                      { rowSpan: 2, text: 'DESDE', style: 'centrado' },
+                      { rowSpan: 2, text: 'HASTA', style: 'centrado' },
+                      { rowSpan: 2, colSpan: 2, text: 'PERMISO', style: 'centrado' },
+                      {},
+                      { rowSpan: 2, colSpan: 2, text: 'ATRASO', style: 'centrado' },
+                      {}
+                    ],
+                    [
+                      {},
+                      { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                      { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                      { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
+                      { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                      {},{},{},
+                      {},
+                      {},
+                      {},
+                      {},
+    
+                    ],
+                    ...obj2.timbres.map(obj3 => {
+                      const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
+                      const tiempo = this.minutosAHorasMinutosSegundos(minutos);
+                      totalTiempoEmpleado += Number(minutos);
+                      totalTiempoSucursal += Number(minutos); 
+                      totalTiempoDepartamento += Number(minutos); 
+                      c = c + 1
+                      return [
+                        { style: 'itemsTableCentrado', text: c },
+                        { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[0] },
+                        { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[1] },
+                        { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[0] },
+                        { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[1] },
+                        {},{},{},{},{},
+                        {style: 'itemsTableDerecha', text: minutos},
+                        {style: 'itemsTableCentrado', text: tiempo},
+                      ];
+                    }),
+                    [
+                      {
+                        border: [true, true, false, true],
+                        text: '',
+                        style: 'itemsTableCentradoTotal'
+                      },
+                      {
+                        border: [false, true, false, true],
+                        text: '',
+                        style: 'itemsTableCentradoTotal'
+                      },
+                      {
+                        border: [false, true, false, true],
+                        text: '',
+                        style: 'itemsTableCentradoTotal'
+                      },
+                      {
+                        border: [false, true, false, true],
+                        text: '',
+                        style: 'itemsTableCentradoTotal'},
+                      {
+                        border: [false, true, false, true],
+                        text: '',
+                        style: 'itemsTableCentradoTotal'
+                      },
+                      {
+                        border: [false, true, false, true],
+                        text: '',
+                        style: 'itemsTableCentradoTotal'
+                      },
+                      {
+                        border: [false, true, false, true],
+                        text: '',
+                        style: 'itemsTableCentradoTotal'
+                      },
+                      { style: 'itemsTableCentradoTotal', text: 'TOTAL'},
+                      { text: '', style: 'itemsTableCentradoTotal'},
+                      { text: '', style: 'itemsTableCentradoTotal'},
+                      { style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
+                      { style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))}
+                    ],
+                  ],
+                },
+                layout: {
+                  fillColor: function (rowIndex) {
+                    return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+                  }
+                }
+              });
+            }
           });
           if (this.bool.bool_dep) {
             totalTiempoDepartamento = Number(totalTiempoDepartamento.toFixed(2));
@@ -1152,8 +1386,8 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                 },
                 { text: '', style: 'itemsTableDerecha' },
                 { text: '', style: 'itemsTableCentrado' },
-                { text: departamento.minutos, style: 'itemsTableDerecha'},
                 { text: departamento.tiempo, style: 'itemsTableCentrado'},
+                { text: departamento.minutos, style: 'itemsTableDerecha'},
               ]
             })    
           ]
@@ -1195,8 +1429,8 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                 },
                 { text: '', style: 'itemsTableDerecha' },
                 { text: '', style: 'itemsTableCentrado' },
-                { text: sucursal.minutos, style: 'itemsTableDerecha'},
                 { text: sucursal.tiempo, style: 'itemsTableCentrado'},
+                { text: sucursal.minutos, style: 'itemsTableDerecha'},
               ]
             })    
           ]
@@ -1302,13 +1536,26 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
           obj3.timbres.forEach((obj4: any) => {
             const minutos = this.segundosAMinutosConDecimales(obj4.diferencia);
             const tiempo = this.minutosAHorasMinutosSegundos(minutos);
-            let ele = { 
-              'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
-              'Departamento': obj2.name_dep,
-              'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
-              'Fecha Horario': obj4.fec_hora_horario.split(' ')[0], 'Hora Horario': obj4.fec_hora_horario.split(' ')[1],
-              'Fecha Timbre': obj4.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj4.fec_hora_timbre.split(' ')[1],
-              'Atraso Minutos': minutos, 'Atraso HH:MM:SS': tiempo,
+            let ele;
+            if (this.tolerancia === 'considerar') {
+              ele = { 
+                'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
+                'Departamento': obj2.name_dep,
+                'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
+                'Horario': obj4.fec_hora_horario, 'Hora Horario': obj4.fec_hora_horario.split(' ')[1],
+                'Fecha Timbre': obj4.fec_hora_timbre, 'Hora Timbre': obj4.fec_hora_timbre.split(' ')[1],
+                'Tolerancia': obj4.tolerancia,
+                'Atraso HH:MM:SS': tiempo, 'Atraso Minutos': minutos,
+              }
+            } else {
+              ele = { 
+                'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
+                'Departamento': obj2.name_dep,
+                'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
+                'Fecha Horario': new Date(obj4.fec_hora_horario), 'Hora Horario': obj4.fec_hora_horario.split(' ')[1],
+                'Fecha Timbre': new Date(obj4.fec_hora_timbre), 'Hora Timbre': obj4.fec_hora_timbre.split(' ')[1],
+                'Atraso HH:MM:SS': tiempo, 'Atraso Minutos': minutos,
+              }
             }
             nuevo.push(ele);
           })
@@ -1325,13 +1572,26 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
         obj2.timbres.forEach((obj3: any) => {
           const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
           const tiempo = this.minutosAHorasMinutosSegundos(minutos);
-          let ele = {
-            'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
-            'Departamento': obj2.departamento,
-            'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
-            'Fecha Horario': obj3.fec_hora_horario.split(' ')[0], 'Hora Horario': obj3.fec_hora_horario.split(' ')[1],
-            'Fecha Timbre': obj3.fec_hora_timbre.split(' ')[0], 'Hora Timbre': obj3.fec_hora_timbre.split(' ')[1],
-            'Atraso Minutos': minutos, 'Atraso HH:MM:SS': tiempo,
+          let ele;
+          if (this.tolerancia === 'considerar') {
+            ele = {
+              'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
+              'Departamento': obj2.departamento,
+              'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
+              'Fecha Horario': new Date(obj3.fec_hora_horario), 'Hora Horario': obj3.fec_hora_horario.split(' ')[1],
+              'Fecha Timbre': new Date(obj3.fec_hora_timbre), 'Hora Timbre': obj3.fec_hora_timbre.split(' ')[1],
+              'Tolerancia': obj3.tolerancia,
+              'Atraso HH:MM:SS': tiempo, 'Atraso Minutos': minutos,
+            }
+          } else {
+            ele = {
+              'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
+              'Departamento': obj2.departamento,
+              'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
+              'Fecha Horario': new Date(obj3.fec_hora_horario), 'Hora Horario': obj3.fec_hora_horario.split(' ')[1],
+              'Fecha Timbre': new Date(obj3.fec_hora_timbre), 'Hora Timbre': obj3.fec_hora_timbre.split(' ')[1],
+              'Atraso HH:MM:SS': tiempo, 'Atraso Minutos': minutos,
+            }
           }
           nuevo.push(ele);
         })
@@ -1350,17 +1610,12 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
           obj3.timbres.forEach((obj4: any) => {
             const minutos = this.segundosAMinutosConDecimales(obj4.diferencia);
             const tiempo = this.minutosAHorasMinutosSegundos(minutos);
-            const resultado = this.validarTolerancia(minutos, obj3.tolerancia);
-            if (resultado!==null) {
-              console.log('resultado',resultado);
-            }
-            console.log('resultado',resultado);
             n = n + 1;
             let ele = {
               n: n,
               ciudad: obj1.ciudad, sucursal: obj1.name_suc,
               departamento: obj2.name_dep,
-              empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
+              empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo, tolerancia: obj4.tolerancia,
               fechaHorario: obj4.fec_hora_horario.split(' ')[0], horaHorario: obj4.fec_hora_horario.split(' ')[1],
               fechaTimbre: obj4.fec_hora_timbre.split(' ')[0], horaTimbre: obj4.fec_hora_timbre.split(' ')[1],
               atrasoM: minutos, atrasoT: tiempo,
@@ -1385,16 +1640,58 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
             n: n,
             ciudad: obj2.ciudad, sucursal: obj2.sucursal,
             departamento: obj2.departamento,
-            empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
+            empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo, tolerancia: obj3.tolerancia,
             fechaHorario: obj3.fec_hora_horario.split(' ')[0], horaHorario: obj3.fec_hora_horario.split(' ')[1],
             fechaTimbre: obj3.fec_hora_timbre.split(' ')[0], horaTimbre: obj3.fec_hora_timbre.split(' ')[1],
-            salidaAnticipadaM: minutos, salidaAnticipadaT: tiempo,
+            atrasoM: minutos, atrasoT: tiempo,
           }
           this.timbres.push(ele);
         })
       })
     })
   }
+
+  filtrarTolerancia() {
+    this.data_pdf = this.data_pdf.filter(obj1 => {
+      obj1.departamentos = obj1.departamentos.filter(obj2 => {
+        obj2.empleado = obj2.empleado.filter(obj3 => {
+          obj3.timbres = obj3.timbres && obj3.timbres.filter(obj4 => {
+            let diferencia = obj4.diferencia;
+            const tolerancia = obj4.tolerancia * 60;
+            return (diferencia <= tolerancia) ? false : (this.tipoTolerancia === 'horario' ? (obj4.diferencia = diferencia, true) : (obj4.diferencia = diferencia - tolerancia, true));
+          });
+          return obj3.timbres && obj3.timbres.length > 0;
+        });
+        return obj2.empleado && obj2.empleado.length > 0;
+      });
+      return obj1.departamentos && obj1.departamentos.length > 0;
+    });
+
+    if (this.data_pdf.length === 0) {
+      this.toastr.error('No se han encontrado registros de timbres');
+    }
+  }
+
+  filtrarToleranciaRegimenCargo(){
+
+    this.data_pdf = this.data_pdf.filter((obj1: any) => {
+      obj1.empleados = obj1.empleados.filter((obj2: any) => {
+        obj2.timbres = obj2.timbres && obj2.timbres.filter((obj3: any) => {
+          let diferencia = obj3.diferencia;
+          const tolerancia = obj3.tolerancia * 60;
+          return (diferencia <= tolerancia) ? false : (this.tipoTolerancia === 'horario' ? (obj3.diferencia = diferencia, true) : (obj3.diferencia = diferencia - tolerancia, true));
+        });
+        return obj2.timbres && obj2.timbres.length > 0;
+      });
+      return obj1.empleados && obj1.empleados.length > 0;
+    });
+
+    if (this.data_pdf.length === 0) {
+      this.toastr.error('No se han encontrado registros de timbres');
+    }
+  }
+  
+  
 
   /*****************************************************************************
    * 

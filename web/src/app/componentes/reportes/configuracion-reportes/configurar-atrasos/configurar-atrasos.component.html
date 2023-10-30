@@ -11,8 +11,8 @@
   
   <div>
     <mat-radio-group [(ngModel)]="tolerancia" class="radio-group">
-      <mat-radio-button value="no_considerar">No considerar minutos de tolerancia</mat-radio-button>
-        <label class="elementos">Atraso <b>00:12</b> minutos</label>
+      <mat-radio-button  value="no_considerar">No considerar minutos de tolerancia</mat-radio-button>
+      <label class="elementos">Atraso <b>00:12</b> minutos</label>
       <mat-radio-button value="considerar">Considerar minutos de tolerancia</mat-radio-button>
     </mat-radio-group>
   
@@ -21,13 +21,13 @@
           <mat-radio-button value="horario">Con horario</mat-radio-button>
           <mat-radio-button value="tolerancia" class="radio2">Con tolerancia</mat-radio-button>
         </mat-radio-group>
-      </div>
+    </div>
       <label class="elementos">Atraso <b>00:12</b> minutos</label>
       <label class="elementos">Atraso <b>00:02</b> minutos</label>
   </div>
 
   <div style="text-align: center; margin-top: 1.5rem;"> 
       <button  class="btn btn-sm" (click)="cerrarDialogo()">Cancelar</button>
-      <button  class="btn btn-sm" (click)="aceptar()">Aceptar</button>
+      <button  class="btn btn-sm" (click)="aceptar()" [disabled]="(tolerancia === 'considerar' && tipoTolerancia==='')">Aceptar</button>
   </div>
 </mat-card-content>

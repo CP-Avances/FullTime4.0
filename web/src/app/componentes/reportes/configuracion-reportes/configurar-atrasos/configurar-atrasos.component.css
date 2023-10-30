@@ -1,10 +1,12 @@
-
 .btn { 
     margin-left: 15px;
     background-color: rgb(80,87,97); 
     color: white !important; 
  }
 
+:host ::ng-deep .mdc-form-field>label{
+  margin-bottom: 0;
+}
 
 p { font-size: 13px; }
 

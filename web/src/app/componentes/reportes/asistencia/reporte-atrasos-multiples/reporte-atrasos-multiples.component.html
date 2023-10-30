@@ -269,7 +269,12 @@
                                 <th scope="col" rowspan="2">CÓDIGO</th>
                                 <th scope="col" rowspan="2">EMPLEADO</th>
                                 <th scope="col" rowspan="1" colspan="2">HORARIO</th>
-                                <th scope="col" rowspan="1" colspan="2">TIMBRE</th>                             
+                                <th scope="col" rowspan="1" colspan="2">TIMBRE</th>
+                                <th scope="col" rowspan="2">TIPO PERMISO</th>
+                                <th scope="col" rowspan="2">DESDE</th>
+                                <th scope="col" rowspan="2">HASTA</th>
+                                <th scope="col" rowspan="2" colspan="2">PERMISO</th>
+                                <th scope="col" rowspan="2" *ngIf="tolerancia==='considerar'">TOLERANCIA</th>                             
                                 <th scope="col" rowspan="2" colspan="2">ATRASO</th>
                             </tr>
                             <tr style="text-align: center">
@@ -288,8 +293,14 @@
                                 <td>{{ t.horaHorario }}</td>
                                 <td>{{ t.fechaTimbre }}</td>
                                 <td>{{ t.horaTimbre }}</td>
-                                <td>{{ t.atrasoM }}</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td *ngIf="tolerancia==='considerar'">{{ t.tolerancia }}</td>
                                 <td>{{ t.atrasoT }}</td>
+                                <td>{{ t.atrasoM }}</td>
                             </tr>
                         </tbody>
                     </table>

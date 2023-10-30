@@ -942,7 +942,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
               Carnet: obj4.carnet,
               'Nombre carnet': obj4.carnet,
               Vacuna: obj4.tipo_vacuna,
-              Fecha: obj4.fecha.split('T')[0],
+              Fecha: new Date(obj4.fecha),
               Descripción: obj4.descripcion,
             };
             nuevo.push(ele);
