@@ -190,6 +190,7 @@ export class RegistrarAsistenciaComponent implements OnInit {
     funcion = this.VerificarFuncion();
 
     console.log('ver funcion ', funcion)
+    
 
     /*
     let datos = {
