@@ -95,7 +95,7 @@
             </div>
 
             <div style="text-align: center; padding-top: 5px; padding-bottom: 10px;">
-                <button class="btn btn-sm float-left" id="btn-raised" [disabled]="sistema">
+                <button class="btn btn-sm float-left" id="btn-raised" [disabled]="sistema" (click)="ReasignarSistema()">
                     Verificar Sistema
                 </button>
                 <button class="btn btn-sm float-right" id="btn-raised" [disabled]="manual" (click)="VerificarManual()">
