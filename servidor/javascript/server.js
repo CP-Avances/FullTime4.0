@@ -69,6 +69,7 @@ const vacunasRutas_1 = __importDefault(require("./rutas/empleado/empleadoVacuna/
 const reporteVacunasRutas_1 = __importDefault(require("./rutas/reportes/reporteVacunasRutas"));
 const salidasAntesRutas_1 = __importDefault(require("./rutas/reportes/salidasAntesRutas"));
 const reportesAtrasosRutas_1 = __importDefault(require("./rutas/reportes/reportesAtrasosRutas"));
+const reportesFaltasRutas_1 = __importDefault(require("./rutas/reportes/reportesFaltasRutas"));
 const auditoriaRutas_1 = __importDefault(require("./rutas/auditoria/auditoriaRutas"));
 const solicitudVacacionesRutas_1 = __importDefault(require("./rutas/reportes/solicitudVacacionesRutas"));
 const parametrosRutas_1 = __importDefault(require("./rutas/parametrosGenerales/parametrosRutas"));
@@ -172,6 +173,7 @@ class Servidor {
         this.app.use('/reportes/vacacion', kardexVacacionesRutas_1.default);
         this.app.use('/reportes/hora-extra', reporteHoraExtraRutas_1.default); //acceso controlado por
         this.app.use('/reporte', reportesRutas_1.default);
+        this.app.use('/reporte-faltas/', reportesFaltasRutas_1.default);
         this.app.use('/reportes-asistencias/', reportesAsistenciaRutas_1.default);
         this.app.use('/reporte-salidas-antes/', salidasAntesRutas_1.default);
         this.app.use('/reporte-atrasos/', reportesAtrasosRutas_1.default);

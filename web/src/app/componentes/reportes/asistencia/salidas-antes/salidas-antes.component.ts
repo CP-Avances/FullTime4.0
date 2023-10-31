@@ -361,7 +361,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
       return obj.departamentos.length > 0
     });
     this.data_pdf = []
-    this.restSalida.BuscarTimbresSalidasAnticipadasRegimenCargo(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.restSalida.BuscarTimbresSalidasAnticipadas(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
@@ -385,7 +385,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     });
 
     this.data_pdf = [];
-    this.restSalida.BuscarTimbresSalidasAnticipadas(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.restSalida.BuscarTimbresSalidasAnticipadasRegimenCargo(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       switch (accion) {
         case 'excel': this.exportToExcel('RegimenCargo'); break;
@@ -460,9 +460,9 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   }
 
   /******************************************************
-   * 
-   *          PDF
-   * 
+   *                                                    *
+   *                          PDF                       *
+   *                                                    *
    ******************************************************/
 
   generarPdf(action) {
@@ -555,26 +555,19 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
 
     if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
       data.forEach((obj1) => {
-        let arr_reg = obj1.empleados.map((o: any) => { return o.timbres.length })
-        let reg = this.SumarRegistros(arr_reg);
         if (this.bool.bool_cargo === true) {
           totalTiempoCargo = 0;
           n.push({
             style: 'tableMarginCabecera',
             table: {
-              widths: ['*', '*'],
+              widths: ['*'],
               headerRows: 1,
               body: [
                 [
                   {
-                    border: [true, true, false, true],
+                    border: [true, true, true, true],
                     bold: true,
                     text: 'CARGO: ' + obj1.name_cargo,
-                    style: 'itemsTableInfo',
-                  },
-                  {
-                    border: [false, true, true, true],
-                    text: 'N° Registros: ' + reg,
                     style: 'itemsTableInfo',
                   },
                 ],
@@ -586,19 +579,14 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
           n.push({
             style: 'tableMarginCabecera',
             table: {
-              widths: ['*', '*'],
+              widths: ['*'],
               headerRows: 1,
               body: [
                 [
                   {
-                    border: [true, true, false, true],
+                    border: [true, true, true, true],
                     bold: true,
                     text: 'RÉGIMEN: ' + obj1.regimen.nombre,
-                    style: 'itemsTableInfo',
-                  },
-                  {
-                    border: [false, true, true, true],
-                    text: 'N° Registros: ' + reg,
                     style: 'itemsTableInfo',
                   },
                 ],
@@ -898,25 +886,18 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
           totalTiempoDepartamento = 0;
           // LA CABECERA CUANDO SE GENERA EL PDF POR DEPARTAMENTOS
           if (this.bool.bool_dep === true) {
-            let arr_reg = obj1.empleado.map((o: any) => { return o.timbres.length })
-            let reg = this.SumarRegistros(arr_reg);
             n.push({
               style: 'tableMarginCabecera',
               table: {
-                widths: ['*', '*'],
+                widths: ['*'],
                 headerRows: 1,
                 body: [
                   [
                     {
-                      border: [true, true, false, true],
+                      border: [true, true, true, true],
                       text: 'DEPARTAMENTO: ' + obj1.name_dep,
                       style: 'itemsTableInfoBlanco'
                     },
-                    {
-                      border: [true, true, true, true],
-                      text: 'N° REGISTROS: ' + reg,
-                      style: 'itemsTableInfoBlanco'
-                    }
                   ]
                 ]
               }

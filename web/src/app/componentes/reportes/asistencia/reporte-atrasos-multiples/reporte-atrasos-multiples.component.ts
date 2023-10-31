@@ -597,26 +597,19 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
     if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
       data.forEach((obj1) => {
-        let arr_reg = obj1.empleados.map((o: any) => { return o.timbres.length })
-        let reg = this.SumarRegistros(arr_reg);
         if (this.bool.bool_cargo === true) {
           totalTiempoCargo = 0;
           n.push({
             style: 'tableMarginCabecera',
             table: {
-              widths: ['*', '*'],
+              widths: ['*'],
               headerRows: 1,
               body: [
                 [
                   {
-                    border: [true, true, false, true],
+                    border: [true, true, true, true],
                     bold: true,
                     text: 'CARGO: ' + obj1.name_cargo,
-                    style: 'itemsTableInfo',
-                  },
-                  {
-                    border: [false, true, true, true],
-                    text: 'N° Registros: ' + reg,
                     style: 'itemsTableInfo',
                   },
                 ],
@@ -628,19 +621,14 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
           n.push({
             style: 'tableMarginCabecera',
             table: {
-              widths: ['*', '*'],
+              widths: ['*'],
               headerRows: 1,
               body: [
                 [
                   {
-                    border: [true, true, false, true],
+                    border: [true, true, true, true],
                     bold: true,
                     text: 'RÉGIMEN: ' + obj1.regimen.nombre,
-                    style: 'itemsTableInfo',
-                  },
-                  {
-                    border: [false, true, true, true],
-                    text: 'N° Registros: ' + reg,
                     style: 'itemsTableInfo',
                   },
                 ],
@@ -1055,25 +1043,18 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
           totalTiempoDepartamento = 0;
           // LA CABECERA CUANDO SE GENERA EL PDF POR DEPARTAMENTOS
           if (this.bool.bool_dep === true) {
-            let arr_reg = obj1.empleado.map((o: any) => { return o.timbres.length })
-            let reg = this.SumarRegistros(arr_reg);
             n.push({
               style: 'tableMarginCabecera',
               table: {
-                widths: ['*', '*'],
+                widths: ['*'],
                 headerRows: 1,
                 body: [
                   [
                     {
-                      border: [true, true, false, true],
+                      border: [true, true, true, true],
                       text: 'DEPARTAMENTO: ' + obj1.name_dep,
                       style: 'itemsTableInfoBlanco'
                     },
-                    {
-                      border: [true, true, true, true],
-                      text: 'N° REGISTROS: ' + reg,
-                      style: 'itemsTableInfoBlanco'
-                    }
                   ]
                 ]
               }

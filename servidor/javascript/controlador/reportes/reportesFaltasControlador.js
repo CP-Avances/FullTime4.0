@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../../database"));
-class SalidasAntesControlador {
-    ReporteSalidasAnticipadas(req, res) {
+class FaltasControlador {
+    ReporteFaltas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log('datos recibidos', req.body);
             let { desde, hasta } = req.params;
@@ -22,7 +22,7 @@ class SalidasAntesControlador {
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.departamentos = yield Promise.all(obj.departamentos.map((ele) => __awaiter(this, void 0, void 0, function* () {
                     ele.empleado = yield Promise.all(ele.empleado.map((o) => __awaiter(this, void 0, void 0, function* () {
-                        o.timbres = yield BuscarSalidasAnticipadas(desde, hasta, o.codigo);
+                        o.timbres = yield BuscarFaltas(desde, hasta, o.codigo);
                         console.log('timbres:-------------------- ', o);
                         return o;
                     })));
@@ -38,18 +38,18 @@ class SalidasAntesControlador {
                 return obj;
             }).filter(obj => { return obj.departamentos.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No se ha encontrado registro de salidas anticipadas.' });
+                return res.status(400).jsonp({ message: 'No se ha encontrado registro de faltas.' });
             return res.status(200).jsonp(nuevo);
         });
     }
-    ReporteSalidasAnticipadasRegimenCargo(req, res) {
+    ReporteFaltasRegimenCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log('datos recibidos', req.body);
             let { desde, hasta } = req.params;
             let datos = req.body;
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                    o.timbres = yield BuscarSalidasAnticipadas(desde, hasta, o.codigo);
+                    o.timbres = yield BuscarFaltas(desde, hasta, o.codigo);
                     console.log('Timbres: ', o);
                     return o;
                 })));
@@ -60,23 +60,23 @@ class SalidasAntesControlador {
                 return e;
             }).filter(e => { return e.empleados.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No se ha encontrado registro de salidas anticipadas.' });
+                return res.status(400).jsonp({ message: 'No se ha encontrado registro de faltas.' });
             return res.status(200).jsonp(nuevo);
         });
     }
 }
-const SALIDAS_ANTICIPADAS_CONTROLADOR = new SalidasAntesControlador();
-exports.default = SALIDAS_ANTICIPADAS_CONTROLADOR;
-const BuscarSalidasAnticipadas = function (fec_inicio, fec_final, codigo) {
+const FALTAS_CONTROLADOR = new FaltasControlador();
+exports.default = FALTAS_CONTROLADOR;
+const BuscarFaltas = function (fec_inicio, fec_final, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield database_1.default.query('SELECT CAST(fec_hora_horario AS VARCHAR), CAST(fec_hora_timbre AS VARCHAR), ' +
-            'EXTRACT(epoch FROM (fec_hora_horario - fec_hora_timbre)) AS diferencia, ' +
-            'codigo, estado_timbre, tipo_entr_salida AS accion, tipo_dia ' +
-            'FROM plan_general WHERE CAST(fec_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' ' +
-            'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 ' +
-            'AND fec_hora_timbre < fec_hora_horario AND tipo_dia NOT IN (\'L\', \'FD\') ' +
-            'AND tipo_entr_salida = \'S\' ' +
-            'ORDER BY fec_hora_horario ASC', [fec_inicio, fec_final, codigo])
+        console.log('aca estoy');
+        return yield database_1.default.query('SELECT codigo, CAST(fec_horario AS VARCHAR) ' +
+            'FROM plan_general WHERE fec_horario BETWEEN $1 ' +
+            'AND $2 AND codigo = $3 ' +
+            'AND tipo_dia NOT IN (\'L\', \'FD\') ' +
+            'GROUP BY codigo, fec_horario ' +
+            'HAVING COUNT(fec_hora_timbre) = 0 ' +
+            'ORDER BY fec_horario ASC', [fec_inicio, fec_final, codigo])
             .then(res => {
             return res.rows;
         });

@@ -65,6 +65,7 @@ import VACUNA_RUTAS from './rutas/empleado/empleadoVacuna/vacunasRutas';
 import VACUNAS_REPORTE_RUTAS from './rutas/reportes/reporteVacunasRutas';
 import SALIDAS_ANTICIPADAS_RUTAS from './rutas/reportes/salidasAntesRutas';
 import REPORTES_ATRASOS_RUTAS from './rutas/reportes/reportesAtrasosRutas';
+import FALTAS_RUTAS from './rutas/reportes/reportesFaltasRutas';
 import AUDITORIA_RUTAS from './rutas/auditoria/auditoriaRutas';
 import VACACIONES_REPORTES_RUTAS from './rutas/reportes/solicitudVacacionesRutas';
 import PARAMETROS_RUTAS from './rutas/parametrosGenerales/parametrosRutas';
@@ -193,6 +194,7 @@ class Servidor {
         this.app.use('/reportes/vacacion', KARDEX_VACACION_RUTAS);
         this.app.use('/reportes/hora-extra', REPORTE_HORA_EXTRA_RUTAS); //acceso controlado por
         this.app.use('/reporte', REPORTES_RUTAS);
+        this.app.use('/reporte-faltas/', FALTAS_RUTAS);
         this.app.use('/reportes-asistencias/', REPORTES_A_RUTAS);
         this.app.use('/reporte-salidas-antes/', SALIDAS_ANTICIPADAS_RUTAS);
         this.app.use('/reporte-atrasos/', REPORTES_ATRASOS_RUTAS);
