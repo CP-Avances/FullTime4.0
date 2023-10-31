@@ -1085,6 +1085,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
               ele = {
                 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
                 'Departamento': obj2.name_dep,
+                'Régimen': obj3.regimen[0].name_regimen,
                 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
                 'Fecha Timbre': servidor_fecha, 'Hora Timbre': servidor_hora,
                 'Fecha Timbre Dispositivo': new Date(obj4.fec_hora_timbre), 'Hora Timbre Dispositivo': obj4.fec_hora_timbre.split(' ')[1],
@@ -1095,6 +1096,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
               ele = {
                 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
                 'Departamento': obj2.name_dep,
+                'Régimen': obj3.regimen[0].name_regimen,
                 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
                 'Fecha Timbre': servidor_fecha, 'Hora Timbre': servidor_hora,
                 'Acción': accionT, 'Reloj': obj4.id_reloj,
@@ -1139,6 +1141,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
             ele = {
               'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
               'Departamento': obj2.departamento,
+              'Régimen': obj2.regimen[0].name_regimen,
               'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
               'Fecha Timbre': servidor_fecha, 'Hora Timbre': servidor_hora,
               'Fecha Timbre Dispositivo': new Date(obj3.fec_hora_timbre), 'Hora Timbre Dispositivo': obj3.fec_hora_timbre.split(' ')[1],
@@ -1149,6 +1152,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
             ele = {
               'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
               'Departamento': obj2.departamento,
+              'Régimen': obj2.regimen[0].name_regimen,
               'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
               'Fecha Timbre': servidor_fecha, 'Hora Timbre': servidor_hora,
               'Acción': accionT, 'Reloj': obj3.id_reloj,

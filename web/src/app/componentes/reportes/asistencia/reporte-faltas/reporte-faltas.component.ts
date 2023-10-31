@@ -472,7 +472,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       documentDefinition = this.getDocumentDefinicion();
     };
 
-    let doc_name = "Salidas_anticipadas.pdf";
+    let doc_name = "Faltas.pdf";
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -1029,25 +1029,24 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     return hora + ':' + min + ':00'
   }
 
-  /** ************************************************************************************************** ** 
+/** ************************************************************************************************** ** 
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
    exportToExcel(tipo: string): void {
-    switch (tipo) {        
-      case 'tabulado':
-        const wsr_tab: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfTabulado(this.data_pdf));
-        const wb_tab: xlsx.WorkBook = xlsx.utils.book_new();
-        xlsx.utils.book_append_sheet(wb_tab, wsr_tab, 'Faltas');
-        xlsx.writeFile(wb_tab, "Faltas_Tabulado" + new Date().getTime() + '.xlsx');
+    switch (tipo) {
+      case 'RegimenCargo':
+        const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfRegimenCargo(this.data_pdf));
+        const wb_regimen_cargo: xlsx.WorkBook = xlsx.utils.book_new();
+        xlsx.utils.book_append_sheet(wb_regimen_cargo, wsr_regimen_cargo, 'Faltas');
+        xlsx.writeFile(wb_regimen_cargo, 'Faltas.xlsx');
         break;
       default:
         const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefault(this.data_pdf));
         const wb: xlsx.WorkBook = xlsx.utils.book_new();
         xlsx.utils.book_append_sheet(wb, wsr, 'Faltas');
-        xlsx.writeFile(wb, "Faltas_default" + new Date().getTime() + '.xlsx');
+        xlsx.writeFile(wb, 'Faltas.xlsx');
         break;
     }
-    
   }
 
   MapingDataPdfDefault(array: Array<any>) {
@@ -1055,46 +1054,47 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     array.forEach((obj1: IReporteFaltas) => {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
-          obj3.faltas.forEach((obj4) => {
-            let ele = {
-              'Id Sucursal': obj1.id_suc, 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc, 
-              'Id Departamento': obj2.id_depa, 'Departamento': obj2.name_dep,
-              'Id Empleado': obj3.id, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
-              'Fecha': obj4.fecha.split(' ')[0],
+          obj3.timbres.forEach((obj4: any) => {
+            let ele = { 
+              'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
+              'Departamento': obj2.name_dep,
+              'Régimen': obj3.regimen[0].name_regimen,
+              'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
+              'Fecha': new Date(obj4.fec_horario),
             }
-            nuevo.push(ele)
+            nuevo.push(ele);
           })
         })
       })
     })
-    return nuevo
+    return nuevo;
   }
-  
-  MapingDataPdfTabulado(array: Array<any>) {
+
+  MapingDataPdfRegimenCargo(array: Array<any>) {
+    console.log(this.data_pdf);
     let nuevo: Array<any> = [];
-    array.forEach((obj1: IReporteFaltas) => {
-      obj1.departamentos.forEach(obj2 => {
-        obj2.empleado.forEach((obj3: any) => {
-          obj3.faltas.forEach((obj4) => {
-            let ele = {
-              'Id Sucursal': obj1.id_suc, 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc, 
-              'Id Departamento': obj2.id_depa, 'Departamento': obj2.name_dep,
-              'Id Empleado': obj3.id, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
-              'Contrado': obj3.contrato, 'Cargo': obj3.cargo,
-              'Fecha': obj4.fecha.split(' ')[0]
-            }
-            nuevo.push(ele)
-          })
+    array.forEach((obj1: any) => {
+      obj1.empleados.forEach((obj2: any) => {
+        obj2.timbres.forEach((obj3: any) => {
+          let ele = {
+            'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
+            'Departamento': obj2.departamento,
+            'Régimen': obj2.regimen[0].name_regimen,
+            'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
+            'Fecha': new Date(obj3.fec_horario),
+          }
+          nuevo.push(ele);
         })
       })
     })
-    return nuevo
+    return nuevo;
   }
 
     //METODOS PARA EXTRAER LOS TIMBRES EN UNA LISTA Y VISUALIZARLOS
     extraerTimbres() {
       this.timbres = [];
       let n = 0;
+      console.log(this.data_pdf);
       this.data_pdf.forEach((obj1: IReporteFaltas) => {
         obj1.departamentos.forEach(obj2 => {
           obj2.empleado.forEach((obj3: any) => {
@@ -1105,8 +1105,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
                 ciudad: obj1.ciudad, sucursal: obj1.name_suc,
                 departamento: obj2.name_dep,
                 empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
-                fechaHorario: obj4.fec_hora_horario.split(' ')[0], horaHorario: obj4.fec_hora_horario.split(' ')[1],
-                fechaTimbre: obj4.fec_hora_timbre.split(' ')[0], horaTimbre: obj4.fec_hora_timbre.split(' ')[1],
+                fecha: obj4.fec_horario
               }
               this.timbres.push(ele);
             })
@@ -1127,8 +1126,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
               ciudad: obj2.ciudad, sucursal: obj2.sucursal,
               departamento: obj2.departamento,
               empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
-              fechaHorario: obj3.fec_hora_horario.split(' ')[0], horaHorario: obj3.fec_hora_horario.split(' ')[1],
-              fechaTimbre: obj3.fec_hora_timbre.split(' ')[0], horaTimbre: obj3.fec_hora_timbre.split(' ')[1],
+              fecha: obj3.fec_horario
             }
             this.timbres.push(ele);
           })
