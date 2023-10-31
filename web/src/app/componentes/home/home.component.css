@@ -5,6 +5,12 @@
     width: 50%;
 }
 
+label {
+    vertical-align: middle;
+    text-align: center;
+    align-items: center;
+}
+
 .example-card {
     max-width: 500px;
 }
@@ -21,62 +27,186 @@
 }
 
 .icon-menu {
-    margin-right: 10px;
-    margin-left: -7px;
+    margin: auto;
+    vertical-align: middle;
+    margin-right: 8px !important;
     color: white;
 }
 
-/* REPORTES */
-.boton-uno {
-    background: linear-gradient(to right, rgb(245, 4, 96), rgb(173, 4, 69));
-    font-size: 16px;
+.titulo-card {
+    margin: auto;
+    vertical-align: middle;
+    margin-right: 8px !important;
+    color: white;
+    font-size: 16px !important;
 }
 
-/* HORAS EXTRAS */
-.boton-dos {
-    background: linear-gradient(to right, rgb(15, 206, 171), rgb(2, 100, 82));
-    font-size: 16px;
+/*Infotmacion Usuario*/
+.card-info {
+    height: 100%;
+    background: linear-gradient(to right, rgb(32, 119, 150), rgb(18, 96, 125));
+    font-size: 14px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+    margin-left: 5px;
 }
 
-/* VACACIONES */
-.boton-tre {
-    background: linear-gradient(to right, rgb(1, 168, 23), rgb(0, 107, 14));
-    font-size: 16px;
+.card-info:hover {
+    cursor: pointer;
+    transform: scale(1.03);
 }
 
 /* PERMISOS */
-.boton-cua {
+.card-permi {
+    height: 215px;
     background: linear-gradient(to right, rgb(235, 212, 8), rgb(177, 159, 2));
-    font-size: 16px;
+    font-size: 14px;
+    border-radius: 10px;
+    transition: transform 0.3s;
 }
 
-/* ACCIONES PERSONAL */
-.boton-cin {
-    background: linear-gradient(to right, rgb(255, 67, 224), rgb(185, 45, 162));
-    font-size: 15px;
+.card-permi:hover {
+    cursor: pointer;
+    transform: scale(1.03);
 }
 
-/* MOVIL */
-.boton-sei {
-    background: linear-gradient(to right, rgb(0, 119, 255), rgb(0, 84, 180));
-    font-size: 15px;
+/* VACACIONES */
+.card-vaca {
+    height: 215px;
+    background: linear-gradient(to right, rgb(27, 135, 52), rgb(13, 94, 32));
+    font-size: 14px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+    margin-right: 5px;
+}
+
+.card-vaca:hover {
+    cursor: pointer;
+    transform: scale(1.03);
+}
+
+/* REPORTES */
+.card-timbreTele {
+    background: linear-gradient(to right, rgb(100, 159, 28), rgb(74, 124, 12));
+    height: 200px;
+    width: 225px;
+    font-size: 14px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+    margin-left: 6px;
+    margin-right: 6px;
+}
+
+.card-timbreTele:hover {
+    cursor: pointer;
+    transform: scale(1.03);
+}
+
+/* HORAS EXTRAS */
+.card-horasExtras {
+    height: 215px;
+    background: linear-gradient(to right, rgb(138, 71, 213), rgb(113, 47, 189));
+    font-size: 14px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+    margin-left: 5px;
+}
+
+.card-horasExtras:hover {
+    cursor: pointer;
+    transform: scale(1.03);
 }
 
 /* ALIMENTACION */
-.boton-sie {
+.card-alimentacion {
+    height: 215px;
     background: linear-gradient(to right, rgb(241, 160, 67), rgb(148, 81, 4));
-    font-size: 16px;
+    font-size: 14px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+}
+
+.card-alimentacion:hover {
+    cursor: pointer;
+    transform: scale(1.03);
+}
+
+/* ACCIONES PERSONAL */
+.card-accionPerso {
+    background: linear-gradient(to right, rgb(180, 87, 160), rgb(119, 51, 104));
+    height: 200px;
+    width: 225px;
+    font-size: 14px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+    margin-left: 6px;
+    margin-right: 6px;
+}
+
+.card-accionPerso:hover {
+    cursor: pointer;
+    transform: scale(1.03);
+}
+
+/* MOVIL */
+.card-aplicacionMovil {
+    background: linear-gradient(to right, rgb(39, 124, 222), rgb(16, 84, 161));
+    height: 200px;
+    width: 225px;
+    font-size: 14px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+    margin-left: 6px;
+    margin-right: 6px;
+}
+
+.card-aplicacionMovil:hover {
+    cursor: pointer;
+    transform: scale(1.03);
 }
 
 /* GEOLOCALIZACION */
-.boton-ocho {
-    background: linear-gradient(to right, rgb(11, 194, 226), rgb(2, 113, 146));
-    font-size: 16px;
+.card-geolocali {
+    background: linear-gradient(to right, rgb(28, 169, 173), rgb(15, 116, 120));
+    height: 200px;
+    width: 225px;
+    font-size: 14px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+    margin-left: 6px;
+    margin-right: 6px;
 }
 
-.boton-inactivo {
+.card-geolocali:hover {
+    cursor: pointer;
+    transform: scale(1.03);
+}
+
+.card-inactivo {
     background: linear-gradient(to right, rgb(164, 166, 167), rgb(131, 132, 133));
-    font-size: 16px;
+    font-size: 14px;
+    height: 215px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+}
+
+.card-inactivo_ {
+    background: linear-gradient(to right, rgb(164, 166, 167), rgb(131, 132, 133));
+    height: 200px;
+    width: 225px;
+    font-size: 14px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+}
+
+.card-inactivo:hover {
+    cursor: pointer;
+    transform: scale(1.03);
+}
+
+.card-inactivo_:hover {
+    cursor: pointer;
+    transform: scale(1.03);
 }
 
 #charts_inasistencia {
@@ -136,4 +266,33 @@
         font-size: 15px;
     }
 
+}
+
+.texto {
+    margin: auto;
+}
+
+#avatar {
+    border-radius: 100%;
+    height: 130px;
+    width: 130px;
+    background-color: rgb(126, 126, 126);
+    margin-bottom: 10px;
+}
+
+#avatarImagen {
+    border-radius: 100%;
+    height: 130px;
+    width: 130px;
+}
+
+.iniciales {
+    color: white;
+    font-weight: bold;
+    font-size: 60px;
+}
+
+.cont_imagen {
+    width: min-content;
+    margin: auto;
 }

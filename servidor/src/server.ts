@@ -70,7 +70,6 @@ import AUDITORIA_RUTAS from './rutas/auditoria/auditoriaRutas';
 import VACACIONES_REPORTES_RUTAS from './rutas/reportes/solicitudVacacionesRutas';
 import PARAMETROS_RUTAS from './rutas/parametrosGenerales/parametrosRutas';
 import UBICACION_RUTAS from './rutas/empleado/empleadoUbicacion/emplUbicacionRutas';
-import ASISTENCIA_USUARIOS_RUTAS from './rutas/asistencia/asistenciaRutas';
 
 import { createServer, Server } from 'http';
 
@@ -144,9 +143,6 @@ class Servidor {
         // Horarios
         this.app.use('/empleadoHorario', EMPLEADO_HORARIOS_RUTAS);
         this.app.use('/detalleHorario', DETALLE_CATALOGO_HORARIO_RUTAS);
-
-        // ASISTENCIA
-        this.app.use('/asistencia-usuarios', ASISTENCIA_USUARIOS_RUTAS);
 
         // Enrolados
         this.app.use('/relojes', RELOJES_RUTA);

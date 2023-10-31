@@ -74,7 +74,6 @@ const auditoriaRutas_1 = __importDefault(require("./rutas/auditoria/auditoriaRut
 const solicitudVacacionesRutas_1 = __importDefault(require("./rutas/reportes/solicitudVacacionesRutas"));
 const parametrosRutas_1 = __importDefault(require("./rutas/parametrosGenerales/parametrosRutas"));
 const emplUbicacionRutas_1 = __importDefault(require("./rutas/empleado/empleadoUbicacion/emplUbicacionRutas"));
-const asistenciaRutas_2 = __importDefault(require("./rutas/asistencia/asistenciaRutas"));
 const http_1 = require("http");
 var io;
 class Servidor {
@@ -132,8 +131,6 @@ class Servidor {
         // Horarios
         this.app.use('/empleadoHorario', empleadoHorariosRutas_1.default);
         this.app.use('/detalleHorario', detalleCatHorarioRutas_1.default);
-        // ASISTENCIA
-        this.app.use('/asistencia-usuarios', asistenciaRutas_2.default);
         // Enrolados
         this.app.use('/relojes', catRelojesRuta_1.default);
         //Redireccionamiento a páginas que contienen catálogos

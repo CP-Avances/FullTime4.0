@@ -1,11 +1,11 @@
-// CONEXIÓN CON LA BASE DE DATOS POSTGRESQL
+// CONEXION CON LA BASE DE DATOS POSTGRESQL
 
 import Pool from 'pg-pool';
 
 const pool = new Pool({
   user: 'fulltime',
-  host: '186.4.226.49',
-  port: 9192,
+  host: '192.168.0.156', //'186.4.226.49',
+  port: 5432,
   database: 'fulltime4_prueba',
   password: 'fulltime'
 })

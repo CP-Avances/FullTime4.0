@@ -1,4 +1,4 @@
-<div class="container" style="padding-top: 15px;">
+<div class="container" style="padding-top: 15px;" *ngIf="ver_asistencia">
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
             <span>ASISTENCIA</span>
@@ -70,12 +70,66 @@
                             (click)="BuscarDatosAsistencia(formulario.value)">
                             Buscar
                         </button>
-                        <button class="btn btn-sm" id="btn-raised" type="submit">
+                        <button class="btn btn-sm" id="btn-raised" type="submit" (click)="Limpiar()">
                             Limpiar
                         </button>
                     </div>
                 </div>
             </div>
         </form>
+
+        <hr>
+        <div class="container" style="padding-top: 5px; text-align: center;">
+            <div class="mat-elevation-z8" style="background: white;">
+                <div id="resultados">RESULTADO DE BÚSQUEDA</div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col" id="centrar" rowspan="2">CÓDIGO</th>
+                                <th scope="col" id="centrar" rowspan="2">NOMBRE</th>
+                                <th scope="col" id="centrar" rowspan="2">APELLIDO</th>
+                                <th scope="col" id="centrar" rowspan="2">FECHA</th>
+                                <th scope="col" id="centrar" colspan="2">HORARIO</th>
+                                <th scope="col" id="centrar" colspan="2">TIMBRE</th>
+                                <th scope="col" id="centrar" rowspan="2">TIPO</th>
+                                <th scope="col" id="centrar" rowspan="2">ACCIONES</th>
+                            </tr>
+                            <tr>
+                                <th id="centrar" scope="col">Fecha</th>
+                                <th id="centrar" scope="col">Hora</th>
+                                <th id="centrar" scope="col">Fecha</th>
+                                <th id="centrar" scope="col">Hora</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let a of asistencia | paginate:tamanio_pagina:numero_pagina">
+                                <td>{{a.codigo}}</td>
+                                <td>{{a.nombre}}</td>
+                                <td>{{a.apellido}}</td>
+                                <td>{{a.fecha_general_}}</td>
+                                <td>{{a.fecha_horario_}}</td>
+                                <td>{{a.hora_horario_}}</td>
+                                <td>{{a.fecha_timbre_}}</td>
+                                <td>{{a.hora_timbre_}}</td>
+                                <td>{{a.tipo_}}</td>
+                                <td class="justify-content-center">
+                                    <i class="fas fa-eye" id="t-ver" matSuffix matTooltipPosition="right"
+                                        matTooltip="Ver detalle del registro." (click)="VerDetalle(a)">
+                                        <p>Revisar</p>
+                                    </i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <mat-paginator id="pagina" [length]="asistencia.length" [pageSize]="tamanio_pagina"
+                    [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
+                </mat-paginator>
+            </div>
+        </div>
     </mat-card>
 </div>
+
+<!--  ***************************  PANTALLA REVISION DE ASISTENCIA  ********************************  -->
+<app-registrar-asistencia *ngIf="ver_detalle" [informacion]="informacion"></app-registrar-asistencia>

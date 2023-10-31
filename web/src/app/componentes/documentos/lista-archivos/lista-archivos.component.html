@@ -15,6 +15,7 @@
   <div style="width: 100%;" >
     <div style="float: left;" *ngIf="Dirname != 'permisos' && Dirname != 'contratos'">
       <mat-form-field id="t-inputs">
+        <mat-icon matPrefix>search</mat-icon>
         <input matInput placeholder="Buscar archivo" minlength="2" [formControl]="nombreF"
         [(ngModel)]="filtroDescripcion" (input)="Filtrar($event, 'archivo')">
       </mat-form-field>
@@ -69,6 +70,7 @@
 
     <div>
       <mat-form-field id="t-inputs">
+        <mat-icon matPrefix>search</mat-icon>
         <input matInput placeholder="Buscar Carpeta"   minlength="2" [formControl]="nombreF"
         [(ngModel)]="filtroDescripcion" (input)="Filtrar($event, 'carpeta')">
       </mat-form-field>
@@ -119,6 +121,7 @@
   <div class="table-responsive">
     <div *ngIf="listap">
       <mat-form-field id="t-inputs">
+        <mat-icon matPrefix>search</mat-icon>
         <input matInput placeholder="Buscar archivo" minlength="2" [formControl]="nombreF"
         [(ngModel)]="filtroDescripcion" (input)="Filtrar($event, 'archivo')">
       </mat-form-field>

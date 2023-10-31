@@ -1,0 +1,40 @@
+mat-label {
+    font-size: 14px;
+}
+
+.btn {
+    background-color: rgb(80, 87, 97);
+    color: white;
+    margin: 5px 10px 5px 10px;
+}
+
+mat-form-field {
+    width: 225px;
+    padding: 10px 10px 0px 10px;
+}
+
+tr {
+    text-align: center;
+}
+
+table {
+    width: 100%;
+    font-size: 12px;
+    border: 1px solid #ccc;
+}
+
+td {
+    padding-top: 10px;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid #ccc;
+}
+
+#centrar {
+    border: 1px solid #ccc;
+    vertical-align: middle;
+}
+
+p {
+    font-size: x-small;
+}

@@ -36,28 +36,33 @@ class AsistenciaControlador {
                         EMPLEADO = yield database_1.default.query(`
                         SELECT codigo FROM empleados WHERE UPPER(apellido) ilike '%${apellido}%'
                         `);
+                        if (EMPLEADO.rowCount != 0) {
+                            // TRATAMIENTO DE CODIGOS
+                            var datos = [];
+                            datos = EMPLEADO.rows;
+                            datos.forEach((obj) => {
+                                //console.log('ver codigos ', obj.codigo)
+                                if (codigos === '') {
+                                    codigos = '\'' + obj.codigo + '\'';
+                                }
+                                else {
+                                    codigos = codigos + ', \'' + obj.codigo + '\'';
+                                }
+                            });
+                        }
+                        else {
+                            verificador = 1;
+                        }
                     }
                 }
             }
             else {
                 codigos = '\'' + codigo + '\'';
             }
-            //console.log('ver codigo1 ', codigos)
-            //console.log('ver empleados 1 ', EMPLEADO.rows)
             if (verificador === 0) {
-                var datos = [];
-                datos = EMPLEADO.rows;
-                datos.forEach((obj) => {
-                    //console.log('ver codigos ', obj.codigo)
-                    if (codigos === '') {
-                        codigos = '\'' + obj.codigo + '\'';
-                    }
-                    else {
-                        codigos = codigos + ', \'' + obj.codigo + '\'';
-                    }
-                });
-                //console.log('ver codigo ', codigos)
-                const ASISTENCIA = yield database_1.default.query("SELECT p_g.*, empleado.cedula, empleado.nombre, empleado.apellido " +
+                const ASISTENCIA = yield database_1.default.query("SELECT p_g.*, p_g.fec_hora_horario::time AS hora_horario, p_g.fec_hora_horario::date AS fecha_horario, " +
+                    "p_g.fec_hora_timbre::date AS fecha_timbre, p_g.fec_hora_timbre::time AS hora_timbre, " +
+                    "empleado.cedula, empleado.nombre, empleado.apellido " +
                     "FROM plan_general p_g " +
                     "INNER JOIN empleados empleado on empleado.codigo = p_g.codigo AND p_g.codigo IN (" + codigos + ")" +
                     "WHERE p_g.fec_horario BETWEEN $1 AND $2 " +
