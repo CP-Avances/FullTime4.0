@@ -115,6 +115,9 @@ export class HomeComponent implements OnInit {
       } else {
         this.iniciales = data[0].nombre.split(" ")[0].slice(0, 1) + data[0].apellido.split(" ")[0].slice(0, 1);
         this.mostrarImagen = false;
+        this.ImagenLocalUsuario("assets/imagenes/user.png").then(
+          (result) => (this.imagenEmpleado = result)
+        );
       }
     })
   }

@@ -51,9 +51,15 @@ export class PlanGeneralService {
     return this.http.post<any>(`${environment.url}/planificacion_general/horario-solo-planificacion/lista-descanso`, datos);
   }
 
+  // METODO PARA CONSULTAR ASISTENCIA
+  ConsultarAsistencia(data: any) {
+    return this.http.post<any>(`${environment.url}/planificacion_general/buscar-asistencia`, data);
+  }
 
-
-
+  // METODO PARA ACTUALIZAR ASISTENCIA MANUAL
+  ActualizarAsistenciaManual(data: any) {
+    return this.http.post<any>(`${environment.url}/planificacion_general/actualizar-asistencia/manual`, data);
+  }
 
 
 

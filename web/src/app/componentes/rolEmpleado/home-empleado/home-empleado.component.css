@@ -158,9 +158,30 @@
 }
 
 .card-inactivo {
-    background: linear-gradient(to right, rgb(105, 106, 107), rgb(88, 89, 89));
+    background: linear-gradient(to right, rgb(164, 166, 167), rgb(131, 132, 133));
+    font-size: 14px;
+    height: 215px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+}
+
+.card-inactivo_ {
+    background: linear-gradient(to right, rgb(164, 166, 167), rgb(131, 132, 133));
+    height: 200px;
+    width: 225px;
     font-size: 14px;
     border-radius: 10px;
+    transition: transform 0.3s;
+}
+
+.card-inactivo:hover {
+    cursor: pointer;
+    transform: scale(1.03);
+}
+
+.card-inactivo_:hover {
+    cursor: pointer;
+    transform: scale(1.03);
 }
 
 #charts_atraso {

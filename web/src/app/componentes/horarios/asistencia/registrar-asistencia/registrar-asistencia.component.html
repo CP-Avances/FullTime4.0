@@ -2,7 +2,7 @@
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
             <span>VERIFICAR ASISTENCIA</span>
-            <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+            <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana(1)">highlight_off</mat-icon>
         </div>
 
         <div class="container">
@@ -16,59 +16,58 @@
                         {{informacion.detalle.nombre}} {{informacion.detalle.apellido}}
                     </b>
                 </div>
-                <div class="col-md-4">
-                    <br>
-                    <div class="row">
-                        <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
-                            Código:
-                        </div>
-                        <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
-                            {{informacion.detalle.codigo}}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
-                            Cédula:
-                        </div>
-                        <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
-                            {{informacion.detalle.cedula}}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
-                            Fecha:
-                        </div>
-                        <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
-                            {{informacion.detalle.fecha_general_}}
-                        </div>
-                    </div>
-                </div>
-
                 <div class="row">
+                    <div class="col-md-4">
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                                Código:
+                            </div>
+                            <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
+                                {{informacion.detalle.codigo}}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                                Cédula:
+                            </div>
+                            <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
+                                {{informacion.detalle.cedula}}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                                Fecha:
+                            </div>
+                            <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
+                                {{informacion.detalle.fecha_general_}}
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="col-md-4">
                         <br>
                         <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(3, 5, 123);">
+                            <div class="col-md-4" style="text-align: right !important; color: rgb(223, 37, 20);">
                                 Fecha horario:
                             </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(3, 5, 123);">
+                            <div class="col-md-8" style="text-align: left !important; color: rgb(223, 37, 20);">
                                 {{informacion.detalle.fecha_horario_}}
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(3, 5, 123);">
+                            <div class="col-md-4" style="text-align: right !important; color: rgb(223, 37, 20);">
                                 Hora horario:
                             </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(3, 5, 123);">
+                            <div class="col-md-8" style="text-align: left !important; color: rgb(223, 37, 20);">
                                 {{informacion.detalle.hora_horario_}}
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(3, 5, 123);">
+                            <div class="col-md-4" style="text-align: right !important; color: rgb(223, 37, 20);">
                                 Tipo:
                             </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(3, 5, 123);">
+                            <div class="col-md-8" style="text-align: left !important; color: rgb(223, 37, 20);">
                                 {{informacion.detalle.tipo_}}
                             </div>
                         </div>
@@ -94,6 +93,68 @@
                     </div>
                 </div>
             </div>
+
+            <div style="text-align: center; padding-top: 5px; padding-bottom: 10px;">
+                <button class="btn btn-sm float-left" id="btn-raised" [disabled]="sistema">
+                    Verificar Sistema
+                </button>
+                <button class="btn btn-sm float-right" id="btn-raised" [disabled]="manual" (click)="VerificarManual()">
+                    Verificar Manual
+                </button>
+            </div>
+        </div>
+
+        <div class="container" style="padding-top: 5px; text-align: center; padding-bottom: 20px;" *ngIf="ver_timbres">
+            <hr>
+            <div class="mat-elevation-z8" style="background: white;">
+                <div class="d-flex bd-highlight" id="resultados">
+                    <span class="w-100 bd-highlight">
+                        ASIGNACIÓN MANUAL DE TIMBRES
+                    </span>
+                    <mat-icon class="float-right" id="cerrar" (click)="CerrarTimbres()">highlight_off</mat-icon>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col" id="centrar" rowspan="2">CÓDIGO</th>
+                                <th scope="col" id="centrar" rowspan="2">NOMBRE</th>
+                                <th scope="col" id="centrar" rowspan="2">APELLIDO</th>
+                                <th scope="col" id="centrar" colspan="2">TIMBRE</th>
+                                <th scope="col" id="centrar" rowspan="2">TIPO</th>
+                                <th scope="col" id="centrar" rowspan="2">ACCIONES</th>
+                            </tr>
+                            <tr>
+                                <th id="centrar" scope="col">Fecha</th>
+                                <th id="centrar" scope="col">Hora</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let t of timbres | paginate:tamanio_pagina:numero_pagina">
+                                <td>{{t.codigo}}</td>
+                                <td>{{informacion.detalle.nombre}}</td>
+                                <td>{{informacion.detalle.apellido}}</td>
+                                <td>{{t.fecha}}</td>
+                                <td>{{t.hora}}</td>
+                                <td>{{informacion.detalle.tipo_}}</td>
+                                <td class="justify-content-center">
+                                    <i class="fas fa-eye" id="t-ver" matSuffix matTooltipPosition="right"
+                                        matTooltip="Asignar timbre a la asistencia." (click)="ReasignarTimbre(t)">
+                                        <p>Asignar</p>
+                                    </i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <mat-paginator id="pagina" [length]="timbres.length" [pageSize]="tamanio_pagina"
+                    [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
+                </mat-paginator>
+            </div>
+        </div>
+        <div class="pantalla-progress" *ngIf="progreso">
+            <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
+            </mat-progress-spinner>
         </div>
     </mat-card>
 </div>

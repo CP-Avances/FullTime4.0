@@ -59,10 +59,7 @@ class AsistenciaControlador {
             else {
                 codigos = '\'' + codigo + '\'';
             }
-            //console.log('ver codigo1 ', codigos)
-            //console.log('ver empleados 1 ', EMPLEADO.rows)
             if (verificador === 0) {
-                //console.log('ver codigo ', codigos)
                 const ASISTENCIA = yield database_1.default.query("SELECT p_g.*, p_g.fec_hora_horario::time AS hora_horario, p_g.fec_hora_horario::date AS fecha_horario, " +
                     "p_g.fec_hora_timbre::date AS fecha_timbre, p_g.fec_hora_timbre::time AS hora_timbre, " +
                     "empleado.cedula, empleado.nombre, empleado.apellido " +

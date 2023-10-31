@@ -27,21 +27,24 @@ export class TimbresService {
     return this.http.post<any>(`${environment.url}/timbres/admin/`, datos);
   }
 
-  ObtenerTimbresFechaEmple(datos: any){
+  ObtenerTimbresFechaEmple(datos: any) {
     const params = new HttpParams()
-    .set('codigo',datos.codigo)
-    .set('cedula',datos.cedula)
-    .set('fecha',datos.fecha)
-    return this.http.get<any>(`${environment.url}/timbres/timbresfechaemple`,{params});
+      .set('codigo', datos.codigo)
+      .set('cedula', datos.cedula)
+      .set('fecha', datos.fecha)
+    return this.http.get<any>(`${environment.url}/timbres/timbresfechaemple`, { params });
   }
 
-  
+
   EditarTimbreEmpleado(data: any) {
     return this.http.put(`${environment.url}/timbres/timbre/editar`, data);
   }
 
 
-
+  // METODO PARA BUSCAR TIMBRES (ASISTENCIA)
+  BuscarTimbresAsistencia(datos: any) {
+    return this.http.post<any>(`${environment.url}/timbres/buscar/timbres-asistencia`, datos);
+  }
 
 
 

@@ -116,9 +116,7 @@ export class HomeEmpleadoComponent implements OnInit {
           else {
             this.ImagenLocalUsuario("assets/imagenes/user.png").then(
               (result) => (this.imagenEmpleado = result)
-            ).catch(Error => {
-              this.imagenEmpleado = 'sin imagen';
-            });
+            );
           }
         });
         //console.log('ver urlImagen ', this.urlImagen)
@@ -126,12 +124,15 @@ export class HomeEmpleadoComponent implements OnInit {
       } else {
         this.iniciales = data[0].nombre.split(" ")[0].slice(0, 1) + data[0].apellido.split(" ")[0].slice(0, 1);
         this.mostrarImagen = false;
+        this.ImagenLocalUsuario("assets/imagenes/user.png").then(
+          (result) => (this.imagenEmpleado = result)
+        );
       }
     })
   }
 
-   // METODO PARA MOSTRAR IMAGEN EN PDF
-   ImagenLocalUsuario(localPath: string): Promise<string> {
+  // METODO PARA MOSTRAR IMAGEN EN PDF
+  ImagenLocalUsuario(localPath: string): Promise<string> {
     return new Promise((resolve, reject) => {
       let canvas = document.createElement('canvas');
       let img = new Image();

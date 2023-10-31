@@ -15,7 +15,8 @@ class TimbresRutas {
         this.router.put('/eliminar-multiples/avisos', TokenValidation, TIMBRES_CONTROLADOR.EliminarMultiplesAvisos);
 
 
-
+        // METODO PARA BUSCAR TIMBRES (ASISTENCIA)
+        this.router.post('/buscar/timbres-asistencia', TokenValidation, TIMBRES_CONTROLADOR.BuscarTimbresAsistencia);
 
 
 
