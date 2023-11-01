@@ -70,7 +70,6 @@ const FALTAS_CONTROLADOR = new FaltasControlador();
 export default FALTAS_CONTROLADOR;
 
 const BuscarFaltas = async function (fec_inicio: string, fec_final: string, codigo: string | number) {
-    console.log('aca estoy')
     return await pool.query('SELECT codigo, CAST(fec_horario AS VARCHAR) ' +
         'FROM plan_general WHERE fec_horario BETWEEN $1 ' +
         'AND $2 AND codigo = $3 ' +

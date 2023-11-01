@@ -1,4 +1,3 @@
-import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
 import { IReporteFaltas, ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, OnInit, OnDestroy } from '@angular/core';
@@ -13,16 +12,18 @@ import * as xlsx from 'xlsx';
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
-import { FaltasService } from 'src/app/servicios/reportes/faltas/faltas.service';
+import { AlimentacionService } from 'src/app/servicios/reportes/alimentacion/alimentacion.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 
+
 @Component({
-  selector: 'app-reporte-faltas',
-  templateUrl: './reporte-faltas.component.html',
-  styleUrls: ['./reporte-faltas.component.css']
+  selector: 'app-reporte-tiempo-alimentacion',
+  templateUrl: './reporte-tiempo-alimentacion.component.html',
+  styleUrls: ['./reporte-tiempo-alimentacion.component.css']
 })
-export class ReporteFaltasComponent implements OnInit, OnDestroy {
+export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
+
 
   // CRITERIOS DE BUSQUEDA POR FECHAS
   get rangoFechas() { return this.reporteService.rangoFechas };
@@ -45,10 +46,10 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   origen: any = [];
 
   //VARIABLES PARA ALMACENAR TIEMPOS DE SALIDAS ANTICIPADAS
-  faltasDepartamentos: any = [];
-  faltasSucursales: any = [];
-  faltasRegimen: any = [];
-  faltasCargos: any = [];
+  excesoDepartamentos: any = [];
+  excesoSucursales: any = [];
+  excesoRegimen: any = [];
+  excesoCargos: any = [];
 
   //VARIABLES PARA MOSTRAR DETALLES
   tipo: string;
@@ -105,11 +106,10 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   get filtroCedula() { return this.reporteService.filtroCedula };
   
   constructor(
-    private R_asistencias: ReportesAsistenciasService,
     private validacionService: ValidacionesService,
     private informacion: DatosGeneralesService,
     private reporteService: ReportesService,
-    private restFaltas: FaltasService,
+    private restAlimentacion: AlimentacionService,
     private restEmpre: EmpresaService,
     private toastr: ToastrService,
   ) { 
@@ -288,8 +288,9 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     });
 
     this.data_pdf = []
-    this.restFaltas.BuscarFaltas(suc, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.restAlimentacion.BuscarTimbresAlimentacion(suc, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res;
+      console.log('DATA PDF', this.data_pdf);
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
         case 'ver': this.verDatos(); break;
@@ -331,8 +332,8 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     });
 
     this.data_pdf = [];
-    this.restFaltas.BuscarFaltasRegimenCargo(reg, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res;
+    this.restAlimentacion.BuscarTimbresAlimentacionRegimenCargo(reg, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+      this.data_pdf = res
       switch (accion) {
         case 'excel': this.exportToExcel('RegimenCargo'); break;
         case 'ver': this.verDatos(); break;
@@ -359,7 +360,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       return obj.departamentos.length > 0
     });
     this.data_pdf = []
-    this.restFaltas.BuscarFaltas(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.restAlimentacion.BuscarTimbresAlimentacion(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
@@ -383,7 +384,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     });
 
     this.data_pdf = [];
-    this.restFaltas.BuscarFaltasRegimenCargo(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.restAlimentacion.BuscarTimbresAlimentacionRegimenCargo(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       switch (accion) {
         case 'excel': this.exportToExcel('RegimenCargo'); break;
@@ -420,7 +421,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     });
 
     this.data_pdf = []
-    this.restFaltas.BuscarFaltas(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.restAlimentacion.BuscarTimbresAlimentacion(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
@@ -511,7 +512,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
         { text: (localStorage.getItem('name_empresa') as string).toUpperCase(), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
-        { text: 'FALTAS', bold: true, fontSize: 16, alignment: 'center', margin: [0, -10, 0, 5] },
+        { text: 'TIEMPO DE ALIMENTACIÓN', bold: true, fontSize: 16, alignment: 'center', margin: [0, -10, 0, 5] },
         { text: 'PERIODO DEL: ' + this.rangoFechas.fec_inico + " AL " + this.rangoFechas.fec_final, bold: true, fontSize: 15, alignment: 'center', margin: [0, 10, 0, 10] },
         ...this.impresionDatosPDF(this.data_pdf).map(obj => {
           return obj
@@ -525,6 +526,8 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
         itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0],fillColor: '#E3E3E3' },
         itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
+        itemsTableCentradoFT: { fontSize: 8, alignment: 'center',fillColor: '#EE4444' },
+        itemsTableCentradoExceso: { fontSize: 8, alignment: 'center',fillColor: '#55EE44' },
         itemsTableDerecha: { fontSize: 8, alignment: 'right' },
         itemsTableInfoTotal: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.s_color  },
         itemsTableTotal: { fontSize: 8, bold: true, alignment: 'right', fillColor: '#E3E3E3' },
@@ -542,20 +545,20 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     let n: any = []
     let c = 0;
     let accionT: string = '';
-    let totalFaltasEmpleado: number = 0;
-    let totalFaltasSucursal: number = 0;
-    let totalFaltasCargo = 0;
-    let totalFaltasRegimen = 0;
-    let totalFaltasDepartamento = 0;
-    this.faltasDepartamentos = [];
-    this.faltasSucursales = [];
-    this.faltasRegimen = [];
-    this.faltasCargos = [];
+    let totalExcesoEmpleado: number = 0;
+    let totalExcesoSucursal: number = 0;
+    let totalExcesoCargo = 0;
+    let totalExcesoRegimen = 0;
+    let totalExcesoDepartamento = 0;
+    this.excesoDepartamentos = [];
+    this.excesoSucursales = [];
+    this.excesoRegimen = [];
+    this.excesoCargos = [];
 
     if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
       data.forEach((obj1) => {
         if (this.bool.bool_cargo === true) {
-          totalFaltasCargo = 0;
+          totalExcesoCargo = 0;
           n.push({
             style: 'tableMarginCabecera',
             table: {
@@ -574,7 +577,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
             },
           });
         } else {
-          totalFaltasRegimen = 0;
+          totalExcesoRegimen = 0;
           n.push({
             style: 'tableMarginCabecera',
             table: {
@@ -639,30 +642,50 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
             },
           });
           c = 0;
-          totalFaltasEmpleado = 0;
+          totalExcesoEmpleado = 0;
           n.push({
             style: 'tableMargin',
             table: {
-              widths: ['*', '*'],
+              widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
               headerRows: 1,
               body: [
                 [
                   { text: 'N°', style: 'centrado' },
                   { text: 'FECHA', style: 'centrado' },
+                  { text: 'INICIO ALIMENTACIÓN', style: 'centrado' },
+                  { text: 'FIN ALIMENTACIÓN', style: 'centrado' },
+                  { text: 'M. ALIMENTACIÓN', style: 'centrado' },
+                  { text: 'M. TOMADOS', style: 'centrado' },
+                  { text: 'M. EXCESO', style: 'centrado' },
                 ],
                 ...obj2.timbres.map(obj3 => {
-                  totalFaltasEmpleado ++;
-                  totalFaltasRegimen ++; 
-                  totalFaltasCargo ++; 
+                  const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null 
+                    ? obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1]
+                    : 'FT';
+                  const finAlimentacion = obj3.finAlimentacion.fec_hora_timbre != null
+                    ? obj3.finAlimentacion.fec_hora_timbre.split(' ')[1]
+                    : 'FT';
+                  const minAlimentacion = obj3.inicioAlimentacion.min_alimentacion;
+                  const minutosTomados = this.calcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre,obj3.finAlimentacion.fec_hora_timbre);
+                  const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
+                  totalExcesoEmpleado += exceso;
+                  totalExcesoRegimen += exceso; 
+                  totalExcesoCargo += exceso; 
                   c = c + 1
                   return [
                     { style: 'itemsTableCentrado', text: c },
-                    { style: 'itemsTableCentrado', text: obj3.fec_horario },
+                    { style: 'itemsTableCentrado', text: obj3.inicioAlimentacion.fec_horario },
+                    { style: inicioAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: inicioAlimentacion },
+                    { style: finAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: finAlimentacion },
+                    { style: 'itemsTableCentrado', text: minAlimentacion },
+                    { style: 'itemsTableCentrado', text: minutosTomados !==null ? minutosTomados : minAlimentacion },
+                    { style: exceso > 0 ? 'itemsTableCentradoExceso' :'itemsTableCentrado', text: exceso },
                   ];
                 }),
                 [
+                  {},{},{},{},{},
                   {style: 'itemsTableCentradoTotal', text: 'TOTAL'},
-                  {style: 'itemsTableCentradoTotal', text: totalFaltasEmpleado},
+                  {style: 'itemsTableCentradoTotal', text: totalExcesoEmpleado},
                 ],
               ],
             },
@@ -676,17 +699,17 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
         if (this.bool.bool_cargo) {
           let cargo = {
             cargo: obj1.name_cargo,
-            faltas: totalFaltasCargo,
+            exceso: totalExcesoCargo,
           }
-          this.faltasCargos.push(cargo);
+          this.excesoCargos.push(cargo);
         };
 
         if (this.bool.bool_reg) {
           let regimen = {
             regimen: obj1.regimen.nombre,
-            faltas: totalFaltasRegimen,
+            exceso: totalExcesoRegimen,
           }
-          this.faltasRegimen.push(regimen);
+          this.excesoRegimen.push(regimen);
         };
       });
 
@@ -694,7 +717,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
         n.push({
           style: 'tableMarginCabeceraTotal',
           table: {
-            widths: ['*', '*'],
+            widths: ['*', 'auto'],
             headerRows: 1,
             body: [
               [
@@ -704,9 +727,9 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
                   text: 'TOTAL CARGOS',
                   style: 'itemsTableInfoTotal'
                 },
-                { text: 'FALTAS', style: 'itemsTableInfoTotal' },
+                { text: 'M. EXCESO', style: 'itemsTableInfoTotal' },
               ],
-              ...this.faltasCargos.map((cargo: any) => {
+              ...this.excesoCargos.map((cargo: any) => {
                 return [
                   {
                     border: [true, true, false, true],
@@ -714,7 +737,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
                     text: cargo.cargo,
                     style: 'itemsTableCentrado'
                   },
-                  { text: cargo.faltas, style: 'itemsTableCentrado'},
+                  { text: cargo.exceso, style: 'itemsTableCentrado'},
                 ]
               })    
             ]
@@ -731,7 +754,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
         n.push({
           style: 'tableMarginCabeceraTotal',
           table: {
-            widths: ['*', '*'],
+            widths: ['*', 'auto'],
             headerRows: 1,
             body: [
               [
@@ -741,9 +764,9 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
                   text: 'TOTAL REGIMENES',
                   style: 'itemsTableInfoTotal'
                 },
-                { text: 'FALTAS', style: 'itemsTableInfoTotal' },
+                { text: 'M. EXCESO', style: 'itemsTableInfoTotal' },
               ],
-              ...this.faltasRegimen.map((regimen: any) => {
+              ...this.excesoRegimen.map((regimen: any) => {
                 return [
                   {
                     border: [true, true, false, true],
@@ -751,7 +774,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
                     text: regimen.regimen,
                     style: 'itemsTableCentrado'
                   },
-                  { text: regimen.faltas, style: 'itemsTableCentrado'},
+                  { text: regimen.exceso, style: 'itemsTableCentrado'},
                 ]
               })    
             ]
@@ -766,7 +789,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     } else {
       data.forEach((obj: IReporteFaltas) => {
         if (this.bool.bool_suc === true || this.bool.bool_dep === true) {
-          totalFaltasSucursal = 0;
+          totalExcesoSucursal = 0;
           n.push({
             table: {
               widths: ['*', '*'],
@@ -791,7 +814,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
         }
 
         obj.departamentos.forEach(obj1 => {
-          totalFaltasDepartamento = 0;
+          totalExcesoDepartamento = 0;
           // LA CABECERA CUANDO SE GENERA EL PDF POR DEPARTAMENTOS
           if (this.bool.bool_dep === true) {
             n.push({
@@ -857,30 +880,50 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
               }
             });
             c = 0;
-            totalFaltasEmpleado = 0;
+            totalExcesoEmpleado = 0;
             n.push({
               style: 'tableMargin',
               table: {
-                widths: ['*', '*'],
+                widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
                 headerRows: 1,
                 body: [
                   [
                     { text: 'N°', style: 'centrado' },
                     { text: 'FECHA', style: 'centrado' },
+                    { text: 'INICIO ALIMENTACIÓN', style: 'centrado' },
+                    { text: 'FIN ALIMENTACIÓN', style: 'centrado' },
+                    { text: 'M. ALIMENTACIÓN', style: 'centrado' },
+                    { text: 'M. TOMADOS', style: 'centrado' },
+                    { text: 'M. EXCESO', style: 'centrado' },
                   ],
                   ...obj2.timbres.map(obj3 => {
-                    totalFaltasEmpleado ++;
-                    totalFaltasSucursal ++; 
-                    totalFaltasDepartamento ++; 
+                    const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null 
+                      ? obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1]
+                      : 'FT';
+                    const finAlimentacion = obj3.finAlimentacion.fec_hora_timbre != null
+                      ? obj3.finAlimentacion.fec_hora_timbre.split(' ')[1]
+                      : 'FT';
+                    const minAlimentacion = obj3.inicioAlimentacion.min_alimentacion;
+                    const minutosTomados = this.calcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre,obj3.finAlimentacion.fec_hora_timbre);
+                    const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
+                    totalExcesoEmpleado += exceso;
+                    totalExcesoRegimen += exceso; 
+                    totalExcesoCargo += exceso; 
                     c = c + 1
                     return [
                       { style: 'itemsTableCentrado', text: c },
-                      { style: 'itemsTableCentrado', text: obj3.fec_horario },
+                      { style: 'itemsTableCentrado', text: obj3.inicioAlimentacion.fec_horario },
+                      { style: inicioAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: inicioAlimentacion },
+                      { style: finAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: finAlimentacion },
+                      { style: 'itemsTableCentrado', text: minAlimentacion },
+                      { style: 'itemsTableCentrado', text: minutosTomados !==null ? minutosTomados : minAlimentacion },
+                      { style: exceso > 0 ? 'itemsTableCentradoExceso' :'itemsTableCentrado', text: exceso },
                     ];
                   }),
                   [
+                    {},{},{},{},{},
                     {style: 'itemsTableCentradoTotal', text: 'TOTAL'},
-                    {style: 'itemsTableCentradoTotal', text: totalFaltasEmpleado},
+                    {style: 'itemsTableCentradoTotal', text: totalExcesoEmpleado},
                   ],
                 ],
               },
@@ -894,18 +937,18 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
           if (this.bool.bool_dep) {
             let departamento = {
               departamento: obj1.name_dep,
-              faltas: totalFaltasDepartamento,
+              exceso: totalExcesoDepartamento,
             }
-            this.faltasDepartamentos.push(departamento);
+            this.excesoDepartamentos.push(departamento);
           };
         });
 
         if (this.bool.bool_suc) {
           let sucursal = {
             sucursal: obj.name_suc,
-            faltas: totalFaltasSucursal,
+            exceso: totalExcesoSucursal,
           }
-          this.faltasSucursales.push(sucursal);
+          this.excesoSucursales.push(sucursal);
         };
       });
     }
@@ -914,7 +957,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       n.push({
         style: 'tableMarginCabeceraTotal',
         table: {
-          widths: ['*', '*'],
+          widths: ['*', 'auto'],
           headerRows: 1,
           body: [
             [
@@ -924,9 +967,9 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
                 text: 'TOTAL DEPARTAMENTOS',
                 style: 'itemsTableInfoTotal'
               },
-              { text: 'FALTAS', style: 'itemsTableInfoTotal' },
+              { text: 'M. EXCESO', style: 'itemsTableInfoTotal' },
             ],
-            ...this.faltasDepartamentos.map((departamento: any) => {
+            ...this.excesoDepartamentos.map((departamento: any) => {
               return [
                 {
                   border: [true, true, false, true],
@@ -934,7 +977,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
                   text: departamento.departamento,
                   style: 'itemsTableCentrado'
                 },
-                { text: departamento.faltas, style: 'itemsTableCentrado'},
+                { text: departamento.exceso, style: 'itemsTableCentrado'},
               ]
             })    
           ]
@@ -951,7 +994,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       n.push({
         style: 'tableMarginCabeceraTotal',
         table: {
-          widths: ['*', '*'],
+          widths: ['*', 'auto'],
           headerRows: 1,
           body: [
             [
@@ -961,9 +1004,9 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
                 text: 'TOTAL SUCURSALES',
                 style: 'itemsTableInfoTotal'
               },
-              { text: 'FALTAS', style: 'itemsTableInfoTotal' },
+              { text: 'M. EXCESO', style: 'itemsTableInfoTotal' },
             ],
-            ...this.faltasSucursales.map((sucursal: any) => {
+            ...this.excesoSucursales.map((sucursal: any) => {
               return [
                 {
                   border: [true, true, false, true],
@@ -971,7 +1014,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
                   text: sucursal.sucursal,
                   style: 'itemsTableCentrado'
                 },
-                { text: sucursal.faltas, style: 'itemsTableCentrado'},
+                { text: sucursal.exceso, style: 'itemsTableCentrado'},
               ]
             })    
           ]
@@ -1002,6 +1045,27 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     }
     return valor
   }
+
+  calcularDiferenciaFechas(inicioAlimentacion: string, finAlimentacion: string) {
+    if (inicioAlimentacion!=null && finAlimentacion!=null) {
+      const fechaInicio = new Date(inicioAlimentacion);
+      const fechaFin = new Date(finAlimentacion);
+      const diferenciaEnMinutos = Math.abs(fechaFin.getTime() - fechaInicio.getTime()) / 1000 / 60;
+      console.log('diferencia de fechas', fechaInicio, fechaFin, diferenciaEnMinutos);
+      return Number(diferenciaEnMinutos.toFixed(2));
+    } else {
+      return null;
+    }  
+   }
+
+   calcularExcesoTiempo(minutosAsignados: string, minutosTomados: any): number {
+    if (!minutosAsignados || !minutosTomados) return 0;
+   
+    const asignados = Number(minutosAsignados);
+    const tomados = Number(minutosTomados);
+   
+    return Number((Math.max(tomados - asignados, 0)).toFixed(2));
+   }
 
   HorasDecimalToHHMM(dato: number) {
     // console.log('Hora decimal a HHMM ======>',dato);
@@ -1036,14 +1100,14 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       case 'RegimenCargo':
         const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfRegimenCargo(this.data_pdf));
         const wb_regimen_cargo: xlsx.WorkBook = xlsx.utils.book_new();
-        xlsx.utils.book_append_sheet(wb_regimen_cargo, wsr_regimen_cargo, 'Faltas');
-        xlsx.writeFile(wb_regimen_cargo, 'Faltas.xlsx');
+        xlsx.utils.book_append_sheet(wb_regimen_cargo, wsr_regimen_cargo, 'Alimentacion');
+        xlsx.writeFile(wb_regimen_cargo, 'Tiempo_alimentacion.xlsx');
         break;
       default:
         const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefault(this.data_pdf));
         const wb: xlsx.WorkBook = xlsx.utils.book_new();
-        xlsx.utils.book_append_sheet(wb, wsr, 'Faltas');
-        xlsx.writeFile(wb, 'Faltas.xlsx');
+        xlsx.utils.book_append_sheet(wb, wsr, 'Alimentacion');
+        xlsx.writeFile(wb, 'Tiempo_alimentacion.xlsx');
         break;
     }
   }
@@ -1054,12 +1118,23 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
+            const inicioAlimentacion = obj4.inicioAlimentacion.fec_hora_timbre != null 
+              ? obj4.inicioAlimentacion.fec_hora_timbre.split(' ')[1]
+              : 'FT';
+            const finAlimentacion = obj4.finAlimentacion.fec_hora_timbre != null
+              ? obj4.finAlimentacion.fec_hora_timbre.split(' ')[1]
+              : 'FT';
+              const minAlimentacion = obj4.inicioAlimentacion.min_alimentacion;
+              const minutosTomados = this.calcularDiferenciaFechas(obj4.inicioAlimentacion.fec_hora_timbre,obj4.finAlimentacion.fec_hora_timbre);
+              const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
             let ele = { 
               'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
               'Departamento': obj2.name_dep,
               'Régimen': obj3.regimen[0].name_regimen,
               'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
-              'Fecha': new Date(obj4.fec_horario),
+              'Fecha': new Date(obj4.inicioAlimentacion.fec_horario), 'Inicio Alimentación': inicioAlimentacion,
+              'Fin Alimentación': finAlimentacion, 'M. Alimentación': minAlimentacion, 'M. Tomados': minutosTomados,
+              'M. Exceso': exceso
             }
             nuevo.push(ele);
           })
@@ -1074,12 +1149,23 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     array.forEach((obj1: any) => {
       obj1.empleados.forEach((obj2: any) => {
         obj2.timbres.forEach((obj3: any) => {
+          const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null 
+              ? obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1]
+              : 'FT';
+            const finAlimentacion = obj3.finAlimentacion.fec_hora_timbre != null
+              ? obj3.finAlimentacion.fec_hora_timbre.split(' ')[1]
+              : 'FT';
+              const minAlimentacion = obj3.inicioAlimentacion.min_alimentacion;
+              const minutosTomados = this.calcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre,obj3.finAlimentacion.fec_hora_timbre);
+              const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
           let ele = {
             'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
             'Departamento': obj2.departamento,
             'Régimen': obj2.regimen[0].name_regimen,
             'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
-            'Fecha': new Date(obj3.fec_horario),
+            'Fecha': new Date(obj3.inicioAlimentacion.fec_horario), 'Inicio Alimentación': inicioAlimentacion,
+            'Fin Alimentación': finAlimentacion, 'M. Alimentación': minAlimentacion, 'M. Tomados': minutosTomados,
+            'M. Exceso': exceso
           }
           nuevo.push(ele);
         })
@@ -1096,13 +1182,23 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
         obj1.departamentos.forEach(obj2 => {
           obj2.empleado.forEach((obj3: any) => {
             obj3.timbres.forEach((obj4: any) => {
+              const inicioAlimentacion = obj4.inicioAlimentacion.fec_hora_timbre != null 
+              ? obj4.inicioAlimentacion.fec_hora_timbre.split(' ')[1]
+              : 'FT';
+            const finAlimentacion = obj4.finAlimentacion.fec_hora_timbre != null
+              ? obj4.finAlimentacion.fec_hora_timbre.split(' ')[1]
+              : 'FT';
+              const minAlimentacion = obj4.inicioAlimentacion.min_alimentacion;
+              const minutosTomados = this.calcularDiferenciaFechas(obj4.inicioAlimentacion.fec_hora_timbre,obj4.finAlimentacion.fec_hora_timbre);
+              const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
               n = n + 1;
               let ele = {
                 n: n,
                 ciudad: obj1.ciudad, sucursal: obj1.name_suc,
                 departamento: obj2.name_dep,
                 empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
-                fecha: obj4.fec_horario
+                fecha: obj3.inicioAlimentacion.fec_horario, inicio: inicioAlimentacion, fin: finAlimentacion, 
+                alimentacion: minAlimentacion, tomados: minutosTomados, exceso: exceso
               }
               this.timbres.push(ele);
             })
@@ -1117,13 +1213,23 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       this.data_pdf.forEach((obj1: any) => {
         obj1.empleados.forEach((obj2: any) => {
           obj2.timbres.forEach((obj3: any) => {
+            const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null 
+              ? obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1]
+              : 'FT';
+            const finAlimentacion = obj3.finAlimentacion.fec_hora_timbre != null
+              ? obj3.finAlimentacion.fec_hora_timbre.split(' ')[1]
+              : 'FT';
+              const minAlimentacion = obj3.inicioAlimentacion.min_alimentacion;
+              const minutosTomados = this.calcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre,obj3.finAlimentacion.fec_hora_timbre);
+              const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
             n = n + 1;
             let ele = {
               n: n,
               ciudad: obj2.ciudad, sucursal: obj2.sucursal,
               departamento: obj2.departamento,
               empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
-              fecha: obj3.fec_horario
+              fecha: obj3.inicioAlimentacion.fec_horario, inicio: inicioAlimentacion, fin: finAlimentacion, 
+              alimentacion: minAlimentacion, tomados: minutosTomados, exceso: exceso
             }
             this.timbres.push(ele);
           })

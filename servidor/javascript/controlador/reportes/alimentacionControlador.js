@@ -203,6 +203,85 @@ class AlimentacionControlador {
             }
         });
     }
+    ReporteTimbresAlimentacion(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log('datos recibidos', req.body);
+            let { desde, hasta } = req.params;
+            let datos = req.body;
+            let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
+                obj.departamentos = yield Promise.all(obj.departamentos.map((ele) => __awaiter(this, void 0, void 0, function* () {
+                    ele.empleado = yield Promise.all(ele.empleado.map((o) => __awaiter(this, void 0, void 0, function* () {
+                        const listaTimbres = yield BuscarAlimentacion(desde, hasta, o.codigo);
+                        o.timbres = yield agruparTimbres(listaTimbres);
+                        console.log('timbres:-------------------- ', o);
+                        return o;
+                    })));
+                    return ele;
+                })));
+                return obj;
+            })));
+            let nuevo = n.map((obj) => {
+                obj.departamentos = obj.departamentos.map((e) => {
+                    e.empleado = e.empleado.filter((v) => { return v.timbres.length > 0; });
+                    return e;
+                }).filter((e) => { return e.empleado.length > 0; });
+                return obj;
+            }).filter(obj => { return obj.departamentos.length > 0; });
+            if (nuevo.length === 0)
+                return res.status(400).jsonp({ message: 'No se ha encontrado registro de faltas.' });
+            return res.status(200).jsonp(nuevo);
+        });
+    }
+    ReporteTimbresAlimentacionRegimenCargo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log('datos recibidos', req.body);
+            let { desde, hasta } = req.params;
+            let datos = req.body;
+            let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
+                obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
+                    const listaTimbres = yield BuscarAlimentacion(desde, hasta, o.codigo);
+                    o.timbres = yield agruparTimbres(listaTimbres);
+                    console.log('Timbres: ', o);
+                    return o;
+                })));
+                return obj;
+            })));
+            let nuevo = n.map((e) => {
+                e.empleados = e.empleados.filter((t) => { return t.timbres.length > 0; });
+                return e;
+            }).filter(e => { return e.empleados.length > 0; });
+            if (nuevo.length === 0)
+                return res.status(400).jsonp({ message: 'No se ha encontrado registro de faltas.' });
+            return res.status(200).jsonp(nuevo);
+        });
+    }
 }
 exports.ALIMENTACION_CONTROLADOR = new AlimentacionControlador();
 exports.default = exports.ALIMENTACION_CONTROLADOR;
+const BuscarAlimentacion = function (fec_inicio, fec_final, codigo) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield database_1.default.query('SELECT CAST(fec_horario AS VARCHAR), CAST(fec_hora_horario AS VARCHAR), CAST(fec_hora_timbre AS VARCHAR), ' +
+            'codigo, estado_timbre, tipo_entr_salida AS accion, min_alimentacion ' +
+            'FROM plan_general WHERE CAST(fec_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' ' +
+            'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 ' +
+            'AND tipo_dia NOT IN (\'L\', \'FD\') ' +
+            'AND tipo_entr_salida IN (\'I/A\', \'F/A\') ' +
+            'ORDER BY codigo, fec_hora_horario ASC', [fec_inicio, fec_final, codigo])
+            .then(res => {
+            return res.rows;
+        });
+    });
+};
+const agruparTimbres = function (listaTimbres) {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log('en agrupar');
+        const timbresAgrupados = [];
+        for (let i = 0; i < listaTimbres.length; i += 2) {
+            timbresAgrupados.push({
+                inicioAlimentacion: listaTimbres[i],
+                finAlimentacion: i + 1 < listaTimbres.length ? listaTimbres[i + 1] : null
+            });
+        }
+        return timbresAgrupados;
+    });
+};

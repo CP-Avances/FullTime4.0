@@ -4,7 +4,7 @@ import ALIMENTACION_CONTROLADOR from '../../controlador/reportes/alimentacionCon
 import { ModuloAlimentacionValidation } from '../../libs/Modulos/verificarAlimentacion';
 import { TokenValidation } from '../../libs/verificarToken';
 
-class CiudadRutas {
+class AlimentacionRutas {
     public router: Router = Router();
 
     constructor() {
@@ -26,9 +26,12 @@ class CiudadRutas {
         // DETALLES SERVICIOS DE ALIMENTACIÓN DE INVITADOS
         this.router.post('/servicios/invitados', [TokenValidation, ModuloAlimentacionValidation], ALIMENTACION_CONTROLADOR.DetallarServiciosInvitados);
 
+        // TIMBRES DE ALIMENTACION
+        this.router.put('/timbres-alimentacion/:desde/:hasta', [TokenValidation, ModuloAlimentacionValidation], ALIMENTACION_CONTROLADOR.ReporteTimbresAlimentacion);
+        this.router.put('/timbres-alimentacion-regimen-cargo/:desde/:hasta', [TokenValidation, ModuloAlimentacionValidation], ALIMENTACION_CONTROLADOR.ReporteTimbresAlimentacionRegimenCargo);
     }
 }
 
-const ALIMENTACION_RUTAS = new CiudadRutas();
+const ALIMENTACION_RUTAS = new AlimentacionRutas();
 
 export default ALIMENTACION_RUTAS.router;
