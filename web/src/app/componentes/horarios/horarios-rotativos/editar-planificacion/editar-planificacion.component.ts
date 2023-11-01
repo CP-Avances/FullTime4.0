@@ -856,6 +856,7 @@ export class EditarPlanificacionComponent implements OnInit {
                   salida_otro_dia: nocturno,
                   tipo_entr_salida: deta.tipo_accion,
                   fec_hora_horario: fecha + ' ' + deta.hora,
+                  min_alimentacion: deta.min_almuerzo,
                 };
                 if (deta.segundo_dia === true) {
                   plan.fec_hora_horario = moment(fecha).add(1, 'd').format('YYYY-MM-DD') + ' ' + deta.hora;

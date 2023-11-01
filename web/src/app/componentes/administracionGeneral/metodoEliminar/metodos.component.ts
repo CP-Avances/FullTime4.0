@@ -14,6 +14,8 @@ export class MetodosComponent implements OnInit {
     public ventana: MatDialogRef<MetodosComponent>,
     @Inject(MAT_DIALOG_DATA) public mensaje: string) { }
 
+  eliminar: boolean = true;
+
   CerrarVentana(): void {
     this.ventana.close(false);
   }
@@ -23,7 +25,13 @@ export class MetodosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
+    if (this.mensaje === 'asistencia') {
+      this.eliminar = false;
+    }
+    else {
+      this.eliminar = true;
+    }
+    //console.log('ver mensaje ', this.mensaje)
   }
 
 }

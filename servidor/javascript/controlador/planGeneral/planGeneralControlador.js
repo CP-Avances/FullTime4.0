@@ -29,12 +29,13 @@ class PlanGeneralControlador {
                 database_1.default.query(`
                 INSERT INTO plan_general (fec_hora_horario, tolerancia, estado_timbre, id_det_horario,
                     fec_horario, id_empl_cargo, tipo_entr_salida, codigo, id_horario, tipo_dia, salida_otro_dia,
-                    min_antes, min_despues, estado_origen) 
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
+                    min_antes, min_despues, estado_origen, min_alimentacion) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
                 `, [req.body[i].fec_hora_horario, req.body[i].tolerancia, req.body[i].estado_timbre,
                     req.body[i].id_det_horario, req.body[i].fec_horario, req.body[i].id_empl_cargo,
                     req.body[i].tipo_entr_salida, req.body[i].codigo, req.body[i].id_horario, req.body[i].tipo_dia,
-                    req.body[i].salida_otro_dia, req.body[i].min_antes, req.body[i].min_despues, req.body[i].estado_origen], (error) => {
+                    req.body[i].salida_otro_dia, req.body[i].min_antes, req.body[i].min_despues, req.body[i].estado_origen,
+                    req.body[i].min_alimentacion], (error) => {
                     iterar = iterar + 1;
                     try {
                         if (error) {
@@ -345,7 +346,7 @@ class PlanGeneralControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { codigo, fecha, id, accion, id_timbre } = req.body;
-                //console.log('ver datos ', codigo, ' ', fecha, ' ', id)
+                console.log('ver datos ', codigo, ' ', fecha, ' ', id);
                 const ASIGNADO = yield database_1.default.query(`
                 SELECT * FROM fnbuscarregistroasignado ($1, $2::character varying);
                 `, [fecha, codigo]);

@@ -22,7 +22,10 @@ class DetalleCatalogoHorarioControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_horario } = req.params;
             const HORARIO = yield database_1.default.query(`
-            SELECT * FROM deta_horarios WHERE id_horario = $1 ORDER BY orden ASC
+            SELECT dh.*, cg.min_almuerzo
+            FROM deta_horarios AS dh, cg_horarios AS cg
+            WHERE dh.id_horario = cg.id AND dh.id_horario = $1
+            ORDER BY orden ASC
             `, [id_horario])
                 .then((result) => {
                 if (result.rowCount === 0)
@@ -46,8 +49,8 @@ class DetalleCatalogoHorarioControlador {
                             o.tipo_accion = 'S';
                             break;
                         default:
-                            o.tipo_accion_show = 'Codigo 99';
-                            o.tipo_accion = 'codigo 99';
+                            o.tipo_accion_show = 'Desconocido';
+                            o.tipo_accion = 'D';
                             break;
                     }
                     return o;
