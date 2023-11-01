@@ -48,4 +48,12 @@ export class AlimentacionService {
     return this.http.post(`${environment.url}/alimentacion/servicios/invitados`, data)
   }
 
+  BuscarTimbresAlimentacion(data: any, inicio: string, fin: string) {
+    return this.http.put<any>(`${environment.url}/alimentacion/timbres-alimentacion/${inicio}/${fin}`, data);
+  }
+
+  BuscarTimbresAlimentacionRegimenCargo(data: any, inicio: string, fin: string) {
+    return this.http.put<any>(`${environment.url}/alimentacion/timbres-alimentacion-regimen-cargo/${inicio}/${fin}`, data);
+  }
+
 }

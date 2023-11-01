@@ -516,6 +516,7 @@ export class MainNavComponent implements OnInit {
             icono: 'check_circle_outline',
             color: true,
             children: [
+              { name: 'Tiempo Alimentación', url: '/tiempo-alimentacion', color: true },
               { name: 'Salidas Anticipadas', url: '/salidas-anticipadas', color: true },
               { name: 'Puntualidad', url: '/reporte-puntualidad', color: true },
               { name: 'Atrasos', url: '/reporte-atrasos-multiples', color: true },

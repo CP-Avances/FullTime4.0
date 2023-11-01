@@ -41,6 +41,7 @@ import { TimbreVirtualComponent } from './timbres/timbre-virtual/timbre-virtual.
 import { VerEmpleadosActivosDetalleComponent } from './generales/empleados/activos/ver-empleados-activos-detalle/ver-empleados-activos-detalle.component';
 import { VerEmpleadosInactivosDetalleComponent } from './generales/empleados/inactivos/ver-empleados-inactivos-detalle/ver-empleados-inactivos-detalle.component';
 import { VerVacunasComponent } from './generales/vacunas/ver-vacunas/ver-vacunas.component';
+import { ReporteTiempoAlimentacionComponent } from './asistencia/reporte-tiempo-alimentacion/reporte-tiempo-alimentacion.component';
 @NgModule({
   declarations: [
     RangoFechasComponent,
@@ -76,6 +77,7 @@ import { VerVacunasComponent } from './generales/vacunas/ver-vacunas/ver-vacunas
     VerEmpleadosActivosDetalleComponent,
     VerEmpleadosInactivosDetalleComponent,
     VerVacunasComponent,
+    ReporteTiempoAlimentacionComponent,
   ],
   exports: [
     ReporteFaltasComponent,

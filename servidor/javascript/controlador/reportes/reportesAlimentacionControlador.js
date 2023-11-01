@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../../database"));
-class FaltasControlador {
-    ReporteFaltas(req, res) {
+class AlimentacionControlador {
+    ReporteAlimentacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log('datos recibidos', req.body);
             let { desde, hasta } = req.params;
@@ -22,7 +22,8 @@ class FaltasControlador {
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.departamentos = yield Promise.all(obj.departamentos.map((ele) => __awaiter(this, void 0, void 0, function* () {
                     ele.empleado = yield Promise.all(ele.empleado.map((o) => __awaiter(this, void 0, void 0, function* () {
-                        o.timbres = yield BuscarFaltas(desde, hasta, o.codigo);
+                        const listaTimbres = yield BuscarAlimentacion(desde, hasta, o.codigo);
+                        o.timbres = this.agruparTimbres(listaTimbres);
                         console.log('timbres:-------------------- ', o);
                         return o;
                     })));
@@ -42,14 +43,14 @@ class FaltasControlador {
             return res.status(200).jsonp(nuevo);
         });
     }
-    ReporteFaltasRegimenCargo(req, res) {
+    ReporteAlimentacionRegimenCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log('datos recibidos', req.body);
             let { desde, hasta } = req.params;
             let datos = req.body;
             let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
                 obj.empleados = yield Promise.all(obj.empleados.map((o) => __awaiter(this, void 0, void 0, function* () {
-                    o.timbres = yield BuscarFaltas(desde, hasta, o.codigo);
+                    o.timbres = yield BuscarAlimentacion(desde, hasta, o.codigo);
                     console.log('Timbres: ', o);
                     return o;
                 })));
@@ -64,18 +65,28 @@ class FaltasControlador {
             return res.status(200).jsonp(nuevo);
         });
     }
+    agruparTimbres(listaTimbres) {
+        const timbresAgrupados = [];
+        for (let i = 0; i < listaTimbres.length; i += 2) {
+            timbresAgrupados.push({
+                timbre1: listaTimbres[i],
+                timbre2: i + 1 < listaTimbres.length ? listaTimbres[i + 1] : null
+            });
+        }
+        return timbresAgrupados;
+    }
 }
-const FALTAS_CONTROLADOR = new FaltasControlador();
-exports.default = FALTAS_CONTROLADOR;
-const BuscarFaltas = function (fec_inicio, fec_final, codigo) {
+const ALIMENTACION_CONTROLADOR = new AlimentacionControlador();
+exports.default = ALIMENTACION_CONTROLADOR;
+const BuscarAlimentacion = function (fec_inicio, fec_final, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield database_1.default.query('SELECT codigo, CAST(fec_horario AS VARCHAR) ' +
-            'FROM plan_general WHERE fec_horario BETWEEN $1 ' +
-            'AND $2 AND codigo = $3 ' +
+        return yield database_1.default.query('SELECT CAST(fec_horario AS VARCHAR), CAST(fec_hora_horario AS VARCHAR), CAST(fec_hora_timbre AS VARCHAR), ' +
+            'codigo, estado_timbre, tipo_entr_salida AS accion ' +
+            'FROM plan_general WHERE CAST(fec_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' ' +
+            'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 ' +
             'AND tipo_dia NOT IN (\'L\', \'FD\') ' +
-            'GROUP BY codigo, fec_horario ' +
-            'HAVING COUNT(fec_hora_timbre) = 0 ' +
-            'ORDER BY fec_horario ASC', [fec_inicio, fec_final, codigo])
+            'tipo_entr_salida IN (\'I/A\', \'F/A\') ' +
+            'ORDER BY codigo, fec_hora_horario ASC', [fec_inicio, fec_final, codigo])
             .then(res => {
             return res.rows;
         });
