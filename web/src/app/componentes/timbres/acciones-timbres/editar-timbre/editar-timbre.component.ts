@@ -136,7 +136,8 @@ export class EditarTimbreComponent implements OnInit {
       codigo: this.datosTimbre.codigo,
       accion: formTimbre.accionTimbre,
       tecla: formTimbre.teclaFunTimbre,
-      observacion: formTimbre.ObservacionForm
+      observacion: formTimbre.ObservacionForm,
+      fecha: this.datosTimbre.fec_hora_timbre_servidor,
     }
 
     console.log('data: ', data);

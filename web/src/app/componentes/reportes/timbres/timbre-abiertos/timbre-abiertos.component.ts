@@ -1064,10 +1064,10 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
             let ele: any;
-            let servidor_fecha = '';
+            let servidor_fecha: any = '';
             let servidor_hora = '';
             if (obj4.fec_hora_timbre_servidor != '' && obj4.fec_hora_timbre_servidor != null) {
-              servidor_fecha = obj4.fec_hora_timbre_servidor.split(' ')[0];
+              servidor_fecha = new Date(obj4.fec_hora_timbre_servidor);
               servidor_hora = obj4.fec_hora_timbre_servidor.split(' ')[1]
             }
             switch (obj4.accion) {
@@ -1087,9 +1087,10 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
               ele = {
                 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
                 'Departamento': obj2.name_dep,
+                'Régimen': obj3.regimen[0].name_regimen,
                 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
                 'Fecha Timbre': servidor_fecha, 'Hora Timbre': servidor_hora,
-                'Fecha Timbre Dispositivo': obj4.fec_hora_timbre.split(' ')[0], 'Hora Timbre Dispositivo': obj4.fec_hora_timbre.split(' ')[1],
+                'Fecha Timbre Dispositivo': new Date(obj4.fec_hora_timbre), 'Hora Timbre Dispositivo': obj4.fec_hora_timbre.split(' ')[1],
                 'Acción': accionT, 'Reloj': obj4.id_reloj,
                 'Latitud': obj4.latitud, 'Longitud': obj4.longitud, 'Observación': obj4.observacion
               }
@@ -1097,6 +1098,7 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
               ele = {
                 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
                 'Departamento': obj2.name_dep,
+                'Régimen': obj3.regimen[0].name_regimen,
                 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
                 'Fecha Timbre': servidor_fecha, 'Hora Timbre': servidor_hora,
                 'Acción': accionT, 'Reloj': obj4.id_reloj,
@@ -1118,10 +1120,10 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
       obj1.empleados.forEach((obj2: any) => {
         obj2.timbres.forEach((obj3: any) => {
           let ele: any;
-          let servidor_fecha = '';
+          let servidor_fecha: any = '';
           let servidor_hora = '';
           if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
-            servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
+            servidor_fecha = new Date(obj3.fec_hora_timbre_servidor);
             servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
           }
           switch (obj3.accion) {
@@ -1141,9 +1143,10 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
             ele = {
               'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
               'Departamento': obj2.departamento,
+              'Régimen': obj2.regimen[0].name_regimen,
               'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
               'Fecha Timbre': servidor_fecha, 'Hora Timbre': servidor_hora,
-              'Fecha Timbre Dispositivo': obj3.fec_hora_timbre.split(' ')[0], 'Hora Timbre Dispositivo': obj3.fec_hora_timbre.split(' ')[1],
+              'Fecha Timbre Dispositivo': new Date(obj3.fec_hora_timbre), 'Hora Timbre Dispositivo': obj3.fec_hora_timbre.split(' ')[1],
               'Acción': accionT, 'Reloj': obj3.id_reloj,
               'Latitud': obj3.latitud, 'Longitud': obj3.longitud, 'Observación': obj3.observacion
             }
@@ -1151,6 +1154,7 @@ export class TimbreAbiertosComponent implements OnInit, OnDestroy {
             ele = {
               'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
               'Departamento': obj2.departamento,
+              'Régimen': obj2.regimen[0].name_regimen,
               'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
               'Fecha Timbre': servidor_fecha, 'Hora Timbre': servidor_hora,
               'Acción': accionT, 'Reloj': obj3.id_reloj,

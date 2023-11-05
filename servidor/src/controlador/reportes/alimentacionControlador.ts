@@ -1,3 +1,4 @@
+import { ReporteAlimentacion } from "../../class/Alimentacion";
 import { Request, Response } from 'express';
 import pool from '../../database';
 
@@ -192,8 +193,97 @@ class AlimentacionControlador {
         }
     }
 
+    public async ReporteTimbresAlimentacion(req: Request, res: Response) {
+        console.log('datos recibidos', req.body)
+        let { desde, hasta } = req.params
+        let datos: any[] = req.body;
+
+        let n: Array<any> = await Promise.all(datos.map(async (obj: ReporteAlimentacion) => {
+            obj.departamentos = await Promise.all(obj.departamentos.map(async (ele) => {
+                ele.empleado = await Promise.all(ele.empleado.map(async (o) => {
+                    const listaTimbres = await BuscarAlimentacion(desde, hasta, o.codigo);
+                    o.timbres = await agruparTimbres(listaTimbres);
+                    console.log('timbres:-------------------- ', o);
+                    return o
+                })
+                )
+                return ele
+            })
+            )
+            return obj
+        })
+        )
+
+        let nuevo = n.map((obj: ReporteAlimentacion) => {
+            obj.departamentos = obj.departamentos.map((e) => {
+                e.empleado = e.empleado.filter((v: any) => { return v.timbres.length > 0 })
+                return e
+            }).filter((e: any) => { return e.empleado.length > 0 })
+            return obj
+
+        }).filter(obj => { return obj.departamentos.length > 0 })
+
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registro de faltas.' })
+
+        return res.status(200).jsonp(nuevo)
+
+    }
+
+    public async ReporteTimbresAlimentacionRegimenCargo(req: Request, res: Response) {
+        console.log('datos recibidos', req.body)
+        let { desde, hasta } = req.params;
+        let datos: any[] = req.body;
+        let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {      
+            obj.empleados = await Promise.all(obj.empleados.map(async (o:any) => {
+                const listaTimbres = await BuscarAlimentacion(desde, hasta, o.codigo);
+                o.timbres = await agruparTimbres(listaTimbres);
+                console.log('Timbres: ', o);
+                return o;
+            }));    
+            return obj;
+        }));
+
+        let nuevo = n.map((e: any) => {
+            e.empleados = e.empleados.filter((t: any) => { return t.timbres.length > 0 })
+            return e
+        }).filter(e => { return e.empleados.length > 0 })
+
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registro de faltas.' })
+
+        return res.status(200).jsonp(nuevo)
+
+    }
+
+
 }
 
 export const ALIMENTACION_CONTROLADOR = new AlimentacionControlador();
 
 export default ALIMENTACION_CONTROLADOR;
+
+
+const BuscarAlimentacion = async function (fec_inicio: string, fec_final: string, codigo: string | number) {
+    return await pool.query('SELECT CAST(fec_horario AS VARCHAR), CAST(fec_hora_horario AS VARCHAR), CAST(fec_hora_timbre AS VARCHAR), ' +
+    'codigo, estado_timbre, tipo_entr_salida AS accion, min_alimentacion ' +
+    'FROM plan_general WHERE CAST(fec_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' ' +
+    'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 ' +
+    'AND tipo_dia NOT IN (\'L\', \'FD\') ' +
+    'AND tipo_entr_salida IN (\'I/A\', \'F/A\') ' +
+    'ORDER BY codigo, fec_hora_horario ASC', [fec_inicio, fec_final, codigo])
+        .then(res => {
+            return res.rows;
+        })
+}
+
+
+const agruparTimbres = async function(listaTimbres: any) {
+    console.log('en agrupar');
+    const timbresAgrupados: any[] = [];
+    for (let i = 0; i < listaTimbres.length; i += 2) {
+        timbresAgrupados.push({
+            inicioAlimentacion: listaTimbres[i],
+            finAlimentacion: i + 1 < listaTimbres.length ? listaTimbres[i + 1] : null
+        });
+    }
+    return timbresAgrupados;
+}

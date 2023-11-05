@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { TokenValidation } from '../../libs/verificarToken'
+import { TokenValidation } from '../../libs/verificarToken';
 import SALIDAS_ANTICIPADAS_CONTROLADOR from '../../controlador/reportes/salidaAntesControlador';
 
 class SalidasAnticipadasRutas {

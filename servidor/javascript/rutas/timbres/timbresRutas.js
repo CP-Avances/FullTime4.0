@@ -14,6 +14,8 @@ class TimbresRutas {
     configuracion() {
         // METODO PARA ELIMINAR NOTIFICACIONES DE AVISOS  --**VERIFICADO
         this.router.put('/eliminar-multiples/avisos', verificarToken_1.TokenValidation, timbresControlador_1.default.EliminarMultiplesAvisos);
+        // METODO PARA BUSCAR TIMBRES (ASISTENCIA)
+        this.router.post('/buscar/timbres-asistencia', verificarToken_1.TokenValidation, timbresControlador_1.default.BuscarTimbresAsistencia);
         // METODO PARA BUSCAR MARCACIONES
         this.router.get('/', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenerTimbres);
         // METODO PARA BUSCAR EL TIMBRE DE EMPLEADO POR FECHA

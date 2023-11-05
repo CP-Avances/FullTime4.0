@@ -5,7 +5,7 @@
     <br>
     <div class="row">
         <div class="col-lg-5" style="padding-bottom: 10px;">
-            <app-rango-fechas></app-rango-fechas>
+            <app-rango-fechas [limitarFecha]="true"></app-rango-fechas>
         </div>
         <div class="col-lg-7">
             <div id="resultados">
@@ -253,7 +253,7 @@
 <div class="container" style="padding-top: 15px" [hidden]="!verDetalle">
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
-            <span>DETALLES DE TIMBRES</span>
+            <span>DETALLES DE SALIDAS ANTICIPADAS</span>
             <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
                 matTooltip="Regresar">
                 <i class="fas fa-arrow-left"></i>
@@ -268,15 +268,13 @@
                                 <th scope="col" rowspan="2">N°</th>
                                 <th scope="col" rowspan="2">CÓDIGO</th>
                                 <th scope="col" rowspan="2">EMPLEADO</th>
-                                <th scope="col" rowspan="1" colspan="2">TIMBRE</th>
-                                <th scope="col" rowspan="2">RELOJ</th>
-                                <th scope="col" rowspan="2">ACCIÓN</th>
-                                <th scope="col" rowspan="2">OBSERVACION</th>
-                                <th scope="col" rowspan="2">LONGITUD</th>
-                                <th scope="col" rowspan="2">LATITUD</th>
-                                <th scope="col" rowspan="2">MAPS</th>
+                                <th scope="col" rowspan="1" colspan="2">HORARIO</th>
+                                <th scope="col" rowspan="1" colspan="2">TIMBRE</th>                             
+                                <th scope="col" rowspan="2" colspan="2">SALIDA ANTICIPADA</th>
                             </tr>
                             <tr style="text-align: center">
+                                <th scope="col" rowspan="1">FECHA</th>
+                                <th scope="col" rowspan="1">HORA</th>
                                 <th scope="col" rowspan="1">FECHA</th>
                                 <th scope="col" rowspan="1">HORA</th>
                             </tr>
@@ -286,13 +284,12 @@
                                 <td>{{ t.n }}</td>
                                 <td>{{ t.codigo }}</td>
                                 <td>{{ t.empleado }}</td>
-                                <td>{{ t.fechaTimbreServidor }}</td>
-                                <td>{{ t.horaTimbreServidor }}</td>
-                                <td>{{ t.reloj }}</td>
-                                <td>{{ t.accion }}</td>
-                                <td>{{ t.observacion }}</td>
-                                <td>{{ t.longitud }}</td>
-                                <td>{{ t.latitud }}</td>
+                                <td>{{ t.fechaHorario }}</td>
+                                <td>{{ t.horaHorario }}</td>
+                                <td>{{ t.fechaTimbre }}</td>
+                                <td>{{ t.horaTimbre }}</td>
+                                <td>{{ t.salidaAnticipadaM }}</td>
+                                <td>{{ t.salidaAnticipadaT }}</td>
                             </tr>
                         </tbody>
                     </table>

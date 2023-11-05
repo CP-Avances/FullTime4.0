@@ -707,6 +707,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
           salida_otro_dia: nocturno,
           tipo_entr_salida: element.tipo_accion,
           fec_hora_horario: obj + ' ' + element.hora,
+          min_alimentacion: element.min_almuerzo,
         };
         if (element.segundo_dia === true) {
           plan.fec_hora_horario = moment(obj).add(1, 'd').format('YYYY-MM-DD') + ' ' + element.hora;

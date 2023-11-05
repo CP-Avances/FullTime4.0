@@ -643,7 +643,7 @@ class ReportesAsistenciaControlador {
                 return obj;
             }).filter(obj => { return obj.departamentos.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo' });
+                return res.status(400).jsonp({ message: 'No hay timbres incompletos en ese periodo' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -665,7 +665,7 @@ class ReportesAsistenciaControlador {
                 return e;
             }).filter(e => { return e.empleados.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo' });
+                return res.status(400).jsonp({ message: 'No hay timbres incompletos en ese periodo' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -995,7 +995,7 @@ const BuscarTimbresIncompletos = function (fec_inicio, fec_final, codigo) {
         return yield database_1.default.query('SELECT CAST(fec_hora_horario AS VARCHAR), codigo, estado_timbre, tipo_entr_salida AS accion, tipo_dia, estado_origen ' +
             'FROM plan_general WHERE CAST(fec_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' ' +
             'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 ' +
-            'AND fec_hora_timbre IS null AND tipo_dia NOT IN (\'L\', \'FD\')' +
+            'AND fec_hora_timbre IS null AND tipo_dia NOT IN (\'L\', \'FD\') ' +
             'ORDER BY fec_hora_horario ASC', [fec_inicio, fec_final, codigo])
             .then(res => {
             return res.rows;

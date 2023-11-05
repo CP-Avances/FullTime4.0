@@ -1,27 +1,33 @@
 <mat-card-content>
-    <div>
-        <p id="titulo">CONTABILIZAR TIEMPO DE ATRASOS</p>
-        <p><b>EJEMPLO:</b></p>
-        <ul>
-            <li type="disc">Hora de entrada 09:00</li>
-            <li type="disc">Minutos de tolerancia 10</li>
-            <li type="disc">Timbre del empleado 09:12</li>
-        </ul>
-        <p><b>Considerando minutos de tolerancia:</b></p>
-        <ul>
-            <li type="square">Atraso <b>00:02</b> minutos</li>
-        </ul>
-        <p><b>Sin considerar minutos de tolerancia:</b></p>
-        <ul>
-            <li type="square">Atraso <b>00:12</b> minutos</li>
-        </ul>
-        <p id="mensaje">¿PARA CONTABILZAR EL TIEMPO TOTAL DE ATRASOS INDIQUE?</p>
+  <p id="titulo">CONTABILIZAR TIEMPO DE ATRASOS</p>
+  <div id="ejemplo">
+    <p><b>EJEMPLO:</b></p>
+    <ul>
+      <li type="disc">Hora de entrada 09:00</li>
+      <li type="disc">Minutos de tolerancia 10</li>
+      <li type="disc">Timbre del empleado 09:12</li>
+    </ul>
+  </div>
+  
+  <div>
+    <mat-radio-group [(ngModel)]="tolerancia" class="radio-group">
+      <mat-radio-button  value="no_considerar">No considerar minutos de tolerancia</mat-radio-button>
+      <label class="elementos">Atraso <b>00:12</b> minutos</label>
+      <mat-radio-button value="considerar">Considerar minutos de tolerancia</mat-radio-button>
+    </mat-radio-group>
+  
+    <div id="grupo2">
+      <mat-radio-group [(ngModel)]="tipoTolerancia" [disabled]="tolerancia === 'no_considerar'">
+          <mat-radio-button value="horario">Con horario</mat-radio-button>
+          <mat-radio-button value="tolerancia" class="radio2">Con tolerancia</mat-radio-button>
+        </mat-radio-group>
     </div>
+      <label class="elementos">Atraso <b>00:12</b> minutos</label>
+      <label class="elementos">Atraso <b>00:02</b> minutos</label>
+  </div>
+
+  <div style="text-align: center; margin-top: 1.5rem;"> 
+      <button  class="btn btn-sm" (click)="cerrarDialogo()">Cancelar</button>
+      <button  class="btn btn-sm" (click)="aceptar()" [disabled]="(tolerancia === 'considerar' && tipoTolerancia==='')">Aceptar</button>
+  </div>
 </mat-card-content>
-<div style="text-align: center;">
-    <button mat-button class="btn btn-primary mb1 bg-blue btn-sm" (click)="confirmadoCon()" cdkFocusInitial>Considerar
-        minutos de Tolerancia</button><br><br>
-    <button mat-button class="btn btn btn-info btn-sm" (click)="confirmadoSin()">Sin considerar minutos
-        de Tolerancia</button><br><br>
-    <button id="cancelar" mat-button class="btn btn-sm" (click)="cerrarDialogo()">Cancelar</button>
-</div>

@@ -141,7 +141,7 @@
   <div class="col-md">
     <div class="d-flex justify-content-center flex-wrap">
       <mat-card (click)="MenuRapido(5)" 
-        [ngClass]="!accion ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-accionPerso'"
+        [ngClass]="!accion ? 'mat-elevation-z8 card-inactivo_' : 'mat-elevation-z8 card-accionPerso'"
         style="color: antiquewhite;"><!--boton-inactivo-->
         <mat-card-title style="text-align: center; padding: 3px;">
           <mat-label  class="titulo-card">Acciones Personal</mat-label>
@@ -157,7 +157,7 @@
         </mat-card-content>
       </mat-card>
 
-      <mat-card (click)="MenuRapido(8)" [ngClass]="!teletrabajo ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-timbreTele'"
+      <mat-card (click)="MenuRapido(8)" [ngClass]="!teletrabajo ? 'mat-elevation-z8 card-inactivo_' : 'mat-elevation-z8 card-timbreTele'"
         style="color: antiquewhite;"><!--boton-inactivo-->
         <mat-card-title style="text-align: center; padding: 3px;">
           <mat-label  class="titulo-card">Timbre Teletrabajo</mat-label>

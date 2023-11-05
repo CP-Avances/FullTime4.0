@@ -665,31 +665,13 @@ export class HorariosMultiplesComponent implements OnInit {
   }
 
   // METODO PARA CREAR LA DATA QUE SE VA A INSERTAR EN LA BASE DE DATOS
-  empl_horario: any = [];
   validos: number = 0;
   CrearData(form: any) {
     console.log('ver datos validos ', this.usuarios_validos)
-    this.empl_horario = [];
     this.plan_general = [];
     this.validos = 0;
     this.usuarios_validos.map(obj => {
       this.validos = this.validos + 1;
-      let horario = {
-        fec_inicio: form.fechaInicioForm,
-        fec_final: form.fechaFinalForm,
-        id_horarios: form.horarioForm,
-        miercoles: form.miercolesForm,
-        codigo: parseInt(obj.codigo),
-        id_empl_cargo: obj.id_cargo,
-        viernes: form.viernesForm,
-        domingo: form.domingoForm,
-        martes: form.martesForm,
-        jueves: form.juevesForm,
-        sabado: form.sabadoForm,
-        lunes: form.lunesForm,
-        estado: 1,
-      };
-      this.empl_horario = this.empl_horario.concat(horario);
       this.RegistrarPlanificacion(form, obj, this.validos);
     })
   }
@@ -944,6 +926,7 @@ export class HorariosMultiplesComponent implements OnInit {
           salida_otro_dia: nocturno,
           tipo_entr_salida: element.tipo_accion,
           fec_hora_horario: obj + ' ' + element.hora,
+          min_alimentacion: element.min_almuerzo,
         };
         if (element.segundo_dia === true) {
           plan.fec_hora_horario = moment(obj).add(1, 'd').format('YYYY-MM-DD') + ' ' + element.hora;

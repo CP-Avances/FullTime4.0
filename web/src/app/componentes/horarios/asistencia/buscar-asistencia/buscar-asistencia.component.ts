@@ -2,10 +2,10 @@ import { Validators, FormGroup, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { AsistenciaService } from 'src/app/servicios/asistencia/asistencia.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import moment from 'moment';
 import { PageEvent } from '@angular/material/paginator';
+import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 
 @Component({
   selector: 'app-buscar-asistencia',
@@ -40,7 +40,7 @@ export class BuscarAsistenciaComponent implements OnInit {
   constructor(
     private toastr: ToastrService,
     public validar: ValidacionesService,
-    public asistir: AsistenciaService,
+    public asistir: PlanGeneralService,
     public parametro: ParametrosService,
   ) { }
 
@@ -160,6 +160,7 @@ export class BuscarAsistenciaComponent implements OnInit {
   // METODO PARA LIMPIAR FORMULARIO
   Limpiar() {
     this.formulario.reset();
+    this.asistencia = [];
   }
 
 

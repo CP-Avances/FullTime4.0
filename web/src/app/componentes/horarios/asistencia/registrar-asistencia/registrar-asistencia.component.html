@@ -2,21 +2,22 @@
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
             <span>VERIFICAR ASISTENCIA</span>
-            <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">highlight_off</mat-icon>
+            <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana(1)">highlight_off</mat-icon>
         </div>
 
         <div class="container">
             <div class="nota">
+                <div style="text-align: center !important;">
+                    <i class="fas fa-solid fa-user-clock" matSuffix matTooltipPosition="left" matTooltip="Ver timbre."
+                        style="font-size: 50px; color: rgb(10, 62, 110);">
+                    </i>
+                    <br>
+                    <b>
+                        {{informacion.detalle.nombre}} {{informacion.detalle.apellido}}
+                    </b>
+                </div>
                 <div class="row">
-                    <div class="col-md-3" style="text-align: center !important;">
-                        <i class="fas fa-solid fa-user-clock" matSuffix matTooltipPosition="left"
-                            matTooltip="Ver timbre." style="font-size: 120px; color: rgb(10, 62, 110);">
-                        </i>
-                        <br><b>
-                            {{informacion.detalle.nombre}} {{informacion.detalle.apellido}}
-                        </b>
-                    </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <br>
                         <div class="row">
                             <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
@@ -42,69 +43,118 @@
                                 {{informacion.detalle.fecha_general_}}
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
-                                Tipo:
-                            </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
-                                {{informacion.detalle.tipo_}}
-                            </div>
-                        </div>
                     </div>
-                    <div class="col-md-3">
+
+                    <div class="col-md-4">
                         <br>
                         <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                            <div class="col-md-4" style="text-align: right !important; color: rgb(223, 37, 20);">
                                 Fecha horario:
                             </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
+                            <div class="col-md-8" style="text-align: left !important; color: rgb(223, 37, 20);">
                                 {{informacion.detalle.fecha_horario_}}
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                            <div class="col-md-4" style="text-align: right !important; color: rgb(223, 37, 20);">
                                 Hora horario:
                             </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
+                            <div class="col-md-8" style="text-align: left !important; color: rgb(223, 37, 20);">
                                 {{informacion.detalle.hora_horario_}}
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-4" style="text-align: right !important; color: rgb(223, 37, 20);">
+                                Tipo:
+                            </div>
+                            <div class="col-md-8" style="text-align: left !important; color: rgb(223, 37, 20);">
+                                {{informacion.detalle.tipo_}}
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <br>
                         <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                            <div class="col-md-4" style="text-align: right !important; color: rgb(20, 98, 2);">
                                 Fecha timbre:
                             </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
+                            <div class="col-md-8" style="text-align: left !important; color: rgb(20, 98, 2);">
                                 {{informacion.detalle.fecha_timbre_}}
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4" style="text-align: right !important; color: rgb(14, 15, 15);">
+                            <div class="col-md-4" style="text-align: right !important; color: rgb(20, 98, 2);">
                                 Hora timbre:
                             </div>
-                            <div class="col-md-8" style="text-align: left !important; color: rgb(14, 15, 15);">
+                            <div class="col-md-8" style="text-align: left !important; color: rgb(20, 98, 2);">
                                 {{informacion.detalle.hora_timbre_}}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="container">
-            <div style="text-align: right;">
-                <i type="submit" id="edit" style="margin-right: 20px;" matSuffix matTooltipPosition="right"
-                    matTooltip="Modificar los datos generales de este registro" class="fas fa-edit">
-                    <p>Editar</p>
-                </i>
-                <i class="far fa-trash-alt" id="delete" matSuffix matTooltipPosition="right"
-                    matTooltip="Eliminar registro.">
-                    <p>Eliminar</p>
-                </i>
+            <div style="text-align: center; padding-top: 5px; padding-bottom: 10px;">
+                <button class="btn btn-sm float-left" id="btn-raised" [disabled]="sistema" (click)="ConfirmarReasignacion()">
+                    Verificar Sistema
+                </button>
+                <button class="btn btn-sm float-right" id="btn-raised" [disabled]="manual" (click)="VerificarManual()">
+                    Verificar Manual
+                </button>
             </div>
         </div>
 
+        <div class="container" style="padding-top: 5px; text-align: center; padding-bottom: 20px;" *ngIf="ver_timbres">
+            <hr>
+            <div class="mat-elevation-z8" style="background: white;">
+                <div class="d-flex bd-highlight" id="resultados">
+                    <span class="w-100 bd-highlight">
+                        ASIGNACIÓN MANUAL DE TIMBRES
+                    </span>
+                    <mat-icon class="float-right" id="cerrar" (click)="CerrarTimbres()">highlight_off</mat-icon>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col" id="centrar" rowspan="2">CÓDIGO</th>
+                                <th scope="col" id="centrar" rowspan="2">NOMBRE</th>
+                                <th scope="col" id="centrar" rowspan="2">APELLIDO</th>
+                                <th scope="col" id="centrar" colspan="2">TIMBRE</th>
+                                <th scope="col" id="centrar" rowspan="2">TIPO</th>
+                                <th scope="col" id="centrar" rowspan="2">ACCIONES</th>
+                            </tr>
+                            <tr>
+                                <th id="centrar" scope="col">Fecha</th>
+                                <th id="centrar" scope="col">Hora</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let t of timbres | paginate:tamanio_pagina:numero_pagina">
+                                <td>{{t.codigo}}</td>
+                                <td>{{informacion.detalle.nombre}}</td>
+                                <td>{{informacion.detalle.apellido}}</td>
+                                <td>{{t.fecha}}</td>
+                                <td>{{t.hora}}</td>
+                                <td>{{informacion.detalle.tipo_}}</td>
+                                <td class="justify-content-center">
+                                    <i class="fas fa-eye" id="t-ver" matSuffix matTooltipPosition="right"
+                                        matTooltip="Asignar timbre a la asistencia." (click)="ReasignarTimbre(t)">
+                                        <p>Asignar</p>
+                                    </i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <mat-paginator id="pagina" [length]="timbres.length" [pageSize]="tamanio_pagina"
+                    [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
+                </mat-paginator>
+            </div>
+        </div>
+        <div class="pantalla-progress" *ngIf="progreso">
+            <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
+            </mat-progress-spinner>
+        </div>
     </mat-card>
 </div>

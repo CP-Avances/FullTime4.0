@@ -7,7 +7,7 @@ const express_1 = require("express");
 const alimentacionControlador_1 = __importDefault(require("../../controlador/reportes/alimentacionControlador"));
 const verificarAlimentacion_1 = require("../../libs/Modulos/verificarAlimentacion");
 const verificarToken_1 = require("../../libs/verificarToken");
-class CiudadRutas {
+class AlimentacionRutas {
     constructor() {
         this.router = (0, express_1.Router)();
         this.configuracion();
@@ -24,7 +24,10 @@ class CiudadRutas {
         this.router.post('/extras/detalle/solicita', [verificarToken_1.TokenValidation, verificarAlimentacion_1.ModuloAlimentacionValidation], alimentacionControlador_1.default.DetallarExtrasSolConsumidos);
         // DETALLES SERVICIOS DE ALIMENTACIÓN DE INVITADOS
         this.router.post('/servicios/invitados', [verificarToken_1.TokenValidation, verificarAlimentacion_1.ModuloAlimentacionValidation], alimentacionControlador_1.default.DetallarServiciosInvitados);
+        // TIMBRES DE ALIMENTACION
+        this.router.put('/timbres-alimentacion/:desde/:hasta', [verificarToken_1.TokenValidation, verificarAlimentacion_1.ModuloAlimentacionValidation], alimentacionControlador_1.default.ReporteTimbresAlimentacion);
+        this.router.put('/timbres-alimentacion-regimen-cargo/:desde/:hasta', [verificarToken_1.TokenValidation, verificarAlimentacion_1.ModuloAlimentacionValidation], alimentacionControlador_1.default.ReporteTimbresAlimentacionRegimenCargo);
     }
 }
-const ALIMENTACION_RUTAS = new CiudadRutas();
+const ALIMENTACION_RUTAS = new AlimentacionRutas();
 exports.default = ALIMENTACION_RUTAS.router;

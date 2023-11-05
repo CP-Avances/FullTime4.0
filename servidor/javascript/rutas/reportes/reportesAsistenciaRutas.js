@@ -16,8 +16,6 @@ class ReportesAsistenciasRutas {
         this.router.get('/datos_generales/:estado', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.DatosGeneralesUsuarios);
         // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR CARGOS
         this.router.get(`/informacion-general-cargo/:estado`, verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.DatosGeneralesCargo);
-        // REPORTES DE ATRASOS
-        this.router.put('/atrasos-empleados/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteAtrasosMultiple);
         // REPORTES DE FALTAS
         this.router.put('/faltas-empleados/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteFaltasMultiple);
         this.router.put('/faltas-tabulado/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteFaltasMultipleTabulado);
@@ -27,25 +25,20 @@ class ReportesAsistenciasRutas {
         this.router.put('/puntualidad/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReportePuntualidad);
         // REPORTES DE TIMBRES MULTIPLE
         this.router.put('/timbres/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresMultiple);
-        // REPORTES DE TIMBRES MULTIPLES PARA REGIMEN Y CARGO
         this.router.put('/timbres-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresMultipleRegimenCargo);
         // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL SISTEMA 
         this.router.put('/timbres-sistema/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreSistema);
-        // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL SISTEMA PARA REGIMEN Y CARGO
         this.router.put('/timbres-sistema-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreSistemaRegimenCargo);
         // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL RELOJ VIRTUAL 
         this.router.put('/timbres-reloj-virtual/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreRelojVirtual);
-        // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL RELOJ VIRTUAL PARA REGIMEN Y CARGO
         this.router.put('/timbres-reloj-virtual-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreRelojVirtualRegimenCargo);
         // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL RELOJ VIRTUAL 
         this.router.put('/timbres-horario-abierto/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreHorarioAbierto);
-        // REPORTES DE TIMBRES REALIZADOS MEDIANTE EL RELOJ VIRTUAL PARA REGIMEN Y CARGO
         this.router.put('/timbres-horario-abierto-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbreHorarioAbiertoRegimenCargo);
         // REPORTES DE TIMBRES DE HORARIO ABIERTO
         this.router.get('/timbres-abiertos', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresAbiertos);
         // REPORTES DE TIMBRES INCOMPLETOS
         this.router.put('/timbres-incompletos/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresIncompletos);
-        // REPORTES DE TIMBRES INCOMPLETOS PARA REGIMEN Y CARGO
         this.router.put('/timbres-incompletos-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresIncompletosRegimenCargo);
         // REPORTES DE TIMBRES TABULADO
         this.router.put('/timbres-tabulados/:desde/:hasta', verificarToken_1.TokenValidation, reportesAsistenciaControlador_1.default.ReporteTimbresTabulado);

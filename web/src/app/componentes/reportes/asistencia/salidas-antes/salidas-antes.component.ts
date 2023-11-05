@@ -1,18 +1,17 @@
 // IMPORTAR LIBRERIAS
-import { ReporteSalidaAntes, tim_tabulado, timbre } from 'src/app/model/salida-antes.model';
+import { ReporteSalidaAntes } from 'src/app/model/salida-antes.model';
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { PageEvent } from '@angular/material/paginator';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import { ToastrService } from 'ngx-toastr';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
 
 // IMPORTAR SERVICIOS
-import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
 import { SalidasAntesService } from 'src/app/servicios/reportes/salidas-antes/salidas-antes.service';
@@ -108,7 +107,6 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   get filtroCedula() { return this.reporteService.filtroCedula };
 
   constructor(
-    private R_asistencias: ReportesAsistenciasService,
     private validacionService: ValidacionesService,
     private informacion: DatosGeneralesService,
     private reporteService: ReportesService,
@@ -363,7 +361,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
       return obj.departamentos.length > 0
     });
     this.data_pdf = []
-    this.restSalida.BuscarTimbresSalidasAnticipadasRegimenCargo(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.restSalida.BuscarTimbresSalidasAnticipadas(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
@@ -387,7 +385,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     });
 
     this.data_pdf = [];
-    this.restSalida.BuscarTimbresSalidasAnticipadas(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
+    this.restSalida.BuscarTimbresSalidasAnticipadasRegimenCargo(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       switch (accion) {
         case 'excel': this.exportToExcel('RegimenCargo'); break;
@@ -462,9 +460,9 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   }
 
   /******************************************************
-   * 
-   *          PDF
-   * 
+   *                                                    *
+   *                          PDF                       *
+   *                                                    *
    ******************************************************/
 
   generarPdf(action) {
@@ -528,7 +526,9 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
         itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0],fillColor: '#E3E3E3' },
         itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
+        itemsTableDerecha: { fontSize: 8, alignment: 'right' },
         itemsTableInfoTotal: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.s_color  },
+        itemsTableTotal: { fontSize: 8, bold: true, alignment: 'right', fillColor: '#E3E3E3' },
         itemsTableCentradoTotal: { fontSize: 8, bold: true, alignment: 'center', fillColor: '#E3E3E3' },
         tableMargin: { margin: [0, 0, 0, 10] },
         tableMarginCabecera: { margin: [0, 15, 0, 0] },
@@ -555,26 +555,19 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
 
     if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
       data.forEach((obj1) => {
-        let arr_reg = obj1.empleados.map((o: any) => { return o.timbres.length })
-        let reg = this.SumarRegistros(arr_reg);
         if (this.bool.bool_cargo === true) {
           totalTiempoCargo = 0;
           n.push({
             style: 'tableMarginCabecera',
             table: {
-              widths: ['*', '*'],
+              widths: ['*'],
               headerRows: 1,
               body: [
                 [
                   {
-                    border: [true, true, false, true],
+                    border: [true, true, true, true],
                     bold: true,
                     text: 'CARGO: ' + obj1.name_cargo,
-                    style: 'itemsTableInfo',
-                  },
-                  {
-                    border: [false, true, true, true],
-                    text: 'N° Registros: ' + reg,
                     style: 'itemsTableInfo',
                   },
                 ],
@@ -586,19 +579,14 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
           n.push({
             style: 'tableMarginCabecera',
             table: {
-              widths: ['*', '*'],
+              widths: ['*'],
               headerRows: 1,
               body: [
                 [
                   {
-                    border: [true, true, false, true],
+                    border: [true, true, true, true],
                     bold: true,
                     text: 'RÉGIMEN: ' + obj1.regimen.nombre,
-                    style: 'itemsTableInfo',
-                  },
-                  {
-                    border: [false, true, true, true],
-                    text: 'N° Registros: ' + reg,
                     style: 'itemsTableInfo',
                   },
                 ],
@@ -656,7 +644,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
           n.push({
             style: 'tableMargin',
             table: {
-              widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
+              widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
               headerRows: 2,
               body: [
                 [
@@ -700,7 +688,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[0] },
                     { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[1] },
                     {},{},{},{},{},
-                    {style: 'itemsTableCentrado', text: minutos},
+                    {style: 'itemsTableDerecha', text: minutos},
                     {style: 'itemsTableCentrado', text: tiempo},
                   ];
                 }),
@@ -748,8 +736,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     text: '',
                     style: 'itemsTableCentradoTotal'
                   },
-                  {style: 'itemsTableCentradoTotal', text: totalTiempoEmpleado},
-                  {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado)}
+                  {style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
+                  {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))}
                 ],
               ],
             },
@@ -806,15 +794,20 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     border: [true, true, false, true],
                     bold: true,
                     text: cargo.cargo,
-                    style: 'itemsTableCentradoTotal'
+                    style: 'itemsTableCentrado'
                   },
-                  { text: '', style: 'itemsTableCentradoTotal' },
-                  { text: '', style: 'itemsTableCentradoTotal' },
-                  { text: cargo.minutos, style: 'itemsTableCentradoTotal'},
-                  { text: cargo.tiempo, style: 'itemsTableCentradoTotal'},
+                  { text: '', style: 'itemsTableDerecha' },
+                  { text: '', style: 'itemsTableCentrado' },
+                  { text: cargo.minutos, style: 'itemsTableDerecha'},
+                  { text: cargo.tiempo, style: 'itemsTableCentrado'},
                 ]
               })    
             ]
+          },
+          layout: {
+            fillColor: function (rowIndex) {
+              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+            }
           }
         });
       };
@@ -844,15 +837,20 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     border: [true, true, false, true],
                     bold: true,
                     text: regimen.regimen,
-                    style: 'itemsTableCentradoTotal'
+                    style: 'itemsTableCentrado'
                   },
-                  { text: '', style: 'itemsTableCentradoTotal' },
-                  { text: '', style: 'itemsTableCentradoTotal' },
-                  { text: regimen.minutos, style: 'itemsTableCentradoTotal'},
-                  { text: regimen.tiempo, style: 'itemsTableCentradoTotal'},
+                  { text: '', style: 'itemsTableDerecha' },
+                  { text: '', style: 'itemsTableCentrado' },
+                  { text: regimen.minutos, style: 'itemsTableDerecha'},
+                  { text: regimen.tiempo, style: 'itemsTableCentrado'},
                 ]
               })    
             ]
+          },
+          layout: {
+            fillColor: function (rowIndex) {
+              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+            }
           }
         });
       };
@@ -888,25 +886,18 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
           totalTiempoDepartamento = 0;
           // LA CABECERA CUANDO SE GENERA EL PDF POR DEPARTAMENTOS
           if (this.bool.bool_dep === true) {
-            let arr_reg = obj1.empleado.map((o: any) => { return o.timbres.length })
-            let reg = this.SumarRegistros(arr_reg);
             n.push({
               style: 'tableMarginCabecera',
               table: {
-                widths: ['*', '*'],
+                widths: ['*'],
                 headerRows: 1,
                 body: [
                   [
                     {
-                      border: [true, true, false, true],
+                      border: [true, true, true, true],
                       text: 'DEPARTAMENTO: ' + obj1.name_dep,
                       style: 'itemsTableInfoBlanco'
                     },
-                    {
-                      border: [true, true, true, true],
-                      text: 'N° REGISTROS: ' + reg,
-                      style: 'itemsTableInfoBlanco'
-                    }
                   ]
                 ]
               }
@@ -963,7 +954,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
             n.push({
               style: 'tableMargin',
               table: {
-                widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
+                widths: ['auto', 'auto', 'auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
                 headerRows: 2,
                 body: [
                   [
@@ -1007,7 +998,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                       { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[0] },
                       { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[1] },
                       {},{},{},{},{},
-                      {style: 'itemsTableCentrado', text: minutos},
+                      {style: 'itemsTableDerecha', text: minutos},
                       {style: 'itemsTableCentrado', text: tiempo},
                     ];
                   }),
@@ -1049,8 +1040,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     { style: 'itemsTableCentradoTotal', text: 'TOTAL'},
                     { text: '', style: 'itemsTableCentradoTotal'},
                     { text: '', style: 'itemsTableCentradoTotal'},
-                    { style: 'itemsTableCentradoTotal', text: totalTiempoEmpleado},
-                    { style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado)}
+                    { style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
+                    { style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))}
                   ],
                 ],
               },
@@ -1062,6 +1053,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
             });
           });
           if (this.bool.bool_dep) {
+            totalTiempoDepartamento = Number(totalTiempoDepartamento.toFixed(2));
             let departamento = {
               departamento: obj1.name_dep,
               minutos: totalTiempoDepartamento,
@@ -1072,6 +1064,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
         });
 
         if (this.bool.bool_suc) {
+          totalTiempoSucursal = Number(totalTiempoSucursal.toFixed(2));
           let sucursal = {
             sucursal: obj.name_suc,
             minutos: totalTiempoSucursal,
@@ -1107,15 +1100,20 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                   border: [true, true, false, true],
                   bold: true,
                   text: departamento.departamento,
-                  style: 'itemsTableCentradoTotal'
+                  style: 'itemsTableCentrado'
                 },
-                { text: '', style: 'itemsTableCentradoTotal' },
-                { text: '', style: 'itemsTableCentradoTotal' },
-                { text: departamento.minutos, style: 'itemsTableCentradoTotal'},
-                { text: departamento.tiempo, style: 'itemsTableCentradoTotal'},
+                { text: '', style: 'itemsTableDerecha' },
+                { text: '', style: 'itemsTableCentrado' },
+                { text: departamento.minutos, style: 'itemsTableDerecha'},
+                { text: departamento.tiempo, style: 'itemsTableCentrado'},
               ]
             })    
           ]
+        },
+        layout: {
+          fillColor: function (rowIndex) {
+            return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+          }
         }
       });
     };
@@ -1145,15 +1143,20 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                   border: [true, true, false, true],
                   bold: true,
                   text: sucursal.sucursal,
-                  style: 'itemsTableCentradoTotal'
+                  style: 'itemsTableCentrado'
                 },
-                { text: '', style: 'itemsTableCentradoTotal' },
-                { text: '', style: 'itemsTableCentradoTotal' },
-                { text: sucursal.minutos, style: 'itemsTableCentradoTotal'},
-                { text: sucursal.tiempo, style: 'itemsTableCentradoTotal'},
+                { text: '', style: 'itemsTableDerecha' },
+                { text: '', style: 'itemsTableCentrado' },
+                { text: sucursal.minutos, style: 'itemsTableDerecha'},
+                { text: sucursal.tiempo, style: 'itemsTableCentrado'},
               ]
             })    
           ]
+        },
+        layout: {
+          fillColor: function (rowIndex) {
+            return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+          }
         }
       });
     };
@@ -1215,22 +1218,21 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   /** ************************************************************************************************** ** 
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
-  exportToExcel(tipo: string): void {
+   exportToExcel(tipo: string): void {
     switch (tipo) {
-      case 'tabulado':
-        const wsr_tab: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfTabulado(this.data_pdf));
-        const wb_tab: xlsx.WorkBook = xlsx.utils.book_new();
-        xlsx.utils.book_append_sheet(wb_tab, wsr_tab, 'Timbres');
-        xlsx.writeFile(wb_tab, "Timbres_Tabulado" + new Date().getTime() + '.xlsx');
+      case 'RegimenCargo':
+        const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfRegimenCargo(this.data_pdf));
+        const wb_regimen_cargo: xlsx.WorkBook = xlsx.utils.book_new();
+        xlsx.utils.book_append_sheet(wb_regimen_cargo, wsr_regimen_cargo, 'Salidas Anticipadas');
+        xlsx.writeFile(wb_regimen_cargo, 'Salidas_anticipadas.xlsx');
         break;
       default:
         const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefault(this.data_pdf));
         const wb: xlsx.WorkBook = xlsx.utils.book_new();
-        xlsx.utils.book_append_sheet(wb, wsr, 'Timbres');
-        xlsx.writeFile(wb, "Timbres_default" + new Date().getTime() + '.xlsx');
+        xlsx.utils.book_append_sheet(wb, wsr, 'Salidas Anticipadas');
+        xlsx.writeFile(wb, 'Salidas_anticipadas.xlsx');
         break;
     }
-
   }
 
   MapingDataPdfDefault(array: Array<any>) {
@@ -1238,41 +1240,100 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     array.forEach((obj1: ReporteSalidaAntes) => {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
-          obj3.timbres.forEach((obj4: timbre) => {
-            let ele = {
-              'Id Sucursal': obj1.id_suc, 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
-              'Id Departamento': obj2.id_depa, 'Departamento': obj2.name_dep,
-              'Id Empleado': obj3.id, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
+          obj3.timbres.forEach((obj4: any) => {
+            const minutos = this.segundosAMinutosConDecimales(obj4.diferencia);
+            const tiempo = this.minutosAHorasMinutosSegundos(minutos);
+            let ele = { 
+              'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
+              'Departamento': obj2.name_dep,
+              'Régimen': obj3.regimen[0].name_regimen,
+              'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
+              'Fecha Horario': new Date(obj4.fec_hora_horario), 'Hora Horario': obj4.fec_hora_horario.split(' ')[1],
+              'Fecha Timbre': new Date(obj4.fec_hora_timbre), 'Hora Timbre': obj4.fec_hora_timbre.split(' ')[1],
+              'Salida Anticipada Minutos': minutos, 'Salida Anticipada HH:MM:SS': tiempo,
             }
-            nuevo.push(ele)
+            nuevo.push(ele);
           })
         })
       })
     })
-    return nuevo
+    return nuevo;
   }
 
-  MapingDataPdfTabulado(array: Array<any>) {
+  MapingDataPdfRegimenCargo(array: Array<any>) {
     let nuevo: Array<any> = [];
-    array.forEach((obj1: ReporteSalidaAntes) => {
+    array.forEach((obj1: any) => {
+      obj1.empleados.forEach((obj2: any) => {
+        obj2.timbres.forEach((obj3: any) => {
+          const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
+          const tiempo = this.minutosAHorasMinutosSegundos(minutos);
+          let ele = {
+            'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
+            'Departamento': obj2.departamento,
+            'Régimen': obj2.regimen[0].name_regimen,
+            'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
+            'Fecha Horario': new Date(obj3.fec_hora_horario), 'Hora Horario': obj3.fec_hora_horario.split(' ')[1],
+            'Fecha Timbre': new Date(obj3.fec_hora_timbre), 'Hora Timbre': obj3.fec_hora_timbre.split(' ')[1],
+            'Salida Anticipada Minutos': minutos, 'Salida Anticipada HH:MM:SS': tiempo,
+          }
+          nuevo.push(ele);
+        })
+      })
+    })
+    return nuevo;
+  }
+
+  //METODOS PARA EXTRAER LOS TIMBRES EN UNA LISTA Y VISUALIZARLOS
+  extraerTimbres() {
+    this.timbres = [];
+    let n = 0;
+    this.data_pdf.forEach((obj1: ReporteSalidaAntes) => {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
-          obj3.timbres.forEach((obj4: tim_tabulado) => {
+          obj3.timbres.forEach((obj4: any) => {
+            const minutos = this.segundosAMinutosConDecimales(obj4.diferencia);
+            const tiempo = this.minutosAHorasMinutosSegundos(minutos);
+            n = n + 1;
             let ele = {
-              'Id Sucursal': obj1.id_suc, 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
-              'Id Departamento': obj2.id_depa, 'Departamento': obj2.name_dep,
-              'Id Empleado': obj3.id, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
-              'Contrado': obj3.contrato, 'Cargo': obj3.cargo,
-              'Fecha Timbre': obj4.fecha.split(' ')[0], 'Hora Timbre': obj4.fecha.split(' ')[1], 'Género': obj3.genero,
-
+              n: n,
+              ciudad: obj1.ciudad, sucursal: obj1.name_suc,
+              departamento: obj2.name_dep,
+              empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
+              fechaHorario: obj4.fec_hora_horario.split(' ')[0], horaHorario: obj4.fec_hora_horario.split(' ')[1],
+              fechaTimbre: obj4.fec_hora_timbre.split(' ')[0], horaTimbre: obj4.fec_hora_timbre.split(' ')[1],
+              salidaAnticipadaM: minutos, salidaAnticipadaT: tiempo,
             }
-            nuevo.push(ele)
+            this.timbres.push(ele);
           })
         })
       })
     })
-    return nuevo
   }
+
+  extraerTimbresRegimenCargo() {
+    this.timbres = [];
+    let n = 0;
+    this.data_pdf.forEach((obj1: any) => {
+      obj1.empleados.forEach((obj2: any) => {
+        obj2.timbres.forEach((obj3: any) => {
+          const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
+          const tiempo = this.minutosAHorasMinutosSegundos(minutos);
+          n = n + 1;
+          let ele = {
+            n: n,
+            ciudad: obj2.ciudad, sucursal: obj2.sucursal,
+            departamento: obj2.departamento,
+            empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
+            fechaHorario: obj3.fec_hora_horario.split(' ')[0], horaHorario: obj3.fec_hora_horario.split(' ')[1],
+            fechaTimbre: obj3.fec_hora_timbre.split(' ')[0], horaTimbre: obj3.fec_hora_timbre.split(' ')[1],
+            salidaAnticipadaM: minutos, salidaAnticipadaT: tiempo,
+          }
+          this.timbres.push(ele);
+        })
+      })
+    })
+  }
+
 
 
   /*****************************************************************************
@@ -1436,9 +1497,9 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   verDatos() {
     this.verDetalle = true;
     if (this.bool.bool_cargo || this.bool.bool_reg) {
-      // this.extraerTimbresRegimenCargo();
+      this.extraerTimbresRegimenCargo();
     } else {
-      // this.extraerTimbres();
+      this.extraerTimbres();
     }
   }
 

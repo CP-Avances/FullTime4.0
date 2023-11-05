@@ -1,12 +1,41 @@
+.btn { 
+    margin-left: 15px;
+    background-color: rgb(80,87,97); 
+    color: white !important; 
+ }
 
-.btn { margin-left: 15px; }
-
-#cancelar { background-color: rgb(80,87,97); color: white; }
+:host ::ng-deep .mdc-form-field>label{
+  margin-bottom: 0;
+}
 
 p { font-size: 13px; }
 
-#titulo { font-size: 14px; text-align: center; color: blue; font-weight: bold; }
+#titulo { font-size: 14px; text-align: center; color: white; font-weight: bold; }
 
 #mensaje { font-size: 14px; text-align: center; color: red; font-weight: bold; }
 
 li { font-size: 13px; }
+
+label{
+    font-size: 14px;
+}
+
+.radio-group{
+    display: flex;
+    flex-direction: column; 
+}
+
+#ejemplo{
+    margin-left: 1rem;
+}
+
+.elementos{
+    margin-left: 2.9rem;
+}
+#grupo2{
+    margin-left: 2rem;
+}
+
+.radio2{
+    margin-left: 4rem;
+}

@@ -205,26 +205,26 @@ class TimbresControlador {
     //METODO PARA ACTUALIZAR O EDITAR EL TIMBRE DEL EMPLEADO
     public async EditarTimbreEmpleadoFecha(req: Request, res: Response): Promise<any> {
         try {
-            let { id, codigo, accion, tecla, observacion } = req.body;
+            let { id, codigo, accion, tecla, observacion, fecha } = req.body;
             console.log('id: ', id);
             console.log('codigo: ', codigo);
             console.log('accion: ', accion);
             console.log('tecla: ', tecla);
             console.log('observacion: ', observacion);
+            console.log('fecha: ', fecha);
+            
             await pool.query(
                 `
-                UPDATE timbres SET accion = $1, tecl_funcion = $2, observacion = $3 
-                    WHERE id = $4 
-                    AND codigo = $5  
+                SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::character varying, $3::character varying, $4::integer, $5::character varying);  
                 `
-                , [accion, tecla, observacion, id, codigo])
+                , [fecha, codigo, tecla, id, observacion])
                 .then((result: any) => {
                     return res.status(200).jsonp({ message: 'Registro actualizado.' });
                 });
 
-
         } catch (err) {
-            const message = '!Ups poblemas con la peticion al servidor.'
+            const message = 'Ups!!! algo salio mal con la peticion al servidor.'
+            console.log('error ----- ', err)
             return res.status(500).jsonp({ error: err, message: message })
         }
     }
@@ -526,6 +526,29 @@ class TimbresControlador {
             });
         } catch (error) {
             res.status(400).jsonp({ message: error })
+        }
+    }
+
+
+    // METODO PARA BUSCAR TIMBRES (ASISTENCIA)
+    public async BuscarTimbresAsistencia(req: Request, res: Response): Promise<any> {
+
+        const { fecha, funcion, codigo } = req.body;
+        const TIMBRE = await pool.query(
+            `
+            SELECT t.*, t.fec_hora_timbre_servidor::date AS t_fec_timbre, 
+                t.fec_hora_timbre_servidor::time AS t_hora_timbre 
+                FROM timbres AS t
+                WHERE codigo = $1 AND fec_hora_timbre_servidor::date = $2 AND tecl_funcion = $3 
+                ORDER BY t.fec_hora_timbre_servidor ASC;
+            `
+            , [codigo, fecha, funcion]);
+
+        if (TIMBRE.rowCount > 0) {
+            return res.jsonp({ message: 'OK', respuesta: TIMBRE.rows })
+        }
+        else {
+            return res.status(404).jsonp({ message: 'vacio' });
         }
     }
 

@@ -1,4 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
+import { FormGroup, FormControl } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
@@ -8,20 +9,23 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 })
 export class ConfigurarAtrasosComponent implements OnInit {
 
+  tolerancia: string = 'no_considerar';
+  tipoTolerancia: string = '';
+
   constructor(
     public dialogo: MatDialogRef<ConfigurarAtrasosComponent>,
     @Inject(MAT_DIALOG_DATA) public mensaje: string) { }
 
   cerrarDialogo(): void {
-    this.dialogo.close('cerrar');
+    this.dialogo.close('cancelar');
   }
   
-  confirmadoCon(): void {
-    this.dialogo.close('con');
-  }
-
-  confirmadoSin(): void {
-    this.dialogo.close('sin');
+  aceptar(): void {
+    const result = {
+      tolerancia: this.tolerancia,
+      tipoTolerancia: this.tipoTolerancia
+   };
+   this.dialogo.close(result);
   }
 
   ngOnInit(): void {

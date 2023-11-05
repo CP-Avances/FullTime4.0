@@ -38,7 +38,7 @@ class SalidasAntesControlador {
                 return obj;
             }).filter(obj => { return obj.departamentos.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No se ha encontrado registro de timbres.' });
+                return res.status(400).jsonp({ message: 'No se ha encontrado registro de salidas anticipadas.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -60,7 +60,7 @@ class SalidasAntesControlador {
                 return e;
             }).filter(e => { return e.empleados.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo' });
+                return res.status(400).jsonp({ message: 'No se ha encontrado registro de salidas anticipadas.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -74,7 +74,7 @@ const BuscarSalidasAnticipadas = function (fec_inicio, fec_final, codigo) {
             'codigo, estado_timbre, tipo_entr_salida AS accion, tipo_dia ' +
             'FROM plan_general WHERE CAST(fec_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' ' +
             'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 ' +
-            'AND fec_hora_timbre < fec_hora_horario AND tipo_dia NOT IN (\'L\', \'FD\')' +
+            'AND fec_hora_timbre < fec_hora_horario AND tipo_dia NOT IN (\'L\', \'FD\') ' +
             'AND tipo_entr_salida = \'S\' ' +
             'ORDER BY fec_hora_horario ASC', [fec_inicio, fec_final, codigo])
             .then(res => {

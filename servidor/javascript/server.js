@@ -68,12 +68,12 @@ const reloj_virtual_1 = __importDefault(require("./utils/reloj_virtual"));
 const vacunasRutas_1 = __importDefault(require("./rutas/empleado/empleadoVacuna/vacunasRutas"));
 const reporteVacunasRutas_1 = __importDefault(require("./rutas/reportes/reporteVacunasRutas"));
 const salidasAntesRutas_1 = __importDefault(require("./rutas/reportes/salidasAntesRutas"));
+const reportesAtrasosRutas_1 = __importDefault(require("./rutas/reportes/reportesAtrasosRutas"));
+const reportesFaltasRutas_1 = __importDefault(require("./rutas/reportes/reportesFaltasRutas"));
 const auditoriaRutas_1 = __importDefault(require("./rutas/auditoria/auditoriaRutas"));
 const solicitudVacacionesRutas_1 = __importDefault(require("./rutas/reportes/solicitudVacacionesRutas"));
 const parametrosRutas_1 = __importDefault(require("./rutas/parametrosGenerales/parametrosRutas"));
 const emplUbicacionRutas_1 = __importDefault(require("./rutas/empleado/empleadoUbicacion/emplUbicacionRutas"));
-const asistenciaRutas_2 = __importDefault(require("./rutas/asistencia/asistenciaRutas"));
-const conexionDataBasesRutas_1 = __importDefault(require("./rutas/conexionDataBases/conexionDataBasesRutas"));
 const http_1 = require("http");
 var io;
 class Servidor {
@@ -110,8 +110,6 @@ class Servidor {
         this.app.use('/', indexRutas_1.default);
         this.app.use('/rol', catRolesRutas_1.default);
         this.app.use('/login', loginRuta_1.default);
-        // CONEXION A BASE DE DATOS
-        this.app.use('/conexionDataBases', conexionDataBasesRutas_1.default);
         // PARÁMETROS GENERALES
         this.app.use('/parametrizacion', parametrosRutas_1.default);
         // COORDENADAS DE UBICACIONES
@@ -133,8 +131,6 @@ class Servidor {
         // Horarios
         this.app.use('/empleadoHorario', empleadoHorariosRutas_1.default);
         this.app.use('/detalleHorario', detalleCatHorarioRutas_1.default);
-        // ASISTENCIA
-        this.app.use('/asistencia-usuarios', asistenciaRutas_2.default);
         // Enrolados
         this.app.use('/relojes', catRelojesRuta_1.default);
         //Redireccionamiento a páginas que contienen catálogos
@@ -174,8 +170,10 @@ class Servidor {
         this.app.use('/reportes/vacacion', kardexVacacionesRutas_1.default);
         this.app.use('/reportes/hora-extra', reporteHoraExtraRutas_1.default); //acceso controlado por
         this.app.use('/reporte', reportesRutas_1.default);
+        this.app.use('/reporte-faltas/', reportesFaltasRutas_1.default);
         this.app.use('/reportes-asistencias/', reportesAsistenciaRutas_1.default);
         this.app.use('/reporte-salidas-antes/', salidasAntesRutas_1.default);
+        this.app.use('/reporte-atrasos/', reportesAtrasosRutas_1.default);
         // REPORTES DE AUDITORIA
         this.app.use('/reportes-auditoria', auditoriaRutas_1.default);
         // REPORTE MÚLTIPLE DE VACUNAS

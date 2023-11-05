@@ -1,5 +1,5 @@
 "use strict";
-// CONEXIÓN CON LA BASE DE DATOS POSTGRESQL
+// CONEXION CON LA BASE DE DATOS POSTGRESQL
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };

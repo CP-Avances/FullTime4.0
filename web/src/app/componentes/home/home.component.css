@@ -5,7 +5,7 @@
     width: 50%;
 }
 
-label{
+label {
     vertical-align: middle;
     text-align: center;
     align-items: center;
@@ -33,7 +33,7 @@ label{
     color: white;
 }
 
-.titulo-card{
+.titulo-card {
     margin: auto;
     vertical-align: middle;
     margin-right: 8px !important;
@@ -42,7 +42,7 @@ label{
 }
 
 /*Infotmacion Usuario*/
-.card-info{
+.card-info {
     height: 100%;
     background: linear-gradient(to right, rgb(32, 119, 150), rgb(18, 96, 125));
     font-size: 14px;
@@ -50,9 +50,10 @@ label{
     transition: transform 0.3s;
     margin-left: 5px;
 }
-.card-info:hover{
+
+.card-info:hover {
     cursor: pointer;
-    transform: scale(1.03); 
+    transform: scale(1.03);
 }
 
 /* PERMISOS */
@@ -63,13 +64,14 @@ label{
     border-radius: 10px;
     transition: transform 0.3s;
 }
-.card-permi:hover{
+
+.card-permi:hover {
     cursor: pointer;
-    transform: scale(1.03); 
+    transform: scale(1.03);
 }
 
 /* VACACIONES */
-.card-vaca{
+.card-vaca {
     height: 215px;
     background: linear-gradient(to right, rgb(27, 135, 52), rgb(13, 94, 32));
     font-size: 14px;
@@ -77,13 +79,14 @@ label{
     transition: transform 0.3s;
     margin-right: 5px;
 }
-.card-vaca:hover{
+
+.card-vaca:hover {
     cursor: pointer;
-    transform: scale(1.03); 
+    transform: scale(1.03);
 }
 
 /* REPORTES */
-.card-timbreTele{
+.card-timbreTele {
     background: linear-gradient(to right, rgb(100, 159, 28), rgb(74, 124, 12));
     height: 200px;
     width: 225px;
@@ -93,13 +96,14 @@ label{
     margin-left: 6px;
     margin-right: 6px;
 }
-.card-timbreTele:hover{
+
+.card-timbreTele:hover {
     cursor: pointer;
-    transform: scale(1.03); 
+    transform: scale(1.03);
 }
 
 /* HORAS EXTRAS */
-.card-horasExtras{
+.card-horasExtras {
     height: 215px;
     background: linear-gradient(to right, rgb(138, 71, 213), rgb(113, 47, 189));
     font-size: 14px;
@@ -107,9 +111,10 @@ label{
     transition: transform 0.3s;
     margin-left: 5px;
 }
-.card-horasExtras:hover{
+
+.card-horasExtras:hover {
     cursor: pointer;
-    transform: scale(1.03); 
+    transform: scale(1.03);
 }
 
 /* ALIMENTACION */
@@ -120,9 +125,10 @@ label{
     border-radius: 10px;
     transition: transform 0.3s;
 }
-.card-alimentacion:hover{
+
+.card-alimentacion:hover {
     cursor: pointer;
-    transform: scale(1.03); 
+    transform: scale(1.03);
 }
 
 /* ACCIONES PERSONAL */
@@ -136,9 +142,10 @@ label{
     margin-left: 6px;
     margin-right: 6px;
 }
-.card-accionPerso:hover{
+
+.card-accionPerso:hover {
     cursor: pointer;
-    transform: scale(1.03); 
+    transform: scale(1.03);
 }
 
 /* MOVIL */
@@ -152,9 +159,10 @@ label{
     margin-left: 6px;
     margin-right: 6px;
 }
-.card-aplicacionMovil:hover{
+
+.card-aplicacionMovil:hover {
     cursor: pointer;
-    transform: scale(1.03); 
+    transform: scale(1.03);
 }
 
 /* GEOLOCALIZACION */
@@ -168,14 +176,37 @@ label{
     margin-left: 6px;
     margin-right: 6px;
 }
-.card-geolocali:hover{
+
+.card-geolocali:hover {
     cursor: pointer;
-    transform: scale(1.03); 
+    transform: scale(1.03);
 }
 
-.boton-inactivo {
+.card-inactivo {
     background: linear-gradient(to right, rgb(164, 166, 167), rgb(131, 132, 133));
-    font-size: 16px;
+    font-size: 14px;
+    height: 215px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+}
+
+.card-inactivo_ {
+    background: linear-gradient(to right, rgb(164, 166, 167), rgb(131, 132, 133));
+    height: 200px;
+    width: 225px;
+    font-size: 14px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+}
+
+.card-inactivo:hover {
+    cursor: pointer;
+    transform: scale(1.03);
+}
+
+.card-inactivo_:hover {
+    cursor: pointer;
+    transform: scale(1.03);
 }
 
 #charts_inasistencia {
@@ -237,7 +268,7 @@ label{
 
 }
 
-.texto{
+.texto {
     margin: auto;
 }
 
@@ -261,7 +292,7 @@ label{
     font-size: 60px;
 }
 
-.cont_imagen{
-    width: min-content; 
+.cont_imagen {
+    width: min-content;
     margin: auto;
 }

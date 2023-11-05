@@ -1032,6 +1032,7 @@ export class PlanificacionMultipleComponent implements OnInit {
                 salida_otro_dia: nocturno,
                 tipo_entr_salida: element.tipo_accion,
                 fec_hora_horario: asig.fecha + ' ' + element.hora,
+                min_alimentacion: element.min_almuerzo,
               };
               if (element.segundo_dia === true) {
                 plan.fec_hora_horario = moment(asig.fecha).add(1, 'd').format('YYYY-MM-DD') + ' ' + element.hora;
