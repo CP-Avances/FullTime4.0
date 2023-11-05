@@ -69,10 +69,12 @@ import VACACIONES_REPORTES_RUTAS from './rutas/reportes/solicitudVacacionesRutas
 import PARAMETROS_RUTAS from './rutas/parametrosGenerales/parametrosRutas';
 import UBICACION_RUTAS from './rutas/empleado/empleadoUbicacion/emplUbicacionRutas';
 import ASISTENCIA_USUARIOS_RUTAS from './rutas/asistencia/asistenciaRutas';
+import CONEXION_DATABASES_RUTAS from './rutas/conexionDataBases/conexionDataBasesRutas';
 
 import { createServer, Server } from 'http';
 
 var io: any;
+
 
 class Servidor {
 
@@ -92,7 +94,7 @@ class Servidor {
                 methods: ['GET', 'POST'],
             }
         });
-
+        
     }
     configuracion(): void {
         this.app.set('puerto', process.env.PORT || 3001);
@@ -114,6 +116,9 @@ class Servidor {
         this.app.use('/', indexRutas);
         this.app.use('/rol', ROLES_RUTAS);
         this.app.use('/login', LOGIN_RUTA);
+        
+        // CONEXION A BASE DE DATOS
+        this.app.use('/conexionDataBases', CONEXION_DATABASES_RUTAS);
 
         // PARÁMETROS GENERALES
         this.app.use('/parametrizacion', PARAMETROS_RUTAS);

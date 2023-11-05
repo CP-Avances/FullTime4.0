@@ -73,6 +73,7 @@ const solicitudVacacionesRutas_1 = __importDefault(require("./rutas/reportes/sol
 const parametrosRutas_1 = __importDefault(require("./rutas/parametrosGenerales/parametrosRutas"));
 const emplUbicacionRutas_1 = __importDefault(require("./rutas/empleado/empleadoUbicacion/emplUbicacionRutas"));
 const asistenciaRutas_2 = __importDefault(require("./rutas/asistencia/asistenciaRutas"));
+const conexionDataBasesRutas_1 = __importDefault(require("./rutas/conexionDataBases/conexionDataBasesRutas"));
 const http_1 = require("http");
 var io;
 class Servidor {
@@ -109,6 +110,8 @@ class Servidor {
         this.app.use('/', indexRutas_1.default);
         this.app.use('/rol', catRolesRutas_1.default);
         this.app.use('/login', loginRuta_1.default);
+        // CONEXION A BASE DE DATOS
+        this.app.use('/conexionDataBases', conexionDataBasesRutas_1.default);
         // PARÁMETROS GENERALES
         this.app.use('/parametrizacion', parametrosRutas_1.default);
         // COORDENADAS DE UBICACIONES

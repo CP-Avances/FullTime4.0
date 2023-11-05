@@ -20,6 +20,8 @@ import { GraficasService } from 'src/app/servicios/graficas/graficas.service';
 import { MainNavService } from '../administracionGeneral/main-nav/main-nav.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 
+import { ConexionDataBaseService } from 'src/app/servicios/conexionDataBase/conexion-data-base.service';
+
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -51,11 +53,18 @@ export class HomeComponent implements OnInit {
     public validar: ValidacionesService,
     public parametro: ParametrosService,
     public restEmpleado: EmpleadoService,
+    public conexionDataBase: ConexionDataBaseService
   ) { }
 
+  datosBase: any;
   ngOnInit(): void {
     this.idEmpleado = localStorage.getItem('empleado');
     this.BuscarParametro();
+    this.conexionDataBase.ObtenerDataBase().subscribe(res => {
+      this.datosBase = res;
+      console.log('Nombre de la base de datos: ', this.datosBase.options.database);
+    })
+
   }
 
   /** **************************************************************************************** **
