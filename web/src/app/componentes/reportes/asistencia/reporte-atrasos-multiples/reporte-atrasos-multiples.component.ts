@@ -844,8 +844,8 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                       { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[0] },
                       { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[1] },
                       {},{},{},{},{},
-                      {style: 'itemsTableDerecha', text: minutos},
                       {style: 'itemsTableCentrado', text: tiempo},
+                      {style: 'itemsTableDerecha', text: minutos},
                     ];
                   }),
                   [
@@ -892,8 +892,8 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                       text: '',
                       style: 'itemsTableCentradoTotal'
                     },
+                    {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))},
                     {style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
-                    {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))}
                   ],
                 ],
               },
@@ -1260,8 +1260,8 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                         { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[0] },
                         { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[1] },
                         {},{},{},{},{},
-                        {style: 'itemsTableDerecha', text: minutos},
                         {style: 'itemsTableCentrado', text: tiempo},
+                        {style: 'itemsTableDerecha', text: minutos},
                       ];
                     }),
                     [
@@ -1302,8 +1302,8 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                       { style: 'itemsTableCentradoTotal', text: 'TOTAL'},
                       { text: '', style: 'itemsTableCentradoTotal'},
                       { text: '', style: 'itemsTableCentradoTotal'},
+                      { style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))},
                       { style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
-                      { style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))}
                     ],
                   ],
                 },
@@ -1599,7 +1599,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
             let ele = {
               n: n,
               ciudad: obj1.ciudad, sucursal: obj1.name_suc,
-              departamento: obj2.name_dep,
+              departamento: obj2.name_dep, regimen: obj3.regimen[0].name_regimen,
               empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo, tolerancia: obj4.tolerancia,
               fechaHorario: obj4.fec_hora_horario.split(' ')[0], horaHorario: obj4.fec_hora_horario.split(' ')[1],
               fechaTimbre: obj4.fec_hora_timbre.split(' ')[0], horaTimbre: obj4.fec_hora_timbre.split(' ')[1],
@@ -1624,7 +1624,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
           let ele = {
             n: n,
             ciudad: obj2.ciudad, sucursal: obj2.sucursal,
-            departamento: obj2.departamento,
+            departamento: obj2.departamento, regimen: obj2.regimen[0].name_regimen,
             empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo, tolerancia: obj3.tolerancia,
             fechaHorario: obj3.fec_hora_horario.split(' ')[0], horaHorario: obj3.fec_hora_horario.split(' ')[1],
             fechaTimbre: obj3.fec_hora_timbre.split(' ')[0], horaTimbre: obj3.fec_hora_timbre.split(' ')[1],
