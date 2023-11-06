@@ -11,8 +11,8 @@ export class ConexionDataBaseService {
     private http: HttpClient,
   ) { }
 
-  ObtenerDataBase() {
-    console.log('entro en conexion base');
-    return this.http.get(`${environment.url}/conexionDataBases/dataBase`);
+  ObtenerDataBase(nombre: string) {
+    console.log('nombre: ',nombre);
+    return this.http.get(`${environment.url}/conexionDataBases/dataBase/${nombre}`);
   }
 }

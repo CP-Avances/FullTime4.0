@@ -60,9 +60,10 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.idEmpleado = localStorage.getItem('empleado');
     this.BuscarParametro();
-    this.conexionDataBase.ObtenerDataBase().subscribe(res => {
+    const nombreData = 'postgres'
+    this.conexionDataBase.ObtenerDataBase(nombreData).subscribe(res => {
       this.datosBase = res;
-      console.log('Nombre de la base de datos: ', this.datosBase.options.database);
+      console.log('Nombre de la base de datos: ', this.datosBase);
     })
 
   }

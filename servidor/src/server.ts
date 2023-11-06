@@ -70,6 +70,7 @@ import AUDITORIA_RUTAS from './rutas/auditoria/auditoriaRutas';
 import VACACIONES_REPORTES_RUTAS from './rutas/reportes/solicitudVacacionesRutas';
 import PARAMETROS_RUTAS from './rutas/parametrosGenerales/parametrosRutas';
 import UBICACION_RUTAS from './rutas/empleado/empleadoUbicacion/emplUbicacionRutas';
+import CONEXION_DATABASES_RUTAS from './rutas/conexionDataBases/conexionDataBasesRutas';
 
 import { createServer, Server } from 'http';
 
@@ -116,8 +117,10 @@ class Servidor {
         this.app.use('/', indexRutas);
         this.app.use('/rol', ROLES_RUTAS);
         this.app.use('/login', LOGIN_RUTA);
-        
 
+        // CONEXION DATA BASE
+        this.app.use('/conexionDataBases', CONEXION_DATABASES_RUTAS);
+        
         // PARÁMETROS GENERALES
         this.app.use('/parametrizacion', PARAMETROS_RUTAS);
 

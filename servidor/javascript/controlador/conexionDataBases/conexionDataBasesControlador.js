@@ -15,27 +15,28 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CONEXION_DATABASES_CONTROLADOR = void 0;
 const pg_pool_1 = __importDefault(require("pg-pool"));
 class ConexionDataBasesControlador {
-    constructor() {
-        const db_cliente = new pg_pool_1.default({
-            user: 'postgres',
-            host: 'localhost',
-            port: 5432,
-            database: 'VacaOrtiz',
-            password: 'fulltime'
-        });
-        db_cliente.query('SELECT NOW()', (err, res) => {
-            if (err) {
-                console.log("Error durante la conexión", err);
-            }
-            else {
-                console.log("Conexión exitosa Cliente");
-            }
-        });
-        exports.cliente = db_cliente;
-    }
     // METODO PARA OPTENER EL NOMBRE DE LA BASE DE DATOS
-    getDatabaseName(req, res) {
+    setDatabaseName(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            const { nombre } = req.params;
+            console.log('entro en conexion data base');
+            const db_cliente = new pg_pool_1.default({
+                user: 'postgres',
+                host: 'localhost',
+                port: 5432,
+                database: nombre,
+                password: '12345'
+            });
+            db_cliente.query('SELECT NOW()', (err, res) => {
+                if (err) {
+                    console.log("Error durante la conexión", err);
+                }
+                else {
+                    console.log("Conexión exitosa base: ", nombre);
+                }
+            });
+            exports.cliente = db_cliente;
+            return res.json(exports.cliente);
         });
     }
 }

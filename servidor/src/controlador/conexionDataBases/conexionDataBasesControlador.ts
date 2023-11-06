@@ -5,30 +5,30 @@ import pool from '../../database';
 
 class ConexionDataBasesControlador {
 
-  NombreDataB: any;
+  // METODO PARA OPTENER EL NOMBRE DE LA BASE DE DATOS
+  public async setDatabaseName(req: Request, res: Response): Promise<any> {
+    const { nombre } = req.params;
+    console.log('entro en conexion data base')
 
-  constructor(){
     const db_cliente = new Pool({
       user: 'postgres',
       host: 'localhost',
       port: 5432,
-      database: 'VacaOrtiz',
-      password: 'fulltime'
+      database: nombre,
+      password: '12345'
   });
   
   db_cliente.query('SELECT NOW()', (err, res) => {
       if (err) {
         console.log("Error durante la conexión", err)
       } else {
-        console.log("Conexión exitosa Cliente")
+        console.log("Conexión exitosa base: ",nombre)
       }
   });
     
   exports.cliente = db_cliente;
-  }
 
-  // METODO PARA OPTENER EL NOMBRE DE LA BASE DE DATOS
-  public async getDatabaseName(req: Request, res: Response): Promise<any> {
+    return res.json(exports.cliente);
     
   }
 

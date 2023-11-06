@@ -13,7 +13,7 @@ class ConexionDataBasesRutas {
     }
     configuracion() {
         // METODO PARA OPTENER EL NOMBRE DE LA BASE DE DATOS
-        this.router.get('/dataBase', verificarToken_1.TokenValidation, conexionDataBasesControlador_1.default.getDatabaseName);
+        this.router.get('/dataBase/:nombre', verificarToken_1.TokenValidation, conexionDataBasesControlador_1.default.setDatabaseName);
     }
 }
 const CONEXION_DATABASES_RUTAS = new ConexionDataBasesRutas();
