@@ -518,10 +518,10 @@ export class MainNavComponent implements OnInit {
             children: [
               { name: 'Tiempo Alimentación', url: '/tiempo-alimentacion', color: true },
               { name: 'Salidas Anticipadas', url: '/salidas-anticipadas', color: true },
+              { name: 'Tiempo Laborado', url: '/reporte-horas-trabajadas', color: true },
               { name: 'Puntualidad', url: '/reporte-puntualidad', color: true },
               { name: 'Atrasos', url: '/reporte-atrasos-multiples', color: true },
               { name: 'Faltas', url: '/reporte-faltas', color: true },
-              //{ name: 'Horas Trabajadas', url: '/reporte-horas-trabaja', color: true },
               //{ name: 'Entradas Salidas', url: '/reporteEntradaSalida', color: true },
               //{ name: 'Asistencia Detalle Consolidado', url: '/reporteAsistenciaConsolidado', color: true },
             ]
