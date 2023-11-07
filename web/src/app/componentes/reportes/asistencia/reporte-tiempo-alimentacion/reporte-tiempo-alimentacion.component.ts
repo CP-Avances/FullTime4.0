@@ -1158,9 +1158,9 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
             const finAlimentacion = obj4.finAlimentacion.fec_hora_timbre != null
               ? obj4.finAlimentacion.fec_hora_timbre.split(' ')[1]
               : 'FT';
-              const minAlimentacion = obj4.inicioAlimentacion.min_alimentacion;
-              const minutosTomados = this.calcularDiferenciaFechas(obj4.inicioAlimentacion.fec_hora_timbre,obj4.finAlimentacion.fec_hora_timbre);
-              const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
+            const minAlimentacion = obj4.inicioAlimentacion.min_alimentacion;
+            const minutosTomados = this.calcularDiferenciaFechas(obj4.inicioAlimentacion.fec_hora_timbre,obj4.finAlimentacion.fec_hora_timbre);
+            const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
             let ele = { 
               'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
               'Departamento': obj2.name_dep,
@@ -1184,14 +1184,14 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       obj1.empleados.forEach((obj2: any) => {
         obj2.timbres.forEach((obj3: any) => {
           const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null 
-              ? obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1]
-              : 'FT';
-            const finAlimentacion = obj3.finAlimentacion.fec_hora_timbre != null
-              ? obj3.finAlimentacion.fec_hora_timbre.split(' ')[1]
-              : 'FT';
-              const minAlimentacion = obj3.inicioAlimentacion.min_alimentacion;
-              const minutosTomados = this.calcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre,obj3.finAlimentacion.fec_hora_timbre);
-              const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
+            ? obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1]
+            : 'FT';
+          const finAlimentacion = obj3.finAlimentacion.fec_hora_timbre != null
+            ? obj3.finAlimentacion.fec_hora_timbre.split(' ')[1]
+            : 'FT';
+          const minAlimentacion = obj3.inicioAlimentacion.min_alimentacion;
+          const minutosTomados = this.calcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre,obj3.finAlimentacion.fec_hora_timbre);
+          const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
           let ele = {
             'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
             'Departamento': obj2.departamento,

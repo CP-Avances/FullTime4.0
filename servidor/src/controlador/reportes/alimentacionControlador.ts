@@ -277,7 +277,6 @@ const BuscarAlimentacion = async function (fec_inicio: string, fec_final: string
 
 
 const agruparTimbres = async function(listaTimbres: any) {
-    console.log('en agrupar');
     const timbresAgrupados: any[] = [];
     for (let i = 0; i < listaTimbres.length; i += 2) {
         timbresAgrupados.push({

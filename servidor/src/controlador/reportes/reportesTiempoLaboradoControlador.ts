@@ -12,7 +12,8 @@ class ReportesTiempoLaboradoControlador {
         let n: Array<any> = await Promise.all(datos.map(async (obj: ReporteTiempoLaborado) => {
             obj.departamentos = await Promise.all(obj.departamentos.map(async (ele) => {
                 ele.empleado = await Promise.all(ele.empleado.map(async (o) => {
-                    o.timbres = await BuscarTiempoLaborado(desde, hasta, o.codigo);
+                    const listaTimbres = await BuscarTiempoLaborado(desde, hasta, o.codigo);
+                    o.timbres = await agruparTimbres(listaTimbres);
                     console.log('timbres:-------------------- ', o);
                     return o
                 })
@@ -45,7 +46,8 @@ class ReportesTiempoLaboradoControlador {
         let datos: any[] = req.body;
         let n: Array<any> = await Promise.all(datos.map(async (obj: any) => {      
             obj.empleados = await Promise.all(obj.empleados.map(async (o:any) => {
-                o.timbres = await BuscarTiempoLaborado(desde, hasta, o.codigo);
+                const listaTimbres = await BuscarTiempoLaborado(desde, hasta, o.codigo);
+                o.timbres = await agruparTimbres(listaTimbres);
                 console.log('Timbres: ', o);
                 return o;
             }));    
@@ -70,16 +72,71 @@ const REPORTES_TIEMPO_LABORADO_CONTROLADOR = new ReportesTiempoLaboradoControlad
 export default REPORTES_TIEMPO_LABORADO_CONTROLADOR;
 
 const BuscarTiempoLaborado = async function (fec_inicio: string, fec_final: string, codigo: string | number) {
-    return await pool.query('SELECT CAST(fec_hora_horario AS VARCHAR), CAST(fec_hora_timbre AS VARCHAR), ' +
-        'EXTRACT(epoch FROM (fec_hora_timbre - fec_hora_horario)) AS diferencia, ' +
-        'codigo, estado_timbre, tipo_entr_salida AS accion, tolerancia, tipo_dia ' +
-        'FROM plan_general WHERE CAST(fec_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' ' +
-        'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 ' +
-        'AND fec_hora_timbre > fec_hora_horario AND tipo_dia NOT IN (\'L\', \'FD\') ' +
-        'AND tipo_entr_salida = \'E\' ' +
-        'ORDER BY fec_hora_horario ASC', [fec_inicio, fec_final, codigo])
+    return await pool.query('SELECT CAST(fec_horario AS VARCHAR), CAST(fec_hora_horario AS VARCHAR), CAST(fec_hora_timbre AS VARCHAR), ' +
+    'codigo, estado_timbre, tipo_entr_salida AS accion, min_alimentacion ' +
+    'FROM plan_general WHERE CAST(fec_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' ' +
+    'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 ' +
+    'AND tipo_dia NOT IN (\'L\', \'FD\') ' +
+    'AND tipo_entr_salida IN (\'E\',\'I/A\', \'F/A\', \'S\') ' +
+    'ORDER BY codigo, fec_hora_horario ASC', [fec_inicio, fec_final, codigo])
         .then(res => {
             
             return res.rows;
         })
 }
+
+const agruparTimbres = async function agruparTimbresPorClave(timbres: Timbre[]) {
+    const timbresAgrupadosFecha: { [key: string]: Timbre[] } = {};
+    const timbresAgrupados: any[] = [];
+
+    timbres.forEach((timbre) => {
+        const clave = `${timbre.fec_horario}`;
+        if (!timbresAgrupadosFecha[clave]) {
+            timbresAgrupadosFecha[clave] = [];
+        }
+        timbresAgrupadosFecha[clave].push(timbre);
+    });
+
+    for (let key in timbresAgrupadosFecha) {
+        console.log('key',key)
+        const cantidadTimbres = timbresAgrupadosFecha[key].length;
+        switch (cantidadTimbres) {
+            case 4:
+                for (let i = 0; i < timbresAgrupadosFecha[key].length; i += 4) {
+                    timbresAgrupados.push({
+                        tipo: 'EAS',
+                        entrada: timbresAgrupadosFecha[key][i],
+                        inicioAlimentacion: timbresAgrupadosFecha[key][i+1],
+                        finAlimentacion: timbresAgrupadosFecha[key][i+2],
+                        salida: i + 3 < timbresAgrupadosFecha[key].length ? timbresAgrupadosFecha[key][i + 3] : null
+                    });
+                }
+                break;  
+            default:
+                for (let i = 0; i < timbresAgrupadosFecha[key].length; i += 2) {
+                   timbresAgrupados.push({
+                        tipo: 'ES',
+                        entrada: timbresAgrupadosFecha[key][i],
+                        salida: i + 1 < timbresAgrupadosFecha[key].length ? timbresAgrupadosFecha[key][i + 1] : null
+                     });
+                }
+                break;
+        }
+    }
+
+    return timbresAgrupados;
+}
+
+
+
+
+interface Timbre {
+    fec_horario: string;
+    fec_hora_horario: string;
+    fec_hora_timbre: string | null;
+    codigo: string;
+    estado_timbre: string | null;
+    accion: string;
+    min_alimentacion: number;
+}
+

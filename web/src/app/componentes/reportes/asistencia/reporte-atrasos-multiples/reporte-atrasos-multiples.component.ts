@@ -1524,8 +1524,8 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                 'Departamento': obj2.name_dep,
                 'Régimen': obj3.regimen[0].name_regimen,
                 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
-                'Horario': obj4.fec_hora_horario, 'Hora Horario': obj4.fec_hora_horario.split(' ')[1],
-                'Fecha Timbre': obj4.fec_hora_timbre, 'Hora Timbre': obj4.fec_hora_timbre.split(' ')[1],
+                'Fecha Horario': new Date(obj4.fec_hora_horario), 'Hora Horario': obj4.fec_hora_horario.split(' ')[1],
+                'Fecha Timbre': new Date(obj4.fec_hora_timbre), 'Hora Timbre': obj4.fec_hora_timbre.split(' ')[1],
                 'Tolerancia': obj4.tolerancia,
                 'Atraso HH:MM:SS': tiempo, 'Atraso Minutos': minutos,
               }
