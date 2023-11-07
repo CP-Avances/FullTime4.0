@@ -36,7 +36,8 @@ class TimbresRutas {
 
 
 
-
+        // METODO PARA BUSCAR TIMBRES - PLANIFICACION HORARIA
+        this.router.post('/buscar/timbres-planificacion', TokenValidation, TIMBRES_CONTROLADOR.BuscarTimbresPlanificacion);
 
 
 

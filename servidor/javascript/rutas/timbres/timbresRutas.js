@@ -26,6 +26,8 @@ class TimbresRutas {
         this.router.post('/admin/', verificarToken_1.TokenValidation, timbresControlador_1.default.CrearTimbreWebAdmin);
         // METODO PARA ACTUALIZAR EL TIMBRE DEL EMPLEADO
         this.router.put('/timbre/editar', verificarToken_1.TokenValidation, timbresControlador_1.default.EditarTimbreEmpleadoFecha);
+        // METODO PARA BUSCAR TIMBRES - PLANIFICACION HORARIA
+        this.router.post('/buscar/timbres-planificacion', verificarToken_1.TokenValidation, timbresControlador_1.default.BuscarTimbresPlanificacion);
         // METODO DE BUSQUEDA DE AVISOS GENERALES
         this.router.get('/avisos-generales/:id_empleado', verificarToken_1.TokenValidation, timbresControlador_1.default.ObtenerAvisosColaborador);
         // RUTA DE BUSQUEDA DE UNA NOTIFICACION ESPECIFICA

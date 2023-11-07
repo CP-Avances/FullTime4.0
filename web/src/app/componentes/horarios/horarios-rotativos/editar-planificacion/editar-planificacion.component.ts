@@ -21,6 +21,7 @@ import { BuscarPlanificacionComponent } from '../../rango-fechas/buscar-planific
 import { HorariosEmpleadoComponent } from 'src/app/componentes/rolEmpleado/horarios-empleado/horarios-empleado.component';
 import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
 @Component({
   selector: 'app-editar-planificacion',
@@ -59,6 +60,7 @@ export class EditarPlanificacionComponent implements OnInit {
     public ventanae: MatDialog,
     public feriado: FeriadosService,
     public validar: ValidacionesService,
+    public timbrar: TimbresService,
     public horario: EmpleadoHorariosService,
     public router: Router,
     public restE: EmpleadoService,
@@ -293,17 +295,20 @@ export class EditarPlanificacionComponent implements OnInit {
       codigo: '\'' + this.datos_horarios.codigo + '\''
     }
     this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
-      //console.log('ver datos horarios ', datos)
+      console.log('ver datos horarios antes', datos)
       if (datos.message === 'OK') {
         for (var j = 0; j < this.horarios.length; j++) {
           for (var k = 0; k < datos.data.length; k++) {
             // COMPARAR HORARIOS (SE RETIRA ESPACIOS)
             if (this.horarios[j].id === datos.data[k].id_horario) {
-              if (this.horarios[j].detalles.segundo_dia === true) {
-                let data = {
-                  horarios: this.horarios[j].detalles,
+              if (this.horarios[j].detalles.segundo_dia) {
+                console.log('detalles ', this.horarios[j].detalles.segundo_dia)
+                if (this.horarios[j].detalles.segundo_dia === true) {
+                  let data = {
+                    horarios: this.horarios[j].detalles,
+                  }
+                  this.antes = this.antes.concat(data);
                 }
-                this.antes = this.antes.concat(data);
               }
               break;
             }
@@ -328,7 +333,7 @@ export class EditarPlanificacionComponent implements OnInit {
       codigo: '\'' + this.datos_horarios.codigo + '\''
     }
     this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
-      //console.log('ver datos horarios ', datos)
+      console.log('ver datos horarios despues', datos)
       if (datos.message === 'OK') {
         for (var j = 0; j < this.horarios.length; j++) {
           for (var k = 0; k < datos.data.length; k++) {
@@ -517,6 +522,8 @@ export class EditarPlanificacionComponent implements OnInit {
       }
     }
 
+    console.log('verificador .. ', verificador)
+
     if (verificador === 1) {
       this.toastr.warning('Horario ya se encuentra registrado.', 'Ups!!! VERIFICAR.', {
         timeOut: 6000,
@@ -543,12 +550,14 @@ export class EditarPlanificacionComponent implements OnInit {
         });
       }
       else {
-
+        console.log('ver horario dia despues ', this.despues)
         // SI EL HORARIO TIENE SALIDA AL SIGUIENTE DIA
         if (data.horarios.detalles.segundo_dia === true) {
           // VALIDAR SI EXISTEN HORARIOS DEL DIA SIGUIENTE
           for (var t = 0; t < this.despues.length; t++) {
-            if (moment(this.despues[i].horarios.entrada, 'HH:mm:ss').format('HH:mm:ss') >= moment(data.horarios.detalles.salida, 'HH:mm:ss').format('HH:mm:ss')) {
+            console.log('entrada ', moment(this.despues[i].horarios.entrada, 'HH:mm:ss').format('HH:mm:ss'))
+            console.log('salida ', moment(data.horarios.detalles.salida, 'HH:mm:ss').format('HH:mm:ss'))
+            if (moment(this.despues[i].horarios.entrada, 'HH:mm:ss').format('HH:mm:ss') <= moment(data.horarios.detalles.salida, 'HH:mm:ss').format('HH:mm:ss')) {
               verificador = 4;
               break;
             }
@@ -574,6 +583,8 @@ export class EditarPlanificacionComponent implements OnInit {
     }
 
     //console.log('horarios agregados ', this.horas)
+
+    console.log('verificador ', verificador)
   }
 
   // METODO PARA QUITAR HORARIOS DE LA LISTA
@@ -896,7 +907,9 @@ export class EditarPlanificacionComponent implements OnInit {
         this.toastr.success('Operación exitosa.', 'Planificación horaria registrada.', {
           timeOut: 6000,
         });
-        this.CerrarVentana(2);
+        this.cargar = true;
+        this.ver_feriado = false;
+        this.ver_guardar = false;
       }
       else {
         //this.progreso = false;
@@ -946,6 +959,46 @@ export class EditarPlanificacionComponent implements OnInit {
         this.GuardarHorario(this.asignado_feriados);
       }
     }
+  }
+
+  // METODO PARA CARGAR TIMBRES
+  cargar: boolean = false;
+  CargarTimbres() {
+    let fecha = this.datos_horarios.anio + '-' + this.datos_horarios.mes + '-' + this.datos_horarios.dia;
+    var codigos = '\'' + this.datos_horarios.codigo + '\'';
+    let usuarios = {
+      codigo: codigos,
+      fec_final: moment(moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD')).add(2, 'days'),
+      fec_inicio: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+    };
+
+    this.timbrar.BuscarTimbresPlanificacion(usuarios).subscribe(datos => {
+      console.log('datos ', datos)
+      if (datos.message === 'vacio') {
+        this.toastr.info(
+          'No se han encontrado registros de marcaciones.', '', {
+          timeOut: 6000,
+        })
+      }
+      else if (datos.message === 'error') {
+        this.toastr.info(
+          'Ups!!! algo salio mal', 'No se cargaron todos los registros.', {
+          timeOut: 6000,
+        })
+      }
+      else {
+        this.toastr.success(
+          'Operación exitosa.', 'Registros de marcaciones cargados.', {
+          timeOut: 6000,
+        })
+        this.CerrarVentana(2);
+      }
+    }, vacio => {
+      this.toastr.info(
+        'No se han encontrado registros de marcaciones.', '', {
+        timeOut: 6000,
+      })
+    })
   }
 
   // METODO PARA SUMAR HORAS

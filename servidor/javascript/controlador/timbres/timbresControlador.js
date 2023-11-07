@@ -189,7 +189,7 @@ class TimbresControlador {
             }
         });
     }
-    //METODO PARA ACTUALIZAR O EDITAR EL TIMBRE DEL EMPLEADO
+    // METODO PARA ACTUALIZAR O EDITAR EL TIMBRE DEL EMPLEADO
     EditarTimbreEmpleadoFecha(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -297,6 +297,41 @@ class TimbresControlador {
             }
             catch (error) {
                 res.status(400).jsonp({ message: error });
+            }
+        });
+    }
+    // METODO PARA BUSCAR TIMBRES
+    BuscarTimbresPlanificacion(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { codigo, fec_inicio, fec_final } = req.body;
+            console.log('ver datos timbres ', codigo, fec_inicio, fec_final);
+            const TIMBRES = yield database_1.default.query("SELECT * FROM timbres " +
+                "WHERE fec_hora_timbre_servidor BETWEEN $1 AND $2 " +
+                "AND codigo IN (" + codigo + ") " +
+                "ORDER BY codigo, fec_hora_timbre_servidor ASC", [fec_inicio, fec_final]);
+            if (TIMBRES.rowCount === 0) {
+                return res.status(404).jsonp({ message: 'vacio' });
+            }
+            else {
+                var contador = 0;
+                TIMBRES.rows.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
+                    console.log('fecha ', obj.fec_hora_timbre_servidor);
+                    console.log('codigo ', obj.codigo);
+                    console.log('funcion ', obj.tecl_funcion);
+                    console.log('id ', obj.id);
+                    console.log('observacion ', obj.observacion);
+                    contador = contador + 1;
+                    // fecha_hora_servidor, codigo, tecla_funcion, id_timbre, observcaion
+                    yield database_1.default.query(`
+                    SELECT * FROM modificartimbre ($1::timestamp without time zone, $2::character varying, $3::character varying, $4::integer, $5::character varying);  
+                    `, [obj.fec_hora_timbre_servidor, obj.codigo, obj.tecl_funcion, obj.id, obj.observacion]);
+                }));
+                if (contador === TIMBRES.rowCount) {
+                    return res.jsonp({ message: 'OK', respuesta: TIMBRES.rows });
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'error' });
+                }
             }
         });
     }

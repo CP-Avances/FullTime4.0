@@ -14,6 +14,7 @@ import { EmpleadoHorariosService } from 'src/app/servicios/horarios/empleadoHora
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
 
 // IMPORTAR COMPONENTES
@@ -86,6 +87,7 @@ export class HorariosMultiplesComponent implements OnInit {
     public router: Router, // VARIABLE USADA PARA NAVEGACIÓN ENTRE PÁGINAS
     public cambio: ChangeDetectorRef,
     public feriado: FeriadosService,
+    public timbrar: TimbresService,
     private toastr: ToastrService, // VARIABLE USADA PARA MOSTRAR NOTIFICACIONES
     private buscar: BuscarPlanificacionComponent,
     private componente: HorarioMultipleEmpleadoComponent,
@@ -117,6 +119,7 @@ export class HorariosMultiplesComponent implements OnInit {
   btn_eliminar: boolean = false;
   observaciones: boolean = false;
   guardar: boolean = false;
+  cargar: boolean = false;
   validar: boolean = true;
   cancelar: boolean = false;
   registrar: boolean = false;
@@ -308,6 +311,7 @@ export class HorariosMultiplesComponent implements OnInit {
   VerificarDuplicidad(form: any) {
     this.progreso = true;
     this.guardar = false;
+    this.cargar = false;
     this.observaciones = false;
     let fechas = {
       fechaInicio: form.fechaInicioForm,
@@ -876,6 +880,8 @@ export class HorariosMultiplesComponent implements OnInit {
   ValidarLimites() {
     if (this.plan_general.length > 99200) {
       this.progreso = false;
+      this.guardar = false;
+      this.cargar = false;
       this.toastr.error(
         'Intentar con un número menor de usuarios o planificar con periodos más cortos de tiempo.',
         'Ups!!! se ha producido un error.', {
@@ -886,6 +892,7 @@ export class HorariosMultiplesComponent implements OnInit {
       this.progreso = false;
       this.guardar = true;
       this.btn_eliminar = false;
+      this.cargar = false;
     }
   }
 
@@ -1020,16 +1027,76 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA REGISTRAR PLANIFICACION
   GuardarInformacion() {
-    //console.log('plan general ', this.plan_general)
+    console.log('plan general ', this.plan_general)
     this.restP.CrearPlanGeneral(this.plan_general).subscribe(res => {
+      console.log('respuesta ', res)
+
       if (res.message === 'OK') {
         this.progreso = false;
+        this.cargar = true;
+        this.guardar = false;
         this.toastr.success(
           'Operación exitosa.', 'Se asignó la planificación horaria a ' + this.usuarios_validos.length + ' colaboradores.', {
           timeOut: 6000,
         })
+        //this.CerrarTabla();
+      }
+      else {
+        this.progreso = false;
+        this.toastr.error(
+          'Ups!!! algo salio mal.', '', {
+          timeOut: 6000,
+        })
+      }
+    })
+  }
+
+
+  // METODO PARA CARGAR TIMBRES
+  CargarTimbres(form: any) {
+    this.guardar = false;
+    var codigos = '';
+    this.usuarios_validos.forEach(obj => {
+      if (codigos === '') {
+        codigos = '\'' + obj.codigo + '\''
+      }
+      else {
+        codigos = codigos + ', \'' + obj.codigo + '\''
+      }
+    })
+
+    let usuarios = {
+      codigo: codigos,
+      fec_final: moment(moment(form.fechaFinalForm).format('YYYY-MM-DD')).add(2, 'days'),
+      fec_inicio: moment(form.fechaInicioForm).format('YYYY-MM-DD'),
+    };
+
+    this.timbrar.BuscarTimbresPlanificacion(usuarios).subscribe(datos => {
+      console.log('datos ', datos)
+      if (datos.message === 'vacio') {
+        this.toastr.info(
+          'No se han encontrado registros de marcaciones.', '', {
+          timeOut: 6000,
+        })
+      }
+      else if (datos.message === 'error') {
+        this.toastr.info(
+          'Ups!!! algo salio mal', 'No se cargaron todos los registros.', {
+          timeOut: 6000,
+        })
+      }
+      else {
+        this.toastr.success(
+          'Operación exitosa.', 'Registros cargados.', {
+          timeOut: 6000,
+        })
         this.CerrarTabla();
       }
+    }, vacio => {
+      this.toastr.info(
+        'No se han encontrado registros de marcaciones.', '', {
+        timeOut: 6000,
+      })
     })
   }
 
@@ -1068,7 +1135,7 @@ export class HorariosMultiplesComponent implements OnInit {
     this.observaciones = false;
     this.ControlarBotones(true, false, false, true, false);
     this.guardar = false;
-
+    this.cargar = false;
     if (this.pagina === 'buscar') {
       this.buscar.buscar_fechas = true;
     }

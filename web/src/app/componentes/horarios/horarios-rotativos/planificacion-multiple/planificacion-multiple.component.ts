@@ -19,6 +19,7 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
 import { ThemePalette } from '@angular/material/core';
+import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
 @Component({
   selector: 'app-planificacion-multiple',
@@ -54,6 +55,7 @@ export class PlanificacionMultipleComponent implements OnInit {
     public feriado: FeriadosService,
     public validar: ValidacionesService,
     public horario: EmpleadoHorariosService,
+    public timbrar: TimbresService,
     public router: Router,
     public restD: DetalleCatHorariosService,
     public restH: HorarioService,
@@ -1173,7 +1175,8 @@ export class PlanificacionMultipleComponent implements OnInit {
         this.toastr.success('Operación exitosa.', 'Registro guardado.', {
           timeOut: 6000,
         });
-        this.CerrarVentana();
+        this.ver_guardar = false;
+        this.cargar = true;
       }
       else {
         this.progreso = false;
@@ -1191,6 +1194,57 @@ export class PlanificacionMultipleComponent implements OnInit {
     })
 
   }
+
+  // METODO PARA CARGAR TIMBRES
+  cargar: boolean = false;
+  CargarTimbres() {
+    //console.log('ver datos seleccionados ', this.datosSeleccionados.usuario)
+    var codigos = '';
+    this.datosSeleccionados.usuario.forEach(obj => {
+      if (codigos === '') {
+        codigos = '\'' + obj.codigo + '\''
+      }
+      else {
+        codigos = codigos + ', \'' + obj.codigo + '\''
+      }
+    })
+
+    let usuarios = {
+      codigo: codigos,
+      fec_final: moment(moment(this.fechaFinalF.value).format('YYYY-MM-DD')).add(2, 'days'),
+      fec_inicio: moment(this.fechaInicialF.value).format('YYYY-MM-DD'),
+    };
+
+    this.timbrar.BuscarTimbresPlanificacion(usuarios).subscribe(datos => {
+      console.log('datos ', datos)
+      if (datos.message === 'vacio') {
+        this.toastr.info(
+          'No se han encontrado registros de marcaciones.', '', {
+          timeOut: 6000,
+        })
+        this.CerrarVentana();
+      }
+      else if (datos.message === 'error') {
+        this.toastr.info(
+          'Ups!!! algo salio mal', 'No se cargaron todos los registros.', {
+          timeOut: 6000,
+        })
+      }
+      else {
+        this.toastr.success(
+          'Operación exitosa.', 'Registros cargados.', {
+          timeOut: 6000,
+        })
+        this.CerrarVentana();
+      }
+    }, vacio => {
+      this.toastr.info(
+        'No se han encontrado registros de marcaciones.', '', {
+        timeOut: 6000,
+      })
+    })
+  }
+
 
   // METODO PARA SUMAR HORAS
   SumarHoras(suma: string, tiempo: string) {

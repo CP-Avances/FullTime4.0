@@ -122,6 +122,9 @@
                         [disabled]="!formulario.valid" *ngIf="btn_guardar">
                         Guardar
                     </button>
+                    <button id="btn-raised" class="btn btn-sm" (click)="CargarTimbres(formulario.value)" *ngIf="cargar">
+                        Cargar timbres
+                    </button>
                     <button id="btn-raised" class="btn btn-sm" (click)="BuscarExistencias(formulario.value)"
                         [disabled]="!formulario.valid" *ngIf="btn_eliminar">
                         Eliminar

@@ -33,6 +33,7 @@ class PlanGeneralControlador {
                     iterar = iterar + 1;
 
                     try {
+                        console.log('if ', error)
                         if (error) {
                             errores = errores + 1;
                             if (iterar === req.body.length && errores > 0) {
@@ -49,6 +50,7 @@ class PlanGeneralControlador {
                         }
 
                     } catch (error) {
+                        console.log('ver el error ', error)
                         return res.status(500).jsonp({ message: 'Se ha producido un error en el proceso.' });
                     }
                 });

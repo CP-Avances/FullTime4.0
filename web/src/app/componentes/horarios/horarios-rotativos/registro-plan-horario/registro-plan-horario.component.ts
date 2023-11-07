@@ -16,13 +16,14 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
 import { HorarioMultipleEmpleadoComponent } from '../../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
 import { BuscarPlanificacionComponent } from '../../rango-fechas/buscar-planificacion/buscar-planificacion.component';
+import { HorariosEmpleadoComponent } from 'src/app/componentes/rolEmpleado/horarios-empleado/horarios-empleado.component';
 import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { HorariosEmpleadoComponent } from 'src/app/componentes/rolEmpleado/horarios-empleado/horarios-empleado.component';
-import { number } from 'echarts/core';
+
 
 @Component({
   selector: 'app-registro-plan-horario',
@@ -70,6 +71,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
     public feriado: FeriadosService,
     public validar: ValidacionesService,
     public horario: EmpleadoHorariosService,
+    public timbrar: TimbresService,
     public router: Router,
     public restE: EmpleadoService,
     public restD: DetalleCatHorariosService,
@@ -1171,7 +1173,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
     //console.log('datos finales ', datos)
   }
 
- 
+
   // METODO PARA ELIMINAR PLANIFICACION GENERAL DE HORARIOS
   EliminarPlanificacion(seleccionados: any, origen: any, opcion: number) {
     let verificador = 0;
@@ -1296,7 +1298,8 @@ export class RegistroPlanHorarioComponent implements OnInit {
         this.toastr.success('Operación exitosa.', 'Planificación horaria registrada.', {
           timeOut: 6000,
         });
-        this.CerrarVentana();
+        this.cargar = true;
+        this.ver_guardar = false;
       }
       else {
         this.progreso = false;
@@ -1313,6 +1316,48 @@ export class RegistroPlanHorarioComponent implements OnInit {
       this.CerrarVentana();
     })
     //this.AuditarPlanificar(form);
+  }
+
+
+  // METODO PARA CARGAR TIMBRES
+  cargar: boolean = false;
+  CargarTimbres() {
+    var codigos = '\'' + this.datoEmpleado.codigo + '\'';
+
+    let usuarios = {
+      codigo: codigos,
+      fec_final: moment(moment(this.fechaFinalF.value).format('YYYY-MM-DD')).add(2, 'days'),
+      fec_inicio: moment(this.fechaInicialF.value).format('YYYY-MM-DD'),
+    };
+
+    this.timbrar.BuscarTimbresPlanificacion(usuarios).subscribe(datos => {
+      console.log('datos ', datos)
+      if (datos.message === 'vacio') {
+        this.toastr.info(
+          'No se han encontrado registros de marcaciones.', '', {
+          timeOut: 6000,
+        })
+        this.CerrarVentana();
+      }
+      else if (datos.message === 'error') {
+        this.toastr.info(
+          'Ups!!! algo salio mal', 'No se cargaron todos los registros.', {
+          timeOut: 6000,
+        })
+      }
+      else {
+        this.toastr.success(
+          'Operación exitosa.', 'Registros cargados.', {
+          timeOut: 6000,
+        })
+        this.CerrarVentana();
+      }
+    }, vacio => {
+      this.toastr.info(
+        'No se han encontrado registros de marcaciones.', '', {
+        timeOut: 6000,
+      })
+    })
   }
 
   // METODO PARA CERRAR VENTANA
