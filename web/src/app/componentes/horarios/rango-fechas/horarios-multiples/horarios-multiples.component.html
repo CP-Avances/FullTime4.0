@@ -132,6 +132,10 @@
                 *ngIf="guardar">
                 Guardar
             </button>
+            <button id="btn-raised" class="btn btn-sm" (click)="CargarTimbres(formulario.value)"
+                *ngIf="cargar">
+                Cargar timbres
+            </button>
             <button id="btn-raised" class="btn btn-sm" *ngIf="btn_eliminar"
                 (click)="EliminarRegistros(formulario.value, 2)">
                 Eliminar
@@ -139,7 +143,7 @@
         </div>
         <div class="d-flex bd-highlight" id="titulo">
             <span class="w-100 bd-highlight">
-                LISTA DE EMPLEADOS SIN ASIGNACIÓN DE HORARIO
+                LISTA DE USUARIOS / OBSERVACIONES
             </span>
             <mat-icon class="float-right" id="cerrar" (click)="CerrarTabla()">highlight_off</mat-icon>
         </div>

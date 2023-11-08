@@ -482,24 +482,36 @@ export class HorariosEmpleadoComponent implements OnInit {
   editar_horario: boolean = false;
   datos_editar: any = [];
   AbrirEditarHorario(anio: any, mes: any, dia: any, horario: any, index: any): void {
-    this.horariosEmpleado[index].color = 'ok';
-    this.horariosEmpleado[index].seleccionado = dia;
-    this.datos_editar = {
-      idEmpleado: this.idEmpleado,
-      datosPlan: horario,
-      anio: anio,
-      mes: mes,
-      dia: dia,
-      codigo: this.datoActual.codigo,
-      pagina: 'perfil-empleado',
-      idCargo: this.datoActual.id_cargo,
-      horas_trabaja: this.cargoEmpleado[0].hora_trabaja,
-      index: index
+    let fecha = anio + '-' + mes + '-' + dia;
+    let fecha_ = moment(fecha, 'YYYY-MM-D').format('YYYY/MM/DD');
+    let verificar = moment(fecha_, 'YYYY/MM/DD', true).isValid();
+    console.log('resultado ', verificar)
+    // VERIFICAR QUE EL DIA SEA VALIDO
+    if (verificar === true) {
+      this.horariosEmpleado[index].color = 'ok';
+      this.horariosEmpleado[index].seleccionado = dia;
+      this.datos_editar = {
+        idEmpleado: this.idEmpleado,
+        datosPlan: horario,
+        anio: anio,
+        mes: mes,
+        dia: dia,
+        codigo: this.datoActual.codigo,
+        pagina: 'perfil-empleado',
+        idCargo: this.datoActual.id_cargo,
+        horas_trabaja: this.cargoEmpleado[0].hora_trabaja,
+        index: index
+      }
+      this.editar_horario = true;
+      this.expansion = false;
+      this.editar_activar = false;
+      this.ver_activar_editar = false;
     }
-    this.editar_horario = true;
-    this.expansion = false;
-    this.editar_activar = false;
-    this.ver_activar_editar = false;
+    else {
+      this.toastr.warning('Ups!!! Fecha no es válida.', '', {
+        timeOut: 6000,
+      });
+    }
   }
 
   // METODO PARA EXPANDIR Y CONTRAER FORMULARIO

@@ -37,6 +37,7 @@ export class BuscarPlanificacionComponent {
 
   idEmpleadoLogueado: any;
   columnAccion: boolean = true;
+
   constructor(
     public informacion: DatosGeneralesService, // SERVICIO DE DATOS INFORMATIVOS DE USUARIOS
     public componente: HorarioMultipleEmpleadoComponent,
@@ -493,28 +494,39 @@ export class BuscarPlanificacionComponent {
   editar_horario: boolean = false;
   datos_editar: any = [];
   AbrirEditarHorario(anio: any, mes: any, dia: any, horario: any, id_empleado: any, codigo: any, id_cargo: any, hora_trabaja: any, index: any): void {
-    //valor.ob = true;
-    this.horariosEmpleado[index].color = 'ok';
-    this.horariosEmpleado[index].seleccionado = dia;
-    console.log('index ', index)
-    this.datos_editar = {
-      idEmpleado: id_empleado,
-      datosPlan: horario,
-      anio: anio,
-      mes: mes,
-      dia: dia,
-      codigo: codigo,
-      pagina: 'lista-planificar',
-      idCargo: id_cargo,
-      horas_trabaja: hora_trabaja,
-      index: index
+    let fecha = anio + '-' + mes + '-' + dia;
+    let fecha_ = moment(fecha, 'YYYY-MM-D').format('YYYY/MM/DD');
+    let verificar = moment(fecha_, 'YYYY/MM/DD', true).isValid();
+    console.log('resultado ', verificar)
+    // VERIFICAR QUE EL DIA SEA VALIDO
+    if (verificar === true) {
+      this.horariosEmpleado[index].color = 'ok';
+      this.horariosEmpleado[index].seleccionado = dia;
+      console.log('index ', index)
+      this.datos_editar = {
+        idEmpleado: id_empleado,
+        datosPlan: horario,
+        anio: anio,
+        mes: mes,
+        dia: dia,
+        codigo: codigo,
+        pagina: 'lista-planificar',
+        idCargo: id_cargo,
+        horas_trabaja: hora_trabaja,
+        index: index
+      }
+      this.multiple = false;
+      this.editar_horario = true;
+      this.editar_activar = false;
+      this.auto_individual = false;
+      this.ver_activar_editar = false;
+      this.columnAccion = false;
     }
-    this.multiple = false;
-    this.editar_horario = true;
-    this.editar_activar = false;
-    this.auto_individual = false;
-    this.ver_activar_editar = false;
-    this.columnAccion = false;
+    else {
+      this.toastr.warning('Ups!!! Fecha no es válida.', '', {
+        timeOut: 6000,
+      });
+    }
   }
 
   // METODO PARA CAMBIAR DE COLORES SEGUN EL MES

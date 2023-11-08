@@ -12,8 +12,7 @@
       <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name">
         <li class="material-tree-node" *ngIf="!barraInicial; else showItemsMenu">
           <ul>
-            <a class="btn btn-sm btn-block"  [ngClass]="{active: node.name == nombreSelect}" 
-              *ngIf="node.color === true"
+            <a class="btn btn-sm btn-block" [ngClass]="{active: node.name == nombreSelect}" *ngIf="node.color === true"
               (click)="manejarEstadoActivo(node.name);" [routerLink]="[node.url]">
               <mat-icon style="float: left;" id="icono-menu_">done</mat-icon>
               <p style="float: left; margin-left: -5%; margin-top: 2%;">{{node.name}}</p>
@@ -30,14 +29,16 @@
         <ng-template #showItemsMenu>
           <li class="material-tree-node">
             <ul>
-              <a class="btn btn-sm btn-block" [ngClass]="{active: node.name == nombreSelect}" *ngIf="node.color === true" 
-                (click)="manejarEstadoActivo(node.name); drawer.toggle()" [routerLink]="[node.url]">
+              <a class="btn btn-sm btn-block" [ngClass]="{active: node.name == nombreSelect}"
+                *ngIf="node.color === true" (click)="manejarEstadoActivo(node.name); drawer.toggle()"
+                [routerLink]="[node.url]">
                 <mat-icon id="icono-menu_" style="float: left;">done</mat-icon>
                 <p style="float: left; margin-left: -5%; margin-top: 2%;">{{node.name}}</p>
               </a>
-              <a class="btn btn-sm btn-block" [ngClass]="{active: node.name == nombreSelect}" 
-                *ngIf="(node.color === false && node.activo === false)" (click)="manejarEstadoActivo(node.name); drawer.toggle()" 
-                [routerLink]="[node.url]" style="color: rgb(99, 105, 107);">
+              <a class="btn btn-sm btn-block" [ngClass]="{active: node.name == nombreSelect}"
+                *ngIf="(node.color === false && node.activo === false)"
+                (click)="manejarEstadoActivo(node.name); drawer.toggle()" [routerLink]="[node.url]"
+                style="color: rgb(99, 105, 107);">
                 <mat-icon id="icono-menu_x" style="float: left;">phonelink_off</mat-icon>
                 <p style="float: left; margin-left: -3%; margin-top: 2%; margin-bottom: 2%;">{{node.name}}</p>
               </a>
@@ -53,7 +54,8 @@
             style="width: 100%; background: rgb(255, 255, 255); display: block; border: none;">
             <div class="tree-titulos d-flex bd-highlight">
               <div class="bd-highlight" style="float: left;">
-                <mat-icon id="icono-subtitulo" *ngIf="node.subtitulo === true && node.color === true">{{node.icono}}</mat-icon>
+                <mat-icon id="icono-subtitulo"
+                  *ngIf="node.subtitulo === true && node.color === true">{{node.icono}}</mat-icon>
                 <mat-icon id="icono-menu" *ngIf="node.subtitulo === false">{{node.icono}}</mat-icon>
               </div>
               <div class="bd-highlight" style="float: left;">
@@ -78,24 +80,23 @@
 
     <mat-card *ngIf="showMessageLicencia"
       style="background-color: rgba(240, 56, 56, 0.849); color: white; text-align: center;">
-      <mat-icon style="font-size: 40px;">report_problem</mat-icon>
-      <mat-card-header>
-        <mat-card-title style="font-size: 18px;">LICENCIA EXPIRARÁ</mat-card-title>
-        <mat-card-subtitle style="color: rgb(221, 221, 221); font-size: 14px;">
-          {{fec_caducidad_licencia | date: 'fullDate' }}
-        </mat-card-subtitle>
-      </mat-card-header>
+      <div>
+        <mat-icon style="font-size: 25px; padding-top: 5px;">report_problem</mat-icon>
+      </div>
+      <mat-card-title style="font-size: 18px;">LICENCIA EXPIRARÁ</mat-card-title>
+      <mat-card-subtitle style="color: rgb(221, 221, 221); font-size: 14px;">
+        {{fec_caducidad_licencia | date: 'fullDate' }}
+      </mat-card-subtitle>
+
       <mat-card-content style="font-size: 15px;">
         <p>
-          Comunicate con Casa Pazmiño para seguir utilizando tu sistema.
+          Comunicate con &nbsp;
+          <a href="https://casapazmino.com.ec" target="_blank" style="text-decoration: none;">
+            Casa Pazmiño Import & Export S.A
+          </a>
+          &nbsp; para seguir utilizando tu sistema.
         </p>
       </mat-card-content>
-      <mat-card-actions style="text-align: center;">
-        <a mat-raised-button href="https://casapazmino.com.ec" target="_blank">
-          Ir Casa Pazmiño
-          <mat-icon>public</mat-icon>
-        </a>
-      </mat-card-actions>
     </mat-card>
 
   </mat-sidenav>
@@ -170,7 +171,7 @@
           <!-- BOTON NOTIFICACION -->
           <app-button-notificacion></app-button-notificacion>
 
-          <app-search ></app-search>
+          <app-search></app-search>
 
         </mat-toolbar-row>
       </ng-template>

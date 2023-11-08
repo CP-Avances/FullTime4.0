@@ -47,6 +47,10 @@ export class TimbresService {
   }
 
 
+  // METODO PARA BUSCAR TIMBRES (PLANIFICACION HORARIA)
+  BuscarTimbresPlanificacion(datos: any) {
+    return this.http.post<any>(`${environment.url}/timbres/buscar/timbres-planificacion`, datos);
+  }
 
 
   /**

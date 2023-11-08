@@ -11,6 +11,8 @@ import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { MatDialog } from '@angular/material/dialog';
+import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
 @Component({
   selector: 'app-registrar-asistencia',
@@ -36,6 +38,7 @@ export class RegistrarAsistenciaComponent implements OnInit {
   constructor(
     public componneteb: BuscarAsistenciaComponent,
     public parametro: ParametrosService,
+    public ventana_: MatDialog, // VARIABLE MANEJO DE VENTANAS
     public validar: ValidacionesService,
     public asistir: PlanGeneralService,
     public timbre: TimbresService,
@@ -88,27 +91,7 @@ export class RegistrarAsistenciaComponent implements OnInit {
     this.timbres = [];
     var funcion = '';
 
-    if (this.informacion.detalle.tipo_entr_salida === 'E') {
-      funcion = '0';
-    }
-    else if (this.informacion.detalle.tipo_entr_salida === 'S') {
-      funcion = '1';
-    }
-    else if (this.informacion.detalle.tipo_entr_salida === 'I/A') {
-      funcion = '2';
-    }
-    else if (this.informacion.detalle.tipo_entr_salida === 'F/A') {
-      funcion = '3';
-    }
-    else if (this.informacion.detalle.tipo_entr_salida === 'I/P') {
-      funcion = '4';
-    }
-    else if (this.informacion.detalle.tipo_entr_salida === 'F/P') {
-      funcion = '5';
-    }
-    else if (this.informacion.detalle.tipo_entr_salida === 'HA') {
-      funcion = '7';
-    }
+    funcion = this.VerificarFuncion();
 
     let datos = {
       codigo: this.informacion.detalle.codigo,
@@ -166,7 +149,7 @@ export class RegistrarAsistenciaComponent implements OnInit {
       accion: this.informacion.detalle.tipo_entr_salida,
       id_timbre: seleccionado.id
     }
-    //console.log('datos enviados ', datos)
+    console.log('datos enviados ', datos)
     this.asistir.ActualizarAsistenciaManual(datos).subscribe(data => {
       console.log('ver datos ', data)
       if (data.message === 'OK') {
@@ -190,17 +173,111 @@ export class RegistrarAsistenciaComponent implements OnInit {
       this.progreso = false;
     })
 
-
   }
   // METODO PARA CERRAR VENTANA
   CerrarVentana(opcion: number) {
     if (this.informacion.pagina === 'buscar-asistencia') {
       this.componneteb.ver_detalle = false;
       this.componneteb.ver_asistencia = true;
-      if(opcion === 2){
+      if (opcion === 2) {
         this.componneteb.BuscarDatosAsistencia(this.componneteb.formulario.value);
       }
     }
   }
 
+  // METODO PARA ASIGNACION DESDE EL SISTEMA
+  ReasignarSistema() {
+
+    this.timbres = [];
+    var funcion = '';
+    funcion = this.VerificarFuncion();
+    //console.log('ver funcion ', funcion)
+
+    let datos = {
+      codigo: this.informacion.detalle.codigo,
+      funcion: funcion,
+      fecha: this.informacion.detalle.fecha_horario
+    }
+
+    let diferencias: any = [];
+    this.timbre.BuscarTimbresAsistencia(datos).subscribe(data => {
+      //console.log('ver datos ', data)
+      if (data.message === 'OK') {
+        console.log('ver respuesta ', data.respuesta)
+        this.timbres = data.respuesta;
+        this.timbres.forEach((obj: any) => {
+          var h_horario = moment(obj.t_hora_timbre, 'HH:mm:ss');
+          var h_timbre = moment(this.informacion.detalle.hora_horario, 'HH:mm:ss');
+          if (this.informacion.detalle.hora_horario < obj.t_hora_timbre) {
+            var duration = moment.duration(h_horario.diff(h_timbre)).asHours();
+          }
+          else {
+            var duration = moment.duration(h_timbre.diff(h_horario)).asHours();
+          }
+          let proceso = {
+            duracion: duration,
+            fec_hora_timbre_servidor: obj.fec_hora_timbre_servidor,
+            fecha: obj.t_fec_timbre,
+            hora: obj.t_hora_timbre,
+            id: obj.id
+          }
+          diferencias = diferencias.concat(proceso);
+        })
+        //console.log('ver duracion ', diferencias)
+        // ENCUENTRA EL VALOR MINIMO
+        var minValue = Math.min(...diferencias.map(x => x.duracion))
+        // FILTRA EL OBJETO TAL QUE LOS VALORES SEAN IGUAL AL MINIMO
+        var resultado = diferencias.filter(x => x.duracion == minValue)
+        // IMPRIME EL RESULTADO
+        console.log(' resultado menor', resultado[0].duracion);
+        this.ReasignarTimbre(resultado[0]);
+      }
+      else {
+        this.toastr.warning('No se han encontrado registros.', '', {
+          timeOut: 6000,
+        });
+      }
+    }, vacio => {
+      this.toastr.warning('No se han encontrado registros.', '', {
+        timeOut: 6000,
+      });
+    })
+  }
+
+  // METODO PARA VERIFICAR FUNCION
+  VerificarFuncion() {
+    var funcion = '';
+    if (this.informacion.detalle.tipo_entr_salida === 'E') {
+      funcion = '0';
+    }
+    else if (this.informacion.detalle.tipo_entr_salida === 'S') {
+      funcion = '1';
+    }
+    else if (this.informacion.detalle.tipo_entr_salida === 'I/A') {
+      funcion = '2';
+    }
+    else if (this.informacion.detalle.tipo_entr_salida === 'F/A') {
+      funcion = '3';
+    }
+    else if (this.informacion.detalle.tipo_entr_salida === 'I/P') {
+      funcion = '4';
+    }
+    else if (this.informacion.detalle.tipo_entr_salida === 'F/P') {
+      funcion = '5';
+    }
+    else if (this.informacion.detalle.tipo_entr_salida === 'HA') {
+      funcion = '7';
+    }
+    return funcion;
+  }
+
+  // FUNCION PARA CONFIRMAR REASIGNACION DE TIMBRES
+  ConfirmarReasignacion() {
+    this.ventana_.open(MetodosComponent, { width: '450px', data: 'asistencia' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.ReasignarSistema();
+        }
+      });
+  }
 }
