@@ -39,7 +39,7 @@ class ReportesTiempoLaboradoControlador {
                 return obj;
             }).filter(obj => { return obj.departamentos.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No se ha encontrado registro de atrasos.' });
+                return res.status(400).jsonp({ message: 'No se ha encontrado registro de tiempo laborado.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -62,7 +62,7 @@ class ReportesTiempoLaboradoControlador {
                 return e;
             }).filter(e => { return e.empleados.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No se ha encontrado registro de atrasos.' });
+                return res.status(400).jsonp({ message: 'No se ha encontrado registro de tiempo laborado.' });
             return res.status(200).jsonp(nuevo);
         });
     }

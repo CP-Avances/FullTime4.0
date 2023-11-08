@@ -546,11 +546,16 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     let n: any = []
     let c = 0;
     let accionT: string = '';
-    let totalTiempoEmpleado: number = 0;
-    let totalTiempoSucursal: number = 0;
-    let totalTiempoCargo = 0;
-    let totalTiempoRegimen = 0;
-    let totalTiempoDepartamento = 0;
+    let totalTiempoLaboradoEmpleado: number = 0;
+    let totalTiempoPlanificadoEmpleado: number = 0;
+    let totalTiempoLaboradoSucursal: number = 0;
+    let totalTiempoPlanificadoSucursal: number = 0;
+    let totalTiempoLaboradoCargo = 0;
+    let totalTiempoPlanificadoCargo = 0;
+    let totalTiempoLaboradoRegimen = 0;
+    let totalTiempoPlanificadoRegimen = 0;
+    let totalTiempoLaboradoDepartamento = 0;
+    let totalTiempoPlanificadoDepartamento = 0;
     this.tiempoDepartamentos = [];
     this.tiempoSucursales = [];
     this.tiempoRegimen = [];
@@ -559,7 +564,8 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
       data.forEach((obj1) => {
         if (this.bool.bool_cargo === true) {
-          totalTiempoCargo = 0;
+          totalTiempoLaboradoCargo = 0;
+          totalTiempoPlanificadoCargo = 0;
           n.push({
             style: 'tableMarginCabecera',
             table: {
@@ -578,7 +584,8 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
             },
           });
         } else {
-          totalTiempoRegimen = 0;
+          totalTiempoLaboradoRegimen = 0;
+          totalTiempoPlanificadoRegimen = 0;
           n.push({
             style: 'tableMarginCabecera',
             table: {
@@ -643,7 +650,8 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
             },
           });
           c = 0;
-          totalTiempoEmpleado = 0;
+          totalTiempoLaboradoEmpleado = 0;
+          totalTiempoPlanificadoEmpleado = 0;
           if (this.tolerancia==='considerar') {
             n.push({
               style: 'tableMargin',
@@ -653,50 +661,58 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                 body: [
                   [
                     { rowSpan: 2, text: 'N°', style: 'centrado' },
-                    { rowSpan: 1, colSpan: 2, text: 'HORARIO', style: 'tableHeader' },
-                    {},
-                    { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
-                    {},
-                    { rowSpan: 2, text: 'TIPO PERMISO', style: 'centrado' },
-                    { rowSpan: 2, text: 'DESDE', style: 'centrado' },
-                    { rowSpan: 2, text: 'HASTA', style: 'centrado' },
-                    { rowSpan: 2, colSpan: 2, text: 'PERMISO', style: 'centrado' },
-                    {},
-                    { rowSpan: 2, text: 'TOLERANCIA', style: 'centrado' },
-                    { rowSpan: 2, colSpan: 2, text: 'ATRASO', style: 'centrado' },
-                    {}
-                  ],
-                  [
-                    {},
-                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
-                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
-                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
-                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
-                    {},{},{},{},
-                    {},
-                    {},
-                    {},
-                    {},
-  
+                    { rowSpan: 2, text: 'FECHA', style: 'tableHeader' },
+                    { rowSpan: 2, text: 'ENTRADA', style: 'tableHeader' },
+                    { rowSpan: 2, text: 'SALIDA', style: 'centrado' },
+                    { rowSpan: 2, text: 'INICIO ALIMENTACIÓN', style: 'centrado' },
+                    { rowSpan: 2, text: 'FIN ALIMENTACIÓN', style: 'centrado' },
+                    { rowSpan: 2, colSpan: 2, text: 'TIEMPO PLANIFICADO', style: 'centrado' },
+                    { rowSpan: 2, colSpan: 2, text: 'TIEMPO LABORADO', style: 'centrado' },
                   ],
                   ...obj2.timbres.map(obj3 => {
-                    const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
-                    const tiempo = this.minutosAHorasMinutosSegundos(minutos);
-                    totalTiempoEmpleado += Number(minutos);
-                    totalTiempoRegimen += Number(minutos); 
-                    totalTiempoCargo += Number(minutos); 
-                    c = c + 1
-                    return [
-                      { style: 'itemsTableCentrado', text: c },
-                      { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[0] },
-                      { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[1] },
-                      { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[0] },
-                      { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[1] },
-                      {},{},{},{},{},
-                      {style: 'itemsTableCentrado', text: obj3.tolerancia},
-                      {style: 'itemsTableCentrado', text: tiempo},
-                      {style: 'itemsTableDerecha', text: minutos},
-                    ];
+
+                    if (obj3.tipo == 'EAS') {
+                      const entrada = obj3.entrada.fec_hora_timbre != null 
+                        ? obj3.entrada.fec_hora_timbre.split(' ')[1]
+                        : 'FT';
+                      const salida = obj3.salida.fec_hora_timbre != null
+                        ? obj3.salida.fec_hora_timbre.split(' ')[1]
+                        : 'FT';
+                      const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null 
+                        ? obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1]
+                        : 'FT';
+                      const finAlimentacion = obj3.finAlimentacion.fec_hora_timbre != null
+                        ? obj3.finAlimentacion.fec_hora_timbre.split(' ')[1]
+                        : 'FT';
+                      const diferenciaEnMinutos = this.calcularDiferenciaFechas(obj3);
+                      const minutosPlanificados = diferenciaEnMinutos[0];
+                      const tiempoPlanificado = this.minutosAHorasMinutosSegundos(minutosPlanificados);
+                      const minutosLaborados = diferenciaEnMinutos[1];
+                      const tiempoLaborado = this.minutosAHorasMinutosSegundos(minutosLaborados);
+                      
+                      totalTiempoPlanificadoEmpleado += minutosPlanificados;
+                      totalTiempoPlanificadoRegimen += minutosPlanificados; 
+                      totalTiempoPlanificadoCargo += minutosPlanificados; 
+                      totalTiempoLaboradoEmpleado += minutosLaborados;
+                      totalTiempoLaboradoRegimen += minutosLaborados; 
+                      totalTiempoLaboradoCargo += minutosLaborados; 
+                      c = c + 1
+                      return [
+                        { style: 'itemsTableCentrado', text: c },
+                        { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[0] },
+                        { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[1] },
+                        { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[0] },
+                        { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[1] },
+                        {},{},{},{},{},
+                        {style: 'itemsTableCentrado', text: obj3.tolerancia},
+                        {style: 'itemsTableCentrado', text: totalTiempoPlanificadoEmpleado},
+                        {style: 'itemsTableDerecha', text: totalTiempoPlanificadoEmpleado},
+                      ];
+                    } else {
+                      
+                    }
+
+
                   }),
                   [
                     {
@@ -746,8 +762,8 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                       text: '',
                       style: 'itemsTableCentradoTotal'
                     },
-                    {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))},
-                    {style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
+                    {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoLaboradoEmpleado.toFixed(2))},
+                    {style: 'itemsTableTotal', text: totalTiempoLaboradoEmpleado.toFixed(2)},
                   ],
                 ],
               },
@@ -794,9 +810,9 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                   ...obj2.timbres.map(obj3 => {
                     const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
                     const tiempo = this.minutosAHorasMinutosSegundos(minutos);
-                    totalTiempoEmpleado += Number(minutos);
-                    totalTiempoRegimen += Number(minutos); 
-                    totalTiempoCargo += Number(minutos); 
+                    totalTiempoLaboradoEmpleado += Number(minutos);
+                    totalTiempoLaboradoRegimen += Number(minutos); 
+                    totalTiempoLaboradoCargo += Number(minutos); 
                     c = c + 1
                     return [
                       { style: 'itemsTableCentrado', text: c },
@@ -853,8 +869,8 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                       text: '',
                       style: 'itemsTableCentradoTotal'
                     },
-                    {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))},
-                    {style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
+                    {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoLaboradoEmpleado.toFixed(2))},
+                    {style: 'itemsTableTotal', text: totalTiempoLaboradoEmpleado.toFixed(2)},
                   ],
                 ],
               },
@@ -867,21 +883,21 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
           }
         });
         if (this.bool.bool_cargo) {
-          totalTiempoCargo = Number(totalTiempoCargo.toFixed(2));
+          totalTiempoLaboradoCargo = Number(totalTiempoLaboradoCargo.toFixed(2));
           let cargo = {
             cargo: obj1.name_cargo,
-            minutos: totalTiempoCargo,
-            tiempo: this.minutosAHorasMinutosSegundos(totalTiempoCargo)
+            minutos: totalTiempoLaboradoCargo,
+            tiempo: this.minutosAHorasMinutosSegundos(totalTiempoLaboradoCargo)
           }
           this.tiempoCargos.push(cargo);
         };
 
         if (this.bool.bool_reg) {
-          totalTiempoRegimen = Number(totalTiempoRegimen.toFixed(2));
+          totalTiempoLaboradoRegimen = Number(totalTiempoLaboradoRegimen.toFixed(2));
           let regimen = {
             regimen: obj1.regimen.nombre,
-            minutos: totalTiempoRegimen,
-            tiempo: this.minutosAHorasMinutosSegundos(totalTiempoRegimen)
+            minutos: totalTiempoLaboradoRegimen,
+            tiempo: this.minutosAHorasMinutosSegundos(totalTiempoLaboradoRegimen)
           }
           this.tiempoRegimen.push(regimen);
         };
@@ -976,7 +992,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
       data.forEach((obj: IReporteHorasTrabaja) => {
 
         if (this.bool.bool_suc === true || this.bool.bool_dep === true) {
-          totalTiempoSucursal = 0;
+          totalTiempoLaboradoSucursal = 0;
           n.push({
             table: {
               widths: ['*', '*'],
@@ -1001,7 +1017,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
         }
 
         obj.departamentos.forEach(obj1 => {
-          totalTiempoDepartamento = 0;
+          totalTiempoLaboradoDepartamento = 0;
           // LA CABECERA CUANDO SE GENERA EL PDF POR DEPARTAMENTOS
           if (this.bool.bool_dep === true) {
             n.push({
@@ -1068,7 +1084,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
               }
             });
             c = 0;
-            totalTiempoEmpleado = 0;
+            totalTiempoLaboradoEmpleado = 0;
             if (this.tolerancia === 'considerar') {
               n.push({
                 style: 'tableMargin',
@@ -1107,9 +1123,9 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                     ...obj2.timbres.map(obj3 => {
                       const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
                       const tiempo = this.minutosAHorasMinutosSegundos(minutos);
-                      totalTiempoEmpleado += Number(minutos);
-                      totalTiempoSucursal += Number(minutos); 
-                      totalTiempoDepartamento += Number(minutos); 
+                      totalTiempoLaboradoEmpleado += Number(minutos);
+                      totalTiempoLaboradoSucursal += Number(minutos); 
+                      totalTiempoLaboradoDepartamento += Number(minutos); 
                       c = c + 1
                       return [
                         { style: 'itemsTableCentrado', text: c },
@@ -1162,8 +1178,8 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                       { text: '', style: 'itemsTableCentradoTotal'},
                       { text: '', style: 'itemsTableCentradoTotal'},
                       { text: '', style: 'itemsTableCentradoTotal'},
-                      { style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))},
-                      { style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
+                      { style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoLaboradoEmpleado.toFixed(2))},
+                      { style: 'itemsTableTotal', text: totalTiempoLaboradoEmpleado.toFixed(2)},
                     ],
                   ],
                 },
@@ -1210,9 +1226,9 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                     ...obj2.timbres.map(obj3 => {
                       const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
                       const tiempo = this.minutosAHorasMinutosSegundos(minutos);
-                      totalTiempoEmpleado += Number(minutos);
-                      totalTiempoSucursal += Number(minutos); 
-                      totalTiempoDepartamento += Number(minutos); 
+                      totalTiempoLaboradoEmpleado += Number(minutos);
+                      totalTiempoLaboradoSucursal += Number(minutos); 
+                      totalTiempoLaboradoDepartamento += Number(minutos); 
                       c = c + 1
                       return [
                         { style: 'itemsTableCentrado', text: c },
@@ -1263,8 +1279,8 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                       { style: 'itemsTableCentradoTotal', text: 'TOTAL'},
                       { text: '', style: 'itemsTableCentradoTotal'},
                       { text: '', style: 'itemsTableCentradoTotal'},
-                      { style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))},
-                      { style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
+                      { style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoLaboradoEmpleado.toFixed(2))},
+                      { style: 'itemsTableTotal', text: totalTiempoLaboradoEmpleado.toFixed(2)},
                     ],
                   ],
                 },
@@ -1277,22 +1293,22 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
             }
           });
           if (this.bool.bool_dep) {
-            totalTiempoDepartamento = Number(totalTiempoDepartamento.toFixed(2));
+            totalTiempoLaboradoDepartamento = Number(totalTiempoLaboradoDepartamento.toFixed(2));
             let departamento = {
               departamento: obj1.name_dep,
-              minutos: totalTiempoDepartamento,
-              tiempo: this.minutosAHorasMinutosSegundos(totalTiempoDepartamento)
+              minutos: totalTiempoLaboradoDepartamento,
+              tiempo: this.minutosAHorasMinutosSegundos(totalTiempoLaboradoDepartamento)
             }
             this.tiempoDepartamentos.push(departamento);
           };
         });
 
         if (this.bool.bool_suc) {
-          totalTiempoSucursal = Number(totalTiempoSucursal.toFixed(2));
+          totalTiempoLaboradoSucursal = Number(totalTiempoLaboradoSucursal.toFixed(2));
           let sucursal = {
             sucursal: obj.name_suc,
-            minutos: totalTiempoSucursal,
-            tiempo: this.minutosAHorasMinutosSegundos(totalTiempoSucursal)
+            minutos: totalTiempoLaboradoSucursal,
+            tiempo: this.minutosAHorasMinutosSegundos(totalTiempoLaboradoSucursal)
           }
           this.tiempoSucursales.push(sucursal);
         };
