@@ -16,12 +16,12 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
+import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
 import { BuscarPlanificacionComponent } from '../../rango-fechas/buscar-planificacion/buscar-planificacion.component';
 import { HorariosEmpleadoComponent } from 'src/app/componentes/rolEmpleado/horarios-empleado/horarios-empleado.component';
 import { VerEmpleadoComponent } from 'src/app/componentes/empleado/ver-empleado/ver-empleado.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
-import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
 @Component({
   selector: 'app-editar-planificacion',
