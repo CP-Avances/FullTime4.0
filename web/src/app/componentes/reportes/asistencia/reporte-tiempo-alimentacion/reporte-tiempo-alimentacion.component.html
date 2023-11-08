@@ -261,6 +261,17 @@
         </div>
         <mat-card-content>
             <div class="container" style="padding-bottom: 25px; text-align: center; margin-top: 0.5rem">
+                <div>
+                    <table id="codigoColoresTabla">
+                        <tr style="text-align: center">
+                            <th scope="col" rowspan="2">CÓDIGO DE COLOR:</th>
+                            <th scope="col" rowspan="2">FALTA TIMBRE</th>
+                            <th scope="col" rowspan="2" class="rojo" style="width: 3rem;"></th>
+                            <th scope="col" rowspan="2">EXCESO DE ALIMENTACIÓN</th>
+                            <th scope="col" rowspan="2" class="verde" style="width: 3rem;"></th>
+                        </tr>
+                    </table>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover table-sm" id="detalle">
                         <thead class="thead-light">
@@ -269,6 +280,11 @@
                                 <th scope="col" rowspan="2">CÓDIGO</th>
                                 <th scope="col" rowspan="2">EMPLEADO</th>
                                 <th scope="col" rowspan="2">FECHA</th>
+                                <th scope="col" rowspan="2">INICIO ALIMENTACIÓN</th>
+                                <th scope="col" rowspan="2">FIN ALIMENTACIÓN</th>
+                                <th scope="col" rowspan="2">M. ALIMENTACIÓN</th>
+                                <th scope="col" rowspan="2">M. TOMADOS</th>
+                                <th scope="col" rowspan="2">M. EXCESO</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -277,6 +293,11 @@
                                 <td>{{ t.codigo }}</td>
                                 <td>{{ t.empleado }}</td>
                                 <td>{{ t.fecha }}</td>
+                                <td [ngClass]="obtenerClaseCeldas(t.inicio)">{{ t.inicio }}</td>
+                                <td [ngClass]="obtenerClaseCeldas(t.fin)">{{ t.fin }}</td>
+                                <td>{{ t.alimentacion }}</td>
+                                <td>{{ t.tomados }}</td>
+                                <td [ngClass]="obtenerClaseCeldas(t.exceso)">{{ t.exceso }}</td>
                             </tr>
                         </tbody>
                     </table>

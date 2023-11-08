@@ -274,7 +274,6 @@ const BuscarAlimentacion = function (fec_inicio, fec_final, codigo) {
 };
 const agruparTimbres = function (listaTimbres) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log('en agrupar');
         const timbresAgrupados = [];
         for (let i = 0; i < listaTimbres.length; i += 2) {
             timbresAgrupados.push({

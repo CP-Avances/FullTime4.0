@@ -472,7 +472,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       documentDefinition = this.getDocumentDefinicion();
     };
 
-    let doc_name = "Faltas.pdf";
+    let doc_name = "Tiempo_alimentacion.pdf";
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -528,11 +528,13 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
         itemsTableCentradoFT: { fontSize: 8, alignment: 'center',fillColor: '#EE4444' },
         itemsTableCentradoExceso: { fontSize: 8, alignment: 'center',fillColor: '#55EE44' },
+        itemsTableCentradoColores: { fontSize: 9, alignment: 'center' },
         itemsTableDerecha: { fontSize: 8, alignment: 'right' },
         itemsTableInfoTotal: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.s_color  },
         itemsTableTotal: { fontSize: 8, bold: true, alignment: 'right', fillColor: '#E3E3E3' },
         itemsTableCentradoTotal: { fontSize: 8, bold: true, alignment: 'center', fillColor: '#E3E3E3' },
         tableMargin: { margin: [0, 0, 0, 10] },
+        tableMarginColores: { margin: [0, 5, 0, 15] },
         tableMarginCabecera: { margin: [0, 15, 0, 0] },
         tableMarginCabeceraTotal: { margin: [0, 15, 0, 15] },
         quote: { margin: [5, -2, 0, -2], italics: true },
@@ -554,6 +556,38 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
     this.excesoSucursales = [];
     this.excesoRegimen = [];
     this.excesoCargos = [];
+
+    n.push({
+      style: 'tableMarginColores',
+      table: {
+        widths: ['*','auto',50,'auto',50],
+        headerRows: 1,
+        body: [
+          [
+            {
+              text: 'CÓDIGO DE COLOR',
+              style: 'itemsTableCentradoColores'
+            },
+            {
+              text: 'FALTA TIMBRE',
+              style: 'itemsTableCentradoColores'
+            },
+            {
+              text: ' ',
+              style: 'itemsTableCentradoFT'
+            },
+            {
+              text: 'EXCESO DE ALIMENTACIÓN',
+              style: 'itemsTableCentradoColores'
+            },
+            {
+              text: ' ',
+              style: 'itemsTableCentradoExceso'
+            },
+          ]
+        ]
+      }
+    });
 
     if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
       data.forEach((obj1) => {
@@ -907,8 +941,8 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
                     const minutosTomados = this.calcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre,obj3.finAlimentacion.fec_hora_timbre);
                     const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
                     totalExcesoEmpleado += exceso;
-                    totalExcesoRegimen += exceso; 
-                    totalExcesoCargo += exceso; 
+                    totalExcesoSucursal += exceso; 
+                    totalExcesoDepartamento += exceso; 
                     c = c + 1
                     return [
                       { style: 'itemsTableCentrado', text: c },
@@ -1124,16 +1158,16 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
             const finAlimentacion = obj4.finAlimentacion.fec_hora_timbre != null
               ? obj4.finAlimentacion.fec_hora_timbre.split(' ')[1]
               : 'FT';
-              const minAlimentacion = obj4.inicioAlimentacion.min_alimentacion;
-              const minutosTomados = this.calcularDiferenciaFechas(obj4.inicioAlimentacion.fec_hora_timbre,obj4.finAlimentacion.fec_hora_timbre);
-              const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
+            const minAlimentacion = obj4.inicioAlimentacion.min_alimentacion;
+            const minutosTomados = this.calcularDiferenciaFechas(obj4.inicioAlimentacion.fec_hora_timbre,obj4.finAlimentacion.fec_hora_timbre);
+            const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
             let ele = { 
               'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
               'Departamento': obj2.name_dep,
               'Régimen': obj3.regimen[0].name_regimen,
               'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
               'Fecha': new Date(obj4.inicioAlimentacion.fec_horario), 'Inicio Alimentación': inicioAlimentacion,
-              'Fin Alimentación': finAlimentacion, 'M. Alimentación': minAlimentacion, 'M. Tomados': minutosTomados,
+              'Fin Alimentación': finAlimentacion, 'M. Alimentación': minAlimentacion, 'M. Tomados': minutosTomados !==null ? minutosTomados : minAlimentacion,
               'M. Exceso': exceso
             }
             nuevo.push(ele);
@@ -1150,21 +1184,21 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       obj1.empleados.forEach((obj2: any) => {
         obj2.timbres.forEach((obj3: any) => {
           const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null 
-              ? obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1]
-              : 'FT';
-            const finAlimentacion = obj3.finAlimentacion.fec_hora_timbre != null
-              ? obj3.finAlimentacion.fec_hora_timbre.split(' ')[1]
-              : 'FT';
-              const minAlimentacion = obj3.inicioAlimentacion.min_alimentacion;
-              const minutosTomados = this.calcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre,obj3.finAlimentacion.fec_hora_timbre);
-              const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
+            ? obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1]
+            : 'FT';
+          const finAlimentacion = obj3.finAlimentacion.fec_hora_timbre != null
+            ? obj3.finAlimentacion.fec_hora_timbre.split(' ')[1]
+            : 'FT';
+          const minAlimentacion = obj3.inicioAlimentacion.min_alimentacion;
+          const minutosTomados = this.calcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre,obj3.finAlimentacion.fec_hora_timbre);
+          const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
           let ele = {
             'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
             'Departamento': obj2.departamento,
             'Régimen': obj2.regimen[0].name_regimen,
             'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
             'Fecha': new Date(obj3.inicioAlimentacion.fec_horario), 'Inicio Alimentación': inicioAlimentacion,
-            'Fin Alimentación': finAlimentacion, 'M. Alimentación': minAlimentacion, 'M. Tomados': minutosTomados,
+            'Fin Alimentación': finAlimentacion, 'M. Alimentación': minAlimentacion, 'M. Tomados': minutosTomados !==null ? minutosTomados : minAlimentacion,
             'M. Exceso': exceso
           }
           nuevo.push(ele);
@@ -1195,10 +1229,10 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
               let ele = {
                 n: n,
                 ciudad: obj1.ciudad, sucursal: obj1.name_suc,
-                departamento: obj2.name_dep,
+                departamento: obj2.name_dep, regimen: obj3.regimen[0].name_regimen,
                 empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
-                fecha: obj3.inicioAlimentacion.fec_horario, inicio: inicioAlimentacion, fin: finAlimentacion, 
-                alimentacion: minAlimentacion, tomados: minutosTomados, exceso: exceso
+                fecha: obj4.inicioAlimentacion.fec_horario, inicio: inicioAlimentacion, fin: finAlimentacion, 
+                alimentacion: minAlimentacion, tomados: minutosTomados !==null ? minutosTomados : minAlimentacion, exceso: exceso
               }
               this.timbres.push(ele);
             })
@@ -1226,10 +1260,10 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
             let ele = {
               n: n,
               ciudad: obj2.ciudad, sucursal: obj2.sucursal,
-              departamento: obj2.departamento,
+              departamento: obj2.departamento, regimen: obj2.regimen[0].name_regimen,
               empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
               fecha: obj3.inicioAlimentacion.fec_horario, inicio: inicioAlimentacion, fin: finAlimentacion, 
-              alimentacion: minAlimentacion, tomados: minutosTomados, exceso: exceso
+              alimentacion: minAlimentacion, tomados: minutosTomados !==null ? minutosTomados : minAlimentacion, exceso: exceso
             }
             this.timbres.push(ele);
           })
@@ -1408,4 +1442,14 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   Regresar() {
     this.verDetalle = false;
   }
+
+  //METDODO PARA CAMBIAR EL COLOR DE LAS CELDAS EN LA TABLA DE PREVISUALIZACION
+  obtenerClaseCeldas(valor: any) {
+    if (valor > 0) {
+        return 'verde';
+    } else if (valor == 'FT') {
+        return 'rojo';
+    }
+  }
+
 }

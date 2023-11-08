@@ -1,5 +1,39 @@
-table { width: 100%; font-size: 14px;}
+mat-form-field {
+    padding: 10px 15px 0px 15px;
+}
 
-tr { text-align: center; }
+table {
+    width: 100%;
+    font-size: 14px;
+}
 
-td { padding-top: 10px; text-align: center; }
+tr {
+    text-align: center;
+}
+
+td {
+    padding-top: 10px;
+    text-align: center;
+}
+
+p {
+    font-size: x-small;
+}
+
+mat-icon {
+    cursor: pointer;
+}
+
+.ver {
+    color: indianred;
+}
+
+#busqueda {
+    margin-top: 10px;
+}
+
+#detalle {
+    width: 100%;
+    font-size: 12px;
+}
+
