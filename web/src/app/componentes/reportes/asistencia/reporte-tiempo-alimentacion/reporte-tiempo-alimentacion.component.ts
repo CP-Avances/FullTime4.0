@@ -1226,7 +1226,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
               const minutosTomados = this.calcularDiferenciaFechas(obj4.inicioAlimentacion.fec_hora_timbre,obj4.finAlimentacion.fec_hora_timbre);
               const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
               n = n + 1;
-              let ele = {
+              const ele = {
                 n: n,
                 ciudad: obj1.ciudad, sucursal: obj1.name_suc,
                 departamento: obj2.name_dep, regimen: obj3.regimen[0].name_regimen,
@@ -1257,7 +1257,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
               const minutosTomados = this.calcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre,obj3.finAlimentacion.fec_hora_timbre);
               const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
             n = n + 1;
-            let ele = {
+            const ele = {
               n: n,
               ciudad: obj2.ciudad, sucursal: obj2.sucursal,
               departamento: obj2.departamento, regimen: obj2.regimen[0].name_regimen,

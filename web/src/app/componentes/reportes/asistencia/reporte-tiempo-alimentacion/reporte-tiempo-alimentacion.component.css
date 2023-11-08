@@ -8,10 +8,14 @@ table {
 }
 
 #codigoColoresTabla {
-    width: 50%;
+    width: auto;
     font-size: 14px;
     margin-bottom: 2rem;
     margin-top: 2rem;
+}
+
+.coloresItem{
+    padding-left: 10px;
 }
 
 tr {

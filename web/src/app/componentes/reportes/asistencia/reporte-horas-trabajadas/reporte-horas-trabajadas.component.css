@@ -7,6 +7,17 @@ table {
     font-size: 14px;
 }
 
+#codigoColoresTabla {
+    width: auto;
+    font-size: 14px;
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+}
+
+.coloresItem{
+    padding-left: 10px;
+}
+
 tr {
     text-align: center;
 }
@@ -35,5 +46,13 @@ mat-icon {
 #detalle {
     width: 100%;
     font-size: 12px;
+}
+
+.verde {
+    background-color: #55EE44;
+}
+
+.rojo {
+    background-color: #EE4444;
 }
 

@@ -261,6 +261,17 @@
         </div>
         <mat-card-content>
             <div class="container" style="padding-bottom: 25px; text-align: center; margin-top: 0.5rem">
+                <div>
+                    <table id="codigoColoresTabla">
+                        <tr style="text-align: center">
+                            <th scope="col" rowspan="2">CÓDIGO DE COLOR: </th>
+                            <th scope="col" rowspan="2" class="coloresItem" >FALTA TIMBRE</th>
+                            <th scope="col" rowspan="2" class="rojo" style="width: 3rem;"></th>
+                            <th scope="col" rowspan="2" class="coloresItem" >TIEMPO LABORADO MENOR AL PLANIFICADO</th>
+                            <th scope="col" rowspan="2" class="verde" style="width: 3rem;"></th>
+                        </tr>
+                    </table>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover table-sm" id="detalle">
                         <thead class="thead-light">
@@ -268,20 +279,13 @@
                                 <th scope="col" rowspan="2">N°</th>
                                 <th scope="col" rowspan="2">CÓDIGO</th>
                                 <th scope="col" rowspan="2">EMPLEADO</th>
-                                <th scope="col" rowspan="1" colspan="2">HORARIO</th>
-                                <th scope="col" rowspan="1" colspan="2">TIMBRE</th>
-                                <th scope="col" rowspan="2">TIPO PERMISO</th>
-                                <th scope="col" rowspan="2">DESDE</th>
-                                <th scope="col" rowspan="2">HASTA</th>
-                                <th scope="col" rowspan="2" colspan="2">PERMISO</th>
-                                <th scope="col" rowspan="2" *ngIf="tolerancia==='considerar'">TOLERANCIA</th>                             
-                                <th scope="col" rowspan="2" colspan="2">ATRASO</th>
-                            </tr>
-                            <tr style="text-align: center">
-                                <th scope="col" rowspan="1">FECHA</th>
-                                <th scope="col" rowspan="1">HORA</th>
-                                <th scope="col" rowspan="1">FECHA</th>
-                                <th scope="col" rowspan="1">HORA</th>
+                                <th scope="col" rowspan="2">FECHA</th>
+                                <th scope="col" rowspan="2">ENTRADA</th>
+                                <th scope="col" rowspan="2">SALIDA</th>
+                                <th scope="col" rowspan="2">INICIO ALIMENTACIÓN</th>
+                                <th scope="col" rowspan="2">FIN ALIMENTACIÓN</th>
+                                <th scope="col" rowspan="2" colspan="2">TIEMPO PLANIFICADO</th>
+                                <th scope="col" rowspan="2" colspan="2">TIEMPO LABORADO</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -289,18 +293,15 @@
                                 <td>{{ t.n }}</td>
                                 <td>{{ t.codigo }}</td>
                                 <td>{{ t.empleado }}</td>
-                                <td>{{ t.fechaHorario }}</td>
-                                <td>{{ t.horaHorario }}</td>
-                                <td>{{ t.fechaTimbre }}</td>
-                                <td>{{ t.horaTimbre }}</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td *ngIf="tolerancia==='considerar'">{{ t.tolerancia }}</td>
-                                <td>{{ t.atrasoT }}</td>
-                                <td>{{ t.atrasoM }}</td>
+                                <td>{{ t.fecha }}</td>
+                                <td [ngClass]="obtenerClaseTimbre(t.entrada)">{{ t.entrada }}</td>
+                                <td [ngClass]="obtenerClaseTimbre(t.salida)">{{ t.salida }}</td>
+                                <td [ngClass]="obtenerClaseTimbre(t.inicioAlimentacion)">{{ t.inicioAlimentacion }}</td>
+                                <td [ngClass]="obtenerClaseTimbre(t.finAlimentacion)">{{ t.finAlimentacion }}</td>
+                                <td>{{ t.tiempoPlanificado }}</td>
+                                <td>{{ t.minutosPlanificados }}</td>
+                                <td [ngClass]="obtenerClaseTiempo(t.minutosPlanificados,t.minutosLaborados)">{{ t.tiempoLaborado }}</td>
+                                <td [ngClass]="obtenerClaseTiempo(t.minutosPlanificados,t.minutosLaborados)">{{ t.minutosLaborados }}</td>
                             </tr>
                         </tbody>
                     </table>
