@@ -15,8 +15,9 @@ import * as xlsx from 'xlsx';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
 import { SalidasAntesService } from 'src/app/servicios/reportes/salidas-antes/salidas-antes.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 
 @Component({
   selector: 'app-salidas-antes',
@@ -111,6 +112,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     private informacion: DatosGeneralesService,
     private reporteService: ReportesService,
     private restSalida: SalidasAntesService,
+    private parametro: ParametrosService,
     private restEmpre: EmpresaService,
     private toastr: ToastrService,
   ) {
@@ -121,6 +123,29 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.BuscarInformacion();
     this.BuscarCargos();
+  }
+
+  /********************************************************************************************
+  ****                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                            **** 
+  ********************************************************************************************/
+  formato_fecha: string = 'DD/MM/YYYY';
+  formato_hora: string = 'HH:mm:ss';
+
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  BuscarParametro() {
+    // id_tipo_parametro Formato fecha = 25
+    this.parametro.ListarDetalleParametros(25).subscribe(
+      res => {
+        this.formato_fecha = res[0].descripcion;
+      });
+  }
+
+  BuscarHora() {
+    // id_tipo_parametro Formato hora = 26
+    this.parametro.ListarDetalleParametros(26).subscribe(
+      res => {
+        this.formato_hora = res[0].descripcion;
+      });
   }
 
   // METODO DE BUSQUEDA DE DATOS
@@ -519,8 +544,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
         })
       ],
       styles: {
-        tableHeader: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color },
-        centrado: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 10, 0, 10] },
+        tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color },
+        centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 10, 0, 10] },
         itemsTable: { fontSize: 8 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
         itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0],fillColor: '#E3E3E3' },
@@ -675,6 +700,25 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
 
                 ],
                 ...obj2.timbres.map(obj3 => {
+
+                  const fechaHorario = this.validacionService.FormatearFecha(
+                    obj3.fec_hora_horario.split(' ')[0],
+                    this.formato_fecha, 
+                    this.validacionService.dia_abreviado);
+
+                  const fechaTimbre = this.validacionService.FormatearFecha(
+                    obj3.fec_hora_timbre.split(' ')[0],
+                    this.formato_fecha, 
+                    this.validacionService.dia_abreviado);
+
+                  const horaHorario = this.validacionService.FormatearHora(
+                    obj3.fec_hora_horario.split(' ')[1], 
+                    this.formato_hora);
+
+                  const horaTimbre = this.validacionService.FormatearHora(
+                    obj3.fec_hora_timbre.split(' ')[1], 
+                    this.formato_hora);
+
                   const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
                   const tiempo = this.minutosAHorasMinutosSegundos(minutos);
                   totalTiempoEmpleado += Number(minutos);
@@ -683,10 +727,10 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                   c = c + 1
                   return [
                     { style: 'itemsTableCentrado', text: c },
-                    { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[0] },
-                    { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[1] },
-                    { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[0] },
-                    { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[1] },
+                    { style: 'itemsTableCentrado', text: fechaHorario },
+                    { style: 'itemsTableCentrado', text: horaHorario },
+                    { style: 'itemsTableCentrado', text: fechaTimbre },
+                    { style: 'itemsTableCentrado', text: horaTimbre },
                     {},{},{},{},{},
                     {style: 'itemsTableDerecha', text: minutos},
                     {style: 'itemsTableCentrado', text: tiempo},
@@ -985,6 +1029,25 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   
                   ],
                   ...obj2.timbres.map(obj3 => {
+
+                    const fechaHorario = this.validacionService.FormatearFecha(
+                      obj3.fec_hora_horario.split(' ')[0],
+                      this.formato_fecha, 
+                      this.validacionService.dia_abreviado);
+
+                    const fechaTimbre = this.validacionService.FormatearFecha(
+                      obj3.fec_hora_timbre.split(' ')[0],
+                      this.formato_fecha, 
+                      this.validacionService.dia_abreviado);
+
+                    const horaHorario = this.validacionService.FormatearHora(
+                      obj3.fec_hora_horario.split(' ')[1], 
+                      this.formato_hora);
+
+                    const horaTimbre = this.validacionService.FormatearHora(
+                      obj3.fec_hora_timbre.split(' ')[1], 
+                      this.formato_hora);
+
                     const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
                     const tiempo = this.minutosAHorasMinutosSegundos(minutos);
                     totalTiempoEmpleado += Number(minutos);
@@ -993,10 +1056,10 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     c = c + 1
                     return [
                       { style: 'itemsTableCentrado', text: c },
-                      { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[0] },
-                      { style: 'itemsTableCentrado', text: obj3.fec_hora_horario.split(' ')[1] },
-                      { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[0] },
-                      { style: 'itemsTableCentrado', text: obj3.fec_hora_timbre.split(' ')[1] },
+                      { style: 'itemsTableCentrado', text: fechaHorario },
+                      { style: 'itemsTableCentrado', text: horaHorario },
+                      { style: 'itemsTableCentrado', text: fechaTimbre },
+                      { style: 'itemsTableCentrado', text: horaTimbre },
                       {},{},{},{},{},
                       {style: 'itemsTableDerecha', text: minutos},
                       {style: 'itemsTableCentrado', text: tiempo},
@@ -1241,6 +1304,15 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
+
+            const horaHorario = this.validacionService.FormatearHora(
+              obj4.fec_hora_horario.split(' ')[1], 
+              this.formato_hora);
+
+            const horaTimbre = this.validacionService.FormatearHora(
+              obj4.fec_hora_timbre.split(' ')[1], 
+              this.formato_hora);
+
             const minutos = this.segundosAMinutosConDecimales(obj4.diferencia);
             const tiempo = this.minutosAHorasMinutosSegundos(minutos);
             let ele = { 
@@ -1248,8 +1320,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
               'Departamento': obj2.name_dep,
               'Régimen': obj3.regimen[0].name_regimen,
               'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
-              'Fecha Horario': new Date(obj4.fec_hora_horario), 'Hora Horario': obj4.fec_hora_horario.split(' ')[1],
-              'Fecha Timbre': new Date(obj4.fec_hora_timbre), 'Hora Timbre': obj4.fec_hora_timbre.split(' ')[1],
+              'Fecha Horario': new Date(obj4.fec_hora_horario), 'Hora Horario': horaHorario,
+              'Fecha Timbre': new Date(obj4.fec_hora_timbre), 'Hora Timbre': horaTimbre,
               'Salida Anticipada Minutos': minutos, 'Salida Anticipada HH:MM:SS': tiempo,
             }
             nuevo.push(ele);
@@ -1265,6 +1337,15 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     array.forEach((obj1: any) => {
       obj1.empleados.forEach((obj2: any) => {
         obj2.timbres.forEach((obj3: any) => {
+
+          const horaHorario = this.validacionService.FormatearHora(
+            obj3.fec_hora_horario.split(' ')[1], 
+            this.formato_hora);
+
+          const horaTimbre = this.validacionService.FormatearHora(
+            obj3.fec_hora_timbre.split(' ')[1], 
+            this.formato_hora);
+
           const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
           const tiempo = this.minutosAHorasMinutosSegundos(minutos);
           let ele = {
@@ -1272,8 +1353,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
             'Departamento': obj2.departamento,
             'Régimen': obj2.regimen[0].name_regimen,
             'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
-            'Fecha Horario': new Date(obj3.fec_hora_horario), 'Hora Horario': obj3.fec_hora_horario.split(' ')[1],
-            'Fecha Timbre': new Date(obj3.fec_hora_timbre), 'Hora Timbre': obj3.fec_hora_timbre.split(' ')[1],
+            'Fecha Horario': new Date(obj3.fec_hora_horario), 'Hora Horario': horaHorario,
+            'Fecha Timbre': new Date(obj3.fec_hora_timbre), 'Hora Timbre': horaTimbre,
             'Salida Anticipada Minutos': minutos, 'Salida Anticipada HH:MM:SS': tiempo,
           }
           nuevo.push(ele);
@@ -1291,6 +1372,25 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
+
+            const fechaHorario = this.validacionService.FormatearFecha(
+              obj4.fec_hora_horario.split(' ')[0],
+              this.formato_fecha, 
+              this.validacionService.dia_abreviado);
+
+            const fechaTimbre = this.validacionService.FormatearFecha(
+              obj4.fec_hora_timbre.split(' ')[0],
+              this.formato_fecha, 
+              this.validacionService.dia_abreviado);
+
+            const horaHorario = this.validacionService.FormatearHora(
+              obj4.fec_hora_horario.split(' ')[1], 
+              this.formato_hora);
+
+            const horaTimbre = this.validacionService.FormatearHora(
+              obj4.fec_hora_timbre.split(' ')[1], 
+              this.formato_hora);
+
             const minutos = this.segundosAMinutosConDecimales(obj4.diferencia);
             const tiempo = this.minutosAHorasMinutosSegundos(minutos);
             n = n + 1;
@@ -1299,8 +1399,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
               ciudad: obj1.ciudad, sucursal: obj1.name_suc,
               departamento: obj2.name_dep,
               empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
-              fechaHorario: obj4.fec_hora_horario.split(' ')[0], horaHorario: obj4.fec_hora_horario.split(' ')[1],
-              fechaTimbre: obj4.fec_hora_timbre.split(' ')[0], horaTimbre: obj4.fec_hora_timbre.split(' ')[1],
+              fechaHorario, horaHorario,
+              fechaTimbre, horaTimbre,
               salidaAnticipadaM: minutos, salidaAnticipadaT: tiempo,
             }
             this.timbres.push(ele);
@@ -1316,6 +1416,25 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     this.data_pdf.forEach((obj1: any) => {
       obj1.empleados.forEach((obj2: any) => {
         obj2.timbres.forEach((obj3: any) => {
+
+          const fechaHorario = this.validacionService.FormatearFecha(
+            obj3.fec_hora_horario.split(' ')[0],
+            this.formato_fecha, 
+            this.validacionService.dia_abreviado);
+
+          const fechaTimbre = this.validacionService.FormatearFecha(
+            obj3.fec_hora_timbre.split(' ')[0],
+            this.formato_fecha, 
+            this.validacionService.dia_abreviado);
+
+          const horaHorario = this.validacionService.FormatearHora(
+            obj3.fec_hora_horario.split(' ')[1], 
+            this.formato_hora);
+
+          const horaTimbre = this.validacionService.FormatearHora(
+            obj3.fec_hora_timbre.split(' ')[1], 
+            this.formato_hora);
+
           const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
           const tiempo = this.minutosAHorasMinutosSegundos(minutos);
           n = n + 1;
@@ -1324,8 +1443,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
             ciudad: obj2.ciudad, sucursal: obj2.sucursal,
             departamento: obj2.departamento,
             empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
-            fechaHorario: obj3.fec_hora_horario.split(' ')[0], horaHorario: obj3.fec_hora_horario.split(' ')[1],
-            fechaTimbre: obj3.fec_hora_timbre.split(' ')[0], horaTimbre: obj3.fec_hora_timbre.split(' ')[1],
+            fechaHorario, horaHorario,
+            fechaTimbre, horaTimbre,
             salidaAnticipadaM: minutos, salidaAnticipadaT: tiempo,
           }
           this.timbres.push(ele);

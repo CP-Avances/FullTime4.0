@@ -73,10 +73,9 @@ export default REPORTES_TIEMPO_LABORADO_CONTROLADOR;
 
 const BuscarTiempoLaborado = async function (fec_inicio: string, fec_final: string, codigo: string | number) {
     return await pool.query('SELECT CAST(fec_horario AS VARCHAR), CAST(fec_hora_horario AS VARCHAR), CAST(fec_hora_timbre AS VARCHAR), ' +
-    'codigo, estado_timbre, tipo_entr_salida AS accion, min_alimentacion ' +
+    'codigo, estado_timbre, tipo_entr_salida AS accion, min_alimentacion, tipo_dia ' +
     'FROM plan_general WHERE CAST(fec_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' ' +
     'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 ' +
-    'AND tipo_dia NOT IN (\'L\', \'FD\') ' +
     'AND tipo_entr_salida IN (\'E\',\'I/A\', \'F/A\', \'S\') ' +
     'ORDER BY codigo, fec_hora_horario ASC', [fec_inicio, fec_final, codigo])
         .then(res => {
@@ -105,6 +104,7 @@ const agruparTimbres = async function agruparTimbresPorClave(timbres: Timbre[]) 
                 for (let i = 0; i < timbresAgrupadosFecha[key].length; i += 4) {
                     timbresAgrupados.push({
                         tipo: 'EAS',
+                        dia: timbresAgrupadosFecha[key][i].tipo_dia,
                         entrada: timbresAgrupadosFecha[key][i],
                         inicioAlimentacion: timbresAgrupadosFecha[key][i+1],
                         finAlimentacion: timbresAgrupadosFecha[key][i+2],
@@ -116,6 +116,7 @@ const agruparTimbres = async function agruparTimbresPorClave(timbres: Timbre[]) 
                 for (let i = 0; i < timbresAgrupadosFecha[key].length; i += 2) {
                    timbresAgrupados.push({
                         tipo: 'ES',
+                        dia: timbresAgrupadosFecha[key][i].tipo_dia,
                         entrada: timbresAgrupadosFecha[key][i],
                         salida: i + 1 < timbresAgrupadosFecha[key].length ? timbresAgrupadosFecha[key][i + 1] : null
                      });
@@ -137,6 +138,7 @@ interface Timbre {
     codigo: string;
     estado_timbre: string | null;
     accion: string;
+    tipo_dia: string;
     min_alimentacion: number;
 }
 

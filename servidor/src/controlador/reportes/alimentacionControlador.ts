@@ -267,7 +267,6 @@ const BuscarAlimentacion = async function (fec_inicio: string, fec_final: string
     'codigo, estado_timbre, tipo_entr_salida AS accion, min_alimentacion ' +
     'FROM plan_general WHERE CAST(fec_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' ' +
     'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 ' +
-    'AND tipo_dia NOT IN (\'L\', \'FD\') ' +
     'AND tipo_entr_salida IN (\'I/A\', \'F/A\') ' +
     'ORDER BY codigo, fec_hora_horario ASC', [fec_inicio, fec_final, codigo])
         .then(res => {

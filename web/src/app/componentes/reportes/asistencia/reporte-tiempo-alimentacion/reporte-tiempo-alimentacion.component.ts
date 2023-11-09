@@ -13,9 +13,9 @@ import * as xlsx from 'xlsx';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
 import { AlimentacionService } from 'src/app/servicios/reportes/alimentacion/alimentacion.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-
+import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 
 @Component({
   selector: 'app-reporte-tiempo-alimentacion',
@@ -107,9 +107,10 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   
   constructor(
     private validacionService: ValidacionesService,
+    private restAlimentacion: AlimentacionService,
     private informacion: DatosGeneralesService,
     private reporteService: ReportesService,
-    private restAlimentacion: AlimentacionService,
+    private parametro: ParametrosService,
     private restEmpre: EmpresaService,
     private toastr: ToastrService,
   ) { 
@@ -133,115 +134,138 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
 
   }
 
-    // METODO DE BUSQUEDA DE DATOS
-    BuscarInformacion() {
-      this.departamentos = [];
-      this.sucursales = [];
-      this.respuesta = [];
-      this.empleados = [];
-      this.regimen = [];
-      this.origen = [];
-      this.informacion.ObtenerInformacion(1).subscribe(
-        (res: any[]) => {
-          this.origen = JSON.stringify(res);
-          res.forEach((obj) => {
-            this.sucursales.push({
-              id: obj.id_suc,
-              nombre: obj.name_suc,
+  /********************************************************************************************
+  ****                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                            **** 
+  ********************************************************************************************/
+  formato_fecha: string = 'DD/MM/YYYY';
+  formato_hora: string = 'HH:mm:ss';
+
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  BuscarParametro() {
+    // id_tipo_parametro Formato fecha = 25
+    this.parametro.ListarDetalleParametros(25).subscribe(
+      res => {
+        this.formato_fecha = res[0].descripcion;
+      });
+  }
+
+  BuscarHora() {
+    // id_tipo_parametro Formato hora = 26
+    this.parametro.ListarDetalleParametros(26).subscribe(
+      res => {
+        this.formato_hora = res[0].descripcion;
+      });
+  }
+
+  // METODO DE BUSQUEDA DE DATOS
+  BuscarInformacion() {
+    this.departamentos = [];
+    this.sucursales = [];
+    this.respuesta = [];
+    this.empleados = [];
+    this.regimen = [];
+    this.origen = [];
+    this.informacion.ObtenerInformacion(1).subscribe(
+      (res: any[]) => {
+        this.origen = JSON.stringify(res);
+        res.forEach((obj) => {
+          this.sucursales.push({
+            id: obj.id_suc,
+            nombre: obj.name_suc,
+          });
+        });
+
+        res.forEach((obj) => {
+          obj.departamentos.forEach((ele) => {
+            this.departamentos.push({
+              id: ele.id_depa,
+              departamento: ele.name_dep,
+              nombre: ele.sucursal,
             });
           });
-  
-          res.forEach((obj) => {
-            obj.departamentos.forEach((ele) => {
-              this.departamentos.push({
-                id: ele.id_depa,
-                departamento: ele.name_dep,
-                nombre: ele.sucursal,
-              });
-            });
-          });
-  
-          res.forEach((obj) => {
-            obj.departamentos.forEach((ele) => {
-              ele.empleado.forEach((r) => {
-                let elemento = {
-                  id: r.id,
-                  nombre: r.name_empleado,
-                  codigo: r.codigo,
-                  cedula: r.cedula,
-                  correo: r.correo,
-                  cargo: r.cargo,
-                  id_contrato: r.id_contrato,
-                  hora_trabaja: r.hora_trabaja,
-                  sucursal: r.sucursal,
-                  departamento: r.departamento,
-                  ciudad: r.ciudad,
-                  regimen: r.regimen,
-                };
-                this.empleados.push(elemento);
-              });
-            });
-          });
-  
-          res.forEach((obj) => {
-            obj.departamentos.forEach((ele) => {
-              ele.empleado.forEach((reg) => {
-                reg.regimen.forEach((r) => {
-                  this.regimen.push({
-                    id: r.id_regimen,
-                    nombre: r.name_regimen,
-                  });
-                });
-              });
-            });
-          });
-  
-          this.regimen = this.regimen.filter(
-            (obj, index, self) => index === self.findIndex((o) => o.id === obj.id)
-          );
-        },
-        (err) => {
-          this.toastr.error(err.error.message);
-        }
-      );
-    }
-  
-    // METODO PARA FILTRAR POR CARGOS
-    empleados_cargos: any = [];
-    origen_cargo: any = [];
-    BuscarCargos() {
-      this.empleados_cargos = [];
-      this.origen_cargo = [];
-      this.cargos = [];
-      this.informacion.ObtenerInformacionCargo(1).subscribe(
-        (res: any[]) => {
-          this.origen_cargo = JSON.stringify(res);
-  
-          res.forEach((obj) => {
-            this.cargos.push({
-              id: obj.id_cargo,
-              nombre: obj.name_cargo,
-            });
-          });
-  
-          res.forEach((obj) => {
-            obj.empleados.forEach((r) => {
-              this.empleados_cargos.push({
+        });
+
+        res.forEach((obj) => {
+          obj.departamentos.forEach((ele) => {
+            ele.empleado.forEach((r) => {
+              let elemento = {
                 id: r.id,
                 nombre: r.name_empleado,
                 codigo: r.codigo,
                 cedula: r.cedula,
                 correo: r.correo,
-                ciudad: r.ciudad,
-                id_cargo: r.id_cargo,
+                cargo: r.cargo,
                 id_contrato: r.id_contrato,
                 hora_trabaja: r.hora_trabaja,
+                sucursal: r.sucursal,
+                departamento: r.departamento,
+                ciudad: r.ciudad,
+                regimen: r.regimen,
+              };
+              this.empleados.push(elemento);
+            });
+          });
+        });
+
+        res.forEach((obj) => {
+          obj.departamentos.forEach((ele) => {
+            ele.empleado.forEach((reg) => {
+              reg.regimen.forEach((r) => {
+                this.regimen.push({
+                  id: r.id_regimen,
+                  nombre: r.name_regimen,
+                });
               });
             });
           });
-        },
-      );
-    }
+        });
+
+        this.regimen = this.regimen.filter(
+          (obj, index, self) => index === self.findIndex((o) => o.id === obj.id)
+        );
+      },
+      (err) => {
+        this.toastr.error(err.error.message);
+      }
+    );
+  }
+
+  // METODO PARA FILTRAR POR CARGOS
+  empleados_cargos: any = [];
+  origen_cargo: any = [];
+  BuscarCargos() {
+    this.empleados_cargos = [];
+    this.origen_cargo = [];
+    this.cargos = [];
+    this.informacion.ObtenerInformacionCargo(1).subscribe(
+      (res: any[]) => {
+        this.origen_cargo = JSON.stringify(res);
+
+        res.forEach((obj) => {
+          this.cargos.push({
+            id: obj.id_cargo,
+            nombre: obj.name_cargo,
+          });
+        });
+
+        res.forEach((obj) => {
+          obj.empleados.forEach((r) => {
+            this.empleados_cargos.push({
+              id: r.id,
+              nombre: r.name_empleado,
+              codigo: r.codigo,
+              cedula: r.cedula,
+              correo: r.correo,
+              ciudad: r.ciudad,
+              id_cargo: r.id_cargo,
+              id_contrato: r.id_contrato,
+              hora_trabaja: r.hora_trabaja,
+            });
+          });
+        });
+      },
+    );
+  }
 
   // VALIDACIONES DE OPCIONES DE REPORTE
   validacionReporte(action: any) {
@@ -519,8 +543,8 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
         })
       ],
       styles: {
-        tableHeader: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color },
-        centrado: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 2, 0, 2] },
+        tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color },
+        centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 2, 0, 2] },
         itemsTable: { fontSize: 8 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
         itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0],fillColor: '#E3E3E3' },
@@ -693,12 +717,19 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
                   { text: 'M. EXCESO', style: 'centrado' },
                 ],
                 ...obj2.timbres.map(obj3 => {
+
+                  const fecha = this.validacionService.FormatearFecha(
+                    obj3.inicioAlimentacion.fec_horario,
+                    this.formato_fecha, 
+                    this.validacionService.dia_abreviado);
+
                   const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null 
-                    ? obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1]
+                    ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
                     : 'FT';
                   const finAlimentacion = obj3.finAlimentacion.fec_hora_timbre != null
-                    ? obj3.finAlimentacion.fec_hora_timbre.split(' ')[1]
+                    ? this.validacionService.FormatearHora(obj3.finAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
                     : 'FT';
+
                   const minAlimentacion = obj3.inicioAlimentacion.min_alimentacion;
                   const minutosTomados = this.calcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre,obj3.finAlimentacion.fec_hora_timbre);
                   const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
@@ -708,7 +739,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
                   c = c + 1
                   return [
                     { style: 'itemsTableCentrado', text: c },
-                    { style: 'itemsTableCentrado', text: obj3.inicioAlimentacion.fec_horario },
+                    { style: 'itemsTableCentrado', text: fecha },
                     { style: inicioAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: inicioAlimentacion },
                     { style: finAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: finAlimentacion },
                     { style: 'itemsTableCentrado', text: minAlimentacion },
@@ -931,12 +962,18 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
                     { text: 'M. EXCESO', style: 'centrado' },
                   ],
                   ...obj2.timbres.map(obj3 => {
+                    const fecha = this.validacionService.FormatearFecha(
+                      obj3.inicioAlimentacion.fec_horario,
+                      this.formato_fecha, 
+                      this.validacionService.dia_abreviado);
+  
                     const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null 
-                      ? obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1]
+                      ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
                       : 'FT';
                     const finAlimentacion = obj3.finAlimentacion.fec_hora_timbre != null
-                      ? obj3.finAlimentacion.fec_hora_timbre.split(' ')[1]
-                      : 'FT';
+                      ? this.validacionService.FormatearHora(obj3.finAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
+                      : 'FT';  
+
                     const minAlimentacion = obj3.inicioAlimentacion.min_alimentacion;
                     const minutosTomados = this.calcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre,obj3.finAlimentacion.fec_hora_timbre);
                     const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
@@ -946,7 +983,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
                     c = c + 1
                     return [
                       { style: 'itemsTableCentrado', text: c },
-                      { style: 'itemsTableCentrado', text: obj3.inicioAlimentacion.fec_horario },
+                      { style: 'itemsTableCentrado', text: fecha },
                       { style: inicioAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: inicioAlimentacion },
                       { style: finAlimentacion == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: finAlimentacion },
                       { style: 'itemsTableCentrado', text: minAlimentacion },
@@ -1153,10 +1190,10 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
             const inicioAlimentacion = obj4.inicioAlimentacion.fec_hora_timbre != null 
-              ? obj4.inicioAlimentacion.fec_hora_timbre.split(' ')[1]
+              ? this.validacionService.FormatearHora(obj4.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
               : 'FT';
             const finAlimentacion = obj4.finAlimentacion.fec_hora_timbre != null
-              ? obj4.finAlimentacion.fec_hora_timbre.split(' ')[1]
+              ? this.validacionService.FormatearHora(obj4.finAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
               : 'FT';
             const minAlimentacion = obj4.inicioAlimentacion.min_alimentacion;
             const minutosTomados = this.calcularDiferenciaFechas(obj4.inicioAlimentacion.fec_hora_timbre,obj4.finAlimentacion.fec_hora_timbre);
@@ -1166,7 +1203,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
               'Departamento': obj2.name_dep,
               'Régimen': obj3.regimen[0].name_regimen,
               'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
-              'Fecha': new Date(obj4.inicioAlimentacion.fec_horario), 'Inicio Alimentación': inicioAlimentacion,
+              'Fecha': new Date(obj4.inicioAlimentacion.fec_hora_horario), 'Inicio Alimentación': inicioAlimentacion,
               'Fin Alimentación': finAlimentacion, 'M. Alimentación': minAlimentacion, 'M. Tomados': minutosTomados !==null ? minutosTomados : minAlimentacion,
               'M. Exceso': exceso
             }
@@ -1184,11 +1221,11 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       obj1.empleados.forEach((obj2: any) => {
         obj2.timbres.forEach((obj3: any) => {
           const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null 
-            ? obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1]
+            ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
             : 'FT';
           const finAlimentacion = obj3.finAlimentacion.fec_hora_timbre != null
-            ? obj3.finAlimentacion.fec_hora_timbre.split(' ')[1]
-            : 'FT';
+            ? this.validacionService.FormatearHora(obj3.finAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
+            : 'FT'; 
           const minAlimentacion = obj3.inicioAlimentacion.min_alimentacion;
           const minutosTomados = this.calcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre,obj3.finAlimentacion.fec_hora_timbre);
           const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
@@ -1197,7 +1234,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
             'Departamento': obj2.departamento,
             'Régimen': obj2.regimen[0].name_regimen,
             'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
-            'Fecha': new Date(obj3.inicioAlimentacion.fec_horario), 'Inicio Alimentación': inicioAlimentacion,
+            'Fecha': new Date(obj3.inicioAlimentacion.fec_hora_horario), 'Inicio Alimentación': inicioAlimentacion,
             'Fin Alimentación': finAlimentacion, 'M. Alimentación': minAlimentacion, 'M. Tomados': minutosTomados !==null ? minutosTomados : minAlimentacion,
             'M. Exceso': exceso
           }
@@ -1216,12 +1253,17 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
         obj1.departamentos.forEach(obj2 => {
           obj2.empleado.forEach((obj3: any) => {
             obj3.timbres.forEach((obj4: any) => {
+              const fecha = this.validacionService.FormatearFecha(
+                obj4.inicioAlimentacion.fec_horario,
+                this.formato_fecha, 
+                this.validacionService.dia_abreviado);
+
               const inicioAlimentacion = obj4.inicioAlimentacion.fec_hora_timbre != null 
-              ? obj4.inicioAlimentacion.fec_hora_timbre.split(' ')[1]
-              : 'FT';
-            const finAlimentacion = obj4.finAlimentacion.fec_hora_timbre != null
-              ? obj4.finAlimentacion.fec_hora_timbre.split(' ')[1]
-              : 'FT';
+                ? this.validacionService.FormatearHora(obj4.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
+                : 'FT';
+              const finAlimentacion = obj4.finAlimentacion.fec_hora_timbre != null
+                ? this.validacionService.FormatearHora(obj4.finAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
+                : 'FT'; 
               const minAlimentacion = obj4.inicioAlimentacion.min_alimentacion;
               const minutosTomados = this.calcularDiferenciaFechas(obj4.inicioAlimentacion.fec_hora_timbre,obj4.finAlimentacion.fec_hora_timbre);
               const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
@@ -1231,7 +1273,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
                 ciudad: obj1.ciudad, sucursal: obj1.name_suc,
                 departamento: obj2.name_dep, regimen: obj3.regimen[0].name_regimen,
                 empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
-                fecha: obj4.inicioAlimentacion.fec_horario, inicio: inicioAlimentacion, fin: finAlimentacion, 
+                fecha, inicio: inicioAlimentacion, fin: finAlimentacion, 
                 alimentacion: minAlimentacion, tomados: minutosTomados !==null ? minutosTomados : minAlimentacion, exceso: exceso
               }
               this.timbres.push(ele);
@@ -1247,22 +1289,28 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       this.data_pdf.forEach((obj1: any) => {
         obj1.empleados.forEach((obj2: any) => {
           obj2.timbres.forEach((obj3: any) => {
+            const fecha = this.validacionService.FormatearFecha(
+              obj3.inicioAlimentacion.fec_horario,
+              this.formato_fecha, 
+              this.validacionService.dia_abreviado);
+
             const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null 
-              ? obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1]
+              ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
               : 'FT';
             const finAlimentacion = obj3.finAlimentacion.fec_hora_timbre != null
-              ? obj3.finAlimentacion.fec_hora_timbre.split(' ')[1]
-              : 'FT';
-              const minAlimentacion = obj3.inicioAlimentacion.min_alimentacion;
-              const minutosTomados = this.calcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre,obj3.finAlimentacion.fec_hora_timbre);
-              const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
+              ? this.validacionService.FormatearHora(obj3.finAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
+              : 'FT'; 
+
+            const minAlimentacion = obj3.inicioAlimentacion.min_alimentacion;
+            const minutosTomados = this.calcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre,obj3.finAlimentacion.fec_hora_timbre);
+            const exceso = this.calcularExcesoTiempo(minAlimentacion, minutosTomados);
             n = n + 1;
             const ele = {
               n: n,
               ciudad: obj2.ciudad, sucursal: obj2.sucursal,
               departamento: obj2.departamento, regimen: obj2.regimen[0].name_regimen,
               empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
-              fecha: obj3.inicioAlimentacion.fec_horario, inicio: inicioAlimentacion, fin: finAlimentacion, 
+              fecha, inicio: inicioAlimentacion, fin: finAlimentacion, 
               alimentacion: minAlimentacion, tomados: minutosTomados !==null ? minutosTomados : minAlimentacion, exceso: exceso
             }
             this.timbres.push(ele);

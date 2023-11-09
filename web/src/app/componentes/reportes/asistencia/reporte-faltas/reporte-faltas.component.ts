@@ -13,9 +13,10 @@ import * as xlsx from 'xlsx';
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
-import { FaltasService } from 'src/app/servicios/reportes/faltas/faltas.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { FaltasService } from 'src/app/servicios/reportes/faltas/faltas.service';
 
 @Component({
   selector: 'app-reporte-faltas',
@@ -109,6 +110,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     private validacionService: ValidacionesService,
     private informacion: DatosGeneralesService,
     private reporteService: ReportesService,
+    private parametro: ParametrosService,
     private restFaltas: FaltasService,
     private restEmpre: EmpresaService,
     private toastr: ToastrService,
@@ -133,115 +135,138 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
 
   }
 
-    // METODO DE BUSQUEDA DE DATOS
-    BuscarInformacion() {
-      this.departamentos = [];
-      this.sucursales = [];
-      this.respuesta = [];
-      this.empleados = [];
-      this.regimen = [];
-      this.origen = [];
-      this.informacion.ObtenerInformacion(1).subscribe(
-        (res: any[]) => {
-          this.origen = JSON.stringify(res);
-          res.forEach((obj) => {
-            this.sucursales.push({
-              id: obj.id_suc,
-              nombre: obj.name_suc,
+  /********************************************************************************************
+  ****                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                            **** 
+  ********************************************************************************************/
+  formato_fecha: string = 'DD/MM/YYYY';
+  formato_hora: string = 'HH:mm:ss';
+
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  BuscarParametro() {
+    // id_tipo_parametro Formato fecha = 25
+    this.parametro.ListarDetalleParametros(25).subscribe(
+      res => {
+        this.formato_fecha = res[0].descripcion;
+      });
+  }
+
+  BuscarHora() {
+    // id_tipo_parametro Formato hora = 26
+    this.parametro.ListarDetalleParametros(26).subscribe(
+      res => {
+        this.formato_hora = res[0].descripcion;
+      });
+  }
+
+  // METODO DE BUSQUEDA DE DATOS
+  BuscarInformacion() {
+    this.departamentos = [];
+    this.sucursales = [];
+    this.respuesta = [];
+    this.empleados = [];
+    this.regimen = [];
+    this.origen = [];
+    this.informacion.ObtenerInformacion(1).subscribe(
+      (res: any[]) => {
+        this.origen = JSON.stringify(res);
+        res.forEach((obj) => {
+          this.sucursales.push({
+            id: obj.id_suc,
+            nombre: obj.name_suc,
+          });
+        });
+
+        res.forEach((obj) => {
+          obj.departamentos.forEach((ele) => {
+            this.departamentos.push({
+              id: ele.id_depa,
+              departamento: ele.name_dep,
+              nombre: ele.sucursal,
             });
           });
-  
-          res.forEach((obj) => {
-            obj.departamentos.forEach((ele) => {
-              this.departamentos.push({
-                id: ele.id_depa,
-                departamento: ele.name_dep,
-                nombre: ele.sucursal,
-              });
-            });
-          });
-  
-          res.forEach((obj) => {
-            obj.departamentos.forEach((ele) => {
-              ele.empleado.forEach((r) => {
-                let elemento = {
-                  id: r.id,
-                  nombre: r.name_empleado,
-                  codigo: r.codigo,
-                  cedula: r.cedula,
-                  correo: r.correo,
-                  cargo: r.cargo,
-                  id_contrato: r.id_contrato,
-                  hora_trabaja: r.hora_trabaja,
-                  sucursal: r.sucursal,
-                  departamento: r.departamento,
-                  ciudad: r.ciudad,
-                  regimen: r.regimen,
-                };
-                this.empleados.push(elemento);
-              });
-            });
-          });
-  
-          res.forEach((obj) => {
-            obj.departamentos.forEach((ele) => {
-              ele.empleado.forEach((reg) => {
-                reg.regimen.forEach((r) => {
-                  this.regimen.push({
-                    id: r.id_regimen,
-                    nombre: r.name_regimen,
-                  });
-                });
-              });
-            });
-          });
-  
-          this.regimen = this.regimen.filter(
-            (obj, index, self) => index === self.findIndex((o) => o.id === obj.id)
-          );
-        },
-        (err) => {
-          this.toastr.error(err.error.message);
-        }
-      );
-    }
-  
-    // METODO PARA FILTRAR POR CARGOS
-    empleados_cargos: any = [];
-    origen_cargo: any = [];
-    BuscarCargos() {
-      this.empleados_cargos = [];
-      this.origen_cargo = [];
-      this.cargos = [];
-      this.informacion.ObtenerInformacionCargo(1).subscribe(
-        (res: any[]) => {
-          this.origen_cargo = JSON.stringify(res);
-  
-          res.forEach((obj) => {
-            this.cargos.push({
-              id: obj.id_cargo,
-              nombre: obj.name_cargo,
-            });
-          });
-  
-          res.forEach((obj) => {
-            obj.empleados.forEach((r) => {
-              this.empleados_cargos.push({
+        });
+
+        res.forEach((obj) => {
+          obj.departamentos.forEach((ele) => {
+            ele.empleado.forEach((r) => {
+              let elemento = {
                 id: r.id,
                 nombre: r.name_empleado,
                 codigo: r.codigo,
                 cedula: r.cedula,
                 correo: r.correo,
-                ciudad: r.ciudad,
-                id_cargo: r.id_cargo,
+                cargo: r.cargo,
                 id_contrato: r.id_contrato,
                 hora_trabaja: r.hora_trabaja,
+                sucursal: r.sucursal,
+                departamento: r.departamento,
+                ciudad: r.ciudad,
+                regimen: r.regimen,
+              };
+              this.empleados.push(elemento);
+            });
+          });
+        });
+
+        res.forEach((obj) => {
+          obj.departamentos.forEach((ele) => {
+            ele.empleado.forEach((reg) => {
+              reg.regimen.forEach((r) => {
+                this.regimen.push({
+                  id: r.id_regimen,
+                  nombre: r.name_regimen,
+                });
               });
             });
           });
-        },
-      );
-    }
+        });
+
+        this.regimen = this.regimen.filter(
+          (obj, index, self) => index === self.findIndex((o) => o.id === obj.id)
+        );
+      },
+      (err) => {
+        this.toastr.error(err.error.message);
+      }
+    );
+  }
+
+  // METODO PARA FILTRAR POR CARGOS
+  empleados_cargos: any = [];
+  origen_cargo: any = [];
+  BuscarCargos() {
+    this.empleados_cargos = [];
+    this.origen_cargo = [];
+    this.cargos = [];
+    this.informacion.ObtenerInformacionCargo(1).subscribe(
+      (res: any[]) => {
+        this.origen_cargo = JSON.stringify(res);
+
+        res.forEach((obj) => {
+          this.cargos.push({
+            id: obj.id_cargo,
+            nombre: obj.name_cargo,
+          });
+        });
+
+        res.forEach((obj) => {
+          obj.empleados.forEach((r) => {
+            this.empleados_cargos.push({
+              id: r.id,
+              nombre: r.name_empleado,
+              codigo: r.codigo,
+              cedula: r.cedula,
+              correo: r.correo,
+              ciudad: r.ciudad,
+              id_cargo: r.id_cargo,
+              id_contrato: r.id_contrato,
+              hora_trabaja: r.hora_trabaja,
+            });
+          });
+        });
+      },
+    );
+  }
 
   // VALIDACIONES DE OPCIONES DE REPORTE
   validacionReporte(action: any) {
@@ -651,13 +676,18 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
                   { text: 'FECHA', style: 'centrado' },
                 ],
                 ...obj2.timbres.map(obj3 => {
+                  const fecha = this.validacionService.FormatearFecha(
+                    obj3.fec_horario,
+                    this.formato_fecha, 
+                    this.validacionService.dia_abreviado);
+
                   totalFaltasEmpleado ++;
                   totalFaltasRegimen ++; 
                   totalFaltasCargo ++; 
                   c = c + 1
                   return [
                     { style: 'itemsTableCentrado', text: c },
-                    { style: 'itemsTableCentrado', text: obj3.fec_horario },
+                    { style: 'itemsTableCentrado', text: fecha },
                   ];
                 }),
                 [
@@ -869,13 +899,18 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
                     { text: 'FECHA', style: 'centrado' },
                   ],
                   ...obj2.timbres.map(obj3 => {
+                    const fecha = this.validacionService.FormatearFecha(
+                      obj3.fec_horario,
+                      this.formato_fecha, 
+                      this.validacionService.dia_abreviado);
+
                     totalFaltasEmpleado ++;
                     totalFaltasSucursal ++; 
                     totalFaltasDepartamento ++; 
                     c = c + 1
                     return [
                       { style: 'itemsTableCentrado', text: c },
-                      { style: 'itemsTableCentrado', text: obj3.fec_horario },
+                      { style: 'itemsTableCentrado', text: fecha },
                     ];
                   }),
                   [
@@ -1054,12 +1089,16 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
+            const fecha = this.validacionService.FormatearFecha(
+              obj4.fec_horario,
+              this.formato_fecha, 
+              this.validacionService.dia_abreviado);
             let ele = { 
               'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
               'Departamento': obj2.name_dep,
               'Régimen': obj3.regimen[0].name_regimen,
               'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
-              'Fecha': new Date(obj4.fec_horario),
+              'Fecha': fecha,
             }
             nuevo.push(ele);
           })
@@ -1074,12 +1113,16 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     array.forEach((obj1: any) => {
       obj1.empleados.forEach((obj2: any) => {
         obj2.timbres.forEach((obj3: any) => {
+          const fecha = this.validacionService.FormatearFecha(
+            obj3.fec_horario,
+            this.formato_fecha, 
+            this.validacionService.dia_abreviado);
           let ele = {
             'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
             'Departamento': obj2.departamento,
             'Régimen': obj2.regimen[0].name_regimen,
             'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
-            'Fecha': new Date(obj3.fec_horario),
+            'Fecha': fecha,
           }
           nuevo.push(ele);
         })
@@ -1096,13 +1139,17 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
         obj1.departamentos.forEach(obj2 => {
           obj2.empleado.forEach((obj3: any) => {
             obj3.timbres.forEach((obj4: any) => {
+              const fecha = this.validacionService.FormatearFecha(
+                obj4.fec_horario,
+                this.formato_fecha, 
+                this.validacionService.dia_abreviado);
               n = n + 1;
               let ele = {
                 n: n,
                 ciudad: obj1.ciudad, sucursal: obj1.name_suc,
                 departamento: obj2.name_dep,
                 empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
-                fecha: obj4.fec_horario
+                fecha
               }
               this.timbres.push(ele);
             })
@@ -1117,13 +1164,17 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       this.data_pdf.forEach((obj1: any) => {
         obj1.empleados.forEach((obj2: any) => {
           obj2.timbres.forEach((obj3: any) => {
+            const fecha = this.validacionService.FormatearFecha(
+              obj3.fec_horario,
+              this.formato_fecha, 
+              this.validacionService.dia_abreviado);
             n = n + 1;
             let ele = {
               n: n,
               ciudad: obj2.ciudad, sucursal: obj2.sucursal,
               departamento: obj2.departamento,
               empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
-              fecha: obj3.fec_horario
+              fecha
             }
             this.timbres.push(ele);
           })

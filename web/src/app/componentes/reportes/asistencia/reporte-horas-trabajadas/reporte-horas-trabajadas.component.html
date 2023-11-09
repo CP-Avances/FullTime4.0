@@ -280,12 +280,22 @@
                                 <th scope="col" rowspan="2">CÓDIGO</th>
                                 <th scope="col" rowspan="2">EMPLEADO</th>
                                 <th scope="col" rowspan="2">FECHA</th>
-                                <th scope="col" rowspan="2">ENTRADA</th>
-                                <th scope="col" rowspan="2">SALIDA</th>
-                                <th scope="col" rowspan="2">INICIO ALIMENTACIÓN</th>
-                                <th scope="col" rowspan="2">FIN ALIMENTACIÓN</th>
+                                <th scope="col" rowspan="1" colspan="2">ENTRADA</th>
+                                <th scope="col" rowspan="1" colspan="2">SALIDA</th>
+                                <th scope="col" rowspan="1" colspan="2">INICIO ALIMENTACIÓN</th>
+                                <th scope="col" rowspan="1" colspan="2">FIN ALIMENTACIÓN</th>
                                 <th scope="col" rowspan="2" colspan="2">TIEMPO PLANIFICADO</th>
                                 <th scope="col" rowspan="2" colspan="2">TIEMPO LABORADO</th>
+                            </tr>
+                            <tr style="text-align: center">
+                                <th scope="col" rowspan="1">HORARIO</th>
+                                <th scope="col" rowspan="1">TIMBRE</th>
+                                <th scope="col" rowspan="1">HORARIO</th>
+                                <th scope="col" rowspan="1">TIMBRE</th>
+                                <th scope="col" rowspan="1">HORARIO</th>
+                                <th scope="col" rowspan="1">TIMBRE</th>
+                                <th scope="col" rowspan="1">HORARIO</th>
+                                <th scope="col" rowspan="1">TIMBRE</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -294,9 +304,13 @@
                                 <td>{{ t.codigo }}</td>
                                 <td>{{ t.empleado }}</td>
                                 <td>{{ t.fecha }}</td>
+                                <td>{{ t.entradaHorario }}</td>
                                 <td [ngClass]="obtenerClaseTimbre(t.entrada)">{{ t.entrada }}</td>
+                                <td>{{ t.salidaHorario }}</td>
                                 <td [ngClass]="obtenerClaseTimbre(t.salida)">{{ t.salida }}</td>
+                                <td>{{ t.inicioAlimentacionHorario }}</td>
                                 <td [ngClass]="obtenerClaseTimbre(t.inicioAlimentacion)">{{ t.inicioAlimentacion }}</td>
+                                <td>{{ t.finAlimentacionHorario }}</td>
                                 <td [ngClass]="obtenerClaseTimbre(t.finAlimentacion)">{{ t.finAlimentacion }}</td>
                                 <td>{{ t.tiempoPlanificado }}</td>
                                 <td>{{ t.minutosPlanificados }}</td>
