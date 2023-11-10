@@ -16,6 +16,7 @@ import { ITableEmpleados, IReporteTimbres } from 'src/app/model/reportes.model';
 import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from '../../../../servicios/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 
@@ -103,10 +104,11 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
   dispositivo: boolean = false;
 
   constructor(
-    private validacionService: ValidacionesService,
-    private reporteService: ReportesService,
     private R_asistencias: ReportesAsistenciasService,
+    private validacionService: ValidacionesService,
     private informacion: DatosGeneralesService,
+    private reporteService: ReportesService,
+    private parametro: ParametrosService,
     private restEmpre: EmpresaService,
     private toastr: ToastrService,
   ) {
@@ -121,6 +123,29 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
     this.BuscarInformacion();
     this.BuscarCargos();
   }
+
+ /********************************************************************************************
+  ****                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                            **** 
+  ********************************************************************************************/
+  formato_fecha: string = 'DD/MM/YYYY';
+  formato_hora: string = 'HH:mm:ss';
+
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  BuscarParametro() {
+    // id_tipo_parametro Formato fecha = 25
+    this.parametro.ListarDetalleParametros(25).subscribe(
+      res => {
+        this.formato_fecha = res[0].descripcion;
+      });
+  }
+
+  BuscarHora() {
+    // id_tipo_parametro Formato hora = 26
+    this.parametro.ListarDetalleParametros(26).subscribe(
+      res => {
+        this.formato_hora = res[0].descripcion;
+      });
+  } 
 
   // METODO DE BUSQUEDA DE DATOS
   BuscarInformacion() {
@@ -335,8 +360,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
 
     this.data_pdf = [];
     this.R_asistencias.ReporteTimbreSistemaRegimenCargo(reg, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      console.log('DATA PDF', this.data_pdf);
+      this.data_pdf = res;
       switch (accion) {
         case 'excel': this.exportToExcel('RegimenCargo'); break;
         case 'ver': this.verDatos(); break;
@@ -360,8 +384,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
 
     this.data_pdf = [];
     this.R_asistencias.ReporteTimbreSistemaRegimenCargo(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      console.log('DATA PDF', this.data_pdf);
+      this.data_pdf = res;
       switch (accion) {
         case 'excel': this.exportToExcel('RegimenCargo'); break;
         case 'ver': this.verDatos(); break;
@@ -391,8 +414,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
     // console.log('DEPARTAMENTOS', dep);
     this.data_pdf = []
     this.R_asistencias.ReporteTimbreSistema(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      // console.log('DATA PDF',this.data_pdf);
+      this.data_pdf = res;
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
         case 'ver': this.verDatos(); break;
@@ -431,8 +453,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
     // console.log('EMPLEADOS', emp);
     this.data_pdf = []
     this.R_asistencias.ReporteTimbreSistema(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      // console.log('DATA PDF',this.data_pdf);
+      this.data_pdf = res;
       switch (accion) {
         case 'excel': this.exportToExcel('default'); break;
         case 'ver': this.verDatos(); break;
@@ -528,8 +549,8 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
         })
       ],
       styles: {
-        tableHeader: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color },
-        centrado: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 10, 0, 10] },
+        tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color },
+        centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 10, 0, 10] },
         itemsTable: { fontSize: 8 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
         itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0],fillColor: '#E3E3E3' },
@@ -676,9 +697,24 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
                     let servidor_fecha = '';
                     let servidor_hora = '';
                     if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
-                      servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
-                      servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
+                      servidor_fecha = this.validacionService.FormatearFecha(
+                        obj3.fec_hora_timbre_servidor.split(' ')[0],
+                        this.formato_fecha, 
+                        this.validacionService.dia_abreviado);
+                      servidor_hora = this.validacionService.FormatearHora(
+                        obj3.fec_hora_timbre_servidor.split(' ')[1], 
+                        this.formato_hora);
                     }
+
+                    const fechaTimbre = this.validacionService.FormatearFecha(
+                      obj3.fec_hora_timbre.split(' ')[0],
+                      this.formato_fecha, 
+                      this.validacionService.dia_abreviado);
+
+                    const horaTimbre = this.validacionService.FormatearHora(
+                      obj3.fec_hora_timbre.split(' ')[1], 
+                      this.formato_hora);
+
                     switch (obj3.accion) {
                       case 'EoS': accionT = 'Entrada o salida'; break;
                       case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -698,10 +734,10 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
                       { style: 'itemsTableCentrado', text: c },
                       { style: 'itemsTable', text: servidor_fecha },
                       { style: 'itemsTable', text: servidor_hora },
-                      { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[0] },
-                      { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[1] },
-                      { style: 'itemsTable', text: obj3.id_reloj },
-                      { style: 'itemsTable', text: accionT },
+                      { style: 'itemsTable', text: fechaTimbre },
+                      { style: 'itemsTable', text: horaTimbre },
+                      { style: 'itemsTableCentrado', text: obj3.id_reloj },
+                      { style: 'itemsTableCentrado', text: accionT },
                       { style: 'itemsTable', text: obj3.observacion },
                       { style: 'itemsTable', text: obj3.longitud },
                       { style: 'itemsTable', text: obj3.latitud },
@@ -743,9 +779,15 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
                     let servidor_fecha = '';
                     let servidor_hora = '';
                     if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
-                      servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
-                      servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
-                    }
+                      servidor_fecha = this.validacionService.FormatearFecha(
+                        obj3.fec_hora_timbre_servidor.split(' ')[0],
+                        this.formato_fecha, 
+                        this.validacionService.dia_abreviado);
+                      servidor_hora = this.validacionService.FormatearHora(
+                        obj3.fec_hora_timbre_servidor.split(' ')[1], 
+                        this.formato_hora);
+                    };
+
                     switch (obj3.accion) {
                       case 'EoS': accionT = 'Entrada o salida'; break;
                       case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -764,8 +806,8 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
                       { style: 'itemsTableCentrado', text: c },
                       { style: 'itemsTable', text: servidor_fecha },
                       { style: 'itemsTable', text: servidor_hora },
-                      { style: 'itemsTable', text: obj3.id_reloj },
-                      { style: 'itemsTable', text: accionT },
+                      { style: 'itemsTableCentrado', text: obj3.id_reloj },
+                      { style: 'itemsTableCentrado', text: accionT },
                       { style: 'itemsTable', text: obj3.observacion },
                       { style: 'itemsTable', text: obj3.longitud },
                       { style: 'itemsTable', text: obj3.latitud },
@@ -915,9 +957,24 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
                       let servidor_fecha = '';
                       let servidor_hora = '';
                       if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
-                        servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
-                        servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
-                      };
+                        servidor_fecha = this.validacionService.FormatearFecha(
+                          obj3.fec_hora_timbre_servidor.split(' ')[0],
+                          this.formato_fecha, 
+                          this.validacionService.dia_abreviado);
+                        servidor_hora = this.validacionService.FormatearHora(
+                          obj3.fec_hora_timbre_servidor.split(' ')[1], 
+                          this.formato_hora);
+                      }
+  
+                      const fechaTimbre = this.validacionService.FormatearFecha(
+                        obj3.fec_hora_timbre.split(' ')[0],
+                        this.formato_fecha, 
+                        this.validacionService.dia_abreviado);
+  
+                      const horaTimbre = this.validacionService.FormatearHora(
+                        obj3.fec_hora_timbre.split(' ')[1], 
+                        this.formato_hora);
+
                       switch (obj3.accion) {
                         case 'EoS': accionT = 'Entrada o salida'; break;
                         case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -937,10 +994,10 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
                         { style: 'itemsTableCentrado', text: c },
                         { style: 'itemsTable', text: servidor_fecha },
                         { style: 'itemsTable', text: servidor_hora },
-                        { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[0] },
-                        { style: 'itemsTable', text: obj3.fec_hora_timbre.split(' ')[1] },
-                        { style: 'itemsTable', text: obj3.id_reloj },
-                        { style: 'itemsTable', text: accionT },
+                        { style: 'itemsTable', text: fechaTimbre },
+                        { style: 'itemsTable', text: horaTimbre },
+                        { style: 'itemsTableCentrado', text: obj3.id_reloj },
+                        { style: 'itemsTableCentrado', text: accionT },
                         { style: 'itemsTable', text: obj3.observacion },
                         { style: 'itemsTable', text: obj3.longitud },
                         { style: 'itemsTable', text: obj3.latitud },
@@ -981,9 +1038,15 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
                       let servidor_fecha = '';
                       let servidor_hora = '';
                       if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
-                        servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
-                        servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
+                        servidor_fecha = this.validacionService.FormatearFecha(
+                          obj3.fec_hora_timbre_servidor.split(' ')[0],
+                          this.formato_fecha, 
+                          this.validacionService.dia_abreviado);
+                        servidor_hora = this.validacionService.FormatearHora(
+                          obj3.fec_hora_timbre_servidor.split(' ')[1], 
+                          this.formato_hora);
                       };
+
                       switch (obj3.accion) {
                         case 'EoS': accionT = 'Entrada o salida'; break;
                         case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -1002,8 +1065,8 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
                         { style: 'itemsTableCentrado', text: c },
                         { style: 'itemsTable', text: servidor_fecha },
                         { style: 'itemsTable', text: servidor_hora },
-                        { style: 'itemsTable', text: obj3.id_reloj },
-                        { style: 'itemsTable', text: accionT },
+                        { style: 'itemsTableCentrado', text: obj3.id_reloj },
+                        { style: 'itemsTableCentrado', text: accionT },
                         { style: 'itemsTable', text: obj3.observacion },
                         { style: 'itemsTable', text: obj3.longitud },
                         { style: 'itemsTable', text: obj3.latitud },
@@ -1067,8 +1130,15 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
             let servidor_hora = '';
             if (obj4.fec_hora_timbre_servidor != '' && obj4.fec_hora_timbre_servidor != null) {
               servidor_fecha = new Date(obj4.fec_hora_timbre_servidor);
-              servidor_hora = obj4.fec_hora_timbre_servidor.split(' ')[1]
-            }
+              servidor_hora = this.validacionService.FormatearHora(
+                obj4.fec_hora_timbre_servidor.split(' ')[1], 
+                this.formato_hora);
+            };
+
+            const horaTimbre = this.validacionService.FormatearHora(
+              obj4.fec_hora_timbre.split(' ')[1], 
+              this.formato_hora);
+
             switch (obj4.accion) {
               case 'EoS': accionT = 'Entrada o salida'; break;
               case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -1089,9 +1159,9 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
                 'Régimen': obj3.regimen[0].name_regimen,
                 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
                 'Fecha Timbre': servidor_fecha, 'Hora Timbre': servidor_hora,
-                'Fecha Timbre Dispositivo': new Date(obj4.fec_hora_timbre), 'Hora Timbre Dispositivo': obj4.fec_hora_timbre.split(' ')[1],
-                'Acción': accionT, 'Reloj': obj4.id_reloj,
-                'Latitud': obj4.latitud, 'Longitud': obj4.longitud, 'Observación': obj4.observacion
+                'Fecha Timbre Dispositivo': new Date(obj4.fec_hora_timbre), 'Hora Timbre Dispositivo': horaTimbre,
+                'Reloj': obj4.id_reloj, 'Acción': accionT, 'Observación': obj4.observacion,
+                'Latitud': obj4.latitud, 'Longitud': obj4.longitud,
               }
             } else {
               ele = {
@@ -1100,8 +1170,8 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
                 'Régimen': obj3.regimen[0].name_regimen,
                 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
                 'Fecha Timbre': servidor_fecha, 'Hora Timbre': servidor_hora,
-                'Acción': accionT, 'Reloj': obj4.id_reloj,
-                'Latitud': obj4.latitud, 'Longitud': obj4.longitud, 'Observación': obj4.observacion
+                'Reloj': obj4.id_reloj, 'Acción': accionT,  'Observación': obj4.observacion,
+                'Latitud': obj4.latitud, 'Longitud': obj4.longitud
               }
             }
             nuevo.push(ele);
@@ -1123,8 +1193,15 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
           let servidor_hora = '';
           if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
             servidor_fecha = new Date(obj3.fec_hora_timbre_servidor);
-            servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
-          }
+            servidor_hora = this.validacionService.FormatearHora(
+              obj3.fec_hora_timbre_servidor.split(' ')[1], 
+              this.formato_hora);
+          };
+
+          const horaTimbre = this.validacionService.FormatearHora(
+            obj3.fec_hora_timbre.split(' ')[1], 
+            this.formato_hora);
+
           switch (obj3.accion) {
             case 'EoS': accionT = 'Entrada o salida'; break;
             case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -1145,9 +1222,9 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
               'Régimen': obj2.regimen[0].name_regimen,
               'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
               'Fecha Timbre': servidor_fecha, 'Hora Timbre': servidor_hora,
-              'Fecha Timbre Dispositivo': new Date(obj3.fec_hora_timbre), 'Hora Timbre Dispositivo': obj3.fec_hora_timbre.split(' ')[1],
-              'Acción': accionT, 'Reloj': obj3.id_reloj,
-              'Latitud': obj3.latitud, 'Longitud': obj3.longitud, 'Observación': obj3.observacion
+              'Fecha Timbre Dispositivo': new Date(obj3.fec_hora_timbre), 'Hora Timbre Dispositivo': horaTimbre,
+              'Reloj': obj3.id_reloj, 'Acción': accionT, 'Observación': obj3.observacion,
+              'Latitud': obj3.latitud, 'Longitud': obj3.longitud, 
             }
           } else {
             ele = {
@@ -1156,8 +1233,8 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
               'Régimen': obj2.regimen[0].name_regimen,
               'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
               'Fecha Timbre': servidor_fecha, 'Hora Timbre': servidor_hora,
-              'Acción': accionT, 'Reloj': obj3.id_reloj,
-              'Latitud': obj3.latitud, 'Longitud': obj3.longitud, 'Observación': obj3.observacion
+              'Reloj': obj3.id_reloj, 'Acción': accionT, 'Observación': obj3.observacion,
+              'Latitud': obj3.latitud, 'Longitud': obj3.longitud
             }
           }
           nuevo.push(ele);
@@ -1180,9 +1257,24 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
             let servidor_fecha = '';
             let servidor_hora = '';
             if (obj4.fec_hora_timbre_servidor != '' && obj4.fec_hora_timbre_servidor != null) {
-              servidor_fecha = obj4.fec_hora_timbre_servidor.split(' ')[0];
-              servidor_hora = obj4.fec_hora_timbre_servidor.split(' ')[1]
-            }
+              servidor_fecha = this.validacionService.FormatearFecha(
+                obj4.fec_hora_timbre_servidor.split(' ')[0],
+                this.formato_fecha, 
+                this.validacionService.dia_abreviado);
+              servidor_hora = this.validacionService.FormatearHora(
+                obj4.fec_hora_timbre_servidor.split(' ')[1], 
+                this.formato_hora);
+            };
+
+            const fechaTimbre = this.validacionService.FormatearFecha(
+              obj4.fec_hora_timbre.split(' ')[0],
+              this.formato_fecha, 
+              this.validacionService.dia_abreviado);
+
+            const horaTimbre = this.validacionService.FormatearHora(
+              obj4.fec_hora_timbre.split(' ')[1], 
+              this.formato_hora);
+
             switch (obj4.accion) {
               case 'EoS': accionT = 'Entrada o salida'; break;
               case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -1201,7 +1293,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
                 ciudad: obj1.ciudad, sucursal: obj1.name_suc,
                 departamento: obj2.name_dep,
                 empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
-                fechaTimbre: obj4.fec_hora_timbre.split(' ')[0], horaTimbre: obj4.fec_hora_timbre.split(' ')[1],
+                fechaTimbre, horaTimbre,
                 fechaTimbreServidor: servidor_fecha, horaTimbreServidor: servidor_hora,
                 accion: accionT, reloj: obj4.id_reloj,
                 latitud: obj4.latitud, longitud: obj4.longitud, observacion: obj4.observacion
@@ -1225,9 +1317,24 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
           let servidor_fecha = '';
           let servidor_hora = '';
           if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
-            servidor_fecha = obj3.fec_hora_timbre_servidor.split(' ')[0];
-            servidor_hora = obj3.fec_hora_timbre_servidor.split(' ')[1]
+            servidor_fecha = this.validacionService.FormatearFecha(
+              obj3.fec_hora_timbre_servidor.split(' ')[0],
+              this.formato_fecha, 
+              this.validacionService.dia_abreviado);
+            servidor_hora = this.validacionService.FormatearHora(
+              obj3.fec_hora_timbre_servidor.split(' ')[1], 
+              this.formato_hora);
           }
+
+          const fechaTimbre = this.validacionService.FormatearFecha(
+            obj3.fec_hora_timbre.split(' ')[0],
+            this.formato_fecha, 
+            this.validacionService.dia_abreviado);
+
+          const horaTimbre = this.validacionService.FormatearHora(
+            obj3.fec_hora_timbre.split(' ')[1], 
+            this.formato_hora);
+
           switch (obj3.accion) {
             case 'EoS': accionT = 'Entrada o salida'; break;
             case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -1246,7 +1353,7 @@ export class TimbreSistemaComponent implements OnInit, OnDestroy {
             ciudad: obj2.ciudad, sucursal: obj2.sucursal,
             departamento: obj2.departamento,
             empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
-            fechaTimbre: obj3.fec_hora_timbre.split(' ')[0], horaTimbre: obj3.fec_hora_timbre.split(' ')[1],
+            fechaTimbre, horaTimbre,
             fechaTimbreServidor: servidor_fecha, horaTimbreServidor: servidor_hora,
             accion: accionT, reloj: obj3.id_reloj,
             latitud: obj3.latitud, longitud: obj3.longitud, observacion: obj3.observacion

@@ -13,6 +13,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from '../../../../../servicios/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { VacunasService } from 'src/app/servicios/reportes/vacunas/vacunas.service';
@@ -116,12 +117,13 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
 
   constructor(
     private validacionService: ValidacionesService, // VARIABLE DE VALIDACIONES DE INGRESO DE LETRAS O NÚMEROS
-    private reporteService: ReportesService, // SERVICIO DATOS DE BUSQUEDA GENERALES DE REPORTE
     private informacion: DatosGeneralesService,
+    private reporteService: ReportesService, // SERVICIO DATOS DE BUSQUEDA GENERALES DE REPORTE
+    private parametro: ParametrosService,
     private restEmpre: EmpresaService, // SERVICIO DATOS GENERALES DE EMPRESA
     private R_vacuna: VacunasService, // SERVICIO DATOS PARA REPORTE DE VACUNAS
-    private toastr: ToastrService // VARIABLE DE MANEJO DE NOTIFICACIONES
-  ) {
+    private toastr: ToastrService, // VARIABLE DE MANEJO DE NOTIFICACIONES
+    ) {
     this.ObtenerLogo();
     this.ObtenerColores();
   }
@@ -140,6 +142,29 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     this.regimen = [];
     this.cargos = [];
     this.origen = [];
+  }
+
+  /********************************************************************************************
+  ****                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                            **** 
+  ********************************************************************************************/
+  formato_fecha: string = 'DD/MM/YYYY';
+  formato_hora: string = 'HH:mm:ss';
+
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  BuscarParametro() {
+    // id_tipo_parametro Formato fecha = 25
+    this.parametro.ListarDetalleParametros(25).subscribe(
+      res => {
+        this.formato_fecha = res[0].descripcion;
+      });
+  }
+
+  BuscarHora() {
+    // id_tipo_parametro Formato hora = 26
+    this.parametro.ListarDetalleParametros(26).subscribe(
+      res => {
+        this.formato_hora = res[0].descripcion;
+      });
   }
 
   // METODO DE BUSQUEDA DE DATOS
@@ -658,7 +683,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
           margin: [0, 3, 0, 3],
           fillColor: '#E3E3E3',
         },
-        itemsTableCentrado: { fontSize: 10, alignment: 'center' },
+        itemsTableCentrado: { fontSize: 8, alignment: 'center' },
         tableMargin: { margin: [0, 0, 0, 10] },
         tableMarginCabecera: { margin: [0, 15, 0, 0] },
         quote: { margin: [5, -2, 0, -2], italics: true },
@@ -758,13 +783,18 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
                   { text: 'Descripción', style: 'tableHeader' },
                 ],
                 ...obj2.vacunas.map((obj3) => {
+                  const fecha = this.validacionService.FormatearFecha(
+                    obj3.fecha.split('T')[0],
+                    this.formato_fecha, 
+                    this.validacionService.dia_abreviado);
+
                   return [
                     {
                       style: 'itemsTableCentrado',
                       text: obj2.vacunas.indexOf(obj3) + 1,
                     },
                     { style: 'itemsTable', text: obj3.tipo_vacuna },
-                    { style: 'itemsTable', text: obj3.fecha.split('T')[0] },
+                    { style: 'itemsTableCentrado', text: fecha },
                     { style: 'itemsTable', text: obj3.descripcion },
                   ];
                 }),
@@ -870,13 +900,18 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
                     { text: 'Descripción', style: 'tableHeader' },
                   ],
                   ...obj2.vacunas.map((obj3) => {
+                    const fecha = this.validacionService.FormatearFecha(
+                      obj3.fecha.split('T')[0],
+                      this.formato_fecha, 
+                      this.validacionService.dia_abreviado);
+
                     return [
                       {
                         style: 'itemsTableCentrado',
                         text: obj2.vacunas.indexOf(obj3) + 1,
                       },
                       { style: 'itemsTable', text: obj3.tipo_vacuna },
-                      { style: 'itemsTable', text: obj3.fecha.split('T')[0] },
+                      { style: 'itemsTableCentrado', text: fecha },
                       { style: 'itemsTable', text: obj3.descripcion },
                     ];
                   }),

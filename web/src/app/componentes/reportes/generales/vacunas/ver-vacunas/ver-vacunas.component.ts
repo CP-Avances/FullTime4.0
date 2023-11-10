@@ -1,3 +1,4 @@
+// IMPORTAR LIBRERIAS
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from 'src/environments/environment';
@@ -8,11 +9,13 @@ import * as moment from 'moment';
 import * as xlsx from 'xlsx';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 
-import { ReporteVacunas, vacuna, } from 'src/app/model/reportes.model';
-
+// IMPORTAR SERVICIOS
 import { VacunaMultipleComponent } from '../vacuna-multiple/vacuna-multiple.component';
+import { ReporteVacunas, vacuna, } from 'src/app/model/reportes.model';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
+import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 
 @Component({
   selector: 'app-ver-vacunas',
@@ -54,8 +57,10 @@ export class VerVacunasComponent implements OnInit {
   logo: any = String;
 
   constructor(
+    private validacionService: ValidacionesService,
+    private vacuna: VacunaMultipleComponent,
+    private parametro: ParametrosService,
     private restEmpre: EmpresaService,
-    private vacuna: VacunaMultipleComponent
   ) {
     this.ObtenerLogo();
     this.ObtenerColores();
@@ -63,6 +68,29 @@ export class VerVacunasComponent implements OnInit {
 
   ngOnInit(): void {
     this.validarTipo(this.tipo);
+  }
+
+  /********************************************************************************************
+  ****                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                            **** 
+  ********************************************************************************************/
+  formato_fecha: string = 'DD/MM/YYYY';
+  formato_hora: string = 'HH:mm:ss';
+
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
+  BuscarParametro() {
+    // id_tipo_parametro Formato fecha = 25
+    this.parametro.ListarDetalleParametros(25).subscribe(
+      res => {
+        this.formato_fecha = res[0].descripcion;
+      });
+  }
+
+  BuscarHora() {
+    // id_tipo_parametro Formato hora = 26
+    this.parametro.ListarDetalleParametros(26).subscribe(
+      res => {
+        this.formato_hora = res[0].descripcion;
+      });
   }
 
   validarTipo(tipo: string) {
@@ -124,6 +152,11 @@ export class VerVacunasComponent implements OnInit {
       obj1.departamentos.forEach((obj2: any) => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.vacunas.forEach((obj4: any) => {
+            const fecha = this.validacionService.FormatearFecha(
+              obj4.fecha.split('T')[0],
+              this.formato_fecha, 
+              this.validacionService.dia_abreviado);
+
             n = n + 1;
             let ele = {
               n: n,
@@ -140,7 +173,7 @@ export class VerVacunasComponent implements OnInit {
               correo: obj3.correo,
               carnet: obj4.carnet,
               vacuna: obj4.tipo_vacuna,
-              fecha: obj4.fecha.split('T')[0],
+              fecha,
               descripcion: obj4.descripcion,
             };
             this.arr_vac.push(ele);
@@ -156,6 +189,11 @@ export class VerVacunasComponent implements OnInit {
     this.data.forEach((obj1: any) => {
       obj1.empleados.forEach((obj2: any) => {
         obj2.vacunas.forEach((obj3) => {
+          const fecha = this.validacionService.FormatearFecha(
+            obj3.fecha.split('T')[0],
+            this.formato_fecha, 
+            this.validacionService.dia_abreviado);
+
           n = n + 1;
           let ele = {
             n: n,
@@ -172,7 +210,7 @@ export class VerVacunasComponent implements OnInit {
             correo: obj2.correo,
             carnet: obj3.carnet,
             vacuna: obj3.tipo_vacuna,
-            fecha: obj3.fecha.split('T')[0],
+            fecha,
             descripcion: obj3.descripcion,
           };
           this.arr_vac.push(ele);
@@ -342,7 +380,7 @@ export class VerVacunasComponent implements OnInit {
           margin: [0, 3, 0, 3],
           fillColor: '#E3E3E3',
         },
-        itemsTableCentrado: { fontSize: 10, alignment: 'center' },
+        itemsTableCentrado: { fontSize: 8, alignment: 'center' },
         tableMargin: { margin: [0, 0, 0, 20] },
         tableMarginCabecera: { margin: [0, 10, 0, 0] },
         quote: { margin: [5, -2, 0, -2], italics: true },
@@ -440,13 +478,17 @@ export class VerVacunasComponent implements OnInit {
                   { text: 'Descripción', style: 'tableHeader' },
                 ],
                 ...obj2.vacunas.map((obj3) => {
+                  const fecha = this.validacionService.FormatearFecha(
+                    obj3.fecha.split('T')[0],
+                    this.formato_fecha, 
+                    this.validacionService.dia_abreviado);
                   return [
                     {
                       style: 'itemsTableCentrado',
                       text: obj2.vacunas.indexOf(obj3) + 1,
                     },
                     { style: 'itemsTable', text: obj3.tipo_vacuna },
-                    { style: 'itemsTable', text: obj3.fecha.split('T')[0] },
+                    { style: 'itemsTableCentrado', text: fecha },
                     { style: 'itemsTable', text: obj3.descripcion },
                   ];
                 }),
@@ -552,13 +594,17 @@ export class VerVacunasComponent implements OnInit {
                     { text: 'Descripción', style: 'tableHeader' },
                   ],
                   ...obj2.vacunas.map((obj3) => {
+                    const fecha = this.validacionService.FormatearFecha(
+                      obj3.fecha.split('T')[0],
+                      this.formato_fecha, 
+                      this.validacionService.dia_abreviado);
                     return [
                       {
                         style: 'itemsTableCentrado',
                         text: obj2.vacunas.indexOf(obj3) + 1,
                       },
                       { style: 'itemsTable', text: obj3.tipo_vacuna },
-                      { style: 'itemsTable', text: obj3.fecha.split('T')[0] },
+                      { style: 'itemsTableCentrado', text: fecha },
                       { style: 'itemsTable', text: obj3.descripcion },
                     ];
                   }),
