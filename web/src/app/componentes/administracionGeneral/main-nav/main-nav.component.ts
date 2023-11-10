@@ -517,6 +517,7 @@ export class MainNavComponent implements OnInit {
             color: true,
             children: [
               { name: 'Tiempo Alimentación', url: '/tiempo-alimentacion', color: true },
+              { name: 'Planificación Horaria', url: '/reporte-planificacion-horaria', color: true },
               { name: 'Salidas Anticipadas', url: '/salidas-anticipadas', color: true },
               { name: 'Tiempo Laborado', url: '/reporte-horas-trabajadas', color: true },
               { name: 'Puntualidad', url: '/reporte-puntualidad', color: true },

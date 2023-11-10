@@ -647,6 +647,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   // METODO PARA VER PLANIFICACION
   resultados: any = [];
   VerPlanificacion(data: any) {
+    console.log('VerPlanificacion',data);
     if (data.length > 0) {
       this.resultados = data;
       this.seleccionar = false;

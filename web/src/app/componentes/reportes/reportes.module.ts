@@ -42,6 +42,7 @@ import { VerEmpleadosActivosDetalleComponent } from './generales/empleados/activ
 import { VerEmpleadosInactivosDetalleComponent } from './generales/empleados/inactivos/ver-empleados-inactivos-detalle/ver-empleados-inactivos-detalle.component';
 import { VerVacunasComponent } from './generales/vacunas/ver-vacunas/ver-vacunas.component';
 import { ReporteTiempoAlimentacionComponent } from './asistencia/reporte-tiempo-alimentacion/reporte-tiempo-alimentacion.component';
+import { ReportePlanificacionHorariaComponent } from './asistencia/reporte-planificacion-horaria/reporte-planificacion-horaria.component';
 @NgModule({
   declarations: [
     RangoFechasComponent,
@@ -78,6 +79,7 @@ import { ReporteTiempoAlimentacionComponent } from './asistencia/reporte-tiempo-
     VerEmpleadosInactivosDetalleComponent,
     VerVacunasComponent,
     ReporteTiempoAlimentacionComponent,
+    ReportePlanificacionHorariaComponent,
   ],
   exports: [
     ReporteFaltasComponent,
