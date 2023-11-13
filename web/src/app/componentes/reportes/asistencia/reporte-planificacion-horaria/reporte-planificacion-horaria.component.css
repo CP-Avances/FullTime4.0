@@ -1,14 +1,7 @@
-mat-form-field {
-    padding: 10px 15px 0px 15px;
-}
-
-table {
-    width: 100%;
-    font-size: 14px;
-}
-
-tr {
-    text-align: center;
+.btn {
+    background-color: rgb(80, 87, 97);
+    margin-left: 15px;
+    color: white;
 }
 
 td {
@@ -16,12 +9,146 @@ td {
     text-align: center;
 }
 
+mat-form-field {
+    padding: 10px 15px 0px 15px;
+}
+
+table {
+    width: 100%;
+    font-size: 12px;
+}
+
+#SelectCheck {
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+#cerrar {
+    cursor: pointer;
+    margin-left: 25px;
+}
+
+.mat-mdc-radio-button~.mat-mdc-radio-button {
+    margin-left: 16px;
+}
+
+#plan {
+    color: rgb(38, 0, 255);
+    cursor: pointer;
+    margin-right: 5px;
+    margin-left: 15px;
+    text-align: center;
+}
+
 p {
     font-size: x-small;
 }
 
-mat-icon {
+#table_horario {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 11px;
+}
+
+#td_horarios {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#cerrar_ {
+    color: red;
     cursor: pointer;
+    margin-right: 2%;
+}
+
+#table_acciones {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 10px;
+}
+
+#fuente_ {
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+
+.table{
+    border-spacing: 0;
+}
+
+.table th,
+.table td{
+    border-right: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    min-width: 100px;
+}
+
+.table th:last-child,
+.table td:last-child{
+    border-right: 0;
+}
+
+.table tbody tr{
+    background-color: #fbfbfb;
+}
+
+.table tbody tr:nth-child(2n) {
+    background-color: #e6f3ff;
+}
+
+.colum_1{
+    border-right: 0px solid #a1a1a1;
+    border-left: 0px solid #979797;
+    min-width: 100px !important;
+}
+
+.colum_2{
+    border-right: 0px solid #a1a1a1;
+    border-left: 0px solid #979797;
+    min-width: 70px !important;
+}
+
+.table .sticky{
+    position: sticky;
+    left: 0;
+}
+
+.table .sticky-2{
+    position: sticky;
+    left: 100px;
+}
+
+.table .sticky-3{
+    position: sticky;
+    left: 200px;
+}
+
+.table .sticky-4{
+    position: sticky;
+    left: 270px;
+}
+
+.table .sticky-5{
+    position: sticky;
+    right:0;
+}
+
+.table tbody tr .sticky,
+.table tbody tr .sticky-2,
+.table tbody tr .sticky-3,
+.table tbody tr .sticky-4,
+.table tbody tr .sticky-5{
+    background-color: #fbfbfb;
+}
+
+.table tbody tr:nth-child(2n) .sticky,
+.table tbody tr:nth-child(2n) .sticky-2,
+.table tbody tr:nth-child(2n) .sticky-3,
+.table tbody tr:nth-child(2n) .sticky-4,
+.table tbody tr:nth-child(2n) .sticky-5{
+    background-color: #e6f3ff;
 }
 
 .ver {
@@ -35,4 +162,8 @@ mat-icon {
 #detalle {
     width: 100%;
     font-size: 12px;
+}
+
+#horarios{
+    padding: 0 0 25px;
 }

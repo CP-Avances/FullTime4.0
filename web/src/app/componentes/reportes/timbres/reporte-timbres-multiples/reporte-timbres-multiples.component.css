@@ -16,6 +16,26 @@ td {
     text-align: center;
 }
 
+/* .table th,
+.table td{
+    border-right: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    min-width: 100px;
+}
+
+.table th:last-child,
+.table td:last-child{
+    border-right: 0;
+}
+
+.table tbody tr{
+    background-color: #fbfbfb;
+}
+
+.table tbody tr:nth-child(2n) {
+    background-color: #e6f3ff;
+} */
+
 p {
     font-size: x-small;
 }

@@ -4,9 +4,10 @@ import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 
-
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
+import { MatDatepicker } from '@angular/material/datepicker';
+import { default as _rollupMoment, Moment } from 'moment';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
@@ -18,6 +19,7 @@ import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.s
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ReportesService } from '../../../../servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { FormControl } from '@angular/forms';
 
 
 @Component({
@@ -45,6 +47,9 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   timbres: any = [];
   cargos: any = [];
   origen: any = [];
+ 
+  resultados: any = [];
+  codigos: string = '';
 
 
   // VARIABLES PARA MOSTRAR DETALLES
@@ -54,6 +59,19 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   // VARIABLES PARA ADMINISTRAR TOLERANCIA
   tolerancia: string = 'no_considerar';
   tipoTolerancia: string = '';
+
+  // METODO PARA OBTENER DETALLE DE PLANIFICACION
+  ver_detalle: boolean = false;
+  ver_acciones: boolean = false;
+  paginar: boolean = false;
+  detalles: any = [];
+  detalle_acciones: any = [];
+
+  // ACCIONES DE HORARIOS
+  entrada: '';
+  salida: '';
+  inicio_comida = '';
+  fin_comida = '';
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS SELECCIONADOS EN LA BUSQUEDA
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
@@ -104,6 +122,10 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
+
+  // FECHAS DE BUSQUEDA
+  fechaInicialF = new FormControl();
+  fechaFinalF = new FormControl();
 
   constructor(
     private validacionService: ValidacionesService,
@@ -227,6 +249,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
         this.toastr.error(err.error.message);
       }
     );
+    console.log('data',this.origen);
   }
 
   // METODO PARA FILTRAR POR CARGOS
@@ -268,7 +291,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
 
   // VALIDACIONES DE OPCIONES DE REPORTE
   validacionReporte(action: any) {
-    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de búsqueda.');
+    if (this.fechaInicialF.value == null && this.fechaFinalF.value == null) return this.toastr.error('Primero valide fechas de búsqueda.');
     if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
       && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.');
     switch (this.opcion) {
@@ -302,15 +325,22 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
 
   ModelarSucursal(accion) {
     this.tipo = 'default';
-    let respuesta = JSON.parse(this.origen)
+    let respuesta = JSON.parse(this.origen);
+    let usuarios: any = [];
 
-    let suc = respuesta.filter(o => {
-      let bool = this.selectionSuc.selected.find(obj1 => {
-        return obj1.id === o.id_suc
-      });
-      return bool != undefined
+    respuesta.forEach((obj: any) => {
+      this.selectionSuc.selected.find(obj1 => {
+        if (obj1.id === obj.id_suc) {
+          obj.departamentos.forEach((obj2: any) => {
+            obj2.empleado.forEach((obj3: any) => {
+              usuarios.push(obj3);
+            })
+          })
+        }
+      })
     });
 
+    this.VerPlanificacion(usuarios);
     this.data_pdf = []
     // this.reportesTiempoLaborado.ReporteTiempoLaborado(suc, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
     //   this.data_pdf = res;
@@ -330,7 +360,6 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
     this.tipo = 'RegimenCargo';
     let respuesta = JSON.parse(this.origen);
     let empleados: any = [];
-    let reg: any = [];
     let objeto: any;
     respuesta.forEach((obj: any) => {
       this.selectionReg.selected.find((regimen) => {
@@ -340,7 +369,6 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
             nombre: regimen.nombre,
           },
         };
-        empleados = [];
         obj.departamentos.forEach((departamento: any) => {
           departamento.empleado.forEach((empleado: any) => {
             empleado.regimen.forEach((r) => {
@@ -350,12 +378,11 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
             });
           });
         });
-        objeto.empleados = empleados;
-        reg.push(objeto);
       });
     });
 
     this.data_pdf = [];
+    this.VerPlanificacion(empleados);
     // this.reportesTiempoLaborado.ReporteTiempoLaboradoRegimenCargo(reg, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
     //   this.data_pdf = res
     //   switch (accion) {
@@ -370,20 +397,23 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
 
   ModelarDepartamento(accion) {
     this.tipo = 'default';
-    let respuesta = JSON.parse(this.origen)
+    let respuesta = JSON.parse(this.origen);
+    let usuarios: any = [];
 
     respuesta.forEach((obj: any) => {
-      obj.departamentos = obj.departamentos.filter(o => {
-        let bool = this.selectionDep.selected.find(obj1 => {
-          return obj1.id === o.id_depa
+      obj.departamentos.forEach((obj1: any) => {
+        this.selectionDep.selected.find(obj2 => {
+          if (obj1.id_depa === obj2.id) {
+            obj1.empleado.forEach((obj3: any) => {
+              usuarios.push(obj3)
+            })
+          }
         })
-        return bool != undefined
       })
-    })
-    let dep = respuesta.filter(obj => {
-      return obj.departamentos.length > 0
     });
-    this.data_pdf = []
+    console.log('usuarios',usuarios);
+    this.data_pdf = [];
+    this.VerPlanificacion(usuarios);
     // this.reportesTiempoLaborado.ReporteTiempoLaborado(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
     //   this.data_pdf = res
     //   switch (accion) {
@@ -400,14 +430,19 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   ModelarCargo(accion: any) {
     this.tipo = 'RegimenCargo';
     let respuesta = JSON.parse(this.origen_cargo);
-    let car = respuesta.filter((o) => {
-      var bool = this.selectionCar.selected.find((obj1) => {
-        return obj1.id === o.id_cargo;
-      });
-      return bool != undefined;
-    });
+    let usuarios: any = [];
+     respuesta.forEach((obj: any) => {
+        this.selectionCar.selected.find(obj1 => {
+          if (obj.id_cargo === obj1.id) {
+            obj.empleados.forEach((obj3: any) => {
+              usuarios.push(obj3)
+            })
+          }
+        })
+      })
 
     this.data_pdf = [];
+    this.VerPlanificacion(usuarios);
     // this.reportesTiempoLaborado.ReporteTiempoLaboradoRegimenCargo(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
     //   this.data_pdf = res;
     //   console.log('data pdf cargo',this.data_pdf);
@@ -423,18 +458,13 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
 
   ModelarEmpleados(accion) {
     this.tipo = 'default';
-    let respuesta = JSON.parse(this.origen)
     let emp: any = [];
-    respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach(element => {
-        element.empleado.forEach(o => {
-          this.selectionEmp.selected.find(obj1 => {
-            if (obj1.id === obj.id) {
-              emp.push(o)
-            }
-          })
-        })
-      });
+    this.empleados.forEach((obj: any) => {
+      this.selectionEmp.selected.find(obj1 => {
+        if (obj1.id === obj.id) {
+          emp.push(obj)
+        }
+      })
     })
 
 
@@ -453,8 +483,6 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   }
 
   // METODO PARA VER PLANIFICACION
-  codigos: string = '';
-  resultados: any = [];
   VerPlanificacion(data: any) {
     this.resultados = data;
     this.codigos = '';
@@ -467,8 +495,8 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
         this.codigos = this.codigos + ', \'' + obj.codigo + '\''
       }
     })
-    this.ObtenerHorariosEmpleado(this.rangoFechas.fec_inico, this.rangoFechas.fec_final, 2, this.codigos);
 
+    this.ObtenerHorariosEmpleado(this.fechaInicialF.value, this.fechaFinalF.value, this.codigos);
 
   }
 
@@ -477,14 +505,18 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   horariosEmpleado: any = [];
   mes_inicio: any = '';
   mes_fin: any = '';
-  ObtenerHorariosEmpleado(fec_inicio: any, fec_final: any, opcion: number, codigo: any) {
+  ObtenerHorariosEmpleado(fec_inicio: any, fec_final: any, codigo: any) {
     this.horariosEmpleado = [];
     console.log('codigos',codigo);   
+    this.mes_inicio = fec_inicio.format("YYYY-MM-DD");
+    this.mes_fin = fec_final.format("YYYY-MM-DD");
+
     let busqueda = {
-      fecha_inicio: fec_inicio,
-      fecha_final: fec_final,
+      fecha_inicio: this.mes_inicio,
+      fecha_final: this.mes_fin,
       codigo: codigo
     }
+
     this.plan.BuscarPlanificacionHoraria(busqueda).subscribe(datos => {
       if (datos.message === 'OK') {
         this.horariosEmpleado = datos.data;
@@ -502,7 +534,9 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
             }
           })
         })
-        console.log('ver datos de horario ', this.horariosEmpleado)
+        console.log('ver datos de horario ', this.horariosEmpleado);
+        this.ObtenerDetallesPlanificacion();
+        this.verDatos();
       }
       else {
         this.toastr.info('Ups no se han encontrado registros!!!', 'No existe planificación.', {
@@ -511,6 +545,130 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
       }
     })
   }
+
+
+  ObtenerDetallesPlanificacion() {
+    this.detalles = [];
+    // DATOS DE BUSQUEDA DE DETALLES DE PLANIFICACION
+    let busqueda = {
+      fecha_inicio: this.mes_inicio,
+      fecha_final: this.mes_fin,
+      codigo: this.codigos
+    }
+    let codigo_horario = '';
+    let tipos: any = [];
+    let accion = '';
+    // VARIABLES AUXILIARES
+    let aux_h = '';
+    let aux_a = '';
+    // BUSQUEDA DE DETALLES DE PLANIFICACIONES
+    this.plan.BuscarDetallePlanificacion(busqueda).subscribe(datos => {
+      if (datos.message === 'OK') {
+        this.ver_acciones = true;
+        this.detalle_acciones = [];
+        this.detalles = datos.data;
+
+        datos.data.forEach(obj => {
+          if (aux_h === '') {
+            accion = obj.tipo_accion + ': ' + obj.hora;
+            this.ValidarAcciones(obj);
+          }
+          else if (obj.id_horario === aux_h) {
+            if (obj.tipo_accion != aux_a) {
+              accion = accion + ' , ' + obj.tipo_accion + ': ' + obj.hora
+              codigo_horario = obj.codigo_dia
+              this.ValidarAcciones(obj);
+            }
+          }
+          else {
+            // CONCATENAR VALORES ANTERIORES
+            tipos = [{
+              acciones: accion,
+              horario: codigo_horario,
+              entrada: this.entrada,
+              inicio_comida: this.inicio_comida,
+              fin_comida: this.fin_comida,
+              salida: this.salida,
+            }]
+            this.detalle_acciones = this.detalle_acciones.concat(tipos);
+            // LIMPIAR VALORES
+            accion = obj.tipo_accion + ': ' + obj.hora;
+            codigo_horario = obj.codigo_dia;
+            this.entrada = '';
+            this.salida = '';
+            this.inicio_comida = '';
+            this.fin_comida = '';
+            this.ValidarAcciones(obj);
+          }
+          // ASIGNAR VALORES A VARIABLES AUXILIARES
+          aux_h = obj.id_horario;
+          aux_a = obj.tipo_accion;
+        })
+        // AL FINALIZAR EL CICLO CONCATENAR VALORES
+        tipos = [{
+          acciones: accion,
+          horario: codigo_horario,
+          entrada: this.entrada,
+          inicio_comida: this.inicio_comida,
+          fin_comida: this.fin_comida,
+          salida: this.salida,
+        }]
+        this.detalle_acciones = this.detalle_acciones.concat(tipos);
+
+        // FORMATEAR HORAS
+        this.detalle_acciones.forEach(detalle => {
+          detalle.entrada_ = this.validacionService.FormatearHora(detalle.entrada, this.formato_hora);
+          if (detalle.inicio_comida != '') {
+            detalle.inicio_comida = this.validacionService.FormatearHora(detalle.inicio_comida, this.formato_hora);
+          }
+          if (detalle.fin_comida != '') {
+            detalle.fin_comida = this.validacionService.FormatearHora(detalle.fin_comida, this.formato_hora);
+          }
+          detalle.salida_ = this.validacionService.FormatearHora(detalle.salida, this.formato_hora);
+        })
+
+        // METODO PARA VER PAGINACION
+        if (this.detalle_acciones.length > 8) {
+          this.paginar = true;
+        }
+        else {
+          this.paginar = false;
+        }
+      }
+      else {
+        this.toastr.info('Ups no se han encontrado registros!!!', 'No existe detalle de planificación.', {
+          timeOut: 6000,
+        });
+      }
+    })
+  }
+
+  // CONDICIONES DE ACCIONES EN HORARIO ASIGNADO
+  ValidarAcciones(obj: any) {
+    if (obj.tipo_accion === 'E') {
+      return this.entrada = obj.hora;
+    }
+    if (obj.tipo_accion === 'S') {
+      return this.salida = obj.hora;
+    }
+    if (obj.tipo_accion === 'I/A') {
+      return this.inicio_comida = obj.hora;
+    }
+    if (obj.tipo_accion === 'F/A') {
+      return this.fin_comida = obj.hora;
+    }
+  }
+
+  // ARREGLO DE DATOS DE HORARIOS
+  nomenclatura = [
+    { nombre: 'L', descripcion: 'LIBRE' },
+    { nombre: 'FD', descripcion: 'FERIADO' },
+    { nombre: 'REC', descripcion: 'RECUPERACIÓN' },
+    { nombre: 'P', descripcion: 'PERMISO' },
+    { nombre: 'V', descripcion: 'VACACION' },
+    { nombre: '-', descripcion: 'SIN PLANIFICACIÓN' }
+  ]
+
 
   /***************************
    * 
@@ -1480,6 +1638,11 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
     this.tamanio_pagina = e.pageSize;
   }
 
+  ManejarPaginaResultados(e: PageEvent) {
+    this.tamanio_pagina_emp = e.pageSize;
+    this.numero_pagina_emp = e.pageIndex + 1;
+  }
+
   /**
    * METODOS PARA CONTROLAR INGRESO DE LETRAS
    */
@@ -1495,11 +1658,11 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   // MOSTRAR DETALLES
   verDatos() {
     this.verDetalle = true;
-    if (this.bool.bool_cargo || this.bool.bool_reg) {
-      this.extraerTimbresRegimenCargo();
-    } else {
-      this.extraerTimbres();
-    }
+    // if (this.bool.bool_cargo || this.bool.bool_reg) {
+    //   this.extraerTimbresRegimenCargo();
+    // } else {
+    //   this.extraerTimbres();
+    // }
   }
 
   // METODO PARA REGRESAR A LA PAGINA ANTERIOR
@@ -1507,18 +1670,69 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
     this.verDetalle = false;
   }
 
-    //METDODO PARA CAMBIAR EL COLOR DE LAS CELDAS EN LA TABLA DE PREVISUALIZACION
-    obtenerClaseTiempo(planificado: any, laborado: any) {
-      const tPlanificado = Number(planificado);
-      const tLaborado = Number(laborado);
-      if (tLaborado < tPlanificado) {
-          return 'verde';
-      } 
+  //METDODO PARA CAMBIAR EL COLOR DE LAS CELDAS EN LA TABLA DE PREVISUALIZACION
+  obtenerClaseTiempo(planificado: any, laborado: any) {
+    const tPlanificado = Number(planificado);
+    const tLaborado = Number(laborado);
+    if (tLaborado < tPlanificado) {
+        return 'verde';
+    } 
+  }
+  obtenerClaseTimbre(valor: any) {
+    if (valor == 'FT') {
+      return 'rojo';
     }
+  }
 
-    obtenerClaseTimbre(valor: any) {
-      if (valor == 'FT') {
-        return 'rojo';
+  // METODO PARA CAMBIAR DE COLORES SEGUN EL MES
+  CambiarColores(opcion: any) {
+    let color: string;
+    switch (opcion) {
+      case 'ok':
+        return color = '#F6DDCC';
+    }
+  }
+
+  fecHorario: boolean = true;
+  // METODO PARA MOSTRAR FECHA SELECCIONADA
+  FormatearFecha(fecha: Moment, datepicker: MatDatepicker<Moment>, opcion: number) {
+    const ctrlValue = fecha;
+    if (opcion === 1) {
+      if (this.fechaFinalF.value) {
+        this.ValidarFechas(ctrlValue, this.fechaFinalF.value, this.fechaInicialF, opcion);
+      }
+      else {
+        let inicio = moment(ctrlValue).format('01/MM/YYYY');
+        this.fechaInicialF.setValue(moment(inicio, 'DD/MM/YYYY'));
+      }
+      this.fecHorario = false;
+    }
+    else {
+      this.ValidarFechas(this.fechaInicialF.value, ctrlValue, this.fechaFinalF, opcion);
+    }
+    datepicker.close();
+  }
+
+    // METODO PARA VALIDAR EL INGRESO DE LAS FECHAS
+    ValidarFechas(fec_inicio: any, fec_fin: any, formulario: any, opcion: number) {
+      // FORMATO DE FECHA PERMITIDO PARA COMPARARLAS
+      let inicio = moment(fec_inicio).format('01/MM/YYYY');
+      let final = moment(fec_fin).daysInMonth() + moment(fec_fin).format('/MM/YYYY');
+      let feci = moment(inicio, 'DD/MM/YYYY').format('YYYY/MM/DD');
+      let fecf = moment(final, 'DD/MM/YYYY').format('YYYY/MM/DD');
+      // VERIFICAR SI LAS FECHAS ESTAN INGRESDAS DE FORMA CORRECTA
+      if (Date.parse(feci) <= Date.parse(fecf)) {
+        if (opcion === 1) {
+          formulario.setValue(moment(inicio, 'DD/MM/YYYY'));
+        }
+        else {
+          formulario.setValue(moment(final, 'DD/MM/YYYY'));
+        }
+      }
+      else {
+        this.toastr.warning('La fecha no se registro. Ups la fecha no es correcta.!!!', 'VERIFICAR', {
+          timeOut: 6000,
+        });
       }
     }
 
