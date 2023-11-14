@@ -292,7 +292,7 @@
         </button>
         </div>
         <!-- *********************** TABLA DE DETALLES DE HORARIOS Y DEFINICIONES ******************************* -->
-        <div class="container" id="horarios">
+        <div class="container" id="horarios" *ngIf="ver_acciones">
             <div class="row">
                 <div class="col-md">
                     <div class="mat-elevation-z8" style="background: white;">
@@ -666,7 +666,7 @@
                         <p>PDF</p>
                     </i>
                     <i id="excel" class="fas fa-file-excel icon" matSuffix matTooltipPosition="right"
-                        matTooltip="Descargar reporte en formato EXCEL." (click)="exportToExcel(tipo)">
+                        matTooltip="Descargar reporte en formato EXCEL." (click)="exportToExcel()">
                         <p>XLSL</p>
                     </i>
                 </div>
