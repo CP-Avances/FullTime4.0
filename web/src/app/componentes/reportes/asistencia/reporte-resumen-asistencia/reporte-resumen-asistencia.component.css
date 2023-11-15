@@ -1,0 +1,75 @@
+mat-form-field {
+    padding: 10px 15px 0px 15px;
+}
+
+table {
+    width: 100%;
+    font-size: 14px;
+}
+
+#codigoColoresTabla {
+    width: auto;
+    font-size: 14px;
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+}
+
+.coloresItem{
+    padding-left: 10px;
+}
+
+tr {
+    text-align: center;
+}
+
+td {
+    padding-top: 10px;
+    text-align: center;
+}
+
+p {
+    font-size: x-small;
+}
+
+mat-icon {
+    cursor: pointer;
+}
+
+.ver {
+    color: indianred;
+}
+
+#busqueda {
+    margin-top: 10px;
+}
+
+#detalle {
+    width: 100%;
+    font-size: 12px;
+}
+
+.verde {
+    background-color: #55EE44;
+}
+
+.colores{
+    width: 2.5rem;
+    min-width: 1rem;
+}
+
+.rojo {
+    background-color: #EE4444;
+}
+
+.azul {
+    background-color: #4499ee;
+}
+
+.amarillo {
+    background-color: #eee344;
+}
+
+.naranja {
+    background-color: #e68a2e;
+}
+

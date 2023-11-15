@@ -68,6 +68,7 @@ import { ReporteAtrasosMultiplesComponent } from './componentes/reportes/asisten
 import { ReporteEmpleadosInactivosComponent } from './componentes/reportes/generales/empleados/inactivos/reporte-empleados-inactivos/reporte-empleados-inactivos.component';
 import { ReporteFaltasComponent } from './componentes/reportes/asistencia/reporte-faltas/reporte-faltas.component';
 import { ReporteHorasTrabajadasComponent } from './componentes/reportes/asistencia/reporte-horas-trabajadas/reporte-horas-trabajadas.component';
+import { ReporteResumenAsistenciaComponent } from './componentes/reportes/asistencia/reporte-resumen-asistencia/reporte-resumen-asistencia.component';
 import { ReporteTimbresMultiplesComponent } from './componentes/reportes/timbres/reporte-timbres-multiples/reporte-timbres-multiples.component';
 import { ReportePuntualidadComponent } from './componentes/reportes/asistencia/reporte-puntualidad/reporte-puntualidad.component';
 import { ReportePlanificacionHorariaComponent } from './componentes/reportes/asistencia/reporte-planificacion-horaria/reporte-planificacion-horaria.component';
@@ -182,6 +183,7 @@ const routes: Routes = [
   { path: 'reporte-emp-inactivos', component: ReporteEmpleadosInactivosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'reporte-faltas', component: ReporteFaltasComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'reporte-horas-trabajadas', component: ReporteHorasTrabajadasComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'reporte-resumen-asistencia', component: ReporteResumenAsistenciaComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'reporte-puntualidad', component: ReportePuntualidadComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'reporte-timbres-multiples', component: ReporteTimbresMultiplesComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'reporte-timbre-abierto', component: TimbreAbiertosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
