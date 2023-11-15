@@ -48,6 +48,11 @@ mat-icon {
     font-size: 12px;
 }
 
+.colores{
+    width: 2.5rem;
+    min-width: 1rem;
+}
+
 .verde {
     background-color: #55EE44;
 }
