@@ -1549,108 +1549,46 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
   }
 
 
-    //METODOS PARA EXTRAER LOS TIMBRES EN UNA LISTA Y VISUALIZARLOS
-    extraerTimbres() {
-      this.timbres = [];
-      let n = 0;
-      this.data_pdf.forEach((obj1: IReporteHorasTrabaja) => {
-        obj1.departamentos.forEach(obj2 => {
-          obj2.empleado.forEach((obj3: any) => {
-            obj3.timbres.forEach((obj4: any) => {
-              //CAMBIO DE FORMATO EN FECHA Y HORAS (HORARIO Y TIMBRE)
-              const fecha = this.validacionService.FormatearFecha(
-                obj4.entrada.fec_horario,
-                this.formato_fecha, 
-                this.validacionService.dia_abreviado);
-
-              const entradaHorario =  this.validacionService.FormatearHora(obj4.entrada.fec_hora_horario.split(' ')[1],this.formato_hora);
-              const salidaHorario = this.validacionService.FormatearHora(obj4.salida.fec_hora_horario.split(' ')[1],this.formato_hora);
-              const inicioAlimentacionHorario = obj4.tipo == 'EAS'
-                ? this.validacionService.FormatearHora(obj4.inicioAlimentacion.fec_hora_horario.split(' ')[1],this.formato_hora)
-                : '';
-              const finAlimentacionHorario = obj4.tipo == 'EAS'
-                ? this.validacionService.FormatearHora(obj4.finAlimentacion.fec_hora_horario.split(' ')[1],this.formato_hora)
-                : '';
-              const entrada = obj4.entrada.fec_hora_timbre != null 
-                ? this.validacionService.FormatearHora(obj4.entrada.fec_hora_timbre.split(' ')[1],this.formato_hora)
-                : (obj4.dia === 'L' || obj4.dia === 'FD' ? obj4.dia : 'FT');
-              const salida = obj4.salida.fec_hora_timbre != null
-                ? this.validacionService.FormatearHora(obj4.salida.fec_hora_timbre.split(' ')[1], this.formato_hora)
-                : (obj4.dia === 'L' || obj4.dia === 'FD' ? obj4.dia : 'FT');
-              const inicioAlimentacion = obj4.tipo == 'EAS'
-                ? (obj4.inicioAlimentacion.fec_hora_timbre != null 
-                  ? this.validacionService.FormatearHora(obj4.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
-                  : (obj4.dia === 'L' || obj4.dia === 'FD' ? obj4.dia : 'FT')) 
-                : '';
-              const finAlimentacion = obj4.tipo == 'EAS' && (obj4.dia !== 'L' || obj4.dia !== 'FD') 
-                ? (obj4.finAlimentacion.fec_hora_timbre != null
-                  ? this.validacionService.FormatearHora(obj4.finAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
-                  : (obj4.dia === 'L' || obj4.dia === 'FD' ? obj4.dia : 'FT')) 
-                : '';
-
-              const diferenciaEnMinutos = this.calcularDiferenciaFechas(obj4);
-              const minutosPlanificados = diferenciaEnMinutos[0];
-              const tiempoPlanificado = this.minutosAHorasMinutosSegundos(minutosPlanificados);
-              const minutosLaborados = diferenciaEnMinutos[1];
-              const tiempoLaborado = this.minutosAHorasMinutosSegundos(minutosLaborados);
-              n = n + 1;
-              const ele = { 
-                n,
-                ciudad: obj1.ciudad, sucursal: obj1.name_suc,
-                departamento: obj2.name_dep,
-                regimen: obj3.regimen[0].name_regimen,
-                empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
-                fecha, entradaHorario, entrada, salidaHorario, salida,
-                inicioAlimentacionHorario, inicioAlimentacion, 
-                finAlimentacionHorario, finAlimentacion,  
-                tiempoPlanificado, minutosPlanificados,
-                tiempoLaborado, minutosLaborados,
-              }  
-              this.timbres.push(ele);
-            })
-          })
-        })
-      })
-    }
-  
-    extraerTimbresRegimenCargo() {
-      this.timbres = [];
-      let n = 0;
-      this.data_pdf.forEach((obj1: any) => {
-        obj1.empleados.forEach((obj2: any) => {
-          obj2.timbres.forEach((obj3: any) => {
+  //METODOS PARA EXTRAER LOS TIMBRES EN UNA LISTA Y VISUALIZARLOS
+  extraerTimbres() {
+    this.timbres = [];
+    let n = 0;
+    this.data_pdf.forEach((obj1: IReporteHorasTrabaja) => {
+      obj1.departamentos.forEach(obj2 => {
+        obj2.empleado.forEach((obj3: any) => {
+          obj3.timbres.forEach((obj4: any) => {
             //CAMBIO DE FORMATO EN FECHA Y HORAS (HORARIO Y TIMBRE)
             const fecha = this.validacionService.FormatearFecha(
-              obj3.entrada.fec_horario,
+              obj4.entrada.fec_horario,
               this.formato_fecha, 
               this.validacionService.dia_abreviado);
 
-            const entradaHorario = this.validacionService.FormatearHora(obj3.entrada.fec_hora_horario.split(' ')[1],this.formato_hora);
-            const salidaHorario = this.validacionService.FormatearHora(obj3.salida.fec_hora_horario.split(' ')[1],this.formato_hora);
-            const inicioAlimentacionHorario = obj3.tipo == 'EAS' 
-              ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fec_hora_horario.split(' ')[1],this.formato_hora)
+            const entradaHorario =  this.validacionService.FormatearHora(obj4.entrada.fec_hora_horario.split(' ')[1],this.formato_hora);
+            const salidaHorario = this.validacionService.FormatearHora(obj4.salida.fec_hora_horario.split(' ')[1],this.formato_hora);
+            const inicioAlimentacionHorario = obj4.tipo == 'EAS'
+              ? this.validacionService.FormatearHora(obj4.inicioAlimentacion.fec_hora_horario.split(' ')[1],this.formato_hora)
               : '';
-            const finAlimentacionHorario = obj3.tipo == 'EAS' 
-              ? this.validacionService.FormatearHora(obj3.finAlimentacion.fec_hora_horario.split(' ')[1],this.formato_hora)
+            const finAlimentacionHorario = obj4.tipo == 'EAS'
+              ? this.validacionService.FormatearHora(obj4.finAlimentacion.fec_hora_horario.split(' ')[1],this.formato_hora)
               : '';
-            const entrada = obj3.entrada.fec_hora_timbre != null 
-              ? this.validacionService.FormatearHora(obj3.entrada.fec_hora_timbre.split(' ')[1],this.formato_hora)
-              : (obj3.dia === 'L' || obj3.dia === 'FD' ? obj3.dia : 'FT');
-            const salida = obj3.salida.fec_hora_timbre != null
-              ? this.validacionService.FormatearHora(obj3.salida.fec_hora_timbre.split(' ')[1], this.formato_hora)
-              : (obj3.dia === 'L' || obj3.dia === 'FD' ? obj3.dia : 'FT');
-            const inicioAlimentacion = obj3.tipo == 'EAS' && (obj3.dia !== 'L' || obj3.dia !== 'FD')
-              ? (obj3.inicioAlimentacion.fec_hora_timbre != null 
-                ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
-                : (obj3.dia === 'L' || obj3.dia === 'FD' ? obj3.dia : 'FT')) 
+            const entrada = obj4.entrada.fec_hora_timbre != null 
+              ? this.validacionService.FormatearHora(obj4.entrada.fec_hora_timbre.split(' ')[1],this.formato_hora)
+              : (obj4.dia === 'L' || obj4.dia === 'FD' ? obj4.dia : 'FT');
+            const salida = obj4.salida.fec_hora_timbre != null
+              ? this.validacionService.FormatearHora(obj4.salida.fec_hora_timbre.split(' ')[1], this.formato_hora)
+              : (obj4.dia === 'L' || obj4.dia === 'FD' ? obj4.dia : 'FT');
+            const inicioAlimentacion = obj4.tipo == 'EAS'
+              ? (obj4.inicioAlimentacion.fec_hora_timbre != null 
+                ? this.validacionService.FormatearHora(obj4.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
+                : (obj4.dia === 'L' || obj4.dia === 'FD' ? obj4.dia : 'FT')) 
               : '';
-            const finAlimentacion = obj3.tipo == 'EAS' && (obj3.dia !== 'L' || obj3.dia !== 'FD') 
-              ? (obj3.finAlimentacion.fec_hora_timbre != null
-                ? this.validacionService.FormatearHora(obj3.finAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
-                : (obj3.dia === 'L' || obj3.dia === 'FD' ? obj3.dia : 'FT')) 
+            const finAlimentacion = obj4.tipo == 'EAS' && (obj4.dia !== 'L' || obj4.dia !== 'FD') 
+              ? (obj4.finAlimentacion.fec_hora_timbre != null
+                ? this.validacionService.FormatearHora(obj4.finAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
+                : (obj4.dia === 'L' || obj4.dia === 'FD' ? obj4.dia : 'FT')) 
               : '';
 
-            const diferenciaEnMinutos = this.calcularDiferenciaFechas(obj3);
+            const diferenciaEnMinutos = this.calcularDiferenciaFechas(obj4);
             const minutosPlanificados = diferenciaEnMinutos[0];
             const tiempoPlanificado = this.minutosAHorasMinutosSegundos(minutosPlanificados);
             const minutosLaborados = diferenciaEnMinutos[1];
@@ -1658,21 +1596,83 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
             n = n + 1;
             const ele = { 
               n,
-              ciudad: obj2.ciudad, sucursal: obj2.sucursal,
-              departamento: obj2.departamento,
-              regimen: obj2.regimen[0].name_regimen,
-              empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
+              ciudad: obj1.ciudad, sucursal: obj1.name_suc,
+              departamento: obj2.name_dep,
+              regimen: obj3.regimen[0].name_regimen,
+              empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
               fecha, entradaHorario, entrada, salidaHorario, salida,
               inicioAlimentacionHorario, inicioAlimentacion, 
               finAlimentacionHorario, finAlimentacion,  
               tiempoPlanificado, minutosPlanificados,
               tiempoLaborado, minutosLaborados,
-            }      
+            }  
             this.timbres.push(ele);
           })
         })
       })
-    }
+    })
+  }
+  
+  extraerTimbresRegimenCargo() {
+    this.timbres = [];
+    let n = 0;
+    this.data_pdf.forEach((obj1: any) => {
+      obj1.empleados.forEach((obj2: any) => {
+        obj2.timbres.forEach((obj3: any) => {
+          //CAMBIO DE FORMATO EN FECHA Y HORAS (HORARIO Y TIMBRE)
+          const fecha = this.validacionService.FormatearFecha(
+            obj3.entrada.fec_horario,
+            this.formato_fecha, 
+            this.validacionService.dia_abreviado);
+            
+          const entradaHorario = this.validacionService.FormatearHora(obj3.entrada.fec_hora_horario.split(' ')[1],this.formato_hora);
+          const salidaHorario = this.validacionService.FormatearHora(obj3.salida.fec_hora_horario.split(' ')[1],this.formato_hora);
+          const inicioAlimentacionHorario = obj3.tipo == 'EAS' 
+            ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fec_hora_horario.split(' ')[1],this.formato_hora)
+            : '';
+          const finAlimentacionHorario = obj3.tipo == 'EAS' 
+            ? this.validacionService.FormatearHora(obj3.finAlimentacion.fec_hora_horario.split(' ')[1],this.formato_hora)
+            : '';
+          const entrada = obj3.entrada.fec_hora_timbre != null 
+            ? this.validacionService.FormatearHora(obj3.entrada.fec_hora_timbre.split(' ')[1],this.formato_hora)
+            : (obj3.dia === 'L' || obj3.dia === 'FD' ? obj3.dia : 'FT');
+          const salida = obj3.salida.fec_hora_timbre != null
+            ? this.validacionService.FormatearHora(obj3.salida.fec_hora_timbre.split(' ')[1], this.formato_hora)
+            : (obj3.dia === 'L' || obj3.dia === 'FD' ? obj3.dia : 'FT');
+          const inicioAlimentacion = obj3.tipo == 'EAS' && (obj3.dia !== 'L' || obj3.dia !== 'FD')
+            ? (obj3.inicioAlimentacion.fec_hora_timbre != null 
+              ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
+              : (obj3.dia === 'L' || obj3.dia === 'FD' ? obj3.dia : 'FT')) 
+            : '';
+          const finAlimentacion = obj3.tipo == 'EAS' && (obj3.dia !== 'L' || obj3.dia !== 'FD') 
+            ? (obj3.finAlimentacion.fec_hora_timbre != null
+              ? this.validacionService.FormatearHora(obj3.finAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
+              : (obj3.dia === 'L' || obj3.dia === 'FD' ? obj3.dia : 'FT')) 
+            : '';
+
+          const diferenciaEnMinutos = this.calcularDiferenciaFechas(obj3);
+          const minutosPlanificados = diferenciaEnMinutos[0];
+          const tiempoPlanificado = this.minutosAHorasMinutosSegundos(minutosPlanificados);
+          const minutosLaborados = diferenciaEnMinutos[1];
+          const tiempoLaborado = this.minutosAHorasMinutosSegundos(minutosLaborados);
+          n = n + 1;
+          const ele = { 
+            n,
+            ciudad: obj2.ciudad, sucursal: obj2.sucursal,
+            departamento: obj2.departamento,
+            regimen: obj2.regimen[0].name_regimen,
+            empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
+            fecha, entradaHorario, entrada, salidaHorario, salida,
+            inicioAlimentacionHorario, inicioAlimentacion, 
+            finAlimentacionHorario, finAlimentacion,  
+            tiempoPlanificado, minutosPlanificados,
+            tiempoLaborado, minutosLaborados,
+          }      
+          this.timbres.push(ele);
+        })
+      })
+    })
+  }
 
   /*****************************************************************************
    * 
@@ -1846,18 +1846,18 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     this.verDetalle = false;
   }
 
-    //METDODO PARA CAMBIAR EL COLOR DE LAS CELDAS EN LA TABLA DE PREVISUALIZACION
-    obtenerClaseTiempo(planificado: any, laborado: any) {
-      const tPlanificado = Number(planificado);
-      const tLaborado = Number(laborado);
-      if (tLaborado < tPlanificado) {
-          return 'verde';
-      } 
-    }
+  //METDODO PARA CAMBIAR EL COLOR DE LAS CELDAS EN LA TABLA DE PREVISUALIZACION
+  obtenerClaseTiempo(planificado: any, laborado: any) {
+    const tPlanificado = Number(planificado);
+    const tLaborado = Number(laborado);
+    if (tLaborado < tPlanificado) {
+        return 'verde';
+    } 
+  }
 
-    obtenerClaseTimbre(valor: any) {
-      if (valor == 'FT') {
-        return 'rojo';
-      }
+  obtenerClaseTimbre(valor: any) {
+    if (valor == 'FT') {
+      return 'rojo';
     }
+  }
 }
