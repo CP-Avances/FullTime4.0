@@ -76,8 +76,9 @@
                         <tr style="text-align: center;">
                             <th scope="col">Código</th>
                             <th scope="col">Descripción</th>
-                            <th scope="col">Minutos de alimentación</th>
+                            <th scope="col">Min. alimentación</th>
                             <th scope="col">Horas totales</th>
+                            <th scope="col">Tipo</th>
                             <th scope="col">Horario nocturno</th>
                             <th scope="col">Documento</th>
                             <th scope="col">Acciones</th>
@@ -96,6 +97,7 @@
                             <td></td>
                             <td></td>
                             <td></td>
+                            <td></td>
                             <td>
                                 <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
                                     matTooltip="Búsqueda de horario por el nombre.">
@@ -109,6 +111,7 @@
                             <td>{{horario.nombre}}</td>
                             <td>{{horario.min_almuerzo}}</td>
                             <td>{{horario.hora_trabajo}}</td>
+                            <td>{{horario.default_tipo}}</td>
                             <td *ngIf="horario.nocturno == true">Sí</td>
                             <td *ngIf="horario.nocturno == false">No</td>
                             <td *ngIf="horario.documento == null"></td>

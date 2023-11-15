@@ -85,6 +85,25 @@ export class VerHorarioDetalleComponent implements OnInit {
     this.datosHorario = [];
     this.rest.BuscarUnHorario(id_horario).subscribe(data => {
       this.datosHorario = data;
+      this.ColocarTipo();
+    })
+  }
+
+  // METODO PARA COLOCAR TIPO DE HORARIO
+  ColocarTipo() {
+    this.datosHorario.forEach(obj => {
+      if (obj.default_ === 'N') {
+        obj.default_tipo = 'Laborable';
+      }
+      else if (obj.default_ === 'L' || obj.default_ === 'DL') {
+        obj.default_tipo = 'Libre';
+      }
+      else if (obj.default_ === 'FD' || obj.default_ === 'DFD') {
+        obj.default_tipo = 'Feriado';
+      }
+      else if (obj.default_ === 'HA' || obj.default_ === 'DHA') {
+        obj.default_tipo = 'Abierto';
+      }
     })
   }
 
@@ -446,6 +465,7 @@ export class VerHorarioDetalleComponent implements OnInit {
   ActualizarHorario(id: any, horasT: any, mensaje: boolean) {
     this.rest.ActualizarHorasTrabaja(id, { hora_trabajo: horasT }).subscribe(res => {
       this.datosHorario = res;
+      this.ColocarTipo();
       if (mensaje === true) {
         this.toastr.success('Horas totales de trabajo son correctas.', 'Verificación exitosa.', {
           timeOut: 6000

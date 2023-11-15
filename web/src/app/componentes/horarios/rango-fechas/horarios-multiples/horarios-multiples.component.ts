@@ -168,10 +168,10 @@ export class HorariosMultiplesComponent implements OnInit {
           }]
           hor.detalles = datos_horario[0];
           // SE VERIFICA QUE LOS HORARIOS SEAN NORMALES
-          if (hor.default === 'L' || hor.default === 'FD') {
+          if (hor.default_ === 'DL' || hor.default_ === 'DFD') {
             this.vista_descanso = this.vista_descanso.concat(datos_horario);
             let descanso = {
-              tipo: hor.default,
+              tipo: hor.default_,
               id_horario: hor.id,
               detalle: this.detalles_horarios
             }
@@ -425,7 +425,7 @@ export class HorariosMultiplesComponent implements OnInit {
     this.cont3 = 0;
 
     correctos.map(dh => {
-      console.log('dh ************************* ', dh)
+      //console.log('dh ************************* ', dh)
       // METODO PARA LECTURA DE HORARIOS DE EMPLEADO
       this.horariosEmpleado = [];
       let fechas = {
@@ -434,8 +434,7 @@ export class HorariosMultiplesComponent implements OnInit {
       };
 
       this.rest.VerificarHorariosExistentes(dh.codigo, fechas).subscribe(existe => {
-        console.log('existe ', existe)
-
+        //console.log('existe ', existe)
         this.suma = '00:00:00';
         this.sumHoras = '00:00:00';
         this.cont3 = this.cont3 + 1;
@@ -444,7 +443,7 @@ export class HorariosMultiplesComponent implements OnInit {
 
         this.horariosEmpleado.map(h => {
           // SUMA DE HORAS DE CADA UNO DE LOS HORARIOS DEL EMPLEADO
-          if (h.default != 'L' && h.default != 'FD') {
+          if (h.default_ != 'DL' && h.default_ != 'DFD') {
             this.suma = this.SumarHoras(this.suma, h.hora_trabajo);
           }
         })
@@ -459,7 +458,6 @@ export class HorariosMultiplesComponent implements OnInit {
         // LIMPIAR EXISTENCIAS
         this.horariosEmpleado = [];
         //console.log('ver verificador existe ', verificador)
-
         if (verificador === 2) {
           dh.observacion = 'No es posible registrar horarios con rangos de tiempo similares.';
           dh.nota = '';
@@ -557,7 +555,7 @@ export class HorariosMultiplesComponent implements OnInit {
   // METODO PARA VERIFICAR QUE NO EXISTAN HORARIOS DENTRO DE LOS MISMOS RANGOS
   feriados_eliminar: any = [];
   VerificarHorarioRangos(ingresado: any) {
-    console.log('existentes ', this.horariosEmpleado)
+    //console.log('existentes ', this.horariosEmpleado)
     //console.log('horarios ', this.horarios)
     //console.log('seleccionado ', ingresado)
 
@@ -571,7 +569,7 @@ export class HorariosMultiplesComponent implements OnInit {
 
           //console.log('ver horario ', this.horarios[j])
 
-          if (this.horarios[j].default === 'N' || this.horarios[j].default === 'HA') {
+          if (this.horarios[j].default_ === 'N' || this.horarios[j].default_ === 'DHA' || this.horarios[j].default_ === 'L' || this.horarios[j].default_ === 'FD') {
 
             if (this.horarios[j].detalles.segundo_dia === false && ingresado.detalles.segundo_dia === false) {
               if (this.horarios[j].detalles.salida < ingresado.detalles.entrada) {
@@ -671,7 +669,7 @@ export class HorariosMultiplesComponent implements OnInit {
   // METODO PARA CREAR LA DATA QUE SE VA A INSERTAR EN LA BASE DE DATOS
   validos: number = 0;
   CrearData(form: any) {
-    console.log('ver datos validos ', this.usuarios_validos)
+    //console.log('ver datos validos ', this.usuarios_validos)
     this.plan_general = [];
     this.validos = 0;
     this.usuarios_validos.map(obj => {
@@ -725,6 +723,15 @@ export class HorariosMultiplesComponent implements OnInit {
   finDate: any;
   plan_general: any = [];
   CrearPlanGeneral(form: any, dh: any, validos: number) {
+
+    // CONSULTAR HORARIO
+    const [obj_res] = this.horarios.filter(o => {
+      return o.id === parseInt(form.horarioForm)
+    })
+
+    if (!obj_res) return this.toastr.warning('Horario no válido.');
+    const { default_ } = obj_res;
+
     //console.log('dh  --------------------------------- ', dh)
     this.fechasHorario = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO 
     this.inicioDate = moment(form.fechaInicioForm).format('YYYY-MM-DD');
@@ -740,11 +747,11 @@ export class HorariosMultiplesComponent implements OnInit {
     var tipo: any = null;
     var origen: string = '';
     var tipo_dia: string = '';
-    this.fechasHorario.map(obj => {
 
+    this.fechasHorario.map(obj => {
       // DEFINICION DE TIPO DE DIA SEGUN HORARIO
-      tipo_dia = 'N';
-      origen = 'N';
+      tipo_dia = default_;
+      origen = default_;
       tipo = null;
       var day = moment(obj).day();
       if (moment.weekdays(day) === 'lunes') {
@@ -796,13 +803,22 @@ export class HorariosMultiplesComponent implements OnInit {
           origen = 'L';
         }
       }
-      // BUSCAR FERIADOS 
-      if (this.feriados.length != 0) {
-        for (let i = 0; i < this.feriados.length; i++) {
-          if (moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
-            tipo = 'FD';
-            tipo_dia = 'FD';
-            break;
+      //console.log('ver tipo dia default -------- ', default_)
+      if (default_ === 'FD' || default_ === 'L') {
+        //console.log('ingresa fd ')
+        tipo = default_;
+        tipo_dia = default_;
+        origen = 'H' + default_;
+      }
+      else {
+        // BUSCAR FERIADOS 
+        if (this.feriados.length != 0) {
+          for (let i = 0; i < this.feriados.length; i++) {
+            if (moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
+              tipo = 'DFD';
+              tipo_dia = 'DFD';
+              break;
+            }
           }
         }
       }
@@ -822,28 +838,36 @@ export class HorariosMultiplesComponent implements OnInit {
         fechaInicio: obj,
         fechaFinal: obj,
       };
-      if (tipo_dia === 'N' || tipo_dia === 'REC') {
+      //console.log('ver tipo ***** ', tipo_dia, 'origen ', origen)
+      if (tipo_dia === 'N' || tipo_dia === 'REC' || tipo_dia === 'DHA' || origen === 'HFD' || origen === 'HL') {
+        //console.log('ingresa a crear')
         this.CrearDataHorario(obj, tipo_dia, dh, origen, tipo, this.detalles);
       }
-      // EN HORRAIOS DE DESCANSO SE ELIMINA LOS REGISTROS PARA ACTUALIZARLOS
-      else if (tipo_dia === 'FD') {
+      // EN HORARIOS DE DESCANSO SE ELIMINA LOS REGISTROS PARA ACTUALIZARLOS
+      else if (tipo_dia === 'DFD') {
         this.rest.VerificarHorariosExistentes(dh.codigo, fechas).subscribe(existe => {
           //console.log('ver existe ----------------------------- ', existe)
           this.EliminarRegistrosH(existe, obj, dh);
         });
         this.lista_descanso.forEach(desc => {
-          if (desc.tipo === 'FD') {
+          if (desc.tipo === 'DFD') {
+            tipo = 'FD';
+            tipo_dia = 'FD';
+            origen = 'FD';
             this.CrearDataHorario(obj, tipo_dia, dh, origen, tipo, desc.detalle);
           }
         })
       }
-      else if (tipo_dia === 'L') {
+      else if (tipo_dia === 'L' && origen === 'L') {
         this.rest.VerificarHorariosExistentes(dh.codigo, fechas).subscribe(existe => {
           //console.log('ver existe ----------------------------- ', existe)
           this.EliminarRegistrosH(existe, obj, dh);
         });
         this.lista_descanso.forEach(desc => {
-          if (desc.tipo === 'L') {
+          if (desc.tipo === 'DL') {
+            tipo = 'L';
+            tipo_dia = 'L';
+            origen = 'L';
             this.CrearDataHorario(obj, tipo_dia, dh, origen, tipo, desc.detalle);
           }
         })
@@ -859,7 +883,7 @@ export class HorariosMultiplesComponent implements OnInit {
   EliminarRegistrosH(existe: any, obj: any, dh: any) {
     existe.forEach(h => {
       //console.log(' ver valor h ..... ', h)
-      if (h.default === 'N') {
+      if (h.default_ === 'N' || h.default_ === 'DHA' || h.default_ === 'L' || h.default_ === 'FD') {
         let plan_fecha = {
           codigo: dh.codigo,
           fec_final: obj,
@@ -944,6 +968,7 @@ export class HorariosMultiplesComponent implements OnInit {
         // ALMACENAMIENTO DE PLANIFICACION GENERAL
         this.plan_general = this.plan_general.concat(plan);
       })
+      console.log('ver datos de plan_general ', this.plan_general)
     }
   }
 
@@ -1027,10 +1052,9 @@ export class HorariosMultiplesComponent implements OnInit {
 
   // METODO PARA REGISTRAR PLANIFICACION
   GuardarInformacion() {
-    console.log('plan general ', this.plan_general)
+    //console.log('plan general ', this.plan_general)
     this.restP.CrearPlanGeneral(this.plan_general).subscribe(res => {
-      console.log('respuesta ', res)
-
+      //console.log('respuesta ****** ', res)
       if (res.message === 'OK') {
         this.progreso = false;
         this.cargar = true;
@@ -1039,7 +1063,6 @@ export class HorariosMultiplesComponent implements OnInit {
           'Operación exitosa.', 'Se asignó la planificación horaria a ' + this.usuarios_validos.length + ' colaboradores.', {
           timeOut: 6000,
         })
-        //this.CerrarTabla();
       }
       else {
         this.progreso = false;
@@ -1050,7 +1073,6 @@ export class HorariosMultiplesComponent implements OnInit {
       }
     })
   }
-
 
   // METODO PARA CARGAR TIMBRES
   CargarTimbres(form: any) {
@@ -1072,7 +1094,7 @@ export class HorariosMultiplesComponent implements OnInit {
     };
 
     this.timbrar.BuscarTimbresPlanificacion(usuarios).subscribe(datos => {
-      console.log('datos ', datos)
+      //console.log('datos ', datos)
       if (datos.message === 'vacio') {
         this.toastr.info(
           'No se han encontrado registros de marcaciones.', '', {
@@ -1176,7 +1198,7 @@ export class HorariosMultiplesComponent implements OnInit {
         }
         else {
           this.lista_descanso.forEach(obj => {
-            if (obj.tipo === 'L') {
+            if (obj.tipo === 'DL') {
               data_eliminar = [{
                 id: obj.id_horario,
               }]
@@ -1184,7 +1206,7 @@ export class HorariosMultiplesComponent implements OnInit {
             }
           })
           this.lista_descanso.forEach(obj => {
-            if (obj.tipo === 'FD') {
+            if (obj.tipo === 'DFD') {
               data_eliminar = [{
                 id: obj.id_horario,
               }]
@@ -1318,7 +1340,7 @@ export class HorariosMultiplesComponent implements OnInit {
           //console.log('datos e ----------------------------- ', e)
           //console.log('suma  ----------------------------- ', suma)
           verificar = verificar + 1;
-          if (e.default === 'N') {
+          if (e.default_ === 'N' || e.default_ === 'DHA' || e.default_ === 'L' || e.default_ === 'FD') {
             suma = suma + 1;
             d.existencias = suma;
           }
@@ -1336,7 +1358,6 @@ export class HorariosMultiplesComponent implements OnInit {
         this.ConfirmarEliminacion(contador, datos, form, opcion);
       });
     })
-
   }
 
   // METODO PARA CONFIRMAR ELIMINACION
@@ -1346,4 +1367,5 @@ export class HorariosMultiplesComponent implements OnInit {
       this.EliminarPlanificacion(form, datos, opcion);
     }
   }
+
 }

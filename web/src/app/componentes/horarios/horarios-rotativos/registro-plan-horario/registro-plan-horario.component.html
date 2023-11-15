@@ -239,16 +239,16 @@
                 <div class="bordes" *ngFor="let d of fechas_mes; index as i"
                     [ngStyle]="{'background-color':CambiarColores('1')}">
 
-                    <mat-icon *ngIf="ver_icono === true && d.tipo_dia != 'FD'" class="float-left" id="seleccionar"
+                    <mat-icon *ngIf="ver_icono === true" class="float-left" id="seleccionar"
                         (click)="IngresarHorario(i)">
                         add_circle
                     </mat-icon>
 
-                    <mat-icon class="center" *ngIf="d.tipo_dia != 'FD'" id="libre" (click)="IngresarLibre(i)">
+                    <mat-icon class="center" *ngIf="d.tipo_dia_origen != 'DFD'" id="libre" (click)="IngresarLibre(i)">
                         work_off
                     </mat-icon>
 
-                    <mat-icon *ngIf="ver_icono === true && d.tipo_dia != 'FD' && d.tipo_dia != 'L'" class="float-right"
+                    <mat-icon *ngIf="ver_icono === true && d.tipo_dia_origen != 'DL'" class="float-right"
                         id="seleccionar" (click)="EliminarHorario(i)">
                         delete_forever
                     </mat-icon>
@@ -283,19 +283,20 @@
 
                     <span class="fuente" *ngFor="let h of d.horarios">
                         <div>
-                            <b style="color: blue;" *ngIf="d.tipo_dia === 'N'"
+                            <b style="color: blue;"
+                                *ngIf="(d.tipo_dia === 'N' || d.tipo_dia === 'FD' || d.tipo_dia === 'L') && d.tipo_dia_origen != 'DFD' && d.tipo_dia_origen != 'DL'"
                                 [ngStyle]="{'text-decoration':EstiloSubrayado(h.verificar)}">
                                 <span class="fuente_pequeño">({{h.hora_trabajo}})</span>
                                 {{h.horario}}
                             </b>
                         </div>
 
-                        <div *ngIf="d.tipo_dia === 'L'">
+                        <div *ngIf="d.tipo_dia_origen === 'DL'">
                             <span class="fuente" style="color:green"><b>DIA LIBRE</b></span>
                         </div>
 
                         <div>
-                            <b style="color: blue;" *ngIf="d.tipo_dia === 'FD' || d.tipo_dia === 'L'">
+                            <b style="color: blue;" *ngIf="d.tipo_dia_origen === 'DFD' || d.tipo_dia_origen === 'DL'">
                                 <span class="fuente_pequeño">({{h.hora_trabajo}})</span>
                                 {{h.horario}}
                             </b>

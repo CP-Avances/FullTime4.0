@@ -143,10 +143,10 @@ export class RegistroPlanHorarioComponent implements OnInit {
 
           hor.detalles = datos_horario[0];
 
-          if (hor.default === 'L' || hor.default === 'FD') {
+          if (hor.default_ === 'DL' || hor.default_ === 'DFD') {
             this.vista_descanso = this.vista_descanso.concat(datos_horario);
             let descanso = {
-              tipo: hor.default,
+              tipo: hor.default_,
               id_horario: hor.id,
               detalle: this.detalles_horarios
             }
@@ -239,6 +239,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
   // METODO PARA SELECCIONAR TIPO DE BUSQUEDA
   GenerarCalendario() {
     this.ver_horario = true;
+    this.cargar = false;
     this.ControlarBotones(true, false);
 
     if (this.fechaInicialF.value != null && this.fechaFinalF.value != null) {
@@ -255,6 +256,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
   fechas_mes: any = [];
   dia_inicio: any;
   dia_fin: any;
+  hora_feriado: boolean = false;
   ListarFechas(fecha_inicio: any, fecha_final: any) {
     this.fechas_mes = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO 
 
@@ -278,6 +280,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
         horarios_existentes: '',
         supera_jornada: '',
         horas_superadas: '',
+        tipo_dia_origen: '-', // TRATAMIENTO LIBRES Y FERIADOS
       }
       this.fechas_mes.push(fechas);
       var newDate = moment(this.dia_inicio).add(1, 'd').format('YYYY-MM-DD')
@@ -296,9 +299,10 @@ export class RegistroPlanHorarioComponent implements OnInit {
             obj.tipo_dia = 'FD';
             obj.estado = true;
             obj.observacion = 'FERIADO*';
-
+            obj.tipo_dia_origen = 'DFD';
+            this.hora_feriado = true;
             const [datoHorario] = this.horarios.filter(o => {
-              return o.default === 'FD';
+              return o.default_ === 'DFD';
             })
             let data = [{
               horario: datoHorario.codigo,
@@ -334,11 +338,10 @@ export class RegistroPlanHorarioComponent implements OnInit {
         obj.registrados = existe;
 
         if (existe.length === 1) {
-          if (existe[0].default === 'L') {
+          if (existe[0].default_ === 'DL') {
             obj.estado = false;
           }
         }
-
       }, error => {
         obj.horarios_existentes = '';
       });
@@ -350,30 +353,6 @@ export class RegistroPlanHorarioComponent implements OnInit {
   CambiarColores(opcion: any) {
     let color: string;
     switch (opcion) {
-      case 'ENERO':
-        return color = '#FFC7A3';
-      case 'FEBRERO':
-        return color = '#CAFFA9';
-      case 'MARZO':
-        return color = '#FEEEA9';
-      case 'ABRIL':
-        return color = '#AFDDE9';
-      case 'MAYO':
-        return color = '#F2B8FF';
-      case 'JUNIO':
-        return color = '#FFFF97';
-      case 'JULIO':
-        return color = '#FE9594';
-      case 'AGOSTO':
-        return color = '#CCAAFE';
-      case 'SEPTIEMBRE':
-        return color = '#80E7FF';
-      case 'OCTUBRE':
-        return color = '#FDD6F6';
-      case 'NOVIEMBRE':
-        return color = '#E9C6B0';
-      case 'DICIEMBRE':
-        return color = '#C9E9B0';
       case 'OK':
         return color = '#115703';
       case 'Horario ya existe.':
@@ -403,7 +382,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
   ver_icono: boolean = false;
   SeleccionarHorario() {
     this.ver_icono = true;
-    this.valor = this.horarioF.value
+    this.valor = this.horarioF.value;
   }
 
   // METODO PARA VALIDAR SELECCION DE HORARIO
@@ -520,7 +499,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
     const [datoHorario] = this.horarios.filter(o => {
       return o.codigo === this.horarioF.value
     })
-
+    //console.log('ver horario ', datoHorario)
     let data = {
       horario: this.horarioF.value,
       detalles: datoHorario.detalles,
@@ -529,7 +508,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
     }
 
     if (this.fechas_mes[index].registrados.length === 1) {
-      if (this.fechas_mes[index].registrados[0].default === 'L') {
+      if (this.fechas_mes[index].registrados[0].default_ === 'DL' || this.fechas_mes[index].registrados[0].default_ === 'DFD') {
         let eliminar = {
           fecha: this.fechas_mes[index].fecha,
           id_horarios: this.fechas_mes[index].registrados[0].id_horario,
@@ -539,62 +518,73 @@ export class RegistroPlanHorarioComponent implements OnInit {
       }
     }
 
-    ///console.log('tipo dia ', this.fechas_mes[index].tipo_dia, ' observa ', this.fechas_mes[index].observacion)
+    //console.log('tipo dia ', this.fechas_mes[index].tipo_dia, ' observa ', this.fechas_mes[index].observacion, ' registrados ', this.fechas_mes[index].registrados)
     //console.log('fechas mes ', this.fechas_mes[index], 'ver data horario ', data.detalles.segundo_dia)
-    if (this.fechas_mes[index].tipo_dia === 'L') {
+    //console.log('tipo dia origen', this.fechas_mes[index].tipo_dia_origen)
+    if (this.fechas_mes[index].tipo_dia_origen === 'DL') {
       this.EliminarLibre(index)
     }
 
+    //console.log('horarios ', this.fechas_mes[index].horarios)
     for (let i = 0; i < this.fechas_mes[index].horarios.length; i++) {
-      if (this.fechas_mes[index].horarios[i].horario === this.horarioF.value) {
-        verificador = 1;
-        break
+
+      if (this.fechas_mes[index].horarios[i].horario != 'DEFAULT-FERIADO') {
+        if (this.fechas_mes[index].horarios[i].horario === this.horarioF.value) {
+          verificador = 1;
+          break
+        }
+        else {
+          if (this.fechas_mes[index].horarios[i].detalles.segundo_dia === false && data.detalles.segundo_dia === false) {
+            if (this.fechas_mes[index].horarios[i].detalles.salida < data.detalles.entrada) {
+              verificador = 0;
+            }
+            else if (this.fechas_mes[index].horarios[i].detalles.entrada > data.detalles.salida) {
+              verificador = 0
+            }
+            else {
+              verificador = 2;
+              break;
+            }
+          }
+          else if (this.fechas_mes[index].horarios[i].detalles.segundo_dia === true && data.detalles.segundo_dia === true) {
+            verificador = 2;
+            break;
+          }
+          else if (this.fechas_mes[index].horarios[i].detalles.segundo_dia === false && data.detalles.segundo_dia === true) {
+            if (this.fechas_mes[index].horarios[i].detalles.entrada > data.detalles.salida
+              && this.fechas_mes[index].horarios[i].detalles.salida > data.detalles.salida
+              && this.fechas_mes[index].horarios[i].detalles.salida < data.detalles.entrada) {
+              verificador = 0;
+            }
+            else {
+              verificador = 2;
+              break;
+            }
+          }
+          else if (this.fechas_mes[index].horarios[i].detalles.segundo_dia === true && data.detalles.segundo_dia === false) {
+            if (this.fechas_mes[index].horarios[i].detalles.salida < data.detalles.entrada
+              && this.fechas_mes[index].horarios[i].detalles.salida < data.detalles.salida
+              && this.fechas_mes[index].horarios[i].detalles.entrada > data.detalles.salida) {
+              verificador = 0;
+            }
+            else {
+              verificador = 2;
+              break;
+            }
+          }
+        }
       }
       else {
-        if (this.fechas_mes[index].horarios[i].detalles.segundo_dia === false && data.detalles.segundo_dia === false) {
-          if (this.fechas_mes[index].horarios[i].detalles.salida < data.detalles.entrada) {
-            verificador = 0;
-          }
-          else if (this.fechas_mes[index].horarios[i].detalles.entrada > data.detalles.salida) {
-            verificador = 0
-          }
-          else {
-            verificador = 2;
-            break;
-          }
-        }
-        else if (this.fechas_mes[index].horarios[i].detalles.segundo_dia === true && data.detalles.segundo_dia === true) {
-          verificador = 2;
-          break;
-        }
-        else if (this.fechas_mes[index].horarios[i].detalles.segundo_dia === false && data.detalles.segundo_dia === true) {
-          if (this.fechas_mes[index].horarios[i].detalles.entrada > data.detalles.salida
-            && this.fechas_mes[index].horarios[i].detalles.salida > data.detalles.salida
-            && this.fechas_mes[index].horarios[i].detalles.salida < data.detalles.entrada) {
-            verificador = 0;
-          }
-          else {
-            verificador = 2;
-            break;
-          }
-        }
-        else if (this.fechas_mes[index].horarios[i].detalles.segundo_dia === true && data.detalles.segundo_dia === false) {
-          if (this.fechas_mes[index].horarios[i].detalles.salida < data.detalles.entrada
-            && this.fechas_mes[index].horarios[i].detalles.salida < data.detalles.salida
-            && this.fechas_mes[index].horarios[i].detalles.entrada > data.detalles.salida) {
-            verificador = 0;
-          }
-          else {
-            verificador = 2;
-            break;
-          }
-        }
+        verificador = 0;
+        this.fechas_mes[index].horarios.splice(i, 1);
       }
     }
 
+    // console.log('ver data ', this.fechas_mes[index])
     if (verificador === 0) {
       this.fechas_mes[index].estado = true;
-      this.fechas_mes[index].tipo_dia = 'N';
+      this.fechas_mes[index].tipo_dia = datoHorario.default_;
+      this.fechas_mes[index].tipo_dia_origen = datoHorario.default_;
       this.fechas_mes[index].horarios = this.fechas_mes[index].horarios.concat(data);
     }
     else if (verificador === 1) {
@@ -607,8 +597,6 @@ export class RegistroPlanHorarioComponent implements OnInit {
         timeOut: 6000,
       });
     }
-
-
   }
 
   // METODO PARA INGRESAR HORARIO
@@ -617,7 +605,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
     this.ControlarBotones(true, false);
 
     const [datoHorario] = this.horarios.filter(o => {
-      return o.default === 'L';
+      return o.default_ === 'DL';
     })
 
     let data = [{
@@ -627,11 +615,9 @@ export class RegistroPlanHorarioComponent implements OnInit {
       hora_trabajo: datoHorario.hora_trabajo,
       verificar: '',
     }]
-
     //console.log('ver libre ', this.fechas_mes[index], 'data ', data)
-
     if (this.fechas_mes[index].registrados.length === 1) {
-      if (this.fechas_mes[index].registrados[0].default === 'L') {
+      if (this.fechas_mes[index].registrados[0].default_ === 'DL') {
         this.toastr.info('Ya se encuentra registrado como día de descanso.', 'Ups!!! VERIFICAR.', {
           timeOut: 6000,
         });
@@ -652,7 +638,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
     }
 
     if (verificador === 1) {
-      if (this.fechas_mes[index].tipo_dia === 'L') {
+      if (this.fechas_mes[index].tipo_dia_origen === 'DL') {
         this.EliminarLibre(index)
       }
       else {
@@ -660,6 +646,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
         this.fechas_mes[index].horarios_existentes = '';
         this.fechas_mes[index].estado = true;
         this.fechas_mes[index].tipo_dia = 'L';
+        this.fechas_mes[index].tipo_dia_origen = 'DL';
         this.fechas_mes[index].horarios = this.fechas_mes[index].horarios.concat(data);
         //console.log('ver libre------- ', this.fechas_mes[index])
       }
@@ -693,8 +680,9 @@ export class RegistroPlanHorarioComponent implements OnInit {
     this.ControlarBotones(true, false);
 
     for (let i = 0; i < this.fechas_mes[index].horarios.length; i++) {
-      if (this.fechas_mes[index].tipo_dia === 'L') {
+      if (this.fechas_mes[index].tipo_dia_origen === 'DL') {
         this.fechas_mes[index].tipo_dia = '-';
+        this.fechas_mes[index].tipo_dia_origen = '-';
         this.fechas_mes[index].estado = false;
         this.fechas_mes[index].horarios.splice(i, 1);
         break
@@ -722,7 +710,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
 
     //console.log('verificador ', verificador);
     if (verificador > 0) {
-      //console.log('ingresa ver datos seleccionados ', this.data_horarios)
+      console.log('ingresa ver datos seleccionados ', this.data_horarios)
       this.VerificarContrato(opcion);
     }
     else {
@@ -867,10 +855,10 @@ export class RegistroPlanHorarioComponent implements OnInit {
         iterar3 = iterar3 + 1;
         obj.registrados.map(h => {
           horario2 = horario2 + 1;
-          console.log('h ', h)
+          //console.log('h ', h)
           //console.log('hora trabajo  ---- ', h.hora_trabajo)
           // SUMA DE HORAS DE CADA UNO DE LOS HORARIOS DEL EMPLEADO
-          if (h.default != 'L') {
+          if (h.default_ != 'DL' && h.default_ != 'DFD') {
             suma2 = this.SumarHoras(suma2, h.hora_trabajo);
           }
           //console.log('horario 2 ---- ', horario2, ' original ', obj.registrados.length)
@@ -888,8 +876,9 @@ export class RegistroPlanHorarioComponent implements OnInit {
     if (iterar3 === this.data_horarios.length) {
       this.data_horarios.forEach(obj => {
         this.leer_horario2 = this.leer_horario2 + 1;
-        if (obj.tipo_dia != 'L' && obj.tipo_dia != 'FD') {
-          //console.log('ver valor ', obj.horas_registradas, obj.horas_seleccionadas)
+        //console.log('ingresa  ', obj.tipo_dia_origen)
+        if (obj.tipo_dia_origen != 'DL' && obj.tipo_dia_origen != 'DFD') {
+          //console.log('ver valor ****', obj.horas_registradas, obj.horas_seleccionadas)
           let suma3 = this.SumarHoras(obj.horas_seleccionadas, obj.horas_registradas);
           if (this.StringTimeToSegundosTime(suma3) <= this.StringTimeToSegundosTime(trabajo)) {
             obj.horas_validas = 'OK';
@@ -920,7 +909,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
 
   // METODO PARA LEER DATOS VALIDOS
   LeerDatosValidos(opcion: number) {
-    //console.log('datos a verificar ', this.data_horarios)
+    //console.log('datos a verificar *****', this.data_horarios)
     let datos: any = [];
 
     this.data_horarios.forEach(valor => {
@@ -948,11 +937,9 @@ export class RegistroPlanHorarioComponent implements OnInit {
   // METODO PARA CREAR LISTA DE PLANIFICACION
   plan_general: any = [];
   CrearPlanGeneral(seleccionados: any, opcion: number) {
+
     this.plan_general = [];
     var origen: string = '';
-
-    // DEFINICION DE TIPO DE DIA SEGUN HORARIO
-    origen = 'N';
 
     if (opcion === 2) {
       if (this.lista_eliminar.length != 0) {
@@ -973,7 +960,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
 
   // METODO PARA VERIFICAR QUE NO EXISTAN HORARIOS DENTRO DE LOS MISMOS RANGOS
   VerificarHorarioRangos(existe: any, ingresados: any, tipo: any, valor: any) {
-    //console.log('existentes ', existe)
+    //console.log('existentes------ ', existe)
     //console.log('horarios ', this.horarios)
     //console.log('seleccionado ', ingresados)
     //console.log('data horarios ', this.data_horarios.length, ' data h ', this.data_horarios)
@@ -990,7 +977,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
 
     for (var i = 0; i < existe.length; i++) {
       //console.log('ver i ', i)
-      if (tipo === 'N' || tipo === 'HA') {
+      if ((tipo === 'N' || tipo === 'HA' || tipo === 'N' || tipo === 'HA') && valor.tipo_dia_origen != 'DFD' && valor.tipo_dia_origen != 'DL') {
         for (var k = 0; k < ingresados.length; k++) {
           //console.log('horarios ... ', ingresados[k].detalles.segundo_dia)
           //console.log('ver K ', k)
@@ -1143,11 +1130,11 @@ export class RegistroPlanHorarioComponent implements OnInit {
         datos = datos.concat(valor);
       }
 
-      if (valor.tipo_dia === 'L') {
+      if (valor.tipo_dia_origen === 'DL') {
         datos = datos.concat(valor);
       }
 
-      if (valor.tipo_dia === 'FD') {
+      if (valor.tipo_dia_origen === 'DFD') {
         valor.registrados.forEach(r => {
           let eliminar = {
             fecha: valor.fecha,
@@ -1241,6 +1228,28 @@ export class RegistroPlanHorarioComponent implements OnInit {
                 nocturno = 0;
               }
 
+              // SE COLOCA TIPO DE DIA ACORDE AL TIPO DE HORARIO
+              if (valor.tipo_dia_origen === 'DFD') {
+                valor.tipo_dia = 'FD';
+                origen = 'FD';
+              }
+              else if (valor.tipo_dia_origen === 'DL') {
+                valor.tipo_dia = 'L';
+                origen = 'L';
+              }
+              else if (valor.tipo_dia === 'L') {
+                valor.tipo_dia = 'L';
+                origen = 'HL';
+              }
+              else if (valor.tipo_dia === 'FD') {
+                valor.tipo_dia = 'FD';
+                origen = 'HFD';
+              }
+              else {
+                valor.tipo_dia = 'N';
+                origen = 'N';
+              }
+
               let plan = {
                 codigo: this.datoEmpleado.codigo,
                 tipo_dia: valor.tipo_dia,
@@ -1331,7 +1340,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
     };
 
     this.timbrar.BuscarTimbresPlanificacion(usuarios).subscribe(datos => {
-      console.log('datos ', datos)
+      //console.log('datos ', datos)
       if (datos.message === 'vacio') {
         this.toastr.info(
           'No se han encontrado registros de marcaciones.', '', {

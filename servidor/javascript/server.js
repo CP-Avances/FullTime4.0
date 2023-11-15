@@ -82,7 +82,7 @@ class Servidor {
         this.app = (0, express_1.default)();
         this.configuracion();
         this.rutas();
-        //this.server = require("http").createServer(this.app);
+        // this.server = require("http").createServer();
         this.server = (0, http_1.createServer)(this.app);
         this.app.use((0, cors_1.default)());
         io = require('socket.io')(this.server, {
@@ -273,3 +273,4 @@ const DesactivarEmpleado_1 = require("./libs/DesactivarEmpleado");
 (0, NotiTimbres_1.NotificacionTimbreAutomatica)();
 (0, SinTimbres_1.NotificacionSinTimbres)();
 (0, DesactivarEmpleado_1.DesactivarFinContratoEmpleado)();
+//generarTimbres('35', '2023-11-01', '2023-11-02');

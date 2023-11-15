@@ -1,98 +1,90 @@
 import pool from '../database';
-import moment from 'moment';
+import moment, { min } from 'moment';
 const FECHA_FERIADOS: any = [];
 
-export const generarTimbres = async function(id_empleado: number) {
-/*
-    // pool.query('SELECT co.id_empleado AS empleado, co.id AS contrato, ca.id AS cargo, ho.fec_inicio, ho.fec_final,' + 
-    //     'ho.lunes, ho.martes, ho.miercoles, ho.jueves, ho.viernes, ho.sabado, ho.domingo, ho.id_horarios' +
-    //     'FROM empl_contratos AS co, empl_cargos AS ca, empl_horarios AS ho' +
-    //     'WHERE co.id_empleado = $1 AND co.id = ca.id_empl_contrato AND ho.id_empl_cargo = ca.id AND ho.estado = 1',[id_empleado])
+export const generarTimbres = async function (codigo: string, inicio: string, fin: string) {
+
     let horarios = await pool.query(
-        'SELECT ho.fec_inicio, ho.fec_final, ho.lunes, ho.martes, ho.miercoles, ho.jueves, ho.viernes, ho.sabado, ho.domingo, ho.id_horarios ' +
-        'FROM empl_contratos AS co, empl_cargos AS ca, empl_horarios AS ho ' +
-        'WHERE co.id_empleado = $1 AND co.id = ca.id_empl_contrato AND ho.id_empl_cargo = ca.id AND ho.estado = 1 ORDER BY ho.fec_inicio ASC',[id_empleado])
+        `
+        SELECT pg.fec_hora_horario::date AS fecha, pg.fec_hora_horario::time AS hora, pg.tipo_dia, pg.tipo_entr_salida,
+            pg.min_alimentacion
+        FROM plan_general AS pg
+        WHERE pg.fec_horario BETWEEN $1 AND $2 AND pg.codigo = $3 AND tipo_dia = 'N'
+        ORDER BY pg.fec_hora_horario ASC
+        `
+        , [inicio, fin, codigo])
         .then(result => {
             return result.rows
         });
 
-    let Ids_horarios = [... new Set(
-            horarios.map(obj => {
-                return obj.id_horarios;
-            })
-        )]
+    horarios.forEach(async ele => {
+        let accion: string = '';
+        let observacion: string = '';
+        let latitud = '-0.928755'
+        let longitud = '-78.606327'
+        let tecla_funcion: string = '';
+        let fecha: string = '';
 
-    console.log(Ids_horarios);
-
-    let detaHorarios: any[] = await Promise.all(Ids_horarios.map(async(obj): Promise<any> => {
-        return {
-            id_horario: obj,
-            datos: await pool.query('SELECT orden, hora FROM deta_horarios WHERE id_horario = $1 ORDER BY orden, hora',[obj])
-            .then(result => {
-                return result.rows.map(obj => { return obj })
-            })
+        switch (ele.tipo_entr_salida) {
+            case 'E':
+                var hora_ = moment(ele.hora, "HH:mm:ss").subtract(moment.duration("00:10:00")).format("HH:mm:ss");
+                //console.log('ver fecha ', moment(ele.fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
+                var formato = moment(ele.fecha, 'YYYY-MM-DD').format('YYYY-MM-DD');
+                fecha = moment(formato + ' ' + hora_, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+                //console.log('ver formato ', fecha)
+                accion = 'E';
+                observacion = 'Entrada';
+                tecla_funcion = '0';
+                break;
+            case 'S':
+                var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:10:00")).format("HH:mm:ss");
+                var formato = moment(ele.fecha, 'YYYY-MM-DD').format('YYYY-MM-DD');
+                fecha = moment(formato + ' ' + hora_, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+                observacion = 'Salida';
+                tecla_funcion = '1';
+                break;
+            case 'I/A':
+                var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:10:00")).format("HH:mm:ss");
+                var formato = moment(ele.fecha, 'YYYY-MM-DD').format('YYYY-MM-DD');
+                fecha = moment(formato + ' ' + hora_, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+                accion = 'I/A';
+                observacion = 'Inicio alimentacion';
+                tecla_funcion = '2';
+                break;
+            case 'F/A':
+                var hora_ = moment(ele.hora, "HH:mm:ss").subtract(moment.duration("01:30:00")).format("HH:mm:ss");
+                console.log('hora ', hora_)
+                var formato = moment(ele.fecha, 'YYYY-MM-DD').format('YYYY-MM-DD');
+                fecha = moment(formato + ' ' + hora_, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
+                accion = 'F/A';
+                observacion = 'Fin alimentacion';
+                tecla_funcion = '3';
+                break;
+            default:
+                break;
         }
-    }))
-    detaHorarios.forEach(obj => {
-        console.log(obj);
+
+        console.log('fecha ', fecha)
+        await pool.query(
+            `
+            INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, 
+                codigo, id_reloj, fec_hora_timbre_servidor)
+            values($1, $2, $3, $4, $5, $6, $7, $8, $9)         
+            `
+            , [fecha, accion, tecla_funcion, observacion, latitud, longitud, codigo, 3, fecha]
+        )
     })
-    let arregloTotal: any = [];
 
-    horarios.forEach(obj => {
-        DiasByEstado(obj).forEach(ele => {
-            arregloTotal.push(ele)
-        });
-    })
+    /*
+        `
+            INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, 
+                codigo, id_reloj, fec_hora_timbre_servidor)
+            values($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            `
+            , [fecha, accion, tecla_funcion, observacion, latitud, longitud, codigo, 3, fecha]
 
-    arregloTotal.forEach((obj:any) => {
-        detaHorarios.forEach(ele => {
-            if (ele.id_horario === obj.id_horario) {
-                ele.datos.forEach(async(itera:any) => {
-                    let fecha = obj.fecha + 'T' + '00:00:00'
-                    var f = new Date(fecha)
-                    var min_aleatoria = Math.floor((Math.random() * 59) + 0)
-                    
-                    f.setUTCHours(itera.hora.split(':')[0])
-                    f.setUTCMinutes(min_aleatoria)
-
-                    let accion: string;
-                    let observacion: string;
-                    let latitud = '-0.928755'
-                    let longitud =  '-78.606327'
-                    let tecla_funcion: number;
-                    switch (itera.orden) {
-                        case 1:
-                            f.setUTCHours(f.getUTCHours() - 1)
-                            accion = 'EoS';
-                            observacion = 'Entrada';
-                            tecla_funcion = 0;
-                            break;
-                        case 2:
-                            accion = 'AES';                            
-                            observacion = 'Salida Almuerzo';
-                            tecla_funcion = 1;
-                            break;
-                        case 3:
-                            accion = 'AES';
-                            observacion = 'Entrada Almuerzo';
-                            tecla_funcion = 1;
-                            break;
-                        default: //es orden 4
-                            accion = 'EoS';
-                            observacion = 'Salida';
-                            tecla_funcion = 0;
-                            break;
-                    }
-                    console.log('accion:', accion,f.toJSON());
-
-                    await pool.query('INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, id_empleado, id_reloj)' +
-                    'values($1,$2,$3,$4,$5,$6,$7,$8)', [f.toJSON(), accion, tecla_funcion , observacion, latitud, longitud, id_empleado, 3])
-                });
-            }
-        })
-    });
-    
     */
+
 
 }
 
@@ -110,11 +102,11 @@ function DiasByEstado(horario: any) {
     var fec_aux = new Date(horario.fec_inicio)
     let respuesta = [];
     for (let i = 0; i <= diasHorario; i++) {
-        let horario_res =  fechaIterada(fec_aux, horario);
+        let horario_res = fechaIterada(fec_aux, horario);
         respuesta.push(horario_res)
         fec_aux.setDate(fec_aux.getDate() + 1)
     }
-    return respuesta.filter(ele => { return ele.estado === false})
+    return respuesta.filter(ele => { return ele.estado === false })
 }
 
 /**
@@ -122,7 +114,7 @@ function DiasByEstado(horario: any) {
  * @param fechaIterada Fecha asignada por el ciclo for 
  * @param horario es el ultimo horario del empleado.
  */
-function fechaIterada(fechaIterada: Date, horario: any){
+function fechaIterada(fechaIterada: Date, horario: any) {
     let est;
     if (fechaIterada.getDay() === 0) {
         est = horario.domingo
@@ -138,7 +130,7 @@ function fechaIterada(fechaIterada: Date, horario: any){
         est = horario.viernes
     } else if (fechaIterada.getDay() === 6) {
         est = horario.sabado
-    } 
+    }
 
     return {
         fecha: fechaIterada.toJSON().split('T')[0],
@@ -147,32 +139,32 @@ function fechaIterada(fechaIterada: Date, horario: any){
     }
 }
 
-export const EliminarTimbres = async function(id_empleado: number) {
+export const EliminarTimbres = async function (id_empleado: number) {
 
-    await pool.query('DELETE FROM timbres WHERE codigo = $1',[id_empleado])
-    .then(result => {
-        console.log(result.command);
-    });
+    await pool.query('DELETE FROM timbres WHERE codigo = $1', [id_empleado])
+        .then(result => {
+            console.log(result.command);
+        });
 
 }
 
-export const ModificarTimbresEntrada = async function() {
+export const ModificarTimbresEntrada = async function () {
     let arrayRespuesta = await pool.query('select id, CAST(fec_hora_timbre as VARCHAR) from timbres where accion like \'E\' order by fec_hora_timbre, codigo ASC')
-    .then(result => {
-        console.log(result.rowCount);
-        
-        return result.rows.filter(obj => {
-            var minuto: number = obj.fec_hora_timbre.split(' ')[1].split(':')[1];            
-            return (minuto >= 0 && minuto <= 35 )
+        .then(result => {
+            console.log(result.rowCount);
+
+            return result.rows.filter(obj => {
+                var minuto: number = obj.fec_hora_timbre.split(' ')[1].split(':')[1];
+                return (minuto >= 0 && minuto <= 35)
+            });
         });
-    });
     console.log(arrayRespuesta.length);
-    
-    arrayRespuesta.forEach(async(obj) => {
+
+    arrayRespuesta.forEach(async (obj) => {
         var hora: number = parseInt(obj.fec_hora_timbre.split(' ')[1].split(':')[0]) + 1;
         var minuto: number = obj.fec_hora_timbre.split(' ')[1].split(':')[1];
         var f = new Date(obj.fec_hora_timbre.split(' ')[0]);
-        
+
         // console.log(f.toJSON());
         f.setUTCHours(hora);
         f.setUTCMinutes(minuto);

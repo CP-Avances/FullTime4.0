@@ -71,7 +71,7 @@ export class EditarPlanificacionComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log('ver rotativo ', this.datos_horarios)
+    //console.log('ver rotativo ', this.datos_horarios)
     this.BuscarHora();
     this.BuscarFeriados();
   }
@@ -165,7 +165,7 @@ export class EditarPlanificacionComponent implements OnInit {
             tercer_dia: this.tercer_dia,
           }]
           hor.detalles = datos_horario[0];
-          if (hor.default === 'L' || hor.default === 'FD') {
+          if (hor.default_ === 'DL' || hor.default === 'DFD') {
             this.vista_descanso = this.vista_descanso.concat(datos_horario);
           }
           else {
@@ -196,6 +196,7 @@ export class EditarPlanificacionComponent implements OnInit {
     this.dia_fecha = (moment(fecha_, 'YYYY/MM/DD').format('MMMM, ddd DD, YYYY')).toUpperCase();
 
     for (var i = 0; i < total; i++) {
+      // HORARIOS LIBRE Y FERIADO PROPIOS DEL SISTEMA
       if ((this.datos_horarios.datosPlan.split(',')[i]).trim() === 'L' ||
         (this.datos_horarios.datosPlan.split(',')[i]).trim() === 'FD') {
         this.BuscarPlanificacion((this.datos_horarios.datosPlan.split(',')[i]).trim());
@@ -219,15 +220,15 @@ export class EditarPlanificacionComponent implements OnInit {
     }
 
     if (this.feriados.length) {
-      console.log('existen feriados', this.feriados);
-      this.seleccionar_horario = false;
+      //console.log('existen feriados', this.feriados);
       this.seleccionar_libre = false;
       this.ver_feriado = true;
       this.ver_nota = true;
       this.notas1 = 'DÍA CONFIGURADO EN EL SISTEMA COMO FERIADO.';
       this.nota_ = 'feriado';
     }
-    console.log('ver horarios asignados ', this.horas)
+
+    //console.log('ver horarios asignados ', this.horas)
 
     this.BuscarPlanificacionAntes();
     this.BuscarPlanificacionDespues();
@@ -237,6 +238,7 @@ export class EditarPlanificacionComponent implements OnInit {
   lista_libres: any = [];
   lista_feriados: any = [];
   BuscarPlanificacion(tipo: string) {
+    //console.log('ver tipo ', tipo)
     if (tipo === 'L') {
       this.tipo_dia_verificar = 'L';
     }
@@ -295,14 +297,14 @@ export class EditarPlanificacionComponent implements OnInit {
       codigo: '\'' + this.datos_horarios.codigo + '\''
     }
     this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
-      console.log('ver datos horarios antes', datos)
+      //console.log('ver datos horarios antes', datos)
       if (datos.message === 'OK') {
         for (var j = 0; j < this.horarios.length; j++) {
           for (var k = 0; k < datos.data.length; k++) {
             // COMPARAR HORARIOS (SE RETIRA ESPACIOS)
             if (this.horarios[j].id === datos.data[k].id_horario) {
               if (this.horarios[j].detalles.segundo_dia) {
-                console.log('detalles ', this.horarios[j].detalles.segundo_dia)
+                //console.log('detalles ', this.horarios[j].detalles.segundo_dia)
                 if (this.horarios[j].detalles.segundo_dia === true) {
                   let data = {
                     horarios: this.horarios[j].detalles,
@@ -315,7 +317,7 @@ export class EditarPlanificacionComponent implements OnInit {
           }
         }
       }
-      console.log('antes ', this.antes);
+      //console.log('antes ', this.antes);
     })
   }
 
@@ -333,7 +335,7 @@ export class EditarPlanificacionComponent implements OnInit {
       codigo: '\'' + this.datos_horarios.codigo + '\''
     }
     this.restP.BuscarHorariosUsuario(busqueda).subscribe(datos => {
-      console.log('ver datos horarios despues', datos)
+      //console.log('ver datos horarios despues', datos)
       if (datos.message === 'OK') {
         for (var j = 0; j < this.horarios.length; j++) {
           for (var k = 0; k < datos.data.length; k++) {
@@ -348,15 +350,17 @@ export class EditarPlanificacionComponent implements OnInit {
           }
         }
       }
-      console.log('depues ', this.despues);
+      //console.log('depues ', this.despues);
     })
   }
 
   // METODO PARA VALIDAR SELECCION DE HORARIO
   ValidarHorario() {
+
     const [obj_res] = this.horarios.filter(o => {
       return o.codigo === this.horarioF.value
     })
+
     if (!obj_res) return this.toastr.warning('Horario no válido.');
 
     const { hora_trabajo, id, codigo, min_almuerzo } = obj_res;
@@ -455,136 +459,175 @@ export class EditarPlanificacionComponent implements OnInit {
 
     if (!obj_res) return this.toastr.warning('Horario no válido.');
 
-    //console.log('ver obj horario ', obj_res)
+
     //console.log('ver horas ', this.horas)
 
     this.asignado_libre = [];
 
-    let tipo = 'N';
-    if (obj_res.default === 'HA') {
+    var tipo = '';
+
+    console.log('ver obj horario ', obj_res.default_)
+    if (obj_res.default_ === 'HA') {
       tipo = 'HA';
     }
-
-    let data = {
-      horarios: obj_res,
-      asignado: true,
-      anio: this.datos_horarios.anio,
-      mes: this.datos_horarios.mes,
-      dia: this.datos_horarios.dia,
-      tipo_dia: tipo,
+    else if (obj_res.default_ === 'L') {
+      tipo = 'HL';
     }
-
-    let verificador = 0;
-    for (var i = 0; i < this.horas.length; i++) {
-      if (this.horas[i].horarios.codigo === this.horarioF.value) {
-        verificador = 1;
-        break;
-      }
-      else {
-        if (this.horas[i].horarios.detalles.segundo_dia === false && data.horarios.detalles.segundo_dia === false) {
-          if (this.horas[i].horarios.detalles.salida < data.horarios.detalles.entrada) {
-            verificador = 0;
-          }
-          else if (this.horas[i].horarios.detalles.entrada > data.horarios.detalles.salida) {
-            verificador = 0
-          }
-          else {
-            verificador = 2;
-            break;
-          }
-        }
-        else if (this.horas[i].horarios.detalles.segundo_dia === true && data.horarios.detalles.segundo_dia === true) {
-          verificador = 2;
-          break;
-        }
-        else if (this.horas[i].horarios.detalles.segundo_dia === false && data.horarios.detalles.segundo_dia === true) {
-          if (this.horas[i].horarios.detalles.entrada > data.horarios.detalles.salida
-            && this.horas[i].horarios.detalles.salida > data.horarios.detalles.salida
-            && this.horas[i].horarios.detalles.salida < data.horarios.detalles.entrada) {
-            verificador = 0;
-          }
-          else {
-            verificador = 2;
-            break;
-          }
-        }
-        else if (this.horas[i].horarios.detalles.segundo_dia === true && data.horarios.detalles.segundo_dia === false) {
-          if (this.horas[i].horarios.detalles.salida < data.horarios.detalles.entrada
-            && this.horas[i].horarios.detalles.salida < data.horarios.detalles.salida
-            && this.horas[i].horarios.detalles.entrada > data.horarios.detalles.salida) {
-            verificador = 0;
-          }
-          else {
-            verificador = 2;
-            break;
-          }
-        }
-      }
-    }
-
-    console.log('verificador .. ', verificador)
-
-    if (verificador === 1) {
-      this.toastr.warning('Horario ya se encuentra registrado.', 'Ups!!! VERIFICAR.', {
-        timeOut: 6000,
-      });
-    }
-    else if (verificador === 2) {
-      this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups!!! VERIFICAR.', {
-        timeOut: 6000,
-      });
+    else if (obj_res.default_ === 'FD') {
+      console.log('ingresa a DFD')
+      tipo = 'HFD';
     }
     else {
+      console.log('ingresa a N')
+      tipo = 'N';
+    }
 
-      // VERIFICAR SI EXISTEN HORARIOS CON SALIDAS AL DIA SIGUIENTE (UN DIA ANTES)
-      for (var t = 0; t < this.antes.length; t++) {
-        if (moment(this.antes[i].horarios.salida, 'HH:mm:ss').format('HH:mm:ss') <= moment(data.horarios.detalles.entrada, 'HH:mm:ss').format('HH:mm:ss')) {
-          verificador = 3;
-          break;
-        }
+    var proceso: number = 0;
+    if (this.feriados.length) {
+      //console.log('ver tipo ', tipo)
+      if (tipo === 'HL' || tipo === 'HFD') {
+        proceso = 0;
+        this.ver_feriado = false;
+      }
+      else {
+        //console.log('existen feriados', this.feriados);
+        this.seleccionar_libre = false;
+        this.ver_feriado = true;
+        this.ver_nota = true;
+        this.notas1 = 'DÍA CONFIGURADO EN EL SISTEMA COMO FERIADO.';
+        this.nota_ = 'feriado';
+        proceso = 1;
+      }
+    }
+    else {
+      proceso = 0;
+    }
+
+    if (proceso === 0) {
+      let data = {
+        horarios: obj_res,
+        asignado: true,
+        anio: this.datos_horarios.anio,
+        mes: this.datos_horarios.mes,
+        dia: this.datos_horarios.dia,
+        tipo_dia: tipo,
       }
 
-      if (verificador === 3) {
+      let verificador = 0;
+      for (var i = 0; i < this.horas.length; i++) {
+        if (this.horas[i].horarios.codigo === this.horarioF.value) {
+          verificador = 1;
+          break;
+        }
+        else {
+          if (this.horas[i].horarios.detalles.segundo_dia === false && data.horarios.detalles.segundo_dia === false) {
+            if (this.horas[i].horarios.detalles.salida < data.horarios.detalles.entrada) {
+              verificador = 0;
+            }
+            else if (this.horas[i].horarios.detalles.entrada > data.horarios.detalles.salida) {
+              verificador = 0
+            }
+            else {
+              verificador = 2;
+              break;
+            }
+          }
+          else if (this.horas[i].horarios.detalles.segundo_dia === true && data.horarios.detalles.segundo_dia === true) {
+            verificador = 2;
+            break;
+          }
+          else if (this.horas[i].horarios.detalles.segundo_dia === false && data.horarios.detalles.segundo_dia === true) {
+            if (this.horas[i].horarios.detalles.entrada > data.horarios.detalles.salida
+              && this.horas[i].horarios.detalles.salida > data.horarios.detalles.salida
+              && this.horas[i].horarios.detalles.salida < data.horarios.detalles.entrada) {
+              verificador = 0;
+            }
+            else {
+              verificador = 2;
+              break;
+            }
+          }
+          else if (this.horas[i].horarios.detalles.segundo_dia === true && data.horarios.detalles.segundo_dia === false) {
+            if (this.horas[i].horarios.detalles.salida < data.horarios.detalles.entrada
+              && this.horas[i].horarios.detalles.salida < data.horarios.detalles.salida
+              && this.horas[i].horarios.detalles.entrada > data.horarios.detalles.salida) {
+              verificador = 0;
+            }
+            else {
+              verificador = 2;
+              break;
+            }
+          }
+        }
+      }
+      //console.log('verificador .. ', verificador)
+      if (verificador === 1) {
+        this.toastr.warning('Horario ya se encuentra registrado.', 'Ups!!! VERIFICAR.', {
+          timeOut: 6000,
+        });
+      }
+      else if (verificador === 2) {
         this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups!!! VERIFICAR.', {
           timeOut: 6000,
         });
       }
       else {
-        console.log('ver horario dia despues ', this.despues)
-        // SI EL HORARIO TIENE SALIDA AL SIGUIENTE DIA
-        if (data.horarios.detalles.segundo_dia === true) {
-          // VALIDAR SI EXISTEN HORARIOS DEL DIA SIGUIENTE
-          for (var t = 0; t < this.despues.length; t++) {
-            console.log('entrada ', moment(this.despues[i].horarios.entrada, 'HH:mm:ss').format('HH:mm:ss'))
-            console.log('salida ', moment(data.horarios.detalles.salida, 'HH:mm:ss').format('HH:mm:ss'))
-            if (moment(this.despues[i].horarios.entrada, 'HH:mm:ss').format('HH:mm:ss') <= moment(data.horarios.detalles.salida, 'HH:mm:ss').format('HH:mm:ss')) {
-              verificador = 4;
-              break;
-            }
+
+        // VERIFICAR SI EXISTEN HORARIOS CON SALIDAS AL DIA SIGUIENTE (UN DIA ANTES)
+        for (var t = 0; t < this.antes.length; t++) {
+          if (moment(this.antes[i].horarios.salida, 'HH:mm:ss').format('HH:mm:ss') <= moment(data.horarios.detalles.entrada, 'HH:mm:ss').format('HH:mm:ss')) {
+            verificador = 3;
+            break;
           }
         }
-        else {
-          verificador === 5
-        }
 
-        // FIN DE LAS VALIDACIONES
-        if (verificador === 4) {
+        if (verificador === 3) {
           this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups!!! VERIFICAR.', {
             timeOut: 6000,
           });
         }
         else {
-          this.horas = this.horas.concat(data);
-          this.ver_horario_ = true;
-          this.ver_guardar = false;
-          this.ver_nota = false;
+          console.log('ver horario dia despues ', this.despues)
+          // SI EL HORARIO TIENE SALIDA AL SIGUIENTE DIA
+          if (data.horarios.detalles.segundo_dia === true) {
+            // VALIDAR SI EXISTEN HORARIOS DEL DIA SIGUIENTE
+            for (var t = 0; t < this.despues.length; t++) {
+              //console.log('entrada ', moment(this.despues[i].horarios.entrada, 'HH:mm:ss').format('HH:mm:ss'))
+              //console.log('salida ', moment(data.horarios.detalles.salida, 'HH:mm:ss').format('HH:mm:ss'))
+              if (moment(this.despues[i].horarios.entrada, 'HH:mm:ss').format('HH:mm:ss') <= moment(data.horarios.detalles.salida, 'HH:mm:ss').format('HH:mm:ss')) {
+                verificador = 4;
+                break;
+              }
+            }
+          }
+          else {
+            verificador === 5
+          }
+
+          // FIN DE LAS VALIDACIONES
+          if (verificador === 4) {
+            this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups!!! VERIFICAR.', {
+              timeOut: 6000,
+            });
+          }
+          else {
+            this.horas = this.horas.concat(data);
+            this.ver_horario_ = true;
+            this.ver_guardar = false;
+            this.ver_nota = false;
+          }
         }
       }
+
+      //console.log('horarios agregados ', this.horas)
+      //console.log('verificador ', verificador)
+
     }
-
-    //console.log('horarios agregados ', this.horas)
-
-    console.log('verificador ', verificador)
+    else {
+      this.toastr.warning('Dia configurado como feriado en el sistema. Puede ingresar horarios de tipo Feriado.', 'Ups!!! VERIFICAR.', {
+        timeOut: 6000,
+      });
+    }
   }
 
   // METODO PARA QUITAR HORARIOS DE LA LISTA
@@ -638,7 +681,7 @@ export class EditarPlanificacionComponent implements OnInit {
       else {
         //console.log('ver horarios ', this.horarios)
         const [obj_res] = this.horarios.filter(o => {
-          return o.default === 'L'
+          return o.default_ === 'DL'
         })
 
         this.asignado_libre = [];
@@ -661,9 +704,7 @@ export class EditarPlanificacionComponent implements OnInit {
         this.notas1 = 'DÍA CONFIGURADO COMO LIBRE O NO LABORABLE.';
         this.notas2 = '';
       }
-
-      console.log('ver libre ', this.asignado_libre)
-
+      //console.log('ver libre ', this.asignado_libre)
     }
   }
 
@@ -690,6 +731,7 @@ export class EditarPlanificacionComponent implements OnInit {
       this.nota_ = 'ok';
       this.ver_guardar = true;
       this.ver_horario_ = false;
+      this.ver_feriado = false;
     }
     else {
       this.nota_ = 'ok';
@@ -698,9 +740,9 @@ export class EditarPlanificacionComponent implements OnInit {
       this.notas2 = 'Horas totales de horarios seleccionados (' + suma + '). Superan las horas de su jornada laboral (' + trabajo + ').';
       this.ver_guardar = true;
       this.ver_horario_ = false;
+      this.ver_feriado = false;
     }
-    console.log('ver suma total ', suma);
-
+    //console.log('ver suma total ', suma);
   }
 
   // METODO PARA ELIMINAR Y REGISTRAR HORARIOS
@@ -826,9 +868,11 @@ export class EditarPlanificacionComponent implements OnInit {
     if (cont1 != 0) {
       let cont2 = 0;
       let cont3 = 0;
-      let origen = 'N';
+      let origen = '';
+      var laborar = 0;
       // SELECCIONADOS CON HORARIOS
       lista.forEach(h => {
+        //console.log('ver asignado ', h)
         if (h.asignado === true) {
           this.restD.ConsultarUnDetalleHorario(h.horarios.id).subscribe(res => {
             cont2 = cont2 + 1;
@@ -852,16 +896,46 @@ export class EditarPlanificacionComponent implements OnInit {
                   nocturno = 0;
                 }
 
+                // SE COLOCA TIPO DE DIA ACORDE AL TIPO DE HORARIO
+                var estado: any = null;
+                var dia_tipo = '';
+                if (h.tipo_dia === 'HFD') {
+                  dia_tipo = 'FD';
+                  estado = 'FD';
+                  origen = 'HFD';
+                  laborar = 1;
+                }
+                else if (h.tipo_dia === 'FD') {
+                  dia_tipo = 'FD';
+                  estado = 'FD';
+                  origen = 'FD';
+                }
+                else if (h.tipo_dia === 'HL') {
+                  dia_tipo = 'L';
+                  estado = 'L';
+                  origen = 'HL';
+                  laborar = 1;
+                }
+                else if (h.tipo_dia === 'L') {
+                  dia_tipo = 'L';
+                  estado = 'L';
+                  origen = 'L';
+                }
+                else {
+                  dia_tipo = 'N';
+                  origen = 'N';
+                }
+
                 let plan = {
                   codigo: this.datos_horarios.codigo,
-                  tipo_dia: h.tipo_dia,
+                  tipo_dia: dia_tipo,
                   min_antes: deta.min_antes,
                   tolerancia: accion,
                   id_horario: h.horarios.id,
                   min_despues: deta.min_despues,
                   fec_horario: fecha,
                   estado_origen: origen,
-                  estado_timbre: h.tipo_dia,
+                  estado_timbre: estado,
                   id_empl_cargo: this.datos_horarios.idCargo,
                   id_det_horario: deta.id,
                   salida_otro_dia: nocturno,
@@ -882,6 +956,9 @@ export class EditarPlanificacionComponent implements OnInit {
                   cont3 = 0;
                   if (cont2 === cont1) {
                     //console.log('ver data plan generala ', this.plan_general);
+                    if (laborar === 1) {
+                      this.EliminarFeriados(this.lista_feriados);
+                    }
                     this.InsertarPlanificacion();
                   }
                 }
@@ -933,7 +1010,7 @@ export class EditarPlanificacionComponent implements OnInit {
   asignado_feriados: any = [];
   RegistrarFeriado() {
     const [obj_res] = this.horarios.filter(o => {
-      return o.default === 'FD'
+      return o.default_ === 'FD'
     })
 
     this.asignado_feriados = [];
@@ -973,7 +1050,7 @@ export class EditarPlanificacionComponent implements OnInit {
     };
 
     this.timbrar.BuscarTimbresPlanificacion(usuarios).subscribe(datos => {
-      console.log('datos ', datos)
+      //console.log('datos ', datos)
       if (datos.message === 'vacio') {
         this.toastr.info(
           'No se han encontrado registros de marcaciones.', '', {
@@ -997,6 +1074,28 @@ export class EditarPlanificacionComponent implements OnInit {
       this.toastr.info(
         'No se han encontrado registros de marcaciones.', '', {
         timeOut: 6000,
+      })
+      this.CerrarVentana(2);
+    })
+  }
+
+
+  // METODO PARA ELIMINAR FERIADOS
+  EliminarFeriados(lista: any) {
+    lista.forEach(horario => {
+      let fecha = horario.anio + '-' + horario.mes + '-' + horario.dia;
+      //console.log('fecha ', moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
+      let plan_fecha = {
+        codigo: this.datos_horarios.codigo,
+        fec_final: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+        fec_inicio: moment(fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+        id_horario: horario.horarios.id,
+      };
+      //console.log('plan ', plan_fecha)
+      this.restP.BuscarFechas(plan_fecha).subscribe(res => {
+        // METODO PARA ELIMINAR DE LA BASE DE DATOS
+        this.restP.EliminarRegistro(res).subscribe(datos => {
+        })
       })
     })
   }
@@ -1099,6 +1198,19 @@ export class EditarPlanificacionComponent implements OnInit {
       if (opcion === 2) {
         this.componentep.BuscarHorarioPeriodo();
       }
+    }
+  }
+
+  // METODO PARA VER LOS DATOS MODIFICADOS
+  VerModificacion() {
+    if (this.datos_horarios.pagina === 'ver_empleado') {
+      this.componentev.BuscarHorarioPeriodo();
+    }
+    else if (this.datos_horarios.pagina === 'lista-planificar') {
+      this.componenteb.VerPlanificacion();
+    }
+    else if (this.datos_horarios.pagina === 'perfil-empleado') {
+      this.componentep.BuscarHorarioPeriodo();
     }
   }
 

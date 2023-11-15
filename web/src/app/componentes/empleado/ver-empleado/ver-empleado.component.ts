@@ -1394,7 +1394,7 @@ export class VerEmpleadoComponent implements OnInit {
     let fecha_ = moment(fecha, 'YYYY-MM-D').format('YYYY/MM/DD');
     let verificar = moment(fecha_, 'YYYY/MM/DD', true).isValid();
     console.log('resultado ', verificar)
-    // VERIFICAR QUE EL DIA SEA VALIDO
+    // VERIFICAR QUE EL DIA SEA VALIDO (30-31)
     if (verificar === true) {
       this.horariosEmpleado[index].color = 'ok';
       this.horariosEmpleado[index].seleccionado = dia;

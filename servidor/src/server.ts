@@ -82,10 +82,10 @@ class Servidor {
     public server: Server;
 
     constructor() {
-        this.app = express();
+       this.app = express();
         this.configuracion();
         this.rutas();
-        //this.server = require("http").createServer(this.app);
+       // this.server = require("http").createServer();
         this.server = createServer(this.app);
         this.app.use(cors());
         io = require('socket.io')(this.server, {
@@ -96,6 +96,7 @@ class Servidor {
         });
 
     }
+    
     configuracion(): void {
         this.app.set('puerto', process.env.PORT || 3001);
         this.app.use(morgan('dev'));
@@ -294,6 +295,7 @@ class Servidor {
         });
 
     }
+    
 }
 
 const SERVIDOR = new Servidor();
@@ -306,6 +308,7 @@ import { RegistrarAsistenciaByTimbres } from './libs/ContarHoras';
 import { NotificacionTimbreAutomatica } from './libs/NotiTimbres'
 import { NotificacionSinTimbres } from './libs/SinTimbres'
 import { DesactivarFinContratoEmpleado } from './libs/DesactivarEmpleado'
+import { generarTimbres } from './script/scriptTimbres';
 
 // LLAMA AL MEODO DE CUMPLEAÑOS
 cumpleanios();
@@ -327,3 +330,5 @@ NotificacionTimbreAutomatica();
 NotificacionSinTimbres();
 
 DesactivarFinContratoEmpleado();
+
+//generarTimbres('35', '2023-11-01', '2023-11-02');

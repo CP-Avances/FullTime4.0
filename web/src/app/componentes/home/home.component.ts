@@ -56,6 +56,9 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.idEmpleado = localStorage.getItem('empleado');
     this.BuscarParametro();
+
+    var min_aleatoria = Math.floor(Math.random() * 10)
+    console.log('ver valor aleatorio ', min_aleatoria)
   }
 
   /** **************************************************************************************** **

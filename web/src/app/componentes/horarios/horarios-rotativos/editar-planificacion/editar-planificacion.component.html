@@ -2,7 +2,7 @@
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
             <span>MODIFICAR {{dia_fecha}}</span>
-            <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana(1)">
+            <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana(2)">
                 highlight_off
             </mat-icon>
         </div>
@@ -145,7 +145,7 @@
                                 </div>
                                 <div *ngIf="ver_feriado" style="padding-top: 10px; margin: 0 auto;">
                                     <button class="btn btn-sm" (click)="RegistrarFeriado()">
-                                        Guardar
+                                        Registrar Feriado
                                     </button>
                                 </div>
                                 <div *ngIf="cargar" style="padding-top: 10px; margin: 0 auto;">

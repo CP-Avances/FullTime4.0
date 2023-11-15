@@ -1,10 +1,10 @@
 import { ObtenerRutaHorarios } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-import pool from '../../database';
-import excel from 'xlsx';
 import fs from 'fs';
 import path from 'path';
+import pool from '../../database';
+import excel from 'xlsx';
 import moment from 'moment';
 const builder = require('xmlbuilder');
 
@@ -13,14 +13,14 @@ class HorarioControlador {
 
   // REGISTRAR HORARIO
   public async CrearHorario(req: Request, res: Response): Promise<Response> {
-    const { nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo } = req.body;
+    const { nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_ } = req.body;
     try {
       const response: QueryResult = await pool.query(
         `
       INSERT INTO cg_horarios (nombre, min_almuerzo, hora_trabajo,
-      nocturno, detalle, codigo) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
+      nocturno, detalle, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
       `
-        , [nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo]);
+        , [nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_]);
 
       const [horario] = response.rows;
 
@@ -31,6 +31,7 @@ class HorarioControlador {
         return res.status(404).jsonp({ message: 'error' })
       }
     } catch (error) {
+      console.log('error ', error)
       return res.status(400).jsonp({ message: error });
     }
   }
@@ -95,16 +96,16 @@ class HorarioControlador {
   // METODO PARA ACTUALIZAR DATOS DE HORARIO
   public async EditarHorario(req: Request, res: Response): Promise<any> {
     const id = req.params.id;
-    const { nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo } = req.body;
+    const { nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_ } = req.body;
 
     try {
       const respuesta = await pool.query(
         `
         UPDATE cg_horarios SET nombre = $1, min_almuerzo = $2, hora_trabajo = $3,  
-        nocturno = $4, detalle = $5, codigo = $6 
-        WHERE id = $7 RETURNING *
+        nocturno = $4, detalle = $5, codigo = $6, default_ = $7
+        WHERE id = $8 RETURNING *
         `
-        , [nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, id,])
+        , [nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_, id,])
         .then((result: any) => { return result.rows })
 
       if (respuesta.length === 0) return res.status(400).jsonp({ message: 'error' });

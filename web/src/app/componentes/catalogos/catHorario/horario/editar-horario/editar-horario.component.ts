@@ -35,6 +35,7 @@ export class EditarHorarioComponent implements OnInit {
   codigoF = new FormControl('', [Validators.required]);
   nombre = new FormControl('', [Validators.required, Validators.minLength(2)]);
   tipoF = new FormControl('');
+  tipoH = new FormControl('N');
 
   // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
   public formulario = new FormGroup({
@@ -44,6 +45,7 @@ export class EditarHorarioComponent implements OnInit {
     nombreForm: this.nombre,
     codigoForm: this.codigoF,
     tipoForm: this.tipoF,
+    tipoHForm: this.tipoH,
   });
 
   // VARIABLES DE CONTROL
@@ -67,10 +69,12 @@ export class EditarHorarioComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    console.log('data ', this.data)
     this.ImprimirDatos();
   }
 
   // MOSTRAR DATOS EN FORMULARIO
+  establecido: boolean = false;
   ImprimirDatos() {
 
     // FORMATEAR HORAS
@@ -86,11 +90,28 @@ export class EditarHorarioComponent implements OnInit {
       }
     }
 
+    // TIPO DE HORARIO
+    var tipo = this.data.horario.default_;
+
+    if (this.data.horario.default_ === 'DHA') {
+      tipo = 'N';
+      this.establecido = true;
+    }
+    else if (this.data.horario.default_ === 'DL') {
+      tipo = 'L';
+      this.establecido = true;
+    }
+    else if (this.data.horario.default_ === 'DFD') {
+      tipo = 'FD';
+      this.establecido = true;
+    }
+
     this.formulario.patchValue({
       horarioMinAlmuerzoForm: this.data.horario.min_almuerzo,
       nombreForm: this.data.horario.nombre,
       codigoForm: this.data.horario.codigo,
       tipoForm: this.data.horario.nocturno,
+      tipoHForm: tipo,
     });
 
     if (this.data.horario.nocturno === true) {
@@ -111,13 +132,26 @@ export class EditarHorarioComponent implements OnInit {
   // METODO PARA REGISTRAR DATOS DE HORARIO
   ModificarHorario(form: any) {
     this.habilitarprogress = true;
+    var tipo = form.tipoHForm;
+
+    if (tipo === 'L' && this.data.horario.default === 'DL') {
+      tipo = 'DL';
+    }
+    else if (tipo === 'FD' && this.data.horario.default === 'DFD') {
+      tipo = 'DFD';
+    }
+    else if (tipo === 'N' && this.data.horario.default === 'DHA') {
+      tipo = 'DHA';
+    }
+
     let dataHorario = {
       min_almuerzo: form.horarioMinAlmuerzoForm,
       hora_trabajo: form.horarioHoraTrabajoForm,
       nocturno: form.tipoForm,
       detalle: true,
       nombre: form.nombreForm,
-      codigo: form.codigoForm
+      codigo: form.codigoForm,
+      default_: tipo,
     };
 
     // FORMATEAR HORAS
@@ -190,7 +224,7 @@ export class EditarHorarioComponent implements OnInit {
     }
     else if (this.opcion === 2) {
       if (form.documentoForm != '' && form.documentoForm != null) {
-        this.ActualizarDatosArchivo(datos, form);
+        this.ActualizarDatosArchivo(datos);
       }
       else {
         this.toastr.info('No ha seleccionado ningún archivo.', '', {
@@ -214,7 +248,7 @@ export class EditarHorarioComponent implements OnInit {
   }
 
   // METODO PARA INGRESAR DATOS CON ARCHIVO
-  ActualizarDatosArchivo(datos: any, form: any) {
+  ActualizarDatosArchivo(datos: any) {
     this.habilitarprogress = true;
     this.EliminarDocumentoServidor();
     this.rest.ActualizarHorario(this.data.horario.id, datos).subscribe(response => {

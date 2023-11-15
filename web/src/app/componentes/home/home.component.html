@@ -172,7 +172,7 @@
 
       <mat-card (click)="MenuRapido(6)"
         [ngClass]="!movil ? 'mat-elevation-z8 card-inactivo_' : 'mat-elevation-z8 card-aplicacionMovil'"
-        style="color: antiquewhite;"><!--boton-inactivo-->
+        style="color: antiquewhite; padding-bottom: 5px;"><!--boton-inactivo-->
         <mat-card-title style="text-align: center; padding: 3px;">
           <mat-label class="titulo-card">Aplicación Móvil</mat-label>
         </mat-card-title>
@@ -186,7 +186,7 @@
           </div>
         </mat-card-content>
       </mat-card>
-
+      
       <mat-card (click)="MenuRapido(1)"
         [ngClass]="!teletrabajo ? 'mat-elevation-z8 card-inactivo_' : 'mat-elevation-z8 card-timbreTele'"
         style="color: antiquewhite;"><!--boton-inactivo-->

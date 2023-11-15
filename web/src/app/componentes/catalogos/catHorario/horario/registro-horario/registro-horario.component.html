@@ -59,6 +59,39 @@
                                 {{ObtenerMensajeErrorHoraTrabajo()}}
                             </mat-error>
                         </mat-form-field>
+                    </div>
+
+                    <div class="d-flex flex-wrap justify-content-start">
+                        <label
+                            style="padding-top: 15px; padding-bottom: 5px; position: relative; left:40px; font-size: 14px;">
+                            Tipo horario:
+                        </label>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-start" style="position: relative; left:48px;">
+                        <mat-radio-group aria-label="Select an option" [formControl]="tipoH">
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-radio-button value="N" matSuffix matTooltipPosition="right"
+                                    matTooltip="Indicar tiempo mínimo de servicios en horas.">
+                                    <label id="textoradiobtn">Laborable</label>
+                                </mat-radio-button>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-radio-button value="L" matSuffix matTooltipPosition="right"
+                                    matTooltip="Indicar tiempo mínimo de servicios en meses.">
+                                    <label id="textoradiobtn">Libre</label>
+                                </mat-radio-button>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <mat-radio-button value="FD" matSuffix matTooltipPosition="right"
+                                    matTooltip="Indicar tiempo mínimo de servicios en horas.">
+                                    <label id="textoradiobtn">Feriado</label>
+                                </mat-radio-button>
+                            </div>
+                        </mat-radio-group>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="d-flex flex-wrap justify-content-around">
                         <mat-checkbox id="check" [formControl]="tipoF" [(ngModel)]="nocturno" matSuffix
                             matTooltipPosition="right" matTooltip="Marcar si el horario es Nocturno.">
                             <label id="textoradiobtn">Horario nocturno</label>
@@ -67,10 +100,6 @@
                             <label id="textoradiobtn">Subir un archivo</label>
                         </mat-checkbox>
                     </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md">
                     <div class="d-flex flex-wrap justify-content-center" *ngIf="isChecked">
                         <div class="separar">
                             <form method="post" enctype="multipart/form-data">
@@ -94,9 +123,12 @@
                     </div>
                 </div>
             </div>
+
             <div class="d-flex flex-wrap justify-content-center" style="padding-top: 10px; margin-bottom: 4%;">
                 <button id="btn-raised" class="btn btn-sm" [disabled]="!formulario.valid"
-                    (click)="InsertarHorario(formulario.value)" value="Guardar">Guardar</button>
+                    (click)="InsertarHorario(formulario.value)" value="Guardar">
+                    Guardar
+                </button>
             </div>
         </form>
     </div>
