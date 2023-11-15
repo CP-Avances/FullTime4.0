@@ -70,7 +70,7 @@ class EmpleadoHorariosControlador {
         const { codigo } = req.params;
         const HORARIO = await pool.query(
             `
-            SELECT DISTINCT pg.id_horario, ch.hora_trabajo, ch.codigo, ch.default  
+            SELECT DISTINCT pg.id_horario, ch.hora_trabajo, ch.codigo, ch.default_  
             FROM plan_general AS pg, cg_horarios AS ch
             WHERE pg.codigo = $3 AND pg.id_horario = ch.id AND
                 (fec_horario BETWEEN $1 AND $2)

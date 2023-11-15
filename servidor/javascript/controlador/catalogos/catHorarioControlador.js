@@ -14,22 +14,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HORARIO_CONTROLADOR = void 0;
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
-const database_1 = __importDefault(require("../../database"));
-const xlsx_1 = __importDefault(require("xlsx"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
+const database_1 = __importDefault(require("../../database"));
+const xlsx_1 = __importDefault(require("xlsx"));
 const moment_1 = __importDefault(require("moment"));
 const builder = require('xmlbuilder');
 class HorarioControlador {
     // REGISTRAR HORARIO
     CrearHorario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo } = req.body;
+            const { nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_ } = req.body;
             try {
                 const response = yield database_1.default.query(`
       INSERT INTO cg_horarios (nombre, min_almuerzo, hora_trabajo,
-      nocturno, detalle, codigo) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
-      `, [nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo]);
+      nocturno, detalle, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+      `, [nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_]);
                 const [horario] = response.rows;
                 if (horario) {
                     return res.status(200).jsonp(horario);
@@ -39,6 +39,7 @@ class HorarioControlador {
                 }
             }
             catch (error) {
+                console.log('error ', error);
                 return res.status(400).jsonp({ message: error });
             }
         });
@@ -98,13 +99,13 @@ class HorarioControlador {
     EditarHorario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const { nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo } = req.body;
+            const { nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_ } = req.body;
             try {
                 const respuesta = yield database_1.default.query(`
         UPDATE cg_horarios SET nombre = $1, min_almuerzo = $2, hora_trabajo = $3,  
-        nocturno = $4, detalle = $5, codigo = $6 
-        WHERE id = $7 RETURNING *
-        `, [nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, id,])
+        nocturno = $4, detalle = $5, codigo = $6, default_ = $7
+        WHERE id = $8 RETURNING *
+        `, [nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_, id,])
                     .then((result) => { return result.rows; });
                 if (respuesta.length === 0)
                     return res.status(400).jsonp({ message: 'error' });

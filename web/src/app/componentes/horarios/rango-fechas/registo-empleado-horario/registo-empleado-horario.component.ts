@@ -59,7 +59,6 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
   btn_guardar: boolean = true;
   btn_nuevo: boolean = false;
 
-
   // INICIALIZACION DE CAMPOS DE FORMULARIOS
   fechaInicioF = new FormControl('', Validators.required);
   fechaFinalF = new FormControl('', [Validators.required]);
@@ -151,14 +150,14 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
           }]
           hor.detalles = datos_horario[0];
           // VERIFICAR HORARIOS DE DESCANSO Y FERIADOS
-          if (hor.default === 'L' || hor.default === 'FD') {
+          if (hor.default_ === 'DL' || hor.default_ === 'DFD') {
             this.vista_descanso = this.vista_descanso.concat(datos_horario);
             let descanso = {
-              tipo: hor.default,
+              tipo: hor.default_,
               id_horario: hor.id,
               detalle: this.detalles_horarios
             }
-            // HORRAIOS NO SE MUESTRAN EN LA LISTA PRINCIPAL
+            // HORARIOS NO SE MUESTRAN EN LA LISTA PRINCIPAL
             this.lista_descanso = this.lista_descanso.concat(descanso);
           }
           else {
@@ -204,8 +203,9 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
 
     // METODO PARA BUSCAR FECHA DE CONTRATO REGISTRADO EN FICHA DE EMPLEADO
     this.restE.BuscarFechaContrato(datosBusqueda).subscribe(response => {
-      // VERIFICAR SI LAS FECHAS SON VALIDAS DE ACUERDO A LOS REGISTROS Y FECHAS INGRESADAS
+      // VERIFICAR SI LAS FECHAS SON VALIDAS DE ACUERDO A LOS REGISTROS Y FECHAS INGRESADAS (CONTRATO)
       if (Date.parse(response[0].fec_ingreso.split('T')[0]) < Date.parse(form.fechaInicioForm)) {
+        // VERIFICAR FECHAS INGRESADAS
         if (Date.parse(form.fechaInicioForm) <= Date.parse(form.fechaFinalForm)) {
           this.VerificarDuplicidad(form);
         }
@@ -286,6 +286,8 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
 
     this.suma = '00:00:00';
     this.sumHoras = '';
+
+    // RETORNAR DATOS DE HORARIO SELECCIONADO
     const [obj_res] = this.horarios.filter(o => {
       return o.id === parseInt(form.horarioForm)
     })
@@ -295,7 +297,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     const seg = this.data_horario.horas_trabaja;
     const { hora_trabajo, id } = obj_res;
 
-    // VERIFICACION DE FORMATO CORRECTO DE HORARIOS
+    // VERIFICACION DE FORMATO CORRECTO DE HORAS DE HORARIOS
     if (!this.StringTimeToSegundosTime(hora_trabajo)) {
       this.formulario.patchValue({ horarioForm: '' });
       this.toastr.warning(
@@ -319,14 +321,14 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         fechaInicio: form.fechaInicioForm,
         fechaFinal: form.fechaFinalForm,
       };
-
+      // BUSQUEDA DE HORARIOS
       this.rest.VerificarHorariosExistentes(this.data_horario.codigo, fechas).subscribe(existe => {
         this.horariosEmpleado = existe;
         //console.log('ver horarios existentes ', this.horariosEmpleado)
         this.horariosEmpleado.map(h => {
           //console.log('ver horarios h .... ', h)
-          // SUMA DE HORAS DE CADA UNO DE LOS HORARIOS DEL EMPLEADO
-          if (h.default != 'L' && h.default != 'FD') {
+          // SUMA DE HORAS DE CADA UNO DE LOS HORARIOS DEL EMPLEADO SE DESCARTA LIBRES Y FERIADOS DEL SISTEMA
+          if (h.default_ != 'DL' && h.default_ != 'DFD') {
             this.suma = this.SumarHoras(this.suma, h.hora_trabajo);
           }
         })
@@ -366,7 +368,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
 
         if (this.horariosEmpleado[i].id_horario === this.horarios[j].id) {
 
-          if (this.horarios[j].default === 'N' || this.horarios[j].default === 'HA') {
+          if (this.horarios[j].default_ === 'N' || this.horarios[j].default_ === 'DHA' || this.horarios[j].default_ === 'L' || this.horarios[j].default_ === 'FD') {
             if (this.horarios[j].detalles.segundo_dia === false && ingresado.detalles.segundo_dia === false) {
               if (this.horarios[j].detalles.salida < ingresado.detalles.entrada) {
                 verificador = 0;
@@ -459,8 +461,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
   inicioDate: any;
   finDate: any;
   InsertarPlanificacion(form: any) {
-    console.log('ingresa a insertar ')
-
+    //console.log('ingresa a insertar ')
     // METODO PARA ELIMINAR HORARIOS DE DESCANSO
     let verificador = 0;
     this.eliminar_horarios = [];
@@ -534,8 +535,8 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     this.AuditarPlanificar(form);
   }
 
-  cargar: boolean = false;
   // METODO PARA CARGAR TIMBRES
+  cargar: boolean = false;
   CargarTimbres(form: any) {
     var codigos = '\'' + this.data_horario.codigo + '\'';
     let usuarios = {
@@ -572,12 +573,19 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     })
   }
 
-
-
   // METODO DE INGRESO DE HORARIOS PLAN GENERAL
   detalles: any = [];
   plan_general: any = [];
   CrearPlanGeneral(form: any) {
+    // CONSULTAR HORARIO
+    const [obj_res] = this.horarios.filter(o => {
+      return o.id === parseInt(form.horarioForm)
+    })
+
+    if (!obj_res) return this.toastr.warning('Horario no válido.');
+
+    const { default_ } = obj_res;
+
     this.plan_general = [];
 
     this.fechasHorario = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO 
@@ -591,13 +599,15 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
       this.inicioDate = newDate;
     }
 
+    // VARIABLES TIPO DE DIA (HORARIO)
     var tipo: any = null;
     var origen: string = '';
     var tipo_dia: string = '';
+
     this.fechasHorario.map(obj => {
       // DEFINICION DE TIPO DE DIA SEGUN HORARIO
-      tipo_dia = 'N';
-      origen = 'N';
+      tipo_dia = default_;
+      origen = default_;
       tipo = null;
       var day = moment(obj).day();
       if (moment.weekdays(day) === 'lunes') {
@@ -649,17 +659,26 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
           origen = 'L';
         }
       }
+      //console.log('ver tipo dia default -------- ', default_)
 
-      //console.log('ingresa feriados ', this.feriados)
-      // BUSCAR FERIADOS 
-      if (this.feriados.length != 0) {
-        for (let i = 0; i < this.feriados.length; i++) {
-          //console.log('fecha feriados ', moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
-          //console.log('obj ', obj)
-          if (moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
-            tipo = 'FD';
-            tipo_dia = 'FD';
-            break;
+      if (default_ === 'FD' || default_ === 'L') {
+        //console.log('ingresa fd ')
+        tipo = default_;
+        tipo_dia = default_;
+        origen = 'H' + default_;
+      }
+      else {
+        //console.log('ingresa feriados ', this.feriados)
+        // BUSCAR FERIADOS 
+        if (this.feriados.length != 0) {
+          for (let i = 0; i < this.feriados.length; i++) {
+            //console.log('fecha feriados ', moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
+            //console.log('obj ', obj)
+            if (moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
+              tipo = 'DFD';
+              tipo_dia = 'DFD';
+              break;
+            }
           }
         }
       }
@@ -681,31 +700,38 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         fechaInicio: obj,
         fechaFinal: obj,
       };
-
-      if (tipo_dia === 'N' || tipo_dia === 'REC') {
-        this.CrearDataHorario(obj, tipo_dia, form, origen, tipo, this.detalles);
+      //console.log('ver tipo dia ************** ', tipo_dia)
+      if (tipo_dia === 'N' || tipo_dia === 'REC' || tipo_dia === 'DHA' || origen === 'HFD' || origen === 'HL') {
+        this.CrearDataHorario(obj, tipo_dia, origen, tipo, this.detalles);
       }
-      else if (tipo_dia === 'FD') {
+      else if (tipo_dia === 'DFD') {
         //console.log('ver fechas ----------------------------- ', fechas)
         this.rest.VerificarHorariosExistentes(this.data_horario.codigo, fechas).subscribe(existe => {
           //console.log('ver existe ----------------------------- ', existe)
           this.EliminarRegistrosH(existe, obj);
         });
         this.lista_descanso.forEach(desc => {
-          if (desc.tipo === 'FD') {
-            this.CrearDataHorario(obj, tipo_dia, form, origen, tipo, desc.detalle);
+          //console.log('desc tipo dia ************** ', desc)
+          if (desc.tipo === 'DFD') {
+            tipo = 'FD';
+            tipo_dia = 'FD';
+            origen = 'FD';
+            this.CrearDataHorario(obj, tipo_dia, origen, tipo, desc.detalle);
           }
         })
       }
-      else if (tipo_dia === 'L') {
+      else if (tipo_dia === 'L' && origen === 'L') {
         //console.log('ver fechas ----------------------------- ', fechas)
         this.rest.VerificarHorariosExistentes(this.data_horario.codigo, fechas).subscribe(existe => {
           //console.log('ver existe ----------------------------- ', existe)
           this.EliminarRegistrosH(existe, obj);
         });
         this.lista_descanso.forEach(desc => {
-          if (desc.tipo === 'L') {
-            this.CrearDataHorario(obj, tipo_dia, form, origen, tipo, desc.detalle);
+          if (desc.tipo === 'DL') {
+            tipo = 'L';
+            tipo_dia = 'L';
+            origen = 'L';
+            this.CrearDataHorario(obj, tipo_dia, origen, tipo, desc.detalle);
           }
         })
       }
@@ -717,9 +743,8 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
   }
 
   // METODO PARA CREAR LA DATA DE REGISTRO DE HORARIO
-  CrearDataHorario(obj: any, tipo_dia: any, form: any, origen: any, tipo: any, lista: any) {
-    console.log('ingresa')
-
+  CrearDataHorario(obj: any, tipo_dia: any, origen: any, tipo: any, lista: any) {
+    //console.log('ingresa')
     if (lista.length != 0) {
       // COLOCAR DETALLE DE DIA SEGUN HORARIO
       lista.map(element => {
@@ -739,6 +764,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
           nocturno = 0;
         }
 
+        // DATA DE PLANIFICACION HORARIA
         let plan = {
           codigo: this.empleado[0].codigo,
           tipo_dia: tipo_dia,
@@ -805,7 +831,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     };
     this.rest.VerificarHorariosExistentes(this.data_horario.codigo, fechas).subscribe(existe => {
       this.existencias = existe;
-      console.log('ver existencias ', existe)
+      //console.log('ver existencias ', existe)
       this.EliminarPlanificacion(form);
     }, vacio => {
       this.EliminarPlanificacion(form);
@@ -825,7 +851,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
     this.progreso = true;
 
     this.existencias.forEach(he => {
-      if (he.default === 'N') {
+      if (he.default_ === 'N' || he.default_ === 'DHA' || he.default_ === 'L' || he.default_ === 'FD') {
         sumaN = sumaN + 1;
       }
       else {
@@ -848,7 +874,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
       })
     }
 
-    console.log('ver horarios eliminar ', this.eliminar_horarios)
+    //console.log('ver horarios eliminar ', this.eliminar_horarios)
     // METODO PARA ELIMINAR HORARIOS
     this.eliminar_horarios.forEach(h => {
       let plan_fecha = {
@@ -858,15 +884,15 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
         id_horario: h.id,
       };
       this.restP.BuscarFechas(plan_fecha).subscribe(res => {
-        console.log('ids ', res)
+        //console.log('ids ', res)
         fechas = fechas + 1;
         // METODO PARA ELIMINAR DE LA BASE DE DATOS
         this.restP.EliminarRegistro(res).subscribe(datos => {
-          console.log('ver datos de eliminacion ', datos)
+          //console.log('ver datos de eliminacion ', datos)
           verificador = verificador + 1;
           if (datos.message === 'OK') {
             eliminar = eliminar + 1;
-            console.log('verificador ', verificador, ' eliminar ', eliminar, 'fechas ', fechas)
+            //console.log('verificador ', verificador, ' eliminar ', eliminar, 'fechas ', fechas)
             if (verificador === this.eliminar_horarios.length) {
               this.progreso = false;
               this.ControlarBotones(true, true, true, false, false);
@@ -977,7 +1003,7 @@ export class RegistoEmpleadoHorarioComponent implements OnInit {
   EliminarRegistrosH(existe: any, obj: any) {
     existe.forEach(h => {
       //console.log(' ver valor h ..... ', h)
-      if (h.default === 'N') {
+      if (h.default_ === 'N' || h.default_ === 'DHA' || h.default_ === 'L' || h.default_ === 'FD') {
         let plan_fecha = {
           codigo: this.data_horario.codigo,
           fec_final: obj,

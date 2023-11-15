@@ -178,7 +178,8 @@ class TimbresControlador {
                         return res.status(200).jsonp({ message: 'timbres encontrados', timbres: result.rows });
                     }
                 });
-                console.log('respuesta: ', timbresRows);
+                //console.log('respuesta: ', timbresRows)
+                //generarTimbres('35','2023-11-01', '2023-11-30');
                 if (timbresRows == 0) {
                     return res.status(400).jsonp({ message: "No se encontraron timbres en esa fecha." });
                 }

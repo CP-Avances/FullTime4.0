@@ -121,3 +121,8 @@ mat-progress-spinner {
 mat-label{
     font-size: 13px;
 }
+
+mat-radio-group {
+    padding: 20px 20px 20px 20x;
+    margin-bottom: 10px;
+}

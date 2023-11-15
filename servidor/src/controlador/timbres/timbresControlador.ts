@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import pool from '../../database';
+import { generarTimbres } from '../../script/scriptTimbres';
 
 class TimbresControlador {
 
@@ -191,7 +192,11 @@ class TimbresControlador {
 
                 }
                 );
-            console.log('respuesta: ', timbresRows)
+            //console.log('respuesta: ', timbresRows)
+
+            //generarTimbres('35','2023-11-01', '2023-11-30');
+
+            
             if (timbresRows == 0) {
                 return res.status(400).jsonp({ message: "No se encontraron timbres en esa fecha." })
             }

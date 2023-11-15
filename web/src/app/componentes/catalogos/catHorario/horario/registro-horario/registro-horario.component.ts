@@ -34,6 +34,7 @@ export class RegistroHorarioComponent implements OnInit {
   codigoF = new FormControl('', [Validators.required]);
   nombre = new FormControl('', [Validators.required, Validators.minLength(2)]);
   tipoF = new FormControl('');
+  tipoH = new FormControl('N');
 
   // ASIGNAR LOS CAMPOS EN UN FORMULARIO EN GRUPO
   public formulario = new FormGroup({
@@ -43,6 +44,7 @@ export class RegistroHorarioComponent implements OnInit {
     nombreForm: this.nombre,
     codigoForm: this.codigoF,
     tipoForm: this.tipoF,
+    tipoHForm: this.tipoH,
   });
 
 
@@ -77,6 +79,7 @@ export class RegistroHorarioComponent implements OnInit {
       detalle: true,
       nombre: form.nombreForm,
       codigo: form.codigoForm,
+      default_: form.tipoHForm,
     };
 
     // FORMATEAR HORAS
@@ -151,6 +154,7 @@ export class RegistroHorarioComponent implements OnInit {
 
   // METODO PARA REGISTRAR DATOS DEL HORARIO
   GuardarDatos(datos: any, form: any) {
+    console.log('datos ', datos)
     this.rest.RegistrarHorario(datos).subscribe(response => {
       this.RegistrarAuditoria(datos);
       this.toastr.success('Operación exitosa.', 'Registro guardado.', {
@@ -177,6 +181,8 @@ export class RegistroHorarioComponent implements OnInit {
       })
     });
   }
+
+
 
   /** ********************************************************************************************* **
    ** **                             METODO PARA SUBIR ARCHIVO                                   ** **

@@ -129,12 +129,26 @@ export class PrincipalHorarioComponent implements OnInit {
     this.horarios = [];
     this.rest.BuscarListaHorarios().subscribe(datos => {
       this.horarios = datos;
+      this.horarios.forEach(obj => {
+        if (obj.default_ === 'N') {
+          obj.default_tipo = 'Laborable';
+        }
+        else if (obj.default_ === 'L' || obj.default_ === 'DL') {
+          obj.default_tipo = 'Libre';
+        }
+        else if (obj.default_ === 'FD' || obj.default_ === 'DFD') {
+          obj.default_tipo = 'Feriado';
+        }
+        else if (obj.default_ === 'HA' || obj.default_ === 'DHA') {
+          obj.default_tipo = 'Abierto';
+        }
+      })
     })
   }
 
   // METODO PARA ABRIR VENTANA REGISTRAR HORARIO
   AbrirVentanaRegistrarHorario(): void {
-    this.ventana.open(RegistroHorarioComponent, { width: '800px' })
+    this.ventana.open(RegistroHorarioComponent, { width: '1000px' })
       .afterClosed().subscribe(items => {
         if (items > 0) {
           this.VerDetallesHorario(items)
@@ -167,9 +181,9 @@ export class PrincipalHorarioComponent implements OnInit {
   // METODO PARA ABRIR VENTANA EDITAR HORARIO
   AbrirVentanaEditarHorario(datosSeleccionados: any): void {
     this.ventana.open(EditarHorarioComponent,
-      { width: '900px', data: { horario: datosSeleccionados, actualizar: false } })
+      { width: '1000px', data: { horario: datosSeleccionados, actualizar: false } })
       .afterClosed().subscribe(items => {
-        if(items === 1){
+        if (items === 1) {
           this.VerDetallesHorario(datosSeleccionados.id)
         }
       });
