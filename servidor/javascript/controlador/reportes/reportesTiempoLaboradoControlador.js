@@ -72,7 +72,7 @@ exports.default = REPORTES_TIEMPO_LABORADO_CONTROLADOR;
 const BuscarTiempoLaborado = function (fec_inicio, fec_final, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query('SELECT CAST(fec_horario AS VARCHAR), CAST(fec_hora_horario AS VARCHAR), CAST(fec_hora_timbre AS VARCHAR), ' +
-            'codigo, estado_timbre, tipo_entr_salida AS accion, min_alimentacion, tipo_dia ' +
+            'codigo, estado_timbre, tipo_entr_salida AS accion, min_alimentacion, tipo_dia, id_horario ' +
             'FROM plan_general WHERE CAST(fec_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' ' +
             'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 ' +
             'AND tipo_entr_salida IN (\'E\',\'I/A\', \'F/A\', \'S\') ' +
@@ -87,7 +87,7 @@ const agruparTimbres = function agruparTimbresPorClave(timbres) {
         const timbresAgrupadosFecha = {};
         const timbresAgrupados = [];
         timbres.forEach((timbre) => {
-            const clave = `${timbre.fec_horario}`;
+            const clave = `${timbre.fec_horario}-${timbre.id_horario}`;
             if (!timbresAgrupadosFecha[clave]) {
                 timbresAgrupadosFecha[clave] = [];
             }
@@ -109,7 +109,7 @@ const agruparTimbres = function agruparTimbresPorClave(timbres) {
                         });
                     }
                     break;
-                default:
+                case 2:
                     for (let i = 0; i < timbresAgrupadosFecha[key].length; i += 2) {
                         timbresAgrupados.push({
                             tipo: 'ES',

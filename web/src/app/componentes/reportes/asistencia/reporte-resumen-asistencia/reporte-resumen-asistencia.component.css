@@ -2,10 +2,6 @@ mat-form-field {
     padding: 10px 15px 0px 15px;
 }
 
-table {
-    width: 100%;
-    font-size: 14px;
-}
 
 #codigoColoresTabla {
     width: auto;
@@ -45,7 +41,7 @@ mat-icon {
 
 #detalle {
     width: 100%;
-    font-size: 12px;
+    font-size: 10px;
 }
 
 .verde {

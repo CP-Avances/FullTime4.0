@@ -1369,28 +1369,27 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
   }
 
   calcularDiferenciaFechas(timbre: any) {
+    //VALORES DE RETORNO [minutosAlimentacion,minutosLaborados]
+
     if (timbre.dia === 'L' || timbre.dia === 'FD') {
       return [0,0];
     }
 
     if (timbre.tipo === 'ES') {
-      const { entrada, salida } = timbre;
-      let minutosPlanificados = this.calcularMinutosDiferencia(entrada.fec_hora_horario, salida.fec_hora_horario);
-      
+      const { entrada, salida } = timbre;      
       if (entrada.fec_hora_timbre !== null && salida.fec_hora_timbre !== null) {
         const minutosLaborados = this.calcularMinutosDiferencia(entrada.fec_hora_timbre, salida.fec_hora_timbre);
-        return [minutosPlanificados,Number(minutosLaborados.toFixed(2))];
+        return [0,Number(minutosLaborados.toFixed(2))];
       }
 
-      return [minutosPlanificados,0];
+      return [0,0];
     } else {
       const { entrada, inicioAlimentacion, finAlimentacion, salida } = timbre;
       const min_alimentacion: number = timbre.inicioAlimentacion.min_alimentacion;
-      
-      const minutosPlanificados = Number((this.calcularMinutosDiferencia(entrada.fec_hora_horario, salida.fec_hora_horario)-min_alimentacion).toFixed(2));
+      console.log(timbre)
       const minutosLaborados = entrada.fec_hora_timbre !== null && salida.fec_hora_timbre !== null ? this.calcularMinutosDiferencia(entrada.fec_hora_timbre, salida.fec_hora_timbre) : 0;
       const minutosAlimentacion = inicioAlimentacion.fec_hora_timbre !== null && finAlimentacion.fec_hora_timbre !== null ? this.calcularMinutosDiferencia(inicioAlimentacion.fec_hora_timbre, finAlimentacion.fec_hora_timbre) : min_alimentacion;
-      return minutosLaborados == 0 ? [minutosPlanificados,minutosLaborados] :[minutosPlanificados,Number((minutosLaborados - minutosAlimentacion).toFixed(2))];
+      return minutosLaborados == 0 ? [Number(min_alimentacion.toFixed(2)),minutosLaborados] : [Number(min_alimentacion.toFixed(2)),Number((minutosLaborados - minutosAlimentacion).toFixed(2))];
     }
   }
   
@@ -1587,9 +1586,11 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
                 : (obj4.dia === 'L' || obj4.dia === 'FD' ? obj4.dia : 'FT')) 
               : '';
 
+            const alimentacion_asignada = obj4.tipo == 'EAS' ? obj4.inicioAlimentacion.min_alimentacion : 0;
+            
             const diferenciaEnMinutos = this.calcularDiferenciaFechas(obj4);
-            const minutosPlanificados = diferenciaEnMinutos[0];
-            const tiempoPlanificado = this.minutosAHorasMinutosSegundos(minutosPlanificados);
+            const minutosAlimentacion = diferenciaEnMinutos[0];
+            const tiempoAlimentacion = this.minutosAHorasMinutosSegundos(minutosAlimentacion);
             const minutosLaborados = diferenciaEnMinutos[1];
             const tiempoLaborado = this.minutosAHorasMinutosSegundos(minutosLaborados);
             n = n + 1;
@@ -1599,10 +1600,10 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
               departamento: obj2.name_dep,
               regimen: obj3.regimen[0].name_regimen,
               empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
-              fecha, entradaHorario, entrada, salidaHorario, salida,
+              fecha, entradaHorario, entrada, salidaHorario, salida, alimentacion_asignada,
               inicioAlimentacionHorario, inicioAlimentacion, 
               finAlimentacionHorario, finAlimentacion,  
-              tiempoPlanificado, minutosPlanificados,
+              tiempoAlimentacion, minutosAlimentacion,
               tiempoLaborado, minutosLaborados,
             }  
             this.timbres.push(ele);
