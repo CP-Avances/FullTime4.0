@@ -63,7 +63,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   empleados: any = [];
   respuesta: any = [];
   regimen: any = [];
-  timbres: any = [];
+  horarios: any = [];
   cargos: any = [];
   origen: any = [];
  
@@ -122,6 +122,11 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
 
+  // ITEMS DE PAGINACION DE LA TABLA RESULTADOS
+  pageSizeOptions_res = [5, 10, 20, 50];
+  tamanio_pagina_res: number = 5;
+  numero_pagina_res: number = 1;
+
   // ARREGLO DE DATOS DE HORARIOS
   nomenclatura = [
     { nombre: 'L', descripcion: 'LIBRE' },
@@ -156,7 +161,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
     this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
-    this.timbres = [];
+    this.horarios = [];
     this.cargos = [];
   }
 
@@ -465,21 +470,20 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
 
     this.plan.BuscarPlanificacionHoraria(busqueda).subscribe(datos => {
       if (datos.message === 'OK') {
-        this.horariosEmpleado = datos.data;
-        let index = 0;
-        this.horariosEmpleado.forEach(obj => {
-          this.resultados.forEach(r => {
-            if (r.codigo === obj.codigo_e) {
-              obj.id_empleado = r.id;
-              obj.id_cargo = r.id_cargo;
-              obj.hora_trabaja = r.hora_trabaja;
-              obj.seleccionado = '';
-              obj.color = '';
-              obj.index = index;
-              index = index + 1;
-            }
-          })
-        })
+        const horarios = datos.data;    
+        const horariosPorEmpleado = {};
+
+        //AGRUPAMIENTO DE LOS HORIOS POR CODIGO DE EMPLEADO
+        horarios.forEach((h:any) => {
+          horariosPorEmpleado[h.codigo_e] = horariosPorEmpleado[h.codigo_e] || [];
+          horariosPorEmpleado[h.codigo_e].push(h);
+        });
+        
+        this.resultados.forEach((r:any) => {
+          r.horarios = horariosPorEmpleado[r.codigo];
+        });
+
+        this.horariosEmpleado = this.resultados;
         this.ObtenerDetallesPlanificacion();
 
       }
@@ -695,11 +699,12 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
         })
       ],
       styles: {
-        tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color },
+        tableHeader: { fontSize: 7, bold: true, alignment: 'center', fillColor: this.p_color },
         centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 10, 0, 10] },
         itemsTable: { fontSize: 8 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
-        itemsTableCentrado: { fontSize: 8, alignment: 'center' },
+        itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
+        itemsTableCentrado: { fontSize: 6, alignment: 'center', margin: [1, 3, 1, 3] },
         tableMargin: { margin: [0, 0, 0, 10] },
         tableMarginHorarios: { margin: [10, 0, 10, 0]},
         tableMarginCabecera: { margin: [0, 15, 0, 0] },
@@ -811,140 +816,154 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
       );
     };
 
-    n.push({
-      style: 'tableMargin',
-      table: {
-        widths: [
-          'auto', '*', 'auto', 'auto','auto', 'auto', 'auto','auto', 'auto', 'auto', 'auto',
-          'auto', 'auto', 'auto','auto', 'auto', 'auto', 'auto','auto', 'auto',
-        ],
-        headerRows: 2,
-        body: [
-          [
-            { rowSpan: 2, text: 'CÓDIGO', style: 'centrado' },
-            { rowSpan: 2, text: 'USUARIO', style: 'centrado' },
-            { rowSpan: 2, text: 'AÑO', style: 'centrado' },
-            { rowSpan: 2, text: 'MES', style: 'centrado' },
-            { rowSpan: 1, colSpan: 16, text: 'DÍAS DEL MES', style: 'tableHeader' },
-            {},{},{},{},{},{},{},{},{},{},{},{},{},{},{},
-          ],
-          [
-            {},{},{},{},
-            { rowSpan: 1, text: '01', style: 'tableHeader' },
-            { rowSpan: 1, text: '02', style: 'tableHeader' },
-            { rowSpan: 1, text: '03', style: 'tableHeader' },
-            { rowSpan: 1, text: '04', style: 'tableHeader' },
-            { rowSpan: 1, text: '05', style: 'tableHeader' },
-            { rowSpan: 1, text: '06', style: 'tableHeader' },
-            { rowSpan: 1, text: '07', style: 'tableHeader' },
-            { rowSpan: 1, text: '08', style: 'tableHeader' },
-            { rowSpan: 1, text: '09', style: 'tableHeader' },
-            { rowSpan: 1, text: '10', style: 'tableHeader' },
-            { rowSpan: 1, text: '11', style: 'tableHeader' },
-            { rowSpan: 1, text: '12', style: 'tableHeader' },
-            { rowSpan: 1, text: '13', style: 'tableHeader' },
-            { rowSpan: 1, text: '14', style: 'tableHeader' },
-            { rowSpan: 1, text: '15', style: 'tableHeader' },
-            { rowSpan: 1, text: '16', style: 'tableHeader' },
-          ],
-          ...this.horariosEmpleado.map(e => {
-            return [
-              { style: 'itemsTableCentrado', text: e.codigo_e },
-              { style: 'itemsTableCentrado', text: e.nombre_e },
-              { style: 'itemsTableCentrado', text: e.anio },
-              { style: 'itemsTableCentrado', text: e.mes },
-              { style: 'itemsTableCentrado', text:  e.dia1.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia2.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia3.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia4.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia5.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia6.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia7.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia8.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia9.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia10.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia11.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia12.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia13.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia14.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia15.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia16.split(',').join('\n')},
-            ];
-          }),
-        ],
-      },
-      layout: {
-        fillColor: function (rowIndex) {
-          return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+    this.horariosEmpleado.forEach((e:any) => {
+      n.push({
+        style: 'tableMarginCabecera',
+        table: {
+          widths: ['*', 'auto', 'auto',],
+          headerRows: 2,
+          body: [
+            [
+              {
+                border: [true, true, false, false],
+                text: 'EMPLEADO: ' + e.name_empleado,
+                style: 'itemsTableInfoEmpleado'
+              },
+              {
+                border: [false, true, false, false],
+                text: 'C.C.: ' + e.cedula,
+                style: 'itemsTableInfoEmpleado'
+              },
+              {
+                border: [false, true, true, false],
+                text: 'COD: ' + e.codigo,
+                style: 'itemsTableInfoEmpleado'
+              }
+            ],
+            [
+              {
+                border: [true, false, false, false],
+                text: 'DEPARTAMENTO: ' + e.departamento,
+                style: 'itemsTableInfoEmpleado'
+              },
+              {
+                border: [false, false, false, false],
+                text: 'CARGO: ' + e.cargo,
+                style: 'itemsTableInfoEmpleado'
+              },
+              {
+                border: [false, false, true, false],
+                text: '',
+                style: 'itemsTableInfoEmpleado'
+              }
+            ]
+          ]
         }
-      }
-    });
-    n.push({
-      style: 'tableMargin',
-      table: {
-        widths: [
-          'auto', '*', 'auto', 'auto','auto', 'auto', 'auto','auto', 'auto', 'auto', 'auto',
-          'auto', 'auto', 'auto','auto', 'auto', 'auto', 'auto','auto',
-        ],
-        headerRows: 2,
-        body: [
-          [
-            { rowSpan: 2, text: 'CÓDIGO', style: 'centrado' },
-            { rowSpan: 2, text: 'USUARIO', style: 'centrado' },
-            { rowSpan: 2, text: 'AÑO', style: 'centrado' },
-            { rowSpan: 2, text: 'MES', style: 'centrado' },
-            { rowSpan: 1, colSpan: 15, text: 'DÍAS DEL MES', style: 'tableHeader' },
-            {},{},{},{},{},{},{},{},{},{},{},{},{},{}
-          ],
-          [
-            {},{},{},{},
-            { rowSpan: 1, text: '17', style: 'tableHeader' },
-            { rowSpan: 1, text: '18', style: 'tableHeader' },
-            { rowSpan: 1, text: '19', style: 'tableHeader' },
-            { rowSpan: 1, text: '20', style: 'tableHeader' },
-            { rowSpan: 1, text: '21', style: 'tableHeader' },
-            { rowSpan: 1, text: '22', style: 'tableHeader' },
-            { rowSpan: 1, text: '23', style: 'tableHeader' },
-            { rowSpan: 1, text: '24', style: 'tableHeader' },
-            { rowSpan: 1, text: '25', style: 'tableHeader' },
-            { rowSpan: 1, text: '26', style: 'tableHeader' },
-            { rowSpan: 1, text: '27', style: 'tableHeader' },
-            { rowSpan: 1, text: '28', style: 'tableHeader' },
-            { rowSpan: 1, text: '29', style: 'tableHeader' },
-            { rowSpan: 1, text: '30', style: 'tableHeader' },
-            { rowSpan: 1, text: '31', style: 'tableHeader' }
-          ],
-          ...this.horariosEmpleado.map(e => {
-            return [
-              { style: 'itemsTableCentrado', text: e.codigo_e },
-              { style: 'itemsTableCentrado', text: e.nombre_e },
-              { style: 'itemsTableCentrado', text: e.anio },
-              { style: 'itemsTableCentrado', text: e.mes },
-              { style: 'itemsTableCentrado', text:  e.dia17.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia18.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia19.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia20.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia21.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia22.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia23.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia24.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia25.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia26.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia27.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia28.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia29.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia30.split(',').join('\n')},
-              { style: 'itemsTableCentrado', text:  e.dia31.split(',').join('\n')}
-            ];
-          }),
-        ],
-      },
-      layout: {
-        fillColor: function (rowIndex) {
-          return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-        }
-      }
-    });
+      });
+
+      e.horarios.forEach((h)=>{
+        n.push({
+          style: 'tableMargin',
+          table: {
+            widths: [
+              '*', '*', '*', '*','*','*','*' 
+            ],
+            headerRows: 0,
+            body: [
+              [
+                { rowSpan: 1, colSpan: 7, text: 'AÑO: ' + h.anio + ' MES: ' + h.mes, style: 'tableHeader' },
+                {},{},{},{},{},{}
+              ],
+              [
+                { rowSpan: 1, text: '01', style: 'tableHeader' },
+                { rowSpan: 1, text: '02', style: 'tableHeader' },
+                { rowSpan: 1, text: '03', style: 'tableHeader' },
+                { rowSpan: 1, text: '04', style: 'tableHeader' },
+                { rowSpan: 1, text: '05', style: 'tableHeader' },
+                { rowSpan: 1, text: '06', style: 'tableHeader' },
+                { rowSpan: 1, text: '07', style: 'tableHeader' },
+              ],
+              [
+                { style: 'itemsTableCentrado', text:  h.dia1},
+                { style: 'itemsTableCentrado', text:  h.dia2},
+                { style: 'itemsTableCentrado', text:  h.dia3 },
+                { style: 'itemsTableCentrado', text:  h.dia4 },
+                { style: 'itemsTableCentrado', text:  h.dia5 }, 
+                { style: 'itemsTableCentrado', text:  h.dia6 },
+                { style: 'itemsTableCentrado', text:  h.dia7 },
+              ],
+              [
+                { rowSpan: 1, text: '08', style: 'tableHeader' },
+                { rowSpan: 1, text: '09', style: 'tableHeader' },
+                { rowSpan: 1, text: '10', style: 'tableHeader' },
+                { rowSpan: 1, text: '11', style: 'tableHeader' },
+                { rowSpan: 1, text: '12', style: 'tableHeader' },
+                { rowSpan: 1, text: '13', style: 'tableHeader' },
+                { rowSpan: 1, text: '14', style: 'tableHeader' },
+              ],
+              [
+                { style: 'itemsTableCentrado', text:  h.dia8 },
+                { style: 'itemsTableCentrado', text:  h.dia9 },
+                { style: 'itemsTableCentrado', text:  h.dia10 },
+                { style: 'itemsTableCentrado', text:  h.dia11 },
+                { style: 'itemsTableCentrado', text:  h.dia12 },
+                { style: 'itemsTableCentrado', text:  h.dia13 },
+                { style: 'itemsTableCentrado', text:  h.dia14 },
+              ],
+              [
+                { rowSpan: 1, text: '15', style: 'tableHeader' },
+                { rowSpan: 1, text: '16', style: 'tableHeader' },
+                { rowSpan: 1, text: '17', style: 'tableHeader' },
+                { rowSpan: 1, text: '18', style: 'tableHeader' },
+                { rowSpan: 1, text: '19', style: 'tableHeader' },
+                { rowSpan: 1, text: '20', style: 'tableHeader' },
+                { rowSpan: 1, text: '21', style: 'tableHeader' },
+              ],
+              [
+                { style: 'itemsTableCentrado', text:  h.dia15 },
+                { style: 'itemsTableCentrado', text:  h.dia16 },
+                { style: 'itemsTableCentrado', text:  h.dia17 },
+                { style: 'itemsTableCentrado', text:  h.dia18 },
+                { style: 'itemsTableCentrado', text:  h.dia19 },
+                { style: 'itemsTableCentrado', text:  h.dia20 },
+                { style: 'itemsTableCentrado', text:  h.dia21 }
+              ],
+              [
+                { rowSpan: 1, text: '22', style: 'tableHeader' },
+                { rowSpan: 1, text: '23', style: 'tableHeader' },
+                { rowSpan: 1, text: '24', style: 'tableHeader' },
+                { rowSpan: 1, text: '25', style: 'tableHeader' },
+                { rowSpan: 1, text: '26', style: 'tableHeader' },
+                { rowSpan: 1, text: '27', style: 'tableHeader' },
+                { rowSpan: 1, text: '28', style: 'tableHeader' },
+              ],
+              [
+                { style: 'itemsTableCentrado', text:  h.dia22 },
+                { style: 'itemsTableCentrado', text:  h.dia23 },
+                { style: 'itemsTableCentrado', text:  h.dia24 },
+                { style: 'itemsTableCentrado', text:  h.dia25 },
+                { style: 'itemsTableCentrado', text:  h.dia26 },
+                { style: 'itemsTableCentrado', text:  h.dia27 },
+                { style: 'itemsTableCentrado', text:  h.dia28 },
+              ],
+              [            
+                { rowSpan: 1, text: '29', style: 'tableHeader' },
+                { rowSpan: 1, text: '30', style: 'tableHeader' },
+                { rowSpan: 1, text: '31', style: 'tableHeader' },
+                {},{},{},{}
+              ],
+              [         
+                { style: 'itemsTableCentrado', text:  h.dia29 },
+                { style: 'itemsTableCentrado', text:  h.dia30 },
+                { style: 'itemsTableCentrado', text:  h.dia31 },
+                {},{},{},{}
+              ],
+            ],
+          },
+        });
+      })
+    })
+
     return n;
   }
 
@@ -1023,7 +1042,8 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
 
     const tableData = [
       [
-        'CÓDIGO', 'USUARIO', 'AÑO', 'MES',
+        'CIUDAD', 'SUCURSAL', 'DEPARTAMENTO', 'REGIMEN',
+        'NOMBRE EMPLEADO', 'CÉDULA','CÓDIGO', 'AÑO', 'MES',
         '01', '02', '03', '04', '05',
         '06', '07', '08', '09', '10',
         '11', '12', '13', '14', '15',
@@ -1033,18 +1053,24 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
       ],
     ];
     
-    this.horariosEmpleado.forEach((employee) => {
-      tableData.push([
-        employee.codigo_e, employee.nombre_e, employee.anio, employee.mes,
-        employee.dia1, employee.dia2, employee.dia3, employee.dia4,
-        employee.dia5, employee.dia6, employee.dia7, employee.dia8,
-        employee.dia9, employee.dia10, employee.dia11, employee.dia12,
-        employee.dia13, employee.dia14, employee.dia15, employee.dia16,
-        employee.dia17, employee.dia18, employee.dia19, employee.dia20,
-        employee.dia21, employee.dia22, employee.dia23, employee.dia24,
-        employee.dia25, employee.dia26, employee.dia27, employee.dia28,
-        employee.dia29, employee.dia30, employee.dia31
-      ]);
+    this.horariosEmpleado.forEach((empleado) => {
+      empleado.horarios.forEach((h:any) =>{
+        tableData.push([
+          empleado.ciudad, empleado.sucursal, empleado.departamento,
+          empleado.regimen[0].name_regimen, empleado.name_empleado,
+          empleado.cedula, empleado.codigo, h.anio, h.mes,
+          h.dia1, h.dia2, h.dia3, h.dia4,
+          h.dia5, h.dia6, h.dia7, h.dia8,
+          h.dia9, h.dia10, h.dia11, h.dia12,
+          h.dia13, h.dia14, h.dia15, h.dia16,
+          h.dia17, h.dia18, h.dia19, h.dia20,
+          h.dia21, h.dia22, h.dia23, h.dia24,
+          h.dia25, h.dia26, h.dia27, h.dia28,
+          h.dia29, h.dia30, h.dia31
+        ]);
+      })
+
+      
     });
     return tableData;
   }
@@ -1082,6 +1108,29 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
       ]);
     });
     return tableData;
+  }
+
+  extraerHorarioEmpleados() {
+    this.horarios = [];
+    this.horariosEmpleado.forEach((empleado:any) => {
+      empleado.horarios.forEach((h:any) =>{
+        const horario = {
+          ciudad:empleado.ciudad, sucursal:empleado.sucursal, departamento:empleado.departamento,
+          regimen:empleado.regimen[0].name_regimen, empleado:empleado.name_empleado,
+          cedula:empleado.cedula, codigo:empleado.codigo, anio:h.anio, mes:h.mes,
+          dia1:h.dia1, dia2:h.dia2, dia3:h.dia3, dia4:h.dia4,
+          dia5:h.dia5, dia6:h.dia6, dia7:h.dia7, dia8:h.dia8,
+          dia9:h.dia9, dia10:h.dia10, dia11:h.dia11, dia12:h.dia12,
+          dia13:h.dia13, dia14:h.dia14, dia15:h.dia15, dia16:h.dia16,
+          dia17:h.dia17, dia18:h.dia18, dia19:h.dia19, dia20:h.dia20,
+          dia21:h.dia21, dia22:h.dia22, dia23:h.dia23, dia24:h.dia24,
+          dia25:h.dia25, dia26:h.dia26, dia27:h.dia27, dia28:h.dia28,
+          dia29:h.dia29, dia30:h.dia30, dia31:h.dia31
+        }
+        this.horarios.push(horario);
+      })
+    });
+    console.log('extraidos',this.horarios)
   }
 
 
@@ -1231,8 +1280,8 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   }
 
   ManejarPaginaResultados(e: PageEvent) {
-    this.tamanio_pagina_emp = e.pageSize;
-    this.numero_pagina_emp = e.pageIndex + 1;
+    this.numero_pagina_res = e.pageIndex + 1;
+    this.tamanio_pagina_res = e.pageSize;
   }
 
   /**
@@ -1249,7 +1298,9 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
 
   // MOSTRAR DETALLES
   verDatos() {
+    this.extraerHorarioEmpleados();
     this.verDetalle = true;
+
   }
 
   // METODO PARA REGRESAR A LA PAGINA ANTERIOR

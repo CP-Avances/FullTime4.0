@@ -378,7 +378,7 @@
                         <thead class="thead-light">
                             <tr style="text-align: center;">
                                 <th class="sticky colum_1" scope="col" id="td_horarios" rowspan="2">CÓDIGO</th>
-                                <th class="sticky-2 colum_1" scope="col" id="td_horarios" rowspan="2">USUARIO</th>
+                                <th class="sticky-2 colum_1" scope="col" id="td_horarios" rowspan="2">EMPLEADO</th>
                                 <th class="sticky-3 colum_2" scope="col" id="td_horarios" rowspan="2">AÑO</th>
                                 <th class="sticky-4 colum_2" scope="col" id="td_horarios" rowspan="2">MES</th>
                                 <th scope="col" id="td_horarios" colspan="31">DÍAS DEL MES</th>
@@ -418,14 +418,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let e of horariosEmpleado | paginate:tamanio_pagina_emp:numero_pagina_emp">
+                            <tr *ngFor="let e of horarios | paginate : tamanio_pagina_res : numero_pagina_res">
                                 <td class="sticky colum_1" id="td_horarios"
-                                    [ngStyle]="{'background':CambiarColores(e.color)}">
-                                    {{e.codigo_e}}
+                                [ngStyle]="{'background':CambiarColores(e.color)}">
+                                {{e.codigo}}
                                 </td>
                                 <td class="sticky-2 colum_1" id="td_horarios"
                                     [ngStyle]="{'background':CambiarColores(e.color)}">
-                                    {{e.nombre_e}}
+                                    {{e.empleado}}
                                 </td>
                                 <td class="sticky-3 colum_2" id="td_horarios"
                                     [ngStyle]="{'background':CambiarColores(e.color)}">
@@ -653,11 +653,11 @@
                                     </div>
                                 </td>
                             </tr>
-                        </tbody>
-                    </table>
+                        </tbody>    
+                    </table>    
                 </div>
-                <mat-paginator id="pagina" [length]="horariosEmpleado.length" [pageSize]="tamanio_pagina_emp"
-                    [pageSizeOptions]="pageSizeOptions_emp" (page)="ManejarPaginaResultados($event)"
+                <mat-paginator [length]="horarios.length" [pageSize]="tamanio_pagina_res"
+                    [pageSizeOptions]="pageSizeOptions_res" (page)="ManejarPaginaResultados($event)"
                     showFirstLastButtons>
                 </mat-paginator>
                 <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 0.5rem">
