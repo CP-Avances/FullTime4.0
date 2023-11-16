@@ -73,7 +73,7 @@ export default REPORTES_TIEMPO_LABORADO_CONTROLADOR;
 
 const BuscarTiempoLaborado = async function (fec_inicio: string, fec_final: string, codigo: string | number) {
     return await pool.query('SELECT CAST(fec_horario AS VARCHAR), CAST(fec_hora_horario AS VARCHAR), CAST(fec_hora_timbre AS VARCHAR), ' +
-    'codigo, estado_timbre, tipo_entr_salida AS accion, min_alimentacion, tipo_dia ' +
+    'codigo, estado_timbre, tipo_entr_salida AS accion, min_alimentacion, tipo_dia, id_horario, estado_origen ' +
     'FROM plan_general WHERE CAST(fec_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' ' +
     'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 ' +
     'AND tipo_entr_salida IN (\'E\',\'I/A\', \'F/A\', \'S\') ' +
@@ -89,7 +89,7 @@ const agruparTimbres = async function agruparTimbresPorClave(timbres: Timbre[]) 
     const timbresAgrupados: any[] = [];
 
     timbres.forEach((timbre) => {
-        const clave = `${timbre.fec_horario}`;
+        const clave = `${timbre.fec_horario}-${timbre.id_horario}`;
         if (!timbresAgrupadosFecha[clave]) {
             timbresAgrupadosFecha[clave] = [];
         }
@@ -105,6 +105,7 @@ const agruparTimbres = async function agruparTimbresPorClave(timbres: Timbre[]) 
                     timbresAgrupados.push({
                         tipo: 'EAS',
                         dia: timbresAgrupadosFecha[key][i].tipo_dia,
+                        origen: timbresAgrupadosFecha[key][i].estado_origen,
                         entrada: timbresAgrupadosFecha[key][i],
                         inicioAlimentacion: timbresAgrupadosFecha[key][i+1],
                         finAlimentacion: timbresAgrupadosFecha[key][i+2],
@@ -112,16 +113,17 @@ const agruparTimbres = async function agruparTimbresPorClave(timbres: Timbre[]) 
                     });
                 }
                 break;  
-            default:
+            case 2:
                 for (let i = 0; i < timbresAgrupadosFecha[key].length; i += 2) {
-                   timbresAgrupados.push({
-                        tipo: 'ES',
-                        dia: timbresAgrupadosFecha[key][i].tipo_dia,
-                        entrada: timbresAgrupadosFecha[key][i],
-                        salida: i + 1 < timbresAgrupadosFecha[key].length ? timbresAgrupadosFecha[key][i + 1] : null
-                     });
-                }
-                break;
+                    timbresAgrupados.push({
+                         tipo: 'ES',
+                         dia: timbresAgrupadosFecha[key][i].tipo_dia,
+                         origen: timbresAgrupadosFecha[key][i].estado_origen,
+                         entrada: timbresAgrupadosFecha[key][i],
+                         salida: i + 1 < timbresAgrupadosFecha[key].length ? timbresAgrupadosFecha[key][i + 1] : null
+                      });
+                 }
+                 break;
         }
     }
 
@@ -132,6 +134,7 @@ const agruparTimbres = async function agruparTimbresPorClave(timbres: Timbre[]) 
 
 
 interface Timbre {
+    id_horario: string;
     fec_horario: string;
     fec_hora_horario: string;
     fec_hora_timbre: string | null;
@@ -139,6 +142,7 @@ interface Timbre {
     estado_timbre: string | null;
     accion: string;
     tipo_dia: string;
+    estado_origen: string;
     min_alimentacion: number;
 }
 

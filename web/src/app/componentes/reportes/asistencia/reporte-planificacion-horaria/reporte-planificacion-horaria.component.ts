@@ -815,8 +815,8 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
       style: 'tableMargin',
       table: {
         widths: [
-          'auto', 'auto', 'auto', 'auto','*', '*', '*','*', '*', '*', '*',
-          '*', '*', '*','*', '*', '*', '*','*', '*',
+          'auto', '*', 'auto', 'auto','auto', 'auto', 'auto','auto', 'auto', 'auto', 'auto',
+          'auto', 'auto', 'auto','auto', 'auto', 'auto', 'auto','auto', 'auto',
         ],
         headerRows: 2,
         body: [
@@ -883,8 +883,8 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
       style: 'tableMargin',
       table: {
         widths: [
-          'auto', 'auto', 'auto', 'auto','*', '*', '*','*', '*', '*', '*',
-          '*', '*', '*','*', '*', '*', '*','*',
+          'auto', '*', 'auto', 'auto','auto', 'auto', 'auto','auto', 'auto', 'auto', 'auto',
+          'auto', 'auto', 'auto','auto', 'auto', 'auto', 'auto','auto',
         ],
         headerRows: 2,
         body: [
