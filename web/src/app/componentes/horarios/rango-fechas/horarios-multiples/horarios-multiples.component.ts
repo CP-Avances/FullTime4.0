@@ -968,7 +968,7 @@ export class HorariosMultiplesComponent implements OnInit {
         // ALMACENAMIENTO DE PLANIFICACION GENERAL
         this.plan_general = this.plan_general.concat(plan);
       })
-      console.log('ver datos de plan_general ', this.plan_general)
+      //console.log('ver datos de plan_general ', this.plan_general)
     }
   }
 
