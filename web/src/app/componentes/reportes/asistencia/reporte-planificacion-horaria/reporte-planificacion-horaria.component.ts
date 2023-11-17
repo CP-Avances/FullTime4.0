@@ -424,14 +424,20 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   ModelarEmpleados(accion) {
     this.tipo = 'default';
     this.accion = accion;
+    let respuesta = JSON.parse(this.origen);
     let emp: any = [];
-    this.empleados.forEach((obj: any) => {
-      this.selectionEmp.selected.find(obj1 => {
-        if (obj1.id === obj.id) {
-          emp.push(obj)
-        }
+
+    respuesta.forEach((obj: any) => {
+      obj.departamentos.forEach((obj1: any) => {
+       obj1.empleado.forEach((obj2:any) => {
+        this.selectionEmp.selected.find(obj3 => {
+          if (obj2.id === obj3.id){
+            emp.push(obj2);
+          }
+        });
+       });
       })
-    })
+    });
     this.VerPlanificacion(emp);
   }
 
