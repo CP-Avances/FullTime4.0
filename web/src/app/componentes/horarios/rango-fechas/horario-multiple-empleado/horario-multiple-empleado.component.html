@@ -148,8 +148,74 @@
                 <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 'm')">
                     Planificación Múltiple
                 </button>
+                <button id="btn-raised" class="btn btn-sm" (click)="VerCargarTimbres()">
+                    Asignar timbres
+                </button>
                 <button id="btn-raised" class="btn btn-sm" (click)="LimpiarFormulario()">Cancelar</button>
             </div>
+
+            <hr *ngIf="activar_cargar">
+
+            <div id="titulo" *ngIf="activar_cargar">
+                <span>
+                    CARGAR TIMBRES
+                </span>
+                <mat-icon class="float-right" id="cerrar" (click)="CerrarCargarTimbres()">highlight_off</mat-icon>
+            </div>
+            <mat-card class="example-card mat-elevation-z8" *ngIf="activar_cargar">
+                <div class="d-flex flex-wrap justify-content-center" style="padding-top: 5px;">
+                    <!-- FORMULARIO COMPLETO -->
+                    <form [formGroup]="timbre">
+                        <mat-card-content>
+                            <div class="container" style="text-align: center;">
+                                <div class="nota" style="text-align: justify;">
+                                    <span>
+                                        NOTA: Por favor llenar todos los campos obligatorios (*) del formulario para
+                                        activar el botón Cargar.
+                                    </span>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm">
+                                        <div class="row">
+                                            <div class="col-md d-flex flex-wrap justify-content-start">
+                                                <mat-form-field id="campos">
+                                                    <mat-label>Fecha desde</mat-label>
+                                                    <input matInput [matDatepicker]="picker" placeholder="dd/mm/aaaa"
+                                                        [formControl]="fechaInicioF" min="1950-01-31" max="2050-01-31"
+                                                        required>
+                                                    <mat-datepicker-toggle matSuffix [for]="picker" id="i-cursor"
+                                                        matTooltipPosition="right"
+                                                        matTooltip="Seleccionar la fecha dando click en el ícono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                                                    </mat-datepicker-toggle>
+                                                    <mat-datepicker touchUi #picker></mat-datepicker>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="col-md d-flex flex-wrap justify-content-start">
+                                                <mat-form-field id="campos">
+                                                    <mat-label>Fecha hasta</mat-label>
+                                                    <input matInput [matDatepicker]="picker2" placeholder="dd/mm/aaaa"
+                                                        [formControl]="fechaFinalF" required>
+                                                    <mat-datepicker-toggle matSuffix [for]="picker2" id="i-cursor"
+                                                        matTooltipPosition="right"
+                                                        matTooltip="Seleccionar la fecha dando click en el ícono de calendario o puede escribir la fecha con el formato  día/mes/año. Ejemplo: 12/04/1993">
+                                                    </mat-datepicker-toggle>
+                                                    <mat-datepicker touchUi #picker2></mat-datepicker>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 't')"
+                                    [disabled]="!timbre.valid">
+                                    Cargar
+                                </button>
+                            </div>
+                        </mat-card-content>
+                    </form>
+                </div>
+            </mat-card>
 
             <hr>
 

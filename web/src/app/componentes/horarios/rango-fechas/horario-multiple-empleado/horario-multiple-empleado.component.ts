@@ -4,7 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
 import { Component, OnInit } from '@angular/core';
-import { Validators, FormControl } from '@angular/forms';
+import { Validators, FormControl, FormGroup } from '@angular/forms';
 
 // IMPORTAR PLANTILLA DE MODELO DE DATOS
 import { ITableEmpleados } from 'src/app/model/reportes.model';
@@ -17,6 +17,8 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import moment from 'moment';
+import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 
 @Component({
   selector: 'app-horario-multiple-empleado',
@@ -98,6 +100,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     public restCargo: EmplCargosService,
     public restPerV: PeriodoVacacionesService, // SERVICIO DATOS PERIODO DE VACACIONES
     public validar: ValidacionesService, // VARIABLE USADA PARA VALIDACIONES DE INGRESO DE LETRAS - NUMEROS
+    public timbrar: TimbresService,
     public restR: ReportesService,
     public plan: PlanGeneralService,
     private toastr: ToastrService, // VARIABLE PARA MANEJO DE NOTIFICACIONES
@@ -417,6 +420,9 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     else if (tipo === 'm') {
       this.PlanificarRotativos(usuarios);
     }
+    else if (tipo === 't') {
+      this.CargarTimbres(usuarios);
+    }
   }
 
   // METODO PARA MOSTRAR DATOS DE DEPARTAMENTOS
@@ -461,6 +467,9 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     else if (tipo === 'm') {
       this.PlanificarRotativos(usuarios);
     }
+    else if (tipo === 't') {
+      this.CargarTimbres(usuarios);
+    }
   }
 
   // METODO PARA MOSTRAR DATOS DE EMPLEADOS
@@ -485,6 +494,9 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     }
     else if (tipo === 'm') {
       this.PlanificarRotativos(respuesta);
+    }
+    else if (tipo === 't') {
+      this.CargarTimbres(respuesta);
     }
   }
 
@@ -647,7 +659,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   // METODO PARA VER PLANIFICACION
   resultados: any = [];
   VerPlanificacion(data: any) {
-    console.log('VerPlanificacion',data);
+    console.log('VerPlanificacion', data);
     if (data.length > 0) {
       this.resultados = data;
       this.seleccionar = false;
@@ -709,6 +721,106 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     }
     this.registrar_rotativo = true;
     this.seleccionar = false;
+  }
+
+  /** **************************************************************************************** **
+   ** **                              METODO PARA CARGAR TIMBRE                             ** **
+   ** **************************************************************************************** **/
+
+  // METODO PARA CARGAR TIMBRES
+  activar_cargar: boolean = false;
+
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
+
+  fechaInicioF = new FormControl('', Validators.required);
+  fechaFinalF = new FormControl('', [Validators.required]);
+
+  public timbre = new FormGroup({
+    fechaInicioForm: this.fechaInicioF,
+    fechaFinalForm: this.fechaFinalF,
+  });
+
+  // METODO PARA VER FORMULARIO PARA CARGAR TIMBRES
+  VerCargarTimbres() {
+    this.activar_boton = false;
+    this.activar_cargar = true;
+  }
+
+  // METODO PARA CERRAR FORMULARIO PARA CARGAR TIMBRES
+  CerrarCargarTimbres() {
+    this.activar_boton = true;
+    this.activar_cargar = false;
+  }
+
+  // METODO PARA CARGAR TIMBRES EN LA ASISTENCIA DE LOS USUARIO
+  CargarTimbres(data: any) {
+    //console.log('ver data timbres ', data)
+    if (data.length > 0) {
+
+      var inicio = moment(this.fechaInicioF.value).format('YYYY-MM-DD');
+      var fin = moment(this.fechaFinalF.value).format('YYYY-MM-DD');
+
+      // VERIFICAR FECHAS INGRESADAS
+      if (Date.parse(inicio) <= Date.parse(fin)) {
+
+        // CONTROL DE ASIGNACION DE TIMBRES A LA ASISTENCIA
+        var codigos = '';
+        data.forEach(obj => {
+          if (codigos === '') {
+            codigos = '\'' + obj.codigo + '\''
+          }
+          else {
+            codigos = codigos + ', \'' + obj.codigo + '\''
+          }
+        })
+
+        let usuarios = {
+          codigo: codigos,
+          fec_final: moment(moment(this.fechaFinalF.value).format('YYYY-MM-DD')).add(2, 'days'),
+          fec_inicio: moment(this.fechaInicioF.value).format('YYYY-MM-DD'),
+        };
+
+        this.timbrar.BuscarTimbresPlanificacion(usuarios).subscribe(datos => {
+          //console.log('datos ', datos)
+          if (datos.message === 'vacio') {
+            this.toastr.info(
+              'No se han encontrado registros de marcaciones.', '', {
+              timeOut: 6000,
+            })
+            this.CerrarCargarTimbres();
+          }
+          else if (datos.message === 'error') {
+            this.toastr.info(
+              'Ups!!! algo salio mal', 'No se cargaron todos los registros.', {
+              timeOut: 6000,
+            })
+          }
+          else {
+            this.toastr.success(
+              'Operación exitosa.', 'Registros cargados.', {
+              timeOut: 6000,
+            })
+            this.CerrarCargarTimbres();
+          }
+        }, vacio => {
+          this.toastr.info(
+            'No se han encontrado registros de marcaciones.', '', {
+            timeOut: 6000,
+          })
+        })
+        this.CerrarCargarTimbres();
+      }
+      else {
+        this.toastr.warning('Fecha hasta debe ser mayor a la fecha desde.', 'Verificar las fechas ingresadas.', {
+          timeOut: 6000,
+        });
+      }
+    }
+    else {
+      this.toastr.warning('No ha seleccionado usuarios.', '', {
+        timeOut: 6000,
+      });
+    }
   }
 
 }

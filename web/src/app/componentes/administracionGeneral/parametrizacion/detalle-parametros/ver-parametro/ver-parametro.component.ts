@@ -1,4 +1,5 @@
 // SECCIÓN DE LIBRERIAS
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit, Input } from '@angular/core';
 import { MatRadioChange } from '@angular/material/radio';
 import { ToastrService } from 'ngx-toastr';
@@ -38,6 +39,8 @@ export class VerParametroComponent implements OnInit {
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
 
+  ver_detalles: boolean = true;
+
   // ACTIVADORES
   formato: boolean = true;
   formato_fecha: boolean = false;
@@ -49,6 +52,7 @@ export class VerParametroComponent implements OnInit {
   ubicacion: boolean = false;
   dispositivos: boolean = false;
   segundos_timbres: boolean = false;
+  tolerancia_atrasos: boolean = false;
 
   ingreso: number = 0;
 
@@ -102,6 +106,11 @@ export class VerParametroComponent implements OnInit {
       this.formato = false;
       this.segundos_timbres = true;
     }
+    if (this.idParametro === '2') {
+      this.formato = false;
+      this.tolerancia_atrasos = true;
+      this.ver_detalles = false;
+    }
   }
 
   // METODO PARA MANEJAR PAGINACION DE TABLAS
@@ -124,6 +133,7 @@ export class VerParametroComponent implements OnInit {
     this.datosDetalle = [];
     this.parametro.ListarDetalleParametros(id).subscribe(datos => {
       this.datosDetalle = datos;
+      console.log('ver detalles ', this.datosDetalle)
       if (this.ingreso === 0) {
         this.seleccion = this.datosDetalle[0].descripcion;
         this.opcion_kardex = this.datosDetalle[0].descripcion;
@@ -151,6 +161,21 @@ export class VerParametroComponent implements OnInit {
         this.formatoE = '#4194F0';
         this.formatoI = 'rgb(80, 87, 97)';
         this.formatoA = 'rgb(80, 87, 97)';
+      }
+
+      if (this.idParametro === '2') {
+        this.VerConfiguracionAtrasos();
+      }
+    }, vacio => {
+      if (this.idParametro === '2') {
+        this.ver_actualizar_atraso = false;
+        this.ver_eliminar_atraso = false;
+        this.ver_guardar_atraso = true;
+        this.ver_atraso = false;
+        this.ver_con_tolerancia = false;
+        this.ver_con_tolerancia_2 = false;
+        this.ver_sin_tolerancia = false;
+        this.ver_registrar_atraso = true;
       }
     })
   }
@@ -292,7 +317,7 @@ export class VerParametroComponent implements OnInit {
   }
 
   // METODO PARA REGISTRAR NUEVO PARÁMETRO
-  CrearDetalle(detalle: string) {
+  CrearDetalle(detalle: any) {
     let datos = {
       id_tipo: this.idParametro,
       descripcion: detalle
@@ -307,7 +332,7 @@ export class VerParametroComponent implements OnInit {
   }
 
   // METODO PARA ACTUALIZAR DETALLE DEL PARAMETRO
-  ActualizarDetalle(id_detalle: number, detalle: string) {
+  ActualizarDetalle(id_detalle: number, detalle: any) {
     let datos = {
       id: id_detalle,
       descripcion: detalle
@@ -332,6 +357,139 @@ export class VerParametroComponent implements OnInit {
     this.seleccion = '';
     this.opcion_kardex = '';
     this.opcion_laboral = '';
+    this.formularioT.reset();
   }
 
+  /** ******************************************************************************************* **
+   ** **                        REGISTRO DE CONFIGURACION DE ATRASOS                           ** ** 
+   ** ******************************************************************************************* **/
+
+  // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
+  toleranciaF = new FormControl('');
+  tipoF = new FormControl('');
+
+  // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
+  public formularioT = new FormGroup({
+    tipoForm: this.tipoF,
+    toleranciaForm: this.toleranciaF,
+  });
+
+  // VARIABLES DE CONTROL DE VISTA DE BOTONES
+  ver_con_tolerancia: boolean = false;
+  ver_con_tolerancia_2: boolean = false;
+  ver_sin_tolerancia: boolean = false;
+  ver_atraso: boolean = false;
+  ver_registrar_atraso: boolean = true;
+  ver_guardar_atraso: boolean = true;
+  ver_eliminar_atraso: boolean = false;
+  ver_actualizar_atraso: boolean = false;
+
+  // METODO PARA SELECCION TIPO DE EMPRESA, ESTABLECIMIENTOS Y RESTRICCIONES
+  SeleccionarOpcion(event: MatRadioChange) {
+    var opcion = event.value;
+    this.ver_atraso = true;
+    // OPCION DOS (2) CONSIDERAR TOLERANCIA
+    if (opcion === '2') {
+      this.ver_con_tolerancia = true;
+      this.ver_sin_tolerancia = false;
+      this.ver_registrar_atraso = true;
+    }
+    // OPCION UNO (1) SIN CONSIDERAR TOLERANCIA
+    else {
+      this.tipoF.reset();
+      this.ver_con_tolerancia = false;
+      this.ver_con_tolerancia_2 = false;
+      this.ver_sin_tolerancia = true;
+      this.ver_registrar_atraso = false;
+    }
+    console.log('ver opcion ', opcion)
+  }
+
+  // METODO PARA SELECCION TIPO DE EMPRESA, ESTABLECIMIENTOS Y RESTRICCIONES
+  SeleccionarTipo(event: MatRadioChange) {
+    var opcion = event.value;
+    this.ver_registrar_atraso = false;
+    // OPCION (2-1) CONSIDERANDO MINUTOS DE TOLERANCIA - ATRASO CALCULADO CON HORARIO
+    if (opcion === '2-1') {
+      this.ver_sin_tolerancia = true;
+      this.ver_con_tolerancia_2 = false;
+    }
+    // OPCION (2-2) CONSIDERANDO MINUTOS DE TOLERANCIA - ATRASO CALCULADO CON TOLERANCIA
+    else {
+      this.ver_con_tolerancia_2 = true;
+      this.ver_sin_tolerancia = false;
+    }
+    console.log('ver opcion ', opcion)
+  }
+
+  // METODO PARA REGISTRAR DETALLE DE ATRASOS
+  RegistrarAtraso() {
+    if (this.tipoF.value) {
+      console.log('ver registro ', this.tipoF.value)
+      this.CrearDetalle(this.tipoF.value)
+    }
+    else {
+      console.log('ver registro ', this.toleranciaF.value)
+      this.CrearDetalle(this.toleranciaF.value)
+    }
+  }
+
+  // METODO PARA REGISTRAR DETALLE DE ATRASOS
+  ActualizarAtraso() {
+    if (this.tipoF.value) {
+      console.log('ver registro ', this.tipoF.value)
+      this.ActualizarDetalle(this.datosDetalle[0].id_detalle, this.tipoF.value)
+    }
+    else {
+      console.log('ver registro ', this.toleranciaF.value)
+      this.ActualizarDetalle(this.datosDetalle[0].id_detalle, this.toleranciaF.value)
+    }
+  }
+
+  // METODO PARA ELIMINAR DETALLE DE ATRASOS
+  EliminarAtrasos() {
+    this.ConfirmarDelete(this.datosDetalle[0]);
+  }
+
+  // METODO PARA VER CONFIGURACION DE ATRASOS
+  VerConfiguracionAtrasos() {
+    console.log('ver detalles ', this.datosDetalle)
+    if (this.datosDetalle[0].descripcion != '' && this.datosDetalle[0].descripcion != null) {
+      this.ver_actualizar_atraso = true;
+      this.ver_eliminar_atraso = true;
+      this.ver_registrar_atraso = false;
+      this.ver_guardar_atraso = false;
+      this.ver_atraso = true;
+      if (this.datosDetalle[0].descripcion === '1') {
+        this.toleranciaF.setValue(this.datosDetalle[0].descripcion);
+        this.tipoF.reset();
+        this.ver_con_tolerancia = false;
+        this.ver_con_tolerancia_2 = false;
+        this.ver_sin_tolerancia = true;
+      }
+      else if (this.datosDetalle[0].descripcion === '2-1') {
+        this.ver_con_tolerancia = true;
+        this.ver_sin_tolerancia = true;
+        this.ver_con_tolerancia_2 = false;
+
+        this.toleranciaF.setValue('2');
+        this.tipoF.setValue(this.datosDetalle[0].descripcion);
+      }
+      else if (this.datosDetalle[0].descripcion === '2-2') {
+        this.ver_con_tolerancia = true;
+        this.ver_con_tolerancia_2 = true;
+        this.ver_sin_tolerancia = false;
+
+        this.toleranciaF.setValue('2');
+        this.tipoF.setValue(this.datosDetalle[0].descripcion);
+      }
+
+    }
+    else {
+      this.ver_actualizar_atraso = false;
+      this.ver_eliminar_atraso = false;
+      this.ver_registrar_atraso = true;
+      this.ver_guardar_atraso = true;
+    }
+  }
 }
