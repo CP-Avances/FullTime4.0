@@ -323,10 +323,10 @@
                                 <td [ngClass]="obtenerClaseTimbre(t.finAlimentacion)">{{ t.finAlimentacion }}</td>
                                 <td>{{ t.salidaHorario }}</td>
                                 <td [ngClass]="obtenerClaseTimbre(t.salida)">{{ t.salida }}</td>
-                                <td></td>
-                                <td></td>
+                                <td [ngClass]="obtenerClaseAtrasoSalida(t.minutosAtraso, 'A')" >{{ t.tiempoAtraso }}</td>
+                                <td [ngClass]="obtenerClaseAtrasoSalida(t.minutosSalidaAnticipada, 'S')" >{{ t.tiempoSalidaAnticipada }}</td>
                                 <td>{{ t.alimentacion_asignada }}</td>
-                                <td>{{ t.tiempoAlimentacion }}</td>
+                                <td [ngClass]="obtenerClaseAlimentacion(t.alimentacion_asignada, t.minutosAlimentacion)">{{ t.tiempoAlimentacion }}</td>
                                 <td>{{ t.tiempoLaborado }}</td>
                                 <td></td>
                             </tr>
