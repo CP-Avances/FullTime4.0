@@ -1,7 +1,7 @@
 import { IReporteFaltas, ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { PageEvent } from '@angular/material/paginator';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ToastrService } from 'ngx-toastr';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
@@ -88,6 +88,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   pageSizeOptions_emp = [5, 10, 20, 50];
 
   // ITEMS DE PAGINACION DE LA TABLA DETALLE
+  @ViewChild('paginatorDetalle') paginatorDetalle: MatPaginator;
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
@@ -120,7 +121,9 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.BuscarInformacion();
+    this.BuscarParametro();
     this.BuscarCargos();
+    this.BuscarHora();
   }
 
   ngOnDestroy(): void {
@@ -1489,6 +1492,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   // METODO PARA REGRESAR A LA PAGINA ANTERIOR
   Regresar() {
     this.verDetalle = false;
+    this.paginatorDetalle.firstPage();
   }
 
   //METDODO PARA CAMBIAR EL COLOR DE LAS CELDAS EN LA TABLA DE PREVISUALIZACION

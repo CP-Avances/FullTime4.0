@@ -73,7 +73,7 @@ export default REPORTES_TIEMPO_LABORADO_CONTROLADOR;
 
 const BuscarTiempoLaborado = async function (fec_inicio: string, fec_final: string, codigo: string | number) {
     return await pool.query('SELECT CAST(fec_horario AS VARCHAR), CAST(fec_hora_horario AS VARCHAR), CAST(fec_hora_timbre AS VARCHAR), ' +
-    'codigo, estado_timbre, tipo_entr_salida AS accion, min_alimentacion, tipo_dia, id_horario, estado_origen ' +
+    'codigo, estado_timbre, tipo_entr_salida AS accion, min_alimentacion, tipo_dia, id_horario, estado_origen, tolerancia ' +
     'FROM plan_general WHERE CAST(fec_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' ' +
     'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 ' +
     'AND tipo_entr_salida IN (\'E\',\'I/A\', \'F/A\', \'S\') ' +
@@ -144,5 +144,6 @@ interface Timbre {
     tipo_dia: string;
     estado_origen: string;
     min_alimentacion: number;
+    toleranica: number;
 }
 

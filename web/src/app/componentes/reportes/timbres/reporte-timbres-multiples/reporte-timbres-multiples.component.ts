@@ -125,7 +125,9 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
       this.dispositivo = true;
     }
     this.BuscarInformacion();
+    this.BuscarParametro();
     this.BuscarCargos();
+    this.BuscarHora();
   }
 
   /********************************************************************************************
@@ -134,8 +136,8 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
-  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
   BuscarParametro() {
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
     // id_tipo_parametro Formato fecha = 25
     this.parametro.ListarDetalleParametros(25).subscribe(
       res => {

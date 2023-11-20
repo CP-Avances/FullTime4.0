@@ -1,9 +1,9 @@
 // IMPORTAR LIBRERIAS
 import { ReporteSalidaAntes } from 'src/app/model/salida-antes.model';
 import { ITableEmpleados } from 'src/app/model/reportes.model';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import { ToastrService } from 'ngx-toastr';
@@ -90,6 +90,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   pageSizeOptions_emp = [5, 10, 20, 50];
 
   // ITEMS DE PAGINACION DE LA TABLA DETALLE
+  @ViewChild('paginatorDetalle') paginatorDetalle: MatPaginator;
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
@@ -122,7 +123,9 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.BuscarInformacion();
+    this.BuscarParametro();
     this.BuscarCargos();
+    this.BuscarHora();
   }
 
   /********************************************************************************************
@@ -1625,5 +1628,6 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   // METODO PARA REGRESAR A LA PAGINA ANTERIOR
   Regresar() {
     this.verDetalle = false;
+    this.paginatorDetalle.firstPage();
   }
 }

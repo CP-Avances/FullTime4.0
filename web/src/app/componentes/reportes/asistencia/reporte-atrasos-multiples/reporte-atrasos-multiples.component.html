@@ -274,7 +274,7 @@
                                 <th scope="col" rowspan="2">DESDE</th>
                                 <th scope="col" rowspan="2">HASTA</th>
                                 <th scope="col" rowspan="2" colspan="2">PERMISO</th>
-                                <th scope="col" rowspan="2" *ngIf="tolerancia==='considerar'">TOLERANCIA</th>                             
+                                <th scope="col" rowspan="2" *ngIf="tolerancia!=='1'">TOLERANCIA</th>                             
                                 <th scope="col" rowspan="2" colspan="2">ATRASO</th>
                             </tr>
                             <tr style="text-align: center">
@@ -298,14 +298,14 @@
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                                <td *ngIf="tolerancia==='considerar'">{{ t.tolerancia }}</td>
+                                <td *ngIf="tolerancia!=='1'">{{ t.tolerancia }}</td>
                                 <td>{{ t.atrasoT }}</td>
                                 <td>{{ t.atrasoM }}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <mat-paginator [length]="timbres.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
+                <mat-paginator #paginatorDetalle [length]="timbres.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
                     (page)="ManejarPaginaDetalle($event)" showFirstLastButtons aria-label="Seleccionar pagina">
                 </mat-paginator>
             </div>

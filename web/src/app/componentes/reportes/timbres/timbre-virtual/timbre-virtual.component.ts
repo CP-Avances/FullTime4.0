@@ -121,7 +121,9 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
       this.dispositivo = true;
     }
     this.BuscarInformacion();
+    this.BuscarParametro();
     this.BuscarCargos();
+    this.BuscarHora();
   }
 
   /********************************************************************************************

@@ -279,7 +279,6 @@
         <mat-paginator id="pagina" [length]="empleados.length" [pageSize]="tamanio_pagina_emp"
             [pageSizeOptions]="pageSizeOptions_emp" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
-        <br>
     </div>
 </div>
 
@@ -333,7 +332,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <mat-paginator *ngIf="paginar" id="pagina" [length]="detalle_acciones.length"
+                        <mat-paginator #paginatorDetalle [hidden]="!paginar" id="pagina" [length]="detalle_acciones.length"
                             [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
                             (page)="ManejarPaginaDetalle($event)" showFirstLastButtons>
                         </mat-paginator>
@@ -656,7 +655,7 @@
                         </tbody>    
                     </table>    
                 </div>
-                <mat-paginator [length]="horarios.length" [pageSize]="tamanio_pagina_res"
+                <mat-paginator #paginatorResultado [length]="horarios.length" [pageSize]="tamanio_pagina_res"
                     [pageSizeOptions]="pageSizeOptions_res" (page)="ManejarPaginaResultados($event)"
                     showFirstLastButtons>
                 </mat-paginator>

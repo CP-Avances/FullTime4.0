@@ -1,8 +1,8 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
@@ -57,8 +57,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
   verDetalle: boolean = false;
 
   // VARIABLES PARA ADMINISTRAR TOLERANCIA
-  tolerancia: string = 'no_considerar';
-  tipoTolerancia: string = '';
+  tolerancia: string = '1';
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS SELECCIONADOS EN LA BUSQUEDA
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
@@ -93,6 +92,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
   pageSizeOptions_emp = [5, 10, 20, 50];
 
   // ITEMS DE PAGINACION DE LA TABLA DETALLE
+  @ViewChild('paginatorDetalle') paginatorDetalle: MatPaginator;
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
@@ -125,7 +125,10 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
 
   ngOnInit(): void {
     this.BuscarInformacion();
+    this.buscarTolerancia();
+    this.BuscarParametro();
     this.BuscarCargos();
+    this.BuscarHora();
   }
 
   ngOnDestroy(): void {
@@ -158,6 +161,13 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
     this.parametro.ListarDetalleParametros(26).subscribe(
       res => {
         this.formato_hora = res[0].descripcion;
+      });
+  }
+
+  buscarTolerancia() {
+    this.parametro.ListarDetalleParametros(2).subscribe(
+      res => {
+        this.tolerancia = res[0].descripcion;
       });
   }
 
@@ -1560,7 +1570,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
       const { entrada, salida } = timbre;      
       if (entrada.fec_hora_timbre !== null && salida.fec_hora_timbre !== null) {
         minutosLaborados = Number(this.calcularMinutosDiferencia(entrada.fec_hora_timbre, salida.fec_hora_timbre).toFixed(2));
-        minutosAtrasos = Number(this.calcularMinutosAtraso(entrada.fec_hora_horario, entrada.fec_hora_timbre));
+        minutosAtrasos = Number(this.calcularMinutosAtraso(entrada.fec_hora_horario, entrada.fec_hora_timbre, entrada.tolerancia));
         minutosSalidasAnticipadas = Number(this.calcularMinutosSalidaAnticipada(salida.fec_hora_horario, salida.fec_hora_timbre).toFixed(2));
       }
     } else {
@@ -1568,7 +1578,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
       const min_alimentacion: number = timbre.inicioAlimentacion.min_alimentacion;
       if (entrada.fec_hora_timbre !== null && salida.fec_hora_timbre !== null) {
         minutosLaborados = Number(this.calcularMinutosDiferencia(entrada.fec_hora_timbre, salida.fec_hora_timbre).toFixed(2));
-        minutosAtrasos = Number(this.calcularMinutosAtraso(entrada.fec_hora_horario, entrada.fec_hora_timbre));
+        minutosAtrasos = Number(this.calcularMinutosAtraso(entrada.fec_hora_horario, entrada.fec_hora_timbre, entrada.tolerancia));
       }     
       if (minutosLaborados >0) {
         minutosAlimentacion = inicioAlimentacion.fec_hora_timbre !== null && finAlimentacion.fec_hora_timbre !== null ? Number(this.calcularMinutosDiferencia(inicioAlimentacion.fec_hora_timbre, finAlimentacion.fec_hora_timbre).toFixed(2)) : min_alimentacion;
@@ -1584,12 +1594,17 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
     return Math.abs(fechaFin.getTime() - fechaInicio.getTime()) / 1000 / 60;
   }
 
-  calcularMinutosAtraso(horario: any, timbre: any): number {
-    const fechaHorario = new Date(horario);
-    const fechaTimbre = new Date(timbre);
+  calcularMinutosAtraso(horario: any, timbre: any, tolerancia: number): number {
+    const diferencia = (new Date(timbre)).getTime() - (new Date(horario)).getTime();
+    const atraso = diferencia / (1000 * 60);
 
-    return fechaTimbre > fechaHorario ? (fechaTimbre.getTime() - fechaHorario.getTime()) / 1000 / 60 : 0;
-  }
+    return this.tolerancia !== '1'
+        ? atraso > tolerancia
+            ? this.tolerancia === '2-1' ? atraso : atraso - tolerancia
+            : 0
+        : atraso;
+}
+
 
   calcularMinutosSalidaAnticipada(horario: any, timbre: any): number {
     const fechaHorario = new Date(horario);
@@ -2050,21 +2065,6 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
     this.tamanio_pagina = e.pageSize;
   }
 
-  restablecerNumerosDePAgina(){
-    this.numero_pagina = 1;
-    this.numero_pagina_car = 1;
-    this.numero_pagina_dep = 1;
-    this.numero_pagina_emp = 1;
-    this.numero_pagina_reg = 1;
-    this.numero_pagina_suc = 1;
-
-    this.tamanio_pagina = 5;
-    this.tamanio_pagina_car = 5;
-    this.tamanio_pagina_dep = 5;
-    this.tamanio_pagina_emp = 5;
-    this.tamanio_pagina_reg = 5;
-    this.tamanio_pagina_suc = 5;
-  }
 
   /**
    * METODOS PARA CONTROLAR INGRESO DE LETRAS
@@ -2081,7 +2081,6 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
   // MOSTRAR DETALLES
   verDatos() {
     this.verDetalle = true;
-    this.restablecerNumerosDePAgina();
     if (this.bool.bool_cargo || this.bool.bool_reg) {
       this.extraerTimbresRegimenCargo();
     } else {
@@ -2092,6 +2091,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
   // METODO PARA REGRESAR A LA PAGINA ANTERIOR
   Regresar() {
     this.verDetalle = false;
+    this.paginatorDetalle.firstPage();
   }
 
   //METDODO PARA CAMBIAR EL COLOR DE LAS CELDAS EN LA TABLA DE PREVISUALIZACION

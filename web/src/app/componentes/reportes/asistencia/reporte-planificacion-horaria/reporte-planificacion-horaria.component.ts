@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 
 import { MatDatepicker } from '@angular/material/datepicker';
@@ -75,10 +75,6 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   tipo: string;
   verDetalle: boolean = false;
 
-  // VARIABLES PARA ADMINISTRAR TOLERANCIA
-  tolerancia: string = 'no_considerar';
-  tipoTolerancia: string = '';
-
   // METODO PARA OBTENER DETALLE DE PLANIFICACION
   ver_detalle: boolean = false;
   ver_acciones: boolean = false;
@@ -118,11 +114,13 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   pageSizeOptions_emp = [5, 10, 20, 50];
 
   // ITEMS DE PAGINACION DE LA TABLA DETALLE
+  @ViewChild('paginatorDetalle') paginatorDetalle: MatPaginator;
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
 
   // ITEMS DE PAGINACION DE LA TABLA RESULTADOS
+  @ViewChild('paginatorResultado') paginatorResultado: MatPaginator;
   pageSizeOptions_res = [5, 10, 20, 50];
   tamanio_pagina_res: number = 5;
   numero_pagina_res: number = 1;
@@ -152,7 +150,9 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
 
   ngOnInit(): void {
     this.BuscarInformacion();
+    this.BuscarParametro();
     this.BuscarCargos();
+    this.BuscarHora();
   }
 
   ngOnDestroy(): void {
@@ -1312,6 +1312,8 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   // METODO PARA REGRESAR A LA PAGINA ANTERIOR
   Regresar() {
     this.verDetalle = false;
+    this.paginatorDetalle.firstPage();
+    this.paginatorResultado.firstPage();
   }
 
   // METODO PARA CAMBIAR DE COLORES SEGUN EL MES

@@ -120,7 +120,9 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.BuscarInformacion();
+    this.BuscarParametro();
     this.BuscarCargos();
+    this.BuscarHora();
   }
 
   /********************************************************************************************

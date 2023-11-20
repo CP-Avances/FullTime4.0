@@ -1,8 +1,8 @@
 // IMPORTAR LIBRERIAS
 import { ITableEmpleados, tim } from 'src/app/model/reportes.model';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 
@@ -61,9 +61,8 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
   tipo: string;
   verDetalle: boolean = false;
 
-  // VARIABLES PARA ADMINISTRAR TOLERANCIA
-  tolerancia: string = 'no_considerar';
-  tipoTolerancia: string = '';
+  // VARIABLE PARA ADMINISTRAR TOLERANCIA
+  tolerancia: string = '1';
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS SELECCIONADOS EN LA BUSQUEDA
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
@@ -98,6 +97,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
   pageSizeOptions_emp = [5, 10, 20, 50];
 
   // ITEMS DE PAGINACION DE LA TABLA DETALLE
+  @ViewChild('paginatorDetalle') paginatorDetalle: MatPaginator;
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
@@ -132,7 +132,10 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.BuscarInformacion();
+    this.buscarTolerancia();
+    this.BuscarParametro();
     this.BuscarCargos();
+    this.BuscarHora();
   }
 
   ngOnDestroy(): void {
@@ -165,6 +168,13 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     this.parametro.ListarDetalleParametros(26).subscribe(
       res => {
         this.formato_hora = res[0].descripcion;
+      });
+  }
+
+  buscarTolerancia() {
+    this.parametro.ListarDetalleParametros(2).subscribe(
+      res => {
+        this.tolerancia = res[0].descripcion;
       });
   }
 
@@ -284,48 +294,33 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de búsqueda.');
     if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
       && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.');
-
-      const dialogRef = this.dialog.open(ConfigurarAtrasosComponent, {
-        width: '30rem',
-        height: '28rem',
-     });
-    
-     dialogRef.afterClosed().subscribe(result => {
-        if (result=='cancelar') {
-          return;
-        }
-        this.tolerancia = result.tolerancia;
-        this.tipoTolerancia = result.tipoTolerancia;
         
-        switch (this.opcion) {
-          case 's':
-            if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione sucursal.')
-            this.ModelarSucursal(action);
-            break;
-          case 'r':
-            if (this.selectionReg.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione régimen.')
-            this.ModelarRegimen(action);
-            break;
-          case 'd':
-            if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione departamentos.')
-            this.ModelarDepartamento(action);
-            break;
-          case 'c':
-            if (this.selectionCar.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione cargos.')
-            this.ModelarCargo(action);
-            break;
-          case 'e':
-            if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione empleados.')
-            this.ModelarEmpleados(action);
-            break;
-          default:
-            this.toastr.error('Ups !!! algo salio mal.', 'Seleccione criterio de búsqueda.')
-            this.reporteService.DefaultFormCriterios()
-            break;
-        }
-
-      });
-
+      switch (this.opcion) {
+        case 's':
+          if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione sucursal.')
+          this.ModelarSucursal(action);
+          break;
+        case 'r':
+          if (this.selectionReg.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione régimen.')
+          this.ModelarRegimen(action);
+          break;
+        case 'd':
+          if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione departamentos.')
+          this.ModelarDepartamento(action);
+          break;
+        case 'c':
+          if (this.selectionCar.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione cargos.')
+          this.ModelarCargo(action);
+          break;
+        case 'e':
+          if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione empleados.')
+          this.ModelarEmpleados(action);
+          break;
+        default:
+          this.toastr.error('Ups !!! algo salio mal.', 'Seleccione criterio de búsqueda.')
+          this.reporteService.DefaultFormCriterios()
+          break;
+      }
   }
 
   ModelarSucursal(accion) {
@@ -342,7 +337,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     this.data_pdf = []
     this.reportesAtrasos.ReporteAtrasos(suc, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res;
-      if (this.tolerancia === 'considerar') {
+      if (this.tolerancia !== '1') {
         this.filtrarTolerancia();
       }
       switch (accion) {
@@ -1550,13 +1545,13 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
   }
 
   validarTolerancia(minutos: number, tolerancia:number){
-    if (this.tolerancia === 'no_considerar') {
+    if (this.tolerancia === '1') {
       return minutos;
     }
     if (minutos <= tolerancia) {
       return null;
     }
-    return this.tipoTolerancia === 'horario' ? minutos : minutos - tolerancia;
+    return this.tolerancia === '2-1' ? minutos : minutos - tolerancia;
   }
   
 
@@ -1797,7 +1792,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
           obj3.timbres = obj3.timbres && obj3.timbres.filter(obj4 => {
             let diferencia = obj4.diferencia;
             const tolerancia = obj4.tolerancia * 60;
-            return (diferencia <= tolerancia) ? false : (this.tipoTolerancia === 'horario' ? (obj4.diferencia = diferencia, true) : (obj4.diferencia = diferencia - tolerancia, true));
+            return (diferencia <= tolerancia) ? false : (this.tolerancia === '2-1' ? (obj4.diferencia = diferencia, true) : (obj4.diferencia = diferencia - tolerancia, true));
           });
           return obj3.timbres && obj3.timbres.length > 0;
         });
@@ -1818,7 +1813,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
         obj2.timbres = obj2.timbres && obj2.timbres.filter((obj3: any) => {
           let diferencia = obj3.diferencia;
           const tolerancia = obj3.tolerancia * 60;
-          return (diferencia <= tolerancia) ? false : (this.tipoTolerancia === 'horario' ? (obj3.diferencia = diferencia, true) : (obj3.diferencia = diferencia - tolerancia, true));
+          return (diferencia <= tolerancia) ? false : (this.tolerancia === '2-1' ? (obj3.diferencia = diferencia, true) : (obj3.diferencia = diferencia - tolerancia, true));
         });
         return obj2.timbres && obj2.timbres.length > 0;
       });
@@ -2002,6 +1997,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
   // METODO PARA REGRESAR A LA PAGINA ANTERIOR
   Regresar() {
     this.verDetalle = false;
+    this.paginatorDetalle.firstPage();
   }
 
 }

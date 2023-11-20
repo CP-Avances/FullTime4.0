@@ -68,6 +68,8 @@ export class VerVacunasComponent implements OnInit {
 
   ngOnInit(): void {
     this.validarTipo(this.tipo);
+    this.BuscarParametro();
+    this.BuscarHora();
   }
 
   /********************************************************************************************
