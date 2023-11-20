@@ -1,5 +1,5 @@
 // IMPORTAR LIBRERIAS
-import { ITableEmpleados, tim } from 'src/app/model/reportes.model';
+import { ITableEmpleados} from 'src/app/model/reportes.model';
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
@@ -11,9 +11,6 @@ import * as pdfMake from 'pdfmake/build/pdfmake.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
-
-// IMPORTAR COMPONENTES
-import { ConfigurarAtrasosComponent } from '../../configuracion-reportes/configurar-atrasos/configurar-atrasos.component';
 
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
@@ -148,9 +145,9 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     this.cargos = [];
   }
 
-  /********************************************************************************************
-  ****                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                            **** 
-  ********************************************************************************************/
+  /** **************************************************************************************** **
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **************************************************************************************** **/
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
@@ -1976,7 +1973,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
    * METODOS PARA CONTROLAR INGRESO DE LETRAS
    */
 
-  IngresarSoloLetras(e) {
+  IngresarSoloLetras(e: any) {
     return this.validacionService.IngresarSoloLetras(e)
   }
 

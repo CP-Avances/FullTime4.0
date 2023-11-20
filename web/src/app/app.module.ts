@@ -86,7 +86,6 @@ import { SubirDocumentoComponent } from './componentes/documentos/subir-document
 import { VerDocumentosComponent } from './componentes/documentos/ver-documentos/ver-documentos.component';
 import { SettingsComponent } from './componentes/administracionGeneral/configuracion-notificaciones/settings/settings.component';
 import { VacacionAutorizacionesComponent } from './componentes/autorizaciones/vacacion-autorizaciones/vacacion-autorizaciones.component';
-import { ConfigurarAtrasosComponent } from './componentes/reportes/configuracion-reportes/configurar-atrasos/configurar-atrasos.component';
 import { HoraExtraAutorizacionesComponent } from './componentes/autorizaciones/hora-extra-autorizaciones/hora-extra-autorizaciones.component';
 import { EditarEstadoHoraExtraAutorizacionComponent } from './componentes/autorizaciones/editar-estado-hora-extra-autorizacion/editar-estado-hora-extra-autorizacion.component';
 import { EditarCiudadComponent } from './componentes/catalogos/catFeriados/ciudad-feriados/editar-ciudad/editar-ciudad.component';
@@ -465,7 +464,6 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     HoraExtraRealComponent,
     PlanHoraExtraComponent,
     ListaEmplePlanHoraEComponent,
-    ConfigurarAtrasosComponent,
     TiempoAutorizadoComponent,
     ConfirmarDesactivadosComponent,
     RealtimeAvisosComponent,
