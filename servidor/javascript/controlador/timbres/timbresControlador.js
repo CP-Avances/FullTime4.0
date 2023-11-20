@@ -179,13 +179,13 @@ class TimbresControlador {
                     }
                 });
                 //console.log('respuesta: ', timbresRows)
-                //generarTimbres('35','2023-11-01', '2023-11-30');
+                //generarTimbres('89', '2023-10-02', '2023-10-31');
                 if (timbresRows == 0) {
                     return res.status(400).jsonp({ message: "No se encontraron timbres en esa fecha." });
                 }
             }
             catch (err) {
-                const message = '!Ups poblemas con la peticion al servidor.';
+                const message = 'Ups!!! problemas con la petición al servidor.';
                 return res.status(500).jsonp({ error: err, message: message });
             }
         });

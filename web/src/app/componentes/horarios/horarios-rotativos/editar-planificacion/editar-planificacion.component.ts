@@ -165,7 +165,7 @@ export class EditarPlanificacionComponent implements OnInit {
             tercer_dia: this.tercer_dia,
           }]
           hor.detalles = datos_horario[0];
-          if (hor.default_ === 'DL' || hor.default === 'DFD') {
+          if (hor.default_ === 'DL' || hor.default_ === 'DFD') {
             this.vista_descanso = this.vista_descanso.concat(datos_horario);
           }
           else {

@@ -17,6 +17,100 @@
         </div>
         <mat-card-content>
 
+            <!-- CONTENIDO CONFIGURACION DE ATRASOS -->
+            <div class="container" style="padding-bottom: 20px;" *ngIf="tolerancia_atrasos">
+                <div class="nota" id="espacio" style="text-align: justify;">
+                    <span>
+                        NOTA: Configuración de uso de minutos de tolerancia para cálculo de atrasos.
+                    </span>
+                </div>
+                <form [formGroup]="formularioT">
+                    <mat-radio-group aria-label="Select an option" [formControl]="toleranciaF">
+                        <div class="d-flex flex-wrap justify-content-start">
+                            <mat-radio-button value="1" (change)="SeleccionarOpcion($event)">
+                                <label id="textoradiobtn" style="color: black;">
+                                    No considerar minutos de tolerancia.
+                                </label>
+                            </mat-radio-button>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-start">
+                            <mat-radio-button value="2" (change)="SeleccionarOpcion($event)">
+                                <label id="textoradiobtn" style="color: black;">
+                                    Considerar minutos de tolerancia.
+                                </label>
+                            </mat-radio-button>
+                            <div class="nota" style="text-align: center; margin-left: 15px;" *ngIf="ver_con_tolerancia">
+                                <span>
+                                    Si el usuario llega después de los minutos de tolerancia, calcular el atraso
+                                    considerando:
+                                </span>
+                            </div>
+                        </div>
+                    </mat-radio-group>
+
+                    <mat-radio-group aria-label="Select an option" [formControl]="tipoF" *ngIf="ver_con_tolerancia">
+                        <div class="d-flex flex-wrap justify-content-start" style="margin-left: 30px;">
+                            <mat-radio-button value="2-1" (change)="SeleccionarTipo($event)">
+                                <label id="textoradiobtn" style="color: black;">
+                                    Horario de entrada.
+                                </label>
+                            </mat-radio-button>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-start" style="margin-left: 30px;">
+                            <mat-radio-button value="2-2" (change)="SeleccionarTipo($event)">
+                                <label id="textoradiobtn" style="color: black;">
+                                    Minutos de tolerancia.
+                                </label>
+                            </mat-radio-button>
+                        </div>
+                    </mat-radio-group>
+                </form>
+
+                <div class="mat-elevation-z8" style="background: white; padding-top: 10px;">
+                    <div class="d-flex bd-highlight" id="resultados" style="font-size: 12px;">
+                        <span class="w-100 bd-highlight">
+                            EJEMPLO CASO DE USO
+                        </span>
+                    </div>
+                    <div class="table-responsive" style="text-align: center;">
+                        <table id="table_acciones" class="table table-hover table-sm" style="margin: 0 auto;">
+                            <thead class="thead-light">
+                                <tr style="text-align: center;">
+                                    <th scope="col" id="td_horarios">HORARIO ENTRADA</th>
+                                    <th scope="col" id="td_horarios">TOLERANCIA</th>
+                                    <th scope="col" id="td_horarios">MARCACION USUARIO</th>
+                                    <th scope="col" id="td_horarios" *ngIf="ver_atraso">ATRASO</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="td_horarios">09:00</td>
+                                    <td id="td_horarios">00:10</td>
+                                    <td id="td_horarios">09:12</td>
+                                    <td id="td_horarios" *ngIf="ver_sin_tolerancia">00:12</td>
+                                    <td id="td_horarios" *ngIf="ver_con_tolerancia_2">00:02</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 1.5rem;">
+                    <button class="btn btn-sm" *ngIf="ver_eliminar_atraso" (click)="EliminarAtrasos()">
+                        Eliminar
+                    </button>
+                    <button class="btn btn-sm" *ngIf="ver_guardar_atraso" (click)="RegistrarAtraso()"
+                        [disabled]="ver_registrar_atraso">
+                        Registrar
+                    </button>
+                    <button class="btn btn-sm" *ngIf="ver_actualizar_atraso" (click)="ActualizarAtraso()"
+                        [disabled]="ver_registrar_atraso">
+                        Actualizar
+                    </button>
+                </div>
+
+            </div>
+
             <!-- CONTENIDO DISPOSITIVOS REGISTRADOS -->
             <div class="container" style="padding-bottom: 20px; text-align: center;" *ngIf="dispositivos">
                 <div class="nota" id="espacio" style="text-align: justify;">
@@ -224,7 +318,8 @@
                 </div>
             </div>
 
-            <div class="container" style="padding-bottom: 25px; text-align: center; padding-top: 5px;">
+            <div class="container" style="padding-bottom: 25px; text-align: center; padding-top: 5px;"
+                *ngIf="ver_detalles">
                 <div class="mat-elevation-z8" style="background: white;">
                     <div id="titulo">
                         <span>DETALLES DE PARÁMETRO GENERAL</span>

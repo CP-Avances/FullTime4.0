@@ -1,5 +1,5 @@
 import pool from '../database';
-import moment, { min } from 'moment';
+import moment from 'moment';
 const FECHA_FERIADOS: any = [];
 
 export const generarTimbres = async function (codigo: string, inicio: string, fin: string) {
@@ -9,13 +9,15 @@ export const generarTimbres = async function (codigo: string, inicio: string, fi
         SELECT pg.fec_hora_horario::date AS fecha, pg.fec_hora_horario::time AS hora, pg.tipo_dia, pg.tipo_entr_salida,
             pg.min_alimentacion
         FROM plan_general AS pg
-        WHERE pg.fec_horario BETWEEN $1 AND $2 AND pg.codigo = $3 AND tipo_dia = 'N'
+        WHERE pg.fec_horario BETWEEN $1 AND $2 AND pg.codigo = $3 AND (tipo_dia = 'N' OR estado_origen = 'HFD' OR estado_origen = 'HL')
         ORDER BY pg.fec_hora_horario ASC
         `
         , [inicio, fin, codigo])
         .then(result => {
             return result.rows
         });
+
+    var auxiliar: string = '';
 
     horarios.forEach(async ele => {
         let accion: string = '';
@@ -27,7 +29,9 @@ export const generarTimbres = async function (codigo: string, inicio: string, fi
 
         switch (ele.tipo_entr_salida) {
             case 'E':
-                var hora_ = moment(ele.hora, "HH:mm:ss").subtract(moment.duration("00:10:00")).format("HH:mm:ss");
+                //var hora_ = moment(ele.hora, "HH:mm:ss").subtract(moment.duration("00:01:00")).format("HH:mm:ss");
+                var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:00:00")).format("HH:mm:ss");
+                //var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:00:00")).format("HH:mm:ss");
                 //console.log('ver fecha ', moment(ele.fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
                 var formato = moment(ele.fecha, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 fecha = moment(formato + ' ' + hora_, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
@@ -37,42 +41,54 @@ export const generarTimbres = async function (codigo: string, inicio: string, fi
                 tecla_funcion = '0';
                 break;
             case 'S':
-                var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:10:00")).format("HH:mm:ss");
+                //var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:10:00")).format("HH:mm:ss");
+                var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:00:00")).format("HH:mm:ss");
+                //var hora_ = moment(ele.hora, "HH:mm:ss").subtract(moment.duration("00:02:00")).format("HH:mm:ss");
                 var formato = moment(ele.fecha, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 fecha = moment(formato + ' ' + hora_, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
                 observacion = 'Salida';
                 tecla_funcion = '1';
                 break;
             case 'I/A':
-                var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:10:00")).format("HH:mm:ss");
+                auxiliar = '';
+                var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:20:00")).format("HH:mm:ss");
                 var formato = moment(ele.fecha, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 fecha = moment(formato + ' ' + hora_, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
                 accion = 'I/A';
                 observacion = 'Inicio alimentacion';
                 tecla_funcion = '2';
+                auxiliar = hora_;
                 break;
             case 'F/A':
-                var hora_ = moment(ele.hora, "HH:mm:ss").subtract(moment.duration("01:30:00")).format("HH:mm:ss");
-                console.log('hora ', hora_)
+                var comida = moment(formatearMinutos(ele.min_alimentacion), 'HH:mm:ss').format('HH:mm:ss');
+                var min = moment(comida, "HH:mm:ss").subtract(moment.duration("00:01:00")).format("HH:mm:ss");
+                //var min = moment(comida, "HH:mm:ss").subtract(moment.duration("00:01:00")).format("HH:mm:ss");
+                //var min = moment(comida, "HH:mm:ss").add(moment.duration("00:03:00")).format("HH:mm:ss")
+                var hora_ = moment(auxiliar, "HH:mm:ss").add(moment.duration(min)).format("HH:mm:ss");
+                console.log('hora ', hora_, ' auxiliar ', auxiliar)
                 var formato = moment(ele.fecha, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 fecha = moment(formato + ' ' + hora_, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
                 accion = 'F/A';
                 observacion = 'Fin alimentacion';
                 tecla_funcion = '3';
+                auxiliar = '';
                 break;
             default:
                 break;
         }
 
         console.log('fecha ', fecha)
-        await pool.query(
-            `
-            INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, 
-                codigo, id_reloj, fec_hora_timbre_servidor)
-            values($1, $2, $3, $4, $5, $6, $7, $8, $9)         
-            `
-            , [fecha, accion, tecla_funcion, observacion, latitud, longitud, codigo, 3, fecha]
-        )
+        if (fecha) {
+            await pool.query(
+                `
+                INSERT INTO timbres (fec_hora_timbre, accion, tecl_funcion, observacion, latitud, longitud, 
+                    codigo, id_reloj, fec_hora_timbre_servidor)
+                values($1, $2, $3, $4, $5, $6, $7, $8, $9)         
+                `
+                , [fecha, accion, tecla_funcion, observacion, latitud, longitud, codigo, 3, fecha]
+            )
+        }
+
     })
 
     /*
@@ -86,6 +102,17 @@ export const generarTimbres = async function (codigo: string, inicio: string, fi
     */
 
 
+}
+
+function formatearMinutos(minutos: any) {
+    var seconds: any = (minutos * 60);
+    var hour: any = Math.floor(seconds / 3600);
+    hour = (hour < 10) ? '0' + hour : hour;
+    var minute: any = Math.floor((seconds / 60) % 60);
+    minute = (minute < 10) ? '0' + minute : minute;
+    var second: any = seconds % 60;
+    second = (second < 10) ? '0' + second : second;
+    return hour + ':' + minute + ':' + second;
 }
 
 /**
