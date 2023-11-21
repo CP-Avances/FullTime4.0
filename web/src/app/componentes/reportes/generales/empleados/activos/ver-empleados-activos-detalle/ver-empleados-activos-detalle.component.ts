@@ -1,16 +1,18 @@
+// IMPORTAR LIBRERIAS
+import { ReporteEmpleadosComponent } from '../reporte-empleados/reporte-empleados.component';
 import { Component, Input, OnInit } from '@angular/core';
+import { IReporteAtrasos } from 'src/app/model/reportes.model';
 import { PageEvent } from '@angular/material/paginator';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
+
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-import { IReporteAtrasos } from 'src/app/model/reportes.model';
-
+// IMPORTAR SERVICIOS
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 
-import { ReporteEmpleadosComponent } from '../reporte-empleados/reporte-empleados.component';
 
 @Component({
   selector: 'app-ver-empleados-activos-detalle',
@@ -45,18 +47,18 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
   logo: any = String;
 
   constructor(
+    private reporte: ReporteEmpleadosComponent,
     private restEmpre: EmpresaService,
-    private reporte: ReporteEmpleadosComponent
   ) {
     this.ObtenerLogo();
     this.ObtenerColores();
   }
 
   ngOnInit(): void {
-    this.validarTipo(this.tipo);
+    this.ValidarTipo(this.tipo);
   }
 
-  validarTipo(tipo: string) {
+  ValidarTipo(tipo: string) {
     switch (tipo) {
       case 'suc':
         this.bool_suc = true;
@@ -64,7 +66,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
         this.bool_car = false;
         this.bool_dep = false;
         this.bool_emp = false;
-        this.extraerDatos();
+        this.ExtraerDatos();
         break;
       case 'reg':
         this.bool_suc = false;
@@ -72,7 +74,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
         this.bool_car = false;
         this.bool_dep = false;
         this.bool_emp = false;
-        this.extraerDatosCargosRegimen();
+        this.ExtraerDatosCargosRegimen();
         break;
       case 'car':
         this.bool_suc = false;
@@ -80,7 +82,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
         this.bool_car = true;
         this.bool_dep = false;
         this.bool_emp = false;
-        this.extraerDatosCargosRegimen();
+        this.ExtraerDatosCargosRegimen();
         break;
       case 'dep':
         this.bool_suc = false;
@@ -88,7 +90,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
         this.bool_car = false;
         this.bool_dep = true;
         this.bool_emp = false;
-        this.extraerDatos();
+        this.ExtraerDatos();
         break;
       case 'emp':
         this.bool_suc = false;
@@ -96,7 +98,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
         this.bool_car = false;
         this.bool_dep = false;
         this.bool_emp = true;
-        this.extraerDatos();
+        this.ExtraerDatos();
         break;
       default:
         this.bool_suc = false;
@@ -108,7 +110,11 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
     }
   }
 
-  extraerDatos() {
+  /** ****************************************************************************************** ** 
+   ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
+   ** ****************************************************************************************** **/
+
+  ExtraerDatos() {
     this.arr_emp = [];
     let n = 0;
     this.data.forEach((obj: any) => {
@@ -120,10 +126,9 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
         });
       });
     });
-    console.log('array', this.arr_emp);
   }
 
-  extraerDatosCargosRegimen() {
+  ExtraerDatosCargosRegimen() {
     this.arr_emp = [];
     let n = 0;
     this.data.forEach((obj: any) => {
@@ -135,37 +140,31 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
     });
   }
 
-  // METODO PARA MANEJAR PAGINACION
-  ManejarPagina(e: PageEvent) {
-    this.numero_pagina = e.pageIndex + 1;
-    this.tamanio_pagina = e.pageSize;
-  }
-
-  descargarReporte(accion: any) {
+  DescargarReporte(accion: any) {
     if (this.bool_car || this.bool_reg) {
       switch (accion) {
         case 'excel':
-          this.exportToExcelCargoRegimen();
+          this.ExportarExcelCargoRegimen();
           break;
         default:
-          this.generarPdf(accion);
+          this.GenerarPDF(accion);
           break;
       }
     } else {
       switch (accion) {
         case 'excel':
-          this.exportToExcel();
+          this.ExportarExcel();
           break;
         default:
-          this.generarPdf(accion);
+          this.GenerarPDF(accion);
           break;
       }
     }
   }
 
-  /** *************************************************************************************** **
-   ** **                        COLORES Y LOGO PARA EL REPORTE                             ** **
-   ** *************************************************************************************** **/
+  /** ****************************************************************************************** **
+   **                              COLORES Y LOGO PARA EL REPORTE                                ** 
+   ** ****************************************************************************************** **/
 
   ObtenerLogo() {
     this.restEmpre
@@ -176,7 +175,6 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
   }
 
   // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
-
   ObtenerColores() {
     this.restEmpre
       .ConsultarDatosEmpresa(
@@ -189,13 +187,13 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
       });
   }
 
-  /** ************************************************************************************ **
-   ** **                               GENERACION DE PDF                                ** **
-   ** ************************************************************************************ **/
+  /** ****************************************************************************************** **
+   **                                              PDF                                           **
+   ** ****************************************************************************************** **/
 
-  generarPdf(action: any) {
-    const documentDefinition = this.getDocumentDefinicion();
-    let doc_name = 'Reporte_usuarios_activos.pdf';
+  GenerarPDF(action: any) {
+    const documentDefinition = this.GetDocumentDefinicion();
+    let doc_name = 'Usuarios.pdf';
     switch (action) {
       case 'open':
         pdfMake.createPdf(documentDefinition).open();
@@ -212,7 +210,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
     }
   }
 
-  getDocumentDefinicion() {
+  GetDocumentDefinicion() {
     return {
       pageSize: 'A4',
       pageOrientation: 'landscape',
@@ -274,7 +272,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
           fontSize: 13,
           alignment: 'center',
         },
-        ...this.impresionDatosPDF(this.data).map((obj) => {
+        ...this.EstructurarDatosPDF(this.data).map((obj) => {
           return obj;
         }),
       ],
@@ -292,13 +290,14 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
     };
   }
 
-  impresionDatosPDF(data: any[]): Array<any> {
+  // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
+  EstructurarDatosPDF(data: any[]): Array<any> {
     let n: any = [];
     let regimen = '';
     let arr_emp: any = [];
 
     if (this.bool_car === true || this.bool_reg === true) {
-      data.forEach((obj1) => {
+      data.forEach((obj1: any) => {
         arr_emp = [];
 
         if (this.bool_car === true) {
@@ -347,7 +346,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
           });
         }
 
-        obj1.empleados.forEach(obj2 => {
+        obj1.empleados.forEach((obj2: any) => {
           arr_emp.push(obj2)
         });
 
@@ -368,7 +367,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
                 { text: 'DEPARTAMENTO', style: 'tableHeader' },
                 { text: 'CORREO', style: 'tableHeader' }
               ],
-              ...arr_emp.map(obj3 => {
+              ...arr_emp.map((obj3: any) => {
                 return [
                   { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
                   { style: 'itemsTableCentrado', text: obj3.codigo },
@@ -385,7 +384,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
             ]
           },
           layout: {
-            fillColor: function (rowIndex) {
+            fillColor: function (rowIndex: any) {
               return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
             }
           }
@@ -450,8 +449,8 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
                   { text: 'CARGO', style: 'tableHeader' },
                   { text: 'CORREO', style: 'tableHeader' }
                 ],
-                ...arr_emp.map(obj3 => {
-                  obj3.regimen.forEach((r) => (regimen = r.name_regimen));
+                ...arr_emp.map((obj3: any) => {
+                  obj3.regimen.forEach((r: any) => (regimen = r.name_regimen));
                   return [
                     { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
                     { style: 'itemsTableCentrado', text: obj3.codigo },
@@ -467,7 +466,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
               ]
             },
             layout: {
-              fillColor: function (rowIndex) {
+              fillColor: function (rowIndex: any) {
                 return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
               }
             }
@@ -540,8 +539,8 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
                     { text: 'CARGO', style: 'tableHeader' },
                     { text: 'CORREO', style: 'tableHeader' }
                   ],
-                  ...arr_emp.map(obj3 => {
-                    obj3.regimen.forEach((r) => (regimen = r.name_regimen));
+                  ...arr_emp.map((obj3: any) => {
+                    obj3.regimen.forEach((r: any) => (regimen = r.name_regimen));
                     return [
                       { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
                       { style: 'itemsTableCentrado', text: obj3.codigo },
@@ -556,7 +555,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
                 ]
               },
               layout: {
-                fillColor: function (rowIndex) {
+                fillColor: function (rowIndex: any) {
                   return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
                 }
               }
@@ -596,8 +595,8 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
               { text: 'CARGO', style: 'tableHeader' },
               { text: 'CORREO', style: 'tableHeader' }
             ],
-            ...arr_emp.map(obj3 => {
-              obj3.regimen.forEach((r) => (regimen = r.name_regimen));
+            ...arr_emp.map((obj3: any) => {
+              obj3.regimen.forEach((r: any) => (regimen = r.name_regimen));
               return [
                 { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
                 { style: 'itemsTableCentrado', text: obj3.codigo },
@@ -633,20 +632,20 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
     return valor;
   }
 
-  /** ************************************************************************************************** ** 
-   ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
-   ** ************************************************************************************************** **/
+  /** ****************************************************************************************** ** 
+   ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
+   ** ****************************************************************************************** **/
 
-  exportToExcel(): void {
+  ExportarExcel(): void {
 
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefault(this.data));
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'Empleados Activos');
-    xlsx.writeFile(wb, "Empleados Activos " + new Date().getTime() + '.xlsx');
+    xlsx.utils.book_append_sheet(wb, wsr, 'Usuarios');
+    xlsx.writeFile(wb, 'Usuarios.xlsx');
 
   }
 
-  MapingDataPdfDefault(array: Array<any>) {
+  EstructurarDatosExcel(array: Array<any>) {
     let nuevo: Array<any> = [];
     console.log(array);
     let c = 0;
@@ -654,7 +653,7 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
     array.forEach((obj1: IReporteAtrasos) => {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
-          obj3.regimen.forEach((r) => (regimen = r.name_regimen));
+          obj3.regimen.forEach((r: any) => (regimen = r.name_regimen));
           c = c + 1;
           let ele = {
             'N°': c, 'Código Empleado': obj3.codigo, 'Nombre Empleado': obj3.name_empleado,
@@ -672,20 +671,20 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
     return nuevo;
   }
 
-  exportToExcelCargoRegimen(): void {
+  ExportarExcelCargoRegimen(): void {
 
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefaultCargoRegimen(this.data));
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcelRegimenCargo(this.data));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Usuarios Activos');
     xlsx.writeFile(wb, "Usuarios_activos.xlsx");
 
   }
 
-  MapingDataPdfDefaultCargoRegimen(array: Array<any>) {
+  EstructurarDatosExcelRegimenCargo(array: Array<any>) {
     let nuevo: Array<any> = [];
     let c = 0;
     array.forEach((obj1) => {
-      obj1.empleados.forEach(obj2 => {
+      obj1.empleados.forEach((obj2: any) => {
         c = c + 1;
         let ele = {
           'N°': c, 'Código Empleado': obj2.codigo, 'Nombre Empleado': obj2.name_empleado,
@@ -700,6 +699,12 @@ export class VerEmpleadosActivosDetalleComponent implements OnInit {
       })
     })
     return nuevo;
+  }
+
+  // METODO PARA MANEJAR PAGINACION
+  ManejarPagina(e: PageEvent) {
+    this.numero_pagina = e.pageIndex + 1;
+    this.tamanio_pagina = e.pageSize;
   }
 
   // METODO PARA REGRESAR A LA PAGINA ANTERIOR

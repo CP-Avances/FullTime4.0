@@ -4,11 +4,12 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
+
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
@@ -146,9 +147,10 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     this.origen = [];
   }
 
-  /********************************************************************************************
-  ****                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                            **** 
-  ********************************************************************************************/
+  /** ****************************************************************************************** **
+   ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** ****************************************************************************************** **/
+
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
@@ -161,6 +163,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       });
   }
 
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE HORA
   BuscarHora() {
     // id_tipo_parametro Formato hora = 26
     this.parametro.ListarDetalleParametros(26).subscribe(
@@ -169,6 +172,9 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       });
   }
 
+  /** ****************************************************************************************** **
+   ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** ** 
+   ** ****************************************************************************************** **/
   // METODO DE BUSQUEDA DE DATOS
   BuscarInformacion() {
     this.departamentos = [];
@@ -181,26 +187,26 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       (res: any[]) => {
         this.origen = JSON.stringify(res);
 
-        res.forEach((obj) => {
+        res.forEach((obj: any) => {
           this.sucursales.push({
             id: obj.id_suc,
             nombre: obj.name_suc,
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((departamento: any) => {
             this.departamentos.push({
-              id: ele.id_depa,
-              departamento: ele.name_dep,
-              nombre: ele.sucursal,
+              id: departamento.id_depa,
+              departamento: departamento.name_dep,
+              nombre: departamento.sucursal,
             });
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
-            ele.empleado.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((departamento: any) => {
+            departamento.empleado.forEach((r: any) => {
               let elemento = {
                 id: r.id,
                 nombre: r.name_empleado,
@@ -220,10 +226,10 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
-            ele.empleado.forEach((reg) => {
-              reg.regimen.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((departamento: any) => {
+            departamento.empleado.forEach((reg: any) => {
+              reg.regimen.forEach((r: any) => {
                 this.regimen.push({
                   id: r.id_regimen,
                   nombre: r.name_regimen,
@@ -234,7 +240,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
         });
 
         this.regimen = this.regimen.filter(
-          (obj, index, self) => index === self.findIndex((o) => o.id === obj.id)
+          (obj: any, index: any, self: any) => index === self.findIndex((o: any) => o.id === obj.id)
         );
       },
       (err) => {
@@ -254,15 +260,15 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       (res: any[]) => {
         this.origen_cargo = JSON.stringify(res);
 
-        res.forEach((obj) => {
+        res.forEach((obj: any) => {
           this.cargos.push({
             id: obj.id_cargo,
             nombre: obj.name_cargo,
           });
         });
 
-        res.forEach((obj) => {
-          obj.empleados.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.empleados.forEach((r: any) => {
             this.empleados_cargos.push({
               id: r.id,
               nombre: r.name_empleado,
@@ -280,7 +286,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   }
 
   // VALIDACIONES DE SELECCION DE BUSQUEDA
-  validacionReporte(action: any) {
+  ValidarReporte(action: any) {
     if (
       this.bool.bool_suc === false &&
       this.bool.bool_reg === false &&
@@ -289,7 +295,6 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       this.bool.bool_emp === false
     )
       return this.toastr.error('Seleccione un criterio de búsqueda.');
-    console.log('opcion', this.opcion);
     switch (this.opcion) {
       case 's':
         if (this.selectionSuc.selected.length === 0)
@@ -344,7 +349,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   // MODELAMIENTO DE DATOS DE ACUERDO A LAS SUCURSALES
   ModelarSucursal(accion: any) {
     let respuesta = JSON.parse(this.origen);
-    let suc = respuesta.filter((o) => {
+    let suc = respuesta.filter((o: any) => {
       var bool = this.selectionSuc.selected.find((obj1) => {
         return obj1.id === o.id_suc;
       });
@@ -356,13 +361,13 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
         this.data_pdf = res;
         switch (accion) {
           case 'excel':
-            this.exportToExcel();
+            this.ExportarExcel();
             break;
           case 'ver':
-            this.verDatos('suc');
+            this.VerDatos('suc');
             break;
           default:
-            this.generarPdf(accion);
+            this.GenerarPDF(accion);
             break;
         }
       },
@@ -379,7 +384,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     let reg: any = [];
     let objeto: any;
     respuesta.forEach((obj: any) => {
-      this.selectionReg.selected.find((regimen) => {
+      this.selectionReg.selected.find((regimen: any) => {
         objeto = {
           regimen: {
             id: regimen.id,
@@ -389,7 +394,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
         empleados = [];
         obj.departamentos.forEach((departamento: any) => {
           departamento.empleado.forEach((empleado: any) => {
-            empleado.regimen.forEach((r) => {
+            empleado.regimen.forEach((r: any) => {
               if (regimen.id === r.id_regimen) {
                 empleados.push(empleado);
               }
@@ -407,13 +412,13 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
         this.data_pdf = res;
         switch (accion) {
           case 'excel':
-            this.exportToExcelCargoRegimen();
+            this.ExportarExcelCargoRegimen();
             break;
           case 'ver':
-            this.verDatos('reg');
+            this.VerDatos('reg');
             break;
           default:
-            this.generarPdf(accion);
+            this.GenerarPDF(accion);
             break;
         }
       },
@@ -426,7 +431,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   // MODELAMIENTO DE DATOS DE ACUERDO AL CARGO
   ModelarCargo(accion: any) {
     let respuesta = JSON.parse(this.origen_cargo);
-    let car = respuesta.filter((o) => {
+    let car = respuesta.filter((o: any) => {
       var bool = this.selectionCar.selected.find((obj1) => {
         return obj1.id === o.id_cargo;
       });
@@ -439,13 +444,13 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
         this.data_pdf = res;
         switch (accion) {
           case 'excel':
-            this.exportToExcelCargoRegimen();
+            this.ExportarExcelCargoRegimen();
             break;
           case 'ver':
-            this.verDatos('car');
+            this.VerDatos('car');
             break;
           default:
-            this.generarPdf(accion);
+            this.GenerarPDF(accion);
             break;
         }
       },
@@ -459,14 +464,14 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   ModelarDepartamento(accion: any) {
     let respuesta = JSON.parse(this.origen);
     respuesta.forEach((obj: any) => {
-      obj.departamentos = obj.departamentos.filter((o) => {
+      obj.departamentos = obj.departamentos.filter((o: any) => {
         var bool = this.selectionDep.selected.find((obj1) => {
           return obj1.id === o.id_depa;
         });
         return bool != undefined;
       });
     });
-    let dep = respuesta.filter((obj) => {
+    let dep = respuesta.filter((obj: any) => {
       return obj.departamentos.length > 0;
     });
     this.data_pdf = [];
@@ -475,13 +480,13 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
         this.data_pdf = res;
         switch (accion) {
           case 'excel':
-            this.exportToExcel();
+            this.ExportarExcel();
             break;
           case 'ver':
-            this.verDatos('dep');
+            this.VerDatos('dep');
             break;
           default:
-            this.generarPdf(accion);
+            this.GenerarPDF(accion);
             break;
         }
       },
@@ -495,8 +500,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   ModelarEmpleados(accion: any) {
     let respuesta = JSON.parse(this.origen);
     respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach((element) => {
-        element.empleado = element.empleado.filter((o) => {
+      obj.departamentos.forEach((departamento: any) => {
+        departamento.empleado = departamento.empleado.filter((o) => {
           var bool = this.selectionEmp.selected.find((obj1) => {
             return obj1.id === o.id;
           });
@@ -504,12 +509,12 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
         });
       });
     });
-    respuesta.forEach((obj) => {
-      obj.departamentos = obj.departamentos.filter((e) => {
+    respuesta.forEach((obj: any) => {
+      obj.departamentos = obj.departamentos.filter((e: any) => {
         return e.empleado.length > 0;
       });
     });
-    let emp = respuesta.filter((obj) => {
+    let emp = respuesta.filter((obj: any) => {
       return obj.departamentos.length > 0;
     });
     this.data_pdf = [];
@@ -518,13 +523,13 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
         this.data_pdf = res;
         switch (accion) {
           case 'excel':
-            this.exportToExcel();
+            this.ExportarExcel();
             break;
           case 'ver':
-            this.verDatos('emp');
+            this.VerDatos('emp');
             break;
           default:
-            this.generarPdf(accion);
+            this.GenerarPDF(accion);
             break;
         }
       },
@@ -534,9 +539,9 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     );
   }
 
-  /** *************************************************************************************** **
-   ** **                        COLORES Y LOGO PARA EL REPORTE                             ** **
-   ** *************************************************************************************** **/
+  /** ****************************************************************************************** **
+   **                              COLORES Y LOGO PARA EL REPORTE                                ** 
+   ** ****************************************************************************************** **/
 
   // OBTENER LOGO PARA EL REPORTE
   logo: any = String;
@@ -564,11 +569,11 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       });
   }
 
-  /** ************************************************************************************ **
-   ** **                               GENERACION DE PDF                                ** **
-   ** ************************************************************************************ **/
+  /** ****************************************************************************************** **
+   **                                              PDF                                           **
+   ** ****************************************************************************************** **/
 
-  generarPdf(action: any) {
+  GenerarPDF(action: any) {
     let documentDefinition: any;
 
     if (
@@ -578,10 +583,10 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       this.bool.bool_dep === true ||
       this.bool.bool_cargo === true
     ) {
-      documentDefinition = this.getDocumentDefinicion();
+      documentDefinition = this.GetDocumentDefinicion();
     }
 
-    let doc_name = 'Reporte_vacunas.pdf';
+    let doc_name = 'Vacunas.pdf';
     switch (action) {
       case 'open':
         pdfMake.createPdf(documentDefinition).open();
@@ -598,7 +603,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     }
   }
 
-  getDocumentDefinicion() {
+  GetDocumentDefinicion() {
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -663,7 +668,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
           alignment: 'center',
           margin: [0, -10, 0, 5],
         },
-        ...this.impresionDatosPDF(this.data_pdf).map((obj) => {
+        ...this.EstructurarDatosPDF(this.data_pdf).map((obj) => {
           return obj;
         }),
       ],
@@ -694,11 +699,12 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     };
   }
 
-  impresionDatosPDF(data: any[]): Array<any> {
+  // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
+  EstructurarDatosPDF(data: any[]): Array<any> {
     let n: any = [];
 
     if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      data.forEach((obj1) => {
+      data.forEach((obj1: any) => {
         let arr_reg = obj1.empleados.map((o: any) => { return o.vacunas.length })
         let reg = this.SumarRegistros(arr_reg);
         if (this.bool.bool_cargo === true) {
@@ -784,7 +790,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
                   { text: 'Fecha', style: 'tableHeader' },
                   { text: 'Descripción', style: 'tableHeader' },
                 ],
-                ...obj2.vacunas.map((obj3) => {
+                ...obj2.vacunas.map((obj3: any) => {
                   const fecha = this.validacionService.FormatearFecha(
                     obj3.fecha.split('T')[0],
                     this.formato_fecha, 
@@ -803,7 +809,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
               ],
             },
             layout: {
-              fillColor: function (rowIndex) {
+              fillColor: function (rowIndex: any) {
                 return rowIndex % 2 === 0 ? '#E5E7E9' : null;
               },
             },
@@ -901,7 +907,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
                     { text: 'Fecha', style: 'tableHeader' },
                     { text: 'Descripción', style: 'tableHeader' },
                   ],
-                  ...obj2.vacunas.map((obj3) => {
+                  ...obj2.vacunas.map((obj3: any) => {
                     const fecha = this.validacionService.FormatearFecha(
                       obj3.fecha.split('T')[0],
                       this.formato_fecha, 
@@ -920,7 +926,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
                 ],
               },
               layout: {
-                fillColor: function (rowIndex) {
+                fillColor: function (rowIndex: any) {
                   return rowIndex % 2 === 0 ? '#E5E7E9' : null;
                 },
               },
@@ -941,27 +947,27 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     return valor;
   }
 
-  /** ************************************************************************************************** *
-   ** *                                     METODO PARA EXPORTAR A EXCEL                                 *
-   ** ************************************************************************************************** */
+  /** ****************************************************************************************** ** 
+   ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
+   ** ****************************************************************************************** **/
 
-  exportToExcel(): void {
+  ExportarExcel(): void {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(
-      this.MapingDataPdfDefault(this.data_pdf)
+      this.EstructurarDatosExcel(this.data_pdf)
     );
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Vacunas');
     xlsx.writeFile(wb, 'Vacunas.xlsx');
   }
 
-  MapingDataPdfDefault(array: Array<any>) {
+  EstructurarDatosExcel(array: Array<any>) {
     let nuevo: Array<any> = [];
     let c = 0;
     let regimen = '';
     array.forEach((obj1: ReporteVacunas) => {
       obj1.departamentos.forEach((obj2) => {
         obj2.empleado.forEach((obj3: any) => {
-          obj3.regimen.forEach((r) => (regimen = r.name_regimen));
+          obj3.regimen.forEach((r: any) => (regimen = r.name_regimen));
           obj3.vacunas.forEach((obj4: vacuna) => {
             c = c + 1;
             let ele = {
@@ -990,21 +996,21 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     return nuevo;
   }
 
-  exportToExcelCargoRegimen(): void {
+  ExportarExcelCargoRegimen(): void {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(
-      this.MapingDataPdfDefaultCargoRegimen(this.data_pdf)
+      this.EstructurarDatosExcelRegimenCargo(this.data_pdf)
     );
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Vacunas');
     xlsx.writeFile(wb, 'Vacunas.xlsx');
   }
 
-  MapingDataPdfDefaultCargoRegimen(array: Array<any>) {
+  EstructurarDatosExcelRegimenCargo(array: Array<any>) {
     let nuevo: Array<any> = [];
     let c = 0;
     array.forEach((obj) => {
-      obj.empleados.forEach((obj2) => {
-        obj2.vacunas.forEach((obj3) => {
+      obj.empleados.forEach((obj2: any) => {
+        obj2.vacunas.forEach((obj3: any) => {
           c = c + 1;
           let ele = {
             'N°': c,
@@ -1032,9 +1038,9 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     return nuevo;
   }
 
-  /** ************************************************************************************* *
-   ** *            VARIOS METODOS COMPLEMENTARIOS AL FUNCIONAMIENTO                         *
-   ** ************************************************************************************* */
+  /** ****************************************************************************************** **
+   **                   VARIOS METODOS COMPLEMENTARIOS AL FUNCIONAMIENTO.                        **
+   ** ****************************************************************************************** **/
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc() {
@@ -1180,7 +1186,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   }
 
   //ENVIAR DATOS A LA VENTANA DE DETALLE
-  verDatos(tipo: string) {
+  VerDatos(tipo: string) {
     this.verDetalle = true;
     this.tipo = tipo;
   }

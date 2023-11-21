@@ -29,7 +29,7 @@ class AutorizacionesControlador {
             return res.jsonp(AUTORIZACIONES.rows)
         }
         else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros' });
+            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
         }
     }
 
@@ -41,7 +41,7 @@ class AutorizacionesControlador {
             return res.jsonp(AUTORIZACIONES.rows)
         }
         else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros' });
+            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
         }
     }
 
@@ -52,7 +52,7 @@ class AutorizacionesControlador {
             return res.jsonp(AUTORIZACIONES.rows)
         }
         else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros' });
+            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
         }
     }
 
@@ -64,7 +64,7 @@ class AutorizacionesControlador {
             'VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
             [orden, estado, id_departamento, id_permiso, id_vacacion, id_hora_extra,
                 id_plan_hora_extra, id_documento]);
-        res.jsonp({ message: 'Autorizacion guardado' });
+        res.jsonp({ message: 'Autorizacion guardado.' });
     }
 
 

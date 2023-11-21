@@ -1,11 +1,12 @@
+// IMPORTAR LIBRERIAS
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
@@ -125,7 +126,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
 
   ngOnInit(): void {
     this.BuscarInformacion();
-    this.buscarTolerancia();
+    this.BuscarTolerancia();
     this.BuscarParametro();
     this.BuscarCargos();
     this.BuscarHora();
@@ -141,10 +142,11 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
     this.cargos = [];
   }
 
-  /********************************************************************************************
-  ****                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                            **** 
-  ********************************************************************************************/
-  formato_fecha: string = 'DD/MM/YYYY';
+  /** ****************************************************************************************** **
+   ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** ****************************************************************************************** **/
+  
+   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
   // METODO PARA BUSCAR PARAMETRO DE FORMATO DE FECHA
@@ -156,6 +158,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
       });
   }
 
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE HORA
   BuscarHora() {
     // id_tipo_parametro Formato hora = 26
     this.parametro.ListarDetalleParametros(26).subscribe(
@@ -164,12 +167,18 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
       });
   }
 
-  buscarTolerancia() {
+  // METODO PARA BUSCAR PARAMETRO DE TOLERANCIA
+  BuscarTolerancia() {
+    // id_tipo_parametro Tolerancia - atrasos = 2
     this.parametro.ListarDetalleParametros(2).subscribe(
       res => {
         this.tolerancia = res[0].descripcion;
       });
   }
+
+  /** ****************************************************************************************** **
+   ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** ** 
+   ** ****************************************************************************************** **/
 
   // METODO DE BUSQUEDA DE DATOS
   BuscarInformacion() {
@@ -182,26 +191,26 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
     this.informacion.ObtenerInformacion(1).subscribe(
       (res: any[]) => {
         this.origen = JSON.stringify(res);
-        res.forEach((obj) => {
+        res.forEach((obj: any) => {
           this.sucursales.push({
             id: obj.id_suc,
             nombre: obj.name_suc,
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((departamento: any) => {
             this.departamentos.push({
-              id: ele.id_depa,
-              departamento: ele.name_dep,
-              nombre: ele.sucursal,
+              id: departamento.id_depa,
+              departamento: departamento.name_dep,
+              nombre: departamento.sucursal,
             });
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
-            ele.empleado.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((departamento: any) => {
+            departamento.empleado.forEach((r: any) => {
               let elemento = {
                 id: r.id,
                 nombre: r.name_empleado,
@@ -221,10 +230,10 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
-            ele.empleado.forEach((reg) => {
-              reg.regimen.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((departamento: any) => {
+            departamento.empleado.forEach((reg: any) => {
+              reg.regimen.forEach((r: any) => {
                 this.regimen.push({
                   id: r.id_regimen,
                   nombre: r.name_regimen,
@@ -235,7 +244,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
         });
 
         this.regimen = this.regimen.filter(
-          (obj, index, self) => index === self.findIndex((o) => o.id === obj.id)
+          (obj: any, index: any, self: any) => index === self.findIndex((o: any) => o.id === obj.id)
         );
       },
       (err) => {
@@ -255,15 +264,15 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
       (res: any[]) => {
         this.origen_cargo = JSON.stringify(res);
 
-        res.forEach((obj) => {
+        res.forEach((obj: any) => {
           this.cargos.push({
             id: obj.id_cargo,
             nombre: obj.name_cargo,
           });
         });
 
-        res.forEach((obj) => {
-          obj.empleados.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.empleados.forEach((r: any) => {
             this.empleados_cargos.push({
               id: r.id,
               nombre: r.name_empleado,
@@ -282,7 +291,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
   }
 
   // VALIDACIONES DE OPCIONES DE REPORTE
-  validacionReporte(action: any) {
+  ValidarReporte(action: any) {
     if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de búsqueda.');
     if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
       && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.');
@@ -314,12 +323,12 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
     }
   }
 
-
-  ModelarSucursal(accion) {
+// TRATAMIENTO DE DATOS POR SUCURSAL
+  ModelarSucursal(accion: any) {
     this.tipo = 'default';
     let respuesta = JSON.parse(this.origen)
 
-    let suc = respuesta.filter(o => {
+    let suc = respuesta.filter((o: any) => {
       let bool = this.selectionSuc.selected.find(obj1 => {
         return obj1.id === o.id_suc
       });
@@ -331,9 +340,9 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
       this.data_pdf = res;
       console.log('DATA PDF', this.data_pdf);
       switch (accion) {
-        case 'excel': this.exportToExcel('default'); break;
+        case 'excel': this.ExportarExcel('default'); break;
         case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
@@ -348,7 +357,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
     let reg: any = [];
     let objeto: any;
     respuesta.forEach((obj: any) => {
-      this.selectionReg.selected.find((regimen) => {
+      this.selectionReg.selected.find((regimen: any) => {
         objeto = {
           regimen: {
             id: regimen.id,
@@ -358,7 +367,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
         empleados = [];
         obj.departamentos.forEach((departamento: any) => {
           departamento.empleado.forEach((empleado: any) => {
-            empleado.regimen.forEach((r) => {
+            empleado.regimen.forEach((r: any) => {
               if (regimen.id === r.id_regimen) {
                 empleados.push(empleado);
               }
@@ -374,37 +383,38 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
     this.reportesTiempoLaborado.ReporteTiempoLaboradoRegimenCargo(reg, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       switch (accion) {
-        case 'excel': this.exportToExcel('RegimenCargo'); break;
+        case 'excel': this.ExportarExcel('RegimenCargo'); break;
         case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
     })
   }
 
-  ModelarDepartamento(accion) {
+  // TRATAMIENTO DE DATOS POR DEPARTAMENTO
+  ModelarDepartamento(accion: any) {
     this.tipo = 'default';
     let respuesta = JSON.parse(this.origen)
 
     respuesta.forEach((obj: any) => {
-      obj.departamentos = obj.departamentos.filter(o => {
+      obj.departamentos = obj.departamentos.filter((o: any) => {
         let bool = this.selectionDep.selected.find(obj1 => {
           return obj1.id === o.id_depa
         })
         return bool != undefined
       })
     })
-    let dep = respuesta.filter(obj => {
+    let dep = respuesta.filter((obj: any) => {
       return obj.departamentos.length > 0
     });
     this.data_pdf = []
     this.reportesTiempoLaborado.ReporteTiempoLaborado(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       switch (accion) {
-        case 'excel': this.exportToExcel('default'); break;
+        case 'excel': this.ExportarExcel('default'); break;
         case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
@@ -415,7 +425,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
   ModelarCargo(accion: any) {
     this.tipo = 'RegimenCargo';
     let respuesta = JSON.parse(this.origen_cargo);
-    let car = respuesta.filter((o) => {
+    let car = respuesta.filter((o: any) => {
       var bool = this.selectionCar.selected.find((obj1) => {
         return obj1.id === o.id_cargo;
       });
@@ -427,22 +437,23 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
       this.data_pdf = res;
       console.log('data pdf cargo',this.data_pdf);
       switch (accion) {
-        case 'excel': this.exportToExcel('RegimenCargo'); break;
+        case 'excel': this.ExportarExcel('RegimenCargo'); break;
         case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
     })
   }
 
-  ModelarEmpleados(accion) {
+  // TRATAMIENTO DE DATOS POR EMPLEADO
+  ModelarEmpleados(accion: any) {
     this.tipo = 'default';
     let respuesta = JSON.parse(this.origen)
 
     respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach(element => {
-        element.empleado = element.empleado.filter(o => {
+      obj.departamentos.forEach((departamento: any) => {
+        departamento.empleado = departamento.empleado.filter((o: any) => {
           var bool = this.selectionEmp.selected.find(obj1 => {
             return obj1.id === o.id
           })
@@ -450,13 +461,13 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
         })
       });
     })
-    respuesta.forEach(obj => {
-      obj.departamentos = obj.departamentos.filter(e => {
+    respuesta.forEach((obj: any) => {
+      obj.departamentos = obj.departamentos.filter((e: any) => {
         return e.empleado.length > 0
       })
     });
 
-    let emp = respuesta.filter(obj => {
+    let emp = respuesta.filter((obj: any) => {
       return obj.departamentos.length > 0
     });
 
@@ -464,20 +475,18 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
     this.reportesTiempoLaborado.ReporteTiempoLaborado(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       switch (accion) {
-        case 'excel': this.exportToExcel('default'); break;
+        case 'excel': this.ExportarExcel('default'); break;
         case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
     })
   }
 
-  /***************************
-   * 
-   * COLORES Y LOGO PARA EL REPORTE
-   * 
-   *****************************/
+  /** ****************************************************************************************** **
+   **                              COLORES Y LOGO PARA EL REPORTE                                ** 
+   ** ****************************************************************************************** **/
 
   logo: any = String;
   ObtenerLogo() {
@@ -498,17 +507,15 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
     });
   }
 
-  /******************************************************
-   *                                                    *
-   *                         PDF                        *
-   *                                                    *
-   ******************************************************/
+  /** ****************************************************************************************** **
+   **                                              PDF                                           **
+   ** ****************************************************************************************** **/
 
-  generarPdf(action) {
-    let documentDefinition;
+  GenerarPDF(action) {
+    let documentDefinition: any;
 
     if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true || this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      documentDefinition = this.getDocumentDefinicion();
+      documentDefinition = this.GetDocumentDefinicion();
     };
 
     let doc_name = "Resumen_asistencia.pdf";
@@ -521,7 +528,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
 
   }
 
-   getDocumentDefinicion() {
+   GetDocumentDefinicion() {
     return {
       pageSize: 'A4',
       pageOrientation: 'landscape',
@@ -553,7 +560,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
         { text: (localStorage.getItem('name_empresa') as string).toUpperCase(), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
         { text: 'RESUMEN DE ASISTENCIA', bold: true, fontSize: 16, alignment: 'center', margin: [0, -10, 0, 5] },
         { text: 'PERIODO DEL: ' + this.rangoFechas.fec_inico + " AL " + this.rangoFechas.fec_final, bold: true, fontSize: 15, alignment: 'center', margin: [0, 10, 0, 10] },
-        ...this.impresionDatosPDF(this.data_pdf).map(obj => {
+        ...this.EstructurarDatosPDF(this.data_pdf).map(obj => {
           return obj
         })
       ],
@@ -585,7 +592,8 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
     };
   }
 
-  impresionDatosPDF(data: any[]): Array<any> {
+  // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
+  EstructurarDatosPDF(data: any[]): Array<any> {
     let n: any = []
     let c = 0;
     let totalTiempoLaboradoEmpleado: number = 0;
@@ -680,7 +688,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
     });
 
     if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      data.forEach((obj1) => {
+      data.forEach((obj1: any) => {
         if (this.bool.bool_cargo === true) {
           totalTiempoLaboradoCargo = 0;
           totalTiempoAtrasosCargo = 0;
@@ -821,7 +829,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
                   { rowSpan: 1, text: 'TOMADO', style: 'tableHeader' },
                   {},{}
                 ],
-                ...obj2.timbres.map(obj3 => {
+                ...obj2.timbres.map((obj3: any) => {
                   c = c + 1;
 
                   //CAMBIO DE FORMATO EN FECHA Y HORAS (HORARIO Y TIMBRE)
@@ -856,15 +864,15 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
                     : '';
                 
                   const alimentacion_asignada = obj3.tipo == 'EAS' ? obj3.inicioAlimentacion.min_alimentacion : 0;
-                  const diferenciaEnMinutos = this.calcularDiferenciaFechas(obj3);
+                  const diferenciaEnMinutos = this.CalcularDiferenciaFechas(obj3);
                   const minutosAlimentacion = diferenciaEnMinutos[0];
-                  const tiempoAlimentacion = this.minutosAHorasMinutosSegundos(minutosAlimentacion);
+                  const tiempoAlimentacion = this.MinutosAHorasMinutosSegundos(minutosAlimentacion);
                   const minutosLaborados = diferenciaEnMinutos[1];
-                  const tiempoLaborado = this.minutosAHorasMinutosSegundos(minutosLaborados);
+                  const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
                   const minutosAtraso = diferenciaEnMinutos[2];
-                  const tiempoAtraso = this.minutosAHorasMinutosSegundos(minutosAtraso);
+                  const tiempoAtraso = this.MinutosAHorasMinutosSegundos(minutosAtraso);
                   const minutosSalidaAnticipada = diferenciaEnMinutos[3];
-                  const tiempoSalidaAnticipada = this.minutosAHorasMinutosSegundos(minutosSalidaAnticipada);
+                  const tiempoSalidaAnticipada = this.MinutosAHorasMinutosSegundos(minutosSalidaAnticipada);
                   
                   totalTiempoLaboradoEmpleado += minutosLaborados;
                   totalTiempoLaboradoRegimen += minutosLaborados; 
@@ -952,17 +960,17 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
                     style: 'itemsTableCentradoTotal'
                   },
                   {style: 'itemsTableCentradoTotal', text: 'TOTAL'},
-                  {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoAtrasosEmpleado.toFixed(2))},
-                  {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoSalidasEmpleado.toFixed(2))},
+                  {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoAtrasosEmpleado.toFixed(2))},
+                  {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoSalidasEmpleado.toFixed(2))},
                   {style: 'itemsTableCentradoTotal', text: totalTiempoAlimentacionAEmpleado.toFixed(2)},
-                  {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoAlimentacionTEmpleado.toFixed(2))},
-                  {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoLaboradoEmpleado.toFixed(2))},
+                  {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoAlimentacionTEmpleado.toFixed(2))},
+                  {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoEmpleado.toFixed(2))},
                   {}
                 ],
               ],
             },
             layout: {
-              fillColor: function (rowIndex) {
+              fillColor: function (rowIndex: any) {
                 return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
               }
             }
@@ -977,11 +985,11 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
 
           let cargo = {
             cargo: obj1.name_cargo,
-            tiempoLaborado: this.minutosAHorasMinutosSegundos(totalTiempoLaboradoCargo),
-            tiempoAtrasos: this.minutosAHorasMinutosSegundos(totalTiempoAtrasosCargo),
-            tiempoSalida: this.minutosAHorasMinutosSegundos(totalTiempoSalidasCargo),
+            tiempoLaborado: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoCargo),
+            tiempoAtrasos: this.MinutosAHorasMinutosSegundos(totalTiempoAtrasosCargo),
+            tiempoSalida: this.MinutosAHorasMinutosSegundos(totalTiempoSalidasCargo),
             tiempoAlimentacionA: totalTiempoAlimentacionACargo,
-            tiempoAlimentacionT: this.minutosAHorasMinutosSegundos(totalTiempoAlimentacionTCargo),
+            tiempoAlimentacionT: this.MinutosAHorasMinutosSegundos(totalTiempoAlimentacionTCargo),
           }
           this.tiempoCargos.push(cargo);
         };
@@ -995,11 +1003,11 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
 
           let regimen = {
             regimen: obj1.regimen.nombre,
-            tiempoLaborado: this.minutosAHorasMinutosSegundos(totalTiempoLaboradoRegimen),
-            tiempoAtrasos: this.minutosAHorasMinutosSegundos(totalTiempoAtrasosRegimen),
-            tiempoSalida: this.minutosAHorasMinutosSegundos(totalTiempoSalidasRegimen),
+            tiempoLaborado: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoRegimen),
+            tiempoAtrasos: this.MinutosAHorasMinutosSegundos(totalTiempoAtrasosRegimen),
+            tiempoSalida: this.MinutosAHorasMinutosSegundos(totalTiempoSalidasRegimen),
             tiempoAlimentacionA: totalTiempoAlimentacionARegimen,
-            tiempoAlimentacionT: this.minutosAHorasMinutosSegundos(totalTiempoAlimentacionTRegimen),
+            tiempoAlimentacionT: this.MinutosAHorasMinutosSegundos(totalTiempoAlimentacionTRegimen),
           }
           this.tiempoRegimen.push(regimen);
         };
@@ -1050,7 +1058,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
             ]
           },
           layout: {
-            fillColor: function (rowIndex) {
+            fillColor: function (rowIndex: any) {
               return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
             }
           }
@@ -1102,7 +1110,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
             ]
           },
           layout: {
-            fillColor: function (rowIndex) {
+            fillColor: function (rowIndex: any) {
               return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
             }
           }
@@ -1256,7 +1264,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
                     { rowSpan: 1, text: 'TOMADO', style: 'tableHeader' },
                     {},{}
                   ],
-                  ...obj2.timbres.map(obj3 => {
+                  ...obj2.timbres.map((obj3: any) => {
                     c = c + 1;
   
                     //CAMBIO DE FORMATO EN FECHA Y HORAS (HORARIO Y TIMBRE)
@@ -1291,15 +1299,15 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
                       : '';
                   
                     const alimentacion_asignada = obj3.tipo == 'EAS' ? obj3.inicioAlimentacion.min_alimentacion : 0;
-                    const diferenciaEnMinutos = this.calcularDiferenciaFechas(obj3);
+                    const diferenciaEnMinutos = this.CalcularDiferenciaFechas(obj3);
                     const minutosAlimentacion = diferenciaEnMinutos[0];
-                    const tiempoAlimentacion = this.minutosAHorasMinutosSegundos(minutosAlimentacion);
+                    const tiempoAlimentacion = this.MinutosAHorasMinutosSegundos(minutosAlimentacion);
                     const minutosLaborados = diferenciaEnMinutos[1];
-                    const tiempoLaborado = this.minutosAHorasMinutosSegundos(minutosLaborados);
+                    const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
                     const minutosAtraso = diferenciaEnMinutos[2];
-                    const tiempoAtraso = this.minutosAHorasMinutosSegundos(minutosAtraso);
+                    const tiempoAtraso = this.MinutosAHorasMinutosSegundos(minutosAtraso);
                     const minutosSalidaAnticipada = diferenciaEnMinutos[3];
-                    const tiempoSalidaAnticipada = this.minutosAHorasMinutosSegundos(minutosSalidaAnticipada);
+                    const tiempoSalidaAnticipada = this.MinutosAHorasMinutosSegundos(minutosSalidaAnticipada);
                     
                     totalTiempoLaboradoEmpleado += minutosLaborados;
                     totalTiempoLaboradoSucursal += minutosLaborados; 
@@ -1387,17 +1395,17 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
                       style: 'itemsTableCentradoTotal'
                     },
                     {style: 'itemsTableCentradoTotal', text: 'TOTAL'},
-                    {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoAtrasosEmpleado.toFixed(2))},
-                    {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoSalidasEmpleado.toFixed(2))},
+                    {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoAtrasosEmpleado.toFixed(2))},
+                    {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoSalidasEmpleado.toFixed(2))},
                     {style: 'itemsTableCentradoTotal', text: totalTiempoAlimentacionAEmpleado.toFixed(2)},
-                    {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoAlimentacionTEmpleado.toFixed(2))},
-                    {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoLaboradoEmpleado.toFixed(2))},
+                    {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoAlimentacionTEmpleado.toFixed(2))},
+                    {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoEmpleado.toFixed(2))},
                     {}
                   ],
                 ],
               },
               layout: {
-                fillColor: function (rowIndex) {
+                fillColor: function (rowIndex: any) {
                   return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
                 }
               }
@@ -1411,11 +1419,11 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
             totalTiempoAlimentacionTDepartamento = Number(totalTiempoAlimentacionTDepartamento.toFixed(2));
             let departamento = {
               departamento: obj1.name_dep,
-              tiempoLaborado: this.minutosAHorasMinutosSegundos(totalTiempoLaboradoDepartamento),
-              tiempoAtrasos: this.minutosAHorasMinutosSegundos(totalTiempoAtrasosDepartamento),
-              tiempoSalida: this.minutosAHorasMinutosSegundos(totalTiempoSalidasDepartamento),
+              tiempoLaborado: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoDepartamento),
+              tiempoAtrasos: this.MinutosAHorasMinutosSegundos(totalTiempoAtrasosDepartamento),
+              tiempoSalida: this.MinutosAHorasMinutosSegundos(totalTiempoSalidasDepartamento),
               tiempoAlimentacionA: totalTiempoAlimentacionADepartamento,
-              tiempoAlimentacionT: this.minutosAHorasMinutosSegundos(totalTiempoAlimentacionTDepartamento),
+              tiempoAlimentacionT: this.MinutosAHorasMinutosSegundos(totalTiempoAlimentacionTDepartamento),
             }
             this.tiempoDepartamentos.push(departamento);
           };
@@ -1429,11 +1437,11 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
           totalTiempoAlimentacionTSucursal = Number(totalTiempoAlimentacionTSucursal.toFixed(2));
           let sucursal = {
             sucursal: obj.name_suc,
-            tiempoLaborado: this.minutosAHorasMinutosSegundos(totalTiempoLaboradoSucursal),
-            tiempoAtrasos: this.minutosAHorasMinutosSegundos(totalTiempoAtrasosSucursal),
-            tiempoSalida: this.minutosAHorasMinutosSegundos(totalTiempoSalidasSucursal),
+            tiempoLaborado: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoSucursal),
+            tiempoAtrasos: this.MinutosAHorasMinutosSegundos(totalTiempoAtrasosSucursal),
+            tiempoSalida: this.MinutosAHorasMinutosSegundos(totalTiempoSalidasSucursal),
             tiempoAlimentacionA: totalTiempoAlimentacionASucursal,
-            tiempoAlimentacionT: this.minutosAHorasMinutosSegundos(totalTiempoAlimentacionTSucursal)
+            tiempoAlimentacionT: this.MinutosAHorasMinutosSegundos(totalTiempoAlimentacionTSucursal)
           }
           this.tiempoSucursales.push(sucursal);
         };
@@ -1485,7 +1493,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
           ]
         },
         layout: {
-          fillColor: function (rowIndex) {
+          fillColor: function (rowIndex: any) {
             return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
           }
         }
@@ -1537,7 +1545,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
           ]
         },
         layout: {
-          fillColor: function (rowIndex) {
+          fillColor: function (rowIndex: any) {
             return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
           }
         }
@@ -1546,102 +1554,20 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
 
     return n;
   }
-  
-  SumarRegistros(array: any []) {
-    let valor = 0;
-    for (let i = 0; i < array.length; i++) {
-        valor = valor + array[i];
-    }
-    return valor
-  }
 
-  calcularDiferenciaFechas(timbre: any) {
-    //VALORES DE RETORNO [minutosAlimentacion,minutosLaborados,minutosAtrasos,minutosSalidasAnticipadas]
-    let minutosAlimentacion = 0;
-    let minutosLaborados = 0;
-    let minutosAtrasos = 0;
-    let minutosSalidasAnticipadas = 0;
-    
-    if (timbre.origen === 'L' || timbre.origen === 'FD'){
-      return [0,0,0,0];
-    }
-
-    if (timbre.tipo === 'ES') {
-      const { entrada, salida } = timbre;      
-      if (entrada.fec_hora_timbre !== null && salida.fec_hora_timbre !== null) {
-        minutosLaborados = Number(this.calcularMinutosDiferencia(entrada.fec_hora_timbre, salida.fec_hora_timbre).toFixed(2));
-        minutosAtrasos = Number(this.calcularMinutosAtraso(entrada.fec_hora_horario, entrada.fec_hora_timbre, entrada.tolerancia));
-        minutosSalidasAnticipadas = Number(this.calcularMinutosSalidaAnticipada(salida.fec_hora_horario, salida.fec_hora_timbre).toFixed(2));
-      }
-    } else {
-      const { entrada, inicioAlimentacion, finAlimentacion, salida } = timbre;
-      const min_alimentacion: number = timbre.inicioAlimentacion.min_alimentacion;
-      if (entrada.fec_hora_timbre !== null && salida.fec_hora_timbre !== null) {
-        minutosLaborados = Number(this.calcularMinutosDiferencia(entrada.fec_hora_timbre, salida.fec_hora_timbre).toFixed(2));
-        minutosAtrasos = Number(this.calcularMinutosAtraso(entrada.fec_hora_horario, entrada.fec_hora_timbre, entrada.tolerancia));
-      }     
-      if (minutosLaborados >0) {
-        minutosAlimentacion = inicioAlimentacion.fec_hora_timbre !== null && finAlimentacion.fec_hora_timbre !== null ? Number(this.calcularMinutosDiferencia(inicioAlimentacion.fec_hora_timbre, finAlimentacion.fec_hora_timbre).toFixed(2)) : min_alimentacion;
-        minutosLaborados = Number((minutosLaborados - minutosAlimentacion).toFixed(2))
-      }
-    }
-    return [minutosAlimentacion,minutosLaborados,minutosAtrasos,minutosSalidasAnticipadas];
-  }
-  
-  calcularMinutosDiferencia(inicio: any, fin: any): number {
-    const fechaInicio = new Date(inicio);
-    const fechaFin = new Date(fin);
-    return Math.abs(fechaFin.getTime() - fechaInicio.getTime()) / 1000 / 60;
-  }
-
-  calcularMinutosAtraso(horario: any, timbre: any, tolerancia: number): number {
-    const diferencia = (new Date(timbre)).getTime() - (new Date(horario)).getTime();
-    const atraso = diferencia / (1000 * 60);
-
-    return this.tolerancia !== '1'
-        ? atraso > tolerancia
-            ? this.tolerancia === '2-1' ? atraso : atraso - tolerancia
-            : 0
-        : atraso;
-}
-
-
-  calcularMinutosSalidaAnticipada(horario: any, timbre: any): number {
-    const fechaHorario = new Date(horario);
-    const fechaTimbre = new Date(timbre);
-
-    return fechaTimbre < fechaHorario ? (fechaHorario.getTime() - fechaTimbre.getTime()) / 1000 / 60 : 0;
-  }
-
-
-  segundosAMinutosConDecimales(segundos) {
-    return Number((segundos / 60).toFixed(2));
-  }
-
-  minutosAHorasMinutosSegundos(minutos) {
-    let seconds = minutos * 60;
-    let hour: string | number = Math.floor(seconds / 3600);
-    hour = (hour < 10)? '0' + hour : hour;
-    let minute: string | number = Math.floor((seconds / 60) % 60);
-    minute = (minute < 10)? '0' + minute : minute;
-    let second: string | number = Number((seconds % 60).toFixed(0));
-    second = (second < 10)? '0' + second : second;
-    return `${hour}:${minute}:${second}`;
-  }
-
- /** ************************************************************************************************** ** 
-   ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
-   ** ************************************************************************************************** **/
-   exportToExcel(tipo: string): void {
+  /** ****************************************************************************************** ** 
+   ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
+   ** ****************************************************************************************** **/
+   ExportarExcel(tipo: string): void {
     switch (tipo) {
       case 'RegimenCargo':
-        const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfRegimenCargo(this.data_pdf));
+        const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcelRegimenCargo(this.data_pdf));
         const wb_regimen_cargo: xlsx.WorkBook = xlsx.utils.book_new();
         xlsx.utils.book_append_sheet(wb_regimen_cargo, wsr_regimen_cargo, 'Resumen_asistencia');
         xlsx.writeFile(wb_regimen_cargo, 'Resumen_asistencia.xlsx');
         break;
       default:
-        const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefault(this.data_pdf));
+        const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
         const wb: xlsx.WorkBook = xlsx.utils.book_new();
         xlsx.utils.book_append_sheet(wb, wsr, 'Resumen_asistencia');
         xlsx.writeFile(wb, 'Resumen_asistencia.xlsx');
@@ -1649,7 +1575,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
     }
   }
 
-  MapingDataPdfDefault(array: Array<any>) {
+  EstructurarDatosExcel(array: Array<any>) {
     let nuevo: Array<any> = [];
     array.forEach((obj1: IReporteHorasTrabaja) => {
       obj1.departamentos.forEach(obj2 => {
@@ -1683,15 +1609,15 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
 
             const alimentacion_asignada = obj4.tipo == 'EAS' ? obj4.inicioAlimentacion.min_alimentacion : 0;
             
-            const diferenciaEnMinutos = this.calcularDiferenciaFechas(obj4);
+            const diferenciaEnMinutos = this.CalcularDiferenciaFechas(obj4);
             const minutosAlimentacion = diferenciaEnMinutos[0];
-            const tiempoAlimentacion = this.minutosAHorasMinutosSegundos(minutosAlimentacion);
+            const tiempoAlimentacion = this.MinutosAHorasMinutosSegundos(minutosAlimentacion);
             const minutosLaborados = diferenciaEnMinutos[1];
-            const tiempoLaborado = this.minutosAHorasMinutosSegundos(minutosLaborados);
+            const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
             const minutosAtraso = diferenciaEnMinutos[2];
-            const tiempoAtraso = this.minutosAHorasMinutosSegundos(minutosAtraso);
+            const tiempoAtraso = this.MinutosAHorasMinutosSegundos(minutosAtraso);
             const minutosSalidaAnticipada = diferenciaEnMinutos[3];
-            const tiempoSalidaAnticipada = this.minutosAHorasMinutosSegundos(minutosSalidaAnticipada);
+            const tiempoSalidaAnticipada = this.MinutosAHorasMinutosSegundos(minutosSalidaAnticipada);
             let ele = { 
               'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
               'Departamento': obj2.name_dep,
@@ -1714,7 +1640,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
     return nuevo;
   }
 
-  MapingDataPdfRegimenCargo(array: Array<any>) {
+  EstructurarDatosExcelRegimenCargo(array: Array<any>) {
     let nuevo: Array<any> = [];
     array.forEach((obj1: any) => {
       obj1.empleados.forEach((obj2: any) => {
@@ -1747,15 +1673,15 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
 
           const alimentacion_asignada = obj3.tipo == 'EAS' ? obj3.inicioAlimentacion.min_alimentacion : 0;
 
-          const diferenciaEnMinutos = this.calcularDiferenciaFechas(obj3);
+          const diferenciaEnMinutos = this.CalcularDiferenciaFechas(obj3);
           const minutosAlimentacion = diferenciaEnMinutos[0];
-          const tiempoAlimentacion = this.minutosAHorasMinutosSegundos(minutosAlimentacion);
+          const tiempoAlimentacion = this.MinutosAHorasMinutosSegundos(minutosAlimentacion);
           const minutosLaborados = diferenciaEnMinutos[1];
-          const tiempoLaborado = this.minutosAHorasMinutosSegundos(minutosLaborados);
+          const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
           const minutosAtraso = diferenciaEnMinutos[2];
-          const tiempoAtraso = this.minutosAHorasMinutosSegundos(minutosAtraso);
+          const tiempoAtraso = this.MinutosAHorasMinutosSegundos(minutosAtraso);
           const minutosSalidaAnticipada = diferenciaEnMinutos[3];
-          const tiempoSalidaAnticipada = this.minutosAHorasMinutosSegundos(minutosSalidaAnticipada);
+          const tiempoSalidaAnticipada = this.MinutosAHorasMinutosSegundos(minutosSalidaAnticipada);
 
           let ele = { 
             'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
@@ -1778,8 +1704,11 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
     return nuevo;
   }
 
-  //METODOS PARA EXTRAER LOS TIMBRES EN UNA LISTA Y VISUALIZARLOS
-  extraerTimbres() {
+  /** ****************************************************************************************** ** 
+   ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
+   ** ****************************************************************************************** **/
+
+  ExtraerTimbres() {
     this.timbres = [];
     let n = 0;
     this.data_pdf.forEach((obj1: IReporteHorasTrabaja) => {
@@ -1819,15 +1748,15 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
 
             const alimentacion_asignada = obj4.tipo == 'EAS' ? obj4.inicioAlimentacion.min_alimentacion : 0;
             
-            const diferenciaEnMinutos = this.calcularDiferenciaFechas(obj4);
+            const diferenciaEnMinutos = this.CalcularDiferenciaFechas(obj4);
             const minutosAlimentacion = diferenciaEnMinutos[0];
-            const tiempoAlimentacion = this.minutosAHorasMinutosSegundos(minutosAlimentacion);
+            const tiempoAlimentacion = this.MinutosAHorasMinutosSegundos(minutosAlimentacion);
             const minutosLaborados = diferenciaEnMinutos[1];
-            const tiempoLaborado = this.minutosAHorasMinutosSegundos(minutosLaborados);
+            const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
             const minutosAtraso = diferenciaEnMinutos[2];
-            const tiempoAtraso = this.minutosAHorasMinutosSegundos(minutosAtraso);
+            const tiempoAtraso = this.MinutosAHorasMinutosSegundos(minutosAtraso);
             const minutosSalidaAnticipada = diferenciaEnMinutos[3];
-            const tiempoSalidaAnticipada = this.minutosAHorasMinutosSegundos(minutosSalidaAnticipada);
+            const tiempoSalidaAnticipada = this.MinutosAHorasMinutosSegundos(minutosSalidaAnticipada);
             n = n + 1;
             const ele = { 
               n,
@@ -1850,7 +1779,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
     })
   }
 
-  extraerTimbresRegimenCargo() {
+  ExtraerTimbresRegimenCargo() {
     this.timbres = [];
     let n = 0;
     this.data_pdf.forEach((obj1: any) => {
@@ -1889,15 +1818,15 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
 
           const alimentacion_asignada = obj3.tipo == 'EAS' ? obj3.inicioAlimentacion.min_alimentacion : 0;
 
-          const diferenciaEnMinutos = this.calcularDiferenciaFechas(obj3);
+          const diferenciaEnMinutos = this.CalcularDiferenciaFechas(obj3);
           const minutosAlimentacion = diferenciaEnMinutos[0];
-          const tiempoAlimentacion = this.minutosAHorasMinutosSegundos(minutosAlimentacion);
+          const tiempoAlimentacion = this.MinutosAHorasMinutosSegundos(minutosAlimentacion);
           const minutosLaborados = diferenciaEnMinutos[1];
-          const tiempoLaborado = this.minutosAHorasMinutosSegundos(minutosLaborados);
+          const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
           const minutosAtraso = diferenciaEnMinutos[2];
-          const tiempoAtraso = this.minutosAHorasMinutosSegundos(minutosAtraso);
+          const tiempoAtraso = this.MinutosAHorasMinutosSegundos(minutosAtraso);
           const minutosSalidaAnticipada = diferenciaEnMinutos[3];
-          const tiempoSalidaAnticipada = this.minutosAHorasMinutosSegundos(minutosSalidaAnticipada);
+          const tiempoSalidaAnticipada = this.MinutosAHorasMinutosSegundos(minutosSalidaAnticipada);
 
           n = n + 1;
           const ele = { 
@@ -1920,13 +1849,85 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
     })
   }
 
-  /*****************************************************************************
-   * 
-   * 
-   * Varios Metodos Complementarios al funcionamiento. 
-   * 
-   * 
-   **************************************************************************/
+  /** ****************************************************************************************** ** 
+   ** **                                   CALCULOS Y CONVERSIONES                            ** **
+   ** ****************************************************************************************** **/
+
+  CalcularDiferenciaFechas(timbre: any) {
+    //VALORES DE RETORNO [minutosAlimentacion,minutosLaborados,minutosAtrasos,minutosSalidasAnticipadas]
+    let minutosAlimentacion = 0;
+    let minutosLaborados = 0;
+    let minutosAtrasos = 0;
+    let minutosSalidasAnticipadas = 0;
+    
+    if (timbre.origen === 'L' || timbre.origen === 'FD'){
+      return [0,0,0,0];
+    }
+
+    if (timbre.tipo === 'ES') {
+      const { entrada, salida } = timbre;      
+      if (entrada.fec_hora_timbre !== null && salida.fec_hora_timbre !== null) {
+        minutosLaborados = Number(this.CalcularMinutosDiferencia(entrada.fec_hora_timbre, salida.fec_hora_timbre).toFixed(2));
+        minutosAtrasos = Number(this.CalcularMinutosAtraso(entrada.fec_hora_horario, entrada.fec_hora_timbre, entrada.tolerancia));
+        minutosSalidasAnticipadas = Number(this.CalcularMinutosSalidaAnticipada(salida.fec_hora_horario, salida.fec_hora_timbre).toFixed(2));
+      }
+    } else {
+      const { entrada, inicioAlimentacion, finAlimentacion, salida } = timbre;
+      const min_alimentacion: number = timbre.inicioAlimentacion.min_alimentacion;
+      if (entrada.fec_hora_timbre !== null && salida.fec_hora_timbre !== null) {
+        minutosLaborados = Number(this.CalcularMinutosDiferencia(entrada.fec_hora_timbre, salida.fec_hora_timbre).toFixed(2));
+        minutosAtrasos = Number(this.CalcularMinutosAtraso(entrada.fec_hora_horario, entrada.fec_hora_timbre, entrada.tolerancia));
+      }     
+      if (minutosLaborados >0) {
+        minutosAlimentacion = inicioAlimentacion.fec_hora_timbre !== null && finAlimentacion.fec_hora_timbre !== null ? Number(this.CalcularMinutosDiferencia(inicioAlimentacion.fec_hora_timbre, finAlimentacion.fec_hora_timbre).toFixed(2)) : min_alimentacion;
+        minutosLaborados = Number((minutosLaborados - minutosAlimentacion).toFixed(2))
+      }
+    }
+    return [minutosAlimentacion,minutosLaborados,minutosAtrasos,minutosSalidasAnticipadas];
+  }
+  
+  CalcularMinutosDiferencia(inicio: any, fin: any): number {
+    const fechaInicio = new Date(inicio);
+    const fechaFin = new Date(fin);
+    return Math.abs(fechaFin.getTime() - fechaInicio.getTime()) / 1000 / 60;
+  }
+
+  CalcularMinutosAtraso(horario: any, timbre: any, tolerancia: number): number {
+    const diferencia = (new Date(timbre)).getTime() - (new Date(horario)).getTime();
+    const atraso = diferencia / (1000 * 60);
+
+    return this.tolerancia !== '1'
+        ? atraso > tolerancia
+            ? this.tolerancia === '2-1' ? atraso : atraso - tolerancia
+            : 0
+        : atraso;
+}
+
+  CalcularMinutosSalidaAnticipada(horario: any, timbre: any): number {
+    const fechaHorario = new Date(horario);
+    const fechaTimbre = new Date(timbre);
+
+    return fechaTimbre < fechaHorario ? (fechaHorario.getTime() - fechaTimbre.getTime()) / 1000 / 60 : 0;
+  }
+
+  SegundosAMinutosConDecimales(segundos: any) {
+    return Number((segundos / 60).toFixed(2));
+  }
+
+  MinutosAHorasMinutosSegundos(minutos: any) {
+    let seconds = minutos * 60;
+    let hour: string | number = Math.floor(seconds / 3600);
+    hour = (hour < 10)? '0' + hour : hour;
+    let minute: string | number = Math.floor((seconds / 60) % 60);
+    minute = (minute < 10)? '0' + minute : minute;
+    let second: string | number = Number((seconds % 60).toFixed(0));
+    second = (second < 10)? '0' + second : second;
+    return `${hour}:${minute}:${second}`;
+  }
+
+  /** ****************************************************************************************** **
+   **                   VARIOS METODOS COMPLEMENTARIOS AL FUNCIONAMIENTO.                        **
+   ** ****************************************************************************************** **/
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc() {
@@ -2034,7 +2035,6 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
     return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-
   // METODO PARA EVENTOS DE PAGINACION
   ManejarPagina(e: PageEvent) {
     if (this.bool.bool_suc === true) {
@@ -2066,15 +2066,11 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
   }
 
 
-  /**
-   * METODOS PARA CONTROLAR INGRESO DE LETRAS
-   */
-
-  IngresarSoloLetras(e) {
+  IngresarSoloLetras(e: any) {
     return this.validacionService.IngresarSoloLetras(e)
   }
 
-  IngresarSoloNumeros(evt) {
+  IngresarSoloNumeros(evt: any) {
     return this.validacionService.IngresarSoloNumeros(evt)
   }
 
@@ -2082,9 +2078,9 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
   verDatos() {
     this.verDetalle = true;
     if (this.bool.bool_cargo || this.bool.bool_reg) {
-      this.extraerTimbresRegimenCargo();
+      this.ExtraerTimbresRegimenCargo();
     } else {
-      this.extraerTimbres();
+      this.ExtraerTimbres();
     }
   }
 
@@ -2095,7 +2091,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
   }
 
   //METDODO PARA CAMBIAR EL COLOR DE LAS CELDAS EN LA TABLA DE PREVISUALIZACION
-  obtenerClaseAlimentacion(asignado: any, tomado: any) {
+  ObtenerClaseAlimentacion(asignado: any, tomado: any) {
     const tAsignado = Number(asignado);
     const tTomado = Number(tomado);
     if (tTomado > tAsignado) {
@@ -2103,13 +2099,13 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
     } 
   }
 
-  obtenerClaseTimbre(valor: any) {
+  ObtenerClaseTimbre(valor: any) {
     if (valor == 'FT') {
       return 'rojo';
     }
   }
 
-  obtenerClaseAtrasoSalida(valor: any, tipo:string){
+  ObtenerClaseAtrasoSalida(valor: any, tipo:string){
   const numero = Number(valor);
     if (numero > 0) {
       return tipo === 'A' ? 'amarillo' : 'azul';

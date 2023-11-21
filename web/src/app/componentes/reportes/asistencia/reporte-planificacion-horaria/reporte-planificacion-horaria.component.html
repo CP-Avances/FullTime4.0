@@ -46,23 +46,23 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
-                    <button mat-icon-button (click)="validacionReporte('ver')" matTooltipPosition="right"
+                    <button mat-icon-button (click)="ValidarReporte('ver')" matTooltipPosition="right"
                         matTooltip="Previsualizar reporte en el navegador.">
                         <mat-icon class="ver">visibility</mat-icon>
                     </button>
-                    <button mat-icon-button (click)="validacionReporte('open')" matTooltipPosition="right"
+                    <button mat-icon-button (click)="ValidarReporte('open')" matTooltipPosition="right"
                         matTooltip="Previsualizar reporte en el navegador en fomato PDF.">
                         <mat-icon class="i-pdf">picture_as_pdf</mat-icon>
                     </button>
-                    <button mat-icon-button (click)="validacionReporte('excel')" matTooltipPosition="right"
+                    <button mat-icon-button (click)="ValidarReporte('excel')" matTooltipPosition="right"
                         matTooltip="Descargar reporte en formato EXCEL.">
                         <mat-icon class="fas fa-file-excel i-excel"></mat-icon>
                     </button>
-                    <button mat-icon-button (click)="validacionReporte('print')" matTooltipPosition="right"
+                    <button mat-icon-button (click)="ValidarReporte('print')" matTooltipPosition="right"
                         matTooltip="Imprimir reporte en formato PDF.">
                         <mat-icon class="i-print">local_printshop</mat-icon>
                     </button>
-                    <button mat-icon-button (click)="validacionReporte('download')" matTooltipPosition="right"
+                    <button mat-icon-button (click)="ValidarReporte('download')" matTooltipPosition="right"
                         matTooltip="Descargar reporte en formato PDF.">
                         <mat-icon class="i-download">cloud_download</mat-icon>
                     </button>
@@ -661,11 +661,11 @@
                 </mat-paginator>
                 <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 0.5rem">
                     <i id="pdf" class="fas fa-file-pdf icon" matSuffix matTooltipPosition="right"
-                        matTooltip="Descargar reporte en formato PDF." (click)="generarPdf('download')">
+                        matTooltip="Descargar reporte en formato PDF." (click)="GenerarPDF('download')">
                         <p>PDF</p>
                     </i>
                     <i id="excel" class="fas fa-file-excel icon" matSuffix matTooltipPosition="right"
-                        matTooltip="Descargar reporte en formato EXCEL." (click)="exportToExcel()">
+                        matTooltip="Descargar reporte en formato EXCEL." (click)="ExportarExcel()">
                         <p>XLSL</p>
                     </i>
                 </div>

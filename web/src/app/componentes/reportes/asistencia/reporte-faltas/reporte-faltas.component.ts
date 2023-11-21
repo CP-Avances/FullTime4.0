@@ -1,11 +1,12 @@
-import { ReportesAsistenciasService } from 'src/app/servicios/reportes/reportes-asistencias.service';
-import { IReporteFaltas, ITableEmpleados } from 'src/app/model/reportes.model';
-import { SelectionModel } from '@angular/cdk/collections';
+// IMPORTAR LIBRERIAS
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { IReporteFaltas, ITableEmpleados } from 'src/app/model/reportes.model';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
+
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
+import * as pdfMake from 'pdfmake/build/pdfmake.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
@@ -107,7 +108,6 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   get filtroCedula() { return this.reporteService.filtroCedula };
   
   constructor(
-    private R_asistencias: ReportesAsistenciasService,
     private validacionService: ValidacionesService,
     private informacion: DatosGeneralesService,
     private reporteService: ReportesService,
@@ -138,9 +138,9 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
 
   }
 
-  /********************************************************************************************
-  ****                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                            **** 
-  ********************************************************************************************/
+  /** ****************************************************************************************** **
+   ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** ****************************************************************************************** **/
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
@@ -153,6 +153,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       });
   }
 
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE HORA
   BuscarHora() {
     // id_tipo_parametro Formato hora = 26
     this.parametro.ListarDetalleParametros(26).subscribe(
@@ -160,6 +161,10 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
         this.formato_hora = res[0].descripcion;
       });
   }
+
+  /** ****************************************************************************************** **
+   ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** ** 
+   ** ****************************************************************************************** **/
 
   // METODO DE BUSQUEDA DE DATOS
   BuscarInformacion() {
@@ -172,15 +177,15 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     this.informacion.ObtenerInformacion(1).subscribe(
       (res: any[]) => {
         this.origen = JSON.stringify(res);
-        res.forEach((obj) => {
+        res.forEach((obj:any) => {
           this.sucursales.push({
             id: obj.id_suc,
             nombre: obj.name_suc,
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
+        res.forEach((obj:any) => {
+          obj.departamentos.forEach((ele: any) => {
             this.departamentos.push({
               id: ele.id_depa,
               departamento: ele.name_dep,
@@ -189,9 +194,9 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
-            ele.empleado.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((ele: any) => {
+            ele.empleado.forEach((r: any) => {
               let elemento = {
                 id: r.id,
                 nombre: r.name_empleado,
@@ -212,9 +217,9 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
         });
 
         res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
-            ele.empleado.forEach((reg) => {
-              reg.regimen.forEach((r) => {
+          obj.departamentos.forEach((ele: any) => {
+            ele.empleado.forEach((reg: any) => {
+              reg.regimen.forEach((r: any) => {
                 this.regimen.push({
                   id: r.id_regimen,
                   nombre: r.name_regimen,
@@ -225,7 +230,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
         });
 
         this.regimen = this.regimen.filter(
-          (obj, index, self) => index === self.findIndex((o) => o.id === obj.id)
+          (obj: any, index: any, self: any) => index === self.findIndex((o: any) => o.id === obj.id)
         );
       },
       (err) => {
@@ -245,15 +250,15 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
       (res: any[]) => {
         this.origen_cargo = JSON.stringify(res);
 
-        res.forEach((obj) => {
+        res.forEach((obj: any) => {
           this.cargos.push({
             id: obj.id_cargo,
             nombre: obj.name_cargo,
           });
         });
 
-        res.forEach((obj) => {
-          obj.empleados.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.empleados.forEach((r: any) => {
             this.empleados_cargos.push({
               id: r.id,
               nombre: r.name_empleado,
@@ -272,7 +277,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   }
 
   // VALIDACIONES DE OPCIONES DE REPORTE
-  validacionReporte(action: any) {
+  ValidarReporte(action: any) {
     if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de búsqueda.');
     if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
       && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.');
@@ -304,11 +309,12 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     }
   }
 
-  ModelarSucursal(accion) {
+  // TRATAMIENTO DE DATOS POR SUCURSAL
+  ModelarSucursal(accion: any) {
     this.tipo = 'default';
     let respuesta = JSON.parse(this.origen)
 
-    let suc = respuesta.filter(o => {
+    let suc = respuesta.filter((o: any) => {
       let bool = this.selectionSuc.selected.find(obj1 => {
         return obj1.id === o.id_suc
       });
@@ -319,9 +325,9 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     this.restFaltas.BuscarFaltas(suc, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res;
       switch (accion) {
-        case 'excel': this.exportToExcel('default'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        case 'excel': this.ExportarExcel('default'); break;
+        case 'ver': this.VerDatos(); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
@@ -336,7 +342,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     let reg: any = [];
     let objeto: any;
     respuesta.forEach((obj: any) => {
-      this.selectionReg.selected.find((regimen) => {
+      this.selectionReg.selected.find((regimen: any) => {
         objeto = {
           regimen: {
             id: regimen.id,
@@ -346,7 +352,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
         empleados = [];
         obj.departamentos.forEach((departamento: any) => {
           departamento.empleado.forEach((empleado: any) => {
-            empleado.regimen.forEach((r) => {
+            empleado.regimen.forEach((r: any) => {
               if (regimen.id === r.id_regimen) {
                 empleados.push(empleado);
               }
@@ -362,37 +368,38 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     this.restFaltas.BuscarFaltasRegimenCargo(reg, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res;
       switch (accion) {
-        case 'excel': this.exportToExcel('RegimenCargo'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        case 'excel': this.ExportarExcel('RegimenCargo'); break;
+        case 'ver': this.VerDatos(); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
     })
   }
 
-  ModelarDepartamento(accion) {
+  // TRATAMIENTO DE DATOS POR DEPARTAMENTO
+  ModelarDepartamento(accion: any) {
     this.tipo = 'default';
     let respuesta = JSON.parse(this.origen)
 
     respuesta.forEach((obj: any) => {
-      obj.departamentos = obj.departamentos.filter(o => {
+      obj.departamentos = obj.departamentos.filter((o: any) => {
         let bool = this.selectionDep.selected.find(obj1 => {
           return obj1.id === o.id_depa
         })
         return bool != undefined
       })
     })
-    let dep = respuesta.filter(obj => {
+    let dep = respuesta.filter((obj: any) => {
       return obj.departamentos.length > 0
     });
     this.data_pdf = []
     this.restFaltas.BuscarFaltas(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       switch (accion) {
-        case 'excel': this.exportToExcel('default'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        case 'excel': this.ExportarExcel('default'); break;
+        case 'ver': this.VerDatos(); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
@@ -403,7 +410,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   ModelarCargo(accion: any) {
     this.tipo = 'RegimenCargo';
     let respuesta = JSON.parse(this.origen_cargo);
-    let car = respuesta.filter((o) => {
+    let car = respuesta.filter((o: any) => {
       var bool = this.selectionCar.selected.find((obj1) => {
         return obj1.id === o.id_cargo;
       });
@@ -414,22 +421,23 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     this.restFaltas.BuscarFaltasRegimenCargo(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       switch (accion) {
-        case 'excel': this.exportToExcel('RegimenCargo'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        case 'excel': this.ExportarExcel('RegimenCargo'); break;
+        case 'ver': this.VerDatos(); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
     })
   }
 
-  ModelarEmpleados(accion) {
+  // TRATAMIENTO DE DATOS POR EMPLEADO
+  ModelarEmpleados(accion: any) {
     this.tipo = 'default';
     let respuesta = JSON.parse(this.origen)
 
     respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach(element => {
-        element.empleado = element.empleado.filter(o => {
+      obj.departamentos.forEach((departamento: any) => {
+        departamento.empleado = departamento.empleado.filter((o: any) => {
           var bool = this.selectionEmp.selected.find(obj1 => {
             return obj1.id === o.id
           })
@@ -437,8 +445,8 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
         })
       });
     })
-    respuesta.forEach(obj => {
-      obj.departamentos = obj.departamentos.filter(e => {
+    respuesta.forEach((obj: any) => {
+      obj.departamentos = obj.departamentos.filter((e: any) => {
         return e.empleado.length > 0
       })
     });
@@ -451,9 +459,9 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     this.restFaltas.BuscarFaltas(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       switch (accion) {
-        case 'excel': this.exportToExcel('default'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        case 'excel': this.ExportarExcel('default'); break;
+        case 'ver': this.VerDatos(); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
@@ -461,11 +469,9 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   }
 
 
-  /***************************
-   * 
-   * COLORES Y LOGO PARA EL REPORTE
-   * 
-   *****************************/
+  /** ****************************************************************************************** **
+   **                              COLORES Y LOGO PARA EL REPORTE                                ** 
+   ** ****************************************************************************************** **/
 
   logo: any = String;
   ObtenerLogo() {
@@ -486,17 +492,15 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     });
   }
 
-  /******************************************************
-   *                                                    *
-   *                          PDF                       *
-   *                                                    *
-   ******************************************************/
+  /** ****************************************************************************************** **
+   **                                              PDF                                           **
+   ** ****************************************************************************************** **/
 
-  generarPdf(action) {
-    let documentDefinition;
+  GenerarPDF(action: any) {
+    let documentDefinition: any;
 
     if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true || this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      documentDefinition = this.getDocumentDefinicion();
+      documentDefinition = this.GetDocumentDefinicion();
     };
 
     let doc_name = "Faltas.pdf";
@@ -509,7 +513,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
 
   }
 
-   getDocumentDefinicion() {
+  GetDocumentDefinicion() {
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -541,7 +545,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
         { text: (localStorage.getItem('name_empresa') as string).toUpperCase(), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
         { text: 'FALTAS', bold: true, fontSize: 16, alignment: 'center', margin: [0, -10, 0, 5] },
         { text: 'PERIODO DEL: ' + this.rangoFechas.fec_inico + " AL " + this.rangoFechas.fec_final, bold: true, fontSize: 15, alignment: 'center', margin: [0, 10, 0, 10] },
-        ...this.impresionDatosPDF(this.data_pdf).map(obj => {
+        ...this.EstructurarDatosPDF(this.data_pdf).map((obj: any) => {
           return obj
         })
       ],
@@ -566,7 +570,8 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     };
   }
 
-  impresionDatosPDF(data: any[]): Array<any> {
+  // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
+  EstructurarDatosPDF(data: any[]): Array<any> {
     let n: any = []
     let c = 0;
     let accionT: string = '';
@@ -581,7 +586,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     this.faltasCargos = [];
 
     if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      data.forEach((obj1) => {
+      data.forEach((obj1: any) => {
         if (this.bool.bool_cargo === true) {
           totalFaltasCargo = 0;
           n.push({
@@ -678,7 +683,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
                   { text: 'N°', style: 'centrado' },
                   { text: 'FECHA', style: 'centrado' },
                 ],
-                ...obj2.timbres.map(obj3 => {
+                ...obj2.timbres.map((obj3: any) => {
                   const fecha = this.validacionService.FormatearFecha(
                     obj3.fec_horario,
                     this.formato_fecha, 
@@ -700,7 +705,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
               ],
             },
             layout: {
-              fillColor: function (rowIndex) {
+              fillColor: function (rowIndex: any) {
                 return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
               }
             }
@@ -753,7 +758,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
             ]
           },
           layout: {
-            fillColor: function (rowIndex) {
+            fillColor: function (rowIndex: any) {
               return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
             }
           }
@@ -790,7 +795,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
             ]
           },
           layout: {
-            fillColor: function (rowIndex) {
+            fillColor: function (rowIndex: any) {
               return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
             }
           }
@@ -901,7 +906,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
                     { text: 'N°', style: 'centrado' },
                     { text: 'FECHA', style: 'centrado' },
                   ],
-                  ...obj2.timbres.map(obj3 => {
+                  ...obj2.timbres.map((obj3: any) => {
                     const fecha = this.validacionService.FormatearFecha(
                       obj3.fec_horario,
                       this.formato_fecha, 
@@ -923,7 +928,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
                 ],
               },
               layout: {
-                fillColor: function (rowIndex) {
+                fillColor: function (rowIndex: any) {
                   return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
                 }
               }
@@ -1015,7 +1020,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
           ]
         },
         layout: {
-          fillColor: function (rowIndex) {
+          fillColor: function (rowIndex: any) {
             return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
           }
         }
@@ -1025,60 +1030,20 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     return n;
   }
 
-  SumarValoresArray(array: any []) {
-    let valor = 0;
-    for (let i = 0; i < array.length; i++) {
-        valor = valor + parseFloat(array[i]);
-    }
-    return valor.toFixed(2)
-  }
-  
-  SumarRegistros(array: any []) {
-    let valor = 0;
-    for (let i = 0; i < array.length; i++) {
-        valor = valor + array[i];
-    }
-    return valor
-  }
+  /** ****************************************************************************************** ** 
+   ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
+   ** ****************************************************************************************** **/
 
-  HorasDecimalToHHMM(dato: number) {
-    // console.log('Hora decimal a HHMM ======>',dato);
-    var h = parseInt(dato.toString());
-    var x = (dato - h) * 60;
-    var m = parseInt(x.toString());
-
-    let hora;
-    let min;
-    if (h < 10 && m < 10) {
-        hora = '0' + h;
-        min = '0' + m;
-    } else if (h < 10 && m >= 10) {
-        hora = '0' + h;
-        min = m;
-    } else if (h >= 10 && m < 10) {
-        hora = h;
-        min = '0' + m;
-    } else if (h >= 10 && m >= 10) {
-        hora = h;
-        min = m;
-    }
-
-    return hora + ':' + min + ':00'
-  }
-
-/** ************************************************************************************************** ** 
-   ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
-   ** ************************************************************************************************** **/
-   exportToExcel(tipo: string): void {
+  ExportarExcel(tipo: string): void {
     switch (tipo) {
       case 'RegimenCargo':
-        const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfRegimenCargo(this.data_pdf));
+        const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcelRegimenCargo(this.data_pdf));
         const wb_regimen_cargo: xlsx.WorkBook = xlsx.utils.book_new();
         xlsx.utils.book_append_sheet(wb_regimen_cargo, wsr_regimen_cargo, 'Faltas');
         xlsx.writeFile(wb_regimen_cargo, 'Faltas.xlsx');
         break;
       default:
-        const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefault(this.data_pdf));
+        const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
         const wb: xlsx.WorkBook = xlsx.utils.book_new();
         xlsx.utils.book_append_sheet(wb, wsr, 'Faltas');
         xlsx.writeFile(wb, 'Faltas.xlsx');
@@ -1086,7 +1051,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     }
   }
 
-  MapingDataPdfDefault(array: Array<any>) {
+  EstructurarDatosExcel(array: Array<any>) {
     let nuevo: Array<any> = [];
     array.forEach((obj1: IReporteFaltas) => {
       obj1.departamentos.forEach(obj2 => {
@@ -1111,7 +1076,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     return nuevo;
   }
 
-  MapingDataPdfRegimenCargo(array: Array<any>) {
+  EstructurarDatosExcelRegimenCargo(array: Array<any>) {
     let nuevo: Array<any> = [];
     array.forEach((obj1: any) => {
       obj1.empleados.forEach((obj2: any) => {
@@ -1134,64 +1099,63 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     return nuevo;
   }
 
-    //METODOS PARA EXTRAER LOS TIMBRES EN UNA LISTA Y VISUALIZARLOS
-    extraerTimbres() {
-      this.timbres = [];
-      let n = 0;
-      this.data_pdf.forEach((obj1: IReporteFaltas) => {
-        obj1.departamentos.forEach(obj2 => {
-          obj2.empleado.forEach((obj3: any) => {
-            obj3.timbres.forEach((obj4: any) => {
-              const fecha = this.validacionService.FormatearFecha(
-                obj4.fec_horario,
-                this.formato_fecha, 
-                this.validacionService.dia_abreviado);
-              n = n + 1;
-              let ele = {
-                n: n,
-                ciudad: obj1.ciudad, sucursal: obj1.name_suc,
-                departamento: obj2.name_dep,
-                empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
-                fecha
-              }
-              this.timbres.push(ele);
-            })
-          })
-        })
-      })
-    }
-  
-    extraerTimbresRegimenCargo() {
-      this.timbres = [];
-      let n = 0;
-      this.data_pdf.forEach((obj1: any) => {
-        obj1.empleados.forEach((obj2: any) => {
-          obj2.timbres.forEach((obj3: any) => {
+  /** ****************************************************************************************** ** 
+   ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
+   ** ****************************************************************************************** **/
+    
+  ExtraerTimbres() {
+    this.timbres = [];
+    let n = 0;
+    this.data_pdf.forEach((obj1: IReporteFaltas) => {
+      obj1.departamentos.forEach(obj2 => {
+        obj2.empleado.forEach((obj3: any) => {
+          obj3.timbres.forEach((obj4: any) => {
             const fecha = this.validacionService.FormatearFecha(
-              obj3.fec_horario,
+              obj4.fec_horario,
               this.formato_fecha, 
               this.validacionService.dia_abreviado);
             n = n + 1;
             let ele = {
               n: n,
-              ciudad: obj2.ciudad, sucursal: obj2.sucursal,
-              departamento: obj2.departamento,
-              empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
+              ciudad: obj1.ciudad, sucursal: obj1.name_suc,
+              departamento: obj2.name_dep,
+              empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
               fecha
             }
             this.timbres.push(ele);
           })
         })
       })
-    }
+    })
+  }
 
-/*****************************************************************************
-   * 
-   * 
-   * Varios Metodos Complementarios al funcionamiento. 
-   * 
-   * 
-   **************************************************************************/
+  ExtraerTimbresRegimenCargo() {
+    this.timbres = [];
+    let n = 0;
+    this.data_pdf.forEach((obj1: any) => {
+      obj1.empleados.forEach((obj2: any) => {
+        obj2.timbres.forEach((obj3: any) => {
+          const fecha = this.validacionService.FormatearFecha(
+            obj3.fec_horario,
+            this.formato_fecha, 
+            this.validacionService.dia_abreviado);
+          n = n + 1;
+          let ele = {
+            n: n,
+            ciudad: obj2.ciudad, sucursal: obj2.sucursal,
+            departamento: obj2.departamento,
+            empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
+            fecha
+          }
+          this.timbres.push(ele);
+        })
+      })
+    })
+  }
+
+  /** ****************************************************************************************** **
+   **                   VARIOS METODOS COMPLEMENTARIOS AL FUNCIONAMIENTO.                        **
+   ** ****************************************************************************************** **/
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc() {
@@ -1330,10 +1294,6 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
     this.tamanio_pagina = e.pageSize;
   }
 
-  /**
-   * METODOS PARA CONTROLAR INGRESO DE LETRAS
-   */
-
   IngresarSoloLetras(e) {
     return this.validacionService.IngresarSoloLetras(e)
   }
@@ -1343,12 +1303,12 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   }
 
   // MOSTRAR DETALLES
-  verDatos() {
+  VerDatos() {
     this.verDetalle = true;
     if (this.bool.bool_cargo || this.bool.bool_reg) {
-      this.extraerTimbresRegimenCargo();
+      this.ExtraerTimbresRegimenCargo();
     } else {
-      this.extraerTimbres();
+      this.ExtraerTimbres();
     }
   }
 

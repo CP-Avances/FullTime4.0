@@ -1,13 +1,13 @@
 // IMPORTAR LIBRERIAS
 import { Component, Input, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
+
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 
 // IMPORTAR SERVICIOS
@@ -67,14 +67,15 @@ export class VerVacunasComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.validarTipo(this.tipo);
+    this.ValidarTipo(this.tipo);
     this.BuscarParametro();
     this.BuscarHora();
   }
 
-  /********************************************************************************************
-  ****                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                            **** 
-  ********************************************************************************************/
+  /** ****************************************************************************************** **
+   ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** ****************************************************************************************** **/
+
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
@@ -87,6 +88,7 @@ export class VerVacunasComponent implements OnInit {
       });
   }
 
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE HORA
   BuscarHora() {
     // id_tipo_parametro Formato hora = 26
     this.parametro.ListarDetalleParametros(26).subscribe(
@@ -95,7 +97,7 @@ export class VerVacunasComponent implements OnInit {
       });
   }
 
-  validarTipo(tipo: string) {
+  ValidarTipo(tipo: string) {
     switch (tipo) {
       case 'suc':
         this.bool_suc = true;
@@ -103,7 +105,7 @@ export class VerVacunasComponent implements OnInit {
         this.bool_car = false;
         this.bool_dep = false;
         this.bool_emp = false;
-        this.extraerDatos();
+        this.ExtraerDatos();
         break;
       case 'reg':
         this.bool_suc = false;
@@ -111,7 +113,7 @@ export class VerVacunasComponent implements OnInit {
         this.bool_car = false;
         this.bool_dep = false;
         this.bool_emp = false;
-        this.extraerDatosCargosRegimen();
+        this.ExtraerDatosCargosRegimen();
         break;
       case 'car':
         this.bool_suc = false;
@@ -119,7 +121,7 @@ export class VerVacunasComponent implements OnInit {
         this.bool_car = true;
         this.bool_dep = false;
         this.bool_emp = false;
-        this.extraerDatosCargosRegimen();
+        this.ExtraerDatosCargosRegimen();
         break;
       case 'dep':
         this.bool_suc = false;
@@ -127,7 +129,7 @@ export class VerVacunasComponent implements OnInit {
         this.bool_car = false;
         this.bool_dep = true;
         this.bool_emp = false;
-        this.extraerDatos();
+        this.ExtraerDatos();
         break;
       case 'emp':
         this.bool_suc = false;
@@ -135,7 +137,7 @@ export class VerVacunasComponent implements OnInit {
         this.bool_car = false;
         this.bool_dep = false;
         this.bool_emp = true;
-        this.extraerDatos();
+        this.ExtraerDatos();
         break;
       default:
         this.bool_suc = false;
@@ -147,7 +149,10 @@ export class VerVacunasComponent implements OnInit {
     }
   }
 
-  extraerDatos() {
+  /** ****************************************************************************************** ** 
+   ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
+   ** ****************************************************************************************** **/
+  ExtraerDatos() {
     this.arr_vac = [];
     let n = 0;
     this.data.forEach((obj1: any) => {
@@ -185,12 +190,12 @@ export class VerVacunasComponent implements OnInit {
     });
   }
 
-  extraerDatosCargosRegimen() {
+  ExtraerDatosCargosRegimen() {
     this.arr_vac = [];
     let n = 0;
     this.data.forEach((obj1: any) => {
       obj1.empleados.forEach((obj2: any) => {
-        obj2.vacunas.forEach((obj3) => {
+        obj2.vacunas.forEach((obj3: any) => {
           const fecha = this.validacionService.FormatearFecha(
             obj3.fecha.split('T')[0],
             this.formato_fecha, 
@@ -221,37 +226,31 @@ export class VerVacunasComponent implements OnInit {
     });
   }
 
-  // METODO PARA MANEJAR PAGINACION
-  ManejarPagina(e: PageEvent) {
-    this.numero_pagina = e.pageIndex + 1;
-    this.tamanio_pagina = e.pageSize;
-  }
-
-  descargarReporte(accion: any) {
+  DescargarReporte(accion: any) {
     if (this.bool_car || this.bool_reg) {
       switch (accion) {
         case 'excel':
-          this.exportToExcelCargoRegimen();
+          this.ExportarExcelCargoRegimen();
           break;
         default:
-          this.generarPdf(accion);
+          this.GenerarPDF(accion);
           break;
       }
     } else {
       switch (accion) {
         case 'excel':
-          this.exportToExcel();
+          this.ExportarExcel();
           break;
         default:
-          this.generarPdf(accion);
+          this.GenerarPDF(accion);
           break;
       }
     }
   }
 
-  /** *************************************************************************************** **
-   ** **                        COLORES Y LOGO PARA EL REPORTE                             ** **
-   ** *************************************************************************************** **/
+  /** ****************************************************************************************** **
+   **                              COLORES Y LOGO PARA EL REPORTE                                ** 
+   ** ****************************************************************************************** **/
 
   ObtenerLogo() {
     this.restEmpre
@@ -275,13 +274,13 @@ export class VerVacunasComponent implements OnInit {
       });
   }
 
-  /** ************************************************************************************ **
-   ** **                               GENERACION DE PDF                                ** **
-   ** ************************************************************************************ **/
+  /** ****************************************************************************************** **
+   **                                              PDF                                           **
+   ** ****************************************************************************************** **/
 
-  generarPdf(action: any) {
-    const documentDefinition = this.getDocumentDefinicion();
-    let doc_name = 'Reporte_vacunas.pdf';
+  GenerarPDF(action: any) {
+    const documentDefinition = this.GetDocumentDefinicion();
+    let doc_name = 'Vacunas.pdf';
     switch (action) {
       case 'open':
         pdfMake.createPdf(documentDefinition).open();
@@ -298,7 +297,7 @@ export class VerVacunasComponent implements OnInit {
     }
   }
 
-  getDocumentDefinicion() {
+  GetDocumentDefinicion() {
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -360,7 +359,7 @@ export class VerVacunasComponent implements OnInit {
           fontSize: 13,
           alignment: 'center',
         },
-        ...this.impresionDatosPDF(this.data).map((obj) => {
+        ...this.EstructurarDatosPDF(this.data).map((obj) => {
           return obj;
         }),
       ],
@@ -391,11 +390,12 @@ export class VerVacunasComponent implements OnInit {
     };
   }
 
-  impresionDatosPDF(data: any[]): Array<any> {
+  // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
+  EstructurarDatosPDF(data: any[]): Array<any> {
     let n: any = [];
 
     if (this.bool_car === true || this.bool_reg === true) {
-      data.forEach((obj1) => {
+      data.forEach((obj1: any) => {
         if (this.bool_car === true) {
           n.push({
             style: 'tableMarginSuc',
@@ -479,7 +479,7 @@ export class VerVacunasComponent implements OnInit {
                   { text: 'Fecha', style: 'tableHeader' },
                   { text: 'Descripción', style: 'tableHeader' },
                 ],
-                ...obj2.vacunas.map((obj3) => {
+                ...obj2.vacunas.map((obj3: any) => {
                   const fecha = this.validacionService.FormatearFecha(
                     obj3.fecha.split('T')[0],
                     this.formato_fecha, 
@@ -497,7 +497,7 @@ export class VerVacunasComponent implements OnInit {
               ],
             },
             layout: {
-              fillColor: function (rowIndex) {
+              fillColor: function (rowIndex: any) {
                 return rowIndex % 2 === 0 ? '#E5E7E9' : null;
               },
             },
@@ -595,7 +595,7 @@ export class VerVacunasComponent implements OnInit {
                     { text: 'Fecha', style: 'tableHeader' },
                     { text: 'Descripción', style: 'tableHeader' },
                   ],
-                  ...obj2.vacunas.map((obj3) => {
+                  ...obj2.vacunas.map((obj3: any) => {
                     const fecha = this.validacionService.FormatearFecha(
                       obj3.fecha.split('T')[0],
                       this.formato_fecha, 
@@ -613,7 +613,7 @@ export class VerVacunasComponent implements OnInit {
                 ],
               },
               layout: {
-                fillColor: function (rowIndex) {
+                fillColor: function (rowIndex: any) {
                   return rowIndex % 2 === 0 ? '#E5E7E9' : null;
                 },
               },
@@ -634,27 +634,27 @@ export class VerVacunasComponent implements OnInit {
     return valor;
   }
 
-  /** ************************************************************************************************** *
-   ** *                                     METODO PARA EXPORTAR A EXCEL                                 *
-   ** ************************************************************************************************** */
+  /** ****************************************************************************************** ** 
+   ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
+   ** ****************************************************************************************** **/
 
-  exportToExcel(): void {
+  ExportarExcel(): void {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(
-      this.MapingDataPdfDefault(this.data)
+      this.EstructurarDatosExcel(this.data)
     );
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Vacunas');
     xlsx.writeFile(wb, 'Vacunas.xlsx');
   }
 
-  MapingDataPdfDefault(array: Array<any>) {
+  EstructurarDatosExcel(array: Array<any>) {
     let nuevo: Array<any> = [];
     let c = 0;
     let regimen = '';
     array.forEach((obj1: ReporteVacunas) => {
       obj1.departamentos.forEach((obj2) => {
         obj2.empleado.forEach((obj3: any) => {
-          obj3.regimen.forEach(r => regimen = r.name_regimen);
+          obj3.regimen.forEach((r: any) => regimen = r.name_regimen);
           obj3.vacunas.forEach((obj4: vacuna) => {
             c = c + 1;
             let ele = {
@@ -683,21 +683,21 @@ export class VerVacunasComponent implements OnInit {
     return nuevo;
   }
 
-  exportToExcelCargoRegimen(): void {
+  ExportarExcelCargoRegimen(): void {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(
-      this.MapingDataPdfDefaultCargoRegimen(this.data)
+      this.EstructurarDatosExcelRegimenCargo(this.data)
     );
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Vacunas');
     xlsx.writeFile(wb, 'Vacunas.xlsx');
   }
 
-  MapingDataPdfDefaultCargoRegimen(array: Array<any>) {
+  EstructurarDatosExcelRegimenCargo(array: Array<any>) {
     let nuevo: Array<any> = [];
     let c = 0;
     array.forEach((obj) => {
-      obj.empleados.forEach((obj2) => {
-        obj2.vacunas.forEach((obj3) => {
+      obj.empleados.forEach((obj2: any) => {
+        obj2.vacunas.forEach((obj3: any) => {
           c = c + 1;
           let ele = {
             'N°': c,
@@ -722,6 +722,12 @@ export class VerVacunasComponent implements OnInit {
       });
     });
     return nuevo;
+  }
+
+  // METODO PARA MANEJAR PAGINACION
+  ManejarPagina(e: PageEvent) {
+    this.numero_pagina = e.pageIndex + 1;
+    this.tamanio_pagina = e.pageSize;
   }
 
   // METODO PARA REGRESAR A LA PAGINA ANTERIOR

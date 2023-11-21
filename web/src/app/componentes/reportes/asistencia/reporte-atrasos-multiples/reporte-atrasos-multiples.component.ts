@@ -1,8 +1,8 @@
 // IMPORTAR LIBRERIAS
-import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { SelectionModel } from '@angular/cdk/collections';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { ITableEmpleados } from 'src/app/model/reportes.model';
+import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
@@ -146,6 +146,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
   /** ****************************************************************************************** **
    ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
    ** ****************************************************************************************** **/
+
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
@@ -176,6 +177,10 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
       });
   }
 
+  /** ****************************************************************************************** **
+   ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** ** 
+   ** ****************************************************************************************** **/
+
   // METODO DE BUSQUEDA DE DATOS
   BuscarInformacion() {
     this.departamentos = [];
@@ -195,7 +200,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
         });
 
         res.forEach((obj:any) => {
-          obj.departamentos.forEach((ele) => {
+          obj.departamentos.forEach((ele: any) => {
             this.departamentos.push({
               id: ele.id_depa,
               departamento: ele.name_dep,
@@ -204,9 +209,9 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
-            ele.empleado.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((ele: any) => {
+            ele.empleado.forEach((r: any) => {
               let elemento = {
                 id: r.id,
                 nombre: r.name_empleado,
@@ -227,9 +232,9 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
         });
 
         res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
-            ele.empleado.forEach((reg) => {
-              reg.regimen.forEach((r) => {
+          obj.departamentos.forEach((ele: any) => {
+            ele.empleado.forEach((reg: any) => {
+              reg.regimen.forEach((r: any) => {
                 this.regimen.push({
                   id: r.id_regimen,
                   nombre: r.name_regimen,
@@ -240,7 +245,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
         });
 
         this.regimen = this.regimen.filter(
-          (obj, index, self) => index === self.findIndex((o) => o.id === obj.id)
+          (obj: any, index: any, self: any) => index === self.findIndex((o: any) => o.id === obj.id)
         );
       },
       (err) => {
@@ -260,15 +265,15 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
       (res: any[]) => {
         this.origen_cargo = JSON.stringify(res);
 
-        res.forEach((obj) => {
+        res.forEach((obj: any) => {
           this.cargos.push({
             id: obj.id_cargo,
             nombre: obj.name_cargo,
           });
         });
 
-        res.forEach((obj) => {
-          obj.empleados.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.empleados.forEach((r: any) => {
             this.empleados_cargos.push({
               id: r.id,
               nombre: r.name_empleado,
@@ -292,32 +297,32 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
       && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.');
         
-      switch (this.opcion) {
-        case 's':
-          if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione sucursal.')
-          this.ModelarSucursal(action);
-          break;
-        case 'r':
-          if (this.selectionReg.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione régimen.')
-          this.ModelarRegimen(action);
-          break;
-        case 'd':
-          if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione departamentos.')
-          this.ModelarDepartamento(action);
-          break;
-        case 'c':
-          if (this.selectionCar.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione cargos.')
-          this.ModelarCargo(action);
-          break;
-        case 'e':
-          if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione empleados.')
-          this.ModelarEmpleados(action);
-          break;
-        default:
-          this.toastr.error('Ups !!! algo salio mal.', 'Seleccione criterio de búsqueda.')
-          this.reporteService.DefaultFormCriterios()
-          break;
-      }
+    switch (this.opcion) {
+      case 's':
+        if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione sucursal.')
+        this.ModelarSucursal(action);
+        break;
+      case 'r':
+        if (this.selectionReg.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione régimen.')
+        this.ModelarRegimen(action);
+        break;
+      case 'd':
+        if (this.selectionDep.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione departamentos.')
+        this.ModelarDepartamento(action);
+        break;
+      case 'c':
+        if (this.selectionCar.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione cargos.')
+        this.ModelarCargo(action);
+        break;
+      case 'e':
+        if (this.selectionEmp.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione empleados.')
+        this.ModelarEmpleados(action);
+        break;
+      default:
+        this.toastr.error('Ups !!! algo salio mal.', 'Seleccione criterio de búsqueda.')
+        this.reporteService.DefaultFormCriterios()
+        break;
+    }
   }
 
   // TRATAMIENTO DE DATOS POR SUCURSAL
@@ -460,8 +465,8 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     let respuesta = JSON.parse(this.origen)
 
     respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach((elemento: any) => {
-        elemento.empleado = elemento.empleado.filter((o: any) => {
+      obj.departamentos.forEach((departamento: any) => {
+        departamento.empleado = departamento.empleado.filter((o: any) => {
           var bool = this.selectionEmp.selected.find(obj1 => {
             return obj1.id === o.id
           })
@@ -498,7 +503,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
   /** ****************************************************************************************** **
    **                              COLORES Y LOGO PARA EL REPORTE                                ** 
-   ********************************************************************************************* **/
+   ** ****************************************************************************************** **/
 
   logo: any = String;
   ObtenerLogo() {
@@ -527,7 +532,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     let documentDefinition: any;
 
     if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true || this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      documentDefinition = this.ObtenerDefinicionDocumento();
+      documentDefinition = this.GetDocumentDefinicion();
     };
 
     let doc_name = "Atrasos.pdf";
@@ -540,7 +545,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
 
   }
 
-   ObtenerDefinicionDocumento() {
+   GetDocumentDefinicion() {
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -572,7 +577,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
         { text: (localStorage.getItem('name_empresa') as string).toUpperCase(), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
         { text: 'ATRASOS', bold: true, fontSize: 16, alignment: 'center', margin: [0, -10, 0, 5] },
         { text: 'PERIODO DEL: ' + this.rangoFechas.fec_inico + " AL " + this.rangoFechas.fec_final, bold: true, fontSize: 15, alignment: 'center', margin: [0, 10, 0, 10] },
-        ...this.EstructurarDatosPDF(this.data_pdf).map(obj => {
+        ...this.EstructurarDatosPDF(this.data_pdf).map((obj: any) => {
           return obj
         })
       ],
@@ -597,7 +602,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     };
   }
 
-  // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA
+  // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
   EstructurarDatosPDF(data: any[]): Array<any> {
     let n: any = []
     let c = 0;
@@ -1515,50 +1520,11 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     return n;
   }
 
-  // METODO PARA SUMAR REGISTROS
-  SumarRegistros(array: any[]) {
-    let valor = 0;
-    for (let i = 0; i < array.length; i++) {
-      valor = valor + array[i];
-    }
-    return valor;
-  }
-
-  // METODO PARA CONVERTIR SEGUNDOS A MINUTOS
-  SegundosAMinutosConDecimales(segundos: any) {
-    return Number((segundos / 60).toFixed(2));
-  }
-
-  // METODO PARA CONVERTIR MINUTOS A FORMATO HH:MM:SS 
-  MinutosAHorasMinutosSegundos(minutos) {
-    let seconds = minutos * 60;
-    let hour: string | number = Math.floor(seconds / 3600);
-    hour = (hour < 10)? '0' + hour : hour;
-    let minute: string | number = Math.floor((seconds / 60) % 60);
-    minute = (minute < 10)? '0' + minute : minute;
-    let second: string | number = Number((seconds % 60).toFixed(0));
-    second = (second < 10)? '0' + second : second;
-    return `${hour}:${minute}:${second}`;
-  }
-
-  // METODO PARA CALCULAR LOS MINUTOS DE ATRASO VALIDANDO LA TOLERANCIA
-  validarTolerancia(minutos: number, tolerancia:number){
-    if (this.tolerancia === '1') {
-      return minutos;
-    }
-    if (minutos <= tolerancia) {
-      return null;
-    }
-    return this.tolerancia === '2-1' ? minutos : minutos - tolerancia;
-  }
-  
-
-
   /** ****************************************************************************************** ** 
-   ** **                                METODO PARA EXPORTAR A EXCEL                          ** **
+   ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
-   ExportarExcel(tipo: string): void {
+  ExportarExcel(tipo: string): void {
     switch (tipo) {
       case 'RegimenCargo':
         const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcelRegimenCargo(this.data_pdf));
@@ -1669,8 +1635,11 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     return nuevo;
   }
 
-  //METODOS PARA EXTRAER LOS TIMBRES EN UNA LISTA Y VISUALIZARLOS
-  ExtraerTimbres() {
+  /** ****************************************************************************************** ** 
+   ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
+   ** ****************************************************************************************** **/
+  
+   ExtraerTimbres() {
     this.timbres = [];
     let n = 0;
     this.data_pdf.forEach((obj1: IReporteAtrasos) => {
@@ -1758,11 +1727,15 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     })
   }
 
+  /** ****************************************************************************************** ** 
+   ** **                              METODOS PARA FILTRAR TOLERANCIA                         ** **
+   ** ****************************************************************************************** **/
+
   FiltrarTolerancia() {
-    this.data_pdf = this.data_pdf.filter(obj1 => {
-      obj1.departamentos = obj1.departamentos.filter(obj2 => {
-        obj2.empleado = obj2.empleado.filter(obj3 => {
-          obj3.timbres = obj3.timbres && obj3.timbres.filter(obj4 => {
+    this.data_pdf = this.data_pdf.filter((obj1: any) => {
+      obj1.departamentos = obj1.departamentos.filter((obj2: any) => {
+        obj2.empleado = obj2.empleado.filter((obj3: any) => {
+          obj3.timbres = obj3.timbres && obj3.timbres.filter((obj4: any) => {
             let diferencia = obj4.diferencia;
             const tolerancia = obj4.tolerancia * 60;
             return (diferencia <= tolerancia) ? false : (this.tolerancia === '2-1' ? (obj4.diferencia = diferencia, true) : (obj4.diferencia = diferencia - tolerancia, true));
@@ -1797,11 +1770,30 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
       this.toastr.error('No se han encontrado registros de timbres');
     }
   }
-  
-  
+
+  /** ****************************************************************************************** ** 
+   ** **                                   CALCULOS Y CONVERSIONES                            ** **
+   ** ****************************************************************************************** **/
+
+  // METODO PARA CONVERTIR SEGUNDOS A MINUTOS
+  SegundosAMinutosConDecimales(segundos: any) {
+    return Number((segundos / 60).toFixed(2));
+  }
+
+  // METODO PARA CONVERTIR MINUTOS A FORMATO HH:MM:SS 
+  MinutosAHorasMinutosSegundos(minutos: any) {
+    let seconds = minutos * 60;
+    let hour: string | number = Math.floor(seconds / 3600);
+    hour = (hour < 10)? '0' + hour : hour;
+    let minute: string | number = Math.floor((seconds / 60) % 60);
+    minute = (minute < 10)? '0' + minute : minute;
+    let second: string | number = Number((seconds % 60).toFixed(0));
+    second = (second < 10)? '0' + second : second;
+    return `${hour}:${minute}:${second}`;
+  }
 
   /** ****************************************************************************************** **
-   **                   Varios Metodos Complementarios al funcionamiento.                        **
+   **                   VARIOS METODOS COMPLEMENTARIOS AL FUNCIONAMIENTO.                        **
    ** ****************************************************************************************** **/
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
@@ -1910,7 +1902,6 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-
   // METODO PARA EVENTOS DE PAGINACION
   ManejarPagina(e: PageEvent) {
     if (this.bool.bool_suc === true) {
@@ -1941,15 +1932,11 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     this.tamanio_pagina = e.pageSize;
   }
 
-  /**
-   * METODOS PARA CONTROLAR INGRESO DE LETRAS
-   */
-
-  IngresarSoloLetras(e) {
+  IngresarSoloLetras(e: any) {
     return this.validacionService.IngresarSoloLetras(e)
   }
 
-  IngresarSoloNumeros(evt) {
+  IngresarSoloNumeros(evt: any) {
     return this.validacionService.IngresarSoloNumeros(evt)
   }
 

@@ -5,20 +5,21 @@ import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { PageEvent } from '@angular/material/paginator';
+
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 import { IReporteAtrasos } from 'src/app/model/reportes.model';
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 
 // IMPORTAR SERVICIOS
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import { ValidacionesService } from '../../../../../../servicios/validaciones/validaciones.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
+import { ValidacionesService } from '../../../../../../servicios/validaciones/validaciones.service';
+import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 
 @Component({
   selector: 'app-reporte-empleados',
@@ -138,7 +139,10 @@ export class ReporteEmpleadosComponent implements OnInit {
     this.BuscarCargos();
   }
 
-  // METODO DE BUSQUEDA DE DATOS
+  /** ****************************************************************************************** **
+   ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** ** 
+   ** ****************************************************************************************** **/
+
   BuscarInformacion() {
     this.departamentos = [];
     this.sucursales = [];
@@ -149,26 +153,26 @@ export class ReporteEmpleadosComponent implements OnInit {
     this.informacion.ObtenerInformacion(1).subscribe(
       (res: any[]) => {
         this.origen = JSON.stringify(res);
-        res.forEach((obj) => {
+        res.forEach((obj: any) => {
           this.sucursales.push({
             id: obj.id_suc,
             nombre: obj.name_suc,
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((departamento: any) => {
             this.departamentos.push({
-              id: ele.id_depa,
-              departamento: ele.name_dep,
-              nombre: ele.sucursal,
+              id: departamento.id_depa,
+              departamento: departamento.name_dep,
+              nombre: departamento.sucursal,
             });
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
-            ele.empleado.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((departamento: any) => {
+            departamento.empleado.forEach((r: any) => {
               let elemento = {
                 id: r.id,
                 nombre: r.name_empleado,
@@ -188,10 +192,10 @@ export class ReporteEmpleadosComponent implements OnInit {
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
-            ele.empleado.forEach((reg) => {
-              reg.regimen.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((departamento: any) => {
+            departamento.empleado.forEach((reg: any) => {
+              reg.regimen.forEach((r: any) => {
                 this.regimen.push({
                   id: r.id_regimen,
                   nombre: r.name_regimen,
@@ -202,7 +206,7 @@ export class ReporteEmpleadosComponent implements OnInit {
         });
 
         this.regimen = this.regimen.filter(
-          (obj, index, self) => index === self.findIndex((o) => o.id === obj.id)
+          (obj: any, index: any, self: any) => index === self.findIndex((o: any) => o.id === obj.id)
         );
       },
       (err) => {
@@ -221,15 +225,15 @@ export class ReporteEmpleadosComponent implements OnInit {
     this.informacion.ObtenerInformacionCargo(1).subscribe(
       (res: any[]) => {
         this.origen_cargo = JSON.stringify(res);
-        res.forEach((obj) => {
+        res.forEach((obj: any) => {
           this.cargos.push({
             id: obj.id_cargo,
             nombre: obj.name_cargo,
           });
         });
 
-        res.forEach((obj) => {
-          obj.empleados.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.empleados.forEach((r: any) => {
             this.empleados_cargos.push({
               id: r.id,
               nombre: r.name_empleado,
@@ -251,7 +255,7 @@ export class ReporteEmpleadosComponent implements OnInit {
   }
 
   // VALIDACIONES DE SELECCION DE BUSQUEDA
-  validacionReporte(action: any) {
+  ValidarReporte(action: any) {
     if (
       this.bool.bool_suc === false &&
       this.bool.bool_reg === false &&
@@ -260,7 +264,6 @@ export class ReporteEmpleadosComponent implements OnInit {
       this.bool.bool_emp === false
     )
       return this.toastr.error('Seleccione un criterio de búsqueda.');
-    //console.log('opcion', this.opcion);
     switch (this.opcion) {
       case 's':
         if (this.selectionSuc.selected.length === 0)
@@ -323,26 +326,23 @@ export class ReporteEmpleadosComponent implements OnInit {
       })
       return bool != undefined
     })
-
-    console.log('SUCURSAL', suc);
     this.data_pdf = [];
     this.data_pdf = suc;
     switch (accion) {
-      case 'excel': this.exportToExcel(); break;
-      case 'ver': this.verDatos('suc'); break;
-      default: this.generarPdf(accion); break;
+      case 'excel': this.ExportarExcel(); break;
+      case 'ver': this.VerDatos('suc'); break;
+      default: this.GenerarPDF(accion); break;
     }
   }
 
   // TRAMIENTO DE DATOS POR REGIMEN
   ModelarRegimen(accion: any) {
     let respuesta = JSON.parse(this.origen);
-    //console.log('ver respuesta ', respuesta)
     let empleados: any = [];
     let reg: any = [];
     let objeto: any;
     respuesta.forEach((obj: any) => {
-      this.selectionReg.selected.find((regimen) => {
+      this.selectionReg.selected.find((regimen: any) => {
         objeto = {
           regimen: {
             id: regimen.id,
@@ -352,7 +352,7 @@ export class ReporteEmpleadosComponent implements OnInit {
         empleados = [];
         obj.departamentos.forEach((departamento: any) => {
           departamento.empleado.forEach((empleado: any) => {
-            empleado.regimen.forEach((r) => {
+            empleado.regimen.forEach((r: any) => {
               if (regimen.id === r.id_regimen) {
                 empleados.push(empleado);
               }
@@ -363,33 +363,31 @@ export class ReporteEmpleadosComponent implements OnInit {
         reg.push(objeto);
       });
     });
-    console.log('Regimen', reg);
     this.data_pdf = [];
     this.data_pdf = reg;
     switch (accion) {
-      case 'excel': this.exportToExcelCargoRegimen(); break;
-      case 'ver': this.verDatos('reg'); break;
-      default: this.generarPdf(accion); break;
+      case 'excel': this.ExportarExcelCargoRegimen(); break;
+      case 'ver': this.VerDatos('reg'); break;
+      default: this.GenerarPDF(accion); break;
     }
   }
 
   // TRATAMIENTO DE DATOS POR CARGO
   ModelarCargo(accion: any) {
     let respuesta = JSON.parse(this.origen_cargo);
-    let car = respuesta.filter(o => {
+    let car = respuesta.filter((o: any) => {
       var bool = this.selectionCar.selected.find(obj1 => {
         return obj1.id === o.id_cargo
       })
       return bool != undefined
     })
 
-    console.log('CARGO', car);
     this.data_pdf = [];
     this.data_pdf = car;
     switch (accion) {
-      case 'excel': this.exportToExcelCargoRegimen(); break;
-      case 'ver': this.verDatos('car'); break;
-      default: this.generarPdf(accion); break;
+      case 'excel': this.ExportarExcelCargoRegimen(); break;
+      case 'ver': this.VerDatos('car'); break;
+      default: this.GenerarPDF(accion); break;
     }
   }
 
@@ -398,23 +396,22 @@ export class ReporteEmpleadosComponent implements OnInit {
     let respuesta = JSON.parse(this.origen)
 
     respuesta.forEach((obj: any) => {
-      obj.departamentos = obj.departamentos.filter(o => {
+      obj.departamentos = obj.departamentos.filter((o: any) => {
         var bool = this.selectionDep.selected.find(obj1 => {
           return obj1.id === o.id_depa
         })
         return bool != undefined
       })
     })
-    let dep = respuesta.filter(obj => {
+    let dep = respuesta.filter((obj: any) => {
       return obj.departamentos.length > 0
     });
-    console.log('DEPARTAMENTOS', dep);
     this.data_pdf = [];
     this.data_pdf = dep;
     switch (accion) {
-      case 'excel': this.exportToExcel(); break;
-      case 'ver': this.verDatos('dep'); break;
-      default: this.generarPdf(accion); break;
+      case 'excel': this.ExportarExcel(); break;
+      case 'ver': this.VerDatos('dep'); break;
+      default: this.GenerarPDF(accion); break;
     }
   }
 
@@ -424,8 +421,8 @@ export class ReporteEmpleadosComponent implements OnInit {
     let respuesta = JSON.parse(this.origen)
 
     respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach(element => {
-        element.empleado = element.empleado.filter(o => {
+      obj.departamentos.forEach((departamento: any) => {
+        departamento.empleado = departamento.empleado.filter((o: any) => {
           var bool = this.selectionEmp.selected.find(obj1 => {
             return obj1.id === o.id
           })
@@ -434,29 +431,28 @@ export class ReporteEmpleadosComponent implements OnInit {
       });
     })
     respuesta.forEach(obj => {
-      obj.departamentos = obj.departamentos.filter(e => {
+      obj.departamentos = obj.departamentos.filter((e: any) => {
         return e.empleado.length > 0
       })
     });
 
-    let emp = respuesta.filter(obj => {
+    let emp = respuesta.filter((obj: any) => {
       return obj.departamentos.length > 0
     });
 
-    console.log('EMPLEADOS', emp);
     this.data_pdf = [];
     this.data_pdf = emp;
     switch (accion) {
-      case 'excel': this.exportToExcel(); break;
-      case 'ver': this.verDatos('emp'); break;
-      default: this.generarPdf(accion); break;
+      case 'excel': this.ExportarExcel(); break;
+      case 'ver': this.VerDatos('emp'); break;
+      default: this.GenerarPDF(accion); break;
     }
 
   }
 
-  /** *************************************************************************************** **
-   ** **                        COLORES Y LOGO PARA EL REPORTE                             ** **
-   ** *************************************************************************************** **/
+  /** ****************************************************************************************** **
+   **                              COLORES Y LOGO PARA EL REPORTE                                ** 
+   ** ****************************************************************************************** **/
 
   logo: any = String;
   ObtenerLogo() {
@@ -477,12 +473,12 @@ export class ReporteEmpleadosComponent implements OnInit {
     });
   }
 
-  /** ************************************************************************************ **
-   ** **                               GENERACION DE PDF                                ** **
-   ** ************************************************************************************ **/
+  /** ****************************************************************************************** **
+   **                                              PDF                                           **
+   ** ****************************************************************************************** **/
 
-  generarPdf(action: any) {
-    const documentDefinition = this.getDocumentDefinicion();
+  GenerarPDF(action: any) {
+    const documentDefinition = this.GetDocumentDefinicion();
     let doc_name = "Reporte_usuarios_activos.pdf";
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
@@ -492,7 +488,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     }
   }
 
-  getDocumentDefinicion() {
+  GetDocumentDefinicion() {
     return {
       pageSize: 'A4',
       pageOrientation: 'landscape',
@@ -525,7 +521,7 @@ export class ReporteEmpleadosComponent implements OnInit {
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
         { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 21, alignment: 'center', margin: [0, -35, 0, 10] },
         { text: 'REPORTE - EMPLEADOS ACTIVOS', bold: true, fontSize: 13, alignment: 'center' },
-        ...this.impresionDatosPDF(this.data_pdf).map(obj => {
+        ...this.EstructurarDatosPDF(this.data_pdf).map(obj => {
           return obj
         })
       ],
@@ -543,13 +539,14 @@ export class ReporteEmpleadosComponent implements OnInit {
     };
   }
 
-  impresionDatosPDF(data: any[]): Array<any> {
+  // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
+  EstructurarDatosPDF(data: any[]): Array<any> {
     let n: any = [];
     let regimen = '';
     let arr_emp: any = [];
 
     if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      data.forEach((obj1) => {
+      data.forEach((obj1: any) => {
         arr_emp = [];
 
         if (this.bool.bool_cargo === true) {
@@ -598,7 +595,7 @@ export class ReporteEmpleadosComponent implements OnInit {
           });
         }
 
-        obj1.empleados.forEach(obj2 => {
+        obj1.empleados.forEach((obj2: any) => {
           arr_emp.push(obj2)
         });
 
@@ -619,7 +616,7 @@ export class ReporteEmpleadosComponent implements OnInit {
                 { text: 'DEPARTAMENTO', style: 'tableHeader' },
                 { text: 'CORREO', style: 'tableHeader' }
               ],
-              ...arr_emp.map(obj3 => {
+              ...arr_emp.map((obj3: any) => {
                 return [
                   { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
                   { style: 'itemsTableCentrado', text: obj3.codigo },
@@ -636,7 +633,7 @@ export class ReporteEmpleadosComponent implements OnInit {
             ]
           },
           layout: {
-            fillColor: function (rowIndex) {
+            fillColor: function (rowIndex: any) {
               return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
             }
           }
@@ -701,8 +698,8 @@ export class ReporteEmpleadosComponent implements OnInit {
                   { text: 'CARGO', style: 'tableHeader' },
                   { text: 'CORREO', style: 'tableHeader' }
                 ],
-                ...arr_emp.map(obj3 => {
-                  obj3.regimen.forEach((r) => (regimen = r.name_regimen));
+                ...arr_emp.map((obj3: any) => {
+                  obj3.regimen.forEach((r: any) => (regimen = r.name_regimen));
                   return [
                     { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
                     { style: 'itemsTableCentrado', text: obj3.codigo },
@@ -718,7 +715,7 @@ export class ReporteEmpleadosComponent implements OnInit {
               ]
             },
             layout: {
-              fillColor: function (rowIndex) {
+              fillColor: function (rowIndex: any) {
                 return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
               }
             }
@@ -791,8 +788,8 @@ export class ReporteEmpleadosComponent implements OnInit {
                     { text: 'CARGO', style: 'tableHeader' },
                     { text: 'CORREO', style: 'tableHeader' }
                   ],
-                  ...arr_emp.map(obj3 => {
-                    obj3.regimen.forEach((r) => (regimen = r.name_regimen));
+                  ...arr_emp.map((obj3: any) => {
+                    obj3.regimen.forEach((r: any) => (regimen = r.name_regimen));
                     return [
                       { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
                       { style: 'itemsTableCentrado', text: obj3.codigo },
@@ -807,7 +804,7 @@ export class ReporteEmpleadosComponent implements OnInit {
                 ]
               },
               layout: {
-                fillColor: function (rowIndex) {
+                fillColor: function (rowIndex: any) {
                   return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
                 }
               }
@@ -847,8 +844,8 @@ export class ReporteEmpleadosComponent implements OnInit {
               { text: 'CARGO', style: 'tableHeader' },
               { text: 'CORREO', style: 'tableHeader' }
             ],
-            ...arr_emp.map(obj3 => {
-              obj3.regimen.forEach((r) => (regimen = r.name_regimen));
+            ...arr_emp.map((obj3: any) => {
+              obj3.regimen.forEach((r: any) => (regimen = r.name_regimen));
               return [
                 { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
                 { style: 'itemsTableCentrado', text: obj3.codigo },
@@ -865,7 +862,7 @@ export class ReporteEmpleadosComponent implements OnInit {
           ]
         },
         layout: {
-          fillColor: function (rowIndex) {
+          fillColor: function (rowIndex: any) {
             return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
           }
         }
@@ -884,24 +881,25 @@ export class ReporteEmpleadosComponent implements OnInit {
     return valor;
   }
 
-  /** ************************************************************************************************** ** 
-   ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
-   ** ************************************************************************************************** **/
-  exportToExcel(): void {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefault(this.data_pdf));
+  /** ****************************************************************************************** ** 
+   ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
+   ** ****************************************************************************************** **/
+
+  ExportarExcel(): void {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'Empleados Activos');
-    xlsx.writeFile(wb, 'Usuarios_activos.xlsx');
+    xlsx.utils.book_append_sheet(wb, wsr, 'Usuarios');
+    xlsx.writeFile(wb, 'Usuarios.xlsx');
   }
 
-  MapingDataPdfDefault(array: Array<any>) {
+  EstructurarDatosExcel(array: Array<any>) {
     let nuevo: Array<any> = [];
     let c = 0;
     let regimen = '';
     array.forEach((obj1: IReporteAtrasos) => {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
-          obj3.regimen.forEach((r) => (regimen = r.name_regimen));
+          obj3.regimen.forEach((r: any) => (regimen = r.name_regimen));
           c = c + 1;
           let ele = {
             'N°': c, 'Código Empleado': obj3.codigo, 'Nombre Empleado': obj3.name_empleado,
@@ -919,18 +917,18 @@ export class ReporteEmpleadosComponent implements OnInit {
     return nuevo
   }
 
-  exportToExcelCargoRegimen(): void {
-    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefaultCargoRegimen(this.data_pdf));
+  ExportarExcelCargoRegimen(): void {
+    const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcelRegimenCargo(this.data_pdf));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(wb, wsr, 'Empleados Activos');
-    xlsx.writeFile(wb, "Usuarios_activos.xlsx");
+    xlsx.utils.book_append_sheet(wb, wsr, 'Usuarios');
+    xlsx.writeFile(wb, "Usuarios.xlsx");
   }
 
-  MapingDataPdfDefaultCargoRegimen(array: Array<any>) {
+  EstructurarDatosExcelRegimenCargo(array: Array<any>) {
     let nuevo: Array<any> = [];
     let c = 0;
     array.forEach((obj1) => {
-      obj1.empleados.forEach(obj2 => {
+      obj1.empleados.forEach((obj2: any) => {
         c = c + 1;
         let ele = {
           'N°': c, 'Código Empleado': obj2.codigo, 'Nombre Empleado': obj2.name_empleado,
@@ -947,9 +945,9 @@ export class ReporteEmpleadosComponent implements OnInit {
     return nuevo
   }
 
-  /** ************************************************************************************** **
-   ** **                   METODOS DE SELECCION DE DATOS DE USUARIOS                      ** **
-   ** ************************************************************************************** **/
+  /** ****************************************************************************************** **
+   **                   VARIOS METODOS COMPLEMENTARIOS AL FUNCIONAMIENTO.                        **
+   ** ****************************************************************************************** **/
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc() {
@@ -1091,7 +1089,7 @@ export class ReporteEmpleadosComponent implements OnInit {
   }
 
   //ENVIAR DATOS A LA VENTANA DE DETALLE
-  verDatos(tipo: string) {
+  VerDatos(tipo: string) {
     this.verDetalle = true;
     this.tipo = tipo;
   }
