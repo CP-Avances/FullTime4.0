@@ -9,22 +9,24 @@ table {
 
 #codigoColoresTabla {
     width: auto;
-    font-size: 14px;
+    font-size: 12px;
     margin-bottom: 2rem;
     margin-top: 2rem;
-}
-
-.coloresItem{
-    padding-left: 10px;
 }
 
 tr {
     text-align: center;
 }
 
+th {
+    text-align: center;
+    vertical-align: middle !important;
+}
+
 td {
     padding-top: 10px;
     text-align: center;
+    vertical-align: middle;
 }
 
 p {
@@ -39,13 +41,13 @@ mat-icon {
     color: indianred;
 }
 
-#busqueda {
-    margin-top: 10px;
+#coloresTitulo{
+    background-color: #e9ecef;
 }
 
-#detalle {
-    width: 100%;
-    font-size: 12px;
+.colores{
+    width: 2.5rem;
+    min-width: 1rem;
 }
 
 .verde {
@@ -54,4 +56,40 @@ mat-icon {
 
 .rojo {
     background-color: #EE4444;
+}
+
+
+
+#busqueda {
+    margin-top: 10px;
+}
+
+#detalle {
+    width: 100%;
+    font-size: 12px;
+    border-collapse: collapse;
+}
+#detalle .t_horarios, .coloresItem, .colores{
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#detalle {
+    border-spacing: 0;
+}
+
+#detalle th,
+#detalle td{
+    border-right: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+}
+
+#detalle tbody tr{
+    background-color: #fbfbfb;
+}
+
+#detalle tbody tr:nth-child(2n) {
+    background-color: #e6f3ff;
 }

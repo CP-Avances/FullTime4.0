@@ -261,7 +261,7 @@ class ReportesAsistenciaControlador {
                 return obj;
             }).filter(obj => { return obj.departamentos.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay atrasos de empleados en ese periodo' });
+                return res.status(400).jsonp({ message: 'No hay atrasos de empleados en ese periodo.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -299,7 +299,7 @@ class ReportesAsistenciaControlador {
                 return obj;
             }).filter(obj => { return obj.departamentos.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay faltas de empleados en ese periodo' });
+                return res.status(400).jsonp({ message: 'No hay faltas de empleados en ese periodo.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -335,7 +335,7 @@ class ReportesAsistenciaControlador {
                 return obj;
             }).filter(obj => { return obj.departamentos.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay faltas de empleados en ese periodo' });
+                return res.status(400).jsonp({ message: 'No hay faltas de empleados en ese periodo.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -386,7 +386,7 @@ class ReportesAsistenciaControlador {
                 return obj;
             }).filter(obj => { return obj.departamentos.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo' });
+                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo.' });
             return res.status(200).jsonp(datos);
         });
     }
@@ -517,7 +517,7 @@ class ReportesAsistenciaControlador {
                 return obj;
             }).filter(obj => { return obj.departamentos.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay atrasos de empleados en ese periodo' });
+                return res.status(400).jsonp({ message: 'No hay atrasos de empleados en ese periodo.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -565,7 +565,7 @@ class ReportesAsistenciaControlador {
                 return obj;
             }).filter(obj => { return obj.departamentos.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay atrasos de empleados en ese periodo' });
+                return res.status(400).jsonp({ message: 'No hay atrasos de empleados en ese periodo.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -594,7 +594,7 @@ class ReportesAsistenciaControlador {
                 return obj;
             }).filter(obj => { return obj.departamentos.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo' });
+                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -616,7 +616,7 @@ class ReportesAsistenciaControlador {
                 return e;
             }).filter(e => { return e.empleados.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo' });
+                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -643,7 +643,7 @@ class ReportesAsistenciaControlador {
                 return obj;
             }).filter(obj => { return obj.departamentos.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres incompletos en ese periodo' });
+                return res.status(400).jsonp({ message: 'No hay timbres incompletos en ese periodo.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -665,7 +665,7 @@ class ReportesAsistenciaControlador {
                 return e;
             }).filter(e => { return e.empleados.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres incompletos en ese periodo' });
+                return res.status(400).jsonp({ message: 'No hay timbres incompletos en ese periodo.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -695,7 +695,7 @@ class ReportesAsistenciaControlador {
                 return obj;
             }).filter(obj => { return obj.departamentos.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo' });
+                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -717,7 +717,7 @@ class ReportesAsistenciaControlador {
                 return e;
             }).filter(e => { return e.empleados.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo' });
+                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -747,7 +747,7 @@ class ReportesAsistenciaControlador {
                 return obj;
             }).filter(obj => { return obj.departamentos.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo' });
+                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -769,7 +769,7 @@ class ReportesAsistenciaControlador {
                 return e;
             }).filter(e => { return e.empleados.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo' });
+                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -799,7 +799,7 @@ class ReportesAsistenciaControlador {
                 return obj;
             }).filter(obj => { return obj.departamentos.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo' });
+                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -822,7 +822,7 @@ class ReportesAsistenciaControlador {
                 return e;
             }).filter(e => { return e.empleados.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo' });
+                return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -832,7 +832,7 @@ class ReportesAsistenciaControlador {
             try {
                 const array = JSON.parse(data);
                 if (array.length === 0)
-                    return res.status(400).jsonp({ message: 'no existe datos de consulta' });
+                    return res.status(400).jsonp({ message: 'No existe datos de consulta.' });
                 const resultado = yield Promise.all(array.map((o) => __awaiter(this, void 0, void 0, function* () {
                     return {
                         id: o.id,

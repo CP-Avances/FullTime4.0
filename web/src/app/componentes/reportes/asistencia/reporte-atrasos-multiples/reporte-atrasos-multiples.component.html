@@ -265,17 +265,17 @@
                     <table class="table table-hover table-sm" id="detalle">
                         <thead class="thead-light">
                             <tr style="text-align: center">
-                                <th scope="col" rowspan="2">N°</th>
-                                <th scope="col" rowspan="2">CÓDIGO</th>
-                                <th scope="col" rowspan="2">EMPLEADO</th>
-                                <th scope="col" rowspan="1" colspan="2">HORARIO</th>
-                                <th scope="col" rowspan="1" colspan="2">TIMBRE</th>
-                                <th scope="col" rowspan="2">TIPO PERMISO</th>
-                                <th scope="col" rowspan="2">DESDE</th>
-                                <th scope="col" rowspan="2">HASTA</th>
-                                <th scope="col" rowspan="2" colspan="2">PERMISO</th>
-                                <th scope="col" rowspan="2" *ngIf="tolerancia!=='1'">TOLERANCIA</th>                             
-                                <th scope="col" rowspan="2" colspan="2">ATRASO</th>
+                                <th class="t_horarios" scope="col" rowspan="2">N°</th>
+                                <th class="t_horarios" scope="col" rowspan="2">CÓDIGO</th>
+                                <th class="t_horarios" scope="col" rowspan="2">EMPLEADO</th>
+                                <th class="t_horarios" scope="col" rowspan="1" colspan="2">HORARIO</th>
+                                <th class="t_horarios" scope="col" rowspan="1" colspan="2">TIMBRE</th>
+                                <th class="t_horarios" scope="col" rowspan="2">TIPO PERMISO</th>
+                                <th class="t_horarios" scope="col" rowspan="2">DESDE</th>
+                                <th class="t_horarios" scope="col" rowspan="2">HASTA</th>
+                                <th class="t_horarios" scope="col" rowspan="2" colspan="2">PERMISO</th>
+                                <th class="t_horarios" scope="col" rowspan="2" *ngIf="tolerancia!=='1'">TOLERANCIA</th>                             
+                                <th class="t_horarios" scope="col" rowspan="2" colspan="2">ATRASO</th>
                             </tr>
                             <tr style="text-align: center">
                                 <th scope="col" rowspan="1">FECHA</th>
@@ -286,21 +286,21 @@
                         </thead>
                         <tbody>
                             <tr *ngFor="let t of timbres | paginate : tamanio_pagina : numero_pagina">
-                                <td>{{ t.n }}</td>
-                                <td>{{ t.codigo }}</td>
-                                <td>{{ t.empleado }}</td>
-                                <td>{{ t.fechaHorario }}</td>
-                                <td>{{ t.horaHorario }}</td>
-                                <td>{{ t.fechaTimbre }}</td>
-                                <td>{{ t.horaTimbre }}</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td *ngIf="tolerancia!=='1'">{{ t.tolerancia }}</td>
-                                <td>{{ t.atrasoT }}</td>
-                                <td>{{ t.atrasoM }}</td>
+                                <td class="t_horarios">{{ t.n }}</td>
+                                <td class="t_horarios">{{ t.codigo }}</td>
+                                <td class="t_horarios">{{ t.empleado }}</td>
+                                <td class="t_horarios">{{ t.fechaHorario }}</td>
+                                <td class="t_horarios">{{ t.horaHorario }}</td>
+                                <td class="t_horarios">{{ t.fechaTimbre }}</td>
+                                <td class="t_horarios">{{ t.horaTimbre }}</td>
+                                <td class="t_horarios"></td>
+                                <td class="t_horarios"></td>
+                                <td class="t_horarios"></td>
+                                <td class="t_horarios"></td>
+                                <td class="t_horarios"></td>
+                                <td class="t_horarios" *ngIf="tolerancia!=='1'">{{ t.tolerancia }}</td>
+                                <td class="t_horarios">{{ t.atrasoT }}</td>
+                                <td class="t_horarios">{{ t.atrasoM }}</td>
                             </tr>
                         </tbody>
                     </table>

@@ -740,8 +740,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     { style: 'itemsTableCentrado', text: fechaTimbre },
                     { style: 'itemsTableCentrado', text: horaTimbre },
                     {},{},{},{},{},
-                    {style: 'itemsTableDerecha', text: minutos},
                     {style: 'itemsTableCentrado', text: tiempo},
+                    {style: 'itemsTableDerecha', text: minutos.toFixed(2)},
                   ];
                 }),
                 [
@@ -788,8 +788,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     text: '',
                     style: 'itemsTableCentradoTotal'
                   },
+                  {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoEmpleado.toFixed(2)))},
                   {style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
-                  {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))}
                 ],
               ],
             },
@@ -801,21 +801,19 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
           });
         });
         if (this.bool.bool_cargo) {
-          totalTiempoCargo = Number(totalTiempoCargo.toFixed(2));
           let cargo = {
             cargo: obj1.name_cargo,
-            minutos: totalTiempoCargo,
-            tiempo: this.MinutosAHorasMinutosSegundos(totalTiempoCargo)
+            minutos: totalTiempoCargo.toFixed(2),
+            tiempo: this.MinutosAHorasMinutosSegundos(Number(totalTiempoCargo.toFixed(2)))
           }
           this.tiempoCargos.push(cargo);
         };
 
         if (this.bool.bool_reg) {
-          totalTiempoRegimen = Number(totalTiempoRegimen.toFixed(2));
           let regimen = {
             regimen: obj1.regimen.nombre,
-            minutos: totalTiempoRegimen,
-            tiempo: this.MinutosAHorasMinutosSegundos(totalTiempoRegimen)
+            minutos: totalTiempoRegimen.toFixed(2),
+            tiempo: this.MinutosAHorasMinutosSegundos(Number(totalTiempoRegimen.toFixed(2)))
           }
           this.tiempoRegimen.push(regimen);
         };
@@ -850,8 +848,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                   },
                   { text: '', style: 'itemsTableDerecha' },
                   { text: '', style: 'itemsTableCentrado' },
-                  { text: cargo.minutos, style: 'itemsTableDerecha'},
                   { text: cargo.tiempo, style: 'itemsTableCentrado'},
+                  { text: cargo.minutos, style: 'itemsTableDerecha'},
                 ]
               })    
             ]
@@ -893,8 +891,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                   },
                   { text: '', style: 'itemsTableDerecha' },
                   { text: '', style: 'itemsTableCentrado' },
-                  { text: regimen.minutos, style: 'itemsTableDerecha'},
                   { text: regimen.tiempo, style: 'itemsTableCentrado'},
+                  { text: regimen.minutos, style: 'itemsTableDerecha'},
                 ]
               })    
             ]
@@ -1069,8 +1067,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                       { style: 'itemsTableCentrado', text: fechaTimbre },
                       { style: 'itemsTableCentrado', text: horaTimbre },
                       {},{},{},{},{},
-                      {style: 'itemsTableDerecha', text: minutos},
                       {style: 'itemsTableCentrado', text: tiempo},
+                      {style: 'itemsTableDerecha', text: minutos.toFixed(2)},
                     ];
                   }),
                   [
@@ -1111,8 +1109,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     { style: 'itemsTableCentradoTotal', text: 'TOTAL'},
                     { text: '', style: 'itemsTableCentradoTotal'},
                     { text: '', style: 'itemsTableCentradoTotal'},
+                    { style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoEmpleado.toFixed(2)))},
                     { style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
-                    { style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))}
                   ],
                 ],
               },
@@ -1124,22 +1122,20 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
             });
           });
           if (this.bool.bool_dep) {
-            totalTiempoDepartamento = Number(totalTiempoDepartamento.toFixed(2));
             let departamento = {
               departamento: obj1.name_dep,
-              minutos: totalTiempoDepartamento,
-              tiempo: this.MinutosAHorasMinutosSegundos(totalTiempoDepartamento)
+              tiempo: this.MinutosAHorasMinutosSegundos(Number(totalTiempoDepartamento.toFixed(2))),
+              minutos: totalTiempoDepartamento.toFixed(2),
             }
             this.tiempoDepartamentos.push(departamento);
           };
         });
 
         if (this.bool.bool_suc) {
-          totalTiempoSucursal = Number(totalTiempoSucursal.toFixed(2));
           let sucursal = {
             sucursal: obj.name_suc,
-            minutos: totalTiempoSucursal,
-            tiempo: this.MinutosAHorasMinutosSegundos(totalTiempoSucursal)
+            tiempo: this.MinutosAHorasMinutosSegundos(Number(totalTiempoSucursal.toFixed(2))),
+            minutos: totalTiempoSucursal.toFixed(2),
           }
           this.tiempoSucursales.push(sucursal);
         };
@@ -1175,8 +1171,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                 },
                 { text: '', style: 'itemsTableDerecha' },
                 { text: '', style: 'itemsTableCentrado' },
-                { text: departamento.minutos, style: 'itemsTableDerecha'},
                 { text: departamento.tiempo, style: 'itemsTableCentrado'},
+                { text: departamento.minutos, style: 'itemsTableDerecha'},
               ]
             })    
           ]
@@ -1218,8 +1214,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                 },
                 { text: '', style: 'itemsTableDerecha' },
                 { text: '', style: 'itemsTableCentrado' },
-                { text: sucursal.minutos, style: 'itemsTableDerecha'},
                 { text: sucursal.tiempo, style: 'itemsTableCentrado'},
+                { text: sucursal.minutos, style: 'itemsTableDerecha'},
               ]
             })    
           ]
@@ -1271,7 +1267,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
               obj4.fec_hora_timbre.split(' ')[1], 
               this.formato_hora);
 
-            const minutos = this.SegundosAMinutosConDecimales(obj4.diferencia);
+            const minutos = this.SegundosAMinutosConDecimales(Number(obj4.diferencia));
             const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
             let ele = { 
               'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
@@ -1280,7 +1276,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
               'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
               'Fecha Horario': new Date(obj4.fec_hora_horario), 'Hora Horario': horaHorario,
               'Fecha Timbre': new Date(obj4.fec_hora_timbre), 'Hora Timbre': horaTimbre,
-              'Salida Anticipada Minutos': minutos, 'Salida Anticipada HH:MM:SS': tiempo,
+              'Salida Anticipada HH:MM:SS': tiempo, 'Salida Anticipada Minutos': minutos.toFixed(2),
             }
             nuevo.push(ele);
           })
@@ -1304,7 +1300,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
             obj3.fec_hora_timbre.split(' ')[1], 
             this.formato_hora);
 
-          const minutos = this.SegundosAMinutosConDecimales(obj3.diferencia);
+          const minutos = this.SegundosAMinutosConDecimales(Number(obj3.diferencia));
           const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
           let ele = {
             'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
@@ -1313,7 +1309,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
             'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
             'Fecha Horario': new Date(obj3.fec_hora_horario), 'Hora Horario': horaHorario,
             'Fecha Timbre': new Date(obj3.fec_hora_timbre), 'Hora Timbre': horaTimbre,
-            'Salida Anticipada Minutos': minutos, 'Salida Anticipada HH:MM:SS': tiempo,
+            'Salida Anticipada HH:MM:SS': tiempo, 'Salida Anticipada Minutos': minutos.toFixed(2)
           }
           nuevo.push(ele);
         })
@@ -1352,7 +1348,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
               obj4.fec_hora_timbre.split(' ')[1], 
               this.formato_hora);
 
-            const minutos = this.SegundosAMinutosConDecimales(obj4.diferencia);
+            const minutos = this.SegundosAMinutosConDecimales(Number(obj4.diferencia));
             const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
             n = n + 1;
             let ele = {
@@ -1362,7 +1358,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
               empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
               fechaHorario, horaHorario,
               fechaTimbre, horaTimbre,
-              salidaAnticipadaM: minutos, salidaAnticipadaT: tiempo,
+              salidaAnticipadaM: minutos.toFixed(2), salidaAnticipadaT: tiempo,
             }
             this.timbres.push(ele);
           })
@@ -1396,7 +1392,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
             obj3.fec_hora_timbre.split(' ')[1], 
             this.formato_hora);
 
-          const minutos = this.SegundosAMinutosConDecimales(obj3.diferencia);
+          const minutos = this.SegundosAMinutosConDecimales(Number(obj3.diferencia));
           const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
           n = n + 1;
           let ele = {
@@ -1406,7 +1402,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
             empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
             fechaHorario, horaHorario,
             fechaTimbre, horaTimbre,
-            salidaAnticipadaM: minutos, salidaAnticipadaT: tiempo,
+            salidaAnticipadaM: minutos.toFixed(2), salidaAnticipadaT: tiempo,
           }
           this.timbres.push(ele);
         })
@@ -1418,11 +1414,11 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
    ** **                                   CALCULOS Y CONVERSIONES                            ** **
    ** ****************************************************************************************** **/
   
-  SegundosAMinutosConDecimales(segundos: any) {
-    return (segundos / 60).toFixed(2);
+  SegundosAMinutosConDecimales(segundos: number) {
+    return Number((segundos / 60).toFixed(2));
   }
 
-  MinutosAHorasMinutosSegundos(minutos: any) {
+  MinutosAHorasMinutosSegundos(minutos: number) {
     let seconds = minutos * 60;
     let hour: string | number = Math.floor(seconds / 3600);
     hour = (hour < 10)? '0' + hour : hour;

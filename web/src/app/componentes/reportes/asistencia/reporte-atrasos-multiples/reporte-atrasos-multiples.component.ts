@@ -758,7 +758,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                       obj3.fec_hora_timbre.split(' ')[1], 
                       this.formato_hora);
 
-                    const minutos = this.SegundosAMinutosConDecimales(obj3.diferencia);
+                    const minutos = this.SegundosAMinutosConDecimales(Number(obj3.diferencia));
                     const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
                     totalTiempoEmpleado += Number(minutos);
                     totalTiempoRegimen += Number(minutos); 
@@ -773,7 +773,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                       {},{},{},{},{},
                       {style: 'itemsTableCentrado', text: obj3.tolerancia},
                       {style: 'itemsTableCentrado', text: tiempo},
-                      {style: 'itemsTableDerecha', text: minutos},
+                      {style: 'itemsTableDerecha', text: minutos.toFixed(2)},
                     ];
                   }),
                   [
@@ -824,7 +824,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                       text: '',
                       style: 'itemsTableCentradoTotal'
                     },
-                    {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))},
+                    {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoEmpleado.toFixed(2)))},
                     {style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
                   ],
                 ],
@@ -889,7 +889,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                       obj3.fec_hora_timbre.split(' ')[1], 
                       this.formato_hora);
 
-                    const minutos = this.SegundosAMinutosConDecimales(obj3.diferencia);
+                    const minutos = this.SegundosAMinutosConDecimales(Number(obj3.diferencia));
                     const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
                     totalTiempoEmpleado += Number(minutos);
                     totalTiempoRegimen += Number(minutos); 
@@ -903,7 +903,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                       { style: 'itemsTableCentrado', text: horaTimbre },
                       {},{},{},{},{},
                       {style: 'itemsTableCentrado', text: tiempo},
-                      {style: 'itemsTableDerecha', text: minutos},
+                      {style: 'itemsTableDerecha', text: minutos.toFixed(2)},
                     ];
                   }),
                   [
@@ -950,7 +950,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                       text: '',
                       style: 'itemsTableCentradoTotal'
                     },
-                    {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))},
+                    {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoEmpleado.toFixed(2)))},
                     {style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
                   ],
                 ],
@@ -964,21 +964,19 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
           }
         });
         if (this.bool.bool_cargo) {
-          totalTiempoCargo = Number(totalTiempoCargo.toFixed(2));
           let cargo = {
             cargo: obj1.name_cargo,
-            minutos: totalTiempoCargo,
-            tiempo: this.MinutosAHorasMinutosSegundos(totalTiempoCargo)
+            minutos: totalTiempoCargo.toFixed(2),
+            tiempo: this.MinutosAHorasMinutosSegundos(Number(totalTiempoCargo.toFixed(2)))
           }
           this.tiempoCargos.push(cargo);
         };
 
         if (this.bool.bool_reg) {
-          totalTiempoRegimen = Number(totalTiempoRegimen.toFixed(2));
           let regimen = {
             regimen: obj1.regimen.nombre,
-            minutos: totalTiempoRegimen,
-            tiempo: this.MinutosAHorasMinutosSegundos(totalTiempoRegimen)
+            minutos: totalTiempoRegimen.toFixed(2),
+            tiempo: this.MinutosAHorasMinutosSegundos(Number(totalTiempoRegimen.toFixed(2)))
           }
           this.tiempoRegimen.push(regimen);
         };
@@ -1219,7 +1217,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                         obj3.fec_hora_timbre.split(' ')[1], 
                         this.formato_hora);
 
-                      const minutos = this.SegundosAMinutosConDecimales(obj3.diferencia);
+                      const minutos = this.SegundosAMinutosConDecimales(Number(obj3.diferencia));
                       const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
                       totalTiempoEmpleado += Number(minutos);
                       totalTiempoSucursal += Number(minutos); 
@@ -1234,7 +1232,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                         {},{},{},{},{},
                         {style: 'itemsTableCentrado', text: obj3.tolerancia},
                         {style: 'itemsTableCentrado', text: tiempo},
-                        {style: 'itemsTableDerecha', text: minutos},
+                        {style: 'itemsTableDerecha', text: minutos.toFixed(2)},
                       ];
                     }),
                     [
@@ -1276,7 +1274,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                       { text: '', style: 'itemsTableCentradoTotal'},
                       { text: '', style: 'itemsTableCentradoTotal'},
                       { text: '', style: 'itemsTableCentradoTotal'},
-                      { style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))},
+                      { style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoEmpleado.toFixed(2)))},
                       { style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
                     ],
                   ],
@@ -1340,7 +1338,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                         obj3.fec_hora_timbre.split(' ')[1], 
                         this.formato_hora);
 
-                      const minutos = this.SegundosAMinutosConDecimales(obj3.diferencia);
+                      const minutos = this.SegundosAMinutosConDecimales(Number(obj3.diferencia));
                       const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
                       totalTiempoEmpleado += Number(minutos);
                       totalTiempoSucursal += Number(minutos); 
@@ -1354,7 +1352,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                         { style: 'itemsTableCentrado', text: horaTimbre },
                         {},{},{},{},{},
                         {style: 'itemsTableCentrado', text: tiempo},
-                        {style: 'itemsTableDerecha', text: minutos},
+                        {style: 'itemsTableDerecha', text: minutos.toFixed(2)},
                       ];
                     }),
                     [
@@ -1395,7 +1393,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                       { style: 'itemsTableCentradoTotal', text: 'TOTAL'},
                       { text: '', style: 'itemsTableCentradoTotal'},
                       { text: '', style: 'itemsTableCentradoTotal'},
-                      { style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))},
+                      { style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoEmpleado.toFixed(2)))},
                       { style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
                     ],
                   ],
@@ -1409,22 +1407,20 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
             }
           });
           if (this.bool.bool_dep) {
-            totalTiempoDepartamento = Number(totalTiempoDepartamento.toFixed(2));
             let departamento = {
               departamento: obj1.name_dep,
-              minutos: totalTiempoDepartamento,
-              tiempo: this.MinutosAHorasMinutosSegundos(totalTiempoDepartamento)
+              minutos: totalTiempoDepartamento.toFixed(2),
+              tiempo: this.MinutosAHorasMinutosSegundos(Number(totalTiempoDepartamento.toFixed(2)))
             }
             this.tiempoDepartamentos.push(departamento);
           };
         });
 
         if (this.bool.bool_suc) {
-          totalTiempoSucursal = Number(totalTiempoSucursal.toFixed(2));
           let sucursal = {
             sucursal: obj.name_suc,
-            minutos: totalTiempoSucursal,
-            tiempo: this.MinutosAHorasMinutosSegundos(totalTiempoSucursal)
+            minutos: totalTiempoSucursal.toFixed(2),
+            tiempo: this.MinutosAHorasMinutosSegundos(Number(totalTiempoSucursal.toFixed(2)))
           }
           this.tiempoSucursales.push(sucursal);
         };
@@ -1556,7 +1552,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
               obj4.fec_hora_timbre.split(' ')[1], 
               this.formato_hora);
 
-            const minutos = this.SegundosAMinutosConDecimales(obj4.diferencia);
+            const minutos = this.SegundosAMinutosConDecimales(Number(obj4.diferencia));
             const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
             let ele: any;
             if (this.tolerancia !== '1') {
@@ -1568,7 +1564,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                 'Fecha Horario': new Date(obj4.fec_hora_horario), 'Hora Horario': horaHorario,
                 'Fecha Timbre': new Date(obj4.fec_hora_timbre), 'Hora Timbre': horaTimbre,
                 'Tolerancia': obj4.tolerancia,
-                'Atraso HH:MM:SS': tiempo, 'Atraso Minutos': minutos,
+                'Atraso HH:MM:SS': tiempo, 'Atraso Minutos': minutos.toFixed(2),
               }
             } else {
               ele = { 
@@ -1578,7 +1574,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
                 'Fecha Horario': new Date(obj4.fec_hora_horario), 'Hora Horario': horaHorario,
                 'Fecha Timbre': new Date(obj4.fec_hora_timbre), 'Hora Timbre': horaTimbre,
-                'Atraso HH:MM:SS': tiempo, 'Atraso Minutos': minutos,
+                'Atraso HH:MM:SS': tiempo, 'Atraso Minutos': minutos.toFixed(2),
               }
             }
             nuevo.push(ele);
@@ -1603,7 +1599,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
             obj3.fec_hora_timbre.split(' ')[1], 
             this.formato_hora);
 
-          const minutos = this.SegundosAMinutosConDecimales(obj3.diferencia);
+          const minutos = this.SegundosAMinutosConDecimales(Number(obj3.diferencia));
           const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
           let ele: any;
           if (this.tolerancia !== '1') {
@@ -1615,7 +1611,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
               'Fecha Horario': new Date(obj3.fec_hora_horario), 'Hora Horario': horaHorario,
               'Fecha Timbre': new Date(obj3.fec_hora_timbre), 'Hora Timbre': horaTimbre,
               'Tolerancia': obj3.tolerancia,
-              'Atraso HH:MM:SS': tiempo, 'Atraso Minutos': minutos,
+              'Atraso HH:MM:SS': tiempo, 'Atraso Minutos': minutos.toFixed(2),
             }
           } else {
             ele = {
@@ -1625,7 +1621,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
               'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
               'Fecha Horario': new Date(obj3.fec_hora_horario), 'Hora Horario': horaHorario,
               'Fecha Timbre': new Date(obj3.fec_hora_timbre), 'Hora Timbre': horaTimbre,
-              'Atraso HH:MM:SS': tiempo, 'Atraso Minutos': minutos,
+              'Atraso HH:MM:SS': tiempo, 'Atraso Minutos': minutos.toFixed(2),
             }
           }
           nuevo.push(ele);
@@ -1665,7 +1661,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
               obj4.fec_hora_timbre.split(' ')[1], 
               this.formato_hora);
 
-            const minutos = this.SegundosAMinutosConDecimales(obj4.diferencia);
+            const minutos = this.SegundosAMinutosConDecimales(Number(obj4.diferencia));
             const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
             n = n + 1;
             let ele = {
@@ -1675,7 +1671,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
               empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo, tolerancia: obj4.tolerancia,
               fechaHorario, horaHorario,
               fechaTimbre, horaTimbre,
-              atrasoM: minutos, atrasoT: tiempo,
+              atrasoM: minutos.toFixed(2), atrasoT: tiempo,
             }
             this.timbres.push(ele);
           })
@@ -1709,7 +1705,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
             obj3.fec_hora_timbre.split(' ')[1], 
             this.formato_hora);
 
-          const minutos = this.SegundosAMinutosConDecimales(obj3.diferencia);
+          const minutos = this.SegundosAMinutosConDecimales(Number(obj3.diferencia));
           const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
           n = n + 1;
           let ele = {
@@ -1719,7 +1715,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
             empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo, tolerancia: obj3.tolerancia,
             fechaHorario, horaHorario,
             fechaTimbre, horaTimbre,
-            atrasoM: minutos, atrasoT: tiempo,
+            atrasoM: minutos.toFixed(2), atrasoT: tiempo,
           }
           this.timbres.push(ele);
         })
@@ -1776,12 +1772,12 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
    ** ****************************************************************************************** **/
 
   // METODO PARA CONVERTIR SEGUNDOS A MINUTOS
-  SegundosAMinutosConDecimales(segundos: any) {
+  SegundosAMinutosConDecimales(segundos: number) {
     return Number((segundos / 60).toFixed(2));
   }
 
   // METODO PARA CONVERTIR MINUTOS A FORMATO HH:MM:SS 
-  MinutosAHorasMinutosSegundos(minutos: any) {
+  MinutosAHorasMinutosSegundos(minutos: number) {
     let seconds = minutos * 60;
     let hour: string | number = Math.floor(seconds / 3600);
     hour = (hour < 10)? '0' + hour : hour;

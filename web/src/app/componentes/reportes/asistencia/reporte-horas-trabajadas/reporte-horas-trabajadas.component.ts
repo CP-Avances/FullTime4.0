@@ -565,7 +565,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
         itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
         itemsTableCentradoFT: { fontSize: 8, alignment: 'center',fillColor: '#EE4444' },
-        itemsTableCentradoMenor: { fontSize: 8, alignment: 'center',fillColor: '#55EE44' },
+        itemsTableCentradoMenor: { fontSize: 8, alignment: 'right',fillColor: '#55EE44' },
         itemsTableCentradoColores: { fontSize: 9, alignment: 'center' },
         itemsTableDerecha: { fontSize: 8, alignment: 'right' },
         itemsTableInfoTotal: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.s_color  },
@@ -815,9 +815,9 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                     { style: 'itemsTableCentrado', text: salidaHorario },
                     { style: salida == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: salida },
                     { style: 'itemsTableDerecha', text: tiempoPlanificado},
-                    { style: 'itemsTableDerecha', text: minutosPlanificados},
-                    { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' :'itemsTableCentrado', text: tiempoLaborado},
-                    { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' :'itemsTableCentrado', text: minutosLaborados},
+                    { style: 'itemsTableDerecha', text: minutosPlanificados.toFixed(2)},
+                    { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' :'itemsTableDerecha', text: tiempoLaborado},
+                    { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' :'itemsTableDerecha', text: minutosLaborados.toFixed(2)},
                   ];
                 }),
                 [
@@ -867,9 +867,9 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                     style: 'itemsTableCentradoTotal'
                   },
                   {style: 'itemsTableCentradoTotal', text: 'TOTAL'},
-                  {style: 'itemsTableTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoPlanificadoEmpleado.toFixed(2))},
+                  {style: 'itemsTableTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoPlanificadoEmpleado.toFixed(2)))},
                   {style: 'itemsTableTotal', text: totalTiempoPlanificadoEmpleado.toFixed(2)},
-                  {style: 'itemsTableTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoEmpleado.toFixed(2))},
+                  {style: 'itemsTableTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoLaboradoEmpleado.toFixed(2)))},
                   {style: 'itemsTableTotal', text: totalTiempoLaboradoEmpleado.toFixed(2)},
                 ],
               ],
@@ -886,9 +886,9 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
           totalTiempoLaboradoCargo = Number(totalTiempoLaboradoCargo.toFixed(2));
           let cargo = {
             cargo: obj1.name_cargo,
-            minutosPlanificados: totalTiempoPlanificadoCargo,
+            minutosPlanificados: totalTiempoPlanificadoCargo.toFixed(2),
             tiempoPlanificado: this.MinutosAHorasMinutosSegundos(totalTiempoPlanificadoCargo),
-            minutosLaborados: totalTiempoLaboradoCargo,
+            minutosLaborados: totalTiempoLaboradoCargo.toFixed(2),
             tiempoLaborado: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoCargo)
           }
           this.tiempoCargos.push(cargo);
@@ -899,9 +899,9 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
           totalTiempoLaboradoRegimen = Number(totalTiempoLaboradoRegimen.toFixed(2));
           let regimen = {
             regimen: obj1.regimen.nombre,
-            minutosPlanificados: totalTiempoPlanificadoRegimen,
+            minutosPlanificados: totalTiempoPlanificadoRegimen.toFixed(2),
             tiempoPlanificado: this.MinutosAHorasMinutosSegundos(totalTiempoPlanificadoRegimen),
-            minutosLaborados: totalTiempoLaboradoRegimen,
+            minutosLaborados: totalTiempoLaboradoRegimen.toFixed(2),
             tiempoLaborado: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoRegimen)
           }
           this.tiempoRegimen.push(regimen);
@@ -1186,9 +1186,9 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                       { style: 'itemsTableCentrado', text: salidaHorario },
                       { style: salida == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: salida },
                       { style: 'itemsTableDerecha', text: tiempoPlanificado},
-                      { style: 'itemsTableDerecha', text: minutosPlanificados},
-                      { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' :'itemsTableCentrado', text: tiempoLaborado},
-                      { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' :'itemsTableCentrado', text: minutosLaborados},
+                      { style: 'itemsTableDerecha', text: minutosPlanificados.toFixed(2)},
+                      { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' :'itemsTableDerecha', text: tiempoLaborado},
+                      { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' :'itemsTableDerecha', text: minutosLaborados.toFixed(2)},
                     ];
                   }),
                   [
@@ -1238,9 +1238,9 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                       style: 'itemsTableCentradoTotal'
                     },
                     {style: 'itemsTableCentradoTotal', text: 'TOTAL'},
-                    {style: 'itemsTableTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoPlanificadoEmpleado.toFixed(2))},
+                    {style: 'itemsTableTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoPlanificadoEmpleado.toFixed(2)))},
                     {style: 'itemsTableTotal', text: totalTiempoPlanificadoEmpleado.toFixed(2)},
-                    {style: 'itemsTableTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoEmpleado.toFixed(2))},
+                    {style: 'itemsTableTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoLaboradoEmpleado.toFixed(2)))},
                     {style: 'itemsTableTotal', text: totalTiempoLaboradoEmpleado.toFixed(2)},
                   ],
                 ],
@@ -1257,9 +1257,9 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
             totalTiempoLaboradoDepartamento = Number(totalTiempoLaboradoDepartamento.toFixed(2));
             let departamento = {
               departamento: obj1.name_dep,
-              minutosPlanificados: totalTiempoPlanificadoDepartamento,
+              minutosPlanificados: totalTiempoPlanificadoDepartamento.toFixed(2),
               tiempoPlanificado: this.MinutosAHorasMinutosSegundos(totalTiempoPlanificadoDepartamento),
-              minutosLaborados: totalTiempoLaboradoDepartamento,
+              minutosLaborados: totalTiempoLaboradoDepartamento.toFixed(2),
               tiempoLaborado: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoDepartamento)
             }
             this.tiempoDepartamentos.push(departamento);
@@ -1271,9 +1271,9 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
           totalTiempoLaboradoSucursal = Number(totalTiempoLaboradoSucursal.toFixed(2));
           let sucursal = {
             sucursal: obj.name_suc,
-            minutosPlanificados: totalTiempoPlanificadoSucursal,
+            minutosPlanificados: totalTiempoPlanificadoSucursal.toFixed(2),
             tiempoPlanificado: this.MinutosAHorasMinutosSegundos(totalTiempoPlanificadoSucursal),
-            minutosLaborados: totalTiempoLaboradoSucursal,
+            minutosLaborados: totalTiempoLaboradoSucursal.toFixed(2),
             tiempoLaborado: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoSucursal)
           }
           this.tiempoSucursales.push(sucursal);
@@ -1437,8 +1437,8 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
               'Horario Inicio Alimentación': inicioAlimentacionHorario, 'Timbre Inicio Alimentación': inicioAlimentacion, 
               'Horario Fin Alimentación': finAlimentacionHorario, 'Timbre Fin Alimentación': finAlimentacion, 
               'Horario Salida': salidaHorario, 'Timbre Salida': salida,
-              'Tiempo Planificado HH:MM:SS': tiempoPlanificado, 'Tiempo Planificado Minutos': minutosPlanificados,
-              'Tiempo Laborado HH:MM:SS': tiempoLaborado, 'Tiempo Laborado Minutos': minutosLaborados,
+              'Tiempo Planificado HH:MM:SS': tiempoPlanificado, 'Tiempo Planificado Minutos': minutosPlanificados.toFixed(2),
+              'Tiempo Laborado HH:MM:SS': tiempoLaborado, 'Tiempo Laborado Minutos': minutosLaborados.toFixed(2),
             }      
             nuevo.push(ele);
           })
@@ -1494,8 +1494,8 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
             'Horario Inicio Alimentación': inicioAlimentacionHorario, 'Timbre Inicio Alimentación': inicioAlimentacion, 
             'Horario Fin Alimentación': finAlimentacionHorario, 'Timbre Fin Alimentación': finAlimentacion, 
             'Horario Salida': salidaHorario, 'Timbre Salida': salida,
-            'Tiempo Planificado HH:MM:SS': tiempoPlanificado, 'Tiempo Planificado Minutos': minutosPlanificados,
-            'Tiempo Laborado HH:MM:SS': tiempoLaborado, 'Tiempo Laborado Minutos': minutosLaborados,
+            'Tiempo Planificado HH:MM:SS': tiempoPlanificado, 'Tiempo Planificado Minutos': minutosPlanificados.toFixed(2),
+            'Tiempo Laborado HH:MM:SS': tiempoLaborado, 'Tiempo Laborado Minutos': minutosLaborados.toFixed(2),
           }      
           nuevo.push(ele);
         })
@@ -1562,8 +1562,8 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
               fecha, entradaHorario, entrada, salidaHorario, salida,
               inicioAlimentacionHorario, inicioAlimentacion, 
               finAlimentacionHorario, finAlimentacion,  
-              tiempoPlanificado, minutosPlanificados,
-              tiempoLaborado, minutosLaborados,
+              tiempoPlanificado, minutosPlanificados: minutosPlanificados.toFixed(2),
+              tiempoLaborado, minutosLaborados: minutosLaborados.toFixed(2),
             }  
             this.timbres.push(ele);
           })
@@ -1624,8 +1624,8 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
             fecha, entradaHorario, entrada, salidaHorario, salida,
             inicioAlimentacionHorario, inicioAlimentacion, 
             finAlimentacionHorario, finAlimentacion,  
-            tiempoPlanificado, minutosPlanificados,
-            tiempoLaborado, minutosLaborados,
+            tiempoPlanificado, minutosPlanificados: minutosPlanificados.toFixed(2),
+            tiempoLaborado,  minutosLaborados: minutosLaborados.toFixed(2),
           }      
           this.timbres.push(ele);
         })
@@ -1669,11 +1669,11 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     return Math.abs(fechaFin.getTime() - fechaInicio.getTime()) / 1000 / 60;
   }
 
-  SegundosAMinutosConDecimales(segundos: any) {
+  SegundosAMinutosConDecimales(segundos: number) {
     return Number((segundos / 60).toFixed(2));
   }
 
-  MinutosAHorasMinutosSegundos(minutos: any) {
+  MinutosAHorasMinutosSegundos(minutos: number) {
     let seconds = minutos * 60;
     let hour: string | number = Math.floor(seconds / 3600);
     hour = (hour < 10)? '0' + hour : hour;

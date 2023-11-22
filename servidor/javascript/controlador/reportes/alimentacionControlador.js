@@ -31,7 +31,7 @@ class AlimentacionControlador {
                 return res.jsonp(DATOS.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
@@ -113,7 +113,7 @@ class AlimentacionControlador {
                 return res.jsonp(DATOS.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
@@ -135,7 +135,7 @@ class AlimentacionControlador {
                 return res.jsonp(DATOS.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }

@@ -1063,7 +1063,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
               this.validacionService.dia_abreviado);
             let ele = { 
               'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
-              'Departamento': obj2.name_dep,
+              'Departamento': obj2.name_dep, 'Cargo': obj3.cargo,
               'Régimen': obj3.regimen[0].name_regimen,
               'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
               'Fecha': fecha,
@@ -1087,7 +1087,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
             this.validacionService.dia_abreviado);
           let ele = {
             'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
-            'Departamento': obj2.departamento,
+            'Departamento': obj2.departamento, 'Cargo': obj2.cargo,
             'Régimen': obj2.regimen[0].name_regimen,
             'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
             'Fecha': fecha,
@@ -1106,6 +1106,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
   ExtraerTimbres() {
     this.timbres = [];
     let n = 0;
+    console.log(this.data_pdf)
     this.data_pdf.forEach((obj1: IReporteFaltas) => {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
@@ -1118,7 +1119,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
             let ele = {
               n: n,
               ciudad: obj1.ciudad, sucursal: obj1.name_suc,
-              departamento: obj2.name_dep,
+              departamento: obj2.name_dep, cargo: obj3.cargo,
               empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
               fecha
             }
@@ -1143,7 +1144,7 @@ export class ReporteFaltasComponent implements OnInit, OnDestroy {
           let ele = {
             n: n,
             ciudad: obj2.ciudad, sucursal: obj2.sucursal,
-            departamento: obj2.departamento,
+            departamento: obj2.departamento, cargo: obj2.cargo,
             empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
             fecha
           }
