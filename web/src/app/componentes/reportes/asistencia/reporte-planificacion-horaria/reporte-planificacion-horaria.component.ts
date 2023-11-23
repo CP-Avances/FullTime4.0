@@ -702,24 +702,22 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
       },
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
-        { text: (localStorage.getItem('name_empresa') as string).toUpperCase(), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
-        { text: 'PLANIFICACIÓN HORARIA', bold: true, fontSize: 16, alignment: 'center', margin: [0, -10, 0, 5] },
-        { text: 'PERIODO DEL: ' + this.mes_inicio + " AL " + this.mes_fin, bold: true, fontSize: 15, alignment: 'center', margin: [0, 10, 0, 10] },
+        { text: (localStorage.getItem('name_empresa') as string).toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'PLANIFICACIÓN HORARIA', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+        { text: 'PERIODO DEL: ' + this.mes_inicio + " AL " + this.mes_fin, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
         ...this.EstructurarDatosPDF().map(obj => {
           return obj
         })
       ],
       styles: {
         tableHeader: { fontSize: 7, bold: true, alignment: 'center', fillColor: this.p_color },
-        centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 10, 0, 10] },
-        itemsTable: { fontSize: 8 },
-        itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
+        tableHeaderSecundario: { fontSize: 7, bold: true, alignment: 'center', fillColor: this.s_color, margin: [0, 1, 0, 1] },
         itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 6, alignment: 'center', margin: [1, 3, 1, 3] },
         tableMargin: { margin: [0, 0, 0, 10] },
-        tableMarginHorarios: { margin: [10, 0, 10, 0]},
-        tableMarginCabecera: { margin: [0, 15, 0, 0] },
-        tableMarginCabeceraTotal: { margin: [0, 15, 0, 15] },
+        tableMarginHorarios: { margin: [10, 10, 10, 0]},
+        tableMarginCabecera: { margin: [0, 10, 0, 0] },
+        tableMarginCabeceraTotal: { margin: [0, 20, 0, 0] },
         quote: { margin: [5, -2, 0, -2], italics: true },
         small: { fontSize: 8, color: 'blue', opacity: 0.5 }
       }
@@ -882,7 +880,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
             headerRows: 0,
             body: [
               [
-                { rowSpan: 1, colSpan: 7, text: 'AÑO: ' + h.anio + ' MES: ' + h.mes, style: 'tableHeader' },
+                { rowSpan: 1, colSpan: 7, text: 'AÑO: ' + h.anio + ' MES: ' + h.mes, style: 'tableHeaderSecundario' },
                 {},{},{},{},{},{}
               ],
               [
