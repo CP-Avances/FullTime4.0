@@ -907,7 +907,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
                     { style: salida == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: salida },
                     { style: minutosAtraso > 0 ? 'itemsTableCentradoAtraso' : 'itemsTableCentrado', text: tiempoAtraso},
                     { style: minutosSalidaAnticipada > 0 ? 'itemsTableCentradoSalidas' : 'itemsTableCentrado', text: tiempoSalidaAnticipada},
-                    { style: 'itemsTableCentrado', text: alimentacion_asignada},
+                    { style: 'itemsTableCentrado', text: this.MinutosAHorasMinutosSegundos(alimentacion_asignada)},
                     { style: minutosAlimentacion > alimentacion_asignada ? 'itemsTableCentradoAlimentacion' : 'itemsTableCentrado', text: tiempoAlimentacion},
                     { style: 'itemsTableCentrado', text: tiempoLaborado},
                     { },
@@ -960,11 +960,11 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
                     style: 'itemsTableCentradoTotal'
                   },
                   {style: 'itemsTableCentradoTotal', text: 'TOTAL'},
-                  {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoAtrasosEmpleado.toFixed(2))},
-                  {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoSalidasEmpleado.toFixed(2))},
-                  {style: 'itemsTableCentradoTotal', text: totalTiempoAlimentacionAEmpleado.toFixed(2)},
-                  {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoAlimentacionTEmpleado.toFixed(2))},
-                  {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoEmpleado.toFixed(2))},
+                  {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoAtrasosEmpleado.toFixed(2)))},
+                  {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoSalidasEmpleado.toFixed(2)))},
+                  {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoAlimentacionAEmpleado.toFixed(2)))},
+                  {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoAlimentacionTEmpleado.toFixed(2)))},
+                  {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoLaboradoEmpleado.toFixed(2)))},
                   {}
                 ],
               ],
@@ -988,7 +988,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
             tiempoLaborado: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoCargo),
             tiempoAtrasos: this.MinutosAHorasMinutosSegundos(totalTiempoAtrasosCargo),
             tiempoSalida: this.MinutosAHorasMinutosSegundos(totalTiempoSalidasCargo),
-            tiempoAlimentacionA: totalTiempoAlimentacionACargo,
+            tiempoAlimentacionA: this.MinutosAHorasMinutosSegundos(totalTiempoAlimentacionACargo),
             tiempoAlimentacionT: this.MinutosAHorasMinutosSegundos(totalTiempoAlimentacionTCargo),
           }
           this.tiempoCargos.push(cargo);
@@ -1006,7 +1006,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
             tiempoLaborado: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoRegimen),
             tiempoAtrasos: this.MinutosAHorasMinutosSegundos(totalTiempoAtrasosRegimen),
             tiempoSalida: this.MinutosAHorasMinutosSegundos(totalTiempoSalidasRegimen),
-            tiempoAlimentacionA: totalTiempoAlimentacionARegimen,
+            tiempoAlimentacionA: this.MinutosAHorasMinutosSegundos(totalTiempoAlimentacionARegimen),
             tiempoAlimentacionT: this.MinutosAHorasMinutosSegundos(totalTiempoAlimentacionTRegimen),
           }
           this.tiempoRegimen.push(regimen);
@@ -1342,7 +1342,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
                       { style: salida == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: salida },
                       { style: minutosAtraso > 0 ? 'itemsTableCentradoAtraso' : 'itemsTableCentrado', text: tiempoAtraso},
                       { style: minutosSalidaAnticipada > 0 ? 'itemsTableCentradoSalidas' : 'itemsTableCentrado', text: tiempoSalidaAnticipada},
-                      { style: 'itemsTableCentrado', text: alimentacion_asignada},
+                      { style: 'itemsTableCentrado', text: this.MinutosAHorasMinutosSegundos(alimentacion_asignada)},
                       { style: minutosAlimentacion > alimentacion_asignada ? 'itemsTableCentradoAlimentacion' : 'itemsTableCentrado', text: tiempoAlimentacion},
                       { style: 'itemsTableCentrado', text: tiempoLaborado},
                       { },
@@ -1395,11 +1395,11 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
                       style: 'itemsTableCentradoTotal'
                     },
                     {style: 'itemsTableCentradoTotal', text: 'TOTAL'},
-                    {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoAtrasosEmpleado.toFixed(2))},
-                    {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoSalidasEmpleado.toFixed(2))},
-                    {style: 'itemsTableCentradoTotal', text: totalTiempoAlimentacionAEmpleado.toFixed(2)},
-                    {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoAlimentacionTEmpleado.toFixed(2))},
-                    {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoEmpleado.toFixed(2))},
+                    {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoAtrasosEmpleado.toFixed(2)))},
+                    {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoSalidasEmpleado.toFixed(2)))},
+                    {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoAlimentacionAEmpleado.toFixed(2)))},
+                    {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoAlimentacionTEmpleado.toFixed(2)))},
+                    {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoLaboradoEmpleado.toFixed(2)))},
                     {}
                   ],
                 ],
@@ -1422,7 +1422,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
               tiempoLaborado: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoDepartamento),
               tiempoAtrasos: this.MinutosAHorasMinutosSegundos(totalTiempoAtrasosDepartamento),
               tiempoSalida: this.MinutosAHorasMinutosSegundos(totalTiempoSalidasDepartamento),
-              tiempoAlimentacionA: totalTiempoAlimentacionADepartamento,
+              tiempoAlimentacionA: this.MinutosAHorasMinutosSegundos(totalTiempoAlimentacionADepartamento),
               tiempoAlimentacionT: this.MinutosAHorasMinutosSegundos(totalTiempoAlimentacionTDepartamento),
             }
             this.tiempoDepartamentos.push(departamento);
@@ -1440,7 +1440,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
             tiempoLaborado: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoSucursal),
             tiempoAtrasos: this.MinutosAHorasMinutosSegundos(totalTiempoAtrasosSucursal),
             tiempoSalida: this.MinutosAHorasMinutosSegundos(totalTiempoSalidasSucursal),
-            tiempoAlimentacionA: totalTiempoAlimentacionASucursal,
+            tiempoAlimentacionA: this.MinutosAHorasMinutosSegundos(totalTiempoAlimentacionASucursal),
             tiempoAlimentacionT: this.MinutosAHorasMinutosSegundos(totalTiempoAlimentacionTSucursal)
           }
           this.tiempoSucursales.push(sucursal);
@@ -1607,7 +1607,8 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
                 : (obj4.origen === 'L' || obj4.origen === 'FD' ? obj4.origen : 'FT')) 
               : '';
 
-            const alimentacion_asignada = obj4.tipo == 'EAS' ? obj4.inicioAlimentacion.min_alimentacion : 0;
+            let alimentacion_asignada = obj4.tipo == 'EAS' ? obj4.inicioAlimentacion.min_alimentacion : 0;
+            alimentacion_asignada = this.MinutosAHorasMinutosSegundos(Number(alimentacion_asignada));
             
             const diferenciaEnMinutos = this.CalcularDiferenciaFechas(obj4);
             const minutosAlimentacion = diferenciaEnMinutos[0];
@@ -1671,7 +1672,8 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
               : (obj3.origen === 'L' || obj3.origen === 'FD' ? obj3.origen : 'FT')) 
             : '';
 
-          const alimentacion_asignada = obj3.tipo == 'EAS' ? obj3.inicioAlimentacion.min_alimentacion : 0;
+          let alimentacion_asignada = obj3.tipo == 'EAS' ? obj3.inicioAlimentacion.min_alimentacion : 0;
+          alimentacion_asignada = this.MinutosAHorasMinutosSegundos(Number(alimentacion_asignada));
 
           const diferenciaEnMinutos = this.CalcularDiferenciaFechas(obj3);
           const minutosAlimentacion = diferenciaEnMinutos[0];
@@ -1746,7 +1748,8 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
                 : (obj4.origen === 'L' || obj4.origen === 'FD' ? obj4.origen : 'FT')) 
               : '';
 
-            const alimentacion_asignada = obj4.tipo == 'EAS' ? obj4.inicioAlimentacion.min_alimentacion : 0;
+            let alimentacion_asignada = obj4.tipo == 'EAS' ? obj4.inicioAlimentacion.min_alimentacion : 0;
+            alimentacion_asignada = this.MinutosAHorasMinutosSegundos(Number(alimentacion_asignada));
             
             const diferenciaEnMinutos = this.CalcularDiferenciaFechas(obj4);
             const minutosAlimentacion = diferenciaEnMinutos[0];
@@ -1816,7 +1819,8 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
               : (obj3.origen === 'L' || obj3.origen === 'FD' ? obj3.origen : 'FT')) 
             : '';
 
-          const alimentacion_asignada = obj3.tipo == 'EAS' ? obj3.inicioAlimentacion.min_alimentacion : 0;
+          let alimentacion_asignada = obj3.tipo == 'EAS' ? obj3.inicioAlimentacion.min_alimentacion : 0;
+          alimentacion_asignada = this.MinutosAHorasMinutosSegundos(Number(alimentacion_asignada));
 
           const diferenciaEnMinutos = this.CalcularDiferenciaFechas(obj3);
           const minutosAlimentacion = diferenciaEnMinutos[0];
@@ -1877,10 +1881,14 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
       if (entrada.fec_hora_timbre !== null && salida.fec_hora_timbre !== null) {
         minutosLaborados = Number(this.CalcularMinutosDiferencia(entrada.fec_hora_timbre, salida.fec_hora_timbre).toFixed(2));
         minutosAtrasos = Number(this.CalcularMinutosAtraso(entrada.fec_hora_horario, entrada.fec_hora_timbre, entrada.tolerancia));
-      }     
-      if (minutosLaborados >0) {
-        minutosAlimentacion = inicioAlimentacion.fec_hora_timbre !== null && finAlimentacion.fec_hora_timbre !== null ? Number(this.CalcularMinutosDiferencia(inicioAlimentacion.fec_hora_timbre, finAlimentacion.fec_hora_timbre).toFixed(2)) : min_alimentacion;
-        minutosLaborados = Number((minutosLaborados - minutosAlimentacion).toFixed(2))
+        minutosSalidasAnticipadas = Number(this.CalcularMinutosSalidaAnticipada(salida.fec_hora_horario, salida.fec_hora_timbre).toFixed(2));
+      }  
+      minutosAlimentacion = inicioAlimentacion.fec_hora_timbre !== null && finAlimentacion.fec_hora_timbre !== null 
+        ? Number(this.CalcularMinutosDiferencia(inicioAlimentacion.fec_hora_timbre, finAlimentacion.fec_hora_timbre).toFixed(2)) 
+        : min_alimentacion;  
+
+      if (minutosLaborados > 0) {
+        minutosLaborados = Number((minutosLaborados - minutosAlimentacion).toFixed(2));
       }
     }
     return [minutosAlimentacion,minutosLaborados,minutosAtrasos,minutosSalidasAnticipadas];
@@ -1894,7 +1902,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
 
   CalcularMinutosAtraso(horario: any, timbre: any, tolerancia: number): number {
     const diferencia = (new Date(timbre)).getTime() - (new Date(horario)).getTime();
-    const atraso = diferencia / (1000 * 60);
+    const atraso = diferencia > 0 ? (diferencia / (1000 * 60)) : 0;
 
     return this.tolerancia !== '1'
         ? atraso > tolerancia
@@ -1910,11 +1918,11 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
     return fechaTimbre < fechaHorario ? (fechaHorario.getTime() - fechaTimbre.getTime()) / 1000 / 60 : 0;
   }
 
-  SegundosAMinutosConDecimales(segundos: any) {
+  SegundosAMinutosConDecimales(segundos: number) {
     return Number((segundos / 60).toFixed(2));
   }
 
-  MinutosAHorasMinutosSegundos(minutos: any) {
+  MinutosAHorasMinutosSegundos(minutos: number) {
     let seconds = minutos * 60;
     let hour: string | number = Math.floor(seconds / 3600);
     hour = (hour < 10)? '0' + hour : hour;

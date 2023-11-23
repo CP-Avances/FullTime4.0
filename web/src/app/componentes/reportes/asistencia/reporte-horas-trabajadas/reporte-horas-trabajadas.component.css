@@ -7,13 +7,6 @@ table {
     font-size: 14px;
 }
 
-#codigoColoresTabla {
-    width: auto;
-    font-size: 12px;
-    margin-bottom: 2rem;
-    margin-top: 2rem;
-}
-
 tr {
     text-align: center;
 }
@@ -37,12 +30,19 @@ mat-icon {
     cursor: pointer;
 }
 
-.ver {
-    color: indianred;
+#codigoColoresTabla {
+    width: auto;
+    font-size: 12px;
+    margin-bottom: 2rem;
+    margin-top: 2rem;
 }
 
 #coloresTitulo{
     background-color: #e9ecef;
+}
+
+.ver {
+    color: indianred;
 }
 
 .colores{
