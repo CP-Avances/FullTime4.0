@@ -265,25 +265,25 @@
                     <table class="table table-hover table-sm" id="detalle">
                         <thead class="thead-light">
                             <tr style="text-align: center">
-                                <th scope="col" rowspan="2">N°</th>
-                                <th scope="col" rowspan="2">CÓDIGO</th>
-                                <th scope="col" rowspan="2">EMPLEADO</th>
-                                <th scope="col" rowspan="1" colspan="2">TIMBRE</th>
-                                <th scope="col" rowspan="2">ACCIÓN</th>
+                                <th class="t_horarios" scope="col" rowspan="2">N°</th>
+                                <th class="t_horarios" scope="col" rowspan="2">CÓDIGO</th>
+                                <th class="t_horarios" scope="col" rowspan="2">EMPLEADO</th>
+                                <th class="t_horarios" scope="col" rowspan="1" colspan="2">TIMBRE</th>
+                                <th class="t_horarios" scope="col" rowspan="2">ACCIÓN</th>
                             </tr>
                             <tr style="text-align: center">
-                                <th scope="col" rowspan="1">FECHA</th>
-                                <th scope="col" rowspan="1">HORA</th>
+                                <th class="t_horarios" scope="col" rowspan="1">FECHA</th>
+                                <th class="t_horarios" scope="col" rowspan="1">HORA</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr *ngFor="let t of timbres | paginate : tamanio_pagina : numero_pagina">
-                                <td>{{ t.n }}</td>
-                                <td>{{ t.codigo }}</td>
-                                <td>{{ t.empleado }}</td>
-                                <td>{{ t.fechaTimbre }}</td>
-                                <td>{{ t.horaTimbre }}</td>
-                                <td>{{ t.accion }}</td>
+                                <td class="t_horarios">{{ t.n }}</td>
+                                <td class="t_horarios">{{ t.codigo }}</td>
+                                <td class="t_horarios">{{ t.empleado }}</td>
+                                <td class="t_horarios">{{ t.fechaTimbre }}</td>
+                                <td class="t_horarios">{{ t.horaTimbre }}</td>
+                                <td class="t_horarios">{{ t.accion }}</td>
                             </tr>
                         </tbody>
                     </table>

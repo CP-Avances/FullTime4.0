@@ -349,43 +349,34 @@ export class VerVacunasComponent implements OnInit {
         {
           text: localStorage.getItem('name_empresa')?.toUpperCase(),
           bold: true,
-          fontSize: 21,
+          fontSize: 14,
           alignment: 'center',
-          margin: [0, -35, 0, 10],
+          margin: [0, -30, 0, 5],
         },
         {
-          text: 'REPORTE - REGISTRO DE VACUNACIÓN',
+          text: 'REGISTRO DE VACUNACIÓN',
           bold: true,
-          fontSize: 13,
+          fontSize: 12,
           alignment: 'center',
+          margin: [0, 0, 0, 0],
         },
         ...this.EstructurarDatosPDF(this.data).map((obj) => {
           return obj;
         }),
       ],
       styles: {
-        tableHeader: {
-          fontSize: 10,
-          bold: true,
-          alignment: 'center',
-          fillColor: this.p_color,
-        },
+        tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color },
+        centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 7, 0, 0] },
         itemsTable: { fontSize: 8 },
-        itemsTableInfo: {
-          fontSize: 10,
-          margin: [0, 3, 0, 3],
-          fillColor: this.s_color,
-        },
-        itemsTableInfoBlanco: {
-          fontSize: 10,
-          margin: [0, 3, 0, 3],
-          fillColor: '#E3E3E3',
-        },
+        itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
+        itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0],fillColor: '#E3E3E3' },
+        itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
-        tableMargin: { margin: [0, 0, 0, 20] },
-        tableMarginCabecera: { margin: [0, 10, 0, 0] },
+        tableMargin: { margin: [0, 0, 0, 0] },
+        tableMarginCabecera: { margin: [0, 15, 0, 0] },
+        tableMarginCabeceraEmpleado: { margin: [0, 10, 0, 0] },
         quote: { margin: [5, -2, 0, -2], italics: true },
-        small: { fontSize: 8, color: 'blue', opacity: 0.5 },
+        small: { fontSize: 8, color: 'blue', opacity: 0.5 }
       },
     };
   }
@@ -398,9 +389,10 @@ export class VerVacunasComponent implements OnInit {
       data.forEach((obj1: any) => {
         if (this.bool_car === true) {
           n.push({
-            style: 'tableMarginSuc',
+            style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
+              headerRows: 1,
               body: [
                 [
                   {
@@ -420,9 +412,10 @@ export class VerVacunasComponent implements OnInit {
           });
         } else {
           n.push({
-            style: 'tableMarginSuc',
+            style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
+              headerRows: 1,
               body: [
                 [
                   {
@@ -444,27 +437,45 @@ export class VerVacunasComponent implements OnInit {
 
         obj1.empleados.forEach((obj2: any) => {
           n.push({
-            style: 'tableMarginCabecera',
+            style: 'tableMarginCabeceraEmpleado',
             table: {
               widths: ['*', 'auto', 'auto'],
+              headerRows: 2,
               body: [
                 [
                   {
                     border: [true, true, false, false],
                     text: 'EMPLEADO: ' + obj2.name_empleado,
-                    style: 'itemsTableInfoBlanco',
+                    style: 'itemsTableInfoEmpleado',
                   },
                   {
                     border: [false, true, false, false],
                     text: 'C.C.: ' + obj2.cedula,
-                    style: 'itemsTableInfoBlanco',
+                    style: 'itemsTableInfoEmpleado',
                   },
                   {
                     border: [false, true, true, false],
                     text: 'COD: ' + obj2.codigo,
-                    style: 'itemsTableInfoBlanco',
+                    style: 'itemsTableInfoEmpleado',
                   },
                 ],
+                [
+                  {
+                    border: [true, false, false, false],
+                    text: 'DEPARTAMENTO: ' + obj2.departamento,
+                    style: 'itemsTableInfoEmpleado'
+                  },
+                  {
+                    border: [false, false, false, false],
+                    text: this.bool_reg ? 'CARGO: ' + obj2.cargo : '',
+                    style: 'itemsTableInfoEmpleado'
+                  },
+                  {
+                    border: [false, false, true, false],
+                    text: '',
+                    style: 'itemsTableInfoEmpleado'
+                  }
+                ]
               ],
             },
           });
@@ -472,12 +483,13 @@ export class VerVacunasComponent implements OnInit {
             style: 'tableMargin',
             table: {
               widths: ['*', '*', '*', '*'],
+              headerRows: 1,
               body: [
                 [
                   { text: 'N°', style: 'tableHeader' },
-                  { text: 'Vacuna', style: 'tableHeader' },
-                  { text: 'Fecha', style: 'tableHeader' },
-                  { text: 'Descripción', style: 'tableHeader' },
+                  { text: 'VACUNA', style: 'tableHeader' },
+                  { text: 'FECHA', style: 'tableHeader' },
+                  { text: 'DESCRIPCIÓN', style: 'tableHeader' },
                 ],
                 ...obj2.vacunas.map((obj3: any) => {
                   const fecha = this.validacionService.FormatearFecha(
@@ -489,7 +501,7 @@ export class VerVacunasComponent implements OnInit {
                       style: 'itemsTableCentrado',
                       text: obj2.vacunas.indexOf(obj3) + 1,
                     },
-                    { style: 'itemsTable', text: obj3.tipo_vacuna },
+                    { style: 'itemsTableCentrado', text: obj3.tipo_vacuna },
                     { style: 'itemsTableCentrado', text: fecha },
                     { style: 'itemsTable', text: obj3.descripcion },
                   ];
@@ -506,10 +518,12 @@ export class VerVacunasComponent implements OnInit {
       });
     } else {
       data.forEach((obj: ReporteVacunas) => {
-        if (this.bool_suc === true || this.bool_dep === true) {
+        if (this.bool_suc === true) {
           n.push({
+            style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
+              headerRows: 1,
               body: [
                 [
                   {
@@ -540,6 +554,7 @@ export class VerVacunasComponent implements OnInit {
               style: 'tableMarginCabecera',
               table: {
                 widths: ['*', '*'],
+                headerRows: 1,
                 body: [
                   [
                     {
@@ -548,7 +563,7 @@ export class VerVacunasComponent implements OnInit {
                       style: 'itemsTableInfo',
                     },
                     {
-                      border: [true, true, true, true],
+                      border: [false, true, true, true],
                       text: 'N° REGISTROS: ' + reg,
                       style: 'itemsTableInfo',
                     },
@@ -560,27 +575,45 @@ export class VerVacunasComponent implements OnInit {
 
           obj1.empleado.forEach((obj2: any) => {
             n.push({
-              style: 'tableMarginCabecera',
+              style: 'tableMarginCabeceraEmpleado',
               table: {
                 widths: ['*', 'auto', 'auto'],
+                headerRows: 2,
                 body: [
                   [
                     {
                       border: [true, true, false, false],
                       text: 'EMPLEADO: ' + obj2.name_empleado,
-                      style: 'itemsTableInfoBlanco',
+                      style: 'itemsTableInfoEmpleado'
                     },
                     {
                       border: [false, true, false, false],
                       text: 'C.C.: ' + obj2.cedula,
-                      style: 'itemsTableInfoBlanco',
+                      style: 'itemsTableInfoEmpleado'
                     },
                     {
                       border: [false, true, true, false],
                       text: 'COD: ' + obj2.codigo,
-                      style: 'itemsTableInfoBlanco',
-                    },
+                      style: 'itemsTableInfoEmpleado'
+                    }
                   ],
+                  [
+                    {
+                      border: [true, false, false, false],
+                      text: this.bool_suc || this.bool_emp?'DEPARTAMENTO: ' + obj2.departamento:'',
+                      style: 'itemsTableInfoEmpleado'
+                    },
+                    {
+                      border: [false, false, false, false],
+                      text: 'CARGO: ' + obj2.cargo,
+                      style: 'itemsTableInfoEmpleado'
+                    },
+                    {
+                      border: [false, false, true, false],
+                      text: '',
+                      style: 'itemsTableInfoEmpleado'
+                    }
+                  ]
                 ],
               },
             });
@@ -588,12 +621,13 @@ export class VerVacunasComponent implements OnInit {
               style: 'tableMargin',
               table: {
                 widths: ['*', '*', '*', '*'],
+                headerRows: 1,
                 body: [
                   [
                     { text: 'N°', style: 'tableHeader' },
-                    { text: 'Vacuna', style: 'tableHeader' },
-                    { text: 'Fecha', style: 'tableHeader' },
-                    { text: 'Descripción', style: 'tableHeader' },
+                    { text: 'VACUNA', style: 'tableHeader' },
+                    { text: 'FECHA', style: 'tableHeader' },
+                    { text: 'DESCRIPCIÓN', style: 'tableHeader' },
                   ],
                   ...obj2.vacunas.map((obj3: any) => {
                     const fecha = this.validacionService.FormatearFecha(
@@ -605,7 +639,7 @@ export class VerVacunasComponent implements OnInit {
                         style: 'itemsTableCentrado',
                         text: obj2.vacunas.indexOf(obj3) + 1,
                       },
-                      { style: 'itemsTable', text: obj3.tipo_vacuna },
+                      { style: 'itemsTableCentrado', text: obj3.tipo_vacuna },
                       { style: 'itemsTableCentrado', text: fecha },
                       { style: 'itemsTable', text: obj3.descripcion },
                     ];
@@ -662,7 +696,7 @@ export class VerVacunasComponent implements OnInit {
               'Código Empleado': obj3.codigo,
               'Nombre Empleado': obj3.name_empleado,
               Cédula: obj3.cedula,
-              Género: obj3.genero,
+              Género: obj3.genero == 1 ? 'M' : 'F',
               Ciudad: obj1.ciudad,
               Sucursal: obj1.name_suc,
               Régimen: regimen,
@@ -704,7 +738,7 @@ export class VerVacunasComponent implements OnInit {
             'Código Empleado': obj2.codigo,
             'Nombre Empleado': obj2.name_empleado,
             Cédula: obj2.cedula,
-            Género: obj2.genero,
+            Género: obj2.genero == 1 ? 'M' : 'F',
             Ciudad: obj2.ciudad,
             Sucursal: obj2.sucursal,
             Régimen: this.bool_car ? obj2.regimen : obj2.regimen[0].name_regimen,

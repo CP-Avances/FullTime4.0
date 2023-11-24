@@ -10,31 +10,16 @@ table {
 tr {
     text-align: center;
 }
+th {
+    text-align: center;
+    vertical-align: middle !important;
+}
 
 td {
     padding-top: 10px;
     text-align: center;
+    vertical-align: middle;
 }
-
-/* .table th,
-.table td{
-    border-right: 1px solid #ccc;
-    border-left: 1px solid #ccc;
-    min-width: 100px;
-}
-
-.table th:last-child,
-.table td:last-child{
-    border-right: 0;
-}
-
-.table tbody tr{
-    background-color: #fbfbfb;
-}
-
-.table tbody tr:nth-child(2n) {
-    background-color: #e6f3ff;
-} */
 
 p {
     font-size: x-small;
@@ -55,7 +40,33 @@ mat-icon {
 #detalle {
     width: 100%;
     font-size: 12px;
+    border-collapse: collapse;
 }
+#detalle .t_horarios {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#detalle {
+    border-spacing: 0;
+}
+
+#detalle th,
+#detalle td{
+    border-right: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+}
+
+#detalle tbody tr{
+    background-color: #fbfbfb;
+}
+
+#detalle tbody tr:nth-child(2n) {
+    background-color: #e6f3ff;
+}
+
 
 #accion {
     color: rgb(53, 95, 209);

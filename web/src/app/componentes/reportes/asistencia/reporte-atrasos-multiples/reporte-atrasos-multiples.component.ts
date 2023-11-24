@@ -760,6 +760,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                       obj3.fec_hora_timbre.split(' ')[1], 
                       this.formato_hora);
 
+                    const tolerancia = this.MinutosAHorasMinutosSegundos(Number(obj3.tolerancia));
                     const minutos = this.SegundosAMinutosConDecimales(Number(obj3.diferencia));
                     const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
                     totalTiempoEmpleado += Number(minutos);
@@ -773,7 +774,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                       { style: 'itemsTableCentrado', text: fechaTimbre },
                       { style: 'itemsTableCentrado', text: horaTimbre },
                       {},{},{},{},{},
-                      {style: 'itemsTableCentrado', text: obj3.tolerancia},
+                      {style: 'itemsTableCentrado', text: tolerancia},
                       {style: 'itemsTableCentrado', text: tiempo},
                       {style: 'itemsTableDerecha', text: minutos.toFixed(2)},
                     ];
@@ -1220,6 +1221,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                         obj3.fec_hora_timbre.split(' ')[1], 
                         this.formato_hora);
 
+                      const tolerancia = this.MinutosAHorasMinutosSegundos(Number(obj3.tolerancia));
                       const minutos = this.SegundosAMinutosConDecimales(Number(obj3.diferencia));
                       const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
                       totalTiempoEmpleado += Number(minutos);
@@ -1233,7 +1235,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                         { style: 'itemsTableCentrado', text: fechaTimbre },
                         { style: 'itemsTableCentrado', text: horaTimbre },
                         {},{},{},{},{},
-                        {style: 'itemsTableCentrado', text: obj3.tolerancia},
+                        {style: 'itemsTableCentrado', text: tolerancia},
                         {style: 'itemsTableCentrado', text: tiempo},
                         {style: 'itemsTableDerecha', text: minutos.toFixed(2)},
                       ];
@@ -1559,6 +1561,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
             const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
             let ele: any;
             if (this.tolerancia !== '1') {
+              const tolerancia = this.MinutosAHorasMinutosSegundos(Number(obj4.tolerancia));
               ele = { 
                 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
                 'Departamento': obj2.name_dep,
@@ -1566,7 +1569,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
                 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
                 'Fecha Horario': new Date(obj4.fec_hora_horario), 'Hora Horario': horaHorario,
                 'Fecha Timbre': new Date(obj4.fec_hora_timbre), 'Hora Timbre': horaTimbre,
-                'Tolerancia': obj4.tolerancia,
+                'Tolerancia': tolerancia,
                 'Atraso HH:MM:SS': tiempo, 'Atraso Minutos': minutos.toFixed(2),
               }
             } else {
@@ -1606,6 +1609,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
           const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
           let ele: any;
           if (this.tolerancia !== '1') {
+            const tolerancia = this.MinutosAHorasMinutosSegundos(Number(obj3.tolerancia));
             ele = {
               'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
               'Departamento': obj2.departamento,
@@ -1613,7 +1617,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
               'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
               'Fecha Horario': new Date(obj3.fec_hora_horario), 'Hora Horario': horaHorario,
               'Fecha Timbre': new Date(obj3.fec_hora_timbre), 'Hora Timbre': horaTimbre,
-              'Tolerancia': obj3.tolerancia,
+              'Tolerancia': tolerancia,
               'Atraso HH:MM:SS': tiempo, 'Atraso Minutos': minutos.toFixed(2),
             }
           } else {
@@ -1664,6 +1668,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
               obj4.fec_hora_timbre.split(' ')[1], 
               this.formato_hora);
 
+            const tolerancia = this.MinutosAHorasMinutosSegundos(Number(obj4.tolerancia));
             const minutos = this.SegundosAMinutosConDecimales(Number(obj4.diferencia));
             const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
             n = n + 1;
@@ -1671,7 +1676,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
               n: n,
               ciudad: obj1.ciudad, sucursal: obj1.name_suc,
               departamento: obj2.name_dep, regimen: obj3.regimen[0].name_regimen,
-              empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo, tolerancia: obj4.tolerancia,
+              empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo, tolerancia,
               fechaHorario, horaHorario,
               fechaTimbre, horaTimbre,
               atrasoM: minutos.toFixed(2), atrasoT: tiempo,
@@ -1708,6 +1713,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
             obj3.fec_hora_timbre.split(' ')[1], 
             this.formato_hora);
 
+          const tolerancia = this.MinutosAHorasMinutosSegundos(Number(obj3.tolerancia));
           const minutos = this.SegundosAMinutosConDecimales(Number(obj3.diferencia));
           const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
           n = n + 1;
@@ -1715,7 +1721,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
             n: n,
             ciudad: obj2.ciudad, sucursal: obj2.sucursal,
             departamento: obj2.departamento, regimen: obj2.regimen[0].name_regimen,
-            empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo, tolerancia: obj3.tolerancia,
+            empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo, tolerancia,
             fechaHorario, horaHorario,
             fechaTimbre, horaTimbre,
             atrasoM: minutos.toFixed(2), atrasoT: tiempo,

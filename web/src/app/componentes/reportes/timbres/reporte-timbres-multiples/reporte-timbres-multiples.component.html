@@ -266,40 +266,40 @@
                     <table class="table table-hover table-sm" id="detalle">
                         <thead class="thead-light">
                             <tr style="text-align: center">
-                                <th scope="col" rowspan="2">N°</th>
-                                <th scope="col" rowspan="2">CÓDIGO</th>
-                                <th scope="col" rowspan="2">EMPLEADO</th>
-                                <th scope="col" rowspan="1" colspan="2">TIMBRE</th>
-                                <th scope="col" rowspan="1" colspan="2" *ngIf="timbreDispositivo">DISPOSITIVO</th>
-                                <th scope="col" rowspan="2">RELOJ</th>
-                                <th scope="col" rowspan="2">ACCIÓN</th>
-                                <th scope="col" rowspan="2">OBSERVACION</th>
-                                <th scope="col" rowspan="2">LONGITUD</th>
-                                <th scope="col" rowspan="2">LATITUD</th>
-                                <th scope="col" rowspan="2">MAPS</th>
+                                <th class="t_horarios" scope="col" rowspan="2">N°</th>
+                                <th class="t_horarios" scope="col" rowspan="2">CÓDIGO</th>
+                                <th class="t_horarios" scope="col" rowspan="2">EMPLEADO</th>
+                                <th class="t_horarios" scope="col" rowspan="1" colspan="2">TIMBRE</th>
+                                <th class="t_horarios" scope="col" rowspan="1" colspan="2" *ngIf="timbreDispositivo">DISPOSITIVO</th>
+                                <th class="t_horarios" scope="col" rowspan="2">RELOJ</th>
+                                <th class="t_horarios" scope="col" rowspan="2">ACCIÓN</th>
+                                <th class="t_horarios" scope="col" rowspan="2">OBSERVACION</th>
+                                <th class="t_horarios" scope="col" rowspan="2">LONGITUD</th>
+                                <th class="t_horarios" scope="col" rowspan="2">LATITUD</th>
+                                <th class="t_horarios" scope="col" rowspan="2">MAPS</th>
                             </tr>
                             <tr style="text-align: center">
-                                <th scope="col" rowspan="1">FECHA</th>
-                                <th scope="col" rowspan="1">HORA</th>
-                                <th scope="col" rowspan="1" *ngIf="timbreDispositivo">FECHA</th>
-                                <th scope="col" rowspan="1" *ngIf="timbreDispositivo">HORA</th>
+                                <th class="t_horarios" scope="col" rowspan="1">FECHA</th>
+                                <th class="t_horarios" scope="col" rowspan="1">HORA</th>
+                                <th class="t_horarios" scope="col" rowspan="1" *ngIf="timbreDispositivo">FECHA</th>
+                                <th class="t_horarios" scope="col" rowspan="1" *ngIf="timbreDispositivo">HORA</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr *ngFor="let t of timbres | paginate : tamanio_pagina : numero_pagina">
-                                <td>{{ t.n }}</td>
-                                <td>{{ t.codigo }}</td>
-                                <td>{{ t.empleado }}</td>
-                                <td>{{ t.fechaTimbreServidor }}</td>
-                                <td>{{ t.horaTimbreServidor }}</td>
-                                <td *ngIf="timbreDispositivo">{{ t.fechaTimbre }}</td>
-                                <td *ngIf="timbreDispositivo">{{ t.horaTimbre }}</td>
-                                <td>{{ t.reloj }}</td>
-                                <td>{{ t.accion }}</td>
-                                <td>{{ t.observacion }}</td>
-                                <td>{{ t.longitud }}</td>
-                                <td>{{ t.latitud }}</td>
-                                <td>
+                                <td class="t_horarios">{{ t.n }}</td>
+                                <td class="t_horarios">{{ t.codigo }}</td>
+                                <td class="t_horarios">{{ t.empleado }}</td>
+                                <td class="t_horarios">{{ t.fechaTimbreServidor }}</td>
+                                <td class="t_horarios">{{ t.horaTimbreServidor }}</td>
+                                <td class="t_horarios" *ngIf="timbreDispositivo">{{ t.fechaTimbre }}</td>
+                                <td class="t_horarios" *ngIf="timbreDispositivo">{{ t.horaTimbre }}</td>
+                                <td class="t_horarios">{{ t.reloj }}</td>
+                                <td class="t_horarios">{{ t.accion }}</td>
+                                <td class="t_horarios">{{ t.observacion }}</td>
+                                <td class="t_horarios">{{ t.longitud }}</td>
+                                <td class="t_horarios">{{ t.latitud }}</td>
+                                <td class="t_horarios">
                                     <mat-icon aria-hidden="false" id="accion" (click)="AbrirMapa(t.latitud, t.longitud)"
                                         matSuffix matTooltipPtosition="right"
                                         matTooltip="Direccionar al mapa con ubicación del timbre seleccionado."

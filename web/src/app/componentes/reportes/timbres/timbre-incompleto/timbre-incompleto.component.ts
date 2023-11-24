@@ -538,23 +538,24 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
       },
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
-        { text: (localStorage.getItem('name_empresa') as string).toUpperCase(), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
-        { text: 'TIMBRES INCOMPLETOS', bold: true, fontSize: 16, alignment: 'center', margin: [0, -10, 0, 5] },
-        { text: 'PERIODO DEL: ' + this.rangoFechas.fec_inico + " AL " + this.rangoFechas.fec_final, bold: true, fontSize: 15, alignment: 'center', margin: [0, 10, 0, 10] },
+        { text: (localStorage.getItem('name_empresa') as string).toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'TIMBRES INCOMPLETOS', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+        { text: 'PERIODO DEL: ' + this.rangoFechas.fec_inico + " AL " + this.rangoFechas.fec_final, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
         ...this.EstructurarDatosPDF(this.data_pdf).map(obj => {
           return obj
         })
       ],
       styles: {
         tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color },
-        centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 10, 0, 10] },
+        centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 7, 0, 0] },
         itemsTable: { fontSize: 8 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
         itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0],fillColor: '#E3E3E3' },
         itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
-        tableMargin: { margin: [0, 0, 0, 10] },
+        tableMargin: { margin: [0, 0, 0, 0] },
         tableMarginCabecera: { margin: [0, 15, 0, 0] },
+        tableMarginCabeceraEmpleado: { margin: [0, 10, 0, 0] },
         quote: { margin: [5, -2, 0, -2], italics: true },
         small: { fontSize: 8, color: 'blue', opacity: 0.5 }
       }
@@ -621,7 +622,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
 
         obj1.empleados.forEach((obj2: any) => {
           n.push({
-            style: 'tableMarginCabecera',
+            style: 'tableMarginCabeceraEmpleado',
             table: {
               widths: ['*', 'auto', 'auto'],
               headerRows: 2,
@@ -729,8 +730,9 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
     } else {
       data.forEach((obj: IReporteTimbres) => {
 
-        if (this.bool.bool_suc === true || this.bool.bool_dep === true) {
+        if (this.bool.bool_suc === true) {
           n.push({
+            style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
               headerRows: 1,
@@ -769,12 +771,12 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
                     {
                       border: [true, true, false, true],
                       text: 'DEPARTAMENTO: ' + obj1.name_dep,
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfo'
                     },
                     {
-                      border: [true, true, true, true],
+                      border: [false, true, true, true],
                       text: 'N° REGISTROS: ' + reg,
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfo'
                     }
                   ]
                 ]
@@ -785,7 +787,7 @@ export class TimbreIncompletoComponent implements OnInit, OnDestroy {
           obj1.empleado.forEach((obj2: any) => {
 
             n.push({
-              style: 'tableMarginCabecera',
+              style: 'tableMarginCabeceraEmpleado',
               table: {
                 widths: ['*', 'auto', 'auto',],
                 headerRows: 2,

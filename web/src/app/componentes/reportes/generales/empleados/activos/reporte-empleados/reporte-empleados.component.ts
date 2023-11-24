@@ -519,20 +519,24 @@ export class ReporteEmpleadosComponent implements OnInit {
       },
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
-        { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 21, alignment: 'center', margin: [0, -35, 0, 10] },
-        { text: 'REPORTE - EMPLEADOS ACTIVOS', bold: true, fontSize: 13, alignment: 'center' },
+        { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'USUARIOS', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0], },
         ...this.EstructurarDatosPDF(this.data_pdf).map(obj => {
           return obj
         })
       ],
       styles: {
-        tableHeader: { fontSize: 12, bold: true, alignment: 'center', fillColor: this.p_color },
-        itemsTable: { fontSize: 10.5 },
-        itemsTableInfo: { fontSize: 12, margin: [0, 3, 0, 3], fillColor: this.s_color },
-        itemsTableCentrado: { fontSize: 10, alignment: 'center' },
-        tableMarginSuc: { margin: [0, 10, 0, 10] },
-        tableMarginDep: { margin: [0, 10, 0, 0] },
-        tableMarginEmp: { margin: [0, 0, 0, 10] },
+        tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color },
+        centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 7, 0, 0] },
+        itemsTable: { fontSize: 8 },
+        itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
+        itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0],fillColor: '#E3E3E3' },
+        itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
+        itemsTableCentrado: { fontSize: 8, alignment: 'center' },
+        tableMargin: { margin: [0, 0, 0, 0] },
+        tableMarginEmp: { margin: [0, 15, 0, 0] },
+        tableMarginCabecera: { margin: [0, 15, 0, 0] },
+        tableMarginCabeceraEmpleado: { margin: [0, 10, 0, 0] },
         quote: { margin: [5, -2, 0, -2], italics: true },
         small: { fontSize: 8, color: 'blue', opacity: 0.5 }
       }
@@ -548,22 +552,23 @@ export class ReporteEmpleadosComponent implements OnInit {
     if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
       data.forEach((obj1: any) => {
         arr_emp = [];
-
+        console.log('carbore',this.data_pdf);
         if (this.bool.bool_cargo === true) {
           n.push({
-            style: 'tableMarginSuc',
+            style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
+              headerRows: 1,
               body: [
                 [
                   {
-                    border: [true, true, false, true],
+                    border: [true, true, false, false],
                     bold: true,
                     text: 'CARGO: ' + obj1.name_cargo,
                     style: 'itemsTableInfo',
                   },
                   {
-                    border: [false, true, true, true],
+                    border: [false, true, true, false],
                     text: 'N° Registros: ' + obj1.empleados.length,
                     style: 'itemsTableInfo',
                   },
@@ -573,19 +578,20 @@ export class ReporteEmpleadosComponent implements OnInit {
           });
         } else {
           n.push({
-            style: 'tableMarginSuc',
+            style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
+              headerRows: 1,
               body: [
                 [
                   {
-                    border: [true, true, false, true],
+                    border: [true, true, false, false],
                     bold: true,
                     text: 'RÉGIMEN: ' + obj1.regimen.nombre,
                     style: 'itemsTableInfo',
                   },
                   {
-                    border: [false, true, true, true],
+                    border: [false, true, true, false],
                     text: 'N° Registros: ' + obj1.empleados.length,
                     style: 'itemsTableInfo',
                   },
@@ -600,9 +606,10 @@ export class ReporteEmpleadosComponent implements OnInit {
         });
 
         n.push({
-          style: 'tableMarginEmp',
+          style: 'tableMargin',
           table: {
-            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
+            widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
+            headerRows: 1,
             body: [
               [
                 { text: 'N°', style: 'tableHeader' },
@@ -612,8 +619,8 @@ export class ReporteEmpleadosComponent implements OnInit {
                 { text: 'GÉNERO', style: 'tableHeader' },
                 { text: 'CIUDAD', style: 'tableHeader' },
                 { text: 'SUCURSAL', style: 'tableHeader' },
-                { text: 'RÉGIMEN', style: 'tableHeader' },
                 { text: 'DEPARTAMENTO', style: 'tableHeader' },
+                { text: this.bool.bool_cargo ? 'RÉGIMEN' : 'CARGO' , style: 'tableHeader' },
                 { text: 'CORREO', style: 'tableHeader' }
               ],
               ...arr_emp.map((obj3: any) => {
@@ -625,8 +632,8 @@ export class ReporteEmpleadosComponent implements OnInit {
                   { style: 'itemsTableCentrado', text: obj3.genero == 1 ? 'M' : 'F' },
                   { style: 'itemsTable', text: obj3.ciudad },
                   { style: 'itemsTable', text: obj3.sucursal },
-                  { style: 'itemsTable', text: this.bool.bool_cargo ? obj3.regimen : obj3.regimen[0].name_regimen },
                   { style: 'itemsTable', text: obj3.departamento },
+                  { style: 'itemsTable', text: this.bool.bool_cargo ? obj3.regimen : obj3.cargo },
                   { style: 'itemsTable', text: obj3.correo },
                 ]
               }),
@@ -646,27 +653,27 @@ export class ReporteEmpleadosComponent implements OnInit {
         if (this.bool.bool_suc === true) {
           let arr_suc = obj.departamentos.map(o => { return o.empleado.length });
           let suma_suc = this.SumarRegistros(arr_suc);
-
           arr_emp = [];
           n.push({
-            style: 'tableMarginSuc',
+            style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*', '*'],
+              headerRows: 1,
               body: [
                 [
                   {
-                    border: [true, true, false, true],
+                    border: [true, true, false, false],
                     bold: true,
                     text: 'CIUDAD: ' + obj.ciudad,
                     style: 'itemsTableInfo'
                   },
                   {
-                    border: [false, true, false, true],
+                    border: [false, true, false, false],
                     text: 'SUCURSAL: ' + obj.name_suc,
                     style: 'itemsTableInfo'
                   },
                   {
-                    border: [false, true, true, true],
+                    border: [false, true, true, false],
                     text: 'N° Registros: ' + suma_suc,
                     style: 'itemsTableInfo'
                   }
@@ -674,18 +681,84 @@ export class ReporteEmpleadosComponent implements OnInit {
               ]
             }
           });
+        }
 
-          obj.departamentos.forEach(o => {
-            o.empleado.forEach(e => {
-              arr_emp.push(e)
-            })
-          })
-
+        obj.departamentos.forEach((obj1) => {
+          if (this.bool.bool_dep === true) {
+            let reg = obj1.empleado.length;
+            n.push({
+              style: 'tableMarginCabecera',
+              table: {
+                widths: ['*', '*'],
+                headerRows: 1,
+                body: [
+                  [
+                    {
+                      border: [true, true, false, false],
+                      text: 'DEPARTAMENTO: ' + obj1.name_dep,
+                      style: 'itemsTableInfo',
+                    },
+                    {
+                      border: [false, true, true, false],
+                      text: 'N° REGISTROS: ' + reg,
+                      style: 'itemsTableInfo',
+                    },
+                  ],
+                ],
+              },
+            });
+            n.push({
+              style: 'tableMargin',
+              table: {
+                widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
+                headerRows: 1,
+                body: [
+                  [
+                    { text: 'N°', style: 'tableHeader' },
+                    { text: 'CÓDIGO', style: 'tableHeader' },
+                    { text: 'EMPLEADO', style: 'tableHeader' },
+                    { text: 'CÉDULA', style: 'tableHeader' },
+                    { text: 'GÉNERO', style: 'tableHeader' },
+                    { text: 'CIUDAD', style: 'tableHeader' },
+                    { text: 'SUCURSAL', style: 'tableHeader' },
+                    { text: 'RÉGIMEN', style: 'tableHeader' },
+                    { text: 'CARGO', style: 'tableHeader' },
+                    { text: 'CORREO', style: 'tableHeader' }
+                  ],
+                  ...obj1.empleado.map((obj3: any) => {
+                    return [
+                      { style: 'itemsTableCentrado', text: obj1.empleado.indexOf(obj3) + 1 },
+                      { style: 'itemsTableCentrado', text: obj3.codigo },
+                      { style: 'itemsTable', text: obj3.name_empleado },
+                      { style: 'itemsTable', text: obj3.cedula },
+                      { style: 'itemsTableCentrado', text: obj3.genero == 1 ? 'M' : 'F' },
+                      { style: 'itemsTable', text: obj3.ciudad },
+                      { style: 'itemsTable', text: obj3.sucursal },
+                      { style: 'itemsTable', text: obj3.regimen[0].name_regimen },
+                      { style: 'itemsTable', text: obj3.cargo },
+                      { style: 'itemsTable', text: obj3.correo },
+                    ]
+                  }),
+                ]
+              },
+              layout: {
+                fillColor: function (rowIndex: any) {
+                  return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+                }
+              }
+            });
+          } else {
+              obj1.empleado.forEach(e => {
+                arr_emp.push(e)
+              });
+          }
+        });
+        if (this.bool.bool_suc) {
           n.push({
-
-            style: 'tableMarginEmp',
+            style: 'tableMargin',
             table: {
-              widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+              widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
+              headerRows: 1,
               body: [
                 [
                   { text: 'N°', style: 'tableHeader' },
@@ -693,20 +766,21 @@ export class ReporteEmpleadosComponent implements OnInit {
                   { text: 'EMPLEADO', style: 'tableHeader' },
                   { text: 'CÉDULA', style: 'tableHeader' },
                   { text: 'GÉNERO', style: 'tableHeader' },
+                  { text: 'CIUDAD', style: 'tableHeader' },
                   { text: 'RÉGIMEN', style: 'tableHeader' },
                   { text: 'DEPARTAMENTO', style: 'tableHeader' },
                   { text: 'CARGO', style: 'tableHeader' },
                   { text: 'CORREO', style: 'tableHeader' }
                 ],
                 ...arr_emp.map((obj3: any) => {
-                  obj3.regimen.forEach((r: any) => (regimen = r.name_regimen));
                   return [
                     { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
                     { style: 'itemsTableCentrado', text: obj3.codigo },
                     { style: 'itemsTable', text: obj3.name_empleado },
                     { style: 'itemsTable', text: obj3.cedula },
                     { style: 'itemsTableCentrado', text: obj3.genero == 1 ? 'M' : 'F' },
-                    { style: 'itemsTable', text: regimen },
+                    { style: 'itemsTable', text: obj3.ciudad },
+                    { style: 'itemsTable', text: obj3.regimen[0].name_regimen },
                     { style: 'itemsTable', text: obj3.departamento },
                     { style: 'itemsTable', text: obj3.cargo },
                     { style: 'itemsTable', text: obj3.correo },
@@ -721,154 +795,55 @@ export class ReporteEmpleadosComponent implements OnInit {
             }
           });
         }
+        
+      });
 
-        if (this.bool.bool_dep === true) {
-
-          n.push({
-            style: 'tableMarginSuc',
-            table: {
-              widths: ['*', '*'],
-              body: [
-                [
-                  {
-                    border: [true, true, false, true],
-                    bold: true,
-                    text: 'CIUDAD: ' + obj.ciudad,
-                    style: 'itemsTableInfo'
-                  },
-                  {
-                    border: [false, true, true, true],
-                    text: 'SUCURSAL: ' + obj.name_suc,
-                    style: 'itemsTableInfo'
-                  }
+      if (this.bool.bool_emp) {
+        n.push({
+          style: 'tableMarginEmp',
+          table: {
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
+            headerRows: 1,
+            body: [
+              [
+                { text: 'N°', style: 'tableHeader' },
+                { text: 'CÓDIGO', style: 'tableHeader' },
+                { text: 'EMPLEADO', style: 'tableHeader' },
+                { text: 'CÉDULA', style: 'tableHeader' },
+                { text: 'GÉNERO', style: 'tableHeader' },
+                { text: 'CIUDAD', style: 'tableHeader' },
+                { text: 'SUCURSAL', style: 'tableHeader' },
+                { text: 'RÉGIMEN', style: 'tableHeader' },
+                { text: 'DEPARTAMENTO', style: 'tableHeader' },
+                { text: 'CARGO', style: 'tableHeader' },
+                { text: 'CORREO', style: 'tableHeader' }
+              ],
+              ...arr_emp.map((obj3: any) => {
+                return [
+                  { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
+                  { style: 'itemsTableCentrado', text: obj3.codigo },
+                  { style: 'itemsTable', text: obj3.name_empleado },
+                  { style: 'itemsTable', text: obj3.cedula },
+                  { style: 'itemsTableCentrado', text: obj3.genero == 1 ? 'M' : 'F' },
+                  { style: 'itemsTable', text: obj3.ciudad },
+                  { style: 'itemsTable', text: obj3.sucursal },
+                  { style: 'itemsTable', text: obj3.regimen[0].name_regimen },
+                  { style: 'itemsTable', text: obj3.departamento },
+                  { style: 'itemsTable', text: obj3.cargo },
+                  { style: 'itemsTable', text: obj3.correo },
                 ]
-              ]
+              }),
+            ]
+          },
+          layout: {
+            fillColor: function (rowIndex: any) {
+              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
             }
-          })
-
-          obj.departamentos.forEach(obj1 => {
-            arr_emp = [];
-            obj1.empleado.forEach(e => {
-              arr_emp.push(e)
-            })
-            let reg = obj1.empleado.length
-            n.push({
-              style: 'tableMarginDep',
-              table: {
-                widths: ['*', '*'],
-                body: [
-                  [
-                    {
-                      border: [true, true, false, false],
-                      text: 'DEPARTAMENTO: ' + obj1.name_dep,
-                      style: 'itemsTable'
-                    },
-                    {
-                      border: [true, true, true, false],
-                      text: 'N° EMPLEADOS DEPARTAMENTO: ' + reg,
-                      style: 'itemsTable'
-                    }
-                  ]
-                ]
-              }
-            })
-
-            n.push({
-              style: 'tableMarginEmp',
-              table: {
-                widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', '*'],
-                body: [
-                  [
-                    { text: 'N°', style: 'tableHeader' },
-                    { text: 'CÓDIGO', style: 'tableHeader' },
-                    { text: 'EMPLEADO', style: 'tableHeader' },
-                    { text: 'CÉDULA', style: 'tableHeader' },
-                    { text: 'GÉNERO', style: 'tableHeader' },
-                    { text: 'RÉGIMEN', style: 'tableHeader' },
-                    { text: 'CARGO', style: 'tableHeader' },
-                    { text: 'CORREO', style: 'tableHeader' }
-                  ],
-                  ...arr_emp.map((obj3: any) => {
-                    obj3.regimen.forEach((r: any) => (regimen = r.name_regimen));
-                    return [
-                      { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
-                      { style: 'itemsTableCentrado', text: obj3.codigo },
-                      { style: 'itemsTable', text: obj3.name_empleado },
-                      { style: 'itemsTable', text: obj3.cedula },
-                      { style: 'itemsTableCentrado', text: obj3.genero == 1 ? 'M' : 'F' },
-                      { style: 'itemsTable', text: regimen },
-                      { style: 'itemsTable', text: obj3.cargo },
-                      { style: 'itemsTable', text: obj3.correo },
-                    ]
-                  }),
-                ]
-              },
-              layout: {
-                fillColor: function (rowIndex: any) {
-                  return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
-                }
-              }
-            });
-
-          });
-
-        }
-
-        if (this.bool.bool_emp === true) {
-          arr_emp = [];
-          obj.departamentos.forEach(o => {
-            o.empleado.forEach(e => {
-              arr_emp.push(e)
-            })
-          })
-        }
-
-      });
-    }
-
-    if (arr_emp.length > 0 && this.bool.bool_emp === true) {
-      n.push({
-        style: 'tableMarginEmp',
-        table: {
-          widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
-          body: [
-            [
-              { text: 'N°', style: 'tableHeader' },
-              { text: 'CÓDIGO', style: 'tableHeader' },
-              { text: 'EMPLEADO', style: 'tableHeader' },
-              { text: 'CÉDULA', style: 'tableHeader' },
-              { text: 'GÉNERO', style: 'tableHeader' },
-              { text: 'SUCURSAL', style: 'tableHeader' },
-              { text: 'RÉGIMEN', style: 'tableHeader' },
-              { text: 'DEPARTAMENTO', style: 'tableHeader' },
-              { text: 'CARGO', style: 'tableHeader' },
-              { text: 'CORREO', style: 'tableHeader' }
-            ],
-            ...arr_emp.map((obj3: any) => {
-              obj3.regimen.forEach((r: any) => (regimen = r.name_regimen));
-              return [
-                { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
-                { style: 'itemsTableCentrado', text: obj3.codigo },
-                { style: 'itemsTable', text: obj3.name_empleado },
-                { style: 'itemsTable', text: obj3.cedula },
-                { style: 'itemsTableCentrado', text: obj3.genero == 1 ? 'M' : 'F' },
-                { style: 'itemsTable', text: obj3.sucursal },
-                { style: 'itemsTable', text: regimen },
-                { style: 'itemsTable', text: obj3.departamento },
-                { style: 'itemsTable', text: obj3.cargo },
-                { style: 'itemsTable', text: obj3.correo },
-              ]
-            }),
-          ]
-        },
-        layout: {
-          fillColor: function (rowIndex: any) {
-            return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
           }
-        }
-      });
+        });
+      }
+         
     }
-
     return n;
   }
 
