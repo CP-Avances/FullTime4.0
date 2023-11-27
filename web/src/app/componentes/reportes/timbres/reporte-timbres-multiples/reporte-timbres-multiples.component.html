@@ -34,10 +34,11 @@
                         <mat-icon class="i-download">cloud_download</mat-icon>
                     </button>
                     <app-option-timbre-dispositivo *ngIf="dispositivo"></app-option-timbre-dispositivo>
+                    <app-opcion-usuario (tipoUsuarioChange)="ObtenerTipoUsuario($event)"></app-opcion-usuario>
                 </div>
             </mat-card>
         </div>
-        <app-criterios-busqueda [num_option]="5" id="busqueda"></app-criterios-busqueda>
+        <app-criterios-busqueda [num_option]="5" [limpiar]="limpiar" id="busqueda"></app-criterios-busqueda>
     </div>
 </div>
 <div class="container" style="padding-bottom: 50px; text-align: center;" [hidden]="verDetalle">

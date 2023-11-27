@@ -1,0 +1,7 @@
+<div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
+    <mat-label class="tipo" for="tipoUsuario">Tipo de usuario</mat-label>
+    <mat-radio-group class="tipo" [(ngModel)]="tipoUsuario" (change)="CambiarTipoUsuario()">
+        <mat-radio-button value="activo" class="rBoton"><label>Activo</label></mat-radio-button>
+        <mat-radio-button value="inactivo" class="rBoton"><label>Inactivo</label></mat-radio-button>
+      </mat-radio-group>      
+</div>

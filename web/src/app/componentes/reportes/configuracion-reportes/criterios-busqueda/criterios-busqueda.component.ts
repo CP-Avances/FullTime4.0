@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatRadioChange } from '@angular/material/radio';
 import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.model';
@@ -53,6 +53,7 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
   public check: checkOptions[];
 
   @Input('num_option') num_option: number = 0;
+  @Input('limpiar') limpiar: number = 0;
 
   constructor(
     private reporteService: ReportesService,
@@ -61,7 +62,7 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     console.log('atributo', this.num_option);
-
+    console.log('opcion: ' + this.limpiar);
     this.check = this.reporteService.checkOptionsN(this.num_option);
     console.log('CHECK ', this.check);
 
@@ -75,6 +76,14 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
     console.log('Componenete destruido');
 
   }
+
+  ngOnChanges(changes: SimpleChanges) {
+    console.log('opcion: ' + this.limpiar);
+    if (this.limpiar !=0) {
+      this.limpiarCampos();
+    }  }
+
+
 
   opcion: string;
   BuscarPorTipo(e: MatRadioChange) {
@@ -213,6 +222,7 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
       this._booleanOptions.bool_cargo = false;
     }
     this.seleccion.reset();
+    this.seleccion.patchValue(null);
   }
 
 }
