@@ -17,7 +17,7 @@ import { ITableEmpleados } from 'src/app/model/reportes.model';
 
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
-import { ValidacionesService } from '../../../../../../servicios/validaciones/validaciones.service';
+import { ValidacionesService } from '../../../../../servicios/validaciones/validaciones.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 
@@ -59,6 +59,11 @@ export class ReporteEmpleadosComponent implements OnInit {
   //VARIABLES PARA MOSTRAR DETALLES
   tipo: string;
   verDetalle: boolean = false;
+
+  // VARIABLES UTILIZADAS PARA IDENTIFICAR EL TIPO DE USUARIO
+  tipoUsuario: string = 'activo';
+  opcionBusqueda: number = 1;
+  limpiar: number = 0;
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS SELECCIONADOS EN LA BUSQUEDA
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
@@ -135,22 +140,23 @@ export class ReporteEmpleadosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.BuscarInformacion();
-    this.BuscarCargos();
+    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.BuscarInformacion(this.opcionBusqueda);
+    this.BuscarCargos(this.opcionBusqueda);
   }
 
   /** ****************************************************************************************** **
    ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** ** 
    ** ****************************************************************************************** **/
 
-  BuscarInformacion() {
+   BuscarInformacion(opcion: number) {
     this.departamentos = [];
     this.sucursales = [];
     this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.origen = [];
-    this.informacion.ObtenerInformacion(1).subscribe(
+    this.informacion.ObtenerInformacion(opcion).subscribe(
       (res: any[]) => {
         this.origen = JSON.stringify(res);
         res.forEach((obj: any) => {
@@ -176,6 +182,7 @@ export class ReporteEmpleadosComponent implements OnInit {
               let elemento = {
                 id: r.id,
                 nombre: r.name_empleado,
+                apellido: r.apellido,
                 codigo: r.codigo,
                 cedula: r.cedula,
                 correo: r.correo,
@@ -218,13 +225,14 @@ export class ReporteEmpleadosComponent implements OnInit {
   // METODO PARA FILTRAR POR CARGOS
   empleados_cargos: any = [];
   origen_cargo: any = [];
-  BuscarCargos() {
+  BuscarCargos(opcion: number) {
     this.empleados_cargos = [];
     this.origen_cargo = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionCargo(1).subscribe(
+    this.informacion.ObtenerInformacionCargo(opcion).subscribe(
       (res: any[]) => {
         this.origen_cargo = JSON.stringify(res);
+
         res.forEach((obj: any) => {
           this.cargos.push({
             id: obj.id_cargo,
@@ -237,6 +245,7 @@ export class ReporteEmpleadosComponent implements OnInit {
             this.empleados_cargos.push({
               id: r.id,
               nombre: r.name_empleado,
+              apellido: r.apellido,
               codigo: r.codigo,
               cedula: r.cedula,
               correo: r.correo,
@@ -247,11 +256,20 @@ export class ReporteEmpleadosComponent implements OnInit {
             });
           });
         });
-      },
-      (err) => {
-        this.toastr.error(err.error.message);
-      }
-    );
+      });
+  }
+
+  ObtenerTipoUsuario($event: string){
+    this.tipoUsuario = $event;
+    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.limpiar = this.opcionBusqueda;
+    this.selectionSuc.clear();
+    this.selectionDep.clear();
+    this.selectionCar.clear();
+    this.selectionReg.clear();
+    this.selectionEmp.clear();
+    this.BuscarInformacion(this.opcionBusqueda);
+    this.BuscarCargos(this.opcionBusqueda);
   }
 
   // VALIDACIONES DE SELECCION DE BUSQUEDA
@@ -546,13 +564,11 @@ export class ReporteEmpleadosComponent implements OnInit {
   // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
   EstructurarDatosPDF(data: any[]): Array<any> {
     let n: any = [];
-    let regimen = '';
     let arr_emp: any = [];
 
     if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
       data.forEach((obj1: any) => {
         arr_emp = [];
-        console.log('carbore',this.data_pdf);
         if (this.bool.bool_cargo === true) {
           n.push({
             style: 'tableMarginCabecera',
@@ -603,6 +619,10 @@ export class ReporteEmpleadosComponent implements OnInit {
 
         obj1.empleados.forEach((obj2: any) => {
           arr_emp.push(obj2)
+        });
+
+        arr_emp.sort(function(a: any, b: any){
+          return ((a.apellido+a.nombre).toLowerCase().localeCompare((b.apellido+b.nombre).toLowerCase()))
         });
 
         n.push({
@@ -686,6 +706,9 @@ export class ReporteEmpleadosComponent implements OnInit {
         obj.departamentos.forEach((obj1) => {
           if (this.bool.bool_dep === true) {
             let reg = obj1.empleado.length;
+            obj1.empleado.sort(function(a: any, b: any){
+              return ((a.apellido+a.nombre).toLowerCase().localeCompare((b.apellido+b.nombre).toLowerCase()))
+            });
             n.push({
               style: 'tableMarginCabecera',
               table: {
@@ -750,6 +773,9 @@ export class ReporteEmpleadosComponent implements OnInit {
           } else {
               obj1.empleado.forEach(e => {
                 arr_emp.push(e)
+              });
+              arr_emp.sort(function(a: any, b: any){
+                return ((a.apellido+a.nombre).toLowerCase().localeCompare((b.apellido+b.nombre).toLowerCase()))
               });
           }
         });
@@ -877,7 +903,7 @@ export class ReporteEmpleadosComponent implements OnInit {
           obj3.regimen.forEach((r: any) => (regimen = r.name_regimen));
           c = c + 1;
           let ele = {
-            'N°': c, 'Código Empleado': obj3.codigo, 'Nombre Empleado': obj3.name_empleado,
+            'N°': c, 'Código Empleado': obj3.codigo, 'Nombre': obj3.nombre, 'Apellido': obj3.apellido,
             'Cédula': obj3.cedula, 'Género': obj3.genero == 1 ? 'M' : 'F',
             'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
             'Régimen': regimen,
@@ -885,10 +911,13 @@ export class ReporteEmpleadosComponent implements OnInit {
             'Cargo': obj3.cargo,
             'Correo': obj3.correo,
           }
-          nuevo.push(ele)
+          nuevo.push(ele);
         })
       })
-    })
+    });
+    nuevo.sort(function(a: any, b: any){
+      return ((a.Apellido+a.Nombre).toLowerCase().localeCompare((b.Apellido+b.Nombre).toLowerCase()))
+    });
     return nuevo
   }
 
@@ -906,7 +935,7 @@ export class ReporteEmpleadosComponent implements OnInit {
       obj1.empleados.forEach((obj2: any) => {
         c = c + 1;
         let ele = {
-          'N°': c, 'Código Empleado': obj2.codigo, 'Nombre Empleado': obj2.name_empleado,
+          'N°': c, 'Código Empleado': obj2.codigo, 'Nombre': obj2.nombre, 'Apellido': obj2.apellido,
           'Cédula': obj2.cedula, 'Género': obj2.genero == 1 ? 'M' : 'F',
           'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
           'Régimen': this.bool.bool_cargo ? obj2.regimen : obj2.regimen[0].name_regimen,
@@ -916,7 +945,10 @@ export class ReporteEmpleadosComponent implements OnInit {
         }
         nuevo.push(ele)
       })
-    })
+    });
+    nuevo.sort(function(a: any, b: any){
+      return ((a.Apellido+a.Nombre).toLowerCase().localeCompare((b.Apellido+b.Nombre).toLowerCase()))
+    });
     return nuevo
   }
 

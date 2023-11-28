@@ -503,8 +503,7 @@ export class MainNavComponent implements OnInit {
             icono: 'group',
             color: true,
             children: [
-              { name: 'Usuarios Activos', url: '/reporteEmpleados', color: true },
-              { name: 'Usuarios Inactivos', url: '/reporte-emp-inactivos', color: true },
+              { name: 'Usuarios', url: '/reporteEmpleados', color: true },
               { name: 'Registro Vacunación', url: '/lista-vacunados', color: true },
             ]
           },

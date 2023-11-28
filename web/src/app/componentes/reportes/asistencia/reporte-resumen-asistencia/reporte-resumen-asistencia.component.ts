@@ -57,6 +57,11 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
   tipo: string;
   verDetalle: boolean = false;
 
+  // VARIABLES UTILIZADAS PARA IDENTIFICAR EL TIPO DE USUARIO
+  tipoUsuario: string = 'activo';
+  opcionBusqueda: number = 1;
+  limpiar: number = 0;
+
   // VARIABLES PARA ADMINISTRAR TOLERANCIA
   tolerancia: string = '1';
 
@@ -125,10 +130,11 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
   }
 
   ngOnInit(): void {
-    this.BuscarInformacion();
+    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.BuscarInformacion(this.opcionBusqueda);
+    this.BuscarCargos(this.opcionBusqueda);
     this.BuscarTolerancia();
     this.BuscarParametro();
-    this.BuscarCargos();
     this.BuscarHora();
   }
 
@@ -181,14 +187,14 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
    ** ****************************************************************************************** **/
 
   // METODO DE BUSQUEDA DE DATOS
-  BuscarInformacion() {
+  BuscarInformacion(opcion: number) {
     this.departamentos = [];
     this.sucursales = [];
     this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.origen = [];
-    this.informacion.ObtenerInformacion(1).subscribe(
+    this.informacion.ObtenerInformacion(opcion).subscribe(
       (res: any[]) => {
         this.origen = JSON.stringify(res);
         res.forEach((obj: any) => {
@@ -256,11 +262,11 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
   // METODO PARA FILTRAR POR CARGOS
   empleados_cargos: any = [];
   origen_cargo: any = [];
-  BuscarCargos() {
+  BuscarCargos(opcion: number) {
     this.empleados_cargos = [];
     this.origen_cargo = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionCargo(1).subscribe(
+    this.informacion.ObtenerInformacionCargo(opcion).subscribe(
       (res: any[]) => {
         this.origen_cargo = JSON.stringify(res);
 
@@ -286,8 +292,20 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
             });
           });
         });
-      },
-    );
+      });
+  }
+
+  ObtenerTipoUsuario($event: string){
+    this.tipoUsuario = $event;
+    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.limpiar = this.opcionBusqueda;
+    this.selectionSuc.clear();
+    this.selectionDep.clear();
+    this.selectionCar.clear();
+    this.selectionReg.clear();
+    this.selectionEmp.clear();
+    this.BuscarInformacion(this.opcionBusqueda);
+    this.BuscarCargos(this.opcionBusqueda);
   }
 
   // VALIDACIONES DE OPCIONES DE REPORTE

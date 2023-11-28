@@ -37,6 +37,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
 
   get bool() { return this.reporteService.criteriosBusqueda };
 
+  // VARIABLES DE ALMACENAMIENTO DE DATOS
   departamentos: any = [];
   sucursales: any = [];
   respuesta: any[];
@@ -48,9 +49,17 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
 
   data_pdf: any = [];
 
+  // ESTADO HORA SERVIDOR
+  dispositivo: boolean = false;
+
   //VARIABLES PARA MOSTRAR DETALLES
   tipo: string;
   verDetalle: boolean = false;
+
+  // VARIABLES UTILIZADAS PARA IDENTIFICAR EL TIPO DE USUARIO
+  tipoUsuario: string = 'activo';
+  opcionBusqueda: number = 1;
+  limpiar: number = 0;
 
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
   selectionReg = new SelectionModel<any>(true, []);
@@ -102,9 +111,6 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
 
-  // ESTADO HORA SERVIDOR
-  dispositivo: boolean = false;
-
   constructor(
     private R_asistencias: ReportesAsistenciasService,
     private validacionService: ValidacionesService,
@@ -122,9 +128,10 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
     if (parseInt(localStorage.getItem('rol') as string) === 1) {
       this.dispositivo = true;
     }
-    this.BuscarInformacion();
+    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.BuscarInformacion(this.opcionBusqueda);
+    this.BuscarCargos(this.opcionBusqueda);
     this.BuscarParametro();
-    this.BuscarCargos();
     this.BuscarHora();
   }
 
@@ -169,14 +176,14 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
    ** ****************************************************************************************** **/
 
   // METODO DE BUSQUEDA DE DATOS
-  BuscarInformacion() {
+  BuscarInformacion(opcion: number) {
     this.departamentos = [];
     this.sucursales = [];
     this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.origen = [];
-    this.informacion.ObtenerInformacion(1).subscribe(
+    this.informacion.ObtenerInformacion(opcion).subscribe(
       (res: any[]) => {
         this.origen = JSON.stringify(res);
         res.forEach((obj: any) => {
@@ -220,7 +227,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
 
         res.forEach((obj: any) => {
           obj.departamentos.forEach((departamento: any) => {
-            departamento.empleado.forEach((reg) => {
+            departamento.empleado.forEach((reg: any) => {
               reg.regimen.forEach((r: any) => {
                 this.regimen.push({
                   id: r.id_regimen,
@@ -244,11 +251,11 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
   // METODO PARA FILTRAR POR CARGOS
   empleados_cargos: any = [];
   origen_cargo: any = [];
-  BuscarCargos() {
+  BuscarCargos(opcion: number) {
     this.empleados_cargos = [];
     this.origen_cargo = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionCargo(1).subscribe(
+    this.informacion.ObtenerInformacionCargo(opcion).subscribe(
       (res: any[]) => {
         this.origen_cargo = JSON.stringify(res);
 
@@ -275,6 +282,19 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
           });
         });
       });
+  }
+
+  ObtenerTipoUsuario($event: string){
+    this.tipoUsuario = $event;
+    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.limpiar = this.opcionBusqueda;
+    this.selectionSuc.clear();
+    this.selectionDep.clear();
+    this.selectionCar.clear();
+    this.selectionReg.clear();
+    this.selectionEmp.clear();
+    this.BuscarInformacion(this.opcionBusqueda);
+    this.BuscarCargos(this.opcionBusqueda);
   }
 
   // VALIDACIONES REPORTES

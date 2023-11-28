@@ -62,7 +62,6 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     console.log('atributo', this.num_option);
-    console.log('opcion: ' + this.limpiar);
     this.check = this.reporteService.checkOptionsN(this.num_option);
     console.log('CHECK ', this.check);
 
@@ -77,10 +76,13 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
 
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    console.log('opcion: ' + this.limpiar);
+  ngOnChanges() {
     if (this.limpiar !=0) {
       this.limpiarCampos();
+      this.seleccion.patchValue(null);
+      this.reporteService.GuardarCheckOpcion('');
+      this.reporteService.DefaultFormCriterios();
+      this.reporteService.DefaultValoresFiltros();
     }  }
 
 
@@ -222,7 +224,6 @@ export class CriteriosBusquedaComponent implements OnInit, OnDestroy {
       this._booleanOptions.bool_cargo = false;
     }
     this.seleccion.reset();
-    this.seleccion.patchValue(null);
   }
 
 }

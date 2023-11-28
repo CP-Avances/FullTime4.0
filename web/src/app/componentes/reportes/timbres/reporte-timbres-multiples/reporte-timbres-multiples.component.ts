@@ -38,7 +38,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
   get bool() { return this.reporteService.criteriosBusqueda };
   
 
-
+  // VARIABLES DE ALMACENAMIENTO DE DATOS
   departamentos: any = [];
   sucursales: any = [];
   empleados: any = [];
@@ -48,12 +48,19 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
   cargos: any = [];
   origen: any = [];
 
-  // VARIABLE DE ALMACENAMIENTO DE DATOS DE PDF
   data_pdf: any = [];
+
+  // ESTADO HORA SERVIDOR
+  dispositivo: boolean = false;
 
   //VARIABLES PARA MOSTRAR DETALLES
   tipo: string;
   verDetalle: boolean = false;
+
+  // VARIABLES UTILIZADAS PARA IDENTIFICAR EL TIPO DE USUARIO
+  tipoUsuario: string = 'activo';
+  opcionBusqueda: number = 1;
+  limpiar: number = 0;
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS SELECCIONADOS EN LA BUSQUEDA
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
@@ -106,20 +113,11 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
 
-
-  // ESTADO HORA SERVIDOR
-  dispositivo: boolean = false;
-
-  // TIPO DE USUARIO
-  tipoUsuario: string = 'activo';
-  opcionBusqueda: number = 1;
-  limpiar: number = 0;
-
   constructor(
-    private validacionService: ValidacionesService,
-    private reporteService: ReportesService,
     private R_asistencias: ReportesAsistenciasService,
+    private validacionService: ValidacionesService,
     private informacion: DatosGeneralesService,
+    private reporteService: ReportesService,
     private parametro: ParametrosService,
     private restEmpre: EmpresaService,
     private toastr: ToastrService,
@@ -134,8 +132,8 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     }
     this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
     this.BuscarInformacion(this.opcionBusqueda);
-    this.BuscarParametro();
     this.BuscarCargos(this.opcionBusqueda);
+    this.BuscarParametro();
     this.BuscarHora();
   }
 
@@ -177,14 +175,6 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
   /** ****************************************************************************************** **
    ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** ** 
    ** ****************************************************************************************** **/
-
-  ObtenerTipoUsuario($event: string){
-   this.tipoUsuario = $event;
-   this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
-   this.limpiar = this.opcionBusqueda;
-   this.BuscarInformacion(this.opcionBusqueda);
-   this.BuscarCargos(this.opcionBusqueda);
-  }
 
   // METODO DE BUSQUEDA DE DATOS
   BuscarInformacion(opcion: number) {
@@ -293,6 +283,19 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
           });
         });
       });
+  }
+
+  ObtenerTipoUsuario($event: string){
+    this.tipoUsuario = $event;
+    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.limpiar = this.opcionBusqueda;
+    this.selectionSuc.clear();
+    this.selectionDep.clear();
+    this.selectionCar.clear();
+    this.selectionReg.clear();
+    this.selectionEmp.clear();
+    this.BuscarInformacion(this.opcionBusqueda);
+    this.BuscarCargos(this.opcionBusqueda);
   }
 
   // VALIDACIONES DE OPCIONES DE REPORTE
@@ -453,7 +456,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
   ModelarEmpleados(accion: any) {
     this.tipo = 'default';
     let respuesta = JSON.parse(this.origen)
-
+    console.log('empleados', this.selectionEmp);
     respuesta.forEach((obj: any) => {
       obj.departamentos.forEach((departamento:any) => {
         departamento.empleado = departamento.empleado.filter((o: any) => {

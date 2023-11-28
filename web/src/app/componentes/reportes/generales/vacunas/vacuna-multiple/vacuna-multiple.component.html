@@ -31,15 +31,18 @@
                         <mat-icon class="i-download">cloud_download</mat-icon>
                     </button>
                 </div>
+                <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
+                    <app-opcion-usuario (tipoUsuarioChange)="ObtenerTipoUsuario($event)"></app-opcion-usuario>
+                </div>
             </mat-card>
 
         </div>
         <div class="col-lg-7">
-            <app-criterios-busqueda [num_option]="5"></app-criterios-busqueda>
+            <app-criterios-busqueda [num_option]="5" [limpiar]="limpiar"></app-criterios-busqueda>
         </div>
     </div>
 </div>
-<div *ngIf="!verDetalle" class="container" style="padding-bottom: 50px; text-align: center;">
+<div class="container" style="padding-bottom: 50px; text-align: center;" [hidden]="verDetalle">
     <!-- TABLA PARA SUCURSALES -->
     <div *ngIf="bool.bool_suc" class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="resultados">

@@ -461,7 +461,7 @@ class ReportesAsistenciaControlador {
 
         }).filter(obj => { return obj.departamentos.length > 0 })
 
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo.' })
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' })
 
         return res.status(200).jsonp(datos)
     }
@@ -710,7 +710,7 @@ class ReportesAsistenciaControlador {
 
         }).filter(obj => { return obj.departamentos.length > 0 })
 
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo.' })
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' })
 
         return res.status(200).jsonp(nuevo)
 
@@ -734,7 +734,7 @@ class ReportesAsistenciaControlador {
             return e
         }).filter(e => { return e.empleados.length > 0 })
 
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo.' })
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' })
 
         return res.status(200).jsonp(nuevo)
 
@@ -831,7 +831,7 @@ class ReportesAsistenciaControlador {
 
         }).filter(obj => { return obj.departamentos.length > 0 })
 
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo.' })
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' })
 
         return res.status(200).jsonp(nuevo)
     }
@@ -854,7 +854,7 @@ class ReportesAsistenciaControlador {
             return e
         }).filter(e => { return e.empleados.length > 0 })
 
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo.' })
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' })
 
         return res.status(200).jsonp(nuevo)
     }
@@ -894,7 +894,7 @@ class ReportesAsistenciaControlador {
 
         }).filter(obj => { return obj.departamentos.length > 0 })
 
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo.' })
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' })
 
         return res.status(200).jsonp(nuevo)
     }
@@ -917,7 +917,7 @@ class ReportesAsistenciaControlador {
             return e
         }).filter(e => { return e.empleados.length > 0 })
 
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo.' })
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' })
 
         return res.status(200).jsonp(nuevo)
     }
@@ -957,7 +957,7 @@ class ReportesAsistenciaControlador {
 
         }).filter(obj => { return obj.departamentos.length > 0 })
 
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo.' })
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' })
 
         return res.status(200).jsonp(nuevo)
     }
@@ -982,7 +982,7 @@ class ReportesAsistenciaControlador {
         }).filter(e => { return e.empleados.length > 0 })
 
 
-        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres de empleados en ese periodo.' })
+        if (nuevo.length === 0) return res.status(400).jsonp({ message: 'No hay timbres en ese periodo.' })
 
         return res.status(200).jsonp(nuevo)
     }

@@ -57,9 +57,10 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
   tipo: string;
   verDetalle: boolean = false;
 
-  // VARIABLES PARA ADMINISTRAR TOLERANCIA
-  tolerancia: string = 'no_considerar';
-  tipoTolerancia: string = '';
+  // VARIABLES UTILIZADAS PARA IDENTIFICAR EL TIPO DE USUARIO
+  tipoUsuario: string = 'activo';
+  opcionBusqueda: number = 1;
+  limpiar: number = 0;
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS SELECCIONADOS EN LA BUSQUEDA
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
@@ -126,9 +127,10 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.BuscarInformacion();
+    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.BuscarInformacion(this.opcionBusqueda);
+    this.BuscarCargos(this.opcionBusqueda);
     this.BuscarParametro();
-    this.BuscarCargos();
     this.BuscarHora();
   }
 
@@ -172,14 +174,14 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
    ** ****************************************************************************************** **/
 
   // METODO DE BUSQUEDA DE DATOS
-  BuscarInformacion() {
+  BuscarInformacion(opcion: number) {
     this.departamentos = [];
     this.sucursales = [];
     this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.origen = [];
-    this.informacion.ObtenerInformacion(1).subscribe(
+    this.informacion.ObtenerInformacion(opcion).subscribe(
       (res: any[]) => {
         this.origen = JSON.stringify(res);
         res.forEach((obj: any) => {
@@ -189,7 +191,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
           });
         });
 
-        res.forEach((obj) => {
+        res.forEach((obj: any) => {
           obj.departamentos.forEach((departamento: any) => {
             this.departamentos.push({
               id: departamento.id_depa,
@@ -247,11 +249,11 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
   // METODO PARA FILTRAR POR CARGOS
   empleados_cargos: any = [];
   origen_cargo: any = [];
-  BuscarCargos() {
+  BuscarCargos(opcion: number) {
     this.empleados_cargos = [];
     this.origen_cargo = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionCargo(1).subscribe(
+    this.informacion.ObtenerInformacionCargo(opcion).subscribe(
       (res: any[]) => {
         this.origen_cargo = JSON.stringify(res);
 
@@ -277,8 +279,20 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
             });
           });
         });
-      },
-    );
+      });
+  }
+
+  ObtenerTipoUsuario($event: string){
+    this.tipoUsuario = $event;
+    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.limpiar = this.opcionBusqueda;
+    this.selectionSuc.clear();
+    this.selectionDep.clear();
+    this.selectionCar.clear();
+    this.selectionReg.clear();
+    this.selectionEmp.clear();
+    this.BuscarInformacion(this.opcionBusqueda);
+    this.BuscarCargos(this.opcionBusqueda);
   }
 
   // VALIDACIONES DE OPCIONES DE REPORTE

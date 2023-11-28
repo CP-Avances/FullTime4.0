@@ -83,6 +83,11 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   detalles: any = [];
   detalle_acciones: any = [];
 
+  // VARIABLES UTILIZADAS PARA IDENTIFICAR EL TIPO DE USUARIO
+  tipoUsuario: string = 'activo';
+  opcionBusqueda: number = 1;
+  limpiar: number = 0;
+
   // ACCIONES DE HORARIOS
   entrada: '';
   salida: '';
@@ -150,9 +155,10 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   }
 
   ngOnInit(): void {
-    this.BuscarInformacion();
+    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.BuscarInformacion(this.opcionBusqueda);
+    this.BuscarCargos(this.opcionBusqueda);
     this.BuscarParametro();
-    this.BuscarCargos();
     this.BuscarHora();
   }
 
@@ -196,14 +202,14 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
    ** ****************************************************************************************** **/
 
   // METODO DE BUSQUEDA DE DATOS
-  BuscarInformacion() {
+  BuscarInformacion(opcion: number) {
     this.departamentos = [];
     this.sucursales = [];
     this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.origen = [];
-    this.informacion.ObtenerInformacion(1).subscribe(
+    this.informacion.ObtenerInformacion(opcion).subscribe(
       (res: any[]) => {
         this.origen = JSON.stringify(res);
         res.forEach((obj: any) => {
@@ -271,11 +277,11 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   // METODO PARA FILTRAR POR CARGOS
   empleados_cargos: any = [];
   origen_cargo: any = [];
-  BuscarCargos() {
+  BuscarCargos(opcion: number) {
     this.empleados_cargos = [];
     this.origen_cargo = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionCargo(1).subscribe(
+    this.informacion.ObtenerInformacionCargo(opcion).subscribe(
       (res: any[]) => {
         this.origen_cargo = JSON.stringify(res);
 
@@ -301,8 +307,20 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
             });
           });
         });
-      },
-    );
+      });
+  }
+
+  ObtenerTipoUsuario($event: string){
+    this.tipoUsuario = $event;
+    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.limpiar = this.opcionBusqueda;
+    this.selectionSuc.clear();
+    this.selectionDep.clear();
+    this.selectionCar.clear();
+    this.selectionReg.clear();
+    this.selectionEmp.clear();
+    this.BuscarInformacion(this.opcionBusqueda);
+    this.BuscarCargos(this.opcionBusqueda);
   }
 
   // VALIDACIONES DE OPCIONES DE REPORTE
@@ -485,9 +503,11 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
 
     this.plan.BuscarPlanificacionHoraria(busqueda).subscribe((datos: any) => {
       if (datos.message === 'OK') {
-        const horarios = datos.data;    
+        const horarios = datos.data;   
+        console.log('horarios',horarios); 
         const horariosPorEmpleado = {};
-
+        
+        
         //AGRUPAMIENTO DE LOS HORIOS POR CODIGO DE EMPLEADO
         horarios.forEach((h: any) => {
           horariosPorEmpleado[h.codigo_e] = horariosPorEmpleado[h.codigo_e] || [];
@@ -497,6 +517,13 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
         this.resultados.forEach((r: any) => {
           r.horarios = horariosPorEmpleado[r.codigo];
         });
+
+
+        this.resultados = this.resultados.filter((r: any) => {
+          return r.horarios !== undefined && r.horarios !== null;
+        });
+        
+        console.log('resultado',this.resultados); 
 
         this.horariosEmpleado = this.resultados;
         this.ObtenerDetallesPlanificacion();
