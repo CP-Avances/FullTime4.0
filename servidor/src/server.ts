@@ -66,6 +66,7 @@ import VACUNAS_REPORTE_RUTAS from './rutas/reportes/reporteVacunasRutas';
 import SALIDAS_ANTICIPADAS_RUTAS from './rutas/reportes/salidasAntesRutas';
 import REPORTES_ATRASOS_RUTAS from './rutas/reportes/reportesAtrasosRutas';
 import REPORTES_TIEMPO_LABORADO_RUTAS from './rutas/reportes/reportesTiempoLaboradoRutas';
+import REPORTES_TIMBRES_MRL_RUTAS from './rutas/reportes/reportesTimbresMrlRutas';
 import FALTAS_RUTAS from './rutas/reportes/reportesFaltasRutas';
 import AUDITORIA_RUTAS from './rutas/auditoria/auditoriaRutas';
 import VACACIONES_REPORTES_RUTAS from './rutas/reportes/solicitudVacacionesRutas';
@@ -197,6 +198,7 @@ class Servidor {
         this.app.use('/reporte-salidas-antes/', SALIDAS_ANTICIPADAS_RUTAS);
         this.app.use('/reporte-atrasos/', REPORTES_ATRASOS_RUTAS);
         this.app.use('/reporte-tiempo-laborado/', REPORTES_TIEMPO_LABORADO_RUTAS);
+        this.app.use('/reporte-timbres-mrl/', REPORTES_TIMBRES_MRL_RUTAS);
 
         // REPORTES DE AUDITORIA
         this.app.use('/reportes-auditoria', AUDITORIA_RUTAS);

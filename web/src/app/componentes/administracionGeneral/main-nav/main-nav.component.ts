@@ -536,6 +536,7 @@ export class MainNavComponent implements OnInit {
             color: true,
             children: [
               { name: 'Timbres', url: '/reporte-timbres-multiples', color: true },
+              { name: 'Timbres MRL', url: '/reporte-timbre-mrl', color: true },
               { name: 'Timbres Libres', url: '/reporte-timbre-abierto', color: true },
               { name: 'Timbres Incompletos', url: '/reporte-timbre-incompleto', color: true },
             ]

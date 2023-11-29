@@ -107,7 +107,7 @@ export class VerEmpleadoComponent implements OnInit {
   hipervinculo: string = environment.url; // VARIABLE DE MANEJO DE RUTAS CON URL
   FechaActual: any; // VARIBLE PARA ALMACENAR LA FECHA DEL DÍA DE HOY
 
-  // ITEMS DE PAGINACION DE LA TABLA 
+  // ITEMS DE PAGINACION DE LA TABLA
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
@@ -151,7 +151,7 @@ export class VerEmpleadoComponent implements OnInit {
     private scriptService: ScriptService, // SERVICIO DATOS EMPLEADO - REPORTE
     private activatedRoute: ActivatedRoute,
     private restPlanGeneral: PlanGeneralService, // SERVICIO DATOS DE PLANIFICACION
-    private aprobar: AutorizacionService, // SERVICIO DE DATOS DE AUTORIZACIONES 
+    private aprobar: AutorizacionService, // SERVICIO DE DATOS DE AUTORIZACIONES
 
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
@@ -232,7 +232,7 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -290,7 +290,7 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                       METODOS GENERALES DEL SISTEMA                                ** ** 
+   ** **                       METODOS GENERALES DEL SISTEMA                                ** **
    ** **************************************************************************************** **/
 
   // BUSQUEDA DE DATOS ACTUALES DEL USUARIO
@@ -327,7 +327,7 @@ export class VerEmpleadoComponent implements OnInit {
    ** **                      METODO PARA MOSTRAR DATOS PERFIL DE USUARIO                        ** **                                           *
    ** ********************************************************************************************* **/
 
-  // METODO PARA VER LA INFORMACION DEL USUARIO 
+  // METODO PARA VER LA INFORMACION DEL USUARIO
   urlImagen: any;
   iniciales: any;
   mostrarImagen: boolean = false;
@@ -544,7 +544,7 @@ export class VerEmpleadoComponent implements OnInit {
       })
   }
 
-  // ELIMINAR REGISTRO DE TITULO 
+  // ELIMINAR REGISTRO DE TITULO
   EliminarTituloEmpleado(id: number) {
     this.restEmpleado.EliminarTitulo(id).subscribe(res => {
       this.ObtenerTituloEmpleado();
@@ -554,7 +554,7 @@ export class VerEmpleadoComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeleteTitulo(id: number) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -572,7 +572,7 @@ export class VerEmpleadoComponent implements OnInit {
    ** **               BUSQUEDA DE DATOS DE ASIGNACIONES: DISCAPACIDAD                           ** **                        *
    ** ********************************************************************************************* **/
 
-  // METODO PARA OBTENER DATOS DE DISCAPACIDAD 
+  // METODO PARA OBTENER DATOS DE DISCAPACIDAD
   ObtenerDiscapacidadEmpleado() {
     this.discapacidadUser = [];
     this.restDiscapacidad.BuscarDiscapacidadUsuario(parseInt(this.idEmpleado)).subscribe(data => {
@@ -581,7 +581,7 @@ export class VerEmpleadoComponent implements OnInit {
     });
   }
 
-  // ELIMINAR REGISTRO DE DISCAPACIDAD 
+  // ELIMINAR REGISTRO DE DISCAPACIDAD
   EliminarDiscapacidad(id_discapacidad: number) {
     this.restDiscapacidad.EliminarDiscapacidad(id_discapacidad).subscribe(res => {
       this.ObtenerDiscapacidadEmpleado();
@@ -592,7 +592,7 @@ export class VerEmpleadoComponent implements OnInit {
     })
   };
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeleteDiscapacidad(id: number) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -624,7 +624,7 @@ export class VerEmpleadoComponent implements OnInit {
     }
   }
 
-  // LÓGICA DE BOTÓN PARA MOSTRAR COMPONENTE DEL REGISTRO DE DISCAPACIDAD 
+  // LÓGICA DE BOTÓN PARA MOSTRAR COMPONENTE DEL REGISTRO DE DISCAPACIDAD
   MostrarDis() {
     if (this.discapacidadUser.length != 0) {
       this.AbrirVentanaDiscapacidad('editar');
@@ -660,7 +660,7 @@ export class VerEmpleadoComponent implements OnInit {
       })
   }
 
-  // LÓGICA DE BOTÓN PARA MOSTRAR COMPONENTE DEL REGISTRO DE VACUNACION 
+  // LÓGICA DE BOTÓN PARA MOSTRAR COMPONENTE DEL REGISTRO DE VACUNACION
   MostrarVentanaVacuna() {
     this.ventana.open(CrearVacunaComponent, {
       data: { idEmpleado: this.idEmpleado }, width: '600px'
@@ -680,7 +680,7 @@ export class VerEmpleadoComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarEliminarVacuna(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -704,7 +704,7 @@ export class VerEmpleadoComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER EL CONTRATO DE UN EMPLEADO CON SU RESPECTIVO REGIMEN LABORAL 
+  // METODO PARA OBTENER EL CONTRATO DE UN EMPLEADO CON SU RESPECTIVO REGIMEN LABORAL
   ObtenerContratoEmpleado(id_contrato: number, formato_fecha: string) {
     this.contratoEmpleado = [];
     this.restEmpleado.BuscarDatosContrato(id_contrato).subscribe(res => {
@@ -728,7 +728,7 @@ export class VerEmpleadoComponent implements OnInit {
     });
   }
 
-  // METODO PARA VER DATOS DEL CONTRATO SELECCIONADO 
+  // METODO PARA VER DATOS DEL CONTRATO SELECCIONADO
   fechaContrato = new FormControl('');
   public contratoForm = new FormGroup({
     fechaContratoForm: this.fechaContrato,
@@ -783,7 +783,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.btnActualizarContrato = value;
   }
 
-  // METODO BUSQUEDA DE DATOS DE CONTRATO 
+  // METODO BUSQUEDA DE DATOS DE CONTRATO
   idSelectContrato: number;
   ObtenerIdContratoSeleccionado(idContratoEmpleado: number) {
     this.idSelectContrato = idContratoEmpleado;
@@ -806,7 +806,7 @@ export class VerEmpleadoComponent implements OnInit {
    ** ******************************************************************************************** **/
 
 
-  // METODO PARA OBTENER LOS DATOS DEL CARGO DEL EMPLEADO 
+  // METODO PARA OBTENER LOS DATOS DEL CARGO DEL EMPLEADO
   cargoEmpleado: any = [];
   ObtenerCargoEmpleado(id_cargo: number, formato_fecha: string) {
     this.cargoEmpleado = [];
@@ -819,14 +819,14 @@ export class VerEmpleadoComponent implements OnInit {
     });
   }
 
-  // METODO PARA LIMPIAR REGISTRO 
+  // METODO PARA LIMPIAR REGISTRO
   LimpiarCargo() {
     this.cargoSeleccionado = [];
     this.listaCargos = [];
     this.cargoForm.reset();
   }
 
-  // METODO PARA VER CARGO SELECCIONADO 
+  // METODO PARA VER CARGO SELECCIONADO
   fechaICargo = new FormControl('');
   public cargoForm = new FormGroup({
     fechaICargoForm: this.fechaICargo,
@@ -856,7 +856,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.idSelectCargo = idCargoEmpleado;
   }
 
-  // VENTANA PARA INGRESAR CARGO DEL EMPLEADO 
+  // VENTANA PARA INGRESAR CARGO DEL EMPLEADO
   AbrirVentanaCargo(): void {
     if (this.datoActual.id_contrato != undefined) {
       this.ventana.open(EmplCargosComponent,
@@ -873,8 +873,8 @@ export class VerEmpleadoComponent implements OnInit {
     }
   }
 
-  /** ***************************************************************************************** ** 
-   ** **                VENTANA PARA VER HORARIOS ASIGNADOS AL USUARIO                       ** ** 
+  /** ***************************************************************************************** **
+   ** **                VENTANA PARA VER HORARIOS ASIGNADOS AL USUARIO                       ** **
    ** ***************************************************************************************** **/
 
   // FECHAS DE BUSQUEDA
@@ -943,7 +943,7 @@ export class VerEmpleadoComponent implements OnInit {
     }
   }
 
-  // METODO PARA MOSTRAR DATOS DE HORARIO 
+  // METODO PARA MOSTRAR DATOS DE HORARIO
   horariosEmpleado: any = [];
   mes_inicio: any = '';
   mes_fin: any = '';
@@ -1127,7 +1127,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.ver_acciones = false;
   }
 
-  // ITEMS DE PAGINACION DE LA TABLA 
+  // ITEMS DE PAGINACION DE LA TABLA
   pageSizeOptionsD = [5, 10, 20, 50];
   tamanio_paginaD: number = 5;
   numero_paginaD: number = 1;
@@ -1139,11 +1139,11 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
 
-  /** ***************************************************************************************** ** 
-   ** **              METODOS PARA MANEJAR HORARIOS FIJOS DEL USUARIO                        ** ** 
+  /** ***************************************************************************************** **
+   ** **              METODOS PARA MANEJAR HORARIOS FIJOS DEL USUARIO                        ** **
    ** ***************************************************************************************** **/
 
-  // VENTANA PARA REGISTRAR HORARIO 
+  // VENTANA PARA REGISTRAR HORARIO
   ventana_horario: boolean = false;
   data_horario: any = [];
   AbrirPlanificarHorario(): void {
@@ -1286,7 +1286,7 @@ export class VerEmpleadoComponent implements OnInit {
    ** **                          METODO DE REGISTRO DE HORARIOS ROTATIVOS                  ** **
    ** **************************************************************************************** **/
 
-  // VENTANA PARA REGISTRAR PLANIFICACION DE HORARIOS DEL EMPLEADO 
+  // VENTANA PARA REGISTRAR PLANIFICACION DE HORARIOS DEL EMPLEADO
   rotativo: any = []
   registrar_rotativo: boolean = false;
   ver_rotativo: boolean = true;
@@ -1335,7 +1335,7 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
 
-  // ELIMINAR REGISTROS DE PLANIFICACION GENERAL 
+  // ELIMINAR REGISTROS DE PLANIFICACION GENERAL
   EliminarPlanificacionGeneral(fecha: string, horario: number, codigo: string) {
     this.id_planificacion_general = [];
     let plan_fecha = {
@@ -1385,7 +1385,7 @@ export class VerEmpleadoComponent implements OnInit {
     }
   }
 
-  // VENTANA PARA REGISTRAR HORARIO 
+  // VENTANA PARA REGISTRAR HORARIO
   editar_horario: boolean = false;
   datos_editar: any = [];
   expansion: boolean = true;
@@ -1433,10 +1433,10 @@ export class VerEmpleadoComponent implements OnInit {
 
 
   /** **************************************************************************************** **
-   ** **                METODO DE PRESENTACION DE DATOS DE PERMISOS                         ** ** 
+   ** **                METODO DE PRESENTACION DE DATOS DE PERMISOS                         ** **
    ** **************************************************************************************** **/
 
-  // METODO PARA IMPRIMIR DATOS DEL PERMISO 
+  // METODO PARA IMPRIMIR DATOS DEL PERMISO
   permisosTotales: any = [];
   ObtenerPermisos(formato_fecha: string, formato_hora: string) {
     this.permisosTotales = [];
@@ -1456,7 +1456,7 @@ export class VerEmpleadoComponent implements OnInit {
     })
   }
 
-  // VENTANA PARA REGISTRAR PERMISOS DEL EMPLEADO 
+  // VENTANA PARA REGISTRAR PERMISOS DEL EMPLEADO
   solicita_permiso: any = [];
   solicitudes_permiso: boolean = true;
   formulario_permiso: boolean = false;
@@ -1593,7 +1593,7 @@ export class VerEmpleadoComponent implements OnInit {
     });
   }
 
-  // METODO PARA INGRESAR NOMBRE Y CARGO DEL USUARIO QUE REVIZO LA SOLICITUD 
+  // METODO PARA INGRESAR NOMBRE Y CARGO DEL USUARIO QUE REVIZO LA SOLICITUD
   cadena_texto: string = ''; // VARIABLE PARA ALMACENAR TODOS LOS USUARIOS
   cont: number = 0;
   VerInformacionAutoriza(array: any) {
@@ -1617,7 +1617,7 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
 
-  /** **************************************************************************************************** ** 
+  /** **************************************************************************************************** **
    **                        METODO PARA EXPORTAR A PDF SOLICITUDES DE PERMISOS                            **
    ** **************************************************************************************************** **/
 
@@ -1913,10 +1913,10 @@ export class VerEmpleadoComponent implements OnInit {
 
 
   /** **************************************************************************************** **
-   ** **            METODO DE PRESENTACION DE DATOS DE PERIODO DE VACACIONES                ** ** 
+   ** **            METODO DE PRESENTACION DE DATOS DE PERIODO DE VACACIONES                ** **
    ** **************************************************************************************** **/
 
-  // METODO PARA IMPRIMIR DATOS DEL PERIODO DE VACACIONES 
+  // METODO PARA IMPRIMIR DATOS DEL PERIODO DE VACACIONES
   peridoVacaciones: any;
   ObtenerPeriodoVacaciones(formato_fecha: string) {
     this.peridoVacaciones = [];
@@ -1924,14 +1924,14 @@ export class VerEmpleadoComponent implements OnInit {
       this.peridoVacaciones = datos;
 
       this.peridoVacaciones.forEach(v => {
-        // TRATAMIENTO DE FECHAS Y HORAS 
+        // TRATAMIENTO DE FECHAS Y HORAS
         v.fec_inicio_ = this.validar.FormatearFecha(v.fec_inicio, formato_fecha, this.validar.dia_completo);
         v.fec_final_ = this.validar.FormatearFecha(v.fec_final, formato_fecha, this.validar.dia_completo);
       })
     })
   }
 
-  // VENTANA PARA INGRESAR PERÍODO DE VACACIONES 
+  // VENTANA PARA INGRESAR PERÍODO DE VACACIONES
   AbrirVentanaPerVacaciones(): void {
     if (this.datoActual.id_contrato != undefined) {
       this.restPerV.BuscarIDPerVacaciones(parseInt(this.idEmpleado)).subscribe(datos => {
@@ -1960,7 +1960,7 @@ export class VerEmpleadoComponent implements OnInit {
     }
   }
 
-  // VENTANA PARA PERIODO DE VACACIONES 
+  // VENTANA PARA PERIODO DE VACACIONES
   AbrirEditarPeriodoVacaciones(datoSeleccionado: any): void {
     this.ventana.open(EditarPeriodoVacacionesComponent,
       { width: '900px', data: { idEmpleado: this.idEmpleado, datosPeriodo: datoSeleccionado } })
@@ -1971,10 +1971,10 @@ export class VerEmpleadoComponent implements OnInit {
 
 
   /** **************************************************************************************** **
-   ** **                 METODO DE PRESENTACION DE DATOS DE VACACIONES                      ** ** 
+   ** **                 METODO DE PRESENTACION DE DATOS DE VACACIONES                      ** **
    ** **************************************************************************************** **/
 
-  // METODO PARA IMPRIMIR DATOS DE VACACIONES 
+  // METODO PARA IMPRIMIR DATOS DE VACACIONES
   vacaciones: any = [];
   ObtenerVacaciones(formato_fecha: string) {
     this.restPerV.BuscarIDPerVacaciones(parseInt(this.idEmpleado)).subscribe(datos => {
@@ -1982,7 +1982,7 @@ export class VerEmpleadoComponent implements OnInit {
       this.restVacaciones.ObtenerVacacionesPorIdPeriodo(this.idPerVacacion[0].id).subscribe(res => {
         this.vacaciones = res;
         this.vacaciones.forEach(v => {
-          // TRATAMIENTO DE FECHAS Y HORAS 
+          // TRATAMIENTO DE FECHAS Y HORAS
           v.fec_ingreso_ = this.validar.FormatearFecha(v.fec_ingreso, formato_fecha, this.validar.dia_completo);
           v.fec_inicio_ = this.validar.FormatearFecha(v.fec_inicio, formato_fecha, this.validar.dia_completo);
           v.fec_final_ = this.validar.FormatearFecha(v.fec_final, formato_fecha, this.validar.dia_completo);
@@ -1991,7 +1991,7 @@ export class VerEmpleadoComponent implements OnInit {
     });
   }
 
-  // VENTANA PARA REGISTRAR VACACIONES DEL EMPLEADO 
+  // VENTANA PARA REGISTRAR VACACIONES DEL EMPLEADO
   AbrirVentanaVacaciones(): void {
     if (this.datoActual.id_contrato != undefined && this.datoActual.id_cargo != undefined) {
       this.restPerV.BuscarIDPerVacaciones(parseInt(this.idEmpleado)).subscribe(datos => {
@@ -2050,7 +2050,7 @@ export class VerEmpleadoComponent implements OnInit {
 
 
   /** *************************************************************************************** **
-   ** **                 METODO PARA MOSTRAR DATOS DE HORAS EXTRAS                         ** ** 
+   ** **                 METODO PARA MOSTRAR DATOS DE HORAS EXTRAS                         ** **
    ** *************************************************************************************** **/
 
   // METODO DE BUSQUEDA DE HORAS EXTRAS
@@ -2097,7 +2097,7 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   /** *************************************************************************************** **
-   ** **                 METODO PARA MOSTRAR DATOS DE HORAS EXTRAS                         ** ** 
+   ** **                 METODO PARA MOSTRAR DATOS DE HORAS EXTRAS                         ** **
    ** *************************************************************************************** **/
 
   // METODO DE BUSQUEDA DE HORAS EXTRAS
@@ -2182,7 +2182,7 @@ export class VerEmpleadoComponent implements OnInit {
       });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeletePlan(datos: any) {
     console.log('ver data seleccionada... ', datos)
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
@@ -2270,7 +2270,7 @@ export class VerEmpleadoComponent implements OnInit {
    ** **         METODO PARA MOSTRAR DATOS DE ADMINISTRACION MODULO DE ALIMENTACION           ** **
    ** ****************************************************************************************** **/
 
-  // MOSTRAR DATOS DE USUARIO - ADMINISTRACIÓN DE MÓDULO DE ALIMENTACIÓN 
+  // MOSTRAR DATOS DE USUARIO - ADMINISTRACIÓN DE MÓDULO DE ALIMENTACIÓN
   administra_comida: any = [];
   VerAdminComida() {
     this.administra_comida = [];
@@ -2279,7 +2279,7 @@ export class VerEmpleadoComponent implements OnInit {
     });
   }
 
-  // VENTANA PARA REGISTRAR ADMINISTRACION DE MÓDULO DE ALIMENTACIÓN 
+  // VENTANA PARA REGISTRAR ADMINISTRACION DE MÓDULO DE ALIMENTACIÓN
   AbrirVentanaAdminComida(): void {
     this.ventana.open(AdministraComidaComponent,
       { width: '450px', data: { idEmpleado: this.idEmpleado } })
@@ -2292,7 +2292,7 @@ export class VerEmpleadoComponent implements OnInit {
    ** **          METODO DE PRESENTACION DE DATOS DE SERVICIO DE ALIMENTACION              ** **
    ** *************************************************************************************** **/
 
-  // METODO PARA MOSTRAR DATOS DE PLANIFICACION DE ALMUERZOS 
+  // METODO PARA MOSTRAR DATOS DE PLANIFICACION DE ALMUERZOS
   planComidas: any = [];
   ObtenerPlanComidasEmpleado(formato_fecha: string, formato_hora: string) {
     this.planComidas = [];
@@ -2302,7 +2302,7 @@ export class VerEmpleadoComponent implements OnInit {
     });
   }
 
-  // METODO PARA FORMATEAR FECHAS Y HORAS 
+  // METODO PARA FORMATEAR FECHAS Y HORAS
   FormatearFechas(datos: any, formato_fecha: string, formato_hora: string) {
     datos.forEach(c => {
       // TRATAMIENTO DE FECHAS Y HORAS
@@ -2322,7 +2322,7 @@ export class VerEmpleadoComponent implements OnInit {
     })
   }
 
-  // VENTANA PARA INGRESAR PLANIFICACION DE COMIDAS 
+  // VENTANA PARA INGRESAR PLANIFICACION DE COMIDAS
   AbrirVentanaPlanificacion(): void {
     console.log(this.idEmpleado);
     var info = {
@@ -2343,7 +2343,7 @@ export class VerEmpleadoComponent implements OnInit {
       });
   }
 
-  // VENTANA PARA EDITAR PLANIFICACIÓN DE COMIDAS 
+  // VENTANA PARA EDITAR PLANIFICACIÓN DE COMIDAS
   AbrirEditarPlanComidas(datoSeleccionado): void {
     if (datoSeleccionado.fec_inicio != undefined) {
       // VERIFICAR SI HAY UN REGISTRO CON ESTADO CONSUMIDO DENTRO DE LA PLANIFICACION
@@ -2375,7 +2375,7 @@ export class VerEmpleadoComponent implements OnInit {
       });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeletePlanComidas(datos: any) {
     // VERIFICAR SI HAY UN REGISTRO CON ESTADO CONSUMIDO DENTRO DE LA PLANIFICACION
     let datosConsumido = {
@@ -2441,7 +2441,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.plan_comida = false;
   }
 
-  // METODO PARA MOSTRAR DATOS DE PLANIFICACIÓN DE ALMUERZOS 
+  // METODO PARA MOSTRAR DATOS DE PLANIFICACIÓN DE ALMUERZOS
   solicitaComida: any = [];
   ObtenerSolComidas(formato_fecha: string, formato_hora: string) {
     this.solicitaComida = [];
@@ -2508,10 +2508,10 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   /** ******************************************************************************************* **
-   ** **                   METODO DE PRSENTACION DE DATOS DE PROCESOS                          ** ** 
+   ** **                   METODO DE PRSENTACION DE DATOS DE PROCESOS                          ** **
    ** ******************************************************************************************* **/
 
-  // METODO PARA MOSTRAR DATOS DE LOS PROCESOS DEL EMPLEADO 
+  // METODO PARA MOSTRAR DATOS DE LOS PROCESOS DEL EMPLEADO
   empleadoProcesos: any = [];
   ObtenerEmpleadoProcesos(formato_fecha: string) {
     this.empleadoProcesos = [];
@@ -2524,7 +2524,7 @@ export class VerEmpleadoComponent implements OnInit {
     })
   }
 
-  // VENTANA PARA INGRESAR PROCESOS DEL EMPLEADO 
+  // VENTANA PARA INGRESAR PROCESOS DEL EMPLEADO
   AbrirVentanaProcesos(): void {
     if (this.datoActual.id_cargo != undefined) {
       this.ventana.open(RegistrarEmpleProcesoComponent,
@@ -2540,7 +2540,7 @@ export class VerEmpleadoComponent implements OnInit {
     }
   }
 
-  // VENTANA PARA EDITAR PROCESOS DEL EMPLEADO 
+  // VENTANA PARA EDITAR PROCESOS DEL EMPLEADO
   AbrirVentanaEditarProceso(datoSeleccionado: any): void {
     this.ventana.open(EditarEmpleadoProcesoComponent,
       { width: '500px', data: { idEmpleado: this.idEmpleado, datosProcesos: datoSeleccionado } })
@@ -2559,7 +2559,7 @@ export class VerEmpleadoComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeleteProceso(datos: any) {
     console.log(datos);
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
@@ -2574,10 +2574,10 @@ export class VerEmpleadoComponent implements OnInit {
 
 
   /** ******************************************************************************************* **
-   ** **                METODO DE PRESENTACION DE DATOS DE AUTORIZACION                        ** ** 
+   ** **                METODO DE PRESENTACION DE DATOS DE AUTORIZACION                        ** **
    ** ******************************************************************************************* **/
 
-  // METODO PARA MOSTRAR DATOS DE AUTORIDAD DEPARTAMENTOS 
+  // METODO PARA MOSTRAR DATOS DE AUTORIDAD DEPARTAMENTOS
   autorizacionesTotales: any = [];
   ObtenerAutorizaciones() {
     this.autorizacionesTotales = [];
@@ -2587,7 +2587,7 @@ export class VerEmpleadoComponent implements OnInit {
     })
   }
 
-  // VENTANA PARA REGISTRAR AUTORIZACIONES DE DIFERENTES DEPARTAMENTOS 
+  // VENTANA PARA REGISTRAR AUTORIZACIONES DE DIFERENTES DEPARTAMENTOS
   AbrirVentanaAutorizar(): void {
     if (this.datoActual.id_cargo != undefined) {
       this.ventana.open(RegistroAutorizacionDepaComponent,
@@ -2603,7 +2603,7 @@ export class VerEmpleadoComponent implements OnInit {
     }
   }
 
-  // VENTANA PARA EDITAR AUTORIZACIONES DE DIFERENTES DEPARTAMENTOS 
+  // VENTANA PARA EDITAR AUTORIZACIONES DE DIFERENTES DEPARTAMENTOS
   AbrirEditarAutorizar(datoSeleccionado: any): void {
     this.ventana.open(EditarAutorizacionDepaComponent,
       { width: '600px', data: { idEmpleado: this.idEmpleado, datosAuto: datoSeleccionado } })
@@ -2622,7 +2622,7 @@ export class VerEmpleadoComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDeleteAutorizacion(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -2635,10 +2635,10 @@ export class VerEmpleadoComponent implements OnInit {
   }
 
   /** ***************************************************************************************** **
-   ** **                      METODO DE MANEJO DE BOTONES DE PERFIL                          ** **                      
+   ** **                      METODO DE MANEJO DE BOTONES DE PERFIL                          ** **
    ** ***************************************************************************************** **/
 
-  // VENTANA PARA MODIFICAR CONTRASEÑA 
+  // VENTANA PARA MODIFICAR CONTRASEÑA
   CambiarContrasena(): void {
     this.ventana.open(CambiarContrasenaComponent, { width: '350px', data: this.idEmpleado })
       .afterClosed()
@@ -2649,7 +2649,7 @@ export class VerEmpleadoComponent implements OnInit {
       });
   }
 
-  // INGRESAR FRASE 
+  // INGRESAR FRASE
   IngresarFrase(): void {
     this.restU.BuscarDatosUser(this.idEmpleadoLogueado).subscribe(data => {
       if (data[0].frase === null || data[0].frase === '') {
@@ -2667,7 +2667,7 @@ export class VerEmpleadoComponent implements OnInit {
     });
   }
 
-  // CAMBIAR FRASE 
+  // CAMBIAR FRASE
   CambiarFrase(): void {
     this.ventana.open(CambiarFraseComponent, { width: '450px', data: this.idEmpleado })
       .disableClose = true;
@@ -3067,7 +3067,7 @@ export class VerEmpleadoComponent implements OnInit {
     FileSaver.saveAs(data, (datos[0])[0].Nombre + "_" + (datos[0])[0].Apellido + '.csv');
   }
 
-  /** ******************************************************************************************* ** 
+  /** ******************************************************************************************* **
    ** **                             METODO PARA IMPRIMIR EN XML                               ** **
    ** ******************************************************************************************* **/
 
