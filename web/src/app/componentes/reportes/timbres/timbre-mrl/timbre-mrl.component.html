@@ -254,6 +254,7 @@
                   <table class="table table-hover table-sm" id="detalle">
                       <thead class="thead-light">
                           <tr style="text-align: center">
+                              <th class="t_horarios" scope="col" rowspan="2">N°</th>
                               <th class="t_horarios" scope="col" rowspan="2">CÉDULA</th>
                               <th class="t_horarios" scope="col" rowspan="2">ACCIÓN</th>
                               <th class="t_horarios" scope="col" rowspan="1" colspan="2">TIMBRE</th>
@@ -265,6 +266,7 @@
                       </thead>
                       <tbody>
                           <tr *ngFor="let t of timbres | paginate : tamanio_pagina : numero_pagina">
+                              <td class="t_horarios">{{ timbres.indexOf(t) + 1 }}</td>
                               <td class="t_horarios">{{ t.cedula }}</td>
                               <td class="t_horarios">{{ t.accion }}</td>
                               <td class="t_horarios">{{ t.fecha_hora.split(' ')[0] }}</td>
