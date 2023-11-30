@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { ReportesService } from '../../../../servicios/reportes/reportes.service';
 

@@ -1,13 +1,14 @@
 // IMPORTAR LIBRERIAS
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 // IMPORTAR MODELOS
 import { ITableEmpleados, IReporteTimbres } from 'src/app/model/reportes.model';
@@ -36,6 +37,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
 
   get bool() { return this.reporteService.criteriosBusqueda };
 
+  // VARIABLES DE ALMACENAMIENTO DE DATOS
   departamentos: any = [];
   sucursales: any = [];
   respuesta: any[];
@@ -47,9 +49,17 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
 
   data_pdf: any = [];
 
+  // ESTADO HORA SERVIDOR
+  dispositivo: boolean = false;
+
   //VARIABLES PARA MOSTRAR DETALLES
   tipo: string;
   verDetalle: boolean = false;
+
+  // VARIABLES UTILIZADAS PARA IDENTIFICAR EL TIPO DE USUARIO
+  tipoUsuario: string = 'activo';
+  opcionBusqueda: number = 1;
+  limpiar: number = 0;
 
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
   selectionReg = new SelectionModel<any>(true, []);
@@ -83,6 +93,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
   pageSizeOptions_emp = [5, 10, 20, 50];
 
   // ITEMS DE PAGINACION DE LA TABLA DETALLE
+  @ViewChild('paginatorDetalle') paginatorDetalle: MatPaginator;
   pageSizeOptions = [5, 10, 20, 50];
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
@@ -99,9 +110,6 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
-
-  // ESTADO HORA SERVIDOR
-  dispositivo: boolean = false;
 
   constructor(
     private R_asistencias: ReportesAsistenciasService,
@@ -120,15 +128,28 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
     if (parseInt(localStorage.getItem('rol') as string) === 1) {
       this.dispositivo = true;
     }
-    this.BuscarInformacion();
+    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.BuscarInformacion(this.opcionBusqueda);
+    this.BuscarCargos(this.opcionBusqueda);
     this.BuscarParametro();
-    this.BuscarCargos();
     this.BuscarHora();
   }
 
-  /********************************************************************************************
-  ****                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                            **** 
-  ********************************************************************************************/
+  ngOnDestroy() {
+    this.departamentos = [];
+    this.sucursales = [];
+    this.respuesta = [];
+    this.empleados = [];
+    this.regimen = [];
+    this.timbres = [];
+    this.cargos = [];
+  }
+
+
+  /** ****************************************************************************************** **
+   ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** ****************************************************************************************** **/
+
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
@@ -141,6 +162,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
       });
   }
 
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE HORA
   BuscarHora() {
     // id_tipo_parametro Formato hora = 26
     this.parametro.ListarDetalleParametros(26).subscribe(
@@ -149,37 +171,41 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
       });
   }
 
+  /** ****************************************************************************************** **
+   ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** ** 
+   ** ****************************************************************************************** **/
+
   // METODO DE BUSQUEDA DE DATOS
-  BuscarInformacion() {
+  BuscarInformacion(opcion: number) {
     this.departamentos = [];
     this.sucursales = [];
     this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.origen = [];
-    this.informacion.ObtenerInformacion(1).subscribe(
+    this.informacion.ObtenerInformacion(opcion).subscribe(
       (res: any[]) => {
         this.origen = JSON.stringify(res);
-        res.forEach((obj) => {
+        res.forEach((obj: any) => {
           this.sucursales.push({
             id: obj.id_suc,
             nombre: obj.name_suc,
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((departamento: any) => {
             this.departamentos.push({
-              id: ele.id_depa,
-              departamento: ele.name_dep,
-              nombre: ele.sucursal,
+              id: departamento.id_depa,
+              departamento: departamento.name_dep,
+              nombre: departamento.sucursal,
             });
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
-            ele.empleado.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((departamento: any) => {
+            departamento.empleado.forEach((r: any) => {
               let elemento = {
                 id: r.id,
                 nombre: r.name_empleado,
@@ -199,10 +225,10 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
-            ele.empleado.forEach((reg) => {
-              reg.regimen.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((departamento: any) => {
+            departamento.empleado.forEach((reg: any) => {
+              reg.regimen.forEach((r: any) => {
                 this.regimen.push({
                   id: r.id_regimen,
                   nombre: r.name_regimen,
@@ -213,7 +239,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
         });
 
         this.regimen = this.regimen.filter(
-          (obj, index, self) => index === self.findIndex((o) => o.id === obj.id)
+          (obj: any, index: any, self: any) => index === self.findIndex((o: any) => o.id === obj.id)
         );
       },
       (err) => {
@@ -225,23 +251,23 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
   // METODO PARA FILTRAR POR CARGOS
   empleados_cargos: any = [];
   origen_cargo: any = [];
-  BuscarCargos() {
+  BuscarCargos(opcion: number) {
     this.empleados_cargos = [];
     this.origen_cargo = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionCargo(1).subscribe(
+    this.informacion.ObtenerInformacionCargo(opcion).subscribe(
       (res: any[]) => {
         this.origen_cargo = JSON.stringify(res);
 
-        res.forEach((obj) => {
+        res.forEach((obj: any) => {
           this.cargos.push({
             id: obj.id_cargo,
             nombre: obj.name_cargo,
           });
         });
 
-        res.forEach((obj) => {
-          obj.empleados.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.empleados.forEach((r: any) => {
             this.empleados_cargos.push({
               id: r.id,
               nombre: r.name_empleado,
@@ -255,30 +281,28 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
             });
           });
         });
-      },
-      (err) => {
-        this.toastr.error(err.error.message);
-      }
-    );
+      });
   }
 
-  ngOnDestroy() {
-    this.departamentos = [];
-    this.sucursales = [];
-    this.respuesta = [];
-    this.empleados = [];
-    this.regimen = [];
-    this.timbres = [];
-    this.cargos = [];
+  ObtenerTipoUsuario($event: string){
+    this.tipoUsuario = $event;
+    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.limpiar = this.opcionBusqueda;
+    this.selectionSuc.clear();
+    this.selectionDep.clear();
+    this.selectionCar.clear();
+    this.selectionReg.clear();
+    this.selectionEmp.clear();
+    this.BuscarInformacion(this.opcionBusqueda);
+    this.BuscarCargos(this.opcionBusqueda);
   }
 
   // VALIDACIONES REPORTES
-  validacionReporte(action: any) {
+  ValidarReporte(action: any) {
     if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de búsqueda.');
     if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
       && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.')
-    //console.log('opcion:', this.opcion);
-    //console.log('ver rol -----------------------***********', localStorage.getItem('rol'))
+   
     switch (this.opcion) {
       case 's':
         if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione sucursal.')
@@ -313,22 +337,20 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
     this.tipo = 'default';
     let respuesta = JSON.parse(this.origen);
 
-    let suc = respuesta.filter(o => {
+    let suc = respuesta.filter((o: any) => {
       var bool = this.selectionSuc.selected.find(obj1 => {
         return obj1.id === o.id_suc
       })
       return bool != undefined
     })
 
-    // console.log('SUCURSAL', suc);
-    this.data_pdf = []
+    this.data_pdf = [];
     this.R_asistencias.ReporteTimbreRelojVirtual(suc, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      // console.log('DATA PDF', this.data_pdf);
+      this.data_pdf = res;
       switch (accion) {
-        case 'excel': this.exportToExcel('default'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        case 'excel': this.ExportarExcel('default'); break;
+        case 'ver': this.VerDatos(); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
@@ -353,7 +375,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
         empleados = [];
         obj.departamentos.forEach((departamento: any) => {
           departamento.empleado.forEach((empleado: any) => {
-            empleado.regimen.forEach((r) => {
+            empleado.regimen.forEach((r: any) => {
               if (regimen.id === r.id_regimen) {
                 empleados.push(empleado);
               }
@@ -367,12 +389,11 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
 
     this.data_pdf = [];
     this.R_asistencias.ReporteTimbreRelojVirtualRegimenCargo(reg, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      console.log('DATA PDF', this.data_pdf);
+      this.data_pdf = res;
       switch (accion) {
-        case 'excel': this.exportToExcel('RegimenCargo'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        case 'excel': this.ExportarExcel('RegimenCargo'); break;
+        case 'ver': this.VerDatos(); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
@@ -383,7 +404,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
   ModelarCargo(accion: any) {
     this.tipo = 'RegimenCargo';
     let respuesta = JSON.parse(this.origen_cargo);
-    let car = respuesta.filter((o) => {
+    let car = respuesta.filter((o: any) => {
       var bool = this.selectionCar.selected.find((obj1) => {
         return obj1.id === o.id_cargo;
       });
@@ -392,12 +413,11 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
 
     this.data_pdf = [];
     this.R_asistencias.ReporteTimbreRelojVirtualRegimenCargo(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      console.log('DATA PDF', this.data_pdf);
+      this.data_pdf = res;
       switch (accion) {
-        case 'excel': this.exportToExcel('RegimenCargo'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        case 'excel': this.ExportarExcel('RegimenCargo'); break;
+        case 'ver': this.VerDatos(); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
@@ -411,25 +431,23 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
     let respuesta = JSON.parse(this.origen);
 
     respuesta.forEach((obj: any) => {
-      obj.departamentos = obj.departamentos.filter(o => {
+      obj.departamentos = obj.departamentos.filter((o: any) => {
         var bool = this.selectionDep.selected.find(obj1 => {
           return obj1.id === o.id_depa
         })
         return bool != undefined
       })
     })
-    let dep = respuesta.filter(obj => {
+    let dep = respuesta.filter((obj: any) => {
       return obj.departamentos.length > 0
     });
-    // console.log('DEPARTAMENTOS', dep);
-    this.data_pdf = []
+    this.data_pdf = [];
     this.R_asistencias.ReporteTimbreRelojVirtual(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      // console.log('DATA PDF',this.data_pdf);
+      this.data_pdf = res;
       switch (accion) {
-        case 'excel': this.exportToExcel('default'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        case 'excel': this.ExportarExcel('default'); break;
+        case 'ver': this.VerDatos(); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
@@ -443,8 +461,8 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
     let respuesta = JSON.parse(this.origen);
 
     respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach(element => {
-        element.empleado = element.empleado.filter(o => {
+      obj.departamentos.forEach((departamento: any) => {
+        departamento.empleado = departamento.empleado.filter((o: any) => {
           var bool = this.selectionEmp.selected.find(obj1 => {
             return obj1.id === o.id
           })
@@ -452,34 +470,32 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
         })
       });
     })
-    respuesta.forEach(obj => {
-      obj.departamentos = obj.departamentos.filter(e => {
+    respuesta.forEach((obj: any) => {
+      obj.departamentos = obj.departamentos.filter((e: any) => {
         return e.empleado.length > 0
       })
     });
 
-    let emp = respuesta.filter(obj => {
+    let emp = respuesta.filter((obj: any) => {
       return obj.departamentos.length > 0
     });
 
-    // console.log('EMPLEADOS', emp);
-    this.data_pdf = []
+    this.data_pdf = [];
     this.R_asistencias.ReporteTimbreRelojVirtual(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      // console.log('DATA PDF',this.data_pdf);
+      this.data_pdf = res;
       switch (accion) {
-        case 'excel': this.exportToExcel('default'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        case 'excel': this.ExportarExcel('default'); break;
+        case 'ver': this.VerDatos(); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
     })
   }
 
-  /** *************************************************************************************** **
-   ** **                        COLORES Y LOGO PARA EL REPORTE                             ** **
-   ** *************************************************************************************** **/
+  /** ****************************************************************************************** **
+   **                              COLORES Y LOGO PARA EL REPORTE                                ** 
+   ** ****************************************************************************************** **/
 
   logo: any = String;
   ObtenerLogo() {
@@ -500,15 +516,15 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** ************************************************************************************ **
-   ** **                               GENERACION DE PDF                                ** **
-   ** ************************************************************************************ **/
+  /** ****************************************************************************************** **
+   **                                              PDF                                           **
+   ** ****************************************************************************************** **/
 
-  generarPdf(action: any) {
+  GenerarPDF(action: any) {
     let documentDefinition: any;
 
     if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true || this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      documentDefinition = this.getDocumentDefinicion();
+      documentDefinition = this.GetDocumentDefinicion();
     }
 
     let doc_name = "Timbres_virtuales_movil.pdf";
@@ -521,7 +537,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
 
   }
 
-  getDocumentDefinicion() {
+  GetDocumentDefinicion() {
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -552,30 +568,32 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
       },
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
-        { text: localStorage.getItem('name_empresa'), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
-        { text: 'REPORTE TIMBRES (APLICACIÓN MÓVIL)', bold: true, fontSize: 16, alignment: 'center', margin: [0, -5, 0, 5] },
-        { text: 'PERIODO DEL: ' + this.rangoFechas.fec_inico + " AL " + this.rangoFechas.fec_final, bold: true, fontSize: 15, alignment: 'center', margin: [0, 10, 0, 10] },
-        ...this.impresionDatosPDF(this.data_pdf).map(obj => {
+        { text: localStorage.getItem('name_empresa'), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'TIMBRES (APLICACIÓN MÓVIL)', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+        { text: 'PERIODO DEL: ' + this.rangoFechas.fec_inico + " AL " + this.rangoFechas.fec_final, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
+        ...this.EstructurarDatosPDF(this.data_pdf).map(obj => {
           return obj
         })
       ],
       styles: {
         tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color },
-        centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 10, 0, 10] },
+        centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 7, 0, 0] },
         itemsTable: { fontSize: 8 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
         itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0],fillColor: '#E3E3E3' },
         itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
-        tableMargin: { margin: [0, 0, 0, 10] },
+        tableMargin: { margin: [0, 0, 0, 0] },
         tableMarginCabecera: { margin: [0, 15, 0, 0] },
+        tableMarginCabeceraEmpleado: { margin: [0, 10, 0, 0] },
         quote: { margin: [5, -2, 0, -2], italics: true },
         small: { fontSize: 8, color: 'blue', opacity: 0.5 }
       }
     };
   }
 
-  impresionDatosPDF(data: any[]): Array<any> {
+  // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
+  EstructurarDatosPDF(data: any[]): Array<any> {
     let n: any = []
     let c = 0;
     var accionT: string = '';
@@ -634,7 +652,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
 
         obj1.empleados.forEach((obj2: any) => {
           n.push({
-            style: 'tableMarginCabecera',
+            style: 'tableMarginCabeceraEmpleado',
             table: {
               widths: ['*', 'auto', 'auto'],
               headerRows: 2,
@@ -704,7 +722,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                     { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
                     {},{},{},{},{}
                   ],
-                  ...obj2.timbres.map(obj3 => {
+                  ...obj2.timbres.map((obj3: any) => {
                     let servidor_fecha = '';
                     let servidor_hora = '';
                     if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
@@ -758,7 +776,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                 ]
               },
               layout: {
-                fillColor: function (rowIndex) {
+                fillColor: function (rowIndex: any) {
                   return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
                 }
               }
@@ -786,7 +804,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                     { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
                     {},{},{},{},{}
                   ],
-                  ...obj2.timbres.map(obj3 => {
+                  ...obj2.timbres.map((obj3: any) => {
                     let servidor_fecha = '';
                     let servidor_hora = '';
                     if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
@@ -827,7 +845,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                 ],
               },
               layout: {
-                fillColor: function (rowIndex) {
+                fillColor: function (rowIndex: any) {
                   return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
                 }
               }
@@ -838,8 +856,9 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
     } else {
       data.forEach((obj: IReporteTimbres) => {
 
-        if (this.bool.bool_suc === true || this.bool.bool_dep === true) {
+        if (this.bool.bool_suc === true) {
           n.push({
+            style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
               headerRows: 1,
@@ -878,12 +897,12 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                     {
                       border: [true, true, false, true],
                       text: 'DEPARTAMENTO: ' + obj1.name_dep,
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfo'
                     },
                     {
-                      border: [true, true, true, true],
+                      border: [false, true, true, true],
                       text: 'N° REGISTROS: ' + reg,
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfo'
                     }
                   ]
                 ]
@@ -894,7 +913,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
           obj1.empleado.forEach((obj2: any) => {
 
             n.push({
-              style: 'tableMarginCabecera',
+              style: 'tableMarginCabeceraEmpleado',
               table: {
                 widths: ['*', 'auto', 'auto'],
                 headerRows: 2,
@@ -964,7 +983,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                       { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
                       {},{},{},{},{}
                     ],
-                    ...obj2.timbres.map(obj3 => {
+                    ...obj2.timbres.map((obj3: any) => {
                       let servidor_fecha = '';
                       let servidor_hora = '';
                       if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
@@ -1017,7 +1036,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                   ],
                 },
                 layout: {
-                  fillColor: function (rowIndex) {
+                  fillColor: function (rowIndex: any) {
                     return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
                   },
                 },
@@ -1045,7 +1064,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                       { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
                       {},{},{},{},{}
                     ],
-                    ...obj2.timbres.map(obj3 => {
+                    ...obj2.timbres.map((obj3: any) => {
                       let servidor_fecha = '';
                       let servidor_hora = '';
                       if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
@@ -1087,7 +1106,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
                   ]
                 },
                 layout: {
-                  fillColor: function (rowIndex) {
+                  fillColor: function (rowIndex: any) {
                     return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
                   }
                 }
@@ -1110,19 +1129,20 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
   }
 
 
-  /** ************************************************************************************************** ** 
-   ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
-   ** ************************************************************************************************** **/
-  exportToExcel(tipo: string): void {
+  /** ****************************************************************************************** ** 
+   ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
+   ** ****************************************************************************************** **/
+
+  ExportarExcel(tipo: string): void {
     switch (tipo) {
       case 'RegimenCargo':
-        const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfRegimenCargo(this.data_pdf));
+        const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcelRegimenCargo(this.data_pdf));
         const wb_regimen_cargo: xlsx.WorkBook = xlsx.utils.book_new();
         xlsx.utils.book_append_sheet(wb_regimen_cargo, wsr_regimen_cargo, 'Timbres');
         xlsx.writeFile(wb_regimen_cargo, 'Timbres_virtuales_movil.xlsx');
         break;
       default:
-        const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefault(this.data_pdf));
+        const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
         const wb: xlsx.WorkBook = xlsx.utils.book_new();
         xlsx.utils.book_append_sheet(wb, wsr, 'Timbres');
         xlsx.writeFile(wb, 'Timbres_virtuales_movil.xlsx');
@@ -1130,7 +1150,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
     }
   }
 
-  MapingDataPdfDefault(array: Array<any>) {
+  EstructurarDatosExcel(array: Array<any>) {
     let nuevo: Array<any> = [];
     let accionT = '';
     array.forEach((obj1: IReporteTimbres) => {
@@ -1194,7 +1214,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
     return nuevo;
   }
 
-  MapingDataPdfRegimenCargo(array: Array<any>) {
+  EstructurarDatosExcelRegimenCargo(array: Array<any>) {
     let nuevo: Array<any> = [];
     let accionT = '';
     array.forEach((obj1: any) => {
@@ -1256,8 +1276,11 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
     return nuevo;
   }
 
-  // METODOS PARA EXTRAER LOS TIMBRES EN UNA LISTA Y VISUALIZARLOS
-  extraerTimbres() {
+  /** ****************************************************************************************** ** 
+   ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
+   ** ****************************************************************************************** **/
+
+  ExtraerTimbres() {
     this.timbres = [];
     let n = 0;
     let accionT = '';
@@ -1318,7 +1341,7 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
     })
   }
 
-  extraerTimbresRegimenCargo() {
+  ExtraerTimbresRegimenCargo() {
     this.timbres = [];
     let n = 0;
     let accionT = '';
@@ -1376,9 +1399,9 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
     })
   }
 
-  /** ************************************************************************************** **
-   ** **                   METODOS DE SELECCION DE DATOS DE USUARIOS                      ** **
-   ** ************************************************************************************** **/
+  /** ****************************************************************************************** **
+   **                   VARIOS METODOS COMPLEMENTARIOS AL FUNCIONAMIENTO.                        **
+   ** ****************************************************************************************** **/
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc() {
@@ -1533,18 +1556,19 @@ export class TimbreVirtualComponent implements OnInit, OnDestroy {
   }
 
   //MOSTRAR DETALLES
-  verDatos() {
+  VerDatos() {
     this.verDetalle = true;
     if (this.bool.bool_cargo || this.bool.bool_reg) {
-      this.extraerTimbresRegimenCargo();
+      this.ExtraerTimbresRegimenCargo();
     } else {
-      this.extraerTimbres();
+      this.ExtraerTimbres();
     }
   }
 
   // METODO PARA REGRESAR A LA PAGINA ANTERIOR
   Regresar() {
     this.verDetalle = false;
+    this.paginatorDetalle.firstPage();
   }
 
 }

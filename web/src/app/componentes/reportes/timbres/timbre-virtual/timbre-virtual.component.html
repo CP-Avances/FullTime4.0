@@ -13,31 +13,34 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
-                    <button mat-icon-button (click)="validacionReporte('ver')" matTooltipPosition="right"
+                    <button mat-icon-button (click)="ValidarReporte('ver')" matTooltipPosition="right"
                         matTooltip="Previsualizar reporte en el navegador">
                         <mat-icon class="ver">visibility</mat-icon>
                     </button>
-                    <button mat-icon-button (click)="validacionReporte('open')" matTooltipPosition="right"
+                    <button mat-icon-button (click)="ValidarReporte('open')" matTooltipPosition="right"
                         matTooltip="Previsualizar reporte en el navegador en fomato PDF.">
                         <mat-icon class="i-pdf">picture_as_pdf</mat-icon>
                     </button>
-                    <button mat-icon-button (click)="validacionReporte('excel')" matTooltipPosition="right"
+                    <button mat-icon-button (click)="ValidarReporte('excel')" matTooltipPosition="right"
                         matTooltip="Descargar reporte en formato EXCEL.">
                         <mat-icon class="fas fa-file-excel i-excel"></mat-icon>
                     </button>
-                    <button mat-icon-button (click)="validacionReporte('print')" matTooltipPosition="right"
+                    <button mat-icon-button (click)="ValidarReporte('print')" matTooltipPosition="right"
                         matTooltip="Imprimir reporte en formato PDF.">
                         <mat-icon class="i-print">local_printshop</mat-icon>
                     </button>
-                    <button mat-icon-button (click)="validacionReporte('download')" matTooltipPosition="right"
+                    <button mat-icon-button (click)="ValidarReporte('download')" matTooltipPosition="right"
                         matTooltip="Descargar reporte en formato PDF.">
                         <mat-icon class="i-download">cloud_download</mat-icon>
                     </button>
                     <app-option-timbre-dispositivo *ngIf="dispositivo"></app-option-timbre-dispositivo>
                 </div>
+                <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
+                    <app-opcion-usuario (tipoUsuarioChange)="ObtenerTipoUsuario($event)"></app-opcion-usuario>
+                </div>
             </mat-card>
         </div>
-        <app-criterios-busqueda [num_option]="5" id="busqueda"></app-criterios-busqueda>
+        <app-criterios-busqueda [num_option]="5" [limpiar]="limpiar" id="busqueda"></app-criterios-busqueda>
     </div>
 </div>
 <div class="container" style="padding-bottom: 50px; text-align: center;" [hidden]="verDetalle">
@@ -264,40 +267,40 @@
                     <table class="table table-hover table-sm" id="detalle">
                         <thead class="thead-light">
                             <tr style="text-align: center">
-                                <th scope="col" rowspan="2">N°</th>
-                                <th scope="col" rowspan="2">CÓDIGO</th>
-                                <th scope="col" rowspan="2">EMPLEADO</th>
-                                <th scope="col" rowspan="1" colspan="2">TIMBRE</th>
-                                <th scope="col" rowspan="1" colspan="2" *ngIf="timbreDispositivo">DISPOSITIVO</th>
-                                <th scope="col" rowspan="2">RELOJ</th>
-                                <th scope="col" rowspan="2">ACCIÓN</th>
-                                <th scope="col" rowspan="2">OBSERVACION</th>
-                                <th scope="col" rowspan="2">LONGITUD</th>
-                                <th scope="col" rowspan="2">LATITUD</th>
-                                <th scope="col" rowspan="2">MAPS</th>
+                                <th class="t_horarios" scope="col" rowspan="2">N°</th>
+                                <th class="t_horarios" scope="col" rowspan="2">CÓDIGO</th>
+                                <th class="t_horarios" scope="col" rowspan="2">EMPLEADO</th>
+                                <th class="t_horarios" scope="col" rowspan="1" colspan="2">TIMBRE</th>
+                                <th class="t_horarios" scope="col" rowspan="1" colspan="2" *ngIf="timbreDispositivo">DISPOSITIVO</th>
+                                <th class="t_horarios" scope="col" rowspan="2">RELOJ</th>
+                                <th class="t_horarios" scope="col" rowspan="2">ACCIÓN</th>
+                                <th class="t_horarios" scope="col" rowspan="2">OBSERVACION</th>
+                                <th class="t_horarios" scope="col" rowspan="2">LONGITUD</th>
+                                <th class="t_horarios" scope="col" rowspan="2">LATITUD</th>
+                                <th class="t_horarios" scope="col" rowspan="2">MAPS</th>
                             </tr>
                             <tr style="text-align: center">
-                                <th scope="col" rowspan="1">FECHA</th>
-                                <th scope="col" rowspan="1">HORA</th>
-                                <th scope="col" rowspan="1" *ngIf="timbreDispositivo">FECHA</th>
-                                <th scope="col" rowspan="1" *ngIf="timbreDispositivo">HORA</th>
+                                <th class="t_horarios" scope="col" rowspan="1">FECHA</th>
+                                <th class="t_horarios" scope="col" rowspan="1">HORA</th>
+                                <th class="t_horarios" scope="col" rowspan="1" *ngIf="timbreDispositivo">FECHA</th>
+                                <th class="t_horarios" scope="col" rowspan="1" *ngIf="timbreDispositivo">HORA</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr *ngFor="let t of timbres | paginate : tamanio_pagina : numero_pagina">
-                                <td>{{ t.n }}</td>
-                                <td>{{ t.codigo }}</td>
-                                <td>{{ t.empleado }}</td>
-                                <td>{{ t.fechaTimbreServidor }}</td>
-                                <td>{{ t.horaTimbreServidor }}</td>
-                                <td *ngIf="timbreDispositivo">{{ t.fechaTimbre }}</td>
-                                <td *ngIf="timbreDispositivo">{{ t.horaTimbre }}</td>
-                                <td>{{ t.reloj }}</td>
-                                <td>{{ t.accion }}</td>
-                                <td>{{ t.observacion }}</td>
-                                <td>{{ t.longitud }}</td>
-                                <td>{{ t.latitud }}</td>
-                                <td>
+                                <td class="t_horarios">{{ t.n }}</td>
+                                <td class="t_horarios">{{ t.codigo }}</td>
+                                <td class="t_horarios">{{ t.empleado }}</td>
+                                <td class="t_horarios">{{ t.fechaTimbreServidor }}</td>
+                                <td class="t_horarios">{{ t.horaTimbreServidor }}</td>
+                                <td class="t_horarios" *ngIf="timbreDispositivo">{{ t.fechaTimbre }}</td>
+                                <td class="t_horarios" *ngIf="timbreDispositivo">{{ t.horaTimbre }}</td>
+                                <td class="t_horarios">{{ t.reloj }}</td>
+                                <td class="t_horarios">{{ t.accion }}</td>
+                                <td class="t_horarios">{{ t.observacion }}</td>
+                                <td class="t_horarios">{{ t.longitud }}</td>
+                                <td class="t_horarios">{{ t.latitud }}</td>
+                                <td class="t_horarios">
                                     <mat-icon aria-hidden="false" id="accion" (click)="AbrirMapa(t.latitud, t.longitud)"
                                         matSuffix matTooltipPtosition="right"
                                         matTooltip="Direccionar al mapa con ubicación del timbre seleccionado."
@@ -309,17 +312,17 @@
                         </tbody>
                     </table>
                 </div>
-                <mat-paginator [length]="timbres.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
+                <mat-paginator #paginatorDetalle [length]="timbres.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
                     (page)="ManejarPaginaDetalle($event)" showFirstLastButtons aria-label="Seleccionar pagina">
                 </mat-paginator>
             </div>
             <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 0.5rem">
                 <i id="pdf" class="fas fa-file-pdf icon" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar reporte en formato PDF." (click)="generarPdf('download')">
+                    matTooltip="Descargar reporte en formato PDF." (click)="GenerarPDF('download')">
                     <p>PDF</p>
                 </i>
                 <i id="excel" class="fas fa-file-excel icon" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar reporte en formato EXCEL." (click)="exportToExcel(tipo)">
+                    matTooltip="Descargar reporte en formato EXCEL." (click)="ExportarExcel(tipo)">
                     <p>XLSL</p>
                 </i>
             </div>

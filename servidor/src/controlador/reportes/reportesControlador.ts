@@ -105,7 +105,7 @@ class ReportesControlador {
             return res.jsonp(FECHAS.rows)
         }
         else {
-            return res.status(404).jsonp({ text: 'No se encuentran registros' });
+            return res.status(404).jsonp({ text: 'No se encuentran registros.' });
         }
     }
     //// FIN PLANIFICACION DE EMPLEADO CON FECHAS

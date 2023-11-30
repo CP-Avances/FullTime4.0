@@ -11,14 +11,13 @@ import { ReporteFaltasComponent } from './asistencia/reporte-faltas/reporte-falt
 import { CriteriosBusquedaComponent } from './configuracion-reportes/criterios-busqueda/criterios-busqueda.component';
 import { ReporteTimbresMultiplesComponent } from './timbres/reporte-timbres-multiples/reporte-timbres-multiples.component';
 
-import { ReporteEmpleadosComponent } from './generales/empleados/activos/reporte-empleados/reporte-empleados.component';
+import { ReporteEmpleadosComponent } from './generales/empleados/reporte-empleados/reporte-empleados.component';
 import { ReporteKardexComponent } from './modulos/vacaciones/reporte-kardex/reporte-kardex.component';
 import { ReporteHorasPedidasComponent } from './modulos/horasExtras/reporte-horas-pedidas/reporte-horas-pedidas.component';
 import { ReporteHorasExtrasComponent } from './modulos/horasExtras/reporte-horas-extras/reporte-horas-extras.component';
 import { AlimentosGeneralComponent } from './modulos/alimentacion/alimentos-general/alimentos-general.component';
 import { DetallePlanificadosComponent } from './modulos/alimentacion/detalle-planificados/detalle-planificados.component';
 import { ReporteAtrasosMultiplesComponent } from './asistencia/reporte-atrasos-multiples/reporte-atrasos-multiples.component';
-import { ReporteEmpleadosInactivosComponent } from './generales/empleados/inactivos/reporte-empleados-inactivos/reporte-empleados-inactivos.component';
 import { ReporteHorasTrabajadasComponent } from './asistencia/reporte-horas-trabajadas/reporte-horas-trabajadas.component';
 import { ReportePuntualidadComponent } from './asistencia/reporte-puntualidad/reporte-puntualidad.component';
 import { AsistenciaConsolidadoComponent } from './asistencia/reporte-asistencia-consolidado/asistencia-consolidado.component';
@@ -38,12 +37,12 @@ import { SolicitudVacacionComponent } from './modulos/vacaciones/solicitud-vacac
 import { HorasPlanificadasComponent } from './modulos/horasExtras/horas-planificadas/horas-planificadas.component';
 import { TimbreSistemaComponent } from './timbres/timbre-sistema/timbre-sistema.component';
 import { TimbreVirtualComponent } from './timbres/timbre-virtual/timbre-virtual.component';
-import { VerEmpleadosActivosDetalleComponent } from './generales/empleados/activos/ver-empleados-activos-detalle/ver-empleados-activos-detalle.component';
-import { VerEmpleadosInactivosDetalleComponent } from './generales/empleados/inactivos/ver-empleados-inactivos-detalle/ver-empleados-inactivos-detalle.component';
+import { VerEmpleadosDetalleComponent } from './generales/empleados/ver-empleados-detalle/ver-empleados-detalle.component';
 import { VerVacunasComponent } from './generales/vacunas/ver-vacunas/ver-vacunas.component';
 import { ReporteTiempoAlimentacionComponent } from './asistencia/reporte-tiempo-alimentacion/reporte-tiempo-alimentacion.component';
 import { ReportePlanificacionHorariaComponent } from './asistencia/reporte-planificacion-horaria/reporte-planificacion-horaria.component';
 import { ReporteResumenAsistenciaComponent } from './asistencia/reporte-resumen-asistencia/reporte-resumen-asistencia.component';
+import { OpcionUsuarioComponent } from './configuracion-reportes/opcion-usuario/opcion-usuario.component';
 @NgModule({
   declarations: [
     RangoFechasComponent,
@@ -57,7 +56,6 @@ import { ReporteResumenAsistenciaComponent } from './asistencia/reporte-resumen-
     AlimentosGeneralComponent,
     DetallePlanificadosComponent,
     ReporteAtrasosMultiplesComponent,
-    ReporteEmpleadosInactivosComponent,
     ReporteHorasTrabajadasComponent,
     ReportePuntualidadComponent,
     AsistenciaConsolidadoComponent,
@@ -76,12 +74,12 @@ import { ReporteResumenAsistenciaComponent } from './asistencia/reporte-resumen-
     HorasPlanificadasComponent,
     TimbreSistemaComponent,
     TimbreVirtualComponent,
-    VerEmpleadosActivosDetalleComponent,
-    VerEmpleadosInactivosDetalleComponent,
+    VerEmpleadosDetalleComponent,
     VerVacunasComponent,
     ReporteTiempoAlimentacionComponent,
     ReportePlanificacionHorariaComponent,
     ReporteResumenAsistenciaComponent,
+    OpcionUsuarioComponent,
   ],
   exports: [
     ReporteFaltasComponent,
@@ -93,7 +91,6 @@ import { ReporteResumenAsistenciaComponent } from './asistencia/reporte-resumen-
     AlimentosGeneralComponent,
     DetallePlanificadosComponent,
     ReporteAtrasosMultiplesComponent,
-    ReporteEmpleadosInactivosComponent,
     ReporteHorasTrabajadasComponent,
     ReportePuntualidadComponent,
     AsistenciaConsolidadoComponent,

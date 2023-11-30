@@ -503,8 +503,7 @@ export class MainNavComponent implements OnInit {
             icono: 'group',
             color: true,
             children: [
-              { name: 'Usuarios Activos', url: '/reporteEmpleados', color: true },
-              { name: 'Usuarios Inactivos', url: '/reporte-emp-inactivos', color: true },
+              { name: 'Usuarios', url: '/reporteEmpleados', color: true },
               { name: 'Registro Vacunación', url: '/lista-vacunados', color: true },
             ]
           },
@@ -518,7 +517,7 @@ export class MainNavComponent implements OnInit {
             children: [
               { name: 'Faltas', url: '/reporte-faltas', color: true },
               { name: 'Atrasos', url: '/reporte-atrasos-multiples', color: true },
-              { name: 'Puntualidad', url: '/reporte-puntualidad', color: true },
+              // { name: 'Puntualidad', url: '/reporte-puntualidad', color: true },
               { name: 'Tiempo Laborado', url: '/reporte-horas-trabajadas', color: true },
               { name: 'Salidas Anticipadas', url: '/salidas-anticipadas', color: true },
               { name: 'Resumen Asistencia', url: '/reporte-resumen-asistencia', color: true },

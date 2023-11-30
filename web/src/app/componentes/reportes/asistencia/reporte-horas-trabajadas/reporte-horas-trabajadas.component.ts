@@ -1,8 +1,9 @@
+// IMPORTAR LIBRERIAS
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
@@ -56,9 +57,10 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
   tipo: string;
   verDetalle: boolean = false;
 
-  // VARIABLES PARA ADMINISTRAR TOLERANCIA
-  tolerancia: string = 'no_considerar';
-  tipoTolerancia: string = '';
+  // VARIABLES UTILIZADAS PARA IDENTIFICAR EL TIPO DE USUARIO
+  tipoUsuario: string = 'activo';
+  opcionBusqueda: number = 1;
+  limpiar: number = 0;
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS SELECCIONADOS EN LA BUSQUEDA
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
@@ -125,9 +127,10 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.BuscarInformacion();
+    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.BuscarInformacion(this.opcionBusqueda);
+    this.BuscarCargos(this.opcionBusqueda);
     this.BuscarParametro();
-    this.BuscarCargos();
     this.BuscarHora();
   }
 
@@ -141,9 +144,10 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     this.cargos = [];
   }
 
-  /********************************************************************************************
-  ****                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                            **** 
-  ********************************************************************************************/
+  /** ****************************************************************************************** **
+   ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** ****************************************************************************************** **/
+
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
@@ -156,6 +160,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
       });
   }
 
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE HORA
   BuscarHora() {
     // id_tipo_parametro Formato hora = 26
     this.parametro.ListarDetalleParametros(26).subscribe(
@@ -164,37 +169,41 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
       });
   }
 
+  /** ****************************************************************************************** **
+   ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** ** 
+   ** ****************************************************************************************** **/
+
   // METODO DE BUSQUEDA DE DATOS
-  BuscarInformacion() {
+  BuscarInformacion(opcion: number) {
     this.departamentos = [];
     this.sucursales = [];
     this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.origen = [];
-    this.informacion.ObtenerInformacion(1).subscribe(
+    this.informacion.ObtenerInformacion(opcion).subscribe(
       (res: any[]) => {
         this.origen = JSON.stringify(res);
-        res.forEach((obj) => {
+        res.forEach((obj: any) => {
           this.sucursales.push({
             id: obj.id_suc,
             nombre: obj.name_suc,
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((departamento: any) => {
             this.departamentos.push({
-              id: ele.id_depa,
-              departamento: ele.name_dep,
-              nombre: ele.sucursal,
+              id: departamento.id_depa,
+              departamento: departamento.name_dep,
+              nombre: departamento.sucursal,
             });
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
-            ele.empleado.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((departamento: any) => {
+            departamento.empleado.forEach((r: any) => {
               let elemento = {
                 id: r.id,
                 nombre: r.name_empleado,
@@ -214,10 +223,10 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
-            ele.empleado.forEach((reg) => {
-              reg.regimen.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((departamento: any) => {
+            departamento.empleado.forEach((reg: any) => {
+              reg.regimen.forEach((r: any) => {
                 this.regimen.push({
                   id: r.id_regimen,
                   nombre: r.name_regimen,
@@ -228,7 +237,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
         });
 
         this.regimen = this.regimen.filter(
-          (obj, index, self) => index === self.findIndex((o) => o.id === obj.id)
+          (obj: any, index: any, self: any) => index === self.findIndex((o: any) => o.id === obj.id)
         );
       },
       (err) => {
@@ -240,23 +249,23 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
   // METODO PARA FILTRAR POR CARGOS
   empleados_cargos: any = [];
   origen_cargo: any = [];
-  BuscarCargos() {
+  BuscarCargos(opcion: number) {
     this.empleados_cargos = [];
     this.origen_cargo = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionCargo(1).subscribe(
+    this.informacion.ObtenerInformacionCargo(opcion).subscribe(
       (res: any[]) => {
         this.origen_cargo = JSON.stringify(res);
 
-        res.forEach((obj) => {
+        res.forEach((obj: any) => {
           this.cargos.push({
             id: obj.id_cargo,
             nombre: obj.name_cargo,
           });
         });
 
-        res.forEach((obj) => {
-          obj.empleados.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.empleados.forEach((r: any) => {
             this.empleados_cargos.push({
               id: r.id,
               nombre: r.name_empleado,
@@ -270,15 +279,28 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
             });
           });
         });
-      },
-    );
+      });
+  }
+
+  ObtenerTipoUsuario($event: string){
+    this.tipoUsuario = $event;
+    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.limpiar = this.opcionBusqueda;
+    this.selectionSuc.clear();
+    this.selectionDep.clear();
+    this.selectionCar.clear();
+    this.selectionReg.clear();
+    this.selectionEmp.clear();
+    this.BuscarInformacion(this.opcionBusqueda);
+    this.BuscarCargos(this.opcionBusqueda);
   }
 
   // VALIDACIONES DE OPCIONES DE REPORTE
-  validacionReporte(action: any) {
+  ValidarReporte(action: any) {
     if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de búsqueda.');
     if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
       && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.');
+    
     switch (this.opcion) {
       case 's':
         if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno.', 'Seleccione sucursal.')
@@ -307,12 +329,12 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     }
   }
 
-
-  ModelarSucursal(accion) {
+  // TRATAMIENTO DE DATOS POR SUCURSAL
+  ModelarSucursal(accion: any) {
     this.tipo = 'default';
     let respuesta = JSON.parse(this.origen)
 
-    let suc = respuesta.filter(o => {
+    let suc = respuesta.filter((o: any) => {
       let bool = this.selectionSuc.selected.find(obj1 => {
         return obj1.id === o.id_suc
       });
@@ -324,9 +346,9 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
       this.data_pdf = res;
       console.log('DATA PDF', this.data_pdf);
       switch (accion) {
-        case 'excel': this.exportToExcel('default'); break;
+        case 'excel': this.ExportarExcel('default'); break;
         case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
@@ -351,7 +373,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
         empleados = [];
         obj.departamentos.forEach((departamento: any) => {
           departamento.empleado.forEach((empleado: any) => {
-            empleado.regimen.forEach((r) => {
+            empleado.regimen.forEach((r: any) => {
               if (regimen.id === r.id_regimen) {
                 empleados.push(empleado);
               }
@@ -367,37 +389,38 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     this.reportesTiempoLaborado.ReporteTiempoLaboradoRegimenCargo(reg, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       switch (accion) {
-        case 'excel': this.exportToExcel('RegimenCargo'); break;
+        case 'excel': this.ExportarExcel('RegimenCargo'); break;
         case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
     })
   }
 
-  ModelarDepartamento(accion) {
+  // TRATAMIENTO DE DATOS POR DEPARTAMENTO
+  ModelarDepartamento(accion: any) {
     this.tipo = 'default';
     let respuesta = JSON.parse(this.origen)
 
     respuesta.forEach((obj: any) => {
-      obj.departamentos = obj.departamentos.filter(o => {
+      obj.departamentos = obj.departamentos.filter((o: any) => {
         let bool = this.selectionDep.selected.find(obj1 => {
           return obj1.id === o.id_depa
         })
         return bool != undefined
       })
     })
-    let dep = respuesta.filter(obj => {
+    let dep = respuesta.filter((obj: any) => {
       return obj.departamentos.length > 0
     });
     this.data_pdf = []
     this.reportesTiempoLaborado.ReporteTiempoLaborado(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       switch (accion) {
-        case 'excel': this.exportToExcel('default'); break;
+        case 'excel': this.ExportarExcel('default'); break;
         case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
@@ -408,7 +431,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
   ModelarCargo(accion: any) {
     this.tipo = 'RegimenCargo';
     let respuesta = JSON.parse(this.origen_cargo);
-    let car = respuesta.filter((o) => {
+    let car = respuesta.filter((o: any) => {
       var bool = this.selectionCar.selected.find((obj1) => {
         return obj1.id === o.id_cargo;
       });
@@ -420,22 +443,23 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
       this.data_pdf = res;
       console.log('data pdf cargo',this.data_pdf);
       switch (accion) {
-        case 'excel': this.exportToExcel('RegimenCargo'); break;
+        case 'excel': this.ExportarExcel('RegimenCargo'); break;
         case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
     })
   }
 
-  ModelarEmpleados(accion) {
+  // TRATAMIENTO DE DATOS POR EMPLEADO
+  ModelarEmpleados(accion: any) {
     this.tipo = 'default';
     let respuesta = JSON.parse(this.origen)
 
     respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach(element => {
-        element.empleado = element.empleado.filter(o => {
+      obj.departamentos.forEach((departamento: any) => {
+        departamento.empleado = departamento.empleado.filter((o: any) => {
           var bool = this.selectionEmp.selected.find(obj1 => {
             return obj1.id === o.id
           })
@@ -443,13 +467,13 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
         })
       });
     })
-    respuesta.forEach(obj => {
-      obj.departamentos = obj.departamentos.filter(e => {
+    respuesta.forEach((obj: any) => {
+      obj.departamentos = obj.departamentos.filter((e: any) => {
         return e.empleado.length > 0
       })
     });
 
-    let emp = respuesta.filter(obj => {
+    let emp = respuesta.filter((obj: any) => {
       return obj.departamentos.length > 0
     });
 
@@ -457,20 +481,18 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     this.reportesTiempoLaborado.ReporteTiempoLaborado(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
       this.data_pdf = res
       switch (accion) {
-        case 'excel': this.exportToExcel('default'); break;
+        case 'excel': this.ExportarExcel('default'); break;
         case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
     })
   }
 
-  /***************************
-   * 
-   * COLORES Y LOGO PARA EL REPORTE
-   * 
-   *****************************/
+  /** ****************************************************************************************** **
+   **                              COLORES Y LOGO PARA EL REPORTE                                ** 
+   ** ****************************************************************************************** **/
 
   logo: any = String;
   ObtenerLogo() {
@@ -491,17 +513,15 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     });
   }
 
-  /******************************************************
-   *                                                    *
-   *                         PDF                        *
-   *                                                    *
-   ******************************************************/
+  /** ****************************************************************************************** **
+   **                                              PDF                                           **
+   ** ****************************************************************************************** **/
 
-  generarPdf(action) {
-    let documentDefinition;
+  GenerarPDF(action: any) {
+    let documentDefinition: any;
 
     if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true || this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      documentDefinition = this.getDocumentDefinicion();
+      documentDefinition = this.GetDocumentDefinicion();
     };
 
     let doc_name = "Tiempo_laborado.pdf";
@@ -514,7 +534,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
 
   }
 
-   getDocumentDefinicion() {
+   GetDocumentDefinicion() {
     return {
       pageSize: 'A4',
       pageOrientation: 'landscape',
@@ -543,39 +563,42 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
       },
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
-        { text: (localStorage.getItem('name_empresa') as string).toUpperCase(), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
-        { text: 'TIEMPO LABORADO', bold: true, fontSize: 16, alignment: 'center', margin: [0, -10, 0, 5] },
-        { text: 'PERIODO DEL: ' + this.rangoFechas.fec_inico + " AL " + this.rangoFechas.fec_final, bold: true, fontSize: 15, alignment: 'center', margin: [0, 10, 0, 10] },
-        ...this.impresionDatosPDF(this.data_pdf).map(obj => {
+        { text: (localStorage.getItem('name_empresa') as string).toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'TIEMPO LABORADO', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+        { text: 'PERIODO DEL: ' + this.rangoFechas.fec_inico + " AL " + this.rangoFechas.fec_final, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
+        ...this.EstructurarDatosPDF(this.data_pdf).map(obj => {
           return obj
         })
       ],
       styles: {
         tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color },
-        centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 10, 0, 10] },
+        tableHeaderSecundario: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.s_color },
+        centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 7, 0, 0] },
         itemsTable: { fontSize: 8 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
         itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0],fillColor: '#E3E3E3' },
         itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
         itemsTableCentradoFT: { fontSize: 8, alignment: 'center',fillColor: '#EE4444' },
-        itemsTableCentradoMenor: { fontSize: 8, alignment: 'center',fillColor: '#55EE44' },
+        itemsTableCentradoMenor: { fontSize: 8, alignment: 'right',fillColor: '#55EE44' },
         itemsTableCentradoColores: { fontSize: 9, alignment: 'center' },
         itemsTableDerecha: { fontSize: 8, alignment: 'right' },
         itemsTableInfoTotal: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.s_color  },
         itemsTableTotal: { fontSize: 8, bold: true, alignment: 'right', fillColor: '#E3E3E3' },
         itemsTableCentradoTotal: { fontSize: 8, bold: true, alignment: 'center', fillColor: '#E3E3E3' },
-        tableMargin: { margin: [0, 0, 0, 10] },
-        tableMarginColores: { margin: [0, 5, 0, 15] },
+        tableMargin: { margin: [0, 0, 0, 0] },
+        tableMarginColores: { margin: [0, 15, 0, 0] },
         tableMarginCabecera: { margin: [0, 15, 0, 0] },
-        tableMarginCabeceraTotal: { margin: [0, 15, 0, 15] },
+        tableMarginCabeceraEmpleado: { margin: [0, 10, 0, 0] },
+        tableMarginCabeceraTotal: { margin: [0, 20, 0, 0] },
         quote: { margin: [5, -2, 0, -2], italics: true },
         small: { fontSize: 8, color: 'blue', opacity: 0.5 }
       }
     };
   }
 
-  impresionDatosPDF(data: any[]): Array<any> {
+  // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
+  EstructurarDatosPDF(data: any[]): Array<any> {
     let n: any = []
     let c = 0;
     let totalTiempoLaboradoEmpleado: number = 0;
@@ -626,7 +649,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     });
 
     if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      data.forEach((obj1) => {
+      data.forEach((obj1: any) => {
         if (this.bool.bool_cargo === true) {
           totalTiempoLaboradoCargo = 0;
           totalTiempoPlanificadoCargo = 0;
@@ -671,7 +694,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
 
         obj1.empleados.forEach((obj2: any) => {
           n.push({
-            style: 'tableMarginCabecera',
+            style: 'tableMarginCabeceraEmpleado',
             table: {
               widths: ['*', 'auto', 'auto'],
               headerRows: 2,
@@ -741,16 +764,16 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                 [
                   {},{},
                   { rowSpan: 1, text: 'HORARIO', style: 'tableHeader' },
-                  { rowSpan: 1, text: 'TIMBRE', style: 'tableHeader' },
+                  { rowSpan: 1, text: 'TIMBRE', style: 'tableHeaderSecundario' },
                   { rowSpan: 1, text: 'HORARIO', style: 'tableHeader' },
-                  { rowSpan: 1, text: 'TIMBRE', style: 'tableHeader' },
+                  { rowSpan: 1, text: 'TIMBRE', style: 'tableHeaderSecundario' },
                   { rowSpan: 1, text: 'HORARIO', style: 'tableHeader' },
-                  { rowSpan: 1, text: 'TIMBRE', style: 'tableHeader' },
+                  { rowSpan: 1, text: 'TIMBRE', style: 'tableHeaderSecundario' },
                   { rowSpan: 1, text: 'HORARIO', style: 'tableHeader' },
-                  { rowSpan: 1, text: 'TIMBRE', style: 'tableHeader' },
+                  { rowSpan: 1, text: 'TIMBRE', style: 'tableHeaderSecundario' },
                   {},{},{},{}
                 ],
-                ...obj2.timbres.map(obj3 => {
+                ...obj2.timbres.map((obj3: any) => {
                   c = c + 1;
 
                   //CAMBIO DE FORMATO EN FECHA Y HORAS (HORARIO Y TIMBRE)
@@ -784,11 +807,11 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                       : (obj3.origen === 'L' || obj3.origen === 'FD' ? obj3.origen : 'FT')) 
                     : '';
               
-                  const diferenciaEnMinutos = this.calcularDiferenciaFechas(obj3);
+                  const diferenciaEnMinutos = this.CalcularDiferenciaFechas(obj3);
                   const minutosPlanificados = diferenciaEnMinutos[0];
-                  const tiempoPlanificado = this.minutosAHorasMinutosSegundos(minutosPlanificados);
+                  const tiempoPlanificado = this.MinutosAHorasMinutosSegundos(minutosPlanificados);
                   const minutosLaborados = diferenciaEnMinutos[1];
-                  const tiempoLaborado = this.minutosAHorasMinutosSegundos(minutosLaborados);
+                  const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
                   
                   totalTiempoPlanificadoEmpleado += minutosPlanificados;
                   totalTiempoPlanificadoRegimen += minutosPlanificados; 
@@ -808,9 +831,9 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                     { style: 'itemsTableCentrado', text: salidaHorario },
                     { style: salida == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: salida },
                     { style: 'itemsTableDerecha', text: tiempoPlanificado},
-                    { style: 'itemsTableDerecha', text: minutosPlanificados},
-                    { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' :'itemsTableCentrado', text: tiempoLaborado},
-                    { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' :'itemsTableCentrado', text: minutosLaborados},
+                    { style: 'itemsTableDerecha', text: minutosPlanificados.toFixed(2)},
+                    { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' :'itemsTableDerecha', text: tiempoLaborado},
+                    { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' :'itemsTableDerecha', text: minutosLaborados.toFixed(2)},
                   ];
                 }),
                 [
@@ -860,15 +883,15 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                     style: 'itemsTableCentradoTotal'
                   },
                   {style: 'itemsTableCentradoTotal', text: 'TOTAL'},
-                  {style: 'itemsTableTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoPlanificadoEmpleado.toFixed(2))},
+                  {style: 'itemsTableTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoPlanificadoEmpleado.toFixed(2)))},
                   {style: 'itemsTableTotal', text: totalTiempoPlanificadoEmpleado.toFixed(2)},
-                  {style: 'itemsTableTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoLaboradoEmpleado.toFixed(2))},
+                  {style: 'itemsTableTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoLaboradoEmpleado.toFixed(2)))},
                   {style: 'itemsTableTotal', text: totalTiempoLaboradoEmpleado.toFixed(2)},
                 ],
               ],
             },
             layout: {
-              fillColor: function (rowIndex) {
+              fillColor: function (rowIndex: any) {
                 return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
               }
             }
@@ -879,10 +902,10 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
           totalTiempoLaboradoCargo = Number(totalTiempoLaboradoCargo.toFixed(2));
           let cargo = {
             cargo: obj1.name_cargo,
-            minutosPlanificados: totalTiempoPlanificadoCargo,
-            tiempoPlanificado: this.minutosAHorasMinutosSegundos(totalTiempoPlanificadoCargo),
-            minutosLaborados: totalTiempoLaboradoCargo,
-            tiempoLaborado: this.minutosAHorasMinutosSegundos(totalTiempoLaboradoCargo)
+            minutosPlanificados: totalTiempoPlanificadoCargo.toFixed(2),
+            tiempoPlanificado: this.MinutosAHorasMinutosSegundos(totalTiempoPlanificadoCargo),
+            minutosLaborados: totalTiempoLaboradoCargo.toFixed(2),
+            tiempoLaborado: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoCargo)
           }
           this.tiempoCargos.push(cargo);
         };
@@ -892,10 +915,10 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
           totalTiempoLaboradoRegimen = Number(totalTiempoLaboradoRegimen.toFixed(2));
           let regimen = {
             regimen: obj1.regimen.nombre,
-            minutosPlanificados: totalTiempoPlanificadoRegimen,
-            tiempoPlanificado: this.minutosAHorasMinutosSegundos(totalTiempoPlanificadoRegimen),
-            minutosLaborados: totalTiempoLaboradoRegimen,
-            tiempoLaborado: this.minutosAHorasMinutosSegundos(totalTiempoLaboradoRegimen)
+            minutosPlanificados: totalTiempoPlanificadoRegimen.toFixed(2),
+            tiempoPlanificado: this.MinutosAHorasMinutosSegundos(totalTiempoPlanificadoRegimen),
+            minutosLaborados: totalTiempoLaboradoRegimen.toFixed(2),
+            tiempoLaborado: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoRegimen)
           }
           this.tiempoRegimen.push(regimen);
         };
@@ -937,7 +960,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
             ]
           },
           layout: {
-            fillColor: function (rowIndex) {
+            fillColor: function (rowIndex: any) {
               return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
             }
           }
@@ -980,7 +1003,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
             ]
           },
           layout: {
-            fillColor: function (rowIndex) {
+            fillColor: function (rowIndex: any) {
               return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
             }
           }
@@ -989,10 +1012,11 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     } else {
       data.forEach((obj: IReporteHorasTrabaja) => {
 
-        if (this.bool.bool_suc === true || this.bool.bool_dep === true) {
+        if (this.bool.bool_suc === true) {
           totalTiempoPlanificadoSucursal = 0;
           totalTiempoLaboradoSucursal = 0;
           n.push({
+            style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
               headerRows: 1,
@@ -1030,7 +1054,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                     {
                       border: [true, true, true, true],
                       text: 'DEPARTAMENTO: ' + obj1.name_dep,
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfo'
                     },
                   ]
                 ]
@@ -1041,7 +1065,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
           obj1.empleado.forEach((obj2: any) => {
 
             n.push({
-              style: 'tableMarginCabecera',
+              style: 'tableMarginCabeceraEmpleado',
               table: {
                 widths: ['*', 'auto', 'auto',],
                 headerRows: 2,
@@ -1111,16 +1135,16 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                   [
                     {},{},
                     { rowSpan: 1, text: 'HORARIO', style: 'tableHeader' },
-                    { rowSpan: 1, text: 'TIMBRE', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'TIMBRE', style: 'tableHeaderSecundario' },
                     { rowSpan: 1, text: 'HORARIO', style: 'tableHeader' },
-                    { rowSpan: 1, text: 'TIMBRE', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'TIMBRE', style: 'tableHeaderSecundario' },
                     { rowSpan: 1, text: 'HORARIO', style: 'tableHeader' },
-                    { rowSpan: 1, text: 'TIMBRE', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'TIMBRE', style: 'tableHeaderSecundario' },
                     { rowSpan: 1, text: 'HORARIO', style: 'tableHeader' },
-                    { rowSpan: 1, text: 'TIMBRE', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'TIMBRE', style: 'tableHeaderSecundario' },
                     {},{},{},{}
                   ],
-                  ...obj2.timbres.map(obj3 => {
+                  ...obj2.timbres.map((obj3: any) => {
                     c = c + 1;
   
                     //CAMBIO DE FORMATO EN FECHA Y HORAS (HORARIO Y TIMBRE)
@@ -1154,11 +1178,11 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                           : (obj3.origen === 'L' || obj3.origen === 'FD' ? obj3.origen : 'FT')) 
                         : '';
                     
-                    const diferenciaEnMinutos = this.calcularDiferenciaFechas(obj3);
+                    const diferenciaEnMinutos = this.CalcularDiferenciaFechas(obj3);
                     const minutosPlanificados = diferenciaEnMinutos[0];
-                    const tiempoPlanificado = this.minutosAHorasMinutosSegundos(minutosPlanificados);
+                    const tiempoPlanificado = this.MinutosAHorasMinutosSegundos(minutosPlanificados);
                     const minutosLaborados = diferenciaEnMinutos[1];
-                    const tiempoLaborado = this.minutosAHorasMinutosSegundos(minutosLaborados);
+                    const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
                     
                     totalTiempoPlanificadoEmpleado += minutosPlanificados;
                     totalTiempoPlanificadoDepartamento += minutosPlanificados; 
@@ -1179,9 +1203,9 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                       { style: 'itemsTableCentrado', text: salidaHorario },
                       { style: salida == 'FT' ? 'itemsTableCentradoFT' : 'itemsTableCentrado', text: salida },
                       { style: 'itemsTableDerecha', text: tiempoPlanificado},
-                      { style: 'itemsTableDerecha', text: minutosPlanificados},
-                      { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' :'itemsTableCentrado', text: tiempoLaborado},
-                      { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' :'itemsTableCentrado', text: minutosLaborados},
+                      { style: 'itemsTableDerecha', text: minutosPlanificados.toFixed(2)},
+                      { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' :'itemsTableDerecha', text: tiempoLaborado},
+                      { style: minutosLaborados < minutosPlanificados ? 'itemsTableCentradoMenor' :'itemsTableDerecha', text: minutosLaborados.toFixed(2)},
                     ];
                   }),
                   [
@@ -1231,15 +1255,15 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                       style: 'itemsTableCentradoTotal'
                     },
                     {style: 'itemsTableCentradoTotal', text: 'TOTAL'},
-                    {style: 'itemsTableTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoPlanificadoEmpleado.toFixed(2))},
+                    {style: 'itemsTableTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoPlanificadoEmpleado.toFixed(2)))},
                     {style: 'itemsTableTotal', text: totalTiempoPlanificadoEmpleado.toFixed(2)},
-                    {style: 'itemsTableTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoLaboradoEmpleado.toFixed(2))},
+                    {style: 'itemsTableTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoLaboradoEmpleado.toFixed(2)))},
                     {style: 'itemsTableTotal', text: totalTiempoLaboradoEmpleado.toFixed(2)},
                   ],
                 ],
               },
               layout: {
-                fillColor: function (rowIndex) {
+                fillColor: function (rowIndex: any) {
                   return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
                 }
               }
@@ -1250,10 +1274,10 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
             totalTiempoLaboradoDepartamento = Number(totalTiempoLaboradoDepartamento.toFixed(2));
             let departamento = {
               departamento: obj1.name_dep,
-              minutosPlanificados: totalTiempoPlanificadoDepartamento,
-              tiempoPlanificado: this.minutosAHorasMinutosSegundos(totalTiempoPlanificadoDepartamento),
-              minutosLaborados: totalTiempoLaboradoDepartamento,
-              tiempoLaborado: this.minutosAHorasMinutosSegundos(totalTiempoLaboradoDepartamento)
+              minutosPlanificados: totalTiempoPlanificadoDepartamento.toFixed(2),
+              tiempoPlanificado: this.MinutosAHorasMinutosSegundos(totalTiempoPlanificadoDepartamento),
+              minutosLaborados: totalTiempoLaboradoDepartamento.toFixed(2),
+              tiempoLaborado: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoDepartamento)
             }
             this.tiempoDepartamentos.push(departamento);
           };
@@ -1264,10 +1288,10 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
           totalTiempoLaboradoSucursal = Number(totalTiempoLaboradoSucursal.toFixed(2));
           let sucursal = {
             sucursal: obj.name_suc,
-            minutosPlanificados: totalTiempoPlanificadoSucursal,
-            tiempoPlanificado: this.minutosAHorasMinutosSegundos(totalTiempoPlanificadoSucursal),
-            minutosLaborados: totalTiempoLaboradoSucursal,
-            tiempoLaborado: this.minutosAHorasMinutosSegundos(totalTiempoLaboradoSucursal)
+            minutosPlanificados: totalTiempoPlanificadoSucursal.toFixed(2),
+            tiempoPlanificado: this.MinutosAHorasMinutosSegundos(totalTiempoPlanificadoSucursal),
+            minutosLaborados: totalTiempoLaboradoSucursal.toFixed(2),
+            tiempoLaborado: this.MinutosAHorasMinutosSegundos(totalTiempoLaboradoSucursal)
           }
           this.tiempoSucursales.push(sucursal);
         };
@@ -1310,7 +1334,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
           ]
         },
         layout: {
-          fillColor: function (rowIndex) {
+          fillColor: function (rowIndex: any) {
             return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
           }
         }
@@ -1353,7 +1377,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
           ]
         },
         layout: {
-          fillColor: function (rowIndex) {
+          fillColor: function (rowIndex: any) {
             return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
           }
         }
@@ -1362,76 +1386,21 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
 
     return n;
   }
-  
-  SumarRegistros(array: any []) {
-    let valor = 0;
-    for (let i = 0; i < array.length; i++) {
-        valor = valor + array[i];
-    }
-    return valor
-  }
 
-  calcularDiferenciaFechas(timbre: any) {
-    console.log('timbre',timbre);
-    if (timbre.origen === 'L' || timbre.origen === 'FD'){
-      return [0,0];
-    }
+  /** ****************************************************************************************** ** 
+   ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
+   ** ****************************************************************************************** **/
 
-    if (timbre.tipo === 'ES') {
-      const { entrada, salida } = timbre;
-      let minutosPlanificados = this.calcularMinutosDiferencia(entrada.fec_hora_horario, salida.fec_hora_horario);
-      
-      if (entrada.fec_hora_timbre !== null && salida.fec_hora_timbre !== null) {
-        const minutosLaborados = this.calcularMinutosDiferencia(entrada.fec_hora_timbre, salida.fec_hora_timbre);
-        return [minutosPlanificados,Number(minutosLaborados.toFixed(2))];
-      }
-
-      return [minutosPlanificados,0];
-    } else {
-      const { entrada, inicioAlimentacion, finAlimentacion, salida } = timbre;
-      const min_alimentacion: number = timbre.inicioAlimentacion.min_alimentacion;
-      
-      const minutosPlanificados = Number((this.calcularMinutosDiferencia(entrada.fec_hora_horario, salida.fec_hora_horario)-min_alimentacion).toFixed(2));
-      const minutosLaborados = entrada.fec_hora_timbre !== null && salida.fec_hora_timbre !== null ? this.calcularMinutosDiferencia(entrada.fec_hora_timbre, salida.fec_hora_timbre) : 0;
-      const minutosAlimentacion = inicioAlimentacion.fec_hora_timbre !== null && finAlimentacion.fec_hora_timbre !== null ? this.calcularMinutosDiferencia(inicioAlimentacion.fec_hora_timbre, finAlimentacion.fec_hora_timbre) : min_alimentacion;
-      return minutosLaborados == 0 ? [minutosPlanificados,minutosLaborados] :[minutosPlanificados,Number((minutosLaborados - minutosAlimentacion).toFixed(2))];
-    }
-  }
-  
-  calcularMinutosDiferencia(inicio: any, fin: any): number {
-    const fechaInicio = new Date(inicio);
-    const fechaFin = new Date(fin);
-    return Math.abs(fechaFin.getTime() - fechaInicio.getTime()) / 1000 / 60;
-  }
-
-  segundosAMinutosConDecimales(segundos) {
-    return Number((segundos / 60).toFixed(2));
-  }
-
-  minutosAHorasMinutosSegundos(minutos) {
-    let seconds = minutos * 60;
-    let hour: string | number = Math.floor(seconds / 3600);
-    hour = (hour < 10)? '0' + hour : hour;
-    let minute: string | number = Math.floor((seconds / 60) % 60);
-    minute = (minute < 10)? '0' + minute : minute;
-    let second: string | number = Number((seconds % 60).toFixed(0));
-    second = (second < 10)? '0' + second : second;
-    return `${hour}:${minute}:${second}`;
-  }
-
- /** ************************************************************************************************** ** 
-   ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
-   ** ************************************************************************************************** **/
-   exportToExcel(tipo: string): void {
+   ExportarExcel(tipo: string): void {
     switch (tipo) {
       case 'RegimenCargo':
-        const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfRegimenCargo(this.data_pdf));
+        const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcelRegimenCargo(this.data_pdf));
         const wb_regimen_cargo: xlsx.WorkBook = xlsx.utils.book_new();
         xlsx.utils.book_append_sheet(wb_regimen_cargo, wsr_regimen_cargo, 'Tiempo_laborado');
         xlsx.writeFile(wb_regimen_cargo, 'Tiempo_laborado.xlsx');
         break;
       default:
-        const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefault(this.data_pdf));
+        const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
         const wb: xlsx.WorkBook = xlsx.utils.book_new();
         xlsx.utils.book_append_sheet(wb, wsr, 'Tiempo_laborado');
         xlsx.writeFile(wb, 'Tiempo_laborado.xlsx');
@@ -1439,7 +1408,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     }
   }
 
-  MapingDataPdfDefault(array: Array<any>) {
+  EstructurarDatosExcel(array: Array<any>) {
     let nuevo: Array<any> = [];
     array.forEach((obj1: IReporteHorasTrabaja) => {
       obj1.departamentos.forEach(obj2 => {
@@ -1471,11 +1440,11 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                 : (obj4.origen === 'L' || obj4.origen === 'FD' ? obj4.origen : 'FT')) 
               : '';
 
-            const diferenciaEnMinutos = this.calcularDiferenciaFechas(obj4);
+            const diferenciaEnMinutos = this.CalcularDiferenciaFechas(obj4);
             const minutosPlanificados = diferenciaEnMinutos[0];
-            const tiempoPlanificado = this.minutosAHorasMinutosSegundos(minutosPlanificados);
+            const tiempoPlanificado = this.MinutosAHorasMinutosSegundos(minutosPlanificados);
             const minutosLaborados = diferenciaEnMinutos[1];
-            const tiempoLaborado = this.minutosAHorasMinutosSegundos(minutosLaborados);
+            const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
             let ele = { 
               'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
               'Departamento': obj2.name_dep,
@@ -1485,8 +1454,8 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
               'Horario Inicio Alimentación': inicioAlimentacionHorario, 'Timbre Inicio Alimentación': inicioAlimentacion, 
               'Horario Fin Alimentación': finAlimentacionHorario, 'Timbre Fin Alimentación': finAlimentacion, 
               'Horario Salida': salidaHorario, 'Timbre Salida': salida,
-              'Tiempo Planificado HH:MM:SS': tiempoPlanificado, 'Tiempo Planificado Minutos': minutosPlanificados,
-              'Tiempo Laborado HH:MM:SS': tiempoLaborado, 'Tiempo Laborado Minutos': minutosLaborados,
+              'Tiempo Planificado HH:MM:SS': tiempoPlanificado, 'Tiempo Planificado Minutos': minutosPlanificados.toFixed(2),
+              'Tiempo Laborado HH:MM:SS': tiempoLaborado, 'Tiempo Laborado Minutos': minutosLaborados.toFixed(2),
             }      
             nuevo.push(ele);
           })
@@ -1496,7 +1465,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     return nuevo;
   }
 
-  MapingDataPdfRegimenCargo(array: Array<any>) {
+  EstructurarDatosExcelRegimenCargo(array: Array<any>) {
     let nuevo: Array<any> = [];
     array.forEach((obj1: any) => {
       obj1.empleados.forEach((obj2: any) => {
@@ -1527,11 +1496,11 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
               : (obj3.origen === 'L' || obj3.origen === 'FD' ? obj3.origen : 'FT')) 
             : '';
 
-          const diferenciaEnMinutos = this.calcularDiferenciaFechas(obj3);
+          const diferenciaEnMinutos = this.CalcularDiferenciaFechas(obj3);
           const minutosPlanificados = diferenciaEnMinutos[0];
-          const tiempoPlanificado = this.minutosAHorasMinutosSegundos(minutosPlanificados);
+          const tiempoPlanificado = this.MinutosAHorasMinutosSegundos(minutosPlanificados);
           const minutosLaborados = diferenciaEnMinutos[1];
-          const tiempoLaborado = this.minutosAHorasMinutosSegundos(minutosLaborados);
+          const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
 
           let ele = { 
             'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
@@ -1542,8 +1511,8 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
             'Horario Inicio Alimentación': inicioAlimentacionHorario, 'Timbre Inicio Alimentación': inicioAlimentacion, 
             'Horario Fin Alimentación': finAlimentacionHorario, 'Timbre Fin Alimentación': finAlimentacion, 
             'Horario Salida': salidaHorario, 'Timbre Salida': salida,
-            'Tiempo Planificado HH:MM:SS': tiempoPlanificado, 'Tiempo Planificado Minutos': minutosPlanificados,
-            'Tiempo Laborado HH:MM:SS': tiempoLaborado, 'Tiempo Laborado Minutos': minutosLaborados,
+            'Tiempo Planificado HH:MM:SS': tiempoPlanificado, 'Tiempo Planificado Minutos': minutosPlanificados.toFixed(2),
+            'Tiempo Laborado HH:MM:SS': tiempoLaborado, 'Tiempo Laborado Minutos': minutosLaborados.toFixed(2),
           }      
           nuevo.push(ele);
         })
@@ -1553,8 +1522,11 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
   }
 
 
-  //METODOS PARA EXTRAER LOS TIMBRES EN UNA LISTA Y VISUALIZARLOS
-  extraerTimbres() {
+  /** ****************************************************************************************** ** 
+   ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
+   ** ****************************************************************************************** **/
+
+  ExtraerTimbres() {
     this.timbres = [];
     let n = 0;
     this.data_pdf.forEach((obj1: IReporteHorasTrabaja) => {
@@ -1592,11 +1564,11 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
                 : (obj4.origen === 'L' || obj4.origen === 'FD' ? obj4.origen : 'FT')) 
               : '';
 
-            const diferenciaEnMinutos = this.calcularDiferenciaFechas(obj4);
+            const diferenciaEnMinutos = this.CalcularDiferenciaFechas(obj4);
             const minutosPlanificados = diferenciaEnMinutos[0];
-            const tiempoPlanificado = this.minutosAHorasMinutosSegundos(minutosPlanificados);
+            const tiempoPlanificado = this.MinutosAHorasMinutosSegundos(minutosPlanificados);
             const minutosLaborados = diferenciaEnMinutos[1];
-            const tiempoLaborado = this.minutosAHorasMinutosSegundos(minutosLaborados);
+            const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
             n = n + 1;
             const ele = { 
               n,
@@ -1607,8 +1579,8 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
               fecha, entradaHorario, entrada, salidaHorario, salida,
               inicioAlimentacionHorario, inicioAlimentacion, 
               finAlimentacionHorario, finAlimentacion,  
-              tiempoPlanificado, minutosPlanificados,
-              tiempoLaborado, minutosLaborados,
+              tiempoPlanificado, minutosPlanificados: minutosPlanificados.toFixed(2),
+              tiempoLaborado, minutosLaborados: minutosLaborados.toFixed(2),
             }  
             this.timbres.push(ele);
           })
@@ -1617,7 +1589,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     })
   }
   
-  extraerTimbresRegimenCargo() {
+  ExtraerTimbresRegimenCargo() {
     this.timbres = [];
     let n = 0;
     this.data_pdf.forEach((obj1: any) => {
@@ -1654,11 +1626,11 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
               : (obj3.origen === 'L' || obj3.origen === 'FD' ? obj3.origen : 'FT')) 
             : '';
 
-          const diferenciaEnMinutos = this.calcularDiferenciaFechas(obj3);
+          const diferenciaEnMinutos = this.CalcularDiferenciaFechas(obj3);
           const minutosPlanificados = diferenciaEnMinutos[0];
-          const tiempoPlanificado = this.minutosAHorasMinutosSegundos(minutosPlanificados);
+          const tiempoPlanificado = this.MinutosAHorasMinutosSegundos(minutosPlanificados);
           const minutosLaborados = diferenciaEnMinutos[1];
-          const tiempoLaborado = this.minutosAHorasMinutosSegundos(minutosLaborados);
+          const tiempoLaborado = this.MinutosAHorasMinutosSegundos(minutosLaborados);
           n = n + 1;
           const ele = { 
             n,
@@ -1669,8 +1641,8 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
             fecha, entradaHorario, entrada, salidaHorario, salida,
             inicioAlimentacionHorario, inicioAlimentacion, 
             finAlimentacionHorario, finAlimentacion,  
-            tiempoPlanificado, minutosPlanificados,
-            tiempoLaborado, minutosLaborados,
+            tiempoPlanificado, minutosPlanificados: minutosPlanificados.toFixed(2),
+            tiempoLaborado,  minutosLaborados: minutosLaborados.toFixed(2),
           }      
           this.timbres.push(ele);
         })
@@ -1678,13 +1650,60 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     })
   }
 
-  /*****************************************************************************
-   * 
-   * 
-   * Varios Metodos Complementarios al funcionamiento. 
-   * 
-   * 
-   **************************************************************************/
+  /** ****************************************************************************************** ** 
+   ** **                                   CALCULOS Y CONVERSIONES                            ** **
+   ** ****************************************************************************************** **/
+
+   CalcularDiferenciaFechas(timbre: any) {
+    if (timbre.origen === 'L' || timbre.origen === 'FD'){
+      return [0,0];
+    }
+
+    if (timbre.tipo === 'ES') {
+      const { entrada, salida } = timbre;
+      let minutosPlanificados = this.CalcularMinutosDiferencia(entrada.fec_hora_horario, salida.fec_hora_horario);
+      
+      if (entrada.fec_hora_timbre !== null && salida.fec_hora_timbre !== null) {
+        const minutosLaborados = this.CalcularMinutosDiferencia(entrada.fec_hora_timbre, salida.fec_hora_timbre);
+        return [minutosPlanificados,Number(minutosLaborados.toFixed(2))];
+      }
+
+      return [minutosPlanificados,0];
+    } else {
+      const { entrada, inicioAlimentacion, finAlimentacion, salida } = timbre;
+      const min_alimentacion: number = timbre.inicioAlimentacion.min_alimentacion;
+      
+      const minutosPlanificados = Number((this.CalcularMinutosDiferencia(entrada.fec_hora_horario, salida.fec_hora_horario)-min_alimentacion).toFixed(2));
+      const minutosLaborados = entrada.fec_hora_timbre !== null && salida.fec_hora_timbre !== null ? this.CalcularMinutosDiferencia(entrada.fec_hora_timbre, salida.fec_hora_timbre) : 0;
+      const minutosAlimentacion = inicioAlimentacion.fec_hora_timbre !== null && finAlimentacion.fec_hora_timbre !== null ? this.CalcularMinutosDiferencia(inicioAlimentacion.fec_hora_timbre, finAlimentacion.fec_hora_timbre) : min_alimentacion;
+      return minutosLaborados == 0 ? [minutosPlanificados,minutosLaborados] :[minutosPlanificados,Number((minutosLaborados - minutosAlimentacion).toFixed(2))];
+    }
+  }
+  
+  CalcularMinutosDiferencia(inicio: any, fin: any): number {
+    const fechaInicio = new Date(inicio);
+    const fechaFin = new Date(fin);
+    return Math.abs(fechaFin.getTime() - fechaInicio.getTime()) / 1000 / 60;
+  }
+
+  SegundosAMinutosConDecimales(segundos: number) {
+    return Number((segundos / 60).toFixed(2));
+  }
+
+  MinutosAHorasMinutosSegundos(minutos: number) {
+    let seconds = minutos * 60;
+    let hour: string | number = Math.floor(seconds / 3600);
+    hour = (hour < 10)? '0' + hour : hour;
+    let minute: string | number = Math.floor((seconds / 60) % 60);
+    minute = (minute < 10)? '0' + minute : minute;
+    let second: string | number = Number((seconds % 60).toFixed(0));
+    second = (second < 10)? '0' + second : second;
+    return `${hour}:${minute}:${second}`;
+  }
+
+  /** ****************************************************************************************** **
+   **                   VARIOS METODOS COMPLEMENTARIOS AL FUNCIONAMIENTO.                        **
+   ** ****************************************************************************************** **/
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc() {
@@ -1792,7 +1811,6 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-
   // METODO PARA EVENTOS DE PAGINACION
   ManejarPagina(e: PageEvent) {
     if (this.bool.bool_suc === true) {
@@ -1823,15 +1841,12 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     this.tamanio_pagina = e.pageSize;
   }
 
-  /**
-   * METODOS PARA CONTROLAR INGRESO DE LETRAS
-   */
 
-  IngresarSoloLetras(e) {
+  IngresarSoloLetras(e: any) {
     return this.validacionService.IngresarSoloLetras(e)
   }
 
-  IngresarSoloNumeros(evt) {
+  IngresarSoloNumeros(evt: any) {
     return this.validacionService.IngresarSoloNumeros(evt)
   }
 
@@ -1839,9 +1854,9 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
   verDatos() {
     this.verDetalle = true;
     if (this.bool.bool_cargo || this.bool.bool_reg) {
-      this.extraerTimbresRegimenCargo();
+      this.ExtraerTimbresRegimenCargo();
     } else {
-      this.extraerTimbres();
+      this.ExtraerTimbres();
     }
   }
 
@@ -1851,7 +1866,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     this.paginatorDetalle.firstPage();
   }
 
-  //METDODO PARA CAMBIAR EL COLOR DE LAS CELDAS EN LA TABLA DE PREVISUALIZACION
+  //METODODO PARA CAMBIAR EL COLOR DE LAS CELDAS EN LA TABLA DE PREVISUALIZACION
   obtenerClaseTiempo(planificado: any, laborado: any) {
     const tPlanificado = Number(planificado);
     const tLaborado = Number(laborado);
@@ -1860,7 +1875,7 @@ export class ReporteHorasTrabajadasComponent implements OnInit, OnDestroy {
     } 
   }
 
-  obtenerClaseTimbre(valor: any) {
+  ObtenerClaseTimbre(valor: any) {
     if (valor == 'FT') {
       return 'rojo';
     }

@@ -69,7 +69,7 @@ class DatosGeneralesControlador {
                 obj.departamentos = yield Promise.all(obj.departamentos.map((empl) => __awaiter(this, void 0, void 0, function* () {
                     if (estado === '1') {
                         empl.empleado = yield database_1.default.query(`
-                        SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
+                        SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.nombre, e.apellido, e.codigo, 
                             e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo, tc.id AS id_tipo_cargo,
                             co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
                             d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
@@ -92,7 +92,7 @@ class DatosGeneralesControlador {
                     }
                     else {
                         empl.empleado = yield database_1.default.query(`
-                        SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
+                        SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.nombre, e.apellido, e.codigo, 
                             e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo, tc.id AS id_tipo_cargo,
                             co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
                             d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
@@ -189,7 +189,7 @@ class DatosGeneralesControlador {
             let empleados = yield Promise.all(cargo.map((empl) => __awaiter(this, void 0, void 0, function* () {
                 if (estado === '1') {
                     empl.empleados = yield database_1.default.query(`
-                    SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
+                    SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.nombre, e.apellido, e.codigo, 
                         e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo,
                         co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
                         d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
@@ -211,7 +211,7 @@ class DatosGeneralesControlador {
                 }
                 else {
                     empl.empleados = yield database_1.default.query(`
-                    SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.codigo, 
+                    SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.nombre, e.apellido, e.codigo, 
                         e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo,
                         co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
                         d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 

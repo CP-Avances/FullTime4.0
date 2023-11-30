@@ -1,10 +1,11 @@
+// IMPORTAR LIBRERIAS
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { SelectionModel } from '@angular/cdk/collections';
-import { ToastrService } from 'ngx-toastr';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ITableEmpleados } from 'src/app/model/reportes.model';
-
+import { SelectionModel } from '@angular/cdk/collections';
+import { ToastrService } from 'ngx-toastr';
 import { MatDatepicker } from '@angular/material/datepicker';
+
 import { default as _rollupMoment, Moment } from 'moment';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
@@ -82,6 +83,11 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   detalles: any = [];
   detalle_acciones: any = [];
 
+  // VARIABLES UTILIZADAS PARA IDENTIFICAR EL TIPO DE USUARIO
+  tipoUsuario: string = 'activo';
+  opcionBusqueda: number = 1;
+  limpiar: number = 0;
+
   // ACCIONES DE HORARIOS
   entrada: '';
   salida: '';
@@ -149,9 +155,10 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   }
 
   ngOnInit(): void {
-    this.BuscarInformacion();
+    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.BuscarInformacion(this.opcionBusqueda);
+    this.BuscarCargos(this.opcionBusqueda);
     this.BuscarParametro();
-    this.BuscarCargos();
     this.BuscarHora();
   }
 
@@ -165,9 +172,10 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
     this.cargos = [];
   }
 
-  /********************************************************************************************
-  ****                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                            **** 
-  ********************************************************************************************/
+  /** ****************************************************************************************** **
+   ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** ****************************************************************************************** **/
+
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
@@ -180,6 +188,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
       });
   }
 
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE HORA
   BuscarHora() {
     // id_tipo_parametro Formato hora = 26
     this.parametro.ListarDetalleParametros(26).subscribe(
@@ -188,37 +197,41 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
       });
   }
 
+  /** ****************************************************************************************** **
+   ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** ** 
+   ** ****************************************************************************************** **/
+
   // METODO DE BUSQUEDA DE DATOS
-  BuscarInformacion() {
+  BuscarInformacion(opcion: number) {
     this.departamentos = [];
     this.sucursales = [];
     this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.origen = [];
-    this.informacion.ObtenerInformacion(1).subscribe(
+    this.informacion.ObtenerInformacion(opcion).subscribe(
       (res: any[]) => {
         this.origen = JSON.stringify(res);
-        res.forEach((obj) => {
+        res.forEach((obj: any) => {
           this.sucursales.push({
             id: obj.id_suc,
             nombre: obj.name_suc,
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((departamento: any) => {
             this.departamentos.push({
-              id: ele.id_depa,
-              departamento: ele.name_dep,
-              nombre: ele.sucursal,
+              id: departamento.id_depa,
+              departamento: departamento.name_dep,
+              nombre: departamento.sucursal,
             });
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
-            ele.empleado.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((departamento: any) => {
+            departamento.empleado.forEach((r: any) => {
               let elemento = {
                 id: r.id,
                 nombre: r.name_empleado,
@@ -238,10 +251,10 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
-            ele.empleado.forEach((reg) => {
-              reg.regimen.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((departamento: any) => {
+            departamento.empleado.forEach((reg: any) => {
+              reg.regimen.forEach((r: any) => {
                 this.regimen.push({
                   id: r.id_regimen,
                   nombre: r.name_regimen,
@@ -252,7 +265,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
         });
 
         this.regimen = this.regimen.filter(
-          (obj, index, self) => index === self.findIndex((o) => o.id === obj.id)
+          (obj: any, index: any, self: any) => index === self.findIndex((o: any) => o.id === obj.id)
         );
       },
       (err) => {
@@ -264,23 +277,23 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   // METODO PARA FILTRAR POR CARGOS
   empleados_cargos: any = [];
   origen_cargo: any = [];
-  BuscarCargos() {
+  BuscarCargos(opcion: number) {
     this.empleados_cargos = [];
     this.origen_cargo = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionCargo(1).subscribe(
+    this.informacion.ObtenerInformacionCargo(opcion).subscribe(
       (res: any[]) => {
         this.origen_cargo = JSON.stringify(res);
 
-        res.forEach((obj) => {
+        res.forEach((obj: any) => {
           this.cargos.push({
             id: obj.id_cargo,
             nombre: obj.name_cargo,
           });
         });
 
-        res.forEach((obj) => {
-          obj.empleados.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.empleados.forEach((r: any) => {
             this.empleados_cargos.push({
               id: r.id,
               nombre: r.name_empleado,
@@ -294,12 +307,24 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
             });
           });
         });
-      },
-    );
+      });
+  }
+
+  ObtenerTipoUsuario($event: string){
+    this.tipoUsuario = $event;
+    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.limpiar = this.opcionBusqueda;
+    this.selectionSuc.clear();
+    this.selectionDep.clear();
+    this.selectionCar.clear();
+    this.selectionReg.clear();
+    this.selectionEmp.clear();
+    this.BuscarInformacion(this.opcionBusqueda);
+    this.BuscarCargos(this.opcionBusqueda);
   }
 
   // VALIDACIONES DE OPCIONES DE REPORTE
-  validacionReporte(action: any) {
+  ValidarReporte(action: any) {
     if (this.fechaInicialF.value == null && this.fechaFinalF.value == null) return this.toastr.error('Primero valide fechas de búsqueda.');
     if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
       && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.');
@@ -331,8 +356,8 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
     }
   }
 
-
-  ModelarSucursal(accion) {
+  // TRATAMIENTO DE DATOS POR SUCURSAL
+  ModelarSucursal(accion: any) {
     this.tipo = 'default';
     this.accion = accion;
     let respuesta = JSON.parse(this.origen);
@@ -360,7 +385,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
     let empleados: any = [];
     let objeto: any;
     respuesta.forEach((obj: any) => {
-      this.selectionReg.selected.find((regimen) => {
+      this.selectionReg.selected.find((regimen: any) => {
         objeto = {
           regimen: {
             id: regimen.id,
@@ -369,7 +394,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
         };
         obj.departamentos.forEach((departamento: any) => {
           departamento.empleado.forEach((empleado: any) => {
-            empleado.regimen.forEach((r) => {
+            empleado.regimen.forEach((r: any) => {
               if (regimen.id === r.id_regimen) {
                 empleados.push(empleado);
               }
@@ -382,7 +407,8 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
     this.VerPlanificacion(empleados);
   }
 
-  ModelarDepartamento(accion) {
+  // TRATAMIENTO DE DATOS POR DEPARTAMENTO
+  ModelarDepartamento(accion: any) {
     this.tipo = 'default';
     this.accion = accion;
     let respuesta = JSON.parse(this.origen);
@@ -421,7 +447,8 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
     this.VerPlanificacion(usuarios);
   }
 
-  ModelarEmpleados(accion) {
+  // TRATAMIENTO DE DATOS POR EMPLEADO
+  ModelarEmpleados(accion: any) {
     this.tipo = 'default';
     this.accion = accion;
     let respuesta = JSON.parse(this.origen);
@@ -445,7 +472,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   VerPlanificacion(data: any) {
     this.resultados = data;
     this.codigos = '';
-    this.resultados.forEach(obj => {
+    this.resultados.forEach((obj: any) => {
       if (this.codigos === '') {
         this.codigos = '\'' + obj.codigo + '\''
       }
@@ -474,20 +501,29 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
       codigo: codigo
     }
 
-    this.plan.BuscarPlanificacionHoraria(busqueda).subscribe(datos => {
+    this.plan.BuscarPlanificacionHoraria(busqueda).subscribe((datos: any) => {
       if (datos.message === 'OK') {
-        const horarios = datos.data;    
+        const horarios = datos.data;   
+        console.log('horarios',horarios); 
         const horariosPorEmpleado = {};
-
+        
+        
         //AGRUPAMIENTO DE LOS HORIOS POR CODIGO DE EMPLEADO
-        horarios.forEach((h:any) => {
+        horarios.forEach((h: any) => {
           horariosPorEmpleado[h.codigo_e] = horariosPorEmpleado[h.codigo_e] || [];
           horariosPorEmpleado[h.codigo_e].push(h);
         });
         
-        this.resultados.forEach((r:any) => {
+        this.resultados.forEach((r: any) => {
           r.horarios = horariosPorEmpleado[r.codigo];
         });
+
+
+        this.resultados = this.resultados.filter((r: any) => {
+          return r.horarios !== undefined && r.horarios !== null;
+        });
+        
+        console.log('resultado',this.resultados); 
 
         this.horariosEmpleado = this.resultados;
         this.ObtenerDetallesPlanificacion();
@@ -517,13 +553,13 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
     let aux_h = '';
     let aux_a = '';
     // BUSQUEDA DE DETALLES DE PLANIFICACIONES
-    this.plan.BuscarDetallePlanificacion(busqueda).subscribe(datos => {
+    this.plan.BuscarDetallePlanificacion(busqueda).subscribe((datos: any) => {
       if (datos.message === 'OK') {
         this.ver_acciones = true;
         this.detalle_acciones = [];
         this.detalles = datos.data;
 
-        datos.data.forEach(obj => {
+        datos.data.forEach((obj: any) => {
           if (aux_h === '') {
             accion = obj.tipo_accion + ': ' + obj.hora;
             this.ValidarAcciones(obj);
@@ -569,7 +605,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
         this.detalle_acciones = this.detalle_acciones.concat(tipos);
 
         // FORMATEAR HORAS
-        this.detalle_acciones.forEach(detalle => {
+        this.detalle_acciones.forEach((detalle: any) => {
           detalle.entrada_ = this.validacionService.FormatearHora(detalle.entrada, this.formato_hora);
           if (detalle.inicio_comida != '') {
             detalle.inicio_comida = this.validacionService.FormatearHora(detalle.inicio_comida, this.formato_hora);
@@ -586,9 +622,9 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
         } else {
           this.paginar = false;
         }
-        this.ejecutarAccion();
+        this.EjecutarAccion();
       } else {
-        this.ejecutarAccion();
+        this.EjecutarAccion();
         this.toastr.info('Ups no se han encontrado registros!!!', 'No existe detalle de planificación.', {
           timeOut: 6000,
         });
@@ -612,19 +648,17 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
     }
   }
 
-  ejecutarAccion(){
+  EjecutarAccion(){
     switch (this.accion) {
-      case 'excel': this.exportToExcel(); break;
-      case 'ver': this.verDatos(); break;
-      default: this.generarPdf(this.accion); break;
+      case 'excel': this.ExportarExcel(); break;
+      case 'ver': this.VerDatos(); break;
+      default: this.GenerarPDF(this.accion); break;
     }
   }
 
-  /***************************
-   * 
-   * COLORES Y LOGO PARA EL REPORTE
-   * 
-   *****************************/
+  /** ****************************************************************************************** **
+   **                              COLORES Y LOGO PARA EL REPORTE                                ** 
+   ** ****************************************************************************************** **/
 
   logo: any = String;
   ObtenerLogo() {
@@ -645,17 +679,15 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
     });
   }
 
-  /******************************************************
-   *                                                    *
-   *                         PDF                        *
-   *                                                    *
-   ******************************************************/
+  /** ****************************************************************************************** **
+   **                                              PDF                                           **
+   ** ****************************************************************************************** **/
 
-  generarPdf(action) {
-    let documentDefinition;
+  GenerarPDF(action: any) {
+    let documentDefinition: any;
 
     if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true || this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      documentDefinition = this.getDocumentDefinicion();
+      documentDefinition = this.GetDocumentDefinicion();
     };
 
     let doc_name = "Planificacion_horaria.pdf";
@@ -668,7 +700,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
 
   }
 
-   getDocumentDefinicion() {
+   GetDocumentDefinicion() {
     return {
       pageSize: 'A4',
       pageOrientation: 'landscape',
@@ -697,32 +729,30 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
       },
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
-        { text: (localStorage.getItem('name_empresa') as string).toUpperCase(), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
-        { text: 'PLANIFICACIÓN HORARIA', bold: true, fontSize: 16, alignment: 'center', margin: [0, -10, 0, 5] },
-        { text: 'PERIODO DEL: ' + this.mes_inicio + " AL " + this.mes_fin, bold: true, fontSize: 15, alignment: 'center', margin: [0, 10, 0, 10] },
-        ...this.impresionDatosPDF().map(obj => {
+        { text: (localStorage.getItem('name_empresa') as string).toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'PLANIFICACIÓN HORARIA', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+        { text: 'PERIODO DEL: ' + this.mes_inicio + " AL " + this.mes_fin, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
+        ...this.EstructurarDatosPDF().map(obj => {
           return obj
         })
       ],
       styles: {
         tableHeader: { fontSize: 7, bold: true, alignment: 'center', fillColor: this.p_color },
-        centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 10, 0, 10] },
-        itemsTable: { fontSize: 8 },
-        itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
+        tableHeaderSecundario: { fontSize: 7, bold: true, alignment: 'center', fillColor: this.s_color, margin: [0, 1, 0, 1] },
         itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 6, alignment: 'center', margin: [1, 3, 1, 3] },
         tableMargin: { margin: [0, 0, 0, 10] },
-        tableMarginHorarios: { margin: [10, 0, 10, 0]},
-        tableMarginCabecera: { margin: [0, 15, 0, 0] },
-        tableMarginCabeceraTotal: { margin: [0, 15, 0, 15] },
+        tableMarginHorarios: { margin: [10, 10, 10, 0]},
+        tableMarginCabecera: { margin: [0, 10, 0, 0] },
+        tableMarginCabeceraTotal: { margin: [0, 20, 0, 0] },
         quote: { margin: [5, -2, 0, -2], italics: true },
         small: { fontSize: 8, color: 'blue', opacity: 0.5 }
       }
     };
   }
 
-
-  impresionDatosPDF(): Array<any> {
+  // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
+  EstructurarDatosPDF(): Array<any> {
     let n: any = []
     if (this.ver_acciones) {
       n.push({
@@ -759,7 +789,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
                               { text: 'FIN ALIMENTACIÓN (F/A)', style: 'tableHeader' },
                               { text: 'SALIDA (S)', style: 'tableHeader' }
                             ],
-                            ...this.detalle_acciones.map(d => {
+                            ...this.detalle_acciones.map((d: any) => {
                               return [
                                 { style: 'itemsTableCentrado', text: d.horario },
                                 { style: 'itemsTableCentrado', text: d.entrada_ },
@@ -771,7 +801,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
                           ]
                         },
                         layout: {
-                          fillColor: function (rowIndex) {
+                          fillColor: function (rowIndex: any) {
                             return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
                           }
                         }
@@ -800,7 +830,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
                           ]
                         },
                         layout: {
-                          fillColor: function (rowIndex) {
+                          fillColor: function (rowIndex: any) {
                             return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
                           }
                         }
@@ -822,7 +852,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
       );
     };
 
-    this.horariosEmpleado.forEach((e:any) => {
+    this.horariosEmpleado.forEach((e: any) => {
       n.push({
         style: 'tableMarginCabecera',
         table: {
@@ -867,7 +897,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
         }
       });
 
-      e.horarios.forEach((h)=>{
+      e.horarios.forEach((h: any)=>{
         n.push({
           style: 'tableMargin',
           table: {
@@ -877,7 +907,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
             headerRows: 0,
             body: [
               [
-                { rowSpan: 1, colSpan: 7, text: 'AÑO: ' + h.anio + ' MES: ' + h.mes, style: 'tableHeader' },
+                { rowSpan: 1, colSpan: 7, text: 'AÑO: ' + h.anio + ' MES: ' + h.mes, style: 'tableHeaderSecundario' },
                 {},{},{},{},{},{}
               ],
               [
@@ -973,70 +1003,14 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
     return n;
   }
 
-  // METODO P
-  
-  SumarRegistros(array: any []) {
-    let valor = 0;
-    for (let i = 0; i < array.length; i++) {
-        valor = valor + array[i];
-    }
-    return valor
-  }
-
-  calcularDiferenciaFechas(timbre: any) {
-    if (timbre.dia === 'L' || timbre.dia === 'FD') {
-      return [0,0];
-    }
-
-    if (timbre.tipo === 'ES') {
-      const { entrada, salida } = timbre;
-      let minutosPlanificados = this.calcularMinutosDiferencia(entrada.fec_hora_horario, salida.fec_hora_horario);
-      
-      if (entrada.fec_hora_timbre !== null && salida.fec_hora_timbre !== null) {
-        const minutosLaborados = this.calcularMinutosDiferencia(entrada.fec_hora_timbre, salida.fec_hora_timbre);
-        return [minutosPlanificados,Number(minutosLaborados.toFixed(2))];
-      }
-
-      return [minutosPlanificados,0];
-    } else {
-      const { entrada, inicioAlimentacion, finAlimentacion, salida } = timbre;
-      const min_alimentacion: number = timbre.inicioAlimentacion.min_alimentacion;
-      
-      const minutosPlanificados = Number((this.calcularMinutosDiferencia(entrada.fec_hora_horario, salida.fec_hora_horario)-min_alimentacion).toFixed(2));
-      const minutosLaborados = entrada.fec_hora_timbre !== null && salida.fec_hora_timbre !== null ? this.calcularMinutosDiferencia(entrada.fec_hora_timbre, salida.fec_hora_timbre) : 0;
-      const minutosAlimentacion = inicioAlimentacion.fec_hora_timbre !== null && finAlimentacion.fec_hora_timbre !== null ? this.calcularMinutosDiferencia(inicioAlimentacion.fec_hora_timbre, finAlimentacion.fec_hora_timbre) : min_alimentacion;
-      return minutosLaborados == 0 ? [minutosPlanificados,minutosLaborados] :[minutosPlanificados,Number((minutosLaborados - minutosAlimentacion).toFixed(2))];
-    }
-  }
-  
-  calcularMinutosDiferencia(inicio: any, fin: any): number {
-    const fechaInicio = new Date(inicio);
-    const fechaFin = new Date(fin);
-    return Math.abs(fechaFin.getTime() - fechaInicio.getTime()) / 1000 / 60;
-  }
-
-  segundosAMinutosConDecimales(segundos) {
-    return Number((segundos / 60).toFixed(2));
-  }
-
-  minutosAHorasMinutosSegundos(minutos) {
-    let seconds = minutos * 60;
-    let hour: string | number = Math.floor(seconds / 3600);
-    hour = (hour < 10)? '0' + hour : hour;
-    let minute: string | number = Math.floor((seconds / 60) % 60);
-    minute = (minute < 10)? '0' + minute : minute;
-    let second: string | number = Number((seconds % 60).toFixed(0));
-    second = (second < 10)? '0' + second : second;
-    return `${hour}:${minute}:${second}`;
-  }
-
- /** ************************************************************************************************** ** 
-   ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
-   ** ************************************************************************************************** **/
-   exportToExcel(): void {
-        const sheet1: xlsx.WorkSheet = xlsx.utils.aoa_to_sheet(this.construirTablaHorarioEmpleados());
-        const sheet2: xlsx.WorkSheet = xlsx.utils.aoa_to_sheet(this.construirTablaDetalleHorarios());
-        const sheet3: xlsx.WorkSheet = xlsx.utils.aoa_to_sheet(this.construirTablaDefiniciones());
+  /** ****************************************************************************************** ** 
+   ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
+   ** ****************************************************************************************** **/
+   
+   ExportarExcel(): void {
+        const sheet1: xlsx.WorkSheet = xlsx.utils.aoa_to_sheet(this.ConstruirTablaHorarioEmpleados());
+        const sheet2: xlsx.WorkSheet = xlsx.utils.aoa_to_sheet(this.ConstruirTablaDetalleHorarios());
+        const sheet3: xlsx.WorkSheet = xlsx.utils.aoa_to_sheet(this.ConstruirTablaDefiniciones());
         const workbook: xlsx.WorkBook = xlsx.utils.book_new();
         xlsx.utils.book_append_sheet(workbook, sheet1, 'Planificacion horaria');
         xlsx.utils.book_append_sheet(workbook, sheet2, 'Detalle Horarios');
@@ -1044,7 +1018,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
         xlsx.writeFile(workbook, 'Planificacion_horaria.xlsx');
   }
 
-  construirTablaHorarioEmpleados() {
+  ConstruirTablaHorarioEmpleados() {
 
     const tableData = [
       [
@@ -1081,7 +1055,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
     return tableData;
   }
 
-  construirTablaDetalleHorarios() {
+  ConstruirTablaDetalleHorarios() {
 
     const tableData = [
       [
@@ -1100,7 +1074,7 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
     return tableData;
   }
 
-  construirTablaDefiniciones() {
+  ConstruirTablaDefiniciones() {
 
     const tableData = [
       [
@@ -1116,7 +1090,11 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
     return tableData;
   }
 
-  extraerHorarioEmpleados() {
+  /** ****************************************************************************************** ** 
+   ** **                 METODO PARA EXTRAER HORARIOS PARA LA PREVISUALIZACION                ** **
+   ** ****************************************************************************************** **/
+  
+  ExtraerHorarioEmpleados() {
     this.horarios = [];
     this.horariosEmpleado.forEach((empleado:any) => {
       empleado.horarios.forEach((h:any) =>{
@@ -1140,13 +1118,9 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
   }
 
 
-  /*****************************************************************************
-   * 
-   * 
-   * Varios Metodos Complementarios al funcionamiento. 
-   * 
-   * 
-   **************************************************************************/
+  /** ****************************************************************************************** **
+   **                   VARIOS METODOS COMPLEMENTARIOS AL FUNCIONAMIENTO.                        **
+   ** ****************************************************************************************** **/
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc() {
@@ -1290,21 +1264,18 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
     this.tamanio_pagina_res = e.pageSize;
   }
 
-  /**
-   * METODOS PARA CONTROLAR INGRESO DE LETRAS
-   */
 
-  IngresarSoloLetras(e) {
+  IngresarSoloLetras(e: any) {
     return this.validacionService.IngresarSoloLetras(e)
   }
 
-  IngresarSoloNumeros(evt) {
+  IngresarSoloNumeros(evt: any) {
     return this.validacionService.IngresarSoloNumeros(evt)
   }
 
   // MOSTRAR DETALLES
-  verDatos() {
-    this.extraerHorarioEmpleados();
+  VerDatos() {
+    this.ExtraerHorarioEmpleados();
     this.verDetalle = true;
 
   }
@@ -1345,28 +1316,26 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
     datepicker.close();
   }
 
-    // METODO PARA VALIDAR EL INGRESO DE LAS FECHAS
-    ValidarFechas(fec_inicio: any, fec_fin: any, formulario: any, opcion: number) {
-      // FORMATO DE FECHA PERMITIDO PARA COMPARARLAS
-      let inicio = moment(fec_inicio).format('01/MM/YYYY');
-      let final = moment(fec_fin).daysInMonth() + moment(fec_fin).format('/MM/YYYY');
-      let feci = moment(inicio, 'DD/MM/YYYY').format('YYYY/MM/DD');
-      let fecf = moment(final, 'DD/MM/YYYY').format('YYYY/MM/DD');
-      // VERIFICAR SI LAS FECHAS ESTAN INGRESDAS DE FORMA CORRECTA
-      if (Date.parse(feci) <= Date.parse(fecf)) {
-        if (opcion === 1) {
-          formulario.setValue(moment(inicio, 'DD/MM/YYYY'));
-        }
-        else {
-          formulario.setValue(moment(final, 'DD/MM/YYYY'));
-        }
+  // METODO PARA VALIDAR EL INGRESO DE LAS FECHAS
+  ValidarFechas(fec_inicio: any, fec_fin: any, formulario: any, opcion: number) {
+    // FORMATO DE FECHA PERMITIDO PARA COMPARARLAS
+    let inicio = moment(fec_inicio).format('01/MM/YYYY');
+    let final = moment(fec_fin).daysInMonth() + moment(fec_fin).format('/MM/YYYY');
+    let feci = moment(inicio, 'DD/MM/YYYY').format('YYYY/MM/DD');
+    let fecf = moment(final, 'DD/MM/YYYY').format('YYYY/MM/DD');
+    // VERIFICAR SI LAS FECHAS ESTAN INGRESDAS DE FORMA CORRECTA
+    if (Date.parse(feci) <= Date.parse(fecf)) {
+      if (opcion === 1) {
+        formulario.setValue(moment(inicio, 'DD/MM/YYYY'));
       }
       else {
-        this.toastr.warning('La fecha no se registro. Ups la fecha no es correcta.!!!', 'VERIFICAR', {
-          timeOut: 6000,
-        });
+        formulario.setValue(moment(final, 'DD/MM/YYYY'));
       }
     }
-
-  
+    else {
+      this.toastr.warning('La fecha no se registro. Ups la fecha no es correcta.!!!', 'VERIFICAR', {
+        timeOut: 6000,
+      });
+    }
+  }
 }

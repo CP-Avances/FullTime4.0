@@ -1,12 +1,13 @@
 // IMPORTAR LIBRERIAS
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { ReporteSalidaAntes } from 'src/app/model/salida-antes.model';
 import { ITableEmpleados } from 'src/app/model/reportes.model';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { ToastrService } from 'ngx-toastr';
+
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import { ToastrService } from 'ngx-toastr';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as moment from 'moment';
 import * as xlsx from 'xlsx';
@@ -56,6 +57,11 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   //VARIABLES PARA MOSTRAR DETALLES
   tipo: string;
   verDetalle: boolean = false;
+
+  // VARIABLES UTILIZADAS PARA IDENTIFICAR EL TIPO DE USUARIO
+  tipoUsuario: string = 'activo';
+  opcionBusqueda: number = 1;
+  limpiar: number = 0;
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS SELECCIONADOS EN LA BUSQUEDA
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
@@ -122,15 +128,27 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.BuscarInformacion();
+    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.BuscarInformacion(this.opcionBusqueda);
+    this.BuscarCargos(this.opcionBusqueda);
     this.BuscarParametro();
-    this.BuscarCargos();
     this.BuscarHora();
   }
 
-  /********************************************************************************************
-  ****                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                            **** 
-  ********************************************************************************************/
+  ngOnDestroy() {
+    this.departamentos = [];
+    this.sucursales = [];
+    this.respuesta = [];
+    this.empleados = [];
+    this.regimen = [];
+    this.timbres = [];
+    this.cargos = [];
+  }
+
+  /** ****************************************************************************************** **
+   ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** ****************************************************************************************** **/
+
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
@@ -143,6 +161,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
       });
   }
 
+  // METODO PARA BUSCAR PARAMETRO DE FORMATO DE HORA
   BuscarHora() {
     // id_tipo_parametro Formato hora = 26
     this.parametro.ListarDetalleParametros(26).subscribe(
@@ -151,37 +170,41 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
       });
   }
 
+  /** ****************************************************************************************** **
+   ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** ** 
+   ** ****************************************************************************************** **/
+
   // METODO DE BUSQUEDA DE DATOS
-  BuscarInformacion() {
+  BuscarInformacion(opcion: number) {
     this.departamentos = [];
     this.sucursales = [];
     this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.origen = [];
-    this.informacion.ObtenerInformacion(1).subscribe(
+    this.informacion.ObtenerInformacion(opcion).subscribe(
       (res: any[]) => {
         this.origen = JSON.stringify(res);
-        res.forEach((obj) => {
+        res.forEach((obj: any) => {
           this.sucursales.push({
             id: obj.id_suc,
             nombre: obj.name_suc,
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((departamento: any) => {
             this.departamentos.push({
-              id: ele.id_depa,
-              departamento: ele.name_dep,
-              nombre: ele.sucursal,
+              id: departamento.id_depa,
+              departamento: departamento.name_dep,
+              nombre: departamento.sucursal,
             });
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
-            ele.empleado.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((departamento: any) => {
+            departamento.empleado.forEach((r: any) => {
               let elemento = {
                 id: r.id,
                 nombre: r.name_empleado,
@@ -201,10 +224,10 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
           });
         });
 
-        res.forEach((obj) => {
-          obj.departamentos.forEach((ele) => {
-            ele.empleado.forEach((reg) => {
-              reg.regimen.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.departamentos.forEach((departamento: any) => {
+            departamento.empleado.forEach((reg: any) => {
+              reg.regimen.forEach((r: any) => {
                 this.regimen.push({
                   id: r.id_regimen,
                   nombre: r.name_regimen,
@@ -215,7 +238,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
         });
 
         this.regimen = this.regimen.filter(
-          (obj, index, self) => index === self.findIndex((o) => o.id === obj.id)
+          (obj: any, index: any, self: any) => index === self.findIndex((o: any) => o.id === obj.id)
         );
       },
       (err) => {
@@ -227,23 +250,23 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   // METODO PARA FILTRAR POR CARGOS
   empleados_cargos: any = [];
   origen_cargo: any = [];
-  BuscarCargos() {
+  BuscarCargos(opcion: number) {
     this.empleados_cargos = [];
     this.origen_cargo = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionCargo(1).subscribe(
+    this.informacion.ObtenerInformacionCargo(opcion).subscribe(
       (res: any[]) => {
         this.origen_cargo = JSON.stringify(res);
 
-        res.forEach((obj) => {
+        res.forEach((obj: any) => {
           this.cargos.push({
             id: obj.id_cargo,
             nombre: obj.name_cargo,
           });
         });
 
-        res.forEach((obj) => {
-          obj.empleados.forEach((r) => {
+        res.forEach((obj: any) => {
+          obj.empleados.forEach((r: any) => {
             this.empleados_cargos.push({
               id: r.id,
               nombre: r.name_empleado,
@@ -257,23 +280,25 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
             });
           });
         });
-      },
-    );
+      });
   }
 
-
-  ngOnDestroy() {
-    this.departamentos = [];
-    this.sucursales = [];
-    this.respuesta = [];
-    this.empleados = [];
-    this.regimen = [];
-    this.timbres = [];
-    this.cargos = [];
+  ObtenerTipoUsuario($event: string){
+    this.tipoUsuario = $event;
+    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.limpiar = this.opcionBusqueda;
+    this.selectionSuc.clear();
+    this.selectionDep.clear();
+    this.selectionCar.clear();
+    this.selectionReg.clear();
+    this.selectionEmp.clear();
+    this.BuscarInformacion(this.opcionBusqueda);
+    this.BuscarCargos(this.opcionBusqueda);
   }
+
 
   // VALIDACIONES DE OPCIONES DE REPORTE
-  validacionReporte(action: any) {
+  ValidarReporte(action: any) {
     if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de búsqueda.');
     if (this.bool.bool_suc === false && this.bool.bool_reg === false && this.bool.bool_cargo === false && this.bool.bool_dep === false && this.bool.bool_emp === false
       && this.bool.bool_tab === false && this.bool.bool_inc === false) return this.toastr.error('Seleccione un criterio de búsqueda.');
@@ -305,25 +330,25 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     }
   }
 
-  ModelarSucursal(accion) {
+  // TRATAMIENTO DE DATOS POR SUCURSAL
+  ModelarSucursal(accion: any) {
     this.tipo = 'default';
     let respuesta = JSON.parse(this.origen)
 
-    let suc = respuesta.filter(o => {
+    let suc = respuesta.filter((o: any) => {
       let bool = this.selectionSuc.selected.find(obj1 => {
         return obj1.id === o.id_suc
       });
       return bool != undefined
     });
 
-    this.data_pdf = []
+    this.data_pdf = [];
     this.restSalida.BuscarTimbresSalidasAnticipadas(suc, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
-      console.log('DATA PDF', this.data_pdf);
+      this.data_pdf = res;
       switch (accion) {
-        case 'excel': this.exportToExcel('default'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        case 'excel': this.ExportarExcel('default'); break;
+        case 'ver': this.VerDatos(); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
@@ -338,7 +363,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     let reg: any = [];
     let objeto: any;
     respuesta.forEach((obj: any) => {
-      this.selectionReg.selected.find((regimen) => {
+      this.selectionReg.selected.find((regimen: any) => {
         objeto = {
           regimen: {
             id: regimen.id,
@@ -348,7 +373,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
         empleados = [];
         obj.departamentos.forEach((departamento: any) => {
           departamento.empleado.forEach((empleado: any) => {
-            empleado.regimen.forEach((r) => {
+            empleado.regimen.forEach((r: any) => {
               if (regimen.id === r.id_regimen) {
                 empleados.push(empleado);
               }
@@ -362,39 +387,40 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
 
     this.data_pdf = [];
     this.restSalida.BuscarTimbresSalidasAnticipadasRegimenCargo(reg, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
+      this.data_pdf = res;
       switch (accion) {
-        case 'excel': this.exportToExcel('RegimenCargo'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        case 'excel': this.ExportarExcel('RegimenCargo'); break;
+        case 'ver': this.VerDatos(); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
     })
   }
 
-  ModelarDepartamento(accion) {
+  // TRATAMIENTO DE DATOS POR DEPARTAMENTO
+  ModelarDepartamento(accion: any) {
     this.tipo = 'default';
     let respuesta = JSON.parse(this.origen)
 
     respuesta.forEach((obj: any) => {
-      obj.departamentos = obj.departamentos.filter(o => {
+      obj.departamentos = obj.departamentos.filter((o: any) => {
         let bool = this.selectionDep.selected.find(obj1 => {
           return obj1.id === o.id_depa
         })
         return bool != undefined
       })
     })
-    let dep = respuesta.filter(obj => {
+    let dep = respuesta.filter((obj: any) => {
       return obj.departamentos.length > 0
     });
-    this.data_pdf = []
+    this.data_pdf = [];
     this.restSalida.BuscarTimbresSalidasAnticipadas(dep, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
+      this.data_pdf = res;
       switch (accion) {
-        case 'excel': this.exportToExcel('default'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        case 'excel': this.ExportarExcel('default'); break;
+        case 'ver': this.VerDatos(); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
@@ -414,24 +440,25 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
 
     this.data_pdf = [];
     this.restSalida.BuscarTimbresSalidasAnticipadasRegimenCargo(car, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
+      this.data_pdf = res;
       switch (accion) {
-        case 'excel': this.exportToExcel('RegimenCargo'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        case 'excel': this.ExportarExcel('RegimenCargo'); break;
+        case 'ver': this.VerDatos(); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
     })
   }
 
-  ModelarEmpleados(accion) {
+  // TRATAMIENTO DE DATOS POR EMPLEADO
+  ModelarEmpleados(accion: any) {
     this.tipo = 'default';
     let respuesta = JSON.parse(this.origen)
 
     respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach(element => {
-        element.empleado = element.empleado.filter(o => {
+      obj.departamentos.forEach((departamento: any) => {
+        departamento.empleado = departamento.empleado.filter((o: any) => {
           var bool = this.selectionEmp.selected.find(obj1 => {
             return obj1.id === o.id
           })
@@ -439,34 +466,32 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
         })
       });
     })
-    respuesta.forEach(obj => {
-      obj.departamentos = obj.departamentos.filter(e => {
+    respuesta.forEach((obj: any) => {
+      obj.departamentos = obj.departamentos.filter((e: any) => {
         return e.empleado.length > 0
       })
     });
 
-    let emp = respuesta.filter(obj => {
+    let emp = respuesta.filter((obj: any) => {
       return obj.departamentos.length > 0
     });
 
-    this.data_pdf = []
+    this.data_pdf = [];
     this.restSalida.BuscarTimbresSalidasAnticipadas(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final).subscribe(res => {
-      this.data_pdf = res
+      this.data_pdf = res;
       switch (accion) {
-        case 'excel': this.exportToExcel('default'); break;
-        case 'ver': this.verDatos(); break;
-        default: this.generarPdf(accion); break;
+        case 'excel': this.ExportarExcel('default'); break;
+        case 'ver': this.VerDatos(); break;
+        default: this.GenerarPDF(accion); break;
       }
     }, err => {
       this.toastr.error(err.error.message)
     })
   }
 
-  /***********************************
-   * 
-   * COLORES Y LOGO PARA EL REPORTE
-   * 
-   ***********************************/
+  /** ****************************************************************************************** **
+   **                              COLORES Y LOGO PARA EL REPORTE                                ** 
+   ** ****************************************************************************************** **/
 
   logo: any = String;
   ObtenerLogo() {
@@ -487,17 +512,15 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     });
   }
 
-  /******************************************************
-   *                                                    *
-   *                          PDF                       *
-   *                                                    *
-   ******************************************************/
+  /** ****************************************************************************************** **
+   **                                              PDF                                           **
+   ** ****************************************************************************************** **/
 
-  generarPdf(action) {
-    let documentDefinition;
+  GenerarPDF(action: any) {
+    let documentDefinition: any;
 
     if (this.bool.bool_emp === true || this.bool.bool_suc === true || this.bool.bool_dep === true || this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      documentDefinition = this.getDocumentDefinicion();
+      documentDefinition = this.GetDocumentDefinicion();
     };
 
     let doc_name = "Salidas_anticipadas.pdf";
@@ -510,7 +533,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
 
   }
 
-   getDocumentDefinicion() {
+   GetDocumentDefinicion() {
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -539,16 +562,17 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
       },
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
-        { text: (localStorage.getItem('name_empresa') as string).toUpperCase(), bold: true, fontSize: 21, alignment: 'center', margin: [0, -30, 0, 10] },
-        { text: 'SALIDAS ANTICIPADAS', bold: true, fontSize: 16, alignment: 'center', margin: [0, -10, 0, 5] },
-        { text: 'PERIODO DEL: ' + this.rangoFechas.fec_inico + " AL " + this.rangoFechas.fec_final, bold: true, fontSize: 15, alignment: 'center', margin: [0, 10, 0, 10] },
-        ...this.impresionDatosPDF(this.data_pdf).map(obj => {
+        { text: (localStorage.getItem('name_empresa') as string).toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
+        { text: 'SALIDAS ANTICIPADAS', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+        { text: 'PERIODO DEL: ' + this.rangoFechas.fec_inico + " AL " + this.rangoFechas.fec_final, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
+        ...this.EstructurarDatosPDF(this.data_pdf).map(obj => {
           return obj
         })
       ],
       styles: {
         tableHeader: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color },
-        centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 10, 0, 10] },
+        tableHeaderSecundario: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.s_color },
+        centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 5, 0, 0] },
         itemsTable: { fontSize: 8 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
         itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0],fillColor: '#E3E3E3' },
@@ -558,19 +582,20 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
         itemsTableInfoTotal: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.s_color  },
         itemsTableTotal: { fontSize: 8, bold: true, alignment: 'right', fillColor: '#E3E3E3' },
         itemsTableCentradoTotal: { fontSize: 8, bold: true, alignment: 'center', fillColor: '#E3E3E3' },
-        tableMargin: { margin: [0, 0, 0, 10] },
+        tableMargin: { margin: [0, 0, 0, 0] },
         tableMarginCabecera: { margin: [0, 15, 0, 0] },
-        tableMarginCabeceraTotal: { margin: [0, 15, 0, 15] },
+        tableMarginCabeceraEmpleado: { margin: [0, 10, 0, 0] },
+        tableMarginCabeceraTotal: { margin: [0, 20, 0, 0] },
         quote: { margin: [5, -2, 0, -2], italics: true },
         small: { fontSize: 8, color: 'blue', opacity: 0.5 }
       }
     };
   }
 
-  impresionDatosPDF(data: any[]): Array<any> {
+  // METODO PARA ESTRUCTURAR LA INFORMACION CONSULTADA EN EL PDF
+  EstructurarDatosPDF(data: any[]): Array<any> {
     let n: any = []
     let c = 0;
-    let accionT: string = '';
     let totalTiempoEmpleado: number = 0;
     let totalTiempoSucursal: number = 0;
     let totalTiempoCargo = 0;
@@ -582,7 +607,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     this.tiempoCargos = [];
 
     if (this.bool.bool_cargo === true || this.bool.bool_reg === true) {
-      data.forEach((obj1) => {
+      data.forEach((obj1: any) => {
         if (this.bool.bool_cargo === true) {
           totalTiempoCargo = 0;
           n.push({
@@ -625,7 +650,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
 
         obj1.empleados.forEach((obj2: any) => {
           n.push({
-            style: 'tableMarginCabecera',
+            style: 'tableMarginCabeceraEmpleado',
             table: {
               widths: ['*', 'auto', 'auto'],
               headerRows: 2,
@@ -679,7 +704,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                   { rowSpan: 2, text: 'N°', style: 'centrado' },
                   { rowSpan: 1, colSpan: 2, text: 'HORARIO', style: 'tableHeader' },
                   {},
-                  { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                  { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeaderSecundario' },
                   {},
                   { rowSpan: 2, text: 'TIPO PERMISO', style: 'centrado' },
                   { rowSpan: 2, text: 'DESDE', style: 'centrado' },
@@ -693,8 +718,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                   {},
                   { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
                   { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
-                  { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
-                  { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                  { rowSpan: 1, text: 'FECHA', style: 'tableHeaderSecundario' },
+                  { rowSpan: 1, text: 'HORA', style: 'tableHeaderSecundario' },
                   {},{},{},
                   {},
                   {},
@@ -702,7 +727,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                   {},
 
                 ],
-                ...obj2.timbres.map(obj3 => {
+                ...obj2.timbres.map((obj3: any) => {
 
                   const fechaHorario = this.validacionService.FormatearFecha(
                     obj3.fec_hora_horario.split(' ')[0],
@@ -722,8 +747,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     obj3.fec_hora_timbre.split(' ')[1], 
                     this.formato_hora);
 
-                  const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
-                  const tiempo = this.minutosAHorasMinutosSegundos(minutos);
+                  const minutos = this.SegundosAMinutosConDecimales(obj3.diferencia);
+                  const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
                   totalTiempoEmpleado += Number(minutos);
                   totalTiempoRegimen += Number(minutos); 
                   totalTiempoCargo += Number(minutos); 
@@ -735,8 +760,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     { style: 'itemsTableCentrado', text: fechaTimbre },
                     { style: 'itemsTableCentrado', text: horaTimbre },
                     {},{},{},{},{},
-                    {style: 'itemsTableDerecha', text: minutos},
                     {style: 'itemsTableCentrado', text: tiempo},
+                    {style: 'itemsTableDerecha', text: minutos.toFixed(2)},
                   ];
                 }),
                 [
@@ -783,34 +808,32 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     text: '',
                     style: 'itemsTableCentradoTotal'
                   },
+                  {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoEmpleado.toFixed(2)))},
                   {style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
-                  {style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))}
                 ],
               ],
             },
             layout: {
-              fillColor: function (rowIndex) {
+              fillColor: function (rowIndex: any) {
                 return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
               }
             }
           });
         });
         if (this.bool.bool_cargo) {
-          totalTiempoCargo = Number(totalTiempoCargo.toFixed(2));
           let cargo = {
             cargo: obj1.name_cargo,
-            minutos: totalTiempoCargo,
-            tiempo: this.minutosAHorasMinutosSegundos(totalTiempoCargo)
+            minutos: totalTiempoCargo.toFixed(2),
+            tiempo: this.MinutosAHorasMinutosSegundos(Number(totalTiempoCargo.toFixed(2)))
           }
           this.tiempoCargos.push(cargo);
         };
 
         if (this.bool.bool_reg) {
-          totalTiempoRegimen = Number(totalTiempoRegimen.toFixed(2));
           let regimen = {
             regimen: obj1.regimen.nombre,
-            minutos: totalTiempoRegimen,
-            tiempo: this.minutosAHorasMinutosSegundos(totalTiempoRegimen)
+            minutos: totalTiempoRegimen.toFixed(2),
+            tiempo: this.MinutosAHorasMinutosSegundos(Number(totalTiempoRegimen.toFixed(2)))
           }
           this.tiempoRegimen.push(regimen);
         };
@@ -845,14 +868,14 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                   },
                   { text: '', style: 'itemsTableDerecha' },
                   { text: '', style: 'itemsTableCentrado' },
-                  { text: cargo.minutos, style: 'itemsTableDerecha'},
                   { text: cargo.tiempo, style: 'itemsTableCentrado'},
+                  { text: cargo.minutos, style: 'itemsTableDerecha'},
                 ]
               })    
             ]
           },
           layout: {
-            fillColor: function (rowIndex) {
+            fillColor: function (rowIndex: any) {
               return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
             }
           }
@@ -888,14 +911,14 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                   },
                   { text: '', style: 'itemsTableDerecha' },
                   { text: '', style: 'itemsTableCentrado' },
-                  { text: regimen.minutos, style: 'itemsTableDerecha'},
                   { text: regimen.tiempo, style: 'itemsTableCentrado'},
+                  { text: regimen.minutos, style: 'itemsTableDerecha'},
                 ]
               })    
             ]
           },
           layout: {
-            fillColor: function (rowIndex) {
+            fillColor: function (rowIndex: any) {
               return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
             }
           }
@@ -904,9 +927,10 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     } else {
       data.forEach((obj: ReporteSalidaAntes) => {
 
-        if (this.bool.bool_suc === true || this.bool.bool_dep === true) {
+        if (this.bool.bool_suc === true) {
           totalTiempoSucursal = 0;
           n.push({
+            style: 'tableMarginCabecera',
             table: {
               widths: ['*', '*'],
               headerRows: 1,
@@ -943,7 +967,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     {
                       border: [true, true, true, true],
                       text: 'DEPARTAMENTO: ' + obj1.name_dep,
-                      style: 'itemsTableInfoBlanco'
+                      style: 'itemsTableInfo'
                     },
                   ]
                 ]
@@ -954,7 +978,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
           obj1.empleado.forEach((obj2: any) => {
 
             n.push({
-              style: 'tableMarginCabecera',
+              style: 'tableMarginCabeceraEmpleado',
               table: {
                 widths: ['*', 'auto', 'auto',],
                 headerRows: 2,
@@ -1008,7 +1032,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     { rowSpan: 2, text: 'N°', style: 'centrado' },
                     { rowSpan: 1, colSpan: 2, text: 'HORARIO', style: 'tableHeader' },
                     {},
-                    { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeader' },
+                    { rowSpan: 1, colSpan: 2, text: 'TIMBRE', style: 'tableHeaderSecundario' },
                     {},
                     { rowSpan: 2, text: 'TIPO PERMISO', style: 'centrado' },
                     { rowSpan: 2, text: 'DESDE', style: 'centrado' },
@@ -1022,8 +1046,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     {},
                     { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
                     { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
-                    { rowSpan: 1, text: 'FECHA', style: 'tableHeader' },
-                    { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
+                    { rowSpan: 1, text: 'FECHA', style: 'tableHeaderSecundario' },
+                    { rowSpan: 1, text: 'HORA', style: 'tableHeaderSecundario' },
                     {},{},{},
                     {},
                     {},
@@ -1031,7 +1055,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     {},
   
                   ],
-                  ...obj2.timbres.map(obj3 => {
+                  ...obj2.timbres.map((obj3: any) => {
 
                     const fechaHorario = this.validacionService.FormatearFecha(
                       obj3.fec_hora_horario.split(' ')[0],
@@ -1051,8 +1075,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                       obj3.fec_hora_timbre.split(' ')[1], 
                       this.formato_hora);
 
-                    const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
-                    const tiempo = this.minutosAHorasMinutosSegundos(minutos);
+                    const minutos = this.SegundosAMinutosConDecimales(obj3.diferencia);
+                    const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
                     totalTiempoEmpleado += Number(minutos);
                     totalTiempoSucursal += Number(minutos); 
                     totalTiempoDepartamento += Number(minutos); 
@@ -1064,8 +1088,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                       { style: 'itemsTableCentrado', text: fechaTimbre },
                       { style: 'itemsTableCentrado', text: horaTimbre },
                       {},{},{},{},{},
-                      {style: 'itemsTableDerecha', text: minutos},
                       {style: 'itemsTableCentrado', text: tiempo},
+                      {style: 'itemsTableDerecha', text: minutos.toFixed(2)},
                     ];
                   }),
                   [
@@ -1106,35 +1130,33 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     { style: 'itemsTableCentradoTotal', text: 'TOTAL'},
                     { text: '', style: 'itemsTableCentradoTotal'},
                     { text: '', style: 'itemsTableCentradoTotal'},
+                    { style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoEmpleado.toFixed(2)))},
                     { style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
-                    { style: 'itemsTableCentradoTotal', text: this.minutosAHorasMinutosSegundos(totalTiempoEmpleado.toFixed(2))}
                   ],
                 ],
               },
               layout: {
-                fillColor: function (rowIndex) {
+                fillColor: function (rowIndex: any) {
                   return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
                 }
               }
             });
           });
           if (this.bool.bool_dep) {
-            totalTiempoDepartamento = Number(totalTiempoDepartamento.toFixed(2));
             let departamento = {
               departamento: obj1.name_dep,
-              minutos: totalTiempoDepartamento,
-              tiempo: this.minutosAHorasMinutosSegundos(totalTiempoDepartamento)
+              tiempo: this.MinutosAHorasMinutosSegundos(Number(totalTiempoDepartamento.toFixed(2))),
+              minutos: totalTiempoDepartamento.toFixed(2),
             }
             this.tiempoDepartamentos.push(departamento);
           };
         });
 
         if (this.bool.bool_suc) {
-          totalTiempoSucursal = Number(totalTiempoSucursal.toFixed(2));
           let sucursal = {
             sucursal: obj.name_suc,
-            minutos: totalTiempoSucursal,
-            tiempo: this.minutosAHorasMinutosSegundos(totalTiempoSucursal)
+            tiempo: this.MinutosAHorasMinutosSegundos(Number(totalTiempoSucursal.toFixed(2))),
+            minutos: totalTiempoSucursal.toFixed(2),
           }
           this.tiempoSucursales.push(sucursal);
         };
@@ -1170,14 +1192,14 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                 },
                 { text: '', style: 'itemsTableDerecha' },
                 { text: '', style: 'itemsTableCentrado' },
-                { text: departamento.minutos, style: 'itemsTableDerecha'},
                 { text: departamento.tiempo, style: 'itemsTableCentrado'},
+                { text: departamento.minutos, style: 'itemsTableDerecha'},
               ]
             })    
           ]
         },
         layout: {
-          fillColor: function (rowIndex) {
+          fillColor: function (rowIndex: any) {
             return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
           }
         }
@@ -1213,14 +1235,14 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                 },
                 { text: '', style: 'itemsTableDerecha' },
                 { text: '', style: 'itemsTableCentrado' },
-                { text: sucursal.minutos, style: 'itemsTableDerecha'},
                 { text: sucursal.tiempo, style: 'itemsTableCentrado'},
+                { text: sucursal.minutos, style: 'itemsTableDerecha'},
               ]
             })    
           ]
         },
         layout: {
-          fillColor: function (rowIndex) {
+          fillColor: function (rowIndex: any) {
             return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
           }
         }
@@ -1230,70 +1252,20 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     return n;
   }
 
-  // METODO PARA SUMAR REGISTROS
-  SumarRegistros(array: any[]) {
-    let valor = 0;
-    for (let i = 0; i < array.length; i++) {
-      valor = valor + array[i];
-    }
-    return valor;
-  }
-
-  segundosAMinutosConDecimales(segundos) {
-    return (segundos / 60).toFixed(2);
-  }
-
-  minutosAHorasMinutosSegundos(minutos) {
-    let seconds = minutos * 60;
-    let hour: string | number = Math.floor(seconds / 3600);
-    hour = (hour < 10)? '0' + hour : hour;
-    let minute: string | number = Math.floor((seconds / 60) % 60);
-    minute = (minute < 10)? '0' + minute : minute;
-    let second: string | number = Number((seconds % 60).toFixed(0));
-    second = (second < 10)? '0' + second : second;
-    return `${hour}:${minute}:${second}`;
-  }
-  
-
-  HorasDecimalToHHMM(dato: number) {
-    // console.log('Hora decimal a HHMM ======>',dato);
-    let h = parseInt(dato.toString());
-    let x = (dato - h) * 60;
-    let m = parseInt(x.toString());
-
-    let hora;
-    let min;
-    if (h < 10 && m < 10) {
-      hora = '0' + h;
-      min = '0' + m;
-    } else if (h < 10 && m >= 10) {
-      hora = '0' + h;
-      min = m;
-    } else if (h >= 10 && m < 10) {
-      hora = h;
-      min = '0' + m;
-    } else if (h >= 10 && m >= 10) {
-      hora = h;
-      min = m;
-    }
-
-    return hora + ':' + min + ':00'
-  }
-
-
-  /** ************************************************************************************************** ** 
-   ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
-   ** ************************************************************************************************** **/
-   exportToExcel(tipo: string): void {
+  /** ****************************************************************************************** ** 
+   ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
+   ** ****************************************************************************************** **/
+   
+   ExportarExcel(tipo: string): void {
     switch (tipo) {
       case 'RegimenCargo':
-        const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfRegimenCargo(this.data_pdf));
+        const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcelRegimenCargo(this.data_pdf));
         const wb_regimen_cargo: xlsx.WorkBook = xlsx.utils.book_new();
         xlsx.utils.book_append_sheet(wb_regimen_cargo, wsr_regimen_cargo, 'Salidas Anticipadas');
         xlsx.writeFile(wb_regimen_cargo, 'Salidas_anticipadas.xlsx');
         break;
       default:
-        const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.MapingDataPdfDefault(this.data_pdf));
+        const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
         const wb: xlsx.WorkBook = xlsx.utils.book_new();
         xlsx.utils.book_append_sheet(wb, wsr, 'Salidas Anticipadas');
         xlsx.writeFile(wb, 'Salidas_anticipadas.xlsx');
@@ -1301,7 +1273,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     }
   }
 
-  MapingDataPdfDefault(array: Array<any>) {
+  EstructurarDatosExcel(array: Array<any>) {
     let nuevo: Array<any> = [];
     array.forEach((obj1: ReporteSalidaAntes) => {
       obj1.departamentos.forEach(obj2 => {
@@ -1316,8 +1288,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
               obj4.fec_hora_timbre.split(' ')[1], 
               this.formato_hora);
 
-            const minutos = this.segundosAMinutosConDecimales(obj4.diferencia);
-            const tiempo = this.minutosAHorasMinutosSegundos(minutos);
+            const minutos = this.SegundosAMinutosConDecimales(Number(obj4.diferencia));
+            const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
             let ele = { 
               'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
               'Departamento': obj2.name_dep,
@@ -1325,7 +1297,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
               'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
               'Fecha Horario': new Date(obj4.fec_hora_horario), 'Hora Horario': horaHorario,
               'Fecha Timbre': new Date(obj4.fec_hora_timbre), 'Hora Timbre': horaTimbre,
-              'Salida Anticipada Minutos': minutos, 'Salida Anticipada HH:MM:SS': tiempo,
+              'Salida Anticipada HH:MM:SS': tiempo, 'Salida Anticipada Minutos': minutos.toFixed(2),
             }
             nuevo.push(ele);
           })
@@ -1335,7 +1307,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     return nuevo;
   }
 
-  MapingDataPdfRegimenCargo(array: Array<any>) {
+  EstructurarDatosExcelRegimenCargo(array: Array<any>) {
     let nuevo: Array<any> = [];
     array.forEach((obj1: any) => {
       obj1.empleados.forEach((obj2: any) => {
@@ -1349,8 +1321,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
             obj3.fec_hora_timbre.split(' ')[1], 
             this.formato_hora);
 
-          const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
-          const tiempo = this.minutosAHorasMinutosSegundos(minutos);
+          const minutos = this.SegundosAMinutosConDecimales(Number(obj3.diferencia));
+          const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
           let ele = {
             'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
             'Departamento': obj2.departamento,
@@ -1358,7 +1330,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
             'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
             'Fecha Horario': new Date(obj3.fec_hora_horario), 'Hora Horario': horaHorario,
             'Fecha Timbre': new Date(obj3.fec_hora_timbre), 'Hora Timbre': horaTimbre,
-            'Salida Anticipada Minutos': minutos, 'Salida Anticipada HH:MM:SS': tiempo,
+            'Salida Anticipada HH:MM:SS': tiempo, 'Salida Anticipada Minutos': minutos.toFixed(2)
           }
           nuevo.push(ele);
         })
@@ -1367,8 +1339,11 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     return nuevo;
   }
 
-  //METODOS PARA EXTRAER LOS TIMBRES EN UNA LISTA Y VISUALIZARLOS
-  extraerTimbres() {
+  /** ****************************************************************************************** ** 
+   ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
+   ** ****************************************************************************************** **/
+
+  ExtraerTimbres() {
     this.timbres = [];
     let n = 0;
     this.data_pdf.forEach((obj1: ReporteSalidaAntes) => {
@@ -1394,8 +1369,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
               obj4.fec_hora_timbre.split(' ')[1], 
               this.formato_hora);
 
-            const minutos = this.segundosAMinutosConDecimales(obj4.diferencia);
-            const tiempo = this.minutosAHorasMinutosSegundos(minutos);
+            const minutos = this.SegundosAMinutosConDecimales(Number(obj4.diferencia));
+            const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
             n = n + 1;
             let ele = {
               n: n,
@@ -1404,7 +1379,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
               empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
               fechaHorario, horaHorario,
               fechaTimbre, horaTimbre,
-              salidaAnticipadaM: minutos, salidaAnticipadaT: tiempo,
+              salidaAnticipadaM: minutos.toFixed(2), salidaAnticipadaT: tiempo,
             }
             this.timbres.push(ele);
           })
@@ -1413,7 +1388,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     })
   }
 
-  extraerTimbresRegimenCargo() {
+  ExtraerTimbresRegimenCargo() {
     this.timbres = [];
     let n = 0;
     this.data_pdf.forEach((obj1: any) => {
@@ -1438,8 +1413,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
             obj3.fec_hora_timbre.split(' ')[1], 
             this.formato_hora);
 
-          const minutos = this.segundosAMinutosConDecimales(obj3.diferencia);
-          const tiempo = this.minutosAHorasMinutosSegundos(minutos);
+          const minutos = this.SegundosAMinutosConDecimales(Number(obj3.diferencia));
+          const tiempo = this.MinutosAHorasMinutosSegundos(minutos);
           n = n + 1;
           let ele = {
             n: n,
@@ -1448,7 +1423,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
             empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
             fechaHorario, horaHorario,
             fechaTimbre, horaTimbre,
-            salidaAnticipadaM: minutos, salidaAnticipadaT: tiempo,
+            salidaAnticipadaM: minutos.toFixed(2), salidaAnticipadaT: tiempo,
           }
           this.timbres.push(ele);
         })
@@ -1456,15 +1431,29 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     })
   }
 
+  /** ****************************************************************************************** ** 
+   ** **                                   CALCULOS Y CONVERSIONES                            ** **
+   ** ****************************************************************************************** **/
+  
+  SegundosAMinutosConDecimales(segundos: number) {
+    return Number((segundos / 60).toFixed(2));
+  }
+
+  MinutosAHorasMinutosSegundos(minutos: number) {
+    let seconds = minutos * 60;
+    let hour: string | number = Math.floor(seconds / 3600);
+    hour = (hour < 10)? '0' + hour : hour;
+    let minute: string | number = Math.floor((seconds / 60) % 60);
+    minute = (minute < 10)? '0' + minute : minute;
+    let second: string | number = Number((seconds % 60).toFixed(0));
+    second = (second < 10)? '0' + second : second;
+    return `${hour}:${minute}:${second}`;
+  }
 
 
-  /*****************************************************************************
-   * 
-   * 
-   * Varios Metodos Complementarios al funcionamiento. 
-   * 
-   * 
-   **************************************************************************/
+  /** ****************************************************************************************** **
+   **                   VARIOS METODOS COMPLEMENTARIOS AL FUNCIONAMIENTO.                        **
+   ** ****************************************************************************************** **/
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc() {
@@ -1572,7 +1561,6 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-
   // METODO PARA EVENTOS DE PAGINACION
   ManejarPagina(e: PageEvent) {
     if (this.bool.bool_suc === true) {
@@ -1603,25 +1591,21 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     this.tamanio_pagina = e.pageSize;
   }
 
-  /**
-   * METODOS PARA CONTROLAR INGRESO DE LETRAS
-   */
-
-  IngresarSoloLetras(e) {
+  IngresarSoloLetras(e: any) {
     return this.validacionService.IngresarSoloLetras(e)
   }
 
-  IngresarSoloNumeros(evt) {
+  IngresarSoloNumeros(evt: any) {
     return this.validacionService.IngresarSoloNumeros(evt)
   }
 
   // MOSTRAR DETALLES
-  verDatos() {
+  VerDatos() {
     this.verDetalle = true;
     if (this.bool.bool_cargo || this.bool.bool_reg) {
-      this.extraerTimbresRegimenCargo();
+      this.ExtraerTimbresRegimenCargo();
     } else {
-      this.extraerTimbres();
+      this.ExtraerTimbres();
     }
   }
 
