@@ -154,7 +154,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   }
 
   /** ****************************************************************************************** **
-   ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** ****************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -179,7 +179,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   }
 
   /** ****************************************************************************************** **
-   ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** ** 
+   ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** **
    ** ****************************************************************************************** **/
   // METODO DE BUSQUEDA DE DATOS
   BuscarInformacion(opcion: number) {
@@ -519,7 +519,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     let respuesta = JSON.parse(this.origen);
     respuesta.forEach((obj: any) => {
       obj.departamentos.forEach((departamento: any) => {
-        departamento.empleado = departamento.empleado.filter((o) => {
+        departamento.empleado = departamento.empleado.filter((o:any) => {
           var bool = this.selectionEmp.selected.find((obj1) => {
             return obj1.id === o.id;
           });
@@ -558,7 +558,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   }
 
   /** ****************************************************************************************** **
-   **                              COLORES Y LOGO PARA EL REPORTE                                ** 
+   **                              COLORES Y LOGO PARA EL REPORTE                                **
    ** ****************************************************************************************** **/
 
   // OBTENER LOGO PARA EL REPORTE
@@ -822,7 +822,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
                 ...obj2.vacunas.map((obj3: any) => {
                   const fecha = this.validacionService.FormatearFecha(
                     obj3.fecha.split('T')[0],
-                    this.formato_fecha, 
+                    this.formato_fecha,
                     this.validacionService.dia_abreviado);
 
                   return [
@@ -961,7 +961,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
                   ...obj2.vacunas.map((obj3: any) => {
                     const fecha = this.validacionService.FormatearFecha(
                       obj3.fecha.split('T')[0],
-                      this.formato_fecha, 
+                      this.formato_fecha,
                       this.validacionService.dia_abreviado);
 
                     return [
@@ -998,7 +998,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     return valor;
   }
 
-  /** ****************************************************************************************** ** 
+  /** ****************************************************************************************** **
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
@@ -1033,8 +1033,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
               Departamento: obj2.name_dep,
               Cargo: obj3.cargo,
               Correo: obj3.correo,
-              Carnet: obj4.carnet,
-              'Nombre carnet': obj4.carnet,
+              Carnet: obj4.carnet?.length ? 'Si' : 'No',
               Vacuna: obj4.tipo_vacuna,
               Fecha: new Date(obj4.fecha),
               Descripción: obj4.descripcion,
@@ -1075,8 +1074,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
             Departamento: obj2.departamento,
             Cargo: obj2.cargo,
             Correo: obj2.correo,
-            Carnet: obj3.carnet,
-            'Nombre carnet': obj3.carnet,
+            Carnet: obj3.carnet?.length ? 'Si' : 'No',
             Vacuna: obj3.tipo_vacuna,
             Fecha: obj3.fecha.split('T')[0],
             Descripción: obj3.descripcion,

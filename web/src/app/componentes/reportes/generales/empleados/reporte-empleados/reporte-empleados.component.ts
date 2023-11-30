@@ -895,15 +895,15 @@ export class ReporteEmpleadosComponent implements OnInit {
 
   EstructurarDatosExcel(array: Array<any>) {
     let nuevo: Array<any> = [];
+    let usuarios: any[] = [];
     let c = 0;
     let regimen = '';
     array.forEach((obj1: IReporteAtrasos) => {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.regimen.forEach((r: any) => (regimen = r.name_regimen));
-          c = c + 1;
           let ele = {
-            'N°': c, 'Código Empleado': obj3.codigo, 'Nombre': obj3.nombre, 'Apellido': obj3.apellido,
+            'Código Empleado': obj3.codigo, 'Nombre': obj3.nombre, 'Apellido': obj3.apellido,
             'Cédula': obj3.cedula, 'Género': obj3.genero == 1 ? 'M' : 'F',
             'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
             'Régimen': regimen,
@@ -918,7 +918,13 @@ export class ReporteEmpleadosComponent implements OnInit {
     nuevo.sort(function(a: any, b: any){
       return ((a.Apellido+a.Nombre).toLowerCase().localeCompare((b.Apellido+b.Nombre).toLowerCase()))
     });
-    return nuevo
+    nuevo.forEach((u: any)=>{
+      c = c + 1;
+      const usuarioNuevo = Object.assign({'N°': c}, u);
+      usuarios.push(usuarioNuevo);
+    });
+
+    return usuarios;
   }
 
   ExportarExcelCargoRegimen(): void {
@@ -930,6 +936,7 @@ export class ReporteEmpleadosComponent implements OnInit {
 
   EstructurarDatosExcelRegimenCargo(array: Array<any>) {
     let nuevo: Array<any> = [];
+    let usuarios: any[] = [];
     let c = 0;
     array.forEach((obj1) => {
       obj1.empleados.forEach((obj2: any) => {
@@ -949,7 +956,13 @@ export class ReporteEmpleadosComponent implements OnInit {
     nuevo.sort(function(a: any, b: any){
       return ((a.Apellido+a.Nombre).toLowerCase().localeCompare((b.Apellido+b.Nombre).toLowerCase()))
     });
-    return nuevo
+    nuevo.forEach((u: any)=>{
+      c = c + 1;
+      const usuarioNuevo = Object.assign({'N°': c}, u);
+      usuarios.push(usuarioNuevo);
+    });
+
+    return usuarios;
   }
 
   /** ****************************************************************************************** **

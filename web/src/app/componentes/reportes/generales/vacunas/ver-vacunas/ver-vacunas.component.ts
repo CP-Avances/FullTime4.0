@@ -73,7 +73,7 @@ export class VerVacunasComponent implements OnInit {
   }
 
   /** ****************************************************************************************** **
-   ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** ****************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -149,7 +149,7 @@ export class VerVacunasComponent implements OnInit {
     }
   }
 
-  /** ****************************************************************************************** ** 
+  /** ****************************************************************************************** **
    ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
    ** ****************************************************************************************** **/
   ExtraerDatos() {
@@ -161,7 +161,7 @@ export class VerVacunasComponent implements OnInit {
           obj3.vacunas.forEach((obj4: any) => {
             const fecha = this.validacionService.FormatearFecha(
               obj4.fecha.split('T')[0],
-              this.formato_fecha, 
+              this.formato_fecha,
               this.validacionService.dia_abreviado);
 
             n = n + 1;
@@ -198,7 +198,7 @@ export class VerVacunasComponent implements OnInit {
         obj2.vacunas.forEach((obj3: any) => {
           const fecha = this.validacionService.FormatearFecha(
             obj3.fecha.split('T')[0],
-            this.formato_fecha, 
+            this.formato_fecha,
             this.validacionService.dia_abreviado);
 
           n = n + 1;
@@ -249,7 +249,7 @@ export class VerVacunasComponent implements OnInit {
   }
 
   /** ****************************************************************************************** **
-   **                              COLORES Y LOGO PARA EL REPORTE                                ** 
+   **                              COLORES Y LOGO PARA EL REPORTE                                **
    ** ****************************************************************************************** **/
 
   ObtenerLogo() {
@@ -494,7 +494,7 @@ export class VerVacunasComponent implements OnInit {
                 ...obj2.vacunas.map((obj3: any) => {
                   const fecha = this.validacionService.FormatearFecha(
                     obj3.fecha.split('T')[0],
-                    this.formato_fecha, 
+                    this.formato_fecha,
                     this.validacionService.dia_abreviado);
                   return [
                     {
@@ -632,7 +632,7 @@ export class VerVacunasComponent implements OnInit {
                   ...obj2.vacunas.map((obj3: any) => {
                     const fecha = this.validacionService.FormatearFecha(
                       obj3.fecha.split('T')[0],
-                      this.formato_fecha, 
+                      this.formato_fecha,
                       this.validacionService.dia_abreviado);
                     return [
                       {
@@ -668,7 +668,7 @@ export class VerVacunasComponent implements OnInit {
     return valor;
   }
 
-  /** ****************************************************************************************** ** 
+  /** ****************************************************************************************** **
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
@@ -703,8 +703,7 @@ export class VerVacunasComponent implements OnInit {
               Departamento: obj2.name_dep,
               Cargo: obj3.cargo,
               Correo: obj3.correo,
-              Carnet: obj4.carnet,
-              'Nombre carnet': obj4.carnet,
+              Carnet: obj4.carnet?.length ? 'Si' : 'No',
               Vacuna: obj4.tipo_vacuna,
               Fecha: obj4.fecha.split('T')[0],
               Descripción: obj4.descripcion,
@@ -745,8 +744,7 @@ export class VerVacunasComponent implements OnInit {
             Departamento: obj2.departamento,
             Cargo: obj2.cargo,
             Correo: obj2.correo,
-            Carnet: obj3.carnet,
-            'Nombre carnet': obj3.carnet,
+            Carnet: obj3.carnet?.length ? 'Si' : 'No',
             Vacuna: obj3.tipo_vacuna,
             Fecha: obj3.fecha.split('T')[0],
             Descripción: obj3.descripcion,
