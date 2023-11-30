@@ -149,10 +149,9 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     this.cargos = [];
   }
 
-  /** ****************************************************************************************** **
-   ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
-   ** ****************************************************************************************** **/
-
+  /** **************************************************************************************** **
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **************************************************************************************** **/
   formato_fecha: string = 'DD/MM/YYYY';
   formato_hora: string = 'HH:mm:ss';
 
@@ -1955,6 +1954,7 @@ export class ReporteAtrasosMultiplesComponent implements OnInit, OnDestroy {
     this.tamanio_pagina = e.pageSize;
   }
 
+  // METODOS PARA VALIDAR INGRESO DE LETRAS Y NUMEROS
   IngresarSoloLetras(e: any) {
     return this.validacionService.IngresarSoloLetras(e)
   }
