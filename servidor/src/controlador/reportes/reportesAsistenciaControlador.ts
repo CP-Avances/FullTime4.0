@@ -1,9 +1,9 @@
 import { dep, emp, IHorarioTrabajo, IReporteAtrasos, IReportePuntualidad, IReporteTimbres, tim_tabulado, IReporteTimbresIncompletos } from '../../class/Asistencia';
 import { HHMMtoSegundos, SumarValoresArray, SegundosToHHMM, ModelarFechas } from '../../libs/SubMetodosGraficas';
-import { HorariosParaInasistencias } from '../../libs/MetodosHorario'
-import { Request, Response } from 'express'
+import { HorariosParaInasistencias } from '../../libs/MetodosHorario';
+import { Request, Response } from 'express';
 import moment from 'moment';
-import pool from '../../database'
+import pool from '../../database';
 
 class ReportesAsistenciaControlador {
 

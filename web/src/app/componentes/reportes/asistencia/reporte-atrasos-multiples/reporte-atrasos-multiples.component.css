@@ -26,9 +26,9 @@ p {
 }
 
 mat-icon {
-    cursor: pointer;
+  cursor: pointer;
+  width: 1.625rem;
 }
-
 .ver {
     color: indianred;
 }

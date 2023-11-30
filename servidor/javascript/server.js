@@ -70,6 +70,7 @@ const reporteVacunasRutas_1 = __importDefault(require("./rutas/reportes/reporteV
 const salidasAntesRutas_1 = __importDefault(require("./rutas/reportes/salidasAntesRutas"));
 const reportesAtrasosRutas_1 = __importDefault(require("./rutas/reportes/reportesAtrasosRutas"));
 const reportesTiempoLaboradoRutas_1 = __importDefault(require("./rutas/reportes/reportesTiempoLaboradoRutas"));
+const reportesTimbresMrlRutas_1 = __importDefault(require("./rutas/reportes/reportesTimbresMrlRutas"));
 const reportesFaltasRutas_1 = __importDefault(require("./rutas/reportes/reportesFaltasRutas"));
 const auditoriaRutas_1 = __importDefault(require("./rutas/auditoria/auditoriaRutas"));
 const solicitudVacacionesRutas_1 = __importDefault(require("./rutas/reportes/solicitudVacacionesRutas"));
@@ -176,6 +177,7 @@ class Servidor {
         this.app.use('/reporte-salidas-antes/', salidasAntesRutas_1.default);
         this.app.use('/reporte-atrasos/', reportesAtrasosRutas_1.default);
         this.app.use('/reporte-tiempo-laborado/', reportesTiempoLaboradoRutas_1.default);
+        this.app.use('/reporte-timbres-mrl/', reportesTimbresMrlRutas_1.default);
         // REPORTES DE AUDITORIA
         this.app.use('/reportes-auditoria', auditoriaRutas_1.default);
         // REPORTE MÚLTIPLE DE VACUNAS

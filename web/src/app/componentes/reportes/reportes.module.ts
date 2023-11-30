@@ -43,6 +43,7 @@ import { ReporteTiempoAlimentacionComponent } from './asistencia/reporte-tiempo-
 import { ReportePlanificacionHorariaComponent } from './asistencia/reporte-planificacion-horaria/reporte-planificacion-horaria.component';
 import { ReporteResumenAsistenciaComponent } from './asistencia/reporte-resumen-asistencia/reporte-resumen-asistencia.component';
 import { OpcionUsuarioComponent } from './configuracion-reportes/opcion-usuario/opcion-usuario.component';
+import { TimbreMrlComponent } from './timbres/timbre-mrl/timbre-mrl.component';
 @NgModule({
   declarations: [
     RangoFechasComponent,
@@ -80,6 +81,7 @@ import { OpcionUsuarioComponent } from './configuracion-reportes/opcion-usuario/
     ReportePlanificacionHorariaComponent,
     ReporteResumenAsistenciaComponent,
     OpcionUsuarioComponent,
+    TimbreMrlComponent,
   ],
   exports: [
     ReporteFaltasComponent,

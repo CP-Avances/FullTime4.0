@@ -141,19 +141,20 @@ export class ValidacionesService {
   dia_abreviado: string = 'ddd';
   dia_completo: string = 'dddd';
 
-  FormatearFecha(fecha: string, formato: string, dia: string) {
+  FormatearFecha(fecha: string, formato: string, dia: string): string {
+    let valor: string;
     if (dia === 'ddd') {
-      let valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
+      valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
         moment(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
         ' ' + moment(fecha, 'YYYY/MM/DD').format(formato);
-      return valor;
-    }
-    else {
-      let valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
+    } else if (dia==='no') {
+      valor = moment(fecha, 'YYYY/MM/DD').format(formato);
+    } else {
+      valor = moment(fecha, 'YYYY/MM/DD').format(dia).charAt(0).toUpperCase() +
         moment(fecha, 'YYYY/MM/DD').format(dia).slice(1) +
         ', ' + moment(fecha, 'YYYY/MM/DD').format(formato);
-      return valor;
     }
+    return valor;
   }
 
   FormatearHora(hora: string, formato: string) {

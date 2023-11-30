@@ -146,7 +146,7 @@ export class ReporteEmpleadosComponent implements OnInit {
   }
 
   /** ****************************************************************************************** **
-   ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** ** 
+   ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** **
    ** ****************************************************************************************** **/
 
    BuscarInformacion(opcion: number) {
@@ -338,7 +338,7 @@ export class ReporteEmpleadosComponent implements OnInit {
 
     let respuesta = JSON.parse(this.origen);
 
-    let suc = respuesta.filter(o => {
+    let suc = respuesta.filter((o: any) => {
       var bool = this.selectionSuc.selected.find(obj1 => {
         return obj1.id === o.id_suc
       })
@@ -469,7 +469,7 @@ export class ReporteEmpleadosComponent implements OnInit {
   }
 
   /** ****************************************************************************************** **
-   **                              COLORES Y LOGO PARA EL REPORTE                                ** 
+   **                              COLORES Y LOGO PARA EL REPORTE                                **
    ** ****************************************************************************************** **/
 
   logo: any = String;
@@ -479,7 +479,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -821,7 +821,7 @@ export class ReporteEmpleadosComponent implements OnInit {
             }
           });
         }
-        
+
       });
 
       if (this.bool.bool_emp) {
@@ -868,7 +868,7 @@ export class ReporteEmpleadosComponent implements OnInit {
           }
         });
       }
-         
+
     }
     return n;
   }
@@ -882,7 +882,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     return valor;
   }
 
-  /** ****************************************************************************************** ** 
+  /** ****************************************************************************************** **
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
