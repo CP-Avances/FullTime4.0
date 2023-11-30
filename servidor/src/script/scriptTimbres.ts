@@ -30,8 +30,8 @@ export const generarTimbres = async function (codigo: string, inicio: string, fi
         switch (ele.tipo_entr_salida) {
             case 'E':
                 //var hora_ = moment(ele.hora, "HH:mm:ss").subtract(moment.duration("00:01:00")).format("HH:mm:ss");
-                var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:00:00")).format("HH:mm:ss");
                 //var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:00:00")).format("HH:mm:ss");
+                var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:00:00")).format("HH:mm:ss");
                 //console.log('ver fecha ', moment(ele.fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
                 var formato = moment(ele.fecha, 'YYYY-MM-DD').format('YYYY-MM-DD');
                 fecha = moment(formato + ' ' + hora_, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
@@ -61,9 +61,9 @@ export const generarTimbres = async function (codigo: string, inicio: string, fi
                 break;
             case 'F/A':
                 var comida = moment(formatearMinutos(ele.min_alimentacion), 'HH:mm:ss').format('HH:mm:ss');
-                var min = moment(comida, "HH:mm:ss").subtract(moment.duration("00:01:00")).format("HH:mm:ss");
                 //var min = moment(comida, "HH:mm:ss").subtract(moment.duration("00:01:00")).format("HH:mm:ss");
-                //var min = moment(comida, "HH:mm:ss").add(moment.duration("00:03:00")).format("HH:mm:ss")
+                //var min = moment(comida, "HH:mm:ss").subtract(moment.duration("00:01:00")).format("HH:mm:ss");
+                var min = moment(comida, "HH:mm:ss").add(moment.duration("00:04:00")).format("HH:mm:ss")
                 var hora_ = moment(auxiliar, "HH:mm:ss").add(moment.duration(min)).format("HH:mm:ss");
                 console.log('hora ', hora_, ' auxiliar ', auxiliar)
                 var formato = moment(ele.fecha, 'YYYY-MM-DD').format('YYYY-MM-DD');
