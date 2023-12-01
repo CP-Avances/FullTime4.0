@@ -379,6 +379,7 @@
                     <table id="table_horario" class="table table-hover table-sm">
                         <thead class="thead-light">
                             <tr style="text-align: center;">
+                                <th class="sticky colum_1" scope="col" id="td_horarios" rowspan="2">N°</th>
                                 <th class="sticky colum_1" scope="col" id="td_horarios" rowspan="2">CÓDIGO</th>
                                 <th class="sticky-2 colum_1" scope="col" id="td_horarios" rowspan="2">EMPLEADO</th>
                                 <th class="sticky-3 colum_2" scope="col" id="td_horarios" rowspan="2">AÑO</th>
@@ -421,6 +422,10 @@
                         </thead>
                         <tbody>
                             <tr *ngFor="let e of horarios | paginate : tamanio_pagina_res : numero_pagina_res">
+                                <td class="sticky colum_1" id="td_horarios"
+                                [ngStyle]="{'background':CambiarColores(e.color)}">
+                                {{e.n}}
+                                </td>
                                 <td class="sticky colum_1" id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(e.color)}">
                                 {{e.codigo}}

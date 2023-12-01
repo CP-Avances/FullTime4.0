@@ -1020,10 +1020,12 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
 
   ConstruirTablaHorarioEmpleados() {
 
+    let n = 0;
     const tableData = [
       [
-        'CIUDAD', 'SUCURSAL', 'DEPARTAMENTO', 'REGIMEN',
-        'NOMBRE EMPLEADO', 'CÉDULA','CÓDIGO', 'AÑO', 'MES',
+        'N°','CÓDIGO', 'NOMBRE EMPLEADO', 'CÉDULA',
+        'SUCURSAL', 'CIUDAD',  'REGIMEN', 'DEPARTAMENTO',
+        'CARGO','AÑO', 'MES',
         '01', '02', '03', '04', '05',
         '06', '07', '08', '09', '10',
         '11', '12', '13', '14', '15',
@@ -1035,10 +1037,12 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
 
     this.horariosEmpleado.forEach((empleado) => {
       empleado.horarios.forEach((h:any) =>{
+        n++;
         tableData.push([
-          empleado.ciudad, empleado.sucursal, empleado.departamento,
-          empleado.regimen[0].name_regimen, empleado.name_empleado,
-          empleado.cedula, empleado.codigo, h.anio, h.mes,
+          n, empleado.codigo, empleado.name_empleado, empleado.cedula,
+          empleado.sucursal, empleado.ciudad, this.bool.bool_cargo ? empleado.regimen : empleado.regimen[0].name_regimen,
+          empleado.departamento, empleado.cargo,
+          h.anio, h.mes,
           h.dia1, h.dia2, h.dia3, h.dia4,
           h.dia5, h.dia6, h.dia7, h.dia8,
           h.dia9, h.dia10, h.dia11, h.dia12,
@@ -1096,9 +1100,12 @@ export class ReportePlanificacionHorariaComponent implements OnInit, OnDestroy{
 
   ExtraerHorarioEmpleados() {
     this.horarios = [];
+    let n = 0;
     this.horariosEmpleado.forEach((empleado:any) => {
       empleado.horarios.forEach((h:any) =>{
+        n++;
         const horario = {
+          n,
           ciudad:empleado.ciudad, sucursal:empleado.sucursal, departamento:empleado.departamento,
           regimen:empleado.regimen[0].name_regimen, empleado:empleado.name_empleado,
           cedula:empleado.cedula, codigo:empleado.codigo, anio:h.anio, mes:h.mes,
