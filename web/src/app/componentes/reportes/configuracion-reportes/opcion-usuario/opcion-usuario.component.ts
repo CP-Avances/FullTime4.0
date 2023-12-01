@@ -6,7 +6,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
   styleUrls: ['./opcion-usuario.component.css']
 })
 export class OpcionUsuarioComponent {
-  @Output() tipoUsuarioChange = new EventEmitter<string>();
+  @Output() tipoUsuarioCambio = new EventEmitter<string>();
 
   tipoUsuario: string;
 
@@ -15,8 +15,8 @@ export class OpcionUsuarioComponent {
   }
 
   CambiarTipoUsuario(){
-    this.tipoUsuarioChange.emit(this.tipoUsuario);
+    this.tipoUsuarioCambio.emit(this.tipoUsuario);
   }
-  
+
 
 }

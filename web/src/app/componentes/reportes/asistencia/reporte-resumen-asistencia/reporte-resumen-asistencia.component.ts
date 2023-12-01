@@ -536,7 +536,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
       documentDefinition = this.GetDocumentDefinicion();
     };
 
-    let doc_name = "Resumen_asistencia.pdf";
+    let doc_name = `Resumen_asistencia_usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.pdf`;
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -564,7 +564,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
             {
               text: [
                 {
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
+                  text: '© Pag ' + currentPage.toString() + ' de ' + pageCount,
                   alignment: 'right', opacity: 0.3
                 }
               ],
@@ -576,7 +576,7 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
         { text: (localStorage.getItem('name_empresa') as string).toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
-        { text: 'RESUMEN DE ASISTENCIA', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+        { text: `RESUMEN DE ASISTENCIA - ${this.opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
         { text: 'PERIODO DEL: ' + this.rangoFechas.fec_inico + " AL " + this.rangoFechas.fec_final, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
         ...this.EstructurarDatosPDF(this.data_pdf).map(obj => {
           return obj
@@ -1585,23 +1585,25 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
         const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcelRegimenCargo(this.data_pdf));
         const wb_regimen_cargo: xlsx.WorkBook = xlsx.utils.book_new();
         xlsx.utils.book_append_sheet(wb_regimen_cargo, wsr_regimen_cargo, 'Resumen_asistencia');
-        xlsx.writeFile(wb_regimen_cargo, 'Resumen_asistencia.xlsx');
+        xlsx.writeFile(wb_regimen_cargo, `Resumen_asistencia_usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.xlsx`);
         break;
       default:
         const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
         const wb: xlsx.WorkBook = xlsx.utils.book_new();
         xlsx.utils.book_append_sheet(wb, wsr, 'Resumen_asistencia');
-        xlsx.writeFile(wb, 'Resumen_asistencia.xlsx');
+        xlsx.writeFile(wb, `Resumen_asistencia_usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.xlsx`);
         break;
     }
   }
 
   EstructurarDatosExcel(array: Array<any>) {
     let nuevo: Array<any> = [];
+    let n = 0;
     array.forEach((obj1: IReporteHorasTrabaja) => {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
+            n++;
             //CAMBIO DE FORMATO EN HORAS (HORARIO Y TIMBRE)
             const entradaHorario =  this.validacionService.FormatearHora(obj4.entrada.fec_hora_horario.split(' ')[1],this.formato_hora);
             const salidaHorario = this.validacionService.FormatearHora(obj4.salida.fec_hora_horario.split(' ')[1],this.formato_hora);
@@ -1641,10 +1643,9 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
             const minutosSalidaAnticipada = diferenciaEnMinutos[3];
             const tiempoSalidaAnticipada = this.MinutosAHorasMinutosSegundos(minutosSalidaAnticipada);
             let ele = {
-              'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
-              'Departamento': obj2.name_dep,
-              'Régimen': obj3.regimen[0].name_regimen,
-              'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
+              'N°': n, 'Código': obj3.codigo, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula,
+              'Sucursal': obj1.name_suc, 'Ciudad': obj1.ciudad, 'Régimen': obj3.regimen[0].name_regimen,
+              'Departamento': obj2.name_dep, 'Cargo': obj3.cargo,
               'Fecha': new Date(obj4.entrada.fec_hora_horario), 'Horario Entrada': entradaHorario, 'Timbre Entrada': entrada,
               'Horario Salida': salidaHorario, 'Timbre Salida': salida,
               'Horario Inicio Alimentación': inicioAlimentacionHorario, 'Timbre Inicio Alimentación': inicioAlimentacion,
@@ -1664,9 +1665,11 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
 
   EstructurarDatosExcelRegimenCargo(array: Array<any>) {
     let nuevo: Array<any> = [];
+    let n = 0;
     array.forEach((obj1: any) => {
       obj1.empleados.forEach((obj2: any) => {
         obj2.timbres.forEach((obj3: any) => {
+          n++;
           //CAMBIO DE FORMATO EN HORAS (HORARIO Y TIMBRE)
           const entradaHorario = this.validacionService.FormatearHora(obj3.entrada.fec_hora_horario.split(' ')[1],this.formato_hora);
           const salidaHorario = this.validacionService.FormatearHora(obj3.salida.fec_hora_horario.split(' ')[1],this.formato_hora);
@@ -1707,10 +1710,10 @@ export class ReporteResumenAsistenciaComponent implements OnInit, OnDestroy  {
           const tiempoSalidaAnticipada = this.MinutosAHorasMinutosSegundos(minutosSalidaAnticipada);
 
           let ele = {
-            'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
-            'Departamento': obj2.departamento,
-            'Régimen': obj2.regimen[0].name_regimen,
-            'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
+            'N°': n, 'Código': obj2.codigo, 'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula,
+            'Sucursal': obj2.sucursal, 'Ciudad': obj2.ciudad,
+            'Régimen': this.bool.bool_cargo ? obj2.regimen : obj2.regimen[0].name_regimen,
+            'Departamento': obj2.departamento, 'Cargo': obj2.cargo,
             'Fecha': new Date(obj3.entrada.fec_hora_horario), 'Horario Entrada': entradaHorario, 'Timbre Entrada': entrada,
             'Horario Inicio Alimentación': inicioAlimentacionHorario, 'Timbre Inicio Alimentación': inicioAlimentacion,
             'Horario Fin Alimentación': finAlimentacionHorario, 'Timbre Fin Alimentación': finAlimentacion,

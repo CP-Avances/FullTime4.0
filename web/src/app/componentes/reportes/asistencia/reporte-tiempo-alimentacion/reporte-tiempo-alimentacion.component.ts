@@ -30,7 +30,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   // CRITERIOS DE BUSQUEDA POR FECHAS
   get rangoFechas() { return this.reporteService.rangoFechas };
 
-  // SELECCIÓN DE BUSQUEDA DE DATOS SEGÚN OPCIÓN 
+  // SELECCIÓN DE BUSQUEDA DE DATOS SEGÚN OPCIÓN
   get opcion() { return this.reporteService.opcion };
 
   // CRITERIOS DE BUSQUEDA SEGÚN OPCIÓN SELECCIONADA
@@ -56,7 +56,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   //VARIABLES PARA MOSTRAR DETALLES
   tipo: string;
   verDetalle: boolean = false;
-  
+
   // VARIABLES UTILIZADAS PARA IDENTIFICAR EL TIPO DE USUARIO
   tipoUsuario: string = 'activo';
   opcionBusqueda: number = 1;
@@ -112,7 +112,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
-  
+
   constructor(
     private validacionService: ValidacionesService,
     private restAlimentacion: AlimentacionService,
@@ -121,7 +121,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
     private parametro: ParametrosService,
     private restEmpre: EmpresaService,
     private toastr: ToastrService,
-  ) { 
+  ) {
     this.ObtenerLogo();
     this.ObtenerColores();
   }
@@ -146,7 +146,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   }
 
   /** ****************************************************************************************** **
-   ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** ****************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -171,7 +171,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   }
 
   /** ****************************************************************************************** **
-   ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** ** 
+   ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** **
    ** ****************************************************************************************** **/
 
   // METODO DE BUSQUEDA DE DATOS
@@ -490,7 +490,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
 
 
   /** ****************************************************************************************** **
-   **                              COLORES Y LOGO PARA EL REPORTE                                ** 
+   **                              COLORES Y LOGO PARA EL REPORTE                                **
    ** ****************************************************************************************** **/
   logo: any = String;
   ObtenerLogo() {
@@ -499,7 +499,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -522,7 +522,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       documentDefinition = this.GetDocumentDefinicion();
     };
 
-    let doc_name = "Tiempo_alimentacion.pdf";
+    let doc_name = `Tiempo_alimentacion_usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.pdf`;
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -550,7 +550,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
             {
               text: [
                 {
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
+                  text: '© Pag ' + currentPage.toString() + ' de ' + pageCount,
                   alignment: 'right', opacity: 0.3
                 }
               ],
@@ -562,7 +562,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
         { text: (localStorage.getItem('name_empresa') as string).toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
-        { text: 'TIEMPO DE ALIMENTACIÓN', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+        { text: `TIEMPO DE ALIMENTACIÓN - ${this.opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
         { text: 'PERIODO DEL: ' + this.rangoFechas.fec_inico + " AL " + this.rangoFechas.fec_final, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
         ...this.EstructurarDatosPDF(this.data_pdf).map(obj => {
           return obj
@@ -746,10 +746,10 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
 
                   const fecha = this.validacionService.FormatearFecha(
                     obj3.inicioAlimentacion.fec_horario,
-                    this.formato_fecha, 
+                    this.formato_fecha,
                     this.validacionService.dia_abreviado);
 
-                  const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null 
+                  const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null
                     ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
                     : 'FT';
                   const finAlimentacion = obj3.finAlimentacion.fec_hora_timbre != null
@@ -760,8 +760,8 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
                   const minutosTomados = this.CalcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre,obj3.finAlimentacion.fec_hora_timbre);
                   const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
                   totalExcesoEmpleado += exceso;
-                  totalExcesoRegimen += exceso; 
-                  totalExcesoCargo += exceso; 
+                  totalExcesoRegimen += exceso;
+                  totalExcesoCargo += exceso;
                   c = c + 1
                   return [
                     { style: 'itemsTableCentrado', text: c },
@@ -804,7 +804,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
         };
       });
 
-      if (this.bool.bool_cargo) {    
+      if (this.bool.bool_cargo) {
         n.push({
           style: 'tableMarginCabeceraTotal',
           table: {
@@ -830,7 +830,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
                   },
                   { text: cargo.exceso, style: 'itemsTableCentrado'},
                 ]
-              })    
+              })
             ]
           },
           layout: {
@@ -840,8 +840,8 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
           }
         });
       };
-  
-      if (this.bool.bool_reg) {    
+
+      if (this.bool.bool_reg) {
         n.push({
           style: 'tableMarginCabeceraTotal',
           table: {
@@ -867,7 +867,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
                   },
                   { text: regimen.exceso, style: 'itemsTableCentrado'},
                 ]
-              })    
+              })
             ]
           },
           layout: {
@@ -991,22 +991,22 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
                   ...obj2.timbres.map((obj3: any) => {
                     const fecha = this.validacionService.FormatearFecha(
                       obj3.inicioAlimentacion.fec_horario,
-                      this.formato_fecha, 
+                      this.formato_fecha,
                       this.validacionService.dia_abreviado);
-  
-                    const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null 
+
+                    const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null
                       ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
                       : 'FT';
                     const finAlimentacion = obj3.finAlimentacion.fec_hora_timbre != null
                       ? this.validacionService.FormatearHora(obj3.finAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
-                      : 'FT';  
+                      : 'FT';
 
                     const minAlimentacion = obj3.inicioAlimentacion.min_alimentacion;
                     const minutosTomados = this.CalcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre,obj3.finAlimentacion.fec_hora_timbre);
                     const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
                     totalExcesoEmpleado += exceso;
-                    totalExcesoSucursal += exceso; 
-                    totalExcesoDepartamento += exceso; 
+                    totalExcesoSucursal += exceso;
+                    totalExcesoDepartamento += exceso;
                     c = c + 1
                     return [
                       { style: 'itemsTableCentrado', text: c },
@@ -1051,7 +1051,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       });
     }
 
-    if (this.bool.bool_dep) {    
+    if (this.bool.bool_dep) {
       n.push({
         style: 'tableMarginCabeceraTotal',
         table: {
@@ -1077,7 +1077,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
                 },
                 { text: departamento.exceso, style: 'itemsTableCentrado'},
               ]
-            })    
+            })
           ]
         },
         layout: {
@@ -1088,7 +1088,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       });
     };
 
-    if (this.bool.bool_suc) {    
+    if (this.bool.bool_suc) {
       n.push({
         style: 'tableMarginCabeceraTotal',
         table: {
@@ -1114,7 +1114,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
                 },
                 { text: sucursal.exceso, style: 'itemsTableCentrado'},
               ]
-            })    
+            })
           ]
         },
         layout: {
@@ -1129,7 +1129,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   }
 
 
-  /** ****************************************************************************************** ** 
+  /** ****************************************************************************************** **
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
@@ -1139,24 +1139,26 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
         const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcelRegimenCargo(this.data_pdf));
         const wb_regimen_cargo: xlsx.WorkBook = xlsx.utils.book_new();
         xlsx.utils.book_append_sheet(wb_regimen_cargo, wsr_regimen_cargo, 'Alimentacion');
-        xlsx.writeFile(wb_regimen_cargo, 'Tiempo_alimentacion.xlsx');
+        xlsx.writeFile(wb_regimen_cargo, `Tiempo_alimentacion_usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.xlsx`);
         break;
       default:
         const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
         const wb: xlsx.WorkBook = xlsx.utils.book_new();
         xlsx.utils.book_append_sheet(wb, wsr, 'Alimentacion');
-        xlsx.writeFile(wb, 'Tiempo_alimentacion.xlsx');
+        xlsx.writeFile(wb, `Tiempo_alimentacion_usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.xlsx`);
         break;
     }
   }
 
   EstructurarDatosExcel(array: Array<any>) {
     let nuevo: Array<any> = [];
+    let n = 0;
     array.forEach((obj1: IReporteFaltas) => {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
-            const inicioAlimentacion = obj4.inicioAlimentacion.fec_hora_timbre != null 
+            n++;
+            const inicioAlimentacion = obj4.inicioAlimentacion.fec_hora_timbre != null
               ? this.validacionService.FormatearHora(obj4.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
               : 'FT';
             const finAlimentacion = obj4.finAlimentacion.fec_hora_timbre != null
@@ -1165,11 +1167,10 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
             const minAlimentacion = obj4.inicioAlimentacion.min_alimentacion;
             const minutosTomados = this.CalcularDiferenciaFechas(obj4.inicioAlimentacion.fec_hora_timbre,obj4.finAlimentacion.fec_hora_timbre);
             const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
-            let ele = { 
-              'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
-              'Departamento': obj2.name_dep,
-              'Régimen': obj3.regimen[0].name_regimen,
-              'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
+            let ele = {
+              'N°': n, 'Código': obj3.codigo, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula,
+              'Sucursal': obj1.name_suc, 'Ciudad': obj1.ciudad, 'Régimen': obj3.regimen[0].name_regimen,
+              'Departamento': obj2.name_dep, 'Cargo': obj3.cargo,
               'Fecha': new Date(obj4.inicioAlimentacion.fec_hora_horario), 'Inicio Alimentación': inicioAlimentacion,
               'Fin Alimentación': finAlimentacion, 'M. Alimentación': minAlimentacion, 'M. Tomados': minutosTomados !==null ? minutosTomados : minAlimentacion,
               'M. Exceso': exceso
@@ -1184,23 +1185,25 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
 
   EstructurarDatosExcelRegimenCargo(array: Array<any>) {
     let nuevo: Array<any> = [];
+    let n = 0;
     array.forEach((obj1: any) => {
       obj1.empleados.forEach((obj2: any) => {
         obj2.timbres.forEach((obj3: any) => {
-          const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null 
+          n++;
+          const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null
             ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
             : 'FT';
           const finAlimentacion = obj3.finAlimentacion.fec_hora_timbre != null
             ? this.validacionService.FormatearHora(obj3.finAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
-            : 'FT'; 
+            : 'FT';
           const minAlimentacion = obj3.inicioAlimentacion.min_alimentacion;
           const minutosTomados = this.CalcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre,obj3.finAlimentacion.fec_hora_timbre);
           const exceso = this.CalcularExcesoTiempo(minAlimentacion, minutosTomados);
           let ele = {
-            'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
-            'Departamento': obj2.departamento,
-            'Régimen': obj2.regimen[0].name_regimen,
-            'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula, 'Código': obj2.codigo,
+            'N°': n, 'Código': obj2.codigo, 'Nombre Empleado': obj2.name_empleado, 'Cédula': obj2.cedula,
+            'Sucursal': obj2.sucursal, 'Ciudad': obj2.ciudad,
+            'Régimen': this.bool.bool_cargo ? obj2.regimen : obj2.regimen[0].name_regimen,
+            'Departamento': obj2.departamento, 'Cargo': obj2.cargo,
             'Fecha': new Date(obj3.inicioAlimentacion.fec_hora_horario), 'Inicio Alimentación': inicioAlimentacion,
             'Fin Alimentación': finAlimentacion, 'M. Alimentación': minAlimentacion, 'M. Tomados': minutosTomados !==null ? minutosTomados : minAlimentacion,
             'M. Exceso': exceso
@@ -1212,7 +1215,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
     return nuevo;
   }
 
-  /** ****************************************************************************************** ** 
+  /** ****************************************************************************************** **
    ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
    ** ****************************************************************************************** **/
 
@@ -1225,15 +1228,15 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
           obj3.timbres.forEach((obj4: any) => {
             const fecha = this.validacionService.FormatearFecha(
               obj4.inicioAlimentacion.fec_horario,
-              this.formato_fecha, 
+              this.formato_fecha,
               this.validacionService.dia_abreviado);
 
-            const inicioAlimentacion = obj4.inicioAlimentacion.fec_hora_timbre != null 
+            const inicioAlimentacion = obj4.inicioAlimentacion.fec_hora_timbre != null
               ? this.validacionService.FormatearHora(obj4.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
               : 'FT';
             const finAlimentacion = obj4.finAlimentacion.fec_hora_timbre != null
               ? this.validacionService.FormatearHora(obj4.finAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
-              : 'FT'; 
+              : 'FT';
 
             const minAlimentacion = obj4.inicioAlimentacion.min_alimentacion;
             const minutosTomados = this.CalcularDiferenciaFechas(obj4.inicioAlimentacion.fec_hora_timbre,obj4.finAlimentacion.fec_hora_timbre);
@@ -1244,7 +1247,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
               ciudad: obj1.ciudad, sucursal: obj1.name_suc,
               departamento: obj2.name_dep, regimen: obj3.regimen[0].name_regimen,
               empleado: obj3.name_empleado, cedula: obj3.cedula, codigo: obj3.codigo,
-              fecha, inicio: inicioAlimentacion, fin: finAlimentacion, 
+              fecha, inicio: inicioAlimentacion, fin: finAlimentacion,
               alimentacion: minAlimentacion, tomados: minutosTomados !==null ? minutosTomados : minAlimentacion, exceso: exceso
             }
             this.timbres.push(ele);
@@ -1253,7 +1256,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       })
     })
   }
-  
+
   ExtraerTimbresRegimenCargo() {
     this.timbres = [];
     let n = 0;
@@ -1262,15 +1265,15 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
         obj2.timbres.forEach((obj3: any) => {
           const fecha = this.validacionService.FormatearFecha(
             obj3.inicioAlimentacion.fec_horario,
-            this.formato_fecha, 
+            this.formato_fecha,
             this.validacionService.dia_abreviado);
 
-          const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null 
+          const inicioAlimentacion = obj3.inicioAlimentacion.fec_hora_timbre != null
             ? this.validacionService.FormatearHora(obj3.inicioAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
             : 'FT';
           const finAlimentacion = obj3.finAlimentacion.fec_hora_timbre != null
             ? this.validacionService.FormatearHora(obj3.finAlimentacion.fec_hora_timbre.split(' ')[1], this.formato_hora)
-            : 'FT'; 
+            : 'FT';
 
           const minAlimentacion = obj3.inicioAlimentacion.min_alimentacion;
           const minutosTomados = this.CalcularDiferenciaFechas(obj3.inicioAlimentacion.fec_hora_timbre,obj3.finAlimentacion.fec_hora_timbre);
@@ -1281,7 +1284,7 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
             ciudad: obj2.ciudad, sucursal: obj2.sucursal,
             departamento: obj2.departamento, regimen: obj2.regimen[0].name_regimen,
             empleado: obj2.name_empleado, cedula: obj2.cedula, codigo: obj2.codigo,
-            fecha, inicio: inicioAlimentacion, fin: finAlimentacion, 
+            fecha, inicio: inicioAlimentacion, fin: finAlimentacion,
             alimentacion: minAlimentacion, tomados: minutosTomados !==null ? minutosTomados : minAlimentacion, exceso: exceso
           }
           this.timbres.push(ele);
@@ -1291,9 +1294,9 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
   }
 
 
-  /** ****************************************************************************************** ** 
+  /** ****************************************************************************************** **
    ** **                                   CALCULOS Y CONVERSIONES                            ** **
-   ** ****************************************************************************************** **/  
+   ** ****************************************************************************************** **/
 
   CalcularDiferenciaFechas(inicioAlimentacion: string, finAlimentacion: string) {
     if (inicioAlimentacion!=null && finAlimentacion!=null) {
@@ -1304,13 +1307,13 @@ export class ReporteTiempoAlimentacionComponent implements OnInit, OnDestroy {
       return Number(diferenciaEnMinutos.toFixed(2));
     } else {
       return null;
-    }  
+    }
   }
 
   CalcularExcesoTiempo(minutosAsignados: string, minutosTomados: any): number {
-    if (!minutosAsignados || !minutosTomados) return 0;    
+    if (!minutosAsignados || !minutosTomados) return 0;
     const asignados = Number(minutosAsignados);
-    const tomados = Number(minutosTomados); 
+    const tomados = Number(minutosTomados);
     return Number((Math.max(tomados - asignados, 0)).toFixed(2));
   }
 

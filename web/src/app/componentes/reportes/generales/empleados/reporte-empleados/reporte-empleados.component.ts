@@ -1,10 +1,10 @@
 // IMPORTAR LIBRERIAS
 import { MAT_MOMENT_DATE_ADAPTER_OPTIONS, MAT_MOMENT_DATE_FORMATS, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
@@ -32,7 +32,7 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
     { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
   ]
 })
-export class ReporteEmpleadosComponent implements OnInit {
+export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
 
   // METODO QUE INDICA OPCIONES DE BUSQUEDA SELECCIONADOS
   get bool() {
@@ -52,6 +52,7 @@ export class ReporteEmpleadosComponent implements OnInit {
   empleados: any = [];
   respuesta: any = [];
   origen: any = [];
+  arr_emp: any = [];
 
   // VARIABLE DE ALMACENAMIENTO DE DATOS DE PDF
   data_pdf: any = [];
@@ -96,6 +97,12 @@ export class ReporteEmpleadosComponent implements OnInit {
   numero_pagina_emp: number = 1;
   tamanio_pagina_emp: number = 5;
   pageSizeOptions_emp = [5, 10, 20, 50];
+
+  // ITEMS DE PAGINACION DE LA TABLA DETALLE
+  @ViewChild('paginatorDetalle') paginatorDetalle: MatPaginator;
+  pageSizeOptions = [5, 10, 20, 50];
+  tamanio_pagina: number = 5;
+  numero_pagina: number = 1;
 
   // METODOS PARA BUSQUEDA DE DATOS POR FILTROS SUCURSAL
   get filtroNombreSuc() {
@@ -143,6 +150,18 @@ export class ReporteEmpleadosComponent implements OnInit {
     this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
     this.BuscarInformacion(this.opcionBusqueda);
     this.BuscarCargos(this.opcionBusqueda);
+  }
+
+  ngOnDestroy() {
+    this.departamentos = [];
+    this.origen_cargo = [];
+    this.sucursales = [];
+    this.respuesta = [];
+    this.empleados = [];
+    this.regimen = [];
+    this.cargos = [];
+    this.origen = [];
+    this.arr_emp = [];
   }
 
   /** ****************************************************************************************** **
@@ -348,7 +367,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     this.data_pdf = suc;
     switch (accion) {
       case 'excel': this.ExportarExcel(); break;
-      case 'ver': this.VerDatos('suc'); break;
+      case 'ver': this.VerDatos(); break;
       default: this.GenerarPDF(accion); break;
     }
   }
@@ -385,7 +404,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     this.data_pdf = reg;
     switch (accion) {
       case 'excel': this.ExportarExcelCargoRegimen(); break;
-      case 'ver': this.VerDatos('reg'); break;
+      case 'ver': this.VerDatos(); break;
       default: this.GenerarPDF(accion); break;
     }
   }
@@ -404,7 +423,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     this.data_pdf = car;
     switch (accion) {
       case 'excel': this.ExportarExcelCargoRegimen(); break;
-      case 'ver': this.VerDatos('car'); break;
+      case 'ver': this.VerDatos(); break;
       default: this.GenerarPDF(accion); break;
     }
   }
@@ -428,7 +447,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     this.data_pdf = dep;
     switch (accion) {
       case 'excel': this.ExportarExcel(); break;
-      case 'ver': this.VerDatos('dep'); break;
+      case 'ver': this.VerDatos(); break;
       default: this.GenerarPDF(accion); break;
     }
   }
@@ -462,7 +481,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     this.data_pdf = emp;
     switch (accion) {
       case 'excel': this.ExportarExcel(); break;
-      case 'ver': this.VerDatos('emp'); break;
+      case 'ver': this.VerDatos(); break;
       default: this.GenerarPDF(accion); break;
     }
 
@@ -497,7 +516,7 @@ export class ReporteEmpleadosComponent implements OnInit {
 
   GenerarPDF(action: any) {
     const documentDefinition = this.GetDocumentDefinicion();
-    let doc_name = "Reporte_usuarios_activos.pdf";
+    let doc_name = `Usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.pdf`;
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -526,7 +545,7 @@ export class ReporteEmpleadosComponent implements OnInit {
             {
               text: [
                 {
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
+                  text: '© Pag ' + currentPage.toString() + ' de ' + pageCount,
                   alignment: 'right', opacity: 0.3
                 }
               ],
@@ -538,7 +557,7 @@ export class ReporteEmpleadosComponent implements OnInit {
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
         { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
-        { text: 'USUARIOS', bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0], },
+        { text: `USUARIOS - ${this.opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0], },
         ...this.EstructurarDatosPDF(this.data_pdf).map(obj => {
           return obj
         })
@@ -625,46 +644,89 @@ export class ReporteEmpleadosComponent implements OnInit {
           return ((a.apellido+a.nombre).toLowerCase().localeCompare((b.apellido+b.nombre).toLowerCase()))
         });
 
-        n.push({
-          style: 'tableMargin',
-          table: {
-            widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
-            headerRows: 1,
-            body: [
-              [
-                { text: 'N°', style: 'tableHeader' },
-                { text: 'CÓDIGO', style: 'tableHeader' },
-                { text: 'EMPLEADO', style: 'tableHeader' },
-                { text: 'CÉDULA', style: 'tableHeader' },
-                { text: 'GÉNERO', style: 'tableHeader' },
-                { text: 'CIUDAD', style: 'tableHeader' },
-                { text: 'SUCURSAL', style: 'tableHeader' },
-                { text: 'DEPARTAMENTO', style: 'tableHeader' },
-                { text: this.bool.bool_cargo ? 'RÉGIMEN' : 'CARGO' , style: 'tableHeader' },
-                { text: 'CORREO', style: 'tableHeader' }
-              ],
-              ...arr_emp.map((obj3: any) => {
-                return [
-                  { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
-                  { style: 'itemsTableCentrado', text: obj3.codigo },
-                  { style: 'itemsTable', text: obj3.name_empleado },
-                  { style: 'itemsTable', text: obj3.cedula },
-                  { style: 'itemsTableCentrado', text: obj3.genero == 1 ? 'M' : 'F' },
-                  { style: 'itemsTable', text: obj3.ciudad },
-                  { style: 'itemsTable', text: obj3.sucursal },
-                  { style: 'itemsTable', text: obj3.departamento },
-                  { style: 'itemsTable', text: this.bool.bool_cargo ? obj3.regimen : obj3.cargo },
-                  { style: 'itemsTable', text: obj3.correo },
-                ]
-              }),
-            ]
-          },
-          layout: {
-            fillColor: function (rowIndex: any) {
-              return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+        if (this.bool.bool_cargo) {
+          n.push({
+            style: 'tableMargin',
+            table: {
+              widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
+              headerRows: 1,
+              body: [
+                [
+                  { text: 'N°', style: 'tableHeader' },
+                  { text: 'CÓDIGO', style: 'tableHeader' },
+                  { text: 'EMPLEADO', style: 'tableHeader' },
+                  { text: 'CÉDULA', style: 'tableHeader' },
+                  { text: 'GÉNERO', style: 'tableHeader' },
+                  { text: 'SUCURSAL', style: 'tableHeader' },
+                  { text: 'CIUDAD', style: 'tableHeader' },
+                  { text: 'RÉGIMEN', style: 'tableHeader' },
+                  { text: 'DEPARTAMENTO', style: 'tableHeader' },
+                  { text: 'CORREO', style: 'tableHeader' }
+                ],
+                ...arr_emp.map((obj3: any) => {
+                  return [
+                    { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
+                    { style: 'itemsTableCentrado', text: obj3.codigo },
+                    { style: 'itemsTable', text: obj3.name_empleado },
+                    { style: 'itemsTable', text: obj3.cedula },
+                    { style: 'itemsTableCentrado', text: obj3.genero == 1 ? 'M' : 'F' },
+                    { style: 'itemsTable', text: obj3.sucursal },
+                    { style: 'itemsTable', text: obj3.ciudad },
+                    { style: 'itemsTable', text: obj3.regimen },
+                    { style: 'itemsTable', text: obj3.departamento },
+                    { style: 'itemsTable', text: obj3.correo },
+                  ]
+                }),
+              ]
+            },
+            layout: {
+              fillColor: function (rowIndex: any) {
+                return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+              }
             }
-          }
-        });
+          });
+        } else {
+          n.push({
+            style: 'tableMargin',
+            table: {
+              widths: ['auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
+              headerRows: 1,
+              body: [
+                [
+                  { text: 'N°', style: 'tableHeader' },
+                  { text: 'CÓDIGO', style: 'tableHeader' },
+                  { text: 'EMPLEADO', style: 'tableHeader' },
+                  { text: 'CÉDULA', style: 'tableHeader' },
+                  { text: 'GÉNERO', style: 'tableHeader' },
+                  { text: 'SUCURSAL', style: 'tableHeader' },
+                  { text: 'CIUDAD', style: 'tableHeader' },
+                  { text: 'DEPARTAMENTO', style: 'tableHeader' },
+                  { text: 'CARGO' , style: 'tableHeader' },
+                  { text: 'CORREO', style: 'tableHeader' }
+                ],
+                ...arr_emp.map((obj3: any) => {
+                  return [
+                    { style: 'itemsTableCentrado', text: arr_emp.indexOf(obj3) + 1 },
+                    { style: 'itemsTableCentrado', text: obj3.codigo },
+                    { style: 'itemsTable', text: obj3.name_empleado },
+                    { style: 'itemsTable', text: obj3.cedula },
+                    { style: 'itemsTableCentrado', text: obj3.genero == 1 ? 'M' : 'F' },
+                    { style: 'itemsTable', text: obj3.sucursal },
+                    { style: 'itemsTable', text: obj3.ciudad },
+                    { style: 'itemsTable', text: obj3.departamento },
+                    { style: 'itemsTable', text: obj3.cargo },
+                    { style: 'itemsTable', text: obj3.correo },
+                  ]
+                }),
+              ]
+            },
+            layout: {
+              fillColor: function (rowIndex: any) {
+                return (rowIndex % 2 === 0) ? '#E5E7E9' : null;
+              }
+            }
+          });
+        }
       })
     }
 
@@ -742,8 +804,8 @@ export class ReporteEmpleadosComponent implements OnInit {
                     { text: 'EMPLEADO', style: 'tableHeader' },
                     { text: 'CÉDULA', style: 'tableHeader' },
                     { text: 'GÉNERO', style: 'tableHeader' },
-                    { text: 'CIUDAD', style: 'tableHeader' },
                     { text: 'SUCURSAL', style: 'tableHeader' },
+                    { text: 'CIUDAD', style: 'tableHeader' },
                     { text: 'RÉGIMEN', style: 'tableHeader' },
                     { text: 'CARGO', style: 'tableHeader' },
                     { text: 'CORREO', style: 'tableHeader' }
@@ -755,8 +817,8 @@ export class ReporteEmpleadosComponent implements OnInit {
                       { style: 'itemsTable', text: obj3.name_empleado },
                       { style: 'itemsTable', text: obj3.cedula },
                       { style: 'itemsTableCentrado', text: obj3.genero == 1 ? 'M' : 'F' },
-                      { style: 'itemsTable', text: obj3.ciudad },
                       { style: 'itemsTable', text: obj3.sucursal },
+                      { style: 'itemsTable', text: obj3.ciudad },
                       { style: 'itemsTable', text: obj3.regimen[0].name_regimen },
                       { style: 'itemsTable', text: obj3.cargo },
                       { style: 'itemsTable', text: obj3.correo },
@@ -886,11 +948,19 @@ export class ReporteEmpleadosComponent implements OnInit {
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
+   ValidarExcel(){
+    if (this.bool.bool_cargo || this.bool.bool_reg) {
+      this.ExportarExcelCargoRegimen();
+    } else {
+      this.ExportarExcel();
+    }
+  }
+
   ExportarExcel(): void {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Usuarios');
-    xlsx.writeFile(wb, 'Usuarios.xlsx');
+    xlsx.writeFile(wb, `Usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.xlsx`);
   }
 
   EstructurarDatosExcel(array: Array<any>) {
@@ -905,7 +975,7 @@ export class ReporteEmpleadosComponent implements OnInit {
           let ele = {
             'Código Empleado': obj3.codigo, 'Nombre': obj3.nombre, 'Apellido': obj3.apellido,
             'Cédula': obj3.cedula, 'Género': obj3.genero == 1 ? 'M' : 'F',
-            'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
+            'Sucursal': obj1.name_suc, 'Ciudad': obj1.ciudad,
             'Régimen': regimen,
             'Departamento': obj2.name_dep,
             'Cargo': obj3.cargo,
@@ -931,7 +1001,7 @@ export class ReporteEmpleadosComponent implements OnInit {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcelRegimenCargo(this.data_pdf));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Usuarios');
-    xlsx.writeFile(wb, "Usuarios.xlsx");
+    xlsx.writeFile(wb, `Usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.xls`);
   }
 
   EstructurarDatosExcelRegimenCargo(array: Array<any>) {
@@ -940,11 +1010,10 @@ export class ReporteEmpleadosComponent implements OnInit {
     let c = 0;
     array.forEach((obj1) => {
       obj1.empleados.forEach((obj2: any) => {
-        c = c + 1;
         let ele = {
-          'N°': c, 'Código Empleado': obj2.codigo, 'Nombre': obj2.nombre, 'Apellido': obj2.apellido,
+          'Código Empleado': obj2.codigo, 'Nombre': obj2.nombre, 'Apellido': obj2.apellido,
           'Cédula': obj2.cedula, 'Género': obj2.genero == 1 ? 'M' : 'F',
-          'Ciudad': obj2.ciudad, 'Sucursal': obj2.sucursal,
+          'Sucursal': obj2.sucursal, 'Ciudad': obj2.ciudad,
           'Régimen': this.bool.bool_cargo ? obj2.regimen : obj2.regimen[0].name_regimen,
           'Departamento': obj2.departamento,
           'Cargo': obj2.cargo,
@@ -963,6 +1032,46 @@ export class ReporteEmpleadosComponent implements OnInit {
     });
 
     return usuarios;
+  }
+
+  /** ****************************************************************************************** **
+   ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
+   ** ****************************************************************************************** **/
+
+   ExtraerDatos() {
+    this.arr_emp = [];
+    let n = 0;
+    this.data_pdf.forEach((obj: any) => {
+      obj.departamentos.forEach((dep: any) => {
+        dep.empleado.forEach((e: any) => {
+          this.arr_emp.push(e);
+        });
+      });
+    });
+    this.arr_emp.sort(function(a: any, b: any){
+      return ((a.apellido+a.nombre).toLowerCase().localeCompare((b.apellido+b.nombre).toLowerCase()))
+    });
+    this.arr_emp.forEach((u: any) => {
+      n = n + 1;
+      u['n'] = n;
+    });
+  }
+
+  ExtraerDatosRegimenCargo() {
+    this.arr_emp = [];
+    let n = 0;
+    this.data_pdf.forEach((obj: any) => {
+      obj.empleados.forEach((e: any) => {
+        this.arr_emp.push(e);
+      });
+    });
+    this.arr_emp.sort(function(a: any, b: any){
+      return ((a.apellido+a.nombre).toLowerCase().localeCompare((b.apellido+b.nombre).toLowerCase()))
+    });
+    this.arr_emp.forEach((u: any) => {
+      n = n + 1;
+      u['n'] = n;
+    });
   }
 
   /** ****************************************************************************************** **
@@ -1109,8 +1218,18 @@ export class ReporteEmpleadosComponent implements OnInit {
   }
 
   //ENVIAR DATOS A LA VENTANA DE DETALLE
-  VerDatos(tipo: string) {
+  VerDatos() {
     this.verDetalle = true;
-    this.tipo = tipo;
+    if (this.bool.bool_cargo || this.bool.bool_reg) {
+      this.ExtraerDatosRegimenCargo();
+    } else {
+      this.ExtraerDatos();
+    }
+  }
+
+ // METODO PARA REGRESAR A LA PAGINA ANTERIOR
+  Regresar() {
+    this.verDetalle = false;
+    this.paginatorDetalle.firstPage();
   }
 }

@@ -113,7 +113,7 @@ export class AuditoriaComponent implements OnInit {
     });
   }
 
-  // METODO PARA VER LA INFORMACION DE EMPLEADO QUE INICIA SESIÓN 
+  // METODO PARA VER LA INFORMACION DE EMPLEADO QUE INICIA SESIÓN
   urlImagen: string;
   nombreEmpresa: string;
   ObtenerEmpleadoLogueado(idemploy: any) {
@@ -127,7 +127,7 @@ export class AuditoriaComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -146,7 +146,7 @@ export class AuditoriaComponent implements OnInit {
   }
 
   /* ****************************************************************************************************
-  *                               PARA LA EXPORTACION DE ARCHIVOS PDF 
+  *                               PARA LA EXPORTACION DE ARCHIVOS PDF
   * ****************************************************************************************************/
 
   GenerarPdf(action = 'open', datos: any) {
@@ -178,7 +178,7 @@ export class AuditoriaComponent implements OnInit {
             {
               text: [
                 {
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
+                  text: '© Pag ' + currentPage.toString() + ' de ' + pageCount,
                   alignment: 'right', color: 'blue', opacity: 0.5
                 }
               ],

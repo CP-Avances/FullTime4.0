@@ -29,6 +29,9 @@ mat-icon {
 cursor: pointer;
 width: 1.625rem;
 }
+.ver {
+  color: indianred;
+}
 
 #busqueda {
   margin-top: 10px;
@@ -60,3 +63,4 @@ width: 1.625rem;
 #detalle tbody tr:nth-child(2n) {
   background-color: #e6f3ff;
 }
+

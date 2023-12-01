@@ -1,9 +1,9 @@
 // IMPORTAR LIBRERIAS
 import { ITableEmpleados, ReporteVacunas, vacuna, } from 'src/app/model/reportes.model';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
@@ -18,6 +18,7 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { VacunasService } from 'src/app/servicios/reportes/vacunas/vacunas.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-vacuna-multiple',
@@ -40,10 +41,11 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   // VARIABLES DE ALMACENAMIENTO DE RESULTADOS
   departamentos: any = [];
   sucursales: any = [];
+  empleados: any = [];
+  respuesta: any = [];
+  arr_vac: any = [];
   regimen: any = [];
   cargos: any = [];
-  empleados: any = [];
-  respuesta: any[];
   origen: any = [];
 
   // VARIABLE DE ALMACENAMIENTO DE DATOS DE PDF
@@ -57,6 +59,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   tipoUsuario: string = 'activo';
   opcionBusqueda: number = 1;
   limpiar: number = 0;
+
+  hipervinculo: string = environment.url;
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS SELECCIONADOS EN LA BUSQUEDA
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
@@ -89,6 +93,12 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   numero_pagina_emp: number = 1;
   tamanio_pagina_emp: number = 5;
   pageSizeOptions_emp = [5, 10, 20, 50];
+
+  // ITEMS DE PAGINACION DE LA TABLA DETALLE
+  @ViewChild('paginatorDetalle') paginatorDetalle: MatPaginator;
+  pageSizeOptions = [5, 10, 20, 50];
+  tamanio_pagina: number = 5;
+  numero_pagina: number = 1;
 
   // METODOS PARA BUSQUEDA DE DATOS POR FILTROS SUCURSAL
   get filtroNombreSuc() {
@@ -151,6 +161,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     this.regimen = [];
     this.cargos = [];
     this.origen = [];
+    this.arr_vac = [];
   }
 
   /** ****************************************************************************************** **
@@ -382,7 +393,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
             this.ExportarExcel();
             break;
           case 'ver':
-            this.VerDatos('suc');
+            this.VerDatos();
             break;
           default:
             this.GenerarPDF(accion);
@@ -433,7 +444,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
             this.ExportarExcelCargoRegimen();
             break;
           case 'ver':
-            this.VerDatos('reg');
+            this.VerDatos();
             break;
           default:
             this.GenerarPDF(accion);
@@ -465,7 +476,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
             this.ExportarExcelCargoRegimen();
             break;
           case 'ver':
-            this.VerDatos('car');
+            this.VerDatos();
             break;
           default:
             this.GenerarPDF(accion);
@@ -501,7 +512,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
             this.ExportarExcel();
             break;
           case 'ver':
-            this.VerDatos('dep');
+            this.VerDatos();
             break;
           default:
             this.GenerarPDF(accion);
@@ -544,7 +555,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
             this.ExportarExcel();
             break;
           case 'ver':
-            this.VerDatos('emp');
+            this.VerDatos();
             break;
           default:
             this.GenerarPDF(accion);
@@ -604,7 +615,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       documentDefinition = this.GetDocumentDefinicion();
     }
 
-    let doc_name = 'Vacunas.pdf';
+    let doc_name = `Vacunas_usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.pdf`;
     switch (action) {
       case 'open':
         pdfMake.createPdf(documentDefinition).open();
@@ -658,7 +669,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
             {
               text: [
                 {
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
+                  text: '© Pag ' + currentPage.toString() + ' de ' + pageCount,
                   alignment: 'right',
                   opacity: 0.3,
                 },
@@ -680,7 +691,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
           margin: [0, -30, 0, 5],
         },
         {
-          text: 'REGISTRO DE VACUNACIÓN',
+          text: `REGISTRO DE VACUNACIÓN - ${this.opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}`,
           bold: true,
           fontSize: 12,
           alignment: 'center',
@@ -1002,13 +1013,21 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
+  ValidarExcel(){
+    if (this.bool.bool_cargo || this.bool.bool_reg) {
+      this.ExportarExcelCargoRegimen();
+    } else {
+      this.ExportarExcel();
+    }
+  }
+
   ExportarExcel(): void {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(
       this.EstructurarDatosExcel(this.data_pdf)
     );
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Vacunas');
-    xlsx.writeFile(wb, 'Vacunas.xlsx');
+    xlsx.writeFile(wb, `Vacunas_usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.xlsx`);
   }
 
   EstructurarDatosExcel(array: Array<any>) {
@@ -1027,8 +1046,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
               'Nombre Empleado': obj3.name_empleado,
               Cédula: obj3.cedula,
               Género: obj3.genero == 1 ? 'M' : 'F',
-              Ciudad: obj1.ciudad,
               Sucursal: obj1.name_suc,
+              Ciudad: obj1.ciudad,
               Régimen: regimen,
               Departamento: obj2.name_dep,
               Cargo: obj3.cargo,
@@ -1052,7 +1071,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     );
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Vacunas');
-    xlsx.writeFile(wb, 'Vacunas.xlsx');
+    xlsx.writeFile(wb, `Vacunas_usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.xlsx`);
   }
 
   EstructurarDatosExcelRegimenCargo(array: Array<any>) {
@@ -1068,8 +1087,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
             'Nombre Empleado': obj2.name_empleado,
             Cédula: obj2.cedula,
             Género: obj2.genero == 1 ? 'M' : 'F',
-            Ciudad: obj2.ciudad,
             Sucursal: obj2.sucursal,
+            Ciudad: obj2.ciudad,
             Régimen: this.bool.bool_cargo ? obj2.regimen : obj2.regimen[0].name_regimen,
             Departamento: obj2.departamento,
             Cargo: obj2.cargo,
@@ -1085,6 +1104,83 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     });
 
     return nuevo;
+  }
+
+  /** ****************************************************************************************** **
+   ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
+   ** ****************************************************************************************** **/
+   ExtraerDatos() {
+    this.arr_vac = [];
+    let n = 0;
+    this.data_pdf.forEach((obj1: any) => {
+      obj1.departamentos.forEach((obj2: any) => {
+        obj2.empleado.forEach((obj3: any) => {
+          obj3.vacunas.forEach((obj4: any) => {
+            const fecha = this.validacionService.FormatearFecha(
+              obj4.fecha.split('T')[0],
+              this.formato_fecha,
+              this.validacionService.dia_abreviado);
+
+            n = n + 1;
+            let ele = {
+              n: n,
+              id_empleado: obj4.id_empleado,
+              codigo: obj3.codigo,
+              empleado: obj3.name_empleado,
+              cedula: obj3.cedula,
+              genero: obj3.genero,
+              ciudad: obj1.ciudad,
+              sucursal: obj1.name_suc,
+              regimen: obj3.regimen,
+              departamento: obj2.name_dep,
+              cargo: obj3.cargo,
+              correo: obj3.correo,
+              carnet: obj4.carnet,
+              vacuna: obj4.tipo_vacuna,
+              fecha,
+              descripcion: obj4.descripcion,
+            };
+            this.arr_vac.push(ele);
+          });
+        });
+      });
+    });
+  }
+
+  ExtraerDatosRegimenCargo() {
+    this.arr_vac = [];
+    let n = 0;
+    this.data_pdf.forEach((obj1: any) => {
+      obj1.empleados.forEach((obj2: any) => {
+        obj2.vacunas.forEach((obj3: any) => {
+          const fecha = this.validacionService.FormatearFecha(
+            obj3.fecha.split('T')[0],
+            this.formato_fecha,
+            this.validacionService.dia_abreviado);
+
+          n = n + 1;
+          let ele = {
+            n: n,
+            id_empleado: obj3.id_empleado,
+            codigo: obj2.codigo,
+            empleado: obj2.name_empleado,
+            cedula: obj2.cedula,
+            genero: obj2.genero,
+            ciudad: obj2.ciudad,
+            sucursal: obj2.sucursal,
+            regimen: obj2.regimen,
+            departamento: obj2.departamento,
+            cargo: obj2.cargo,
+            correo: obj2.correo,
+            carnet: obj3.carnet,
+            vacuna: obj3.tipo_vacuna,
+            fecha,
+            descripcion: obj3.descripcion,
+          };
+          this.arr_vac.push(ele);
+        });
+      });
+    });
   }
 
   /** ****************************************************************************************** **
@@ -1235,8 +1331,18 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   }
 
   //ENVIAR DATOS A LA VENTANA DE DETALLE
-  VerDatos(tipo: string) {
+  VerDatos() {
     this.verDetalle = true;
-    this.tipo = tipo;
+    if (this.bool.bool_cargo || this.bool.bool_reg) {
+      this.ExtraerDatosRegimenCargo();
+    } else {
+      this.ExtraerDatos();
+    }
+  }
+
+  // METODO PARA REGRESAR A LA PAGINA ANTERIOR
+  Regresar() {
+    this.verDetalle = false;
+    this.paginatorDetalle.firstPage();
   }
 }

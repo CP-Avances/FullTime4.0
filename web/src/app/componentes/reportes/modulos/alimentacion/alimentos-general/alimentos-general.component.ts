@@ -102,7 +102,7 @@ export class AlimentosGeneralComponent implements OnInit {
     this.ObtenerColores();
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleadoLogueado(idemploy: any) {
     this.empleadoLogueado = [];
     this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -174,26 +174,26 @@ export class AlimentosGeneralComponent implements OnInit {
         // 2. Buscamos registros de servicios solicitados
         this.restA.ObtenerSolicitadosConsumidos(fechas).subscribe(sol => {
           this.solicitados = sol;
-          // 3. METODO de BUSQUEDA de registros de servicios extras 
+          // 3. METODO de BUSQUEDA de registros de servicios extras
           this.ObtenerExtrasConsumidos(fechas, archivo, form);
         }, err => {
-          // 4. METODO de BUSQUEDA de registros de servicios extras 
+          // 4. METODO de BUSQUEDA de registros de servicios extras
           this.ObtenerExtrasConsumidos(fechas, archivo, form);
-          return this.validacionesService.RedireccionarHomeAdmin(err.error) 
+          return this.validacionesService.RedireccionarHomeAdmin(err.error)
         });
       }, err => {
         // 5. Buscamos registros de servicios solicitados
         this.restA.ObtenerSolicitadosConsumidos(fechas).subscribe(sol => {
           this.solicitados = sol;
-          // 6. METODO de BUSQUEDA de registros de servicios extras 
+          // 6. METODO de BUSQUEDA de registros de servicios extras
           this.ObtenerExtrasConsumidos(fechas, archivo, form);
         }, err => {
-          // 7. METODO de BUSQUEDA de registros de servicios extras 
+          // 7. METODO de BUSQUEDA de registros de servicios extras
           this.ObtenerExtrasConsumidos(fechas, archivo, form);
-          return this.validacionesService.RedireccionarHomeAdmin(err.error) 
+          return this.validacionesService.RedireccionarHomeAdmin(err.error)
         });
-        
-        return this.validacionesService.RedireccionarHomeAdmin(err.error) 
+
+        return this.validacionesService.RedireccionarHomeAdmin(err.error)
       });
     }
     else {
@@ -218,7 +218,7 @@ export class AlimentosGeneralComponent implements OnInit {
       }, err => {
         // Llamado a METODO de impresión de archivos
         this.ImprimirArchivo(archivo, form);
-        return this.validacionesService.RedireccionarHomeAdmin(err.error) 
+        return this.validacionesService.RedireccionarHomeAdmin(err.error)
       });
     }, err => {
       // 3. BUSQUEDA de servicios extras solicitados
@@ -244,10 +244,10 @@ export class AlimentosGeneralComponent implements OnInit {
           this.ImprimirArchivo(archivo, form);
         }
 
-        return this.validacionesService.RedireccionarHomeAdmin(err.error) 
+        return this.validacionesService.RedireccionarHomeAdmin(err.error)
       });
 
-      return this.validacionesService.RedireccionarHomeAdmin(err.error) 
+      return this.validacionesService.RedireccionarHomeAdmin(err.error)
     });
   }
 
@@ -263,7 +263,7 @@ export class AlimentosGeneralComponent implements OnInit {
   }
 
   IngresarSoloLetras(e) {
-    return this.validacionesService.IngresarSoloLetras(e) 
+    return this.validacionesService.IngresarSoloLetras(e)
   }
 
   IngresarSoloNumeros(evt) {
@@ -346,7 +346,7 @@ export class AlimentosGeneralComponent implements OnInit {
             },
             {
               text: [{
-                text: '© Pag ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', opacity: 0.3
+                text: '© Pag ' + currentPage.toString() + ' de ' + pageCount, alignment: 'right', opacity: 0.3
               }],
             }
           ], fontSize: 10
@@ -583,7 +583,7 @@ export class AlimentosGeneralComponent implements OnInit {
             },
             {
               text: [{
-                text: '© Pag ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', opacity: 0.3
+                text: '© Pag ' + currentPage.toString() + ' de ' + pageCount, alignment: 'right', opacity: 0.3
               }],
             }
           ], fontSize: 10
@@ -604,7 +604,7 @@ export class AlimentosGeneralComponent implements OnInit {
     };
   }
 
-  /****************************************************************************************************** 
+  /******************************************************************************************************
     *                                       METODO PARA EXPORTAR A EXCEL
     ******************************************************************************************************/
   exportToExcelAlimentacion(form: any) {
