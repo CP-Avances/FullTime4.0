@@ -165,3 +165,18 @@ export const ObtenerRutaPlatilla = function () {
     }
     return ruta + separador + 'plantillasRegistro';
 }
+
+// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE ARCHIVOS DE DATOS
+export const ObtenerRutaLeerPlantillas = function () {
+    var ruta = '';
+    let separador = path.sep;
+    for (var i = 0; i < __dirname.split(separador).length - 2; i++) {
+        if (ruta === '') {
+            ruta = __dirname.split(separador)[i];
+        }
+        else {
+            ruta = ruta + separador + __dirname.split(separador)[i];
+        }
+    }
+    return ruta + separador + 'leerPlantillas';
+}

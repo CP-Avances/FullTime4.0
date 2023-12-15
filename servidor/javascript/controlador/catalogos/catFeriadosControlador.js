@@ -12,9 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const moment_1 = __importDefault(require("moment"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../database"));
+const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const builder = require('xmlbuilder');
 class FeriadosControlador {
@@ -157,12 +159,13 @@ class FeriadosControlador {
     }
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
     RevisarDatos(req, res) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            let list = req.files;
-            let cadena = list.uploads[0].path;
-            let filename = cadena.split("\\")[1];
-            var filePath = `./plantillas/${filename}`;
-            const workbook = xlsx_1.default.readFile(filePath);
+            const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+            let separador = path_1.default.sep;
+            let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
+            console.log('ruta ', ruta);
+            const workbook = xlsx_1.default.readFile(ruta);
             const sheet_name_list = workbook.SheetNames;
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
             // VARIABLES USADAS PARA CONTAR NÚMERO DE FILAS CORRECTAS
@@ -302,24 +305,24 @@ class FeriadosControlador {
                 contador = contador + 1;
             }));
             // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                 if (err) {
                 }
                 else {
                     // ELIMINAR DEL SERVIDOR
-                    fs_1.default.unlinkSync(filePath);
+                    fs_1.default.unlinkSync(ruta);
                 }
             });
         });
     }
     // REVISAR DATOS DUPLICADOS DENTRO DE LA MISMA PLANTILLA
     RevisarDatos_Duplicados(req, res) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            let list = req.files;
-            let cadena = list.uploads[0].path;
-            let filename = cadena.split("\\")[1];
-            var filePath = `./plantillas/${filename}`;
-            const workbook = xlsx_1.default.readFile(filePath);
+            const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+            let separador = path_1.default.sep;
+            let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
+            const workbook = xlsx_1.default.readFile(ruta);
             const sheet_name_list = workbook.SheetNames;
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
             // VARIABLES DE CONTADORES DE REGISTROS
@@ -348,12 +351,12 @@ class FeriadosControlador {
                 datos_totales.push(fila_datos);
             }));
             // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                 if (err) {
                 }
                 else {
                     // ELIMINAR DEL SERVIDOR
-                    fs_1.default.unlinkSync(filePath);
+                    fs_1.default.unlinkSync(ruta);
                 }
             });
             ver_fecha = ver_recuperacion = datos_totales;
@@ -412,13 +415,13 @@ class FeriadosControlador {
     }
     // INGRESAR DATOS DE FERIADOS MEDIANTE PLANTILLA
     CrearFeriadoPlantilla(req, res) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            let list = req.files;
-            let cadena = list.uploads[0].path;
-            let filename = cadena.split("\\")[1];
-            var filePath = `./plantillas/${filename}`;
+            const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+            let separador = path_1.default.sep;
+            let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
             var contador = 1;
-            const workbook = xlsx_1.default.readFile(filePath);
+            const workbook = xlsx_1.default.readFile(ruta);
             const sheet_name_list = workbook.SheetNames;
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
             // LECTURA DE DATOS DE LA PLANTILLA
@@ -441,12 +444,12 @@ class FeriadosControlador {
                 contador = contador + 1;
             }));
             // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                 if (err) {
                 }
                 else {
                     // ELIMINAR DEL SERVIDOR
-                    fs_1.default.unlinkSync(filePath);
+                    fs_1.default.unlinkSync(ruta);
                 }
             });
         });

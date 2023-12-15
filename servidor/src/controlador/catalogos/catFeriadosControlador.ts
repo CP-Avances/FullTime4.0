@@ -1,8 +1,10 @@
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
+import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import moment from 'moment';
 import excel from 'xlsx';
 import pool from '../../database';
+import path from 'path';
 import fs from 'fs';
 const builder = require('xmlbuilder');
 
@@ -171,12 +173,13 @@ class FeriadosControlador {
 
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
     public async RevisarDatos(req: Request, res: Response): Promise<void> {
-        let list: any = req.files;
-        let cadena = list.uploads[0].path;
-        let filename = cadena.split("\\")[1];
-        var filePath = `./plantillas/${filename}`
+        const documento = req.file?.originalname;
+        let separador = path.sep;
+        let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
 
-        const workbook = excel.readFile(filePath);
+        console.log('ruta ', ruta)
+
+        const workbook = excel.readFile(ruta);
         const sheet_name_list = workbook.SheetNames;
         const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
         // VARIABLES USADAS PARA CONTAR NÚMERO DE FILAS CORRECTAS
@@ -328,23 +331,22 @@ class FeriadosControlador {
         });
 
         // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-        fs.access(filePath, fs.constants.F_OK, (err) => {
+        fs.access(ruta, fs.constants.F_OK, (err) => {
             if (err) {
             } else {
                 // ELIMINAR DEL SERVIDOR
-                fs.unlinkSync(filePath);
+                fs.unlinkSync(ruta);
             }
         });
     }
 
     // REVISAR DATOS DUPLICADOS DENTRO DE LA MISMA PLANTILLA
     public async RevisarDatos_Duplicados(req: Request, res: Response) {
-        let list: any = req.files;
-        let cadena = list.uploads[0].path;
-        let filename = cadena.split("\\")[1];
-        var filePath = `./plantillas/${filename}`
+        const documento = req.file?.originalname;
+        let separador = path.sep;
+        let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
 
-        const workbook = excel.readFile(filePath);
+        const workbook = excel.readFile(ruta);
         const sheet_name_list = workbook.SheetNames;
         const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
@@ -379,11 +381,11 @@ class FeriadosControlador {
         });
 
         // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-        fs.access(filePath, fs.constants.F_OK, (err) => {
+        fs.access(ruta, fs.constants.F_OK, (err) => {
             if (err) {
             } else {
                 // ELIMINAR DEL SERVIDOR
-                fs.unlinkSync(filePath);
+                fs.unlinkSync(ruta);
             }
         });
 
@@ -445,12 +447,11 @@ class FeriadosControlador {
 
     // INGRESAR DATOS DE FERIADOS MEDIANTE PLANTILLA
     public async CrearFeriadoPlantilla(req: Request, res: Response): Promise<void> {
-        let list: any = req.files;
-        let cadena = list.uploads[0].path;
-        let filename = cadena.split("\\")[1];
-        var filePath = `./plantillas/${filename}`
+        const documento = req.file?.originalname;
+        let separador = path.sep;
+        let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
         var contador = 1;
-        const workbook = excel.readFile(filePath);
+        const workbook = excel.readFile(ruta);
         const sheet_name_list = workbook.SheetNames;
         const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
         // LECTURA DE DATOS DE LA PLANTILLA
@@ -475,11 +476,11 @@ class FeriadosControlador {
         });
 
         // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-        fs.access(filePath, fs.constants.F_OK, (err) => {
+        fs.access(ruta, fs.constants.F_OK, (err) => {
             if (err) {
             } else {
                 // ELIMINAR DEL SERVIDOR
-                fs.unlinkSync(filePath);
+                fs.unlinkSync(ruta);
             }
         });
     }
