@@ -273,6 +273,12 @@ export interface tim_tabulado {
     desconocido: string
 }
 
+export interface TimbreMrl {
+  cedula: string,
+  fecha_hora: string,
+  accion: string
+}
+
 /**
  * Para Reporte TIMBRES
  */

@@ -259,7 +259,7 @@ export class ListarFeriadosComponent implements OnInit {
   Revisarplantilla() {
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
-      formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
     
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA

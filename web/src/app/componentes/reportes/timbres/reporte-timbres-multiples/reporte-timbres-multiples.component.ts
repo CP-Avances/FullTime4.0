@@ -36,7 +36,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
   get opcion() { return this.reporteService.opcion };
 
   get bool() { return this.reporteService.criteriosBusqueda };
-  
+
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS
   departamentos: any = [];
@@ -148,7 +148,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
   }
 
   /** ****************************************************************************************** **
-   ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** ****************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -173,7 +173,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
   }
 
   /** ****************************************************************************************** **
-   ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** ** 
+   ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** **
    ** ****************************************************************************************** **/
 
   // METODO DE BUSQUEDA DE DATOS
@@ -492,7 +492,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
 
 
   /** ****************************************************************************************** **
-   **                              COLORES Y LOGO PARA EL REPORTE                                ** 
+   **                              COLORES Y LOGO PARA EL REPORTE                                **
    ** ****************************************************************************************** **/
 
   logo: any = String;
@@ -502,7 +502,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -725,20 +725,20 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
                     if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
                       servidor_fecha = this.validacionService.FormatearFecha(
                         obj3.fec_hora_timbre_servidor.split(' ')[0],
-                        this.formato_fecha, 
+                        this.formato_fecha,
                         this.validacionService.dia_abreviado);
                       servidor_hora = this.validacionService.FormatearHora(
-                        obj3.fec_hora_timbre_servidor.split(' ')[1], 
+                        obj3.fec_hora_timbre_servidor.split(' ')[1],
                         this.formato_hora);
                     }
 
                     const fechaTimbre = this.validacionService.FormatearFecha(
                       obj3.fec_hora_timbre.split(' ')[0],
-                      this.formato_fecha, 
+                      this.formato_fecha,
                       this.validacionService.dia_abreviado);
 
                     const horaTimbre = this.validacionService.FormatearHora(
-                      obj3.fec_hora_timbre.split(' ')[1], 
+                      obj3.fec_hora_timbre.split(' ')[1],
                       this.formato_hora);
 
                     switch (obj3.accion) {
@@ -807,10 +807,10 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
                     if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
                       servidor_fecha = this.validacionService.FormatearFecha(
                         obj3.fec_hora_timbre_servidor.split(' ')[0],
-                        this.formato_fecha, 
+                        this.formato_fecha,
                         this.validacionService.dia_abreviado);
                       servidor_hora = this.validacionService.FormatearHora(
-                        obj3.fec_hora_timbre_servidor.split(' ')[1], 
+                        obj3.fec_hora_timbre_servidor.split(' ')[1],
                         this.formato_hora);
                     };
 
@@ -986,20 +986,20 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
                       if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
                         servidor_fecha = this.validacionService.FormatearFecha(
                           obj3.fec_hora_timbre_servidor.split(' ')[0],
-                          this.formato_fecha, 
+                          this.formato_fecha,
                           this.validacionService.dia_abreviado);
                         servidor_hora = this.validacionService.FormatearHora(
-                          obj3.fec_hora_timbre_servidor.split(' ')[1], 
+                          obj3.fec_hora_timbre_servidor.split(' ')[1],
                           this.formato_hora);
                       }
-  
+
                       const fechaTimbre = this.validacionService.FormatearFecha(
                         obj3.fec_hora_timbre.split(' ')[0],
-                        this.formato_fecha, 
+                        this.formato_fecha,
                         this.validacionService.dia_abreviado);
-  
+
                       const horaTimbre = this.validacionService.FormatearHora(
-                        obj3.fec_hora_timbre.split(' ')[1], 
+                        obj3.fec_hora_timbre.split(' ')[1],
                         this.formato_hora);
 
                       switch (obj3.accion) {
@@ -1067,13 +1067,13 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
                       if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
                         servidor_fecha = this.validacionService.FormatearFecha(
                           obj3.fec_hora_timbre_servidor.split(' ')[0],
-                          this.formato_fecha, 
+                          this.formato_fecha,
                           this.validacionService.dia_abreviado);
                         servidor_hora = this.validacionService.FormatearHora(
-                          obj3.fec_hora_timbre_servidor.split(' ')[1], 
+                          obj3.fec_hora_timbre_servidor.split(' ')[1],
                           this.formato_hora);
                       };
-  
+
                       switch (obj3.accion) {
                         case 'EoS': accionT = 'Entrada o salida'; break;
                         case 'AES': accionT = 'Inicio o fin alimentación'; break;
@@ -1125,7 +1125,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     return valor;
   }
 
-  /** ****************************************************************************************** ** 
+  /** ****************************************************************************************** **
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
@@ -1159,12 +1159,12 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
             if (obj4.fec_hora_timbre_servidor != '' && obj4.fec_hora_timbre_servidor != null) {
               servidor_fecha = new Date(obj4.fec_hora_timbre_servidor);
               servidor_hora = this.validacionService.FormatearHora(
-                obj4.fec_hora_timbre_servidor.split(' ')[1], 
+                obj4.fec_hora_timbre_servidor.split(' ')[1],
                 this.formato_hora);
             };
 
             const horaTimbre = this.validacionService.FormatearHora(
-              obj4.fec_hora_timbre.split(' ')[1], 
+              obj4.fec_hora_timbre.split(' ')[1],
               this.formato_hora);
 
             switch (obj4.accion) {
@@ -1222,12 +1222,12 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
           if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
             servidor_fecha = new Date(obj3.fec_hora_timbre_servidor);
             servidor_hora = this.validacionService.FormatearHora(
-              obj3.fec_hora_timbre_servidor.split(' ')[1], 
+              obj3.fec_hora_timbre_servidor.split(' ')[1],
               this.formato_hora);
           };
 
           const horaTimbre = this.validacionService.FormatearHora(
-            obj3.fec_hora_timbre.split(' ')[1], 
+            obj3.fec_hora_timbre.split(' ')[1],
             this.formato_hora);
 
           switch (obj3.accion) {
@@ -1252,7 +1252,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
               'Fecha Timbre': servidor_fecha, 'Hora Timbre': servidor_hora,
               'Fecha Timbre Dispositivo': new Date(obj3.fec_hora_timbre), 'Hora Timbre Dispositivo': horaTimbre,
               'Reloj': obj3.id_reloj, 'Acción': accionT, 'Observación': obj3.observacion,
-              'Latitud': obj3.latitud, 'Longitud': obj3.longitud, 
+              'Latitud': obj3.latitud, 'Longitud': obj3.longitud,
             }
           } else {
             ele = {
@@ -1272,7 +1272,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
     return nuevo;
   }
 
-  /** ****************************************************************************************** ** 
+  /** ****************************************************************************************** **
    ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
    ** ****************************************************************************************** **/
 
@@ -1290,20 +1290,20 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
             if (obj4.fec_hora_timbre_servidor != '' && obj4.fec_hora_timbre_servidor != null) {
               servidor_fecha = this.validacionService.FormatearFecha(
                 obj4.fec_hora_timbre_servidor.split(' ')[0],
-                this.formato_fecha, 
+                this.formato_fecha,
                 this.validacionService.dia_abreviado);
               servidor_hora = this.validacionService.FormatearHora(
-                obj4.fec_hora_timbre_servidor.split(' ')[1], 
+                obj4.fec_hora_timbre_servidor.split(' ')[1],
                 this.formato_hora);
             };
 
             const fechaTimbre = this.validacionService.FormatearFecha(
               obj4.fec_hora_timbre.split(' ')[0],
-              this.formato_fecha, 
+              this.formato_fecha,
               this.validacionService.dia_abreviado);
 
             const horaTimbre = this.validacionService.FormatearHora(
-              obj4.fec_hora_timbre.split(' ')[1], 
+              obj4.fec_hora_timbre.split(' ')[1],
               this.formato_hora);
 
             switch (obj4.accion) {
@@ -1350,20 +1350,20 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
           if (obj3.fec_hora_timbre_servidor != '' && obj3.fec_hora_timbre_servidor != null) {
             servidor_fecha = this.validacionService.FormatearFecha(
               obj3.fec_hora_timbre_servidor.split(' ')[0],
-              this.formato_fecha, 
+              this.formato_fecha,
               this.validacionService.dia_abreviado);
             servidor_hora = this.validacionService.FormatearHora(
-              obj3.fec_hora_timbre_servidor.split(' ')[1], 
+              obj3.fec_hora_timbre_servidor.split(' ')[1],
               this.formato_hora);
           };
 
           const fechaTimbre = this.validacionService.FormatearFecha(
             obj3.fec_hora_timbre.split(' ')[0],
-            this.formato_fecha, 
+            this.formato_fecha,
             this.validacionService.dia_abreviado);
 
           const horaTimbre = this.validacionService.FormatearHora(
-            obj3.fec_hora_timbre.split(' ')[1], 
+            obj3.fec_hora_timbre.split(' ')[1],
             this.formato_hora);
 
           switch (obj3.accion) {
@@ -1378,7 +1378,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
             case 'F/P': accionT = 'Fin permiso'; break;
             case 'HA': accionT = 'Timbre libre'; break;
             default: accionT = 'Desconocido'; break;
-          }  
+          }
           let ele = {
             n: n,
             ciudad: obj2.ciudad, sucursal: obj2.sucursal,
