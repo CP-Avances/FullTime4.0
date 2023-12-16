@@ -23,6 +23,7 @@ import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
 
 @Component({
   selector: 'app-lista-sucursales',
@@ -45,6 +46,8 @@ export class ListaSucursalesComponent implements OnInit {
     buscarEmpresForm: this.buscarEmpresa
   });
 
+  archivoForm = new FormControl('', Validators.required);
+
   sucursales: any = [];
 
   // ITEMS DE PAGINACION DE LA TABLA
@@ -57,6 +60,7 @@ export class ListaSucursalesComponent implements OnInit {
 
   constructor(
     private rest: SucursalService,
+    private serviciudades: CiudadService,
     private toastr: ToastrService,
     private router: Router,
     public restEmpre: EmpresaService,
@@ -350,5 +354,99 @@ export class ListaSucursalesComponent implements OnInit {
     // Simular un clic en el enlace para iniciar la descarga
     a.click();
   }
+
+
+
+  // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
+  nameFile: string;
+  archivoSubido: File;
+  excelData: any = [];
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE FERIADOS -----------------------------------------------------------------
+  FileChange(element: any) {
+    this.archivoSubido = element.target.files[0];
+    this.nameFile = this.archivoSubido.name;
+    console.log('this.archivoSubido: ',this.nameFile);
+    let arrayItems = this.nameFile.split(".");
+    let itemExtencion = arrayItems[arrayItems.length - 1];
+    let itemName = arrayItems[0].slice(0, 10);
+    if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
+      console.log(itemName.toLowerCase(), '==','sucursales');
+      if (itemName.toLowerCase() == 'sucursales') {
+        this.Revisarplantilla(this.archivoSubido).then((excelData: any[][]) => {
+          this.excelData = excelData;
+          console.log('excelData: ',this.excelData);
+          this.excelData.forEach(item => {
+            for(var i=0; i<item.length; i++){
+              console.log('valor 1: ',item[1]);
+              item[1] = this.ListarCiudades(item[1]);
+            } 
+          })
+        });
+      } else {
+        this.toastr.error('Seleccione plantilla con nombre Sucursales', 'Plantilla seleccionada incorrecta', {
+          timeOut: 6000,
+        });
+        this.archivoForm.reset();
+        this.nameFile = '';
+      }
+    } else {
+      this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
+        timeOut: 6000,
+      });
+      this.archivoForm.reset();
+      this.nameFile = '';
+    }
+  }
+
+  // METODO PARA ENVIAR MENSAJES DE ERROR O CARGAR DATOS SI LA PLANTILLA ES CORRECTA
+  Revisarplantilla(file: File): Promise<any[][]> {
+    let formData = new FormData();
+    formData.append("uploads[]", this.archivoSubido, this.archivoSubido.name);
+
+    console.log('append: ',formData.get("uploads[]"));
+  
+    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    this.rest.RevisarFormato(formData).subscribe(res => {
+      console.log('probando plantilla1', res);
+    });
+    
+
+    // Función para leer el archivo Excel
+    return new Promise<any[][]>((resolve, reject) => {
+      const reader: FileReader = new FileReader();
+      reader.onload = (e: any) => {
+        const data: any = e.target.result;
+        const workbook = xlsx.read(data, { type: 'binary' });
+        const sheetName = workbook.SheetNames[0]; // Obtener el nombre de la primera hoja
+        const worksheet = workbook.Sheets[sheetName];
+        const excelData: any[][] = xlsx.utils.sheet_to_json(worksheet, { header: 1 });
+        resolve(excelData);
+      };
+      reader.onerror = (e) => {
+        reject(e);
+      };
+      reader.readAsBinaryString(file);
+    });
+
+    
+
+  }
+
+
+  // METODO PARA LISTAR CIUDADES
+  datosCiudades: any = [];
+  ListarCiudades(id_ciudad){
+    this.datosCiudades = [];
+    this.serviciudades.ListarNombreCiudadProvincia().subscribe(datos => {
+      this.datosCiudades = datos;
+      this.datosCiudades.forEach(item => {
+        if(item.id == id_ciudad){
+          console.log(item.id, '==',id_ciudad, '==',item.nombre);
+          return item.nombre;
+        }
+      })
+    })
+  }
+
 
 }

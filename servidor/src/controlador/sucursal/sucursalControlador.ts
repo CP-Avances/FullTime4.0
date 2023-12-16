@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import pool from '../../database';
+import excel from 'xlsx';
 import fs from 'fs';
 const builder = require('xmlbuilder');
 
@@ -118,6 +119,12 @@ class SucursalControlador {
     else {
       return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
+  }
+
+  // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+  public async RevisarDatos(req: Request, res: Response): Promise<any> {
+    let list: any = req.files;
+    console.log('req: ',list)
   }
 
 }

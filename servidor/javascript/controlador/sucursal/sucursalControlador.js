@@ -116,6 +116,13 @@ class SucursalControlador {
             }
         });
     }
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+    RevisarDatos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let list = req.files;
+            console.log('req: ', list);
+        });
+    }
 }
 exports.SUCURSAL_CONTROLADOR = new SucursalControlador();
 exports.default = exports.SUCURSAL_CONTROLADOR;

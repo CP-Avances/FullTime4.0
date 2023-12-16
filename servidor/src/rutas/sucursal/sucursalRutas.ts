@@ -2,6 +2,12 @@ import { Router } from 'express';
 import { TokenValidation } from '../../libs/verificarToken'
 import SUCURSAL_CONTROLADOR from '../../controlador/sucursal/sucursalControlador';
 
+const multipart = require('connect-multiparty');
+
+const multipartMiddleware = multipart({
+    uploadDir: './plantillas',
+});
+
 class SucursalRutas {
     public router: Router = Router();
 
@@ -26,6 +32,8 @@ class SucursalRutas {
         // METODO PARA BUSCAR DATOS DE UNA SUCURSAL
         this.router.get('/unaSucursal/:id', TokenValidation, SUCURSAL_CONTROLADOR.ObtenerUnaSucursal);
 
+    
+        this.router.post('/upload/revision', [TokenValidation, multipartMiddleware], SUCURSAL_CONTROLADOR.RevisarDatos);
     }
 }
 

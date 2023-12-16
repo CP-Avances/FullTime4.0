@@ -6,6 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const verificarToken_1 = require("../../libs/verificarToken");
 const sucursalControlador_1 = __importDefault(require("../../controlador/sucursal/sucursalControlador"));
+const multipart = require('connect-multiparty');
+const multipartMiddleware = multipart({
+    uploadDir: './plantillas',
+});
 class SucursalRutas {
     constructor() {
         this.router = (0, express_1.Router)();
@@ -26,6 +30,7 @@ class SucursalRutas {
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, sucursalControlador_1.default.EliminarRegistros);
         // METODO PARA BUSCAR DATOS DE UNA SUCURSAL
         this.router.get('/unaSucursal/:id', verificarToken_1.TokenValidation, sucursalControlador_1.default.ObtenerUnaSucursal);
+        this.router.post('/upload/revision', [verificarToken_1.TokenValidation, multipartMiddleware], sucursalControlador_1.default.RevisarDatos);
     }
 }
 const SUCURSAL_RUTAS = new SucursalRutas();

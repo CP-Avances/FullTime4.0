@@ -261,9 +261,11 @@ export class ListarFeriadosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+    
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
       console.log('probando plantilla1', res);
+      /*
       if (res.message === 'CAMPO FECHA ES OBLIGATORIO') {
         this.toastr.error('Para asegurar el buen funcionamiento del sistema es necesario que verifique los datos ' +
           'de la plantilla ingresada. No se encuentra el registro del campo fecha en la ' + res.data + '.',
@@ -371,7 +373,9 @@ export class ListarFeriadosComponent implements OnInit {
           }
         });
       }
+      */
     });
+    
   }
 
   /** ************************************************************************************************* **
