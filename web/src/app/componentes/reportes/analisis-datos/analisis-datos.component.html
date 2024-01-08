@@ -3,9 +3,9 @@
     <span>ANÁLISIS DATOS</span>
 </div>
   <mat-card class="example-card mat-elevation-z9">
-    <iframe
+    <iframe *ngIf="cargarHerramienta"
         id="iframe"
-        src="http://192.168.0.143:3000/goto/0lfLMAKSg?orgId=1"
+        [src]="urlSafe"
         width="auto"
         height="800"
         allowtransparency
