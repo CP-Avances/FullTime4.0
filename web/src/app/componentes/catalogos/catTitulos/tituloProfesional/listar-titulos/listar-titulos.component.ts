@@ -24,6 +24,7 @@ import { TitulosComponent } from '../titulos/titulos.component'
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { TituloService } from 'src/app/servicios/catalogos/catTitulos/titulo.service';
+import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulos.service';
 
 @Component({
   selector: 'app-listar-titulos',
@@ -73,12 +74,14 @@ export class ListarTitulosComponent implements OnInit {
     public rest: TituloService, // SERVICIO DATOS DE TITULOS
     private toastr: ToastrService, // VARIABLE DE MANEJO DE MENSAJES DE NOTIFICACIONES
     private plantillaPDF: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
+    public nivel: NivelTitulosService,
   ) { }
 
   ngOnInit(): void {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerTitulos();
+    this.ObtenerNiveles();
   }
 
   // EVENTO PARA MOSTRAR NUMERO DE FILAS DETERMINADAS EN LA TABLA
@@ -99,6 +102,17 @@ export class ListarTitulosComponent implements OnInit {
   ObtenerTitulos() {
     this.rest.ListarTitulos().subscribe(data => {
       this.verTitulos = data;
+      console.log('titulos: ',this.verTitulos);
+    });
+  }
+
+  nivelTitulos: any = [];
+  // METODO DE BUSQUEDA DE DATOS DE NIVELES
+  ObtenerNiveles() {
+    this.nivelTitulos = [];
+    this.nivel.ListarNiveles().subscribe(res => {
+      this.nivelTitulos = res;
+      console.log('this.nivelTitulos: ',this.nivelTitulos);
     });
   }
 
@@ -251,8 +265,6 @@ export class ListarTitulosComponent implements OnInit {
       
   }
 
-
-
    //Metodo para dar color a las celdas y representar las validaciones
    colorCelda: string = ''
    stiloCelda(observacion: string): string{
@@ -279,7 +291,42 @@ export class ListarTitulosComponent implements OnInit {
    }
 
    registrarTitulos(){
+    var data: any = {
+      nombre: '',
+      id_nivel: ''
+    }
+    
+    if(this.listTitulosCorrectos.length > 0){
+      console.log('listTitulosCorrectos', this.listTitulosCorrectos);
+      var cont = 0;
+      this.listTitulosCorrectos.forEach(item => {
+        this.nivelTitulos.forEach(valor => {
+          if(item.nivel.toLowerCase() == valor.nombre.toLowerCase()){
+            data.nombre = item.titulo;
+            data.id_nivel = valor.id;
+            this.rest.RegistrarTitulo(data).subscribe(res => {
+              cont = cont + 1;
+              if(this.listTitulosCorrectos.length  == cont){
+                this.toastr.success('Operación exitosa.', 'Plantilla de Titulos profesionales importada.', {
+                  timeOut: 1500,
+                });
+                this.LimpiarCampos();
+              }
+            })
 
+            data = {}
+          }
+        })
+      })
+    }else{
+      this.toastr.error('La plantilla no tiene ningun titulo para registrar ingrese otra', 'Plantilla no aceptada', {
+        timeOut: 4000,
+      });
+      this.archivoForm.reset();
+    }
+
+    this.archivoSubido = [];
+    this.nameFile = '';
    }
 
 

@@ -272,7 +272,7 @@ export class MainNavComponent implements OnInit {
         children: [
           { name: 'Feriados', url: '/listarFeriados', color: true },
           { name: 'Horarios', url: '/horario', color: true },
-          { name: 'Planificación Horaria', url: '/horariosMultiples', color: true },
+          { name: 'Planificar Horarios', url: '/horariosMultiples', color: true },
           { name: 'Actualizar Asistencia', url: '/asistencia', color: true },
         ]
       },
@@ -519,10 +519,10 @@ export class MainNavComponent implements OnInit {
               { name: 'Atrasos', url: '/reporte-atrasos-multiples', color: true },
               // { name: 'Puntualidad', url: '/reporte-puntualidad', color: true },
               { name: 'Tiempo Laborado', url: '/reporte-horas-trabajadas', color: true },
+              { name: 'Tiempo Alimentación', url: '/tiempo-alimentacion', color: true },
               { name: 'Salidas Anticipadas', url: '/salidas-anticipadas', color: true },
               { name: 'Resumen Asistencia', url: '/reporte-resumen-asistencia', color: true },
               { name: 'Planificación Horaria', url: '/reporte-planificacion-horaria', color: true },
-              { name: 'Tiempo Alimentación', url: '/tiempo-alimentacion', color: true },
               //{ name: 'Entradas Salidas', url: '/reporteEntradaSalida', color: true },
               //{ name: 'Asistencia Detalle Consolidado', url: '/reporteAsistenciaConsolidado', color: true },
             ]
