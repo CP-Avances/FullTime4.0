@@ -51,8 +51,8 @@ const generarTimbres = function (codigo, inicio, fin) {
                     break;
                 case 'S':
                     //var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:10:00")).format("HH:mm:ss");
-                    var hora_ = (0, moment_1.default)(ele.hora, "HH:mm:ss").add(moment_1.default.duration("00:00:00")).format("HH:mm:ss");
-                    //var hora_ = moment(ele.hora, "HH:mm:ss").subtract(moment.duration("00:02:00")).format("HH:mm:ss");
+                    //var hora_ = moment(ele.hora, "HH:mm:ss").add(moment.duration("00:00:00")).format("HH:mm:ss");
+                    var hora_ = (0, moment_1.default)(ele.hora, "HH:mm:ss").subtract(moment_1.default.duration("00:02:00")).format("HH:mm:ss");
                     var formato = (0, moment_1.default)(ele.fecha, 'YYYY-MM-DD').format('YYYY-MM-DD');
                     fecha = (0, moment_1.default)(formato + ' ' + hora_, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');
                     observacion = 'Salida';
@@ -72,7 +72,7 @@ const generarTimbres = function (codigo, inicio, fin) {
                     var comida = (0, moment_1.default)(formatearMinutos(ele.min_alimentacion), 'HH:mm:ss').format('HH:mm:ss');
                     //var min = moment(comida, "HH:mm:ss").subtract(moment.duration("00:01:00")).format("HH:mm:ss");
                     //var min = moment(comida, "HH:mm:ss").subtract(moment.duration("00:01:00")).format("HH:mm:ss");
-                    var min = (0, moment_1.default)(comida, "HH:mm:ss").add(moment_1.default.duration("00:04:00")).format("HH:mm:ss");
+                    var min = (0, moment_1.default)(comida, "HH:mm:ss").add(moment_1.default.duration("00:00:00")).format("HH:mm:ss");
                     var hora_ = (0, moment_1.default)(auxiliar, "HH:mm:ss").add(moment_1.default.duration(min)).format("HH:mm:ss");
                     console.log('hora ', hora_, ' auxiliar ', auxiliar);
                     var formato = (0, moment_1.default)(ele.fecha, 'YYYY-MM-DD').format('YYYY-MM-DD');

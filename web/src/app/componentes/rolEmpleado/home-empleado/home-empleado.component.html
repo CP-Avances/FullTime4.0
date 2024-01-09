@@ -6,94 +6,92 @@
   </div>
   <br>
 
-   <!--Modulos-->
-   <div class="row">
-    <div class="col-4"  (click)="MenuRapido(0)">
-      <mat-card  class="mat-elevation-z8 card-info" 
-        style="color: antiquewhite;">
-        <mat-card-title style="text-align: center; padding: 3px;"> 
-          <mat-label  class="titulo-card">Informacion Usuario</mat-label>
+  <!--Modulos-->
+  <div class="row">
+    <div class="col-4" (click)="MenuRapido(0)">
+      <mat-card class="mat-elevation-z8 card-info" style="color: antiquewhite;">
+        <mat-card-title style="text-align: center; padding: 3px;">
+          <mat-label class="titulo-card">Información Usuario</mat-label>
         </mat-card-title>
         <mat-card-content>
           <div class="row">
-                <div class="col-md">
+            <div class="col-md">
 
-                <br>
-                <div class="cont_imagen">
-                  <div mat-card-avatar id="avatar" *ngIf="mostrarImagen; else inic">
-                    <img src="{{urlImagen}}" alt="" id="avatarImagen">
+              <br>
+              <div class="cont_imagen">
+                <div mat-card-avatar id="avatar" *ngIf="mostrarImagen; else inic">
+                  <img src="{{urlImagen}}" alt="" id="avatarImagen">
+                </div>
+                <ng-template #inic>
+                  <div mat-card-avatar id="avatar">
+                    <span class="btn iniciales d-flex align-items-center justify-content-center">
+                      {{iniciales}}
+                    </span>
                   </div>
-                  <ng-template #inic>
-                    <div mat-card-avatar id="avatar">
-                        <span
-                            class="btn iniciales d-flex align-items-center justify-content-center">
-                            {{iniciales}}
-                        </span>
-                    </div>
-                  </ng-template>
-                </div>
-                <br>
-
-                  <label>
-                    <mat-icon class="icon-menu">assignment_ind</mat-icon>
-                    <mat-label  class="icon-menu">{{datosEmpleado.cedula}}</mat-label>
-                  </label><br>
-                  <label>
-                    <mat-icon class="icon-menu">location_on</mat-icon>
-                    <mat-label  class="icon-menu">{{datosEmpleado.domicilio}}</mat-label>
-                  </label><br>
-                  <label>
-                    <mat-icon class="icon-menu">phone</mat-icon>
-                    <mat-label  class="icon-menu">{{datosEmpleado.telefono}}</mat-label>
-                  </label><br>
-                  <label>
-                    <mat-icon class="icon-menu">cake</mat-icon>
-                    <mat-label  class="icon-menu">{{datosEmpleado.fec_nacimiento_}}</mat-label>
-                  </label><br>
-                  <label>
-                    <mat-icon class="icon-menu"> contact_mail</mat-icon>
-                    <mat-label  class="icon-menu">{{datosEmpleado.correo}}</mat-label>
-                  </label>
-                </div>
+                </ng-template>
               </div>
-            </mat-card-content>
+              <br>
+
+              <label>
+                <mat-icon class="icon-menu">assignment_ind</mat-icon>
+                <mat-label class="icon-menu">{{datosEmpleado.cedula}}</mat-label>
+              </label><br>
+              <label>
+                <mat-icon class="icon-menu">location_on</mat-icon>
+                <mat-label class="icon-menu">{{datosEmpleado.domicilio}}</mat-label>
+              </label><br>
+              <label>
+                <mat-icon class="icon-menu">phone</mat-icon>
+                <mat-label class="icon-menu">{{datosEmpleado.telefono}}</mat-label>
+              </label><br>
+              <label>
+                <mat-icon class="icon-menu">cake</mat-icon>
+                <mat-label class="icon-menu">{{datosEmpleado.fec_nacimiento_}}</mat-label>
+              </label><br>
+              <label>
+                <mat-icon class="icon-menu"> contact_mail</mat-icon>
+                <mat-label class="icon-menu">{{datosEmpleado.correo}}</mat-label>
+              </label>
+            </div>
+          </div>
+        </mat-card-content>
       </mat-card>
     </div>
     <div class="col-8">
       <div class="row" style="text-align:justify;">
         <div class="col-6" (click)="MenuRapido(1)"><!--Permiso-->
-              <mat-card [ngClass]="!permisos ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-permi'" 
-                style="color: antiquewhite;">
-                <mat-card-title style="text-align: center; padding: 3px;"> 
-                  <mat-label  class="titulo-card">Permisos</mat-label>
-                </mat-card-title>
-                <mat-card-content>
-                  <div class="row">
-                    <div class="col-md">
-                      <label>
-                        <mat-icon class="icon-menu align-self-center">insert_emoticon</mat-icon>
-                      </label>
-                    </div>
-                  </div>
-                </mat-card-content>
-              </mat-card>
+          <mat-card [ngClass]="!permisos ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-permi'"
+            style="color: antiquewhite;">
+            <mat-card-title style="text-align: center; padding: 3px;">
+              <mat-label class="titulo-card">Permisos</mat-label>
+            </mat-card-title>
+            <mat-card-content>
+              <div class="row">
+                <div class="col-md">
+                  <label>
+                    <mat-icon class="icon-menu align-self-center">insert_emoticon</mat-icon>
+                  </label>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
         </div>
         <div class="col-6" (click)="MenuRapido(2)"><!--Vacaciones-->
-              <mat-card [ngClass]="!vacaciones ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-vaca'" 
-                style="color: antiquewhite;">
-                <mat-card-title style="text-align: center; padding: 3px;"> 
-                  <mat-label  class="titulo-card">Vacaciones</mat-label>
-                </mat-card-title>
-                <mat-card-content>
-                  <div class="row">
-                    <div class="col-md">
-                      <label>
-                        <mat-icon class="icon-menu align-self-center">flight</mat-icon>
-                      </label>
-                    </div>
-                  </div>
-                </mat-card-content>
-              </mat-card>
+          <mat-card [ngClass]="!vacaciones ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-vaca'"
+            style="color: antiquewhite;">
+            <mat-card-title style="text-align: center; padding: 3px;">
+              <mat-label class="titulo-card">Vacaciones</mat-label>
+            </mat-card-title>
+            <mat-card-content>
+              <div class="row">
+                <div class="col-md">
+                  <label>
+                    <mat-icon class="icon-menu align-self-center">flight</mat-icon>
+                  </label>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
         </div>
       </div>
       <br>
@@ -101,79 +99,80 @@
         <div class="col-6" (click)="MenuRapido(3)"> <!--boton-inactivo-->
           <mat-card [ngClass]="!horasExtras ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-horasExtras'"
             style="color: antiquewhite;"><!--boton-inactivo-->
-            <mat-card-title style="text-align: center; padding: 3px;"> 
-              <mat-label  class="titulo-card">Horas Extras</mat-label>
+            <mat-card-title style="text-align: center; padding: 3px;">
+              <mat-label class="titulo-card">Horas Extras</mat-label>
             </mat-card-title>
             <mat-card-content>
               <div class="row">
-                    <div class="col-md">
-                      <label>
-                        <mat-icon class="icon-menu">schedule</mat-icon>
-                      </label>
-                    </div>
-                  </div>
+                <div class="col-md">
+                  <label>
+                    <mat-icon class="icon-menu">schedule</mat-icon>
+                  </label>
+                </div>
+              </div>
             </mat-card-content>
           </mat-card>
         </div>
         <div class="col-6" (click)="MenuRapido(4)">
           <mat-card [ngClass]="!alimentacion ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-alimentacion'"
             style="color: antiquewhite;">
-            <mat-card-title style="text-align: center; padding: 3px;"> 
-                  <mat-label  class="titulo-card">Alimentación</mat-label>
+            <mat-card-title style="text-align: center; padding: 3px;">
+              <mat-label class="titulo-card">Alimentación</mat-label>
             </mat-card-title>
             <mat-card-content>
-                  <div class="row">
-                    <div class="col-md">
-                      <label>
-                        <mat-icon class="icon-menu align-self-center">local_dining</mat-icon>
-                      </label>
-                    </div>
-                  </div>
+              <div class="row">
+                <div class="col-md">
+                  <label>
+                    <mat-icon class="icon-menu align-self-center">local_dining</mat-icon>
+                  </label>
+                </div>
+              </div>
             </mat-card-content>
           </mat-card>
         </div>
       </div>
     </div>
-   </div>
- 
+  </div>
+
   <br><br>
 
   <div class="col-md">
     <div class="d-flex justify-content-center flex-wrap">
-      <mat-card (click)="MenuRapido(5)" 
+      <mat-card (click)="MenuRapido(5)"
         [ngClass]="!accion ? 'mat-elevation-z8 card-inactivo_' : 'mat-elevation-z8 card-accionPerso'"
         style="color: antiquewhite;"><!--boton-inactivo-->
         <mat-card-title style="text-align: center; padding: 3px;">
-          <mat-label  class="titulo-card">Acciones Personal</mat-label>
+          <mat-label class="titulo-card">Acciones Personal</mat-label>
         </mat-card-title>
         <mat-card-content>
           <div class="row">
-                <div class="col-md">
-                  <label>
-                    <mat-icon class="icon-menu align-self-center">how_to_reg</mat-icon>
-                  </label>
-                </div>
-              </div>
+            <div class="col-md">
+              <label>
+                <mat-icon class="icon-menu align-self-center">how_to_reg</mat-icon>
+              </label>
+            </div>
+          </div>
         </mat-card-content>
       </mat-card>
 
-      <mat-card (click)="MenuRapido(8)" [ngClass]="!teletrabajo ? 'mat-elevation-z8 card-inactivo_' : 'mat-elevation-z8 card-timbreTele'"
+      <mat-card (click)="MenuRapido(8)"
+        [ngClass]="!teletrabajo ? 'mat-elevation-z8 card-inactivo_' : 'mat-elevation-z8 card-timbreTele'"
         style="color: antiquewhite;"><!--boton-inactivo-->
         <mat-card-title style="text-align: center; padding: 3px;">
-          <mat-label  class="titulo-card">Timbre Teletrabajo</mat-label>
+          <mat-label class="titulo-card">Timbre Teletrabajo</mat-label>
         </mat-card-title>
         <mat-card-content>
           <div class="row">
-                <div class="col-md">
-                  <label>
-                    <mat-icon class="icon-menu align-self-center">computer</mat-icon>
-                  </label>
-                </div>
-              </div>
+            <div class="col-md">
+              <label>
+                <mat-icon class="icon-menu align-self-center">computer</mat-icon>
+              </label>
+            </div>
+          </div>
         </mat-card-content>
       </mat-card>
     </div>
   </div>
 
-  
+
 </div>
