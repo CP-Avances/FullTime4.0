@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ObtenerRutaPlatilla = exports.ObtenerRutaContrato = exports.ObtenerRutaLogos = exports.ObtenerRutaBirthday = exports.ObtenerRutaDocumento = exports.ObtenerRutaHorarios = exports.ObtenerRutaPermisos = exports.ObtenerRutaVacuna = exports.ObtenerRutaUsuario = void 0;
+exports.ObtenerRutaLeerPlantillas = exports.ObtenerRutaPlatilla = exports.ObtenerRutaContrato = exports.ObtenerRutaLogos = exports.ObtenerRutaBirthday = exports.ObtenerRutaDocumento = exports.ObtenerRutaHorarios = exports.ObtenerRutaPermisos = exports.ObtenerRutaVacuna = exports.ObtenerRutaUsuario = void 0;
 const database_1 = __importDefault(require("../database"));
 const path_1 = __importDefault(require("path"));
 // METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE IMAGENES DE USUARIO
@@ -175,3 +175,18 @@ const ObtenerRutaPlatilla = function () {
     return ruta + separador + 'plantillasRegistro';
 };
 exports.ObtenerRutaPlatilla = ObtenerRutaPlatilla;
+// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE ARCHIVOS DE DATOS
+const ObtenerRutaLeerPlantillas = function () {
+    var ruta = '';
+    let separador = path_1.default.sep;
+    for (var i = 0; i < __dirname.split(separador).length - 2; i++) {
+        if (ruta === '') {
+            ruta = __dirname.split(separador)[i];
+        }
+        else {
+            ruta = ruta + separador + __dirname.split(separador)[i];
+        }
+    }
+    return ruta + separador + 'leerPlantillas';
+};
+exports.ObtenerRutaLeerPlantillas = ObtenerRutaLeerPlantillas;
