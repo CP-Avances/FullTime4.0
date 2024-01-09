@@ -7,10 +7,16 @@
                     <span>ESTABLECIMIENTOS</span>
                     </div>
                     <mat-card class="example-card mat-elevation-z9">
-                    <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                        <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrar()">
+                    <div
+                    class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
+                        <button *ngIf="!Datasucursales" id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrar()">
                             Crear establecimiento
                         </button>
+                        <button *ngIf="Datasucursales" id="btn-raised" class="btn btn-sm" (click)="registrarSucursales()" matSuffix 
+                            matTooltipPosition="right" 
+                            matTooltip="Guardar registro multiple.">
+                            Registrar
+                         </button>
                         <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampoBuscar()" matSuffix
                             matTooltipPosition="right"
                             matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
@@ -33,33 +39,32 @@
                                         id="file"
                                         accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                     <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
+                                        *ngIf="!mostrarbtnsubir"
                                         style="height: 64px;"
                                         matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
                                         Subir Establecimientos
                                     </label>
+                                    <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
+                                        *ngIf="mostrarbtnsubir"
+                                        style="height: 64px;"
+                                        matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                        Subir nuevamente Establecimientos
+                                    </label>
                                 </form>
                             </div>
                         </div>
-                        <!--div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-around">
-                                <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
-                                    style="margin: 2% 0% 3% 0%;"
-                                    matTooltip="Dar click para ver o descargar el documento."
-                                    href="{{hipervinculo}}/plantillaD/documento/Feriados.xlsx">
-                                    <span class="material-icons">cloud_download</span>
-                                    <br>
-                                    Descargar plantilla feriados
-                                </a>
+                        <div class="col-md">
+                            <div class="d-flex flex-wrap justify-content-around" >
+                               
                             </div>
-                        </div -->
+                        </div>
                     </div>
                 </mat-card>
             </div>
         </div>
-    
     </div>
 <!------------------ LISTA DE ESTABLECIMIENTOS ------------------------------------------------->
-    <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="excelData.length === 0">
+    <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!Datasucursales">
         <div class="mat-elevation-z8" style="background: white;">
             <div id="resultados">RESULTADO DE BÚSQUEDA</div>
             <div class="table-responsive">
@@ -148,53 +153,41 @@
     </div>
 
 <!---------------------- TABLA DE DATOS DE LA CARGA MULTIPLE ----------------------------------->
-     <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="excelData && excelData.length">
+    <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="Datasucursales">
         <div class="mat-elevation-z8" style="background: white;">
-            <div id="resultados">REGISTRO MULTIPLE</div>
+            <div id="resultados">
+                REGISTRO MULTIPLE
+            </div>
             <div class="table-responsive">
                 <table class="table table-hover table-sm ">
                     <thead class="thead-light">
                         <tr style="text-align: center;">
-                            <th scope="col">Empresa</th>
                             <th scope="col">Establecimiento</th>
                             <th scope="col">Ciudad</th>
+                            
+                            <th scope="col">Observación</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr 
-                            *ngFor="let row of excelData.slice(1)">
-                            <td *ngFor="let cell of row">{{cell}}</td>
+                        <tr *ngFor="let data of Datasucursales">
+                            <td [style.color]="stiloTextoCelda(data.nom_sucursal)">{{ data.nom_sucursal}}</td>
+                            <td [style.color]="stiloTextoCelda(data.ciudad)">{{ data.ciudad}}</td>
+                            <td>
+                                <div style="width: 270px; margin: auto;">
+                                    <div id="t-editar" class="circulo"  [style.background-color]="stiloCelda(data.observacion)"></div>
+                                    {{ data.observacion}}
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina"
+            <mat-paginator id="pagina" [length]="Datasucursales.length" [pageSize]="tamanio_pagina"
                 [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
             </mat-paginator>
-            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
-                <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
-                    matTooltipPosition="right" matTooltip="Descargar Lista de Sucursales en formato PDF.">
-                    <p>PDF</p>
-                </i>
-                <i (click)="exportToExcel()" id="excel" class="fas fa-file-excel" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar Lista de Sucursales en formato EXCEL.">
-                    <p>XLSL</p>
-                </i>
-                <i (click)="exportToCVS()" id="csv" class="fas fa-file-csv" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar Lista de Sucursales en formato CSV.">
-                    <p>CSV</p>
-                </i>
-                <i (click)="exportToXML()" id="xml" class="fas fa-file-code" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar Lista de Sucursales en formato XML.">
-                    <p>XML</p>
-                </i>
-            </div>
-            <div class="d-flex justify-content-end"
-                style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
-                <p> Reporte de establecimientos. </p>
-            </div>
         </div>
     </div>
+
 </div>
 
 <!--  ********************  VER DEPARTAMETOS DE SUCURSALES  ************************  -->

@@ -13,7 +13,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NIVEL_TITULO_CONTROLADOR = void 0;
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const database_1 = __importDefault(require("../../database"));
+const xlsx_1 = __importDefault(require("xlsx"));
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
 const builder = require('xmlbuilder');
 class NivelTituloControlador {
     // METODO PARA LISTAR NIVELES DE TITULO PROFESIONAL
@@ -44,6 +48,7 @@ class NivelTituloControlador {
     CrearNivel(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre } = req.body;
+            console.log('nombre ingresado: ', nombre);
             const response = yield database_1.default.query(`
       INSERT INTO nivel_titulo (nombre) VALUES ($1) RETURNING *
       `, [nombre]);
@@ -91,6 +96,71 @@ class NivelTituloControlador {
             else {
                 res.status(404).jsonp({ text: 'Registro no encontrado' });
             }
+        });
+    }
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+    RevisarDatos(req, res) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+            let separador = path_1.default.sep;
+            let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
+            const workbook = xlsx_1.default.readFile(ruta);
+            const sheet_name_list = workbook.SheetNames;
+            const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+            let data = {
+                nombre: '',
+                observacion: ''
+            };
+            var listNivelesProfesionales = [];
+            var duplicados = [];
+            console.log('plantilla: ', plantilla);
+            // LECTURA DE LOS DATOS DE LA PLANTILLA
+            plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
+                var { nombre } = dato;
+                //Validar primero que exista la ciudad en la tabla ciudades
+                const existe_nivelProfecional = yield database_1.default.query('SELECT nombre FROM nivel_titulo WHERE UPPER(nombre) = UPPER($1)', [nombre]);
+                if (existe_nivelProfecional.rowCount == 0) {
+                    if (nombre != null && nombre != undefined && nombre != '') {
+                        console.log('nombre valido: ', nombre);
+                        data.nombre = nombre;
+                        if (duplicados.find((p) => p.nombre === dato.nombre) == undefined) {
+                            data.observacion = 'ok';
+                            duplicados.push(dato);
+                        }
+                        listNivelesProfesionales.push(data);
+                    }
+                    else {
+                        console.log('nombre valido: ', nombre);
+                        data.nombre = 'No registrado';
+                        data.observacion = 'Nivel no registrado';
+                        listNivelesProfesionales.push(data);
+                    }
+                }
+                else {
+                    data.nombre = nombre;
+                    data.observacion = 'Ya esta registrado en base';
+                    listNivelesProfesionales.push(data);
+                }
+                data = {};
+            }));
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(ruta);
+                }
+            });
+            setTimeout(() => {
+                listNivelesProfesionales.forEach((item) => {
+                    if (item.observacion == undefined || item.observacion == null || item.observacion == '') {
+                        item.observacion = 'Registro duplicado';
+                    }
+                });
+                return res.jsonp({ message: 'correcto', data: listNivelesProfesionales });
+            }, 1500);
         });
     }
 }

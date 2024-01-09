@@ -42,7 +42,9 @@ export class NivelTitulosService {
   }
 
 
-
+  RevisarFormato(formData) {
+    return this.http.post<any>(environment.url + '/nivel-titulo/upload/revision', formData);
+  }
 
 
 

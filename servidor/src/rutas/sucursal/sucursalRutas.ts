@@ -2,11 +2,22 @@ import { Router } from 'express';
 import { TokenValidation } from '../../libs/verificarToken'
 import SUCURSAL_CONTROLADOR from '../../controlador/sucursal/sucursalControlador';
 
-const multipart = require('connect-multiparty');
+import multer from 'multer';
+import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 
-const multipartMiddleware = multipart({
-    uploadDir: './plantillas',
-});
+const storage = multer.diskStorage({
+
+    destination: function (req, file, cb) {
+        cb(null, ObtenerRutaLeerPlantillas())
+    },
+    filename: function (req, file, cb) {
+        let documento = file.originalname;
+
+        cb(null, documento);
+    }
+})
+
+const upload = multer({ storage: storage });
 
 class SucursalRutas {
     public router: Router = Router();
@@ -33,7 +44,7 @@ class SucursalRutas {
         this.router.get('/unaSucursal/:id', TokenValidation, SUCURSAL_CONTROLADOR.ObtenerUnaSucursal);
 
     
-        this.router.post('/upload/revision', [TokenValidation, multipartMiddleware], SUCURSAL_CONTROLADOR.RevisarDatos);
+        this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], SUCURSAL_CONTROLADOR.RevisarDatos);
     }
 }
 

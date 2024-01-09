@@ -113,3 +113,11 @@ td {
     height: 65px;
     width: 220px;
 }
+
+.circulo{
+    margin-right: -50px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50px;
+    float: left;
+}

@@ -186,11 +186,16 @@ export class ListarFeriadosComponent implements OnInit {
 
   // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
+    this.DataFeriados = null;
+    this.archivoSubido = [];
+    this.nameFile = '';
     this.formulario.setValue({
       descripcionForm: '',
       fechaForm: ''
     });
     this.BuscarParametro();
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = false;
   }
 
   // METODO PARA INGRESAR SOLO LETRAS
@@ -229,8 +234,11 @@ export class ListarFeriadosComponent implements OnInit {
 
 
 
+  mostrarbtnsubir: boolean = false;
   // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE FERIADOS
   FileChange(element: any) {
+    this.archivoSubido = [];
+    this.nameFile = '';
     this.archivoSubido = element.target.files;
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
@@ -243,29 +251,48 @@ export class ListarFeriadosComponent implements OnInit {
         this.toastr.error('Seleccione plantilla con nombre Feriados', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
         });
-        this.archivoForm.reset();
         this.nameFile = '';
       }
     } else {
       this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
         timeOut: 6000,
       });
-      this.archivoForm.reset();
       this.nameFile = '';
     }
+
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = true;
+
+
   }
 
+  DataFeriados: any;
   // METODO PARA ENVIAR MENSAJES DE ERROR O CARGAR DATOS SI LA PLANTILLA ES CORRECTA
   Revisarplantilla() {
+    this.listFeriadosCorrectos = [];
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-    
+  
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
+      this.DataFeriados = res.data;
+
+      console.log('probando plantilla1 feriados', this.DataFeriados);
+
+      this.DataFeriados.forEach(item => {
+        if( item.observacion.toLowerCase() == 'ok'){
+          this.listFeriadosCorrectos.push(item);
+        }
+      });
+    });
+    
+    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+     /*
+    this.rest.RevisarFormato(formData).subscribe(res => {
       console.log('probando plantilla1', res);
-      /*
+     
       if (res.message === 'CAMPO FECHA ES OBLIGATORIO') {
         this.toastr.error('Para asegurar el buen funcionamiento del sistema es necesario que verifique los datos ' +
           'de la plantilla ingresada. No se encuentra el registro del campo fecha en la ' + res.data + '.',
@@ -373,9 +400,123 @@ export class ListarFeriadosComponent implements OnInit {
           }
         });
       }
-      */
+      
     });
+    */
     
+  }
+
+  listFeriadosCorrectos: any = [];
+  registrarFeriados(){
+    var data = {
+      fecha: '', 
+      descripcion: '', 
+      fec_recuperacion: ''
+    }
+
+    if(this.listFeriadosCorrectos.length > 0){
+      console.log('lista sucursales correctas: ',this.listFeriadosCorrectos);
+      var cont = 0;
+      this.listFeriadosCorrectos.forEach(datos => {
+        data.fecha = datos.fecha;
+        data.descripcion = datos.descripcion;
+        data.fec_recuperacion = datos.fecha_recuperacion;
+        this.rest.CrearNuevoFeriado(data).subscribe(response => {
+          cont = cont + 1;
+          if (response.message === 'error') {
+            this.toastr.error('La fecha del feriado o la fecha de recuperación se encuentran dentro de otro registro.', 'Upss!!! algo salio mal.', {
+              timeOut: 5000,
+            })
+          }else{
+            if(this.listFeriadosCorrectos.length  == cont){
+              this.toastr.success('Operación exitosa.', 'Plantilla de Sucursales importada.', {
+                timeOut: 10000,
+              });
+            }
+          }
+          this.LimpiarCampos();
+        });
+      })
+    }else{
+      this.toastr.error('La plantilla no tiene nungun feriado correcto para registrar ingrese otra', 'Plantilla no aceptada', {
+        timeOut: 4000,
+      });
+      this.archivoForm.reset();
+    }
+
+    this.archivoSubido = [];
+    this.nameFile = '';
+    
+  }
+
+
+  // METODO PARA ASIGNAR CIUDADES A FERIADO
+  contadorc: number = 0;
+  ingresar: number = 0;
+   /*
+  InsertarFeriadoCiudad(id: number) {
+    this.ingresar = 0;
+    this.contadorc = 0;
+
+    // RECORRER LA LISTA DE CIUDADES SELECCIONADAS
+   
+    this.ciudadesSeleccionadas.map(obj => {
+      var buscarCiudad = {
+        id_feriado: id,
+        id_ciudad: obj.id
+      }
+      // BUSCAR ID DE CIUDADES EXISTENTES
+      this.ciudadFeriados = [];
+      this.restF.BuscarIdCiudad(buscarCiudad).subscribe(datos => {
+        this.contadorc = this.contadorc + 1;
+        this.ciudadFeriados = datos;
+        this.VerMensaje(id);
+        this.toastr.info('',
+          'Se indica que ' + obj.descripcion + ' ya fue asignada a este Feriado.', {
+          timeOut: 7000,
+        })
+      }, error => {
+        this.restF.CrearCiudadFeriado(buscarCiudad).subscribe(response => {
+          this.contadorc = this.contadorc + 1;
+          this.ingresar = this.ingresar + 1;
+          this.VerMensaje(id);
+        }, error => {
+          this.contadorc = this.contadorc + 1;
+          this.VerMensaje(id);
+          this.toastr.error('Verificar asignación de ciudades.', 'Ups!!! algo salio mal.', {
+            timeOut: 6000,
+          })
+        });
+      });
+    });
+  }*/
+
+
+  //Metodo para dar color a las celdas y representar las validaciones
+  colorCelda: string = ''
+  stiloCelda(observacion: string): string{
+    let arrayObservacion = observacion.split(" ");
+    if(observacion == 'ok'){
+      return 'rgb(159, 221, 154)';
+    }else if(observacion == 'Ya esta registrado en base'){
+      return 'rgb(239, 203, 106)';
+    }else if(arrayObservacion[0] == 'Fecha' || arrayObservacion[0] == 'Descripcion'){
+      return 'rgb(246, 167, 143)';
+    }else if(observacion == 'Registro duplicado'){
+      return 'rgb(156, 214, 255)';
+    }else{
+      return 'white'
+    }
+  }
+
+  colorTexto: string = '';
+  stiloTextoCelda(texto: string): string{
+    let arrayObservacion = texto.split(" ");
+    if(arrayObservacion[0] == 'No'){
+      return 'rgb(255, 80, 80)';
+    }else{
+      return 'black'
+    }
   }
 
   /** ************************************************************************************************* **
