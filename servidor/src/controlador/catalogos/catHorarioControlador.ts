@@ -1,4 +1,4 @@
-import { ObtenerRutaHorarios } from '../../libs/accesoCarpetas';
+import { ObtenerRutaHorarios, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import fs from 'fs';
@@ -264,35 +264,37 @@ class HorarioControlador {
 
 
   public async CargarHorarioPlantilla(req: Request, res: Response): Promise<void> {
-    let list: any = req.files;
-    let cadena = list.uploads[0].path;
-    let filename = cadena.split("\\")[1];
-    var filePath = `./plantillas/${filename}`
+    
+    console.log('Cargar')
+    // let list: any = req.files;
+    // let cadena = list.uploads[0].path;
+    // let filename = cadena.split("\\")[1];
+    // var filePath = `./plantillas/${filename}`
 
-    const workbook = excel.readFile(filePath);
-    const sheet_name_list = workbook.SheetNames; // Array de hojas de calculo
-    const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-    /** Horarios */
-    plantilla.forEach(async (data: any) => {
-      var { nombre_horario, minutos_almuerzo, hora_trabajo, horario_nocturno } = data;
-      if (minutos_almuerzo != undefined) {
-        await pool.query('INSERT INTO cg_horarios (nombre, min_almuerzo, hora_trabajo, nocturno) VALUES ($1, $2, $3, $4)', [nombre_horario, minutos_almuerzo, hora_trabajo, horario_nocturno]);
-        res.jsonp({ message: 'correcto' });
-      } else {
-        minutos_almuerzo = 0;
-        await pool.query('INSERT INTO cg_horarios (nombre, min_almuerzo, hora_trabajo, nocturno) VALUES ($1, $2, $3, $4)', [nombre_horario, minutos_almuerzo, hora_trabajo, horario_nocturno]);
-        res.jsonp({ message: 'correcto' });
-      }
-    });
+    // const workbook = excel.readFile(filePath);
+    // const sheet_name_list = workbook.SheetNames; // Array de hojas de calculo
+    // const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+    // /** Horarios */
+    // plantilla.forEach(async (data: any) => {
+    //   var { nombre_horario, minutos_almuerzo, hora_trabajo, horario_nocturno } = data;
+    //   if (minutos_almuerzo != undefined) {
+    //     await pool.query('INSERT INTO cg_horarios (nombre, min_almuerzo, hora_trabajo, nocturno) VALUES ($1, $2, $3, $4)', [nombre_horario, minutos_almuerzo, hora_trabajo, horario_nocturno]);
+    //     res.jsonp({ message: 'correcto' });
+    //   } else {
+    //     minutos_almuerzo = 0;
+    //     await pool.query('INSERT INTO cg_horarios (nombre, min_almuerzo, hora_trabajo, nocturno) VALUES ($1, $2, $3, $4)', [nombre_horario, minutos_almuerzo, hora_trabajo, horario_nocturno]);
+    //     res.jsonp({ message: 'correcto' });
+    //   }
+    // });
 
-    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-    fs.access(filePath, fs.constants.F_OK, (err) => {
-      if (err) {
-      } else {
-        // ELIMINAR DEL SERVIDOR
-        fs.unlinkSync(filePath);
-      }
-    });
+    // // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+    // fs.access(filePath, fs.constants.F_OK, (err) => {
+    //   if (err) {
+    //   } else {
+    //     // ELIMINAR DEL SERVIDOR
+    //     fs.unlinkSync(filePath);
+    //   }
+    // });
 
   }
 
@@ -300,65 +302,86 @@ class HorarioControlador {
 
   /** Verificar si existen datos duplicados dentro del sistema */
   public async VerificarDatos(req: Request, res: Response) {
-    let list: any = req.files;
-    let cadena = list.uploads[0].path;
-    let filename = cadena.split("\\")[1];
-    var filePath = `./plantillas/${filename}`
-
-    const workbook = excel.readFile(filePath);
-    const sheet_name_list = workbook.SheetNames; // Array de hojas de calculo
+    const documento = req.file?.originalname;
+    let separador = path.sep;
+    let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+    const workbook = excel.readFile(ruta);
+    const sheet_name_list = workbook.SheetNames;
     const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+    console.log("PLANTILLA",plantilla);
     /** Horarios */
     var contarNombre = 0;
     var contarDatos = 0;
     var contador = 1;
+
+    let codigos: string[] = [];
     plantilla.forEach(async (data: any) => {
-      var { nombre_horario, minutos_almuerzo, hora_trabajo, horario_nocturno } = data;
+      var { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, TIPO_HORARIO, HORARIO_NOTURNO} = data;
 
       // Verificar que los datos obligatorios existan
-      if (nombre_horario != undefined && hora_trabajo != undefined && horario_nocturno != undefined) {
+      if (DESCRIPCION == undefined || CODIGO_HORARIO == undefined || TIPO_HORARIO == undefined || HORAS_TOTALES == undefined  || HORARIO_NOTURNO == undefined) {
         contarDatos = contarDatos + 1;
+        data.observacion = 'Faltan valores obligatorios'
       }
 
-      // Verificar que el nombre del horario no se encuentre registrado
-      if (nombre_horario != undefined) {
-        const NOMBRES = await pool.query('SELECT * FROM cg_horarios WHERE UPPER(nombre) = $1',
-          [nombre_horario.toUpperCase()]);
-        if (NOMBRES.rowCount === 0) {
-          contarNombre = contarNombre + 1;
+      // Verificar que el código del horario no se encuentre registrado
+      if (CODIGO_HORARIO != undefined) {
+        codigos.push(CODIGO_HORARIO);
+        if (VerificarDuplicado(codigos, CODIGO_HORARIO)) {
+          data.observacion = data.observacion? `${data.observacion} - Codigo duplicado` : 'Codigo duplicado';
         }
+        const EXISTENTES = await pool.query('SELECT * FROM cg_horarios WHERE UPPER(codigo) = $1',
+            [CODIGO_HORARIO.toUpperCase()]);
+        console.log('existentes',EXISTENTES.rowCount);
+          if (EXISTENTES.rowCount > 0) {
+            data.observacion = data.observacion? `${data.observacion} - Codigo existe en la base` : 'Codigo existe en la base';
+          }
       }
 
-      // Verificar que todos los datos sean correctos
-      if (contador === plantilla.length) {
-        if (contarNombre === plantilla.length && contarDatos === plantilla.length) {
-          return res.jsonp({ message: 'correcto' });
-        } else {
-          return res.jsonp({ message: 'error' });
-        }
-      }
-      contador = contador + 1;
+  
     });
     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-    fs.access(filePath, fs.constants.F_OK, (err) => {
+    fs.access(ruta, fs.constants.F_OK, (err) => {
       if (err) {
       } else {
         // ELIMINAR DEL SERVIDOR
-        fs.unlinkSync(filePath);
+        fs.unlinkSync(ruta);
       }
     });
 
+    // retornar plantilla
+    res.json(plantilla);
+
   }
+
+      // // Verificar que el nombre del horario no se encuentre registrado
+      // if (DESCRIPCION != undefined) {
+      //   const NOMBRES = await pool.query('SELECT * FROM cg_horarios WHERE UPPER(nombre) = $1',
+      //     [DESCRIPCION.toUpperCase()]);
+      //   if (NOMBRES.rowCount === 0) {
+      //     contarNombre = contarNombre + 1;
+      //   }
+      // }
+
+      // Verificar que todos los datos sean correctos
+      // if (contador === plantilla.length) {
+      //   if (contarNombre === plantilla.length && contarDatos === plantilla.length) {
+      //     return res.jsonp({ message: 'correcto' });
+      //   } else {
+      //     return res.jsonp({ message: 'error' });
+      //   }
+      // }
+      // contador = contador + 1;
 
   /** Verificar que los datos dentro de la plantilla no se encuntren duplicados */
   public async VerificarPlantilla(req: Request, res: Response) {
-    let list: any = req.files;
-    let cadena = list.uploads[0].path;
-    let filename = cadena.split("\\")[1];
-    var filePath = `./plantillas/${filename}`
-    const workbook = excel.readFile(filePath);
+    const documento = req.file?.originalname;
+    let separador = path.sep;
+    let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+    const workbook = excel.readFile(ruta);
     const sheet_name_list = workbook.SheetNames;
     const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+
     var contarNombreData = 0;
     var contador_arreglo = 1;
     var arreglos_datos: any = [];
@@ -392,17 +415,36 @@ class HorarioControlador {
       }
     }
     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-    fs.access(filePath, fs.constants.F_OK, (err) => {
+    fs.access(ruta, fs.constants.F_OK, (err) => {
       if (err) {
       } else {
         // ELIMINAR DEL SERVIDOR
-        fs.unlinkSync(filePath);
+        fs.unlinkSync(ruta);
       }
     });
 
   }
 
+public async RevisarDuplicados(req: Request, res: Response){
+  const documento = req.file?.originalname;
+  let separador = path.sep;
+  let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+
+  const workbook = excel.readFile(ruta);
+  const sheet_name_list = workbook.SheetNames;
+  const plantilla: any = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+
+  
 }
+
+}
+
+function VerificarDuplicado(codigos: any, codigo: string): boolean {
+  const valores = codigos.filter((valor: string) => valor == codigo);
+  const duplicado = valores.length > 1;
+  return duplicado;
+}
+
 
 export const HORARIO_CONTROLADOR = new HorarioControlador();
 

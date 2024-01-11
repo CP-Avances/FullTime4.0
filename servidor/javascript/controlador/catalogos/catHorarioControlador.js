@@ -253,94 +253,110 @@ class HorarioControlador {
     }
     CargarHorarioPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let list = req.files;
-            let cadena = list.uploads[0].path;
-            let filename = cadena.split("\\")[1];
-            var filePath = `./plantillas/${filename}`;
-            const workbook = xlsx_1.default.readFile(filePath);
-            const sheet_name_list = workbook.SheetNames; // Array de hojas de calculo
-            const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-            /** Horarios */
-            plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
-                var { nombre_horario, minutos_almuerzo, hora_trabajo, horario_nocturno } = data;
-                if (minutos_almuerzo != undefined) {
-                    yield database_1.default.query('INSERT INTO cg_horarios (nombre, min_almuerzo, hora_trabajo, nocturno) VALUES ($1, $2, $3, $4)', [nombre_horario, minutos_almuerzo, hora_trabajo, horario_nocturno]);
-                    res.jsonp({ message: 'correcto' });
-                }
-                else {
-                    minutos_almuerzo = 0;
-                    yield database_1.default.query('INSERT INTO cg_horarios (nombre, min_almuerzo, hora_trabajo, nocturno) VALUES ($1, $2, $3, $4)', [nombre_horario, minutos_almuerzo, hora_trabajo, horario_nocturno]);
-                    res.jsonp({ message: 'correcto' });
-                }
-            }));
-            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
-                if (err) {
-                }
-                else {
-                    // ELIMINAR DEL SERVIDOR
-                    fs_1.default.unlinkSync(filePath);
-                }
-            });
+            console.log('Cargar');
+            // let list: any = req.files;
+            // let cadena = list.uploads[0].path;
+            // let filename = cadena.split("\\")[1];
+            // var filePath = `./plantillas/${filename}`
+            // const workbook = excel.readFile(filePath);
+            // const sheet_name_list = workbook.SheetNames; // Array de hojas de calculo
+            // const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+            // /** Horarios */
+            // plantilla.forEach(async (data: any) => {
+            //   var { nombre_horario, minutos_almuerzo, hora_trabajo, horario_nocturno } = data;
+            //   if (minutos_almuerzo != undefined) {
+            //     await pool.query('INSERT INTO cg_horarios (nombre, min_almuerzo, hora_trabajo, nocturno) VALUES ($1, $2, $3, $4)', [nombre_horario, minutos_almuerzo, hora_trabajo, horario_nocturno]);
+            //     res.jsonp({ message: 'correcto' });
+            //   } else {
+            //     minutos_almuerzo = 0;
+            //     await pool.query('INSERT INTO cg_horarios (nombre, min_almuerzo, hora_trabajo, nocturno) VALUES ($1, $2, $3, $4)', [nombre_horario, minutos_almuerzo, hora_trabajo, horario_nocturno]);
+            //     res.jsonp({ message: 'correcto' });
+            //   }
+            // });
+            // // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            // fs.access(filePath, fs.constants.F_OK, (err) => {
+            //   if (err) {
+            //   } else {
+            //     // ELIMINAR DEL SERVIDOR
+            //     fs.unlinkSync(filePath);
+            //   }
+            // });
         });
     }
     /** Verificar si existen datos duplicados dentro del sistema */
     VerificarDatos(req, res) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            let list = req.files;
-            let cadena = list.uploads[0].path;
-            let filename = cadena.split("\\")[1];
-            var filePath = `./plantillas/${filename}`;
-            const workbook = xlsx_1.default.readFile(filePath);
-            const sheet_name_list = workbook.SheetNames; // Array de hojas de calculo
+            const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+            let separador = path_1.default.sep;
+            let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
+            const workbook = xlsx_1.default.readFile(ruta);
+            const sheet_name_list = workbook.SheetNames;
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+            console.log("PLANTILLA", plantilla);
             /** Horarios */
             var contarNombre = 0;
             var contarDatos = 0;
             var contador = 1;
+            let codigos = [];
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
-                var { nombre_horario, minutos_almuerzo, hora_trabajo, horario_nocturno } = data;
+                var { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, TIPO_HORARIO, HORARIO_NOTURNO } = data;
                 // Verificar que los datos obligatorios existan
-                if (nombre_horario != undefined && hora_trabajo != undefined && horario_nocturno != undefined) {
+                if (DESCRIPCION == undefined || CODIGO_HORARIO == undefined || TIPO_HORARIO == undefined || HORAS_TOTALES == undefined || HORARIO_NOTURNO == undefined) {
                     contarDatos = contarDatos + 1;
+                    data.observacion = 'Faltan valores obligatorios';
                 }
-                // Verificar que el nombre del horario no se encuentre registrado
-                if (nombre_horario != undefined) {
-                    const NOMBRES = yield database_1.default.query('SELECT * FROM cg_horarios WHERE UPPER(nombre) = $1', [nombre_horario.toUpperCase()]);
-                    if (NOMBRES.rowCount === 0) {
-                        contarNombre = contarNombre + 1;
+                // Verificar que el código del horario no se encuentre registrado
+                if (CODIGO_HORARIO != undefined) {
+                    codigos.push(CODIGO_HORARIO);
+                    if (VerificarDuplicado(codigos, CODIGO_HORARIO)) {
+                        data.observacion = data.observacion ? `${data.observacion} - Codigo duplicado` : 'Codigo duplicado';
+                    }
+                    const EXISTENTES = yield database_1.default.query('SELECT * FROM cg_horarios WHERE UPPER(codigo) = $1', [CODIGO_HORARIO.toUpperCase()]);
+                    console.log('existentes', EXISTENTES.rowCount);
+                    if (EXISTENTES.rowCount > 0) {
+                        data.observacion = data.observacion ? `${data.observacion} - Codigo existe en la base` : 'Codigo existe en la base';
                     }
                 }
-                // Verificar que todos los datos sean correctos
-                if (contador === plantilla.length) {
-                    if (contarNombre === plantilla.length && contarDatos === plantilla.length) {
-                        return res.jsonp({ message: 'correcto' });
-                    }
-                    else {
-                        return res.jsonp({ message: 'error' });
-                    }
-                }
-                contador = contador + 1;
             }));
             // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                 if (err) {
                 }
                 else {
                     // ELIMINAR DEL SERVIDOR
-                    fs_1.default.unlinkSync(filePath);
+                    fs_1.default.unlinkSync(ruta);
                 }
             });
+            // retornar plantilla
+            res.json(plantilla);
         });
     }
+    // // Verificar que el nombre del horario no se encuentre registrado
+    // if (DESCRIPCION != undefined) {
+    //   const NOMBRES = await pool.query('SELECT * FROM cg_horarios WHERE UPPER(nombre) = $1',
+    //     [DESCRIPCION.toUpperCase()]);
+    //   if (NOMBRES.rowCount === 0) {
+    //     contarNombre = contarNombre + 1;
+    //   }
+    // }
+    // Verificar que todos los datos sean correctos
+    // if (contador === plantilla.length) {
+    //   if (contarNombre === plantilla.length && contarDatos === plantilla.length) {
+    //     return res.jsonp({ message: 'correcto' });
+    //   } else {
+    //     return res.jsonp({ message: 'error' });
+    //   }
+    // }
+    // contador = contador + 1;
     /** Verificar que los datos dentro de la plantilla no se encuntren duplicados */
     VerificarPlantilla(req, res) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            let list = req.files;
-            let cadena = list.uploads[0].path;
-            let filename = cadena.split("\\")[1];
-            var filePath = `./plantillas/${filename}`;
-            const workbook = xlsx_1.default.readFile(filePath);
+            const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+            let separador = path_1.default.sep;
+            let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
+            const workbook = xlsx_1.default.readFile(ruta);
             const sheet_name_list = workbook.SheetNames;
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
             var contarNombreData = 0;
@@ -375,16 +391,32 @@ class HorarioControlador {
                 }
             }
             // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
+            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                 if (err) {
                 }
                 else {
                     // ELIMINAR DEL SERVIDOR
-                    fs_1.default.unlinkSync(filePath);
+                    fs_1.default.unlinkSync(ruta);
                 }
             });
         });
     }
+    RevisarDuplicados(req, res) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+            let separador = path_1.default.sep;
+            let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
+            const workbook = xlsx_1.default.readFile(ruta);
+            const sheet_name_list = workbook.SheetNames;
+            const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+        });
+    }
+}
+function VerificarDuplicado(codigos, codigo) {
+    const valores = codigos.filter((valor) => valor == codigo);
+    const duplicado = valores.length > 1;
+    return duplicado;
 }
 exports.HORARIO_CONTROLADOR = new HorarioControlador();
 exports.default = exports.HORARIO_CONTROLADOR;
