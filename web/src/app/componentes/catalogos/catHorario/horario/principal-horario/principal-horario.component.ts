@@ -90,7 +90,7 @@ export class PrincipalHorarioComponent implements OnInit {
     this.ObtenerEmpleados();
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados() {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(this.idEmpleado).subscribe(data => {
@@ -106,7 +106,7 @@ export class PrincipalHorarioComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -201,7 +201,7 @@ export class PrincipalHorarioComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -222,7 +222,7 @@ export class PrincipalHorarioComponent implements OnInit {
     this.pagina = 'lista-horarios';
   }
 
-  /** ************************************************************************************************* ** 
+  /** ************************************************************************************************* **
    ** **                              PLANTILLA CARGAR SOLO HORARIOS                                 ** **
    ** ************************************************************************************************* **/
 
@@ -234,10 +234,10 @@ export class PrincipalHorarioComponent implements OnInit {
     let itemName = arrayItems[0].slice(0, 17);
     console.log("funcion horario", itemName.toLowerCase());
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'catalogo horarios') {
+      if (itemName.toLowerCase() == 'plantillageneral') {
         this.plantillaHorario();
       } else {
-        this.toastr.error('Solo se acepta', 'Plantilla seleccionada incorrecta', {
+        this.toastr.error('Solo se acepta plantillaGeneral', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
         });
         this.archivo1Form.reset();
@@ -256,7 +256,9 @@ export class PrincipalHorarioComponent implements OnInit {
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
+
     }
+    console.log("formdata", formData);
     this.rest.VerificarDatosHorario(formData).subscribe(res => {
       if (res.message === 'error') {
         this.toastr.error('Para el buen funcionamiento del sistema verifique los datos de su plantilla. ' +
@@ -293,7 +295,7 @@ export class PrincipalHorarioComponent implements OnInit {
     });
   }
 
-  /** *********************************************************************************************** ** 
+  /** *********************************************************************************************** **
    ** **                              PLANTILLA CARGAR SOLO DETALLES                               ** **
    ** *********************************************************************************************** **/
   nameFileDetalle: string;
@@ -360,7 +362,7 @@ export class PrincipalHorarioComponent implements OnInit {
 
 
 
-  /** ************************************************************************************************* ** 
+  /** ************************************************************************************************* **
    ** **                                METODO PARA EXPORTAR A PDF                                   ** **
    ** ************************************************************************************************* **/
 
@@ -463,7 +465,7 @@ export class PrincipalHorarioComponent implements OnInit {
   }
 
 
-  /** ************************************************************************************************* ** 
+  /** ************************************************************************************************* **
    ** **                                 METODO PARA EXPORTAR A EXCEL                                ** **
    ** ************************************************************************************************* **/
 
@@ -474,7 +476,7 @@ export class PrincipalHorarioComponent implements OnInit {
     xlsx.writeFile(wb, "HorariosEXCEL" + '.xlsx');
   }
 
-  /** ************************************************************************************************* ** 
+  /** ************************************************************************************************* **
    ** **                               METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************* **/
 
