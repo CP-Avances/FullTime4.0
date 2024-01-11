@@ -43,7 +43,7 @@ export class ListarFeriadosComponent implements OnInit {
     fechaForm: this.fechaF,
   });
 
-  // ALMACENAMIENTO DE DATOS CONSULTADOS  
+  // ALMACENAMIENTO DE DATOS CONSULTADOS
   feriados: any = [];
   empleado: any = [];
 
@@ -89,7 +89,7 @@ export class ListarFeriadosComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                          BUSQUEDA DE FORMATOS DE FECHAS                            ** ** 
+   ** **                          BUSQUEDA DE FORMATOS DE FECHAS                            ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -107,7 +107,7 @@ export class ListarFeriadosComponent implements OnInit {
       });
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -129,7 +129,7 @@ export class ListarFeriadosComponent implements OnInit {
     })
   }
 
-  // ORDENAR LOS DATOS SEGUN EL ID 
+  // ORDENAR LOS DATOS SEGUN EL ID
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
       if (a.id < b.id) {
@@ -164,7 +164,7 @@ export class ListarFeriadosComponent implements OnInit {
       });;
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_feriado: number) {
     this.rest.EliminarFeriado(id_feriado).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
@@ -174,7 +174,7 @@ export class ListarFeriadosComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -261,6 +261,7 @@ export class ListarFeriadosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+    console.log("formdata", formData);
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
       console.log('probando plantilla1', res);
@@ -545,7 +546,7 @@ export class ListarFeriadosComponent implements OnInit {
     this.BuscarParametro();
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************** **/
 
