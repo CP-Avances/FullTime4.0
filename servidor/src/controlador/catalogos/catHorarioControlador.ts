@@ -319,23 +319,32 @@ class HorarioControlador {
       var { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, TIPO_HORARIO, HORARIO_NOTURNO} = data;
 
       // Verificar que los datos obligatorios existan
-      if (DESCRIPCION == undefined || CODIGO_HORARIO == undefined || TIPO_HORARIO == undefined || HORAS_TOTALES == undefined  || HORARIO_NOTURNO == undefined) {
-        contarDatos = contarDatos + 1;
-        data.observacion = 'Faltan valores obligatorios'
+      const requiredValues = [DESCRIPCION, CODIGO_HORARIO, TIPO_HORARIO, HORAS_TOTALES, HORARIO_NOTURNO];
+
+      if (requiredValues.some(value => value === undefined)) {
+        data.observacion = 'Faltan valores obligatorios';
+        return;
       }
+
+      codigos.push(CODIGO_HORARIO);
+
+      if (VerificarDuplicado(codigos, CODIGO_HORARIO)) {
+        data.observacion = 'Codigo duplicado';
+        return;
+      }
+
+      if (await VerificarDuplicadoBase(CODIGO_HORARIO)) {
+        data.observacion = 'Codigo existe en la base';
+        return;
+      }
+
+              // const EXISTENTES = await pool.query('SELECT * FROM cg_horarios WHERE UPPER(codigo) = $1',
+        //     [CODIGO_HORARIO.toUpperCase()]);
+        // console.log('existentes',EXISTENTES.rowCount);
 
       // Verificar que el código del horario no se encuentre registrado
       if (CODIGO_HORARIO != undefined) {
-        codigos.push(CODIGO_HORARIO);
-        if (VerificarDuplicado(codigos, CODIGO_HORARIO)) {
-          data.observacion = data.observacion? `${data.observacion} - Codigo duplicado` : 'Codigo duplicado';
-        }
-        const EXISTENTES = await pool.query('SELECT * FROM cg_horarios WHERE UPPER(codigo) = $1',
-            [CODIGO_HORARIO.toUpperCase()]);
-        console.log('existentes',EXISTENTES.rowCount);
-          if (EXISTENTES.rowCount > 0) {
-            data.observacion = data.observacion? `${data.observacion} - Codigo existe en la base` : 'Codigo existe en la base';
-          }
+        
       }
 
   
@@ -443,6 +452,13 @@ function VerificarDuplicado(codigos: any, codigo: string): boolean {
   const valores = codigos.filter((valor: string) => valor == codigo);
   const duplicado = valores.length > 1;
   return duplicado;
+}
+
+async function VerificarDuplicadoBase(codigo: string){
+  const result = await pool.query('SELECT * FROM cg_horarios WHERE UPPER(codigo) = $1',
+            [codigo.toUpperCase()]);
+  console.log('result', codigo, result.rowCount);
+  return result.rowCount > 0;
 }
 
 
