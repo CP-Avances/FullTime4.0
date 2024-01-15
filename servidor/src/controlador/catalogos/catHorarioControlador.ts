@@ -356,68 +356,56 @@ class HorarioControlador {
   }
 
   /** Verificar que los datos dentro de la plantilla no se encuntren duplicados */
-  public async VerificarPlantilla(req: Request, res: Response) {
-    const documento = req.file?.originalname;
-    let separador = path.sep;
-    let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-    const workbook = excel.readFile(ruta);
-    const sheet_name_list = workbook.SheetNames;
-    const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+  // public async VerificarPlantilla(req: Request, res: Response) {
+  //   const documento = req.file?.originalname;
+  //   let separador = path.sep;
+  //   let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+  //   const workbook = excel.readFile(ruta);
+  //   const sheet_name_list = workbook.SheetNames;
+  //   const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
-    var contarNombreData = 0;
-    var contador_arreglo = 1;
-    var arreglos_datos: any = [];
-    //Leer la plantilla para llenar un array con los datos nombre para verificar que no sean duplicados
-    plantilla.forEach(async (data: any) => {
-      // Datos que se leen de la plantilla ingresada
-      var { nombre_horario, minutos_almuerzo, hora_trabajo, horario_nocturno } = data;
-      let datos_array = {
-        nombre: nombre_horario,
-      }
-      arreglos_datos.push(datos_array);
-    });
+  //   var contarNombreData = 0;
+  //   var contador_arreglo = 1;
+  //   var arreglos_datos: any = [];
+  //   //Leer la plantilla para llenar un array con los datos nombre para verificar que no sean duplicados
+  //   plantilla.forEach(async (data: any) => {
+  //     // Datos que se leen de la plantilla ingresada
+  //     var { nombre_horario, minutos_almuerzo, hora_trabajo, horario_nocturno } = data;
+  //     let datos_array = {
+  //       nombre: nombre_horario,
+  //     }
+  //     arreglos_datos.push(datos_array);
+  //   });
 
-    // Vamos a verificar dentro de arreglo_datos que no se encuentren datos duplicados
-    for (var i = 0; i <= arreglos_datos.length - 1; i++) {
-      for (var j = 0; j <= arreglos_datos.length - 1; j++) {
-        if (arreglos_datos[i].nombre.toUpperCase() === arreglos_datos[j].nombre.toUpperCase()) {
-          contarNombreData = contarNombreData + 1;
-        }
-      }
-      contador_arreglo = contador_arreglo + 1;
-    }
+  //   // Vamos a verificar dentro de arreglo_datos que no se encuentren datos duplicados
+  //   for (var i = 0; i <= arreglos_datos.length - 1; i++) {
+  //     for (var j = 0; j <= arreglos_datos.length - 1; j++) {
+  //       if (arreglos_datos[i].nombre.toUpperCase() === arreglos_datos[j].nombre.toUpperCase()) {
+  //         contarNombreData = contarNombreData + 1;
+  //       }
+  //     }
+  //     contador_arreglo = contador_arreglo + 1;
+  //   }
 
-    // Cuando todos los datos han sido leidos verificamos si todos los datos son correctos
-    console.log('nombre_data', contarNombreData, plantilla.length, contador_arreglo);
-    if ((contador_arreglo - 1) === plantilla.length) {
-      if (contarNombreData === plantilla.length) {
-        return res.jsonp({ message: 'correcto' });
-      } else {
-        return res.jsonp({ message: 'error' });
-      }
-    }
-    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-    fs.access(ruta, fs.constants.F_OK, (err) => {
-      if (err) {
-      } else {
-        // ELIMINAR DEL SERVIDOR
-        fs.unlinkSync(ruta);
-      }
-    });
+  //   // Cuando todos los datos han sido leidos verificamos si todos los datos son correctos
+  //   console.log('nombre_data', contarNombreData, plantilla.length, contador_arreglo);
+  //   if ((contador_arreglo - 1) === plantilla.length) {
+  //     if (contarNombreData === plantilla.length) {
+  //       return res.jsonp({ message: 'correcto' });
+  //     } else {
+  //       return res.jsonp({ message: 'error' });
+  //     }
+  //   }
+  //   // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+  //   fs.access(ruta, fs.constants.F_OK, (err) => {
+  //     if (err) {
+  //     } else {
+  //       // ELIMINAR DEL SERVIDOR
+  //       fs.unlinkSync(ruta);
+  //     }
+  //   });
 
-  }
-
-public async RevisarDuplicados(req: Request, res: Response){
-  const documento = req.file?.originalname;
-  let separador = path.sep;
-  let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-
-  const workbook = excel.readFile(ruta);
-  const sheet_name_list = workbook.SheetNames;
-  const plantilla: any = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-
-  
-}
+  // }
 
 }
 
@@ -434,6 +422,9 @@ function VerificarFormatoDatos(data: any): [boolean, string] {
   let error = true
   const { HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOTURNO } = data;
   const horasTotalesFormatoCorrecto = /^(\d+)$|^(\d{1,2}:\d{2})$/.test(HORAS_TOTALES);
+  if (MIN_ALIMENTACION === undefined) {
+    data.MIN_ALIMENTACION = 0; 
+  }
   const minAlimentacionFormatoCorrecto = /^\d+$/.test(MIN_ALIMENTACION);
   const tipoHorarioValido = ['Laborable', 'Libre', 'Feriado'].includes(TIPO_HORARIO);
   const tipoHorarioNocturnoValido = ['Si', 'No'].includes(HORARIO_NOTURNO);
