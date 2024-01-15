@@ -312,8 +312,10 @@ class HorarioControlador {
 
     let codigos: string[] = [];
     for (const data of plantilla) {
-      let { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, TIPO_HORARIO, HORARIO_NOTURNO} = data;
-
+      let { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOTURNO} = data;
+      if (MIN_ALIMENTACION === undefined) {
+        data.MIN_ALIMENTACION = 0; 
+      }
       // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
       const requiredValues = [DESCRIPCION, CODIGO_HORARIO, TIPO_HORARIO, HORAS_TOTALES, HORARIO_NOTURNO];
 
@@ -422,9 +424,6 @@ function VerificarFormatoDatos(data: any): [boolean, string] {
   let error = true
   const { HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOTURNO } = data;
   const horasTotalesFormatoCorrecto = /^(\d+)$|^(\d{1,2}:\d{2})$/.test(HORAS_TOTALES);
-  if (MIN_ALIMENTACION === undefined) {
-    data.MIN_ALIMENTACION = 0; 
-  }
   const minAlimentacionFormatoCorrecto = /^\d+$/.test(MIN_ALIMENTACION);
   const tipoHorarioValido = ['Laborable', 'Libre', 'Feriado'].includes(TIPO_HORARIO);
   const tipoHorarioNocturnoValido = ['Si', 'No'].includes(HORARIO_NOTURNO);
