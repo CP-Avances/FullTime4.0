@@ -307,7 +307,7 @@ class HorarioControlador {
     let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
     const workbook = excel.readFile(ruta);
     const sheet_name_list = workbook.SheetNames;
-    const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+    const plantilla: Horario[] = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
     console.log("PLANTILLA",plantilla);
     /** Horarios */
     var contarNombre = 0;
@@ -315,40 +315,30 @@ class HorarioControlador {
     var contador = 1;
 
     let codigos: string[] = [];
-    plantilla.forEach(async (data: any) => {
-      var { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, TIPO_HORARIO, HORARIO_NOTURNO} = data;
+    for (const data of plantilla) {
+      let { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, TIPO_HORARIO, HORARIO_NOTURNO} = data;
 
-      // Verificar que los datos obligatorios existan
+      // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
       const requiredValues = [DESCRIPCION, CODIGO_HORARIO, TIPO_HORARIO, HORAS_TOTALES, HORARIO_NOTURNO];
 
       if (requiredValues.some(value => value === undefined)) {
-        data.observacion = 'Faltan valores obligatorios';
-        return;
+        data.OBSERVACION = 'FALTAN VALORES OBLIGATORIOS';
+        continue;
       }
 
       codigos.push(CODIGO_HORARIO);
 
       if (VerificarDuplicado(codigos, CODIGO_HORARIO)) {
-        data.observacion = 'Codigo duplicado';
-        return;
+        data.OBSERVACION = 'REGISTRO DUPLICADO';
+        continue;
       }
 
       if (await VerificarDuplicadoBase(CODIGO_HORARIO)) {
-        data.observacion = 'Codigo existe en la base';
-        return;
+        data.OBSERVACION = 'YA EXISTE REGISTRO';
+        continue;
       }
+    };
 
-              // const EXISTENTES = await pool.query('SELECT * FROM cg_horarios WHERE UPPER(codigo) = $1',
-        //     [CODIGO_HORARIO.toUpperCase()]);
-        // console.log('existentes',EXISTENTES.rowCount);
-
-      // Verificar que el código del horario no se encuentre registrado
-      if (CODIGO_HORARIO != undefined) {
-        
-      }
-
-  
-    });
     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
     fs.access(ruta, fs.constants.F_OK, (err) => {
       if (err) {
@@ -358,29 +348,8 @@ class HorarioControlador {
       }
     });
 
-    // retornar plantilla
     res.json(plantilla);
-
   }
-
-      // // Verificar que el nombre del horario no se encuentre registrado
-      // if (DESCRIPCION != undefined) {
-      //   const NOMBRES = await pool.query('SELECT * FROM cg_horarios WHERE UPPER(nombre) = $1',
-      //     [DESCRIPCION.toUpperCase()]);
-      //   if (NOMBRES.rowCount === 0) {
-      //     contarNombre = contarNombre + 1;
-      //   }
-      // }
-
-      // Verificar que todos los datos sean correctos
-      // if (contador === plantilla.length) {
-      //   if (contarNombre === plantilla.length && contarDatos === plantilla.length) {
-      //     return res.jsonp({ message: 'correcto' });
-      //   } else {
-      //     return res.jsonp({ message: 'error' });
-      //   }
-      // }
-      // contador = contador + 1;
 
   /** Verificar que los datos dentro de la plantilla no se encuntren duplicados */
   public async VerificarPlantilla(req: Request, res: Response) {
@@ -448,18 +417,30 @@ public async RevisarDuplicados(req: Request, res: Response){
 
 }
 
+// FUNCION PARA VERIFICAR SI EXISTEN DATOS DUPLICADOS EN LA PLANTILLA
 function VerificarDuplicado(codigos: any, codigo: string): boolean {
   const valores = codigos.filter((valor: string) => valor == codigo);
   const duplicado = valores.length > 1;
   return duplicado;
 }
 
+// FUNCION PARA VERIFICAR SI EXISTEN DATOS DUPLICADOS EN LA BASE DE DATOS
 async function VerificarDuplicadoBase(codigo: string){
   const result = await pool.query('SELECT * FROM cg_horarios WHERE UPPER(codigo) = $1',
             [codigo.toUpperCase()]);
   console.log('result', codigo, result.rowCount);
   return result.rowCount > 0;
 }
+
+interface Horario {
+  DESCRIPCION: string, 
+  CODIGO_HORARIO: string, 
+  HORAS_TOTALES: string, 
+  TIPO_HORARIO: string, 
+  HORARIO_NOTURNO: string,
+  OBSERVACION: string
+}
+
 
 
 export const HORARIO_CONTROLADOR = new HorarioControlador();
