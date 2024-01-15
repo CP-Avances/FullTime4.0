@@ -309,10 +309,6 @@ class HorarioControlador {
     const sheet_name_list = workbook.SheetNames;
     const plantilla: Horario[] = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
     console.log("PLANTILLA",plantilla);
-    /** Horarios */
-    var contarNombre = 0;
-    var contarDatos = 0;
-    var contador = 1;
 
     let codigos: string[] = [];
     for (const data of plantilla) {
@@ -326,17 +322,25 @@ class HorarioControlador {
         continue;
       }
 
-      codigos.push(CODIGO_HORARIO);
+      codigos.push(CODIGO_HORARIO.toString());
 
-      if (VerificarDuplicado(codigos, CODIGO_HORARIO)) {
+      if (VerificarDuplicado(codigos, CODIGO_HORARIO.toString())) {
         data.OBSERVACION = 'REGISTRO DUPLICADO';
         continue;
       }
 
-      if (await VerificarDuplicadoBase(CODIGO_HORARIO)) {
-        data.OBSERVACION = 'YA EXISTE REGISTRO';
+      if (VerificarFormatoDatos(data)[0]) {
+        data.OBSERVACION = VerificarFormatoDatos(data)[1];
         continue;
       }
+
+      if (await VerificarDuplicadoBase(CODIGO_HORARIO.toString())) {
+        data.OBSERVACION = 'YA EXISTE HORARIO EN LA BASE DE DATOS';
+        continue;
+      }
+
+      data.OBSERVACION = 'OK';
+      
     };
 
     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
@@ -424,6 +428,23 @@ function VerificarDuplicado(codigos: any, codigo: string): boolean {
   return duplicado;
 }
 
+//FUNCION PARA VERIFICAR QUE LOS TIPOS DE DATOS SEAN LOS CORRECTOS
+function VerificarFormatoDatos(data: any): [boolean, string] {
+  let observacion = '';
+  let error = true
+  const { HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOTURNO } = data;
+  const horasTotalesFormatoCorrecto = /^(\d+)$|^(\d{1,2}:\d{2})$/.test(HORAS_TOTALES);
+  const minAlimentacionFormatoCorrecto = /^\d+$/.test(MIN_ALIMENTACION);
+  const tipoHorarioValido = ['Laborable', 'Libre', 'Feriado'].includes(TIPO_HORARIO);
+  const tipoHorarioNocturnoValido = ['Si', 'No'].includes(HORARIO_NOTURNO);
+  horasTotalesFormatoCorrecto ? null : observacion = 'FORMATO DE HORAS TOTALES INCORRECTO';
+  minAlimentacionFormatoCorrecto ? null : observacion = 'FORMATO DE MIN_ALIMENTACION INCORRECTO';
+  tipoHorarioValido ? null : observacion = 'TIPO DE HORARIO INCORRECTO';
+  tipoHorarioNocturnoValido ? null : observacion = 'TIPO DE HORARIO NOCTURNO INCORRECTO'; 
+  error = horasTotalesFormatoCorrecto && minAlimentacionFormatoCorrecto && tipoHorarioValido && tipoHorarioNocturnoValido ? false : true ;
+  return [error, observacion];
+}
+
 // FUNCION PARA VERIFICAR SI EXISTEN DATOS DUPLICADOS EN LA BASE DE DATOS
 async function VerificarDuplicadoBase(codigo: string){
   const result = await pool.query('SELECT * FROM cg_horarios WHERE UPPER(codigo) = $1',
@@ -433,9 +454,10 @@ async function VerificarDuplicadoBase(codigo: string){
 }
 
 interface Horario {
-  DESCRIPCION: string, 
-  CODIGO_HORARIO: string, 
-  HORAS_TOTALES: string, 
+  DESCRIPCION: string | number, 
+  CODIGO_HORARIO: string | number, 
+  HORAS_TOTALES: string | number, 
+  MIN_ALIMENTACION: string | number,
   TIPO_HORARIO: string, 
   HORARIO_NOTURNO: string,
   OBSERVACION: string
