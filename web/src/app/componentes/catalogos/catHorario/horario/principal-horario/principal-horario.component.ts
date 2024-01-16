@@ -69,6 +69,11 @@ export class PrincipalHorarioComponent implements OnInit {
   // VARIABLE DE NAVEGABILIDAD
   hipervinculo: string = environment.url;
 
+  //VARIABLES PARA VALIDAR HORARIOS Y DETALLES
+  dataHorarios: any;
+  listaHorariosCorrectos: any = [];
+  listaDetalleCorrectos: any = [];
+
   constructor(
     public restEmpre: EmpresaService, // SERVICIO DATOS DE EMPRESA
     public validar: ValidacionesService, // VARIABLE USADA PARA CONTROL DE VALIDACIONES
@@ -270,7 +275,23 @@ export class PrincipalHorarioComponent implements OnInit {
       //   this.nameFile = '';
       // }
       // else {
-        console.log(res);
+        this.dataHorarios = res;
+        this.dataHorarios.plantillaHorarios.forEach(obj => {
+          if (obj.OBSERVACION == 'OK') {
+            this.listaHorariosCorrectos.push(obj);
+          }
+        });
+
+        this.dataHorarios.plantillaDetalles.forEach(obj => {
+          if (obj.OBSERVACION == 'OK') {
+            this.listaDetalleCorrectos.push(obj);
+          }
+        });
+
+        console.log("listaHorariosCorrectos", this.listaHorariosCorrectos);
+        console.log("listaDetalleCorrectos", this.listaDetalleCorrectos);
+
+
         // this.rest.VerificarPlantillaHorario(formData).subscribe(res => {
         //   if (res.message === 'error') {
         //     this.toastr.error('Para el buen funcionamiento del sistema verifique los datos de su plantilla. ' +

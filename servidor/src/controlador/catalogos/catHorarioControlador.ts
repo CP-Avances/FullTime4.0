@@ -307,11 +307,13 @@ class HorarioControlador {
     let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
     const workbook = excel.readFile(ruta);
     const sheet_name_list = workbook.SheetNames;
-    const plantilla: Horario[] = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-    console.log("PLANTILLA",plantilla);
+    const plantillaHorarios: Horario[] = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+    let plantillaDetalles: DetalleHorario[] = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[1]]);
+    plantillaDetalles = plantillaDetalles.filter((valor: DetalleHorario) => valor.CODIGO_HORARIO !== undefined);
+    console.log('plantillaDetalles', plantillaDetalles);
 
     let codigos: string[] = [];
-    for (const data of plantilla) {
+    for (const data of plantillaHorarios) {
       let { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOTURNO} = data;
       if (MIN_ALIMENTACION === undefined) {
         data.MIN_ALIMENTACION = 0; 
@@ -345,6 +347,36 @@ class HorarioControlador {
       
     };
 
+    for (const data of plantillaDetalles) {
+      let { CODIGO_HORARIO, TIPO_ACCION, HORA, ORDEN, SALIDA_SIGUIENTE_DIA, MIN_ANTES, MIN_DESPUES } = data;
+      // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
+      const requiredValues = [CODIGO_HORARIO, TIPO_ACCION, HORA, ORDEN];
+      if (requiredValues.some(value => value === undefined)) {
+        data.OBSERVACION = 'FALTAN VALORES OBLIGATORIOS';
+        continue;
+      }
+
+      if (MIN_ANTES === undefined) {
+        data.MIN_ANTES = 0; 
+      }
+
+      if (MIN_DESPUES === undefined) {
+        data.MIN_DESPUES = 0; 
+      }
+
+      if (!VerificarCodigoHorarioDetalleHorario(CODIGO_HORARIO.toString(), plantillaHorarios)) {
+        data.OBSERVACION = 'CODIGO_HORARIO NO EXISTE EN HORARIOS VALIDOS';
+        continue;
+      }
+
+      if (VerificarFormatoDetalleHorario(data)[0]) {
+        data.OBSERVACION = VerificarFormatoDetalleHorario(data)[1];
+        continue;
+      }
+
+      data.OBSERVACION = 'OK';
+    };
+
     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
     fs.access(ruta, fs.constants.F_OK, (err) => {
       if (err) {
@@ -354,7 +386,7 @@ class HorarioControlador {
       }
     });
 
-    res.json(plantilla);
+    res.json({plantillaHorarios, plantillaDetalles});
   }
 
   /** Verificar que los datos dentro de la plantilla no se encuntren duplicados */
@@ -423,7 +455,7 @@ function VerificarFormatoDatos(data: any): [boolean, string] {
   let observacion = '';
   let error = true
   const { HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOTURNO } = data;
-  const horasTotalesFormatoCorrecto = /^(\d+)$|^(\d{1,2}:\d{2})$/.test(HORAS_TOTALES);
+  const horasTotalesFormatoCorrecto = /^(\d+)$|^(\d{1,2}:\d{2})$|^(\d{1,2}:\d{2}:\d{2})$/.test(HORAS_TOTALES);
   const minAlimentacionFormatoCorrecto = /^\d+$/.test(MIN_ALIMENTACION);
   const tipoHorarioValido = ['Laborable', 'Libre', 'Feriado'].includes(TIPO_HORARIO);
   const tipoHorarioNocturnoValido = ['Si', 'No'].includes(HORARIO_NOTURNO);
@@ -439,9 +471,33 @@ function VerificarFormatoDatos(data: any): [boolean, string] {
 async function VerificarDuplicadoBase(codigo: string){
   const result = await pool.query('SELECT * FROM cg_horarios WHERE UPPER(codigo) = $1',
             [codigo.toUpperCase()]);
-  console.log('result', codigo, result.rowCount);
   return result.rowCount > 0;
 }
+
+//FUNCION PARA COMBROBAR QUE CODIGO_HORARIO EXISTA EN PLANTILLAHORARIOS
+function VerificarCodigoHorarioDetalleHorario(codigo: string, plantillaHorarios: Horario[]){
+  const result = plantillaHorarios.filter((valor: Horario) => valor.CODIGO_HORARIO == codigo && valor.OBSERVACION == 'OK');
+  console.log('result', codigo, result);
+  return result.length > 0;
+}
+
+//FUNCION PARA COMPROBAR FORMATO DE PLANILLA DETALLE HORARIO
+function VerificarFormatoDetalleHorario(data: any): [boolean, string] {
+  let observacion = '';
+  let error = true
+  const { HORA, ORDEN, MIN_ANTES, MIN_DESPUES } = data;
+  const horaFormatoCorrecto = /^(\d{1,2}:\d{2})$|^(\d{1,2}:\d{2}:\d{2})$/.test(HORA);
+  const ordenFormatoCorrecto = /^\d+$/.test(ORDEN);
+  const minAntesFormatoCorrecto = /^\d+$/.test(MIN_ANTES);
+  const minDespuesFormatoCorrecto = /^\d+$/.test(MIN_DESPUES);
+  horaFormatoCorrecto ? null : observacion = 'FORMATO DE HORA INCORRECTO';
+  ordenFormatoCorrecto ? null : observacion = 'FORMATO DE ORDEN INCORRECTO';
+  minAntesFormatoCorrecto ? null : observacion = 'FORMATO DE MIN_ANTES INCORRECTO';
+  minDespuesFormatoCorrecto ? null : observacion = 'FORMATO DE MIN_DESPUES INCORRECTO';
+  error = horaFormatoCorrecto && ordenFormatoCorrecto && minAntesFormatoCorrecto && minDespuesFormatoCorrecto ? false : true ;
+  return [error, observacion];
+}
+
 
 interface Horario {
   DESCRIPCION: string | number, 
@@ -452,6 +508,19 @@ interface Horario {
   HORARIO_NOTURNO: string,
   OBSERVACION: string
 }
+
+interface DetalleHorario {
+  CODIGO_HORARIO: string | number,
+  TIPO_ACCION: string,
+  HORA: string,	
+  ORDEN: string | number,
+  SALIDA_SIGUIENTE_DIA: string,
+  MIN_ANTES: string | number,
+  MIN_DESPUES: string | number,
+  OBSERVACION: string,
+}
+
+
 
 
 

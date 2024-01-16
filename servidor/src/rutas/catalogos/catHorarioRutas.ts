@@ -65,7 +65,7 @@ class HorarioRutas {
 
         // VERIFICAR DATOS DE LA PLANTILLA DE CATÁLOGO HORARIO Y LUEGO SUBIR AL SISTEMA
         this.router.post('/cargarHorario/verificarDatos/upload', [TokenValidation, upload.single('uploads')], HORARIO_CONTROLADOR.VerificarDatos);
-        this.router.post('/cargarHorario/verificarPlantilla/upload', [TokenValidation, upload.single('uploads')], HORARIO_CONTROLADOR.VerificarPlantilla);
+        // this.router.post('/cargarHorario/verificarPlantilla/upload', [TokenValidation, upload.single('uploads')], HORARIO_CONTROLADOR.VerificarPlantilla);
         this.router.post('/cargarHorario/upload', [TokenValidation, upload.single('uploads')], HORARIO_CONTROLADOR.CargarHorarioPlantilla);
     }
 }

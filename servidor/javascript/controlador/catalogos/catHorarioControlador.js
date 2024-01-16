@@ -292,11 +292,16 @@ class HorarioControlador {
             let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
             const workbook = xlsx_1.default.readFile(ruta);
             const sheet_name_list = workbook.SheetNames;
-            const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-            console.log("PLANTILLA", plantilla);
+            const plantillaHorarios = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+            let plantillaDetalles = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[1]]);
+            plantillaDetalles = plantillaDetalles.filter((valor) => valor.CODIGO_HORARIO !== undefined);
+            console.log('plantillaDetalles', plantillaDetalles);
             let codigos = [];
-            for (const data of plantilla) {
-                let { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, TIPO_HORARIO, HORARIO_NOTURNO } = data;
+            for (const data of plantillaHorarios) {
+                let { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOTURNO } = data;
+                if (MIN_ALIMENTACION === undefined) {
+                    data.MIN_ALIMENTACION = 0;
+                }
                 // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
                 const requiredValues = [DESCRIPCION, CODIGO_HORARIO, TIPO_HORARIO, HORAS_TOTALES, HORARIO_NOTURNO];
                 if (requiredValues.some(value => value === undefined)) {
@@ -319,6 +324,31 @@ class HorarioControlador {
                 data.OBSERVACION = 'OK';
             }
             ;
+            for (const data of plantillaDetalles) {
+                let { CODIGO_HORARIO, TIPO_ACCION, HORA, ORDEN, SALIDA_SIGUIENTE_DIA, MIN_ANTES, MIN_DESPUES } = data;
+                // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
+                const requiredValues = [CODIGO_HORARIO, TIPO_ACCION, HORA, ORDEN];
+                if (requiredValues.some(value => value === undefined)) {
+                    data.OBSERVACION = 'FALTAN VALORES OBLIGATORIOS';
+                    continue;
+                }
+                if (MIN_ANTES === undefined) {
+                    data.MIN_ANTES = 0;
+                }
+                if (MIN_DESPUES === undefined) {
+                    data.MIN_DESPUES = 0;
+                }
+                if (!VerificarCodigoHorarioDetalleHorario(CODIGO_HORARIO.toString(), plantillaHorarios)) {
+                    data.OBSERVACION = 'CODIGO_HORARIO NO EXISTE EN HORARIOS VALIDOS';
+                    continue;
+                }
+                if (VerificarFormatoDetalleHorario(data)[0]) {
+                    data.OBSERVACION = VerificarFormatoDetalleHorario(data)[1];
+                    continue;
+                }
+                data.OBSERVACION = 'OK';
+            }
+            ;
             // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
             fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                 if (err) {
@@ -328,70 +358,7 @@ class HorarioControlador {
                     fs_1.default.unlinkSync(ruta);
                 }
             });
-            res.json(plantilla);
-        });
-    }
-    /** Verificar que los datos dentro de la plantilla no se encuntren duplicados */
-    VerificarPlantilla(req, res) {
-        var _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
-            let separador = path_1.default.sep;
-            let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
-            const workbook = xlsx_1.default.readFile(ruta);
-            const sheet_name_list = workbook.SheetNames;
-            const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-            var contarNombreData = 0;
-            var contador_arreglo = 1;
-            var arreglos_datos = [];
-            //Leer la plantilla para llenar un array con los datos nombre para verificar que no sean duplicados
-            plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
-                // Datos que se leen de la plantilla ingresada
-                var { nombre_horario, minutos_almuerzo, hora_trabajo, horario_nocturno } = data;
-                let datos_array = {
-                    nombre: nombre_horario,
-                };
-                arreglos_datos.push(datos_array);
-            }));
-            // Vamos a verificar dentro de arreglo_datos que no se encuentren datos duplicados
-            for (var i = 0; i <= arreglos_datos.length - 1; i++) {
-                for (var j = 0; j <= arreglos_datos.length - 1; j++) {
-                    if (arreglos_datos[i].nombre.toUpperCase() === arreglos_datos[j].nombre.toUpperCase()) {
-                        contarNombreData = contarNombreData + 1;
-                    }
-                }
-                contador_arreglo = contador_arreglo + 1;
-            }
-            // Cuando todos los datos han sido leidos verificamos si todos los datos son correctos
-            console.log('nombre_data', contarNombreData, plantilla.length, contador_arreglo);
-            if ((contador_arreglo - 1) === plantilla.length) {
-                if (contarNombreData === plantilla.length) {
-                    return res.jsonp({ message: 'correcto' });
-                }
-                else {
-                    return res.jsonp({ message: 'error' });
-                }
-            }
-            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
-                if (err) {
-                }
-                else {
-                    // ELIMINAR DEL SERVIDOR
-                    fs_1.default.unlinkSync(ruta);
-                }
-            });
-        });
-    }
-    RevisarDuplicados(req, res) {
-        var _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
-            let separador = path_1.default.sep;
-            let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
-            const workbook = xlsx_1.default.readFile(ruta);
-            const sheet_name_list = workbook.SheetNames;
-            const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+            res.json({ plantillaHorarios, plantillaDetalles });
         });
     }
 }
@@ -406,7 +373,7 @@ function VerificarFormatoDatos(data) {
     let observacion = '';
     let error = true;
     const { HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOTURNO } = data;
-    const horasTotalesFormatoCorrecto = /^(\d+)$|^(\d{1,2}:\d{2})$/.test(HORAS_TOTALES);
+    const horasTotalesFormatoCorrecto = /^(\d+)$|^(\d{1,2}:\d{2})$|^(\d{1,2}:\d{2}:\d{2})$/.test(HORAS_TOTALES);
     const minAlimentacionFormatoCorrecto = /^\d+$/.test(MIN_ALIMENTACION);
     const tipoHorarioValido = ['Laborable', 'Libre', 'Feriado'].includes(TIPO_HORARIO);
     const tipoHorarioNocturnoValido = ['Si', 'No'].includes(HORARIO_NOTURNO);
@@ -421,9 +388,30 @@ function VerificarFormatoDatos(data) {
 function VerificarDuplicadoBase(codigo) {
     return __awaiter(this, void 0, void 0, function* () {
         const result = yield database_1.default.query('SELECT * FROM cg_horarios WHERE UPPER(codigo) = $1', [codigo.toUpperCase()]);
-        console.log('result', codigo, result.rowCount);
         return result.rowCount > 0;
     });
+}
+//FUNCION PARA COMBROBAR QUE CODIGO_HORARIO EXISTA EN PLANTILLAHORARIOS
+function VerificarCodigoHorarioDetalleHorario(codigo, plantillaHorarios) {
+    const result = plantillaHorarios.filter((valor) => valor.CODIGO_HORARIO == codigo && valor.OBSERVACION == 'OK');
+    console.log('result', codigo, result);
+    return result.length > 0;
+}
+//FUNCION PARA COMPROBAR FORMATO DE PLANILLA DETALLE HORARIO
+function VerificarFormatoDetalleHorario(data) {
+    let observacion = '';
+    let error = true;
+    const { HORA, ORDEN, MIN_ANTES, MIN_DESPUES } = data;
+    const horaFormatoCorrecto = /^(\d{1,2}:\d{2})$|^(\d{1,2}:\d{2}:\d{2})$/.test(HORA);
+    const ordenFormatoCorrecto = /^\d+$/.test(ORDEN);
+    const minAntesFormatoCorrecto = /^\d+$/.test(MIN_ANTES);
+    const minDespuesFormatoCorrecto = /^\d+$/.test(MIN_DESPUES);
+    horaFormatoCorrecto ? null : observacion = 'FORMATO DE HORA INCORRECTO';
+    ordenFormatoCorrecto ? null : observacion = 'FORMATO DE ORDEN INCORRECTO';
+    minAntesFormatoCorrecto ? null : observacion = 'FORMATO DE MIN_ANTES INCORRECTO';
+    minDespuesFormatoCorrecto ? null : observacion = 'FORMATO DE MIN_DESPUES INCORRECTO';
+    error = horaFormatoCorrecto && ordenFormatoCorrecto && minAntesFormatoCorrecto && minDespuesFormatoCorrecto ? false : true;
+    return [error, observacion];
 }
 exports.HORARIO_CONTROLADOR = new HorarioControlador();
 exports.default = exports.HORARIO_CONTROLADOR;
