@@ -8,6 +8,7 @@ import pool from '../../../database';
 import moment from 'moment';
 moment.locale('es');
 
+/*
 const multipart = require('connect-multiparty');
 
 const multipartMiddlewarePlantilla = multipart({
@@ -45,6 +46,24 @@ const storage = multer.diskStorage({
 })
 
 const upload = multer({ storage: storage });
+*/
+
+import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
+
+const storage = multer.diskStorage({
+
+    destination: function (req, file, cb) {
+        cb(null, ObtenerRutaLeerPlantillas())
+    },
+    filename: function (req, file, cb) {
+        let documento = file.originalname;
+
+        cb(null, documento);
+    }
+})
+
+const upload = multer({ storage: storage });
+
 
 class EmpleadoRutas {
     public router: Router = Router();
@@ -148,14 +167,14 @@ class EmpleadoRutas {
 
 
         // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA AUTOMÁTICA 
-        this.router.post('/verificar/automatico/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_Automatica);
-        this.router.post('/verificar/datos/automatico/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosAutomatico);
-        this.router.post('/cargar_automatico/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.CargarPlantilla_Automatico);
+        this.router.post('/verificar/automatico/plantillaExcel/', [TokenValidation, upload.single('uploads')], EMPLEADO_CONTROLADOR.VerificarPlantilla_Automatica);
+        //this.router.post('/verificar/datos/automatico/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosAutomatico);
+        //this.router.post('/cargar_automatico/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.CargarPlantilla_Automatico);
 
         // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA MANUAL 
-        this.router.post('/verificar/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_Manual);
-        this.router.post('/verificar/datos/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosManual);
-        this.router.post('/cargar_manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.CargarPlantilla_Manual);
+        //this.router.post('/verificar/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_Manual);
+        //this.router.post('/verificar/datos/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosManual);
+        //this.router.post('/cargar_manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.CargarPlantilla_Manual);
 
 
 

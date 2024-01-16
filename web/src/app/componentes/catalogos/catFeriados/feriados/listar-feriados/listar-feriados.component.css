@@ -60,7 +60,7 @@ td {
 }
 
 [type="file"]+label.btn-2 {
-    background-color: rgb(150, 243, 141);
+    background-color: rgb(83, 157, 76);
     overflow: hidden;
 }
 
@@ -80,7 +80,7 @@ td {
 }
 
 [type="file"]+label.btn-2:hover {
-    background-color: rgb(21, 130, 1);
+    background-color: rgb(15, 94, 1);
 }
 
 [type="file"]+label.btn-2:hover::before {

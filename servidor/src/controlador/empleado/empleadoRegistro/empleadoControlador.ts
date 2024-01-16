@@ -10,7 +10,7 @@ import path from 'path';
 import fs from 'fs';
 import moment from 'moment';
 const builder = require('xmlbuilder');
-
+import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 
 class EmpleadoControlador {
 
@@ -773,13 +773,41 @@ class EmpleadoControlador {
    ** **************************************************************************************** **/
 
   public async VerificarPlantilla_Automatica(req: Request, res: Response): Promise<void> {
-    let list: any = req.files;
-    let cadena = list.uploads[0].path;
-    let filename = cadena.split("\\")[1];
-    var filePath = `./plantillas/${filename}`
-    const workbook = excel.readFile(filePath);
+    const documento = req.file?.originalname;
+    let separador = path.sep;
+    let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+
+    const workbook = excel.readFile(ruta);
     const sheet_name_list = workbook.SheetNames;
     const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+
+    let data: any = {
+      cedula: '',	
+      apellido: '',
+      nombre: '',	
+      estado_civil: '',	
+      genero: '',	
+      correo: '',	
+      fec_nacimiento: '',	
+      estado: '',	
+      mail_alternativo: '',	
+      domicilio: '',
+      telefono: '',	
+      nacionalidad: '',	
+      usuario: '',	
+      contrasena: '',	
+      estado_user: '',	
+      rol: '',	
+      app_habilita: '',
+      observacion: '',
+    };
+
+    var listEmpleados: any = [];
+    var duplicados: any = [];
+
+    console.log('plantilla: ',plantilla);
+
+    /*
     var contarCodigo = 0;
     var contarCedula = 0;
     var contarUsuario = 0;
@@ -793,24 +821,172 @@ class EmpleadoControlador {
     const VALOR = await pool.query('SELECT * FROM codigo');
     //TODO Revisar max codigo
     var codigo = parseInt(VALOR.rows[0].valor);
+    */
 
-    plantilla.forEach(async (data: any) => {
+    plantilla.forEach(async (dato: any) => {
       // Datos que se leen de la plantilla ingresada
-      const { cedula, estado_civil, genero, correo, fec_nacimiento, estado, domicilio,
-        telefono, nacionalidad, usuario, estado_user, rol, app_habilita } = data;
+      const { cedula, apellido, nombre, estado_civil, genero, correo, fec_nacimiento, estado, domicilio,
+        telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
 
-      //Verificar que la cédula no se encuentre registrada
-      const VERIFICAR_CEDULA = await pool.query('SELECT * FROM empleados WHERE cedula = $1', [cedula]);
-      if (VERIFICAR_CEDULA.rowCount === 0) {
-        contarCedula = contarCedula + 1;
+        //Verificar que la cédula no se encuentre registrada
+        if(cedula != undefined && cedula != ''){
+          data.cedula = cedula;
+          const VERIFICAR_CEDULA = await pool.query('SELECT * FROM empleados WHERE cedula = $1', [cedula]);
+          if(VERIFICAR_CEDULA.rowCount > 0){
+            data.observacion = 'Ya esta registrado en base';
+          }
+        }else{
+          data.cedula = 'No registrado';
+          data.observacion = 'No existe la cedula';
+        }
+
+        //Verificar que el usuario no se encuentre registrado
+        if(usuario != undefined && usuario != ''){
+          data.usuario;
+          const VERIFICAR_USUARIO = await pool.query('SELECT * FROM usuarios WHERE usuario = $1', [usuario]);
+          if (VERIFICAR_USUARIO.rowCount > 0) {
+            data.observacion = 'Ya esta registrado en base';
+          }
+        }else{
+          data.usuario = 'No registrado';
+          data.observacion = 'No existe el usuario';
+        }
+
+        if(rol != undefined && rol != ''){
+          data.rol = rol;
+          const VERIFICAR_ROL = await pool.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [rol.toUpperCase()]);
+          if (VERIFICAR_ROL.rowCount == 0) {
+            data.observacion = 'No existe el rol en la base';
+          }
+        }else{
+          data.rol = 'No registrado',
+          data.observacion = 'Rol no ingresado';
+        }
+     
+      /*
+      if(cedula != undefined && cedula != ''){
+        const VERIFICAR_CEDULA = await pool.query('SELECT * FROM empleados WHERE cedula = $1', [cedula]);
+        data.cedula = cedula;
+        if (VERIFICAR_CEDULA.rowCount === 0) {
+          //Verificar que el usuario no se encuentre registrado
+          if(usuario != undefined && usuario != ''){
+            const VERIFICAR_USUARIO = await pool.query('SELECT * FROM usuarios WHERE usuario = $1', [usuario]);
+            data.nombre = nombre;
+            data.apellido = apellido;
+            data.usuario = usuario;
+            if (VERIFICAR_USUARIO.rowCount === 0) {
+              //Verificar que el rol exista dentro del sistema
+              if(rol != undefined && rol != ''){
+                const VERIFICAR_ROL = await pool.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [rol.toUpperCase()]);
+                if (VERIFICAR_ROL.rowCount > 0) {
+                  data.estado_civil = estado_civil,	
+                  data.genero = genero,	
+                  data.correo = correo,	
+                  data.fec_nacimiento = fec_nacimiento,	
+                  data.estado = estado,	
+                  data.mail_alternativo = correo,	
+                  data.domicilio = domicilio,
+                  data.telefono = telefono,	
+                  data.nacionalidad = nacionalidad,	
+                  data.contrasena = contrasena,	
+                  data.estado_user = estado_user,	
+                  data.rol = rol,	
+                  data.app_habilita = app_habilita,
+                  data.observacion = 'ok';
+                }else{
+                  data.estado_civil = estado_civil,	
+                  data.genero = genero,	
+                  data.correo = correo,	
+                  data.fec_nacimiento = fec_nacimiento,	
+                  data.estado = estado,	
+                  data.mail_alternativo = correo,	
+                  data.domicilio = domicilio,
+                  data.telefono = telefono,	
+                  data.nacionalidad = nacionalidad,	
+                  data.contrasena = contrasena,	
+                  data.estado_user = estado_user,	
+                  data.rol = rol,	
+                  data.app_habilita = app_habilita,
+                  data.observacion = 'No existe el rol';
+                }
+              }else{
+                data.rol = 'No registrado',
+                data.observacion = 'Rol no ingresado';
+              }
+              
+            }else{
+              data.observacion = 'Ya esta registrado en base';
+            }
+          }else{
+            data.nombre = nombre;
+            data.apellido = apellido;
+            data.usuario = 'No registrado';
+            data.estado_civil = estado_civil,	
+            data.genero = genero,	
+            data.correo = correo,	
+            data.fec_nacimiento = fec_nacimiento,	
+            data.estado = estado,	
+            data.mail_alternativo = correo,	
+            data.domicilio = domicilio,
+            data.telefono = telefono,	
+            data.nacionalidad = nacionalidad,	
+            data.contrasena = contrasena,	
+            data.estado_user = estado_user,	
+            data.rol = rol,	
+            data.app_habilita = app_habilita,
+            data.observacion = 'No existe el usuario';
+          }
+        }else{
+          data.nombre = nombre;
+          data.apellido = apellido;
+          data.usuario = usuario;
+          data.estado_civil = estado_civil,	
+          data.genero = genero,	
+          data.correo = correo,	
+          data.fec_nacimiento = fec_nacimiento,	
+          data.estado = estado,	
+          data.mail_alternativo = correo,	
+          data.domicilio = domicilio,
+          data.telefono = telefono,	
+          data.nacionalidad = nacionalidad,	
+          data.contrasena = contrasena,	
+          data.estado_user = estado_user,	
+          data.rol = rol,	
+          data.app_habilita = app_habilita,
+          data.observacion = 'Ya esta registrado en base';
+        }
+
+
+      }else{
+        data.cedula = 'No registrado';
+        data.nombre = nombre;
+        data.apellido = apellido;
+        data.usuario = usuario;
+        data.estado_civil = estado_civil,	
+        data.genero = genero,	
+        data.correo = correo,	
+        data.fec_nacimiento = fec_nacimiento,	
+        data.estado = estado,	
+        data.mail_alternativo = correo,	
+        data.domicilio = domicilio,
+        data.telefono = telefono,	
+        data.nacionalidad = nacionalidad,	
+        data.contrasena = contrasena,	
+        data.estado_user = estado_user,	
+        data.rol = rol,	
+        data.app_habilita = app_habilita,
+        data.observacion = 'No existe la cedula';
+
       }
+      */
+      
 
-      //Verificar que el usuario no se encuentre registrado
-      const VERIFICAR_USUARIO = await pool.query('SELECT * FROM usuarios WHERE usuario = $1', [usuario]);
-      if (VERIFICAR_USUARIO.rowCount === 0) {
-        contarUsuario = contarUsuario + 1;
-      }
+      listEmpleados.push(data)
+      
+      
 
+      data = {};
+      /*
       //Verificar que el rol exista dentro del sistema
       const VERIFICAR_ROL = await pool.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1',
         [rol.toUpperCase()]);
@@ -877,25 +1053,49 @@ class EmpleadoControlador {
         }
       }
       contador = contador + 1;
+      */
+
+      
     });
+    
+
     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-    fs.access(filePath, fs.constants.F_OK, (err) => {
+    fs.access(ruta , fs.constants.F_OK, (err) => {
       if (err) {
       } else {
         // ELIMINAR DEL SERVIDOR
-        fs.unlinkSync(filePath);
+        fs.unlinkSync(ruta);
       }
     });
+
+    setTimeout(() => {
+      /*listEmpleados.forEach((item:any) => {
+        if(item.observacion == undefined || item.observacion == null || item.observacion == ''){
+          item.observacion = 'Registro duplicado'
+        }
+      });*/
+      return res.jsonp({ message: 'correcto', data:  listEmpleados});
+
+    }, 1500)
   }
 
   public async VerificarPlantilla_DatosAutomatico(req: Request, res: Response) {
-    let list: any = req.files;
-    let cadena = list.uploads[0].path;
-    let filename = cadena.split("\\")[1];
-    var filePath = `./plantillas/${filename}`
-    const workbook = excel.readFile(filePath);
+    let list: any = req.files;    
+    //let cadena = list.uploads[0].path;
+    //let filename = cadena.split("\\")[1];
+    //var filePath = `./plantillas/${filename}`
+
+    let separador = path.sep;
+    let ruta = ObtenerRutaLeerPlantillas() + separador + list;
+
+    //const workbook = excel.readFile(filePath);
+    const workbook = excel.readFile(ruta);
     const sheet_name_list = workbook.SheetNames;
     const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+
+    console.log('plantilla1: ',plantilla);
+
+    /*
     var contarCedulaData = 0;
     var contarUsuarioData = 0;
     var contador_arreglo = 1;
@@ -943,18 +1143,31 @@ class EmpleadoControlador {
         fs.unlinkSync(filePath);
       }
     });
+    */
+
   }
 
   public async CargarPlantilla_Automatico(req: Request, res: Response): Promise<void> {
     let list: any = req.files;
-    let cadena = list.uploads[0].path;
-    let filename = cadena.split("\\")[1];
-    var filePath = `./plantillas/${filename}`
+    //let cadena = list.uploads[0].path;
+    //let filename = cadena.split("\\")[1];
+    //var filePath = `./plantillas/${filename}`
 
-    const workbook = excel.readFile(filePath);
+    let separador = path.sep;
+    let ruta = ObtenerRutaLeerPlantillas() + separador + list;
+
+    //const workbook = excel.readFile(filePath);
+    const workbook = excel.readFile(ruta);
     const sheet_name_list = workbook.SheetNames;
     const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
+    
+
+    
+
+
+
+    /*
     const VALOR = await pool.query('SELECT * FROM codigo');
     //TODO Revisar max codigo
     var codigo = parseInt(VALOR.rows[0].valor);
@@ -1064,12 +1277,14 @@ class EmpleadoControlador {
       }
       contador = contador + 1;
     });
+    */
+
     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-    fs.access(filePath, fs.constants.F_OK, (err) => {
+    fs.access(ruta, fs.constants.F_OK, (err) => {
       if (err) {
       } else {
         // ELIMINAR DEL SERVIDOR
-        fs.unlinkSync(filePath);
+        fs.unlinkSync(ruta);
       }
     });
   }

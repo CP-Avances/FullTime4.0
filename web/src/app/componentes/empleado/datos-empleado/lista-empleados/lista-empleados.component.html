@@ -68,7 +68,7 @@
 </div>
 
 <!-- LISTA DE EMPLEADOS QUE HAN SIDO INACTIVADOS O QUE YA NO FORMAN PARTE DE LA EMPRESA -->
-<div *ngIf="Hab_Deshabilitados" class="container" style="padding-bottom: 50px; text-align: center;">
+<div *ngIf="Hab_Deshabilitados && !DataEmpleados" class="container" style="padding-bottom: 50px; text-align: center;" >
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
             <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccionDesactivados()" matSuffix
@@ -151,7 +151,7 @@
 </div>
 
 <!-- LISTA DE EMPLEADOS QUE FORMAN PARTE DE LA EMPRESA -->
-<div *ngIf="tabla_activos" class="container" style="padding-bottom: 50px; text-align: center;">
+<div *ngIf="tabla_activos && !DataEmpleados" class="container" style="padding-bottom: 50px; text-align: center;">
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
             <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
@@ -274,5 +274,97 @@
         <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
             <p> Reporte de usuarios activos. </p>
         </div>
+    </div>
+</div>
+
+<!-- LISTA DE EMPLEADOS DEL REGISTRO MULTIPLE -->
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="DataEmpleados">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div class="d-flex bd-highlight" id="titulo">
+            <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
+                matTooltipPosition="right" matTooltip="Selección múltiple para inhabilitar empleados." id="SelectCheck">
+                library_add_check
+            </mat-icon>
+            <button *ngIf="btnCheckHabilitar" class="btn btn-primary btn-outline-light"
+                style="float: left; margin-left: 10px;" (click)="Deshabilitar(1)">
+                Confirmar
+            </button>
+            <span class="w-100 bd-highlight">
+                LISTA DE USUARIOS MULTIPLES
+            </span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th>
+                            <mat-checkbox *ngIf="btnCheckHabilitar" (change)="$event ? masterToggle() : null"
+                                [checked]="selectionUno.hasValue() && isAllSelected()"
+                                [indeterminate]="selectionUno.hasValue() && !isAllSelected()"
+                                [aria-label]="checkboxLabel()">
+                            </mat-checkbox>
+                        </th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Apellido</th>
+                        <th scope="col">Cédula</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Correo</th>
+                        <th scope="col">Rol</th>
+                        <th scope="col">Observación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <mat-form-field class="input-tables codigo">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCodigo" [formControl]="codigo"
+                                    (keypress)="IngresarSoloNumeros($event)">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field class="input-tables cedula">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombre" [formControl]="nombre"
+                                    type="text" (keypress)="IngresarSoloLetras($event)">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field class="input-tables cedula">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroApellido"
+                                    [formControl]="apellido" type="text" (keypress)="IngresarSoloLetras($event)">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field class="input-tables cedula">
+                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCedula" maxlength="10"
+                                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
+                            </mat-form-field>
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr
+                        *ngFor="let e of DataEmpleados | emplCodigo: filtroCodigo | emplCedula: filtroCedula | emplNombre: filtroNombre | emplApellido: filtroApellido | paginate:tamanio_pagina:numero_pagina">
+                        <td>
+                            <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionUno.toggle(e) : null" [checked]="selectionUno.isSelected(e)"
+                                [aria-label]="checkboxLabel(e)">
+                            </mat-checkbox>
+                        </td>
+                        <td>{{e.apellido}}</td>
+                        <td>{{e.nombre}}</td>
+                        <td>{{e.cedula}}</td>
+                        <td>{{e.estado}}</td>
+                        <td>{{e.correo}}</td>
+                        <td>{{e.rol}}</td>
+                        <td>{{e.observacion}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="empleado.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
     </div>
 </div>

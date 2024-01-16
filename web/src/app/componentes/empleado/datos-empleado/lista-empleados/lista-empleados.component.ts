@@ -362,17 +362,27 @@ export class ListaEmpleadosComponent implements OnInit {
     }
   }
 
+  DataEmpleados: any;
+
   VerificarPlantilla() {
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
-      formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    this.rest.verificarArchivoExcel_Automatico(formData).subscribe(res => {
+      console.log('plantilla 1', res);
+      this.DataEmpleados = res.data;
+    });
+
+    /*
     if (this.datosCodigo[0].automatico === true) {
       this.ArchivoAutomatico(formData);
     }
     else {
       this.ArchivoManual(formData);
     }
+    */
   }
 
   ArchivoAutomatico(datosArchivo) {

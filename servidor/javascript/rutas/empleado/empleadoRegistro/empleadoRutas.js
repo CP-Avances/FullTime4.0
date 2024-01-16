@@ -1,53 +1,62 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 // SECCIÓN DE LIBRERIAS
 const empleadoControlador_1 = __importDefault(require("../../../controlador/empleado/empleadoRegistro/empleadoControlador"));
-const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const verificarToken_1 = require("../../../libs/verificarToken");
 const express_1 = require("express");
 const multer_1 = __importDefault(require("multer"));
-const database_1 = __importDefault(require("../../../database"));
 const moment_1 = __importDefault(require("moment"));
 moment_1.default.locale('es');
+/*
 const multipart = require('connect-multiparty');
+
 const multipartMiddlewarePlantilla = multipart({
     uploadDir: './plantillas',
 });
+
+const storage = multer.diskStorage({
+
+    destination: async function (req, file, cb) {
+        let id = req.params.id_empleado;
+        var ruta = await ObtenerRutaUsuario(id);
+        cb(null, ruta)
+    },
+    filename: async function (req, file, cb) {
+
+        // FECHA DEL SISTEMA
+        var fecha = moment();
+        var anio = fecha.format('YYYY');
+        var mes = fecha.format('MM');
+        var dia = fecha.format('DD');
+
+        // DATOS DOCUMENTO
+        let id = req.params.id_empleado;
+
+        const usuario = await pool.query(
+            `
+            SELECT codigo FROM empleados WHERE id = $1
+            `
+            , [id]);
+
+        let documento = usuario.rows[0].codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
+
+        cb(null, documento)
+    }
+})
+
+const upload = multer({ storage: storage });
+*/
+const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
 const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let id = req.params.id_empleado;
-            var ruta = yield (0, accesoCarpetas_1.ObtenerRutaUsuario)(id);
-            cb(null, ruta);
-        });
+        cb(null, (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)());
     },
     filename: function (req, file, cb) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // FECHA DEL SISTEMA
-            var fecha = (0, moment_1.default)();
-            var anio = fecha.format('YYYY');
-            var mes = fecha.format('MM');
-            var dia = fecha.format('DD');
-            // DATOS DOCUMENTO
-            let id = req.params.id_empleado;
-            const usuario = yield database_1.default.query(`
-            SELECT codigo FROM empleados WHERE id = $1
-            `, [id]);
-            let documento = usuario.rows[0].codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname;
-            cb(null, documento);
-        });
+        let documento = file.originalname;
+        cb(null, documento);
     }
 });
 const upload = (0, multer_1.default)({ storage: storage });
@@ -119,13 +128,13 @@ class EmpleadoRutas {
         // INFORMACIÓN DE LA IMAGEN
         this.router.get('/img/codificado/:id/:imagen', empleadoControlador_1.default.getImagenBase64);
         // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA AUTOMÁTICA 
-        this.router.post('/verificar/automatico/plantillaExcel/', [verificarToken_1.TokenValidation, multipartMiddlewarePlantilla], empleadoControlador_1.default.VerificarPlantilla_Automatica);
-        this.router.post('/verificar/datos/automatico/plantillaExcel/', [verificarToken_1.TokenValidation, multipartMiddlewarePlantilla], empleadoControlador_1.default.VerificarPlantilla_DatosAutomatico);
-        this.router.post('/cargar_automatico/plantillaExcel/', [verificarToken_1.TokenValidation, multipartMiddlewarePlantilla], empleadoControlador_1.default.CargarPlantilla_Automatico);
+        this.router.post('/verificar/automatico/plantillaExcel/', [verificarToken_1.TokenValidation, upload.single('uploads')], empleadoControlador_1.default.VerificarPlantilla_Automatica);
+        //this.router.post('/verificar/datos/automatico/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosAutomatico);
+        //this.router.post('/cargar_automatico/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.CargarPlantilla_Automatico);
         // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA MANUAL 
-        this.router.post('/verificar/manual/plantillaExcel/', [verificarToken_1.TokenValidation, multipartMiddlewarePlantilla], empleadoControlador_1.default.VerificarPlantilla_Manual);
-        this.router.post('/verificar/datos/manual/plantillaExcel/', [verificarToken_1.TokenValidation, multipartMiddlewarePlantilla], empleadoControlador_1.default.VerificarPlantilla_DatosManual);
-        this.router.post('/cargar_manual/plantillaExcel/', [verificarToken_1.TokenValidation, multipartMiddlewarePlantilla], empleadoControlador_1.default.CargarPlantilla_Manual);
+        //this.router.post('/verificar/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_Manual);
+        //this.router.post('/verificar/datos/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosManual);
+        //this.router.post('/cargar_manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.CargarPlantilla_Manual);
         // HABILITACIÓN Y DESHABILITACIÓN DE USUARIOS
         // METODOS PARA CONTROL DE MARCACIONES DENTRO DE UNA UBICACIÓN GEOGRÁFICA 
         this.router.post('/geolocalizacion-domicilio/:id/:codigo', verificarToken_1.TokenValidation, empleadoControlador_1.default.IngresarGelocalizacion);

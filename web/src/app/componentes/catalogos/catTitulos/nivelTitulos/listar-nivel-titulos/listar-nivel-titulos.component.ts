@@ -182,7 +182,7 @@ export class ListarNivelTitulosComponent implements OnInit {
         })
       })
     }else{
-      this.toastr.error('La plantilla no tiene ningun nivel para registrar ingrese otra', 'Plantilla no aceptada', {
+      this.toastr.error('No exiten datos para registrar ingrese otra', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
       this.archivoForm.reset();
