@@ -47,6 +47,9 @@ export class PrincipalHorarioComponent implements OnInit {
   archivo1Form = new FormControl('');
   archivo2Form = new FormControl('');
   archivo3Form = new FormControl('');
+  descripcionF = new FormControl('');
+  codigoF = new FormControl('');
+  codigoFD = new FormControl('');
 
   // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public formulario = new FormGroup({
@@ -62,6 +65,16 @@ export class PrincipalHorarioComponent implements OnInit {
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
 
+  // ITEMS DE PAGINACION DE LA TABLA HORARIOS
+  numero_paginaH: number = 1;
+  tamanio_paginaH: number = 5;
+  pageSizeOptionsH = [5, 10, 20, 50];
+
+  // ITEMS DE PAGINACION DE LA TABLA DETALLES
+  numero_paginaD: number = 1;
+  tamanio_paginaD: number = 5;
+  pageSizeOptionsD = [5, 10, 20, 50];
+
   // VARIABLES DE ALMACENAMIENTO DE USUARIO DE INICIO SESIÓN
   empleado: any = [];
   idEmpleado: number;
@@ -73,6 +86,11 @@ export class PrincipalHorarioComponent implements OnInit {
   dataHorarios: any;
   listaHorariosCorrectos: any = [];
   listaDetalleCorrectos: any = [];
+
+  // VARAIBLES USADAS PARA FILTROS DE BUSQUEDA
+  filtroDescripcion = '';
+  filtroCodigo = '';
+  filtroCodigoD = '';
 
   constructor(
     public restEmpre: EmpresaService, // SERVICIO DATOS DE EMPRESA
@@ -127,6 +145,18 @@ export class PrincipalHorarioComponent implements OnInit {
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
     this.numero_pagina = e.pageIndex + 1;
+  }
+
+  // METODO PARA MANEJAR PAGINAS DE TABLA HORARIOS
+  ManejarPaginaH(e: PageEvent) {
+    this.tamanio_paginaH = e.pageSize;
+    this.numero_paginaH = e.pageIndex + 1;
+  }
+
+  // METODO PARA MANEJAR PAGINAS DE TABLA DETALLES
+  ManejarPaginaD(e: PageEvent) {
+    this.tamanio_paginaD = e.pageSize;
+    this.numero_paginaD = e.pageIndex + 1;
   }
 
   // METODO PARA OBTENER HORARIOS
@@ -561,4 +591,18 @@ export class PrincipalHorarioComponent implements OnInit {
     a.click();
   }
 
+
+  //METODO DEFINIR EL COLOR DE LA OBSERVACION
+  ObtenerColorValidacion(observacion: string): string{
+    switch(observacion) {
+      case 'Ok':
+          return 'rgb(159, 221, 154)';
+      case 'Ya esta registrado en la base de datos' || 'Codigo de horario no existe en los horarios validos':
+          return 'rgb(239, 203, 106)';
+      case 'Registro duplicado':
+          return 'rgb(156, 214, 255)';
+      default:
+          return 'rgb(246, 167, 143)';
+    }
+  }
 }

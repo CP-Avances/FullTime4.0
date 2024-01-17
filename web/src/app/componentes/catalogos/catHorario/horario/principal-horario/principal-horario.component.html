@@ -165,5 +165,121 @@
     </div>
 </div>
 
+<!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE HORARIOS ------------------------------------------------->
+<div class="container" style="padding-bottom: 10px; margin-bottom: 35px;" *ngIf="dataHorarios">
+  <div class="mat-elevation-z8" style="background: white;">
+      <div id="titulo">REGISTRO MULTIPLE HORARIOS</div>
+      <div class="table-responsive">
+          <table class="table table-hover table-sm">
+              <thead class="thead-light">
+                  <tr style="text-align: center;">
+                      <th scope="col">Descripción</th>
+                      <th scope="col">Código Horario</th>
+                      <th scope="col">Horas Totales</th>
+                      <th scope="col">Minutos Alimentación</th>
+                      <th scope="col">Tipo Horario</th>
+                      <th scope="col">Horario Nocturno</th>
+                      <th scope="col">Observación</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr>
+                      <td>
+                          <mat-form-field id="t-inputs">
+                              <input matInput placeholder="Buscar" [formControl]="descripcionF"
+                                  [(ngModel)]="filtroDescripcion">
+                          </mat-form-field>
+                      </td>
+                      <td>
+                        <mat-form-field id="t-inputs">
+                            <input matInput placeholder="Buscar" [formControl]="codigoF"
+                                [(ngModel)]="filtroCodigo">
+                        </mat-form-field>
+                      </td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                  </tr>
+                  <tr
+                      *ngFor="let h of dataHorarios.plantillaHorarios | paginate:tamanio_pagina:numero_paginaH ">
+                      <td>{{h.DESCRIPCION}}</td>
+                      <td>{{h.CODIGO_HORARIO}}</td>
+                      <td>{{h.HORAS_TOTALES}}</td>
+                      <td>{{h.MIN_ALIMENTACION}}</td>
+                      <td>{{h.TIPO_HORARIO}}</td>
+                      <td>{{h.HORARIO_NOCTURNO}}</td>
+                      <td>
+                          <div style="width: 270px; margin: auto;">
+                              <div id="t-editar" class="circulo"  [style.background-color]="ObtenerColorValidacion(h.OBSERVACION)"></div>
+                              {{h.OBSERVACION}}
+                          </div>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+      <mat-paginator id="paginaH" [length]="dataHorarios.plantillaHorarios.length" [pageSize]="tamanio_paginaH"
+          [pageSizeOptions]="pageSizeOptionsH" id="pagina" (page)="ManejarPaginaH($event)" showFirstLastButtons>
+      </mat-paginator>
+  </div>
+</div>
+
+<!-------------------TABLA DE DATOS DE LA CARGA MULTIPLE DE DETALLES ------------------------------------------------->
+<div class="container" style="padding-bottom: 10px; margin-bottom: 35px;" *ngIf="dataHorarios">
+  <div class="mat-elevation-z8" style="background: white;">
+      <div id="titulo">REGISTRO MULTIPLE DETALLES</div>
+      <div class="table-responsive">
+          <table class="table table-hover table-sm">
+              <thead class="thead-light">
+                  <tr style="text-align: center;">
+                      <th scope="col">Código Horario</th>
+                      <th scope="col">Tipo Acción</th>
+                      <th scope="col">Hora</th>
+                      <th scope="col">Orden</th>
+                      <th scope="col">Salida Siguiente Día</th>
+                      <th scope="col">Minutos Antes</th>
+                      <th scope="col">Minutos Después</th>
+                      <th scope="col">Observación</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr>
+                      <td>
+                        <mat-form-field id="t-inputs">
+                            <input matInput placeholder="Buscar" [formControl]="codigoFD"
+                                [(ngModel)]="filtroCodigoD">
+                        </mat-form-field>
+                      </td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                  </tr>
+                  <tr
+                      *ngFor="let d of dataHorarios.plantillaDetalles | paginate:tamanio_pagina:numero_paginaD ">
+                      <td>{{d.CODIGO_HORARIO}}</td>
+                      <td>{{d.TIPO_ACCION}}</td>
+                      <td>{{d.HORA}}</td>
+                      <td></td>
+                      <td>{{d.SALIDA_SIGUIENTE_DIA}}</td>
+                      <td>{{d.MIN_ANTES}}</td>
+                      <td>{{d.MIN_DESPUES}}</td>
+                      <td>
+                          <div style="width: 270px; margin: auto;">
+                              <div id="t-editar" class="circulo"  [style.background-color]="ObtenerColorValidacion(d.OBSERVACION)"></div>
+                              {{d.OBSERVACION}}
+                          </div>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+      </div>
+      <mat-paginator id="paginaD" [length]="dataHorarios.plantillaDetalles.length" [pageSize]="tamanio_paginaD"
+          [pageSizeOptions]="pageSizeOptionsD" id="pagina" (page)="ManejarPaginaD($event)" showFirstLastButtons>
+
 <!--  *********************** PANTALLA DETALLE DE HORARIOS ********************************* -->
 <app-ver-horario-detalle *ngIf="ver_detalles" [idHorario]="horario_id" [pagina]="pagina"></app-ver-horario-detalle>
