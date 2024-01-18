@@ -295,7 +295,6 @@ class HorarioControlador {
             const plantillaHorarios = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
             let plantillaDetalles = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[1]]);
             plantillaDetalles = plantillaDetalles.filter((valor) => valor.CODIGO_HORARIO !== undefined);
-            console.log('plantillaDetalles', plantillaDetalles);
             let codigos = [];
             for (const data of plantillaHorarios) {
                 let { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOCTURNO } = data;
@@ -477,7 +476,6 @@ function VerificarDetallesAgrupados(detallesAgrupados, horarios) {
             const tieneAlimentacion = horario.MIN_ALIMENTACION > 0;
             const tiposAccionRequeridos = tieneAlimentacion ? ['Entrada', 'Inicio alimentación', 'Fin alimentación', 'Salida'] : ['Entrada', 'Salida'];
             const tiposAccionExistentes = detalles.map((detalle) => detalle.TIPO_ACCION);
-            console.log('tiposAccionExistentes', tiposAccionExistentes);
             if (tiposAccionExistentes.length < tiposAccionRequeridos.length || tiposAccionExistentes.length > tiposAccionRequeridos.length || !tiposAccionExistentes.includes('Entrada') || !tiposAccionExistentes.includes('Salida')) {
                 codigosDetalles.push({ codigo: codigoHorario, observacion: `Requerido ${tiposAccionRequeridos.length} detalles` });
             }
