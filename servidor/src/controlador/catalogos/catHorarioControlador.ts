@@ -465,14 +465,14 @@ function VerificarFormatoDatos(data: any): [boolean, string] {
 }
 
 // FUNCION PARA VERIFICAR SI EXISTEN DATOS DUPLICADOS EN LA BASE DE DATOS
-async function VerificarDuplicadoBase(codigo: string){
+async function VerificarDuplicadoBase(codigo: string): Promise<boolean>{
   const result = await pool.query('SELECT * FROM cg_horarios WHERE UPPER(codigo) = $1',
             [codigo.toUpperCase()]);
   return result.rowCount > 0;
 }
 
 //FUNCION PARA COMBROBAR QUE CODIGO_HORARIO EXISTA EN PLANTILLAHORARIOS
-function VerificarCodigoHorarioDetalleHorario(codigo: string, plantillaHorarios: Horario[]){
+function VerificarCodigoHorarioDetalleHorario(codigo: string, plantillaHorarios: Horario[]): boolean{
   const result = plantillaHorarios.filter((valor: Horario) => valor.CODIGO_HORARIO == codigo && valor.OBSERVACION == 'Ok');
   return result.length > 0;
 }
@@ -542,7 +542,7 @@ function VerificarDetallesAgrupados(detallesAgrupados: any, horarios: Horario[])
   return codigosDetalles;
 }
 
-function convertirHorasTotalesAMinutos(horasTotales: string) {
+function convertirHorasTotalesAMinutos(horasTotales: string): number {
   console.log('horasTotales', horasTotales);
   if (horasTotales.includes(':')) {
     const [horas, minutos] = horasTotales.split(':').map(Number);
