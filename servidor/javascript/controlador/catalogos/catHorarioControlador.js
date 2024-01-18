@@ -329,12 +329,28 @@ class HorarioControlador {
             ;
             for (const data of plantillaDetalles) {
                 let { CODIGO_HORARIO, TIPO_ACCION, HORA, SALIDA_SIGUIENTE_DIA, MIN_ANTES, MIN_DESPUES } = data;
+                let orden = 0;
                 // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
                 const requiredValues = [CODIGO_HORARIO, TIPO_ACCION, HORA];
                 if (requiredValues.some(value => value === undefined)) {
                     data.OBSERVACION = 'Faltan valores obligatorios';
                     continue;
                 }
+                switch (TIPO_ACCION.toLowerCase()) {
+                    case 'entrada':
+                        orden = 1;
+                        break;
+                    case 'inicio alimentación' || 'inicio alimentacion':
+                        orden = 2;
+                        break;
+                    case 'fin alimentación' || 'fin alimentacion':
+                        orden = 3;
+                        break;
+                    case 'salida':
+                        orden = 4;
+                        break;
+                }
+                data.ORDEN = orden;
                 if (MIN_ANTES === undefined) {
                     data.MIN_ANTES = 0;
                 }
@@ -355,6 +371,24 @@ class HorarioControlador {
                 data.OBSERVACION = 'Ok';
             }
             ;
+            const detallesAgrupados = AgruparDetalles(plantillaDetalles);
+            const detallesAgrupadosVerificados = VerificarDetallesAgrupados(detallesAgrupados, plantillaHorarios);
+            // CAMBIAR OBSERVACIONES DE PLANTILLADETALLES SEGUN LOS CODIGOS QUE NO CUMPLAN CON LOS REQUISITOS
+            for (const codigo of detallesAgrupadosVerificados) {
+                const detalles = plantillaDetalles.filter((detalle) => detalle.CODIGO_HORARIO === codigo.codigo);
+                for (const detalle of detalles) {
+                    detalle.OBSERVACION = codigo.observacion;
+                }
+            }
+            // VERIFICAR EXISTENCIA DE DETALLES PARA CADA HORARIO
+            plantillaHorarios.forEach((horario) => {
+                if (horario.OBSERVACION === 'Ok') {
+                    const detallesCorrespondientes = plantillaDetalles.filter((detalle) => detalle.CODIGO_HORARIO === horario.CODIGO_HORARIO && detalle.OBSERVACION === 'Ok');
+                    if (detallesCorrespondientes.length === 0) {
+                        horario.OBSERVACION = 'Ok. Registro sin detalles';
+                    }
+                }
+            });
             // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
             fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
                 if (err) {
@@ -400,7 +434,6 @@ function VerificarDuplicadoBase(codigo) {
 //FUNCION PARA COMBROBAR QUE CODIGO_HORARIO EXISTA EN PLANTILLAHORARIOS
 function VerificarCodigoHorarioDetalleHorario(codigo, plantillaHorarios) {
     const result = plantillaHorarios.filter((valor) => valor.CODIGO_HORARIO == codigo && valor.OBSERVACION == 'Ok');
-    console.log('result', codigo, result);
     return result.length > 0;
 }
 //FUNCION PARA COMPROBAR FORMATO DE PLANILLA DETALLE HORARIO
@@ -416,6 +449,63 @@ function VerificarFormatoDetalleHorario(data) {
     minDespuesFormatoCorrecto ? null : observacion = 'Formato de MIN_DESPUES INCORRECTO';
     error = horaFormatoCorrecto && minAntesFormatoCorrecto && minDespuesFormatoCorrecto ? false : true;
     return [error, observacion];
+}
+//FUNCION PARA AGRUPAR LOS DETALLES QUE TENGAN EL MISMO CODIGO_HORARIO
+function AgruparDetalles(plantillaDetalles) {
+    const result = plantillaDetalles.reduce((r, a) => {
+        r[a.CODIGO_HORARIO] = [...r[a.CODIGO_HORARIO] || [], a];
+        return r;
+    }, {});
+    return result;
+}
+//FUNCION PARA VERIFICAR QUE LOS DETALLES AGRUPADOS ESTEN COMPLETOS PARA CADA HORARIO
+function VerificarDetallesAgrupados(detallesAgrupados, horarios) {
+    horarios = horarios.filter((horario) => horario.OBSERVACION === 'Ok');
+    let codigosHorarios = horarios.map((horario) => horario.CODIGO_HORARIO);
+    let codigosDetalles = [];
+    //FILTAR DETALLES QUE TENGAN CODIGO_HORARIO EN HORARIOS
+    for (const codigoHorario in detallesAgrupados) {
+        if (!codigosHorarios.includes(codigoHorario)) {
+            delete detallesAgrupados[codigoHorario];
+        }
+    }
+    for (const codigoHorario in detallesAgrupados) {
+        const detalles = detallesAgrupados[codigoHorario].filter((detalle) => detalle.OBSERVACION === 'Ok');
+        const horario = horarios.find(h => h.CODIGO_HORARIO === codigoHorario);
+        if (horario) {
+            const tieneAlimentacion = horario.MIN_ALIMENTACION > 0;
+            const tiposAccionRequeridos = tieneAlimentacion ? ['Entrada', 'Inicio alimentación', 'Fin alimentación', 'Salida'] : ['Entrada', 'Salida'];
+            const tiposAccionExistentes = detalles.map((detalle) => detalle.TIPO_ACCION);
+            console.log('tiposAccionExistentes', tiposAccionExistentes);
+            if (tiposAccionExistentes.length < tiposAccionRequeridos.length || tiposAccionExistentes.length > tiposAccionRequeridos.length || !tiposAccionExistentes.includes('Entrada') || !tiposAccionExistentes.includes('Salida')) {
+                codigosDetalles.push({ codigo: codigoHorario, observacion: `Requerido ${tiposAccionRequeridos.length} detalles` });
+            }
+            else {
+                //VERIFICAR QUE SALIDA MENOS ENTRADA SEA IGUAL A HORAS_TOTALES
+                const entrada = detalles.find((detalle) => detalle.TIPO_ACCION === 'Entrada');
+                const salida = detalles.find((detalle) => detalle.TIPO_ACCION === 'Salida');
+                const horaEntrada = (0, moment_1.default)(entrada.HORA, 'HH:mm');
+                const horaSalida = (0, moment_1.default)(salida.HORA, 'HH:mm');
+                const diferencia = horaSalida.diff(horaEntrada, 'minutes');
+                console.log('horario', horario);
+                const horasTotalesEnMinutos = convertirHorasTotalesAMinutos(horario.HORAS_TOTALES.toString());
+                if (diferencia !== horasTotalesEnMinutos) {
+                    codigosDetalles.push({ codigo: codigoHorario, observacion: 'No cumple con las horas totales' });
+                }
+            }
+        }
+    }
+    return codigosDetalles;
+}
+function convertirHorasTotalesAMinutos(horasTotales) {
+    console.log('horasTotales', horasTotales);
+    if (horasTotales.includes(':')) {
+        const [horas, minutos] = horasTotales.split(':').map(Number);
+        return horas * 60 + minutos;
+    }
+    else {
+        return Number(horasTotales) * 60;
+    }
 }
 exports.HORARIO_CONTROLADOR = new HorarioControlador();
 exports.default = exports.HORARIO_CONTROLADOR;

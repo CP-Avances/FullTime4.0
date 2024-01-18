@@ -269,7 +269,7 @@
                       <td>{{d.CODIGO_HORARIO}}</td>
                       <td>{{d.TIPO_ACCION}}</td>
                       <td>{{d.HORA}}</td>
-                      <td></td>
+                      <td>{{d.ORDEN}}</td>
                       <td>{{d.SALIDA_SIGUIENTE_DIA}}</td>
                       <td>{{d.MIN_ANTES}}</td>
                       <td>{{d.MIN_DESPUES}}</td>
@@ -285,6 +285,9 @@
       </div>
       <mat-paginator id="paginaD" [length]="dataHorarios.plantillaDetalles.length" [pageSize]="tamanio_paginaD"
           [pageSizeOptions]="pageSizeOptionsD" id="pagina" (page)="ManejarPaginaD($event)" showFirstLastButtons>
+      </mat-paginator>
+  </div>
+</div>
 
 <!--  *********************** PANTALLA DETALLE DE HORARIOS ********************************* -->
 <app-ver-horario-detalle *ngIf="ver_detalles" [idHorario]="horario_id" [pagina]="pagina"></app-ver-horario-detalle>

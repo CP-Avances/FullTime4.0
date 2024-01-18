@@ -54,6 +54,9 @@ export class PrincipalHorarioComponent implements OnInit {
   // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public formulario = new FormGroup({
     nombreHorarioForm: this.nombreHorarioF,
+    descripcionForm: this.descripcionF,
+    codigoForm: this.codigoF,
+    codigoFormD: this.codigoFD,
   });
 
   // VARIABLES USADAS EN SELECCIÓN DE ARCHIVOS
@@ -207,9 +210,16 @@ export class PrincipalHorarioComponent implements OnInit {
 
   // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
+    this.dataHorarios = null;
+    this.archivoSubido = [];
+    this.nameFile = '';
     this.formulario.setValue({
       nombreHorarioForm: '',
+      descripcionForm: '',
+      codigoForm: '',
+      codigoFormD: '',
     });
+    this.archivo1Form.reset();
     this.ObtenerHorarios();
   }
 
@@ -317,9 +327,6 @@ export class PrincipalHorarioComponent implements OnInit {
             this.listaDetalleCorrectos.push(obj);
           }
         });
-
-        console.log("listaHorariosCorrectos", this.listaHorariosCorrectos);
-        console.log("listaDetalleCorrectos", this.listaDetalleCorrectos);
 
 
         // this.rest.VerificarPlantillaHorario(formData).subscribe(res => {
@@ -597,7 +604,11 @@ export class PrincipalHorarioComponent implements OnInit {
     switch(observacion) {
       case 'Ok':
           return 'rgb(159, 221, 154)';
-      case 'Ya esta registrado en la base de datos' || 'Codigo de horario no existe en los horarios validos':
+      case 'Ok. Registro sin detalles':
+          return 'rgb(159, 221, 154)';
+      case 'Ya esta registrado en la base de datos':
+          return 'rgb(239, 203, 106)';
+      case 'Codigo de horario no existe en los horarios validos':
           return 'rgb(239, 203, 106)';
       case 'Registro duplicado':
           return 'rgb(156, 214, 255)';

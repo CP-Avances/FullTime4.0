@@ -354,12 +354,30 @@ class HorarioControlador {
 
     for (const data of plantillaDetalles) {
       let { CODIGO_HORARIO, TIPO_ACCION, HORA, SALIDA_SIGUIENTE_DIA, MIN_ANTES, MIN_DESPUES } = data;
+      let orden = 0;
       // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
       const requiredValues = [CODIGO_HORARIO, TIPO_ACCION, HORA];
       if (requiredValues.some(value => value === undefined)) {
         data.OBSERVACION = 'Faltan valores obligatorios';
         continue;
       }
+
+      switch (TIPO_ACCION.toLowerCase()) {
+        case 'entrada':
+          orden = 1;
+          break;
+        case 'inicio alimentación' || 'inicio alimentacion':
+          orden = 2;
+          break;
+        case 'fin alimentación' || 'fin alimentacion':
+          orden = 3;
+          break;
+        case 'salida':
+          orden = 4;
+          break;
+      }
+
+      data.ORDEN = orden;
 
       if (MIN_ANTES === undefined) {
         data.MIN_ANTES = 0; 
@@ -387,6 +405,27 @@ class HorarioControlador {
       data.OBSERVACION = 'Ok';
     };
 
+    const detallesAgrupados = AgruparDetalles(plantillaDetalles);
+    const detallesAgrupadosVerificados = VerificarDetallesAgrupados(detallesAgrupados, plantillaHorarios);
+
+    // CAMBIAR OBSERVACIONES DE PLANTILLADETALLES SEGUN LOS CODIGOS QUE NO CUMPLAN CON LOS REQUISITOS
+    for (const codigo of detallesAgrupadosVerificados) {
+      const detalles = plantillaDetalles.filter((detalle: DetalleHorario) => detalle.CODIGO_HORARIO === codigo.codigo);
+      for (const detalle of detalles) {
+        detalle.OBSERVACION = codigo.observacion;
+      }
+    }
+
+    // VERIFICAR EXISTENCIA DE DETALLES PARA CADA HORARIO
+    plantillaHorarios.forEach((horario: any) => {
+      if (horario.OBSERVACION === 'Ok') {
+        const detallesCorrespondientes = plantillaDetalles.filter((detalle: any) => detalle.CODIGO_HORARIO === horario.CODIGO_HORARIO && detalle.OBSERVACION === 'Ok');
+        if (detallesCorrespondientes.length === 0) {
+          horario.OBSERVACION = 'Ok. Registro sin detalles';
+        }
+      }
+    });
+
     // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
     fs.access(ruta, fs.constants.F_OK, (err) => {
       if (err) {
@@ -398,58 +437,6 @@ class HorarioControlador {
 
     res.json({plantillaHorarios, plantillaDetalles});
   }
-
-  /** Verificar que los datos dentro de la plantilla no se encuntren duplicados */
-  // public async VerificarPlantilla(req: Request, res: Response) {
-  //   const documento = req.file?.originalname;
-  //   let separador = path.sep;
-  //   let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
-  //   const workbook = excel.readFile(ruta);
-  //   const sheet_name_list = workbook.SheetNames;
-  //   const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-
-  //   var contarNombreData = 0;
-  //   var contador_arreglo = 1;
-  //   var arreglos_datos: any = [];
-  //   //Leer la plantilla para llenar un array con los datos nombre para verificar que no sean duplicados
-  //   plantilla.forEach(async (data: any) => {
-  //     // Datos que se leen de la plantilla ingresada
-  //     var { nombre_horario, minutos_almuerzo, hora_trabajo, horario_nocturno } = data;
-  //     let datos_array = {
-  //       nombre: nombre_horario,
-  //     }
-  //     arreglos_datos.push(datos_array);
-  //   });
-
-  //   // Vamos a verificar dentro de arreglo_datos que no se encuentren datos duplicados
-  //   for (var i = 0; i <= arreglos_datos.length - 1; i++) {
-  //     for (var j = 0; j <= arreglos_datos.length - 1; j++) {
-  //       if (arreglos_datos[i].nombre.toUpperCase() === arreglos_datos[j].nombre.toUpperCase()) {
-  //         contarNombreData = contarNombreData + 1;
-  //       }
-  //     }
-  //     contador_arreglo = contador_arreglo + 1;
-  //   }
-
-  //   // Cuando todos los datos han sido leidos verificamos si todos los datos son correctos
-  //   console.log('nombre_data', contarNombreData, plantilla.length, contador_arreglo);
-  //   if ((contador_arreglo - 1) === plantilla.length) {
-  //     if (contarNombreData === plantilla.length) {
-  //       return res.jsonp({ message: 'correcto' });
-  //     } else {
-  //       return res.jsonp({ message: 'error' });
-  //     }
-  //   }
-  //   // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-  //   fs.access(ruta, fs.constants.F_OK, (err) => {
-  //     if (err) {
-  //     } else {
-  //       // ELIMINAR DEL SERVIDOR
-  //       fs.unlinkSync(ruta);
-  //     }
-  //   });
-
-  // }
 
 }
 
@@ -487,7 +474,6 @@ async function VerificarDuplicadoBase(codigo: string){
 //FUNCION PARA COMBROBAR QUE CODIGO_HORARIO EXISTA EN PLANTILLAHORARIOS
 function VerificarCodigoHorarioDetalleHorario(codigo: string, plantillaHorarios: Horario[]){
   const result = plantillaHorarios.filter((valor: Horario) => valor.CODIGO_HORARIO == codigo && valor.OBSERVACION == 'Ok');
-  console.log('result', codigo, result);
   return result.length > 0;
 }
 
@@ -506,12 +492,72 @@ function VerificarFormatoDetalleHorario(data: any): [boolean, string] {
   return [error, observacion];
 }
 
+//FUNCION PARA AGRUPAR LOS DETALLES QUE TENGAN EL MISMO CODIGO_HORARIO
+function AgruparDetalles(plantillaDetalles: DetalleHorario[]): any {
+  const result = plantillaDetalles.reduce((r: any, a: any) => {
+    r[a.CODIGO_HORARIO] = [...r[a.CODIGO_HORARIO] || [], a];
+    return r;
+  }, {});
+  return result;
+}
+
+//FUNCION PARA VERIFICAR QUE LOS DETALLES AGRUPADOS ESTEN COMPLETOS PARA CADA HORARIO
+function VerificarDetallesAgrupados(detallesAgrupados: any, horarios: Horario[]): any {
+  horarios = horarios.filter((horario: Horario) => horario.OBSERVACION === 'Ok');
+  let codigosHorarios = horarios.map((horario: Horario) => horario.CODIGO_HORARIO);
+  let codigosDetalles= [];
+
+  //FILTAR DETALLES QUE TENGAN CODIGO_HORARIO EN HORARIOS
+  for (const codigoHorario in detallesAgrupados) {
+    if (!codigosHorarios.includes(codigoHorario)) {
+      delete detallesAgrupados[codigoHorario];
+    }
+  }
+
+  for (const codigoHorario in detallesAgrupados) {
+    const detalles = detallesAgrupados[codigoHorario].filter((detalle: any) => detalle.OBSERVACION === 'Ok');
+    const horario = horarios.find(h => h.CODIGO_HORARIO === codigoHorario);
+    if (horario) {
+      const tieneAlimentacion = horario.MIN_ALIMENTACION > 0;
+      const tiposAccionRequeridos = tieneAlimentacion ? ['Entrada', 'Inicio alimentación', 'Fin alimentación', 'Salida'] : ['Entrada', 'Salida'];
+      const tiposAccionExistentes = detalles.map((detalle: any) => detalle.TIPO_ACCION);
+      console.log('tiposAccionExistentes', tiposAccionExistentes);
+      if (tiposAccionExistentes.length < tiposAccionRequeridos.length || tiposAccionExistentes.length > tiposAccionRequeridos.length || !tiposAccionExistentes.includes('Entrada') || !tiposAccionExistentes.includes('Salida')) {
+        codigosDetalles.push({codigo: codigoHorario, observacion:`Requerido ${tiposAccionRequeridos.length} detalles`});
+      } else {
+        //VERIFICAR QUE SALIDA MENOS ENTRADA SEA IGUAL A HORAS_TOTALES
+        const entrada = detalles.find((detalle: any) => detalle.TIPO_ACCION === 'Entrada');
+        const salida = detalles.find((detalle: any) => detalle.TIPO_ACCION === 'Salida');
+        const horaEntrada = moment(entrada.HORA, 'HH:mm');
+        const horaSalida = moment(salida.HORA, 'HH:mm');
+        const diferencia = horaSalida.diff(horaEntrada, 'minutes');
+        console.log('horario', horario);
+        const horasTotalesEnMinutos = convertirHorasTotalesAMinutos(horario.HORAS_TOTALES.toString());
+        if (diferencia !== horasTotalesEnMinutos) {
+          codigosDetalles.push({codigo: codigoHorario, observacion: 'No cumple con las horas totales'});
+        }
+      }
+    }
+  }
+  return codigosDetalles;
+}
+
+function convertirHorasTotalesAMinutos(horasTotales: string) {
+  console.log('horasTotales', horasTotales);
+  if (horasTotales.includes(':')) {
+    const [horas, minutos] = horasTotales.split(':').map(Number);
+    return horas * 60 + minutos;
+  } else {
+    return Number(horasTotales) * 60;
+  }
+}
+
 
 interface Horario {
   DESCRIPCION: string | number, 
   CODIGO_HORARIO: string | number, 
   HORAS_TOTALES: string | number, 
-  MIN_ALIMENTACION: string | number,
+  MIN_ALIMENTACION: number,
   TIPO_HORARIO: string, 
   HORARIO_NOCTURNO: string,
   OBSERVACION: string
