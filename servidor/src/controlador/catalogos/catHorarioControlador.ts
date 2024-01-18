@@ -447,7 +447,7 @@ function VerificarDuplicado(codigos: any, codigo: string): boolean {
   return duplicado;
 }
 
-//FUNCION PARA VERIFICAR QUE LOS TIPOS DE DATOS SEAN LOS CORRECTOS
+// FUNCION PARA VERIFICAR QUE LOS TIPOS DE DATOS EN LOS HORARIOS SEAN LOS CORRECTOS
 function VerificarFormatoDatos(data: any): [boolean, string] {
   let observacion = '';
   let error = true
@@ -471,13 +471,13 @@ async function VerificarDuplicadoBase(codigo: string): Promise<boolean>{
   return result.rowCount > 0;
 }
 
-//FUNCION PARA COMBROBAR QUE CODIGO_HORARIO EXISTA EN PLANTILLAHORARIOS
+// FUNCION PARA COMPROBAR QUE CODIGO_HORARIO EXISTA EN PLANTILLAHORARIOS
 function VerificarCodigoHorarioDetalleHorario(codigo: string, plantillaHorarios: Horario[]): boolean{
   const result = plantillaHorarios.filter((valor: Horario) => valor.CODIGO_HORARIO == codigo && valor.OBSERVACION == 'Ok');
   return result.length > 0;
 }
 
-//FUNCION PARA COMPROBAR FORMATO DE PLANILLA DETALLE HORARIO
+// FUNCION PARA COMPROBAR LOS FORMATOS DE LOS DATOS EN LA PLANTILLA DETALLE HORARIO
 function VerificarFormatoDetalleHorario(data: any): [boolean, string] {
   let observacion = '';
   let error = true
@@ -492,7 +492,7 @@ function VerificarFormatoDetalleHorario(data: any): [boolean, string] {
   return [error, observacion];
 }
 
-//FUNCION PARA AGRUPAR LOS DETALLES QUE TENGAN EL MISMO CODIGO_HORARIO
+// FUNCION PARA AGRUPAR LOS DETALLES QUE PERTENEZCAN A UN MISMO HORARIO
 function AgruparDetalles(plantillaDetalles: DetalleHorario[]): any {
   const result = plantillaDetalles.reduce((r: any, a: any) => {
     r[a.CODIGO_HORARIO] = [...r[a.CODIGO_HORARIO] || [], a];
@@ -501,13 +501,14 @@ function AgruparDetalles(plantillaDetalles: DetalleHorario[]): any {
   return result;
 }
 
-//FUNCION PARA VERIFICAR QUE LOS DETALLES AGRUPADOS ESTEN COMPLETOS PARA CADA HORARIO
+// FUNCION PARA VERIFICAR QUE LOS DETALLES AGRUPADOS ESTEN COMPLETOS PARA CADA HORARIO
+// Y VALIDAR QUE LA SUMA DE HORAS DE ENTRADA Y SALIDA SEA IGUAL A HORAS_TOTALES
 function VerificarDetallesAgrupados(detallesAgrupados: any, horarios: Horario[]): any {
   horarios = horarios.filter((horario: Horario) => horario.OBSERVACION === 'Ok');
   let codigosHorarios = horarios.map((horario: Horario) => horario.CODIGO_HORARIO);
   let codigosDetalles= [];
 
-  //FILTAR DETALLES QUE TENGAN CODIGO_HORARIO EN HORARIOS
+  // FILTAR DETALLES QUE TENGAN CODIGO_HORARIO EN HORARIOS
   for (const codigoHorario in detallesAgrupados) {
     if (!codigosHorarios.includes(codigoHorario)) {
       delete detallesAgrupados[codigoHorario];
@@ -531,7 +532,6 @@ function VerificarDetallesAgrupados(detallesAgrupados: any, horarios: Horario[])
         const horaEntrada = moment(entrada.HORA, 'HH:mm');
         const horaSalida = moment(salida.HORA, 'HH:mm');
         const diferencia = horaSalida.diff(horaEntrada, 'minutes');
-        console.log('horario', horario);
         const horasTotalesEnMinutos = convertirHorasTotalesAMinutos(horario.HORAS_TOTALES.toString());
         if (diferencia !== horasTotalesEnMinutos) {
           codigosDetalles.push({codigo: codigoHorario, observacion: 'No cumple con las horas totales'});
@@ -543,7 +543,6 @@ function VerificarDetallesAgrupados(detallesAgrupados: any, horarios: Horario[])
 }
 
 function convertirHorasTotalesAMinutos(horasTotales: string): number {
-  console.log('horasTotales', horasTotales);
   if (horasTotales.includes(':')) {
     const [horas, minutos] = horasTotales.split(':').map(Number);
     return horas * 60 + minutos;
