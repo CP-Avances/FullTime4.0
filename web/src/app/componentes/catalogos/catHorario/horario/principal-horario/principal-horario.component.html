@@ -8,9 +8,14 @@
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
                     <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                        <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarHorario()">
+                        <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarHorario()" *ngIf="!dataHorarios">
                             Crear horario
                         </button>
+                        <button *ngIf="dataHorarios" id="btn-raised" class="btn btn-sm" matSuffix
+                            matTooltipPosition="right"
+                            matTooltip="Guardar registro multiple.">
+                            Registrar
+                         </button>
                         <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
                             matTooltipPosition="right"
                             matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
@@ -202,7 +207,7 @@
                       <td></td>
                   </tr>
                   <tr
-                      *ngFor="let h of dataHorarios.plantillaHorarios | paginate:tamanio_pagina:numero_paginaH ">
+                      *ngFor="let h of dataHorarios.plantillaHorarios | filtroDescripcion: filtroDescripcion | filtroCodigo: filtroCodigo | paginate:tamanio_pagina:numero_paginaH ">
                       <td>{{h.DESCRIPCION}}</td>
                       <td>{{h.CODIGO_HORARIO}}</td>
                       <td>{{h.HORAS_TOTALES}}</td>
@@ -260,7 +265,7 @@
                       <td></td>
                   </tr>
                   <tr
-                      *ngFor="let d of dataHorarios.plantillaDetalles | paginate:tamanio_pagina:numero_paginaD ">
+                      *ngFor="let d of dataHorarios.plantillaDetalles | filtroCodigo: filtroCodigoD | paginate:tamanio_pagina:numero_paginaD ">
                       <td>{{d.CODIGO_HORARIO}}</td>
                       <td>{{d.TIPO_ACCION}}</td>
                       <td>{{d.HORA}}</td>

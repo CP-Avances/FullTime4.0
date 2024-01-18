@@ -8,12 +8,11 @@ export class FiltroCodigoPipe implements PipeTransform {
   transform(value: any, filtroCodigo: any): any {
     if (filtroCodigo === '' || filtroCodigo.length < 2) return value;
     const RESULTADO_HORARIOS: any = [];
-    for (const horarios of value) {
-      if (horarios.DESCRIPCION && horarios.DESCRIPCION.toLowerCase().indexOf(filtroCodigo.toLowerCase()) > -1) {
-        RESULTADO_HORARIOS.push(horarios);
+    for (const horario of value) {
+      if (horario.CODIGO_HORARIO && horario.CODIGO_HORARIO.toString().toLowerCase().indexOf(filtroCodigo.toString().toLowerCase()) > -1) {
+        RESULTADO_HORARIOS.push(horario);
       }
     };
     return RESULTADO_HORARIOS;
   }
-
 }
