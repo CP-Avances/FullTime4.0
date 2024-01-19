@@ -33,7 +33,7 @@
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-around">
                                 <form method="post" enctype="multipart/form-data" style="padding-top: 5px;">
-                                    <input (change)="fileChangeCatalogoHorario($event)" type="file"
+                                    <input (change)="CargarPlantillaGeneral($event)" type="file"
                                         [formControl]="archivo1Form" id="file1"
                                         accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                     <label for="file1" class="btn-2" matSuffix matTooltipPosition="right"
@@ -217,7 +217,8 @@
                       <td>
                           <div style="width: 270px; margin: auto;">
                               <div id="t-editar" class="circulo"  [style.background-color]="ObtenerColorValidacion(h.OBSERVACION)"></div>
-                              {{h.OBSERVACION}}
+                              {{h.OBSERVACION}}.
+                              <span *ngIf="!h.DETALLE && h.OBSERVACION === 'Ok'">Registro sin detalles.</span>
                           </div>
                       </td>
                   </tr>
