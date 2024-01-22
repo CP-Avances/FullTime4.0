@@ -25,6 +25,9 @@ const multipart = require('connect-multiparty');
 const multipartMiddlewarePlantilla = multipart({
     uploadDir: './plantillas',
 });
+/** ************************************************************************************** **
+ ** **                   METODO PARA OBTENER CARPETA IMAGENES DE USUARIO                   **
+ ** ************************************************************************************** **/
 const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -51,6 +54,19 @@ const storage = multer_1.default.diskStorage({
     }
 });
 const upload = (0, multer_1.default)({ storage: storage });
+/** ************************************************************************************** **
+ ** **                   METODO PARA OBTENER CARPETA IMAGENES DE USUARIO                   **
+ ** ************************************************************************************** **/
+const storage_plantilla = multer_1.default.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)());
+    },
+    filename: function (req, file, cb) {
+        let documento = file.originalname;
+        cb(null, documento);
+    }
+});
+const upload_plantilla = (0, multer_1.default)({ storage: storage_plantilla });
 class EmpleadoRutas {
     constructor() {
         this.router = (0, express_1.Router)();
@@ -119,13 +135,13 @@ class EmpleadoRutas {
         // INFORMACIÓN DE LA IMAGEN
         this.router.get('/img/codificado/:id/:imagen', empleadoControlador_1.default.getImagenBase64);
         // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA AUTOMÁTICA 
-        this.router.post('/verificar/automatico/plantillaExcel/', [verificarToken_1.TokenValidation, multipartMiddlewarePlantilla], empleadoControlador_1.default.VerificarPlantilla_Automatica);
-        this.router.post('/verificar/datos/automatico/plantillaExcel/', [verificarToken_1.TokenValidation, multipartMiddlewarePlantilla], empleadoControlador_1.default.VerificarPlantilla_DatosAutomatico);
-        this.router.post('/cargar_automatico/plantillaExcel/', [verificarToken_1.TokenValidation, multipartMiddlewarePlantilla], empleadoControlador_1.default.CargarPlantilla_Automatico);
+        this.router.post('/verificar/automatico/plantillaExcel/', [verificarToken_1.TokenValidation, upload.single('uploads')], empleadoControlador_1.default.VerificarPlantilla_Automatica);
+        //this.router.post('/verificar/datos/automatico/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosAutomatico);
+        //this.router.post('/cargar_automatico/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.CargarPlantilla_Automatico);
         // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA MANUAL 
-        this.router.post('/verificar/manual/plantillaExcel/', [verificarToken_1.TokenValidation, multipartMiddlewarePlantilla], empleadoControlador_1.default.VerificarPlantilla_Manual);
-        this.router.post('/verificar/datos/manual/plantillaExcel/', [verificarToken_1.TokenValidation, multipartMiddlewarePlantilla], empleadoControlador_1.default.VerificarPlantilla_DatosManual);
-        this.router.post('/cargar_manual/plantillaExcel/', [verificarToken_1.TokenValidation, multipartMiddlewarePlantilla], empleadoControlador_1.default.CargarPlantilla_Manual);
+        //this.router.post('/verificar/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_Manual);
+        //this.router.post('/verificar/datos/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosManual);
+        //this.router.post('/cargar_manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.CargarPlantilla_Manual);
         // HABILITACIÓN Y DESHABILITACIÓN DE USUARIOS
         // METODOS PARA CONTROL DE MARCACIONES DENTRO DE UNA UBICACIÓN GEOGRÁFICA 
         this.router.post('/geolocalizacion-domicilio/:id/:codigo', verificarToken_1.TokenValidation, empleadoControlador_1.default.IngresarGelocalizacion);

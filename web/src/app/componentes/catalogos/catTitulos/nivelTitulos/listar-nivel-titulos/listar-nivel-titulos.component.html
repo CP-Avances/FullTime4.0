@@ -6,8 +6,13 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                    <button id="btn-raised"  class="btn btn-sm" (click)="AbrirVentanaNivelTitulo()">
+                    <button *ngIf="!DataNivelesProfesionales" id="btn-raised"  class="btn btn-sm" (click)="AbrirVentanaNivelTitulo()">
                         Crear nivel título profesional
+                    </button>
+                    <button *ngIf="DataNivelesProfesionales" id="btn-raised" class="btn btn-sm" (click)="registrarNiveles()" matSuffix 
+                        matTooltipPosition="right" 
+                        matTooltip="Guardar registro multiple.">
+                        Registrar
                     </button>
                     <button id="btn-raised"  class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
                         matTooltipPosition="right"
@@ -17,9 +22,47 @@
                 </div>
             </mat-card>
         </div>
+        <!------------------ Registro multiple de establecimientos ------------------------------------->
+        <div class="col-md">
+            <div id="titulo">
+                <span>REGISTRO MULTIPLE</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9">
+                <div class="row">
+                    <div class="col-md" style="padding-top: 8px; padding-bottom: 6px; padding-left: 10px;">
+                        <div class="d-flex flex-wrap justify-content-around" style="padding-left: 12px;">
+                            <form method="post" enctype="multipart/form-data" style="width: max-content;">
+                                <input type="file" (change)="FileChange($event)" [formControl]="archivoForm"
+                                    id="file"
+                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
+                                    *ngIf="!mostrarbtnsubir"
+                                    style="height: 64px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre Niveles_profesionales.">
+                                    Subir plantilla
+                                </label>
+                                <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
+                                    *ngIf="mostrarbtnsubir"
+                                    style="height: 64px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre Niveles_profesionales.">
+                                    Subir nuevamente la plantilla
+                                </label>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-around" >
+                           
+                        </div>
+                    </div>
+                </div>
+            </mat-card>
+        </div>
     </div>
 </div>
-<div class="container" style="padding-bottom: 50px; text-align: center;">
+
+<!------------------ LISTA DE NIVELES PROFESIONALES ------------------------------------------------->
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!DataNivelesProfesionales">
     <div class="mat-elevation-z8" style="background: white;">
         <div id="resultados">RESULTADO DE BÚSQUEDA</div>
         <div class="table-responsive">
@@ -85,5 +128,39 @@
         <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
             <p> Reporte de niveles de títulos profesionales. </p>
         </div>
+    </div>
+</div>
+
+<!---------------------- TABLA DE DATOS DE LA CARGA MULTIPLE ----------------------------------->
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="DataNivelesProfesionales">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="resultados">
+            REGISTRO MULTIPLE
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm ">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Nivel</th>
+                        
+                        <th scope="col">Observación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let data of DataNivelesProfesionales">
+                        <td [style.color]="stiloTextoCelda(data.nombre)">{{ data.nombre}}</td>
+                        <td>
+                            <div style="width: 270px; margin: auto;">
+                                <div id="t-editar" class="circulo"  [style.background-color]="stiloCelda(data.observacion)"></div>
+                                {{ data.observacion}}
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="DataNivelesProfesionales.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
     </div>
 </div>

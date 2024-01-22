@@ -1,6 +1,6 @@
 // SECCIÓN DE LIBRERIAS
 import EMPLEADO_CONTROLADOR from '../../../controlador/empleado/empleadoRegistro/empleadoControlador';
-import { ObtenerRutaUsuario } from '../../../libs/accesoCarpetas';
+import { ObtenerRutaUsuario, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { TokenValidation } from '../../../libs/verificarToken';
 import { Router } from 'express';
 import multer from 'multer';
@@ -8,11 +8,16 @@ import pool from '../../../database';
 import moment from 'moment';
 moment.locale('es');
 
+
 const multipart = require('connect-multiparty');
 
 const multipartMiddlewarePlantilla = multipart({
     uploadDir: './plantillas',
 });
+
+/** ************************************************************************************** **
+ ** **                   METODO PARA OBTENER CARPETA IMAGENES DE USUARIO                   **   
+ ** ************************************************************************************** **/
 
 const storage = multer.diskStorage({
 
@@ -45,6 +50,25 @@ const storage = multer.diskStorage({
 })
 
 const upload = multer({ storage: storage });
+
+
+/** ************************************************************************************** **
+ ** **                   METODO PARA OBTENER CARPETA IMAGENES DE USUARIO                   **   
+ ** ************************************************************************************** **/
+
+const storage_plantilla = multer.diskStorage({
+
+    destination: function (req, file, cb) {
+        cb(null, ObtenerRutaLeerPlantillas())
+    },
+    filename: function (req, file, cb) {
+        let documento = file.originalname;
+
+        cb(null, documento);
+    }
+})
+
+const upload_plantilla = multer({ storage: storage_plantilla });
 
 class EmpleadoRutas {
     public router: Router = Router();
@@ -148,14 +172,14 @@ class EmpleadoRutas {
 
 
         // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA AUTOMÁTICA 
-        this.router.post('/verificar/automatico/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_Automatica);
-        this.router.post('/verificar/datos/automatico/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosAutomatico);
-        this.router.post('/cargar_automatico/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.CargarPlantilla_Automatico);
+        this.router.post('/verificar/automatico/plantillaExcel/', [TokenValidation, upload.single('uploads')], EMPLEADO_CONTROLADOR.VerificarPlantilla_Automatica);
+        //this.router.post('/verificar/datos/automatico/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosAutomatico);
+        //this.router.post('/cargar_automatico/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.CargarPlantilla_Automatico);
 
         // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA MANUAL 
-        this.router.post('/verificar/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_Manual);
-        this.router.post('/verificar/datos/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosManual);
-        this.router.post('/cargar_manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.CargarPlantilla_Manual);
+        //this.router.post('/verificar/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_Manual);
+        //this.router.post('/verificar/datos/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosManual);
+        //this.router.post('/cargar_manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.CargarPlantilla_Manual);
 
 
 

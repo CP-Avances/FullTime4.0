@@ -8,9 +8,14 @@
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
                     <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                        <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarFeriado()">
+                        <button *ngIf="!DataFeriados" id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarFeriado()">
                             Crear feriado
                         </button>
+                        <button *ngIf="DataFeriados" id="btn-raised" class="btn btn-sm" (click)="registrarFeriados()" matSuffix 
+                            matTooltipPosition="right" 
+                            matTooltip="Guardar registro multiple.">
+                            Registrar
+                         </button>
                         <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
                             matTooltipPosition="right"
                             matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
@@ -25,16 +30,23 @@
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
                     <div class="row">
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-around">
-                                <form method="post" enctype="multipart/form-data" style="margin: 2% 0% -1% 0%;">
+                        <div class="col-md" style="padding-top: 8px; padding-bottom: 6px; padding-left: 10px;">
+                            <div class="d-flex flex-wrap justify-content-around" style="padding-left: 12px;">
+                                <form method="post" enctype="multipart/form-data" style="width: max-content;">
                                     <input (change)="FileChange($event)" type="file" [formControl]="archivoForm"
                                         id="file"
                                         accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                     <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
+                                        *ngIf="!mostrarbtnsubir"
                                         style="height: 64px;"
                                         matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
-                                        Subir feriados
+                                        Subir plantilla
+                                    </label>
+                                    <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
+                                        *ngIf="mostrarbtnsubir"
+                                        style="height: 64px;"
+                                        matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                        Subir nuevamente la plantilla
                                     </label>
                                 </form>
                             </div>
@@ -56,7 +68,9 @@
             </div>
         </div>
     </div>
-    <div class="container" style="padding-bottom: 10px; margin-bottom: 35px;">
+
+    <!------------------ LISTA DE FERIADOS ------------------------------------------------->
+    <div class="container" style="padding-bottom: 10px; margin-bottom: 35px;" *ngIf="!DataFeriados">
         <div class="mat-elevation-z8" style="background: white;">
             <div id="titulo">LISTA DE FERIADOS</div>
             <div class="table-responsive">
@@ -148,6 +162,61 @@
             </div>
         </div>
     </div>
+
+    <!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE FERIADOS ------------------------------------------------->
+    <div class="container" style="padding-bottom: 10px; margin-bottom: 35px;" *ngIf="DataFeriados">
+        <div class="mat-elevation-z8" style="background: white;">
+            <div id="titulo">REGISTRO MULTIPLE</div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="thead-light">
+                        <tr style="text-align: center;">
+                            <th scope="col">Descripción</th>
+                            <th scope="col">Fecha</th>
+                            <th scope="col">Fecha Recuperación</th>
+                            <th scope="col">Observación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <mat-form-field id="t-inputs">
+                                    <input matInput placeholder="Buscar" [formControl]="descripcionF"
+                                        [(ngModel)]="filtroDescripcion" (keypress)="IngresarSoloLetras($event)">
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-form-field id="t-inputs">
+                                    <input matInput placeholder="yyyy-mm-dd" [formControl]="fechaF"
+                                        [(ngModel)]="filtradoFecha">
+                                </mat-form-field>
+                            </td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr
+                            *ngFor="let f of DataFeriados | filtroNombre: filtroDescripcion | filtroFecha: filtradoFecha | paginate:tamanio_pagina:numero_pagina ">
+                            <td [style.color]="stiloTextoCelda(f.descripcion)" id="letras">{{f.descripcion}}</td>
+                            <td  [style.color]="stiloTextoCelda(f.fecha)" style="font-size: 12px;">{{f.fecha}}</td>
+                            <td style="font-size: 12px;">{{f.fecha_recuperacion}}</td>
+                            <td>
+                                <div style="width: 270px; margin: auto;">
+                                    <div id="t-editar" class="circulo"  [style.background-color]="stiloCelda(f.observacion)"></div>
+                                    {{f.observacion}}
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <mat-paginator id="pagina" [length]="feriados.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+            </mat-paginator>
+        </div>
+    </div>
+
+
+
 </div>
 
 <!--  **************************** PANTALLA DE ASIGNAR CIUDADES A FERIADOS *********************************  -->

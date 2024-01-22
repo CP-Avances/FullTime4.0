@@ -26,3 +26,63 @@ td {
     background-color: rgb(80, 87, 97);
     color: white;
 }
+
+[type="file"] {
+    height: 0;
+    overflow: hidden;
+    width: 0;
+}
+
+[type="file"]+label {
+    background: #f15d22;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    font-family: "Poppins", sans-serif;
+    font-size: inherit;
+    font-weight: 500;
+    outline: none;
+    padding: 1rem;
+    position: relative;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+    vertical-align: middle;
+}
+
+[type="file"]+label.btn-2 {
+    background-color: rgb(83, 157, 76);
+    overflow: hidden;
+}
+
+[type="file"]+label.btn-2::before {
+    color: #fff;
+    content: "\f382";
+    font-family: "Font Awesome 5 Pro";
+    font-size: 100%;
+    height: 100%;
+    right: 130%;
+    line-height: 3.3;
+    position: absolute;
+    top: 0px;
+    margin-left: 5px;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+[type="file"]+label.btn-2:hover {
+    background-color: rgb(15, 94, 1);
+}
+
+[type="file"]+label.btn-2:hover::before {
+    right: 80%
+}
+
+.circulo{
+    margin-right: -50px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50px;
+    float: left;
+}

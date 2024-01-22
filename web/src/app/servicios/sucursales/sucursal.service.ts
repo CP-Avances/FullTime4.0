@@ -51,5 +51,10 @@ export class SucursalService {
     return this.http.get(`${environment.url}/sucursales/unaSucursal/${id}`);
   }
 
+  
+  RevisarFormato(formData) {
+    return this.http.post<any>(environment.url + '/sucursales/upload/revision', formData);
+  }
+
 
 }

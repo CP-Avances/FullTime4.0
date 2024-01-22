@@ -53,6 +53,8 @@ export class ListarNivelTitulosComponent implements OnInit {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
 
+  archivoForm = new FormControl('', Validators.required);
+
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
   get p_color(): string { return this.plantillaPDF.color_Primary }
@@ -97,6 +99,125 @@ export class ListarNivelTitulosComponent implements OnInit {
     });
   }
 
+  // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
+  nameFile: string;
+  archivoSubido: Array<File>;
+  mostrarbtnsubir: boolean = false;
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE FERIADOS -----------------------------------------------------------------
+  FileChange(element: any) {
+    this.archivoSubido = [];
+    this.nameFile = '';
+    this.archivoSubido = element.target.files;
+    this.nameFile = this.archivoSubido[0].name;
+    let arrayItems = this.nameFile.split(".");
+    let itemExtencion = arrayItems[arrayItems.length - 1];
+    let itemName = arrayItems[0].slice(0, 25);
+    console.log('itemName: ',itemName);
+    if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
+      if (itemName.toLowerCase() == 'niveles_profesionales') {
+        this.Revisarplantilla();
+      } else {
+        this.toastr.error('Seleccione plantilla con nombre Niveles_profesionales', 'Plantilla seleccionada incorrecta', {
+          timeOut: 6000,
+        });
+        
+        this.nameFile = '';
+      }
+    } else {
+      this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
+        timeOut: 6000,
+      });
+      
+      this.nameFile = '';
+    }
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = true;
+  }
+
+  DataNivelesProfesionales: any;
+  listNivelesCorrectos: any = [];
+  // METODO PARA ENVIAR MENSAJES DE ERROR O CARGAR DATOS SI LA PLANTILLA ES CORRECTA
+  Revisarplantilla(){
+    this.listNivelesCorrectos = [];
+    let formData = new FormData();
+    for (var i = 0; i < this.archivoSubido.length; i++) {
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
+    }
+  
+    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    this.nivel.RevisarFormato(formData).subscribe(res => {
+      this.DataNivelesProfesionales = res.data;
+      
+      console.log('probando plantilla1', this.DataNivelesProfesionales);
+
+      this.DataNivelesProfesionales.forEach(item => {
+        if( item.observacion.toLowerCase() === 'ok'){
+          this.listNivelesCorrectos.push(item);
+        }
+      });
+      
+    });
+      
+  }
+
+  btn_registrar: boolean = true;
+  registrarNiveles(){
+    console.log('listNivelesCorrectos', this.listNivelesCorrectos);
+    var data = {
+      nombre: ''
+    }
+    
+    if(this.listNivelesCorrectos.length > 0){
+      var cont = 0;
+      this.listNivelesCorrectos.forEach(item => {
+        data.nombre = item.nombre;
+        this.nivel.RegistrarNivel(data).subscribe(res => {
+          cont = cont + 1;
+          if(this.listNivelesCorrectos.length  == cont){
+            this.toastr.success('Operación exitosa.', 'Plantilla de Niveles profesionales importada.', {
+              timeOut: 1500,
+            });
+            this.LimpiarCampos();
+          }
+        })
+      })
+    }else{
+      this.toastr.error('No exiten datos para registrar ingrese otra', 'Plantilla no aceptada', {
+        timeOut: 4000,
+      });
+      this.archivoForm.reset();
+    }
+
+    this.btn_registrar = true;
+    this.archivoSubido = [];
+    this.nameFile = '';
+  }
+
+  //Metodo para dar color a las celdas y representar las validaciones
+  colorCelda: string = ''
+  stiloCelda(observacion: string): string{
+    let arrayObservacion = observacion.split(" ");
+    if(observacion == 'ok'){
+      return 'rgb(159, 221, 154)';
+    }else if(observacion == 'Ya esta registrado en base'){
+      return 'rgb(239, 203, 106)';
+    }else if(observacion == 'Registro duplicado'){
+      return 'rgb(156, 214, 255)';
+    }else{
+      return 'rgb(251, 73, 18)';
+    }
+  }
+
+  colorTexto: string = '';
+  stiloTextoCelda(texto: string): string{
+    let arrayObservacion = texto.split(" ");
+    if(arrayObservacion[0] == 'No'){
+      return 'rgb(255, 80, 80)';
+    }else{
+      return 'black'
+    }
+  }
+
   // ORDENAR LOS DATOS SEGUN EL ID 
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
@@ -121,10 +242,13 @@ export class ListarNivelTitulosComponent implements OnInit {
 
   // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
+    this.DataNivelesProfesionales = null;
     this.formulario.setValue({
       nombreForm: ''
     });
     this.ObtenerNiveles();
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = false;
   }
 
   // METODO PARA VALIDAR INGRESO DE LETRAS
