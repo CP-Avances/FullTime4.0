@@ -278,87 +278,46 @@
 </div>
 
 <!-- LISTA DE EMPLEADOS DEL REGISTRO MULTIPLE -->
-<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="DataEmpleados">
+<div style="padding-bottom: 50px; text-align: center;" *ngIf="DataEmpleados">
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
-            <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
-                matTooltipPosition="right" matTooltip="Selección múltiple para inhabilitar empleados." id="SelectCheck">
-                library_add_check
-            </mat-icon>
-            <button *ngIf="btnCheckHabilitar" class="btn btn-primary btn-outline-light"
-                style="float: left; margin-left: 10px;" (click)="Deshabilitar(1)">
-                Confirmar
-            </button>
             <span class="w-100 bd-highlight">
                 LISTA DE USUARIOS MULTIPLES
             </span>
         </div>
-        <div class="table-responsive">
-            <table class="table table-hover table-sm">
+        <div class="container_ table-responsive">
+            <table id="table_usuarios" class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th>
-                            <mat-checkbox *ngIf="btnCheckHabilitar" (change)="$event ? masterToggle() : null"
-                                [checked]="selectionUno.hasValue() && isAllSelected()"
-                                [indeterminate]="selectionUno.hasValue() && !isAllSelected()"
-                                [aria-label]="checkboxLabel()">
-                            </mat-checkbox>
-                        </th>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Apellido</th>
-                        <th scope="col">Cédula</th>
-                        <th scope="col">Estado</th>
-                        <th scope="col">Correo</th>
-                        <th scope="col">Rol</th>
-                        <th scope="col">Observación</th>
+                        <th id="td_usuario" scope="col">Nombre</th>
+                        <th id="td_usuario" scope="col">Apellido</th>
+                        <th id="td_usuario" scope="col">Cédula</th>
+                        <th style="width: 400px;" scope="col">Fecha Nacimiento</th>
+                        <th id="td_usuario" scope="col">Genero</th>
+                        <th id="td_usuario" scope="col">Estado</th>
+                        <th id="td_usuario" scope="col">Correo</th>
+                        <th id="td_usuario" scope="col">Telefono</th>
+                        <th id="td_usuario" scope="col">Usuario</th>
+                        <th id="td_usuario" scope="col">Contraseña</th>
+                        <th id="td_usuario" scope="col">Rol</th>
+                        <th style="width: 400px;" scope="col">Observación</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td></td>
-                        <td>
-                            <mat-form-field class="input-tables codigo">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCodigo" [formControl]="codigo"
-                                    (keypress)="IngresarSoloNumeros($event)">
-                            </mat-form-field>
-                        </td>
-                        <td>
-                            <mat-form-field class="input-tables cedula">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroNombre" [formControl]="nombre"
-                                    type="text" (keypress)="IngresarSoloLetras($event)">
-                            </mat-form-field>
-                        </td>
-                        <td>
-                            <mat-form-field class="input-tables cedula">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroApellido"
-                                    [formControl]="apellido" type="text" (keypress)="IngresarSoloLetras($event)">
-                            </mat-form-field>
-                        </td>
-                        <td>
-                            <mat-form-field class="input-tables cedula">
-                                <input matInput placeholder="Buscar" [(ngModel)]="filtroCedula" maxlength="10"
-                                    oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                                    [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
-                            </mat-form-field>
-                        </td>
-                        <td></td>
-                        <td></td>
-                    </tr>
                     <tr
                         *ngFor="let e of DataEmpleados | emplCodigo: filtroCodigo | emplCedula: filtroCedula | emplNombre: filtroNombre | emplApellido: filtroApellido | paginate:tamanio_pagina:numero_pagina">
-                        <td>
-                            <mat-checkbox *ngIf="btnCheckHabilitar" (click)="$event.stopPropagation()"
-                                (change)="$event ? selectionUno.toggle(e) : null" [checked]="selectionUno.isSelected(e)"
-                                [aria-label]="checkboxLabel(e)">
-                            </mat-checkbox>
-                        </td>
-                        <td>{{e.apellido}}</td>
-                        <td>{{e.nombre}}</td>
-                        <td>{{e.cedula}}</td>
-                        <td>{{e.estado}}</td>
-                        <td>{{e.correo}}</td>
-                        <td>{{e.rol}}</td>
-                        <td>{{e.observacion}}</td>
+                        <td [style.color]="stiloTextoCelda(e.nombre)">{{e.nombre}}</td>
+                        <td [style.color]="stiloTextoCelda(e.apellido)">{{e.apellido}}</td>
+                        <td [style.color]="stiloTextoCelda(e.cedula)">{{e.cedula}}</td>
+                        <td [style.color]="stiloTextoCelda(e.fec_nacimiento)">{{e.fec_nacimiento}}</td>
+                        <td [style.color]="stiloTextoCelda(e.genero)">{{e.genero}}</td>
+                        <td [style.color]="stiloTextoCelda(e.estado)">{{e.estado}}</td>
+                        <td [style.color]="stiloTextoCelda(e.correo)">{{e.correo}}</td>
+                        <td [style.color]="stiloTextoCelda(e.telefono)">{{e.telefono}}</td>
+                        <td [style.color]="stiloTextoCelda(e.usuario)">{{e.usuario}}</td>
+                        <td [style.color]="stiloTextoCelda(e.contrasena)">{{e.contrasena}}</td>
+                        <td [style.color]="stiloTextoCelda(e.rol)">{{e.rol}}</td>
+                        <td style="width: 400px;">{{e.observacion}}</td>
                     </tr>
                 </tbody>
             </table>

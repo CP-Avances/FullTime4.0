@@ -385,6 +385,15 @@ export class ListaEmpleadosComponent implements OnInit {
     */
   }
 
+  colorTexto: string = '';
+  stiloTextoCelda(texto: string): string{
+    if(texto == 'No registrado'){
+        return 'rgb(255, 80, 80)';
+    }else{   
+      return 'black'
+    }
+  }
+
   ArchivoAutomatico(datosArchivo) {
     this.rest.verificarArchivoExcel_Automatico(datosArchivo).subscribe(res => {
       console.log('plantilla 1', res);

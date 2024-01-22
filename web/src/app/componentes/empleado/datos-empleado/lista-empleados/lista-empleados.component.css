@@ -15,6 +15,11 @@ mat-form-field.input-tables {
 .codigo { width: 75px; }
 .cedula { width: 150px;}
 
+.container_ table-responsive{
+    width: 200px; /* Ancho fijo del contenedor */
+    overflow-x: auto;
+}
+
 p {
     font-size: x-small;
 }
@@ -22,6 +27,7 @@ p {
 table {
     width: 100%;
     font-size: 13px;
+    border-collapse: collapse;
 }
 
 tr {
@@ -29,9 +35,14 @@ tr {
 }
 
 td {
+    width: 400px;
     padding-top: 10px;
     text-align: center;
     vertical-align: middle;
+}
+
+#td_usuario{
+    width: 400px;
 }
 
 #btn_listar{
