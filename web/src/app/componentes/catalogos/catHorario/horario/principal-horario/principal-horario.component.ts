@@ -325,23 +325,25 @@ export class PrincipalHorarioComponent implements OnInit {
             this.listaDetalleCorrectos.push(obj);
           }
         });
-        const data = {
-          horarios: this.listaHorariosCorrectos,
-          detalles: this.listaDetalleCorrectos
-        }
+
         // this.RegistrarHorariosDetalles(data);
       }
     });
   }
 
-  RegistrarHorariosDetalles(data: any) {
+  RegistrarHorariosDetalles() {
+    const data = {
+      horarios: this.listaHorariosCorrectos,
+      detalles: this.listaDetalleCorrectos
+    }
     this.rest.CargarHorariosMultiples(data).subscribe(res => {
             this.toastr.success('Operación exitosa.', 'Horarios y detalles importados.', {
               timeOut: 6000,
             });
+            console.log("res", res);
             this.archivo1Form.reset();
             this.nameFile = '';
-            window.location.reload();
+            // window.location.reload();
           });
   }
 
