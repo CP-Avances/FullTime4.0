@@ -6,7 +6,6 @@ import path from 'path';
 import pool from '../../database';
 import excel from 'xlsx';
 import moment from 'moment';
-import { hora, horarios } from '../../../../web/src/app/model/reportes.model';
 const builder = require('xmlbuilder');
 
 class HorarioControlador {
@@ -294,6 +293,7 @@ class HorarioControlador {
   public async VerificarDatos(req: Request, res: Response) {
     const documento = req.file?.originalname;
     let separador = path.sep;
+    console.log(documento);
     let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
     const workbook = excel.readFile(ruta);
     const sheet_name_list = workbook.SheetNames;
@@ -333,7 +333,7 @@ class HorarioControlador {
       }
 
       if (await VerificarDuplicadoBase(CODIGO_HORARIO.toString())) {
-        data.OBSERVACION = 'Ya esta registrado en la base de datos';
+        data.OBSERVACION = 'Ya existe en el sistema';
         continue;
       }
 
@@ -395,14 +395,14 @@ class HorarioControlador {
     };
 
     // // FORMATEAR HORAS_TOTALES DE HORARIOS CON OBSERVACION OK
-    // console.log('Plantilla horarios: ', plantillaHorarios);
-    // for (const data of plantillaHorarios) {
-    //   console.log('Observacion: ', data.OBSERVACION);
-    //   if (data.OBSERVACION === 'Ok') {
-    //     console.log('Modificar horas totales')
-    //     data.HORAS_TOTALES = FormatearHoras(data.HORAS_TOTALES.toString());
-    //   }
-    // }
+    console.log('Plantilla horarios: ', plantillaHorarios);
+    for (const data of plantillaHorarios) {
+      console.log('Observacion: ', data.OBSERVACION);
+      if (data.OBSERVACION === 'Ok') {
+        console.log('Modificar horas totales')
+        data.HORAS_TOTALES = FormatearHoras(data.HORAS_TOTALES.toString());
+      }
+    }
 
     const detallesAgrupados = AgruparDetalles(plantillaDetalles);
     const detallesAgrupadosVerificados = VerificarDetallesAgrupados(detallesAgrupados, plantillaHorarios);
