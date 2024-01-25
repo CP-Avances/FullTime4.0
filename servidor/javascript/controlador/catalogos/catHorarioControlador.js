@@ -19,7 +19,6 @@ const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const moment_1 = __importDefault(require("moment"));
-const builder = require('xmlbuilder');
 class HorarioControlador {
     // REGISTRAR HORARIO
     CrearHorario(req, res) {
@@ -251,19 +250,46 @@ class HorarioControlador {
             });
         });
     }
+    // METODO PARA CARGAR HORARIOS Y DETALLES DE UNA PLANTILLA EN LA BASE DE DATOS
     CargarHorarioPlantilla(req, res) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { horarios, detalles } = req.body;
                 let horariosCargados = true;
                 let detallesCargados = true;
+                let codigosHorariosCargados = [];
                 // SI HORARIOS NO ESTA VACIO CARGAR EN LA BASE DE DATOS
                 if (horarios.length > 0) {
                     // CARGAR HORARIOS
                     for (const horario of horarios) {
-                        const { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOCTURNO } = horario;
+                        let { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOCTURNO } = horario;
+                        //CAMBIAR TIPO DE HORARIO Laborable = N, Libre = L, Feriado = FD
+                        switch (TIPO_HORARIO) {
+                            case 'Laborable':
+                                TIPO_HORARIO = 'N';
+                                break;
+                            case 'Libre':
+                                TIPO_HORARIO = 'L';
+                                break;
+                            case 'Feriado':
+                                TIPO_HORARIO = 'FD';
+                                break;
+                        }
+                        // CAMBIAR HORARIO_NOCTURNO
+                        switch (HORARIO_NOCTURNO) {
+                            case 'Si':
+                                HORARIO_NOCTURNO = true;
+                                break;
+                            case 'No':
+                                HORARIO_NOCTURNO = false;
+                                break;
+                            default:
+                                HORARIO_NOCTURNO = false;
+                                break;
+                        }
                         // FORMATEAR HORAS_TOTALES
-                        horario.HORAS_TOTALES = FormatearHoras(horario.HORAS_TOTALES.toString(), horario.DETALLE);
+                        HORAS_TOTALES = FormatearHoras(horario.HORAS_TOTALES.toString(), horario.DETALLE);
                         // INSERTAR EN LA BASE DE DATOS
                         const response = yield database_1.default.query(`
             INSERT INTO cg_horarios (nombre, min_almuerzo, hora_trabajo,
@@ -276,20 +302,63 @@ class HorarioControlador {
                         else {
                             horariosCargados = false;
                         }
+                        const idHorario = correcto.id;
+                        const codigoHorario = correcto.codigo;
+                        codigosHorariosCargados.push({ codigoHorario, idHorario });
                     }
                 }
                 // SI DETALLES NO ESTA VACIO CARGAR EN LA BASE DE DATOS
                 if (detalles.length > 0) {
                     // CARGAR DETALLES
                     for (const detalle of detalles) {
-                        const { CODIGO_HORARIO, TIPO_ACCION, HORA, ORDEN, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES, MIN_DESPUES } = detalle;
+                        let { CODIGO_HORARIO, TIPO_ACCION, HORA, ORDEN, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES, MIN_DESPUES } = detalle;
+                        // CAMBIAR TIPO DE ACCION Entrada = E, Inicio alimentacion = I/A, Fin alimentacion = F/A, Salida = S
+                        switch (TIPO_ACCION) {
+                            case 'Entrada':
+                                TIPO_ACCION = 'E';
+                                break;
+                            case 'Inicio alimentación':
+                                TIPO_ACCION = 'I/A';
+                                break;
+                            case 'Fin alimentación':
+                                TIPO_ACCION = 'F/A';
+                                break;
+                            case 'Salida':
+                                TIPO_ACCION = 'S';
+                                break;
+                        }
+                        // CAMBIAR SALIDA_SIGUIENTE_DIA
+                        switch (SALIDA_SIGUIENTE_DIA) {
+                            case 'Si':
+                                SALIDA_SIGUIENTE_DIA = true;
+                                break;
+                            case 'No':
+                                SALIDA_SIGUIENTE_DIA = false;
+                                break;
+                            default:
+                                SALIDA_SIGUIENTE_DIA = false;
+                                break;
+                        }
+                        // CAMBIAR SALIDA_TERCER_DIA
+                        switch (SALIDA_TERCER_DIA) {
+                            case 'Si':
+                                SALIDA_TERCER_DIA = true;
+                                break;
+                            case 'No':
+                                SALIDA_TERCER_DIA = false;
+                                break;
+                            default:
+                                SALIDA_TERCER_DIA = false;
+                                break;
+                        }
+                        // CAMBIAR CODIGO_HORARIO POR EL ID DEL HORARIO CORRESPONDIENTE
+                        const ID_HORARIO = (_a = (codigosHorariosCargados.find((codigo) => codigo.codigoHorario === CODIGO_HORARIO))) === null || _a === void 0 ? void 0 : _a.idHorario;
                         // INSERTAR EN LA BASE DE DATOS
-                        const response = yield database_1.default.query(`
+                        const response2 = yield database_1.default.query(`
             INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes,
                 min_despues) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-            `, [ORDEN, HORA, 0, CODIGO_HORARIO, TIPO_ACCION, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES, MIN_DESPUES]);
-                        const [correcto] = response.rows;
-                        if (correcto) {
+            `, [ORDEN, HORA, 0, ID_HORARIO, TIPO_ACCION, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES, MIN_DESPUES]);
+                        if (response2.rowCount > 0) {
                             detallesCargados = true;
                         }
                         else {
@@ -301,7 +370,7 @@ class HorarioControlador {
                     return res.status(200).jsonp({ message: 'correcto' });
                 }
                 else {
-                    return res.status(404).jsonp({ message: 'error' });
+                    return res.status(400).jsonp({ message: 'error' });
                 }
             }
             catch (error) {
@@ -309,21 +378,19 @@ class HorarioControlador {
             }
         });
     }
-    /** Verificar si existen datos duplicados dentro del sistema */
+    // METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE HORARIOS Y DETALLES
     VerificarDatos(req, res) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
             let separador = path_1.default.sep;
-            console.log(documento);
             let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
             const workbook = xlsx_1.default.readFile(ruta);
             const sheet_name_list = workbook.SheetNames;
             const plantillaHorarios = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
             let plantillaDetalles = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[1]]);
-            plantillaDetalles = plantillaDetalles.filter((valor) => valor.CODIGO_HORARIO !== undefined);
             let codigos = [];
-            for (const data of plantillaHorarios) {
+            for (const [index, data] of plantillaHorarios.entries()) {
                 let { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOCTURNO } = data;
                 if (MIN_ALIMENTACION === undefined) {
                     data.MIN_ALIMENTACION = 0;
@@ -342,8 +409,9 @@ class HorarioControlador {
                     data.OBSERVACION = 'Registro duplicado';
                     continue;
                 }
-                if (VerificarFormatoDatos(data)[0]) {
-                    data.OBSERVACION = VerificarFormatoDatos(data)[1];
+                const verificacion = VerificarFormatoDatos(data);
+                if (verificacion[0]) {
+                    data.OBSERVACION = verificacion[1];
                     continue;
                 }
                 if (yield VerificarDuplicadoBase(CODIGO_HORARIO.toString())) {
@@ -351,14 +419,11 @@ class HorarioControlador {
                     continue;
                 }
                 data.OBSERVACION = 'Ok';
-            }
-            ;
-            // VALIDAR HORAS TOTALES EN HORARIOS CON OBSERVACION Ok
-            for (const horario of plantillaHorarios) {
-                if (horario.OBSERVACION === 'Ok') {
-                    plantillaHorarios[plantillaHorarios.indexOf(horario)] = ValidarHorasTotales(horario);
+                if (data.OBSERVACION === 'Ok') {
+                    plantillaHorarios[index] = ValidarHorasTotales(data);
                 }
             }
+            ;
             for (const data of plantillaDetalles) {
                 let { CODIGO_HORARIO, TIPO_ACCION, HORA, SALIDA_SIGUIENTE_DIA, MIN_ANTES, MIN_DESPUES } = data;
                 let orden = 0;
@@ -372,10 +437,12 @@ class HorarioControlador {
                     case 'entrada':
                         orden = 1;
                         break;
-                    case 'inicio alimentación' || 'inicio alimentacion':
+                    case 'inicio alimentación':
+                    case 'inicio alimentacion':
                         orden = 2;
                         break;
-                    case 'fin alimentación' || 'fin alimentacion':
+                    case 'fin alimentación':
+                    case 'fin alimentacion':
                         orden = 3;
                         break;
                     case 'salida':
@@ -383,21 +450,16 @@ class HorarioControlador {
                         break;
                 }
                 data.ORDEN = orden;
-                if (MIN_ANTES === undefined) {
-                    data.MIN_ANTES = 0;
-                }
-                if (MIN_DESPUES === undefined) {
-                    data.MIN_DESPUES = 0;
-                }
-                if (SALIDA_SIGUIENTE_DIA === undefined) {
-                    data.SALIDA_SIGUIENTE_DIA = 'No';
-                }
+                data.MIN_ANTES = MIN_ANTES !== null && MIN_ANTES !== void 0 ? MIN_ANTES : 0;
+                data.MIN_DESPUES = MIN_DESPUES !== null && MIN_DESPUES !== void 0 ? MIN_DESPUES : 0;
+                data.SALIDA_SIGUIENTE_DIA = SALIDA_SIGUIENTE_DIA !== null && SALIDA_SIGUIENTE_DIA !== void 0 ? SALIDA_SIGUIENTE_DIA : 'No';
                 if (!VerificarCodigoHorarioDetalleHorario(CODIGO_HORARIO.toString(), plantillaHorarios)) {
                     data.OBSERVACION = 'Codigo de horario no existe';
                     continue;
                 }
-                if (VerificarFormatoDetalleHorario(data)[0]) {
-                    data.OBSERVACION = VerificarFormatoDetalleHorario(data)[1];
+                const verificacion = VerificarFormatoDetalleHorario(data);
+                if (verificacion[0]) {
+                    data.OBSERVACION = verificacion[1];
                     continue;
                 }
                 data.OBSERVACION = 'Ok';
@@ -416,12 +478,7 @@ class HorarioControlador {
             plantillaHorarios.forEach((horario) => {
                 if (horario.OBSERVACION === 'Ok') {
                     const detallesCorrespondientes = plantillaDetalles.filter((detalle) => detalle.CODIGO_HORARIO === horario.CODIGO_HORARIO && detalle.OBSERVACION === 'Ok');
-                    if (detallesCorrespondientes.length === 0) {
-                        horario.DETALLE = false;
-                    }
-                    else {
-                        horario.DETALLE = true;
-                    }
+                    horario.DETALLE = detallesCorrespondientes.length > 0;
                 }
             });
             const horariosOk = plantillaHorarios.filter((horario) => horario.OBSERVACION === 'Ok');
@@ -441,7 +498,7 @@ class HorarioControlador {
 }
 // FUNCION PARA VERIFICAR SI EXISTEN DATOS DUPLICADOS EN LA PLANTILLA
 function VerificarDuplicado(codigos, codigo) {
-    const valores = codigos.filter((valor) => valor == codigo);
+    const valores = codigos.filter((valor) => valor.toLowerCase() === codigo.toLowerCase());
     const duplicado = valores.length > 1;
     return duplicado;
 }
@@ -464,7 +521,7 @@ function VerificarFormatoDatos(data) {
 // FUNCION PARA VERIFICAR SI EXISTEN DATOS DUPLICADOS EN LA BASE DE DATOS
 function VerificarDuplicadoBase(codigo) {
     return __awaiter(this, void 0, void 0, function* () {
-        const result = yield database_1.default.query('SELECT * FROM cg_horarios WHERE UPPER(codigo) = $1', [codigo.toUpperCase()]);
+        const result = yield database_1.default.query('SELECT * FROM cg_horarios WHERE LOWER(codigo) = $1', [codigo.toLowerCase()]);
         return result.rowCount > 0;
     });
 }
@@ -571,10 +628,9 @@ function FormatearHoras(hora, detalle) {
 function ValidarHorasTotales(horario) {
     const hora = FormatearHoras(horario.HORAS_TOTALES.toString(), true);
     if ((hora >= '24:00' && hora < '72:00') ||
-        (hora >= '24:00:00' && hora < '72:00:00')) {
-        horario.MIN_ALIMENTACION = 0;
-    }
-    else if (hora >= '72:00' || hora >= '72:00:00') {
+        (hora >= '24:00:00' && hora < '72:00:00') ||
+        hora >= '72:00' ||
+        hora >= '72:00:00') {
         horario.MIN_ALIMENTACION = 0;
     }
     return horario;

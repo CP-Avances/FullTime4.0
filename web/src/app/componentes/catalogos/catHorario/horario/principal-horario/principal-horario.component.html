@@ -37,7 +37,7 @@
                                         [formControl]="archivo1Form" id="file1"
                                         accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                     <label for="file1" class="btn-2" matSuffix matTooltipPosition="right"
-                                        matTooltip="Presionar para seleccionar Plantilla con nombre Catalogo Horarios.">
+                                        matTooltip="Presionar para seleccionar Plantilla con nombre plantillaGeneral.">
                                         Subir horario
                                     </label>
                                 </form>
@@ -168,6 +168,11 @@
             </div>
         </div>
     </div>
+</div>
+
+<div class="pantalla-progress" *ngIf="habilitarprogress">
+  <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
+  </mat-progress-spinner>
 </div>
 
 <!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE HORARIOS ------------------------------------------------->
