@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import fs from 'fs';
 const builder = require('xmlbuilder');
 
 import pool from '../../database';

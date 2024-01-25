@@ -45,12 +45,16 @@ export class PrincipalHorarioComponent implements OnInit {
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreHorarioF = new FormControl('', Validators.minLength(2));
   archivo1Form = new FormControl('');
-  archivo2Form = new FormControl('');
-  archivo3Form = new FormControl('');
+  descripcionF = new FormControl('');
+  codigoF = new FormControl('');
+  codigoFD = new FormControl('');
 
   // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public formulario = new FormGroup({
     nombreHorarioForm: this.nombreHorarioF,
+    descripcionForm: this.descripcionF,
+    codigoForm: this.codigoF,
+    codigoFormD: this.codigoFD,
   });
 
   // VARIABLES USADAS EN SELECCIÓN DE ARCHIVOS
@@ -62,12 +66,32 @@ export class PrincipalHorarioComponent implements OnInit {
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
 
+  // ITEMS DE PAGINACION DE LA TABLA HORARIOS
+  numero_paginaH: number = 1;
+  tamanio_paginaH: number = 5;
+  pageSizeOptionsH = [5, 10, 20, 50];
+
+  // ITEMS DE PAGINACION DE LA TABLA DETALLES
+  numero_paginaD: number = 1;
+  tamanio_paginaD: number = 5;
+  pageSizeOptionsD = [5, 10, 20, 50];
+
   // VARIABLES DE ALMACENAMIENTO DE USUARIO DE INICIO SESIÓN
   empleado: any = [];
   idEmpleado: number;
 
   // VARIABLE DE NAVEGABILIDAD
   hipervinculo: string = environment.url;
+
+  //VARIABLES PARA VALIDAR HORARIOS Y DETALLES
+  dataHorarios: any;
+  listaHorariosCorrectos: any = [];
+  listaDetalleCorrectos: any = [];
+
+  // VARAIBLES USADAS PARA FILTROS DE BUSQUEDA
+  filtroDescripcion = '';
+  filtroCodigo = '';
+  filtroCodigoD = '';
 
   constructor(
     public restEmpre: EmpresaService, // SERVICIO DATOS DE EMPRESA
@@ -90,7 +114,7 @@ export class PrincipalHorarioComponent implements OnInit {
     this.ObtenerEmpleados();
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados() {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(this.idEmpleado).subscribe(data => {
@@ -106,7 +130,7 @@ export class PrincipalHorarioComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -122,6 +146,18 @@ export class PrincipalHorarioComponent implements OnInit {
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
     this.numero_pagina = e.pageIndex + 1;
+  }
+
+  // METODO PARA MANEJAR PAGINAS DE TABLA HORARIOS
+  ManejarPaginaH(e: PageEvent) {
+    this.tamanio_paginaH = e.pageSize;
+    this.numero_paginaH = e.pageIndex + 1;
+  }
+
+  // METODO PARA MANEJAR PAGINAS DE TABLA DETALLES
+  ManejarPaginaD(e: PageEvent) {
+    this.tamanio_paginaD = e.pageSize;
+    this.numero_paginaD = e.pageIndex + 1;
   }
 
   // METODO PARA OBTENER HORARIOS
@@ -172,9 +208,16 @@ export class PrincipalHorarioComponent implements OnInit {
 
   // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
+    this.dataHorarios = null;
+    this.archivoSubido = [];
+    this.nameFile = '';
     this.formulario.setValue({
       nombreHorarioForm: '',
+      descripcionForm: '',
+      codigoForm: '',
+      codigoFormD: '',
     });
+    this.archivo1Form.reset();
     this.ObtenerHorarios();
   }
 
@@ -201,7 +244,7 @@ export class PrincipalHorarioComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -222,22 +265,22 @@ export class PrincipalHorarioComponent implements OnInit {
     this.pagina = 'lista-horarios';
   }
 
-  /** ************************************************************************************************* ** 
+  /** ************************************************************************************************* **
    ** **                              PLANTILLA CARGAR SOLO HORARIOS                                 ** **
    ** ************************************************************************************************* **/
 
-  fileChangeCatalogoHorario(element: any) {
+  CargarPlantillaGeneral(element: any) {
     this.archivoSubido = element.target.files;
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
-    let itemName = arrayItems[0].slice(0, 17);
+    let itemName = arrayItems[0];
     console.log("funcion horario", itemName.toLowerCase());
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'catalogo horarios') {
-        this.plantillaHorario();
+      if (itemName.toLowerCase() == 'plantillageneral') {
+        this.VerificarPlantilla();
       } else {
-        this.toastr.error('Solo se acepta', 'Plantilla seleccionada incorrecta', {
+        this.toastr.error('Solo se acepta plantillaGeneral', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
         });
         this.archivo1Form.reset();
@@ -252,15 +295,17 @@ export class PrincipalHorarioComponent implements OnInit {
     }
   }
 
-  plantillaHorario() {
+  VerificarPlantilla() {
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
-      formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
+
     }
+    console.log("formdata", formData);
     this.rest.VerificarDatosHorario(formData).subscribe(res => {
-      if (res.message === 'error') {
+      if (res.mensaje === 'error') {
         this.toastr.error('Para el buen funcionamiento del sistema verifique los datos de su plantilla. ' +
-          'Son datos obligatorios: nombre de horario, horas de trabajo y tipo de horario, además el nombre ' +
+          'Son datos obligatorios: Descripción, Código de horario, horas totales y tipo de horario, además el código ' +
           'de horario debe ser único en cada registro.', 'Ups!!! algo salio mal.', {
           timeOut: 6000,
         });
@@ -268,99 +313,42 @@ export class PrincipalHorarioComponent implements OnInit {
         this.nameFile = '';
       }
       else {
-        this.rest.VerificarPlantillaHorario(formData).subscribe(res => {
-          if (res.message === 'error') {
-            this.toastr.error('Para el buen funcionamiento del sistema verifique los datos de su plantilla. ' +
-              'Son datos obligatorios: nombre de horario, horas de trabajo y tipo de horario, además el nombre ' +
-              'de horario debe ser único en cada registro.', 'Ups!!! algo salio mal.', {
+        this.dataHorarios = res;
+        this.dataHorarios.plantillaHorarios.forEach(obj => {
+          if (obj.OBSERVACION == 'Ok') {
+            this.listaHorariosCorrectos.push(obj);
+          }
+        });
+
+        this.dataHorarios.plantillaDetalles.forEach(obj => {
+          if (obj.OBSERVACION == 'Ok') {
+            this.listaDetalleCorrectos.push(obj);
+          }
+        });
+
+        // this.RegistrarHorariosDetalles(data);
+      }
+    });
+  }
+
+  RegistrarHorariosDetalles() {
+    const data = {
+      horarios: this.listaHorariosCorrectos,
+      detalles: this.listaDetalleCorrectos
+    }
+    this.rest.CargarHorariosMultiples(data).subscribe(res => {
+            this.toastr.success('Operación exitosa.', 'Horarios y detalles importados.', {
               timeOut: 6000,
             });
+            console.log("res", res);
             this.archivo1Form.reset();
             this.nameFile = '';
-          }
-          else {
-            this.rest.CargarHorariosMultiples(formData).subscribe(res => {
-              this.toastr.success('Operación exitosa.', 'Plantilla de Horario importada.', {
-                timeOut: 6000,
-              });
-              this.archivo1Form.reset();
-              this.nameFile = '';
-              window.location.reload();
-            });
-          }
-        });
-      }
-    });
-  }
-
-  /** *********************************************************************************************** ** 
-   ** **                              PLANTILLA CARGAR SOLO DETALLES                               ** **
-   ** *********************************************************************************************** **/
-  nameFileDetalle: string;
-  archivoSubidoDetalle: Array<File>;
-  fileChangeDetalle(element) {
-    this.archivoSubidoDetalle = element.target.files;
-    this.nameFileDetalle = this.archivoSubidoDetalle[0].name;
-    let arrayItems = this.nameFileDetalle.split(".");
-    let itemExtencion = arrayItems[arrayItems.length - 1];
-    let itemName = arrayItems[0].slice(0, 17);
-    console.log(itemName.toLowerCase());
-    if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'detalles horarios') {
-        this.plantillaDetalle();
-      } else {
-        this.toastr.error('Solo se acepta', 'Plantilla seleccionada incorrecta', {
-          timeOut: 6000,
-        });
-        this.archivo2Form.reset();
-        this.nameFileDetalle = '';
-      }
-    } else {
-      this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
-        timeOut: 6000,
-      });
-      this.archivo2Form.reset();
-      this.nameFileDetalle = '';
-    }
-  }
-
-  plantillaDetalle() {
-    let formData = new FormData();
-    for (var i = 0; i < this.archivoSubidoDetalle.length; i++) {
-      formData.append("uploads[]", this.archivoSubidoDetalle[i], this.archivoSubidoDetalle[i].name);
-    }
-    this.restD.VerificarDatosDetalles(formData).subscribe(res => {
-      if (res.message === 'error') {
-        this.toastr.error('Para el buen funcionamiento del sistema verifique los datos de su plantilla. ' +
-          'Son datos obligatorios: nombre de horario, orden, hora y tipo de accion, además el nombre ' +
-          'de horario debe existir dentro del sistema.', 'Ups!!! algo salio mal.', {
-          timeOut: 6000,
-        });
-        this.archivo2Form.reset();
-        this.nameFileDetalle = '';
-      }
-      else {
-        this.restD.CargarPlantillaDetalles(formData).subscribe(res => {
-          this.toastr.success('Operación exitosa.', 'Plantilla de Detalle de Horario importada.', {
-            timeOut: 6000,
+            // window.location.reload();
           });
-          this.archivo2Form.reset();
-          this.nameFileDetalle = '';
-        });
-      }
-    });
   }
 
 
-
-
-
-
-
-
-
-
-  /** ************************************************************************************************* ** 
+  /** ************************************************************************************************* **
    ** **                                METODO PARA EXPORTAR A PDF                                   ** **
    ** ************************************************************************************************* **/
 
@@ -463,7 +451,7 @@ export class PrincipalHorarioComponent implements OnInit {
   }
 
 
-  /** ************************************************************************************************* ** 
+  /** ************************************************************************************************* **
    ** **                                 METODO PARA EXPORTAR A EXCEL                                ** **
    ** ************************************************************************************************* **/
 
@@ -474,7 +462,7 @@ export class PrincipalHorarioComponent implements OnInit {
     xlsx.writeFile(wb, "HorariosEXCEL" + '.xlsx');
   }
 
-  /** ************************************************************************************************* ** 
+  /** ************************************************************************************************* **
    ** **                               METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************* **/
 
@@ -520,11 +508,11 @@ export class PrincipalHorarioComponent implements OnInit {
     const blob = new Blob([xml], { type: 'application/xml' });
     const xmlUrl = URL.createObjectURL(blob);
 
-    // Abrir una nueva pestaña o ventana con el contenido XML
+    // ABRIR UNA NUEVA PESTAÑA O VENTANA CON EL CONTENIDO XML
     const newTab = window.open(xmlUrl, '_blank');
     if (newTab) {
-      newTab.opener = null; // Evitar que la nueva pestaña tenga acceso a la ventana padre
-      newTab.focus(); // Dar foco a la nueva pestaña
+      newTab.opener = null; // EVITAR QUE LA NUEVA PESTAÑA TENGA ACCESO A LA VENTANA PADRE
+      newTab.focus(); // DAR FOCO A LA NUEVA PESTAÑA
     } else {
       alert('No se pudo abrir una nueva pestaña. Asegúrese de permitir ventanas emergentes.');
     }
@@ -533,8 +521,24 @@ export class PrincipalHorarioComponent implements OnInit {
     const a = document.createElement('a');
     a.href = xmlUrl;
     a.download = 'Horarios.xml';
-    // Simular un clic en el enlace para iniciar la descarga
+    // SIMULAR UN CLIC EN EL ENLACE PARA INICIAR LA DESCARGA
     a.click();
   }
 
+
+  //METODO PARA DEFINIR EL COLOR DE LA OBSERVACION
+  ObtenerColorValidacion(observacion: string): string{
+    switch(observacion) {
+      case 'Ok':
+          return 'rgb(159, 221, 154)';
+      case 'Ya esta registrado en la base de datos':
+          return 'rgb(239, 203, 106)';
+      case 'Codigo de horario no existe en los horarios validos':
+          return 'rgb(239, 203, 106)';
+      case 'Registro duplicado':
+          return 'rgb(156, 214, 255)';
+      default:
+          return 'rgb(246, 167, 143)';
+    }
+  }
 }

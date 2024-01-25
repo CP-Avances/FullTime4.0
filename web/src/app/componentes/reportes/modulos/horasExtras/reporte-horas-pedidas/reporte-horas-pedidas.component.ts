@@ -80,7 +80,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
     // this.VerPedidosHorasExtras();
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleadoLogueado(idemploy: any) {
     this.empleadoLogueado = [];
     this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -184,7 +184,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
     });
   }
 
-  // Manejo del estado del selector 
+  // Manejo del estado del selector
   estado_reporte: boolean;
   setAll(completed: boolean) {
     this.estado_reporte = completed;
@@ -294,14 +294,14 @@ export class ReporteHorasPedidasComponent implements OnInit {
               },
               {
                 text: [{
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', opacity: 0.3
+                  text: '© Pag ' + currentPage.toString() + ' de ' + pageCount, alignment: 'right', opacity: 0.3
                 }],
               }
             ], fontSize: 10
           }
         ]
       },
-      // TÍTULOS DEL ARCHIVO PDF Y CONTENIDO GENERAL 
+      // TÍTULOS DEL ARCHIVO PDF Y CONTENIDO GENERAL
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
         { text: this.nombreEmpresa.toUpperCase(), bold: true, fontSize: 25, alignment: 'center', margin: [0, -30, 0, 5] },
@@ -439,14 +439,14 @@ export class ReporteHorasPedidasComponent implements OnInit {
               },
               {
                 text: [{
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', opacity: 0.3
+                  text: '© Pag ' + currentPage.toString() + ' de ' + pageCount, alignment: 'right', opacity: 0.3
                 }],
               }
             ], fontSize: 10
           }
         ]
       },
-      // TÍTULOS DEL ARCHIVO PDF Y CONTENIDO GENERAL 
+      // TÍTULOS DEL ARCHIVO PDF Y CONTENIDO GENERAL
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
         { text: this.nombreEmpresa.toUpperCase(), bold: true, fontSize: 25, alignment: 'center', margin: [0, -30, 0, 5] },
@@ -555,7 +555,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
   }
 
   /** *******************************************************************************************
-   *                             EXPORTAR ARCHIVOS EN FORMATO PDF SOLICITUDES POR EMPLEADO       
+   *                             EXPORTAR ARCHIVOS EN FORMATO PDF SOLICITUDES POR EMPLEADO
    *  **********************************************************************************************/
 
   GenerarPdfEmpleado(action = 'open', forma: string, id_seleccionado: number) {
@@ -600,14 +600,14 @@ export class ReporteHorasPedidasComponent implements OnInit {
               },
               {
                 text: [{
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', opacity: 0.3
+                  text: '© Pag ' + currentPage.toString() + ' de ' + pageCount, alignment: 'right', opacity: 0.3
                 }],
               }
             ], fontSize: 9
           }
         ]
       },
-      // TÍTULOS DEL ARCHIVO PDF Y CONTENIDO GENERAL 
+      // TÍTULOS DEL ARCHIVO PDF Y CONTENIDO GENERAL
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
         ...this.datosEmpleado.map(obj => {
@@ -630,7 +630,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
     };
   }
 
-  // DATOS GENERALES DEL PDF 
+  // DATOS GENERALES DEL PDF
   DatosSolicitudEmpleado(id_seleccionado) {
     // INICIALIZACIÓN DE VARIBLES
     var ciudad, nombre, apellido, cedula, codigo, sucursal, departamento, cargo, regimen;
@@ -735,7 +735,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
   }
 
   /* ****************************************************************************************************
-   *                               PARA LA EXPORTACION DE ARCHIVOS EXCEL SOLICITUDES 
+   *                               PARA LA EXPORTACION DE ARCHIVOS EXCEL SOLICITUDES
    * ****************************************************************************************************/
 
   GenerarExcelEmpleado(forma: string, id_seleccionado) {
@@ -803,7 +803,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
   }
 
   /** *******************************************************************************************
-   *             EXPORTAR ARCHIVOS EN FORMATO PDF SOLICITUDES AUTORIZADAS POR EMPLEADO       
+   *             EXPORTAR ARCHIVOS EN FORMATO PDF SOLICITUDES AUTORIZADAS POR EMPLEADO
    *  **********************************************************************************************/
 
   GenerarSolicitudAutorizaEmpleado(id_seleccionado: number) {
@@ -831,14 +831,14 @@ export class ReporteHorasPedidasComponent implements OnInit {
               },
               {
                 text: [{
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', opacity: 0.3
+                  text: '© Pag ' + currentPage.toString() + ' de ' + pageCount, alignment: 'right', opacity: 0.3
                 }],
               }
             ], fontSize: 9
           }
         ]
       },
-      // TÍTULOS DEL ARCHIVO PDF Y CONTENIDO GENERAL 
+      // TÍTULOS DEL ARCHIVO PDF Y CONTENIDO GENERAL
       content: [
         { image: this.logo, width: 150, margin: [10, -25, 0, 5] },
         ...this.datosEmpleado.map(obj => {
@@ -861,7 +861,7 @@ export class ReporteHorasPedidasComponent implements OnInit {
     };
   }
 
-  // DATOS GENERALES DEL PDF 
+  // DATOS GENERALES DEL PDF
   DatosSolicitudAutorizaEmpleado(id_seleccionado) {
     // INICIALIZACIÓN DE VARIABLES
     var ciudad, nombre, apellido, cedula, codigo, sucursal, departamento, cargo, regimen;

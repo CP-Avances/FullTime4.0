@@ -80,7 +80,7 @@ export class TiempoJornadaVsHoraExtMacroComponent implements OnInit {
   chartDom: any;
   llamarGraficaOriginal() {
     let local = sessionStorage.getItem('tiempo_jornada');
-    // 
+    //
     this.chartDom = document.getElementById('charts_tiempo_jor_macro') as HTMLCanvasElement;
     this.thisChart = echarts.init(this.chartDom, 'light', { width: 1050, renderer: 'svg', devicePixelRatio: 5 });
 
@@ -161,7 +161,7 @@ export class TiempoJornadaVsHoraExtMacroComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -230,7 +230,7 @@ export class TiempoJornadaVsHoraExtMacroComponent implements OnInit {
               {
                 text: [
                   {
-                    text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
+                    text: '© Pag ' + currentPage.toString() + ' de ' + pageCount,
                     alignment: 'right', opacity: 0.3
                   }
                 ],

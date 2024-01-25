@@ -103,7 +103,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
     this.ObtenerColores();
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleadoLogueado(idemploy: any) {
     this.empleadoLogueado = [];
     this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -120,7 +120,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -156,7 +156,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
     });
   }
 
-  // METODO para controlar ingreso de periodo de fechas 
+  // METODO para controlar ingreso de periodo de fechas
   fechasPeriodo: any = [];
   inicioDate: any;
   finDate: any
@@ -173,7 +173,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
           fechaInicio: form.inicioForm,
           fechaFinal: form.finalForm
         }
-        this.fechasPeriodo = []; // Array que contiene todas las fechas del mes indicado 
+        this.fechasPeriodo = []; // Array que contiene todas las fechas del mes indicado
         this.inicioDate = moment(form.inicioForm).format('MM-DD-YYYY');
         this.finDate = moment(form.finalForm).format('MM-DD-YYYY');
 
@@ -435,7 +435,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
                   text: 'Fecha: ' + fecha + ' Hora: ' + time, alignment: 'left', opacity: 0.3
                 }]
               },
-              { text: [{ text: '© Pag ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', opacity: 0.3 }], }
+              { text: [{ text: '© Pag ' + currentPage.toString() + ' de ' + pageCount, alignment: 'right', opacity: 0.3 }], }
             ], fontSize: 9
           }
         ]
@@ -461,7 +461,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
         this.presentarEntradasSalidas(fechasTotales),
       ],
 
-      // Estilos del archivo PDF 
+      // Estilos del archivo PDF
       styles: {
         tableHeader: { fontSize: 10, bold: true, alignment: 'center', fillColor: this.p_color },
         itemsTableD: { fontSize: 8, alignment: 'center' },
@@ -864,7 +864,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
             },
             {
               text: [{
-                text: '© Pag ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', opacity: 0.3
+                text: '© Pag ' + currentPage.toString() + ' de ' + pageCount, alignment: 'right', opacity: 0.3
               }],
             }
           ], fontSize: 10

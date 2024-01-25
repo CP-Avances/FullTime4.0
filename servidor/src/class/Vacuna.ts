@@ -1,7 +1,7 @@
 export interface ReporteVacuna {
     id_suc: number,
-    name_suc: string,
     ciudad: string,
+    name_suc: string,
     departamentos: Array<depa_vac>
 }
 
@@ -13,13 +13,13 @@ interface depa_vac {
 
 interface emp_vac {
     id: number,
-    name_empleado: string,
+    cargo?: string,
     cedula: string,
     codigo: string | number,
     genero?: string | number,
-    cargo?: string,
-    contrato?: string,
     vacunas?: Array<vacuna>,
+    contrato?: string,
+    name_empleado: string,
 }
 
 export interface vacuna {
