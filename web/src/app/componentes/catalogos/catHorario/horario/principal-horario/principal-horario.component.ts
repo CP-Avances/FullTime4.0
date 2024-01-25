@@ -214,6 +214,10 @@ export class PrincipalHorarioComponent implements OnInit {
     this.dataHorarios = null;
     this.archivoSubido = [];
     this.nameFile = '';
+    this.numero_paginaH = 1;
+    this.numero_paginaD = 1;
+    this.tamanio_paginaH = 5;
+    this.tamanio_paginaD = 5;
     this.formulario.setValue({
       nombreHorarioForm: '',
       descripcionForm: '',
@@ -222,10 +226,6 @@ export class PrincipalHorarioComponent implements OnInit {
     });
     this.archivo1Form.reset();
     this.ObtenerHorarios();
-    this.numero_paginaH = 1;
-    this.numero_paginaD = 1;
-    this.tamanio_paginaH = 5;
-    this.tamanio_paginaD = 5;
   }
 
   // METODO PARA ABRIR VENTANA EDITAR HORARIO
