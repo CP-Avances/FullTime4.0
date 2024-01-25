@@ -58,6 +58,9 @@ export class ListarFeriadosComponent implements OnInit {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
 
+  tamanio_paginaMul: number = 5;
+  numero_paginaMul: number = 1;
+
   // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
   nameFile: string;
   archivoSubido: Array<File>;
@@ -207,6 +210,12 @@ export class ListarFeriadosComponent implements OnInit {
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
     this.numero_pagina = e.pageIndex + 1
+  }
+
+   // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+   ManejarPaginaMulti(e: PageEvent) {
+    this.tamanio_paginaMul = e.pageSize;
+    this.numero_paginaMul = e.pageIndex + 1
   }
 
   // METODO PARA VISUALIZAR PANTALLA ASIGNAR CIUDAD FERIADO
@@ -429,7 +438,7 @@ export class ListarFeriadosComponent implements OnInit {
             })
           }else{
             if(this.listFeriadosCorrectos.length  == cont){
-              this.toastr.success('Operación exitosa.', 'Plantilla de Sucursales importada.', {
+              this.toastr.success('Operación exitosa.', 'Plantilla de feriados importada.', {
                 timeOut: 10000,
               });
             }
@@ -438,7 +447,7 @@ export class ListarFeriadosComponent implements OnInit {
         });
       })
     }else{
-      this.toastr.error('No exiten datos para registrar ingrese otra', 'Plantilla no aceptada', {
+      this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada', {
         timeOut: 4000,
       });
       this.archivoForm.reset();

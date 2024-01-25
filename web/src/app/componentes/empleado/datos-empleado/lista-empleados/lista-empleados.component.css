@@ -139,3 +139,11 @@ td {
 [type="file"]+label.btn-2:hover::before {
     right: 80%
 }
+
+.circulo{
+    margin-right: -50px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50px;
+    float: left;
+}

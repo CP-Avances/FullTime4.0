@@ -363,8 +363,9 @@ export class ListaEmpleadosComponent implements OnInit {
   }
 
   DataEmpleados: any;
-
+  listUsuariosCorrectas: any = [];
   VerificarPlantilla() {
+    this.listUsuariosCorrectas = [];
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
@@ -373,6 +374,13 @@ export class ListaEmpleadosComponent implements OnInit {
     this.rest.verificarArchivoExcel_Automatico(formData).subscribe(res => {
       console.log('plantilla 1', res);
       this.DataEmpleados = res.data;
+
+      this.DataEmpleados.forEach(item => {
+        if( item.observacion.toLowerCase() == 'ok'){
+          this.listUsuariosCorrectas.push(item);
+        }
+      });
+
     });
 
     /*
@@ -383,6 +391,37 @@ export class ListaEmpleadosComponent implements OnInit {
       this.ArchivoManual(formData);
     }
     */
+  }
+
+  registrarUsuariosMultiple(){
+    this.rest.subirArchivoExcel_Automatico(this.listUsuariosCorrectas).subscribe(datos_archivo => {
+      console.log('datos plantilla a enviar: ', this.listUsuariosCorrectas);
+
+      this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
+        timeOut: 6000,
+      });
+      //window.location.reload();
+
+    });
+
+  }
+
+  //Metodo para dar color a las celdas y representar las validaciones
+  colorCelda: string = ''
+  stiloCelda(observacion: string): string{
+    let arrayObservacion = observacion.split(" ");
+    if(observacion == 'ok'){
+      return 'rgb(159, 221, 154)';
+    }else if(observacion == 'Ya esta registrado en base'){
+      return 'rgb(239, 203, 106)';
+    }else if(arrayObservacion[0] == 'Cedula' || arrayObservacion[0] == 'Usuario'){
+      return 'rgb(246, 167, 143)';
+    }else if(observacion == 'Registro duplicado'){
+      return 'rgb(156, 214, 255)';
+    }else{
+      return 'rgb(251, 73, 18)';
+    }
+
   }
 
   colorTexto: string = '';

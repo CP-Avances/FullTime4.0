@@ -763,6 +763,13 @@ class EmpleadoControlador {
                     data.estado_user = estado_user;
                     data.rol = rol,
                         data.app_habilita = app_habilita;
+                    // Verificar si la variable tiene el formato de fecha correcto con moment
+                    if ((0, moment_1.default)(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) {
+                        console.log("La variable tiene el formato de fecha correcto.");
+                    }
+                    else {
+                        console.log("La variable no tiene el formato de fecha correcto.");
+                    }
                     if (duplicados.find((p) => p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined) {
                         data.observacion = 'ok';
                         duplicados.push(dato);
@@ -1162,136 +1169,108 @@ class EmpleadoControlador {
     }
     CargarPlantilla_Automatico(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let list = req.files;
-            //let cadena = list.uploads[0].path;
-            //let filename = cadena.split("\\")[1];
-            //var filePath = `./plantillas/${filename}`
-            let separador = path_1.default.sep;
-            let ruta = (0, accesoCarpetas_2.ObtenerRutaLeerPlantillas)() + separador + list;
-            //const workbook = excel.readFile(filePath);
-            const workbook = xlsx_1.default.readFile(ruta);
-            const sheet_name_list = workbook.SheetNames;
-            const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-            /*
-            const VALOR = await pool.query('SELECT * FROM codigo');
+            const plantilla = req.body;
+            console.log('datos2: ', plantilla);
+            const VALOR = yield database_1.default.query('SELECT * FROM codigo');
             //TODO Revisar max codigo
             var codigo = parseInt(VALOR.rows[0].valor);
             var contador = 1;
-            plantilla.forEach(async (data: any) => {
-        
-              // Realiza un capital letter a los nombres y apellidos
-              var nombreE: any;
-              let nombres = data.nombre.split(' ');
-              if (nombres.length > 1) {
-                let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
-                let name2 = nombres[1].charAt(0).toUpperCase() + nombres[1].slice(1);
-                nombreE = name1 + ' ' + name2;
-              }
-              else {
-                let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
-                nombreE = name1
-              }
-        
-              var apellidoE: any;
-              let apellidos = data.apellido.split(' ');
-              if (apellidos.length > 1) {
-                let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
-                let lastname2 = apellidos[1].charAt(0).toUpperCase() + apellidos[1].slice(1);
-                apellidoE = lastname1 + ' ' + lastname2;
-              }
-              else {
-                let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
-                apellidoE = lastname1
-              }
-        
-              // Encriptar contraseña
-              const md5 = new Md5();
-              const contrasena = md5.appendStr(data.contrasena).end();
-        
-              // Datos que se leen de la plantilla ingresada
-              const { cedula, estado_civil, genero, correo, fec_nacimiento, estado, domicilio, telefono,
-                nacionalidad, usuario, estado_user, rol, app_habilita } = data;
-        
-              //Obtener id del estado_civil
-              var id_estado_civil = 0;
-              if (estado_civil.toUpperCase() === 'SOLTERA/A') {
-                id_estado_civil = 1;
-              }
-              else if (estado_civil.toUpperCase() === 'UNION DE HECHO') {
-                id_estado_civil = 2;
-              }
-              else if (estado_civil.toUpperCase() === 'CASADO/A') {
-                id_estado_civil = 3;
-              }
-              else if (estado_civil.toUpperCase() === 'DIVORCIADO/A') {
-                id_estado_civil = 4;
-              }
-              else if (estado_civil.toUpperCase() === 'VIUDO/A') {
-                id_estado_civil = 5;
-              }
-        
-              //Obtener id del genero
-              var id_genero = 0;
-              if (genero.toUpperCase() === 'MASCULINO') {
-                id_genero = 1;
-              }
-              else if (genero.toUpperCase() === 'FEMENINO') {
-                id_genero = 2;
-              }
-        
-              //OBTENER ID DEL ESTADO
-              var id_estado = 0;
-              if (estado.toUpperCase() === 'ACTIVO') {
-                id_estado = 1;
-              }
-              else if (estado.toUpperCase() === 'INACTIVO') {
-                id_estado = 2;
-              }
-        
-              //Obtener id de la nacionalidad
-              const id_nacionalidad = await pool.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1',
-                [nacionalidad.toUpperCase()]);
-        
-              //Obtener id del rol
-              const id_rol = await pool.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [rol.toUpperCase()]);
-        
-              // Incrementar el valor del código
-              codigo = codigo + 1;
-        
-              // Registro de nuevo empleado
-              await pool.query('INSERT INTO empleados (cedula, apellido, nombre, esta_civil, genero, correo, ' +
-                'fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo) VALUES ' +
-                '($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)', [cedula, apellidoE, nombreE,
-                id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
-                domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo]);
-        
-              // Obtener el id del empleado ingresado
-              const oneEmpley = await pool.query('SELECT id FROM empleados WHERE cedula = $1', [cedula]);
-              const id_empleado = oneEmpley.rows[0].id;
-        
-              // Registro de los datos de usuario
-              await pool.query('INSERT INTO usuarios (usuario, contrasena, estado, id_rol, id_empleado, app_habilita) ' +
-                'VALUES ($1, $2, $3, $4, $5, $6)', [usuario, contrasena, estado_user, id_rol.rows[0]['id'],
-                id_empleado, app_habilita]);
-        
-              if (contador === plantilla.length) {
-                console.log('codigo_ver', codigo, VALOR.rows[0].id);
-                // Actualización del código
-                await pool.query('UPDATE codigo SET valor = $1 WHERE id = $2', [codigo, VALOR.rows[0].id]);
-                return res.jsonp({ message: 'correcto' });
-              }
-              contador = contador + 1;
-            });
-            */
-            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
-                if (err) {
+            plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
+                var _a;
+                // Realiza un capital letter a los nombres y apellidos
+                var nombreE;
+                let nombres = data.nombre.split(' ');
+                if (nombres.length > 1) {
+                    let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
+                    let name2 = nombres[1].charAt(0).toUpperCase() + nombres[1].slice(1);
+                    nombreE = name1 + ' ' + name2;
                 }
                 else {
-                    // ELIMINAR DEL SERVIDOR
-                    fs_1.default.unlinkSync(ruta);
+                    let name1 = nombres[0].charAt(0).toUpperCase() + nombres[0].slice(1);
+                    nombreE = name1;
                 }
-            });
+                var apellidoE;
+                let apellidos = data.apellido.split(' ');
+                if (apellidos.length > 1) {
+                    let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
+                    let lastname2 = apellidos[1].charAt(0).toUpperCase() + apellidos[1].slice(1);
+                    apellidoE = lastname1 + ' ' + lastname2;
+                }
+                else {
+                    let lastname1 = apellidos[0].charAt(0).toUpperCase() + apellidos[0].slice(1);
+                    apellidoE = lastname1;
+                }
+                // Encriptar contraseña
+                var md5 = new ts_md5_1.Md5();
+                var contrasena = (_a = md5.appendStr(data.contrasena).end()) === null || _a === void 0 ? void 0 : _a.toString();
+                // Datos que se leen de la plantilla ingresada
+                const { cedula, estado_civil, genero, correo, fec_nacimiento, estado, domicilio, telefono, nacionalidad, usuario, estado_user, rol, app_habilita } = data;
+                //Obtener id del estado_civil
+                var id_estado_civil = 0;
+                if (estado_civil.toUpperCase() === 'SOLTERO/A') {
+                    id_estado_civil = 1;
+                }
+                else if (estado_civil.toUpperCase() === 'UNION DE HECHO') {
+                    id_estado_civil = 2;
+                }
+                else if (estado_civil.toUpperCase() === 'CASADO/A') {
+                    id_estado_civil = 3;
+                }
+                else if (estado_civil.toUpperCase() === 'DIVORCIADO/A') {
+                    id_estado_civil = 4;
+                }
+                else if (estado_civil.toUpperCase() === 'VIUDO/A') {
+                    id_estado_civil = 5;
+                }
+                //Obtener id del genero
+                var id_genero = 0;
+                if (genero.toUpperCase() === 'MASCULINO') {
+                    id_genero = 1;
+                }
+                else if (genero.toUpperCase() === 'FEMENINO') {
+                    id_genero = 2;
+                }
+                //OBTENER ID DEL ESTADO
+                var id_estado = 0;
+                if (estado.toUpperCase() === 'ACTIVO') {
+                    id_estado = 1;
+                }
+                else if (estado.toUpperCase() === 'INACTIVO') {
+                    id_estado = 2;
+                }
+                //Obtener id de la nacionalidad
+                const id_nacionalidad = yield database_1.default.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1', [nacionalidad.toUpperCase()]);
+                //Obtener id del rol
+                const id_rol = yield database_1.default.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [rol.toUpperCase()]);
+                // Incrementar el valor del código
+                codigo = codigo + 1;
+                var fec_nacimi = new Date((0, moment_1.default)(fec_nacimiento).format('YYYY-MM-DD'));
+                console.log('codigo: ', codigo);
+                console.log('cedula: ', cedula, ' usuario: ', usuario, ' contrasena: ', contrasena);
+                console.log('nombre: ', nombreE, ' usuario: ', apellidoE, ' fecha nacimien: ', fec_nacimi, ' estado civil: ', id_estado_civil);
+                console.log('genero: ', id_genero, ' estado: ', id_estado, ' nacionalidad: ', id_nacionalidad.rows, ' rol: ', id_rol);
+                // Registro de nuevo empleado
+                yield database_1.default.query('INSERT INTO empleados (cedula, apellido, nombre, esta_civil, genero, correo, ' +
+                    'fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo) VALUES ' +
+                    '($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)', [cedula, apellidoE, nombreE,
+                    id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
+                    domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo]);
+                // Obtener el id del empleado ingresado
+                const oneEmpley = yield database_1.default.query('SELECT id FROM empleados WHERE cedula = $1', [cedula]);
+                const id_empleado = oneEmpley.rows[0].id;
+                // Registro de los datos de usuario
+                yield database_1.default.query('INSERT INTO usuarios (usuario, contrasena, estado, id_rol, id_empleado, app_habilita) ' +
+                    'VALUES ($1, $2, $3, $4, $5, $6)', [usuario, contrasena, estado_user, id_rol.rows[0]['id'],
+                    id_empleado, app_habilita]);
+                if (contador === plantilla.length) {
+                    console.log('codigo_ver', codigo, VALOR.rows[0].id);
+                    // Actualización del código
+                    yield database_1.default.query('UPDATE codigo SET valor = $1 WHERE id = $2', [codigo, VALOR.rows[0].id]);
+                    return res.jsonp({ message: 'correcto' });
+                }
+                contador = contador + 1;
+                contrasena = undefined;
+            }));
         });
     }
     /** METODOS PARA VERIFICAR PLANTILLA CON CÓDIGO INGRESADO DE FORMA MANUAL */

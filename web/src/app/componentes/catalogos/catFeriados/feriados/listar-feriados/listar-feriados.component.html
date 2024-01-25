@@ -46,7 +46,7 @@
                                         *ngIf="mostrarbtnsubir"
                                         style="height: 64px;"
                                         matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
-                                        Subir nuevamente la plantilla
+                                        Subir nueva plantilla
                                     </label>
                                 </form>
                             </div>
@@ -59,7 +59,7 @@
                                     href="{{hipervinculo}}/plantillaD/documento/Feriados.xlsx">
                                     <span class="material-icons">cloud_download</span>
                                     <br>
-                                    Descargar plantilla feriados
+                                    Descargar plantilla
                                 </a>
                             </div>
                         </div>
@@ -178,27 +178,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>
-                                <mat-form-field id="t-inputs">
-                                    <input matInput placeholder="Buscar" [formControl]="descripcionF"
-                                        [(ngModel)]="filtroDescripcion" (keypress)="IngresarSoloLetras($event)">
-                                </mat-form-field>
-                            </td>
-                            <td>
-                                <mat-form-field id="t-inputs">
-                                    <input matInput placeholder="yyyy-mm-dd" [formControl]="fechaF"
-                                        [(ngModel)]="filtradoFecha">
-                                </mat-form-field>
-                            </td>
-                            <td></td>
-                            <td></td>
-                        </tr>
                         <tr
-                            *ngFor="let f of DataFeriados | filtroNombre: filtroDescripcion | filtroFecha: filtradoFecha | paginate:tamanio_pagina:numero_pagina ">
+                            *ngFor="let f of DataFeriados | paginate:tamanio_paginaMul:numero_paginaMul">
                             <td [style.color]="stiloTextoCelda(f.descripcion)" id="letras">{{f.descripcion}}</td>
                             <td  [style.color]="stiloTextoCelda(f.fecha)" style="font-size: 12px;">{{f.fecha}}</td>
-                            <td style="font-size: 12px;">{{f.fecha_recuperacion}}</td>
+                            <td style="font-size: 12px;">{{f.fec_recuperacion}}</td>
                             <td>
                                 <div style="width: 270px; margin: auto;">
                                     <div id="t-editar" class="circulo"  [style.background-color]="stiloCelda(f.observacion)"></div>
@@ -209,14 +193,11 @@
                     </tbody>
                 </table>
             </div>
-            <mat-paginator id="pagina" [length]="feriados.length" [pageSize]="tamanio_pagina"
-                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+            <mat-paginator [length]="DataFeriados.length" [pageSize]="tamanio_paginaMul"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
             </mat-paginator>
         </div>
     </div>
-
-
-
 </div>
 
 <!--  **************************** PANTALLA DE ASIGNAR CIUDADES A FERIADOS *********************************  -->

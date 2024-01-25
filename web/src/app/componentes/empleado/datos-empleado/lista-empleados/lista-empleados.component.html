@@ -5,17 +5,22 @@
                 <span>USUARIOS</span>
             </div>
             <mat-card class="example-card mat-elevation-z8">
-                <div class="d-flex flex-wrap justify-content-around" style="margin-top: 1%;">
-                    <button id="btn-raised" class="btn btn-sm" [routerLink]="['/registrarEmpleado']">
+                <div class="d-flex flex-wrap justify-content-around" style="margin-top: 1%; margin-bottom: 1%;">
+                    <button id="btn-raised" class="btn btn-sm" [routerLink]="['/registrarEmpleado']" *ngIf="!DataEmpleados">
                         Crear usuario
                     </button>
+                    <button *ngIf="DataEmpleados" id="btn-raised" class="btn btn-sm"  matSuffix (click)="registrarUsuariosMultiple()"
+                            matTooltipPosition="right" 
+                            matTooltip="Guardar registro multiple.">
+                            Registrar
+                         </button>
                     <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
                         matTooltipPosition="right"
                         matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
                         Mostrar lista
                     </button>
                 </div>
-                <div class="d-flex flex-wrap justify-content-around" style="margin-top: 1%;">
+                <div class="d-flex flex-wrap justify-content-around" style="margin-top: 1%;" *ngIf="!DataEmpleados">
                     <button mat-raised-button id="btn_listar" *ngIf="lista_inactivos" (click)="ListarInactivos()"
                         style="margin-bottom: 20px;" matSuffix matTooltipPosition="right"
                         matTooltip="Mostrar u ocultar tabla con lista de empleados inactivos.">
@@ -317,7 +322,10 @@
                         <td [style.color]="stiloTextoCelda(e.usuario)">{{e.usuario}}</td>
                         <td [style.color]="stiloTextoCelda(e.contrasena)">{{e.contrasena}}</td>
                         <td [style.color]="stiloTextoCelda(e.rol)">{{e.rol}}</td>
-                        <td style="width: 400px;">{{e.observacion}}</td>
+                        <td style="width: 400px;">
+                            <div id="t-editar" class="circulo"  [style.background-color]="stiloCelda(e.observacion)"></div>
+                            {{e.observacion}}
+                        </td>
                     </tr>
                 </tbody>
             </table>

@@ -846,6 +846,13 @@ class EmpleadoControlador {
           data.usuario = usuario;	data.contrasena = contrasena;	
           data.estado_user = estado_user; data.rol = rol,	
           data.app_habilita = app_habilita;
+
+          // Verificar si la variable tiene el formato de fecha correcto con moment
+          if (moment(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) {
+            console.log("La variable tiene el formato de fecha correcto.");
+          } else {
+            console.log("La variable no tiene el formato de fecha correcto.");
+          }
         
           if(duplicados.find((p: any)=> p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined)
           {
@@ -1262,30 +1269,16 @@ class EmpleadoControlador {
   }
 
   public async CargarPlantilla_Automatico(req: Request, res: Response): Promise<void> {
-    let list: any = req.files;
-    //let cadena = list.uploads[0].path;
-    //let filename = cadena.split("\\")[1];
-    //var filePath = `./plantillas/${filename}`
 
-    let separador = path.sep;
-    let ruta = ObtenerRutaLeerPlantillas() + separador + list;
-
-    //const workbook = excel.readFile(filePath);
-    const workbook = excel.readFile(ruta);
-    const sheet_name_list = workbook.SheetNames;
-    const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-
+    const plantilla  = req.body
+    console.log('datos2: ',plantilla);
     
-
-    
-
-
-
-    /*
     const VALOR = await pool.query('SELECT * FROM codigo');
     //TODO Revisar max codigo
     var codigo = parseInt(VALOR.rows[0].valor);
     var contador = 1;
+    
+    
     plantilla.forEach(async (data: any) => {
 
       // Realiza un capital letter a los nombres y apellidos
@@ -1314,8 +1307,8 @@ class EmpleadoControlador {
       }
 
       // Encriptar contraseña
-      const md5 = new Md5();
-      const contrasena = md5.appendStr(data.contrasena).end();
+      var md5 = new Md5();
+      var contrasena = md5.appendStr(data.contrasena).end()?.toString();
 
       // Datos que se leen de la plantilla ingresada
       const { cedula, estado_civil, genero, correo, fec_nacimiento, estado, domicilio, telefono,
@@ -1323,7 +1316,7 @@ class EmpleadoControlador {
 
       //Obtener id del estado_civil
       var id_estado_civil = 0;
-      if (estado_civil.toUpperCase() === 'SOLTERA/A') {
+      if (estado_civil.toUpperCase() === 'SOLTERO/A') {
         id_estado_civil = 1;
       }
       else if (estado_civil.toUpperCase() === 'UNION DE HECHO') {
@@ -1366,7 +1359,14 @@ class EmpleadoControlador {
 
       // Incrementar el valor del código
       codigo = codigo + 1;
+      var fec_nacimi = new Date(moment(fec_nacimiento).format('YYYY-MM-DD'));
 
+      console.log('codigo: ',codigo)
+      console.log('cedula: ',cedula, ' usuario: ',usuario, ' contrasena: ',contrasena);
+      console.log('nombre: ',nombreE, ' usuario: ',apellidoE,' fecha nacimien: ', fec_nacimi,' estado civil: ',id_estado_civil);
+      console.log('genero: ',id_genero, ' estado: ',id_estado, ' nacionalidad: ',id_nacionalidad.rows,' rol: ',id_rol);
+
+      
       // Registro de nuevo empleado
       await pool.query('INSERT INTO empleados (cedula, apellido, nombre, esta_civil, genero, correo, ' +
         'fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo) VALUES ' +
@@ -1389,18 +1389,14 @@ class EmpleadoControlador {
         await pool.query('UPDATE codigo SET valor = $1 WHERE id = $2', [codigo, VALOR.rows[0].id]);
         return res.jsonp({ message: 'correcto' });
       }
-      contador = contador + 1;
-    });
-    */
 
-    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-    fs.access(ruta, fs.constants.F_OK, (err) => {
-      if (err) {
-      } else {
-        // ELIMINAR DEL SERVIDOR
-        fs.unlinkSync(ruta);
-      }
+      
+     
+      contador = contador + 1;
+      contrasena = undefined
     });
+    
+    
   }
 
   /** METODOS PARA VERIFICAR PLANTILLA CON CÓDIGO INGRESADO DE FORMA MANUAL */
