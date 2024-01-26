@@ -1,7 +1,7 @@
 <div class="container" style="padding-top: 15px">
   <mat-card class="example-card mat-elevation-z8">
     <div id="titulo">
-      <span>DETALLES DE EMPLEADOS ACTIVOS</span>
+      <span>DETALLES DE USUARIOS {{opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}}</span>
       <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
         matTooltip="Regresar">
         <i class="fas fa-arrow-left"></i>
@@ -10,31 +10,33 @@
     <mat-card-content>
       <div class="container" style="padding-bottom: 25px; text-align: center; margin-top: 0.5rem">
         <div class="table-responsive">
-          <table class="table table-hover table-sm">
+          <table class="table table-hover table-sm" id="detalle">
             <thead class="thead-light">
               <tr style="text-align: center">
-                <th scope="col" rowspan="2">N°</th>
-                <th scope="col" rowspan="2">CÓDIGO</th>
-                <th scope="col" rowspan="2">EMPLEADO</th>
-                <th scope="col" rowspan="2">CÉDULA</th>
-                <th scope="col" rowspan="2">RÉGIMEN</th>
-                <th scope="col" rowspan="2">SUCURSAL</th>
-                <th scope="col" rowspan="2">DEPARTAMENTO</th>
-                <th scope="col" rowspan="2">CARGO</th>
-                <th scope="col" colspan="2">CORREO</th>
+                <th class="t_horarios" scope="col" rowspan="2">N°</th>
+                <th class="t_horarios" scope="col" rowspan="2">CÓDIGO</th>
+                <th class="t_horarios" scope="col" rowspan="2">EMPLEADO</th>
+                <th class="t_horarios" scope="col" rowspan="2">CÉDULA</th>
+                <th class="t_horarios" scope="col" rowspan="2">SUCURSAL</th>
+                <th class="t_horarios" scope="col" rowspan="2">CIUDAD</th>
+                <th class="t_horarios" scope="col" rowspan="2">RÉGIMEN</th>
+                <th class="t_horarios" scope="col" rowspan="2">DEPARTAMENTO</th>
+                <th class="t_horarios" scope="col" rowspan="2">CARGO</th>
+                <th class="t_horarios" scope="col" colspan="2">CORREO</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let e of arr_emp | paginate : tamanio_pagina : numero_pagina">
-                <td>{{ e.n }}</td>
-                <td>{{ e.codigo }}</td>
-                <td>{{ e.name_empleado.toUpperCase() }}</td>
-                <td>{{ e.cedula }}</td>
-                <td>{{ bool_car? e.regimen : e.regimen[0].name_regimen }}</td>
-                <td>{{ e.sucursal }}</td>
-                <td>{{ e.departamento }}</td>
-                <td>{{ e.cargo }}</td>
-                <td>{{ e.correo }}</td>
+                <td class="t_horarios">{{ e.n }}</td>
+                <td class="t_horarios">{{ e.codigo }}</td>
+                <td class="t_horarios">{{ e.name_empleado.toUpperCase() }}</td>
+                <td class="t_horarios">{{ e.cedula }}</td>
+                <td class="t_horarios">{{ e.sucursal }}</td>
+                <td class="t_horarios">{{ e.ciudad }}</td>
+                <td class="t_horarios">{{ bool_car? e.regimen : e.regimen[0].name_regimen }}</td>
+                <td class="t_horarios">{{ e.departamento }}</td>
+                <td class="t_horarios">{{ e.cargo }}</td>
+                <td class="t_horarios">{{ e.correo }}</td>
               </tr>
             </tbody>
           </table>

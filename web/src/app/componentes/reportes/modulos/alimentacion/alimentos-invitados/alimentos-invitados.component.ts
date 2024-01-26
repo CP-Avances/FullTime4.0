@@ -205,7 +205,7 @@ export class AlimentosInvitadosComponent implements OnInit {
             },
             {
               text: [{
-                text: '© Pag ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', opacity: 0.3
+                text: '© Pag ' + currentPage.toString() + ' de ' + pageCount, alignment: 'right', opacity: 0.3
               }],
             }
           ], fontSize: 10
@@ -410,7 +410,7 @@ export class AlimentosInvitadosComponent implements OnInit {
             },
             {
               text: [{
-                text: '© Pag ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', opacity: 0.3
+                text: '© Pag ' + currentPage.toString() + ' de ' + pageCount, alignment: 'right', opacity: 0.3
               }],
             }
           ], fontSize: 10
@@ -431,7 +431,7 @@ export class AlimentosInvitadosComponent implements OnInit {
     };
   }
 
-  /****************************************************************************************************** 
+  /******************************************************************************************************
      *                                       METODO PARA EXPORTAR A EXCEL
      ******************************************************************************************************/
   exportToExcelAlimentacion(form: any) {

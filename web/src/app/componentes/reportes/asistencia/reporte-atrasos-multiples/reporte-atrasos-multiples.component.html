@@ -35,7 +35,7 @@
                     </button>
                 </div>
                 <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
-                    <app-opcion-usuario (tipoUsuarioChange)="ObtenerTipoUsuario($event)"></app-opcion-usuario>
+                    <app-opcion-usuario (tipoUsuarioCambio)="ObtenerTipoUsuario($event)"></app-opcion-usuario>
                 </div>
             </mat-card>
         </div>
@@ -256,7 +256,7 @@
 <div class="container" style="padding-top: 15px" [hidden]="!verDetalle">
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
-            <span>DETALLES DE ATRASOS</span>
+            <span>DETALLES DE ATRASOS - USUARIOS {{opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}}</span>
             <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
                 matTooltip="Regresar">
                 <i class="fas fa-arrow-left"></i>
@@ -272,19 +272,19 @@
                                 <th class="t_horarios" scope="col" rowspan="2">CÓDIGO</th>
                                 <th class="t_horarios" scope="col" rowspan="2">EMPLEADO</th>
                                 <th class="t_horarios" scope="col" rowspan="1" colspan="2">HORARIO</th>
-                                <th class="t_horarios" scope="col" rowspan="1" colspan="2">TIMBRE</th>
+                                <th class="t_horarios timbre" scope="col" rowspan="1" colspan="2">TIMBRE</th>
                                 <th class="t_horarios" scope="col" rowspan="2">TIPO PERMISO</th>
                                 <th class="t_horarios" scope="col" rowspan="2">DESDE</th>
                                 <th class="t_horarios" scope="col" rowspan="2">HASTA</th>
                                 <th class="t_horarios" scope="col" rowspan="2" colspan="2">PERMISO</th>
-                                <th class="t_horarios" scope="col" rowspan="2" *ngIf="tolerancia!=='1'">TOLERANCIA</th>                             
+                                <th class="t_horarios" scope="col" rowspan="2" *ngIf="tolerancia!=='1'">TOLERANCIA</th>
                                 <th class="t_horarios" scope="col" rowspan="2" colspan="2">ATRASO</th>
                             </tr>
                             <tr style="text-align: center">
-                                <th scope="col" rowspan="1">FECHA</th>
-                                <th scope="col" rowspan="1">HORA</th>
-                                <th scope="col" rowspan="1">FECHA</th>
-                                <th scope="col" rowspan="1">HORA</th>
+                                <th class="t_horarios" scope="col" rowspan="1">FECHA</th>
+                                <th class="t_horarios" scope="col" rowspan="1">HORA</th>
+                                <th class="t_horarios timbre" scope="col" rowspan="1">FECHA</th>
+                                <th class="t_horarios timbre" scope="col" rowspan="1">HORA</th>
                             </tr>
                         </thead>
                         <tbody>

@@ -479,7 +479,6 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
     this.timbres = [];
     let n = 0;
     let accionT = '';
-    console.log(this.data_pdf);
     this.data_pdf.forEach((obj1: IReporteTimbres) => {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
@@ -572,8 +571,8 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
     const txt = this.timbres.map((timbre: TimbreMrl) => {
       return [
         timbre.cedula,
-        timbre.fecha_hora,
         timbre.accion,
+        timbre.fecha_hora,
       ].join(";");
     }).join("\n");
 
@@ -582,7 +581,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
 
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'Timbres_mrl.txt';
+    a.download = `Timbres_mrl_usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.txt`;
 
     document.body.appendChild(a);
     a.click();

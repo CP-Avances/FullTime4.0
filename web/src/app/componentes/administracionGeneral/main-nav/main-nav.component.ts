@@ -613,6 +613,17 @@ export class MainNavComponent implements OnInit {
               { name: 'Servicios Invitados', url: '/alimentosInvitados', color: true },
             ]
           },
+          {
+            name: 'Análisis Datos',
+            accion: this.HabilitarAlimentacion,
+            estado: true,
+            icono: 'dashboard',
+            subtitulo: true,
+            color: true,
+            children: [
+              { name: 'Análisis Datos', url: '/analisisDatos', color: true },
+            ]
+          },
           /*   {
                name: 'Estadísticos',
                accion: true,

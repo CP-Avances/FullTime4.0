@@ -37,14 +37,9 @@ export class TituloService {
     return this.http.put(`${environment.url}/titulo`, datos);
   }
 
-
-
-
-
-
-
-
-
+  RevisarFormato(formData) {
+    return this.http.post<any>(environment.url + '/titulo/upload/revision', formData);
+  }
 
 
   // Catálogo de títulos

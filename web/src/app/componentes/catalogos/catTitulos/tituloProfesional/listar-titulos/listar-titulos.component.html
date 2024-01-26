@@ -6,8 +6,14 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                    <button id="btn-raised"  class="btn btn-sm" (click)="AbrirVentanaRegistrarTitulo()">
+                    <button *ngIf="!DataTitulosProfesionales"
+                        id="btn-raised"  class="btn btn-sm" (click)="AbrirVentanaRegistrarTitulo()">
                         Crear título profesional
+                    </button>
+                    <button *ngIf="DataTitulosProfesionales" id="btn-raised" class="btn btn-sm" (click)="registrarTitulos()" matSuffix 
+                        matTooltipPosition="right" 
+                        matTooltip="Guardar registro multiple.">
+                        Registrar
                     </button>
                     <button id="btn-raised"  class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
                         matTooltipPosition="right"
@@ -17,9 +23,48 @@
                 </div>
             </mat-card>
         </div>
+
+        <!------------------ Registro multiple de establecimientos ------------------------------------->
+        <div class="col-md">
+            <div id="titulo">
+                <span>REGISTRO MULTIPLE</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9">
+                <div class="row">
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-around">
+                            <form method="post" enctype="multipart/form-data" style="margin: 2% 0% -1% 0%;">
+                                <input type="file" (change)="FileChange($event)" [formControl]="archivoForm"
+                                    id="file"
+                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
+                                    *ngIf="!mostrarbtnsubir"
+                                    style="height: 64px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre Titulos_profesionales.">
+                                    Subir niveles
+                                </label>
+                                <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
+                                    *ngIf="mostrarbtnsubir"
+                                    style="height: 64px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre Titulos_profesionales.">
+                                    Subir nuevamente niveles
+                                </label>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="d-flex flex-wrap justify-content-around" >
+                           
+                        </div>
+                    </div>
+                </div>
+            </mat-card>
+        </div>
     </div>
 </div>
-<div class="container" style="padding-bottom: 50px; text-align: center;">
+
+<!------------------ LISTA DE TITULOS PROFESIONALES ------------------------------------------------->
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!DataTitulosProfesionales">
     <div class="mat-elevation-z8" style="background: white;">
         <div id="resultados">RESULTADO DE BÚSQUEDA</div>
         <div class="table-responsive">
@@ -94,5 +139,40 @@
         <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: -1%; color: rgb(158, 154, 154);">
             <p> Reporte de títulos profesionales. </p>
         </div>
+    </div>
+</div>
+
+<!---------------------- TABLA DE DATOS DE LA CARGA MULTIPLE ----------------------------------->
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="DataTitulosProfesionales">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="resultados">
+            REGISTRO MULTIPLE
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm ">
+                <thead class="thead-light">
+                    <tr style="text-align: center;">
+                        <th scope="col">Titulo</th>
+                        <th scope="col">Nivel</th>
+                        <th scope="col">Observación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let data of DataTitulosProfesionales">
+                        <td [style.color]="stiloTextoCelda(data.titulo)">{{ data.titulo}}</td>
+                        <td [style.color]="stiloTextoCelda(data.nivel)">{{ data.nivel}}</td>
+                        <td>
+                            <div style="width: 270px; margin: auto;">
+                                <div id="t-editar" class="circulo"  [style.background-color]="stiloCelda(data.observacion)"></div>
+                                {{ data.observacion}}
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="DataTitulosProfesionales.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
     </div>
 </div>

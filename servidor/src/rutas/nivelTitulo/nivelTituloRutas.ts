@@ -2,6 +2,23 @@ import { Router } from 'express';
 import NIVEL_TITULO_CONTROLADOR from '../../controlador/nivelTitulo/nivelTituloControlador';
 import { TokenValidation } from '../../libs/verificarToken'
 
+import multer from 'multer';
+import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+
+const storage = multer.diskStorage({
+
+    destination: function (req, file, cb) {
+        cb(null, ObtenerRutaLeerPlantillas())
+    },
+    filename: function (req, file, cb) {
+        let documento = file.originalname;
+
+        cb(null, documento);
+    }
+})
+
+const upload = multer({ storage: storage });
+
 class NivelTituloRutas {
     public router: Router = Router();
 
@@ -23,13 +40,9 @@ class NivelTituloRutas {
         // METODO PARA BUSCAR NIVEL POR SU NOMBRE
         this.router.get('/buscar/:nombre', TokenValidation, NIVEL_TITULO_CONTROLADOR.ObtenerNivelNombre);
 
-
-
         this.router.get('/:id', TokenValidation, NIVEL_TITULO_CONTROLADOR.getOne);
 
-
-
-
+        this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], NIVEL_TITULO_CONTROLADOR.RevisarDatos);
 
     }
 }

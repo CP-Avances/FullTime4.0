@@ -249,7 +249,7 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -305,7 +305,7 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
             {
               text: [
                 {
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
+                  text: '© Pag ' + currentPage.toString() + ' de ' + pageCount,
                   alignment: 'right', opacity: 0.3
                 }
               ],
@@ -474,7 +474,7 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
     return valor
   }
 
-  /** ************************************************************************************************** * 
+  /** ************************************************************************************************** *
    ** *                                     METODO PARA EXPORTAR A EXCEL                                 *
    ** ************************************************************************************************** */
   exportToExcel(tipo: string): void {
@@ -515,13 +515,13 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
    ** *            VARIOS METODOS COMPLEMENTARIOS AL FUNCIONAMIENTO                         *
    ** ************************************************************************************* */
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedSuc() {
     const numSelected = this.selectionSuc.selected.length;
     return numSelected === this.sucursales.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleSuc() {
     this.isAllSelectedSuc() ?
       this.selectionSuc.clear() :
@@ -536,13 +536,13 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
     return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedDep() {
     const numSelected = this.selectionDep.selected.length;
     return numSelected === this.departamentos.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionDep.clear() :
@@ -557,13 +557,13 @@ export class SolicitudVacacionComponent implements OnInit, OnDestroy {
     return `${this.selectionDep.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedEmp() {
     const numSelected = this.selectionEmp.selected.length;
     return numSelected === this.empleados.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :

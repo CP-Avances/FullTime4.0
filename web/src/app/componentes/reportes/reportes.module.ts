@@ -44,6 +44,8 @@ import { ReportePlanificacionHorariaComponent } from './asistencia/reporte-plani
 import { ReporteResumenAsistenciaComponent } from './asistencia/reporte-resumen-asistencia/reporte-resumen-asistencia.component';
 import { OpcionUsuarioComponent } from './configuracion-reportes/opcion-usuario/opcion-usuario.component';
 import { TimbreMrlComponent } from './timbres/timbre-mrl/timbre-mrl.component';
+import { AnalisisDatosComponent } from './analisis-datos/analisis-datos.component';
+
 @NgModule({
   declarations: [
     RangoFechasComponent,
@@ -82,6 +84,7 @@ import { TimbreMrlComponent } from './timbres/timbre-mrl/timbre-mrl.component';
     ReporteResumenAsistenciaComponent,
     OpcionUsuarioComponent,
     TimbreMrlComponent,
+    AnalisisDatosComponent,
   ],
   exports: [
     ReporteFaltasComponent,
@@ -107,7 +110,7 @@ import { TimbreMrlComponent } from './timbres/timbre-mrl/timbre-mrl.component';
     ReactiveFormsModule,
     AppRoutingModule,
     MaterialModule,
-    FiltrosModule
+    FiltrosModule,
   ]
 })
 export class ReportesModule { }

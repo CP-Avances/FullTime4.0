@@ -67,6 +67,7 @@ export class FeriadosService {
   }
 
   RevisarFormato(formData) {
+    console.log('formDataferiados: ',formData);
     return this.http.post<any>(environment.url + '/feriados/upload/revision', formData);
   }
 

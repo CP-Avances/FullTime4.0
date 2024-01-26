@@ -24,6 +24,7 @@ import { TitulosComponent } from '../titulos/titulos.component'
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { TituloService } from 'src/app/servicios/catalogos/catTitulos/titulo.service';
+import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulos.service';
 
 @Component({
   selector: 'app-listar-titulos',
@@ -46,6 +47,8 @@ export class ListarTitulosComponent implements OnInit {
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   nombreF = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
   nivelF = new FormControl('', [Validators.pattern("[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]{2,48}")]);
+
+  archivoForm = new FormControl('', Validators.required);
 
   // ASIGNACION DE VALIDACIONES A INPUTS DEL FORMULARIO
   public formulario = new FormGroup({
@@ -71,12 +74,14 @@ export class ListarTitulosComponent implements OnInit {
     public rest: TituloService, // SERVICIO DATOS DE TITULOS
     private toastr: ToastrService, // VARIABLE DE MANEJO DE MENSAJES DE NOTIFICACIONES
     private plantillaPDF: PlantillaReportesService, // SERVICIO DATOS DE EMPRESA
+    public nivel: NivelTitulosService,
   ) { }
 
   ngOnInit(): void {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerTitulos();
+    this.ObtenerNiveles();
   }
 
   // EVENTO PARA MOSTRAR NUMERO DE FILAS DETERMINADAS EN LA TABLA
@@ -97,6 +102,17 @@ export class ListarTitulosComponent implements OnInit {
   ObtenerTitulos() {
     this.rest.ListarTitulos().subscribe(data => {
       this.verTitulos = data;
+      console.log('titulos: ',this.verTitulos);
+    });
+  }
+
+  nivelTitulos: any = [];
+  // METODO DE BUSQUEDA DE DATOS DE NIVELES
+  ObtenerNiveles() {
+    this.nivelTitulos = [];
+    this.nivel.ListarNiveles().subscribe(res => {
+      this.nivelTitulos = res;
+      console.log('this.nivelTitulos: ',this.nivelTitulos);
     });
   }
 
@@ -124,11 +140,14 @@ export class ListarTitulosComponent implements OnInit {
 
   // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
+    this.DataTitulosProfesionales = null;
     this.formulario.setValue({
       nombreForm: '',
       nivelForm: ''
     });
     this.ObtenerTitulos();
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = false;
   }
 
   // METODO PARA VALIDAR INGRESO DE LETRAS
@@ -183,6 +202,132 @@ export class ListarTitulosComponent implements OnInit {
         }
       });
   }
+
+
+  // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
+  nameFile: string;
+  archivoSubido: Array<File>;
+  mostrarbtnsubir: boolean = false;
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE FERIADOS -----------------------------------------------------------------
+  FileChange(element: any) {
+    this.archivoSubido = [];
+    this.nameFile = '';
+    this.archivoSubido = element.target.files;
+    this.nameFile = this.archivoSubido[0].name;
+    let arrayItems = this.nameFile.split(".");
+    let itemExtencion = arrayItems[arrayItems.length - 1];
+    let itemName = arrayItems[0].slice(0, 25);
+    console.log('itemName: ',itemName);
+    if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
+      if (itemName.toLowerCase() == 'titulos_profesionales') {
+        this.Revisarplantilla();
+      } else {
+        this.toastr.error('Seleccione plantilla con nombre Titulos_profesionales', 'Plantilla seleccionada incorrecta', {
+          timeOut: 6000,
+        });
+        
+        this.nameFile = '';
+      }
+    } else {
+      this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
+        timeOut: 6000,
+      });
+      
+      this.nameFile = '';
+    }
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = true;
+  }
+
+  DataTitulosProfesionales: any;
+  listTitulosCorrectos: any = [];
+  // METODO PARA ENVIAR MENSAJES DE ERROR O CARGAR DATOS SI LA PLANTILLA ES CORRECTA
+  Revisarplantilla(){
+    this.listTitulosCorrectos = [];
+    let formData = new FormData();
+    for (var i = 0; i < this.archivoSubido.length; i++) {
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
+    }
+  
+    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    this.rest.RevisarFormato(formData).subscribe(res => {
+      this.DataTitulosProfesionales = res.data;
+      
+      console.log('probando plantilla1', this.DataTitulosProfesionales);
+
+      this.DataTitulosProfesionales.forEach(item => {
+        if( item.observacion.toLowerCase() === 'ok'){
+          this.listTitulosCorrectos.push(item);
+        }
+      });
+      
+    });
+      
+  }
+
+   //Metodo para dar color a las celdas y representar las validaciones
+   colorCelda: string = ''
+   stiloCelda(observacion: string): string{
+     if(observacion == 'ok'){
+       return 'rgb(159, 221, 154)';
+     }else if(observacion == 'Ya esta registrado en base'){
+       return 'rgb(239, 203, 106)';
+     }else if(observacion == 'Registro duplicado'){
+       return 'rgb(156, 214, 255)';
+     }else{
+       return 'rgb(251, 73, 18)';
+     }
+   }
+ 
+   colorTexto: string = '';
+   stiloTextoCelda(texto: string): string{    
+     let arrayObservacion = texto.split(" ");
+     if(arrayObservacion[0] == 'No'){
+       return 'rgb(255, 80, 80)';
+     }else{
+       return 'black'
+     }
+     
+   }
+
+   registrarTitulos(){
+    var data: any = {
+      nombre: '',
+      id_nivel: ''
+    }
+    
+    if(this.listTitulosCorrectos.length > 0){
+      console.log('listTitulosCorrectos', this.listTitulosCorrectos);
+      var cont = 0;
+      this.listTitulosCorrectos.forEach(item => {
+        this.nivelTitulos.forEach(valor => {
+          if(item.nivel.toLowerCase() == valor.nombre.toLowerCase()){
+            data.nombre = item.titulo;
+            data.id_nivel = valor.id;
+            this.rest.RegistrarTitulo(data).subscribe(res => {
+              cont = cont + 1;
+              if(this.listTitulosCorrectos.length  == cont){
+                this.toastr.success('Operación exitosa.', 'Plantilla de Titulos profesionales importada.', {
+                  timeOut: 1500,
+                });
+                this.LimpiarCampos();
+              }
+            })
+
+            data = {}
+          }
+        })
+      })
+    }else{
+      this.toastr.error('La plantilla no tiene ningun titulo para registrar ingrese otra', 'Plantilla no aceptada', {
+        timeOut: 4000,
+      });
+      this.archivoForm.reset();
+    }
+
+    this.archivoSubido = [];
+    this.nameFile = '';
+   }
 
 
   /** ************************************************************************************************* **

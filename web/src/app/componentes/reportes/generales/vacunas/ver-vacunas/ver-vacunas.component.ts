@@ -1,5 +1,5 @@
 // IMPORTAR LIBRERIAS
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
 
@@ -30,6 +30,8 @@ export class VerVacunasComponent implements OnInit {
   @Input() data: any;
   @Input() tipo: string;
   @Input() verDetalle: boolean;
+  @Input() opcionBusqueda: number;
+  @Output() regresar = new EventEmitter<boolean>();
 
   bool_suc: boolean = false;
   bool_reg: boolean = false;
@@ -73,7 +75,7 @@ export class VerVacunasComponent implements OnInit {
   }
 
   /** ****************************************************************************************** **
-   ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                     BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** ****************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -149,7 +151,7 @@ export class VerVacunasComponent implements OnInit {
     }
   }
 
-  /** ****************************************************************************************** ** 
+  /** ****************************************************************************************** **
    ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
    ** ****************************************************************************************** **/
   ExtraerDatos() {
@@ -161,7 +163,7 @@ export class VerVacunasComponent implements OnInit {
           obj3.vacunas.forEach((obj4: any) => {
             const fecha = this.validacionService.FormatearFecha(
               obj4.fecha.split('T')[0],
-              this.formato_fecha, 
+              this.formato_fecha,
               this.validacionService.dia_abreviado);
 
             n = n + 1;
@@ -198,7 +200,7 @@ export class VerVacunasComponent implements OnInit {
         obj2.vacunas.forEach((obj3: any) => {
           const fecha = this.validacionService.FormatearFecha(
             obj3.fecha.split('T')[0],
-            this.formato_fecha, 
+            this.formato_fecha,
             this.validacionService.dia_abreviado);
 
           n = n + 1;
@@ -249,7 +251,7 @@ export class VerVacunasComponent implements OnInit {
   }
 
   /** ****************************************************************************************** **
-   **                              COLORES Y LOGO PARA EL REPORTE                                ** 
+   **                              COLORES Y LOGO PARA EL REPORTE                                **
    ** ****************************************************************************************** **/
 
   ObtenerLogo() {
@@ -280,7 +282,7 @@ export class VerVacunasComponent implements OnInit {
 
   GenerarPDF(action: any) {
     const documentDefinition = this.GetDocumentDefinicion();
-    let doc_name = 'Vacunas.pdf';
+    let doc_name = `Vacunas_usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.pdf`;
     switch (action) {
       case 'open':
         pdfMake.createPdf(documentDefinition).open();
@@ -334,7 +336,7 @@ export class VerVacunasComponent implements OnInit {
             {
               text: [
                 {
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
+                  text: '© Pag ' + currentPage.toString() + ' de ' + pageCount,
                   alignment: 'right',
                   opacity: 0.3,
                 },
@@ -354,7 +356,7 @@ export class VerVacunasComponent implements OnInit {
           margin: [0, -30, 0, 5],
         },
         {
-          text: 'REGISTRO DE VACUNACIÓN',
+          text: `REGISTRO DE VACUNACIÓN - ${this.opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}`,
           bold: true,
           fontSize: 12,
           alignment: 'center',
@@ -494,7 +496,7 @@ export class VerVacunasComponent implements OnInit {
                 ...obj2.vacunas.map((obj3: any) => {
                   const fecha = this.validacionService.FormatearFecha(
                     obj3.fecha.split('T')[0],
-                    this.formato_fecha, 
+                    this.formato_fecha,
                     this.validacionService.dia_abreviado);
                   return [
                     {
@@ -632,7 +634,7 @@ export class VerVacunasComponent implements OnInit {
                   ...obj2.vacunas.map((obj3: any) => {
                     const fecha = this.validacionService.FormatearFecha(
                       obj3.fecha.split('T')[0],
-                      this.formato_fecha, 
+                      this.formato_fecha,
                       this.validacionService.dia_abreviado);
                     return [
                       {
@@ -668,7 +670,7 @@ export class VerVacunasComponent implements OnInit {
     return valor;
   }
 
-  /** ****************************************************************************************** ** 
+  /** ****************************************************************************************** **
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
@@ -678,7 +680,7 @@ export class VerVacunasComponent implements OnInit {
     );
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Vacunas');
-    xlsx.writeFile(wb, 'Vacunas.xlsx');
+    xlsx.writeFile(wb, `Vacunas_usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.xlsx`);
   }
 
   EstructurarDatosExcel(array: Array<any>) {
@@ -697,14 +699,13 @@ export class VerVacunasComponent implements OnInit {
               'Nombre Empleado': obj3.name_empleado,
               Cédula: obj3.cedula,
               Género: obj3.genero == 1 ? 'M' : 'F',
-              Ciudad: obj1.ciudad,
               Sucursal: obj1.name_suc,
+              Ciudad: obj1.ciudad,
               Régimen: regimen,
               Departamento: obj2.name_dep,
               Cargo: obj3.cargo,
               Correo: obj3.correo,
-              Carnet: obj4.carnet,
-              'Nombre carnet': obj4.carnet,
+              Carnet: obj4.carnet?.length ? 'Si' : 'No',
               Vacuna: obj4.tipo_vacuna,
               Fecha: obj4.fecha.split('T')[0],
               Descripción: obj4.descripcion,
@@ -723,7 +724,7 @@ export class VerVacunasComponent implements OnInit {
     );
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Vacunas');
-    xlsx.writeFile(wb, 'Vacunas.xlsx');
+    xlsx.writeFile(wb, `Vacunas_usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.xlsx`);
   }
 
   EstructurarDatosExcelRegimenCargo(array: Array<any>) {
@@ -739,14 +740,13 @@ export class VerVacunasComponent implements OnInit {
             'Nombre Empleado': obj2.name_empleado,
             Cédula: obj2.cedula,
             Género: obj2.genero == 1 ? 'M' : 'F',
-            Ciudad: obj2.ciudad,
             Sucursal: obj2.sucursal,
+            Ciudad: obj2.ciudad,
             Régimen: this.bool_car ? obj2.regimen : obj2.regimen[0].name_regimen,
             Departamento: obj2.departamento,
             Cargo: obj2.cargo,
             Correo: obj2.correo,
-            Carnet: obj3.carnet,
-            'Nombre carnet': obj3.carnet,
+            Carnet: obj3.carnet?.length ? 'Si' : 'No',
             Vacuna: obj3.tipo_vacuna,
             Fecha: obj3.fecha.split('T')[0],
             Descripción: obj3.descripcion,
@@ -767,5 +767,6 @@ export class VerVacunasComponent implements OnInit {
   // METODO PARA REGRESAR A LA PAGINA ANTERIOR
   Regresar() {
     this.vacuna.verDetalle = false;
+    this.regresar.emit(true);
   }
 }

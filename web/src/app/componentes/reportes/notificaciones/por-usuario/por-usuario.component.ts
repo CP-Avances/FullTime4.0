@@ -103,7 +103,7 @@ export class PorUsuarioComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -134,7 +134,7 @@ export class PorUsuarioComponent implements OnInit {
     }
   }
 
-  // LISTA DE VACACIONES 
+  // LISTA DE VACACIONES
   usuarios_vacaciones: any = [];
   ListarUsuariosVacaciones(forma: any) {
     if (forma === 'E') {
@@ -153,7 +153,7 @@ export class PorUsuarioComponent implements OnInit {
     }
   }
 
-  // LISTA DE EXTRAS 
+  // LISTA DE EXTRAS
   usuarios_extras: any = [];
   ListarUsuariosExtras(forma: any) {
     if (forma === 'E') {
@@ -172,7 +172,7 @@ export class PorUsuarioComponent implements OnInit {
     }
   }
 
-  // LISTA DE VACACIONES 
+  // LISTA DE VACACIONES
   usuarios_comidas: any = [];
   ListarUsuariosComidas(forma: any) {
     if (forma === 'E') {
@@ -380,7 +380,7 @@ var documentDefinition: any;
             {
               text: [
                 {
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
+                  text: '© Pag ' + currentPage.toString() + ' de ' + pageCount,
                   alignment: 'right', opacity: 0.3
                 }
               ],
@@ -524,7 +524,7 @@ var documentDefinition: any;
             {
               text: [
                 {
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
+                  text: '© Pag ' + currentPage.toString() + ' de ' + pageCount,
                   alignment: 'right', opacity: 0.3
                 }
               ],
@@ -673,7 +673,7 @@ var documentDefinition: any;
             {
               text: [
                 {
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
+                  text: '© Pag ' + currentPage.toString() + ' de ' + pageCount,
                   alignment: 'right', opacity: 0.3
                 }
               ],
@@ -816,7 +816,7 @@ var documentDefinition: any;
             {
               text: [
                 {
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
+                  text: '© Pag ' + currentPage.toString() + ' de ' + pageCount,
                   alignment: 'right', opacity: 0.3
                 }
               ],

@@ -139,6 +139,7 @@ import { VerEmpleadosDetalleComponent } from './componentes/reportes/generales/e
 import { VerVacunasComponent } from './componentes/reportes/generales/vacunas/ver-vacunas/ver-vacunas.component';
 import { BuscarAsistenciaComponent } from './componentes/horarios/asistencia/buscar-asistencia/buscar-asistencia.component';
 import { ReporteTiempoAlimentacionComponent } from './componentes/reportes/asistencia/reporte-tiempo-alimentacion/reporte-tiempo-alimentacion.component';
+import { AnalisisDatosComponent } from './componentes/reportes/analisis-datos/analisis-datos.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -194,6 +195,7 @@ const routes: Routes = [
   { path: 'solicitud-vacacion', component: SolicitudVacacionComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'reporte-timbre-sistema', component: TimbreSistemaComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'reporte-timbre-reloj-virtual', component: TimbreVirtualComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'analisisDatos', component: AnalisisDatosComponent, canActivate: [AuthGuard], data: {roles: 1} },
 
   //DETALLE REPORTES
   { path: 'ver-empleados-activos-detalle/:tipo', component: VerEmpleadosDetalleComponent, canActivate: [AuthGuard], data: { roles: 1 } },

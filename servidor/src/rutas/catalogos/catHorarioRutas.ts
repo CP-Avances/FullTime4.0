@@ -4,34 +4,27 @@ import multer from 'multer';
 import path from 'path';
 
 import HORARIO_CONTROLADOR from '../../controlador/catalogos/catHorarioControlador';
-import { ObtenerRutaHorarios } from '../../libs/accesoCarpetas';
+import { ObtenerRutaHorarios, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import moment from 'moment';
 
 const storage = multer.diskStorage({
 
-
     destination: function (req, file, cb) {
-        cb(null, ObtenerRutaHorarios())
+        cb(null, ObtenerRutaLeerPlantillas())
     },
     filename: function (req, file, cb) {
         // FECHA DEL SISTEMA
-        var fecha = moment();
-        var anio = fecha.format('YYYY');
-        var mes = fecha.format('MM');
-        var dia = fecha.format('DD');
-        let { id, codigo } = req.params;
-        cb(null, id + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname)
+        //var fecha = moment();
+        //var anio = fecha.format('YYYY');
+        //var mes = fecha.format('MM');
+        //var dia = fecha.format('DD');
+        let documento = file.originalname;
+
+        cb(null, documento);
     }
 })
 
 const upload = multer({ storage: storage });
-
-
-const multipart = require('connect-multiparty');
-
-const multipartMiddleware = multipart({
-    uploadDir: './plantillas',
-});
 
 
 class HorarioRutas {
@@ -71,9 +64,9 @@ class HorarioRutas {
 
 
         // VERIFICAR DATOS DE LA PLANTILLA DE CATÁLOGO HORARIO Y LUEGO SUBIR AL SISTEMA
-        this.router.post('/cargarHorario/verificarDatos/upload', [TokenValidation, multipartMiddleware], HORARIO_CONTROLADOR.VerificarDatos);
-        this.router.post('/cargarHorario/verificarPlantilla/upload', [TokenValidation, multipartMiddleware], HORARIO_CONTROLADOR.VerificarPlantilla);
-        this.router.post('/cargarHorario/upload', [TokenValidation, multipartMiddleware], HORARIO_CONTROLADOR.CargarHorarioPlantilla);
+        this.router.post('/cargarHorario/verificarDatos/upload', [TokenValidation, upload.single('uploads')], HORARIO_CONTROLADOR.VerificarDatos);
+        // this.router.post('/cargarHorario/verificarPlantilla/upload', [TokenValidation, upload.single('uploads')], HORARIO_CONTROLADOR.VerificarPlantilla);
+        this.router.post('/cargarHorario/upload', [TokenValidation, upload.single('uploads')], HORARIO_CONTROLADOR.CargarHorarioPlantilla);
     }
 }
 

@@ -305,13 +305,13 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
    ** **                   METODOS DE SELECCION DE DATOS DE USUARIOS                      ** **
    ** ************************************************************************************** **/
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedCarg() {
     const numSelected = this.selectionCarg.selected.length;
     return numSelected === this.cargos.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleCarg() {
     this.isAllSelectedCarg() ?
       this.selectionCarg.clear() :
@@ -326,13 +326,13 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     return `${this.selectionCarg.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedDep() {
     const numSelected = this.selectionDep.selected.length;
     return numSelected === this.departamentos.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionDep.clear() :
@@ -347,13 +347,13 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     return `${this.selectionDep.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedEmp() {
     const numSelected = this.selectionEmp.selected.length;
     return numSelected === this.empleados.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :
@@ -497,12 +497,14 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     }
     else if (tipo === 't') {
       this.CargarTimbres(respuesta);
+    } else if (tipo === 'd') {
+
     }
   }
 
 
   /** ************************************************************************************** **
-   ** **                     METODOS DE PLANIFICACION DE HORARIOS                         ** ** 
+   ** **                     METODOS DE PLANIFICACION DE HORARIOS                         ** **
    ** ************************************************************************************** **/
 
   // METODO PARA ABRI VENTANA DE ASIGNACION DE HORARIO
@@ -562,6 +564,25 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       }
       this.seleccionar = false;
       this.plan_rotativo = true;
+    }
+    else {
+      this.toastr.warning('No ha seleccionado usuarios.', '', {
+        timeOut: 6000,
+      });
+    }
+  }
+
+  cargar_plantilla: boolean = false;
+  data_descargar: any = [];
+  DescargarPlantilla(data: any) {
+    this.data_descargar = [];
+    if (data.length > 0) {
+      this.data_descargar = {
+        usuarios: data,
+        pagina: 'descargar-plantilla',
+      }
+      this.seleccionar = false;
+      this.cargar_plantilla = true;
     }
     else {
       this.toastr.warning('No ha seleccionado usuarios.', '', {
@@ -707,7 +728,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
    ** **                          METODO DE REGISTRO DE HORARIOS ROTATIVOS                  ** **
    ** **************************************************************************************** **/
 
-  // VENTANA PARA REGISTRAR PLANIFICACION DE HORARIOS DEL EMPLEADO 
+  // VENTANA PARA REGISTRAR PLANIFICACION DE HORARIOS DEL EMPLEADO
   rotativo: any = []
   registrar_rotativo: boolean = false;
   AbrirMultipleIndividual(usuario: any): void {

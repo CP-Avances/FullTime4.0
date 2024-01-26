@@ -52,7 +52,7 @@ export class ReporteKardexComponent implements OnInit {
     fec_inicio: this.anio_inicio,
     fec_final: this.anio_final
   })
-  
+
   constructor(
     private restEmpleado: EmpleadoService,
     private restKardex: KardexService,
@@ -74,7 +74,7 @@ export class ReporteKardexComponent implements OnInit {
     });
   }
 
-  // METODO para ver la informacion del empleado 
+  // METODO para ver la informacion del empleado
   urlImagen: string;
   nombreEmpresa: string;
   ObtenerEmpleadoSolicitaKardex(idemploy: any) {
@@ -88,7 +88,7 @@ export class ReporteKardexComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -156,7 +156,7 @@ export class ReporteKardexComponent implements OnInit {
   }
 
   /* ****************************************************************************************************
-  *                               PARA LA EXPORTACION DE ARCHIVOS PDF 
+  *                               PARA LA EXPORTACION DE ARCHIVOS PDF
   * ****************************************************************************************************/
   fechaHoy: string;
 
@@ -223,11 +223,11 @@ export class ReporteKardexComponent implements OnInit {
           {
             margin: [10, -2, 10, 0],
             columns: [
-              'Fecha: ' + fecha + ' Hora: ' + timer, 
+              'Fecha: ' + fecha + ' Hora: ' + timer,
               {
                 text: [
                   {
-                    text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
+                    text: '© Pag ' + currentPage.toString() + ' de ' + pageCount,
                     alignment: 'right', color: 'blue', opacity: 0.5
                   }
                 ],

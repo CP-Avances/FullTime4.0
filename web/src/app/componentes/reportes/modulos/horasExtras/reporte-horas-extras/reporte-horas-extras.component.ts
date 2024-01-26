@@ -39,7 +39,7 @@ export class ReporteHorasExtrasComponent implements OnInit {
   idEmpleado: number;
   empleadoD: any = [];
   frase = 'reporte';
-  // Getters de colores, nombre empresa y logo para colocar en reporte 
+  // Getters de colores, nombre empresa y logo para colocar en reporte
   get p_color(): string { return this.plantillaPDF.color_Primary }
   get s_color(): string { return this.plantillaPDF.color_Secundary }
   get urlImagen(): string { return this.plantillaPDF.logoBase64 }
@@ -90,7 +90,7 @@ export class ReporteHorasExtrasComponent implements OnInit {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
-  // METODO para ver la informacion del empleado 
+  // METODO para ver la informacion del empleado
   ObtenerEmpleadoSolicitaKardex(idemploy: any) {
     this.empleadoD = [];
     this.restEmpleado.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -112,7 +112,7 @@ export class ReporteHorasExtrasComponent implements OnInit {
   }
 
   /* ****************************************************************************************************
- *                               PARA LA EXPORTACION DE ARCHIVOS PDF 
+ *                               PARA LA EXPORTACION DE ARCHIVOS PDF
  * ****************************************************************************************************/
   fechaHoy: string;
 
@@ -157,7 +157,7 @@ export class ReporteHorasExtrasComponent implements OnInit {
             {
               text: [
                 {
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
+                  text: '© Pag ' + currentPage.toString() + ' de ' + pageCount,
                   alignment: 'right', color: 'blue', opacity: 0.5
                 }
               ],
