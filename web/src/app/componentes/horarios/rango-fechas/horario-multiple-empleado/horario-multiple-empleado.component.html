@@ -31,6 +31,11 @@
     <app-planificacion-multiple [datosSeleccionados]="data_horario"></app-planificacion-multiple>
 </div>
 
+<!-- ************** PANTALLA DE CARGA DE PLANIFICACION HORARIA ************************* -->
+<div style="padding-top: 20px;" *ngIf="cargar_plantilla">
+    <app-cargar-plantilla-planificacion ></app-cargar-plantilla-planificacion>
+</div>
+
 <!--  *********************** PANTALLA DETALLE DE HORARIOS ********************************* -->
 <app-ver-horario-detalle *ngIf="ver_horario" [idHorario]="horario_id" [pagina]="pagina"></app-ver-horario-detalle>
 
@@ -151,6 +156,9 @@
                 <button id="btn-raised" class="btn btn-sm" (click)="VerCargarTimbres()">
                     Asignar timbres
                 </button>
+                <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 'd')">
+                  Descargar plantilla
+              </button>
                 <button id="btn-raised" class="btn btn-sm" (click)="LimpiarFormulario()">Cancelar</button>
             </div>
 
