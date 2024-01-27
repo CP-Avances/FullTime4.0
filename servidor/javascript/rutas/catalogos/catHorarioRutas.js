@@ -8,26 +8,21 @@ const express_1 = require("express");
 const multer_1 = __importDefault(require("multer"));
 const catHorarioControlador_1 = __importDefault(require("../../controlador/catalogos/catHorarioControlador"));
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
-const moment_1 = __importDefault(require("moment"));
 const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, (0, accesoCarpetas_1.ObtenerRutaHorarios)());
+        cb(null, (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)());
     },
     filename: function (req, file, cb) {
         // FECHA DEL SISTEMA
-        var fecha = (0, moment_1.default)();
-        var anio = fecha.format('YYYY');
-        var mes = fecha.format('MM');
-        var dia = fecha.format('DD');
-        let { id, codigo } = req.params;
-        cb(null, id + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + file.originalname);
+        //var fecha = moment();
+        //var anio = fecha.format('YYYY');
+        //var mes = fecha.format('MM');
+        //var dia = fecha.format('DD');
+        let documento = file.originalname;
+        cb(null, documento);
     }
 });
 const upload = (0, multer_1.default)({ storage: storage });
-const multipart = require('connect-multiparty');
-const multipartMiddleware = multipart({
-    uploadDir: './plantillas',
-});
 class HorarioRutas {
     constructor() {
         this.router = (0, express_1.Router)();
@@ -59,9 +54,9 @@ class HorarioRutas {
         // METODO PARA ACTUALIZAR HORAS TRABAJADAS
         this.router.put('/update-horas-trabaja/:id', verificarToken_1.TokenValidation, catHorarioControlador_1.default.EditarHorasTrabaja);
         // VERIFICAR DATOS DE LA PLANTILLA DE CATÁLOGO HORARIO Y LUEGO SUBIR AL SISTEMA
-        this.router.post('/cargarHorario/verificarDatos/upload', [verificarToken_1.TokenValidation, multipartMiddleware], catHorarioControlador_1.default.VerificarDatos);
-        this.router.post('/cargarHorario/verificarPlantilla/upload', [verificarToken_1.TokenValidation, multipartMiddleware], catHorarioControlador_1.default.VerificarPlantilla);
-        this.router.post('/cargarHorario/upload', [verificarToken_1.TokenValidation, multipartMiddleware], catHorarioControlador_1.default.CargarHorarioPlantilla);
+        this.router.post('/cargarHorario/verificarDatos/upload', [verificarToken_1.TokenValidation, upload.single('uploads')], catHorarioControlador_1.default.VerificarDatos);
+        // this.router.post('/cargarHorario/verificarPlantilla/upload', [TokenValidation, upload.single('uploads')], HORARIO_CONTROLADOR.VerificarPlantilla);
+        this.router.post('/cargarHorario/upload', [verificarToken_1.TokenValidation, upload.single('uploads')], catHorarioControlador_1.default.CargarHorarioPlantilla);
     }
 }
 const HORARIO_RUTAS = new HorarioRutas();

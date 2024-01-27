@@ -106,3 +106,7 @@ mat-icon {
 #detalle tbody tr:nth-child(2n) {
     background-color: #e6f3ff;
 }
+
+.timbre{
+  background-color: #dadeec !important;
+}

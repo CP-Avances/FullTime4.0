@@ -170,7 +170,9 @@ class FeriadosControlador {
 
 
 
-
+    /* 
+    * Metodo para revisar
+    */
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
     public async RevisarDatos(req: Request, res: Response): Promise<void> {
         const documento = req.file?.originalname;

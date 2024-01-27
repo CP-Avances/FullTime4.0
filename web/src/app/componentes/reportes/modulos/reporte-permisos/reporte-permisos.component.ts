@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 // LIBRERÍA PARA MANEJAR FECHAS
 import * as moment from 'moment';
 moment.locale('es');
-// LIBRERÍA PARA GENERAR ARCHIVOS 
+// LIBRERÍA PARA GENERAR ARCHIVOS
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -82,7 +82,7 @@ export class ReportePermisosComponent implements OnInit {
   empleadoLogueado: any = [];
   idEmpleado: number;
 
-  // FILTROS DE BUSQUEDA 
+  // FILTROS DE BUSQUEDA
   sucursalF = new FormControl('');
   laboralF = new FormControl('');
   cargosF = new FormControl('');
@@ -97,7 +97,7 @@ export class ReportePermisosComponent implements OnInit {
   });
 
   constructor(
-    // FILTROS DE BUSQUEDA 
+    // FILTROS DE BUSQUEDA
     public restGeneralepa: DepartamentosService,
     public restRegimen: RegimenService,
     public restSucur: SucursalService,
@@ -122,7 +122,7 @@ export class ReportePermisosComponent implements OnInit {
     this.ObtenerLogo();
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleadoLogueado(idemploy: any) {
     this.empleadoLogueado = [];
     this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -138,7 +138,7 @@ export class ReportePermisosComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -267,7 +267,7 @@ export class ReportePermisosComponent implements OnInit {
     });
   }
 
-  // OBTENCIÓN DE LOS PERMISOS DE ACUERDO A LA PLANIFICACIÓN Y AL PERIODO DE FECHAS INDICADO 
+  // OBTENCIÓN DE LOS PERMISOS DE ACUERDO A LA PLANIFICACIÓN Y AL PERIODO DE FECHAS INDICADO
   VerificarInformacion(permisos_horario: any, codigo: string | number, archivo: string, form) {
     if (permisos_horario.length != 0) {
       this.totalPermisos = permisos_horario;
@@ -403,7 +403,7 @@ export class ReportePermisosComponent implements OnInit {
               },
               {
                 text: [{
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', opacity: 0.3
+                  text: '© Pag ' + currentPage.toString() + ' de ' + pageCount, alignment: 'right', opacity: 0.3
                 }],
               }
             ], fontSize: 9
@@ -664,7 +664,7 @@ export class ReportePermisosComponent implements OnInit {
     };
   }
 
-  // GENERACIÓN DE PDF AL NO CONTAR CON REGISTROS 
+  // GENERACIÓN DE PDF AL NO CONTAR CON REGISTROS
 
   PDF_Vacio(action = 'open', codigo, form) {
     const documentDefinition = this.GenerarSinRegstros(codigo, form);
@@ -706,7 +706,7 @@ export class ReportePermisosComponent implements OnInit {
             },
             {
               text: [{
-                text: '© Pag ' + currentPage.toString() + ' of ' + pageCount, alignment: 'right', opacity: 0.3
+                text: '© Pag ' + currentPage.toString() + ' de ' + pageCount, alignment: 'right', opacity: 0.3
               }],
             }
           ], fontSize: 10
@@ -1319,6 +1319,6 @@ export class ReportePermisosComponent implements OnInit {
       this.VerInformacionCargo(form);
     }*/
   }
-  
+
 
 }

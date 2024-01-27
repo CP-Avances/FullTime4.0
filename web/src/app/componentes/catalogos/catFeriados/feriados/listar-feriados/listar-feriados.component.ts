@@ -43,7 +43,7 @@ export class ListarFeriadosComponent implements OnInit {
     fechaForm: this.fechaF,
   });
 
-  // ALMACENAMIENTO DE DATOS CONSULTADOS  
+  // ALMACENAMIENTO DE DATOS CONSULTADOS
   feriados: any = [];
   empleado: any = [];
 
@@ -92,7 +92,7 @@ export class ListarFeriadosComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                          BUSQUEDA DE FORMATOS DE FECHAS                            ** ** 
+   ** **                          BUSQUEDA DE FORMATOS DE FECHAS                            ** **
    ** **************************************************************************************** **/
 
   formato_fecha: string = 'DD/MM/YYYY';
@@ -110,7 +110,7 @@ export class ListarFeriadosComponent implements OnInit {
       });
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -132,7 +132,7 @@ export class ListarFeriadosComponent implements OnInit {
     })
   }
 
-  // ORDENAR LOS DATOS SEGUN EL ID 
+  // ORDENAR LOS DATOS SEGUN EL ID
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
       if (a.id < b.id) {
@@ -167,7 +167,7 @@ export class ListarFeriadosComponent implements OnInit {
       });;
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_feriado: number) {
     this.rest.EliminarFeriado(id_feriado).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
@@ -177,7 +177,7 @@ export class ListarFeriadosComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -283,7 +283,7 @@ export class ListarFeriadosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-  
+
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.DataFeriados = res.data;
@@ -296,12 +296,12 @@ export class ListarFeriadosComponent implements OnInit {
         }
       });
     });
-    
+
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
      /*
     this.rest.RevisarFormato(formData).subscribe(res => {
       console.log('probando plantilla1', res);
-     
+
       if (res.message === 'CAMPO FECHA ES OBLIGATORIO') {
         this.toastr.error('Para asegurar el buen funcionamiento del sistema es necesario que verifique los datos ' +
           'de la plantilla ingresada. No se encuentra el registro del campo fecha en la ' + res.data + '.',
@@ -409,17 +409,17 @@ export class ListarFeriadosComponent implements OnInit {
           }
         });
       }
-      
+
     });
     */
-    
+
   }
 
   listFeriadosCorrectos: any = [];
   registrarFeriados(){
     var data = {
-      fecha: '', 
-      descripcion: '', 
+      fecha: '',
+      descripcion: '',
       fec_recuperacion: ''
     }
 
@@ -455,7 +455,7 @@ export class ListarFeriadosComponent implements OnInit {
 
     this.archivoSubido = [];
     this.nameFile = '';
-    
+
   }
 
 
@@ -468,7 +468,7 @@ export class ListarFeriadosComponent implements OnInit {
     this.contadorc = 0;
 
     // RECORRER LA LISTA DE CIUDADES SELECCIONADAS
-   
+
     this.ciudadesSeleccionadas.map(obj => {
       var buscarCiudad = {
         id_feriado: id,
@@ -699,7 +699,7 @@ export class ListarFeriadosComponent implements OnInit {
     this.BuscarParametro();
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                METODO PARA EXPORTAR A CSV                                    ** **
    ** ************************************************************************************************** **/
 

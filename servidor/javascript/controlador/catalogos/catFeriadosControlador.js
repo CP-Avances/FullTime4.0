@@ -157,6 +157,9 @@ class FeriadosControlador {
             }
         });
     }
+    /*
+    * Metodo para revisar
+    */
     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
     RevisarDatos(req, res) {
         var _a;

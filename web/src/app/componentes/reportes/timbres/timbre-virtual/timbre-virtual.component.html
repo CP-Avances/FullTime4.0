@@ -36,7 +36,7 @@
                     <app-option-timbre-dispositivo *ngIf="dispositivo"></app-option-timbre-dispositivo>
                 </div>
                 <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
-                    <app-opcion-usuario (tipoUsuarioChange)="ObtenerTipoUsuario($event)"></app-opcion-usuario>
+                    <app-opcion-usuario (tipoUsuarioCambio)="ObtenerTipoUsuario($event)"></app-opcion-usuario>
                 </div>
             </mat-card>
         </div>
@@ -255,7 +255,7 @@
 <div class="container" style="padding-top: 15px" [hidden]="!verDetalle">
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
-            <span>DETALLES DE TIMBRES (APLICACIÓN MÓVIL)</span>
+            <span>DETALLES DE TIMBRES (APLICACIÓN MÓVIL) - USUARIOS {{opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}}</span>
             <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
                 matTooltip="Regresar">
                 <i class="fas fa-arrow-left"></i>
