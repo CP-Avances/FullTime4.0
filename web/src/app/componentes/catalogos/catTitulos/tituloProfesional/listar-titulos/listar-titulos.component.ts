@@ -289,13 +289,13 @@ export class ListarTitulosComponent implements OnInit {
    }
  
    colorTexto: string = '';
-   stiloTextoCelda(texto: string): string{    
-     let arrayObservacion = texto.split(" ");
-     if(arrayObservacion[0] == 'No'){
+   stiloTextoCelda(texto: string): any{  
+    let arrayObservacion = texto.split(" ");
+    if(arrayObservacion[0] == 'No'){
        return 'rgb(255, 80, 80)';
-     }else{
+    }else{
        return 'black'
-     }
+    }
      
    }
 
