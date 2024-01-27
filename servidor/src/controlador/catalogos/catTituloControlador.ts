@@ -95,6 +95,26 @@ class TituloControlador {
     // LECTURA DE LOS DATOS DE LA PLANTILLA
     plantilla.forEach(async (dato: any, indice: any, array: any) => {
       var { nombre, nivel} = dato;
+      data.titulo = dato.nombre;
+      data.nivel = dato.nivel;
+
+      if((data.titulo != undefined && data.titulo != '')){
+
+      }else{
+
+        if(data.titulo == '' && data.titulo == undefined){
+          data.nivel = 'No registrado';
+        }
+
+        if(data.nivel == '' && data.nivel == undefined){
+          data.nivel = 'No registrado';
+        }
+
+        listTitulosProfesionales.push(data);
+        
+      }
+
+
       //Validar primero que exista niveles en la tabla niveles
       const existe_nivel = await pool.query('SELECT id FROM nivel_titulo WHERE UPPER(nombre) = UPPER($1)', [nivel]);
       var id_nivel = existe_nivel.rows[0];

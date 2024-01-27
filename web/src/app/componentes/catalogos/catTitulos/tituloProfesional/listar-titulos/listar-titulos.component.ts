@@ -61,6 +61,9 @@ export class ListarTitulosComponent implements OnInit {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
 
+  tamanio_paginaMul: number = 5;
+  numero_paginaMul: number = 1;
+
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
   get p_color(): string { return this.plantillaPDF.color_Primary }
@@ -88,6 +91,12 @@ export class ListarTitulosComponent implements OnInit {
   ManejarPagina(e: PageEvent) {
     this.numero_pagina = e.pageIndex + 1;
     this.tamanio_pagina = e.pageSize;
+  }
+
+  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+  ManejarPaginaMulti(e: PageEvent) {
+    this.tamanio_paginaMul = e.pageSize;
+    this.numero_paginaMul = e.pageIndex + 1
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO 

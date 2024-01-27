@@ -507,7 +507,7 @@ export class ListarFeriadosComponent implements OnInit {
     let arrayObservacion = observacion.split(" ");
     if(observacion == 'ok'){
       return 'rgb(159, 221, 154)';
-    }else if(observacion == 'Ya esta registrado en base'){
+    }else if(observacion == 'Ya existe en el sistema'){
       return 'rgb(239, 203, 106)';
     }else if(arrayObservacion[0] == 'Fecha' || arrayObservacion[0] == 'Descripcion'){
       return 'rgb(246, 167, 143)';

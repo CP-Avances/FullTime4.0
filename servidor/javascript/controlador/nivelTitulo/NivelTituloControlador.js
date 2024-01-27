@@ -118,28 +118,27 @@ class NivelTituloControlador {
             // LECTURA DE LOS DATOS DE LA PLANTILLA
             plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
                 var { nombre } = dato;
-                //Validar primero que exista la ciudad en la tabla ciudades
-                const existe_nivelProfecional = yield database_1.default.query('SELECT nombre FROM nivel_titulo WHERE UPPER(nombre) = UPPER($1)', [nombre]);
-                if (existe_nivelProfecional.rowCount == 0) {
-                    if (nombre != null && nombre != undefined && nombre != '') {
-                        console.log('nombre valido: ', nombre);
+                data.nombre = dato.nombre;
+                if (data.nombre != undefined && data.nombre != '' && data.nombre != null) {
+                    //Validar primero que exista la ciudad en la tabla ciudades
+                    const existe_nivelProfecional = yield database_1.default.query('SELECT nombre FROM nivel_titulo WHERE UPPER(nombre) = UPPER($1)', [data.nombre]);
+                    if (existe_nivelProfecional.rowCount == 0) {
                         data.nombre = nombre;
-                        if (duplicados.find((p) => p.nombre === dato.nombre) == undefined) {
+                        if (duplicados.find((p) => p.nombre.toLowerCase() === data.nombre.toLowerCase()) == undefined) {
                             data.observacion = 'ok';
                             duplicados.push(dato);
                         }
                         listNivelesProfesionales.push(data);
                     }
                     else {
-                        console.log('nombre valido: ', nombre);
-                        data.nombre = 'No registrado';
-                        data.observacion = 'Nivel no registrado';
+                        data.nombre = nombre;
+                        data.observacion = 'Ya existe en el sistema';
                         listNivelesProfesionales.push(data);
                     }
                 }
                 else {
-                    data.nombre = nombre;
-                    data.observacion = 'Ya esta registrado en base';
+                    data.nombre = 'No registrado';
+                    data.observacion = 'Nivel no registrado';
                     listNivelesProfesionales.push(data);
                 }
                 data = {};

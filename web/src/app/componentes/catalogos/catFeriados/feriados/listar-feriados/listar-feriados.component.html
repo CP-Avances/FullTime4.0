@@ -180,10 +180,10 @@
                     <tbody>
                         <tr
                             *ngFor="let f of DataFeriados | paginate:tamanio_paginaMul:numero_paginaMul">
-                            <td [style.color]="stiloTextoCelda(f.descripcion)" id="letras">{{f.descripcion}}</td>
-                            <td  [style.color]="stiloTextoCelda(f.fecha)" style="font-size: 12px;">{{f.fecha}}</td>
+                            <td [style.color]="stiloTextoCelda(f.descripcion)" id="letras" style="font-size: 12px;">{{f.descripcion}}</td>
+                            <td [style.color]="stiloTextoCelda(f.fecha)" style="font-size: 12px;">{{f.fecha}}</td>
                             <td style="font-size: 12px;">{{f.fec_recuperacion}}</td>
-                            <td>
+                            <td style="font-size: 12px;">
                                 <div style="width: 270px; margin: auto;">
                                     <div id="t-editar" class="circulo"  [style.background-color]="stiloCelda(f.observacion)"></div>
                                     {{f.observacion}}
