@@ -48,7 +48,7 @@
                                         *ngIf="mostrarbtnsubir"
                                         style="height: 64px;"
                                         matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
-                                        Subir nuevamente la plantilla
+                                        Subir nueva plantilla
                                     </label>
                                 </form>
                             </div>
@@ -169,7 +169,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let data of Datasucursales">
+                        <tr *ngFor="let data of Datasucursales | paginate:tamanio_paginaMul:numero_paginaMul">
                             <td [style.color]="stiloTextoCelda(data.nom_sucursal)">{{ data.nom_sucursal}}</td>
                             <td [style.color]="stiloTextoCelda(data.ciudad)">{{ data.ciudad}}</td>
                             <td>
@@ -182,8 +182,8 @@
                     </tbody>
                 </table>
             </div>
-            <mat-paginator id="pagina" [length]="Datasucursales.length" [pageSize]="tamanio_pagina"
-                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+            <mat-paginator id="pagina" [length]="Datasucursales.length" [pageSize]="tamanio_paginaMul"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
             </mat-paginator>
         </div>
     </div>

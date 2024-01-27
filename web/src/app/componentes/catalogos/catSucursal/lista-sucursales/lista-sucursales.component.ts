@@ -55,6 +55,9 @@ export class ListaSucursalesComponent implements OnInit {
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
 
+  tamanio_paginaMul: number = 5;
+  numero_paginaMul: number = 1;
+
   empleado: any = [];
   idEmpleado: number;
 
@@ -115,6 +118,11 @@ export class ListaSucursalesComponent implements OnInit {
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
     this.numero_pagina = e.pageIndex + 1;
+  }
+  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+  ManejarPaginaMulti(e: PageEvent) {
+    this.tamanio_paginaMul = e.pageSize;
+    this.numero_paginaMul = e.pageIndex + 1
   }
 
   // METODO PARA BUSCAR SUCURSALES
@@ -466,6 +474,13 @@ export class ListaSucursalesComponent implements OnInit {
             data.nombre = item.nom_sucursal;
             data.id_ciudad = valor.id;
             data.id_empresa = '1';
+
+             // Capitalizar la primera letra de la primera palabra
+            const textonombre = data.nombre.charAt(0).toUpperCase();
+            const restoDelTexto = data.nombre.slice(1);
+            
+            data.nombre = textonombre + restoDelTexto
+
             this.rest.RegistrarSucursal(data).subscribe(res => {
               cont = cont + 1;
               if(this.listSucursalesCorrectas.length  == cont){
@@ -480,7 +495,7 @@ export class ListaSucursalesComponent implements OnInit {
 
       })
     }else{
-      this.toastr.error('No exiten datos para registrar ingrese otra', 'Plantilla no aceptada', {
+      this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada', {
         timeOut: 4000,
       });
       this.archivoForm.reset();
@@ -495,10 +510,11 @@ export class ListaSucursalesComponent implements OnInit {
   //Metodo para dar color a las celdas y representar las validaciones
   colorCelda: string = ''
   stiloCelda(observacion: string): string{
+    console.log('observacion: ',observacion);
     let arrayObservacion = observacion.split(" ");
     if(observacion == 'ok'){
       return 'rgb(159, 221, 154)';
-    }else if(observacion == 'Ya esta registrado en base'){
+    }else if(observacion == 'Ya existe en el sistema'){
       return 'rgb(239, 203, 106)';
     }else if(arrayObservacion[0] == 'Ciudad' || arrayObservacion[0] == 'Sucursal'){
       return 'rgb(246, 167, 143)';

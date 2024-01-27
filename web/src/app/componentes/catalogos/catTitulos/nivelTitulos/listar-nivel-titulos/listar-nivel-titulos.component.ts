@@ -180,10 +180,12 @@ export class ListarNivelTitulosComponent implements OnInit {
       var cont = 0;
       this.listNivelesCorrectos.forEach(item => {
         data.nombre = item.nombre;
-        // Realiza un capital letter a los nombres y apellidos
-        let textoNivel = data.nombre.split(' ');
-        let texto1 = textoNivel[0].charAt(0).toUpperCase() + textoNivel[0].slice(1);
-        data.nombre = texto1;
+        
+        // Capitalizar la primera letra de la primera palabra
+        const textoNivel = item.nombre.charAt(0).toUpperCase();
+        const restoDelTexto = item.nombre.slice(1);
+
+        data.nombre = textoNivel + restoDelTexto;
         this.nivel.RegistrarNivel(data).subscribe(res => {
           cont = cont + 1;
           if(this.listNivelesCorrectos.length  == cont){

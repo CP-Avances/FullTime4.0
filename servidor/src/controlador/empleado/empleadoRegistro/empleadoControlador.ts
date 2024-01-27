@@ -849,15 +849,13 @@ class EmpleadoControlador {
 
           // Verificar si la variable tiene el formato de fecha correcto con moment
           if (moment(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) {
-            console.log("La variable tiene el formato de fecha correcto.");
+            if(duplicados.find((p: any)=> p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined)
+            {
+              data.observacion = 'ok';
+              duplicados.push(dato);
+            }
           } else {
-            console.log("La variable no tiene el formato de fecha correcto.");
-          }
-        
-          if(duplicados.find((p: any)=> p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined)
-          {
-            data.observacion = 'ok';
-            duplicados.push(dato);
+            data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
           }
 
           listEmpleados.push(data);
@@ -940,6 +938,11 @@ class EmpleadoControlador {
           if(cedula == undefined){
             data.cedula = 'No registrado'
             data.observacion = 'Cedula '+data.observacion;
+          }
+
+           // Verificar si la variable tiene el formato de fecha correcto con moment
+           if (moment(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) {} else {
+            data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
           }
 
           listEmpleados.push(data);

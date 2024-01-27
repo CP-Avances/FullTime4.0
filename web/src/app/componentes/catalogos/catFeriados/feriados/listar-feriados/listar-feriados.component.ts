@@ -513,6 +513,10 @@ export class ListarFeriadosComponent implements OnInit {
       return 'rgb(246, 167, 143)';
     }else if(observacion == 'Registro duplicado'){
       return 'rgb(156, 214, 255)';
+    }else if(observacion == 'Formato de fec_recuperacion incorrecto (YYYY-MM-DD)'){
+      return 'rgb(156, 214, 255)';
+    }else if(observacion == 'Formato de fecha incorrecto (YYYY-MM-DD)'){
+      return 'rgb(230, 176, 96)';
     }else{
       return 'white'
     }
