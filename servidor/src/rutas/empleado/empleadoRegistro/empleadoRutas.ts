@@ -1,6 +1,6 @@
 // SECCIÓN DE LIBRERIAS
 import EMPLEADO_CONTROLADOR from '../../../controlador/empleado/empleadoRegistro/empleadoControlador';
-import { ObtenerRutaUsuario } from '../../../libs/accesoCarpetas';
+import { ObtenerRutaUsuario, ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { TokenValidation } from '../../../libs/verificarToken';
 import { Router } from 'express';
 import multer from 'multer';
@@ -8,12 +8,15 @@ import pool from '../../../database';
 import moment from 'moment';
 moment.locale('es');
 
-/*
 const multipart = require('connect-multiparty');
 
 const multipartMiddlewarePlantilla = multipart({
     uploadDir: './plantillas',
 });
+
+/** ************************************************************************************** **
+ ** **                   METODO PARA OBTENER CARPETA IMAGENES DE USUARIO                   **   
+ ** ************************************************************************************** **/
 
 const storage = multer.diskStorage({
 
@@ -46,11 +49,13 @@ const storage = multer.diskStorage({
 })
 
 const upload = multer({ storage: storage });
-*/
 
-import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 
-const storage = multer.diskStorage({
+/** ************************************************************************************** **
+ ** **                   METODO PARA OBTENER CARPETA IMAGENES DE USUARIO                   **   
+ ** ************************************************************************************** **/
+
+const storage_plantilla = multer.diskStorage({
 
     destination: function (req, file, cb) {
         cb(null, ObtenerRutaLeerPlantillas())
@@ -62,7 +67,7 @@ const storage = multer.diskStorage({
     }
 })
 
-const upload = multer({ storage: storage });
+const upload_plantilla = multer({ storage: storage_plantilla });
 
 
 class EmpleadoRutas {
@@ -161,13 +166,13 @@ class EmpleadoRutas {
 
         // INFORMACIÓN DE LA IMAGEN
         this.router.get('/img/:id/:imagen', EMPLEADO_CONTROLADOR.BuscarImagen);
-        
+
         // INFORMACIÓN DE LA IMAGEN
         this.router.get('/img/codificado/:id/:imagen', EMPLEADO_CONTROLADOR.getImagenBase64);
 
 
         // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA AUTOMÁTICA 
-        this.router.post('/verificar/automatico/plantillaExcel/', [TokenValidation, upload.single('uploads')], EMPLEADO_CONTROLADOR.VerificarPlantilla_Automatica);
+        this.router.post('/verificar/automatico/plantillaExcel/', [TokenValidation, upload_plantilla.single('uploads')], EMPLEADO_CONTROLADOR.VerificarPlantilla_Automatica);
         //this.router.post('/verificar/datos/automatico/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosAutomatico);
         this.router.post('/cargar_automatico/plantillaExcel/', TokenValidation, EMPLEADO_CONTROLADOR.CargarPlantilla_Automatico);
 

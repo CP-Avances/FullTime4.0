@@ -314,6 +314,7 @@ import { EditarPermisoEmpleadoComponent } from './componentes/modulos/permisos/g
 import { EliminarIndividualComponent } from './componentes/horarios/eliminar-individual/eliminar-individual.component';
 import { BuscarAsistenciaComponent } from './componentes/horarios/asistencia/buscar-asistencia/buscar-asistencia.component';
 import { CargarPlantillaPlanificacionComponent } from './componentes/horarios/cargar-plantillas/cargar-plantilla-planificacion/cargar-plantilla-planificacion.component';
+import { PrincipalSucursalUsuarioComponent } from './componentes/empleado/sucursal-usuario/principal-sucursal-usuario/principal-sucursal-usuario.component';
 
 
 const config: SocketIoConfig = { url: environment.url, options: {} };
@@ -563,6 +564,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     EliminarIndividualComponent,
     BuscarAsistenciaComponent,
     CargarPlantillaPlanificacionComponent,
+    PrincipalSucursalUsuarioComponent,
 
   ],
 

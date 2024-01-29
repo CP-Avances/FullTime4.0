@@ -23,9 +23,7 @@ const ObtenerRutaUsuario = function (id) {
         const usuario = yield database_1.default.query(`
         SELECT codigo, cedula FROM empleados WHERE id = $1
         `, [id]);
-        console.log('ruta instalacion ', __dirname);
         ruta = path_1.default.join(__dirname, `..${separador}..`);
-        console.log('ver ruta imagen libs ', ruta + separador + 'imagenesEmpleados' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula);
         return ruta + separador + 'imagenesEmpleados' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
     });
 };
@@ -35,12 +33,10 @@ const ObtenerRutaVacuna = function (id) {
     return __awaiter(this, void 0, void 0, function* () {
         let ruta = '';
         let separador = path_1.default.sep;
-        console.log('ruta instalacion ', __dirname);
         const usuario = yield database_1.default.query(`
         SELECT codigo, cedula FROM empleados WHERE id = $1
         `, [id]);
         ruta = path_1.default.join(__dirname, `..${separador}..`);
-        console.log('ver ruta imagen libs ', ruta + separador + 'carnetVacuna' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula);
         return ruta + separador + 'carnetVacuna' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
     });
 };
@@ -53,9 +49,7 @@ const ObtenerRutaPermisos = function (codigo) {
         const usuario = yield database_1.default.query(`
         SELECT cedula FROM empleados WHERE codigo = $1
         `, [codigo]);
-        console.log('ruta instalacion ', __dirname);
         ruta = path_1.default.join(__dirname, `..${separador}..`);
-        console.log('ver ruta imagen libs ', ruta + separador + 'permisos' + separador + codigo + '_' + usuario.rows[0].cedula);
         return ruta + separador + 'permisos' + separador + codigo + '_' + usuario.rows[0].cedula;
     });
 };

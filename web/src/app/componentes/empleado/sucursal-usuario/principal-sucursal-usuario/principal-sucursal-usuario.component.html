@@ -1,0 +1,84 @@
+<!--  ********************  VER LISTA DE SUCURSALES  ************************  -->
+<div *ngIf="ver_lista">
+    <div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;">
+        <div id="resultados">
+            <span>CRÍTERIOS DE BÚSQUEDA</span>
+        </div>
+        <br>
+        <form>
+            <div class="row">
+                <div class="col-md">
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <mat-form-field>
+                            <mat-label>Ciudad</mat-label>
+                            <input matInput placeholder="Buscar" placeholder="Buscar"
+                                (keypress)="IngresarSoloLetras($event)" [formControl]="buscarCiudad"
+                                [(ngModel)]="filtroCiudadSuc">
+                            <mat-icon matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda de ciudades por nombre.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <mat-form-field>
+                            <mat-label>Establecimiento</mat-label>
+                            <input matInput placeholder="Buscar" [formControl]="buscarNombre"
+                                [(ngModel)]="filtroNombreSuc">
+                            <mat-icon matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda de establecimiento por nombre.">
+                                help_outline
+                            </mat-icon>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!------------------ LISTA DE ESTABLECIMIENTOS ------------------------------------------------->
+    <div class="container" style="padding-bottom: 50px; text-align: center;">
+        <div class="mat-elevation-z8" style="background: white;">
+            <div id="resultados">RESULTADO DE BÚSQUEDA</div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm ">
+                    <thead class="thead-light">
+                        <tr style="text-align: center;">
+                            <th scope="col">Ciudad</th>
+                            <th scope="col">Establecimiento</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            *ngFor="let s of sucursales | sucCiudad: filtroCiudadSuc | sucNombre: filtroNombreSuc | paginate:tamanio_pagina:numero_pagina">
+                            <td>{{s.descripcion}}</td>
+                            <td>{{s.nombre}}</td>
+                            <td class="justify-content-center">
+                                <i matSuffix matTooltipPosition="right"
+                                    matTooltip="Ver lista de departamentos del establecimiento." class="fa fa-building"
+                                    id="ver" (click)="VerDepartamentos(s.id)">
+                                    <p>Departamento</p>
+                                </i>
+                                <i id="t-editar" class="fas fa-edit" (click)="AbrirVentanaEditar(s)" matSuffix
+                                    matTooltipPosition="right"
+                                    matTooltip="Modificar los datos generales de este registro.">
+                                    <p>Editar</p>
+                                </i>
+                                <i (click)="ConfirmarDelete(s)" id="t-eliminar" class="far fa-trash-alt" matSuffix
+                                    matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                    <p>Eliminar</p>
+                                </i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <mat-paginator id="pagina" [length]="sucursales.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+            </mat-paginator>
+        </div>
+    </div>
+
+</div>
