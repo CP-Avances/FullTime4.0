@@ -639,11 +639,17 @@ function VerificarDetallesAgrupados(detallesAgrupados: any, horarios: Horario[])
         const horaEntrada = moment(entrada.HORA, 'HH:mm');
         const horaSalida = moment(salida.HORA, 'HH:mm');
         // SI EL HORARIO TIENE SALIDA AL OTRO DIA SE DEBE SUMAR 24 HORAS A LA SALIDA
-        if (salida.SALIDA_SIGUIENTE_DIA) {
+        if (salida.SALIDA_SIGUIENTE_DIA.toLowerCase() == 'si' ) {
+          console.log('salida siguiente dia');
           horaSalida.add(1, 'days');
         }
+        console.log('horaEntrada ', horaEntrada);
+        console.log('horaSalida ', horaSalida);
         const diferencia = horaSalida.diff(horaEntrada, 'minutes');
         const horasTotalesEnMinutos = convertirHorasTotalesAMinutos(horario.HORAS_TOTALES.toString());
+        console.log('diferencia ', diferencia);
+        console.log('horasTotalesEnMinutos ', horasTotalesEnMinutos);
+        console.log(codigoHorario)
         if (diferencia !== horasTotalesEnMinutos) {
           codigosDetalles.push({codigo: codigoHorario, observacion: 'No cumple con las horas totales'});
         }
