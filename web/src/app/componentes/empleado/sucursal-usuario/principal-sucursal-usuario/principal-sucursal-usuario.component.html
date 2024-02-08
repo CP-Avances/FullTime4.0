@@ -1,6 +1,6 @@
 <!--  ********************  VER LISTA DE SUCURSALES  ************************  -->
 <div *ngIf="ver_lista">
-    <div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;">
+    <div class="container" style="margin-bottom: 25px; padding-bottom:5px; padding-top: 20px;">
         <div id="resultados">
             <span>CRÍTERIOS DE BÚSQUEDA</span>
         </div>
@@ -13,7 +13,7 @@
                             <mat-label>Ciudad</mat-label>
                             <input matInput placeholder="Buscar" placeholder="Buscar"
                                 (keypress)="IngresarSoloLetras($event)" [formControl]="buscarCiudad"
-                                [(ngModel)]="filtroCiudadSuc">
+                                [(ngModel)]="filtroCiudadSuc" (input)="ControlarFiltrado(filtroCiudadSuc)">
                             <mat-icon matSuffix matTooltipPosition="right"
                                 matTooltip="Búsqueda de ciudades por nombre.">
                                 help_outline
@@ -26,7 +26,7 @@
                         <mat-form-field>
                             <mat-label>Establecimiento</mat-label>
                             <input matInput placeholder="Buscar" [formControl]="buscarNombre"
-                                [(ngModel)]="filtroNombreSuc">
+                                [(ngModel)]="filtroNombreSuc" (input)="ControlarFiltrado(filtroNombreSuc)">
                             <mat-icon matSuffix matTooltipPosition="right"
                                 matTooltip="Búsqueda de establecimiento por nombre.">
                                 help_outline
@@ -35,8 +35,32 @@
                     </div>
                 </div>
             </div>
+            <div class="d-flex flex-wrap justify-content-center" style="padding-top: 15px;">
+                <button id="btn-raised" class="btn btn-sm">
+                    Eliminar
+                </button>
+                <button id="btn-raised" class="btn btn-sm">
+                    Buscar Planificación
+                </button>
+                <button id="btn-raised" class="btn btn-sm">
+                    Planificación Fija
+                </button>
+                <button id="btn-raised" class="btn btn-sm">
+                    Planificación Múltiple
+                </button>
+                <button id="btn-raised" class="btn btn-sm">
+                    Asignar timbres
+                </button>
+                <button id="btn-raised" class="btn btn-sm">
+                    Descargar plantilla
+                </button>
+                <button id="btn-raised" class="btn btn-sm" (click)="MostrarLista()">
+                    Cancelar
+                </button>
+            </div>
         </form>
     </div>
+    <hr>
     <!------------------ LISTA DE ESTABLECIMIENTOS ------------------------------------------------->
     <div class="container" style="padding-bottom: 50px; text-align: center;">
         <div class="mat-elevation-z8" style="background: white;">
@@ -45,6 +69,18 @@
                 <table class="table table-hover table-sm ">
                     <thead class="thead-light">
                         <tr style="text-align: center;">
+                            <th>
+                                <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
+                                    matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
+                                    id="SelectCheck" (click)="HabilitarSeleccion()">
+                                    library_add_check
+                                </mat-icon>
+                                <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterToggleSuc() : null"
+                                    [checked]="selectionSuc.hasValue() && isAllSelectedSuc()"
+                                    [indeterminate]="selectionSuc.hasValue() && !isAllSelectedSuc()"
+                                    [aria-label]="checkboxLabelSuc()">
+                                </mat-checkbox>
+                            </th>
                             <th scope="col">Ciudad</th>
                             <th scope="col">Establecimiento</th>
                             <th scope="col">Acciones</th>
@@ -53,22 +89,20 @@
                     <tbody>
                         <tr
                             *ngFor="let s of sucursales | sucCiudad: filtroCiudadSuc | sucNombre: filtroNombreSuc | paginate:tamanio_pagina:numero_pagina">
+                            <td>
+                                <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                                    (change)="$event ? selectionSuc.toggle(s) : null"
+                                    [checked]="selectionSuc.isSelected(s)" [aria-label]="checkboxLabelSuc(s)">
+                                </mat-checkbox>
+                            </td>
                             <td>{{s.descripcion}}</td>
                             <td>{{s.nombre}}</td>
                             <td class="justify-content-center">
                                 <i matSuffix matTooltipPosition="right"
-                                    matTooltip="Ver lista de departamentos del establecimiento." class="fa fa-building"
-                                    id="ver" (click)="VerDepartamentos(s.id)">
-                                    <p>Departamento</p>
-                                </i>
-                                <i id="t-editar" class="fas fa-edit" (click)="AbrirVentanaEditar(s)" matSuffix
-                                    matTooltipPosition="right"
-                                    matTooltip="Modificar los datos generales de este registro.">
-                                    <p>Editar</p>
-                                </i>
-                                <i (click)="ConfirmarDelete(s)" id="t-eliminar" class="far fa-trash-alt" matSuffix
-                                    matTooltipPosition="right" matTooltip="Eliminar este registro.">
-                                    <p>Eliminar</p>
+                                    matTooltip="Ver lista de departamentos del establecimiento."
+                                    class="fa fa-user-circle-o" id="ver" (click)="VerDepartamentos(s.id)"
+                                    *ngIf="auto_individual">
+                                    <p>Usuarios</p>
                                 </i>
                             </td>
                         </tr>

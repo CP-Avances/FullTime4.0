@@ -29,14 +29,14 @@ class DatosGeneralesControlador {
 
     public async DatosGenerales(req: Request, res: Response) {
         let estado = req.params.estado;
+        let { id_sucursal } = req.body;
 
         // CONSULTA DE BUSQUEDA DE SUCURSALES
         let suc = await pool.query(
-            `
-            SELECT s.id AS id_suc, s.nombre AS name_suc, c.descripcion AS ciudad 
-            FROM sucursales AS s, ciudades AS c 
-            WHERE s.id_ciudad = c.id ORDER BY s.id ASC
-            `
+            "SELECT s.id AS id_suc, s.nombre AS name_suc, c.descripcion AS ciudad " +
+            "FROM sucursales AS s, ciudades AS c " +
+            "WHERE s.id_ciudad = c.id AND s.id IN (" + id_sucursal + ")" +
+            "ORDER BY s.id ASC"
         ).then((result: any) => { return result.rows });
 
         if (suc.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
@@ -182,6 +182,202 @@ class DatosGeneralesControlador {
     }
 
 
+    public async BuscarDataGeneral(req: Request, res: Response) {
+        let estado = req.params.estado;
+        let { id_sucursal } = req.body;
+
+        console.log('ver id_sucursal ', id_sucursal)
+
+        // CONSULTA DE BUSQUEDA DE SUCURSALES
+        let sucursal_ = await pool.query(
+            "SELECT ig.id_suc, ig.name_suc " +
+            "FROM informacion_general AS ig " +
+            "WHERE ig.id_suc IN (" + id_sucursal + ")" +
+            "GROUP BY ig.id_suc, ig.name_suc " +
+            "ORDER BY ig.name_suc ASC"
+        ).then((result: any) => { return result.rows });
+
+        console.log('sucursal ', sucursal_)
+
+        if (sucursal_.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+
+        // CONSULTA DE BUSQUEDA DE REGIMEN
+        let regimen_ = await Promise.all(sucursal_.map(async (reg: any) => {
+            reg.regimenes = await pool.query(
+                `
+                SELECT ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
+                FROM informacion_general AS ig
+                WHERE ig.id_suc = $1
+                GROUP BY ig.id_suc, ig.name_suc, ig.id_regimen, ig.name_regimen
+                ORDER BY ig.name_suc ASC
+                `
+                , [reg.id_suc]
+            ).then((result: any) => { return result.rows });
+            return reg;
+        }));
+
+        let lista_regimen = regimen_.filter((obj: any) => {
+            return obj.regimenes.length > 0
+        });
+
+        console.log('lista regimen ', lista_regimen)
+
+        if (lista_regimen.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+
+        // CONSULTA DE BUSQUEDA DE DEPARTAMENTOS
+        let departamentos_ = await Promise.all(lista_regimen.map(async (reg: any) => {
+
+            reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
+
+                dep.departamentos = await pool.query(
+                    `
+                    SELECT ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep
+                    FROM informacion_general AS ig
+                    WHERE ig.id_regimen = $1 AND ig.id_suc = $2
+                    GROUP BY ig.id_suc, ig.name_suc, ig.id_depa, ig.name_dep
+                    ORDER BY ig.name_suc ASC
+                    `
+                    , [dep.id_regimen, dep.id_suc]
+                ).then((result: any) => { return result.rows });
+
+                return dep;
+            }))
+
+            return reg;
+
+        }));
+
+        let lista_departamentos = departamentos_.map((reg: any) => {
+            reg.regimenes = reg.regimenes.filter((dep: any) => {
+                return dep.departamentos.length > 0;
+            })
+            return reg;
+        }).filter((obj: any) => {
+            return obj.regimenes.length > 0;
+        });
+
+        console.log('lista departamentos ', lista_departamentos)
+
+        if (lista_departamentos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+
+        // CONSULTA DE BUSQUEDA DE CARGOS
+        let cargos_ = await Promise.all(lista_departamentos.map(async (reg: any) => {
+            reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
+                dep.departamentos = await Promise.all(dep.departamentos.map(async (car: any) => {
+                    console.log('ver car ', car)
+                    car.cargos = await pool.query(
+                        `
+                        SELECT ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo
+                        FROM informacion_general AS ig
+                        WHERE ig.id_depa = $1 AND ig.id_suc = $2
+                        GROUP BY ig.id_suc, ig.name_suc, ig.id_cargo_, ig.name_cargo
+                        ORDER BY ig.name_suc ASC
+                        `
+                        , [car.id_depa, car.id_suc]
+                    ).then((result: any) => { return result.rows });
+
+                    return car;
+                }))
+
+                return dep;
+            }))
+
+            return reg;
+        }));
+
+        let lista_cargos = cargos_.map((reg: any) => {
+            reg.regimenes = reg.regimenes.filter((dep: any) => {
+                dep.departamentos = dep.departamentos.filter((car: any) => {
+                    return car.cargos.length > 0;
+                })
+                return dep;
+            })
+            return reg;
+        }).filter((obj: any) => {
+            return obj.regimenes.length > 0;
+        });
+
+        console.log('ver cargos ', lista_cargos)
+
+        if (lista_cargos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
+
+        // CONSULTA DE BUSQUEDA DE COLABORADORES POR CARGO
+        let lista = await Promise.all(lista_cargos.map(async (reg: any) => {
+
+            reg.regimenes = await Promise.all(reg.regimenes.map(async (dep: any) => {
+
+                dep.departamentos = await Promise.all(dep.departamentos.map(async (car: any) => {
+
+                    car.cargos = await Promise.all(car.cargos.map(async (empl: any) => {
+                        if (estado === '1') {
+                            empl.empleado = await pool.query(
+                                `
+                                SELECT * FROM informacion_general 
+                                WHERE id_cargo_= $1 AND id_suc = $2 AND estado = $3
+                                `,
+                                [empl.id_cargo_, empl.id_suc, estado])
+                                .then((result: any) => { return result.rows });
+
+                        } else {
+                            empl.empleado = await pool.query(
+                                `
+                                SELECT * FROM informacion_general 
+                                WHERE id_cargo_= 1 AND id_suc = 20 AND estado = $3
+                                `,
+                                [empl.id_cargo_, empl.id_suc, estado])
+                                .then((result: any) => { return result.rows });
+                        }
+
+                        return empl;
+                    }));
+
+                    return car;
+
+                }))
+
+                return dep;
+            }))
+
+            return reg;
+        }))
+
+        let empleados = lista.map((reg: any) => {
+            reg.regimenes = reg.regimenes.filter((dep: any) => {
+
+                dep.departamentos = dep.departamentos.filter((car: any) => {
+
+                    car.cargos = car.cargos.filter((empl: any) => {
+                        return empl.empleado.length > 0;
+                    })
+                    return car;
+                })
+                return dep;
+            })
+            return reg;
+        }).filter((obj: any) => {
+            return obj.regimenes.length > 0;
+        });
+
+        console.log('lista empleados ', empleados)
+
+        if (empleados.length === 0) return res.status(404)
+            .jsonp({ message: 'No se han encontrado registros.' })
+
+        return res.status(200).jsonp(empleados);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
     /**
      * METODO DE CONSULTA DE DATOS GENERALES DE USUARIOS
      * REALIZA UN ARRAY DE CARGOS Y EMPLEADOS DEPENDIENDO DEL ESTADO DEL 
@@ -191,6 +387,7 @@ class DatosGeneralesControlador {
 
     public async DatosGeneralesCargo(req: Request, res: Response) {
         let estado = req.params.estado;
+        let { id_sucursal } = req.body;
 
         // CONSULTA DE BUSQUEDA DE CARGOS
         let cargo = await pool.query(
@@ -207,52 +404,51 @@ class DatosGeneralesControlador {
         let empleados = await Promise.all(cargo.map(async (empl: any) => {
             if (estado === '1') {
                 empl.empleados = await pool.query(
-                    `
-                    SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.nombre, e.apellido, e.codigo, 
-                        e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo,
-                        co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
-                        d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
-                        s.nombre AS sucursal, c.descripcion AS ciudad, ca.hora_trabaja
-                    FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
-                        tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s, ciudades AS c
-                    WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
-                        da.id = e.id) 
-                        AND tc.id = ca.cargo
-                        AND ca.cargo = $1
-                        AND ca.id_departamento = d.id
-                        AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
-                        da.id = e.id) 
-                        AND s.id = d.id_sucursal
-                        AND s.id_ciudad = c.id
-                        AND co.id_regimen = r.id AND e.estado = $2
-                    ORDER BY name_empleado ASC
-                    `
+                    "SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.nombre, e.apellido, e.codigo, " +
+                    "e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo, " +
+                    "co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, " +
+                    "d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, " +
+                    "s.nombre AS sucursal, c.descripcion AS ciudad, ca.hora_trabaja " +
+                    "FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e, " +
+                    "tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s, ciudades AS c " +
+                    "WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE " +
+                    "da.id = e.id) " +
+                    "AND tc.id = ca.cargo " +
+                    "AND ca.cargo = $1 " +
+                    "AND ca.id_departamento = d.id " +
+                    "AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE " +
+                    "da.id = e.id) " +
+                    "AND s.id = d.id_sucursal " +
+                    "AND s.id_ciudad = c.id " +
+                    "AND co.id_regimen = r.id AND e.estado = $2 " +
+                    "AND s.id IN (" + id_sucursal + ") " +
+                    "ORDER BY name_empleado ASC "
                     , [empl.id_cargo, estado]
 
                 ).then((result: any) => { return result.rows });
             }
             else {
                 empl.empleados = await pool.query(
-                    `
-                    SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.nombre, e.apellido, e.codigo, 
-                        e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo,
-                        co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, 
-                        d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, 
-                        s.nombre AS sucursal, c.descripcion AS ciudad, ca.fec_final, ca.hora_trabaja
-                    FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
-                        tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s, ciudades AS c
-                    WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
-                        da.id = e.id) 
-                        AND tc.id = ca.cargo
-                        AND ca.cargo = $1
-                        AND ca.id_departamento = d.id
-                        AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
-                        da.id = e.id) 
-                        AND s.id = d.id_sucursal
-                        AND s.id_ciudad = c.id
-                        AND co.id_regimen = r.id AND e.estado = $2
-                    ORDER BY name_empleado ASC
-                    `,
+                    "SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) name_empleado, e.nombre, e.apellido, e.codigo, " +
+                    "e.cedula, e.genero, e.correo, ca.id AS id_cargo, tc.cargo, " +
+                    "co.id AS id_contrato, r.id AS id_regimen, r.descripcion AS regimen, " +
+                    "d.id AS id_departamento, d.nombre AS departamento, s.id AS id_sucursal, " +
+                    "s.nombre AS sucursal, c.descripcion AS ciudad, ca.fec_final, ca.hora_trabaja " +
+                    "FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e, " +
+                    "tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s, ciudades AS c " +
+                    "WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE " +
+                    "da.id = e.id) " +
+                    "AND tc.id = ca.cargo " +
+                    "AND ca.cargo = $1 " +
+                    "AND ca.id_departamento = d.id " +
+                    "AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE " +
+                    "da.id = e.id) " +
+                    "AND s.id = d.id_sucursal " +
+                    "AND s.id_ciudad = c.id " +
+                    "AND co.id_regimen = r.id AND e.estado = $2 " +
+                    "AND s.id IN (" + id_sucursal + ") " +
+                    "ORDER BY name_empleado ASC "
+                    ,
                     [empl.id_cargo, estado])
                     .then((result: any) => { return result.rows });
             }

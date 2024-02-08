@@ -21,6 +21,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 
 import { ITableEmpleados } from 'src/app/model/reportes.model';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
   selector: 'app-lista-emple-plan-hora-e',
@@ -70,6 +71,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
   get filtroNombreReg() { return this.restR.filtroNombreReg };
 
   // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA
+  idEmpleadoLogueado: any;
   departamentos: any = [];
   sucursales: any = [];
   empleados: any = [];
@@ -129,8 +131,11 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     public validar: ValidacionesService,
     private toastr: ToastrService,
     public informacion: DatosGeneralesService,
+    public restUsuario: UsuarioService,
     private funciones: MainNavService
-  ) { }
+  ) {
+    this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
+  }
 
   ngOnInit(): void {
     if (this.habilitarHorasE === false) {
@@ -144,8 +149,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     }
     else {
       this.check = this.restR.checkOptions([{ opcion: 'c' }, { opcion: 'r' }, { opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
-      this.BuscarInformacion();
-      this.BuscarCargos();
+      this.AdministrarSucursalesUsuario();
     }
   }
 
@@ -158,15 +162,39 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     this.origen_cargo = [];
   }
 
+  // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
+  usua_sucursales: any = [];
+  AdministrarSucursalesUsuario() {
+    let empleado = { id_empleado: this.idEmpleadoLogueado };
+    let respuesta: any = [];
+    let codigos = '';
+    //console.log('empleado ', empleado)
+    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe(data => {
+      respuesta = data;
+      respuesta.forEach((obj: any) => {
+        if (codigos === '') {
+          codigos = '\'' + obj.id_sucursal + '\''
+        }
+        else {
+          codigos = codigos + ', \'' + obj.id_sucursal + '\''
+        }
+      })
+      console.log('ver sucursales ', codigos);
+      this.usua_sucursales = { id_sucursal: codigos };
+      this.BuscarInformacion(this.usua_sucursales);
+      this.BuscarCargos(this.usua_sucursales);
+    });
+  }
+
   // METODO PARA FILTRAR POR CARGOS
   empleados_cargos: any = [];
   origen_cargo: any = [];
   cargos: any = [];
-  BuscarCargos() {
+  BuscarCargos(buscar: any) {
     this.empleados_cargos = [];
     this.origen_cargo = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionCargo(1).subscribe((res: any[]) => {
+    this.informacion.ObtenerInformacionCargo(1, buscar).subscribe((res: any[]) => {
       this.origen_cargo = JSON.stringify(res);
 
       res.forEach(obj => {
@@ -196,14 +224,14 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
   }
 
   // METODO PARA BUSCAR INFORMACION DE USUARIOS
-  BuscarInformacion() {
+  BuscarInformacion(buscar: any) {
     this.departamentos = [];
     this.sucursales = [];
     this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.origen = [];
-    this.informacion.ObtenerInformacion(1).subscribe((res: any[]) => {
+    this.informacion.ObtenerInformacion(1, buscar).subscribe((res: any[]) => {
       this.origen = JSON.stringify(res);
 
       res.forEach(obj => {

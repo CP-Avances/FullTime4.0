@@ -19,6 +19,7 @@ import { SalidasAntesService } from 'src/app/servicios/reportes/salidas-antes/sa
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
   selector: 'app-salidas-antes',
@@ -38,6 +39,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   get bool() { return this.reporteService.criteriosBusqueda };
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS
+  idEmpleadoLogueado: any;
   departamentos: any = [];
   sucursales: any = [];
   empleados: any = [];
@@ -122,15 +124,16 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
     private parametro: ParametrosService,
     private restEmpre: EmpresaService,
     private toastr: ToastrService,
+    public restUsuario: UsuarioService,
   ) {
+    this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
     this.ObtenerColores();
   }
 
   ngOnInit(): void {
-    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
-    this.BuscarInformacion(this.opcionBusqueda);
-    this.BuscarCargos(this.opcionBusqueda);
+    this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
+    this.AdministrarSucursalesUsuario(this.opcionBusqueda);
     this.BuscarParametro();
     this.BuscarHora();
   }
@@ -174,15 +177,39 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
    ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** **
    ** ****************************************************************************************** **/
 
+  // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
+  usua_sucursales: any = [];
+  AdministrarSucursalesUsuario(opcion: number) {
+    let empleado = { id_empleado: this.idEmpleadoLogueado };
+    let respuesta: any = [];
+    let codigos = '';
+    //console.log('empleado ', empleado)
+    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe(data => {
+      respuesta = data;
+      respuesta.forEach((obj: any) => {
+        if (codigos === '') {
+          codigos = '\'' + obj.id_sucursal + '\''
+        }
+        else {
+          codigos = codigos + ', \'' + obj.id_sucursal + '\''
+        }
+      })
+      console.log('ver sucursales ', codigos);
+      this.usua_sucursales = { id_sucursal: codigos };
+      this.BuscarInformacion(opcion, this.usua_sucursales);
+      this.BuscarCargos(opcion, this.usua_sucursales);
+    });
+  }
+
   // METODO DE BUSQUEDA DE DATOS
-  BuscarInformacion(opcion: number) {
+  BuscarInformacion(opcion: number, buscar: any) {
     this.departamentos = [];
     this.sucursales = [];
     this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.origen = [];
-    this.informacion.ObtenerInformacion(opcion).subscribe(
+    this.informacion.ObtenerInformacion(opcion, buscar).subscribe(
       (res: any[]) => {
         this.origen = JSON.stringify(res);
         res.forEach((obj: any) => {
@@ -250,11 +277,11 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   // METODO PARA FILTRAR POR CARGOS
   empleados_cargos: any = [];
   origen_cargo: any = [];
-  BuscarCargos(opcion: number) {
+  BuscarCargos(opcion: number, buscar: any) {
     this.empleados_cargos = [];
     this.origen_cargo = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionCargo(opcion).subscribe(
+    this.informacion.ObtenerInformacionCargo(opcion, buscar).subscribe(
       (res: any[]) => {
         this.origen_cargo = JSON.stringify(res);
 
@@ -283,17 +310,16 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
       });
   }
 
-  ObtenerTipoUsuario($event: string){
+  ObtenerTipoUsuario($event: string) {
     this.tipoUsuario = $event;
-    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
     this.limpiar = this.opcionBusqueda;
     this.selectionSuc.clear();
     this.selectionDep.clear();
     this.selectionCar.clear();
     this.selectionReg.clear();
     this.selectionEmp.clear();
-    this.BuscarInformacion(this.opcionBusqueda);
-    this.BuscarCargos(this.opcionBusqueda);
+    this.AdministrarSucursalesUsuario(this.opcionBusqueda);
   }
 
 
@@ -523,7 +549,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
       documentDefinition = this.GetDocumentDefinicion();
     };
 
-    let doc_name = `Salidas_anticipadas_usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.pdf`;
+    let doc_name = `Salidas_anticipadas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -533,7 +559,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
 
   }
 
-   GetDocumentDefinicion() {
+  GetDocumentDefinicion() {
     return {
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -563,7 +589,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
         { text: (localStorage.getItem('name_empresa') as string).toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
-        { text: `SALIDAS ANTICIPADAS - ${this.opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
+        { text: `SALIDAS ANTICIPADAS - ${this.opcionBusqueda == 1 ? 'ACTIVOS' : 'INACTIVOS'}`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0] },
         { text: 'PERIODO DEL: ' + this.rangoFechas.fec_inico + " AL " + this.rangoFechas.fec_final, bold: true, fontSize: 11, alignment: 'center', margin: [0, 0, 0, 0] },
         ...this.EstructurarDatosPDF(this.data_pdf).map(obj => {
           return obj
@@ -575,11 +601,11 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
         centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 5, 0, 0] },
         itemsTable: { fontSize: 8 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
-        itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0],fillColor: '#E3E3E3' },
-        itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
+        itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0], fillColor: '#E3E3E3' },
+        itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2], fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
         itemsTableDerecha: { fontSize: 8, alignment: 'right' },
-        itemsTableInfoTotal: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.s_color  },
+        itemsTableInfoTotal: { fontSize: 9, bold: true, alignment: 'center', fillColor: this.s_color },
         itemsTableTotal: { fontSize: 8, bold: true, alignment: 'right', fillColor: '#E3E3E3' },
         itemsTableCentradoTotal: { fontSize: 8, bold: true, alignment: 'center', fillColor: '#E3E3E3' },
         tableMargin: { margin: [0, 0, 0, 0] },
@@ -720,7 +746,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                   { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
                   { rowSpan: 1, text: 'FECHA', style: 'tableHeaderSecundario' },
                   { rowSpan: 1, text: 'HORA', style: 'tableHeaderSecundario' },
-                  {},{},{},
+                  {}, {}, {},
                   {},
                   {},
                   {},
@@ -759,9 +785,9 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     { style: 'itemsTableCentrado', text: horaHorario },
                     { style: 'itemsTableCentrado', text: fechaTimbre },
                     { style: 'itemsTableCentrado', text: horaTimbre },
-                    {},{},{},{},{},
-                    {style: 'itemsTableCentrado', text: tiempo},
-                    {style: 'itemsTableDerecha', text: minutos.toFixed(2)},
+                    {}, {}, {}, {}, {},
+                    { style: 'itemsTableCentrado', text: tiempo },
+                    { style: 'itemsTableDerecha', text: minutos.toFixed(2) },
                   ];
                 }),
                 [
@@ -783,10 +809,6 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                   {
                     border: [false, true, false, true],
                     text: '',
-                    style: 'itemsTableCentradoTotal'},
-                  {
-                    border: [false, true, false, true],
-                    text: '',
                     style: 'itemsTableCentradoTotal'
                   },
                   {
@@ -799,7 +821,12 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     text: '',
                     style: 'itemsTableCentradoTotal'
                   },
-                  {style: 'itemsTableCentradoTotal', text: 'TOTAL'},
+                  {
+                    border: [false, true, false, true],
+                    text: '',
+                    style: 'itemsTableCentradoTotal'
+                  },
+                  { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
                   {
                     text: '',
                     style: 'itemsTableCentradoTotal'
@@ -808,8 +835,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     text: '',
                     style: 'itemsTableCentradoTotal'
                   },
-                  {style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoEmpleado.toFixed(2)))},
-                  {style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
+                  { style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoEmpleado.toFixed(2))) },
+                  { style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2) },
                 ],
               ],
             },
@@ -868,8 +895,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                   },
                   { text: '', style: 'itemsTableDerecha' },
                   { text: '', style: 'itemsTableCentrado' },
-                  { text: cargo.tiempo, style: 'itemsTableCentrado'},
-                  { text: cargo.minutos, style: 'itemsTableDerecha'},
+                  { text: cargo.tiempo, style: 'itemsTableCentrado' },
+                  { text: cargo.minutos, style: 'itemsTableDerecha' },
                 ]
               })
             ]
@@ -911,8 +938,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                   },
                   { text: '', style: 'itemsTableDerecha' },
                   { text: '', style: 'itemsTableCentrado' },
-                  { text: regimen.tiempo, style: 'itemsTableCentrado'},
-                  { text: regimen.minutos, style: 'itemsTableDerecha'},
+                  { text: regimen.tiempo, style: 'itemsTableCentrado' },
+                  { text: regimen.minutos, style: 'itemsTableDerecha' },
                 ]
               })
             ]
@@ -1003,7 +1030,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                   [
                     {
                       border: [true, false, false, false],
-                      text: this.bool.bool_suc || this.bool.bool_emp?'DEPARTAMENTO: ' + obj2.departamento:'',
+                      text: this.bool.bool_suc || this.bool.bool_emp ? 'DEPARTAMENTO: ' + obj2.departamento : '',
                       style: 'itemsTableInfoEmpleado'
                     },
                     {
@@ -1048,7 +1075,7 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     { rowSpan: 1, text: 'HORA', style: 'tableHeader' },
                     { rowSpan: 1, text: 'FECHA', style: 'tableHeaderSecundario' },
                     { rowSpan: 1, text: 'HORA', style: 'tableHeaderSecundario' },
-                    {},{},{},
+                    {}, {}, {},
                     {},
                     {},
                     {},
@@ -1087,9 +1114,9 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                       { style: 'itemsTableCentrado', text: horaHorario },
                       { style: 'itemsTableCentrado', text: fechaTimbre },
                       { style: 'itemsTableCentrado', text: horaTimbre },
-                      {},{},{},{},{},
-                      {style: 'itemsTableCentrado', text: tiempo},
-                      {style: 'itemsTableDerecha', text: minutos.toFixed(2)},
+                      {}, {}, {}, {}, {},
+                      { style: 'itemsTableCentrado', text: tiempo },
+                      { style: 'itemsTableDerecha', text: minutos.toFixed(2) },
                     ];
                   }),
                   [
@@ -1111,10 +1138,6 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                     {
                       border: [false, true, false, true],
                       text: '',
-                      style: 'itemsTableCentradoTotal'},
-                    {
-                      border: [false, true, false, true],
-                      text: '',
                       style: 'itemsTableCentradoTotal'
                     },
                     {
@@ -1127,11 +1150,16 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                       text: '',
                       style: 'itemsTableCentradoTotal'
                     },
-                    { style: 'itemsTableCentradoTotal', text: 'TOTAL'},
-                    { text: '', style: 'itemsTableCentradoTotal'},
-                    { text: '', style: 'itemsTableCentradoTotal'},
-                    { style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoEmpleado.toFixed(2)))},
-                    { style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2)},
+                    {
+                      border: [false, true, false, true],
+                      text: '',
+                      style: 'itemsTableCentradoTotal'
+                    },
+                    { style: 'itemsTableCentradoTotal', text: 'TOTAL' },
+                    { text: '', style: 'itemsTableCentradoTotal' },
+                    { text: '', style: 'itemsTableCentradoTotal' },
+                    { style: 'itemsTableCentradoTotal', text: this.MinutosAHorasMinutosSegundos(Number(totalTiempoEmpleado.toFixed(2))) },
+                    { style: 'itemsTableTotal', text: totalTiempoEmpleado.toFixed(2) },
                   ],
                 ],
               },
@@ -1192,8 +1220,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                 },
                 { text: '', style: 'itemsTableDerecha' },
                 { text: '', style: 'itemsTableCentrado' },
-                { text: departamento.tiempo, style: 'itemsTableCentrado'},
-                { text: departamento.minutos, style: 'itemsTableDerecha'},
+                { text: departamento.tiempo, style: 'itemsTableCentrado' },
+                { text: departamento.minutos, style: 'itemsTableDerecha' },
               ]
             })
           ]
@@ -1235,8 +1263,8 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
                 },
                 { text: '', style: 'itemsTableDerecha' },
                 { text: '', style: 'itemsTableCentrado' },
-                { text: sucursal.tiempo, style: 'itemsTableCentrado'},
-                { text: sucursal.minutos, style: 'itemsTableDerecha'},
+                { text: sucursal.tiempo, style: 'itemsTableCentrado' },
+                { text: sucursal.minutos, style: 'itemsTableDerecha' },
               ]
             })
           ]
@@ -1256,19 +1284,19 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
-   ExportarExcel(tipo: string): void {
+  ExportarExcel(tipo: string): void {
     switch (tipo) {
       case 'RegimenCargo':
         const wsr_regimen_cargo: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcelRegimenCargo(this.data_pdf));
         const wb_regimen_cargo: xlsx.WorkBook = xlsx.utils.book_new();
         xlsx.utils.book_append_sheet(wb_regimen_cargo, wsr_regimen_cargo, 'Salidas Anticipadas');
-        xlsx.writeFile(wb_regimen_cargo, `Salidas_anticipadas_usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.xlsx`);
+        xlsx.writeFile(wb_regimen_cargo, `Salidas_anticipadas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
         break;
       default:
         const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
         const wb: xlsx.WorkBook = xlsx.utils.book_new();
         xlsx.utils.book_append_sheet(wb, wsr, 'Salidas Anticipadas');
-        xlsx.writeFile(wb, `Salidas_anticipadas_usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.xlsx`);
+        xlsx.writeFile(wb, `Salidas_anticipadas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
         break;
     }
   }
@@ -1443,11 +1471,11 @@ export class SalidasAntesComponent implements OnInit, OnDestroy {
   MinutosAHorasMinutosSegundos(minutos: number) {
     let seconds = minutos * 60;
     let hour: string | number = Math.floor(seconds / 3600);
-    hour = (hour < 10)? '0' + hour : hour;
+    hour = (hour < 10) ? '0' + hour : hour;
     let minute: string | number = Math.floor((seconds / 60) % 60);
-    minute = (minute < 10)? '0' + minute : minute;
+    minute = (minute < 10) ? '0' + minute : minute;
     let second: string | number = Number((seconds % 60).toFixed(0));
-    second = (second < 10)? '0' + second : second;
+    second = (second < 10) ? '0' + second : second;
     return `${hour}:${minute}:${second}`;
   }
 

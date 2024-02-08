@@ -47,8 +47,8 @@ class UsuarioRutas {
         this.router.post('/frase/olvido-frase', USUARIO_CONTROLADOR.RestablecerFrase);
         // METODO PARA CAMBIAR FRASE DE SEGURIDAD
         this.router.post('/frase/restaurar-frase/nueva', USUARIO_CONTROLADOR.CambiarFrase);
-
-
+        // METODO PARA BUSCAR DATOS DE USUARIOS Y SUCURSALES
+        this.router.post('/buscar-usuario-sucursal', TokenValidation, USUARIO_CONTROLADOR.BuscarUsuarioSucursal);
 
 
 
@@ -58,7 +58,6 @@ class UsuarioRutas {
 
         this.router.get('/', TokenValidation, USUARIO_CONTROLADOR.list);
         this.router.get('/busqueda/:usuario', TokenValidation, USUARIO_CONTROLADOR.getIdByUsuario);
-        this.router.get('/noEnrolados', TokenValidation, USUARIO_CONTROLADOR.ListarUsuriosNoEnrolados);
 
     }
 }

@@ -19,6 +19,7 @@ import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import moment from 'moment';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
   selector: 'app-horario-multiple-empleado',
@@ -97,6 +98,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
   constructor(
     public informacion: DatosGeneralesService, // SERVICIO DE DATOS INFORMATIVOS DE USUARIOS
+    public restUsuario: UsuarioService,
     public restCargo: EmplCargosService,
     public restPerV: PeriodoVacacionesService, // SERVICIO DATOS PERIODO DE VACACIONES
     public validar: ValidacionesService, // VARIABLE USADA PARA VALIDACIONES DE INGRESO DE LETRAS - NUMEROS
@@ -110,8 +112,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
   ngOnInit(): void {
     this.check = this.restR.checkOptions([{ opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
-    this.BuscarInformacion();
-    this.BuscarCargos();
+    this.AdministrarSucursalesUsuario();
   }
 
   // METODO PARA DESTRUIR PROCESOS
@@ -123,12 +124,36 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     this.origen_cargo = [];
   }
 
+  // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
+  usua_sucursales: any = [];
+  AdministrarSucursalesUsuario() {
+    let empleado = { id_empleado: this.idEmpleadoLogueado };
+    let respuesta: any = [];
+    let codigos = '';
+    //console.log('empleado ', empleado)
+    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe(data => {
+      respuesta = data;
+      respuesta.forEach((obj: any) => {
+        if (codigos === '') {
+          codigos = '\'' + obj.id_sucursal + '\''
+        }
+        else {
+          codigos = codigos + ', \'' + obj.id_sucursal + '\''
+        }
+      })
+      console.log('ver sucursales ', codigos);
+      this.usua_sucursales = { id_sucursal: codigos };
+      this.BuscarInformacion(this.usua_sucursales);
+      this.BuscarCargos(this.usua_sucursales);
+    });
+  }
+
   // METODO PARA FILTRAR POR CARGOS
   empleados_cargos: any = [];
   origen_cargo: any = [];
   cargos: any = [];
-  BuscarCargos() {
-    this.informacion.ObtenerInformacionCargo(1).subscribe((res: any[]) => {
+  BuscarCargos(buscar: any) {
+    this.informacion.ObtenerInformacionCargo(1, buscar).subscribe((res: any[]) => {
       this.origen_cargo = JSON.stringify(res);
 
       res.forEach(obj => {
@@ -158,9 +183,9 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   }
 
   // METODO PARA BUSCAR INFORMACION DE USUARIOS
-  BuscarInformacion() {
+  BuscarInformacion(buscar: any) {
     this.origen = [];
-    this.informacion.ObtenerInformacion(1).subscribe((res: any[]) => {
+    this.informacion.ObtenerInformacion(1, buscar).subscribe((res: any[]) => {
       this.origen = JSON.stringify(res);
 
       res.forEach(obj => {
