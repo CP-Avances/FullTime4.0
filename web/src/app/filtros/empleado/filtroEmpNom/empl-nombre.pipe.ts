@@ -14,7 +14,6 @@ export class EmplNombrePipe implements PipeTransform {
     for (const resultados of value) {
 
       if (resultados.nombre) {
-
         if (resultados.nombre.toLowerCase().indexOf(arg.toLowerCase()) > -1) {
           RESULTADO_BUSQUEDAS.push(resultados);
         }

@@ -1,29 +1,20 @@
 // IMPORTACION DE LIBRERIAS
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
+import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 
-import * as xlsx from 'xlsx';
-import * as moment from 'moment';
-import * as FileSaver from 'file-saver';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import * as xml2js from 'xml2js';
-
-
+import { RegistrarSucursalesComponent } from 'src/app/componentes/catalogos/catSucursal/registrar-sucursales/registrar-sucursales.component';
 import { EditarSucursalComponent } from 'src/app/componentes/catalogos/catSucursal/editar-sucursal/editar-sucursal.component';
-import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
-import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
-import { RegistrarSucursalesComponent } from 'src/app/componentes/catalogos/catSucursal/registrar-sucursales/registrar-sucursales.component';
+
+import { ITableEmpleados } from 'src/app/model/reportes.model';
 
 @Component({
   selector: 'app-principal-sucursal-usuario',
@@ -35,18 +26,13 @@ export class PrincipalSucursalUsuarioComponent implements OnInit {
 
   buscarNombre = new FormControl('', [Validators.minLength(2)]);
   buscarCiudad = new FormControl('', [Validators.minLength(2)]);
-  buscarEmpresa = new FormControl('', [Validators.minLength(2)]);
   filtroNombreSuc = '';
   filtroCiudadSuc = '';
-  filtroEmpresaSuc = '';
 
   public formulario = new FormGroup({
     buscarNombreForm: this.buscarNombre,
     buscarCiudadForm: this.buscarCiudad,
-    buscarEmpresForm: this.buscarEmpresa
   });
-
-  archivoForm = new FormControl('', Validators.required);
 
   sucursales: any = [];
 
@@ -55,8 +41,6 @@ export class PrincipalSucursalUsuarioComponent implements OnInit {
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
 
-  tamanio_paginaMul: number = 5;
-  numero_paginaMul: number = 1;
 
   empleado: any = [];
   idEmpleado: number;
@@ -65,7 +49,6 @@ export class PrincipalSucursalUsuarioComponent implements OnInit {
     private rest: SucursalService,
     private toastr: ToastrService,
     private router: Router,
-    public restEmpre: EmpresaService,
     public ventana: MatDialog,
     public validar: ValidacionesService,
     public restE: EmpleadoService,
@@ -76,50 +59,13 @@ export class PrincipalSucursalUsuarioComponent implements OnInit {
   ngOnInit(): void {
     this.ObtenerEmpleados(this.idEmpleado);
     this.ObtenerSucursal();
-    this.ObtenerColores();
-    this.ObtenerLogo();
-
-
-
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
-  ObtenerEmpleados(idemploy: any) {
-    this.empleado = [];
-    this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
-      this.empleado = data;
-    })
-  }
-
-  // METODO PARA OBTENER EL LOGO DE LA EMPRESA
-  logo: any = String;
-  ObtenerLogo() {
-    this.restEmpre.LogoEmpresaImagenBase64(localStorage.getItem('empresa') as string).subscribe(res => {
-      this.logo = 'data:image/jpeg;base64,' + res.imagen;
-    });
-  }
-
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
-  p_color: any;
-  s_color: any;
-  frase: any;
-  ObtenerColores() {
-    this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-      this.p_color = res[0].color_p;
-      this.s_color = res[0].color_s;
-      this.frase = res[0].marca_agua;
-    });
-  }
 
   // METODO PARA MANEJAR LA PAGINACION
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
     this.numero_pagina = e.pageIndex + 1;
-  }
-  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
-  ManejarPaginaMulti(e: PageEvent) {
-    this.tamanio_paginaMul = e.pageSize;
-    this.numero_paginaMul = e.pageIndex + 1
   }
 
   // METODO PARA BUSCAR SUCURSALES
@@ -128,6 +74,116 @@ export class PrincipalSucursalUsuarioComponent implements OnInit {
       this.sucursales = data;
     });
   }
+
+  // METODO PARA ACTIVAR SELECCION MULTIPLE
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+  activar_seleccion: boolean = true;
+  auto_individual: boolean = true;
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  /** ************************************************************************************** **
+   ** **                   METODOS DE SELECCION DE DATOS DE USUARIOS                      ** **
+   ** ************************************************************************************** **/
+
+  selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  isAllSelectedSuc() {
+    const numSelected = this.selectionSuc.selected.length;
+    return numSelected === this.sucursales.length
+  }
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  masterToggleSuc() {
+    this.isAllSelectedSuc() ?
+      this.selectionSuc.clear() :
+      this.sucursales.forEach(row => this.selectionSuc.select(row));
+  }
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelSuc(row?: ITableEmpleados): string {
+    if (!row) {
+      return `${this.isAllSelectedSuc() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selectionSuc.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
+
+  // METODO PARA CONTROLAR FILTROS DE BUSQUEDA
+  ControlarFiltrado(e: any) {
+    if (e === '') {
+      if (this.plan_multiple === true) {
+        this.activar_seleccion = false;
+      }
+      else {
+        if (this.activar_seleccion === false) {
+          this.plan_multiple = true;
+          this.auto_individual = false;
+        }
+      }
+    }
+    else {
+      if (this.activar_seleccion === true) {
+        this.activar_seleccion = false;
+        this.plan_multiple_ = true;
+        this.auto_individual = false;
+      }
+      else {
+        this.plan_multiple = false;
+      }
+    }
+  }
+
+
+  // METODO INDIVIDUAL - METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  ObtenerEmpleados(idemploy: any) {
+    this.empleado = [];
+    this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
+      this.empleado = data;
+    })
+  }
+
+  // METODO PARA MOSTRAR LISTA - ICONO INDIVIDUAL
+  MostrarLista() {
+    this.selectionSuc.clear();
+    this.formulario.setValue({
+      buscarNombreForm: '',
+      buscarCiudadForm: '',
+    });
+    this.ObtenerSucursal();
+    this.activar_seleccion = true;
+    this.auto_individual = true;
+    this.plan_multiple_ = false;
+    this.plan_multiple = false;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // METODO PARA REGISTRAR SUCURSAL
   AbrirVentanaRegistrar() {
@@ -159,27 +215,6 @@ export class PrincipalSucursalUsuarioComponent implements OnInit {
     return this.validar.IngresarSoloLetras(e);
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
-  Eliminar(id_sucursal: number) {
-    this.rest.EliminarRegistro(id_sucursal).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ObtenerSucursal();
-    });
-  }
-
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDelete(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.Eliminar(datos.id);
-        } else {
-          this.router.navigate(['/sucursales']);
-        }
-      });
-  }
 
   // METODO PARA VER DATOS DE DEPARTAMENTOS DE SUCURSAL
   ver_departamentos: boolean = false;

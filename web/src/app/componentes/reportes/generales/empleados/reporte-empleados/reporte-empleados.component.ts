@@ -20,6 +20,7 @@ import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-ge
 import { ValidacionesService } from '../../../../../servicios/validaciones/validaciones.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
   selector: 'app-reporte-empleados',
@@ -45,6 +46,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   }
 
   // VARIABLES DE ALMACENAMIENTO DE RESULTADOS
+  idEmpleadoLogueado: any;
   departamentos: any = [];
   sucursales: any = [];
   regimen: any = [];
@@ -141,15 +143,16 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     private informacion: DatosGeneralesService,
     private restEmpre: EmpresaService,
     private toastr: ToastrService,
+    public restUsuario: UsuarioService,
   ) {
+    this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
     this.ObtenerColores();
   }
 
   ngOnInit(): void {
-    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
-    this.BuscarInformacion(this.opcionBusqueda);
-    this.BuscarCargos(this.opcionBusqueda);
+    this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
+    this.AdministrarSucursalesUsuario(this.opcionBusqueda);
   }
 
   ngOnDestroy() {
@@ -168,14 +171,38 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
    ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** **
    ** ****************************************************************************************** **/
 
-   BuscarInformacion(opcion: number) {
+  // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
+  usua_sucursales: any = [];
+  AdministrarSucursalesUsuario(opcion: number) {
+    let empleado = { id_empleado: this.idEmpleadoLogueado };
+    let respuesta: any = [];
+    let codigos = '';
+    //console.log('empleado ', empleado)
+    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe(data => {
+      respuesta = data;
+      respuesta.forEach((obj: any) => {
+        if (codigos === '') {
+          codigos = '\'' + obj.id_sucursal + '\''
+        }
+        else {
+          codigos = codigos + ', \'' + obj.id_sucursal + '\''
+        }
+      })
+      console.log('ver sucursales ', codigos);
+      this.usua_sucursales = { id_sucursal: codigos };
+      this.BuscarInformacion(opcion, this.usua_sucursales);
+      this.BuscarCargos(opcion, this.usua_sucursales);
+    });
+  }
+
+  BuscarInformacion(opcion: number, buscar: any) {
     this.departamentos = [];
     this.sucursales = [];
     this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.origen = [];
-    this.informacion.ObtenerInformacion(opcion).subscribe(
+    this.informacion.ObtenerInformacion(opcion, buscar).subscribe(
       (res: any[]) => {
         this.origen = JSON.stringify(res);
         res.forEach((obj: any) => {
@@ -244,11 +271,11 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
   // METODO PARA FILTRAR POR CARGOS
   empleados_cargos: any = [];
   origen_cargo: any = [];
-  BuscarCargos(opcion: number) {
+  BuscarCargos(opcion: number, buscar: any) {
     this.empleados_cargos = [];
     this.origen_cargo = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionCargo(opcion).subscribe(
+    this.informacion.ObtenerInformacionCargo(opcion, buscar).subscribe(
       (res: any[]) => {
         this.origen_cargo = JSON.stringify(res);
 
@@ -278,17 +305,16 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
       });
   }
 
-  ObtenerTipoUsuario($event: string){
+  ObtenerTipoUsuario($event: string) {
     this.tipoUsuario = $event;
-    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
     this.limpiar = this.opcionBusqueda;
     this.selectionSuc.clear();
     this.selectionDep.clear();
     this.selectionCar.clear();
     this.selectionReg.clear();
     this.selectionEmp.clear();
-    this.BuscarInformacion(this.opcionBusqueda);
-    this.BuscarCargos(this.opcionBusqueda);
+    this.AdministrarSucursalesUsuario(this.opcionBusqueda);
   }
 
   // VALIDACIONES DE SELECCION DE BUSQUEDA
@@ -516,7 +542,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
 
   GenerarPDF(action: any) {
     const documentDefinition = this.GetDocumentDefinicion();
-    let doc_name = `Usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.pdf`;
+    let doc_name = `Usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
     switch (action) {
       case 'open': pdfMake.createPdf(documentDefinition).open(); break;
       case 'print': pdfMake.createPdf(documentDefinition).print(); break;
@@ -557,7 +583,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
         { text: localStorage.getItem('name_empresa')?.toUpperCase(), bold: true, fontSize: 14, alignment: 'center', margin: [0, -30, 0, 5] },
-        { text: `USUARIOS - ${this.opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0], },
+        { text: `USUARIOS - ${this.opcionBusqueda == 1 ? 'ACTIVOS' : 'INACTIVOS'}`, bold: true, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 0], },
         ...this.EstructurarDatosPDF(this.data_pdf).map(obj => {
           return obj
         })
@@ -567,8 +593,8 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
         centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 7, 0, 0] },
         itemsTable: { fontSize: 8 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
-        itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0],fillColor: '#E3E3E3' },
-        itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
+        itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0], fillColor: '#E3E3E3' },
+        itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2], fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
         tableMargin: { margin: [0, 0, 0, 0] },
         tableMarginEmp: { margin: [0, 15, 0, 0] },
@@ -640,8 +666,8 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
           arr_emp.push(obj2)
         });
 
-        arr_emp.sort(function(a: any, b: any){
-          return ((a.apellido+a.nombre).toLowerCase().localeCompare((b.apellido+b.nombre).toLowerCase()))
+        arr_emp.sort(function (a: any, b: any) {
+          return ((a.apellido + a.nombre).toLowerCase().localeCompare((b.apellido + b.nombre).toLowerCase()))
         });
 
         if (this.bool.bool_cargo) {
@@ -701,7 +727,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
                   { text: 'SUCURSAL', style: 'tableHeader' },
                   { text: 'CIUDAD', style: 'tableHeader' },
                   { text: 'DEPARTAMENTO', style: 'tableHeader' },
-                  { text: 'CARGO' , style: 'tableHeader' },
+                  { text: 'CARGO', style: 'tableHeader' },
                   { text: 'CORREO', style: 'tableHeader' }
                 ],
                 ...arr_emp.map((obj3: any) => {
@@ -768,8 +794,8 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
         obj.departamentos.forEach((obj1) => {
           if (this.bool.bool_dep === true) {
             let reg = obj1.empleado.length;
-            obj1.empleado.sort(function(a: any, b: any){
-              return ((a.apellido+a.nombre).toLowerCase().localeCompare((b.apellido+b.nombre).toLowerCase()))
+            obj1.empleado.sort(function (a: any, b: any) {
+              return ((a.apellido + a.nombre).toLowerCase().localeCompare((b.apellido + b.nombre).toLowerCase()))
             });
             n.push({
               style: 'tableMarginCabecera',
@@ -833,12 +859,12 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
               }
             });
           } else {
-              obj1.empleado.forEach(e => {
-                arr_emp.push(e)
-              });
-              arr_emp.sort(function(a: any, b: any){
-                return ((a.apellido+a.nombre).toLowerCase().localeCompare((b.apellido+b.nombre).toLowerCase()))
-              });
+            obj1.empleado.forEach(e => {
+              arr_emp.push(e)
+            });
+            arr_emp.sort(function (a: any, b: any) {
+              return ((a.apellido + a.nombre).toLowerCase().localeCompare((b.apellido + b.nombre).toLowerCase()))
+            });
           }
         });
         if (this.bool.bool_suc) {
@@ -948,7 +974,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
-   ValidarExcel(){
+  ValidarExcel() {
     if (this.bool.bool_cargo || this.bool.bool_reg) {
       this.ExportarExcelCargoRegimen();
     } else {
@@ -960,7 +986,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcel(this.data_pdf));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Usuarios');
-    xlsx.writeFile(wb, `Usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.xlsx`);
+    xlsx.writeFile(wb, `Usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
   }
 
   EstructurarDatosExcel(array: Array<any>) {
@@ -985,12 +1011,12 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
         })
       })
     });
-    nuevo.sort(function(a: any, b: any){
-      return ((a.Apellido+a.Nombre).toLowerCase().localeCompare((b.Apellido+b.Nombre).toLowerCase()))
+    nuevo.sort(function (a: any, b: any) {
+      return ((a.Apellido + a.Nombre).toLowerCase().localeCompare((b.Apellido + b.Nombre).toLowerCase()))
     });
-    nuevo.forEach((u: any)=>{
+    nuevo.forEach((u: any) => {
       c = c + 1;
-      const usuarioNuevo = Object.assign({'N°': c}, u);
+      const usuarioNuevo = Object.assign({ 'N°': c }, u);
       usuarios.push(usuarioNuevo);
     });
 
@@ -1001,7 +1027,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     const wsr: xlsx.WorkSheet = xlsx.utils.json_to_sheet(this.EstructurarDatosExcelRegimenCargo(this.data_pdf));
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Usuarios');
-    xlsx.writeFile(wb, `Usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.xls`);
+    xlsx.writeFile(wb, `Usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xls`);
   }
 
   EstructurarDatosExcelRegimenCargo(array: Array<any>) {
@@ -1022,12 +1048,12 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
         nuevo.push(ele)
       })
     });
-    nuevo.sort(function(a: any, b: any){
-      return ((a.Apellido+a.Nombre).toLowerCase().localeCompare((b.Apellido+b.Nombre).toLowerCase()))
+    nuevo.sort(function (a: any, b: any) {
+      return ((a.Apellido + a.Nombre).toLowerCase().localeCompare((b.Apellido + b.Nombre).toLowerCase()))
     });
-    nuevo.forEach((u: any)=>{
+    nuevo.forEach((u: any) => {
       c = c + 1;
-      const usuarioNuevo = Object.assign({'N°': c}, u);
+      const usuarioNuevo = Object.assign({ 'N°': c }, u);
       usuarios.push(usuarioNuevo);
     });
 
@@ -1038,7 +1064,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
    ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
    ** ****************************************************************************************** **/
 
-   ExtraerDatos() {
+  ExtraerDatos() {
     this.arr_emp = [];
     let n = 0;
     this.data_pdf.forEach((obj: any) => {
@@ -1048,8 +1074,8 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
         });
       });
     });
-    this.arr_emp.sort(function(a: any, b: any){
-      return ((a.apellido+a.nombre).toLowerCase().localeCompare((b.apellido+b.nombre).toLowerCase()))
+    this.arr_emp.sort(function (a: any, b: any) {
+      return ((a.apellido + a.nombre).toLowerCase().localeCompare((b.apellido + b.nombre).toLowerCase()))
     });
     this.arr_emp.forEach((u: any) => {
       n = n + 1;
@@ -1065,8 +1091,8 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
         this.arr_emp.push(e);
       });
     });
-    this.arr_emp.sort(function(a: any, b: any){
-      return ((a.apellido+a.nombre).toLowerCase().localeCompare((b.apellido+b.nombre).toLowerCase()))
+    this.arr_emp.sort(function (a: any, b: any) {
+      return ((a.apellido + a.nombre).toLowerCase().localeCompare((b.apellido + b.nombre).toLowerCase()))
     });
     this.arr_emp.forEach((u: any) => {
       n = n + 1;
@@ -1227,7 +1253,7 @@ export class ReporteEmpleadosComponent implements OnInit, OnDestroy {
     }
   }
 
- // METODO PARA REGRESAR A LA PAGINA ANTERIOR
+  // METODO PARA REGRESAR A LA PAGINA ANTERIOR
   Regresar() {
     this.verDetalle = false;
     this.paginatorDetalle.firstPage();

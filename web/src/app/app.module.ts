@@ -315,6 +315,7 @@ import { EliminarIndividualComponent } from './componentes/horarios/eliminar-ind
 import { BuscarAsistenciaComponent } from './componentes/horarios/asistencia/buscar-asistencia/buscar-asistencia.component';
 import { CargarPlantillaPlanificacionComponent } from './componentes/horarios/cargar-plantillas/cargar-plantilla-planificacion/cargar-plantilla-planificacion.component';
 import { PrincipalSucursalUsuarioComponent } from './componentes/empleado/sucursal-usuario/principal-sucursal-usuario/principal-sucursal-usuario.component';
+import { AsignarUsuarioComponent } from './componentes/empleado/sucursal-usuario/asignar-usuario/asignar-usuario.component';
 
 
 const config: SocketIoConfig = { url: environment.url, options: {} };
@@ -565,6 +566,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     BuscarAsistenciaComponent,
     CargarPlantillaPlanificacionComponent,
     PrincipalSucursalUsuarioComponent,
+    AsignarUsuarioComponent,
 
   ],
 

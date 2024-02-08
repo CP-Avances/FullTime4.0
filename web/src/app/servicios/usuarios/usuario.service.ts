@@ -75,10 +75,10 @@ export class UsuarioService {
     return this.http.get<any>(`${environment.url}/usuarios/lista-app-movil/${estado}/activo/${habilitado}`);
   }
 
-    // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
-    UsuariosTimbreMovilCargos(estado: any, habilitado: boolean) {
-      return this.http.get<any>(`${environment.url}/usuarios/lista-app-movil-cargos/${estado}/activo/${habilitado}`);
-    }
+  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
+  UsuariosTimbreMovilCargos(estado: any, habilitado: boolean) {
+    return this.http.get<any>(`${environment.url}/usuarios/lista-app-movil-cargos/${estado}/activo/${habilitado}`);
+  }
 
   // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL
   ActualizarEstadoTimbreMovil(data: any) {
@@ -106,7 +106,10 @@ export class UsuarioService {
   }
 
 
-
+  // METODO DE BUSQUEDA DE DATOS DE USUARIO
+  BuscarUsuarioSucursal(id_empleado: any) {
+    return this.http.post(`${environment.url}/usuarios/buscar-usuario-sucursal`, id_empleado);
+  }
 
 
 

@@ -646,14 +646,17 @@ class UsuarioControlador {
             }
         });
     }
-    ListarUsuriosNoEnrolados(req, res) {
+    BuscarUsuarioSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const USUARIOS = yield database_1.default.query('SELECT u.id, u.usuario, ce.id_usuario FROM usuarios AS u LEFT JOIN cg_enrolados AS ce ON u.id = ce.id_usuario WHERE ce.id_usuario IS null');
+            const { id_empleado } = req.body;
+            const USUARIOS = yield database_1.default.query(`
+      SELECT * FROM usuario_sucursal WHERE id_usuario = $1
+      `, [id_empleado]);
             if (USUARIOS.rowCount > 0) {
                 return res.jsonp(USUARIOS.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
