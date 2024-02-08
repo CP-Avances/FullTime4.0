@@ -266,6 +266,37 @@ label {
         font-size: 15px;
     }
 
+    .row {
+        flex-direction: column; /* Cambia la dirección del flex a columna */
+      }
+
+      .col-md-4 {
+        flex: 1; /* Ocupa el 100% del ancho en pantallas pequeñas */
+        margin-bottom: 10px; /* Añade margen inferior para separar los elementos */
+        height: min-content;
+      }
+    
+      .col-md-6 {
+        flex: 1; /* Ocupa el 100% del ancho en pantallas pequeñas */
+        margin-bottom: 10px; /* Añade margen inferior para separar los elementos */
+
+      }
+
+      .col-md-8 {
+        flex: 1; /* Ocupa el 100% del ancho en pantallas pequeñas */
+        margin-bottom: 10px; /* Añade margen inferior para separar los elementos */
+      }
+
+      mat-card{
+        margin-top: 10px;
+      }
+
+}
+
+@media only screen and (max-width: 1056px){
+    .aplicacion{
+        margin-top: 10px;
+    }
 }
 
 .texto {

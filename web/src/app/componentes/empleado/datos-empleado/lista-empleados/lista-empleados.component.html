@@ -48,9 +48,16 @@
                                 <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
                                     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                 <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
+                                    *ngIf="!mostrarbtnsubir"
                                     style="height: 65px;"
                                     matTooltip="Dar click para selecionar plantilla y cargar registros.">
                                     Subir plantilla
+                                </label>
+                                <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
+                                    *ngIf="mostrarbtnsubir"
+                                    style="height: 64px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                    Subir nueva plantilla
                                 </label>
                             </form>
                         </div>
@@ -294,6 +301,7 @@
             <table id="table_usuarios" class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
+                        <th id="td_usuario" scope="col"></th>
                         <th id="td_usuario" scope="col">Nombre</th>
                         <th id="td_usuario" scope="col">Apellido</th>
                         <th id="td_usuario" scope="col">Cédula</th>
@@ -310,7 +318,8 @@
                 </thead>
                 <tbody>
                     <tr
-                        *ngFor="let e of DataEmpleados | emplCodigo: filtroCodigo | emplCedula: filtroCedula | emplNombre: filtroNombre | emplApellido: filtroApellido | paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let e of DataEmpleados | paginate:tamanio_pagina:numero_pagina; let i = index">
+                        <td style="font-size: 14px; width: 50px;" align="center">{{i + 1}}</td>
                         <td [style.color]="stiloTextoCelda(e.nombre)">{{e.nombre}}</td>
                         <td [style.color]="stiloTextoCelda(e.apellido)">{{e.apellido}}</td>
                         <td [style.color]="stiloTextoCelda(e.cedula)">{{e.cedula}}</td>
@@ -330,7 +339,7 @@
                 </tbody>
             </table>
         </div>
-        <mat-paginator id="pagina" [length]="empleado.length" [pageSize]="tamanio_pagina"
+        <mat-paginator id="pagina" [length]="DataEmpleados.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
     </div>

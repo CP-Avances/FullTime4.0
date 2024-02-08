@@ -718,6 +718,7 @@ class EmpleadoControlador {
             };
             var listEmpleados = [];
             var duplicados = [];
+            var duplicados1 = [];
             var duplicados2 = [];
             /*
             var contarCodigo = 0;
@@ -773,6 +774,14 @@ class EmpleadoControlador {
                     else {
                         data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                     }
+                    //TODO Revisar max codigo
+                    // Verificar que el código no se duplique en los registros
+                    //codigo = codigo + 1;
+                    //console.log('codigo_ver', codigo);
+                    //const VERIFICAR_CODIGO = await pool.query('SELECT * FROM empleados WHERE codigo = $1', [codigo]);
+                    //if (VERIFICAR_CODIGO.rowCount === 0) {
+                    //contarCodigo = contarCodigo + 1;
+                    //}
                     listEmpleados.push(data);
                 }
                 else {
@@ -868,122 +877,6 @@ class EmpleadoControlador {
                 }
                 data = {};
                 /*
-                  if(cedula != undefined && cedula != ''){
-                    const VERIFICAR_CEDULA = await pool.query('SELECT * FROM empleados WHERE cedula = $1', [cedula]);
-                    data.cedula = cedula;
-                    if (VERIFICAR_CEDULA.rowCount === 0) {
-                      //Verificar que el usuario no se encuentre registrado
-                      if(usuario != undefined && usuario != ''){
-                        const VERIFICAR_USUARIO = await pool.query('SELECT * FROM usuarios WHERE usuario = $1', [usuario]);
-                        data.nombre = nombre;
-                        data.apellido = apellido;
-                        data.usuario = usuario;
-                        if (VERIFICAR_USUARIO.rowCount === 0) {
-                          //Verificar que el rol exista dentro del sistema
-                          if(rol != undefined && rol != ''){
-                            const VERIFICAR_ROL = await pool.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [rol.toUpperCase()]);
-                            if (VERIFICAR_ROL.rowCount > 0) {
-                              data.estado_civil = estado_civil,
-                              data.genero = genero,
-                              data.correo = correo,
-                              data.fec_nacimiento = fec_nacimiento,
-                              data.estado = estado,
-                              data.mail_alternativo = correo,
-                              data.domicilio = domicilio,
-                              data.telefono = telefono,
-                              data.nacionalidad = nacionalidad,
-                              data.contrasena = contrasena,
-                              data.estado_user = estado_user,
-                              data.rol = rol,
-                              data.app_habilita = app_habilita,
-                              data.observacion = 'ok';
-                            }else{
-                              data.estado_civil = estado_civil,
-                              data.genero = genero,
-                              data.correo = correo,
-                              data.fec_nacimiento = fec_nacimiento,
-                              data.estado = estado,
-                              data.mail_alternativo = correo,
-                              data.domicilio = domicilio,
-                              data.telefono = telefono,
-                              data.nacionalidad = nacionalidad,
-                              data.contrasena = contrasena,
-                              data.estado_user = estado_user,
-                              data.rol = rol,
-                              data.app_habilita = app_habilita,
-                              data.observacion = 'No existe el rol';
-                            }
-                          }else{
-                            data.rol = 'No registrado',
-                            data.observacion = 'Rol no ingresado';
-                          }
-                          
-                        }else{
-                          data.observacion = 'Ya esta registrado en base';
-                        }
-                      }else{
-                        data.nombre = nombre;
-                        data.apellido = apellido;
-                        data.usuario = 'No registrado';
-                        data.estado_civil = estado_civil,
-                        data.genero = genero,
-                        data.correo = correo,
-                        data.fec_nacimiento = fec_nacimiento,
-                        data.estado = estado,
-                        data.mail_alternativo = correo,
-                        data.domicilio = domicilio,
-                        data.telefono = telefono,
-                        data.nacionalidad = nacionalidad,
-                        data.contrasena = contrasena,
-                        data.estado_user = estado_user,
-                        data.rol = rol,
-                        data.app_habilita = app_habilita,
-                        data.observacion = 'No existe el usuario';
-                      }
-                    }else{
-                      data.nombre = nombre;
-                      data.apellido = apellido;
-                      data.usuario = usuario;
-                      data.estado_civil = estado_civil,
-                      data.genero = genero,
-                      data.correo = correo,
-                      data.fec_nacimiento = fec_nacimiento,
-                      data.estado = estado,
-                      data.mail_alternativo = correo,
-                      data.domicilio = domicilio,
-                      data.telefono = telefono,
-                      data.nacionalidad = nacionalidad,
-                      data.contrasena = contrasena,
-                      data.estado_user = estado_user,
-                      data.rol = rol,
-                      data.app_habilita = app_habilita,
-                      data.observacion = 'Ya esta registrado en base';
-                    }
-            
-            
-                  }else{
-                    data.cedula = 'No registrado';
-                    data.nombre = nombre;
-                    data.apellido = apellido;
-                    data.usuario = usuario;
-                    data.estado_civil = estado_civil,
-                    data.genero = genero,
-                    data.correo = correo,
-                    data.fec_nacimiento = fec_nacimiento,
-                    data.estado = estado,
-                    data.mail_alternativo = correo,
-                    data.domicilio = domicilio,
-                    data.telefono = telefono,
-                    data.nacionalidad = nacionalidad,
-                    data.contrasena = contrasena,
-                    data.estado_user = estado_user,
-                    data.rol = rol,
-                    data.app_habilita = app_habilita,
-                    data.observacion = 'No existe la cedula';
-            
-                  }
-                  */
-                /*
                 //Verificar que el rol exista dentro del sistema
                 const VERIFICAR_ROL = await pool.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1',
                   [rol.toUpperCase()]);
@@ -1067,22 +960,22 @@ class EmpleadoControlador {
                     valor.observacion = 'Cedula ya existe en la base';
                 }
                 else {
-                    console.log('entro en cedula no existe');
                     var VERIFICAR_USUARIO = yield database_1.default.query('SELECT * FROM usuarios WHERE usuario = $1', [valor.usuario]);
                     if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
                         valor.observacion = 'Usuario ya existe en la base';
                     }
                     else {
                         // Discriminación de elementos iguales
-                        if (duplicados.find((p) => p.cedula === valor.cedula) == undefined) {
+                        if (duplicados1.find((p) => p.cedula === valor.cedula) == undefined) {
                             // Discriminación de elementos iguales
                             if (duplicados2.find((a) => a.usuario === valor.usuario) == undefined) {
+                                //valor.observacion = 'ok'
                                 duplicados2.push(valor);
                             }
                             else {
                                 valor.observacion = '2';
                             }
-                            duplicados.push(valor);
+                            duplicados1.push(valor);
                         }
                         else {
                             valor.observacion = '1';

@@ -194,7 +194,7 @@ class FeriadosControlador {
                 }
                 if (data.descripcion == undefined || data.descripcion == '') {
                     data.descripcion = 'No registrado';
-                    data.observacion = 'Descripcion ' + data.observacion;
+                    data.observacion = 'Descripción ' + data.observacion;
                 }
                 //VERIFICA SI EXISTE EN LAs COLUMNA DATOS REGISTRADOS
                 if (data.fecha != 'No registrado' && data.descripcion != 'No registrado') {
@@ -258,7 +258,7 @@ class FeriadosControlador {
                 else {
                     data.fec_recuperacion = dato.fec_recuperacion;
                     if (data.fecha == 'No registrado' && data.descripcion == 'No registrado') {
-                        data.observacion = 'Fecha y descripcion no registrada';
+                        data.observacion = 'Fecha y descripción no registrada';
                     }
                     if (data.fec_recuperacion == undefined) {
                         data.fec_recuperacion = '-';

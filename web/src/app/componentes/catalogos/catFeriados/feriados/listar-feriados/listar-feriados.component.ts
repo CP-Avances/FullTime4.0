@@ -68,6 +68,8 @@ export class ListarFeriadosComponent implements OnInit {
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
   hipervinculo: string = environment.url
 
+  expansion: boolean = false;
+
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
   get p_color(): string { return this.plantillaPDF.color_Primary }
@@ -296,123 +298,17 @@ export class ListarFeriadosComponent implements OnInit {
         }
       });
     });
+  }
 
-    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
-     /*
-    this.rest.RevisarFormato(formData).subscribe(res => {
-      console.log('probando plantilla1', res);
-
-      if (res.message === 'CAMPO FECHA ES OBLIGATORIO') {
-        this.toastr.error('Para asegurar el buen funcionamiento del sistema es necesario que verifique los datos ' +
-          'de la plantilla ingresada. No se encuentra el registro del campo fecha en la ' + res.data + '.',
-          'Recuerde el campo fecha es obligatorio.', {
-          timeOut: 10000,
-        });
-        this.archivoForm.reset();
-        this.nameFile = '';
-      }
-      else if (res.message === 'CAMPO DESCRIPCION ES OBLIGATORIO') {
-        this.toastr.error('Para asegurar el buen funcionamiento del sistema es necesario que verifique los datos ' +
-          'de la plantilla ingresada. No se encuentra el registro del campo descripcion en la ' + res.data + '.',
-          'Recuerde el campo descripcion es obligatorio.', {
-          timeOut: 10000,
-        });
-        this.archivoForm.reset();
-        this.nameFile = '';
-      }
-      else if (res.message === 'FECHA INVALIDA') {
-        this.toastr.error('Para asegurar el buen funcionamiento del sistema es necesario que verifique los datos ' +
-          'de la plantilla ingresada. Las fechas con formato incorrecto o fuera de rango se encuentran en la ' +
-          res.data + '.', 'Recuerde las fechas en la plantilla EXCEL deben estar en formato texto.', {
-          timeOut: 10000,
-        });
-        this.archivoForm.reset();
-        this.nameFile = '';
-      }
-      else if (res.message === 'FECHA YA EXISTE') {
-        this.toastr.error('Para asegurar el buen funcionamiento del sistema es necesario que verifique los datos ' +
-          'de la plantilla ingresada. Se encuentran fechas que ya estan registradas en el sistema en la ' + res.data + '.',
-          'Recuerde que el sistema no permite registros duplicados.', {
-          timeOut: 10000,
-        });
-        this.archivoForm.reset();
-        this.nameFile = '';
-      }
-      else if (res.message === 'FECHA DE RECUPERACION INVALIDA') {
-        this.toastr.error('Para asegurar el buen funcionamiento del sistema es necesario que verifique los datos ' +
-          'de la plantilla ingresada. Las fechas de recuperación con formato incorrecto o fuera de rango se encuentran en la '
-          + res.data + '.', 'Recuerde las fechas de recuperación en la plantilla EXCEL deben estar en formato texto.', {
-          timeOut: 10000,
-        });
-        this.archivoForm.reset();
-        this.nameFile = '';
-      }
-      else if (res.message === 'FECHA DE RECUPERACION ANTERIOR') {
-        this.toastr.error('Para asegurar el buen funcionamiento del sistema es necesario que verifique los datos ' +
-          'de la plantilla ingresada. Las fechas de recuperación que no son válidas se encuentran en la ' +
-          res.data + '.', 'Recuerde la fecha de recuperación debe ser posterior a la fecha que registra como un feriado.', {
-          timeOut: 10000,
-        });
-        this.archivoForm.reset();
-        this.nameFile = '';
-      }
-      else if (res.message === 'FECHA DE RECUPERACION YA EXISTE') {
-        this.toastr.error('Para asegurar el buen funcionamiento del sistema es necesario que verifique los datos ' +
-          'de la plantilla ingresada. Se encuentran fechas de recuperación que ya se encuentran registradas en el sistema en la ' +
-          res.data + '.', 'Recuerde que el sistema no permite ingresar fechas de recuperación duplicadas.', {
-          timeOut: 10000,
-        });
-        this.archivoForm.reset();
-        this.nameFile = '';
-      }
-      else if (res.message === 'CORRECTO') {
-        // VERIFICAR DATOS DUPLICADOS DENTRO DE LA MISMA PLANTILLA
-        this.rest.RevisarDuplicidad(formData).subscribe(respose => {
-          console.log('probando plantilla2', respose);
-          if (respose.message === 'ERROR FECHA') {
-            this.toastr.error('Para asegurar el buen funcionamiento del sistema es necesario que verifique los datos ' +
-              'de la plantilla ingresada. Se encuentran fechas duplicadas dentro de su plantilla en la ' + respose.data,
-              'Recuerde que el sistema no admite duplicidad de registros.', {
-              timeOut: 10000,
-            });
-            this.archivoForm.reset();
-            this.nameFile = '';
-          }
-          else if (respose.message === 'ERROR RECUPERACION') {
-            this.toastr.error('Para asegurar el buen funcionamiento del sistema es necesario que verifique los datos ' +
-              'de la plantilla ingresada. Se encuentran fechas de recuperación duplicadas dentro de su plantilla en la ' + respose.data,
-              'Recuerde que el sistema no admite duplicidad de registros.', {
-              timeOut: 10000,
-            });
-            this.archivoForm.reset();
-            this.nameFile = '';
-          }
-          else if (respose.message === 'SIMILAR FECHA-RECUPERACION') {
-            this.toastr.error('Para asegurar el buen funcionamiento del sistema es necesario que verifique los datos ' +
-              'de la plantilla ingresada.' + respose.data,
-              'Recuerde que el sistema no admite duplicidad de registros.', {
-              timeOut: 10000,
-            });
-            this.archivoForm.reset();
-            this.nameFile = '';
-          }
-          else if (respose.message === 'CORRECTO') {
-            // SUBIR LOS DATOS CUANDO TODOS SON CORRECTOS
-            this.rest.subirArchivoExcel(formData).subscribe(subido => {
-              window.location.reload();
-              this.toastr.success('Operación exitosa.', 'Plantilla de Feriados importada.', {
-                timeOut: 10000,
-              });
-              this.archivoForm.reset();
-              this.nameFile = '';
-            });
-          }
-        });
-      }
-
-    });
-    */
-
+  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  ConfirmarRegistroMultiple() {
+    const mensaje = 'registro';
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.registrarFeriados();
+        }
+      });
   }
 
   listFeriadosCorrectos: any = [];
@@ -505,12 +401,15 @@ export class ListarFeriadosComponent implements OnInit {
   colorCelda: string = ''
   stiloCelda(observacion: string): string{
     let arrayObservacion = observacion.split(" ");
-    if(observacion == 'ok'){
+    
+    if(observacion == 'Fecha duplicada'){
+      return 'rgb(170, 129, 236)';
+    }else if(observacion == 'ok'){
       return 'rgb(159, 221, 154)';
     }else if(observacion == 'Ya existe en el sistema'){
       return 'rgb(239, 203, 106)';
-    }else if(arrayObservacion[0] == 'Fecha' || arrayObservacion[0] == 'Descripcion'){
-      return 'rgb(246, 167, 143)';
+    }else if(arrayObservacion[0] == 'Fecha' || arrayObservacion[0] == 'Descripción'){
+      return 'rgb(242, 21, 21)';
     }else if(observacion == 'Registro duplicado'){
       return 'rgb(156, 214, 255)';
     }else if(observacion == 'Formato de fec_recuperacion incorrecto (YYYY-MM-DD)'){

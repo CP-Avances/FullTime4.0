@@ -64,6 +64,8 @@ export class ListarTitulosComponent implements OnInit {
   tamanio_paginaMul: number = 5;
   numero_paginaMul: number = 1;
 
+  expansion: boolean = false;
+
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
   get p_color(): string { return this.plantillaPDF.color_Primary }
@@ -298,6 +300,17 @@ export class ListarTitulosComponent implements OnInit {
     }
      
    }
+
+    //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  ConfirmarRegistroMultiple() {
+    const mensaje = 'registro';
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.registrarTitulos();
+        }
+      });
+  }
 
    registrarTitulos(){
     var data: any = {

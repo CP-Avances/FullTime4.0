@@ -12,11 +12,6 @@
                         <button *ngIf="!Datasucursales" id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrar()">
                             Crear establecimiento
                         </button>
-                        <button *ngIf="Datasucursales" id="btn-raised" class="btn btn-sm" (click)="registrarSucursales()" matSuffix 
-                            matTooltipPosition="right" 
-                            matTooltip="Guardar registro multiple.">
-                            Registrar
-                         </button>
                         <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampoBuscar()" matSuffix
                             matTooltipPosition="right"
                             matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
@@ -53,9 +48,13 @@
                                 </form>
                             </div>
                         </div>
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-around" >
-                               
+                        <div class="col-md" *ngIf="mostrarbtnsubir">
+                            <div class="d-flex flex-wrap justify-content-around">
+                                    <button *ngIf="Datasucursales" id="descargar" class="btn btn-sm" (click)="ConfirmarRegistroMultiple()"
+                                        matSuffix matTooltipPosition="right" style="margin: 3% 2% 3% 2%;"
+                                        matTooltip="Guardar registro multiple.">
+                                    Registrar
+                                    </button>
                             </div>
                         </div>
                     </div>
@@ -152,6 +151,77 @@
         </div>
     </div>
 
+<!------------------ INFORMACIOÓN DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ------------------------------------------------->
+    <div class="container" style="text-align: center;  padding-top: 10px; margin-bottom: 25px;" *ngIf="Datasucursales">
+        <mat-accordion>
+            <mat-expansion-panel (opened)="expansion = true" (closed)="expansion = false">
+                <mat-expansion-panel-header style="background: rgb(58, 132, 242); font-size: 16px;">
+                    <mat-panel-title style="color: white;">
+                        <span style="margin-left: 15px;">
+                            INDICACIONES
+                        </span>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="row" style="padding-bottom: 5px; padding-top: 5px;">
+                    <div class="col-md">
+                        <div class="d-flex bd-highlight" id="resultados">
+                            <span class="w-100 bd-highlight" style="font-size: small;">
+                                DEFINICIONES
+                            </span>
+                        </div>
+                        <div class="table-responsive" style="text-align: center;">
+                            <table id="table_definiciones" class="table table-hover table-sm"
+                                style="margin: 0 auto;">
+                                <tbody>
+                                    <tr>
+                                        <td id="td_horarios">
+                                            <div id="t-editar" class="circulo"  style="background-color: rgb(242, 21, 21);"></div>
+                                        </td>
+                                        <td id="td_horarios">
+                                            Identificación del dato que no está registrado. (Fecha no registrada).
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td id="td_horarios">
+                                            <div id="t-editar" class="circulo"  style="background-color: rgb(239, 203, 106)"></div>
+                                        </td>
+                                        <td id="td_horarios">
+                                            Ya existe en el sistema
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td id="td_horarios">
+                                            <div id="t-editar" class="circulo"  style="background-color: rgb(222, 162, 73)"></div>
+                                        </td>
+                                        <td id="td_horarios">
+                                            Formato incorrecto de un dato. (Formato de fecha incorrecto (YYYY-MM-DD))
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td id="td_horarios">
+                                            <div id="t-editar" class="circulo"  style="background-color: rgb(156, 214, 255)"></div>
+                                        </td>
+                                        <td id="td_horarios">
+                                            Registro duplicado dentro de la plantilla
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td id="td_horarios">
+                                            <div id="t-editar" class="circulo"  style="background-color: rgb(159, 221, 154)"></div>
+                                        </td>
+                                        <td id="td_horarios">
+                                            Dato correcto que se va a cargar en el sistema (ok)
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+
 <!---------------------- TABLA DE DATOS DE LA CARGA MULTIPLE ----------------------------------->
     <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="Datasucursales">
         <div class="mat-elevation-z8" style="background: white;">
@@ -162,6 +232,7 @@
                 <table class="table table-hover table-sm ">
                     <thead class="thead-light">
                         <tr style="text-align: center;">
+                            <th scope="col"></th>
                             <th scope="col">Establecimiento</th>
                             <th scope="col">Ciudad</th>
                             
@@ -169,7 +240,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let data of Datasucursales | paginate:tamanio_paginaMul:numero_paginaMul">
+                        <tr *ngFor="let data of Datasucursales | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                            <td style="width: 50px;" align="center">{{i + 1}}</td>
                             <td [style.color]="stiloTextoCelda(data.nom_sucursal)">{{ data.nom_sucursal}}</td>
                             <td [style.color]="stiloTextoCelda(data.ciudad)">{{ data.ciudad}}</td>
                             <td>

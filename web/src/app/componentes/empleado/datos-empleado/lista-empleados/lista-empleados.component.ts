@@ -303,6 +303,11 @@ export class ListaEmpleadosComponent implements OnInit {
     this.cedula.reset();
     this.nombre.reset();
     this.apellido.reset();
+    this.DataEmpleados = null;
+    this.archivoSubido = [];
+    this.nameFile = '';
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = false;
   }
 
   // METODO PARA LISTAR NACIONALIDADES
@@ -321,7 +326,10 @@ export class ListaEmpleadosComponent implements OnInit {
   nameFile: string;
   archivoSubido: Array<File>;
   archivoForm = new FormControl('', Validators.required);
+  mostrarbtnsubir: boolean = false;
   FileChange(element: any) {
+    this.archivoSubido = [];
+    this.nameFile = '';
     this.archivoSubido = element.target.files;
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
@@ -360,6 +368,9 @@ export class ListaEmpleadosComponent implements OnInit {
       this.archivoForm.reset();
       this.nameFile = '';
     }
+
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = true;
   }
 
   DataEmpleados: any;

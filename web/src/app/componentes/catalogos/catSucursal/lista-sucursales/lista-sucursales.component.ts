@@ -60,6 +60,8 @@ export class ListaSucursalesComponent implements OnInit {
   empleado: any = [];
   idEmpleado: number;
 
+  expansion: boolean = false;
+
   constructor(
     private rest: SucursalService,
     private serviciudades: CiudadService,
@@ -453,6 +455,17 @@ export class ListaSucursalesComponent implements OnInit {
     }else{
       return 'No registrada'
     }
+  }
+
+   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+   ConfirmarRegistroMultiple() {
+    const mensaje = 'registro';
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.registrarSucursales();
+        }
+      });
   }
 
   listSucursalesCorrectas: any = [];
