@@ -119,6 +119,7 @@ class NivelTituloControlador {
     const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
     let data: any = {
+      fila: '',
       nombre: '',
       observacion: ''
     };
@@ -130,13 +131,16 @@ class NivelTituloControlador {
 
     // LECTURA DE LOS DATOS DE LA PLANTILLA
     plantilla.forEach(async (dato: any, indice: any, array: any) => {
-      var { nombre} = dato;
+      var {N, nombre} = dato;
 
+      data.fila = dato.N
       data.nombre = dato.nombre;
+
       if(data.nombre != undefined && data.nombre != '' && data.nombre != null){
         //Validar primero que exista la ciudad en la tabla ciudades
         const existe_nivelProfecional = await pool.query('SELECT nombre FROM nivel_titulo WHERE UPPER(nombre) = UPPER($1)', [data.nombre]);
         if(existe_nivelProfecional.rowCount == 0){
+          data.fila = N
           data.nombre = nombre;
           if(duplicados.find((p: any)=> p.nombre.toLowerCase() === data.nombre.toLowerCase()) == undefined)
           {
@@ -146,12 +150,14 @@ class NivelTituloControlador {
 
           listNivelesProfesionales.push(data);
         }else{
+          data.fila = N
           data.nombre = nombre;
           data.observacion = 'Ya existe en el sistema';
 
           listNivelesProfesionales.push(data);
         }
       }else{
+        data.fila = N
         data.nombre = 'No registrado';
         data.observacion = 'Nivel no registrado';
         listNivelesProfesionales.push(data);
@@ -172,6 +178,18 @@ class NivelTituloControlador {
     });
 
     setTimeout(() => {
+
+      listNivelesProfesionales.sort((a: any, b: any) => {
+        // Compara los números de los objetos
+        if (a.fila < b.fila) {
+            return -1;
+        }
+        if (a.fila > b.fila) {
+            return 1;
+        }
+        return 0; // Son iguales
+    });
+
       listNivelesProfesionales.forEach((item:any) => {
         if(item.observacion == undefined || item.observacion == null || item.observacion == ''){
           item.observacion = 'Registro duplicado'

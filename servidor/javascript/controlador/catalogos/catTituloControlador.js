@@ -81,6 +81,7 @@ class TituloControlador {
             const sheet_name_list = workbook.SheetNames;
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
             let data = {
+                fila: '',
                 titulo: '',
                 nivel: '',
                 observacion: ''
@@ -89,7 +90,8 @@ class TituloControlador {
             var duplicados = [];
             // LECTURA DE LOS DATOS DE LA PLANTILLA
             plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
-                var { nombre, nivel } = dato;
+                var { N, nombre, nivel } = dato;
+                data.fila = dato.N;
                 data.titulo = dato.nombre;
                 data.nivel = dato.nivel;
                 if ((data.titulo != undefined && data.titulo != '')
@@ -102,6 +104,7 @@ class TituloControlador {
                         const VERIFICAR_Titulos = yield database_1.default.query('SELECT * FROM cg_titulos ' +
                             'WHERE UPPER(nombre) = UPPER($1) AND id_nivel = $2', [nombre, id_nivel.id]);
                         if (VERIFICAR_Titulos.rowCount == 0) {
+                            data.fila = dato.N;
                             data.titulo = dato.nombre;
                             data.nivel = dato.nivel;
                             if (duplicados.find((p) => p.nombre.toLowerCase() === dato.nombre.toLowerCase() && p.nivel.toLowerCase() === dato.nivel.toLowerCase()) == undefined) {
@@ -111,6 +114,7 @@ class TituloControlador {
                             listTitulosProfesionales.push(data);
                         }
                         else {
+                            data.fila = dato.N;
                             data.titulo = nombre;
                             data.nivel = nivel;
                             data.observacion = 'Ya esta registrado en base';
@@ -118,6 +122,7 @@ class TituloControlador {
                         }
                     }
                     else {
+                        data.fila = dato.N;
                         data.titulo = dato.nombre;
                         data.nivel = dato.nivel;
                         if (data.nivel == '' || data.nivel == undefined) {
@@ -129,6 +134,7 @@ class TituloControlador {
                     }
                 }
                 else {
+                    data.fila = dato.N;
                     data.titulo = dato.nombre;
                     data.nivel = dato.nivel;
                     if (data.titulo == '' || data.titulo == undefined) {
@@ -156,6 +162,16 @@ class TituloControlador {
                 }
             });
             setTimeout(() => {
+                listTitulosProfesionales.sort((a, b) => {
+                    // Compara los números de los objetos
+                    if (a.fila < b.fila) {
+                        return -1;
+                    }
+                    if (a.fila > b.fila) {
+                        return 1;
+                    }
+                    return 0; // Son iguales
+                });
                 listTitulosProfesionales.forEach((item) => {
                     if (item.observacion == undefined || item.observacion == null || item.observacion == '') {
                         item.observacion = 'Registro duplicado';

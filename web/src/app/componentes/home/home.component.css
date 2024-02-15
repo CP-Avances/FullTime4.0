@@ -293,9 +293,26 @@ label {
 
 }
 
-@media only screen and (max-width: 1056px){
-    .aplicacion{
+@media only screen and (max-width: 1069px){
+
+    .Cardfila1{
+        width: 240px;
+    }
+
+    .Cardfila2{
+        width: 240px;
         margin-top: 10px;
+    }
+}
+
+@media only screen and (min-width: 500px){
+
+    .Cardfila1{
+        margin-top: 5px;
+    }
+
+    .Cardfila2{
+        margin-top: 5px;
     }
 }
 

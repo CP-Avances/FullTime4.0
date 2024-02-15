@@ -131,16 +131,17 @@ class SucursalControlador {
             const sheet_name_list = workbook.SheetNames;
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
             let data = {
+                fila: '',
                 nom_sucursal: '',
                 ciudad: '',
                 observacion: ''
             };
             var listSucursales = [];
             var duplicados = [];
-            console.log('plantilla: ', plantilla);
             // LECTURA DE LOS DATOS DE LA PLANTILLA
             plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
-                var { nombre, ciudad } = dato;
+                var { N, nombre, ciudad } = dato;
+                data.fila = dato.N;
                 data.nom_sucursal = dato.nombre;
                 data.ciudad = dato.ciudad;
                 if ((data.nom_sucursal != undefined && data.nom_sucursal != '') &&
@@ -153,6 +154,7 @@ class SucursalControlador {
                         const VERIFICAR_SUCURSAL = yield database_1.default.query('SELECT * FROM sucursales ' +
                             'WHERE UPPER(nombre) = UPPER($1) AND id_ciudad = $2', [nombre, id_ciudad.id]);
                         if (VERIFICAR_SUCURSAL.rowCount === 0) {
+                            data.fila = N;
                             data.nom_sucursal = nombre;
                             data.ciudad = ciudad;
                             // Discriminación de elementos iguales
@@ -164,6 +166,7 @@ class SucursalControlador {
                             listSucursales.push(data);
                         }
                         else {
+                            data.fila = N;
                             data.nom_sucursal = nombre;
                             data.ciudad = ciudad;
                             data.observacion = 'Ya existe en el sistema';
@@ -171,6 +174,7 @@ class SucursalControlador {
                         }
                     }
                     else {
+                        data.fila = N;
                         data.nom_sucursal = dato.nombre;
                         data.ciudad = dato.ciudad;
                         if (data.ciudad == '' || data.ciudad == undefined) {
@@ -181,6 +185,7 @@ class SucursalControlador {
                     }
                 }
                 else {
+                    data.fila = N;
                     data.nom_sucursal = dato.nombre;
                     data.ciudad = dato.ciudad;
                     if (data.nom_sucursal == '' || data.nom_sucursal == undefined) {
@@ -208,6 +213,17 @@ class SucursalControlador {
                 }
             });
             setTimeout(() => {
+                listSucursales.sort((a, b) => {
+                    // Compara los números de los objetos
+                    if (a.fila < b.fila) {
+                        return -1;
+                    }
+                    if (a.fila > b.fila) {
+                        return 1;
+                    }
+                    return 0; // Son iguales
+                });
+                console.log('lista sucursales: ', listSucursales);
                 listSucursales.forEach((item) => {
                     if (item.observacion == undefined || item.observacion == null || item.observacion == '') {
                         item.observacion = 'Registro duplicado';
