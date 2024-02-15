@@ -70,6 +70,8 @@ export class ListaEmpleadosComponent implements OnInit {
   tabla_activos: boolean = true;
   lista_inactivos: boolean = true;
 
+  expansion: boolean = false;
+
   constructor(
     public restEmpre: EmpresaService, // SERVICIO DATOS DE EMPRESA
     public ventana: MatDialog, // VARIABLE MANEJO DE VENTANAS DE DIÁLOGO

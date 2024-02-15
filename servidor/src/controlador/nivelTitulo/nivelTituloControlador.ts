@@ -200,8 +200,6 @@ class NivelTituloControlador {
     }, 1500)
   }
 
-
-
 }
 
 export const NIVEL_TITULO_CONTROLADOR = new NivelTituloControlador();
