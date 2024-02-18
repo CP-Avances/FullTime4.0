@@ -162,7 +162,7 @@
     </div>
 </div>
 
-<!-- LISTA DE EMPLEADOS QUE FORMAN PARTE DE LA EMPRESA -->
+<!-------------------- LISTA DE EMPLEADOS QUE FORMAN PARTE DE LA EMPRESA --------------------------------------->
 <div *ngIf="tabla_activos && !DataEmpleados" class="container" style="padding-bottom: 50px; text-align: center;">
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
@@ -316,7 +316,7 @@
                                         <div id="t-editar" class="circulo"  style="background-color: rgb(242, 21, 21);"></div>
                                     </td>
                                     <td id="td_horarios">
-                                        Identificación del dato que no está registrado. (Fecha no registrada).
+                                       El Dato ingresado es incorrecto.
                                     </td>
                                 </tr>
                                 <tr>
@@ -332,7 +332,7 @@
                                         <div id="t-editar" class="circulo"  style="background-color: rgb(222, 162, 73)"></div>
                                     </td>
                                     <td id="td_horarios">
-                                        Formato incorrecto de un dato. (Formato de fecha incorrecto (YYYY-MM-DD))
+                                        Dato no registrado
                                     </td>
                                 </tr>
                                 <tr>
@@ -343,14 +343,14 @@
                                         Registro duplicado dentro de la plantilla
                                     </td>
                                 </tr>
-                                <tr>
+                                <!--tr>
                                     <td id="td_horarios">
                                         <div id="t-editar" class="circulo"  style="background-color: rgb(170, 129, 236)"></div>
                                     </td>
                                     <td id="td_horarios">
                                         Si la fecha registrada ya existe en la columan fecha o en fecha de recuperacion
                                     </td>
-                                </tr>
+                                </tr-->
 
                                 <tr>
                                     <td id="td_horarios">
@@ -369,7 +369,7 @@
     </mat-accordion>
 </div>
 
-<!-- LISTA DE EMPLEADOS DEL REGISTRO MULTIPLE -->
+<!------------------- LISTA DE EMPLEADOS DEL REGISTRO MULTIPLE ---------------------------------------------->
 <div style="padding-bottom: 50px; text-align: center;" *ngIf="DataEmpleados">
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
@@ -422,5 +422,12 @@
         <mat-paginator id="pagina" [length]="DataEmpleados.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
+    </div>
+</div>
+
+<div class="container" style="text-align: center;  padding-top: 10px; margin-bottom: 25px;">
+    <div class="pantalla-progress" *ngIf="progreso">
+        <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
+        </mat-progress-spinner>
     </div>
 </div>

@@ -208,16 +208,16 @@ class SucursalControlador {
 
         if(data.nom_sucursal == '' ||data.nom_sucursal == undefined){
           data.nom_sucursal = 'No registrado';
-          data.observacion = 'Nombre no registrado';
+          data.observacion = 'Sucursal no registrada';
         }
 
         if(data.ciudad == '' || data.ciudad == undefined){
           data.ciudad = 'No registrado';
-          data.observacion = 'Ciudad no registrado';
+          data.observacion = 'Ciudad no registrada';
         }
 
         if((data.nom_sucursal == '' || data.nom_sucursal == undefined) && (data.ciudad == '' || data.ciudad == undefined)){
-          data.observacion = 'Titulo y Nivel no registrado';
+          data.observacion = 'Sucursal y ciudad no registrado';
         }
 
         listSucursales.push(data);

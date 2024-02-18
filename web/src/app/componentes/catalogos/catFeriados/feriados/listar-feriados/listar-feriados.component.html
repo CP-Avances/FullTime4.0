@@ -248,6 +248,14 @@
         </mat-accordion>
     </div>
 
+    <div class="container" style="text-align: center;  padding-top: 10px; margin-bottom: 25px;">
+        <div class="pantalla-progress" *ngIf="progreso">
+            <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
+            </mat-progress-spinner>
+        </div>
+    </div>
+    
+
     <!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE FERIADOS ------------------------------------------------->
     <div class="container" style="padding-bottom: 10px; margin-bottom: 35px;" *ngIf="DataFeriados">
         <div class="mat-elevation-z8" style="background: white;">

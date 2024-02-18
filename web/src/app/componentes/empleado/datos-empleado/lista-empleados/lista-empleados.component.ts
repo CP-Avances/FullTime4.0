@@ -23,6 +23,8 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { EmpleadoElemento } from '../../../../model/empleado.model'
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+import { ThemePalette } from '@angular/material/core';
 
 @Component({
   selector: 'app-lista-empleados',
@@ -71,6 +73,12 @@ export class ListaEmpleadosComponent implements OnInit {
   lista_inactivos: boolean = true;
 
   expansion: boolean = false;
+
+  // VARIABLES PROGRESS SPINNER
+  progreso: boolean = false;
+  color: ThemePalette = 'primary';
+  mode: ProgressSpinnerMode = 'indeterminate';
+  value = 10;
 
   constructor(
     public restEmpre: EmpresaService, // SERVICIO DATOS DE EMPRESA
@@ -341,7 +349,7 @@ export class ListaEmpleadosComponent implements OnInit {
         var itemName = arrayItems[0].slice(0, 18);
         if (itemName.toLowerCase() == 'empleadoautomatico') {
           console.log('entra_automatico');
-          this.VerificarPlantilla();
+          this.VerificarPlantillaAutomatico();
         } else {
           this.toastr.error('Cargar la plantilla con nombre EmpleadoAutomatico', 'Plantilla seleccionada incorrecta', {
             timeOut: 6000,
@@ -354,7 +362,7 @@ export class ListaEmpleadosComponent implements OnInit {
         itemName = arrayItems[0].slice(0, 14);
         if (itemName.toLowerCase() == 'empleadomanual') {
           console.log('entra_manual');
-          this.VerificarPlantilla();
+          this.VerificarPlantillaManual();
         } else {
           this.toastr.error('Cargar la plantilla con nombre EmpleadoManual', 'Plantilla seleccionada incorrecta', {
             timeOut: 6000,
@@ -377,12 +385,14 @@ export class ListaEmpleadosComponent implements OnInit {
 
   DataEmpleados: any;
   listUsuariosCorrectas: any = [];
-  VerificarPlantilla() {
+  VerificarPlantillaAutomatico() {
     this.listUsuariosCorrectas = [];
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    this.progreso = true;
 
     this.rest.verificarArchivoExcel_Automatico(formData).subscribe(res => {
       console.log('plantilla 1', res);
@@ -394,6 +404,13 @@ export class ListaEmpleadosComponent implements OnInit {
         }
       });
 
+    },error => {
+      console.log('Serivicio rest -> metodo verificarArchivoExcel_Automatico - ',error);
+      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+        timeOut: 4000,
+      });
+    },() => {
+      this.progreso = false;
     });
 
     /*
@@ -404,6 +421,31 @@ export class ListaEmpleadosComponent implements OnInit {
       this.ArchivoManual(formData);
     }
     */
+  }
+
+  VerificarPlantillaManual(){
+    this.listUsuariosCorrectas = [];
+    let formData = new FormData();
+    for (var i = 0; i < this.archivoSubido.length; i++) {
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
+    }
+
+    this.progreso = true;
+
+    this.rest.verificarArchivoExcel_Manual(formData).subscribe(res => {
+      console.log('plantilla manual', res);
+      this.DataEmpleados = res.data;
+
+
+    },error => {
+      console.log('Serivicio rest -> metodo verificarArchivoExcel_Automatico - ',error);
+      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+        timeOut: 4000,
+      });
+    },() => {
+      this.progreso = false;
+    });
+
   }
 
   registrarUsuariosMultiple(){
@@ -427,8 +469,10 @@ export class ListaEmpleadosComponent implements OnInit {
       return 'rgb(159, 221, 154)';
     }else if(observacion == 'Ya esta registrado en base'){
       return 'rgb(239, 203, 106)';
+    }else if((arrayObservacion[0]+' '+arrayObservacion[1]) == 'Cedula ya' || (arrayObservacion[0]+' '+arrayObservacion[1]) == 'Usuario ya'){
+      return 'rgb(239, 203, 106)';
     }else if(arrayObservacion[0] == 'Cedula' || arrayObservacion[0] == 'Usuario'){
-      return 'rgb(246, 167, 143)';
+        return 'rgb(222, 162, 73)';
     }else if(observacion == 'Registro duplicado'){
       return 'rgb(156, 214, 255)';
     }else{

@@ -178,7 +178,7 @@
                                             <div id="t-editar" class="circulo"  style="background-color: rgb(242, 21, 21);"></div>
                                         </td>
                                         <td id="td_horarios">
-                                            Identificación del dato que no está registrado. (Fecha no registrada).
+                                            No existe la ciudad.
                                         </td>
                                     </tr>
                                     <tr>
@@ -194,7 +194,7 @@
                                             <div id="t-editar" class="circulo"  style="background-color: rgb(222, 162, 73)"></div>
                                         </td>
                                         <td id="td_horarios">
-                                            Formato incorrecto de un dato. (Formato de fecha incorrecto (YYYY-MM-DD))
+                                            Dato no registrado
                                         </td>
                                     </tr>
                                     <tr>
@@ -257,6 +257,13 @@
             <mat-paginator id="pagina" [length]="Datasucursales.length" [pageSize]="tamanio_paginaMul"
                 [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
             </mat-paginator>
+        </div>
+    </div>
+
+    <div class="container" style="text-align: center;  padding-top: 10px; margin-bottom: 25px;">
+        <div class="pantalla-progress" *ngIf="progreso">
+            <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
+            </mat-progress-spinner>
         </div>
     </div>
 

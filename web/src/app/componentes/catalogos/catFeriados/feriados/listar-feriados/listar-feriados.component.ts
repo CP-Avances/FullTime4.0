@@ -1,6 +1,8 @@
 // IMPORTACION DE LIBRERIAS
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
+import { ThemePalette } from '@angular/material/core';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { PageEvent } from '@angular/material/paginator';
@@ -69,6 +71,12 @@ export class ListarFeriadosComponent implements OnInit {
   hipervinculo: string = environment.url
 
   expansion: boolean = false;
+
+  // VARIABLES PROGRESS SPINNER
+  progreso: boolean = false;
+  color: ThemePalette = 'primary';
+  mode: ProgressSpinnerMode = 'indeterminate';
+  value = 10;
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
@@ -274,7 +282,6 @@ export class ListarFeriadosComponent implements OnInit {
     this.archivoForm.reset();
     this.mostrarbtnsubir = true;
 
-
   }
 
   DataFeriados: any;
@@ -285,6 +292,8 @@ export class ListarFeriadosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    this.progreso = true;
 
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
@@ -297,6 +306,14 @@ export class ListarFeriadosComponent implements OnInit {
           this.listFeriadosCorrectos.push(item);
         }
       });
+
+    },error => {
+      console.log('Serivicio rest -> metodo RevisarFormato - ',error);
+      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+        timeOut: 4000,
+      });
+    },() => {
+      this.progreso = false;
     });
   }
 
