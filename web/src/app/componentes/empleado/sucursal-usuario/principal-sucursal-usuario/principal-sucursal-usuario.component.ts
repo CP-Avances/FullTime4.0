@@ -1,10 +1,8 @@
 // IMPORTACION DE LIBRERIAS
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { Router } from '@angular/router';
 
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
@@ -35,14 +33,11 @@ export class PrincipalSucursalUsuarioComponent implements OnInit {
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
 
-
   empleado: any = [];
   idEmpleado: number;
 
   constructor(
     private rest: SucursalService,
-    private toastr: ToastrService,
-    private router: Router,
     public ventana: MatDialog,
     public validar: ValidacionesService,
     public restE: EmpleadoService,
@@ -53,7 +48,6 @@ export class PrincipalSucursalUsuarioComponent implements OnInit {
   ngOnInit(): void {
     this.ObtenerSucursal();
   }
-
 
   // METODO PARA MANEJAR LA PAGINACION
   ManejarPagina(e: PageEvent) {
@@ -74,8 +68,7 @@ export class PrincipalSucursalUsuarioComponent implements OnInit {
     return this.validar.IngresarSoloLetras(e);
   }
 
-
-  // METODO PARA VER DATOS DE DEPARTAMENTOS DE SUCURSAL
+  // METODO PARA VER DATOS DE USUARIOS ASIGNADOS AL ESTABLECIMIENTO
   ver_departamentos: boolean = false;
   datos_sucursal: any = [];
   ver_informacion: boolean = false;
