@@ -792,11 +792,16 @@ class UsuarioControlador {
     }
   }
 
+  /** ************************************************************************************************** **
+   ** **                           METODOS TABLA USUARIO - SUCURSAL                                   ** **
+   ** ************************************************************************************************** */
+
+  // BUSCAR DATOS DE USUARIOS - SUCURSAL
   public async BuscarUsuarioSucursal(req: Request, res: Response) {
     const { id_empleado } = req.body;
     const USUARIOS = await pool.query(
       `
-      SELECT * FROM usuario_sucursal WHERE id_usuario = $1
+      SELECT * FROM usuario_sucursal WHERE id_empleado = $1
       `,
       [id_empleado]
     );
@@ -807,6 +812,73 @@ class UsuarioControlador {
       return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
+
+  // CREAR REGISTRO DE USUARIOS - SUCURSAL
+  public async CrearUsuarioSucursal(req: Request, res: Response) {
+    try {
+      const { id_empleado, id_sucursal, principal } = req.body;
+      await pool.query(
+        `
+        INSERT INTO usuario_sucursal (id_empleado, id_sucursal, principal) 
+        VALUES ($1, $2, $3)
+        `
+        , [id_empleado, id_sucursal, principal]);
+
+      res.jsonp({ message: 'Registro guardado.' });
+    }
+    catch (error) {
+      return res.jsonp({ message: 'error' });
+    }
+  }
+
+  // BUSCAR DATOS DE USUARIOS - SUCURSAL
+  public async BuscarUsuarioSucursalPrincipal(req: Request, res: Response) {
+    const { id_empleado } = req.body;
+    const USUARIOS = await pool.query(
+      `
+      SELECT * FROM usuario_sucursal WHERE id_empleado = $1 AND principal = true;
+      `,
+      [id_empleado]
+    );
+    if (USUARIOS.rowCount > 0) {
+      return res.jsonp(USUARIOS.rows)
+    }
+    else {
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+    }
+  }
+
+  // METODO PARA ACTUALIZAR DATOS DE USUARIO - SUCURSAL
+  public async ActualizarUsuarioSucursalPrincipal(req: Request, res: Response) {
+    try {
+      const { id_sucursal, id_empleado } = req.body;
+      await pool.query(
+        `
+        UPDATE usuario_sucursal SET id_sucursal = $1 WHERE id_empleado = $2 AND principal = true;
+        `
+        , [id_sucursal, id_empleado]);
+      res.jsonp({ message: 'Registro actualizado.' });
+    }
+    catch (error) {
+      return res.jsonp({ message: 'error' });
+    }
+  }
+
+
+  // METODO PARA ELIMINAR REGISTROS
+  public async EliminarUsuarioSucursal(req: Request, res: Response): Promise<void> {
+    const id = req.params.id;
+    await pool.query(
+      `
+      DELETE FROM usuario_sucursal WHERE id = $1
+      `
+      , [id]);
+    res.jsonp({ message: 'Registro eliminado.' });
+  }
+
+
+
+
 
   //ACCESOS AL SISTEMA
   public async AuditarAcceso(req: Request, res: Response) {

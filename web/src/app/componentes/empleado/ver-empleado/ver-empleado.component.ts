@@ -860,7 +860,7 @@ export class VerEmpleadoComponent implements OnInit {
   AbrirVentanaCargo(): void {
     if (this.datoActual.id_contrato != undefined) {
       this.ventana.open(EmplCargosComponent,
-        { width: '1000px', data: { idEmpleado: this.idEmpleado, idContrato: this.datoActual.id_contrato } }).
+        { width: '1000px', data: { idEmpleado: this.idEmpleado, idContrato: this.datoActual.id_contrato, idRol: this.datoActual.id_rol } }).
         afterClosed().subscribe(item => {
           this.VerDatosActuales(this.formato_fecha);
         });

@@ -20,7 +20,7 @@ class EmpleadoCargosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const unEmplCargp = yield database_1.default.query(`
-      SELECT ec.id, ec.id_empl_contrato, ec.cargo, ec.fec_inicio, ec.fec_final, ec.sueldo, 
+      SELECT ec.id, ec.id_empl_contrato, ec.cargo, ec.fec_inicio, ec.fec_final, ec.jefe, ec.sueldo, 
       ec.hora_trabaja, ec.id_sucursal, s.nombre AS sucursal, ec.id_departamento, 
       d.nombre AS departamento, e.id AS id_empresa, e.nombre AS empresa, tc.cargo AS nombre_cargo 
       FROM empl_cargos AS ec, sucursales AS s, cg_departamentos AS d, cg_empresa AS e, 
@@ -40,12 +40,12 @@ class EmpleadoCargosControlador {
     // METODO DE REGISTRO DE CARGO
     Crear(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo } = req.body;
+            const { id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe } = req.body;
             yield database_1.default.query(`
       INSERT INTO empl_cargos (id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal,
-         sueldo, hora_trabaja, cargo) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      `, [id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo]);
+         sueldo, hora_trabaja, cargo, jefe) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `, [id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe]);
             res.jsonp({ message: 'Registro guardado.' });
         });
     }
@@ -53,12 +53,12 @@ class EmpleadoCargosControlador {
     EditarCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empl_contrato, id } = req.params;
-            const { id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo } = req.body;
+            const { id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe } = req.body;
             yield database_1.default.query(`
       UPDATE empl_cargos SET id_departamento = $1, fec_inicio = $2, fec_final = $3, id_sucursal = $4, 
-        sueldo = $5, hora_trabaja = $6, cargo = $7  
-      WHERE id_empl_contrato = $8 AND id = $9
-      `, [id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo,
+        sueldo = $5, hora_trabaja = $6, cargo = $7, jefe = $8  
+      WHERE id_empl_contrato = $9 AND id = $10
+      `, [id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe,
                 id_empl_contrato, id]);
             res.jsonp({ message: 'Registro actualizado exitosamente.' });
         });

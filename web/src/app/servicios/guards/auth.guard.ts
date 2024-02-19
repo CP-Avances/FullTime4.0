@@ -24,12 +24,15 @@ export class AuthGuard implements CanActivate {
       }
 
       if (this.loginService.getRol() === route.data['roles']) {
+        console.log('ver roles == roles --> ', this.loginService.getRol(), ' route  --> ', route.data['roles'])
         return true;
       }
 
       if (this.loginService.getRol() != route.data['roles']) {
+        console.log('ver roles !=', this.loginService.getRol())
 
         if (this.loginService.getRol() === 1) {
+          console.log('ver roles =1', this.loginService.getRol())
           this.router.navigate(['/home'], { relativeTo: this.active_route, skipLocationChange: false });
           return true;
         }

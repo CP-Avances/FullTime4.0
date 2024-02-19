@@ -70,6 +70,10 @@ export class DatosGeneralesService {
   }
 
 
+  // METODO PARA CONSULTAR DATOS DE ADMINISTRADORES Y JEFES
+  ObtenerAdminJefes(datos: any) {
+    return this.http.post(`${environment.url}/generalidades/datos-actuales-sucursales`, datos);
+  }
 
 
   // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR
