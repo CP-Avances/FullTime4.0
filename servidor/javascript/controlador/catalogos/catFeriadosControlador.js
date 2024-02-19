@@ -171,6 +171,7 @@ class FeriadosControlador {
             const sheet_name_list = workbook.SheetNames;
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
             let data = {
+                fila: '',
                 fecha: '',
                 descripcion: '',
                 fec_recuperacion: '',
@@ -183,7 +184,8 @@ class FeriadosControlador {
             var fecha_igual = [];
             // LECTURA DE LOS DATOS DE LA PLANTILLA
             plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
-                var { fecha, descripcion, fec_recuperacion } = dato;
+                var { N, fecha, descripcion, fec_recuperacion } = dato;
+                data.fila = N;
                 data.fecha = fecha;
                 data.descripcion = descripcion;
                 data.fec_recuperacion = fec_recuperacion;
@@ -194,7 +196,7 @@ class FeriadosControlador {
                 }
                 if (data.descripcion == undefined || data.descripcion == '') {
                     data.descripcion = 'No registrado';
-                    data.observacion = 'Descripcion ' + data.observacion;
+                    data.observacion = 'Descripción ' + data.observacion;
                 }
                 //VERIFICA SI EXISTE EN LAs COLUMNA DATOS REGISTRADOS
                 if (data.fecha != 'No registrado' && data.descripcion != 'No registrado') {
@@ -209,7 +211,8 @@ class FeriadosControlador {
                     if (fecha_correcta == true) {
                         // VERIFICACIÓN SI LA FECHA DEL FERIADO NO ESTE REGISTRADA EN EL SISTEMA
                         const VERIFICAR_FECHA = yield database_1.default.query('SELECT * FROM cg_feriados ' +
-                            'WHERE fecha = $1 OR fec_recuperacion = $1', [dato.fecha]);
+                            'WHERE fecha = $1 OR fec_recuperacion = $1', [data.fecha]);
+                        data.fila = dato.N;
                         data.fecha = dato.fecha;
                         data.descripcion = dato.descripcion;
                         if (VERIFICAR_FECHA.rowCount === 0) {
@@ -258,7 +261,7 @@ class FeriadosControlador {
                 else {
                     data.fec_recuperacion = dato.fec_recuperacion;
                     if (data.fecha == 'No registrado' && data.descripcion == 'No registrado') {
-                        data.observacion = 'Fecha y descripcion no registrada';
+                        data.observacion = 'Fecha y descripción no registrada';
                     }
                     if (data.fec_recuperacion == undefined) {
                         data.fec_recuperacion = '-';
@@ -279,6 +282,17 @@ class FeriadosControlador {
             setTimeout(() => {
                 //console.log('lista feriados: ',listFeriados);
                 fecha_igual = listFeriados;
+                listFeriados.sort((a, b) => {
+                    // Compara los números de los objetos
+                    if (a.fila < b.fila) {
+                        return -1;
+                    }
+                    if (a.fila > b.fila) {
+                        return 1;
+                    }
+                    return 0; // Son iguales
+                });
+                console.log('lista feriados: ', listFeriados);
                 listFeriados.forEach((item) => {
                     if (item.observacion == undefined || item.observacion == 'no registrada' || item.observacion == '') {
                         item.observacion = 'Registro duplicado';

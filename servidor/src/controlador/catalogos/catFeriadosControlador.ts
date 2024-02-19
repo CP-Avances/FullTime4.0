@@ -184,6 +184,7 @@ class FeriadosControlador {
         const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
         let data: any = {
+            fila: '',
             fecha: '',
             descripcion: '',
             fec_recuperacion: '',
@@ -199,8 +200,9 @@ class FeriadosControlador {
 
         // LECTURA DE LOS DATOS DE LA PLANTILLA
         plantilla.forEach(async (dato: any, indice: any, array: any) => {
-            var { fecha, descripcion, fec_recuperacion } = dato;
+            var {N, fecha, descripcion, fec_recuperacion } = dato;
 
+            data.fila = N
             data.fecha = fecha;
             data.descripcion = descripcion;
             data.fec_recuperacion = fec_recuperacion;
@@ -213,7 +215,7 @@ class FeriadosControlador {
 
             if(data.descripcion == undefined || data.descripcion == ''){
                 data.descripcion = 'No registrado';
-                data.observacion = 'Descripcion '+data.observacion;
+                data.observacion = 'Descripción '+data.observacion;
             }
 
 
@@ -231,7 +233,8 @@ class FeriadosControlador {
                 if(fecha_correcta == true){
                     // VERIFICACIÓN SI LA FECHA DEL FERIADO NO ESTE REGISTRADA EN EL SISTEMA
                     const VERIFICAR_FECHA = await pool.query('SELECT * FROM cg_feriados ' +
-                    'WHERE fecha = $1 OR fec_recuperacion = $1', [dato.fecha]);
+                    'WHERE fecha = $1 OR fec_recuperacion = $1', [data.fecha]);
+                    data.fila = dato.N
                     data.fecha = dato.fecha;
                     data.descripcion = dato.descripcion;
 
@@ -288,7 +291,7 @@ class FeriadosControlador {
                 
                 data.fec_recuperacion = dato.fec_recuperacion;
                 if (data.fecha == 'No registrado' && data.descripcion == 'No registrado') {
-                    data.observacion = 'Fecha y descripcion no registrada';
+                    data.observacion = 'Fecha y descripción no registrada';
                 }
 
                 if(data.fec_recuperacion == undefined){
@@ -316,6 +319,19 @@ class FeriadosControlador {
             //console.log('lista feriados: ',listFeriados);
             fecha_igual = listFeriados;
 
+            listFeriados.sort((a: any, b: any) => {
+                // Compara los números de los objetos
+                if (a.fila < b.fila) {
+                    return -1;
+                }
+                if (a.fila > b.fila) {
+                    return 1;
+                }
+                return 0; // Son iguales
+            });
+
+            console.log('lista feriados: ',listFeriados);
+
             listFeriados.forEach((item:any) => {
                 if(item.observacion == undefined || item.observacion == 'no registrada' || item.observacion == ''){
                   item.observacion = 'Registro duplicado'
@@ -333,6 +349,8 @@ class FeriadosControlador {
           }, 1500)
 
     }
+
+
 
     // REVISAR DATOS DUPLICADOS DENTRO DE LA MISMA PLANTILLA
     public async RevisarDatos_Duplicados(req: Request, res: Response) {

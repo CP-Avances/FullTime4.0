@@ -29,3 +29,11 @@ p {
     letter-spacing: 0.2px;
     word-wrap: break-word;
 }
+
+.circulo{
+    width: 15px;
+    height: 15px;
+    border-radius: 50px;
+    z-index: 0;
+    background-color: rgb(36, 169, 118);
+}

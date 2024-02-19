@@ -44,13 +44,20 @@
                     <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-around">
                             <form method="post" enctype="multipart/form-data"
-                                class="d-flex flex-wrap justify-content-around" style="margin: 2% 0% -1% 0%;">
+                                class="d-flex flex-wrap justify-content-around" style="margin: 2% 2% 2% 2%;">
                                 <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
                                     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                 <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
+                                    *ngIf="!mostrarbtnsubir"
                                     style="height: 65px;"
                                     matTooltip="Dar click para selecionar plantilla y cargar registros.">
                                     Subir plantilla
+                                </label>
+                                <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
+                                    *ngIf="mostrarbtnsubir"
+                                    style="height: 64px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                    Subir nueva plantilla
                                 </label>
                             </form>
                         </div>
@@ -155,7 +162,7 @@
     </div>
 </div>
 
-<!-- LISTA DE EMPLEADOS QUE FORMAN PARTE DE LA EMPRESA -->
+<!-------------------- LISTA DE EMPLEADOS QUE FORMAN PARTE DE LA EMPRESA --------------------------------------->
 <div *ngIf="tabla_activos && !DataEmpleados" class="container" style="padding-bottom: 50px; text-align: center;">
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
@@ -282,7 +289,87 @@
     </div>
 </div>
 
-<!-- LISTA DE EMPLEADOS DEL REGISTRO MULTIPLE -->
+<!------------------ INFORMACIOÓN DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ------------------------------------------------->
+<div class="container" style="text-align: center;  padding-top: 10px; margin-bottom: 25px;" *ngIf="DataEmpleados">
+    <mat-accordion>
+        <mat-expansion-panel (opened)="expansion = true" (closed)="expansion = false">
+            <mat-expansion-panel-header style="background: rgb(58, 132, 242); font-size: 16px;">
+                <mat-panel-title style="color: white;">
+                    <span style="margin-left: 15px;">
+                        INDICACIONES
+                    </span>
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="row" style="padding-bottom: 5px; padding-top: 5px;">
+                <div class="col-md">
+                    <div class="d-flex bd-highlight" id="resultados">
+                        <span class="w-100 bd-highlight" style="font-size: small;">
+                            DEFINICIONES
+                        </span>
+                    </div>
+                    <div class="table-responsive" style="text-align: center;">
+                        <table id="table_definiciones" class="table table-hover table-sm"
+                            style="margin: 0 auto;">
+                            <tbody>
+                                <tr>
+                                    <td id="td_horarios">
+                                        <div id="t-editar" class="circulo"  style="background-color: rgb(242, 21, 21);"></div>
+                                    </td>
+                                    <td id="td_horarios">
+                                       El Dato ingresado es incorrecto.
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td id="td_horarios">
+                                        <div id="t-editar" class="circulo"  style="background-color: rgb(239, 203, 106)"></div>
+                                    </td>
+                                    <td id="td_horarios">
+                                        Ya existe en el sistema
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td id="td_horarios">
+                                        <div id="t-editar" class="circulo"  style="background-color: rgb(222, 162, 73)"></div>
+                                    </td>
+                                    <td id="td_horarios">
+                                        Dato no registrado
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td id="td_horarios">
+                                        <div id="t-editar" class="circulo"  style="background-color: rgb(156, 214, 255)"></div>
+                                    </td>
+                                    <td id="td_horarios">
+                                        Registro duplicado dentro de la plantilla
+                                    </td>
+                                </tr>
+                                <!--tr>
+                                    <td id="td_horarios">
+                                        <div id="t-editar" class="circulo"  style="background-color: rgb(170, 129, 236)"></div>
+                                    </td>
+                                    <td id="td_horarios">
+                                        Si la fecha registrada ya existe en la columan fecha o en fecha de recuperacion
+                                    </td>
+                                </tr-->
+
+                                <tr>
+                                    <td id="td_horarios">
+                                        <div id="t-editar" class="circulo"  style="background-color: rgb(159, 221, 154)"></div>
+                                    </td>
+                                    <td id="td_horarios">
+                                        Dato correcto que se va a cargar en el sistema (ok)
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+</div>
+
+<!------------------- LISTA DE EMPLEADOS DEL REGISTRO MULTIPLE ---------------------------------------------->
 <div style="padding-bottom: 50px; text-align: center;" *ngIf="DataEmpleados">
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
@@ -294,6 +381,7 @@
             <table id="table_usuarios" class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
+                        <th id="td_usuario" scope="col"></th>
                         <th id="td_usuario" scope="col">Nombre</th>
                         <th id="td_usuario" scope="col">Apellido</th>
                         <th id="td_usuario" scope="col">Cédula</th>
@@ -310,7 +398,8 @@
                 </thead>
                 <tbody>
                     <tr
-                        *ngFor="let e of DataEmpleados | emplCodigo: filtroCodigo | emplCedula: filtroCedula | emplNombre: filtroNombre | emplApellido: filtroApellido | paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let e of DataEmpleados | paginate:tamanio_pagina:numero_pagina; let i = index">
+                        <td style="font-size: 14px; width: 50px;" align="center">{{i + 1}}</td>
                         <td [style.color]="stiloTextoCelda(e.nombre)">{{e.nombre}}</td>
                         <td [style.color]="stiloTextoCelda(e.apellido)">{{e.apellido}}</td>
                         <td [style.color]="stiloTextoCelda(e.cedula)">{{e.cedula}}</td>
@@ -330,8 +419,15 @@
                 </tbody>
             </table>
         </div>
-        <mat-paginator id="pagina" [length]="empleado.length" [pageSize]="tamanio_pagina"
+        <mat-paginator id="pagina" [length]="DataEmpleados.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
+    </div>
+</div>
+
+<div class="container" style="text-align: center;  padding-top: 10px; margin-bottom: 25px;">
+    <div class="pantalla-progress" *ngIf="progreso">
+        <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
+        </mat-progress-spinner>
     </div>
 </div>

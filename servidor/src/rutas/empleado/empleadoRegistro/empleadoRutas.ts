@@ -177,9 +177,9 @@ class EmpleadoRutas {
         this.router.post('/cargar_automatico/plantillaExcel/', TokenValidation, EMPLEADO_CONTROLADOR.CargarPlantilla_Automatico);
 
         // RUTAS DE ACCESO A LA CARGA DE DATOS DE FORMA MANUAL 
-        //this.router.post('/verificar/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_Manual);
+        this.router.post('/verificar/manual/plantillaExcel/', [TokenValidation, upload_plantilla.single('uploads')], EMPLEADO_CONTROLADOR.VerificarPlantilla_Manual);
         //this.router.post('/verificar/datos/manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.VerificarPlantilla_DatosManual);
-        //this.router.post('/cargar_manual/plantillaExcel/', [TokenValidation, multipartMiddlewarePlantilla], EMPLEADO_CONTROLADOR.CargarPlantilla_Manual);
+        this.router.post('/cargar_manual/plantillaExcel/', TokenValidation, EMPLEADO_CONTROLADOR.CargarPlantilla_Manual);
 
 
 

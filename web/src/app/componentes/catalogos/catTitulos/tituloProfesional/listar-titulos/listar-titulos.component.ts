@@ -25,6 +25,8 @@ import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { TituloService } from 'src/app/servicios/catalogos/catTitulos/titulo.service';
 import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulos.service';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+import { ThemePalette } from '@angular/material/core';
 
 @Component({
   selector: 'app-listar-titulos',
@@ -64,11 +66,19 @@ export class ListarTitulosComponent implements OnInit {
   tamanio_paginaMul: number = 5;
   numero_paginaMul: number = 1;
 
+  expansion: boolean = false;
+
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
   get p_color(): string { return this.plantillaPDF.color_Primary }
   get frase(): string { return this.plantillaPDF.marca_Agua }
   get logo(): string { return this.plantillaPDF.logoBase64 }
+
+   // VARIABLES PROGRESS SPINNER
+   progreso: boolean = false;
+   color: ThemePalette = 'primary';
+   mode: ProgressSpinnerMode = 'indeterminate';
+   value = 10;
 
   constructor(
     public ventana: MatDialog, // VARIABLE QUE MANEJA EVENTOS CON VENTANAS
@@ -257,6 +267,8 @@ export class ListarTitulosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    this.progreso = true;
   
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
@@ -268,8 +280,14 @@ export class ListarTitulosComponent implements OnInit {
         if( item.observacion.toLowerCase() === 'ok'){
           this.listTitulosCorrectos.push(item);
         }
+      });      
+    },error => {
+      console.log('Serivicio rest -> metodo RevisarFormato - ',error);
+      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+        timeOut: 4000,
       });
-      
+    },() => {
+      this.progreso = false;
     });
       
   }
@@ -298,6 +316,17 @@ export class ListarTitulosComponent implements OnInit {
     }
      
    }
+
+    //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  ConfirmarRegistroMultiple() {
+    const mensaje = 'registro';
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.registrarTitulos();
+        }
+      });
+  }
 
    registrarTitulos(){
     var data: any = {

@@ -23,6 +23,8 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
+import { ThemePalette } from '@angular/material/core';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-lista-sucursales',
@@ -59,6 +61,14 @@ export class ListaSucursalesComponent implements OnInit {
 
   empleado: any = [];
   idEmpleado: number;
+
+  expansion: boolean = false;
+
+   // VARIABLES PROGRESS SPINNER
+   progreso: boolean = false;
+   color: ThemePalette = 'primary';
+   mode: ProgressSpinnerMode = 'indeterminate';
+   value = 10;
 
   constructor(
     private rest: SucursalService,
@@ -415,6 +425,8 @@ export class ListaSucursalesComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    this.progreso = true;
   
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
@@ -437,6 +449,15 @@ export class ListaSucursalesComponent implements OnInit {
       if(this.listSucursalesCorrectas.length > 0){
         this.btn_registrar = false;
       }
+
+    },error => {
+      console.log('Serivicio rest -> metodo RevisarFormato - ',error);
+      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+        timeOut: 4000,
+      });
+
+    },() => {
+      this.progreso = false;
     });
       
   }
@@ -453,6 +474,17 @@ export class ListaSucursalesComponent implements OnInit {
     }else{
       return 'No registrada'
     }
+  }
+
+   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+   ConfirmarRegistroMultiple() {
+    const mensaje = 'registro';
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.registrarSucursales();
+        }
+      });
   }
 
   listSucursalesCorrectas: any = [];
@@ -516,7 +548,7 @@ export class ListaSucursalesComponent implements OnInit {
     }else if(observacion == 'Ya existe en el sistema'){
       return 'rgb(239, 203, 106)';
     }else if(arrayObservacion[0] == 'Ciudad' || arrayObservacion[0] == 'Sucursal'){
-      return 'rgb(246, 167, 143)';
+      return 'rgb(222, 162, 73)';
     }else if(observacion == 'Registro duplicado'){
       return 'rgb(156, 214, 255)';
     }else{
