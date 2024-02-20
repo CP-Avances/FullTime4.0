@@ -316,6 +316,7 @@ import { BuscarAsistenciaComponent } from './componentes/horarios/asistencia/bus
 import { CargarPlantillaPlanificacionComponent } from './componentes/horarios/cargar-plantillas/cargar-plantilla-planificacion/cargar-plantilla-planificacion.component';
 import { PrincipalSucursalUsuarioComponent } from './componentes/empleado/sucursal-usuario/principal-sucursal-usuario/principal-sucursal-usuario.component';
 import { AsignarUsuarioComponent } from './componentes/empleado/sucursal-usuario/asignar-usuario/asignar-usuario.component';
+import { DefinicionPlantillaComponent } from './componentes/administracionGeneral/definicion-plantilla/definicion-plantilla.component';
 
 
 const config: SocketIoConfig = { url: environment.url, options: {} };
@@ -567,6 +568,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     CargarPlantillaPlanificacionComponent,
     PrincipalSucursalUsuarioComponent,
     AsignarUsuarioComponent,
+    DefinicionPlantillaComponent,
 
   ],
 
