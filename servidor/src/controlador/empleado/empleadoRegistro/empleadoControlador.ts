@@ -863,15 +863,6 @@ class EmpleadoControlador {
             }
           }
 
-          //TODO Revisar max codigo
-          // Verificar que el código no se duplique en los registros
-          //codigo = codigo + 1;
-          //console.log('codigo_ver', codigo);
-          //const VERIFICAR_CODIGO = await pool.query('SELECT * FROM empleados WHERE codigo = $1', [codigo]);
-          //if (VERIFICAR_CODIGO.rowCount === 0) {
-              //contarCodigo = contarCodigo + 1;
-          //}
-
           listEmpleados.push(data);
 
         }else{
@@ -960,46 +951,25 @@ class EmpleadoControlador {
           }else{
             if(data.cedula.toString().length > 10){
               data.observacion = 'La cédula ingresada no es valida';
+            }else{
+              //Verificar que el rol exista dentro del sistema
+              const VERIFICAR_ROL = await pool.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1',
+              [rol.toUpperCase()]);
+              if (VERIFICAR_ROL.rowCount === 0) {
+                  data.observacion = 'No existe el rol en el sistema';
+              }
             }
+
           }
+
+          
 
           listEmpleados.push(data);
         }
     
       data = {}
-      
+
       /*
-      //Verificar que el rol exista dentro del sistema
-      const VERIFICAR_ROL = await pool.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1',
-        [rol.toUpperCase()]);
-      if (VERIFICAR_ROL.rowCount > 0) {
-        contarRol = contarRol + 1;
-      }
-
-      //Verificar que el estado civil exista dentro del sistema
-      if (estado_civil.toUpperCase() === 'SOLTERA/A' || estado_civil.toUpperCase() === 'UNION DE HECHO' ||
-        estado_civil.toUpperCase() === 'CASADO/A' || estado_civil.toUpperCase() === 'DIVORCIADO/A' ||
-        estado_civil.toUpperCase() === 'VIUDO/A') {
-        contarECivil = contarECivil + 1;
-      }
-
-      //Verificar que el genero exista dentro del sistema
-      if (genero.toUpperCase() === 'MASCULINO' || genero.toUpperCase() === 'FEMENINO') {
-        contarGenero = contarGenero + 1;
-      }
-
-      //Verificar que el estado exista dentro del sistema
-      if (estado.toUpperCase() === 'ACTIVO' || estado.toUpperCase() === 'INACTIVO') {
-        contarEstado = contarEstado + 1;
-      }
-
-      //Verificar que la nacionalidad exista dentro del sistema
-      const VERIFICAR_NACIONALIDAD = await pool.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1',
-        [nacionalidad.toUpperCase()]);
-      if (VERIFICAR_NACIONALIDAD.rowCount > 0) {
-        contarNacionalidad = contarNacionalidad + 1;
-      }
-
       //TODO Revisar max codigo
       // Verificar que el código no se duplique en los registros
       codigo = codigo + 1;
@@ -1367,6 +1337,31 @@ class EmpleadoControlador {
         data.estado_user = estado_user; data.rol = rol,	
         data.app_habilita = app_habilita;
 
+        if(data.cedula.toString().length > 10){
+          data.observacion = 'La cédula ingresada no es valida';
+        }else{
+          // Verificar si la variable tiene el formato de fecha correcto con moment
+          if (moment(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) {
+            if(duplicados.find((p: any)=> p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined)
+            {
+              data.observacion = 'ok';
+              duplicados.push(dato);
+            }
+          } else {
+            data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+          }
+        }
+
+        //TODO Revisar max codigo
+          // Verificar que el código no se duplique en los registros
+          //codigo = codigo + 1;
+          //console.log('codigo_ver', codigo);
+          //const VERIFICAR_CODIGO = await pool.query('SELECT * FROM empleados WHERE codigo = $1', [codigo]);
+          //if (VERIFICAR_CODIGO.rowCount === 0) {
+              //contarCodigo = contarCodigo + 1;
+          //}
+
+
         listEmpleadosManual.push(data);
 
       }else{
@@ -1478,7 +1473,57 @@ class EmpleadoControlador {
       }
     });
 
+
+    listEmpleadosManual.forEach(async(valor: any) => {
+      var VERIFICAR_CEDULA = await pool.query('SELECT * FROM empleados WHERE cedula = $1', [valor.cedula]);
+      if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '' ) {
+        valor.observacion = 'Cedula ya existe en la base'
+      }else{
+        var VERIFICAR_USUARIO = await pool.query('SELECT * FROM usuarios WHERE usuario = $1', [valor.usuario]);
+        if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
+          valor.observacion = 'Usuario ya existe en la base'
+        }else{
+
+          // Discriminación de elementos iguales
+          if(duplicados1.find((p: any)=> p.cedula === valor.cedula) == undefined)
+          {
+            // Discriminación de elementos iguales
+            if(duplicados2.find((a: any)=> a.usuario === valor.usuario) == undefined)
+            {
+              //valor.observacion = 'ok'
+              duplicados2.push(valor);
+            }else{
+              valor.observacion = '2'
+            }
+
+            duplicados1.push(valor);
+          }else{
+            valor.observacion = '1'
+          }
+
+        }
+      }
+
+    })
+      
+
     setTimeout(() => { 
+
+      listEmpleadosManual.forEach((item:any) => {
+        if(item.observacion == '1'){
+          item.observacion = 'Registro duplicado - cedula'
+        }else if(item.observacion == '2'){
+          item.observacion = 'Registro duplicado - usuario'
+        }
+
+        if(item.observacion != undefined){
+          let arrayObservacion = item.observacion.split(" ");
+          if(arrayObservacion[0] == 'no'){
+            item.observacion = 'ok'
+          }
+        }
+      });
+
       return res.jsonp({ message: 'correcto', data:  listEmpleadosManual});
     }, 1500)
  

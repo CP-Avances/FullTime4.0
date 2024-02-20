@@ -409,6 +409,7 @@ export class ListaEmpleadosComponent implements OnInit {
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
+      this.progreso = false;
     },() => {
       this.progreso = false;
     });
@@ -423,8 +424,10 @@ export class ListaEmpleadosComponent implements OnInit {
     */
   }
 
+  datosManuales: boolean = false;
   VerificarPlantillaManual(){
     this.listUsuariosCorrectas = [];
+    this.datosManuales = false;
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
@@ -435,6 +438,7 @@ export class ListaEmpleadosComponent implements OnInit {
     this.rest.verificarArchivoExcel_Manual(formData).subscribe(res => {
       console.log('plantilla manual', res);
       this.DataEmpleados = res.data;
+      this.datosManuales = true;
 
 
     },error => {
@@ -442,6 +446,8 @@ export class ListaEmpleadosComponent implements OnInit {
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
+      this.progreso = false;
+      this.datosManuales = false;
     },() => {
       this.progreso = false;
     });

@@ -286,6 +286,7 @@ export class ListarTitulosComponent implements OnInit {
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
+      this.progreso = false;
     },() => {
       this.progreso = false;
     });
