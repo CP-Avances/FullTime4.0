@@ -326,7 +326,7 @@
                     <tr
                         *ngFor="let e of DataEmpleados | paginate:tamanio_pagina:numero_pagina; let i = index">
                         <td style="font-size: 14px; width: 50px;" align="center">{{i + 1}}</td>
-                        <td [style.color]="stiloTextoCelda(e.codigo)" *ngIf="e.codigo != undefined">{{e.codigo}}</td>
+                        <td [style.color]="stiloTextoCelda(e.codigo)" *ngIf="datosManuales">{{e.codigo}}</td>
                         <td [style.color]="stiloTextoCelda(e.nombre)">{{e.nombre}}</td>
                         <td [style.color]="stiloTextoCelda(e.apellido)">{{e.apellido}}</td>
                         <td [style.color]="stiloTextoCelda(e.cedula)">{{e.cedula}}</td>

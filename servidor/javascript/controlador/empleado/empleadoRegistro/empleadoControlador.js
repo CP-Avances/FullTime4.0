@@ -1158,7 +1158,6 @@ class EmpleadoControlador {
             const workbook = xlsx_1.default.readFile(ruta);
             const sheet_name_list = workbook.SheetNames;
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-            console.log('plantilla manual: ', plantilla);
             let data = {
                 cedula: '',
                 apellido: '',
@@ -1189,7 +1188,7 @@ class EmpleadoControlador {
                 var { cedula, apellido, nombre, codigo, estado_civil, genero, correo, fec_nacimiento, estado, mail_alternativo, domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
                 //Verificar que el registo no tenga datos vacios
                 if ((cedula != undefined) && (apellido != undefined) &&
-                    (nombre != undefined) && (estado_civil != undefined) &&
+                    (nombre != undefined) && (codigo != undefined) && (estado_civil != undefined) &&
                     (genero != undefined) && (correo != undefined) &&
                     (fec_nacimiento != undefined) && (estado != undefined) &&
                     (mail_alternativo != undefined) && (domicilio != undefined) &&
@@ -1243,6 +1242,7 @@ class EmpleadoControlador {
                     data.cedula = cedula;
                     data.apellido = apellido;
                     data.nombre = nombre;
+                    data.codigo = codigo;
                     data.estado_civil = estado_civil;
                     data.genero = genero;
                     data.correo = correo;
@@ -1267,7 +1267,7 @@ class EmpleadoControlador {
                         data.observacion = 'Nombre ' + data.observacion;
                     }
                     if (codigo == undefined) {
-                        data.estado_civil = 'No registrado';
+                        data.codigo = 'No registrado';
                         data.observacion = 'Codigo ' + data.observacion;
                     }
                     if (estado_civil == undefined) {

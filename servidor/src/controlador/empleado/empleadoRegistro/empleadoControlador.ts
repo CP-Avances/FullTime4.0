@@ -1282,8 +1282,6 @@ class EmpleadoControlador {
     const workbook = excel.readFile(ruta);
     const sheet_name_list = workbook.SheetNames;
     const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-    
-    console.log('plantilla manual: ',plantilla);
 
     let data: any = {
       cedula: '',	
@@ -1319,7 +1317,7 @@ class EmpleadoControlador {
       
          //Verificar que el registo no tenga datos vacios
          if((cedula != undefined) && (apellido != undefined) &&
-         (nombre != undefined) &&	(estado_civil != undefined) &&	
+         (nombre != undefined) && (codigo != undefined) &&	(estado_civil != undefined) &&	
          (genero != undefined) && (correo != undefined) &&
          (fec_nacimiento != undefined) && (estado != undefined) &&	
          (mail_alternativo != undefined) && (domicilio != undefined) &&
@@ -1365,8 +1363,8 @@ class EmpleadoControlador {
         listEmpleadosManual.push(data);
 
       }else{
-        data.cedula = cedula; data.apellido = apellido;
-          data.nombre = nombre; data.estado_civil = estado_civil;	
+          data.cedula = cedula; data.apellido = apellido;
+          data.nombre = nombre; data.codigo = codigo; data.estado_civil = estado_civil;	
           data.genero = genero; data.correo = correo;
           data.fec_nacimiento = fec_nacimiento; data.estado = estado;	
           data.mail_alternativo = mail_alternativo; data.domicilio = domicilio;
@@ -1385,7 +1383,7 @@ class EmpleadoControlador {
             data.observacion = 'Nombre '+data.observacion;
           }
           if(codigo == undefined){
-            data.estado_civil = 'No registrado';
+            data.codigo = 'No registrado';
             data.observacion = 'Codigo '+data.observacion;
           }
           if(estado_civil == undefined){
