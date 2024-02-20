@@ -162,3 +162,7 @@ mat-progress-spinner {
     background: transparent;
     z-index: 100;
 }
+
+:host ::ng-deep .mat-expansion-indicator::after {
+    color: white;
+}

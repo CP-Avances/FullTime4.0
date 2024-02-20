@@ -43,6 +43,15 @@
                                     <mat-option *ngFor="let d of departamento" [value]="d.id">{{d.nombre}}</mat-option>
                                 </mat-select>
                             </mat-form-field>
+                            <div class="d-flex flex-wrap justify-content-start" style="position: relative; right: 10px;"
+                                *ngIf="ver_jefe">
+                                <mat-checkbox id="check" matSuffix matTooltipPosition="right" [formControl]="jefeF"
+                                    matTooltip="Indicar si el usuario es Jefe o Coordinador del departamento.">
+                                    <label id="textoradiobtn" style="font-size: 12px;">
+                                        Jefe/Coordinador de departamento
+                                    </label>
+                                </mat-checkbox>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md">
@@ -91,29 +100,31 @@
                         </div>
                     </div>
                     <div class="col-md">
-                        <mat-form-field appearance="fill" floatLabel="always">
-                            <mat-label id="letras">Sueldo</mat-label>
-                            <input matInput [formControl]="sueldo" class="example-right-align" placeholder="0"
-                                (keypress)="IngresarSoloNumeros($event)" required>
-                            <span matTextPrefix>$&nbsp;</span>
-                            <span matTextSuffix>.00</span>
-                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                matTooltip="Ingresar sueldo del usuario.">
-                                help_outline
-                            </mat-icon>
-                        </mat-form-field>
-                        <mat-form-field>
-                            <mat-label>Horas de trabajo</mat-label>
-                            <input matInput placeholder="Ej: 8:10 " [formControl]="horaTrabaja"
-                                (keypress)="IngresarNumeroCaracter($event)" required>
-                            <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Indicar el número de horas de trabajo. 
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <mat-form-field appearance="fill" floatLabel="always">
+                                <mat-label id="letras">Sueldo</mat-label>
+                                <input matInput [formControl]="sueldo" class="example-right-align" placeholder="0"
+                                    (keypress)="IngresarSoloNumeros($event)" required>
+                                <span matTextPrefix>$&nbsp;</span>
+                                <span matTextSuffix>.00</span>
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
+                                    matTooltip="Ingresar sueldo del usuario.">
+                                    help_outline
+                                </mat-icon>
+                            </mat-form-field>
+                            <mat-form-field>
+                                <mat-label>Horas de trabajo</mat-label>
+                                <input matInput placeholder="Ej: 8:10 " [formControl]="horaTrabaja"
+                                    (keypress)="IngresarNumeroCaracter($event)" required>
+                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right" matTooltip="Indicar el número de horas de trabajo. 
                             En caso de horas y minutos ingresar en el siguiente formato 10 : 35">
-                                help_outline
-                            </mat-icon>
-                            <mat-error id="hora" *ngIf="horaTrabaja.invalid">
-                                {{ObtenerMensajeErrorHoraTrabajo()}}
-                            </mat-error>
-                        </mat-form-field>
+                                    help_outline
+                                </mat-icon>
+                                <mat-error id="hora" *ngIf="horaTrabaja.invalid">
+                                    {{ObtenerMensajeErrorHoraTrabajo()}}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
                     </div>
                 </div>
             </div>

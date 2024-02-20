@@ -373,7 +373,8 @@
                 </app-editar-contrato>
             </div>
             <div style="padding-bottom: 35px;" *ngIf="!btnActualizarCargo">
-                <app-editar-cargo [idSelectCargo]="idSelectCargo" [idEmploy]="idEmpleado" id="editarCargo">
+                <app-editar-cargo [idSelectCargo]="idSelectCargo" [idRol]="datoActual.id_rol" [idEmpleado]="idEmpleado"
+                    id="editarCargo">
                 </app-editar-cargo>
             </div>
             <div class="row">
@@ -413,8 +414,9 @@
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
                                             <label id="datosF">Fecha hasta:</label>
-                                            <label *ngIf="ce.fec_salida === null; else fechaSalida">Sin
-                                                fecha</label>
+                                            <label *ngIf="ce.fec_salida === null; else fechaSalida">
+                                                Sin fecha
+                                            </label>
                                             <ng-template #fechaSalida>
                                                 <label>{{ce.fec_salida_}}</label>
                                             </ng-template>
@@ -596,6 +598,19 @@
                         </div>
                         <mat-card-content>
                             <div class="container" *ngFor="let c of cargoEmpleado" style="padding-top: 15px;">
+                                <div class="row" *ngIf="c.jefe === true">
+                                    <div class="col-md">
+                                        <div class="espacio d-flex justify-content-start"
+                                            style="position: relative; right: 12px;">
+                                            <mat-checkbox matSuffix matTooltipPosition="right" disabled
+                                                [checked]="c.jefe">
+                                                <label id="textoradiobtn" style="color:black; font-weight: bolder;">
+                                                    Jefe/Coordinador departamental
+                                                </label>
+                                            </mat-checkbox>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">
@@ -692,6 +707,19 @@
                                 </form>
                             </div>
                             <div class="container" *ngFor="let c of cargoSeleccionado" style="padding-top: 15px;">
+                                <div class="row" *ngIf="c.jefe === true">
+                                    <div class="col-md">
+                                        <div class="espacio d-flex justify-content-start"
+                                            style="position: relative; right: 12px;">
+                                            <mat-checkbox matSuffix matTooltipPosition="right" disabled
+                                                [checked]="c.jefe">
+                                                <label id="textoradiobtn" style="color:black; font-weight: bolder;">
+                                                    Jefe/Coordinador departamental
+                                                </label>
+                                            </mat-checkbox>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="row">
                                     <div class="col-md">
                                         <div class="espacio d-flex justify-content-start">

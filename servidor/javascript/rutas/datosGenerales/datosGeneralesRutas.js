@@ -35,6 +35,8 @@ class CiudadRutas {
         this.router.post('/informacion-general-ubicacion/:estado', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.DatosGeneralesUbicacion);
         // METODO DE ACCESO A CONSULTA DE DATOS DE CRAGOS Y COLABORADORES ASIGNADOS A UBICACIONES
         this.router.post('/informacion-general-ubicacion-cargo/:estado', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.DatosGeneralesCargoUbicacion);
+        // METODO PARA BUSCAR ADMNISTRADORES Y JEFES
+        this.router.post('/datos-actuales-sucursales', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.BuscarAdminJefes);
         // METODO DE ACCESO A CONSULTA DE DATOS DE COLABORADORES ACTIVOS E INACTIVOS prueba nueva
         this.router.post('/informacion-data-general/:estado', verificarToken_1.TokenValidation, datosGeneralesControlador_1.default.BuscarDataGeneral);
     }

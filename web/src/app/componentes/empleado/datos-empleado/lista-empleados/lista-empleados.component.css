@@ -12,11 +12,17 @@ mat-form-field.input-tables {
     height: 65px;
 }
 
-.codigo { width: 75px; }
-.cedula { width: 150px;}
+.codigo {
+    width: 75px;
+}
 
-.container_ table-responsive{
-    width: 200px; /* Ancho fijo del contenedor */
+.cedula {
+    width: 150px;
+}
+
+.container_ table-responsive {
+    width: 200px;
+    /* Ancho fijo del contenedor */
     overflow-x: auto;
 }
 
@@ -41,11 +47,12 @@ td {
     vertical-align: middle;
 }
 
-#td_usuario{
-    width: 400px;
+#td_usuario {
+    font-size: 10px;
+    width: 600px;
 }
 
-#btn_listar{
+#btn_listar {
     background-color: rgb(3, 169, 224);
     margin: 5px 10px 5px 10px;
     color: white;
@@ -140,7 +147,7 @@ td {
     right: 80%
 }
 
-.circulo{
+.circulo {
     margin-right: -50px;
     width: 15px;
     height: 15px;
@@ -153,7 +160,7 @@ td {
     margin-left: 55%;
     opacity: 1
 }
-  
+
 .pantalla-progress {
     position: fixed;
     top: 0px;
@@ -163,13 +170,13 @@ td {
     background: #ffff;
     opacity: 0.8;
 }
-  
+
 mat-progress-spinner {
     background: transparent;
     z-index: 2;
 }
 
-@media only screen and (max-width: 800px){
+@media only screen and (max-width: 800px) {
 
     .progress {
         margin-top: 300px;
@@ -179,7 +186,7 @@ mat-progress-spinner {
 
 }
 
-@media only screen and (max-width: 413px){
+@media only screen and (max-width: 413px) {
 
     .pantalla-progress {
         position: fixed;

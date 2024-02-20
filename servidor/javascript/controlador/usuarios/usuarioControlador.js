@@ -646,11 +646,15 @@ class UsuarioControlador {
             }
         });
     }
+    /** ************************************************************************************************** **
+     ** **                           METODOS TABLA USUARIO - SUCURSAL                                   ** **
+     ** ************************************************************************************************** */
+    // BUSCAR DATOS DE USUARIOS - SUCURSAL
     BuscarUsuarioSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.body;
             const USUARIOS = yield database_1.default.query(`
-      SELECT * FROM usuario_sucursal WHERE id_usuario = $1
+      SELECT * FROM usuario_sucursal WHERE id_empleado = $1
       `, [id_empleado]);
             if (USUARIOS.rowCount > 0) {
                 return res.jsonp(USUARIOS.rows);
@@ -658,6 +662,62 @@ class UsuarioControlador {
             else {
                 return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
+        });
+    }
+    // CREAR REGISTRO DE USUARIOS - SUCURSAL
+    CrearUsuarioSucursal(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id_empleado, id_sucursal, principal } = req.body;
+                yield database_1.default.query(`
+        INSERT INTO usuario_sucursal (id_empleado, id_sucursal, principal) 
+        VALUES ($1, $2, $3)
+        `, [id_empleado, id_sucursal, principal]);
+                res.jsonp({ message: 'Registro guardado.' });
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error' });
+            }
+        });
+    }
+    // BUSCAR DATOS DE USUARIOS - SUCURSAL
+    BuscarUsuarioSucursalPrincipal(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_empleado } = req.body;
+            const USUARIOS = yield database_1.default.query(`
+      SELECT * FROM usuario_sucursal WHERE id_empleado = $1 AND principal = true;
+      `, [id_empleado]);
+            if (USUARIOS.rowCount > 0) {
+                return res.jsonp(USUARIOS.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
+            }
+        });
+    }
+    // METODO PARA ACTUALIZAR DATOS DE USUARIO - SUCURSAL
+    ActualizarUsuarioSucursalPrincipal(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id_sucursal, id_empleado } = req.body;
+                yield database_1.default.query(`
+        UPDATE usuario_sucursal SET id_sucursal = $1 WHERE id_empleado = $2 AND principal = true;
+        `, [id_sucursal, id_empleado]);
+                res.jsonp({ message: 'Registro actualizado.' });
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error' });
+            }
+        });
+    }
+    // METODO PARA ELIMINAR REGISTROS
+    EliminarUsuarioSucursal(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = req.params.id;
+            yield database_1.default.query(`
+      DELETE FROM usuario_sucursal WHERE id = $1
+      `, [id]);
+            res.jsonp({ message: 'Registro eliminado.' });
         });
     }
     //ACCESOS AL SISTEMA
