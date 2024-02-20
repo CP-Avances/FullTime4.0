@@ -470,6 +470,7 @@ export class ListaEmpleadosComponent implements OnInit {
   //Metodo para dar color a las celdas y representar las validaciones
   colorCelda: string = ''
   stiloCelda(observacion: string): string{
+    
     let arrayObservacion = observacion.split(" ");
     if(observacion == 'ok'){
       return 'rgb(159, 221, 154)';

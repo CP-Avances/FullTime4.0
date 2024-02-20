@@ -953,16 +953,16 @@ class EmpleadoControlador {
               data.observacion = 'La cédula ingresada no es valida';
             }else{
               //Verificar que el rol exista dentro del sistema
+              /*
               const VERIFICAR_ROL = await pool.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1',
               [rol.toUpperCase()]);
               if (VERIFICAR_ROL.rowCount === 0) {
                   data.observacion = 'No existe el rol en el sistema';
-              }
+              }*/
             }
 
           }
 
-          
 
           listEmpleados.push(data);
         }
@@ -1060,11 +1060,14 @@ class EmpleadoControlador {
           item.observacion = 'Registro duplicado - usuario'
         }
 
-        let arrayObservacion = item.observacion.split(" ");
-        if(arrayObservacion[0] == 'no'){
-          item.observacion = 'ok'
+        if(item.observacion != undefined){
+          let arrayObservacion = item.observacion.split(" ");
+          if(arrayObservacion[0] == 'no'){
+            item.observacion = 'ok'
+          }
+        }else{
+          item.observacion = 'Datos no registrado'
         }
-
 
       });
       return res.jsonp({ message: 'correcto', data:  listEmpleados});
