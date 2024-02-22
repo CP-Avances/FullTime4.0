@@ -399,8 +399,15 @@ class HorarioControlador {
                     data.HORARIO_NOCTURNO = 'No';
                 }
                 // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
-                const requiredValues = [DESCRIPCION, CODIGO_HORARIO, TIPO_HORARIO, HORAS_TOTALES, HORARIO_NOCTURNO];
-                if (requiredValues.some(value => value === undefined)) {
+                const requiredValues = ['DESCRIPCION', 'CODIGO_HORARIO', 'TIPO_HORARIO', 'HORAS_TOTALES', 'HORARIO_NOCTURNO'];
+                let faltanDatos = false;
+                for (const key of requiredValues) {
+                    if (data[key] === undefined) {
+                        data[key] = 'No registrado';
+                        faltanDatos = true;
+                    }
+                }
+                if (faltanDatos) {
                     data.OBSERVACION = 'Faltan datos requeridos';
                     continue;
                 }

@@ -175,8 +175,14 @@
   </mat-progress-spinner>
 </div>
 
+<!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
+<div class="container" style="padding-top: 10px;" *ngIf="dataHorarios">
+  <app-definicion-plantilla>
+  </app-definicion-plantilla>
+</div>
+
 <!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE HORARIOS ------------------------------------------------->
-<div class="container" style="padding-bottom: 10px; margin-bottom: 35px;" *ngIf="dataHorarios">
+<div class="container" style="padding-bottom: 10px; padding-top: 10px; margin-bottom: 35px;" *ngIf="dataHorarios">
   <div class="mat-elevation-z8" style="background: white;">
       <div id="titulo">REGISTRO MULTIPLE HORARIOS</div>
       <div class="table-responsive">
