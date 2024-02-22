@@ -58,8 +58,6 @@ export class ListarNivelTitulosComponent implements OnInit {
   tamanio_paginaMul: number = 5;
   numero_paginaMul: number = 1;
 
-  expansion: boolean = false;
-
   archivoForm = new FormControl('', Validators.required);
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA

@@ -1,17 +1,10 @@
 table {
     width: 100%;
+    font-size: 14px;
 }
 
 p {
     font-size: x-small;
-}
-
-h5 {
-    text-align: center;
-}
-
-.upload {
-    cursor: pointer;
 }
 
 .button {

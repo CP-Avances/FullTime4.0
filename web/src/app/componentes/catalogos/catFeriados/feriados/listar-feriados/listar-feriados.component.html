@@ -8,7 +8,8 @@
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
                     <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                        <button *ngIf="!DataFeriados" id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarFeriado()">
+                        <button *ngIf="!DataFeriados" id="btn-raised" class="btn btn-sm"
+                            (click)="AbrirVentanaRegistrarFeriado()">
                             Crear feriado
                         </button>
                         <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
@@ -32,14 +33,12 @@
                                         id="file"
                                         accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                     <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
-                                        *ngIf="!mostrarbtnsubir"
-                                        style="height: 64px;"
+                                        *ngIf="!mostrarbtnsubir" style="height: 64px;"
                                         matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
                                         Subir plantilla
                                     </label>
                                     <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
-                                        *ngIf="mostrarbtnsubir"
-                                        style="height: 64px;"
+                                        *ngIf="mostrarbtnsubir" style="height: 64px;"
                                         matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
                                         Subir nueva plantilla
                                     </label>
@@ -61,11 +60,11 @@
 
                         <div class="col-md" *ngIf="mostrarbtnsubir">
                             <div class="d-flex flex-wrap justify-content-around">
-                                    <button *ngIf="DataFeriados" id="descargar" class="btn btn-sm" (click)="ConfirmarRegistroMultiple()"
-                                        matSuffix matTooltipPosition="right" style="margin: 2% 0% 3% 0%;"
-                                        matTooltip="Guardar registro multiple.">
+                                <button *ngIf="DataFeriados" id="descargar" class="btn btn-sm"
+                                    (click)="ConfirmarRegistroMultiple()" matSuffix matTooltipPosition="right"
+                                    style="margin: 2% 0% 3% 0%;" matTooltip="Guardar registro multiple.">
                                     Registrar
-                                    </button>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -74,8 +73,8 @@
         </div>
     </div>
 
-    <!------------------ LISTA DE FERIADOS ------------------------------------------------->
-    <div class="container" style="padding-bottom: 10px; margin-bottom: 35px;" *ngIf="!DataFeriados">
+    <!--  **************************************  LISTA DE FERIADOS ***************************************** -->
+    <div class="container" style="padding-top: 10px; padding-bottom: 10px; margin-bottom: 35px;" *ngIf="!DataFeriados">
         <div class="mat-elevation-z8" style="background: white;">
             <div id="titulo">LISTA DE FERIADOS</div>
             <div class="table-responsive">
@@ -168,103 +167,29 @@
         </div>
     </div>
 
-    <!------------------ INFORMACIOÓN DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ------------------------------------------------->
-    <div class="container" style="text-align: center;  padding-top: 10px; margin-bottom: 25px;" *ngIf="DataFeriados">
-        <mat-accordion>
-            <mat-expansion-panel (opened)="expansion = true" (closed)="expansion = false">
-                <mat-expansion-panel-header style="background: rgb(58, 132, 242); font-size: 16px;">
-                    <mat-panel-title style="color: white;">
-                        <span style="margin-left: 15px;">
-                            INDICACIONES
-                        </span>
-                    </mat-panel-title>
-                </mat-expansion-panel-header>
-                <div class="row" style="padding-bottom: 5px; padding-top: 5px;">
-                    <div class="col-md">
-                        <div class="d-flex bd-highlight" id="resultados">
-                            <span class="w-100 bd-highlight" style="font-size: small;">
-                                DEFINICIONES
-                            </span>
-                        </div>
-                        <div class="table-responsive" style="text-align: center;">
-                            <table id="table_definiciones" class="table table-hover table-sm"
-                                style="margin: 0 auto;">
-                                <tbody>
-                                    <tr>
-                                        <td id="td_horarios">
-                                            <div id="t-editar" class="circulo"  style="background-color: rgb(242, 21, 21);"></div>
-                                        </td>
-                                        <td id="td_horarios">
-                                            Identificación del dato que no está registrado. (Fecha no registrada).
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td id="td_horarios">
-                                            <div id="t-editar" class="circulo"  style="background-color: rgb(239, 203, 106)"></div>
-                                        </td>
-                                        <td id="td_horarios">
-                                            Ya existe en el sistema
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td id="td_horarios">
-                                            <div id="t-editar" class="circulo"  style="background-color: rgb(222, 162, 73)"></div>
-                                        </td>
-                                        <td id="td_horarios">
-                                            Formato incorrecto de un dato. (Formato de fecha incorrecto (YYYY-MM-DD))
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td id="td_horarios">
-                                            <div id="t-editar" class="circulo"  style="background-color: rgb(156, 214, 255)"></div>
-                                        </td>
-                                        <td id="td_horarios">
-                                            Registro duplicado dentro de la plantilla
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td id="td_horarios">
-                                            <div id="t-editar" class="circulo"  style="background-color: rgb(170, 129, 236)"></div>
-                                        </td>
-                                        <td id="td_horarios">
-                                            Si la fecha registrada ya existe en la columan fecha o en fecha de recuperacion
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td id="td_horarios">
-                                            <div id="t-editar" class="circulo"  style="background-color: rgb(159, 221, 154)"></div>
-                                        </td>
-                                        <td id="td_horarios">
-                                            Dato correcto que se va a cargar en el sistema (ok)
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </mat-expansion-panel>
-        </mat-accordion>
+    <!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
+    <div class="container" style="padding-top: 10px;" *ngIf="DataFeriados">
+        <app-definicion-plantilla>
+        </app-definicion-plantilla>
     </div>
 
-    <div class="container" style="text-align: center;  padding-top: 10px; margin-bottom: 25px;">
+    <div class="container" style="text-align: center;  padding-top: 10px; margin-bottom: 20px;">
         <div class="pantalla-progress" *ngIf="progreso">
             <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
             </mat-progress-spinner>
         </div>
     </div>
-    
 
-    <!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE FERIADOS ------------------------------------------------->
+
+    <!--  **********************************  TABLA DE DATOS DE LA CARGA MULTIPLE DE FERIADOS ***************************************** -->
     <div class="container" style="padding-bottom: 10px; margin-bottom: 35px;" *ngIf="DataFeriados">
         <div class="mat-elevation-z8" style="background: white;">
             <div id="titulo">REGISTRO MULTIPLE</div>
             <div class="table-responsive">
                 <table class="table table-hover table-sm">
                     <thead class="thead-light">
-                        <tr style="text-align: center;">
-                            <th scope="col"></th>
+                        <tr style="text-align: center; font-size: 13px;">
+                            <th scope="col">Nº</th>
                             <th scope="col">Fecha</th>
                             <th scope="col">Descripción</th>
                             <th scope="col">Fecha recuperación</th>
@@ -272,15 +197,17 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr
-                            *ngFor="let f of DataFeriados | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
-                            <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{i + 1}}</td>
+                        <tr *ngFor="let f of DataFeriados | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                            <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{i
+                                + 1}}</td>
                             <td [style.color]="stiloTextoCelda(f.fecha)" style="font-size: 12px;">{{f.fecha}}</td>
-                            <td [style.color]="stiloTextoCelda(f.descripcion)" id="letras" style="font-size: 12px;">{{f.descripcion}}</td>
+                            <td [style.color]="stiloTextoCelda(f.descripcion)" id="letras" style="font-size: 12px;">
+                                {{f.descripcion}}</td>
                             <td style="font-size: 12px;">{{f.fec_recuperacion}}</td>
                             <td style="font-size: 12px;">
                                 <div style="width: 270px; margin: auto;">
-                                    <div id="t-editar" class="circulo"  [style.background-color]="stiloCelda(f.observacion)"></div>
+                                    <div id="t-editar" class="circulo"
+                                        [style.background-color]="stiloCelda(f.observacion)"></div>
                                     {{f.observacion}}
                                 </div>
                             </td>
@@ -289,7 +216,8 @@
                 </table>
             </div>
             <mat-paginator [length]="DataFeriados.length" [pageSize]="tamanio_paginaMul"
-                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+                showFirstLastButtons>
             </mat-paginator>
         </div>
     </div>
