@@ -10,10 +10,7 @@ export const ObtenerRutaUsuario = async function (id: any) {
         SELECT codigo, cedula FROM empleados WHERE id = $1
         `
         , [id]);
-
-    console.log('ruta instalacion ', __dirname)
     ruta = path.join(__dirname, `..${separador}..`);
-    console.log('ver ruta imagen libs ', ruta + separador + 'imagenesEmpleados' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula)
     return ruta + separador + 'imagenesEmpleados' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
 }
 
@@ -21,7 +18,6 @@ export const ObtenerRutaUsuario = async function (id: any) {
 export const ObtenerRutaVacuna = async function (id: any) {
     let ruta = '';
     let separador = path.sep;
-    console.log('ruta instalacion ', __dirname)
     const usuario = await pool.query(
         `
         SELECT codigo, cedula FROM empleados WHERE id = $1
@@ -29,7 +25,6 @@ export const ObtenerRutaVacuna = async function (id: any) {
         , [id]);
 
     ruta = path.join(__dirname, `..${separador}..`);
-    console.log('ver ruta imagen libs ', ruta + separador + 'carnetVacuna' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula)
     return ruta + separador + 'carnetVacuna' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
 }
 
@@ -42,10 +37,7 @@ export const ObtenerRutaPermisos = async function (codigo: any) {
         SELECT cedula FROM empleados WHERE codigo = $1
         `
         , [codigo]);
-
-    console.log('ruta instalacion ', __dirname)
     ruta = path.join(__dirname, `..${separador}..`);
-    console.log('ver ruta imagen libs ', ruta + separador + 'permisos' + separador + codigo + '_' + usuario.rows[0].cedula)
     return ruta + separador + 'permisos' + separador + codigo + '_' + usuario.rows[0].cedula;
 }
 
@@ -89,9 +81,7 @@ export const ObtenerRutaContrato = async function (id: any) {
         SELECT codigo, cedula FROM empleados WHERE id = $1
         `
         , [id]);
-
     ruta = path.join(__dirname, `..${separador}..`);
-
     return ruta + separador + 'contratos' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
 }
 

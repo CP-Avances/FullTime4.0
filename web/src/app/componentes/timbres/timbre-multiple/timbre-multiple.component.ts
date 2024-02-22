@@ -143,8 +143,7 @@ export class TimbreMultipleComponent implements OnInit {
 
   ngOnInit(): void {
     this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'd' }, { opcion: 'c' }, { opcion: 'e' }]);
-    this.BuscarInformacion();
-    this.BuscarCargos();
+    this.AdministrarSucursalesUsuario();;
   }
 
   ngOnDestroy() {
@@ -155,15 +154,39 @@ export class TimbreMultipleComponent implements OnInit {
     this.origen_cargo = [];
   }
 
+  // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
+  usua_sucursales: any = [];
+  AdministrarSucursalesUsuario() {
+    let empleado = { id_empleado: this.idEmpleadoLogueado };
+    let respuesta: any = [];
+    let codigos = '';
+    //console.log('empleado ', empleado)
+    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe(data => {
+      respuesta = data;
+      respuesta.forEach((obj: any) => {
+        if (codigos === '') {
+          codigos = '\'' + obj.id_sucursal + '\''
+        }
+        else {
+          codigos = codigos + ', \'' + obj.id_sucursal + '\''
+        }
+      })
+      console.log('ver sucursales ', codigos);
+      this.usua_sucursales = { id_sucursal: codigos };
+      this.BuscarInformacion(this.usua_sucursales);
+      //this.BuscarCargos(this.usua_sucursales);
+    });
+  }
+
   // METODO PARA FILTRAR POR CARGOS
   empleados_cargos: any = [];
   origen_cargo: any = [];
   cargos: any = [];
-  BuscarCargos() {
+  BuscarCargos(buscar: any) {
     this.empleados_cargos = [];
     this.origen_cargo = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionCargo(1).subscribe((res: any[]) => {
+    this.informacion.ObtenerInformacionCargo(1, buscar).subscribe((res: any[]) => {
       this.origen_cargo = JSON.stringify(res);
 
       res.forEach(obj => {
@@ -193,70 +216,90 @@ export class TimbreMultipleComponent implements OnInit {
   }
 
   // METODO DE BUSQUEDA DE DATOS
-  BuscarInformacion() {
+  BuscarInformacion(buscar: string) {
     this.departamentos = [];
     this.sucursales = [];
     this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.origen = [];
-    this.informacion.ObtenerInformacion(1).subscribe((res: any[]) => {
+    this.informacion.ObtenerInformacionPrueba(1, buscar).subscribe((res: any[]) => {
       this.origen = JSON.stringify(res);
-      //console.log('ver original ', this.origen)
+      console.log('ver original ', this.origen)
+
 
       res.forEach(obj => {
         //console.log('ver obj ', obj)
         this.sucursales.push({
           id: obj.id_suc,
-          nombre: obj.name_suc
+          sucursal: obj.name_suc
         })
       })
 
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
-          this.departamentos.push({
-            id: ele.id_depa,
-            departamento: ele.name_dep,
-            nombre: ele.sucursal,
+      res.forEach(reg => {
+        reg.regimenes.forEach(obj => {
+          this.regimen.push({
+            id: obj.id_regimen,
+            nombre: obj.name_regimen,
+            sucursal: obj.name_suc,
           })
         })
       })
 
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
-          ele.empleado.forEach(r => {
-            let elemento = {
-              id: r.id,
-              nombre: r.name_empleado,
-              codigo: r.codigo,
-              cedula: r.cedula,
-              correo: r.correo,
-              id_cargo: r.id_cargo,
-              id_contrato: r.id_contrato,
-            }
-            this.empleados.push(elemento)
+      res.forEach(reg => {
+        reg.regimenes.forEach(dep => {
+          dep.departamentos.forEach(obj => {
+            this.departamentos.push({
+              id: obj.id_depa,
+              departamento: obj.name_dep,
+              sucursal: obj.name_suc,
+            })
           })
         })
       })
 
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
-          ele.empleado.forEach(reg => {
-            reg.regimen.forEach(r => {
-              this.regimen.push({
-                id: r.id_regimen,
-                nombre: r.name_regimen
+      res.forEach(reg => {
+        reg.regimenes.forEach(dep => {
+          dep.departamentos.forEach(car => {
+            car.cargos.forEach(obj => {
+              this.cargos.push({
+                id: obj.id_cargo_,
+                nombre: obj.name_cargo,
+                sucursal: obj.name_suc,
               })
             })
           })
         })
       })
 
-      this.regimen = this.regimen.filter((obj, index, self) =>
-        index === self.findIndex((o) => o.id === obj.id)
-      );
+      res.forEach(reg => {
+        reg.regimenes.forEach(dep => {
+          dep.departamentos.forEach(car => {
+            car.cargos.forEach(empl => {
+              empl.empleado.forEach(obj => {
+                let elemento = {
+                  id: obj.id,
+                  nombre: obj.nombre + ' ' + obj.apellido,
+                  codigo: obj.codigo,
+                  cedula: obj.cedula,
+                  correo: obj.correo,
+                  id_cargo: obj.id_cargo,
+                  id_contrato: obj.id_contrato,
+                  sucursal: obj.name_suc,
+                }
+                this.empleados.push(elemento)
+              })
+            })
+          })
+        })
+      })
 
-      //console.log('ver sucursales ', this.regimen)
+      console.log('ver sucursales ', this.sucursales)
+      console.log('ver regimenes ', this.regimen)
+      console.log('ver departamentos ', this.departamentos)
+      console.log('ver cargos ', this.cargos)
+      console.log('ver empleados ', this.empleados)
+
     }, err => {
       this.toastr.error(err.error.message)
     })
@@ -857,19 +900,25 @@ export class TimbreMultipleComponent implements OnInit {
     else if (this.opcion === 'r') {
       this.nombre_reg.reset();
       this.filtroNombreReg_ = '';
+      this.nombre_suc.reset();
+      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionEmp.clear();
       this.selectionSuc.clear();
+      this.Filtrar('', 1)
       this.Filtrar('', 7)
     }
     else if (this.opcion === 'c') {
       this.nombre_carg.reset();
       this.filtroNombreCarg_ = '';
+      this.nombre_suc.reset();
+      this.filtroNombreSuc_ = '';
       this.selectionEmp.clear();
       this.selectionDep.clear();
       this.selectionSuc.clear();
       this.selectionReg.clear();
+      this.Filtrar('', 1)
       this.Filtrar('', 2)
     }
     else if (this.opcion === 'd') {
@@ -891,10 +940,13 @@ export class TimbreMultipleComponent implements OnInit {
       this.filtroCodigo_ = '';
       this.filtroCedula_ = '';
       this.filtroNombreEmp_ = '';
+      this.nombre_suc.reset();
+      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();
       this.selectionReg.clear();
+      this.Filtrar('', 1)
       this.Filtrar('', 4)
       this.Filtrar('', 5)
       this.Filtrar('', 6)

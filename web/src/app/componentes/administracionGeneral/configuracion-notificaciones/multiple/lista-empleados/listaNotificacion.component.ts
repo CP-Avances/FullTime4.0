@@ -16,6 +16,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 
 import { ConfiguracionNotificacionComponent } from '../configuracion/configuracionNotificacion.component';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
     selector: 'app-listaNotificacion',
@@ -46,6 +47,7 @@ export class ListaNotificacionComponent implements OnInit {
     public check: checkOptions[];
 
     // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA
+    idEmpleadoLogueado: any;
     departamentos: any = [];
     sucursales: any = [];
     respuesta: any[];
@@ -114,17 +116,18 @@ export class ListaNotificacionComponent implements OnInit {
 
     constructor(
         public informacion: DatosGeneralesService,
+        public restUsuario: UsuarioService,
         public restR: ReportesService,
         private ventana: MatDialog,
         private validar: ValidacionesService,
         private toastr: ToastrService,
     ) {
+        this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     }
 
     ngOnInit(): void {
         this.check = this.restR.checkOptions([{ opcion: 'c' }, { opcion: 'r' }, { opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
-        this.BuscarInformacion();
-        this.BuscarCargos();
+        this.AdministrarSucursalesUsuario();
     }
 
     ngOnDestroy() {
@@ -135,15 +138,39 @@ export class ListaNotificacionComponent implements OnInit {
         this.origen_cargo = [];
     }
 
+    // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
+    usua_sucursales: any = [];
+    AdministrarSucursalesUsuario() {
+        let empleado = { id_empleado: this.idEmpleadoLogueado };
+        let respuesta: any = [];
+        let codigos = '';
+        //console.log('empleado ', empleado)
+        this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe(data => {
+            respuesta = data;
+            respuesta.forEach((obj: any) => {
+                if (codigos === '') {
+                    codigos = '\'' + obj.id_sucursal + '\''
+                }
+                else {
+                    codigos = codigos + ', \'' + obj.id_sucursal + '\''
+                }
+            })
+            console.log('ver sucursales ', codigos);
+            this.usua_sucursales = { id_sucursal: codigos };
+            this.BuscarInformacion(this.usua_sucursales);
+            this.BuscarCargos(this.usua_sucursales);
+        });
+    }
+
     // METODO PARA FILTRAR POR CARGOS
     empleados_cargos: any = [];
     origen_cargo: any = [];
     cargos: any = [];
-    BuscarCargos() {
+    BuscarCargos(buscar: any) {
         this.empleados_cargos = [];
         this.origen_cargo = [];
         this.cargos = [];
-        this.informacion.ObtenerInformacionCargo(1).subscribe((res: any[]) => {
+        this.informacion.ObtenerInformacionCargo(1, buscar).subscribe((res: any[]) => {
             this.origen_cargo = JSON.stringify(res);
 
             res.forEach(obj => {
@@ -173,14 +200,14 @@ export class ListaNotificacionComponent implements OnInit {
     }
 
     // METODO PARA BUSCAR DATOS DE EMPRESA
-    BuscarInformacion() {
+    BuscarInformacion(buscar: any) {
         this.departamentos = [];
         this.sucursales = [];
         this.respuesta = [];
         this.empleados = [];
         this.regimen = [];
         this.origen = [];
-        this.informacion.ObtenerInformacion(1).subscribe((res: any[]) => {
+        this.informacion.ObtenerInformacion(1, buscar).subscribe((res: any[]) => {
 
             this.origen = JSON.stringify(res);
 
@@ -733,7 +760,7 @@ export class ListaNotificacionComponent implements OnInit {
             this.selectionEmp.clear();
             this.selectionSuc.clear();
             this.Filtrar('', 7)
-          }
+        }
         else if (this.opcion === 'c') {
             this.nombre_carg.reset();
             this.filtroNombreCarg_ = '';

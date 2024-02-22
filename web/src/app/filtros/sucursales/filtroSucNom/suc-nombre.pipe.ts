@@ -9,14 +9,25 @@ export class SucNombrePipe implements PipeTransform {
 
     if (arg === undefined || arg === null || arg.length < 2) return value;
 
-    const resultadoSucursal: any = [];
+    const RESULTADO_BUSQUEDAS: any = [];
 
-    for (const sucursal of value) {
-      if (sucursal.nombre.toLowerCase().indexOf(arg.toLowerCase()) > -1) {
-        resultadoSucursal.push(sucursal);
+    for (const resultados of value) {
+
+      if (resultados.nombre) {
+        if (resultados.nombre.toLowerCase().indexOf(arg.toLowerCase()) > -1) {
+          RESULTADO_BUSQUEDAS.push(resultados);
+        }
       }
+
+      if (resultados.sucursal) {
+        if (resultados.sucursal.toLowerCase().indexOf(arg.toLowerCase()) > -1) {
+          RESULTADO_BUSQUEDAS.push(resultados);
+        }
+      }
+
+
     };
-    return resultadoSucursal;
+    return RESULTADO_BUSQUEDAS;
   }
 
 }

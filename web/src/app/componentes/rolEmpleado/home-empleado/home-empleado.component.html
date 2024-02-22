@@ -8,7 +8,8 @@
 
   <!--Modulos-->
   <div class="row">
-    <div class="col-4" (click)="MenuRapido(0)">
+    <div class="d-flex justify-content-center flex-wrap">
+    <div class="col-md-4" (click)="MenuRapido(0)">
       <mat-card class="mat-elevation-z8 card-info" style="color: antiquewhite;">
         <mat-card-title style="text-align: center; padding: 3px;">
           <mat-label class="titulo-card">Información Usuario</mat-label>
@@ -16,7 +17,6 @@
         <mat-card-content>
           <div class="row">
             <div class="col-md">
-
               <br>
               <div class="cont_imagen">
                 <div mat-card-avatar id="avatar" *ngIf="mostrarImagen; else inic">
@@ -57,9 +57,9 @@
         </mat-card-content>
       </mat-card>
     </div>
-    <div class="col-8">
-      <div class="row" style="text-align:justify;">
-        <div class="col-6" (click)="MenuRapido(1)"><!--Permiso-->
+    <div class="col-md-8">
+      <div class="row">
+        <div class="col-md-6" (click)="MenuRapido(1)"><!--Permiso-->
           <mat-card [ngClass]="!permisos ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-permi'"
             style="color: antiquewhite;">
             <mat-card-title style="text-align: center; padding: 3px;">
@@ -76,7 +76,7 @@
             </mat-card-content>
           </mat-card>
         </div>
-        <div class="col-6" (click)="MenuRapido(2)"><!--Vacaciones-->
+        <div class="col-md-6" (click)="MenuRapido(2)"><!--Vacaciones-->
           <mat-card [ngClass]="!vacaciones ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-vaca'"
             style="color: antiquewhite;">
             <mat-card-title style="text-align: center; padding: 3px;">
@@ -95,8 +95,8 @@
         </div>
       </div>
       <br>
-      <div class="row" style="text-align:justify;">
-        <div class="col-6" (click)="MenuRapido(3)"> <!--boton-inactivo-->
+      <div class="row">
+        <div class="col-md-6" (click)="MenuRapido(3)"> <!--Horas extras-->
           <mat-card [ngClass]="!horasExtras ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-horasExtras'"
             style="color: antiquewhite;"><!--boton-inactivo-->
             <mat-card-title style="text-align: center; padding: 3px;">
@@ -113,8 +113,8 @@
             </mat-card-content>
           </mat-card>
         </div>
-        <div class="col-6" (click)="MenuRapido(4)">
-          <mat-card [ngClass]="!alimentacion ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-alimentacion'"
+        <div class="col-md-6" ><!--Alimentación-->
+          <mat-card (click)="MenuRapido(4)" [ngClass]="!alimentacion ? 'mat-elevation-z8 card-inactivo' : 'mat-elevation-z8 card-alimentacion'"
             style="color: antiquewhite;">
             <mat-card-title style="text-align: center; padding: 3px;">
               <mat-label class="titulo-card">Alimentación</mat-label>
@@ -132,10 +132,10 @@
         </div>
       </div>
     </div>
+
+    </div>
   </div>
-
-  <br><br>
-
+  <br>
   <div class="col-md">
     <div class="d-flex justify-content-center flex-wrap">
       <mat-card (click)="MenuRapido(5)"

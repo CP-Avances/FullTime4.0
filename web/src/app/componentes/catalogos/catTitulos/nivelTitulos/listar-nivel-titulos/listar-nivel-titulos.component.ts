@@ -23,6 +23,8 @@ import { RegistrarNivelTitulosComponent } from '../registrar-nivel-titulos/regis
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulos.service';
 import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla-reportes.service';
+import { ThemePalette } from '@angular/material/core';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 
 
 @Component({
@@ -53,6 +55,9 @@ export class ListarNivelTitulosComponent implements OnInit {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
 
+  tamanio_paginaMul: number = 5;
+  numero_paginaMul: number = 1;
+
   archivoForm = new FormControl('', Validators.required);
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
@@ -60,6 +65,12 @@ export class ListarNivelTitulosComponent implements OnInit {
   get p_color(): string { return this.plantillaPDF.color_Primary }
   get frase(): string { return this.plantillaPDF.marca_Agua }
   get logo(): string { return this.plantillaPDF.logoBase64 }
+
+  // VARIABLES PROGRESS SPINNER
+  progreso: boolean = false;
+  color: ThemePalette = 'primary';
+  mode: ProgressSpinnerMode = 'indeterminate';
+  value = 10;
 
   constructor(
     public nivel: NivelTitulosService, // SERVICIO DATOS NIVELES DE TÍTULOS
@@ -81,6 +92,12 @@ export class ListarNivelTitulosComponent implements OnInit {
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
     this.numero_pagina = e.pageIndex + 1;
+  }
+
+  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+  ManejarPaginaMulti(e: PageEvent) {
+    this.tamanio_paginaMul = e.pageSize;
+    this.numero_paginaMul = e.pageIndex + 1
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO 
@@ -143,6 +160,8 @@ export class ListarNivelTitulosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    this.progreso = true;
   
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.nivel.RevisarFormato(formData).subscribe(res => {
@@ -155,9 +174,27 @@ export class ListarNivelTitulosComponent implements OnInit {
           this.listNivelesCorrectos.push(item);
         }
       });
-      
+    },error => {
+      console.log('Serivicio rest -> metodo RevisarFormato - ',error);
+      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+        timeOut: 4000,
+      });
+      this.progreso = false;
+    },() => {
+      this.progreso = false;
     });
       
+  }
+
+   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+   ConfirmarRegistroMultiple() {
+    const mensaje = 'registro';
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.registrarNiveles();
+        }
+      });
   }
 
   btn_registrar: boolean = true;
@@ -171,6 +208,12 @@ export class ListarNivelTitulosComponent implements OnInit {
       var cont = 0;
       this.listNivelesCorrectos.forEach(item => {
         data.nombre = item.nombre;
+        
+        // Capitalizar la primera letra de la primera palabra
+        const textoNivel = item.nombre.charAt(0).toUpperCase();
+        const restoDelTexto = item.nombre.slice(1);
+
+        data.nombre = textoNivel + restoDelTexto;
         this.nivel.RegistrarNivel(data).subscribe(res => {
           cont = cont + 1;
           if(this.listNivelesCorrectos.length  == cont){
@@ -182,7 +225,7 @@ export class ListarNivelTitulosComponent implements OnInit {
         })
       })
     }else{
-      this.toastr.error('La plantilla no tiene ningun nivel para registrar ingrese otra', 'Plantilla no aceptada', {
+      this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada', {
         timeOut: 4000,
       });
       this.archivoForm.reset();
@@ -199,7 +242,7 @@ export class ListarNivelTitulosComponent implements OnInit {
     let arrayObservacion = observacion.split(" ");
     if(observacion == 'ok'){
       return 'rgb(159, 221, 154)';
-    }else if(observacion == 'Ya esta registrado en base'){
+    }else if(observacion == 'Ya existe en el sistema'){
       return 'rgb(239, 203, 106)';
     }else if(observacion == 'Registro duplicado'){
       return 'rgb(156, 214, 255)';

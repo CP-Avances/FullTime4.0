@@ -1,17 +1,10 @@
 table {
     width: 100%;
+    font-size: 14px;
 }
 
 p {
     font-size: x-small;
-}
-
-h5 {
-    text-align: center;
-}
-
-.upload {
-    cursor: pointer;
 }
 
 .button {
@@ -60,7 +53,7 @@ td {
 }
 
 [type="file"]+label.btn-2 {
-    background-color: rgb(150, 243, 141);
+    background-color: rgb(83, 157, 76);
     overflow: hidden;
 }
 
@@ -80,7 +73,7 @@ td {
 }
 
 [type="file"]+label.btn-2:hover {
-    background-color: rgb(21, 130, 1);
+    background-color: rgb(15, 94, 1);
 }
 
 [type="file"]+label.btn-2:hover::before {
@@ -120,4 +113,57 @@ td {
     height: 15px;
     border-radius: 50px;
     float: left;
+}
+
+.progress {
+    margin-top: 280px;
+    margin-left: 55%;
+    opacity: 1
+}
+  
+.pantalla-progress {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    background: #ffff;
+    opacity: 0.8;
+}
+  
+mat-progress-spinner {
+    background: transparent;
+    z-index: 2;
+}
+
+@media only screen and (max-width: 800px){
+
+    .progress {
+        margin-top: 300px;
+        margin-left: 45%;
+        opacity: 1
+    }
+
+}
+
+@media only screen and (max-width: 413px){
+
+    .pantalla-progress {
+        position: fixed;
+        top: 12%;
+        left: 0px;
+        width: 100%;
+        height: 87%;
+        background: #ffff;
+        opacity: 0.8;
+    }
+
+    .progress {
+        margin-top: 300px;
+        margin-left: 40%;
+        width: 10px;
+        height: 10px;
+        opacity: 1
+    }
+
 }

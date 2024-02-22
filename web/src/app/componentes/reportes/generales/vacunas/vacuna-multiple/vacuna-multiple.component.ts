@@ -19,6 +19,7 @@ import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { VacunasService } from 'src/app/servicios/reportes/vacunas/vacunas.service';
 import { environment } from 'src/environments/environment';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
   selector: 'app-vacuna-multiple',
@@ -39,6 +40,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   }
 
   // VARIABLES DE ALMACENAMIENTO DE RESULTADOS
+  idEmpleadoLogueado: any;
   departamentos: any = [];
   sucursales: any = [];
   empleados: any = [];
@@ -139,16 +141,17 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     private restEmpre: EmpresaService, // SERVICIO DATOS GENERALES DE EMPRESA
     private R_vacuna: VacunasService, // SERVICIO DATOS PARA REPORTE DE VACUNAS
     private toastr: ToastrService, // VARIABLE DE MANEJO DE NOTIFICACIONES
-    ) {
+    public restUsuario: UsuarioService,
+  ) {
+    this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
     this.ObtenerColores();
   }
 
   ngOnInit(): void {
-    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
-    this.BuscarInformacion(this.opcionBusqueda);
+    this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
+    this.AdministrarSucursalesUsuario(this.opcionBusqueda);
     this.BuscarParametro();
-    this.BuscarCargos(this.opcionBusqueda);
     this.BuscarHora();
   }
 
@@ -192,15 +195,40 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   /** ****************************************************************************************** **
    ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** **
    ** ****************************************************************************************** **/
+
+  // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
+  usua_sucursales: any = [];
+  AdministrarSucursalesUsuario(opcion: number) {
+    let empleado = { id_empleado: this.idEmpleadoLogueado };
+    let respuesta: any = [];
+    let codigos = '';
+    //console.log('empleado ', empleado)
+    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe(data => {
+      respuesta = data;
+      respuesta.forEach((obj: any) => {
+        if (codigos === '') {
+          codigos = '\'' + obj.id_sucursal + '\''
+        }
+        else {
+          codigos = codigos + ', \'' + obj.id_sucursal + '\''
+        }
+      })
+      console.log('ver sucursales ', codigos);
+      this.usua_sucursales = { id_sucursal: codigos };
+      this.BuscarInformacion(opcion, this.usua_sucursales);
+      this.BuscarCargos(opcion, this.usua_sucursales);
+    });
+  }
+
   // METODO DE BUSQUEDA DE DATOS
-  BuscarInformacion(opcion: number) {
+  BuscarInformacion(opcion: number, buscar: any) {
     this.departamentos = [];
     this.sucursales = [];
     this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.origen = [];
-    this.informacion.ObtenerInformacion(opcion).subscribe(
+    this.informacion.ObtenerInformacion(opcion, buscar).subscribe(
       (res: any[]) => {
         this.origen = JSON.stringify(res);
         res.forEach((obj: any) => {
@@ -268,11 +296,11 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   // METODO PARA FILTRAR POR CARGOS
   empleados_cargos: any = [];
   origen_cargo: any = [];
-  BuscarCargos(opcion: number) {
+  BuscarCargos(opcion: number, buscar: any) {
     this.empleados_cargos = [];
     this.origen_cargo = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionCargo(opcion).subscribe(
+    this.informacion.ObtenerInformacionCargo(opcion, buscar).subscribe(
       (res: any[]) => {
         this.origen_cargo = JSON.stringify(res);
 
@@ -301,17 +329,16 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       });
   }
 
-  ObtenerTipoUsuario($event: string){
+  ObtenerTipoUsuario($event: string) {
     this.tipoUsuario = $event;
-    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
     this.limpiar = this.opcionBusqueda;
     this.selectionSuc.clear();
     this.selectionDep.clear();
     this.selectionCar.clear();
     this.selectionReg.clear();
     this.selectionEmp.clear();
-    this.BuscarInformacion(this.opcionBusqueda);
-    this.BuscarCargos(this.opcionBusqueda);
+    this.AdministrarSucursalesUsuario(this.opcionBusqueda);
   }
 
   // VALIDACIONES DE SELECCION DE BUSQUEDA
@@ -530,7 +557,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     let respuesta = JSON.parse(this.origen);
     respuesta.forEach((obj: any) => {
       obj.departamentos.forEach((departamento: any) => {
-        departamento.empleado = departamento.empleado.filter((o:any) => {
+        departamento.empleado = departamento.empleado.filter((o: any) => {
           var bool = this.selectionEmp.selected.find((obj1) => {
             return obj1.id === o.id;
           });
@@ -615,7 +642,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
       documentDefinition = this.GetDocumentDefinicion();
     }
 
-    let doc_name = `Vacunas_usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.pdf`;
+    let doc_name = `Vacunas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.pdf`;
     switch (action) {
       case 'open':
         pdfMake.createPdf(documentDefinition).open();
@@ -691,7 +718,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
           margin: [0, -30, 0, 5],
         },
         {
-          text: `REGISTRO DE VACUNACIÓN - ${this.opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}`,
+          text: `REGISTRO DE VACUNACIÓN - ${this.opcionBusqueda == 1 ? 'ACTIVOS' : 'INACTIVOS'}`,
           bold: true,
           fontSize: 12,
           alignment: 'center',
@@ -706,8 +733,8 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
         centrado: { fontSize: 8, bold: true, alignment: 'center', fillColor: this.p_color, margin: [0, 7, 0, 0] },
         itemsTable: { fontSize: 8 },
         itemsTableInfo: { fontSize: 10, margin: [0, 3, 0, 3], fillColor: this.s_color },
-        itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0],fillColor: '#E3E3E3' },
-        itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2],fillColor: '#E3E3E3' },
+        itemsTableInfoBlanco: { fontSize: 9, margin: [0, 0, 0, 0], fillColor: '#E3E3E3' },
+        itemsTableInfoEmpleado: { fontSize: 9, margin: [0, -1, 0, -2], fillColor: '#E3E3E3' },
         itemsTableCentrado: { fontSize: 8, alignment: 'center' },
         tableMargin: { margin: [0, 0, 0, 0] },
         tableMarginCabecera: { margin: [0, 15, 0, 0] },
@@ -940,7 +967,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
                   [
                     {
                       border: [true, false, false, false],
-                      text: this.bool.bool_suc || this.bool.bool_emp?'DEPARTAMENTO: ' + obj2.departamento:'',
+                      text: this.bool.bool_suc || this.bool.bool_emp ? 'DEPARTAMENTO: ' + obj2.departamento : '',
                       style: 'itemsTableInfoEmpleado'
                     },
                     {
@@ -1013,7 +1040,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
    ** **                               METODOS PARA EXPORTAR A EXCEL                          ** **
    ** ****************************************************************************************** **/
 
-  ValidarExcel(){
+  ValidarExcel() {
     if (this.bool.bool_cargo || this.bool.bool_reg) {
       this.ExportarExcelCargoRegimen();
     } else {
@@ -1027,7 +1054,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     );
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Vacunas');
-    xlsx.writeFile(wb, `Vacunas_usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.xlsx`);
+    xlsx.writeFile(wb, `Vacunas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
   }
 
   EstructurarDatosExcel(array: Array<any>) {
@@ -1071,7 +1098,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
     );
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Vacunas');
-    xlsx.writeFile(wb, `Vacunas_usuarios_${this.opcionBusqueda==1 ? 'activos': 'inactivos'}.xlsx`);
+    xlsx.writeFile(wb, `Vacunas_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.xlsx`);
   }
 
   EstructurarDatosExcelRegimenCargo(array: Array<any>) {
@@ -1109,7 +1136,7 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
   /** ****************************************************************************************** **
    ** **                 METODOS PARA EXTRAER TIMBRES PARA LA PREVISUALIZACION                ** **
    ** ****************************************************************************************** **/
-   ExtraerDatos() {
+  ExtraerDatos() {
     this.arr_vac = [];
     let n = 0;
     this.data_pdf.forEach((obj1: any) => {

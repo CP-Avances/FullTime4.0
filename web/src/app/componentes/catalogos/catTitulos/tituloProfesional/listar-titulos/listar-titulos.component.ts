@@ -25,6 +25,8 @@ import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { TituloService } from 'src/app/servicios/catalogos/catTitulos/titulo.service';
 import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulos.service';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+import { ThemePalette } from '@angular/material/core';
 
 @Component({
   selector: 'app-listar-titulos',
@@ -61,11 +63,20 @@ export class ListarTitulosComponent implements OnInit {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
 
+  tamanio_paginaMul: number = 5;
+  numero_paginaMul: number = 1;
+
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
   get p_color(): string { return this.plantillaPDF.color_Primary }
   get frase(): string { return this.plantillaPDF.marca_Agua }
   get logo(): string { return this.plantillaPDF.logoBase64 }
+
+   // VARIABLES PROGRESS SPINNER
+   progreso: boolean = false;
+   color: ThemePalette = 'primary';
+   mode: ProgressSpinnerMode = 'indeterminate';
+   value = 10;
 
   constructor(
     public ventana: MatDialog, // VARIABLE QUE MANEJA EVENTOS CON VENTANAS
@@ -88,6 +99,12 @@ export class ListarTitulosComponent implements OnInit {
   ManejarPagina(e: PageEvent) {
     this.numero_pagina = e.pageIndex + 1;
     this.tamanio_pagina = e.pageSize;
+  }
+
+  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+  ManejarPaginaMulti(e: PageEvent) {
+    this.tamanio_paginaMul = e.pageSize;
+    this.numero_paginaMul = e.pageIndex + 1
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO 
@@ -248,6 +265,8 @@ export class ListarTitulosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    this.progreso = true;
   
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
@@ -259,8 +278,15 @@ export class ListarTitulosComponent implements OnInit {
         if( item.observacion.toLowerCase() === 'ok'){
           this.listTitulosCorrectos.push(item);
         }
+      });      
+    },error => {
+      console.log('Serivicio rest -> metodo RevisarFormato - ',error);
+      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+        timeOut: 4000,
       });
-      
+      this.progreso = false;
+    },() => {
+      this.progreso = false;
     });
       
   }
@@ -280,15 +306,26 @@ export class ListarTitulosComponent implements OnInit {
    }
  
    colorTexto: string = '';
-   stiloTextoCelda(texto: string): string{    
-     let arrayObservacion = texto.split(" ");
-     if(arrayObservacion[0] == 'No'){
+   stiloTextoCelda(texto: string): any{  
+    let arrayObservacion = texto.split(" ");
+    if(arrayObservacion[0] == 'No'){
        return 'rgb(255, 80, 80)';
-     }else{
+    }else{
        return 'black'
-     }
+    }
      
    }
+
+    //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  ConfirmarRegistroMultiple() {
+    const mensaje = 'registro';
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.registrarTitulos();
+        }
+      });
+  }
 
    registrarTitulos(){
     var data: any = {
@@ -319,7 +356,7 @@ export class ListarTitulosComponent implements OnInit {
         })
       })
     }else{
-      this.toastr.error('La plantilla no tiene ningun titulo para registrar ingrese otra', 'Plantilla no aceptada', {
+      this.toastr.error('No exiten datos para registrar ingrese otra', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
       this.archivoForm.reset();

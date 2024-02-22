@@ -23,6 +23,8 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { EmpleadoElemento } from '../../../../model/empleado.model'
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+import { ThemePalette } from '@angular/material/core';
 
 @Component({
   selector: 'app-lista-empleados',
@@ -69,6 +71,12 @@ export class ListaEmpleadosComponent implements OnInit {
   lista_activos: boolean = false;
   tabla_activos: boolean = true;
   lista_inactivos: boolean = true;
+
+  // VARIABLES PROGRESS SPINNER
+  progreso: boolean = false;
+  color: ThemePalette = 'primary';
+  mode: ProgressSpinnerMode = 'indeterminate';
+  value = 10;
 
   constructor(
     public restEmpre: EmpresaService, // SERVICIO DATOS DE EMPRESA
@@ -303,6 +311,11 @@ export class ListaEmpleadosComponent implements OnInit {
     this.cedula.reset();
     this.nombre.reset();
     this.apellido.reset();
+    this.DataEmpleados = null;
+    this.archivoSubido = [];
+    this.nameFile = '';
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = false;
   }
 
   // METODO PARA LISTAR NACIONALIDADES
@@ -321,7 +334,10 @@ export class ListaEmpleadosComponent implements OnInit {
   nameFile: string;
   archivoSubido: Array<File>;
   archivoForm = new FormControl('', Validators.required);
+  mostrarbtnsubir: boolean = false;
   FileChange(element: any) {
+    this.archivoSubido = [];
+    this.nameFile = '';
     this.archivoSubido = element.target.files;
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
@@ -331,7 +347,7 @@ export class ListaEmpleadosComponent implements OnInit {
         var itemName = arrayItems[0].slice(0, 18);
         if (itemName.toLowerCase() == 'empleadoautomatico') {
           console.log('entra_automatico');
-          this.VerificarPlantilla();
+          this.VerificarPlantillaAutomatico();
         } else {
           this.toastr.error('Cargar la plantilla con nombre EmpleadoAutomatico', 'Plantilla seleccionada incorrecta', {
             timeOut: 6000,
@@ -344,7 +360,7 @@ export class ListaEmpleadosComponent implements OnInit {
         itemName = arrayItems[0].slice(0, 14);
         if (itemName.toLowerCase() == 'empleadomanual') {
           console.log('entra_manual');
-          this.VerificarPlantilla();
+          this.VerificarPlantillaManual();
         } else {
           this.toastr.error('Cargar la plantilla con nombre EmpleadoManual', 'Plantilla seleccionada incorrecta', {
             timeOut: 6000,
@@ -360,18 +376,122 @@ export class ListaEmpleadosComponent implements OnInit {
       this.archivoForm.reset();
       this.nameFile = '';
     }
+
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = true;
   }
 
-  VerificarPlantilla() {
+  DataEmpleados: any;
+  listUsuariosCorrectas: any = [];
+  VerificarPlantillaAutomatico() {
+    this.listUsuariosCorrectas = [];
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
-      formData.append("uploads[]", this.archivoSubido[i], this.archivoSubido[i].name);
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    this.progreso = true;
+
+    this.rest.verificarArchivoExcel_Automatico(formData).subscribe(res => {
+      console.log('plantilla 1', res);
+      this.DataEmpleados = res.data;
+
+      this.DataEmpleados.forEach(item => {
+        if( item.observacion.toLowerCase() == 'ok'){
+          this.listUsuariosCorrectas.push(item);
+        }
+      });
+
+    },error => {
+      console.log('Serivicio rest -> metodo verificarArchivoExcel_Automatico - ',error);
+      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+        timeOut: 4000,
+      });
+      this.progreso = false;
+    },() => {
+      this.progreso = false;
+    });
+
+    /*
     if (this.datosCodigo[0].automatico === true) {
       this.ArchivoAutomatico(formData);
     }
     else {
       this.ArchivoManual(formData);
+    }
+    */
+  }
+
+  datosManuales: boolean = false;
+  VerificarPlantillaManual(){
+    this.listUsuariosCorrectas = [];
+    this.datosManuales = false;
+    let formData = new FormData();
+    for (var i = 0; i < this.archivoSubido.length; i++) {
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
+    }
+
+    this.progreso = true;
+
+    this.rest.verificarArchivoExcel_Manual(formData).subscribe(res => {
+      console.log('plantilla manual', res);
+      this.DataEmpleados = res.data;
+      this.datosManuales = true;
+
+
+    },error => {
+      console.log('Serivicio rest -> metodo verificarArchivoExcel_Automatico - ',error);
+      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+        timeOut: 4000,
+      });
+      this.progreso = false;
+      this.datosManuales = false;
+    },() => {
+      this.progreso = false;
+    });
+
+  }
+
+  registrarUsuariosMultiple(){
+    this.rest.subirArchivoExcel_Automatico(this.listUsuariosCorrectas).subscribe(datos_archivo => {
+      console.log('datos plantilla a enviar: ', this.listUsuariosCorrectas);
+
+      this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
+        timeOut: 6000,
+      });
+      //window.location.reload();
+
+    });
+
+  }
+
+  //Metodo para dar color a las celdas y representar las validaciones
+  colorCelda: string = ''
+  stiloCelda(observacion: string): string{
+    
+    let arrayObservacion = observacion.split(" ");
+    if(observacion == 'ok'){
+      return 'rgb(159, 221, 154)';
+    }else if(observacion == 'Ya esta registrado en base'){
+      return 'rgb(239, 203, 106)';
+    }else if((arrayObservacion[0]+' '+arrayObservacion[1]) == 'Cedula ya' || (arrayObservacion[0]+' '+arrayObservacion[1]) == 'Usuario ya'){
+      return 'rgb(239, 203, 106)';
+    }else if(arrayObservacion[0] == 'Cedula' || arrayObservacion[0] == 'Usuario'){
+        return 'rgb(222, 162, 73)';
+    }else if(observacion == 'Registro duplicado'){
+      return 'rgb(156, 214, 255)';
+    }else{
+      return 'rgb(251, 73, 18)';
+    }
+
+  }
+
+  colorTexto: string = '';
+  stiloTextoCelda(texto: string): string{
+    if(texto == 'No registrado'){
+        return 'rgb(255, 80, 80)';
+    }else{   
+      return 'black'
     }
   }
 

@@ -1,0 +1,33 @@
+p {
+    font-size: x-small;
+}
+
+button {
+    margin: 5px 10px 5px 10px;
+}
+
+table {
+    width: 100%;
+    font-size: 13px;
+}
+
+td {
+    padding-top: 10px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#ver {
+    color: rgb(53, 16, 218);
+    cursor: pointer;
+}
+
+.btn {
+    background-color: rgb(80, 87, 97);
+    color: white;
+}
+
+#SelectCheck {
+    cursor: pointer;
+    margin-left: 10px;
+}

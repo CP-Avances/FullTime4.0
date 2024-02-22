@@ -293,8 +293,8 @@ export class RegistroPlanHorarioComponent implements OnInit {
       if (this.feriados.length != 0) {
         //console.log('ingresa feriados ', this.feriados)
         for (let i = 0; i < this.feriados.length; i++) {
-          //console.log('fecha feriados ', moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
-          //console.log('obj ', obj)
+          console.log('fecha feriados ', moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD'))
+          console.log('obj ', obj)
           if (moment(this.feriados[i].fecha, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj.fecha) {
             obj.tipo_dia = 'FD';
             obj.estado = true;
@@ -346,7 +346,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
         obj.horarios_existentes = '';
       });
     })
-    //console.log('ver fechas ', this.fechas_mes)
+    console.log('ver fechas ', this.fechas_mes)
   }
 
   // METODO PARA CAMBIAR DE COLORES SEGUN EL MES
@@ -492,8 +492,10 @@ export class RegistroPlanHorarioComponent implements OnInit {
   // METODO PARA INGRESAR HORARIO
   lista_eliminar: any = [];
   IngresarHorario(index: number) {
-    //console.log('verificar existencias ', this.fechas_mes[index].registrados)
+    console.log('verificar existencias ', this.fechas_mes[index])
+    console.log('tipo dia origen', this.fechas_mes[index].tipo_dia_origen)
     let verificador = 0;
+    let procesar = 0;
     this.ControlarBotones(true, false);
 
     const [datoHorario] = this.horarios.filter(o => {
@@ -507,96 +509,120 @@ export class RegistroPlanHorarioComponent implements OnInit {
       hora_trabajo: datoHorario.hora_trabajo,
     }
 
-    if (this.fechas_mes[index].registrados.length === 1) {
-      if (this.fechas_mes[index].registrados[0].default_ === 'DL' || this.fechas_mes[index].registrados[0].default_ === 'DFD') {
-        let eliminar = {
-          fecha: this.fechas_mes[index].fecha,
-          id_horarios: this.fechas_mes[index].registrados[0].id_horario,
-        }
-        this.lista_eliminar = this.lista_eliminar.concat(eliminar);
-        this.fechas_mes[index].registrados = [];
-      }
-    }
-
-    //console.log('tipo dia ', this.fechas_mes[index].tipo_dia, ' observa ', this.fechas_mes[index].observacion, ' registrados ', this.fechas_mes[index].registrados)
-    //console.log('fechas mes ', this.fechas_mes[index], 'ver data horario ', data.detalles.segundo_dia)
-    //console.log('tipo dia origen', this.fechas_mes[index].tipo_dia_origen)
-    if (this.fechas_mes[index].tipo_dia_origen === 'DL') {
-      this.EliminarLibre(index)
-    }
-
-    //console.log('horarios ', this.fechas_mes[index].horarios)
-    for (let i = 0; i < this.fechas_mes[index].horarios.length; i++) {
-
-      if (this.fechas_mes[index].horarios[i].horario != 'DEFAULT-FERIADO') {
-        if (this.fechas_mes[index].horarios[i].horario === this.horarioF.value) {
-          verificador = 1;
-          break
-        }
-        else {
-          if (this.fechas_mes[index].horarios[i].detalles.segundo_dia === false && data.detalles.segundo_dia === false) {
-            if (this.fechas_mes[index].horarios[i].detalles.salida < data.detalles.entrada) {
-              verificador = 0;
-            }
-            else if (this.fechas_mes[index].horarios[i].detalles.entrada > data.detalles.salida) {
-              verificador = 0
-            }
-            else {
-              verificador = 2;
-              break;
-            }
-          }
-          else if (this.fechas_mes[index].horarios[i].detalles.segundo_dia === true && data.detalles.segundo_dia === true) {
-            verificador = 2;
-            break;
-          }
-          else if (this.fechas_mes[index].horarios[i].detalles.segundo_dia === false && data.detalles.segundo_dia === true) {
-            if (this.fechas_mes[index].horarios[i].detalles.entrada > data.detalles.salida
-              && this.fechas_mes[index].horarios[i].detalles.salida > data.detalles.salida
-              && this.fechas_mes[index].horarios[i].detalles.salida < data.detalles.entrada) {
-              verificador = 0;
-            }
-            else {
-              verificador = 2;
-              break;
-            }
-          }
-          else if (this.fechas_mes[index].horarios[i].detalles.segundo_dia === true && data.detalles.segundo_dia === false) {
-            if (this.fechas_mes[index].horarios[i].detalles.salida < data.detalles.entrada
-              && this.fechas_mes[index].horarios[i].detalles.salida < data.detalles.salida
-              && this.fechas_mes[index].horarios[i].detalles.entrada > data.detalles.salida) {
-              verificador = 0;
-            }
-            else {
-              verificador = 2;
-              break;
-            }
-          }
-        }
+    // SI EL DIA ES FERIADO, INGRESAR HORARIOS TIPO LIBRES O FERIADOS
+    if (this.fechas_mes[index].tipo_dia_origen === 'DFD') {
+      if (datoHorario.default_ === 'FD' || datoHorario.default_ === 'L') {
+        procesar = 0
       }
       else {
-        verificador = 0;
-        this.fechas_mes[index].horarios.splice(i, 1);
+        procesar = 1;
       }
     }
 
-    // console.log('ver data ', this.fechas_mes[index])
-    if (verificador === 0) {
-      this.fechas_mes[index].estado = true;
-      this.fechas_mes[index].tipo_dia = datoHorario.default_;
-      this.fechas_mes[index].tipo_dia_origen = datoHorario.default_;
-      this.fechas_mes[index].horarios = this.fechas_mes[index].horarios.concat(data);
+    // PROCESAMIENTO DE LOS DATOS AL CUMPLIR LAS CONDICIONES
+    if (procesar === 0) {
+
+      // EXISTEN HORARIOS REGISTRADOS
+      if (this.fechas_mes[index].registrados.length === 1) {
+        if (this.fechas_mes[index].registrados[0].default_ === 'DL' || this.fechas_mes[index].registrados[0].default_ === 'DFD') {
+          let eliminar = {
+            fecha: this.fechas_mes[index].fecha,
+            id_horarios: this.fechas_mes[index].registrados[0].id_horario,
+          }
+          this.lista_eliminar = this.lista_eliminar.concat(eliminar);
+          this.fechas_mes[index].registrados = [];
+        }
+      }
+
+      //console.log('tipo dia ', this.fechas_mes[index].tipo_dia, ' observa ', this.fechas_mes[index].observacion, ' registrados ', this.fechas_mes[index].registrados)
+      //console.log('fechas mes ', this.fechas_mes[index], 'ver data horario ', data.detalles.segundo_dia)
+      console.log('tipo dia origen', this.fechas_mes[index].tipo_dia_origen)
+      // DIA REGISTRADO COMO LIBRE
+      if (this.fechas_mes[index].tipo_dia_origen === 'DL') {
+        this.EliminarLibre(index)
+      }
+
+      //console.log('horarios ', this.fechas_mes[index].horarios)
+      // LECTURA DE HORARIOS ASIGNADOS
+      for (let i = 0; i < this.fechas_mes[index].horarios.length; i++) {
+
+        if (this.fechas_mes[index].horarios[i].horario != 'DEFAULT-FERIADO') {
+          if (this.fechas_mes[index].horarios[i].horario === this.horarioF.value) {
+            verificador = 1;
+            break
+          }
+          else {
+            if (this.fechas_mes[index].horarios[i].detalles.segundo_dia === false && data.detalles.segundo_dia === false) {
+              if (this.fechas_mes[index].horarios[i].detalles.salida < data.detalles.entrada) {
+                verificador = 0;
+              }
+              else if (this.fechas_mes[index].horarios[i].detalles.entrada > data.detalles.salida) {
+                verificador = 0
+              }
+              else {
+                verificador = 2;
+                break;
+              }
+            }
+            else if (this.fechas_mes[index].horarios[i].detalles.segundo_dia === true && data.detalles.segundo_dia === true) {
+              verificador = 2;
+              break;
+            }
+            else if (this.fechas_mes[index].horarios[i].detalles.segundo_dia === false && data.detalles.segundo_dia === true) {
+              if (this.fechas_mes[index].horarios[i].detalles.entrada > data.detalles.salida
+                && this.fechas_mes[index].horarios[i].detalles.salida > data.detalles.salida
+                && this.fechas_mes[index].horarios[i].detalles.salida < data.detalles.entrada) {
+                verificador = 0;
+              }
+              else {
+                verificador = 2;
+                break;
+              }
+            }
+            else if (this.fechas_mes[index].horarios[i].detalles.segundo_dia === true && data.detalles.segundo_dia === false) {
+              if (this.fechas_mes[index].horarios[i].detalles.salida < data.detalles.entrada
+                && this.fechas_mes[index].horarios[i].detalles.salida < data.detalles.salida
+                && this.fechas_mes[index].horarios[i].detalles.entrada > data.detalles.salida) {
+                verificador = 0;
+              }
+              else {
+                verificador = 2;
+                break;
+              }
+            }
+          }
+        }
+        else {
+          verificador = 0;
+          this.fechas_mes[index].horarios.splice(i, 1);
+        }
+      }
+
+      // console.log('ver data ', this.fechas_mes[index])
+      if (verificador === 0) {
+        this.fechas_mes[index].estado = true;
+        this.fechas_mes[index].tipo_dia = datoHorario.default_;
+        this.fechas_mes[index].tipo_dia_origen = datoHorario.default_;
+        this.fechas_mes[index].horarios = this.fechas_mes[index].horarios.concat(data);
+      }
+      else if (verificador === 1) {
+        this.toastr.warning('Horario ya se encuentra registrado.', 'Ups!!! VERIFICAR.', {
+          timeOut: 6000,
+        });
+      }
+      else if (verificador === 2) {
+        this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups!!! VERIFICAR.', {
+          timeOut: 6000,
+        });
+      }
+
     }
-    else if (verificador === 1) {
-      this.toastr.warning('Horario ya se encuentra registrado.', 'Ups!!! VERIFICAR.', {
+    else {
+      this.toastr.warning('Día configurado como FERIADO dentro del sistema.', 'Ups!!! VERIFICAR.', {
         timeOut: 6000,
       });
     }
-    else if (verificador === 2) {
-      this.toastr.warning('No es posible registrar horarios con rangos de tiempo similares.', 'Ups!!! VERIFICAR.', {
-        timeOut: 6000,
-      });
-    }
+
   }
 
   // METODO PARA INGRESAR HORARIO
@@ -704,9 +730,6 @@ export class RegistroPlanHorarioComponent implements OnInit {
         this.data_horarios = this.data_horarios.concat(obj);
       }
     })
-
-    // METODO PARA TRATAR FERIADOS
-    // this.RegistrarFeriados();
 
     //console.log('verificador ', verificador);
     if (verificador > 0) {
@@ -1122,7 +1145,7 @@ export class RegistroPlanHorarioComponent implements OnInit {
   // METODO PARA GUARDAR DATOS
   guardar: any = [];
   GuardarDatos(opcion: number) {
-    //console.log('datos a verificar ', this.data_horarios)
+    console.log('datos a verificar ', this.data_horarios)
     let datos: any = [];
 
     this.data_horarios.forEach(valor => {
@@ -1287,7 +1310,8 @@ export class RegistroPlanHorarioComponent implements OnInit {
                       this.ValidarRangos(this.plan_general);
                     }
                     else {
-                      this.InsertarPlanificacion();
+                      console.log('paln_general ', this.plan_general)
+                      //this.InsertarPlanificacion();
                     }
                   }
                 }

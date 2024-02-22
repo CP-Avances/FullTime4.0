@@ -266,6 +266,54 @@ label {
         font-size: 15px;
     }
 
+    .row {
+        flex-direction: column; /* Cambia la dirección del flex a columna */
+      }
+
+      .col-md-4 {
+        flex: 1; /* Ocupa el 100% del ancho en pantallas pequeñas */
+        margin-bottom: 10px; /* Añade margen inferior para separar los elementos */
+        height: min-content;
+      }
+    
+      .col-md-6 {
+        flex: 1; /* Ocupa el 100% del ancho en pantallas pequeñas */
+        margin-bottom: 10px; /* Añade margen inferior para separar los elementos */
+
+      }
+
+      .col-md-8 {
+        flex: 1; /* Ocupa el 100% del ancho en pantallas pequeñas */
+        margin-bottom: 10px; /* Añade margen inferior para separar los elementos */
+      }
+
+      mat-card{
+        margin-top: 10px;
+      }
+
+}
+
+@media only screen and (max-width: 1069px){
+
+    .Cardfila1{
+        width: 240px;
+    }
+
+    .Cardfila2{
+        width: 240px;
+        margin-top: 10px;
+    }
+}
+
+@media only screen and (min-width: 500px){
+
+    .Cardfila1{
+        margin-top: 5px;
+    }
+
+    .Cardfila2{
+        margin-top: 5px;
+    }
 }
 
 .texto {

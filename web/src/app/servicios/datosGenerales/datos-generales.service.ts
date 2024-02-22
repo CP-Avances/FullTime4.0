@@ -17,18 +17,19 @@ export class DatosGeneralesService {
     return this.http.get(`${environment.url}/generalidades/datos-actuales/${id_empleado}`);
   }
 
+
   // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR
-  ObtenerInformacion(estado: any) {
-    return this.http.get<any>(`${environment.url}/generalidades/informacion-general/${estado}`);
+  ObtenerInformacion(estado: any, sucursales: any) {
+    return this.http.post<any>(`${environment.url}/generalidades/informacion-general/${estado}`, sucursales);
   }
 
   // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR CARGOS
-  ObtenerInformacionCargo(estado: any) {
-    return this.http.get<any>(`${environment.url}/generalidades/informacion-general-cargo/${estado}`);
+  ObtenerInformacionCargo(estado: any, sucursales: any) {
+    return this.http.post<any>(`${environment.url}/generalidades/informacion-general-cargo/${estado}`, sucursales);
   }
 
   // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR COMUNICADOS
-  ObtenerInformacionComunicados(estado: any) { 
+  ObtenerInformacionComunicados(estado: any) {
     return this.http.get<any>(`${environment.url}/generalidades/datos_generales_comunicados/${estado}`);
   }
 
@@ -68,5 +69,16 @@ export class DatosGeneralesService {
     return this.http.get<any>(`${environment.url}/generalidades/info-configuracion/${id_empleado}`);
   }
 
+
+  // METODO PARA CONSULTAR DATOS DE ADMINISTRADORES Y JEFES
+  ObtenerAdminJefes(datos: any) {
+    return this.http.post(`${environment.url}/generalidades/datos-actuales-sucursales`, datos);
+  }
+
+
+  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR
+  ObtenerInformacionPrueba(estado: any, sucursales: any) {
+    return this.http.post<any>(`${environment.url}/generalidades/informacion-data-general/${estado}`, sucursales);
+  }
 
 }

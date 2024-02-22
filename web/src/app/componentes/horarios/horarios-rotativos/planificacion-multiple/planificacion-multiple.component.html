@@ -167,6 +167,12 @@
 
                                     <div style="text-align: center;">
 
+                                        <div *ngIf="mostrar_feriados" style="padding-top: 10px; margin: 0 auto;">
+                                            <button class="btn btn-sm" (click)="MostrarFeriados()">
+                                                Mostrar Feriados
+                                            </button>
+                                        </div>
+
                                         <div *ngIf="ver_verificar" style="padding-top: 10px; margin: 0 auto;">
                                             <button class="btn btn-sm" (click)="VerificarAsignados()">
                                                 Verificar
@@ -366,9 +372,6 @@
                                 *ngFor="let e of datosSeleccionados.usuarios | paginate:tamanio_pagina_emp:numero_pagina_emp ">
                                 <td class="sticky colum_1" id="td_horarios">
                                     {{e.codigo}}
-                                </td>
-                                <td class="sticky-2 colum_2" id="td_horarios" *ngIf="e.nombre">
-                                    {{e.nombre}}
                                 </td>
                                 <td class="sticky-2 colum_2" id="td_horarios" *ngIf="e.name_empleado">
                                     {{e.name_empleado}}

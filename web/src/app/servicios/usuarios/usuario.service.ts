@@ -75,10 +75,10 @@ export class UsuarioService {
     return this.http.get<any>(`${environment.url}/usuarios/lista-app-movil/${estado}/activo/${habilitado}`);
   }
 
-    // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
-    UsuariosTimbreMovilCargos(estado: any, habilitado: boolean) {
-      return this.http.get<any>(`${environment.url}/usuarios/lista-app-movil-cargos/${estado}/activo/${habilitado}`);
-    }
+  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
+  UsuariosTimbreMovilCargos(estado: any, habilitado: boolean) {
+    return this.http.get<any>(`${environment.url}/usuarios/lista-app-movil-cargos/${estado}/activo/${habilitado}`);
+  }
 
   // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL
   ActualizarEstadoTimbreMovil(data: any) {
@@ -104,6 +104,44 @@ export class UsuarioService {
   CambiarFrase(data: any) {
     return this.http.post(`${environment.url}/usuarios/frase/restaurar-frase/nueva`, data)
   }
+
+
+  /** *********************************************************************************************** **
+   ** **                       SERVICIOS DE TABLA USUARIO - SUCURSAL                               ** **           
+   ** *********************************************************************************************** */
+
+  // METODO DE BUSQUEDA DE DATOS DE USUARIO
+  BuscarUsuarioSucursal(id_empleado: any) {
+    return this.http.post(`${environment.url}/usuarios/buscar-usuario-sucursal`, id_empleado);
+  }
+
+  // REGISTRAR USUARIO
+  RegistrarUsuarioSucursal(data: any) {
+    return this.http.post(`${environment.url}/usuarios/usuario-sucursal`, data)
+      .pipe(
+        catchError(data)
+      );
+  }
+
+  // METODO DE BUSQUEDA DE DATOS DE USUARIO - SUCURSAL
+  BuscarUsuarioSucursalPrincipal(id_empleado: any) {
+    return this.http.post(`${environment.url}/usuarios/principal-usuario-sucursal`, id_empleado);
+  }
+
+  // METODO PARA ACTUALIZAR REGISTRO DE USUARIO - SUCURSAL
+  ActualizarUsuarioSucursalPrincipal(data: any) {
+    return this.http.put(`${environment.url}/usuarios/actualizar-usuario-sucursal`, data).pipe(
+      catchError(data));
+  }
+
+  // METODO PARA ELIMINAR REGISTROS DE USUARIO - SUCURSAL
+  EliminarUsuarioSucursal(id_usucursal: any) {
+    return this.http.delete(`${environment.url}/usuarios/eliminar-usuario-sucursal/${id_usucursal}`);
+  }
+
+
+
+
 
 
 

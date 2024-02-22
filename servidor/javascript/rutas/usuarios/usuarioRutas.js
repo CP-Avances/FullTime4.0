@@ -45,9 +45,18 @@ class UsuarioRutas {
         this.router.post('/frase/olvido-frase', usuarioControlador_1.USUARIO_CONTROLADOR.RestablecerFrase);
         // METODO PARA CAMBIAR FRASE DE SEGURIDAD
         this.router.post('/frase/restaurar-frase/nueva', usuarioControlador_1.USUARIO_CONTROLADOR.CambiarFrase);
+        // METODO PARA BUSCAR DATOS DE USUARIOS Y SUCURSALES
+        this.router.post('/buscar-usuario-sucursal', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.BuscarUsuarioSucursal);
+        // CREAR REGISTRO DE USUARIOS - SUCURSAL
+        this.router.post('/usuario-sucursal', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.CrearUsuarioSucursal);
+        // METODO PARA BUSCAR DATOS DE USUARIO SUCURSAL PRINCIPAL (TRUE)
+        this.router.post('/principal-usuario-sucursal', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.BuscarUsuarioSucursalPrincipal);
+        // METODO PARA ACTUALIZAR DATOS DE USUARIO - SUCURSAL
+        this.router.put('/actualizar-usuario-sucursal', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ActualizarUsuarioSucursalPrincipal);
+        // METODO PARA ELIMINAR REGISTRO USUARIO - SUCURSAL
+        this.router.delete('/eliminar-usuario-sucursal/:id', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.EliminarUsuarioSucursal);
         this.router.get('/', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.list);
         this.router.get('/busqueda/:usuario', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.getIdByUsuario);
-        this.router.get('/noEnrolados', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ListarUsuriosNoEnrolados);
     }
 }
 const USUARIO_RUTA = new UsuarioRutas();

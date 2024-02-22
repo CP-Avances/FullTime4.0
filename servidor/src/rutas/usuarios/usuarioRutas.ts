@@ -49,6 +49,16 @@ class UsuarioRutas {
         this.router.post('/frase/restaurar-frase/nueva', USUARIO_CONTROLADOR.CambiarFrase);
 
 
+        // METODO PARA BUSCAR DATOS DE USUARIOS Y SUCURSALES
+        this.router.post('/buscar-usuario-sucursal', TokenValidation, USUARIO_CONTROLADOR.BuscarUsuarioSucursal);
+        // CREAR REGISTRO DE USUARIOS - SUCURSAL
+        this.router.post('/usuario-sucursal', TokenValidation, USUARIO_CONTROLADOR.CrearUsuarioSucursal);
+        // METODO PARA BUSCAR DATOS DE USUARIO SUCURSAL PRINCIPAL (TRUE)
+        this.router.post('/principal-usuario-sucursal', TokenValidation, USUARIO_CONTROLADOR.BuscarUsuarioSucursalPrincipal);
+        // METODO PARA ACTUALIZAR DATOS DE USUARIO - SUCURSAL
+        this.router.put('/actualizar-usuario-sucursal', TokenValidation, USUARIO_CONTROLADOR.ActualizarUsuarioSucursalPrincipal);
+        // METODO PARA ELIMINAR REGISTRO USUARIO - SUCURSAL
+        this.router.delete('/eliminar-usuario-sucursal/:id', TokenValidation, USUARIO_CONTROLADOR.EliminarUsuarioSucursal);
 
 
 
@@ -56,9 +66,9 @@ class UsuarioRutas {
 
 
 
+        
         this.router.get('/', TokenValidation, USUARIO_CONTROLADOR.list);
         this.router.get('/busqueda/:usuario', TokenValidation, USUARIO_CONTROLADOR.getIdByUsuario);
-        this.router.get('/noEnrolados', TokenValidation, USUARIO_CONTROLADOR.ListarUsuriosNoEnrolados);
 
     }
 }

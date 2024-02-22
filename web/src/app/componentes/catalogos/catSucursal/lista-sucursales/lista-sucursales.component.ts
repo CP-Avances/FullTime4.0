@@ -2,7 +2,6 @@
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
@@ -24,6 +23,8 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
+import { ThemePalette } from '@angular/material/core';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-lista-sucursales',
@@ -55,8 +56,19 @@ export class ListaSucursalesComponent implements OnInit {
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
 
+  tamanio_paginaMul: number = 5;
+  numero_paginaMul: number = 1;
+
   empleado: any = [];
   idEmpleado: number;
+
+  expansion: boolean = false;
+
+   // VARIABLES PROGRESS SPINNER
+   progreso: boolean = false;
+   color: ThemePalette = 'primary';
+   mode: ProgressSpinnerMode = 'indeterminate';
+   value = 10;
 
   constructor(
     private rest: SucursalService,
@@ -115,6 +127,11 @@ export class ListaSucursalesComponent implements OnInit {
   ManejarPagina(e: PageEvent) {
     this.tamanio_pagina = e.pageSize;
     this.numero_pagina = e.pageIndex + 1;
+  }
+  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+  ManejarPaginaMulti(e: PageEvent) {
+    this.tamanio_paginaMul = e.pageSize;
+    this.numero_paginaMul = e.pageIndex + 1
   }
 
   // METODO PARA BUSCAR SUCURSALES
@@ -408,6 +425,8 @@ export class ListaSucursalesComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    this.progreso = true;
   
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
@@ -430,6 +449,15 @@ export class ListaSucursalesComponent implements OnInit {
       if(this.listSucursalesCorrectas.length > 0){
         this.btn_registrar = false;
       }
+
+    },error => {
+      console.log('Serivicio rest -> metodo RevisarFormato - ',error);
+      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+        timeOut: 4000,
+      });
+      this.progreso = false;
+    },() => {
+      this.progreso = false;
     });
       
   }
@@ -446,6 +474,17 @@ export class ListaSucursalesComponent implements OnInit {
     }else{
       return 'No registrada'
     }
+  }
+
+   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+   ConfirmarRegistroMultiple() {
+    const mensaje = 'registro';
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.registrarSucursales();
+        }
+      });
   }
 
   listSucursalesCorrectas: any = [];
@@ -466,6 +505,13 @@ export class ListaSucursalesComponent implements OnInit {
             data.nombre = item.nom_sucursal;
             data.id_ciudad = valor.id;
             data.id_empresa = '1';
+
+             // Capitalizar la primera letra de la primera palabra
+            const textonombre = data.nombre.charAt(0).toUpperCase();
+            const restoDelTexto = data.nombre.slice(1);
+            
+            data.nombre = textonombre + restoDelTexto
+
             this.rest.RegistrarSucursal(data).subscribe(res => {
               cont = cont + 1;
               if(this.listSucursalesCorrectas.length  == cont){
@@ -480,7 +526,7 @@ export class ListaSucursalesComponent implements OnInit {
 
       })
     }else{
-      this.toastr.error('La plantilla no tiene nunguna sucursal correcta para registrar ingrese otra', 'Plantilla no aceptada', {
+      this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada', {
         timeOut: 4000,
       });
       this.archivoForm.reset();
@@ -495,13 +541,14 @@ export class ListaSucursalesComponent implements OnInit {
   //Metodo para dar color a las celdas y representar las validaciones
   colorCelda: string = ''
   stiloCelda(observacion: string): string{
+    console.log('observacion: ',observacion);
     let arrayObservacion = observacion.split(" ");
     if(observacion == 'ok'){
       return 'rgb(159, 221, 154)';
-    }else if(observacion == 'Ya esta registrado en base'){
+    }else if(observacion == 'Ya existe en el sistema'){
       return 'rgb(239, 203, 106)';
     }else if(arrayObservacion[0] == 'Ciudad' || arrayObservacion[0] == 'Sucursal'){
-      return 'rgb(246, 167, 143)';
+      return 'rgb(222, 162, 73)';
     }else if(observacion == 'Registro duplicado'){
       return 'rgb(156, 214, 255)';
     }else{

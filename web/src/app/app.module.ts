@@ -314,6 +314,9 @@ import { EditarPermisoEmpleadoComponent } from './componentes/modulos/permisos/g
 import { EliminarIndividualComponent } from './componentes/horarios/eliminar-individual/eliminar-individual.component';
 import { BuscarAsistenciaComponent } from './componentes/horarios/asistencia/buscar-asistencia/buscar-asistencia.component';
 import { CargarPlantillaPlanificacionComponent } from './componentes/horarios/cargar-plantillas/cargar-plantilla-planificacion/cargar-plantilla-planificacion.component';
+import { PrincipalSucursalUsuarioComponent } from './componentes/empleado/sucursal-usuario/principal-sucursal-usuario/principal-sucursal-usuario.component';
+import { AsignarUsuarioComponent } from './componentes/empleado/sucursal-usuario/asignar-usuario/asignar-usuario.component';
+import { DefinicionPlantillaComponent } from './componentes/administracionGeneral/definicion-plantilla/definicion-plantilla.component';
 
 
 const config: SocketIoConfig = { url: environment.url, options: {} };
@@ -563,6 +566,9 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     EliminarIndividualComponent,
     BuscarAsistenciaComponent,
     CargarPlantillaPlanificacionComponent,
+    PrincipalSucursalUsuarioComponent,
+    AsignarUsuarioComponent,
+    DefinicionPlantillaComponent,
 
   ],
 

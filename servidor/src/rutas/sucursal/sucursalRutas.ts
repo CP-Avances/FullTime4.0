@@ -19,6 +19,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+
+
 class SucursalRutas {
     public router: Router = Router();
 

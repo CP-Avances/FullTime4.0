@@ -140,6 +140,7 @@ import { VerVacunasComponent } from './componentes/reportes/generales/vacunas/ve
 import { BuscarAsistenciaComponent } from './componentes/horarios/asistencia/buscar-asistencia/buscar-asistencia.component';
 import { ReporteTiempoAlimentacionComponent } from './componentes/reportes/asistencia/reporte-tiempo-alimentacion/reporte-tiempo-alimentacion.component';
 import { AnalisisDatosComponent } from './componentes/reportes/analisis-datos/analisis-datos.component';
+import { PrincipalSucursalUsuarioComponent } from './componentes/empleado/sucursal-usuario/principal-sucursal-usuario/principal-sucursal-usuario.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -147,15 +148,17 @@ const routes: Routes = [
   // Para rol Administrador
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard], data: { roles: 1 } },
 
- { path: 'relojes', component: RelojesComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'relojes', component: RelojesComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'registrarProceso', component: RegistroProcesoComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'registrarDepartamento', component: RegistroDepartamentoComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'registrarHorario', component: RegistroHorarioComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'feriados', component: RegistrarFeriadosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-{ path: 'emplCargos', component: EmplCargosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'emplCargos', component: EmplCargosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'planificacion', component: PlanificacionMultipleComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'asistencia', component: BuscarAsistenciaComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'calcularHoraExtra', component: CalculoHoraExtraComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+
+  { path: 'administrarSucursales', component: PrincipalSucursalUsuarioComponent, canActivate: [AuthGuard], data: { roles: 1 } },
 
 
   { path: 'verEmpleado/:id', component: VerEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 1 } },
@@ -195,7 +198,7 @@ const routes: Routes = [
   { path: 'solicitud-vacacion', component: SolicitudVacacionComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'reporte-timbre-sistema', component: TimbreSistemaComponent, canActivate: [AuthGuard], data: { roles: 1 } },
   { path: 'reporte-timbre-reloj-virtual', component: TimbreVirtualComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'analisisDatos', component: AnalisisDatosComponent, canActivate: [AuthGuard], data: {roles: 1} },
+  { path: 'analisisDatos', component: AnalisisDatosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
 
   //DETALLE REPORTES
   { path: 'ver-empleados-activos-detalle/:tipo', component: VerEmpleadosDetalleComponent, canActivate: [AuthGuard], data: { roles: 1 } },
@@ -226,7 +229,7 @@ const routes: Routes = [
   { path: 'estadisticas', component: HomeEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 2 } },
   { path: 'informacion', component: InformacionJefeComponent, canActivate: [AuthGuard], data: { roles: 2 } },
   { path: 'cargoEmpleado', component: ContratoCargoEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 2 } },
- { path: 'horariosEmpleado', component: HorariosEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 2 } },
+  { path: 'horariosEmpleado', component: HorariosEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 2 } },
   { path: 'vacacionesEmpleado', component: VacacionesEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 2 } },
   { path: 'solicitarPermiso', component: SolicitarPermisosEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 2 } },
   { path: 'verDocumentacion', component: VerDocumentacionComponent, canActivate: [AuthGuard], data: { roles: 2 } },

@@ -12,8 +12,19 @@ mat-form-field.input-tables {
     height: 65px;
 }
 
-.codigo { width: 75px; }
-.cedula { width: 150px;}
+.codigo {
+    width: 75px;
+}
+
+.cedula {
+    width: 150px;
+}
+
+.container_ table-responsive {
+    width: 200px;
+    /* Ancho fijo del contenedor */
+    overflow-x: auto;
+}
 
 p {
     font-size: x-small;
@@ -22,6 +33,7 @@ p {
 table {
     width: 100%;
     font-size: 13px;
+    border-collapse: collapse;
 }
 
 tr {
@@ -29,12 +41,18 @@ tr {
 }
 
 td {
+    width: 400px;
     padding-top: 10px;
     text-align: center;
     vertical-align: middle;
 }
 
-#btn_listar{
+#td_usuario {
+    font-size: 10px;
+    width: 600px;
+}
+
+#btn_listar {
     background-color: rgb(3, 169, 224);
     margin: 5px 10px 5px 10px;
     color: white;
@@ -127,4 +145,65 @@ td {
 
 [type="file"]+label.btn-2:hover::before {
     right: 80%
+}
+
+.circulo {
+    margin-right: -50px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50px;
+    float: left;
+}
+
+.progress {
+    margin-top: 280px;
+    margin-left: 55%;
+    opacity: 1
+}
+
+.pantalla-progress {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    background: #ffff;
+    opacity: 0.8;
+}
+
+mat-progress-spinner {
+    background: transparent;
+    z-index: 2;
+}
+
+@media only screen and (max-width: 800px) {
+
+    .progress {
+        margin-top: 300px;
+        margin-left: 45%;
+        opacity: 1
+    }
+
+}
+
+@media only screen and (max-width: 413px) {
+
+    .pantalla-progress {
+        position: fixed;
+        top: 12%;
+        left: 0px;
+        width: 100%;
+        height: 87%;
+        background: #ffff;
+        opacity: 0.8;
+    }
+
+    .progress {
+        margin-top: 300px;
+        margin-left: 40%;
+        width: 10px;
+        height: 10px;
+        opacity: 1
+    }
+
 }
