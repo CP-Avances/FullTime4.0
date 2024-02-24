@@ -782,6 +782,7 @@ class EmpleadoControlador {
     const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
     let data: any = {
+      fila: '',
       cedula: '',	
       apellido: '',
       nombre: '',	
@@ -825,7 +826,7 @@ class EmpleadoControlador {
 
     plantilla.forEach(async (dato: any, indice: any, array: any) => {
       // Datos que se leen de la plantilla ingresada
-      var { cedula, apellido, nombre, estado_civil, genero, correo, fec_nacimiento, estado, mail_alternativo, 
+      var {N, cedula, apellido, nombre, estado_civil, genero, correo, fec_nacimiento, estado, mail_alternativo, 
         domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
 
         //Verificar que el registo no tenga datos vacios
@@ -838,6 +839,7 @@ class EmpleadoControlador {
            (usuario != undefined)	&& (contrasena != undefined) &&	
            (estado_user != undefined) && 	(rol != undefined) &&	(app_habilita != undefined)
         ){
+          data.fila = N;
           data.cedula = cedula; data.apellido = apellido;
           data.nombre = nombre; data.estado_civil = estado_civil;	
           data.genero = genero; data.correo = correo;
@@ -866,7 +868,7 @@ class EmpleadoControlador {
           listEmpleados.push(data);
 
         }else{
-
+          data.fila = N;
           data.cedula = cedula; data.apellido = apellido;
           data.nombre = nombre; data.estado_civil = estado_civil;	
           data.genero = genero; data.correo = correo;
@@ -1287,6 +1289,7 @@ class EmpleadoControlador {
     const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
     let data: any = {
+      fila: '',
       cedula: '',	
       apellido: '',
       nombre: '',	
@@ -1315,7 +1318,7 @@ class EmpleadoControlador {
 
     plantilla.forEach(async (dato: any, indice: any, array: any) => {
       // Datos que se leen de la plantilla ingresada
-      var { cedula, apellido, nombre, codigo, estado_civil, genero, correo, fec_nacimiento, estado, mail_alternativo, 
+      var {N, cedula, apellido, nombre, codigo, estado_civil, genero, correo, fec_nacimiento, estado, mail_alternativo, 
         domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
       
          //Verificar que el registo no tenga datos vacios
@@ -1328,6 +1331,7 @@ class EmpleadoControlador {
          (usuario != undefined)	&& (contrasena != undefined) &&	
          (estado_user != undefined) && 	(rol != undefined) &&	(app_habilita != undefined)
       ){
+        data.fila = N;
         data.cedula = cedula; data.apellido = apellido;
         data.nombre = nombre; data.codigo = codigo; data.estado_civil = estado_civil;	
         data.genero = genero; data.correo = correo;
@@ -1366,6 +1370,7 @@ class EmpleadoControlador {
         listEmpleadosManual.push(data);
 
       }else{
+          data.fila = N;
           data.cedula = cedula; data.apellido = apellido;
           data.nombre = nombre; data.codigo = codigo; data.estado_civil = estado_civil;	
           data.genero = genero; data.correo = correo;

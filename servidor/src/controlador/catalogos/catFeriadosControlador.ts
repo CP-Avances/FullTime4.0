@@ -333,14 +333,14 @@ class FeriadosControlador {
             console.log('lista feriados: ',listFeriados);
 
             listFeriados.forEach((item:any) => {
-                if(item.observacion == undefined || item.observacion == 'no registrada' || item.observacion == ''){
-                  item.observacion = 'Registro duplicado'
+                if(item.observacion != undefined && item.observacion != 'no registrada' && item.observacion != ''){
+                  fecha_igual.forEach((valor: any) => {
+                    if(valor.fecha == item.fec_recuperacion){
+                        item.observacion = 'Fecha registrada como valor de otra columna'   
+                    }
+                })
                 }else{
-                    fecha_igual.forEach((valor: any) => {
-                        if(valor.fecha == item.fec_recuperacion){
-                            item.observacion = 'Fecha duplicada'   
-                        }
-                    })
+                    item.observacion = 'Registro duplicado'
                 }
             });
 

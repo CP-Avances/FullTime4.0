@@ -325,7 +325,7 @@
                 <tbody>
                     <tr
                         *ngFor="let e of DataEmpleados | paginate:tamanio_pagina:numero_pagina; let i = index">
-                        <td style="font-size: 14px; width: 50px;" align="center">{{i + 1}}</td>
+                        <td style="font-size: 14px; width: 50px;" align="center">{{e.fila}}</td>
                         <td [style.color]="stiloTextoCelda(e.codigo)" *ngIf="datosManuales">{{e.codigo}}</td>
                         <td [style.color]="stiloTextoCelda(e.nombre)">{{e.nombre}}</td>
                         <td [style.color]="stiloTextoCelda(e.apellido)">{{e.apellido}}</td>
@@ -352,9 +352,3 @@
     </div>
 </div>
 
-<div class="container" style="text-align: center; padding-top: 10px; margin-bottom: 25px;">
-    <div class="pantalla-progress" *ngIf="progreso">
-        <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
-        </mat-progress-spinner>
-    </div>
-</div>

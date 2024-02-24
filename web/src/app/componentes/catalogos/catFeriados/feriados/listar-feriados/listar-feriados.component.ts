@@ -420,7 +420,7 @@ export class ListarFeriadosComponent implements OnInit {
   stiloCelda(observacion: string): string{
     let arrayObservacion = observacion.split(" ");
     
-    if(observacion == 'Fecha duplicada'){
+    if(observacion == 'Fecha registrada como valor de otra columna'){
       return 'rgb(170, 129, 236)';
     }else if(observacion == 'ok'){
       return 'rgb(159, 221, 154)';

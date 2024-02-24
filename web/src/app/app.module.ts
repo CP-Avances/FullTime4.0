@@ -145,6 +145,8 @@ import { EmpleadoHorariosService } from './servicios/horarios/empleadoHorarios/e
 import { EmplCargosService } from './servicios/empleado/empleadoCargo/empl-cargos.service';
 import { CiudadService } from './servicios/ciudad/ciudad.service';
 import { TokenInterceptorService } from './servicios/login/token-interceptor.service';
+import { SpinnerService } from './servicios/intercepto/spinner.service';
+
 import { GraficasService } from './servicios/graficas/graficas.service';
 import { ProgressService } from './componentes/administracionGeneral/progress/progress.service';
 
@@ -317,6 +319,9 @@ import { CargarPlantillaPlanificacionComponent } from './componentes/horarios/ca
 import { PrincipalSucursalUsuarioComponent } from './componentes/empleado/sucursal-usuario/principal-sucursal-usuario/principal-sucursal-usuario.component';
 import { AsignarUsuarioComponent } from './componentes/empleado/sucursal-usuario/asignar-usuario/asignar-usuario.component';
 import { DefinicionPlantillaComponent } from './componentes/administracionGeneral/definicion-plantilla/definicion-plantilla.component';
+import { SpinnerModule } from './componentes/spinner/spinner.module';
+import { SpinnerComponent } from './componentes/spinner/spinner.component';
+import { SpinnerInterceptor } from './componentes/spinner/Interceptor/spinner.interceptor';
 
 
 const config: SocketIoConfig = { url: environment.url, options: {} };
@@ -569,6 +574,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     PrincipalSucursalUsuarioComponent,
     AsignarUsuarioComponent,
     DefinicionPlantillaComponent,
+   
 
   ],
 
@@ -591,6 +597,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     MatDatepickerModule,
     MatNativeDateModule,
     ReportesModule,
+    SpinnerModule
   ],
   providers: [
     AuthGuard,
@@ -599,6 +606,12 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
       useClass: TokenInterceptorService,
       multi: true
     },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: SpinnerInterceptor,
+      multi: true
+    },
+
     {
       provide: LOCALE_ID, useValue: 'es-EC'
     },

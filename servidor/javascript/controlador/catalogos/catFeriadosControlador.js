@@ -294,15 +294,15 @@ class FeriadosControlador {
                 });
                 console.log('lista feriados: ', listFeriados);
                 listFeriados.forEach((item) => {
-                    if (item.observacion == undefined || item.observacion == 'no registrada' || item.observacion == '') {
-                        item.observacion = 'Registro duplicado';
-                    }
-                    else {
+                    if (item.observacion != undefined && item.observacion != 'no registrada' && item.observacion != '') {
                         fecha_igual.forEach((valor) => {
                             if (valor.fecha == item.fec_recuperacion) {
-                                item.observacion = 'Fecha duplicada';
+                                item.observacion = 'Fecha registrada como valor de otra columna';
                             }
                         });
+                    }
+                    else {
+                        item.observacion = 'Registro duplicado';
                     }
                 });
                 return res.jsonp({ message: 'correcto', data: listFeriados });

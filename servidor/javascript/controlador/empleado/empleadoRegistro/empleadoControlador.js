@@ -697,6 +697,7 @@ class EmpleadoControlador {
             const sheet_name_list = workbook.SheetNames;
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
             let data = {
+                fila: '',
                 cedula: '',
                 apellido: '',
                 nombre: '',
@@ -737,7 +738,7 @@ class EmpleadoControlador {
             */
             plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
                 // Datos que se leen de la plantilla ingresada
-                var { cedula, apellido, nombre, estado_civil, genero, correo, fec_nacimiento, estado, mail_alternativo, domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
+                var { N, cedula, apellido, nombre, estado_civil, genero, correo, fec_nacimiento, estado, mail_alternativo, domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
                 //Verificar que el registo no tenga datos vacios
                 if ((cedula != undefined) && (apellido != undefined) &&
                     (nombre != undefined) && (estado_civil != undefined) &&
@@ -747,6 +748,7 @@ class EmpleadoControlador {
                     (telefono != undefined) && (nacionalidad != undefined) &&
                     (usuario != undefined) && (contrasena != undefined) &&
                     (estado_user != undefined) && (rol != undefined) && (app_habilita != undefined)) {
+                    data.fila = N;
                     data.cedula = cedula;
                     data.apellido = apellido;
                     data.nombre = nombre;
@@ -782,6 +784,7 @@ class EmpleadoControlador {
                     listEmpleados.push(data);
                 }
                 else {
+                    data.fila = N;
                     data.cedula = cedula;
                     data.apellido = apellido;
                     data.nombre = nombre;
@@ -1166,6 +1169,7 @@ class EmpleadoControlador {
             const sheet_name_list = workbook.SheetNames;
             const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
             let data = {
+                fila: '',
                 cedula: '',
                 apellido: '',
                 nombre: '',
@@ -1192,7 +1196,7 @@ class EmpleadoControlador {
             var duplicados2 = [];
             plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
                 // Datos que se leen de la plantilla ingresada
-                var { cedula, apellido, nombre, codigo, estado_civil, genero, correo, fec_nacimiento, estado, mail_alternativo, domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
+                var { N, cedula, apellido, nombre, codigo, estado_civil, genero, correo, fec_nacimiento, estado, mail_alternativo, domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
                 //Verificar que el registo no tenga datos vacios
                 if ((cedula != undefined) && (apellido != undefined) &&
                     (nombre != undefined) && (codigo != undefined) && (estado_civil != undefined) &&
@@ -1202,6 +1206,7 @@ class EmpleadoControlador {
                     (telefono != undefined) && (nacionalidad != undefined) &&
                     (usuario != undefined) && (contrasena != undefined) &&
                     (estado_user != undefined) && (rol != undefined) && (app_habilita != undefined)) {
+                    data.fila = N;
                     data.cedula = cedula;
                     data.apellido = apellido;
                     data.nombre = nombre;
@@ -1246,6 +1251,7 @@ class EmpleadoControlador {
                     listEmpleadosManual.push(data);
                 }
                 else {
+                    data.fila = N;
                     data.cedula = cedula;
                     data.apellido = apellido;
                     data.nombre = nombre;

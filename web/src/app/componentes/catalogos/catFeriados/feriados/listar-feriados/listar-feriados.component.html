@@ -248,14 +248,6 @@
         </mat-accordion>
     </div>
 
-    <div class="container" style="text-align: center;  padding-top: 10px; margin-bottom: 25px;">
-        <div class="pantalla-progress" *ngIf="progreso">
-            <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
-            </mat-progress-spinner>
-        </div>
-    </div>
-    
-
     <!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE FERIADOS ------------------------------------------------->
     <div class="container" style="padding-bottom: 10px; margin-bottom: 35px;" *ngIf="DataFeriados">
         <div class="mat-elevation-z8" style="background: white;">
@@ -274,7 +266,7 @@
                     <tbody>
                         <tr
                             *ngFor="let f of DataFeriados | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
-                            <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{i + 1}}</td>
+                            <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{f.fila}}</td>
                             <td [style.color]="stiloTextoCelda(f.fecha)" style="font-size: 12px;">{{f.fecha}}</td>
                             <td [style.color]="stiloTextoCelda(f.descripcion)" id="letras" style="font-size: 12px;">{{f.descripcion}}</td>
                             <td style="font-size: 12px;">{{f.fec_recuperacion}}</td>
