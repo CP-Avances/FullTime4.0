@@ -66,8 +66,6 @@ export class ListarTitulosComponent implements OnInit {
   tamanio_paginaMul: number = 5;
   numero_paginaMul: number = 1;
 
-  expansion: boolean = false;
-
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
   get p_color(): string { return this.plantillaPDF.color_Primary }

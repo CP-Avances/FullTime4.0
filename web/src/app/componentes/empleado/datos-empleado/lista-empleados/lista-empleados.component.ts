@@ -72,8 +72,6 @@ export class ListaEmpleadosComponent implements OnInit {
   tabla_activos: boolean = true;
   lista_inactivos: boolean = true;
 
-  expansion: boolean = false;
-
   // VARIABLES PROGRESS SPINNER
   progreso: boolean = false;
   color: ThemePalette = 'primary';
