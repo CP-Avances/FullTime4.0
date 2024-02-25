@@ -61,6 +61,9 @@ export class ListaEmpleadosComponent implements OnInit {
   tamanio_paginaDes: number = 5;
   numero_paginaDes: number = 1;
 
+  tamanio_paginaMul: number = 5;
+  numero_paginaMul: number = 1;
+
   idEmpleado: number; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESION
 
   // VARAIBLES DE SELECCION DE DATOS DE UNA TABLA
@@ -261,6 +264,12 @@ export class ListaEmpleadosComponent implements OnInit {
     this.tamanio_pagina = e.pageSize;
   }
 
+  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+  ManejarPaginaMulti(e: PageEvent) {
+    this.tamanio_paginaMul = e.pageSize;
+    this.numero_paginaMul = e.pageIndex + 1
+  }
+
   // METODO PARA MANEJAR PAGINACION INACTIVOS
   ManejarPaginaDes(e: PageEvent) {
     this.numero_paginaDes = e.pageIndex + 1;
@@ -316,6 +325,7 @@ export class ListaEmpleadosComponent implements OnInit {
     this.nameFile = '';
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
+    this.messajeExcel == '';
   }
 
   // METODO PARA LISTAR NACIONALIDADES
@@ -347,6 +357,8 @@ export class ListaEmpleadosComponent implements OnInit {
         var itemName = arrayItems[0].slice(0, 18);
         if (itemName.toLowerCase() == 'empleadoautomatico') {
           console.log('entra_automatico');
+          this.numero_paginaMul = 1;
+          this.tamanio_paginaMul = 5;
           this.VerificarPlantillaAutomatico();
         } else {
           this.toastr.error('Cargar la plantilla con nombre EmpleadoAutomatico', 'Plantilla seleccionada incorrecta', {
@@ -354,12 +366,15 @@ export class ListaEmpleadosComponent implements OnInit {
           });
           this.archivoForm.reset();
           this.nameFile = '';
+          this.LimpiarCampos();
         }
       }
       else {
         itemName = arrayItems[0].slice(0, 14);
         if (itemName.toLowerCase() == 'empleadomanual') {
           console.log('entra_manual');
+          this.numero_paginaMul = 1;
+          this.tamanio_paginaMul = 5;
           this.VerificarPlantillaManual();
         } else {
           this.toastr.error('Cargar la plantilla con nombre EmpleadoManual', 'Plantilla seleccionada incorrecta', {
@@ -367,6 +382,7 @@ export class ListaEmpleadosComponent implements OnInit {
           });
           this.archivoForm.reset();
           this.nameFile = '';
+          this.LimpiarCampos()
         }
       }
     } else {
@@ -383,6 +399,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
   DataEmpleados: any;
   listUsuariosCorrectas: any = [];
+  messajeExcel: string = '';
   VerificarPlantillaAutomatico() {
     this.listUsuariosCorrectas = [];
     let formData = new FormData();
@@ -395,12 +412,20 @@ export class ListaEmpleadosComponent implements OnInit {
     this.rest.verificarArchivoExcel_Automatico(formData).subscribe(res => {
       console.log('plantilla 1', res);
       this.DataEmpleados = res.data;
+      this.messajeExcel = res.message;
 
-      this.DataEmpleados.forEach(item => {
-        if( item.observacion.toLowerCase() == 'ok'){
-          this.listUsuariosCorrectas.push(item);
-        }
-      });
+      if(this.messajeExcel == 'error'){
+        this.toastr.error('Revisar los datos de la columna N, debe enumerar correctamente.', 'Plantilla no aceptada', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }else{
+        this.DataEmpleados.forEach(item => {
+          if( item.observacion.toLowerCase() == 'ok'){
+            this.listUsuariosCorrectas.push(item);
+          }
+        });
+      }
 
     },error => {
       console.log('Serivicio rest -> metodo verificarArchivoExcel_Automatico - ',error);
@@ -436,8 +461,16 @@ export class ListaEmpleadosComponent implements OnInit {
     this.rest.verificarArchivoExcel_Manual(formData).subscribe(res => {
       console.log('plantilla manual', res);
       this.DataEmpleados = res.data;
-      this.datosManuales = true;
+      this.messajeExcel = res.message;
 
+      if(this.messajeExcel == 'error'){
+        this.toastr.error('Revisar los datos de la columna N, debe enumerar correctamente.', 'Plantilla no aceptada', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }else{
+        this.datosManuales = true;
+      }
 
     },error => {
       console.log('Serivicio rest -> metodo verificarArchivoExcel_Automatico - ',error);

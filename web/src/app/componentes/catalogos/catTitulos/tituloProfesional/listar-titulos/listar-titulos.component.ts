@@ -165,6 +165,7 @@ export class ListarTitulosComponent implements OnInit {
     this.ObtenerTitulos();
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
+    this.messajeExcel == '';
   }
 
   // METODO PARA VALIDAR INGRESO DE LETRAS
@@ -237,6 +238,8 @@ export class ListarTitulosComponent implements OnInit {
     console.log('itemName: ',itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (itemName.toLowerCase() == 'titulos_profesionales') {
+        this.numero_paginaMul = 1;
+        this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
       } else {
         this.toastr.error('Seleccione plantilla con nombre Titulos_profesionales', 'Plantilla seleccionada incorrecta', {
@@ -258,6 +261,7 @@ export class ListarTitulosComponent implements OnInit {
 
   DataTitulosProfesionales: any;
   listTitulosCorrectos: any = [];
+  messajeExcel: string = '';
   // METODO PARA ENVIAR MENSAJES DE ERROR O CARGAR DATOS SI LA PLANTILLA ES CORRECTA
   Revisarplantilla(){
     this.listTitulosCorrectos = [];
@@ -271,14 +275,21 @@ export class ListarTitulosComponent implements OnInit {
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.DataTitulosProfesionales = res.data;
-      
-      console.log('probando plantilla1', this.DataTitulosProfesionales);
+      this.messajeExcel = res.message;
 
-      this.DataTitulosProfesionales.forEach(item => {
-        if( item.observacion.toLowerCase() === 'ok'){
-          this.listTitulosCorrectos.push(item);
-        }
-      });      
+      if(this.messajeExcel == 'error'){
+        this.toastr.error('Revisar los datos de la columna N, debe enumerar correctamente.', 'Plantilla no aceptada', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }else{
+        this.DataTitulosProfesionales.forEach(item => {
+          if( item.observacion.toLowerCase() === 'ok'){
+            this.listTitulosCorrectos.push(item);
+          }
+        }); 
+      }
+     
     },error => {
       console.log('Serivicio rest -> metodo RevisarFormato - ',error);
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
@@ -300,6 +311,8 @@ export class ListarTitulosComponent implements OnInit {
        return 'rgb(239, 203, 106)';
      }else if(observacion == 'Registro duplicado'){
        return 'rgb(156, 214, 255)';
+     }else if(observacion == 'Nivel no existe en el sistema'){
+      return 'rgb(255, 192, 203)';
      }else{
        return 'rgb(251, 73, 18)';
      }

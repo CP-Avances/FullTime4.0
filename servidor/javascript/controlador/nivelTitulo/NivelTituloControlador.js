@@ -115,13 +115,14 @@ class NivelTituloControlador {
             };
             var listNivelesProfesionales = [];
             var duplicados = [];
-            console.log('plantilla: ', plantilla);
+            var mensaje = 'correcto';
             // LECTURA DE LOS DATOS DE LA PLANTILLA
             plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
                 var { N, nombre } = dato;
                 data.fila = dato.N;
                 data.nombre = dato.nombre;
-                if (data.nombre != undefined && data.nombre != '' && data.nombre != null) {
+                if ((data.fila != undefined && data.fila != '') &&
+                    (data.nombre != undefined && data.nombre != '' && data.nombre != null)) {
                     //Validar primero que exista la ciudad en la tabla ciudades
                     const existe_nivelProfecional = yield database_1.default.query('SELECT nombre FROM nivel_titulo WHERE UPPER(nombre) = UPPER($1)', [data.nombre]);
                     if (existe_nivelProfecional.rowCount == 0) {
@@ -144,6 +145,10 @@ class NivelTituloControlador {
                     data.fila = N;
                     data.nombre = 'No registrado';
                     data.observacion = 'Nivel no registrado';
+                    if (data.fila == '' || data.fila == undefined) {
+                        data.fila = 'error';
+                        mensaje = 'error';
+                    }
                     listNivelesProfesionales.push(data);
                 }
                 data = {};
@@ -168,12 +173,27 @@ class NivelTituloControlador {
                     }
                     return 0; // Son iguales
                 });
+                var filaDuplicada = 0;
                 listNivelesProfesionales.forEach((item) => {
                     if (item.observacion == undefined || item.observacion == null || item.observacion == '') {
                         item.observacion = 'Registro duplicado';
                     }
+                    //Valida si los datos de la columna N son numeros.
+                    if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+                        //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                        if (item.fila == filaDuplicada) {
+                            mensaje = 'error';
+                        }
+                    }
+                    else {
+                        return mensaje = 'error';
+                    }
+                    filaDuplicada = item.fila;
                 });
-                return res.jsonp({ message: 'correcto', data: listNivelesProfesionales });
+                if (mensaje == 'error') {
+                    listNivelesProfesionales = undefined;
+                }
+                return res.jsonp({ message: mensaje, data: listNivelesProfesionales });
             }, 1500);
         });
     }

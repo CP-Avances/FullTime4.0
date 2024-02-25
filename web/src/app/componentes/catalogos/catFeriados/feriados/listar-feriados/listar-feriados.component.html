@@ -38,7 +38,7 @@
                                         Subir plantilla
                                     </label>
                                     <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
-                                        *ngIf="mostrarbtnsubir" style="height: 64px;"
+                                        *ngIf="mostrarbtnsubir && messajeExcel != 'error'" style="height: 64px;"
                                         matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
                                         Subir nueva plantilla
                                     </label>
@@ -60,7 +60,7 @@
 
                         <div class="col-md" *ngIf="mostrarbtnsubir">
                             <div class="d-flex flex-wrap justify-content-around">
-                                <button *ngIf="DataFeriados" id="descargar" class="btn btn-sm"
+                                <button *ngIf="DataFeriados && messajeExcel != 'error'" id="descargar" class="btn btn-sm"
                                     (click)="ConfirmarRegistroMultiple()" matSuffix matTooltipPosition="right"
                                     style="margin: 2% 0% 3% 0%;" matTooltip="Guardar registro multiple.">
                                     Registrar
@@ -74,7 +74,7 @@
     </div>
 
     <!--  **************************************  LISTA DE FERIADOS ***************************************** -->
-    <div class="container" style="padding-top: 10px; padding-bottom: 10px; margin-bottom: 35px;" *ngIf="!DataFeriados">
+    <div class="container" style="padding-top: 10px; padding-bottom: 10px; margin-bottom: 35px;" *ngIf="!DataFeriados && (messajeExcel == 'error' || messajeExcel == '')">
         <div class="mat-elevation-z8" style="background: white;">
             <div id="titulo">LISTA DE FERIADOS</div>
             <div class="table-responsive">
@@ -168,25 +168,13 @@
     </div>
 
     <!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
-    <div class="container" style="padding-top: 10px;" *ngIf="DataFeriados">
+    <div class="container" style="padding-top: 10px;" *ngIf="DataFeriados && messajeExcel != 'error'">
         <app-definicion-plantilla>
         </app-definicion-plantilla>
     </div>
 
-<<<<<<< HEAD
     <!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE FERIADOS ------------------------------------------------->
-=======
-    <div class="container" style="text-align: center;  padding-top: 10px; margin-bottom: 20px;">
-        <div class="pantalla-progress" *ngIf="progreso">
-            <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
-            </mat-progress-spinner>
-        </div>
-    </div>
-
-
-    <!--  **********************************  TABLA DE DATOS DE LA CARGA MULTIPLE DE FERIADOS ***************************************** -->
->>>>>>> a639b5c3bf0cadf79c8c901eec72a8bc75d6f562
-    <div class="container" style="padding-bottom: 10px; margin-bottom: 35px;" *ngIf="DataFeriados">
+    <div class="container" style="padding-bottom: 10px; margin-bottom: 35px;" *ngIf="DataFeriados && messajeExcel != 'error'">
         <div class="mat-elevation-z8" style="background: white;">
             <div id="titulo">REGISTRO MULTIPLE</div>
             <div class="table-responsive">
@@ -201,15 +189,9 @@
                         </tr>
                     </thead>
                     <tbody>
-<<<<<<< HEAD
                         <tr
                             *ngFor="let f of DataFeriados | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
                             <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{f.fila}}</td>
-=======
-                        <tr *ngFor="let f of DataFeriados | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
-                            <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{i
-                                + 1}}</td>
->>>>>>> a639b5c3bf0cadf79c8c901eec72a8bc75d6f562
                             <td [style.color]="stiloTextoCelda(f.fecha)" style="font-size: 12px;">{{f.fecha}}</td>
                             <td [style.color]="stiloTextoCelda(f.descripcion)" id="letras" style="font-size: 12px;">
                                 {{f.descripcion}}</td>

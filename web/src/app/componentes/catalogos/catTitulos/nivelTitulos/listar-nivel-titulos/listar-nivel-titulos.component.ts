@@ -132,6 +132,8 @@ export class ListarNivelTitulosComponent implements OnInit {
     console.log('itemName: ',itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (itemName.toLowerCase() == 'niveles_profesionales') {
+        this.numero_paginaMul = 1;
+        this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
       } else {
         this.toastr.error('Seleccione plantilla con nombre Niveles_profesionales', 'Plantilla seleccionada incorrecta', {
@@ -153,6 +155,7 @@ export class ListarNivelTitulosComponent implements OnInit {
 
   DataNivelesProfesionales: any;
   listNivelesCorrectos: any = [];
+  messajeExcel: string = '';
   // METODO PARA ENVIAR MENSAJES DE ERROR O CARGAR DATOS SI LA PLANTILLA ES CORRECTA
   Revisarplantilla(){
     this.listNivelesCorrectos = [];
@@ -166,14 +169,23 @@ export class ListarNivelTitulosComponent implements OnInit {
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.nivel.RevisarFormato(formData).subscribe(res => {
       this.DataNivelesProfesionales = res.data;
+      this.messajeExcel = res.message;
       
       console.log('probando plantilla1', this.DataNivelesProfesionales);
 
-      this.DataNivelesProfesionales.forEach(item => {
-        if( item.observacion.toLowerCase() === 'ok'){
-          this.listNivelesCorrectos.push(item);
-        }
-      });
+      if(this.messajeExcel == 'error'){
+        this.toastr.error('Revisar los datos de la columna N, debe enumerar correctamente.', 'Plantilla no aceptada', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }else{
+        this.DataNivelesProfesionales.forEach(item => {
+          if( item.observacion.toLowerCase() === 'ok'){
+            this.listNivelesCorrectos.push(item);
+          }
+        });
+      }
+
     },error => {
       console.log('Serivicio rest -> metodo RevisarFormato - ',error);
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
@@ -292,6 +304,7 @@ export class ListarNivelTitulosComponent implements OnInit {
     this.ObtenerNiveles();
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
+    this.messajeExcel == '';
   }
 
   // METODO PARA VALIDAR INGRESO DE LETRAS

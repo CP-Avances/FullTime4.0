@@ -176,6 +176,7 @@ export class ListaSucursalesComponent implements OnInit {
     this.ObtenerSucursal();
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
+    this.messajeExcel == '';
   }
 
   // METODO PARA VALIDAR SOLO LETRAS
@@ -397,8 +398,9 @@ export class ListaSucursalesComponent implements OnInit {
     let itemName = arrayItems[0].slice(0, 10);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (itemName.toLowerCase() == 'sucursales') {
+        this.numero_paginaMul = 1;
+        this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
-        
       } else {
         this.toastr.error('Seleccione plantilla con nombre Sucursales', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
@@ -418,6 +420,7 @@ export class ListaSucursalesComponent implements OnInit {
   }
 
   Datasucursales: any;
+  messajeExcel: string = '';
   // METODO PARA ENVIAR MENSAJES DE ERROR O CARGAR DATOS SI LA PLANTILLA ES CORRECTA
   Revisarplantilla(){
     this.listSucursalesCorrectas = [];
@@ -431,24 +434,26 @@ export class ListaSucursalesComponent implements OnInit {
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.Datasucursales = res.data;
-      this.Datasucursales.forEach(item => {
-        if(item.nom_sucursal == undefined || item.nom_sucursal == ''){
-          item.nom_sucursal = 'No registrado'
-        }else if(item.ciudad == undefined || item.ciudad == '' ){
-          item.ciudad = 'No registrado'
-        }
-      })
-      console.log('probando plantilla1', this.Datasucursales);
+      this.messajeExcel = res.message;
 
-      this.Datasucursales.forEach(item => {
-        if( item.observacion.toLowerCase() == 'ok'){
-          this.listSucursalesCorrectas.push(item);
+      if(this.messajeExcel == 'error'){
+        this.toastr.error('Revisar los datos de la columna N, debe enumerar correctamente.', 'Plantilla no aceptada', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }else{
+         //Separa llas filas que estan con la observacion OK para luego registrar en la base.
+        this.Datasucursales.forEach(item => {
+          if( item.observacion.toLowerCase() == 'ok'){
+            this.listSucursalesCorrectas.push(item);
+          }
+        });
+        if(this.listSucursalesCorrectas.length > 0){
+          this.btn_registrar = false;
         }
-      });
-
-      if(this.listSucursalesCorrectas.length > 0){
-        this.btn_registrar = false;
       }
+      
+      
 
     },error => {
       console.log('Serivicio rest -> metodo RevisarFormato - ',error);
@@ -456,6 +461,7 @@ export class ListaSucursalesComponent implements OnInit {
         timeOut: 4000,
       });
       this.progreso = false;
+      this.messajeExcel = 'error';
     },() => {
       this.progreso = false;
     });
@@ -541,16 +547,17 @@ export class ListaSucursalesComponent implements OnInit {
   //Metodo para dar color a las celdas y representar las validaciones
   colorCelda: string = ''
   stiloCelda(observacion: string): string{
-    console.log('observacion: ',observacion);
     let arrayObservacion = observacion.split(" ");
     if(observacion == 'ok'){
       return 'rgb(159, 221, 154)';
     }else if(observacion == 'Ya existe en el sistema'){
       return 'rgb(239, 203, 106)';
     }else if(arrayObservacion[0] == 'Ciudad' || arrayObservacion[0] == 'Sucursal'){
-      return 'rgb(222, 162, 73)';
+      return 'rgb(242, 21, 21)';
     }else if(observacion == 'Registro duplicado'){
       return 'rgb(156, 214, 255)';
+    }else if(arrayObservacion[0] == 'No' && arrayObservacion[1] == 'existe'){
+      return 'rgb(255, 192, 203)';
     }else{
       return 'rgb(251, 73, 18)';
     }

@@ -209,6 +209,7 @@ export class ListarFeriadosComponent implements OnInit {
     this.BuscarParametro();
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
+    this.messajeExcel == '';
   }
 
   // METODO PARA INGRESAR SOLO LETRAS
@@ -265,6 +266,8 @@ export class ListarFeriadosComponent implements OnInit {
     let itemName = arrayItems[0].slice(0, 8);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (itemName.toLowerCase() == 'feriados') {
+        this.numero_paginaMul = 1;
+        this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
       } else {
         this.toastr.error('Seleccione plantilla con nombre Feriados', 'Plantilla seleccionada incorrecta', {
@@ -285,6 +288,7 @@ export class ListarFeriadosComponent implements OnInit {
   }
 
   DataFeriados: any;
+  messajeExcel: string = '';
   // METODO PARA ENVIAR MENSAJES DE ERROR O CARGAR DATOS SI LA PLANTILLA ES CORRECTA
   Revisarplantilla() {
     this.listFeriadosCorrectos = [];
@@ -298,14 +302,21 @@ export class ListarFeriadosComponent implements OnInit {
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.DataFeriados = res.data;
-
+      this.messajeExcel = res.message;
       console.log('probando plantilla1 feriados', this.DataFeriados);
 
-      this.DataFeriados.forEach(item => {
-        if( item.observacion.toLowerCase() == 'ok'){
-          this.listFeriadosCorrectos.push(item);
-        }
-      });
+      if(this.messajeExcel == 'error'){
+        this.toastr.error('Revisar los datos de la columna N, debe enumerar correctamente.', 'Plantilla no aceptada', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }else{
+        this.DataFeriados.forEach(item => {
+          if( item.observacion.toLowerCase() == 'ok'){
+            this.listFeriadosCorrectos.push(item);
+          }
+        });
+      }
 
     },error => {
       console.log('Serivicio rest -> metodo RevisarFormato - ',error);
@@ -419,8 +430,7 @@ export class ListarFeriadosComponent implements OnInit {
   colorCelda: string = ''
   stiloCelda(observacion: string): string{
     let arrayObservacion = observacion.split(" ");
-    
-    if(observacion == 'Fecha registrada como valor de otra columna'){
+    if(observacion == 'Fecha duplicada'){
       return 'rgb(170, 129, 236)';
     }else if(observacion == 'ok'){
       return 'rgb(159, 221, 154)';

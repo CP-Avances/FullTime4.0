@@ -807,6 +807,7 @@ class EmpleadoControlador {
     var duplicados: any = [];
     var duplicados1: any = [];
     var duplicados2: any = [];
+    var mensaje: string = 'correcto';
 
     /*
     var contarCodigo = 0;
@@ -830,7 +831,8 @@ class EmpleadoControlador {
         domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
 
         //Verificar que el registo no tenga datos vacios
-        if((cedula != undefined) && (apellido != undefined) &&
+        if((N != undefined && N != '') &&
+           (cedula != undefined) && (apellido != undefined) &&
            (nombre != undefined) &&	(estado_civil != undefined) &&	
            (genero != undefined) && (correo != undefined) &&
            (fec_nacimiento != undefined) && (estado != undefined) &&	
@@ -879,6 +881,11 @@ class EmpleadoControlador {
           data.estado_user = estado_user; data.rol = rol,	
           data.app_habilita = app_habilita,
           data.observacion = 'no registrado';
+
+          if(data.fila == '' || data.fila == undefined){
+            data.fila = 'error';
+            mensaje = 'error'
+          }
 
           if(apellido == undefined){
             data.apellido = 'No registrado';
@@ -1055,6 +1062,20 @@ class EmpleadoControlador {
       
 
     setTimeout(() => {
+
+      listEmpleados.sort((a: any, b: any) => {
+        // Compara los números de los objetos
+        if (a.fila < b.fila) {
+            return -1;
+        }
+        if (a.fila > b.fila) {
+            return 1;
+        }
+        return 0; // Son iguales
+      });
+
+      var filaDuplicada: number = 0;
+
       listEmpleados.forEach((item:any) => {
         if(item.observacion == '1'){
           item.observacion = 'Registro duplicado - cedula'
@@ -1071,8 +1092,27 @@ class EmpleadoControlador {
           item.observacion = 'Datos no registrado'
         }
 
+         //Valida si los datos de la columna N son numeros.
+         if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+          //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+              if(item.fila == filaDuplicada){
+                  mensaje = 'error';
+              }
+        }else{
+            return mensaje = 'error';
+        } 
+
+        filaDuplicada = item.fila;
+
       });
-      return res.jsonp({ message: 'correcto', data:  listEmpleados});
+
+      if(mensaje == 'error'){
+        listEmpleados = undefined;
+      }
+
+      console.log('empleados: ',listEmpleados);
+
+      return res.jsonp({ message: mensaje, data:  listEmpleados});
 
     }, 1500)
 
@@ -1315,6 +1355,7 @@ class EmpleadoControlador {
     var duplicados: any = [];
     var duplicados1: any = [];
     var duplicados2: any = [];
+    var mensaje: string = 'correcto';
 
     plantilla.forEach(async (dato: any, indice: any, array: any) => {
       // Datos que se leen de la plantilla ingresada
@@ -1322,40 +1363,41 @@ class EmpleadoControlador {
         domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
       
          //Verificar que el registo no tenga datos vacios
-         if((cedula != undefined) && (apellido != undefined) &&
-         (nombre != undefined) && (codigo != undefined) &&	(estado_civil != undefined) &&	
-         (genero != undefined) && (correo != undefined) &&
-         (fec_nacimiento != undefined) && (estado != undefined) &&	
-         (mail_alternativo != undefined) && (domicilio != undefined) &&
-         (telefono != undefined) && (nacionalidad != undefined)	&&
-         (usuario != undefined)	&& (contrasena != undefined) &&	
-         (estado_user != undefined) && 	(rol != undefined) &&	(app_habilita != undefined)
-      ){
-        data.fila = N;
-        data.cedula = cedula; data.apellido = apellido;
-        data.nombre = nombre; data.codigo = codigo; data.estado_civil = estado_civil;	
-        data.genero = genero; data.correo = correo;
-        data.fec_nacimiento = fec_nacimiento; data.estado = estado;	
-        data.mail_alternativo = mail_alternativo; data.domicilio = domicilio;
-        data.telefono = telefono;	data.nacionalidad = nacionalidad;	
-        data.usuario = usuario;	data.contrasena = contrasena;	
-        data.estado_user = estado_user; data.rol = rol,	
-        data.app_habilita = app_habilita;
+         if((N != undefined && N != '') && 
+          (cedula != undefined) && (apellido != undefined) &&
+          (nombre != undefined) && (codigo != undefined) &&	(estado_civil != undefined) &&	
+          (genero != undefined) && (correo != undefined) &&
+          (fec_nacimiento != undefined) && (estado != undefined) &&	
+          (mail_alternativo != undefined) && (domicilio != undefined) &&
+          (telefono != undefined) && (nacionalidad != undefined)	&&
+          (usuario != undefined)	&& (contrasena != undefined) &&	
+          (estado_user != undefined) && 	(rol != undefined) &&	(app_habilita != undefined)
+        ){
+          data.fila = N;
+          data.cedula = cedula; data.apellido = apellido;
+          data.nombre = nombre; data.codigo = codigo; data.estado_civil = estado_civil;	
+          data.genero = genero; data.correo = correo;
+          data.fec_nacimiento = fec_nacimiento; data.estado = estado;	
+          data.mail_alternativo = mail_alternativo; data.domicilio = domicilio;
+          data.telefono = telefono;	data.nacionalidad = nacionalidad;	
+          data.usuario = usuario;	data.contrasena = contrasena;	
+          data.estado_user = estado_user; data.rol = rol,	
+          data.app_habilita = app_habilita;
 
-        if(data.cedula.toString().length > 10){
-          data.observacion = 'La cédula ingresada no es valida';
-        }else{
-          // Verificar si la variable tiene el formato de fecha correcto con moment
-          if (moment(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) {
-            if(duplicados.find((p: any)=> p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined)
-            {
-              data.observacion = 'ok';
-              duplicados.push(dato);
+          if(data.cedula.toString().length > 10){
+            data.observacion = 'La cédula ingresada no es valida';
+          }else{
+            // Verificar si la variable tiene el formato de fecha correcto con moment
+            if (moment(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) {
+              if(duplicados.find((p: any)=> p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined)
+              {
+                data.observacion = 'ok';
+                duplicados.push(dato);
+             }
+            } else {
+              data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
             }
-          } else {
-            data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
           }
-        }
 
         //TODO Revisar max codigo
           // Verificar que el código no se duplique en los registros
@@ -1369,7 +1411,7 @@ class EmpleadoControlador {
 
         listEmpleadosManual.push(data);
 
-      }else{
+        }else{
           data.fila = N;
           data.cedula = cedula; data.apellido = apellido;
           data.nombre = nombre; data.codigo = codigo; data.estado_civil = estado_civil;	
@@ -1381,6 +1423,11 @@ class EmpleadoControlador {
           data.estado_user = estado_user; data.rol = rol,	
           data.app_habilita = app_habilita,
           data.observacion = 'no registrado';
+
+          if(data.fila == '' || data.fila == undefined){
+            data.fila = 'error';
+            mensaje = 'error'
+          }
 
           if(apellido == undefined){
             data.apellido = 'No registrado';
@@ -1515,6 +1562,19 @@ class EmpleadoControlador {
 
     setTimeout(() => { 
 
+      listEmpleadosManual.sort((a: any, b: any) => {
+        // Compara los números de los objetos
+        if (a.fila < b.fila) {
+            return -1;
+        }
+        if (a.fila > b.fila) {
+            return 1;
+        }
+        return 0; // Son iguales
+      });
+
+      var filaDuplicada: number = 0;
+
       listEmpleadosManual.forEach((item:any) => {
         if(item.observacion == '1'){
           item.observacion = 'Registro duplicado - cedula'
@@ -1528,9 +1588,25 @@ class EmpleadoControlador {
             item.observacion = 'ok'
           }
         }
+
+        //Valida si los datos de la columna N son numeros.
+        if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+          //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+              if(item.fila == filaDuplicada){
+                  mensaje = 'error';
+              }
+        }else{
+            return mensaje = 'error';
+        } 
+
+        filaDuplicada = item.fila;
       });
 
-      return res.jsonp({ message: 'correcto', data:  listEmpleadosManual});
+      if(mensaje == 'error'){
+        listEmpleadosManual = undefined;
+      }
+
+      return res.jsonp({ message: mensaje, data:  listEmpleadosManual});
     }, 1500)
  
    /*

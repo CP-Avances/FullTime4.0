@@ -39,7 +39,7 @@
                                         Subir plantilla
                                     </label>
                                     <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
-                                        *ngIf="mostrarbtnsubir" style="height: 64px;"
+                                        *ngIf="mostrarbtnsubir && messajeExcel != 'error'" style="height: 64px;"
                                         matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
                                         Subir nueva plantilla
                                     </label>
@@ -48,7 +48,7 @@
                         </div>
                         <div class="col-md" *ngIf="mostrarbtnsubir">
                             <div class="d-flex flex-wrap justify-content-around">
-                                <button *ngIf="Datasucursales" id="descargar" class="btn btn-sm"
+                                <button *ngIf="Datasucursales && messajeExcel != 'error'" id="descargar" class="btn btn-sm"
                                     (click)="ConfirmarRegistroMultiple()" matSuffix matTooltipPosition="right"
                                     style="margin: 3% 2% 3% 2%;" matTooltip="Guardar registro multiple.">
                                     Registrar
@@ -61,7 +61,7 @@
         </div>
     </div>
     <!-- *******************************  LISTA DE ESTABLECIMIENTOS  ***************************************** -->
-    <div class="container" style="padding-top: 15px; padding-bottom: 50px; text-align: center;" *ngIf="!Datasucursales">
+    <div class="container" style="padding-top: 15px; padding-bottom: 50px; text-align: center;" *ngIf="!Datasucursales && (messajeExcel == 'error' || messajeExcel == '')">
         <div class="mat-elevation-z8" style="background: white;">
             <div id="resultados">RESULTADO DE BÚSQUEDA</div>
             <div class="table-responsive">
@@ -150,13 +150,13 @@
     </div>
 
     <!-- ******************************* INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE  ***************************************** -->
-    <div class="container" style="padding-top: 10px; margin-bottom: 25px;" *ngIf="Datasucursales">
+    <div class="container" style="padding-top: 10px; margin-bottom: 25px;" *ngIf="Datasucursales && messajeExcel != 'error'">
         <app-definicion-plantilla>
         </app-definicion-plantilla>
     </div>
 
     <!-- ******************************* TABLA DE DATOS DE LA CARGA MULTIPLE  ***************************************** -->
-    <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="Datasucursales">
+    <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="Datasucursales && messajeExcel != 'error'">
         <div class="mat-elevation-z8" style="background: white;">
             <div id="resultados">
                 REGISTRO MULTIPLE
@@ -173,14 +173,8 @@
                         </tr>
                     </thead>
                     <tbody>
-<<<<<<< HEAD
                         <tr *ngFor="let data of Datasucursales | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
                             <td style="width: 50px;" align="center">{{data.fila}}</td>
-=======
-                        <tr
-                            *ngFor="let data of Datasucursales | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
-                            <td style="width: 50px;" align="center">{{i + 1}}</td>
->>>>>>> a639b5c3bf0cadf79c8c901eec72a8bc75d6f562
                             <td [style.color]="stiloTextoCelda(data.nom_sucursal)">{{ data.nom_sucursal}}</td>
                             <td [style.color]="stiloTextoCelda(data.ciudad)">{{ data.ciudad}}</td>
                             <td>
