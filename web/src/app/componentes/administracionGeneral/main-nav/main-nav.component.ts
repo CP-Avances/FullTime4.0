@@ -20,6 +20,9 @@ import { LoginService } from 'src/app/servicios/login/login.service';
 import { FraseSeguridadComponent } from 'src/app/componentes/administracionGeneral/frase-seguridad/frase-seguridad/frase-seguridad.component';
 
 import { MenuNode } from 'src/app/model/menu.model';
+import { SpinnerService } from 'src/app/servicios/spinner/spinner.service';
+import { ThemePalette } from '@angular/material/core';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-main-nav',
@@ -48,6 +51,12 @@ export class MainNavComponent implements OnInit {
   // VERIFICAR LICENCIA
   fec_caducidad_licencia: Date;
 
+  // VARIABLES PROGRESS SPINNER
+  habilitarprogress: boolean = false;
+  mode: ProgressSpinnerMode = 'indeterminate';
+  color: ThemePalette = 'primary';
+  value = 10;
+
   constructor(
     public restF: FuncionesService,
     public inicio: LoginService,
@@ -61,6 +70,7 @@ export class MainNavComponent implements OnInit {
     private funciones: MainNavService,
     private plantillaPDF: PlantillaReportesService,
     private breakpointObserver: BreakpointObserver,
+    public spinnerService: SpinnerService,
   ) { }
 
   hasChild = (_: number, node: MenuNode) => !!node.children && node.children.length > 0;
