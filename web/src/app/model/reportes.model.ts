@@ -82,6 +82,8 @@ export interface ITableEmpleados {
     apellido?: string,
     cedula?: string,
     id_usucursal?: number,
+    id_suc?: number,
+    id_regimen?: number,
 }
 
 export interface ItableDispositivos {
