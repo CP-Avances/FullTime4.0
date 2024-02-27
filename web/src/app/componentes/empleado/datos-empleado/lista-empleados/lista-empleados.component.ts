@@ -469,6 +469,9 @@ export class ListaEmpleadosComponent implements OnInit {
         });
         this.mostrarbtnsubir = false;
       }else{
+        this.DataEmpleados.forEach(item => {
+          //Aqui va los datos que se van a registrar y tienen la observacion OK
+        });
         this.datosManuales = true;
       }
 
