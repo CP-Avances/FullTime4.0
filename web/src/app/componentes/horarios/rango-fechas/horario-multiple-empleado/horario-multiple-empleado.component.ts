@@ -523,7 +523,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     else if (tipo === 't') {
       this.CargarTimbres(respuesta);
     } else if (tipo === 'd') {
-
+      this.CargarPlantilla(respuesta);
     }
   }
 
@@ -598,13 +598,13 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   }
 
   cargar_plantilla: boolean = false;
-  data_descargar: any = [];
-  DescargarPlantilla(data: any) {
-    this.data_descargar = [];
+  data_cargar: any = [];
+  CargarPlantilla(data: any) {
+    this.data_cargar = [];
     if (data.length > 0) {
-      this.data_descargar = {
+      this.data_cargar = {
         usuarios: data,
-        pagina: 'descargar-plantilla',
+        pagina: 'cargar-plantilla',
       }
       this.seleccionar = false;
       this.cargar_plantilla = true;

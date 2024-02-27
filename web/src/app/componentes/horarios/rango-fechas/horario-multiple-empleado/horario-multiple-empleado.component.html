@@ -33,7 +33,7 @@
 
 <!-- ************** PANTALLA DE CARGA DE PLANIFICACION HORARIA ************************* -->
 <div style="padding-top: 20px;" *ngIf="cargar_plantilla">
-    <app-cargar-plantilla-planificacion ></app-cargar-plantilla-planificacion>
+    <app-cargar-plantilla-planificacion [datosSeleccionados]="data_cargar"></app-cargar-plantilla-planificacion>
 </div>
 
 <!--  *********************** PANTALLA DETALLE DE HORARIOS ********************************* -->
@@ -157,7 +157,7 @@
                     Asignar timbres
                 </button>
                 <button id="btn-raised" class="btn btn-sm" (click)="GuardarRegistros(0, 'd')">
-                  Descargar plantilla
+                  Cargar plantilla
               </button>
                 <button id="btn-raised" class="btn btn-sm" (click)="LimpiarFormulario()">Cancelar</button>
             </div>

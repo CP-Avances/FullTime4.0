@@ -12,6 +12,35 @@ export class DatosGeneralesService {
     private http: HttpClient,
   ) { }
 
+  // METODO PARA CONSULTAR CON PERFIL ADMINISTRADOR LOS DATOS DE LOS EMPLEADOS
+  ObtenerInformacion_ADMIN(estado: any, sucursales: any) {
+    return this.http.post<any>(`${environment.url}/generalidades/informacion-data-general/${estado}`, sucursales);
+  }
+
+  // METODO PARA CONSULTAR CON PERFIL ADMINISTRADOR LOS DATOS DE LOS EMPLEADOS
+  ObtenerInformacion_JEFE(estado: any, data: any) {
+    return this.http.post<any>(`${environment.url}/generalidades/informacion-data-general-jefe/${estado}`, data);
+  }
+
+  // METODO PARA CONSULTAR DATOS DE UN USUARIO ADMINISTRADOR - JEFE
+  ObtenerInformacionUserRol(datos: any) {
+    return this.http.post(`${environment.url}/generalidades/datos-actuales-usuario-rol`, datos);
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   // METODO PARA CONSULTAR DATOS DEL USUARIO
   ObtenerDatosActuales(id_empleado: number) {
     return this.http.get(`${environment.url}/generalidades/datos-actuales/${id_empleado}`);
@@ -76,9 +105,6 @@ export class DatosGeneralesService {
   }
 
 
-  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR
-  ObtenerInformacionPrueba(estado: any, sucursales: any) {
-    return this.http.post<any>(`${environment.url}/generalidades/informacion-data-general/${estado}`, sucursales);
-  }
+
 
 }

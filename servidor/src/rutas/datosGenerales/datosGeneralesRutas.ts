@@ -12,6 +12,27 @@ class CiudadRutas {
 
     configuracion(): void {
 
+        // METODO PARA CONSULTAR DATOS DE USUARIOS ACTIVOS E INACTIVOS CON PERFIL ADMINISTRADOR
+        this.router.post('/informacion-data-general/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarDataGeneral_ADMIN);
+
+        // METODO PARA CONSULTAR DATOS DE USUARIOS ACTIVOS E INACTIVOS CON PERFIL ADMINISTRADOR-JEFE
+        this.router.post('/informacion-data-general-jefe/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarDataGeneral_JEFE);
+
+        // METODO PARA BUSCAR INFORMACION DE UN USUARIO ADMNISTRADOR - JEFE
+        this.router.post('/datos-actuales-usuario-rol', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarInformacionUserRol);
+
+
+
+
+
+
+
+
+
+
+
+
+
         // METODO DE BUSQUEDA DE INFORMACION ACTUAL DEL EMPLEADO
         this.router.get('/datos-actuales/:empleado_id', TokenValidation, DATOS_GENERALES_CONTROLADOR.DatosActuales);
         // METODO DE ACCESO A CONSULTA DE DATOS DE COLABORADORES ACTIVOS E INACTIVOS
@@ -40,8 +61,6 @@ class CiudadRutas {
         this.router.post('/datos-actuales-sucursales', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarAdminJefes);
 
 
-        // METODO DE ACCESO A CONSULTA DE DATOS DE COLABORADORES ACTIVOS E INACTIVOS prueba nueva
-        this.router.post('/informacion-data-general/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarDataGeneral);
 
     }
 }

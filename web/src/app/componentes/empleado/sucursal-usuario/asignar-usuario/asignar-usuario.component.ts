@@ -177,7 +177,13 @@ export class AsignarUsuarioComponent implements OnInit {
       estado: 1
     }
     this.general.ObtenerAdminJefes(data).subscribe(datos => {
-      this.administradores = datos;
+      let respuesta: any = [];
+      respuesta = datos;
+      respuesta.forEach(obj => {
+        if (obj.jefe === false) {
+          this.administradores.push(obj);
+        }
+      })
       this.ver_administradores = true;
       this.ver_guardar = false;
       if (this.administradores.length != 0) {

@@ -29,8 +29,8 @@
                                             <td>{{p.apellido}} {{p.nombre}} </td>
                                             <td>{{p.rol}}</td>
                                             <td>
-                                                <mat-checkbox matSuffix matTooltipPosition="right" disabled
-                                                    [checked]="p.jefe">
+                                                <mat-checkbox *ngIf="p.jefe === true" matSuffix
+                                                    matTooltipPosition="right" disabled [checked]="p.jefe">
                                                 </mat-checkbox>
                                             </td>
                                         </tr>
@@ -157,7 +157,6 @@
                                                     <label style="margin-left: 10px; font-size: 11px;"
                                                         class="form-check-label" for="inlineCheckbox1">
                                                         {{n.apellido}} {{n.nombre}}
-                                                        <span *ngIf="n.jefe === true">(Jefe)</span>
                                                     </label>
                                                 </div>
                                             </div>
