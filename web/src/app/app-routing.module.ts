@@ -146,27 +146,27 @@ const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
 
   // Para rol Administrador
-  { path: 'home', component: HomeComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'home', component: HomeComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
-  { path: 'relojes', component: RelojesComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'registrarProceso', component: RegistroProcesoComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'registrarDepartamento', component: RegistroDepartamentoComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'registrarHorario', component: RegistroHorarioComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'feriados', component: RegistrarFeriadosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'emplCargos', component: EmplCargosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'planificacion', component: PlanificacionMultipleComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'asistencia', component: BuscarAsistenciaComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'calcularHoraExtra', component: CalculoHoraExtraComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'relojes', component: RelojesComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'registrarProceso', component: RegistroProcesoComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'registrarDepartamento', component: RegistroDepartamentoComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'registrarHorario', component: RegistroHorarioComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'feriados', component: RegistrarFeriadosComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'emplCargos', component: EmplCargosComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'planificacion', component: PlanificacionMultipleComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'asistencia', component: BuscarAsistenciaComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'calcularHoraExtra', component: CalculoHoraExtraComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
-  { path: 'administrarSucursales', component: PrincipalSucursalUsuarioComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-
-
-  { path: 'verEmpleado/:id', component: VerEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'administrarSucursales', component: PrincipalSucursalUsuarioComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
 
+  { path: 'verEmpleado/:id', component: VerEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
-  { path: 'planificacionesHorasExtras', component: ListaPlanHoraExtraComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'horaExtraReal', component: HoraExtraRealComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+
+
+  { path: 'planificacionesHorasExtras', component: ListaPlanHoraExtraComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'horaExtraReal', component: HoraExtraRealComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // Graficas Empleado
   { path: 'macro/user/atrasos', component: MetricaAtrasosComponent, canActivate: [AuthGuard], data: { roles: 2 } },
@@ -175,46 +175,46 @@ const routes: Routes = [
   { path: 'macro/user/vacaciones', component: MetricaVacacionesComponent, canActivate: [AuthGuard], data: { roles: 2 } },
 
   // Reportes
-  { path: 'reporteAsistenciaConsolidado', component: AsistenciaConsolidadoComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'reporteEmpleados', component: ReporteEmpleadosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'reporteKardex', component: ReporteKardexComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'reportePermisos', component: ReportePermisosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'reporteEntradaSalida', component: ReporteEntradaSalidaComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'reporteHorasExtras', component: ReporteHorasExtrasComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'horas/extras', component: ReporteHorasPedidasComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'reporte-atrasos-multiples', component: ReporteAtrasosMultiplesComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'reporte-faltas', component: ReporteFaltasComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'reporte-horas-trabajadas', component: ReporteHorasTrabajadasComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'reporte-resumen-asistencia', component: ReporteResumenAsistenciaComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'reporte-puntualidad', component: ReportePuntualidadComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'reporte-timbres-multiples', component: ReporteTimbresMultiplesComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'reporte-timbre-mrl', component: TimbreMrlComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'reporte-timbre-abierto', component: TimbreAbiertosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'reporte-timbre-incompleto', component: TimbreIncompletoComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'reporte-planificacion-horaria', component: ReportePlanificacionHorariaComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'salidas-anticipadas', component: SalidasAntesComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'tiempo-alimentacion', component: ReporteTiempoAlimentacionComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'auditoria', component: AuditoriaComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'solicitud-vacacion', component: SolicitudVacacionComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'reporte-timbre-sistema', component: TimbreSistemaComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'reporte-timbre-reloj-virtual', component: TimbreVirtualComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'analisisDatos', component: AnalisisDatosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'reporteAsistenciaConsolidado', component: AsistenciaConsolidadoComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'reporteEmpleados', component: ReporteEmpleadosComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'reporteKardex', component: ReporteKardexComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'reportePermisos', component: ReportePermisosComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'reporteEntradaSalida', component: ReporteEntradaSalidaComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'reporteHorasExtras', component: ReporteHorasExtrasComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'horas/extras', component: ReporteHorasPedidasComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'reporte-atrasos-multiples', component: ReporteAtrasosMultiplesComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'reporte-faltas', component: ReporteFaltasComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'reporte-horas-trabajadas', component: ReporteHorasTrabajadasComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'reporte-resumen-asistencia', component: ReporteResumenAsistenciaComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'reporte-puntualidad', component: ReportePuntualidadComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'reporte-timbres-multiples', component: ReporteTimbresMultiplesComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'reporte-timbre-mrl', component: TimbreMrlComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'reporte-timbre-abierto', component: TimbreAbiertosComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'reporte-timbre-incompleto', component: TimbreIncompletoComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'reporte-planificacion-horaria', component: ReportePlanificacionHorariaComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'salidas-anticipadas', component: SalidasAntesComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'tiempo-alimentacion', component: ReporteTiempoAlimentacionComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'auditoria', component: AuditoriaComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'solicitud-vacacion', component: SolicitudVacacionComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'reporte-timbre-sistema', component: TimbreSistemaComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'reporte-timbre-reloj-virtual', component: TimbreVirtualComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'analisisDatos', component: AnalisisDatosComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   //DETALLE REPORTES
-  { path: 'ver-empleados-activos-detalle/:tipo', component: VerEmpleadosDetalleComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'ver-vacunas-detalle/:tipo/:lista', component: VerVacunasComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'ver-empleados-activos-detalle/:tipo', component: VerEmpleadosDetalleComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'ver-vacunas-detalle/:tipo/:lista', component: VerVacunasComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // REPORTES ALIMENTACIÓN
-  { path: 'alimentosGeneral', component: AlimentosGeneralComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'alimentosDetallado', component: DetallePlanificadosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'alimentosInvitados', component: AlimentosInvitadosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'alimentosGeneral', component: AlimentosGeneralComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'alimentosDetallado', component: DetallePlanificadosComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'alimentosInvitados', component: AlimentosInvitadosComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // REPORTES DE VACUNAS
-  { path: 'lista-vacunados', component: VacunaMultipleComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'lista-vacunados', component: VacunaMultipleComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // NOTIFICACIONES
-  { path: 'listaAllNotificaciones', component: AdministradorTodasComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'listaNotifacionUsuario', component: PorUsuarioComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'listaAllNotificaciones', component: AdministradorTodasComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'listaNotifacionUsuario', component: PorUsuarioComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ROL MIXTO PARA LAS AUTORIZACIONES
   { path: 'lista-notificaciones', component: RealtimeNotificacionComponent, canActivate: [AuthGuard], data: { rolMix: 0 } },
@@ -250,119 +250,119 @@ const routes: Routes = [
   { path: 'confirmar-contrasenia/:token', component: ConfirmarContraseniaComponent, canActivate: [AuthGuard], data: { log: false } },
 
   // ACCESO A RUTAS DE EMPRESA
-  { path: 'vistaEmpresa', component: VerEmpresaComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'vistaEmpresa', component: VerEmpresaComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS ESTABLECIMIENTOS
-  { path: 'sucursales', component: ListaSucursalesComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'sucursales', component: ListaSucursalesComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE FERIADOS
-  { path: 'listarFeriados', component: ListarFeriadosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'listarFeriados', component: ListarFeriadosComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE PARAMETRIZACION GENERAL
-  { path: 'parametros', component: ListarParametroComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'parametros', component: ListarParametroComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE CONFIGURACION DE CORREO
-  { path: 'configurarCorreo', component: ConfiguracionComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'configurarCorreo', component: ConfiguracionComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE CONFIGURACION DE NOTIFICACIONES DE USUARIOS
-  { path: 'configurarNotificaciones', component: ListaNotificacionComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'configurarNotificaciones', component: ListaNotificacionComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE ROLES
-  { path: 'roles', component: VistaRolesComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'seleccionarPermisos/:id', component: SeleccionarRolPermisoComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'roles', component: VistaRolesComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'seleccionarPermisos/:id', component: SeleccionarRolPermisoComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE REGIMEN LABORAL
-  { path: 'listarRegimen', component: ListarRegimenComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'listarRegimen', component: ListarRegimenComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE PROVINCIA
-  { path: 'provincia', component: PrincipalProvinciaComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'provincia', component: PrincipalProvinciaComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE CIUDAD
-  { path: 'listarCiudades', component: ListarCiudadComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'listarCiudades', component: ListarCiudadComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE DEPARTAMENTOS
-  { path: 'departamento', component: PrincipalDepartamentoComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'departamento', component: PrincipalDepartamentoComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE CODIGO
-  { path: 'codigo', component: ConfigurarCodigoComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'codigo', component: ConfigurarCodigoComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE NIVELES DE TITULOS
-  { path: 'nivelTitulos', component: ListarNivelTitulosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'nivelTitulos', component: ListarNivelTitulosComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE TITULOS
-  { path: 'titulos', component: ListarTitulosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'titulos', component: ListarTitulosComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE EMPLEADO
-  { path: 'registrarEmpleado', component: RegistroComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'empleado', component: ListaEmpleadosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'registrarEmpleado', component: RegistroComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'empleado', component: ListaEmpleadosComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE HORARIOS
-  { path: 'horario', component: PrincipalHorarioComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'horariosMultiples', component: HorarioMultipleEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'horario', component: PrincipalHorarioComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'horariosMultiples', component: HorarioMultipleEmpleadoComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE PERMISOS
-  { path: 'verTipoPermiso', component: VistaElementosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'permisosMultiples', component: PermisosMultiplesEmpleadosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'permisos-solicitados', component: ListarEmpleadoPermisoComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'verTipoPermiso', component: VistaElementosComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'permisosMultiples', component: PermisosMultiplesEmpleadosComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'permisos-solicitados', component: ListarEmpleadoPermisoComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE VACACIONES
-  { path: 'vacaciones-solicitados', component: ListarVacacionesComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'vacaciones-solicitados', component: ListarVacacionesComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE HORAS EXTRAS
-  { path: 'listaHorasExtras', component: ListaHorasExtrasComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'planificaHoraExtra', component: ListaEmplePlanHoraEComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'listadoPlanificaciones', component: ListaPlanificacionesComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'horas-extras-solicitadas', component: ListaPedidoHoraExtraComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'listaHorasExtras', component: ListaHorasExtrasComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'planificaHoraExtra', component: ListaEmplePlanHoraEComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'listadoPlanificaciones', component: ListaPlanificacionesComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'horas-extras-solicitadas', component: ListaPedidoHoraExtraComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTA DE ALIMENTACION
-  { path: 'listarTipoComidas', component: ListarTipoComidasComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'alimentacion', component: PlanComidasComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'listaPlanComida', component: ListarPlanificacionComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'listaSolicitaComida', component: ListarSolicitudComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'listarTipoComidas', component: ListarTipoComidasComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'alimentacion', component: PlanComidasComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'listaPlanComida', component: ListarPlanificacionComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'listaSolicitaComida', component: ListarSolicitudComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE ACCIONES DE PERSONAL
-  { path: 'proceso', component: PrincipalProcesoComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'acciones-personal', component: ListarTipoAccionComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'pedidoAccion', component: CrearPedidoAccionComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'listaPedidos', component: ListarPedidoAccionComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'proceso', component: PrincipalProcesoComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'acciones-personal', component: ListarTipoAccionComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'pedidoAccion', component: CrearPedidoAccionComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'listaPedidos', component: ListarPedidoAccionComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE GEOLOCALIZACION
-  { path: 'coordenadas', component: ListarCoordenadasComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'coordenadas', component: ListarCoordenadasComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE APLICACION MOVIL
-  { path: 'app-movil', component: ListaAppComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'registro-dispositivos', component: RegistroDispositivosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'app-movil', component: ListaAppComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'registro-dispositivos', component: RegistroDispositivosComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE DISPOSITIVOS
-  { path: 'listarRelojes', component: ListarRelojesComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'registrarRelojes', component: RelojesComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'listarRelojes', component: ListarRelojesComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'registrarRelojes', component: RelojesComponent, canActivate: [AuthGuard], data: { roles: 4 } },
   // ACCESO A RUTAS DE TIMBRES
   { path: 'timbres-personal', component: TimbreWebComponent, canActivate: [AuthGuard], data: { rolMix: 0 } },
-  { path: 'timbres-multiples', component: TimbreMultipleComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'timbres-admin', component: TimbreAdminComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'timbresWeb', component: ListaWebComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'timbres-multiples', component: TimbreMultipleComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'timbres-admin', component: TimbreAdminComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'timbresWeb', component: ListaWebComponent, canActivate: [AuthGuard], data: { roles: 4 } },
   { path: 'buscar-timbre', component: BuscarTimbreComponent, canActivate: [AuthGuard], data: { rolMix: 0 } },
 
   // ACCESO A RUTAS DE DOCUMENTOS
-  { path: 'archivos', component: VerDocumentosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'archivos/:filename', component: ListaArchivosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'archivos', component: VerDocumentosComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'archivos/:filename', component: ListaArchivosComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE CUMPLEANIOS
-  { path: 'cumpleanios', component: VerBirthdayComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'cumpleanios', component: VerBirthdayComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
 
   // ACCESO A RUTAS DE COMUNICADOS
-  { path: 'comunicados', component: ComunicadosComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'comunicados', component: ComunicadosComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE GRAFICAS ADMINISTRADOR
-  { path: 'macro/tiempo-jornada-vs-hora-ext', component: TiempoJornadaVsHoraExtMacroComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'macro/jornada-vs-hora-extra', component: JornadaVsHoraExtraMacroComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'macro/salidas-antes', component: SalidasAntesMacroComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'macro/inasistencia', component: InasistenciaMacroComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'macro/marcaciones', component: MarcacionesEmpMacroComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'macro/asistencia', component: AsistenciaMacroComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'macro/hora-extra', component: HoraExtraMacroComponent, canActivate: [AuthGuard], data: { roles: 1 } },
-  { path: 'macro/retrasos', component: RetrasosMacroComponent, canActivate: [AuthGuard], data: { roles: 1 } },
+  { path: 'macro/tiempo-jornada-vs-hora-ext', component: TiempoJornadaVsHoraExtMacroComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'macro/jornada-vs-hora-extra', component: JornadaVsHoraExtraMacroComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'macro/salidas-antes', component: SalidasAntesMacroComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'macro/inasistencia', component: InasistenciaMacroComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'macro/marcaciones', component: MarcacionesEmpMacroComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'macro/asistencia', component: AsistenciaMacroComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'macro/hora-extra', component: HoraExtraMacroComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'macro/retrasos', component: RetrasosMacroComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
 
 ];

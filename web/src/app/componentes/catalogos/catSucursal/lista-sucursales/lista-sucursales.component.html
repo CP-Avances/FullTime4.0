@@ -48,9 +48,10 @@
                         </div>
                         <div class="col-md" *ngIf="mostrarbtnsubir">
                             <div class="d-flex flex-wrap justify-content-around">
-                                <button *ngIf="Datasucursales && messajeExcel != 'error'" id="descargar" class="btn btn-sm"
-                                    (click)="ConfirmarRegistroMultiple()" matSuffix matTooltipPosition="right"
-                                    style="margin: 3% 2% 3% 2%;" matTooltip="Guardar registro multiple.">
+                                <button *ngIf="Datasucursales && messajeExcel != 'error'" id="descargar"
+                                    class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
+                                    matTooltipPosition="right" style="margin: 3% 2% 3% 2%;"
+                                    matTooltip="Guardar registro multiple.">
                                     Registrar
                                 </button>
                             </div>
@@ -61,14 +62,14 @@
         </div>
     </div>
     <!-- *******************************  LISTA DE ESTABLECIMIENTOS  ***************************************** -->
-    <div class="container" style="padding-top: 15px; padding-bottom: 50px; text-align: center;" *ngIf="!Datasucursales && (messajeExcel == 'error' || messajeExcel == '')">
+    <div class="container" style="padding-top: 15px; padding-bottom: 50px; text-align: center;"
+        *ngIf="!Datasucursales && (messajeExcel == 'error' || messajeExcel == '')">
         <div class="mat-elevation-z8" style="background: white;">
             <div id="resultados">RESULTADO DE BÚSQUEDA</div>
             <div class="table-responsive">
                 <table class="table table-hover table-sm ">
                     <thead class="thead-light">
                         <tr style="text-align: center;">
-                            <th scope="col">Empresa</th>
                             <th scope="col">Establecimiento</th>
                             <th scope="col">Ciudad</th>
                             <th scope="col">Acciones</th>
@@ -76,7 +77,6 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td></td>
                             <td>
                                 <mat-form-field id="t-inputs">
                                     <input matInput placeholder="Buscar" [formControl]="buscarNombre"
@@ -98,7 +98,6 @@
                         </tr>
                         <tr
                             *ngFor="let s of sucursales | sucCiudad: filtroCiudadSuc | sucNombre: filtroNombreSuc | paginate:tamanio_pagina:numero_pagina">
-                            <td>{{s.nomempresa}}</td>
                             <td>{{s.nombre}}</td>
                             <td>{{s.descripcion}}</td>
                             <td class="justify-content-center">
@@ -150,13 +149,15 @@
     </div>
 
     <!-- ******************************* INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE  ***************************************** -->
-    <div class="container" style="padding-top: 10px; margin-bottom: 25px;" *ngIf="Datasucursales && messajeExcel != 'error'">
+    <div class="container" style="padding-top: 10px; margin-bottom: 25px;"
+        *ngIf="Datasucursales && messajeExcel != 'error'">
         <app-definicion-plantilla>
         </app-definicion-plantilla>
     </div>
 
     <!-- ******************************* TABLA DE DATOS DE LA CARGA MULTIPLE  ***************************************** -->
-    <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="Datasucursales && messajeExcel != 'error'">
+    <div class="container" style="padding-bottom: 50px; text-align: center;"
+        *ngIf="Datasucursales && messajeExcel != 'error'">
         <div class="mat-elevation-z8" style="background: white;">
             <div id="resultados">
                 REGISTRO MULTIPLE
@@ -173,7 +174,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let data of Datasucursales | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                        <tr
+                            *ngFor="let data of Datasucursales | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
                             <td style="width: 50px;" align="center">{{data.fila}}</td>
                             <td [style.color]="stiloTextoCelda(data.nom_sucursal)">{{ data.nom_sucursal}}</td>
                             <td [style.color]="stiloTextoCelda(data.ciudad)">{{ data.ciudad}}</td>

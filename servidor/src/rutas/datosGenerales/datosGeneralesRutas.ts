@@ -13,6 +13,9 @@ class CiudadRutas {
     configuracion(): void {
 
         // METODO PARA CONSULTAR DATOS DE USUARIOS ACTIVOS E INACTIVOS CON PERFIL ADMINISTRADOR
+        this.router.get('/informacion-data-general-superior/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarDataGeneral_SUPERADMIN);
+
+        // METODO PARA CONSULTAR DATOS DE USUARIOS ACTIVOS E INACTIVOS CON PERFIL ADMINISTRADOR
         this.router.post('/informacion-data-general/:estado', TokenValidation, DATOS_GENERALES_CONTROLADOR.BuscarDataGeneral_ADMIN);
 
         // METODO PARA CONSULTAR DATOS DE USUARIOS ACTIVOS E INACTIVOS CON PERFIL ADMINISTRADOR-JEFE

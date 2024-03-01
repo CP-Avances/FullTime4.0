@@ -205,7 +205,19 @@ export class TimbreMultipleComponent implements OnInit {
         this.usua_sucursales = { id_sucursal: codigos, id_departamento: usuario.id_departamento };
         this.BuscarInformacionJefer(this.usua_sucursales);
       }
+      else if (usuario.id_rol === 3) {
+        this.BuscarInformacionSuperAdministrador();
+      }
     });
+  }
+
+  // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL SUPERADMINISTRADOR
+  BuscarInformacionSuperAdministrador() {
+    this.informacion.ObtenerInformacion_SUPERADMIN(1).subscribe((res: any[]) => {
+      this.ProcesarDatos(res);
+    }, err => {
+      this.toastr.error(err.error.message)
+    })
   }
 
   // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL ADMINISTRADOR
