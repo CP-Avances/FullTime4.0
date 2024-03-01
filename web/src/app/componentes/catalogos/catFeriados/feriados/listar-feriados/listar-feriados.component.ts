@@ -25,6 +25,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { SpinnerService } from 'src/app/servicios/spinner/spinner.service';
 
 @Component({
   selector: 'app-listar-feriados',
@@ -92,6 +93,7 @@ export class ListarFeriadosComponent implements OnInit {
     public ventana: MatDialog, // VARIABLE DE USO DE VENTANAS DE DIÁLOGO
     public validar: ValidacionesService,
     public parametro: ParametrosService,
+    public spinnerService: SpinnerService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -298,6 +300,7 @@ export class ListarFeriadosComponent implements OnInit {
     }
 
     this.progreso = true;
+    this.spinnerService.show();
 
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
@@ -324,8 +327,10 @@ export class ListarFeriadosComponent implements OnInit {
         timeOut: 4000,
       });
       this.progreso = false;
+      this.spinnerService.hide();
     },() => {
       this.progreso = false;
+      this.spinnerService.hide();
     });
   }
 
