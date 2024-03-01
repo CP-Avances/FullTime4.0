@@ -170,11 +170,6 @@
     </div>
 </div>
 
-<!-- <div class="pantalla-progress" *ngIf="habilitarprogress">
-  <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
-  </mat-progress-spinner>
-</div> -->
-
 <!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
 <div class="container" style="padding-top: 10px;" *ngIf="dataHorarios">
   <app-definicion-plantilla>
@@ -201,12 +196,12 @@
               <tbody>
                 <tr
                     *ngFor="let h of dataHorarios.plantillaHorarios | paginate:tamanio_paginaH:numero_paginaH ">
-                    <td>{{h.DESCRIPCION}}</td>
-                    <td>{{h.CODIGO_HORARIO}}</td>
-                    <td>{{h.HORAS_TOTALES}}</td>
+                    <td [style.color]="ObtenerColorDatoRegistrado(h.DESCRIPCION)">{{h.DESCRIPCION}}</td>
+                    <td [style.color]="ObtenerColorDatoRegistrado(h.CODIGO_HORARIO)">{{h.CODIGO_HORARIO}}</td>
+                    <td [style.color]="ObtenerColorDatoRegistrado(h.HORAS_TOTALES)">{{h.HORAS_TOTALES}}</td>
                     <td>{{h.MIN_ALIMENTACION}}</td>
-                    <td>{{h.TIPO_HORARIO}}</td>
-                    <td>{{h.HORARIO_NOCTURNO}}</td>
+                    <td [style.color]="ObtenerColorDatoRegistrado(h.TIPO_HORARIO)">{{h.TIPO_HORARIO}}</td>
+                    <td [style.color]="ObtenerColorDatoRegistrado(h.HORARIO_NOCTURNO)">{{h.HORARIO_NOCTURNO}}</td>
                     <td>
                         <div style="width: 270px; margin: auto;">
                             <div id="t-editar" class="circulo"  [style.background-color]="ObtenerColorValidacion(h.OBSERVACION)"></div>

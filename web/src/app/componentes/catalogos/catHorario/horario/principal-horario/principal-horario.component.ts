@@ -572,17 +572,31 @@ export class PrincipalHorarioComponent implements OnInit {
 
   //METODO PARA DEFINIR EL COLOR DE LA OBSERVACION
   ObtenerColorValidacion(observacion: string): string{
+    if (observacion.startsWith('Datos no registrados:')) {
+      return 'rgb(242, 21, 21)';
+    }
+
+    if (observacion.startsWith('Formato') || (observacion.startsWith('Tipo'))) {
+      return 'rgb(222, 162, 73)';
+    }
+
     switch(observacion) {
       case 'Ok':
           return 'rgb(159, 221, 154)';
-      case 'Ya esta registrado en la base de datos':
+      case 'Ya existe en el sistema':
           return 'rgb(239, 203, 106)';
       case 'Codigo de horario no existe en los horarios validos':
           return 'rgb(239, 203, 106)';
-      case 'Registro duplicado':
+      case 'Registro duplicado dentro de la plantilla':
           return 'rgb(156, 214, 255)';
       default:
-          return 'rgb(246, 167, 143)';
+          return 'rgb(242, 21, 21)';
+    }
+  }
+
+  ObtenerColorDatoRegistrado(dato: string){
+    if (dato == 'No registrado'){
+      return 'rgb(242, 21, 21)';
     }
   }
 }
