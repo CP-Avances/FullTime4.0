@@ -209,7 +209,7 @@ export class ListarFeriadosComponent implements OnInit {
     this.BuscarParametro();
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
-    this.messajeExcel == '';
+    this.messajeExcel = '';
   }
 
   // METODO PARA INGRESAR SOLO LETRAS
@@ -436,14 +436,16 @@ export class ListarFeriadosComponent implements OnInit {
       return 'rgb(159, 221, 154)';
     }else if(observacion == 'Ya existe en el sistema'){
       return 'rgb(239, 203, 106)';
-    }else if(arrayObservacion[0] == 'Fecha' || arrayObservacion[0] == 'Descripción'){
-      return 'rgb(242, 21, 21)';
+    }else if(observacion == 'Fecha registrada como valor de otra columna'){
+      return 'rgb(170, 129, 236)';
     }else if(observacion == 'Registro duplicado'){
       return 'rgb(156, 214, 255)';
     }else if(observacion == 'Formato de fec_recuperacion incorrecto (YYYY-MM-DD)'){
       return 'rgb(156, 214, 255)';
     }else if(observacion == 'Formato de fecha incorrecto (YYYY-MM-DD)'){
       return 'rgb(230, 176, 96)';
+    }else if(arrayObservacion[0] == 'Fecha' || arrayObservacion[0] == 'Descripción'){
+      return 'rgb(242, 21, 21)';
     }else{
       return 'white'
     }

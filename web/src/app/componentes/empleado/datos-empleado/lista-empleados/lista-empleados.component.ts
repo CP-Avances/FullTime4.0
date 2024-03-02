@@ -325,7 +325,8 @@ export class ListaEmpleadosComponent implements OnInit {
     this.nameFile = '';
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
-    this.messajeExcel == '';
+    this.messajeExcel = '';
+    
   }
 
   // METODO PARA LISTAR NACIONALIDADES
@@ -367,6 +368,7 @@ export class ListaEmpleadosComponent implements OnInit {
           this.archivoForm.reset();
           this.nameFile = '';
           this.LimpiarCampos();
+          this.mostrarbtnsubir = false;
         }
       }
       else {
@@ -382,7 +384,8 @@ export class ListaEmpleadosComponent implements OnInit {
           });
           this.archivoForm.reset();
           this.nameFile = '';
-          this.LimpiarCampos()
+          this.LimpiarCampos();
+          this.mostrarbtnsubir = false;
         }
       }
     } else {

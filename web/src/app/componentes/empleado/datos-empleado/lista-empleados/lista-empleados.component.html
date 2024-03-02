@@ -10,11 +10,6 @@
                         *ngIf="!DataEmpleados">
                         Crear usuario
                     </button>
-                    <button *ngIf="DataEmpleados" id="btn-raised" class="btn btn-sm" matSuffix
-                        (click)="registrarUsuariosMultiple()" matTooltipPosition="right"
-                        matTooltip="Guardar registro multiple.">
-                        Registrar
-                    </button>
                     <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
                         matTooltipPosition="right"
                         matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
@@ -42,10 +37,9 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="row">
-                    <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-around">
-                            <form method="post" enctype="multipart/form-data"
-                                class="d-flex flex-wrap justify-content-around" style="margin: 2% 2% 2% 2%;">
+                    <div class="col-md" style="padding-top: 5px;">
+                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                            <form method="post" enctype="multipart/form-data" style="width: max-content;">
                                 <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
                                     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                 <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
@@ -61,7 +55,7 @@
                             </form>
                         </div>
                     </div>
-                    <div class="col-md">
+                    <div class="col-md" *ngIf="!DataEmpleados">
                         <div class="d-flex flex-wrap justify-content-around">
                             <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                 style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
@@ -72,6 +66,16 @@
                             </a>
                         </div>
                     </div>
+                    <div class="col-md" *ngIf="DataEmpleados" style="padding-top: 5px; padding-bottom: 5px;" >
+                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                            <button id="descargar" class="btn btn-sm"
+                                (click)="registrarUsuariosMultiple()" matSuffix matTooltipPosition="right"
+                                 matTooltip="Guardar registro multiple.">
+                                Registrar
+                            </button>
+                        </div>
+                    </div>
+                    
                 </div>
             </mat-card>
         </div>

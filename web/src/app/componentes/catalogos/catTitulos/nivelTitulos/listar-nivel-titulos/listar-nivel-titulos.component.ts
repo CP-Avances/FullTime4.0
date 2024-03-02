@@ -304,7 +304,7 @@ export class ListarNivelTitulosComponent implements OnInit {
     this.ObtenerNiveles();
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
-    this.messajeExcel == '';
+    this.messajeExcel = '';
   }
 
   // METODO PARA VALIDAR INGRESO DE LETRAS

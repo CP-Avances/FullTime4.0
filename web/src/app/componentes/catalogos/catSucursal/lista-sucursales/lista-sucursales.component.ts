@@ -176,7 +176,7 @@ export class ListaSucursalesComponent implements OnInit {
     this.ObtenerSucursal();
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
-    this.messajeExcel == '';
+    this.messajeExcel = '';
   }
 
   // METODO PARA VALIDAR SOLO LETRAS
