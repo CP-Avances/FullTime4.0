@@ -496,9 +496,12 @@ export class ListaEmpleadosComponent implements OnInit {
       console.log('datos plantilla a enviar: ', this.listUsuariosCorrectas);
 
       this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
-        timeOut: 6000,
+        timeOut: 3000,
       });
       //window.location.reload();
+
+      this.archivoForm.reset();
+      this.nameFile = '';
 
     });
 

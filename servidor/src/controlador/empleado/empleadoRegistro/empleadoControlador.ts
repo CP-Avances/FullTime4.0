@@ -1225,8 +1225,8 @@ class EmpleadoControlador {
       var contrasena = md5.appendStr(data.contrasena).end()?.toString();
 
       // Datos que se leen de la plantilla ingresada
-      const { cedula, estado_civil, genero, correo, fec_nacimiento, estado, domicilio, telefono,
-        nacionalidad, usuario, estado_user, rol, app_habilita } = data;
+      const { cedula, estado_civil, genero, correo, fec_nacimiento, domicilio, telefono,
+        nacionalidad, usuario, rol } = data;
 
       //Obtener id del estado_civil
       var id_estado_civil = 0;
@@ -1256,13 +1256,9 @@ class EmpleadoControlador {
       }
 
       //OBTENER ID DEL ESTADO
-      var id_estado = 0;
-      if (estado.toUpperCase() === 'ACTIVO') {
-        id_estado = 1;
-      }
-      else if (estado.toUpperCase() === 'INACTIVO') {
-        id_estado = 2;
-      }
+      var id_estado = 1;
+      var estado_user = true;
+      var app_habilita = false;
 
       //Obtener id de la nacionalidad
       const id_nacionalidad = await pool.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1',
@@ -1307,6 +1303,10 @@ class EmpleadoControlador {
       contador = contador + 1;
       contrasena = undefined
     });
+
+    setTimeout(() => {
+      return
+    }, 1500)
     
     
   }

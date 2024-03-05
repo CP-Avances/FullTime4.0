@@ -1114,7 +1114,7 @@ class EmpleadoControlador {
                 var md5 = new ts_md5_1.Md5();
                 var contrasena = (_a = md5.appendStr(data.contrasena).end()) === null || _a === void 0 ? void 0 : _a.toString();
                 // Datos que se leen de la plantilla ingresada
-                const { cedula, estado_civil, genero, correo, fec_nacimiento, estado, domicilio, telefono, nacionalidad, usuario, estado_user, rol, app_habilita } = data;
+                const { cedula, estado_civil, genero, correo, fec_nacimiento, domicilio, telefono, nacionalidad, usuario, rol } = data;
                 //Obtener id del estado_civil
                 var id_estado_civil = 0;
                 if (estado_civil.toUpperCase() === 'SOLTERO/A') {
@@ -1141,13 +1141,9 @@ class EmpleadoControlador {
                     id_genero = 2;
                 }
                 //OBTENER ID DEL ESTADO
-                var id_estado = 0;
-                if (estado.toUpperCase() === 'ACTIVO') {
-                    id_estado = 1;
-                }
-                else if (estado.toUpperCase() === 'INACTIVO') {
-                    id_estado = 2;
-                }
+                var id_estado = 1;
+                var estado_user = true;
+                var app_habilita = false;
                 //Obtener id de la nacionalidad
                 const id_nacionalidad = yield database_1.default.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1', [nacionalidad.toUpperCase()]);
                 //Obtener id del rol
@@ -1181,6 +1177,9 @@ class EmpleadoControlador {
                 contador = contador + 1;
                 contrasena = undefined;
             }));
+            setTimeout(() => {
+                return;
+            }, 1500);
         });
     }
     /** METODOS PARA VERIFICAR PLANTILLA CON CÓDIGO INGRESADO DE FORMA MANUAL */
