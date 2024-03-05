@@ -30,30 +30,25 @@
                             <form method="post" enctype="multipart/form-data" style="width: max-content;">
                                 <input type="file" (change)="FileChange($event)" [formControl]="archivoForm" id="file"
                                     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
-                                    *ngIf="!mostrarbtnsubir" style="height: 64px;"
+                                <label for="file" matSuffix matTooltipPosition="right"
+                                    *ngIf="!mostrarbtnsubir" style="height: 64px; padding-top: 25px;"
                                     matTooltip="Presionar para seleccionar Plantilla con nombre Niveles_profesionales.">
                                     Subir plantilla
                                 </label>
-                                <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
-                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'" style="height: 64px;"
+                                <label for="file"  matSuffix matTooltipPosition="right"
+                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'" style="height: 64px; padding-top: 25px;"
                                     matTooltip="Presionar para seleccionar Plantilla con nombre Niveles_profesionales.">
                                     Subir nueva plantilla
                                 </label>
                             </form>
                         </div>
                     </div>
-                    <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-around">
-
-                        </div>
-                    </div>
-                    <div class="col-md" *ngIf="DataNivelesProfesionales" style="padding-top: 5px; padding-bottom: 5px;" >
+                    <div class="col-md" *ngIf="!DataNivelesProfesionales" style="padding-top: 5px; padding-bottom: 5px;" >
                         <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
                             <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                 matTooltip="Dar click para ver o descargar el documento."
                                 >
-                                <span class="material-icons">cloud_download</span>
+                                <!--span class="material-icons">cloud_download</span-->
                                 <br>
                                 Descargar plantilla
                             </a>

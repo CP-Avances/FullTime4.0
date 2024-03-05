@@ -39,7 +39,7 @@ td {
 }
 
 [type="file"]+label {
-    background: #f15d22;
+    background-color: rgb(83, 157, 76);
     border: none;
     border-radius: 5px;
     color: #fff;
@@ -93,7 +93,7 @@ td {
     font-weight: bold;
     font-family: "Poppins", sans-serif;
     margin-left: 5px;
-    padding-top: 10px;
+    padding-top: 8px;
     font-size: 12px;
     height: 66px;
     width: 220px;
@@ -106,7 +106,7 @@ td {
     font-family: "Poppins", sans-serif;
     font-weight: bold;
     margin-left: 5px;
-    padding-top: 10px;
+    padding-top: 8px;
     font-size: 12px;
     overflow: hidden;
     height: 65px;

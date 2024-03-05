@@ -790,16 +790,15 @@ class EmpleadoControlador {
       genero: '',	
       correo: '',	
       fec_nacimiento: '',	
-      estado: '',	
+      latitud: '',
+      longitud: '',	
       mail_alternativo: '',	
       domicilio: '',
       telefono: '',	
       nacionalidad: '',	
       usuario: '',	
-      contrasena: '',	
-      estado_user: '',	
+      contrasena: '',		
       rol: '',	
-      app_habilita: '',
       observacion: '',
     };
 
@@ -827,30 +826,29 @@ class EmpleadoControlador {
 
     plantilla.forEach(async (dato: any, indice: any, array: any) => {
       // Datos que se leen de la plantilla ingresada
-      var {N, cedula, apellido, nombre, estado_civil, genero, correo, fec_nacimiento, estado, mail_alternativo, 
-        domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
+      var {N, cedula, apellido, nombre, estado_civil, genero, correo, fec_nacimiento, latitud, longitud, 
+        mail_alternativo, domicilio, telefono, nacionalidad, usuario, contrasena, rol } = dato;
 
         //Verificar que el registo no tenga datos vacios
         if((N != undefined && N != '') &&
            (cedula != undefined) && (apellido != undefined) &&
            (nombre != undefined) &&	(estado_civil != undefined) &&	
            (genero != undefined) && (correo != undefined) &&
-           (fec_nacimiento != undefined) && (estado != undefined) &&	
-           (mail_alternativo != undefined) && (domicilio != undefined) &&
-           (telefono != undefined) && (nacionalidad != undefined)	&&
-           (usuario != undefined)	&& (contrasena != undefined) &&	
-           (estado_user != undefined) && 	(rol != undefined) &&	(app_habilita != undefined)
+           (fec_nacimiento != undefined) &&	(mail_alternativo != undefined) && 
+           (latitud != undefined) && (longitud != undefined) && 
+           (domicilio != undefined) && (telefono != undefined) && 
+           (nacionalidad != undefined)	&& (usuario != undefined)	&& 
+           (contrasena != undefined) && (rol != undefined)
         ){
           data.fila = N;
           data.cedula = cedula; data.apellido = apellido;
           data.nombre = nombre; data.estado_civil = estado_civil;	
           data.genero = genero; data.correo = correo;
-          data.fec_nacimiento = fec_nacimiento; data.estado = estado;	
-          data.mail_alternativo = mail_alternativo; data.domicilio = domicilio;
-          data.telefono = telefono;	data.nacionalidad = nacionalidad;	
-          data.usuario = usuario;	data.contrasena = contrasena;	
-          data.estado_user = estado_user; data.rol = rol,	
-          data.app_habilita = app_habilita;
+          data.fec_nacimiento = fec_nacimiento; data.latitud = latitud;
+          data.longitud = longitud; data.mail_alternativo = mail_alternativo; 
+          data.domicilio = domicilio; data.telefono = telefono;	
+          data.nacionalidad = nacionalidad;	data.usuario = usuario;	
+          data.contrasena = contrasena; data.rol = rol;
 
           if(data.cedula.toString().length > 10){
             data.observacion = 'La cédula ingresada no es valida';
@@ -874,12 +872,11 @@ class EmpleadoControlador {
           data.cedula = cedula; data.apellido = apellido;
           data.nombre = nombre; data.estado_civil = estado_civil;	
           data.genero = genero; data.correo = correo;
-          data.fec_nacimiento = fec_nacimiento; data.estado = estado;	
-          data.mail_alternativo = mail_alternativo; data.domicilio = domicilio;
-          data.telefono = telefono;	data.nacionalidad = nacionalidad;	
-          data.usuario = usuario;	data.contrasena = contrasena;	
-          data.estado_user = estado_user; data.rol = rol,	
-          data.app_habilita = app_habilita,
+          data.fec_nacimiento = fec_nacimiento; data.latitud = latitud;	
+          data.longitud = longitud; data.mail_alternativo = mail_alternativo; 
+          data.domicilio = domicilio; data.telefono = telefono;	
+          data.nacionalidad = nacionalidad;	data.usuario = usuario;	
+          data.contrasena = contrasena;	data.rol = rol;	
           data.observacion = 'no registrado';
 
           if(data.fila == '' || data.fila == undefined){
@@ -911,8 +908,11 @@ class EmpleadoControlador {
             data.fec_nacimiento = 'No registrado';
             data.observacion = 'Fecha de nacimiento '+data.observacion;
           }
-          if(estado == undefined){
-            data.estado = 'No registrado';
+          if(latitud == undefined){
+            data.latitud = 'No registrado';
+          }
+          if(longitud == undefined){
+            data.longitud = 'No registrado';
           }
           if(mail_alternativo == undefined){
             data.mail_alternativo = 'No registrado';
@@ -937,16 +937,9 @@ class EmpleadoControlador {
             data.contrasena = contrasena;
             data.observacion = 'Contraseña '+data.observacion;
           }
-          if(estado_user == undefined){
-            data.estado_user = 'No registrado'
-            data.observacion = 'Estado '+data.observacion;
-          }
           if(rol == undefined){
             data.rol = 'No registrado'
             data.observacion = 'Rol '+data.observacion;
-          }
-          if(app_habilita == undefined){
-            data.app_habilita = 'No registrado'
           }
 
            // Verificar si la variable tiene el formato de fecha correcto con moment
@@ -1338,16 +1331,15 @@ class EmpleadoControlador {
       genero: '',	
       correo: '',	
       fec_nacimiento: '',	
-      estado: '',	
+      latitud: '',
+      longitud: '',		
       mail_alternativo: '',	
       domicilio: '',
       telefono: '',	
       nacionalidad: '',	
       usuario: '',	
-      contrasena: '',	
-      estado_user: '',	
+      contrasena: '',		
       rol: '',	
-      app_habilita: '',
       observacion: '',
     };
 
@@ -1359,30 +1351,29 @@ class EmpleadoControlador {
 
     plantilla.forEach(async (dato: any, indice: any, array: any) => {
       // Datos que se leen de la plantilla ingresada
-      var {N, cedula, apellido, nombre, codigo, estado_civil, genero, correo, fec_nacimiento, estado, mail_alternativo, 
-        domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
+      var {N, cedula, apellido, nombre, codigo, estado_civil, genero, correo, fec_nacimiento, latitud, longitud, 
+        mail_alternativo, domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
       
          //Verificar que el registo no tenga datos vacios
          if((N != undefined && N != '') && 
           (cedula != undefined) && (apellido != undefined) &&
           (nombre != undefined) && (codigo != undefined) &&	(estado_civil != undefined) &&	
           (genero != undefined) && (correo != undefined) &&
-          (fec_nacimiento != undefined) && (estado != undefined) &&	
-          (mail_alternativo != undefined) && (domicilio != undefined) &&
-          (telefono != undefined) && (nacionalidad != undefined)	&&
-          (usuario != undefined)	&& (contrasena != undefined) &&	
-          (estado_user != undefined) && 	(rol != undefined) &&	(app_habilita != undefined)
+          (fec_nacimiento != undefined) && (mail_alternativo != undefined) && 
+          (latitud != undefined) && (longitud != undefined) && 
+          (domicilio != undefined) && (telefono != undefined) && 
+          (nacionalidad != undefined)	&& (usuario != undefined)	&& 
+          (contrasena != undefined) &&	(rol != undefined)
         ){
           data.fila = N;
           data.cedula = cedula; data.apellido = apellido;
           data.nombre = nombre; data.codigo = codigo; data.estado_civil = estado_civil;	
           data.genero = genero; data.correo = correo;
-          data.fec_nacimiento = fec_nacimiento; data.estado = estado;	
-          data.mail_alternativo = mail_alternativo; data.domicilio = domicilio;
-          data.telefono = telefono;	data.nacionalidad = nacionalidad;	
-          data.usuario = usuario;	data.contrasena = contrasena;	
-          data.estado_user = estado_user; data.rol = rol,	
-          data.app_habilita = app_habilita;
+          data.fec_nacimiento = fec_nacimiento; data.latitud = latitud;
+          data.longitud = longitud; data.mail_alternativo = mail_alternativo; 
+          data.domicilio = domicilio; data.telefono = telefono;	
+          data.nacionalidad = nacionalidad;	data.usuario = usuario;	
+          data.contrasena = contrasena;	data.rol = rol;
 
           if(data.cedula.toString().length > 10){
             data.observacion = 'La cédula ingresada no es valida';
@@ -1416,12 +1407,11 @@ class EmpleadoControlador {
           data.cedula = cedula; data.apellido = apellido;
           data.nombre = nombre; data.codigo = codigo; data.estado_civil = estado_civil;	
           data.genero = genero; data.correo = correo;
-          data.fec_nacimiento = fec_nacimiento; data.estado = estado;	
-          data.mail_alternativo = mail_alternativo; data.domicilio = domicilio;
-          data.telefono = telefono;	data.nacionalidad = nacionalidad;	
-          data.usuario = usuario;	data.contrasena = contrasena;	
-          data.estado_user = estado_user; data.rol = rol,	
-          data.app_habilita = app_habilita,
+          data.fec_nacimiento = fec_nacimiento; data.latitud = latitud;
+          data.longitud = longitud; data.mail_alternativo = mail_alternativo; 
+          data.domicilio = domicilio; data.telefono = telefono;	
+          data.nacionalidad = nacionalidad;	data.usuario = usuario;	
+          data.contrasena = contrasena;	data.rol = rol,	
           data.observacion = 'no registrado';
 
           if(data.fila == '' || data.fila == undefined){
@@ -1457,8 +1447,11 @@ class EmpleadoControlador {
             data.fec_nacimiento = 'No registrado';
             data.observacion = 'Fecha de nacimiento '+data.observacion;
           }
-          if(estado == undefined){
-            data.estado = 'No registrado';
+          if(latitud == undefined){
+            data.latitud = 'No registrado';
+          }
+          if(longitud == undefined){
+            data.longitud = 'No registrado';
           }
           if(mail_alternativo == undefined){
             data.mail_alternativo = 'No registrado';
@@ -1483,16 +1476,9 @@ class EmpleadoControlador {
             data.contrasena = contrasena;
             data.observacion = 'Contraseña '+data.observacion;
           }
-          if(estado_user == undefined){
-            data.estado_user = 'No registrado'
-            data.observacion = 'Estado '+data.observacion;
-          }
           if(rol == undefined){
             data.rol = 'No registrado'
             data.observacion = 'Rol '+data.observacion;
-          }
-          if(app_habilita == undefined){
-            data.app_habilita = 'No registrado'
           }
 
            // Verificar si la variable tiene el formato de fecha correcto con moment
