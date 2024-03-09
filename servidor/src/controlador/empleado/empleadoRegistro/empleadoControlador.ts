@@ -1031,21 +1031,36 @@ class EmpleadoControlador {
           valor.observacion = 'Usuario ya existe en la base'
         }else{
 
-          // Discriminación de elementos iguales
-          if(duplicados1.find((p: any)=> p.cedula === valor.cedula) == undefined)
-          {
-            // Discriminación de elementos iguales
-            if(duplicados2.find((a: any)=> a.usuario === valor.usuario) == undefined)
-            {
-              //valor.observacion = 'ok'
-              duplicados2.push(valor);
+          var VERIFICAR_ROL = await pool.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [valor.rol.toUpperCase()]);
+          if (VERIFICAR_ROL.rows[0] != undefined && VERIFICAR_ROL.rows[0] != ''){
+
+            var VERIFICAR_NACIONALIDAD = await pool.query('SELECT * FROM nacionalidades UPPER(nombre) = $1',[valor.nacionalidad.toUpperCase()]);
+            if(VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != ''){
+
+              // Discriminación de elementos iguales
+              if(duplicados1.find((p: any)=> p.cedula === valor.cedula) == undefined)
+              {
+                // Discriminación de elementos iguales
+                if(duplicados2.find((a: any)=> a.usuario === valor.usuario) == undefined)
+                {
+                  //valor.observacion = 'ok'
+                  duplicados2.push(valor);
+                }else{
+                  valor.observacion = '2'
+                }
+
+                duplicados1.push(valor);
+              
+              }else{
+                valor.observacion = '1'
+              }
+
             }else{
-              valor.observacion = '2'
+              valor.observacion = 'La nacionalidad no existe en la base';
             }
 
-            duplicados1.push(valor);
           }else{
-            valor.observacion = '1'
+            valor.observacion = 'El rol no existe en la base';
           }
 
         }
@@ -1109,10 +1124,7 @@ class EmpleadoControlador {
 
     }, 1500)
 
-      
-
   }
-
 
   public async VerificarPlantilla_DatosAutomatico(req: Request, res: Response) {
     let list: any = req.files;    
@@ -1191,7 +1203,6 @@ class EmpleadoControlador {
     //TODO Revisar max codigo
     var codigo = parseInt(VALOR.rows[0].valor);
     var contador = 1;
-    
     
     plantilla.forEach(async (data: any) => {
 
@@ -1297,7 +1308,6 @@ class EmpleadoControlador {
         console.log('codigo_ver', codigo, VALOR.rows[0].id);
         // Actualización del código
         await pool.query('UPDATE codigo SET valor = $1 WHERE id = $2', [codigo, VALOR.rows[0].id]);
-        return res.jsonp({ message: 'correcto' });
       }
 
       contador = contador + 1;
@@ -1305,7 +1315,7 @@ class EmpleadoControlador {
     });
 
     setTimeout(() => {
-      return
+      return res.jsonp({ message: 'correcto' });
     }, 1500)
     
     
@@ -1765,6 +1775,12 @@ class EmpleadoControlador {
   }
 
   public async CargarPlantilla_Manual(req: Request, res: Response): Promise<void> {
+    const plantilla  = req.body
+    console.log('datos2: ',plantilla);
+    
+    var contador = 1;
+    
+    /*
     let list: any = req.files;
     let cadena = list.uploads[0].path;
     let filename = cadena.split("\\")[1];
@@ -1773,9 +1789,10 @@ class EmpleadoControlador {
     const workbook = excel.readFile(filePath);
     const sheet_name_list = workbook.SheetNames;
     const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-    var contador = 1;
-    plantilla.forEach(async (data: any) => {
+    */
 
+    
+    plantilla.forEach(async (data: any) => {
       // Realiza un capital letter a los nombres y apellidos
       var nombreE: any;
       let nombres = data.nombre.split(' ');
@@ -1874,14 +1891,6 @@ class EmpleadoControlador {
         return res.jsonp({ message: 'correcto' });
       }
       contador = contador + 1;
-    });
-    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-    fs.access(filePath, fs.constants.F_OK, (err) => {
-      if (err) {
-      } else {
-        // ELIMINAR DEL SERVIDOR
-        fs.unlinkSync(filePath);
-      }
     });
   }
 

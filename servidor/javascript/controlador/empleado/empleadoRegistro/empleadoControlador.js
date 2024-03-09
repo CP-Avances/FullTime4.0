@@ -947,20 +947,32 @@ class EmpleadoControlador {
                         valor.observacion = 'Usuario ya existe en la base';
                     }
                     else {
-                        // Discriminación de elementos iguales
-                        if (duplicados1.find((p) => p.cedula === valor.cedula) == undefined) {
-                            // Discriminación de elementos iguales
-                            if (duplicados2.find((a) => a.usuario === valor.usuario) == undefined) {
-                                //valor.observacion = 'ok'
-                                duplicados2.push(valor);
+                        var VERIFICAR_ROL = yield database_1.default.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [valor.rol.toUpperCase()]);
+                        if (VERIFICAR_ROL.rows[0] != undefined && VERIFICAR_ROL.rows[0] != '') {
+                            var VERIFICAR_NACIONALIDAD = yield database_1.default.query('SELECT * FROM nacionalidades UPPER(nombre) = $1', [valor.nacionalidad.toUpperCase()]);
+                            if (VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != '') {
+                                // Discriminación de elementos iguales
+                                if (duplicados1.find((p) => p.cedula === valor.cedula) == undefined) {
+                                    // Discriminación de elementos iguales
+                                    if (duplicados2.find((a) => a.usuario === valor.usuario) == undefined) {
+                                        //valor.observacion = 'ok'
+                                        duplicados2.push(valor);
+                                    }
+                                    else {
+                                        valor.observacion = '2';
+                                    }
+                                    duplicados1.push(valor);
+                                }
+                                else {
+                                    valor.observacion = '1';
+                                }
                             }
                             else {
-                                valor.observacion = '2';
+                                valor.observacion = 'La nacionalidad no existe en la base';
                             }
-                            duplicados1.push(valor);
                         }
                         else {
-                            valor.observacion = '1';
+                            valor.observacion = 'El rol no existe en la base';
                         }
                     }
                 }
@@ -1172,13 +1184,12 @@ class EmpleadoControlador {
                     console.log('codigo_ver', codigo, VALOR.rows[0].id);
                     // Actualización del código
                     yield database_1.default.query('UPDATE codigo SET valor = $1 WHERE id = $2', [codigo, VALOR.rows[0].id]);
-                    return res.jsonp({ message: 'correcto' });
                 }
                 contador = contador + 1;
                 contrasena = undefined;
             }));
             setTimeout(() => {
-                return;
+                return res.jsonp({ message: 'correcto' });
             }, 1500);
         });
     }
@@ -1525,14 +1536,19 @@ class EmpleadoControlador {
     }
     CargarPlantilla_Manual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            let list = req.files;
+            const plantilla = req.body;
+            console.log('datos2: ', plantilla);
+            var contador = 1;
+            /*
+            let list: any = req.files;
             let cadena = list.uploads[0].path;
             let filename = cadena.split("\\")[1];
-            var filePath = `./plantillas/${filename}`;
-            const workbook = xlsx_1.default.readFile(filePath);
+            var filePath = `./plantillas/${filename}`
+        
+            const workbook = excel.readFile(filePath);
             const sheet_name_list = workbook.SheetNames;
-            const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-            var contador = 1;
+            const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+            */
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                 // Realiza un capital letter a los nombres y apellidos
                 var nombreE;
@@ -1619,15 +1635,6 @@ class EmpleadoControlador {
                 }
                 contador = contador + 1;
             }));
-            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs_1.default.access(filePath, fs_1.default.constants.F_OK, (err) => {
-                if (err) {
-                }
-                else {
-                    // ELIMINAR DEL SERVIDOR
-                    fs_1.default.unlinkSync(filePath);
-                }
-            });
         });
     }
 }
