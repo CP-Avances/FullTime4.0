@@ -165,7 +165,7 @@ export class ListarTitulosComponent implements OnInit {
     this.ObtenerTitulos();
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
-    this.messajeExcel == '';
+    this.messajeExcel = '';
   }
 
   // METODO PARA VALIDAR INGRESO DE LETRAS
@@ -278,7 +278,7 @@ export class ListarTitulosComponent implements OnInit {
       this.messajeExcel = res.message;
 
       if(this.messajeExcel == 'error'){
-        this.toastr.error('Revisar los datos de la columna N, debe enumerar correctamente.', 'Plantilla no aceptada', {
+        this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;

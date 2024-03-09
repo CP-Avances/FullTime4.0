@@ -705,16 +705,15 @@ class EmpleadoControlador {
                 genero: '',
                 correo: '',
                 fec_nacimiento: '',
-                estado: '',
+                latitud: '',
+                longitud: '',
                 mail_alternativo: '',
                 domicilio: '',
                 telefono: '',
                 nacionalidad: '',
                 usuario: '',
                 contrasena: '',
-                estado_user: '',
                 rol: '',
-                app_habilita: '',
                 observacion: '',
             };
             var listEmpleados = [];
@@ -739,18 +738,18 @@ class EmpleadoControlador {
             */
             plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
                 // Datos que se leen de la plantilla ingresada
-                var { N, cedula, apellido, nombre, estado_civil, genero, correo, fec_nacimiento, estado, mail_alternativo, domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
+                var { item, cedula, apellido, nombre, estado_civil, genero, correo, fec_nacimiento, latitud, longitud, mail_alternativo, domicilio, telefono, nacionalidad, usuario, contrasena, rol } = dato;
                 //Verificar que el registo no tenga datos vacios
-                if ((N != undefined && N != '') &&
+                if ((item != undefined && item != '') &&
                     (cedula != undefined) && (apellido != undefined) &&
                     (nombre != undefined) && (estado_civil != undefined) &&
                     (genero != undefined) && (correo != undefined) &&
-                    (fec_nacimiento != undefined) && (estado != undefined) &&
-                    (mail_alternativo != undefined) && (domicilio != undefined) &&
-                    (telefono != undefined) && (nacionalidad != undefined) &&
-                    (usuario != undefined) && (contrasena != undefined) &&
-                    (estado_user != undefined) && (rol != undefined) && (app_habilita != undefined)) {
-                    data.fila = N;
+                    (fec_nacimiento != undefined) && (mail_alternativo != undefined) &&
+                    (latitud != undefined) && (longitud != undefined) &&
+                    (domicilio != undefined) && (telefono != undefined) &&
+                    (nacionalidad != undefined) && (usuario != undefined) &&
+                    (contrasena != undefined) && (rol != undefined)) {
+                    data.fila = item;
                     data.cedula = cedula;
                     data.apellido = apellido;
                     data.nombre = nombre;
@@ -758,18 +757,17 @@ class EmpleadoControlador {
                     data.genero = genero;
                     data.correo = correo;
                     data.fec_nacimiento = fec_nacimiento;
-                    data.estado = estado;
+                    data.latitud = latitud;
+                    data.longitud = longitud;
                     data.mail_alternativo = mail_alternativo;
                     data.domicilio = domicilio;
                     data.telefono = telefono;
                     data.nacionalidad = nacionalidad;
                     data.usuario = usuario;
                     data.contrasena = contrasena;
-                    data.estado_user = estado_user;
-                    data.rol = rol,
-                        data.app_habilita = app_habilita;
+                    data.rol = rol;
                     if (data.cedula.toString().length > 10) {
-                        data.observacion = 'La cédula ingresada no es valida';
+                        data.observacion = 'La cédula ingresada no es válida';
                     }
                     else {
                         // Verificar si la variable tiene el formato de fecha correcto con moment
@@ -786,7 +784,7 @@ class EmpleadoControlador {
                     listEmpleados.push(data);
                 }
                 else {
-                    data.fila = N;
+                    data.fila = item;
                     data.cedula = cedula;
                     data.apellido = apellido;
                     data.nombre = nombre;
@@ -794,17 +792,16 @@ class EmpleadoControlador {
                     data.genero = genero;
                     data.correo = correo;
                     data.fec_nacimiento = fec_nacimiento;
-                    data.estado = estado;
+                    data.latitud = latitud;
+                    data.longitud = longitud;
                     data.mail_alternativo = mail_alternativo;
                     data.domicilio = domicilio;
                     data.telefono = telefono;
                     data.nacionalidad = nacionalidad;
                     data.usuario = usuario;
                     data.contrasena = contrasena;
-                    data.estado_user = estado_user;
-                    data.rol = rol,
-                        data.app_habilita = app_habilita,
-                        data.observacion = 'no registrado';
+                    data.rol = rol;
+                    data.observacion = 'no registrado';
                     if (data.fila == '' || data.fila == undefined) {
                         data.fila = 'error';
                         mensaje = 'error';
@@ -833,8 +830,11 @@ class EmpleadoControlador {
                         data.fec_nacimiento = 'No registrado';
                         data.observacion = 'Fecha de nacimiento ' + data.observacion;
                     }
-                    if (estado == undefined) {
-                        data.estado = 'No registrado';
+                    if (latitud == undefined) {
+                        data.latitud = 'No registrado';
+                    }
+                    if (longitud == undefined) {
+                        data.longitud = 'No registrado';
                     }
                     if (mail_alternativo == undefined) {
                         data.mail_alternativo = 'No registrado';
@@ -859,16 +859,9 @@ class EmpleadoControlador {
                         data.contrasena = contrasena;
                         data.observacion = 'Contraseña ' + data.observacion;
                     }
-                    if (estado_user == undefined) {
-                        data.estado_user = 'No registrado';
-                        data.observacion = 'Estado ' + data.observacion;
-                    }
                     if (rol == undefined) {
                         data.rol = 'No registrado';
                         data.observacion = 'Rol ' + data.observacion;
-                    }
-                    if (app_habilita == undefined) {
-                        data.app_habilita = 'No registrado';
                     }
                     // Verificar si la variable tiene el formato de fecha correcto con moment
                     if ((0, moment_1.default)(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) { }
@@ -877,11 +870,11 @@ class EmpleadoControlador {
                     }
                     if (cedula == undefined) {
                         data.cedula = 'No registrado';
-                        data.observacion = 'Cedula ' + data.observacion;
+                        data.observacion = 'Cédula ' + data.observacion;
                     }
                     else {
                         if (data.cedula.toString().length > 10) {
-                            data.observacion = 'La cédula ingresada no es valida';
+                            data.observacion = 'La cédula ingresada no es válida';
                         }
                         else {
                             //Verificar que el rol exista dentro del sistema
@@ -946,12 +939,12 @@ class EmpleadoControlador {
             listEmpleados.forEach((valor) => __awaiter(this, void 0, void 0, function* () {
                 var VERIFICAR_CEDULA = yield database_1.default.query('SELECT * FROM empleados WHERE cedula = $1', [valor.cedula]);
                 if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-                    valor.observacion = 'Cedula ya existe en la base';
+                    valor.observacion = 'Cédula ya existe en el sistema';
                 }
                 else {
                     var VERIFICAR_USUARIO = yield database_1.default.query('SELECT * FROM usuarios WHERE usuario = $1', [valor.usuario]);
                     if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
-                        valor.observacion = 'Usuario ya existe en la base';
+                        valor.observacion = 'Usuario ya existe en el sistema';
                     }
                     else {
                         // Discriminación de elementos iguales
@@ -986,7 +979,7 @@ class EmpleadoControlador {
                 var filaDuplicada = 0;
                 listEmpleados.forEach((item) => {
                     if (item.observacion == '1') {
-                        item.observacion = 'Registro duplicado - cedula';
+                        item.observacion = 'Registro duplicado - cédula';
                     }
                     else if (item.observacion == '2') {
                         item.observacion = 'Registro duplicado - usuario';
@@ -1210,16 +1203,15 @@ class EmpleadoControlador {
                 genero: '',
                 correo: '',
                 fec_nacimiento: '',
-                estado: '',
+                latitud: '',
+                longitud: '',
                 mail_alternativo: '',
                 domicilio: '',
                 telefono: '',
                 nacionalidad: '',
                 usuario: '',
                 contrasena: '',
-                estado_user: '',
                 rol: '',
-                app_habilita: '',
                 observacion: '',
             };
             var listEmpleadosManual = [];
@@ -1229,18 +1221,18 @@ class EmpleadoControlador {
             var mensaje = 'correcto';
             plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
                 // Datos que se leen de la plantilla ingresada
-                var { N, cedula, apellido, nombre, codigo, estado_civil, genero, correo, fec_nacimiento, estado, mail_alternativo, domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
+                var { item, cedula, apellido, nombre, codigo, estado_civil, genero, correo, fec_nacimiento, latitud, longitud, mail_alternativo, domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
                 //Verificar que el registo no tenga datos vacios
-                if ((N != undefined && N != '') &&
+                if ((item != undefined && item != '') &&
                     (cedula != undefined) && (apellido != undefined) &&
                     (nombre != undefined) && (codigo != undefined) && (estado_civil != undefined) &&
                     (genero != undefined) && (correo != undefined) &&
-                    (fec_nacimiento != undefined) && (estado != undefined) &&
-                    (mail_alternativo != undefined) && (domicilio != undefined) &&
-                    (telefono != undefined) && (nacionalidad != undefined) &&
-                    (usuario != undefined) && (contrasena != undefined) &&
-                    (estado_user != undefined) && (rol != undefined) && (app_habilita != undefined)) {
-                    data.fila = N;
+                    (fec_nacimiento != undefined) && (mail_alternativo != undefined) &&
+                    (latitud != undefined) && (longitud != undefined) &&
+                    (domicilio != undefined) && (telefono != undefined) &&
+                    (nacionalidad != undefined) && (usuario != undefined) &&
+                    (contrasena != undefined) && (rol != undefined)) {
+                    data.fila = item;
                     data.cedula = cedula;
                     data.apellido = apellido;
                     data.nombre = nombre;
@@ -1249,18 +1241,17 @@ class EmpleadoControlador {
                     data.genero = genero;
                     data.correo = correo;
                     data.fec_nacimiento = fec_nacimiento;
-                    data.estado = estado;
+                    data.latitud = latitud;
+                    data.longitud = longitud;
                     data.mail_alternativo = mail_alternativo;
                     data.domicilio = domicilio;
                     data.telefono = telefono;
                     data.nacionalidad = nacionalidad;
                     data.usuario = usuario;
                     data.contrasena = contrasena;
-                    data.estado_user = estado_user;
-                    data.rol = rol,
-                        data.app_habilita = app_habilita;
+                    data.rol = rol;
                     if (data.cedula.toString().length > 10) {
-                        data.observacion = 'La cédula ingresada no es valida';
+                        data.observacion = 'La cédula ingresada no es válida';
                     }
                     else {
                         // Verificar si la variable tiene el formato de fecha correcto con moment
@@ -1285,7 +1276,7 @@ class EmpleadoControlador {
                     listEmpleadosManual.push(data);
                 }
                 else {
-                    data.fila = N;
+                    data.fila = item;
                     data.cedula = cedula;
                     data.apellido = apellido;
                     data.nombre = nombre;
@@ -1294,16 +1285,15 @@ class EmpleadoControlador {
                     data.genero = genero;
                     data.correo = correo;
                     data.fec_nacimiento = fec_nacimiento;
-                    data.estado = estado;
+                    data.latitud = latitud;
+                    data.longitud = longitud;
                     data.mail_alternativo = mail_alternativo;
                     data.domicilio = domicilio;
                     data.telefono = telefono;
                     data.nacionalidad = nacionalidad;
                     data.usuario = usuario;
                     data.contrasena = contrasena;
-                    data.estado_user = estado_user;
                     data.rol = rol,
-                        data.app_habilita = app_habilita,
                         data.observacion = 'no registrado';
                     if (data.fila == '' || data.fila == undefined) {
                         data.fila = 'error';
@@ -1337,8 +1327,11 @@ class EmpleadoControlador {
                         data.fec_nacimiento = 'No registrado';
                         data.observacion = 'Fecha de nacimiento ' + data.observacion;
                     }
-                    if (estado == undefined) {
-                        data.estado = 'No registrado';
+                    if (latitud == undefined) {
+                        data.latitud = 'No registrado';
+                    }
+                    if (longitud == undefined) {
+                        data.longitud = 'No registrado';
                     }
                     if (mail_alternativo == undefined) {
                         data.mail_alternativo = 'No registrado';
@@ -1363,16 +1356,9 @@ class EmpleadoControlador {
                         data.contrasena = contrasena;
                         data.observacion = 'Contraseña ' + data.observacion;
                     }
-                    if (estado_user == undefined) {
-                        data.estado_user = 'No registrado';
-                        data.observacion = 'Estado ' + data.observacion;
-                    }
                     if (rol == undefined) {
                         data.rol = 'No registrado';
                         data.observacion = 'Rol ' + data.observacion;
-                    }
-                    if (app_habilita == undefined) {
-                        data.app_habilita = 'No registrado';
                     }
                     // Verificar si la variable tiene el formato de fecha correcto con moment
                     if ((0, moment_1.default)(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) { }
@@ -1381,11 +1367,11 @@ class EmpleadoControlador {
                     }
                     if (cedula == undefined) {
                         data.cedula = 'No registrado';
-                        data.observacion = 'Cedula ' + data.observacion;
+                        data.observacion = 'Cédula ' + data.observacion;
                     }
                     else {
                         if (data.cedula.toString().length > 10) {
-                            data.observacion = 'La cédula ingresada no es valida';
+                            data.observacion = 'La cédula ingresada no es válida';
                         }
                     }
                     listEmpleadosManual.push(data);
@@ -1404,12 +1390,12 @@ class EmpleadoControlador {
             listEmpleadosManual.forEach((valor) => __awaiter(this, void 0, void 0, function* () {
                 var VERIFICAR_CEDULA = yield database_1.default.query('SELECT * FROM empleados WHERE cedula = $1', [valor.cedula]);
                 if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-                    valor.observacion = 'Cedula ya existe en la base';
+                    valor.observacion = 'Cédula ya existe en el sistema';
                 }
                 else {
                     var VERIFICAR_USUARIO = yield database_1.default.query('SELECT * FROM usuarios WHERE usuario = $1', [valor.usuario]);
                     if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
-                        valor.observacion = 'Usuario ya existe en la base';
+                        valor.observacion = 'Usuario ya existe en el sistema';
                     }
                     else {
                         // Discriminación de elementos iguales

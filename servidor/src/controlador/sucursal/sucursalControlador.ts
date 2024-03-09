@@ -150,9 +150,9 @@ class SucursalControlador {
 
     // LECTURA DE LOS DATOS DE LA PLANTILLA
     plantilla.forEach(async (dato: any, indice: any, array: any) => {
-      var {N, nombre, ciudad} = dato;
+      var {item, nombre, ciudad} = dato;
 
-      data.fila = dato.N
+      data.fila = dato.item
       data.nom_sucursal = dato.nombre;
       data.ciudad = dato.ciudad;
 
@@ -168,7 +168,7 @@ class SucursalControlador {
           const VERIFICAR_SUCURSAL = await  pool.query('SELECT * FROM sucursales ' +
           'WHERE UPPER(nombre) = UPPER($1) AND id_ciudad = $2', [nombre, id_ciudad.id]);
           if (VERIFICAR_SUCURSAL.rowCount === 0) {
-              data.fila = N
+              data.fila = item
               data.nom_sucursal = nombre;
               data.ciudad = ciudad;
               // Discriminación de elementos iguales
@@ -182,7 +182,7 @@ class SucursalControlador {
             listSucursales.push(data);
 
           } else {
-            data.fila = N
+            data.fila = item
             data.nom_sucursal = nombre;
             data.ciudad = ciudad;
             data.observacion = 'Ya existe en el sistema';
@@ -191,7 +191,7 @@ class SucursalControlador {
           }
 
         }else{
-          data.fila = N
+          data.fila = item
           data.nom_sucursal = dato.nombre;
           data.ciudad = dato.ciudad;
 
@@ -199,13 +199,13 @@ class SucursalControlador {
             data.ciudad = 'No registrado';
           }
 
-          data.observacion = 'No existe la ciudad';
+          data.observacion = 'Ciudad no existe en el sistema';
   
           listSucursales.push(data);
         }
 
       }else{
-        data.fila = N
+        data.fila = item
         data.nom_sucursal = dato.nombre;
         data.ciudad = dato.ciudad;
 

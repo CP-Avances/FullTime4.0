@@ -91,8 +91,8 @@ class TituloControlador {
             var mensaje = 'correcto';
             // LECTURA DE LOS DATOS DE LA PLANTILLA
             plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
-                var { N, nombre, nivel } = dato;
-                data.fila = dato.N;
+                var { item, nombre, nivel } = dato;
+                data.fila = dato.item;
                 data.titulo = dato.nombre;
                 data.nivel = dato.nivel;
                 if ((data.fila != undefined && data.fila != '') &&
@@ -106,7 +106,7 @@ class TituloControlador {
                         const VERIFICAR_Titulos = yield database_1.default.query('SELECT * FROM cg_titulos ' +
                             'WHERE UPPER(nombre) = UPPER($1) AND id_nivel = $2', [nombre, id_nivel.id]);
                         if (VERIFICAR_Titulos.rowCount == 0) {
-                            data.fila = dato.N;
+                            data.fila = dato.item;
                             data.titulo = dato.nombre;
                             data.nivel = dato.nivel;
                             if (duplicados.find((p) => p.nombre.toLowerCase() === dato.nombre.toLowerCase() && p.nivel.toLowerCase() === dato.nivel.toLowerCase()) == undefined) {
@@ -116,7 +116,7 @@ class TituloControlador {
                             listTitulosProfesionales.push(data);
                         }
                         else {
-                            data.fila = dato.N;
+                            data.fila = dato.item;
                             data.titulo = nombre;
                             data.nivel = nivel;
                             data.observacion = 'Ya esta registrado en base';
@@ -124,7 +124,7 @@ class TituloControlador {
                         }
                     }
                     else {
-                        data.fila = dato.N;
+                        data.fila = dato.item;
                         data.titulo = dato.nombre;
                         data.nivel = dato.nivel;
                         if (data.nivel == '' || data.nivel == undefined) {
@@ -136,7 +136,7 @@ class TituloControlador {
                     }
                 }
                 else {
-                    data.fila = dato.N;
+                    data.fila = dato.item;
                     data.titulo = dato.nombre;
                     data.nivel = dato.nivel;
                     if (data.fila == '' || data.fila == undefined) {

@@ -201,9 +201,9 @@ class FeriadosControlador {
 
         // LECTURA DE LOS DATOS DE LA PLANTILLA
         plantilla.forEach(async (dato: any, indice: any, array: any) => {
-            var {N, fecha, descripcion, fec_recuperacion } = dato;
+            var {item, fecha, descripcion, fec_recuperacion } = dato;
 
-            data.fila = N
+            data.fila = item
             data.fecha = fecha;
             data.descripcion = descripcion;
             data.fec_recuperacion = fec_recuperacion;
@@ -239,7 +239,7 @@ class FeriadosControlador {
                     // VERIFICACIÓN SI LA FECHA DEL FERIADO NO ESTE REGISTRADA EN EL SISTEMA
                     const VERIFICAR_FECHA = await pool.query('SELECT * FROM cg_feriados ' +
                     'WHERE fecha = $1 OR fec_recuperacion = $1', [data.fecha]);
-                    data.fila = dato.N
+                    data.fila = dato.item
                     data.fecha = dato.fecha;
                     data.descripcion = dato.descripcion;
 
