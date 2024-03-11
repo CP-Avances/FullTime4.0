@@ -110,7 +110,7 @@
                             </mat-icon>
                         </mat-form-field>
                         <mat-form-field>
-                            <mat-label>CI o pasaporte</mat-label>
+                            <mat-label>Cédula</mat-label>
                             <input matInput placeholder="Buscar" [(ngModel)]="filtroCedula_" maxlength="10"
                                 (input)="Filtrar(filtroCedula_, 9)"
                                 oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
@@ -562,7 +562,7 @@
                             </mat-icon>
                         </mat-form-field>
                         <mat-form-field>
-                            <mat-label>CI o pasaporte</mat-label>
+                            <mat-label>Cédula</mat-label>
                             <input matInput placeholder="Buscar" [(ngModel)]="dh_filtroCedula_" maxlength="10"
                                 (input)="Filtrar_DH(dh_filtroCedula_, 4)"
                                 oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"

@@ -1,4 +1,4 @@
-import { FormControl,Validators } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
@@ -14,6 +14,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 
 @Component({
   selector: 'app-lista-web',
@@ -21,6 +22,8 @@ import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
   styleUrls: ['./lista-web.component.css']
 })
 export class ListaWebComponent implements OnInit {
+
+  idEmpleadoLogueado: any;
 
   // CONTROL DE CRITERIOS DE BUSQUEDA
   codigo = new FormControl('');
@@ -44,11 +47,12 @@ export class ListaWebComponent implements OnInit {
 
   // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA HABILITADOS
   departamentos: any = [];
+  habilitados: any = [];
   sucursales: any = [];
-  respuesta: any[];
+  respuesta: any = [];
   empleados: any = [];
   regimen: any = [];
-  habilitados: any = [];
+  cargos: any = [];
 
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
   selectionCarg = new SelectionModel<ITableEmpleados>(true, []);
@@ -132,9 +136,9 @@ export class ListaWebComponent implements OnInit {
   // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA DESHABILITADOS
   departamentos_dh: any = [];
   sucursales_dh: any = [];
-  respuesta_dh: any[];
   empleados_dh: any = [];
   regimen_dh: any = [];
+  cargos_dh: any = [];
   deshabilitados: any = [];
 
   selectionSuc_dh = new SelectionModel<ITableEmpleados>(true, []);
@@ -207,8 +211,11 @@ export class ListaWebComponent implements OnInit {
     private validar: ValidacionesService,
     private funciones: MainNavService,
     public informacion: UsuarioService,
+    public general: DatosGeneralesService,
     public restR: ReportesService,
-  ) { }
+  ) {
+    this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
+  }
 
   ngOnInit(): void {
     if (this.habilitarTimbreWeb === false) {
@@ -223,10 +230,7 @@ export class ListaWebComponent implements OnInit {
     else {
       this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
       this.check_dh = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'c' }, { opcion: 'd' }, { opcion: 'e' }]);
-      this.BuscarInformacionHabilitados();
-      this.BuscarInformacioDeshabilitados();
-      this.BuscarCargos();
-      this.BuscarCargosDeshabilitados();
+      this.PresentarInformacion();
     }
   }
 
@@ -234,13 +238,256 @@ export class ListaWebComponent implements OnInit {
     this.restR.GuardarCheckOpcion('');
     this.restR.DefaultFormCriterios();
     this.restR.DefaultValoresFiltros();
-    this.habilitados = [];
-    this.origen_cargo = [];
-    this.deshabilitados = [];
-    this.origen_cargo_dh = [];
+  }
+
+  // BUSQUEDA DE DATOS ACTUALES DEL USUARIO
+  PresentarInformacion() {
+    let informacion = { id_empleado: this.idEmpleadoLogueado };
+    let respuesta: any = [];
+    this.general.ObtenerInformacionUserRol(informacion).subscribe(res => {
+      respuesta = res[0];
+      this.AdministrarInformacion(respuesta, informacion);
+    }, vacio => {
+      this.toastr.info('No se han encontrado registros.', '', {
+        timeOut: 4000,
+      });
+    });
+  }
+
+  // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
+  usua_sucursales: any = [];
+  AdministrarInformacion(usuario: any, empleado: any) {
+    // LIMPIAR DATOS DE ALMACENAMIENTO
+    this.departamentos = [];
+    this.sucursales = [];
+    this.empleados = [];
+    this.regimen = [];
+    this.cargos = [];
+
+    this.departamentos_dh = [];
+    this.sucursales_dh = [];
+    this.empleados_dh = [];
+    this.regimen_dh = [];
+    this.cargos_dh = [];
+
+    this.usua_sucursales = [];
+    let respuesta: any = [];
+    let codigos = '';
+    //console.log('empleado ', empleado)
+    this.informacion.BuscarUsuarioSucursal(empleado).subscribe(data => {
+      respuesta = data;
+      respuesta.forEach((obj: any) => {
+        if (codigos === '') {
+          codigos = '\'' + obj.id_sucursal + '\''
+        }
+        else {
+          codigos = codigos + ', \'' + obj.id_sucursal + '\''
+        }
+      })
+      //console.log('ver sucursales ', codigos);
+
+      // VERIFICACION DE BUSQUEDA DE INFORMACION SEGUN PRIVILEGIOS DE USUARIO
+      if (usuario.id_rol === 1 && usuario.jefe === false) {
+        this.usua_sucursales = { id_sucursal: codigos };
+        this.BuscarInformacionAdministrador(this.usua_sucursales, false, this.sucursales_dh, this.regimen_dh, this.departamentos_dh, this.cargos_dh, this.empleados_dh);
+        this.BuscarInformacionAdministrador(this.usua_sucursales, true, this.sucursales, this.regimen, this.departamentos, this.cargos, this.empleados);
+      }
+      else if (usuario.id_rol === 1 && usuario.jefe === true) {
+        this.usua_sucursales = { id_sucursal: codigos, id_departamento: usuario.id_departamento };
+        this.BuscarInformacionJefe(this.usua_sucursales, false, this.sucursales_dh, this.regimen_dh, this.departamentos_dh, this.cargos_dh, this.empleados_dh);
+        this.BuscarInformacionJefe(this.usua_sucursales, true, this.sucursales, this.regimen, this.departamentos, this.cargos, this.empleados);
+      }
+      else if (usuario.id_rol === 3) {
+        this.BuscarInformacionSuperAdministrador(false, this.sucursales_dh, this.regimen_dh, this.departamentos_dh, this.cargos_dh, this.empleados_dh);
+        this.BuscarInformacionSuperAdministrador(true, this.sucursales, this.regimen, this.departamentos, this.cargos, this.empleados);
+      }
+    });
+  }
+
+  // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL SUPERADMINISTRADOR
+  BuscarInformacionSuperAdministrador(estado: any, sucursales_: any, regimenes_: any, departamentos_: any, cargos_: any, empleados_: any) {
+    this.informacion.UsuariosTimbreWeb_SUPERADMIN(1, estado).subscribe((res: any[]) => {
+      if (estado === false) {
+        this.inactivar = true;
+      }
+      else {
+        this.activar = true;
+      }
+      this.ProcesarDatos(res, sucursales_, regimenes_, departamentos_, cargos_, empleados_, estado);
+    }, err => {
+      if (estado === false) {
+        this.inactivar = false;
+      }
+      else {
+        this.activar = false;
+      }
+    })
+  }
+
+  // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL ADMINISTRADOR
+  BuscarInformacionAdministrador(buscar: string, estado: any, sucursales_: any, regimenes_: any, departamentos_: any, cargos_: any, empleados_: any) {
+    this.informacion.UsuariosTimbreWeb_ADMIN(1, estado, buscar).subscribe((res: any[]) => {
+      if (estado === false) {
+        this.inactivar = true;
+      }
+      else {
+        this.activar = true;
+      }
+      this.ProcesarDatos(res, sucursales_, regimenes_, departamentos_, cargos_, empleados_, estado);
+    }, err => {
+      if (estado === false) {
+        this.inactivar = false;
+      }
+      else {
+        this.activar = false;
+      }
+    })
+  }
+
+  // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL ADMINISTRADOR - JEFE
+  BuscarInformacionJefe(buscar: string, estado: any, sucursales_: any, regimenes_: any, departamentos_: any, cargos_: any, empleados_: any) {
+    this.informacion.UsuariosTimbreWeb_JEFE(1, estado, buscar).subscribe((res: any[]) => {
+      if (estado === false) {
+        this.inactivar = true;
+      }
+      else {
+        this.activar = true;
+      }
+      this.ProcesarDatos(res, sucursales_, regimenes_, departamentos_, cargos_, empleados_, estado);
+    }, err => {
+      if (estado === false) {
+        this.inactivar = false;
+      }
+      else {
+        this.activar = false;
+      }
+    })
+  }
+
+  // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
+  ProcesarDatos(informacion: any, sucursales_: any, regimenes_: any, departamentos_: any, cargos_: any, empleados_: any, estado: boolean) {
+    informacion.forEach(obj => {
+      //console.log('ver obj ', obj)
+      sucursales_.push({
+        id: obj.id_suc,
+        sucursal: obj.name_suc
+      })
+    })
+
+    informacion.forEach(reg => {
+      reg.regimenes.forEach(obj => {
+        regimenes_.push({
+          id: obj.id_regimen,
+          nombre: obj.name_regimen,
+          sucursal: obj.name_suc,
+          id_suc: reg.id_suc
+        })
+      })
+    })
+
+    informacion.forEach(reg => {
+      reg.regimenes.forEach(dep => {
+        dep.departamentos.forEach(obj => {
+          departamentos_.push({
+            id: obj.id_depa,
+            departamento: obj.name_dep,
+            sucursal: obj.name_suc,
+            id_suc: reg.id_suc,
+            id_regimen: obj.id_regimen,
+          })
+        })
+      })
+    })
+
+    informacion.forEach(reg => {
+      reg.regimenes.forEach(dep => {
+        dep.departamentos.forEach(car => {
+          car.cargos.forEach(obj => {
+            cargos_.push({
+              id: obj.id_cargo_,
+              nombre: obj.name_cargo,
+              sucursal: obj.name_suc,
+              id_suc: reg.id_suc
+            })
+          })
+        })
+      })
+    })
+
+    informacion.forEach(reg => {
+      reg.regimenes.forEach(dep => {
+        dep.departamentos.forEach(car => {
+          car.cargos.forEach(empl => {
+            empl.empleado.forEach(obj => {
+              let elemento = {
+                id: obj.id,
+                nombre: obj.nombre + ' ' + obj.apellido,
+                codigo: obj.codigo,
+                cedula: obj.cedula,
+                sucursal: obj.name_suc,
+                id_suc: obj.id_suc,
+                id_regimen: obj.id_regimen,
+                id_depa: obj.id_depa,
+                id_cargo_: obj.id_cargo_, // TIPO DE CARGO
+                web_habilita: obj.web_habilita,
+                userid: obj.userid,
+              }
+              empleados_.push(elemento)
+            })
+          })
+        })
+      })
+    })
+
+    this.OmitirDuplicados(departamentos_, cargos_, estado);
+
+
+    console.log('ver sucursales ', sucursales_)
+    console.log('ver regimenes ', regimenes_)
+    console.log('ver departamentos ', departamentos_)
+    console.log('ver cargos ', cargos_)
+    console.log('ver empleados ', empleados_)
+  }
+
+  // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
+  OmitirDuplicados(departamentos_: any, cargos_: any, estado) {
+    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION DEPARTAMENTOS
+    let verificados_dep = departamentos_.filter((objeto, indice, valor) => {
+      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
+      for (let i = 0; i < indice; i++) {
+        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
+          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+        }
+      }
+      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
+    });
+
+
+    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION CARGOS
+    let verificados_car = cargos_.filter((objeto, indice, valor) => {
+      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
+      for (let i = 0; i < indice; i++) {
+        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
+          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+        }
+      }
+      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
+    });
+
+    if (estado === false) {
+      this.departamentos_dh = verificados_dep;
+      this.cargos_dh = verificados_car;
+
+    } else {
+      this.departamentos = verificados_dep;
+      this.cargos = verificados_car;
+    }
+
   }
 
   // CONTROL DE BOTONES
+  activar_habilitados: boolean = false;
+  activar_deshabilitados: boolean = false;
   VerTablas(tipo: number) {
     this.activar = false;
     this.inactivar = false;
@@ -256,111 +503,6 @@ export class ListaWebComponent implements OnInit {
   /** ************************************************************************************************************** **
    ** **                        MANEJO DE DATOS DE USUARIOS DESHABILITADOS TIMBRE WEB                             ** **
    ** ************************************************************************************************************** **/
-
-  // METODO PARA BUSCAR DATOS DE EMPRESA
-  activar_deshabilitados: boolean = false;
-  BuscarInformacioDeshabilitados() {
-    this.departamentos_dh = [];
-    this.deshabilitados = [];
-    this.sucursales_dh = [];
-    this.empleados_dh = [];
-    this.regimen_dh = [];
-    this.informacion.UsuariosTimbreWeb(1, false).subscribe((res: any[]) => {
-      this.inactivar = true;
-      this.deshabilitados = JSON.stringify(res);
-
-      res.forEach(obj => {
-        this.sucursales_dh.push({
-          id: obj.id_suc,
-          nombre: obj.name_suc
-        })
-      })
-
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
-          this.departamentos_dh.push({
-            id: ele.id_depa,
-            departamento: ele.name_dep,
-            nombre: ele.sucursal
-          })
-        })
-      })
-
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
-          ele.empleado.forEach(r => {
-            let elemento = {
-              id: r.id,
-              nombre: r.nombre,
-              codigo: r.codigo,
-              cedula: r.cedula,
-              web_habilita: r.web_habilita,
-              userid: r.userid,
-            }
-            this.empleados_dh.push(elemento)
-          })
-        })
-      })
-
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
-          ele.empleado.forEach(reg => {
-            reg.regimen.forEach(r => {
-              this.regimen_dh.push({
-                id: r.id_regimen,
-                nombre: r.name_regimen
-              })
-            })
-          })
-        })
-      })
-
-      this.regimen_dh = this.regimen_dh.filter((obj, index, self) =>
-        index === self.findIndex((o) => o.id === obj.id)
-      );
-
-    }, err => {
-      this.inactivar = false;
-    })
-  }
-
-  // METODO PARA FILTRAR POR CARGOS
-  empleados_cargos_dh: any = [];
-  origen_cargo_dh: any = [];
-  cargos_dh: any = [];
-  BuscarCargosDeshabilitados() {
-    this.origen_cargo_dh = [];
-    this.cargos_dh = [];
-    this.empleados_cargos_dh = [];
-    this.informacion.UsuariosTimbreWebCargos(1, false).subscribe((res: any[]) => {
-      this.inactivar = true;
-      this.origen_cargo_dh = JSON.stringify(res);
-
-      res.forEach(obj => {
-        this.cargos_dh.push({
-          id: obj.id_cargo,
-          nombre: obj.name_cargo
-        })
-      })
-
-      res.forEach(obj => {
-        obj.empleados.forEach(r => {
-          this.empleados_cargos_dh.push({
-            id: r.id,
-            nombre: r.nombre,
-            codigo: r.codigo,
-            cedula: r.cedula,
-            web_habilta: r.web_habilita,
-            userid: r.ui
-          })
-        })
-      })
-
-      //console.log('ver cargos_dh ', this.cargos_dh)
-    }, err => {
-      this.inactivar = false;
-    })
-  }
 
   // METODO PARA ACTIVAR SELECCION MULTIPLE
   multiple_dh: boolean = false;
@@ -429,163 +571,23 @@ export class ListaWebComponent implements OnInit {
   }
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
-  GuardarRegistros_DH(id: number) {
+  GuardarRegistros_DH(valor: any) {
+    let tipo: number = 1;
     if (this.opcion_dh === 's') {
-      this.ModelarSucursal_DH(id);
+      this.ModelarSucursal(valor.id, tipo, this.empleados_dh);
     }
     if (this.opcion_dh === 'r') {
-      this.ModelarRegimen_DH(id);
+      this.ModelarRegimen(valor.id, valor.id_suc, tipo, this.empleados_dh);
     }
     else if (this.opcion_dh === 'c') {
-      this.ModelarCargo_DH(id);
+      this.ModelarCargo(valor.id, valor.id_suc, tipo, this.empleados_dh);
     }
     else if (this.opcion_dh === 'd') {
-      this.ModelarDepartamentos_DH(id);
+      this.ModelarDepartamentos(valor.id, valor.id_suc, tipo, this.empleados_dh);
     }
     else {
-      this.ModelarEmpleados_DH();
+      this.ModelarEmpleados(tipo, this.empleados_dh);
     }
-  }
-
-  // METODO PARA PRESENTAR DATOS DE SUCURSALES
-  ModelarSucursal_DH(id: number) {
-    let usuarios: any = [];
-    let respuesta = JSON.parse(this.deshabilitados)
-    if (id === 0) {
-      respuesta.forEach((obj: any) => {
-        this.selectionSuc_dh.selected.find(obj1 => {
-          if (obj.id_suc === obj1.id) {
-            obj.departamentos.forEach((obj2: any) => {
-              obj2.empleado.forEach((obj3: any) => {
-                usuarios.push(obj3)
-              })
-            })
-          }
-        })
-      })
-    }
-    else {
-      respuesta.forEach((obj: any) => {
-        if (obj.id_suc === id) {
-          obj.departamentos.forEach((obj2: any) => {
-            obj2.empleado.forEach((obj3: any) => {
-              usuarios.push(obj3)
-            })
-          })
-        }
-      })
-    }
-
-    this.RegistrarMultiple(usuarios, 1);
-  }
-
-  // METODO PARA PRESENTAR DATOS DE REGIMEN
-  ModelarRegimen_DH(id: number) {
-    let usuarios: any = [];
-    let respuesta = JSON.parse(this.deshabilitados)
-    if (id === 0) {
-      respuesta.forEach((obj: any) => {
-        obj.departamentos.forEach((obj1: any) => {
-          obj1.empleado.forEach((obj2: any) => {
-            this.selectionReg_dh.selected.find(obj3 => {
-              obj2.regimen.forEach((obj4: any) => {
-                if (obj3.id === obj4.id_regimen) {
-                  usuarios.push(obj2);
-                }
-              })
-            })
-          })
-        })
-      })
-    }
-    else {
-      respuesta.forEach((obj: any) => {
-        obj.departamentos.forEach((obj2: any) => {
-          obj2.empleado.forEach((obj3: any) => {
-            obj3.regimen.forEach((obj4: any) => {
-              if (obj4.id_regimen === id) {
-                usuarios.push(obj3)
-              }
-            })
-          })
-        })
-      })
-    }
-
-    this.RegistrarMultiple(usuarios, 1);
-  }
-
-  ModelarCargo_DH(id: number) {
-    let usuarios: any = [];
-    let respuesta = JSON.parse(this.origen_cargo_dh)
-    if (id === 0) {
-      respuesta.forEach((obj: any) => {
-        this.selectionCarg_dh.selected.find(obj1 => {
-          if (obj.id_cargo === obj1.id) {
-            obj.empleados.forEach((obj3: any) => {
-              usuarios.push(obj3)
-            })
-          }
-        })
-      })
-    }
-    else {
-      respuesta.forEach((obj: any) => {
-        if (obj.id_cargo === id) {
-          obj.empleados.forEach((obj3: any) => {
-            usuarios.push(obj3)
-          })
-        }
-      })
-    }
-    this.RegistrarMultiple(usuarios, 1);
-  }
-
-
-  // METODO PARA PRESENTAR DATOS DE DEPARTAMENTOS
-  ModelarDepartamentos_DH(id: number) {
-    let usuarios: any = [];
-    let respuesta = JSON.parse(this.deshabilitados)
-
-    if (id === 0) {
-      respuesta.forEach((obj: any) => {
-        obj.departamentos.forEach((obj1: any) => {
-          this.selectionDep_dh.selected.find(obj2 => {
-            if (obj1.id_depa === obj2.id) {
-              obj1.empleado.forEach((obj3: any) => {
-                usuarios.push(obj3)
-              })
-            }
-          })
-        })
-      })
-    }
-    else {
-      respuesta.forEach((obj: any) => {
-        obj.departamentos.forEach((obj1: any) => {
-          if (obj1.id_depa === id) {
-            obj1.empleado.forEach((obj3: any) => {
-              usuarios.push(obj3)
-            })
-          }
-        })
-      })
-    }
-
-    this.RegistrarMultiple(usuarios, 1);
-  }
-
-  // METODO PARA PRESENTAR DATOS DE EMPLEADO
-  ModelarEmpleados_DH() {
-    let respuesta: any = [];
-    this.empleados_dh.forEach((obj: any) => {
-      this.selectionEmp_dh.selected.find(obj1 => {
-        if (obj1.id === obj.id) {
-          respuesta.push(obj)
-        }
-      })
-    })
-    this.RegistrarMultiple(respuesta, 1);
   }
 
   // MOSTRAR DATOS DE USUARIOS
@@ -823,111 +825,6 @@ export class ListaWebComponent implements OnInit {
   /** ************************************************************************************************************** **
    ** **                           MANEJO DE DATOS DE USUARIOS HABILITADOS TIMBRE WEB                             ** **
    ** ************************************************************************************************************** **/
-
-  // METODO PARA BUSCAR DATOS DE EMPRESA
-  activar_habilitados: boolean = false;
-  BuscarInformacionHabilitados() {
-    this.departamentos = [];
-    this.habilitados = [];
-    this.sucursales = [];
-    this.empleados = [];
-    this.informacion.UsuariosTimbreWeb(1, true).subscribe((res: any[]) => {
-      this.activar = true;
-      this.habilitados = JSON.stringify(res);
-
-      res.forEach(obj => {
-        this.sucursales.push({
-          id: obj.id_suc,
-          nombre: obj.name_suc
-        })
-      })
-
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
-          this.departamentos.push({
-            id: ele.id_depa,
-            departamento: ele.name_dep,
-            nombre: ele.sucursal
-          })
-        })
-      })
-
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
-          ele.empleado.forEach(r => {
-            let elemento = {
-              id: r.id,
-              nombre: r.nombre,
-              codigo: r.codigo,
-              cedula: r.cedula,
-              web_habilita: r.web_habilita,
-              userid: r.userid,
-            }
-            this.empleados.push(elemento)
-          })
-        })
-      })
-
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
-          ele.empleado.forEach(reg => {
-            reg.regimen.forEach(r => {
-              this.regimen.push({
-                id: r.id_regimen,
-                nombre: r.name_regimen
-              })
-            })
-          })
-        })
-      })
-
-      this.regimen = this.regimen.filter((obj, index, self) =>
-        index === self.findIndex((o) => o.id === obj.id)
-      );
-
-    }, err => {
-      this.activar = false;
-    })
-  }
-
-  // METODO PARA FILTRAR POR CARGOS
-  empleados_cargos: any = [];
-  origen_cargo: any = [];
-  cargos: any = [];
-  BuscarCargos() {
-    this.origen_cargo = [];
-    this.cargos = [];
-    this.empleados_cargos = [];
-    this.informacion.UsuariosTimbreWebCargos(1, true).subscribe((res: any[]) => {
-      this.activar = true;
-      this.origen_cargo = JSON.stringify(res);
-
-      res.forEach(obj => {
-        this.cargos.push({
-          id: obj.id_cargo,
-          nombre: obj.name_cargo
-        })
-      })
-
-      res.forEach(obj => {
-        obj.empleados.forEach(r => {
-          this.empleados_cargos.push({
-            id: r.id,
-            nombre: r.nombre,
-            codigo: r.codigo,
-            cedula: r.cedula,
-            web_habilta: r.web_habilita,
-            userid: r.userid,
-          })
-        })
-      })
-
-      //console.log('ver cargos ', this.cargos) 
-
-    }, err => {
-      this.activar = false;
-    })
-  }
 
   // METODO PARA ACTIVAR SELECCION MULTIPLE
   multiple: boolean = false;
@@ -1170,135 +1067,95 @@ export class ListaWebComponent implements OnInit {
   }
 
   // METODO PARA PRESENTAR DATOS DE SUCURSALES
-  ModelarSucursal(id: number) {
+  ModelarSucursal(id: number, tipo: number, lista: any) {
     let usuarios: any = [];
-    let respuesta = JSON.parse(this.habilitados)
     if (id === 0) {
-      respuesta.forEach((obj: any) => {
-        this.selectionSuc.selected.find(obj1 => {
-          if (obj.id_suc === obj1.id) {
-            obj.departamentos.forEach((obj2: any) => {
-              obj2.empleado.forEach((obj3: any) => {
-                usuarios.push(obj3)
-              })
-            })
+      lista.forEach((empl: any) => {
+        this.selectionSuc.selected.find(selec => {
+          if (empl.id_suc === selec.id) {
+            usuarios.push(empl)
           }
         })
       })
     }
     else {
-      respuesta.forEach((obj: any) => {
-        if (obj.id_suc === id) {
-          obj.departamentos.forEach((obj2: any) => {
-            obj2.empleado.forEach((obj3: any) => {
-              usuarios.push(obj3)
-            })
-          })
+      this.empleados.forEach((empl: any) => {
+        if (empl.id_suc === id) {
+          usuarios.push(empl)
         }
       })
     }
-
-    this.RegistrarMultiple(usuarios, 2);
+    this.RegistrarMultiple(usuarios, tipo);
   }
 
   // METODO PARA PRESENTAR DATOS DE REGIMEN
-  ModelarRegimen(id: number) {
+  ModelarRegimen(id: number, sucursal: any, tipo: number, lista: any) {
     let usuarios: any = [];
-    let respuesta = JSON.parse(this.habilitados)
     if (id === 0) {
-      respuesta.forEach((obj: any) => {
-        obj.departamentos.forEach((obj1: any) => {
-          obj1.empleado.forEach((obj2: any) => {
-            this.selectionReg.selected.find(obj3 => {
-              obj2.regimen.forEach((obj4: any) => {
-                if (obj3.id === obj4.id_regimen) {
-                  usuarios.push(obj2);
-                }
-              })
-            })
-          })
-        })
-      })
-    }
-    else {
-      respuesta.forEach((obj: any) => {
-        obj.departamentos.forEach((obj2: any) => {
-          obj2.empleado.forEach((obj3: any) => {
-            obj3.regimen.forEach((obj4: any) => {
-              if (obj4.id_regimen === id) {
-                usuarios.push(obj3)
-              }
-            })
-          })
-        })
-      })
-    }
-
-    this.RegistrarMultiple(usuarios, 2);
-  }
-
-  // METODO PARA MOSTRAR DATOS DE CARGOS
-  ModelarCargo(id: number) {
-    let usuarios: any = [];
-    let respuesta = JSON.parse(this.origen_cargo)
-    if (id === 0) {
-      respuesta.forEach((obj: any) => {
-        this.selectionCarg.selected.find(obj1 => {
-          if (obj.id_cargo === obj1.id) {
-            obj.empleados.forEach((obj3: any) => {
-              usuarios.push(obj3)
-            })
+      lista.forEach((empl: any) => {
+        this.selectionReg.selected.find(selec => {
+          if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
+            usuarios.push(empl)
           }
         })
       })
     }
     else {
-      respuesta.forEach((obj: any) => {
-        if (obj.id_cargo === id) {
-          obj.empleados.forEach((obj3: any) => {
-            usuarios.push(obj3)
-          })
+      this.empleados.forEach((empl: any) => {
+        if (empl.id_regimen === id && empl.id_suc === sucursal) {
+          usuarios.push(empl)
         }
       })
     }
-    this.RegistrarMultiple(usuarios, 2);
+    this.RegistrarMultiple(usuarios, tipo);
   }
 
-  // METODO PARA PRESENTAR DATOS DE DEPARTAMENTOS
-  ModelarDepartamentos(id: number) {
+  // METODO PARA MOSTRAR DATOS DE CARGOS
+  ModelarCargo(id: number, sucursal: any, tipo: number, lista: any) {
     let usuarios: any = [];
-    let respuesta = JSON.parse(this.habilitados)
-
     if (id === 0) {
-      respuesta.forEach((obj: any) => {
-        obj.departamentos.forEach((obj1: any) => {
-          this.selectionDep.selected.find(obj2 => {
-            if (obj1.id_depa === obj2.id) {
-              obj1.empleado.forEach((obj3: any) => {
-                usuarios.push(obj3)
-              })
-            }
-          })
-        })
-      })
-    }
-    else {
-      respuesta.forEach((obj: any) => {
-        obj.departamentos.forEach((obj1: any) => {
-          if (obj1.id_depa === id) {
-            obj1.empleado.forEach((obj3: any) => {
-              usuarios.push(obj3)
-            })
+      lista.forEach((empl: any) => {
+        this.selectionCarg.selected.find(selec => {
+          if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
+            usuarios.push(empl)
           }
         })
       })
     }
+    else {
+      this.empleados.forEach((empl: any) => {
+        if (empl.id_cargo_ === id && empl.id_suc === sucursal) {
+          usuarios.push(empl)
+        }
+      })
+    }
+    this.RegistrarMultiple(usuarios, tipo);
+  }
 
-    this.RegistrarMultiple(usuarios, 2);
+  // METODO PARA PRESENTAR DATOS DE DEPARTAMENTOS
+  ModelarDepartamentos(id: number, sucursal: any, tipo: number, lista: any) {
+    let usuarios: any = [];
+    if (id === 0) {
+      this.empleados.forEach((empl: any) => {
+        this.selectionDep.selected.find(selec => {
+          if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
+            usuarios.push(empl)
+          }
+        })
+      })
+    }
+    else {
+      this.empleados.forEach((empl: any) => {
+        if (empl.id_depa === id && empl.id_suc === sucursal) {
+          usuarios.push(empl)
+        }
+      })
+    }
+    this.RegistrarMultiple(usuarios, tipo);
   }
 
   // METODO PARA PRESENTAR DATOS DE EMPLEADO
-  ModelarEmpleados() {
+  ModelarEmpleados(tipo: any, lista: any) {
     let respuesta: any = [];
     this.empleados.forEach((obj: any) => {
       this.selectionEmp.selected.find(obj1 => {
@@ -1307,7 +1164,7 @@ export class ListaWebComponent implements OnInit {
         }
       })
     })
-    this.RegistrarMultiple(respuesta, 2);
+    this.RegistrarMultiple(respuesta, tipo);
   }
 
 
@@ -1341,8 +1198,7 @@ export class ListaWebComponent implements OnInit {
       this.individual = true;
       this.individual_dh = true;
       this.LimpiarFormulario(tipo);
-      this.BuscarInformacionHabilitados();
-      this.BuscarInformacioDeshabilitados();
+      this.PresentarInformacion();
     }, err => {
       this.toastr.error(err.error.message)
     })
@@ -1350,21 +1206,22 @@ export class ListaWebComponent implements OnInit {
 
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
-  GuardarRegistros(id: number) {
+  GuardarRegistros(valor: any) {
+    let tipo: number = 2;
     if (this.opcion === 's') {
-      this.ModelarSucursal(id);
+      this.ModelarSucursal(valor.id, tipo, this.empleados);
     }
     if (this.opcion === 'r') {
-      this.ModelarRegimen(id);
+      this.ModelarRegimen(valor.id, valor.id_suc, tipo, this.empleados);
     }
     else if (this.opcion === 'c') {
-      this.ModelarCargo(id);
+      this.ModelarCargo(valor.id, valor.id_suc, tipo, this.empleados);
     }
     else if (this.opcion === 'd') {
-      this.ModelarDepartamentos(id);
+      this.ModelarDepartamentos(valor.id, valor.id_suc, tipo, this.empleados);
     }
     else {
-      this.ModelarEmpleados();
+      this.ModelarEmpleados(tipo, this.empleados);
     }
   }
 

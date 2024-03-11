@@ -19,32 +19,10 @@ td {
     text-align: center;
 }
 
-mat-form-field {
-    padding: 10px 15px 0px 15px;
-}
-
 table {
     width: 100%;
-    font-size: 14px;
+    font-size: 12px;
 }
-
-mat-form-field.input-tables {
-    background: transparent;
-    font-size: 14px;
-    text-align: center;
-    outline: none;
-    fill: none;
-    height: 65px;
-}
-
-.codigo { width: 70px; }
-.cedula { width: 100px; }
-
-mat-expansion-panel-header { text-align: center; background: rgb(52,65,84); }
-
-mat-panel-title { color: white; }
-
-mat-panel-description { color: white; }
 
 #SelectCheck {
     cursor: pointer;
