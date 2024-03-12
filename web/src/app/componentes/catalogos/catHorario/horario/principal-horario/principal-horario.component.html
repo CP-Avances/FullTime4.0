@@ -184,6 +184,7 @@
           <table class="table table-hover table-sm">
               <thead class="thead-light">
                   <tr style="text-align: center;">
+                      <th scope="col">N°</th>
                       <th scope="col">Descripción</th>
                       <th scope="col">Código Horario</th>
                       <th scope="col">Horas Totales</th>
@@ -196,6 +197,7 @@
               <tbody>
                 <tr
                     *ngFor="let h of dataHorarios.plantillaHorarios | paginate:tamanio_paginaH:numero_paginaH ">
+                    <td>{{h.N}}</td>
                     <td [style.color]="ObtenerColorDatoRegistrado(h.DESCRIPCION)">{{h.DESCRIPCION}}</td>
                     <td [style.color]="ObtenerColorDatoRegistrado(h.CODIGO_HORARIO)">{{h.CODIGO_HORARIO}}</td>
                     <td [style.color]="ObtenerColorDatoRegistrado(h.HORAS_TOTALES)">{{h.HORAS_TOTALES}}</td>
@@ -227,6 +229,7 @@
           <table class="table table-hover table-sm">
               <thead class="thead-light">
                 <tr style="text-align: center;">
+                    <th scope="col">N°</th>
                     <th scope="col">Código Horario</th>
                     <th scope="col">Tipo Acción</th>
                     <th scope="col">Hora</th>
@@ -240,9 +243,10 @@
               <tbody>
                 <tr
                     *ngFor="let d of dataHorarios.plantillaDetalles | paginate:tamanio_paginaD:numero_paginaD ">
-                    <td>{{d.CODIGO_HORARIO}}</td>
-                    <td>{{d.TIPO_ACCION}}</td>
-                    <td>{{d.HORA}}</td>
+                    <td>{{d.N}}</td>
+                    <td [style.color]="ObtenerColorDatoRegistrado(d.CODIGO_HORARIO)">{{d.CODIGO_HORARIO}}</td>
+                    <td [style.color]="ObtenerColorDatoRegistrado(d.TIPO_ACCION)">{{d.TIPO_ACCION}}</td>
+                    <td [style.color]="ObtenerColorDatoRegistrado(d.HORA)">{{d.HORA}}</td>
                     <td>{{d.ORDEN}}</td>
                     <td>{{d.SALIDA_SIGUIENTE_DIA}}</td>
                     <td>{{d.MIN_ANTES}}</td>

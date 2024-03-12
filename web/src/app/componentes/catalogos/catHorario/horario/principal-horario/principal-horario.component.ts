@@ -580,6 +580,10 @@ export class PrincipalHorarioComponent implements OnInit {
       return 'rgb(222, 162, 73)';
     }
 
+    if(observacion.startsWith('Requerido')){
+      return 'rgb(238, 34, 207)';
+    }
+
     switch(observacion) {
       case 'Ok':
           return 'rgb(159, 221, 154)';
