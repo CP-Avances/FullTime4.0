@@ -513,7 +513,7 @@ export class ListaEmpleadosComponent implements OnInit {
           this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
             timeOut: 3000,
           });
-    
+          window.location.reload();
           this.archivoForm.reset();
           this.nameFile = '';
     
@@ -524,7 +524,7 @@ export class ListaEmpleadosComponent implements OnInit {
           this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
             timeOut: 3000,
           });
-    
+          window.location.reload();
           this.archivoForm.reset();
           this.nameFile = '';
         })

@@ -1949,15 +1949,6 @@ class EmpleadoControlador {
       }
 
       //OBTENER ID DEL ESTADO
-      var id_estado = 0;
-      if (estado.toUpperCase() === 'ACTIVO') {
-        id_estado = 1;
-      }
-      else if (estado.toUpperCase() === 'INACTIVO') {
-        id_estado = 2;
-      }
-
-      //OBTENER ID DEL ESTADO
       var id_estado = 1;
       var estado_user = true;
       var app_habilita = false;
