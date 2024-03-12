@@ -519,7 +519,6 @@ export class ListaEmpleadosComponent implements OnInit {
     
         });
       }else{
-        //Aquí va el servicio subirArchivoExcel_Manual
         this.rest.subirArchivoExcel_Manual(this.listUsuariosCorrectas).subscribe(datos_archivo => {
           console.log('datos plantilla a enviar: ', this.listUsuariosCorrectas);
           this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
@@ -552,13 +551,22 @@ export class ListaEmpleadosComponent implements OnInit {
     }else if((arrayObservacion[0]+' '+arrayObservacion[1]) == 'Cédula ya' || 
     (arrayObservacion[0]+' '+arrayObservacion[1]) == 'Usuario ya'  || 
     (arrayObservacion[0]+' '+arrayObservacion[1]) == 'Codigo ya'){
-
       return 'rgb(239, 203, 106)';
     }else if(arrayObservacion[0] == 'Cédula' || arrayObservacion[0] == 'Usuario'){
         return 'rgb(222, 162, 73)';
     }else if((arrayObservacion[0]+' '+arrayObservacion[1]) == 'Registro duplicado'){
       return 'rgb(156, 214, 255)';
-    }else{
+    }else if((observacion ==  'El codigo ingresado es incorrecto') || 
+      (observacion ==  'El teléfono ingresada no es válido') ||
+      (observacion ==  'La cédula ingresada no es válida')
+    ){
+      return 'rgb(222, 162, 73)';
+    }else if((observacion ==  'El rol no existe en la base') || 
+    (observacion ==  'La nacionalidad no existe en la base')
+    ){
+      return 'rgb(255, 192, 203)';
+    }
+    else{
       return 'rgb(251, 73, 18)';
     }
 
