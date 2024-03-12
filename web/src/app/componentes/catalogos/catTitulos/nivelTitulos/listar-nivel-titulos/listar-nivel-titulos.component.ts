@@ -129,7 +129,7 @@ export class ListarNivelTitulosComponent implements OnInit {
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
     let itemName = arrayItems[0].slice(0, 25);
-    console.log('itemName: ',itemName);
+    console.log('itemName: ', itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (itemName.toLowerCase() == 'niveles_profesionales') {
         this.numero_paginaMul = 1;
@@ -139,14 +139,14 @@ export class ListarNivelTitulosComponent implements OnInit {
         this.toastr.error('Seleccione plantilla con nombre Niveles_profesionales', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
         });
-        
+
         this.nameFile = '';
       }
     } else {
       this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
         timeOut: 6000,
       });
-      
+
       this.nameFile = '';
     }
     this.archivoForm.reset();
@@ -157,7 +157,7 @@ export class ListarNivelTitulosComponent implements OnInit {
   listNivelesCorrectos: any = [];
   messajeExcel: string = '';
   // METODO PARA ENVIAR MENSAJES DE ERROR O CARGAR DATOS SI LA PLANTILLA ES CORRECTA
-  Revisarplantilla(){
+  Revisarplantilla() {
     this.listNivelesCorrectos = [];
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
@@ -165,41 +165,41 @@ export class ListarNivelTitulosComponent implements OnInit {
     }
 
     this.progreso = true;
-  
+
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.nivel.RevisarFormato(formData).subscribe(res => {
       this.DataNivelesProfesionales = res.data;
       this.messajeExcel = res.message;
-      
+
       console.log('probando plantilla1', this.DataNivelesProfesionales);
 
-      if(this.messajeExcel == 'error'){
-        this.toastr.error('Revisar los datos de la columna N, debe enumerar correctamente.', 'Plantilla no aceptada', {
+      if (this.messajeExcel == 'error') {
+        this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      }else{
+      } else {
         this.DataNivelesProfesionales.forEach(item => {
-          if( item.observacion.toLowerCase() === 'ok'){
+          if (item.observacion.toLowerCase() === 'ok') {
             this.listNivelesCorrectos.push(item);
           }
         });
       }
 
-    },error => {
-      console.log('Serivicio rest -> metodo RevisarFormato - ',error);
+    }, error => {
+      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
       this.progreso = false;
-    },() => {
+    }, () => {
       this.progreso = false;
     });
-      
+
   }
 
-   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
-   ConfirmarRegistroMultiple() {
+  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -210,17 +210,17 @@ export class ListarNivelTitulosComponent implements OnInit {
   }
 
   btn_registrar: boolean = true;
-  registrarNiveles(){
+  registrarNiveles() {
     console.log('listNivelesCorrectos', this.listNivelesCorrectos);
     var data = {
       nombre: ''
     }
-    
-    if(this.listNivelesCorrectos.length > 0){
+
+    if (this.listNivelesCorrectos.length > 0) {
       var cont = 0;
       this.listNivelesCorrectos.forEach(item => {
         data.nombre = item.nombre;
-        
+
         // Capitalizar la primera letra de la primera palabra
         const textoNivel = item.nombre.charAt(0).toUpperCase();
         const restoDelTexto = item.nombre.slice(1);
@@ -228,7 +228,7 @@ export class ListarNivelTitulosComponent implements OnInit {
         data.nombre = textoNivel + restoDelTexto;
         this.nivel.RegistrarNivel(data).subscribe(res => {
           cont = cont + 1;
-          if(this.listNivelesCorrectos.length  == cont){
+          if (this.listNivelesCorrectos.length == cont) {
             this.toastr.success('Operación exitosa.', 'Plantilla de Niveles profesionales importada.', {
               timeOut: 1500,
             });
@@ -236,7 +236,7 @@ export class ListarNivelTitulosComponent implements OnInit {
           }
         })
       })
-    }else{
+    } else {
       this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada', {
         timeOut: 4000,
       });
@@ -250,25 +250,25 @@ export class ListarNivelTitulosComponent implements OnInit {
 
   //Metodo para dar color a las celdas y representar las validaciones
   colorCelda: string = ''
-  stiloCelda(observacion: string): string{
+  stiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
-    if(observacion == 'ok'){
+    if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    }else if(observacion == 'Ya existe en el sistema'){
+    } else if (observacion == 'Ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
-    }else if(observacion == 'Registro duplicado'){
+    } else if (observacion == 'Registro duplicado') {
       return 'rgb(156, 214, 255)';
-    }else{
+    } else {
       return 'rgb(251, 73, 18)';
     }
   }
 
   colorTexto: string = '';
-  stiloTextoCelda(texto: string): string{
+  stiloTextoCelda(texto: string): string {
     let arrayObservacion = texto.split(" ");
-    if(arrayObservacion[0] == 'No'){
+    if (arrayObservacion[0] == 'No') {
       return 'rgb(255, 80, 80)';
-    }else{
+    } else {
       return 'black'
     }
   }

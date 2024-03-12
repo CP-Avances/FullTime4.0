@@ -20,6 +20,9 @@ import { LoginService } from 'src/app/servicios/login/login.service';
 import { FraseSeguridadComponent } from 'src/app/componentes/administracionGeneral/frase-seguridad/frase-seguridad/frase-seguridad.component';
 
 import { MenuNode } from 'src/app/model/menu.model';
+import { SpinnerService } from 'src/app/servicios/spinner/spinner.service';
+import { ThemePalette } from '@angular/material/core';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-main-nav',
@@ -48,6 +51,12 @@ export class MainNavComponent implements OnInit {
   // VERIFICAR LICENCIA
   fec_caducidad_licencia: Date;
 
+  // VARIABLES PROGRESS SPINNER
+  habilitarprogress: boolean = false;
+  mode: ProgressSpinnerMode = 'indeterminate';
+  color: ThemePalette = 'primary';
+  value = 10;
+
   constructor(
     public restF: FuncionesService,
     public inicio: LoginService,
@@ -61,6 +70,7 @@ export class MainNavComponent implements OnInit {
     private funciones: MainNavService,
     private plantillaPDF: PlantillaReportesService,
     private breakpointObserver: BreakpointObserver,
+    public spinnerService: SpinnerService,
   ) { }
 
   hasChild = (_: number, node: MenuNode) => !!node.children && node.children.length > 0;
@@ -183,16 +193,25 @@ export class MainNavComponent implements OnInit {
   }
 
   // METODO DE SELECCION DE MENU
+  superadmin: boolean = false;
   SeleccionMenu() {
     const name_emp = localStorage.getItem('name_empresa');
+
+    if (this.inicio.getRol() === 3) {
+      this.superadmin = true;
+    }
+    else {
+      this.superadmin = false;
+    }
+
     if (name_emp !== null) {
       this.MetodoSubSelectMenu(name_emp)
     } else {
       this.restEmpresa.ConsultarEmpresas().subscribe(res => {
         localStorage.setItem('name_empresa', res[0].nombre);
         this.MetodoSubSelectMenu(res[0].nombre)
-        console.log("Informacion: ", res)
-        console.log("Estado: ", this.HabilitarAlimentacion);
+        //console.log("Informacion: ", res)
+        //console.log("Estado: ", this.HabilitarAlimentacion);
       })
     }
   }
@@ -225,11 +244,11 @@ export class MainNavComponent implements OnInit {
             subtitulo: true,
             icono: 'widgets',
             children: [
-              { name: nombre, url: '/vistaEmpresa', color: true },
-              { name: 'Parámetros', url: '/parametros', color: true },
-              { name: 'Correo', url: '/configurarCorreo', color: true },
-              { name: 'Roles', url: '/roles', color: true },
-              { name: 'Régimen Laboral', url: '/listarRegimen', color: true },
+              { name: nombre, url: '/vistaEmpresa', color: true, ver: true },
+              { name: 'Parámetros', url: '/parametros', color: true, ver: true },
+              { name: 'Correo', url: '/configurarCorreo', color: true, ver: true },
+              { name: 'Roles', url: '/roles', color: true, ver: true },
+              { name: 'Régimen Laboral', url: '/listarRegimen', color: true, ver: true },
             ]
           },
           {
@@ -240,10 +259,10 @@ export class MainNavComponent implements OnInit {
             subtitulo: true,
             icono: 'location_on',
             children: [
-              { name: 'Provincia', url: '/provincia', color: true },
-              { name: 'Ciudad', url: '/listarCiudades', color: true },
-              { name: 'Establecimiento', url: '/sucursales', color: true },
-              { name: 'Departamento', url: '/departamento', color: true },
+              { name: 'Provincia', url: '/provincia', color: true, ver: true },
+              { name: 'Ciudad', url: '/listarCiudades', color: true, ver: true },
+              { name: 'Establecimiento', url: '/sucursales', color: true, ver: true },
+              { name: 'Departamento', url: '/departamento', color: true, ver: true },
             ]
           },
         ]
@@ -256,11 +275,11 @@ export class MainNavComponent implements OnInit {
         subtitulo: false,
         icono: 'account_circle',
         children: [
-          { name: 'Configurar Código', url: '/codigo', color: true },
-          { name: 'Nivel de Educación', url: '/nivelTitulos', color: true },
-          { name: 'Título Profesional', url: '/titulos', color: true },
-          { name: 'Empleados', url: '/empleado', color: true },
-          { name: 'Asignar Establecimientos', url: '/administrarSucursales', color: true },
+          { name: 'Configurar Código', url: '/codigo', color: true, ver: true },
+          { name: 'Nivel de Educación', url: '/nivelTitulos', color: true, ver: true },
+          { name: 'Título Profesional', url: '/titulos', color: true, ver: true },
+          { name: 'Empleados', url: '/empleado', color: true, ver: true },
+          { name: 'Asignar Establecimientos', url: '/administrarSucursales', color: true, ver: this.superadmin },
         ]
       },
       {
@@ -271,10 +290,10 @@ export class MainNavComponent implements OnInit {
         subtitulo: false,
         icono: 'assignment',
         children: [
-          { name: 'Feriados', url: '/listarFeriados', color: true },
-          { name: 'Horarios', url: '/horario', color: true },
-          { name: 'Planificar Horarios', url: '/horariosMultiples', color: true },
-          { name: 'Actualizar Asistencia', url: '/asistencia', color: true },
+          { name: 'Feriados', url: '/listarFeriados', color: true, ver: true },
+          { name: 'Horarios', url: '/horario', color: true, ver: true },
+          { name: 'Planificar Horarios', url: '/horariosMultiples', color: true, ver: true },
+          { name: 'Actualizar Asistencia', url: '/asistencia', color: true, ver: true },
         ]
       },
       {
@@ -293,9 +312,9 @@ export class MainNavComponent implements OnInit {
             subtitulo: true,
             icono: 'insert_emoticon',
             children: [
-              { name: 'Configurar Permisos', url: '/verTipoPermiso', color: true },
-              { name: 'Permisos Múltiples', url: '/permisosMultiples', color: true },
-              { name: 'Aprobación Múltiple P.', url: '/permisos-solicitados', color: true },
+              { name: 'Configurar Permisos', url: '/verTipoPermiso', color: true, ver: true },
+              { name: 'Permisos Múltiples', url: '/permisosMultiples', color: true, ver: true },
+              { name: 'Aprobación Múltiple P.', url: '/permisos-solicitados', color: true, ver: true },
             ]
           },
           {
@@ -315,7 +334,7 @@ export class MainNavComponent implements OnInit {
             subtitulo: true,
             color: true,
             children: [
-              { name: 'Aprobación Múltiple V.', url: '/vacaciones-solicitados', color: true },
+              { name: 'Aprobación Múltiple V.', url: '/vacaciones-solicitados', color: true, ver: true },
             ]
           },
           {
@@ -335,10 +354,10 @@ export class MainNavComponent implements OnInit {
             subtitulo: true,
             icono: 'schedule',
             children: [
-              { name: 'Configurar HoraExtra', url: '/listaHorasExtras', color: true },
-              { name: 'Planificar Hora Extra', url: '/planificaHoraExtra', color: true },
-              { name: 'Listar Planificación', url: '/listadoPlanificaciones', color: true },
-              { name: 'Aprobación Múltiple HE.', url: '/horas-extras-solicitadas', color: true },
+              { name: 'Configurar HoraExtra', url: '/listaHorasExtras', color: true, ver: true },
+              { name: 'Planificar Hora Extra', url: '/planificaHoraExtra', color: true, ver: true },
+              { name: 'Listar Planificación', url: '/listadoPlanificaciones', color: true, ver: true },
+              { name: 'Aprobación Múltiple HE.', url: '/horas-extras-solicitadas', color: true, ver: true },
             ]
           },
           {
@@ -358,10 +377,10 @@ export class MainNavComponent implements OnInit {
             icono: 'local_dining',
             color: true,
             children: [
-              { name: 'Configurar comidas', url: '/listarTipoComidas', color: true },
-              { name: 'Planificar Servicio', url: '/alimentacion', color: true },
-              { name: 'Listar Planificación', url: '/listaPlanComida', color: true },
-              { name: 'Aprobación Múltiple A.', url: '/listaSolicitaComida', color: true },
+              { name: 'Configurar comidas', url: '/listarTipoComidas', color: true, ver: true },
+              { name: 'Planificar Servicio', url: '/alimentacion', color: true, ver: true },
+              { name: 'Listar Planificación', url: '/listaPlanComida', color: true, ver: true },
+              { name: 'Aprobación Múltiple A.', url: '/listaSolicitaComida', color: true, ver: true },
             ]
           },
           {
@@ -381,10 +400,10 @@ export class MainNavComponent implements OnInit {
             color: true,
             subtitulo: true,
             children: [
-              { name: 'Procesos', url: '/proceso', color: true },
-              { name: 'Tipo Acción Personal', url: '/acciones-personal', color: true },
-              { name: 'Pedido Acción Personal', url: '/pedidoAccion', color: true },
-              { name: 'Listar Pedidos', url: '/listaPedidos', color: true },
+              { name: 'Procesos', url: '/proceso', color: true, ver: true },
+              { name: 'Tipo Acción Personal', url: '/acciones-personal', color: true, ver: true },
+              { name: 'Pedido Acción Personal', url: '/pedidoAccion', color: true, ver: true },
+              { name: 'Listar Pedidos', url: '/listaPedidos', color: true, ver: true },
             ]
           },
           {
@@ -424,8 +443,8 @@ export class MainNavComponent implements OnInit {
             color: true,
             subtitulo: true,
             children: [
-              { name: 'Configurar Timbre Virtual', url: '/timbresWeb', color: true },
-              { name: 'Timbrar', url: '/timbres-personal', color: true },
+              { name: 'Configurar Timbre Virtual', url: '/timbresWeb', color: true, ver: true },
+              { name: 'Timbrar', url: '/timbres-personal', color: true, ver: true },
             ]
           },
           {
@@ -445,8 +464,8 @@ export class MainNavComponent implements OnInit {
             color: true,
             subtitulo: true,
             children: [
-              { name: 'Reloj Virtual', url: '/app-movil', color: true },
-              { name: 'Registro Dispositivos', url: '/registro-dispositivos', color: true },
+              { name: 'Reloj Virtual', url: '/app-movil', color: true, ver: true },
+              { name: 'Registro Dispositivos', url: '/registro-dispositivos', color: true, ver: true },
             ]
           },
           {
@@ -468,10 +487,10 @@ export class MainNavComponent implements OnInit {
         color: true,
         subtitulo: false,
         children: [
-          { name: 'Dispositivos', url: '/listarRelojes', color: true },
-          { name: 'Administrar Timbres', url: '/timbres-admin', color: true },
-          { name: 'Registrar Timbres', url: '/timbres-multiples', color: true },
-          { name: 'Actualizar Timbres', url: '/buscar-timbre', color: true },
+          { name: 'Dispositivos', url: '/listarRelojes', color: true, ver: true },
+          { name: 'Administrar Timbres', url: '/timbres-admin', color: true, ver: true },
+          { name: 'Registrar Timbres', url: '/timbres-multiples', color: true, ver: true },
+          { name: 'Actualizar Timbres', url: '/buscar-timbre', color: true, ver: true },
         ]
       },
       {
@@ -482,10 +501,10 @@ export class MainNavComponent implements OnInit {
         icono: 'notifications',
         color: true,
         children: [
-          { name: 'Configurar Notificaciones', url: '/configurarNotificaciones', color: true },
-          { name: 'Documentos', url: '/archivos', color: true },
-          { name: 'Cumpleaños', url: '/cumpleanios', color: true },
-          { name: 'Comunicados', url: '/comunicados', color: true },
+          { name: 'Configurar Notificaciones', url: '/configurarNotificaciones', color: true, ver: true },
+          { name: 'Documentos', url: '/archivos', color: true, ver: true },
+          { name: 'Cumpleaños', url: '/cumpleanios', color: true, ver: true },
+          { name: 'Comunicados', url: '/comunicados', color: true, ver: true },
         ]
       },
       {
@@ -504,8 +523,8 @@ export class MainNavComponent implements OnInit {
             icono: 'group',
             color: true,
             children: [
-              { name: 'Usuarios', url: '/reporteEmpleados', color: true },
-              { name: 'Registro Vacunación', url: '/lista-vacunados', color: true },
+              { name: 'Usuarios', url: '/reporteEmpleados', color: true, ver: true },
+              { name: 'Registro Vacunación', url: '/lista-vacunados', color: true, ver: true },
             ]
           },
           {
@@ -516,16 +535,16 @@ export class MainNavComponent implements OnInit {
             icono: 'check_circle_outline',
             color: true,
             children: [
-              { name: 'Faltas', url: '/reporte-faltas', color: true },
-              { name: 'Atrasos', url: '/reporte-atrasos-multiples', color: true },
-              // { name: 'Puntualidad', url: '/reporte-puntualidad', color: true },
-              { name: 'Tiempo Laborado', url: '/reporte-horas-trabajadas', color: true },
-              { name: 'Tiempo Alimentación', url: '/tiempo-alimentacion', color: true },
-              { name: 'Salidas Anticipadas', url: '/salidas-anticipadas', color: true },
-              { name: 'Resumen Asistencia', url: '/reporte-resumen-asistencia', color: true },
-              { name: 'Planificación Horaria', url: '/reporte-planificacion-horaria', color: true },
-              //{ name: 'Entradas Salidas', url: '/reporteEntradaSalida', color: true },
-              //{ name: 'Asistencia Detalle Consolidado', url: '/reporteAsistenciaConsolidado', color: true },
+              { name: 'Faltas', url: '/reporte-faltas', color: true, ver: true },
+              { name: 'Atrasos', url: '/reporte-atrasos-multiples', color: true, ver: true },
+              // { name: 'Puntualidad', url: '/reporte-puntualidad', color: true, ver: true },
+              { name: 'Tiempo Laborado', url: '/reporte-horas-trabajadas', color: true, ver: true },
+              { name: 'Tiempo Alimentación', url: '/tiempo-alimentacion', color: true, ver: true },
+              { name: 'Salidas Anticipadas', url: '/salidas-anticipadas', color: true, ver: true },
+              { name: 'Resumen Asistencia', url: '/reporte-resumen-asistencia', color: true, ver: true },
+              { name: 'Planificación Horaria', url: '/reporte-planificacion-horaria', color: true, ver: true },
+              //{ name: 'Entradas Salidas', url: '/reporteEntradaSalida', color: true, ver: true },
+              //{ name: 'Asistencia Detalle Consolidado', url: '/reporteAsistenciaConsolidado', color: true, ver: true },
             ]
           },
           {
@@ -536,10 +555,10 @@ export class MainNavComponent implements OnInit {
             icono: 'touch_app',
             color: true,
             children: [
-              { name: 'Timbres', url: '/reporte-timbres-multiples', color: true },
-              { name: 'Timbres MRL', url: '/reporte-timbre-mrl', color: true },
-              { name: 'Timbres Libres', url: '/reporte-timbre-abierto', color: true },
-              { name: 'Timbres Incompletos', url: '/reporte-timbre-incompleto', color: true },
+              { name: 'Timbres', url: '/reporte-timbres-multiples', color: true, ver: true },
+              { name: 'Timbres MRL', url: '/reporte-timbre-mrl', color: true, ver: true },
+              { name: 'Timbres Libres', url: '/reporte-timbre-abierto', color: true, ver: true },
+              { name: 'Timbres Incompletos', url: '/reporte-timbre-incompleto', color: true, ver: true },
             ]
           },
           {
@@ -550,7 +569,7 @@ export class MainNavComponent implements OnInit {
             color: true,
             subtitulo: true,
             children: [
-              { name: 'Permisos', url: '/reportePermisos', color: true },
+              { name: 'Permisos', url: '/reportePermisos', color: true, ver: true },
             ]
           },
           {
@@ -561,8 +580,8 @@ export class MainNavComponent implements OnInit {
             color: true,
             subtitulo: true,
             children: [
-              { name: 'Kardex', url: '/reporteKardex', color: true },
-              { name: 'Vacaciones Solicitadas', url: '/solicitud-vacacion', color: this.HabilitarVacaciones },
+              { name: 'Kardex', url: '/reporteKardex', color: true, ver: true },
+              { name: 'Vacaciones Solicitadas', url: '/solicitud-vacacion', color: this.HabilitarVacaciones, ver: true },
             ]
           },
           {
@@ -573,10 +592,10 @@ export class MainNavComponent implements OnInit {
             color: true,
             subtitulo: true,
             children: [
-              { name: 'Solicitudes Horas Extras', url: '/horas/extras', color: true },
-              { name: 'Horas Extras Autorizaciones', url: '/reporteHorasExtras', color: true },
-              { name: 'Horas Extras', url: '/macro/hora-extra', color: true },
-              { name: 'Jornada vs Horas extras', url: '/macro/jornada-vs-hora-extra', color: true },
+              { name: 'Solicitudes Horas Extras', url: '/horas/extras', color: true, ver: true },
+              { name: 'Horas Extras Autorizaciones', url: '/reporteHorasExtras', color: true, ver: true },
+              { name: 'Horas Extras', url: '/macro/hora-extra', color: true, ver: true },
+              { name: 'Jornada vs Horas extras', url: '/macro/jornada-vs-hora-extra', color: true, ver: true },
             ]
           },
           {
@@ -587,7 +606,7 @@ export class MainNavComponent implements OnInit {
             subtitulo: true,
             color: true,
             children: [
-              { name: 'Timbre Reloj Virtual', url: '/reporte-timbre-reloj-virtual', color: true },
+              { name: 'Timbre Reloj Virtual', url: '/reporte-timbre-reloj-virtual', color: true, ver: true },
             ]
           },
           {
@@ -598,7 +617,7 @@ export class MainNavComponent implements OnInit {
             subtitulo: true,
             color: true,
             children: [
-              { name: 'Timbre Virtual', url: '/reporte-timbre-sistema', color: true },
+              { name: 'Timbre Virtual', url: '/reporte-timbre-sistema', color: true, ver: true },
             ]
           },
           {
@@ -609,9 +628,9 @@ export class MainNavComponent implements OnInit {
             subtitulo: true,
             color: true,
             children: [
-              { name: 'Tickets Consumidos', url: '/alimentosGeneral', color: true },
-              { name: 'Detalle Tickets Consumidos', url: '/alimentosDetallado', color: true },
-              { name: 'Servicios Invitados', url: '/alimentosInvitados', color: true },
+              { name: 'Tickets Consumidos', url: '/alimentosGeneral', color: true, ver: true },
+              { name: 'Detalle Tickets Consumidos', url: '/alimentosDetallado', color: true, ver: true },
+              { name: 'Servicios Invitados', url: '/alimentosInvitados', color: true, ver: true },
             ]
           },
           {
@@ -622,7 +641,7 @@ export class MainNavComponent implements OnInit {
             subtitulo: true,
             color: true,
             children: [
-              { name: 'Análisis Datos', url: '/analisisDatos', color: true },
+              { name: 'Análisis Datos', url: '/analisisDatos', color: true, ver: true },
             ]
           },
           /*   {
@@ -633,11 +652,11 @@ export class MainNavComponent implements OnInit {
                icono: 'leaderboard',
                color: true,
                children: [
-                 { name: 'Atrasos', url: '/macro/retrasos', color: true },
-                 { name: 'Timbres', url: '/macro/marcaciones', color: true },
-                 { name: 'Asistencia', url: '/macro/asistencia', color: true },
-                 { name: 'Inasistencia', url: '/macro/inasistencia', color: true },
-                 { name: 'Salidas antes', url: '/macro/tiempo-jornada-vs-hora-ext', color: true },
+                 { name: 'Atrasos', url: '/macro/retrasos', color: true, ver: true },
+                 { name: 'Timbres', url: '/macro/marcaciones', color: true, ver: true },
+                 { name: 'Asistencia', url: '/macro/asistencia', color: true, ver: true },
+                 { name: 'Inasistencia', url: '/macro/inasistencia', color: true, ver: true },
+                 { name: 'Salidas antes', url: '/macro/tiempo-jornada-vs-hora-ext', color: true, ver: true },
                ]
              },
              {
@@ -648,8 +667,8 @@ export class MainNavComponent implements OnInit {
                icono: 'notifications_active',
                color: true,
                children: [
-                 { name: 'Todos', url: '/listaAllNotificaciones', color: true },
-                 { name: 'Usuarios', url: '/listaNotifacionUsuario', color: true },
+                 { name: 'Todos', url: '/listaAllNotificaciones', color: true, ver: true },
+                 { name: 'Usuarios', url: '/listaNotifacionUsuario', color: true, ver: true },
                ]
              },
              {
@@ -660,7 +679,7 @@ export class MainNavComponent implements OnInit {
                icono: 'gavel',
                color: true,
                children: [
-                 { name: 'Auditoria', url: '/auditoria', color: true },
+                 { name: 'Auditoria', url: '/auditoria', color: true, ver: true },
                ]
              },*/
         ]
@@ -679,8 +698,8 @@ export class MainNavComponent implements OnInit {
         subtitulo: false,
         icono: 'account_circle',
         children: [
-          { name: 'Datos Personales', url: '/datosEmpleado', color: true },
-          { name: 'Datos Laborales', url: '/cargoEmpleado', color: true },
+          { name: 'Datos Personales', url: '/datosEmpleado', color: true, ver: true },
+          { name: 'Datos Laborales', url: '/cargoEmpleado', color: true, ver: true },
         ]
       },
       {
@@ -691,7 +710,7 @@ export class MainNavComponent implements OnInit {
         subtitulo: false,
         icono: 'event',
         children: [
-          { name: 'Planificación Horaria', url: '/horariosEmpleado', color: true },
+          { name: 'Planificación Horaria', url: '/horariosEmpleado', color: true, ver: true },
         ]
       },
       {
@@ -710,7 +729,7 @@ export class MainNavComponent implements OnInit {
             subtitulo: true,
             icono: 'transfer_within_a_station',
             children: [
-              { name: 'Solicitar Permiso', url: '/solicitarPermiso', color: true },
+              { name: 'Solicitar Permiso', url: '/solicitarPermiso', color: true, ver: true },
             ]
           },
           {
@@ -730,7 +749,7 @@ export class MainNavComponent implements OnInit {
             subtitulo: true,
             icono: 'flight',
             children: [
-              { name: 'Solicitar Vacaciones', url: '/vacacionesEmpleado', color: true },
+              { name: 'Solicitar Vacaciones', url: '/vacacionesEmpleado', color: true, ver: true },
             ]
           },
           {
@@ -750,8 +769,8 @@ export class MainNavComponent implements OnInit {
             color: true,
             icono: 'hourglass_full',
             children: [
-              { name: 'Solicitar Hora Extra', url: '/horaExtraEmpleado', color: true },
-              { name: 'Planificación HorasExtras', url: '/horasPlanEmpleado', color: true },
+              { name: 'Solicitar Hora Extra', url: '/horaExtraEmpleado', color: true, ver: true },
+              { name: 'Planificación HorasExtras', url: '/horasPlanEmpleado', color: true, ver: true },
             ]
           },
           {
@@ -771,8 +790,8 @@ export class MainNavComponent implements OnInit {
             color: true,
             icono: 'restaurant',
             children: [
-              { name: 'Solicitar Servicio', url: '/comidasEmpleado', color: true },
-              { name: 'Planificación Alimentación', url: '/comidasPlanEmpleado', color: true },
+              { name: 'Solicitar Servicio', url: '/comidasEmpleado', color: true, ver: true },
+              { name: 'Planificación Alimentación', url: '/comidasPlanEmpleado', color: true, ver: true },
             ]
           },
           {
@@ -792,7 +811,7 @@ export class MainNavComponent implements OnInit {
             subtitulo: true,
             icono: 'how_to_reg',
             children: [
-              { name: 'Procesos', url: '/procesosEmpleado', color: true },
+              { name: 'Procesos', url: '/procesosEmpleado', color: true, ver: true },
             ]
           },
           {
@@ -812,7 +831,7 @@ export class MainNavComponent implements OnInit {
             color: true,
             subtitulo: true,
             children: [
-              { name: 'Timbre Virtual', url: '/timbres-personal', color: true },
+              { name: 'Timbre Virtual', url: '/timbres-personal', color: true, ver: true },
             ]
           },
           {
@@ -834,7 +853,7 @@ export class MainNavComponent implements OnInit {
         subtitulo: false,
         icono: 'fingerprint',
         children: [
-          { name: 'Actualizar Timbres', url: '/buscar-timbre', color: true },
+          { name: 'Actualizar Timbres', url: '/buscar-timbre', color: true, ver: true },
         ]
       },
       {
@@ -845,9 +864,9 @@ export class MainNavComponent implements OnInit {
         color: true,
         subtitulo: false,
         children: [
-          { name: 'Jefes', url: '/informacion', color: true },
-          { name: 'Documentos', url: '/verDocumentacion', color: true },
-          { name: 'Aprobación departamental', url: '/autorizaEmpleado', color: true },
+          { name: 'Jefes', url: '/informacion', color: true, ver: true },
+          { name: 'Documentos', url: '/verDocumentacion', color: true, ver: true },
+          { name: 'Aprobación departamental', url: '/autorizaEmpleado', color: true, ver: true },
         ]
       },
       /*  {
@@ -858,7 +877,7 @@ export class MainNavComponent implements OnInit {
           subtitulo: false,
           icono: 'notifications',
           children: [
-            { name: 'Lista notificaciones', url: '/lista-notificaciones', color: true },
+            { name: 'Lista notificaciones', url: '/lista-notificaciones', color: true, ver: true },
           ]
         },*/
     ]

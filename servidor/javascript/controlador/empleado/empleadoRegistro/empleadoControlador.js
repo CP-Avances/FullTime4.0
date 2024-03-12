@@ -721,26 +721,11 @@ class EmpleadoControlador {
             var duplicados1 = [];
             var duplicados2 = [];
             var mensaje = 'correcto';
-            /*
-            var contarCodigo = 0;
-            var contarCedula = 0;
-            var contarUsuario = 0;
-            var contarRol = 0;
-            var contarECivil = 0;
-            var contarGenero = 0;
-            var contarEstado = 0;
-            var contarNacionalidad = 0;
-            var contarLlenos = 0;
-            var contador = 1;
-            const VALOR = await pool.query('SELECT * FROM codigo');
-            //TODO Revisar max codigo
-            var codigo = parseInt(VALOR.rows[0].valor);
-            */
             plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
                 // Datos que se leen de la plantilla ingresada
-                var { N, cedula, apellido, nombre, estado_civil, genero, correo, fec_nacimiento, latitud, longitud, mail_alternativo, domicilio, telefono, nacionalidad, usuario, contrasena, rol } = dato;
+                var { item, cedula, apellido, nombre, estado_civil, genero, correo, fec_nacimiento, latitud, longitud, mail_alternativo, domicilio, telefono, nacionalidad, usuario, contrasena, rol } = dato;
                 //Verificar que el registo no tenga datos vacios
-                if ((N != undefined && N != '') &&
+                if ((item != undefined && item != '') &&
                     (cedula != undefined) && (apellido != undefined) &&
                     (nombre != undefined) && (estado_civil != undefined) &&
                     (genero != undefined) && (correo != undefined) &&
@@ -749,7 +734,7 @@ class EmpleadoControlador {
                     (domicilio != undefined) && (telefono != undefined) &&
                     (nacionalidad != undefined) && (usuario != undefined) &&
                     (contrasena != undefined) && (rol != undefined)) {
-                    data.fila = N;
+                    data.fila = item;
                     data.cedula = cedula;
                     data.apellido = apellido;
                     data.nombre = nombre;
@@ -766,25 +751,44 @@ class EmpleadoControlador {
                     data.usuario = usuario;
                     data.contrasena = contrasena;
                     data.rol = rol;
-                    if (data.cedula.toString().length > 10) {
-                        data.observacion = 'La cédula ingresada no es valida';
-                    }
-                    else {
-                        // Verificar si la variable tiene el formato de fecha correcto con moment
-                        if ((0, moment_1.default)(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) {
-                            if (duplicados.find((p) => p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined) {
-                                data.observacion = 'ok';
-                                duplicados.push(dato);
-                            }
+                    //Valida si los datos de la columna cedula son numeros.
+                    if (typeof data.cedula === 'number' && !isNaN(data.cedula)) {
+                        if (data.cedula.toString().length > 10 || data.cedula.toString().length < 10) {
+                            data.observacion = 'La cédula ingresada no es válida';
                         }
                         else {
-                            data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                            // Verificar si la variable tiene el formato de fecha correcto con moment
+                            if ((0, moment_1.default)(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) {
+                                //Valida si los datos de la columna telefono son numeros.
+                                if (telefono != undefined) {
+                                    if (typeof data.telefono === 'number' && !isNaN(data.telefono)) {
+                                        if (data.telefono.toString().length < 10) {
+                                            data.observacion = 'El teléfono ingresada no es válido';
+                                        }
+                                        else {
+                                            if (duplicados.find((p) => p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined) {
+                                                data.observacion = 'ok';
+                                                duplicados.push(dato);
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        data.observacion = 'El teléfono ingresada no es válido';
+                                    }
+                                }
+                            }
+                            else {
+                                data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                            }
                         }
+                    }
+                    else {
+                        data.observacion = 'La cédula ingresada no es válida';
                     }
                     listEmpleados.push(data);
                 }
                 else {
-                    data.fila = N;
+                    data.fila = item;
                     data.cedula = cedula;
                     data.apellido = apellido;
                     data.nombre = nombre;
@@ -868,22 +872,31 @@ class EmpleadoControlador {
                     else {
                         data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                     }
-                    if (cedula == undefined) {
-                        data.cedula = 'No registrado';
-                        data.observacion = 'Cedula ' + data.observacion;
-                    }
-                    else {
-                        if (data.cedula.toString().length > 10) {
-                            data.observacion = 'La cédula ingresada no es valida';
+                    //Valida si los datos de la columna telefono son numeros.
+                    if (telefono != undefined) {
+                        if (typeof data.telefono === 'number' && !isNaN(data.telefono)) {
+                            if (data.telefono.toString().length < 10) {
+                                data.observacion = 'El teléfono ingresada no es válido';
+                            }
                         }
                         else {
-                            //Verificar que el rol exista dentro del sistema
-                            /*
-                            const VERIFICAR_ROL = await pool.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1',
-                            [rol.toUpperCase()]);
-                            if (VERIFICAR_ROL.rowCount === 0) {
-                                data.observacion = 'No existe el rol en el sistema';
-                            }*/
+                            data.observacion = 'El teléfono ingresada no es válido';
+                        }
+                    }
+                    if (cedula == undefined) {
+                        data.cedula = 'No registrado';
+                        data.observacion = 'Cédula ' + data.observacion;
+                    }
+                    else {
+                        //Valida si los datos de la columna cedula son numeros.
+                        if (typeof data.cedula === 'number' && !isNaN(data.cedula)) {
+                            if (data.cedula.toString().length > 10 || data.cedula.toString().length < 10) {
+                                console.log('data.cedula length: ', data.cedula.toString().length);
+                                data.observacion = 'La cédula ingresada no es válida';
+                            }
+                        }
+                        else {
+                            data.observacion = 'La cédula ingresada no es válida';
                         }
                     }
                     listEmpleados.push(data);
@@ -939,17 +952,17 @@ class EmpleadoControlador {
             listEmpleados.forEach((valor) => __awaiter(this, void 0, void 0, function* () {
                 var VERIFICAR_CEDULA = yield database_1.default.query('SELECT * FROM empleados WHERE cedula = $1', [valor.cedula]);
                 if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-                    valor.observacion = 'Cedula ya existe en la base';
+                    valor.observacion = 'Cédula ya existe en el sistema';
                 }
                 else {
                     var VERIFICAR_USUARIO = yield database_1.default.query('SELECT * FROM usuarios WHERE usuario = $1', [valor.usuario]);
                     if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
-                        valor.observacion = 'Usuario ya existe en la base';
+                        valor.observacion = 'Usuario ya existe en el sistema';
                     }
                     else {
                         var VERIFICAR_ROL = yield database_1.default.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [valor.rol.toUpperCase()]);
                         if (VERIFICAR_ROL.rows[0] != undefined && VERIFICAR_ROL.rows[0] != '') {
-                            var VERIFICAR_NACIONALIDAD = yield database_1.default.query('SELECT * FROM nacionalidades UPPER(nombre) = $1', [valor.nacionalidad.toUpperCase()]);
+                            var VERIFICAR_NACIONALIDAD = yield database_1.default.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1', [valor.nacionalidad.toUpperCase()]);
                             if (VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != '') {
                                 // Discriminación de elementos iguales
                                 if (duplicados1.find((p) => p.cedula === valor.cedula) == undefined) {
@@ -991,7 +1004,7 @@ class EmpleadoControlador {
                 var filaDuplicada = 0;
                 listEmpleados.forEach((item) => {
                     if (item.observacion == '1') {
-                        item.observacion = 'Registro duplicado - cedula';
+                        item.observacion = 'Registro duplicado - cédula';
                     }
                     else if (item.observacion == '2') {
                         item.observacion = 'Registro duplicado - usuario';
@@ -1020,7 +1033,7 @@ class EmpleadoControlador {
                 if (mensaje == 'error') {
                     listEmpleados = undefined;
                 }
-                console.log('empleados: ', listEmpleados);
+                //console.log('empleados: ', listEmpleados);
                 return res.jsonp({ message: mensaje, data: listEmpleados });
             }, 1500);
         });
@@ -1092,7 +1105,7 @@ class EmpleadoControlador {
     CargarPlantilla_Automatico(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const plantilla = req.body;
-            console.log('datos2: ', plantilla);
+            console.log('datos automatico: ', plantilla);
             const VALOR = yield database_1.default.query('SELECT * FROM codigo');
             //TODO Revisar max codigo
             var codigo = parseInt(VALOR.rows[0].valor);
@@ -1228,12 +1241,13 @@ class EmpleadoControlador {
             var duplicados = [];
             var duplicados1 = [];
             var duplicados2 = [];
+            var duplicados3 = [];
             var mensaje = 'correcto';
             plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
                 // Datos que se leen de la plantilla ingresada
-                var { N, cedula, apellido, nombre, codigo, estado_civil, genero, correo, fec_nacimiento, latitud, longitud, mail_alternativo, domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
+                var { item, cedula, apellido, nombre, codigo, estado_civil, genero, correo, fec_nacimiento, latitud, longitud, mail_alternativo, domicilio, telefono, nacionalidad, usuario, contrasena, estado_user, rol, app_habilita } = dato;
                 //Verificar que el registo no tenga datos vacios
-                if ((N != undefined && N != '') &&
+                if ((item != undefined && item != '') &&
                     (cedula != undefined) && (apellido != undefined) &&
                     (nombre != undefined) && (codigo != undefined) && (estado_civil != undefined) &&
                     (genero != undefined) && (correo != undefined) &&
@@ -1242,7 +1256,7 @@ class EmpleadoControlador {
                     (domicilio != undefined) && (telefono != undefined) &&
                     (nacionalidad != undefined) && (usuario != undefined) &&
                     (contrasena != undefined) && (rol != undefined)) {
-                    data.fila = N;
+                    data.fila = item;
                     data.cedula = cedula;
                     data.apellido = apellido;
                     data.nombre = nombre;
@@ -1260,20 +1274,39 @@ class EmpleadoControlador {
                     data.usuario = usuario;
                     data.contrasena = contrasena;
                     data.rol = rol;
-                    if (data.cedula.toString().length > 10) {
-                        data.observacion = 'La cédula ingresada no es valida';
-                    }
-                    else {
-                        // Verificar si la variable tiene el formato de fecha correcto con moment
-                        if ((0, moment_1.default)(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) {
-                            if (duplicados.find((p) => p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined) {
-                                data.observacion = 'ok';
-                                duplicados.push(dato);
-                            }
+                    //Valida si los datos de la columna cedula son numeros.
+                    if (typeof data.cedula === 'number' && !isNaN(data.cedula)) {
+                        if (data.cedula.toString().length > 10 || data.cedula.toString().length < 10) {
+                            data.observacion = 'La cédula ingresada no es válida';
                         }
                         else {
-                            data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                            // Verificar si la variable tiene el formato de fecha correcto con moment
+                            if ((0, moment_1.default)(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) {
+                                //Valida si los datos de la columna telefono son numeros.
+                                if (telefono != undefined) {
+                                    if (typeof data.telefono === 'number' && !isNaN(data.telefono)) {
+                                        if (data.telefono.toString().length < 10) {
+                                            data.observacion = 'El teléfono ingresada no es válido';
+                                        }
+                                        else {
+                                            if (duplicados.find((p) => p.cedula === dato.cedula || p.usuario === dato.usuario) == undefined) {
+                                                data.observacion = 'ok';
+                                                duplicados.push(dato);
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        data.observacion = 'El teléfono ingresada no es válido';
+                                    }
+                                }
+                            }
+                            else {
+                                data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                            }
                         }
+                    }
+                    else {
+                        data.observacion = 'La cédula ingresada no es válida';
                     }
                     //TODO Revisar max codigo
                     // Verificar que el código no se duplique en los registros
@@ -1286,7 +1319,7 @@ class EmpleadoControlador {
                     listEmpleadosManual.push(data);
                 }
                 else {
-                    data.fila = N;
+                    data.fila = item;
                     data.cedula = cedula;
                     data.apellido = apellido;
                     data.nombre = nombre;
@@ -1375,13 +1408,31 @@ class EmpleadoControlador {
                     else {
                         data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
                     }
+                    //Valida si los datos de la columna telefono son numeros.
+                    if (telefono != undefined) {
+                        if (typeof data.telefono === 'number' && !isNaN(data.telefono)) {
+                            if (data.telefono.toString().length < 10) {
+                                data.observacion = 'El teléfono ingresada no es válido';
+                            }
+                        }
+                        else {
+                            data.observacion = 'El teléfono ingresada no es válido';
+                        }
+                    }
                     if (cedula == undefined) {
                         data.cedula = 'No registrado';
-                        data.observacion = 'Cedula ' + data.observacion;
+                        data.observacion = 'Cédula ' + data.observacion;
                     }
                     else {
-                        if (data.cedula.toString().length > 10) {
-                            data.observacion = 'La cédula ingresada no es valida';
+                        //Valida si los datos de la columna cedula son numeros.
+                        if (typeof data.cedula === 'number' && !isNaN(data.cedula)) {
+                            if (data.cedula.toString().length > 10 || data.cedula.toString().length < 10) {
+                                console.log('data.cedula length: ', data.cedula.toString().length);
+                                data.observacion = 'La cédula ingresada no es válida';
+                            }
+                        }
+                        else {
+                            data.observacion = 'La cédula ingresada no es válida';
                         }
                     }
                     listEmpleadosManual.push(data);
@@ -1400,28 +1451,53 @@ class EmpleadoControlador {
             listEmpleadosManual.forEach((valor) => __awaiter(this, void 0, void 0, function* () {
                 var VERIFICAR_CEDULA = yield database_1.default.query('SELECT * FROM empleados WHERE cedula = $1', [valor.cedula]);
                 if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-                    valor.observacion = 'Cedula ya existe en la base';
+                    valor.observacion = 'Cédula ya existe en el sistema';
                 }
                 else {
-                    var VERIFICAR_USUARIO = yield database_1.default.query('SELECT * FROM usuarios WHERE usuario = $1', [valor.usuario]);
-                    if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
-                        valor.observacion = 'Usuario ya existe en la base';
+                    var VERIFICAR_CODIGO = yield database_1.default.query('SELECT * FROM empleados WHERE codigo = $1', [valor.codigo]);
+                    if (VERIFICAR_CODIGO.rows[0] != undefined && VERIFICAR_CODIGO.rows[0] != '') {
+                        valor.observacion = 'Codigo ya existe en el sistema';
                     }
                     else {
-                        // Discriminación de elementos iguales
-                        if (duplicados1.find((p) => p.cedula === valor.cedula) == undefined) {
-                            // Discriminación de elementos iguales
-                            if (duplicados2.find((a) => a.usuario === valor.usuario) == undefined) {
-                                //valor.observacion = 'ok'
-                                duplicados2.push(valor);
-                            }
-                            else {
-                                valor.observacion = '2';
-                            }
-                            duplicados1.push(valor);
+                        var VERIFICAR_USUARIO = yield database_1.default.query('SELECT * FROM usuarios WHERE usuario = $1', [valor.usuario]);
+                        if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
+                            valor.observacion = 'Usuario ya existe en el sistema';
                         }
                         else {
-                            valor.observacion = '1';
+                            var VERIFICAR_ROL = yield database_1.default.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [valor.rol.toUpperCase()]);
+                            if (VERIFICAR_ROL.rows[0] != undefined && VERIFICAR_ROL.rows[0] != '') {
+                                var VERIFICAR_NACIONALIDAD = yield database_1.default.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1', [valor.nacionalidad.toUpperCase()]);
+                                if (VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != '') {
+                                    // Discriminación de elementos iguales
+                                    if (duplicados1.find((p) => p.cedula === valor.cedula) == undefined) {
+                                        // Discriminación de elementos iguales
+                                        if (duplicados3.find((c) => c.codigo === valor.codigo) == undefined) {
+                                            // Discriminación de elementos iguales
+                                            if (duplicados2.find((a) => a.usuario === valor.usuario) == undefined) {
+                                                //valor.observacion = 'ok'
+                                                duplicados2.push(valor);
+                                            }
+                                            else {
+                                                valor.observacion = '2';
+                                            }
+                                            duplicados3.push(valor);
+                                        }
+                                        else {
+                                            valor.observacion = '3';
+                                        }
+                                        duplicados1.push(valor);
+                                    }
+                                    else {
+                                        valor.observacion = '1';
+                                    }
+                                }
+                                else {
+                                    valor.observacion = 'La nacionalidad no existe en la base';
+                                }
+                            }
+                            else {
+                                valor.observacion = 'El rol no existe en la base';
+                            }
                         }
                     }
                 }
@@ -1440,10 +1516,13 @@ class EmpleadoControlador {
                 var filaDuplicada = 0;
                 listEmpleadosManual.forEach((item) => {
                     if (item.observacion == '1') {
-                        item.observacion = 'Registro duplicado - cedula';
+                        item.observacion = 'Registro duplicado - cédula';
                     }
                     else if (item.observacion == '2') {
                         item.observacion = 'Registro duplicado - usuario';
+                    }
+                    else if (item.observacion == '3') {
+                        item.observacion = 'Registro duplicado - codigo';
                     }
                     if (item.observacion != undefined) {
                         let arrayObservacion = item.observacion.split(" ");
@@ -1537,7 +1616,7 @@ class EmpleadoControlador {
     CargarPlantilla_Manual(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const plantilla = req.body;
-            console.log('datos2: ', plantilla);
+            console.log('datos manual: ', plantilla);
             var contador = 1;
             /*
             let list: any = req.files;
@@ -1577,7 +1656,7 @@ class EmpleadoControlador {
                 const md5 = new ts_md5_1.Md5();
                 const contrasena = md5.appendStr(data.contrasena).end();
                 // Datos que se leen de la plantilla ingresada
-                const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, estado, domicilio, telefono, nacionalidad, usuario, estado_user, rol, app_habilita } = data;
+                const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, estado, domicilio, telefono, nacionalidad, usuario, rol } = data;
                 //Obtener id del estado_civil
                 var id_estado_civil = 0;
                 if (estado_civil.toUpperCase() === 'SOLTERA/A') {
@@ -1611,6 +1690,10 @@ class EmpleadoControlador {
                 else if (estado.toUpperCase() === 'INACTIVO') {
                     id_estado = 2;
                 }
+                //OBTENER ID DEL ESTADO
+                var id_estado = 1;
+                var estado_user = true;
+                var app_habilita = false;
                 //Obtener id de la nacionalidad
                 const id_nacionalidad = yield database_1.default.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1', [nacionalidad.toUpperCase()]);
                 //Obtener id del rol

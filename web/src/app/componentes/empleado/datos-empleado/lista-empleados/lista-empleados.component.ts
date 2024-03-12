@@ -25,6 +25,7 @@ import { EmpleadoElemento } from '../../../../model/empleado.model'
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ThemePalette } from '@angular/material/core';
+import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 
 @Component({
   selector: 'app-lista-empleados',
@@ -465,7 +466,6 @@ export class ListaEmpleadosComponent implements OnInit {
       console.log('plantilla manual', res);
       this.DataEmpleados = res.data;
       this.messajeExcel = res.message;
-
       if(this.messajeExcel == 'error'){
         this.toastr.error('Revisar los datos de la columna N, debe enumerar correctamente.', 'Plantilla no aceptada', {
           timeOut: 4500,
@@ -473,7 +473,9 @@ export class ListaEmpleadosComponent implements OnInit {
         this.mostrarbtnsubir = false;
       }else{
         this.DataEmpleados.forEach(item => {
-          //Aqui va los datos que se van a registrar y tienen la observacion OK
+          if( item.observacion.toLowerCase() == 'ok'){
+            this.listUsuariosCorrectas.push(item);
+          }
         });
         this.datosManuales = true;
       }
@@ -491,36 +493,70 @@ export class ListaEmpleadosComponent implements OnInit {
 
   }
 
-  registrarUsuariosMultiple(){
-    this.rest.subirArchivoExcel_Automatico(this.listUsuariosCorrectas).subscribe(datos_archivo => {
-      console.log('datos plantilla a enviar: ', this.listUsuariosCorrectas);
-
-      this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
-        timeOut: 3000,
+  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  ConfirmarRegistroMultiple() {
+    const mensaje = 'registro';
+    console.log('this.listUsuariosCorrectas: ',this.listUsuariosCorrectas.length);
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.registrarUsuariosMultiple();
+        }
       });
-      //window.location.reload();
+  }
 
+  registrarUsuariosMultiple(){
+    if(this.listUsuariosCorrectas.length > 0){
+      if (this.datosCodigo[0].automatico === true){
+        this.rest.subirArchivoExcel_Automatico(this.listUsuariosCorrectas).subscribe(datos_archivo => {
+          console.log('datos plantilla a enviar: ', this.listUsuariosCorrectas);
+          this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
+            timeOut: 3000,
+          });
+    
+          this.archivoForm.reset();
+          this.nameFile = '';
+    
+        });
+      }else{
+        //Aquí va el servicio subirArchivoExcel_Manual
+        this.rest.subirArchivoExcel_Manual(this.listUsuariosCorrectas).subscribe(datos_archivo => {
+          console.log('datos plantilla a enviar: ', this.listUsuariosCorrectas);
+          this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
+            timeOut: 3000,
+          });
+    
+          this.archivoForm.reset();
+          this.nameFile = '';
+        })
+      }
+    }else{
+      this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada', {
+        timeOut: 4000,
+      });
       this.archivoForm.reset();
       this.nameFile = '';
-
-    });
-
+    }
   }
+
+
 
   //Metodo para dar color a las celdas y representar las validaciones
   colorCelda: string = ''
   stiloCelda(observacion: string): string{
-    
     let arrayObservacion = observacion.split(" ");
     if(observacion == 'ok'){
       return 'rgb(159, 221, 154)';
     }else if(observacion == 'Ya esta registrado en base'){
       return 'rgb(239, 203, 106)';
-    }else if((arrayObservacion[0]+' '+arrayObservacion[1]) == 'Cedula ya' || (arrayObservacion[0]+' '+arrayObservacion[1]) == 'Usuario ya'){
+    }else if((arrayObservacion[0]+' '+arrayObservacion[1]) == 'Cédula ya' || 
+    (arrayObservacion[0]+' '+arrayObservacion[1]) == 'Usuario ya'  || 
+    (arrayObservacion[0]+' '+arrayObservacion[1]) == 'Codigo ya'){
+
       return 'rgb(239, 203, 106)';
-    }else if(arrayObservacion[0] == 'Cedula' || arrayObservacion[0] == 'Usuario'){
+    }else if(arrayObservacion[0] == 'Cédula' || arrayObservacion[0] == 'Usuario'){
         return 'rgb(222, 162, 73)';
-    }else if(observacion == 'Registro duplicado'){
+    }else if((arrayObservacion[0]+' '+arrayObservacion[1]) == 'Registro duplicado'){
       return 'rgb(156, 214, 255)';
     }else{
       return 'rgb(251, 73, 18)';

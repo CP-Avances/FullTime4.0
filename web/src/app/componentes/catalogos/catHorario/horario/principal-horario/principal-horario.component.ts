@@ -28,6 +28,7 @@ import { EditarHorarioComponent } from '../editar-horario/editar-horario.compone
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { ThemePalette } from '@angular/material/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+import { SpinnerService } from '../../../../../servicios/spinner/spinner.service';
 
 @Component({
   selector: 'app-principal-horario',
@@ -105,6 +106,7 @@ export class PrincipalHorarioComponent implements OnInit {
     private rest: HorarioService, // SERVICIO DATOS DE HORARIO
     private restD: DetalleCatHorariosService, // SERVICIO DE DATOS DE DETALLES DE HORARIOS
     private toastr: ToastrService, // VARIABLE DE MANEJO DE NOTIFICACIONES
+    private spinnerService: SpinnerService
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -285,6 +287,7 @@ export class PrincipalHorarioComponent implements OnInit {
     this.listaDetalleCorrectos = [];
     this.archivo1Form.reset();
     this.habilitarprogress = false;
+    this.spinnerService.hide();
     this.numero_paginaH = 1;
     this.numero_paginaD = 1;
     this.tamanio_paginaH = 5;
@@ -293,6 +296,7 @@ export class PrincipalHorarioComponent implements OnInit {
 
   CargarPlantillaGeneral(element: any) {
     this.habilitarprogress = true;
+    this.spinnerService.show();
     if (element.target.files && element.target.files[0]) {
       this.archivoSubido = element.target.files;
       this.nameFile = this.archivoSubido[0].name;
@@ -344,11 +348,13 @@ export class PrincipalHorarioComponent implements OnInit {
         }
       });
       this.habilitarprogress = false;
+      this.spinnerService.hide();
     });
   }
 
   RegistrarHorariosDetalles() {
     this.habilitarprogress = true;
+    this.spinnerService.show();
     const data = {
       horarios: this.listaHorariosCorrectos,
       detalles: this.listaDetalleCorrectos
@@ -368,6 +374,7 @@ export class PrincipalHorarioComponent implements OnInit {
           this.archivo1Form.reset();
           this.nameFile = '';
           this.habilitarprogress = false;
+          this.spinnerService.hide();
         } else {
           this.toastr.success('Plantilla de horarios importada','Operación exitosa.', {
             timeOut: 6000,
@@ -565,17 +572,31 @@ export class PrincipalHorarioComponent implements OnInit {
 
   //METODO PARA DEFINIR EL COLOR DE LA OBSERVACION
   ObtenerColorValidacion(observacion: string): string{
+    if (observacion.startsWith('Datos no registrados:')) {
+      return 'rgb(242, 21, 21)';
+    }
+
+    if (observacion.startsWith('Formato') || (observacion.startsWith('Tipo'))) {
+      return 'rgb(222, 162, 73)';
+    }
+
     switch(observacion) {
       case 'Ok':
           return 'rgb(159, 221, 154)';
-      case 'Ya esta registrado en la base de datos':
+      case 'Ya existe en el sistema':
           return 'rgb(239, 203, 106)';
       case 'Codigo de horario no existe en los horarios validos':
           return 'rgb(239, 203, 106)';
-      case 'Registro duplicado':
+      case 'Registro duplicado dentro de la plantilla':
           return 'rgb(156, 214, 255)';
       default:
-          return 'rgb(246, 167, 143)';
+          return 'rgb(242, 21, 21)';
+    }
+  }
+
+  ObtenerColorDatoRegistrado(dato: string){
+    if (dato == 'No registrado'){
+      return 'rgb(242, 21, 21)';
     }
   }
 }

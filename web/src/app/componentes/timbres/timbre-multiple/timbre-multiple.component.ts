@@ -144,7 +144,7 @@ export class TimbreMultipleComponent implements OnInit {
 
   ngOnInit(): void {
     this.check = this.restR.checkOptions([{ opcion: 's' }, { opcion: 'r' }, { opcion: 'd' }, { opcion: 'c' }, { opcion: 'e' }]);
-    this.PresentarInformacion();;
+    this.PresentarInformacion();
   }
 
   ngOnDestroy() {
@@ -205,7 +205,19 @@ export class TimbreMultipleComponent implements OnInit {
         this.usua_sucursales = { id_sucursal: codigos, id_departamento: usuario.id_departamento };
         this.BuscarInformacionJefer(this.usua_sucursales);
       }
+      else if (usuario.id_rol === 3) {
+        this.BuscarInformacionSuperAdministrador();
+      }
     });
+  }
+
+  // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL SUPERADMINISTRADOR
+  BuscarInformacionSuperAdministrador() {
+    this.informacion.ObtenerInformacion_SUPERADMIN(1).subscribe((res: any[]) => {
+      this.ProcesarDatos(res);
+    }, err => {
+      this.toastr.error(err.error.message)
+    })
   }
 
   // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL ADMINISTRADOR
@@ -892,7 +904,7 @@ export class TimbreMultipleComponent implements OnInit {
       this.selectionCarg.clear();
       this.selectionEmp.clear();
       this.selectionReg.clear();
-      this.Filtrar('', 1)
+      this.Filtrar('', 1);
     }
     else if (this.opcion === 'r') {
       this.nombre_reg.reset();
@@ -903,8 +915,8 @@ export class TimbreMultipleComponent implements OnInit {
       this.selectionCarg.clear();
       this.selectionEmp.clear();
       this.selectionSuc.clear();
-      this.Filtrar('', 1)
-      this.Filtrar('', 7)
+      this.Filtrar('', 1);
+      this.Filtrar('', 7);
     }
     else if (this.opcion === 'c') {
       this.nombre_carg.reset();
@@ -915,8 +927,8 @@ export class TimbreMultipleComponent implements OnInit {
       this.selectionDep.clear();
       this.selectionSuc.clear();
       this.selectionReg.clear();
-      this.Filtrar('', 1)
-      this.Filtrar('', 2)
+      this.Filtrar('', 1);
+      this.Filtrar('', 2);
     }
     else if (this.opcion === 'd') {
       this.nombre_dep.reset();
@@ -927,8 +939,8 @@ export class TimbreMultipleComponent implements OnInit {
       this.selectionCarg.clear();
       this.selectionSuc.clear();
       this.selectionReg.clear();
-      this.Filtrar('', 1)
-      this.Filtrar('', 3)
+      this.Filtrar('', 1);
+      this.Filtrar('', 3);
     }
     else if (this.opcion === 'e') {
       this.codigo.reset();
@@ -943,10 +955,10 @@ export class TimbreMultipleComponent implements OnInit {
       this.selectionCarg.clear();
       this.selectionSuc.clear();
       this.selectionReg.clear();
-      this.Filtrar('', 1)
-      this.Filtrar('', 4)
-      this.Filtrar('', 5)
-      this.Filtrar('', 6)
+      this.Filtrar('', 1);
+      this.Filtrar('', 4);
+      this.Filtrar('', 5);
+      this.Filtrar('', 6);
     }
   }
 

@@ -94,8 +94,8 @@ class TituloControlador {
 
     // LECTURA DE LOS DATOS DE LA PLANTILLA
     plantilla.forEach(async (dato: any, indice: any, array: any) => {
-      var {N, nombre, nivel} = dato;
-      data.fila = dato.N
+      var {item, nombre, nivel} = dato;
+      data.fila = dato.item
       data.titulo = dato.nombre;
       data.nivel = dato.nivel;
 
@@ -110,7 +110,7 @@ class TituloControlador {
           const VERIFICAR_Titulos = await  pool.query('SELECT * FROM cg_titulos ' +
           'WHERE UPPER(nombre) = UPPER($1) AND id_nivel = $2', [nombre, id_nivel.id]);
           if(VERIFICAR_Titulos.rowCount == 0){
-            data.fila = dato.N
+            data.fila = dato.item
             data.titulo = dato.nombre;
             data.nivel = dato.nivel
               if(duplicados.find((p: any)=> p.nombre.toLowerCase() === dato.nombre.toLowerCase() && p.nivel.toLowerCase() === dato.nivel.toLowerCase()) == undefined)
@@ -122,7 +122,7 @@ class TituloControlador {
             listTitulosProfesionales.push(data);
           
           }else{
-            data.fila = dato.N
+            data.fila = dato.item
             data.titulo = nombre;
             data.nivel = nivel
             data.observacion = 'Ya esta registrado en base';
@@ -130,7 +130,7 @@ class TituloControlador {
             listTitulosProfesionales.push(data);
           }
         }else{
-          data.fila = dato.N
+          data.fila = dato.item
           data.titulo = dato.nombre;
           data.nivel = dato.nivel;
 
@@ -145,7 +145,7 @@ class TituloControlador {
         }
 
       }else{
-        data.fila = dato.N
+        data.fila = dato.item
         data.titulo = dato.nombre;
         data.nivel = dato.nivel;
 

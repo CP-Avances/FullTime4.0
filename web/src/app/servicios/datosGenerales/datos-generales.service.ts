@@ -13,6 +13,12 @@ export class DatosGeneralesService {
   ) { }
 
   // METODO PARA CONSULTAR CON PERFIL ADMINISTRADOR LOS DATOS DE LOS EMPLEADOS
+  ObtenerInformacion_SUPERADMIN(estado: any) {
+    return this.http.get<any>(`${environment.url}/generalidades/informacion-data-general-superior/${estado}`);
+  }
+
+
+  // METODO PARA CONSULTAR CON PERFIL ADMINISTRADOR LOS DATOS DE LOS EMPLEADOS
   ObtenerInformacion_ADMIN(estado: any, sucursales: any) {
     return this.http.post<any>(`${environment.url}/generalidades/informacion-data-general/${estado}`, sucursales);
   }

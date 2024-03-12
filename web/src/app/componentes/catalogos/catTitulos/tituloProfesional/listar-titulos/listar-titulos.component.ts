@@ -278,7 +278,7 @@ export class ListarTitulosComponent implements OnInit {
       this.messajeExcel = res.message;
 
       if(this.messajeExcel == 'error'){
-        this.toastr.error('Revisar los datos de la columna N, debe enumerar correctamente.', 'Plantilla no aceptada', {
+        this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
@@ -329,7 +329,7 @@ export class ListarTitulosComponent implements OnInit {
      
    }
 
-    //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()

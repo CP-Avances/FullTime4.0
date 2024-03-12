@@ -141,8 +141,8 @@ class SucursalControlador {
             var duplicados = [];
             // LECTURA DE LOS DATOS DE LA PLANTILLA
             plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
-                var { N, nombre, ciudad } = dato;
-                data.fila = dato.N;
+                var { item, nombre, ciudad } = dato;
+                data.fila = dato.item;
                 data.nom_sucursal = dato.nombre;
                 data.ciudad = dato.ciudad;
                 if ((data.fila != undefined && data.fila != '') &&
@@ -156,7 +156,7 @@ class SucursalControlador {
                         const VERIFICAR_SUCURSAL = yield database_1.default.query('SELECT * FROM sucursales ' +
                             'WHERE UPPER(nombre) = UPPER($1) AND id_ciudad = $2', [nombre, id_ciudad.id]);
                         if (VERIFICAR_SUCURSAL.rowCount === 0) {
-                            data.fila = N;
+                            data.fila = item;
                             data.nom_sucursal = nombre;
                             data.ciudad = ciudad;
                             // Discriminación de elementos iguales
@@ -168,7 +168,7 @@ class SucursalControlador {
                             listSucursales.push(data);
                         }
                         else {
-                            data.fila = N;
+                            data.fila = item;
                             data.nom_sucursal = nombre;
                             data.ciudad = ciudad;
                             data.observacion = 'Ya existe en el sistema';
@@ -176,18 +176,18 @@ class SucursalControlador {
                         }
                     }
                     else {
-                        data.fila = N;
+                        data.fila = item;
                         data.nom_sucursal = dato.nombre;
                         data.ciudad = dato.ciudad;
                         if (data.ciudad == '' || data.ciudad == undefined) {
                             data.ciudad = 'No registrado';
                         }
-                        data.observacion = 'No existe la ciudad';
+                        data.observacion = 'Ciudad no existe en el sistema';
                         listSucursales.push(data);
                     }
                 }
                 else {
-                    data.fila = N;
+                    data.fila = item;
                     data.nom_sucursal = dato.nombre;
                     data.ciudad = dato.ciudad;
                     if (data.fila == '' || data.fila == undefined) {

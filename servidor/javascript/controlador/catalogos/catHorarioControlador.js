@@ -399,14 +399,31 @@ class HorarioControlador {
                     data.HORARIO_NOCTURNO = 'No';
                 }
                 // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
-                const requiredValues = [DESCRIPCION, CODIGO_HORARIO, TIPO_HORARIO, HORAS_TOTALES, HORARIO_NOCTURNO];
-                if (requiredValues.some(value => value === undefined)) {
-                    data.OBSERVACION = 'Faltan datos requeridos';
+                const requiredValues = ['DESCRIPCION', 'CODIGO_HORARIO', 'TIPO_HORARIO', 'HORAS_TOTALES', 'HORARIO_NOCTURNO'];
+                let faltanDatos = false;
+                let datosFaltantes = [];
+                // MAPEO DE CLAVES A DESCRIPCIONES
+                let descripciones = {
+                    DESCRIPCION: 'descripción',
+                    CODIGO_HORARIO: 'código',
+                    TIPO_HORARIO: 'tipo',
+                    HORAS_TOTALES: 'horas totales',
+                    HORARIO_NOTURNO: 'horario noturno'
+                };
+                for (const key of requiredValues) {
+                    if (data[key] === undefined) {
+                        data[key] = 'No registrado';
+                        datosFaltantes.push(descripciones[key]);
+                        faltanDatos = true;
+                    }
+                }
+                if (faltanDatos) {
+                    data.OBSERVACION = 'Datos no registrados: ' + datosFaltantes.join(', ');
                     continue;
                 }
                 codigos.push(CODIGO_HORARIO.toString());
                 if (VerificarDuplicado(codigos, CODIGO_HORARIO.toString())) {
-                    data.OBSERVACION = 'Registro duplicado';
+                    data.OBSERVACION = 'Registro duplicado dentro de la plantilla';
                     continue;
                 }
                 const verificacion = VerificarFormatoDatos(data);
@@ -428,9 +445,25 @@ class HorarioControlador {
                 let { CODIGO_HORARIO, TIPO_ACCION, HORA, SALIDA_SIGUIENTE_DIA, MIN_ANTES, MIN_DESPUES } = data;
                 let orden = 0;
                 // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
-                const requiredValues = [CODIGO_HORARIO, TIPO_ACCION, HORA];
-                if (requiredValues.some(value => value === undefined)) {
-                    data.OBSERVACION = 'Faltan datos requeridos';
+                // const requiredValues = [CODIGO_HORARIO, TIPO_ACCION, HORA];
+                const requeridos = ['CODIGO_HORARIO', 'TIPO_ACCION', 'HORA'];
+                let faltanDatosDetalles = false;
+                let datosFaltantesDetalles = [];
+                // MAPEO DE CLAVES A DESCRIPCIONES
+                let descripciones = {
+                    CODIGO_HORARIO: 'código',
+                    TIPO_ACCION: 'tipo de acción',
+                    HORA: 'hora'
+                };
+                for (const key of requeridos) {
+                    if (data[key] === undefined) {
+                        data[key] = 'No registrado';
+                        datosFaltantesDetalles.push(descripciones[key]);
+                        faltanDatosDetalles = true;
+                    }
+                }
+                if (faltanDatosDetalles) {
+                    data.OBSERVACION = 'Datos no registrados: ' + datosFaltantesDetalles.join(', ');
                     continue;
                 }
                 switch (TIPO_ACCION.toLowerCase()) {
@@ -511,8 +544,8 @@ function VerificarFormatoDatos(data) {
     const minAlimentacionFormatoCorrecto = /^\d+$/.test(MIN_ALIMENTACION);
     const tipoHorarioValido = ['Laborable', 'Libre', 'Feriado'].includes(TIPO_HORARIO);
     const tipoHorarioNocturnoValido = ['Si', 'No'].includes(HORARIO_NOCTURNO);
-    horasTotalesFormatoCorrecto ? null : observacion = 'Formato de HORAS_TOTALES incorrecto';
-    minAlimentacionFormatoCorrecto ? null : observacion = 'Formato de MIN_ALIMENTACION incorrecto';
+    horasTotalesFormatoCorrecto ? null : observacion = 'Formato de horas totales incorrecto (HH:mm)';
+    minAlimentacionFormatoCorrecto ? null : observacion = 'Formato de minutos de alimentación incorrecto';
     tipoHorarioValido ? null : observacion = 'Tipo de horario incorrecto';
     tipoHorarioNocturnoValido ? null : observacion = 'Tipo de horario nocturno incorrecto';
     error = horasTotalesFormatoCorrecto && minAlimentacionFormatoCorrecto && tipoHorarioValido && tipoHorarioNocturnoValido ? false : true;
@@ -538,9 +571,9 @@ function VerificarFormatoDetalleHorario(data) {
     const horaFormatoCorrecto = /^(\d{1,2}:\d{2})$|^(\d{1,2}:\d{2}:\d{2})$/.test(HORA);
     const minAntesFormatoCorrecto = /^\d+$/.test(MIN_ANTES);
     const minDespuesFormatoCorrecto = /^\d+$/.test(MIN_DESPUES);
-    horaFormatoCorrecto ? null : observacion = 'Formato de HORA incorrecto';
-    minAntesFormatoCorrecto ? null : observacion = 'Formato de MIN_ANTES INCORRECTO';
-    minDespuesFormatoCorrecto ? null : observacion = 'Formato de MIN_DESPUES INCORRECTO';
+    horaFormatoCorrecto ? null : observacion = 'Formato de hora incorrecto';
+    minAntesFormatoCorrecto ? null : observacion = 'Formato de minutos antes INCORRECTO';
+    minDespuesFormatoCorrecto ? null : observacion = 'Formato de minutos después INCORRECTO';
     error = horaFormatoCorrecto && minAntesFormatoCorrecto && minDespuesFormatoCorrecto ? false : true;
     return [error, observacion];
 }
