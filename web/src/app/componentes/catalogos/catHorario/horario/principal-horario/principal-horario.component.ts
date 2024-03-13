@@ -88,6 +88,7 @@ export class PrincipalHorarioComponent implements OnInit {
 
   //VARIABLES PARA VALIDAR HORARIOS Y DETALLES
   dataHorarios: any;
+  mostrarbtnsubir: boolean = false;
   listaHorariosCorrectos: any = [];
   listaDetalleCorrectos: any = [];
 
@@ -220,6 +221,7 @@ export class PrincipalHorarioComponent implements OnInit {
     this.numero_paginaD = 1;
     this.tamanio_paginaH = 5;
     this.tamanio_paginaD = 5;
+    this.mostrarbtnsubir = false;
     this.formulario.setValue({
       nombreHorarioForm: '',
       descripcionForm: '',
@@ -325,6 +327,8 @@ export class PrincipalHorarioComponent implements OnInit {
       });
       this.LimpiarCamposPlantilla();
     }
+    this.archivo1Form.reset();
+    this.mostrarbtnsubir = true;
   }
 
   VerificarPlantilla() {

@@ -675,7 +675,7 @@ function VerificarDetallesAgrupados(detallesAgrupados: any, horarios: Horario[])
       
       //VERIFICAR QUE EN LOS TIPOSACCIONEXISTENTES ESTEN TODOS LOS TIPOSACCIONREQUERIDOS
       else if (tiposAccionRequeridos.some((tipo: string) => !tiposAccionExistentes.includes(tipo))) {
-        codigosDetalles.push({codigo: codigoHorario, observacion:`Requerido tipos de acción completos`});
+        codigosDetalles.push({codigo: codigoHorario, observacion:`Requerido tipos de acción: ${tiposAccionRequeridos.join(', ')}`});
       }
 
       else {
