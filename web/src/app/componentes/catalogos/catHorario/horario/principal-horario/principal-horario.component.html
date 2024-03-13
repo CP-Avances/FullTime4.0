@@ -11,11 +11,6 @@
                         <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarHorario()" *ngIf="!dataHorarios">
                             Crear horario
                         </button>
-                        <button *ngIf="dataHorarios" id="btn-raised" class="btn btn-sm" matSuffix
-                            matTooltipPosition="right"
-                            matTooltip="Guardar registro multiple." (click)="RegistrarHorariosDetalles()">
-                            Registrar
-                         </button>
                         <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
                             matTooltipPosition="right"
                             matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
@@ -29,28 +24,28 @@
                     <span>CARGAR PLANTILLA DE HORARIOS</span>
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
-                    <div class="row">
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-around">
-                                <form method="post" enctype="multipart/form-data" style="padding-top: 5px;">
-                                    <input (change)="CargarPlantillaGeneral($event)" type="file"
-                                        [formControl]="archivo1Form" id="file1"
-                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                    <label for="file1" class="btn-2" matSuffix matTooltipPosition="right"
-                                        *ngIf="!mostrarbtnsubir" style="height: 64px;"
-                                        matTooltip="Presionar para seleccionar Plantilla con nombre plantillaGeneral.">
-                                        Subir plantilla
-                                    </label>
-                                    <label for="file1" class="btn-2" matSuffix matTooltipPosition="right"
-                                        *ngIf="mostrarbtnsubir" style="height: 64px;"
-                                        matTooltip="Presionar para seleccionar Plantilla con nombre plantillaGeneral.">
-                                        Subir nueva plantilla
-                                    </label>
-                                </form>
-                            </div>
+                    <div class="row flex-center">
+                        <div class="col-md flex-item">
+                          <div>
+                            <form method="post" enctype="multipart/form-data">
+                                <input (change)="CargarPlantillaGeneral($event)" type="file"
+                                    [formControl]="archivo1Form" id="file1"
+                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                <label for="file1" class="btn-2" matSuffix matTooltipPosition="right"
+                                    *ngIf="!mostrarbtnsubir" style="height: 64px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre plantillaGeneral.">
+                                    Subir plantilla
+                                </label>
+                                <label for="file1" class="btn-2" matSuffix matTooltipPosition="right"
+                                    *ngIf="mostrarbtnsubir" style="height: 64px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre plantillaGeneral.">
+                                    Subir nueva <br> plantilla
+                                </label>
+                            </form>
+                          </div>
                         </div>
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-around">
+                        <div class="col-md flex-item">
+                            <div>
                               <a type="submit" id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                               matTooltip="Dar click para ver o descargar el documento."
                               href="{{hipervinculo}}/plantillaD/documento/plantillaGeneral.xlsx">
@@ -58,6 +53,15 @@
                               </a>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
+                      <div class="d-flex flex-wrap justify-content-center">
+                        <button *ngIf="dataHorarios" id="registrar" class="btn btn-sm" matSuffix
+                          matTooltipPosition="right"
+                          matTooltip="Guardar registro multiple." (click)="RegistrarHorariosDetalles()">
+                          Registrar
+                        </button>
+                      </div>
                     </div>
                 </mat-card>
             </div>
