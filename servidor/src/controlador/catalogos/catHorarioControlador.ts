@@ -545,7 +545,6 @@ class HorarioControlador {
     const detallesAgrupados = AgruparDetalles(plantillaDetalles);
     const detallesAgrupadosVerificados = VerificarDetallesAgrupados(detallesAgrupados, plantillaHorarios);
 
-    console.log('detallesAgrupadosVerificados ', detallesAgrupadosVerificados);
     // CAMBIAR OBSERVACIONES DE PLANTILLADETALLES SEGUN LOS CODIGOS QUE NO CUMPLAN CON LOS REQUISITOS
     for (const codigo of detallesAgrupadosVerificados) {
       const detalles = plantillaDetalles.filter((detalle: DetalleHorario) => detalle.CODIGO_HORARIO.toString() === codigo.codigo);
@@ -663,10 +662,7 @@ function VerificarDetallesAgrupados(detallesAgrupados: any, horarios: Horario[])
       const tieneAlimentacion = horario.MIN_ALIMENTACION > 0;
       const tiposAccionRequeridos = tieneAlimentacion ? ['Entrada', 'Inicio alimentación', 'Fin alimentación', 'Salida'] : ['Entrada', 'Salida'];
       const tiposAccionExistentes = detalles.map((detalle: any) => detalle.TIPO_ACCION);
-      console.log('tiposAccionRequeridos ', tiposAccionRequeridos);
-      console.log('tiposAccionExistentes ', tiposAccionExistentes);
       if (tiposAccionExistentes.length < tiposAccionRequeridos.length ) {
-        console.log('menor');
         codigosDetalles.push({codigo: codigoHorario, observacion:`Requerido ${tiposAccionRequeridos.length} detalles`});
       } else if  ( tiposAccionExistentes.length > tiposAccionRequeridos.length ) {
         codigosDetalles.push({codigo: codigoHorario, observacion:`Requerido solo ${tiposAccionRequeridos.length} detalles`});
@@ -686,16 +682,10 @@ function VerificarDetallesAgrupados(detallesAgrupados: any, horarios: Horario[])
         const horaSalida = moment(salida.HORA, 'HH:mm');
         // SI EL HORARIO TIENE SALIDA AL OTRO DIA SE DEBE SUMAR 24 HORAS A LA SALIDA
         if (salida.SALIDA_SIGUIENTE_DIA.toLowerCase() == 'si' ) {
-          console.log('salida siguiente dia');
           horaSalida.add(1, 'days');
         }
-        console.log('horaEntrada ', horaEntrada);
-        console.log('horaSalida ', horaSalida);
         const diferencia = horaSalida.diff(horaEntrada, 'minutes');
         const horasTotalesEnMinutos = convertirHorasTotalesAMinutos(horario.HORAS_TOTALES.toString());
-        console.log('diferencia ', diferencia);
-        console.log('horasTotalesEnMinutos ', horasTotalesEnMinutos);
-        console.log(codigoHorario)
         if (diferencia !== horasTotalesEnMinutos) {
           codigosDetalles.push({codigo: codigoHorario, observacion: 'No cumple con las horas totales'});
         }

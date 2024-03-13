@@ -282,6 +282,7 @@ export class PrincipalHorarioComponent implements OnInit {
 
   // LIMPIAR CAMPOS PLANTILLA
   LimpiarCamposPlantilla() {
+    this.mostrarbtnsubir = false;
     this.dataHorarios = null;
     this.archivoSubido = [];
     this.nameFile = '';
@@ -354,6 +355,17 @@ export class PrincipalHorarioComponent implements OnInit {
       this.habilitarprogress = false;
       this.spinnerService.hide();
     });
+  }
+
+  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE HORARIOS Y DETALLES DEL ARCHIVO EXCEL
+  ConfirmarRegistroMultiple() {
+    const mensaje = 'registro';
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.RegistrarHorariosDetalles();
+        }
+      });
   }
 
   RegistrarHorariosDetalles() {
