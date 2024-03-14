@@ -306,7 +306,7 @@ export class PrincipalHorarioComponent implements OnInit {
       let arrayItems = this.nameFile.split(".");
       let itemExtencion = arrayItems[arrayItems.length - 1];
       let itemName = arrayItems[0];
-      console.log("funcion horario", itemName.toLowerCase());
+
       if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
         if (itemName.toLowerCase() == 'plantillageneral') {
           this.VerificarPlantilla();

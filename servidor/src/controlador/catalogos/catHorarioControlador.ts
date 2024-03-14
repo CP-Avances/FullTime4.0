@@ -270,6 +270,8 @@ class HorarioControlador {
         // CARGAR HORARIOS
         for (const horario of horarios) {
           let { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOCTURNO } = horario;
+
+          horario.CODIGO_HORARIO = horario.CODIGO_HORARIO.toString();
         
           //CAMBIAR TIPO DE HORARIO Laborable = N, Libre = L, Feriado = FD
           switch (TIPO_HORARIO) {
@@ -326,7 +328,9 @@ class HorarioControlador {
       if (detalles.length > 0) {
         // CARGAR DETALLES
         for (const detalle of detalles) {
-          let { CODIGO_HORARIO, TIPO_ACCION, HORA, ORDEN, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES, MIN_DESPUES } = detalle;
+          let { CODIGO_HORARIO, TIPO_ACCION, HORA, TOLERANCIA, ORDEN, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES, MIN_DESPUES } = detalle;
+
+          CODIGO_HORARIO = CODIGO_HORARIO.toString();
 
           // CAMBIAR TIPO DE ACCION Entrada = E, Inicio alimentacion = I/A, Fin alimentacion = F/A, Salida = S
           switch (TIPO_ACCION) {
@@ -370,16 +374,18 @@ class HorarioControlador {
               break;
           }
 
+          // CAMBIAR TOLERANCIA
+          TOLERANCIA = TIPO_ACCION.toLowerCase() === 'e' ? TOLERANCIA : null;
+
           // CAMBIAR CODIGO_HORARIO POR EL ID DEL HORARIO CORRESPONDIENTE
           const ID_HORARIO: number = (codigosHorariosCargados.find((codigo: any) => codigo.codigoHorario === CODIGO_HORARIO))?.idHorario;
-
           // INSERTAR EN LA BASE DE DATOS
           const response2: QueryResult = await pool.query(
             `
             INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes,
                 min_despues) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
             `
-            , [ORDEN, HORA, 0, ID_HORARIO, TIPO_ACCION, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES, MIN_DESPUES]);
+            , [ORDEN, HORA, TOLERANCIA, ID_HORARIO, TIPO_ACCION, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES, MIN_DESPUES]);
           
           if (response2.rowCount > 0) {
             detallesCargados = true;
