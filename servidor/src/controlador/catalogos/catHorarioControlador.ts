@@ -475,7 +475,7 @@ class HorarioControlador {
     };
 
     for (const data of plantillaDetalles) {
-      let { CODIGO_HORARIO, TIPO_ACCION, HORA, SALIDA_SIGUIENTE_DIA, MIN_ANTES, MIN_DESPUES } = data;
+      let { CODIGO_HORARIO, TIPO_ACCION, HORA, TOLERANCIA, SALIDA_SIGUIENTE_DIA, MIN_ANTES, MIN_DESPUES } = data;
       let orden = 0;
       // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
       // const requiredValues = [CODIGO_HORARIO, TIPO_ACCION, HORA];
@@ -526,6 +526,7 @@ class HorarioControlador {
       data.MIN_ANTES = MIN_ANTES ?? 0;
       data.MIN_DESPUES = MIN_DESPUES ?? 0;
       data.SALIDA_SIGUIENTE_DIA = SALIDA_SIGUIENTE_DIA ?? 'No';
+      data.TOLERANCIA = TIPO_ACCION.toLowerCase() === 'entrada' ? (TOLERANCIA ?? 0) : '';
       
 
       if (!VerificarCodigoHorarioDetalleHorario(CODIGO_HORARIO.toString(), plantillaHorarios)) {
@@ -549,7 +550,9 @@ class HorarioControlador {
     for (const codigo of detallesAgrupadosVerificados) {
       const detalles = plantillaDetalles.filter((detalle: DetalleHorario) => detalle.CODIGO_HORARIO.toString() === codigo.codigo);
       for (const detalle of detalles) {
-        detalle.OBSERVACION = codigo.observacion;
+        if (detalle.OBSERVACION === 'Ok') {
+          detalle.OBSERVACION = codigo.observacion;
+        }
       }
     }
 
@@ -621,14 +624,19 @@ function VerificarCodigoHorarioDetalleHorario(codigo: string, plantillaHorarios:
 function VerificarFormatoDetalleHorario(data: any): [boolean, string] {
   let observacion = '';
   let error = true
-  const { HORA, MIN_ANTES, MIN_DESPUES } = data;
+  const { TIPO_ACCION, HORA, TOLERANCIA, MIN_ANTES, MIN_DESPUES } = data;
   const horaFormatoCorrecto = /^(\d{1,2}:\d{2})$|^(\d{1,2}:\d{2}:\d{2})$/.test(HORA);
   const minAntesFormatoCorrecto = /^\d+$/.test(MIN_ANTES);
   const minDespuesFormatoCorrecto = /^\d+$/.test(MIN_DESPUES);
-  horaFormatoCorrecto ? null : observacion = 'Formato de hora incorrecto (HH:mm)';
-  minAntesFormatoCorrecto ? null : observacion = 'Formato de minutos antes incorrecto';
-  minDespuesFormatoCorrecto ? null : observacion = 'Formato de minutos después incorrecto';
-  error = horaFormatoCorrecto && minAntesFormatoCorrecto && minDespuesFormatoCorrecto ? false : true ;
+  let toleranciaFormatoCorrecto = true;
+  if (TIPO_ACCION.toLowerCase() === 'entrada') {
+    toleranciaFormatoCorrecto = /^\d+$/.test(TOLERANCIA);
+  }
+  horaFormatoCorrecto ? null : observacion = observacion.concat('Formato de hora incorrecto (HH:mm)');
+  toleranciaFormatoCorrecto ? null : observacion = observacion.concat('Formato de tolerancia incorrecto');
+  minAntesFormatoCorrecto ? null : observacion = observacion.concat('Formato de minutos antes incorrecto');
+  minDespuesFormatoCorrecto ? null : observacion = observacion.concat('Formato de minutos después incorrecto');
+  error = horaFormatoCorrecto && minAntesFormatoCorrecto && minDespuesFormatoCorrecto && toleranciaFormatoCorrecto ? false : true ;
   return [error, observacion];
 }
 
@@ -751,6 +759,7 @@ interface DetalleHorario {
   TIPO_ACCION: string,
   HORA: string,	
   ORDEN: string | number,
+  TOLERANCIA: string | number,
   SALIDA_SIGUIENTE_DIA: string,
   SALIDA_TERCER_DIA: string,
   MIN_ANTES: string | number,

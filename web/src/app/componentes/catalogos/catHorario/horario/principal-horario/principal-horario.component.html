@@ -243,6 +243,7 @@
                     <th scope="col">Código Horario</th>
                     <th scope="col">Tipo Acción</th>
                     <th scope="col">Hora</th>
+                    <th scope="col">Tolerancia</th>
                     <th scope="col">Orden</th>
                     <th scope="col">Salida Siguiente Día</th>
                     <th scope="col">Minutos Antes</th>
@@ -257,6 +258,7 @@
                     <td [style.color]="ObtenerColorDatoRegistrado(d.CODIGO_HORARIO)">{{d.CODIGO_HORARIO}}</td>
                     <td [style.color]="ObtenerColorDatoRegistrado(d.TIPO_ACCION)">{{d.TIPO_ACCION}}</td>
                     <td [style.color]="ObtenerColorDatoRegistrado(d.HORA)">{{d.HORA}}</td>
+                    <td>{{d.TOLERANCIA}}</td>
                     <td>{{d.ORDEN}}</td>
                     <td>{{d.SALIDA_SIGUIENTE_DIA}}</td>
                     <td>{{d.MIN_ANTES}}</td>

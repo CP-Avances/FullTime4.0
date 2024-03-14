@@ -442,7 +442,7 @@ class HorarioControlador {
             }
             ;
             for (const data of plantillaDetalles) {
-                let { CODIGO_HORARIO, TIPO_ACCION, HORA, SALIDA_SIGUIENTE_DIA, MIN_ANTES, MIN_DESPUES } = data;
+                let { CODIGO_HORARIO, TIPO_ACCION, HORA, TOLERANCIA, SALIDA_SIGUIENTE_DIA, MIN_ANTES, MIN_DESPUES } = data;
                 let orden = 0;
                 // VERIFICAR QUE LOS DATOS OBLIGATORIOS EXISTAN
                 // const requiredValues = [CODIGO_HORARIO, TIPO_ACCION, HORA];
@@ -486,6 +486,7 @@ class HorarioControlador {
                 data.MIN_ANTES = MIN_ANTES !== null && MIN_ANTES !== void 0 ? MIN_ANTES : 0;
                 data.MIN_DESPUES = MIN_DESPUES !== null && MIN_DESPUES !== void 0 ? MIN_DESPUES : 0;
                 data.SALIDA_SIGUIENTE_DIA = SALIDA_SIGUIENTE_DIA !== null && SALIDA_SIGUIENTE_DIA !== void 0 ? SALIDA_SIGUIENTE_DIA : 'No';
+                data.TOLERANCIA = TIPO_ACCION.toLowerCase() === 'entrada' ? (TOLERANCIA !== null && TOLERANCIA !== void 0 ? TOLERANCIA : 0) : '';
                 if (!VerificarCodigoHorarioDetalleHorario(CODIGO_HORARIO.toString(), plantillaHorarios)) {
                     data.OBSERVACION = 'Requerido codigo de horario existente';
                     continue;
@@ -504,7 +505,9 @@ class HorarioControlador {
             for (const codigo of detallesAgrupadosVerificados) {
                 const detalles = plantillaDetalles.filter((detalle) => detalle.CODIGO_HORARIO.toString() === codigo.codigo);
                 for (const detalle of detalles) {
-                    detalle.OBSERVACION = codigo.observacion;
+                    if (detalle.OBSERVACION === 'Ok') {
+                        detalle.OBSERVACION = codigo.observacion;
+                    }
                 }
             }
             // VERIFICAR EXISTENCIA DE DETALLES PARA CADA HORARIO
@@ -567,14 +570,19 @@ function VerificarCodigoHorarioDetalleHorario(codigo, plantillaHorarios) {
 function VerificarFormatoDetalleHorario(data) {
     let observacion = '';
     let error = true;
-    const { HORA, MIN_ANTES, MIN_DESPUES } = data;
+    const { TIPO_ACCION, HORA, TOLERANCIA, MIN_ANTES, MIN_DESPUES } = data;
     const horaFormatoCorrecto = /^(\d{1,2}:\d{2})$|^(\d{1,2}:\d{2}:\d{2})$/.test(HORA);
     const minAntesFormatoCorrecto = /^\d+$/.test(MIN_ANTES);
     const minDespuesFormatoCorrecto = /^\d+$/.test(MIN_DESPUES);
-    horaFormatoCorrecto ? null : observacion = 'Formato de hora incorrecto (HH:mm)';
-    minAntesFormatoCorrecto ? null : observacion = 'Formato de minutos antes incorrecto';
-    minDespuesFormatoCorrecto ? null : observacion = 'Formato de minutos después incorrecto';
-    error = horaFormatoCorrecto && minAntesFormatoCorrecto && minDespuesFormatoCorrecto ? false : true;
+    let toleranciaFormatoCorrecto = true;
+    if (TIPO_ACCION.toLowerCase() === 'entrada') {
+        toleranciaFormatoCorrecto = /^\d+$/.test(TOLERANCIA);
+    }
+    horaFormatoCorrecto ? null : observacion = observacion.concat('Formato de hora incorrecto (HH:mm)');
+    toleranciaFormatoCorrecto ? null : observacion = observacion.concat('Formato de tolerancia incorrecto');
+    minAntesFormatoCorrecto ? null : observacion = observacion.concat('Formato de minutos antes incorrecto');
+    minDespuesFormatoCorrecto ? null : observacion = observacion.concat('Formato de minutos después incorrecto');
+    error = horaFormatoCorrecto && minAntesFormatoCorrecto && minDespuesFormatoCorrecto && toleranciaFormatoCorrecto ? false : true;
     return [error, observacion];
 }
 // FUNCION PARA AGRUPAR LOS DETALLES QUE PERTENEZCAN A UN MISMO HORARIO
