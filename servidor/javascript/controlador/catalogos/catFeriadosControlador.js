@@ -182,14 +182,19 @@ class FeriadosControlador {
             var listFeriados = [];
             var duplicados = [];
             var fecha_igual = [];
+            var mensaje = 'correcto';
             // LECTURA DE LOS DATOS DE LA PLANTILLA
             plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
-                var { N, fecha, descripcion, fec_recuperacion } = dato;
-                data.fila = N;
+                var { item, fecha, descripcion, fec_recuperacion } = dato;
+                data.fila = item;
                 data.fecha = fecha;
                 data.descripcion = descripcion;
                 data.fec_recuperacion = fec_recuperacion;
                 data.observacion = 'no registrada';
+                if (data.fila == '' || data.fila == undefined) {
+                    data.fila = 'error';
+                    mensaje = 'error';
+                }
                 if (data.fecha == undefined || data.descripcion == '') {
                     data.fecha = 'No registrado';
                     data.observacion = 'Fecha ' + data.observacion;
@@ -199,7 +204,7 @@ class FeriadosControlador {
                     data.observacion = 'Descripción ' + data.observacion;
                 }
                 //VERIFICA SI EXISTE EN LAs COLUMNA DATOS REGISTRADOS
-                if (data.fecha != 'No registrado' && data.descripcion != 'No registrado') {
+                if (data.fila != 'error' && data.fecha != 'No registrado' && data.descripcion != 'No registrado') {
                     // Verificar si la variable tiene el formato de fecha correcto con moment
                     if ((0, moment_1.default)(data.fecha, 'YYYY-MM-DD', true).isValid()) {
                         fecha_correcta = true;
@@ -212,7 +217,7 @@ class FeriadosControlador {
                         // VERIFICACIÓN SI LA FECHA DEL FERIADO NO ESTE REGISTRADA EN EL SISTEMA
                         const VERIFICAR_FECHA = yield database_1.default.query('SELECT * FROM cg_feriados ' +
                             'WHERE fecha = $1 OR fec_recuperacion = $1', [data.fecha]);
-                        data.fila = dato.N;
+                        data.fila = dato.item;
                         data.fecha = dato.fecha;
                         data.descripcion = dato.descripcion;
                         if (VERIFICAR_FECHA.rowCount === 0) {
@@ -292,20 +297,34 @@ class FeriadosControlador {
                     }
                     return 0; // Son iguales
                 });
-                console.log('lista feriados: ', listFeriados);
+                var filaDuplicada = 0;
                 listFeriados.forEach((item) => {
-                    if (item.observacion == undefined || item.observacion == 'no registrada' || item.observacion == '') {
-                        item.observacion = 'Registro duplicado';
-                    }
-                    else {
+                    if (item.observacion != undefined && item.observacion != 'no registrada' && item.observacion != '') {
                         fecha_igual.forEach((valor) => {
                             if (valor.fecha == item.fec_recuperacion) {
-                                item.observacion = 'Fecha duplicada';
+                                item.observacion = 'Fecha registrada como valor de otra columna';
                             }
                         });
                     }
+                    else {
+                        item.observacion = 'Registro duplicado';
+                    }
+                    //Valida si los datos de la columna N son numeros.
+                    if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+                        //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                        if (item.fila == filaDuplicada) {
+                            mensaje = 'error';
+                        }
+                    }
+                    else {
+                        return mensaje = 'error';
+                    }
+                    filaDuplicada = item.fila;
                 });
-                return res.jsonp({ message: 'correcto', data: listFeriados });
+                if (mensaje == 'error') {
+                    listFeriados = undefined;
+                }
+                return res.jsonp({ message: mensaje, data: listFeriados });
             }, 1500);
         });
     }

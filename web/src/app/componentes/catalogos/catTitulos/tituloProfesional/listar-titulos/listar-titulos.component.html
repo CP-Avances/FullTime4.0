@@ -26,29 +26,40 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="row">
-                    <div class="col-md" style="padding-top: 8px; padding-bottom: 6px; padding-left: 10px;">
-                        <div class="d-flex flex-wrap justify-content-around" style="padding-left: 12px;">
+                    <div class="col-md" style="padding-top: 5px;">
+                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
                             <form method="post" enctype="multipart/form-data" style="width: max-content;">
                                 <input type="file" (change)="FileChange($event)" [formControl]="archivoForm" id="file"
                                     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
-                                    *ngIf="!mostrarbtnsubir" style="height: 64px;"
+                                <label for="file" matSuffix matTooltipPosition="right"
+                                    *ngIf="!mostrarbtnsubir" style="height: 64px; padding-top: 25px;"
                                     matTooltip="Presionar para seleccionar Plantilla con nombre Titulos_profesionales.">
                                     Subir plantilla
                                 </label>
-                                <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
-                                    *ngIf="mostrarbtnsubir" style="height: 64px;"
+                                <label for="file"  matSuffix matTooltipPosition="right"
+                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'" style="height: 64px; padding-top: 25px;"
                                     matTooltip="Presionar para seleccionar Plantilla con nombre Titulos_profesionales.">
                                     Subir nueva plantilla
                                 </label>
                             </form>
                         </div>
                     </div>
-                    <div class="col-md" *ngIf="mostrarbtnsubir">
-                        <div class="d-flex flex-wrap justify-content-around">
-                            <button *ngIf="DataTitulosProfesionales" id="descargar" class="btn btn-sm"
+                    <div class="col-md" *ngIf="!DataTitulosProfesionales" style="padding-top: 5px; padding-bottom: 5px;" >
+                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                            <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                                matTooltip="Dar click para ver o descargar el documento."
+                                >
+                                <!--span class="material-icons">cloud_download</span-->
+                                <br>
+                                Descargar plantilla
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md" *ngIf="mostrarbtnsubir" style="padding-top: 5px; padding-bottom: 5px;" >
+                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                            <button *ngIf="DataTitulosProfesionales && messajeExcel != 'error'" id="descargar" class="btn btn-sm"
                                 (click)="ConfirmarRegistroMultiple()" matSuffix matTooltipPosition="right"
-                                style="margin: 3% 2% 3% 2%;" matTooltip="Guardar registro multiple.">
+                                 matTooltip="Guardar registro multiple.">
                                 Registrar
                             </button>
                         </div>
@@ -61,7 +72,7 @@
 
 <!-- **********************************  LISTA DE TITULOS PROFESIONALES  ****************************************  -->
 <div class="container" style="padding-top: 15px; padding-bottom: 50px; text-align: center;"
-    *ngIf="!DataTitulosProfesionales">
+    *ngIf="!DataTitulosProfesionales && (messajeExcel == 'error' || messajeExcel == '')">
     <div class="mat-elevation-z8" style="background: white;">
         <div id="resultados">RESULTADO DE BÚSQUEDA</div>
         <div class="table-responsive">
@@ -140,13 +151,13 @@
 </div>
 
 <!-- **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE  ****************************************  -->
-<div class="container" style="padding-top: 10px; margin-bottom: 25px;" *ngIf="DataTitulosProfesionales">
+<div class="container" style="padding-top: 10px; margin-bottom: 25px;" *ngIf="DataTitulosProfesionales && messajeExcel != 'error'">
     <app-definicion-plantilla>
     </app-definicion-plantilla>
 </div>
 
 <!-- **********************************  TABLA DE DATOS DE LA CARGA MULTIPLE  ****************************************  -->
-<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="DataTitulosProfesionales">
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="DataTitulosProfesionales && messajeExcel != 'error'">
     <div class="mat-elevation-z8" style="background: white;">
         <div id="resultados">
             REGISTRO MULTIPLE
@@ -155,17 +166,16 @@
             <table class="table table-hover table-sm ">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th scope="col">Nº</th>
+                        <th scope="col">Item</th>
                         <th scope="col">Titulo</th>
                         <th scope="col">Nivel</th>
                         <th scope="col">Observación</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr
-                        *ngFor="let data of DataTitulosProfesionales | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
-                        <td style="font-size: 12px; width: 50px;" align="center">{{i + 1}}</td>
-                        <td style="font-size: 12px;" [style.color]="stiloTextoCelda(data.titulo)">{{ data.titulo}}</td>
+                    <tr *ngFor="let data of DataTitulosProfesionales | paginate:tamanio_paginaMul:numero_paginaMul">
+                        <td style="font-size: 12px; width: 50px;" align="center">{{data.fila}}</td>
+                        <td style="font-size: 12px;"  [style.color]="stiloTextoCelda(data.titulo)">{{ data.titulo}}</td>
                         <td style="font-size: 12px;" [style.color]="stiloTextoCelda(data.nivel)">{{ data.nivel}}</td>
                         <td style="font-size: 12px;">
                             <div style="width: 270px; margin: auto;">
@@ -181,12 +191,5 @@
         <mat-paginator id="pagina" [length]="DataTitulosProfesionales.length" [pageSize]="tamanio_paginaMul"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
         </mat-paginator>
-    </div>
-</div>
-
-<div class="container" style="text-align: center;  padding-top: 10px; margin-bottom: 25px;">
-    <div class="pantalla-progress" *ngIf="progreso">
-        <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
-        </mat-progress-spinner>
     </div>
 </div>

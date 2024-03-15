@@ -55,25 +55,12 @@ export class UsuarioService {
     return this.http.put(`${environment.url}/usuarios/frase`, data);
   }
 
-  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB
-  UsuariosTimbreWeb(estado: any, habilitado: boolean) {
-    return this.http.get<any>(`${environment.url}/usuarios/lista-web/${estado}/activo/${habilitado}`);
-  }
-
-  // METODO PARA BUSCAR DATOS DE USUARIOS Y CARGOS TIMBRE WEB
-  UsuariosTimbreWebCargos(estado: any, habilitado: boolean) {
-    return this.http.get<any>(`${environment.url}/usuarios/lista-web-cargos/${estado}/activo/${habilitado}`);
-  }
-
   // METODO PARA ACTUALIZAR ESTADO TIMBRE WEB
   ActualizarEstadoTimbreWeb(data: any) {
     return this.http.put<any>(`${environment.url}/usuarios/lista-web/`, data);
   }
 
-  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
-  UsuariosTimbreMovil(estado: any, habilitado: boolean) {
-    return this.http.get<any>(`${environment.url}/usuarios/lista-app-movil/${estado}/activo/${habilitado}`);
-  }
+
 
   // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
   UsuariosTimbreMovilCargos(estado: any, habilitado: boolean) {
@@ -104,6 +91,43 @@ export class UsuarioService {
   CambiarFrase(data: any) {
     return this.http.post(`${environment.url}/usuarios/frase/restaurar-frase/nueva`, data)
   }
+
+
+  /** *********************************************************************************************** **
+   ** **                       SERVICIOS USUARIOS QUE USAN TIMBRE WEB                              ** **           
+   ** *********************************************************************************************** */
+
+  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB SUPERADMINISTRADOR
+  UsuariosTimbreWeb_SUPERADMIN(estado: any, habilitado: boolean) {
+    return this.http.get<any>(`${environment.url}/usuarios/lista-web-superior/${estado}/activo/${habilitado}`);
+  }
+
+  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB ADMNISTRADOR
+  UsuariosTimbreWeb_ADMIN(estado: any, habilitado: boolean, datos: any) {
+    return this.http.post<any>(`${environment.url}/usuarios/lista-web-general/${estado}/activo/${habilitado}`, datos);
+  }
+
+  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB
+  UsuariosTimbreWeb_JEFE(estado: any, habilitado: boolean, datos: any) {
+    return this.http.post<any>(`${environment.url}/usuarios/lista-web-jefe/${estado}/activo/${habilitado}`, datos);
+  }
+
+
+  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL SUPERADMINISTRADOR
+  UsuariosTimbreMovil_SUPERADMIN(estado: any, habilitado: boolean) {
+    return this.http.get<any>(`${environment.url}/usuarios/lista-app-movil-superior/${estado}/activo/${habilitado}`);
+  }
+
+  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL ADMINISTRADOR
+  UsuariosTimbreMovil_ADMIN(estado: any, habilitado: boolean, datos: any) {
+    return this.http.post<any>(`${environment.url}/usuarios/lista-app-movil-general/${estado}/activo/${habilitado}`, datos);
+  }
+
+  // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL ADMINISTRADOR JEFE
+  UsuariosTimbreMovil_JEFE(estado: any, habilitado: boolean, datos: any) {
+    return this.http.post<any>(`${environment.url}/usuarios/lista-app-movil-jefe/${estado}/activo/${habilitado}`, datos);
+  }
+
 
 
   /** *********************************************************************************************** **

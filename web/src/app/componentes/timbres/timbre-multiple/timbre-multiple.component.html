@@ -170,7 +170,7 @@
                                 </mat-icon>
                             </mat-form-field>
                             <mat-form-field>
-                                <mat-label>CI o pasaporte</mat-label>
+                                <mat-label>Cédula</mat-label>
                                 <input matInput placeholder="Buscar" [(ngModel)]="filtroCedula_" maxlength="10"
                                     (input)="Filtrar(filtroCedula_, 5)"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
@@ -179,7 +179,7 @@
                                     Indispensable ingresar dos valores
                                 </mat-error>
                                 <mat-icon matSuffix matTooltipPosition="right"
-                                    matTooltip="Búsqueda de datos de empleado por cédula de identificación o pasaporte.">
+                                    matTooltip="Búsqueda de datos de empleado por cédula de identificación.">
                                     help_outline
                                 </mat-icon>
                             </mat-form-field>
@@ -237,7 +237,7 @@
                                 </td>
                                 <td>{{s.sucursal}}</td>
                                 <td class="justify-content-center">
-                                    <i (click)="GuardarRegistros(s.id)" id="accion" *ngIf="auto_individual"
+                                    <i (click)="GuardarRegistros(s)" id="accion" *ngIf="auto_individual"
                                         class="fas fa-clock" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres." [ngStyle]="habilitado">
                                         <p>Timbrar</p>
@@ -297,7 +297,7 @@
                                 <td>{{r.sucursal}}</td>
                                 <td>{{r.nombre}}</td>
                                 <td lass="justify-content-center">
-                                    <i (click)="GuardarRegistros(r.id)" id="accion" *ngIf="auto_individual"
+                                    <i (click)="GuardarRegistros(r)" id="accion" *ngIf="auto_individual"
                                         class="fas fa-clock" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres." [ngStyle]="habilitado">
                                         <p>Timbrar</p>
@@ -357,7 +357,7 @@
                                 <td>{{c.sucursal}}</td>
                                 <td>{{c.nombre}}</td>
                                 <td lass="justify-content-center">
-                                    <i (click)="GuardarRegistros(c.id)" id="accion" *ngIf="auto_individual"
+                                    <i (click)="GuardarRegistros(c)" id="accion" *ngIf="auto_individual"
                                         class="fas fa-clock" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres." [ngStyle]="habilitado">
                                         <p>Timbrar</p>
@@ -419,7 +419,7 @@
                                 <td>{{d.sucursal}}</td>
                                 <td>{{d.departamento}}</td>
                                 <td class="justify-content-center">
-                                    <i (click)="GuardarRegistros(d.id)" id="accion" *ngIf="auto_individual"
+                                    <i (click)="GuardarRegistros(d)" id="accion" *ngIf="auto_individual"
                                         class="fas fa-clock" matSuffix matTooltipPosition="right"
                                         matTooltip="Abrir formulario de registro de timbres." [ngStyle]="habilitado">
                                         <p>Timbrar</p>

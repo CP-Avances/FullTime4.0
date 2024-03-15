@@ -27,14 +27,10 @@ class UsuarioRutas {
         this.router.put('/admin/comida', TokenValidation, USUARIO_CONTROLADOR.RegistrarAdminComida);
         // METODO PARA REGISTRAR FRASE DE SEGURIDAD
         this.router.put('/frase', TokenValidation, USUARIO_CONTROLADOR.ActualizarFrase);
-        // METODO PARA BUSCAR DATOS DE USUARIOS Y CARGOS TIMBRE WEB
-        this.router.get('/lista-web-cargos/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreWebCargos);
-        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB
-        this.router.get('/lista-web/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreWeb);
+
         // METODO PARA ACTUALIZAR ESTADO DE TIMBRE WEB
         this.router.put('/lista-web/', TokenValidation, USUARIO_CONTROLADOR.ActualizarEstadoTimbreWeb);
-        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
-        this.router.get('/lista-app-movil/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreMovil);
+
         // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
         this.router.get('/lista-app-movil-cargos/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreMovilCargos);
         // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL
@@ -47,6 +43,22 @@ class UsuarioRutas {
         this.router.post('/frase/olvido-frase', USUARIO_CONTROLADOR.RestablecerFrase);
         // METODO PARA CAMBIAR FRASE DE SEGURIDAD
         this.router.post('/frase/restaurar-frase/nueva', USUARIO_CONTROLADOR.CambiarFrase);
+
+        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB SUPERADMINISTRADOR
+        this.router.get('/lista-web-superior/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreWeb_SUPERADMIN);
+        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB ADMINISTRADOR
+        this.router.post('/lista-web-general/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreWeb_ADMIN);
+        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB ADMINISTRADOR JEFE
+        this.router.post('/lista-web-jefe/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreWeb_JEFE);
+
+
+        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL SUPERADMINISTRADOR
+        this.router.get('/lista-app-movil-superior/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreMovil_SUPERADMIN);
+        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL ADMINISTRADOR
+        this.router.post('/lista-app-movil-general/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreMovil_ADMIN);
+        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL SUPER ADMINISTRADOR
+        this.router.post('/lista-app-movil-jefe/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreMovil_JEFE);
+
 
 
         // METODO PARA BUSCAR DATOS DE USUARIOS Y SUCURSALES
@@ -66,7 +78,7 @@ class UsuarioRutas {
 
 
 
-        
+
         this.router.get('/', TokenValidation, USUARIO_CONTROLADOR.list);
         this.router.get('/busqueda/:usuario', TokenValidation, USUARIO_CONTROLADOR.getIdByUsuario);
 

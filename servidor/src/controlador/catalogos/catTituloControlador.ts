@@ -90,16 +90,18 @@ class TituloControlador {
 
     var listTitulosProfesionales: any = [];
     var duplicados: any = [];
+    var mensaje: string = 'correcto';
 
     // LECTURA DE LOS DATOS DE LA PLANTILLA
     plantilla.forEach(async (dato: any, indice: any, array: any) => {
-      var {N, nombre, nivel} = dato;
-      data.fila = dato.N
+      var {item, nombre, nivel} = dato;
+      data.fila = dato.item
       data.titulo = dato.nombre;
       data.nivel = dato.nivel;
 
-      if((data.titulo != undefined && data.titulo != '') 
-      && (data.nivel != undefined && data.nivel != '') ){
+      if((data.fila != undefined && data.fila != '') && 
+        (data.titulo != undefined && data.titulo != '') && 
+        (data.nivel != undefined && data.nivel != '') ){
         //Validar primero que exista niveles en la tabla niveles
         const existe_nivel = await pool.query('SELECT id FROM nivel_titulo WHERE UPPER(nombre) = UPPER($1)', [nivel]);
         var id_nivel = existe_nivel.rows[0];
@@ -108,7 +110,7 @@ class TituloControlador {
           const VERIFICAR_Titulos = await  pool.query('SELECT * FROM cg_titulos ' +
           'WHERE UPPER(nombre) = UPPER($1) AND id_nivel = $2', [nombre, id_nivel.id]);
           if(VERIFICAR_Titulos.rowCount == 0){
-            data.fila = dato.N
+            data.fila = dato.item
             data.titulo = dato.nombre;
             data.nivel = dato.nivel
               if(duplicados.find((p: any)=> p.nombre.toLowerCase() === dato.nombre.toLowerCase() && p.nivel.toLowerCase() === dato.nivel.toLowerCase()) == undefined)
@@ -120,7 +122,7 @@ class TituloControlador {
             listTitulosProfesionales.push(data);
           
           }else{
-            data.fila = dato.N
+            data.fila = dato.item
             data.titulo = nombre;
             data.nivel = nivel
             data.observacion = 'Ya esta registrado en base';
@@ -128,7 +130,7 @@ class TituloControlador {
             listTitulosProfesionales.push(data);
           }
         }else{
-          data.fila = dato.N
+          data.fila = dato.item
           data.titulo = dato.nombre;
           data.nivel = dato.nivel;
 
@@ -137,19 +139,24 @@ class TituloControlador {
             data.observacion = 'Nivel no registrado';
           }
 
-          data.observacion = 'nivel no existe en el sistema'
+          data.observacion = 'Nivel no existe en el sistema'
 
           listTitulosProfesionales.push(data);
         }
 
       }else{
-        data.fila = dato.N
+        data.fila = dato.item
         data.titulo = dato.nombre;
         data.nivel = dato.nivel;
 
+        if(data.fila == '' || data.fila == undefined){
+          data.fila = 'error';
+          mensaje = 'error'
+        }
+
         if(data.titulo == '' ||data.titulo == undefined){
           data.titulo = 'No registrado';
-          data.observacion = 'Titulo no registrado';
+          data.observacion = 'Título no registrado';
         }
 
         if(data.nivel == '' || data.nivel == undefined){
@@ -158,7 +165,7 @@ class TituloControlador {
         }
 
         if((data.titulo == '' || data.titulo == undefined) && (data.nivel == '' || data.nivel == undefined)){
-          data.observacion = 'Titulo y Nivel no registrado';
+          data.observacion = 'Título y Nivel no registrado';
         }
 
         listTitulosProfesionales.push(data);
@@ -189,16 +196,33 @@ class TituloControlador {
             return 1;
         }
         return 0; // Son iguales
-    });
+      });
+
+      var filaDuplicada: number = 0;
 
       listTitulosProfesionales.forEach((item:any) => {
         if(item.observacion == undefined || item.observacion == null || item.observacion == ''){
           item.observacion = 'Registro duplicado'
         }
+
+        //Valida si los datos de la columna N son numeros.
+        if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+          //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+              if(item.fila == filaDuplicada){
+                  mensaje = 'error';
+              }
+        }else{
+            return mensaje = 'error';
+        } 
+
+        filaDuplicada = item.fila;
       });
 
-      console.log('list: ',listTitulosProfesionales);
-      return res.jsonp({ message: 'correcto', data:  listTitulosProfesionales});
+      if(mensaje == 'error'){
+        listTitulosProfesionales = undefined;
+      }
+
+      return res.jsonp({ message: mensaje, data:  listTitulosProfesionales});
 
     }, 1500)
   }

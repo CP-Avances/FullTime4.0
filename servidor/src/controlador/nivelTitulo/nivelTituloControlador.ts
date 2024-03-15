@@ -126,21 +126,20 @@ class NivelTituloControlador {
 
     var listNivelesProfesionales: any = [];
     var duplicados: any = [];
-
-    console.log('plantilla: ',plantilla);
+    var mensaje: string = 'correcto';
 
     // LECTURA DE LOS DATOS DE LA PLANTILLA
     plantilla.forEach(async (dato: any, indice: any, array: any) => {
-      var {N, nombre} = dato;
-
-      data.fila = dato.N
+      var {item, nombre} = dato;
+      data.fila = dato.item
       data.nombre = dato.nombre;
 
-      if(data.nombre != undefined && data.nombre != '' && data.nombre != null){
+      if((data.fila != undefined && data.fila != '') && 
+        (data.nombre != undefined && data.nombre != '' && data.nombre != null)){
         //Validar primero que exista la ciudad en la tabla ciudades
         const existe_nivelProfecional = await pool.query('SELECT nombre FROM nivel_titulo WHERE UPPER(nombre) = UPPER($1)', [data.nombre]);
         if(existe_nivelProfecional.rowCount == 0){
-          data.fila = N
+          data.fila = item
           data.nombre = nombre;
           if(duplicados.find((p: any)=> p.nombre.toLowerCase() === data.nombre.toLowerCase()) == undefined)
           {
@@ -150,19 +149,24 @@ class NivelTituloControlador {
 
           listNivelesProfesionales.push(data);
         }else{
-          data.fila = N
+          data.fila = item
           data.nombre = nombre;
           data.observacion = 'Ya existe en el sistema';
 
           listNivelesProfesionales.push(data);
         }
       }else{
-        data.fila = N
+        data.fila = item
         data.nombre = 'No registrado';
         data.observacion = 'Nivel no registrado';
+
+        if(data.fila == '' || data.fila == undefined){
+          data.fila = 'error';
+          mensaje = 'error'
+        }
+
         listNivelesProfesionales.push(data);
       }
-
 
       data = {};
 
@@ -188,14 +192,34 @@ class NivelTituloControlador {
             return 1;
         }
         return 0; // Son iguales
-    });
+      });
+
+      var filaDuplicada: number = 0;
 
       listNivelesProfesionales.forEach((item:any) => {
         if(item.observacion == undefined || item.observacion == null || item.observacion == ''){
           item.observacion = 'Registro duplicado'
         }
+
+        //Valida si los datos de la columna N son numeros.
+        if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+          //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+              if(item.fila == filaDuplicada){
+                  mensaje = 'error';
+              }
+        }else{
+            return mensaje = 'error';
+        } 
+
+        filaDuplicada = item.fila;
+
       });
-      return res.jsonp({ message: 'correcto', data:  listNivelesProfesionales});
+
+      if(mensaje == 'error'){
+        listNivelesProfesionales = undefined;
+      }
+
+      return res.jsonp({ message: mensaje, data:  listNivelesProfesionales});
 
     }, 1500)
   }
