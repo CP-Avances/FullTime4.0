@@ -689,19 +689,41 @@ function VerificarDetallesAgrupados(detallesAgrupados: any, horarios: Horario[])
       }
 
       else {
-        //VERIFICAR QUE SALIDA MENOS ENTRADA SEA IGUAL A HORAS_TOTALES
-        const entrada = detalles.find((detalle: any) => detalle.TIPO_ACCION === 'Entrada');
-        const salida = detalles.find((detalle: any) => detalle.TIPO_ACCION === 'Salida');
-        const horaEntrada = moment(entrada.HORA, 'HH:mm');
-        const horaSalida = moment(salida.HORA, 'HH:mm');
-        // SI EL HORARIO TIENE SALIDA AL OTRO DIA SE DEBE SUMAR 24 HORAS A LA SALIDA
-        if (salida.SALIDA_SIGUIENTE_DIA.toLowerCase() == 'si' ) {
-          horaSalida.add(1, 'days');
+        //VALIDAR QUE LA SUMA DE HORAS DE ENTRADA Y SALIDA SEA IGUAL A HORAS_TOTALES
+        
+        const getDetalle = (accion: string) => detalles.find((detalle: any) => detalle.TIPO_ACCION === accion);
+        const getHora = (detalle: any) => moment(detalle.HORA, 'HH:mm');
+
+        const entrada = getDetalle('Entrada');
+        const salida = getDetalle('Salida');
+        let horaEntrada = getHora(entrada);
+        let horaSalida = getHora(salida);
+        let minutosAlimentacion = 0;
+        let diferenciaAlimentacion = 0;
+
+        if (tieneAlimentacion) {
+            const inicioAlimentacion = getDetalle('Inicio alimentación');
+            const finAlimentacion = getDetalle('Fin alimentación');
+            const horaInicioAlimentacion = getHora(inicioAlimentacion);
+            const horaFinAlimentacion = getHora(finAlimentacion);
+
+            diferenciaAlimentacion = horaFinAlimentacion.diff(horaInicioAlimentacion, 'minutes');
+            minutosAlimentacion = Number(horario.MIN_ALIMENTACION.toString());
+
+            if (diferenciaAlimentacion < minutosAlimentacion) {
+                codigosDetalles.push({codigo: codigoHorario, observacion: 'Minutos de alimentación no corresponden a los asignados'});
+                return codigosDetalles;
+            }
+        } else if (salida.SALIDA_SIGUIENTE_DIA.toLowerCase() == 'si') {
+            horaSalida.add(1, 'days');
         }
+
         const diferencia = horaSalida.diff(horaEntrada, 'minutes');
+        const direnciaTotal = tieneAlimentacion ? diferencia - minutosAlimentacion : diferencia;
         const horasTotalesEnMinutos = convertirHorasTotalesAMinutos(horario.HORAS_TOTALES.toString());
-        if (diferencia !== horasTotalesEnMinutos) {
-          codigosDetalles.push({codigo: codigoHorario, observacion: 'No cumple con las horas totales'});
+
+        if (direnciaTotal !== horasTotalesEnMinutos) {
+            codigosDetalles.push({codigo: codigoHorario, observacion: 'No cumple con las horas totales'});
         }
       }
     }

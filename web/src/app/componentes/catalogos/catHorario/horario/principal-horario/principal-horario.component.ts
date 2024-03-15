@@ -596,7 +596,7 @@ export class PrincipalHorarioComponent implements OnInit {
       return 'rgb(222, 162, 73)';
     }
 
-    if(observacion.startsWith('Requerido')){
+    if(observacion.startsWith('Requerido') || observacion.startsWith('No cumple') || observacion.startsWith('Minutos de alimentación no')){
       return 'rgb(238, 34, 207)';
     }
 
