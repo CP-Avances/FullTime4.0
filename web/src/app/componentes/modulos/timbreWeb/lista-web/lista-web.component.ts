@@ -10,11 +10,11 @@ import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.mode
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 
 // IMPORTAR SERVICIOS
+import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 
 @Component({
   selector: 'app-lista-web',
@@ -47,7 +47,6 @@ export class ListaWebComponent implements OnInit {
 
   // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA HABILITADOS
   departamentos: any = [];
-  habilitados: any = [];
   sucursales: any = [];
   respuesta: any = [];
   empleados: any = [];
@@ -139,7 +138,6 @@ export class ListaWebComponent implements OnInit {
   empleados_dh: any = [];
   regimen_dh: any = [];
   cargos_dh: any = [];
-  deshabilitados: any = [];
 
   selectionSuc_dh = new SelectionModel<ITableEmpleados>(true, []);
   selectionReg_dh = new SelectionModel<ITableEmpleados>(true, []);
@@ -309,9 +307,11 @@ export class ListaWebComponent implements OnInit {
     this.informacion.UsuariosTimbreWeb_SUPERADMIN(1, estado).subscribe((res: any[]) => {
       if (estado === false) {
         this.inactivar = true;
+        this.ver_imagen = true;
       }
       else {
         this.activar = true;
+        this.ver_imagen = true;
       }
       this.ProcesarDatos(res, sucursales_, regimenes_, departamentos_, cargos_, empleados_, estado);
     }, err => {
@@ -329,9 +329,11 @@ export class ListaWebComponent implements OnInit {
     this.informacion.UsuariosTimbreWeb_ADMIN(1, estado, buscar).subscribe((res: any[]) => {
       if (estado === false) {
         this.inactivar = true;
+        this.ver_imagen = true;
       }
       else {
         this.activar = true;
+        this.ver_imagen = true;
       }
       this.ProcesarDatos(res, sucursales_, regimenes_, departamentos_, cargos_, empleados_, estado);
     }, err => {
@@ -349,9 +351,11 @@ export class ListaWebComponent implements OnInit {
     this.informacion.UsuariosTimbreWeb_JEFE(1, estado, buscar).subscribe((res: any[]) => {
       if (estado === false) {
         this.inactivar = true;
+        this.ver_imagen = true;
       }
       else {
         this.activar = true;
+        this.ver_imagen = true;
       }
       this.ProcesarDatos(res, sucursales_, regimenes_, departamentos_, cargos_, empleados_, estado);
     }, err => {
@@ -488,9 +492,11 @@ export class ListaWebComponent implements OnInit {
   // CONTROL DE BOTONES
   activar_habilitados: boolean = false;
   activar_deshabilitados: boolean = false;
+  ver_imagen: boolean = true;
   VerTablas(tipo: number) {
     this.activar = false;
     this.inactivar = false;
+    this.ver_imagen = false;
     if (tipo === 1) {
       this.activar_habilitados = true;
     }
@@ -574,19 +580,19 @@ export class ListaWebComponent implements OnInit {
   GuardarRegistros_DH(valor: any) {
     let tipo: number = 1;
     if (this.opcion_dh === 's') {
-      this.ModelarSucursal(valor.id, tipo, this.empleados_dh);
+      this.ModelarSucursal(valor.id, tipo, this.empleados_dh, this.selectionSuc_dh);
     }
     if (this.opcion_dh === 'r') {
-      this.ModelarRegimen(valor.id, valor.id_suc, tipo, this.empleados_dh);
+      this.ModelarRegimen(valor.id, valor.id_suc, tipo, this.empleados_dh, this.selectionReg_dh);
     }
     else if (this.opcion_dh === 'c') {
-      this.ModelarCargo(valor.id, valor.id_suc, tipo, this.empleados_dh);
+      this.ModelarCargo(valor.id, valor.id_suc, tipo, this.empleados_dh, this.selectionCarg_dh);
     }
     else if (this.opcion_dh === 'd') {
-      this.ModelarDepartamentos(valor.id, valor.id_suc, tipo, this.empleados_dh);
+      this.ModelarDepartamentos(valor.id, valor.id_suc, tipo, this.empleados_dh, this.selectionDep_dh);
     }
     else {
-      this.ModelarEmpleados(tipo, this.empleados_dh);
+      this.ModelarEmpleados(tipo, this.empleados_dh, this.selectionEmp_dh);
     }
   }
 
@@ -604,23 +610,31 @@ export class ListaWebComponent implements OnInit {
     if (this.opcion_dh === 'r') {
       this.nombre_reg_dh.reset();
       this.dh_filtroNombreReg_ = '';
+      this.nombre_suc_dh.reset();
+      this.dh_filtroNombreSuc_ = '';
       this.selectionEmp_dh.clear();
       this.selectionCarg_dh.clear();
       this.selectionSuc_dh.clear();
+      this.Filtrar_DH('', 1)
       this.Filtrar_DH('', 12)
     }
     else if (this.opcion_dh === 'c') {
       this.nombre_carg_dh.reset();
       this.dh_filtroNombreCarg_ = '';
+      this.nombre_suc_dh.reset();
+      this.dh_filtroNombreSuc_ = '';
       this.selectionEmp_dh.clear();
       this.selectionDep_dh.clear();
       this.selectionSuc_dh.clear();
       this.selectionReg_dh.clear();
+      this.Filtrar_DH('', 1)
       this.Filtrar_DH('', 2)
     }
     else if (this.opcion_dh === 'd') {
       this.nombre_dep_dh.reset();
       this.dh_filtroNombreDep_ = '';
+      this.nombre_suc_dh.reset();
+      this.dh_filtroNombreSuc_ = '';
       this.nombre_suc_dh.reset();
       this.dh_filtroNombreSuc_ = '';
       this.selectionEmp_dh.clear();
@@ -637,10 +651,13 @@ export class ListaWebComponent implements OnInit {
       this.dh_filtroCodigo_ = '';
       this.dh_filtroCedula_ = '';
       this.dh_filtroNombreEmp_ = '';
+      this.nombre_suc_dh.reset();
+      this.dh_filtroNombreSuc_ = '';
       this.selectionDep_dh.clear();
       this.selectionCarg_dh.clear();
       this.selectionSuc_dh.clear();
       this.selectionReg_dh.clear();
+      this.Filtrar_DH('', 1)
       this.Filtrar_DH('', 4)
       this.Filtrar_DH('', 5)
       this.Filtrar_DH('', 6)
@@ -1067,11 +1084,11 @@ export class ListaWebComponent implements OnInit {
   }
 
   // METODO PARA PRESENTAR DATOS DE SUCURSALES
-  ModelarSucursal(id: number, tipo: number, lista: any) {
+  ModelarSucursal(id: number, tipo: number, lista: any, selector: any) {
     let usuarios: any = [];
     if (id === 0) {
       lista.forEach((empl: any) => {
-        this.selectionSuc.selected.find(selec => {
+        selector.selected.find(selec => {
           if (empl.id_suc === selec.id) {
             usuarios.push(empl)
           }
@@ -1079,7 +1096,7 @@ export class ListaWebComponent implements OnInit {
       })
     }
     else {
-      this.empleados.forEach((empl: any) => {
+      lista.forEach((empl: any) => {
         if (empl.id_suc === id) {
           usuarios.push(empl)
         }
@@ -1089,11 +1106,11 @@ export class ListaWebComponent implements OnInit {
   }
 
   // METODO PARA PRESENTAR DATOS DE REGIMEN
-  ModelarRegimen(id: number, sucursal: any, tipo: number, lista: any) {
+  ModelarRegimen(id: number, sucursal: any, tipo: number, lista: any, selector: any) {
     let usuarios: any = [];
     if (id === 0) {
       lista.forEach((empl: any) => {
-        this.selectionReg.selected.find(selec => {
+        selector.selected.find(selec => {
           if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
             usuarios.push(empl)
           }
@@ -1101,7 +1118,7 @@ export class ListaWebComponent implements OnInit {
       })
     }
     else {
-      this.empleados.forEach((empl: any) => {
+      lista.forEach((empl: any) => {
         if (empl.id_regimen === id && empl.id_suc === sucursal) {
           usuarios.push(empl)
         }
@@ -1111,11 +1128,11 @@ export class ListaWebComponent implements OnInit {
   }
 
   // METODO PARA MOSTRAR DATOS DE CARGOS
-  ModelarCargo(id: number, sucursal: any, tipo: number, lista: any) {
+  ModelarCargo(id: number, sucursal: any, tipo: number, lista: any, selector: any) {
     let usuarios: any = [];
     if (id === 0) {
       lista.forEach((empl: any) => {
-        this.selectionCarg.selected.find(selec => {
+        selector.selected.find(selec => {
           if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
             usuarios.push(empl)
           }
@@ -1123,7 +1140,7 @@ export class ListaWebComponent implements OnInit {
       })
     }
     else {
-      this.empleados.forEach((empl: any) => {
+      lista.forEach((empl: any) => {
         if (empl.id_cargo_ === id && empl.id_suc === sucursal) {
           usuarios.push(empl)
         }
@@ -1133,11 +1150,11 @@ export class ListaWebComponent implements OnInit {
   }
 
   // METODO PARA PRESENTAR DATOS DE DEPARTAMENTOS
-  ModelarDepartamentos(id: number, sucursal: any, tipo: number, lista: any) {
+  ModelarDepartamentos(id: number, sucursal: any, tipo: number, lista: any, selector: any) {
     let usuarios: any = [];
     if (id === 0) {
-      this.empleados.forEach((empl: any) => {
-        this.selectionDep.selected.find(selec => {
+      lista.forEach((empl: any) => {
+        selector.selected.find(selec => {
           if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
             usuarios.push(empl)
           }
@@ -1145,7 +1162,7 @@ export class ListaWebComponent implements OnInit {
       })
     }
     else {
-      this.empleados.forEach((empl: any) => {
+      lista.forEach((empl: any) => {
         if (empl.id_depa === id && empl.id_suc === sucursal) {
           usuarios.push(empl)
         }
@@ -1155,10 +1172,10 @@ export class ListaWebComponent implements OnInit {
   }
 
   // METODO PARA PRESENTAR DATOS DE EMPLEADO
-  ModelarEmpleados(tipo: any, lista: any) {
+  ModelarEmpleados(tipo: any, lista: any, selector: any) {
     let respuesta: any = [];
-    this.empleados.forEach((obj: any) => {
-      this.selectionEmp.selected.find(obj1 => {
+    lista.forEach((obj: any) => {
+      selector.selected.find(obj1 => {
         if (obj1.id === obj.id) {
           respuesta.push(obj)
         }
@@ -1209,19 +1226,19 @@ export class ListaWebComponent implements OnInit {
   GuardarRegistros(valor: any) {
     let tipo: number = 2;
     if (this.opcion === 's') {
-      this.ModelarSucursal(valor.id, tipo, this.empleados);
+      this.ModelarSucursal(valor.id, tipo, this.empleados, this.selectionSuc);
     }
     if (this.opcion === 'r') {
-      this.ModelarRegimen(valor.id, valor.id_suc, tipo, this.empleados);
+      this.ModelarRegimen(valor.id, valor.id_suc, tipo, this.empleados, this.selectionReg);
     }
     else if (this.opcion === 'c') {
-      this.ModelarCargo(valor.id, valor.id_suc, tipo, this.empleados);
+      this.ModelarCargo(valor.id, valor.id_suc, tipo, this.empleados, this.selectionCarg);
     }
     else if (this.opcion === 'd') {
-      this.ModelarDepartamentos(valor.id, valor.id_suc, tipo, this.empleados);
+      this.ModelarDepartamentos(valor.id, valor.id_suc, tipo, this.empleados, this.selectionDep);
     }
     else {
-      this.ModelarEmpleados(tipo, this.empleados);
+      this.ModelarEmpleados(tipo, this.empleados, this.selectionEmp);
     }
   }
 
@@ -1230,6 +1247,7 @@ export class ListaWebComponent implements OnInit {
 
     this.activar_deshabilitados = false;
     this.activar_habilitados = false;
+    this.ver_imagen = true;
 
     if (this.sucursales.length > 0) {
       this.activar = true;
@@ -1334,19 +1352,25 @@ export class ListaWebComponent implements OnInit {
     else if (this.opcion === 'r') {
       this.nombre_reg.reset();
       this.filtroNombreReg_ = '';
+      this.nombre_suc.reset();
+      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionEmp.clear();
       this.selectionSuc.clear();
+      this.Filtrar('', 6)
       this.Filtrar('', 13)
     }
     else if (this.opcion === 'c') {
       this.nombre_carg.reset();
       this.filtroNombreCarg_ = '';
+      this.nombre_suc.reset();
+      this.filtroNombreSuc_ = '';
       this.selectionEmp.clear();
       this.selectionDep.clear();
       this.selectionSuc.clear();
       this.selectionReg.clear();
+      this.Filtrar('', 6)
       this.Filtrar('', 7)
     }
     else if (this.opcion === 'd') {
@@ -1368,10 +1392,13 @@ export class ListaWebComponent implements OnInit {
       this.filtroCodigo_ = '';
       this.filtroCedula_ = '';
       this.filtroNombreEmp_ = '';
+      this.nombre_suc.reset();
+      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();
       this.selectionReg.clear();
+      this.Filtrar('', 6)
       this.Filtrar('', 9)
       this.Filtrar('', 10)
       this.Filtrar('', 11)

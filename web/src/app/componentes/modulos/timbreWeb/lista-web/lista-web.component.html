@@ -184,7 +184,7 @@
                                         oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                         [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
-                                        matTooltip="Búsqueda de datos de empleado por cédula de identificación o pasaporte.">
+                                        matTooltip="Búsqueda de datos de empleado por cédula de identificación.">
                                         help_outline
                                     </mat-icon>
                                 </mat-form-field>
@@ -472,7 +472,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let e of empleados | emplCodigo: filtroCodigo | emplCedula: filtroCedula | emplNombre: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
+                                    *ngFor="let e of empleados | sucNombre: filtroNombreSuc | emplCodigo: filtroCodigo | emplCedula: filtroCedula | emplNombre: filtroNombreEmp | paginate:tamanio_pagina_emp:numero_pagina_emp">
                                     <td>
                                         <mat-checkbox *ngIf="multiple_" (click)="$event.stopPropagation()"
                                             (change)="$event ? selectionEmp.toggle(e) : null"
@@ -688,7 +688,7 @@
                                         oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                         [formControl]="cedula_dh" type="text" (keypress)="IngresarSoloNumeros($event)">
                                     <mat-icon matSuffix matTooltipPosition="right"
-                                        matTooltip="Búsqueda de datos de empleado por cédula de identificación o pasaporte.">
+                                        matTooltip="Búsqueda de datos de empleado por cédula de identificación.">
                                         help_outline
                                     </mat-icon>
                                 </mat-form-field>
@@ -805,7 +805,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let rdh of regimen_dh | sucNombre: filtroNombreSuc | emplNombre: dh_filtroNombreReg | paginate:tamanio_pagina_reg_dh:numero_pagina_reg_dh">
+                                    *ngFor="let rdh of regimen_dh | sucNombre: dh_filtroNombreSuc_ | emplNombre: dh_filtroNombreReg | paginate:tamanio_pagina_reg_dh:numero_pagina_reg_dh">
                                     <td>
                                         <mat-checkbox *ngIf="multiple_dh_" (click)="$event.stopPropagation()"
                                             (change)="$event ? selectionReg_dh.toggle(rdh) : null"
@@ -867,7 +867,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let c of cargos_dh | sucNombre: filtroNombreSuc | emplNombre: dh_filtroNombreCarg | paginate:tamanio_pagina_car_dh:numero_pagina_car_dh">
+                                    *ngFor="let c of cargos_dh | sucNombre: dh_filtroNombreSuc_ | emplNombre: dh_filtroNombreCarg | paginate:tamanio_pagina_car_dh:numero_pagina_car_dh">
                                     <td>
                                         <mat-checkbox *ngIf="multiple_dh_" (click)="$event.stopPropagation()"
                                             (change)="$event ? selectionCarg_dh.toggle(c) : null"
@@ -993,7 +993,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let e of empleados_dh  | sucNombre: filtroNombreSuc | emplCodigo: dh_filtroCodigo | emplCedula: dh_filtroCedula | emplNombre: dh_filtroNombreEmp | paginate:tamanio_pagina_emp_dh:numero_pagina_emp_dh">
+                                    *ngFor="let e of empleados_dh  | sucNombre: dh_filtroNombreSuc_ | emplCodigo: dh_filtroCodigo | emplCedula: dh_filtroCedula | emplNombre: dh_filtroNombreEmp | paginate:tamanio_pagina_emp_dh:numero_pagina_emp_dh">
                                     <td>
                                         <mat-checkbox *ngIf="multiple_dh_" (click)="$event.stopPropagation()"
                                             (change)="$event ? selectionEmp_dh.toggle(e) : null"
@@ -1025,26 +1025,42 @@
             </mat-card-content>
         </div>
 
-        <div style="padding-top: 25px; padding-bottom: 30px;">
-            <div class="row">
-                <div class="col-sm-3">
+        <div class="container" style="padding-top: 25px; padding-bottom: 30px; text-align: center;">
+            <div class="row" style="text-align:center;">
+                <div class="col-md" *ngIf="ver_imagen">
+                    <br>
+                    <img class="avatar" src="../../../../../assets/imagenes/timbrar_virtual.jpg">
                 </div>
-                <div class="col-sm-6">
-                    <div style="padding-top: 20px; padding-bottom: 20px;" *ngIf="activar">
-                        <button class="activo btn btn-md btn-block" (click)="VerTablas(1)">
-                            INACTIVAR USUARIOS TIMBRE VIRTUAL
-                        </button>
+                <div class="col-md">
+                    <div class="col-md">
+                        <br>
+                        <div (click)="VerTablas(1)" style="padding-top: 10px; padding-bottom: 10px;" *ngIf="activar">
+                            <!--LISTAR USUARIOS ACTIVO-->
+                            <mat-card [ngClass]="'mat-elevation-z8 card-uno'" style="color: antiquewhite;">
+                                <mat-card-content>
+                                    <div style="padding-top: 20px; padding-bottom: 20px;">
+                                        <mat-icon>thumb_down</mat-icon> &nbsp;&nbsp;
+                                        <mat-label>INACTIVAR USUARIOS TIMBRE VIRTUAL</mat-label>
+                                    </div>
+                                </mat-card-content>
+                            </mat-card>
+                        </div>
+                        <div (click)="VerTablas(2)" style="padding-top: 20px; padding-bottom: 10px;" *ngIf="inactivar">
+                            <!--LISTAR USUARIOS INACTIVOS-->
+                            <mat-card [ngClass]="'mat-elevation-z8 card-dos'" style="color: antiquewhite;">
+                                <mat-card-content>
+                                    <div style="padding-top: 20px; padding-bottom: 20px;">
+                                        <mat-icon>thumb_up</mat-icon> &nbsp;&nbsp;
+                                        <mat-label>
+                                            ACTIVAR USUARIOS TIMBRE VIRTUAL
+                                        </mat-label>
+                                    </div>
+                                </mat-card-content>
+                            </mat-card>
+                        </div>
                     </div>
-                    <div style="padding-top: 20px;" *ngIf="inactivar">
-                        <button class="inactivo btn btn-md btn-block" (click)="VerTablas(2)">
-                            ACTIVAR USUARIOS TIMBRE VIRTUAL
-                        </button>
-                    </div>
-                </div>
-                <div class="col-sm-3">
                 </div>
             </div>
         </div>
-
     </mat-card>
 </div>

@@ -28,8 +28,6 @@ class UsuarioRutas {
         // METODO PARA ACTUALIZAR ESTADO DE TIMBRE WEB
         this.router.put('/lista-web/', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ActualizarEstadoTimbreWeb);
         // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
-        this.router.get('/lista-app-movil/:estado/activo/:habilitado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.UsuariosTimbreMovil);
-        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
         this.router.get('/lista-app-movil-cargos/:estado/activo/:habilitado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.UsuariosTimbreMovilCargos);
         // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL
         this.router.put('/lista-app-movil/', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.ActualizarEstadoTimbreMovil);
@@ -47,6 +45,12 @@ class UsuarioRutas {
         this.router.post('/lista-web-general/:estado/activo/:habilitado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.UsuariosTimbreWeb_ADMIN);
         // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB ADMINISTRADOR JEFE
         this.router.post('/lista-web-jefe/:estado/activo/:habilitado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.UsuariosTimbreWeb_JEFE);
+        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL SUPERADMINISTRADOR
+        this.router.get('/lista-app-movil-superior/:estado/activo/:habilitado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.UsuariosTimbreMovil_SUPERADMIN);
+        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL ADMINISTRADOR
+        this.router.post('/lista-app-movil-general/:estado/activo/:habilitado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.UsuariosTimbreMovil_ADMIN);
+        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL SUPER ADMINISTRADOR
+        this.router.post('/lista-app-movil-jefe/:estado/activo/:habilitado', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.UsuariosTimbreMovil_JEFE);
         // METODO PARA BUSCAR DATOS DE USUARIOS Y SUCURSALES
         this.router.post('/buscar-usuario-sucursal', verificarToken_1.TokenValidation, usuarioControlador_1.USUARIO_CONTROLADOR.BuscarUsuarioSucursal);
         // CREAR REGISTRO DE USUARIOS - SUCURSAL
