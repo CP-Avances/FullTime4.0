@@ -963,7 +963,7 @@
                                     <td>{{d.sucursal}}</td>
                                     <td>{{d.departamento}}</td>
                                     <td class="justify-content-center">
-                                        <i (click)="GuardarRegistros_DH(d.id)" id="plan_dh" *ngIf="individual_dh"
+                                        <i (click)="GuardarRegistros_DH(d)" id="plan_dh" *ngIf="individual_dh"
                                             class="fa fa-thumbs-up" matSuffix matTooltipPosition="right"
                                             matTooltip="Habilitar usuarios para uso de timbre de teletrabajo.">
                                             <p>Habilitar</p>
@@ -1053,17 +1053,6 @@
                 <div class="col-md">
                     <div class="col-md">
                         <br>
-                        <div (click)="VerTablas(1)" style="padding-top: 10px; padding-bottom: 10px;" *ngIf="activar">
-                            <!--LISTAR USUARIOS ACTIVO-->
-                            <mat-card [ngClass]="'mat-elevation-z8 card-uno'" style="color: antiquewhite;">
-                                <mat-card-content>
-                                    <div style="padding-top: 20px; padding-bottom: 20px;">
-                                        <mat-icon>thumb_down</mat-icon> &nbsp;&nbsp;
-                                        <mat-label>INACTIVAR USUARIOS RELOJ VIRTUAL</mat-label>
-                                    </div>
-                                </mat-card-content>
-                            </mat-card>
-                        </div>
                         <div (click)="VerTablas(2)" style="padding-top: 20px; padding-bottom: 10px;" *ngIf="inactivar">
                             <!--LISTAR USUARIOS INACTIVOS-->
                             <mat-card [ngClass]="'mat-elevation-z8 card-dos'" style="color: antiquewhite;">
@@ -1071,8 +1060,27 @@
                                     <div style="padding-top: 20px; padding-bottom: 20px;">
                                         <mat-icon>thumb_up</mat-icon> &nbsp;&nbsp;
                                         <mat-label>
-                                            ACTIVAR USUARIOS RELOJ VIRTUAL
+                                            ACTIVAR USUARIOS
                                         </mat-label>
+                                        <br>
+                                        <span class="fuente">
+                                            Listar usuarios que se encuentran inactivos para uso de RELOJ VIRTUAL*
+                                        </span>
+                                    </div>
+                                </mat-card-content>
+                            </mat-card>
+                        </div>
+                        <div (click)="VerTablas(1)" style="padding-top: 10px; padding-bottom: 10px;" *ngIf="activar">
+                            <!--LISTAR USUARIOS ACTIVO-->
+                            <mat-card [ngClass]="'mat-elevation-z8 card-uno'" style="color: antiquewhite;">
+                                <mat-card-content>
+                                    <div style="padding-top: 20px; padding-bottom: 20px;">
+                                        <mat-icon>thumb_down</mat-icon> &nbsp;&nbsp;
+                                        <mat-label>INACTIVAR USUARIOS</mat-label>
+                                        <br>
+                                        <span class="fuente">
+                                            Listar usuarios que se encuentran activos para uso de RELOJ VIRTUAL*
+                                        </span>
                                     </div>
                                 </mat-card-content>
                             </mat-card>

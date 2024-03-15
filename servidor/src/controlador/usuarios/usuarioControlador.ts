@@ -188,8 +188,6 @@ class UsuarioControlador {
         return dep.departamentos.length > 0;
       })
       return reg;
-    }).filter((obj: any) => {
-      return obj.regimenes.length > 0;
     });
 
     if (lista_departamentos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
@@ -226,8 +224,6 @@ class UsuarioControlador {
         return dep;
       })
       return reg;
-    }).filter((obj: any) => {
-      return obj.regimenes.length > 0;
     });
 
     if (lista_cargos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
@@ -263,12 +259,16 @@ class UsuarioControlador {
             return empl.empleado.length > 0;
           })
           return car;
-        })
+        }).filter((car: any) => {
+          return car.cargos.length > 0;
+        });
         return dep;
-      })
+      }).filter((dep: any) => {
+        return dep.departamentos.length > 0;
+      });
       return reg;
-    }).filter((obj: any) => {
-      return obj.regimenes.length > 0;
+    }).filter((reg: any) => {
+      return reg.regimenes.length > 0;
     });
 
     if (empleados.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
@@ -338,8 +338,6 @@ class UsuarioControlador {
         return dep.departamentos.length > 0;
       })
       return reg;
-    }).filter((obj: any) => {
-      return obj.regimenes.length > 0;
     });
 
     if (lista_departamentos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
@@ -376,8 +374,6 @@ class UsuarioControlador {
         return dep;
       })
       return reg;
-    }).filter((obj: any) => {
-      return obj.regimenes.length > 0;
     });
 
     if (lista_cargos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
@@ -413,12 +409,16 @@ class UsuarioControlador {
             return empl.empleado.length > 0;
           })
           return car;
-        })
+        }).filter((car: any) => {
+          return car.cargos.length > 0;
+        });
         return dep;
-      })
+      }).filter((dep: any) => {
+        return dep.departamentos.length > 0;
+      });
       return reg;
-    }).filter((obj: any) => {
-      return obj.regimenes.length > 0;
+    }).filter((reg: any) => {
+      return reg.regimenes.length > 0;
     });
 
     if (empleados.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
@@ -485,8 +485,6 @@ class UsuarioControlador {
         return dep.departamentos.length > 0;
       })
       return reg;
-    }).filter((obj: any) => {
-      return obj.regimenes.length > 0;
     });
 
     if (lista_departamentos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
@@ -523,8 +521,6 @@ class UsuarioControlador {
         return dep;
       })
       return reg;
-    }).filter((obj: any) => {
-      return obj.regimenes.length > 0;
     });
 
     if (lista_cargos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
@@ -560,12 +556,16 @@ class UsuarioControlador {
             return empl.empleado.length > 0;
           })
           return car;
-        })
+        }).filter((car: any) => {
+          return car.cargos.length > 0;
+        });
         return dep;
-      })
+      }).filter((dep: any) => {
+        return dep.departamentos.length > 0;
+      });
       return reg;
-    }).filter((obj: any) => {
-      return obj.regimenes.length > 0;
+    }).filter((reg: any) => {
+      return reg.regimenes.length > 0;
     });
 
     if (empleados.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
@@ -673,8 +673,6 @@ class UsuarioControlador {
         return dep.departamentos.length > 0;
       })
       return reg;
-    }).filter((obj: any) => {
-      return obj.regimenes.length > 0;
     });
 
     if (lista_departamentos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
@@ -711,8 +709,6 @@ class UsuarioControlador {
         return dep;
       })
       return reg;
-    }).filter((obj: any) => {
-      return obj.regimenes.length > 0;
     });
 
     if (lista_cargos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
@@ -748,12 +744,16 @@ class UsuarioControlador {
             return empl.empleado.length > 0;
           })
           return car;
-        })
+        }).filter((car: any) => {
+          return car.cargos.length > 0;
+        });
         return dep;
-      })
+      }).filter((dep: any) => {
+        return dep.departamentos.length > 0;
+      });
       return reg;
-    }).filter((obj: any) => {
-      return obj.regimenes.length > 0;
+    }).filter((reg: any) => {
+      return reg.regimenes.length > 0;
     });
 
     if (empleados.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
@@ -823,8 +823,6 @@ class UsuarioControlador {
         return dep.departamentos.length > 0;
       })
       return reg;
-    }).filter((obj: any) => {
-      return obj.regimenes.length > 0;
     });
 
     if (lista_departamentos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
@@ -861,8 +859,6 @@ class UsuarioControlador {
         return dep;
       })
       return reg;
-    }).filter((obj: any) => {
-      return obj.regimenes.length > 0;
     });
 
     if (lista_cargos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
@@ -898,12 +894,16 @@ class UsuarioControlador {
             return empl.empleado.length > 0;
           })
           return car;
-        })
+        }).filter((car: any) => {
+          return car.cargos.length > 0;
+        });
         return dep;
-      })
+      }).filter((dep: any) => {
+        return dep.departamentos.length > 0;
+      });
       return reg;
-    }).filter((obj: any) => {
-      return obj.regimenes.length > 0;
+    }).filter((reg: any) => {
+      return reg.regimenes.length > 0;
     });
 
     if (empleados.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
@@ -970,8 +970,6 @@ class UsuarioControlador {
         return dep.departamentos.length > 0;
       })
       return reg;
-    }).filter((obj: any) => {
-      return obj.regimenes.length > 0;
     });
 
     if (lista_departamentos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
@@ -1008,8 +1006,6 @@ class UsuarioControlador {
         return dep;
       })
       return reg;
-    }).filter((obj: any) => {
-      return obj.regimenes.length > 0;
     });
 
     if (lista_cargos.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
@@ -1045,207 +1041,22 @@ class UsuarioControlador {
             return empl.empleado.length > 0;
           })
           return car;
-        })
+        }).filter((car: any) => {
+          return car.cargos.length > 0;
+        });
         return dep;
-      })
+      }).filter((dep: any) => {
+        return dep.departamentos.length > 0;
+      });
       return reg;
-    }).filter((obj: any) => {
-      return obj.regimenes.length > 0;
+    }).filter((reg: any) => {
+      return reg.regimenes.length > 0;
     });
 
     if (empleados.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' })
 
     return res.status(200).jsonp(empleados);
   }
-
-
-
-
-
-  public async UsuariosTimbreMovil(req: Request, res: Response) {
-    let estado = req.params.estado;
-    let habilitado = req.params.habilitado;
-
-    // CONSULTA DE BUSQUEDA DE SUCURSALES
-    let suc = await pool.query(
-      `
-      SELECT s.id AS id_suc, s.nombre AS name_suc, c.descripcion AS ciudad FROM sucursales AS s, 
-        ciudades AS c 
-      WHERE s.id_ciudad = c.id ORDER BY s.id
-      `
-    ).then((result: any) => { return result.rows });
-
-    if (suc.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE DEPARTAMENTOS
-    let departamentos = await Promise.all(suc.map(async (dep: any) => {
-      dep.departamentos = await pool.query(
-        `
-        SELECT d.id as id_depa, d.nombre as name_dep, s.nombre AS sucursal
-        FROM cg_departamentos AS d, sucursales AS s
-        WHERE d.id_sucursal = $1 AND d.id_sucursal = s.id
-        `
-        , [dep.id_suc]
-      ).then((result: any) => {
-        return result.rows
-      });
-      return dep;
-    }));
-
-    let depa = departamentos.filter((obj: any) => {
-      return obj.departamentos.length > 0
-    });
-
-    if (depa.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE COLABORADORES POR DEPARTAMENTO
-    let lista = await Promise.all(depa.map(async (obj: any) => {
-      obj.departamentos = await Promise.all(obj.departamentos.map(async (empl: any) => {
-        empl.empleado = await pool.query(
-          `
-          SELECT DISTINCT e.id, (e.nombre || ' ' || e.apellido) AS nombre, e.cedula, e.codigo, u.usuario, 
-            u.app_habilita, u.id AS userid, d.nombre AS departamento, ec.id_regimen
-          FROM usuarios AS u, datos_actuales_empleado AS e, cg_departamentos AS d, empl_contratos AS ec
-          WHERE e.id = u.id_empleado AND d.id = e.id_departamento AND e.id_departamento = $1 AND e.estado = $2
-            AND u.app_habilita = $3 AND ec.id = e.id_contrato
-          ORDER BY nombre
-          `,
-          [empl.id_depa, estado, habilitado])
-          .then((result: any) => { return result.rows });
-        return empl;
-      }));
-      return obj;
-    }))
-
-    if (lista.length === 0) return res.status(404)
-      .jsonp({ message: 'No se han encontrado registros.' });
-
-    let empleados = lista.map((obj: any) => {
-      obj.departamentos = obj.departamentos.filter((ele: any) => {
-        return ele.empleado.length > 0;
-      })
-      return obj;
-    }).filter((obj: any) => {
-      return obj.departamentos.length > 0;
-    });
-
-
-    // CONSULTA DE BUSQUEDA DE COLABORADORES POR REGIMEN
-    let regimen = await Promise.all(empleados.map(async (obj: any) => {
-      obj.departamentos = await Promise.all(obj.departamentos.map(async (empl: any) => {
-        empl.empleado = await Promise.all(empl.empleado.map(async (reg: any) => {
-          //console.log('variables car ', reg)
-          reg.regimen = await pool.query(
-            `
-                            SELECT r.id AS id_regimen, r.descripcion AS name_regimen
-                            FROM cg_regimenes AS r
-                            WHERE r.id = $1
-                            ORDER BY r.descripcion ASC
-                            `,
-            [reg.id_regimen])
-            .then((result: any) => { return result.rows });
-          return reg;
-        }))
-        return empl;
-      }));
-      return obj;
-    }))
-
-    if (regimen.length === 0) return res.status(404)
-      .jsonp({ message: 'No se han encontrado registros.' });
-
-    let respuesta = regimen.map((obj: any) => {
-      obj.departamentos = obj.departamentos.filter((ele: any) => {
-        ele.empleado = ele.empleado.filter((reg: any) => {
-          return reg.regimen.length > 0;
-        })
-        return ele;
-      }).filter((ele: any) => {
-        return ele.empleado.length > 0;
-      });
-      return obj;
-    }).filter((obj: any) => {
-      return obj.departamentos.length > 0;
-    });
-
-    if (respuesta.length === 0) return res.status(404)
-      .jsonp({ message: 'No se han encontrado registros.' })
-
-    return res.status(200).jsonp(respuesta);
-  }
-
-
-  /**
-   * METODO DE CONSULTA DE DATOS GENERALES DE USUARIOS QUE USAN TIMBRE MOVIL
-   * REALIZA UN ARRAY DE CARGOS Y EMPLEADOS DEPENDIENDO DEL ESTADO DEL 
-   * EMPLEADO SI BUSCA EMPLEADOS ACTIVOS O INACTIVOS. 
-   * @returns Retorna Array de [Cargos[empleados[]]]
-   **/
-
-  public async UsuariosTimbreMovilCargos(req: Request, res: Response) {
-    let estado = req.params.estado;
-    let habilitado = req.params.habilitado;
-
-    // CONSULTA DE BUSQUEDA DE CARGOS
-    let cargo = await pool.query(
-      `
-      SELECT tc.id AS id_cargo, tc.cargo AS name_cargo
-      FROM tipo_cargo AS tc 
-      ORDER BY tc.cargo ASC
-      `
-    ).then((result: any) => { return result.rows });
-
-    if (cargo.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    // CONSULTA DE BUSQUEDA DE EMPLEADOS
-    let empleados = await Promise.all(cargo.map(async (empl: any) => {
-      empl.empleados = await pool.query(
-        `
-        SELECT DISTINCT e.id, CONCAT(e.nombre, ' ' , e.apellido) nombre, e.codigo, 
-          e.cedula, tc.cargo, r.descripcion AS regimen, d.nombre AS departamento, 
-          s.nombre AS sucursal, u.usuario, u.app_habilita, u.id AS userid
-        FROM empl_cargos AS ca, empl_contratos AS co, cg_regimenes AS r, empleados AS e,
-          tipo_cargo AS tc, cg_departamentos AS d, sucursales AS s, usuarios AS u
-        WHERE ca.id = (SELECT da.id_cargo FROM datos_actuales_empleado AS da WHERE 
-          da.id = e.id) 
-          AND tc.id = ca.cargo
-          AND ca.cargo = $1
-          AND ca.id_departamento = d.id
-          AND co.id = (SELECT da.id_contrato FROM datos_actuales_empleado AS da WHERE 
-          da.id = e.id) 
-          AND s.id = d.id_sucursal
-          AND co.id_regimen = r.id AND e.estado = $2
-          AND e.id = u.id_empleado
-          AND u.app_habilita = $3
-        ORDER BY nombre ASC
-        `
-        , [empl.id_cargo, estado, habilitado]
-
-      ).then((result: any) => { return result.rows });
-
-
-      return empl;
-    }));
-
-    let respuesta = empleados.filter((obj: any) => {
-      return obj.empleados.length > 0
-    });
-
-    if (respuesta.length === 0) return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
-
-    return res.status(200).jsonp(respuesta);
-  }
-
-
-
-
-
-
-
-
-
-
-
 
   // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL
   public async ActualizarEstadoTimbreMovil(req: Request, res: Response) {

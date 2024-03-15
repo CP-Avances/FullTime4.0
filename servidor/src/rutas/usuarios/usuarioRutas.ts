@@ -31,8 +31,6 @@ class UsuarioRutas {
         // METODO PARA ACTUALIZAR ESTADO DE TIMBRE WEB
         this.router.put('/lista-web/', TokenValidation, USUARIO_CONTROLADOR.ActualizarEstadoTimbreWeb);
 
-        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
-        this.router.get('/lista-app-movil-cargos/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreMovilCargos);
         // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL
         this.router.put('/lista-app-movil/', TokenValidation, USUARIO_CONTROLADOR.ActualizarEstadoTimbreMovil);
         // LISTAR DISPOSITIVOS REGISTRADOS

@@ -582,7 +582,7 @@ export class ListaWebComponent implements OnInit {
     if (this.opcion_dh === 's') {
       this.ModelarSucursal(valor.id, tipo, this.empleados_dh, this.selectionSuc_dh);
     }
-    if (this.opcion_dh === 'r') {
+    else if (this.opcion_dh === 'r') {
       this.ModelarRegimen(valor.id, valor.id_suc, tipo, this.empleados_dh, this.selectionReg_dh);
     }
     else if (this.opcion_dh === 'c') {
@@ -1086,7 +1086,7 @@ export class ListaWebComponent implements OnInit {
   // METODO PARA PRESENTAR DATOS DE SUCURSALES
   ModelarSucursal(id: number, tipo: number, lista: any, selector: any) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       lista.forEach((empl: any) => {
         selector.selected.find(selec => {
           if (empl.id_suc === selec.id) {
@@ -1108,7 +1108,7 @@ export class ListaWebComponent implements OnInit {
   // METODO PARA PRESENTAR DATOS DE REGIMEN
   ModelarRegimen(id: number, sucursal: any, tipo: number, lista: any, selector: any) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       lista.forEach((empl: any) => {
         selector.selected.find(selec => {
           if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
@@ -1130,7 +1130,7 @@ export class ListaWebComponent implements OnInit {
   // METODO PARA MOSTRAR DATOS DE CARGOS
   ModelarCargo(id: number, sucursal: any, tipo: number, lista: any, selector: any) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       lista.forEach((empl: any) => {
         selector.selected.find(selec => {
           if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
@@ -1152,7 +1152,7 @@ export class ListaWebComponent implements OnInit {
   // METODO PARA PRESENTAR DATOS DE DEPARTAMENTOS
   ModelarDepartamentos(id: number, sucursal: any, tipo: number, lista: any, selector: any) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       lista.forEach((empl: any) => {
         selector.selected.find(selec => {
           if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
@@ -1228,7 +1228,7 @@ export class ListaWebComponent implements OnInit {
     if (this.opcion === 's') {
       this.ModelarSucursal(valor.id, tipo, this.empleados, this.selectionSuc);
     }
-    if (this.opcion === 'r') {
+    else if (this.opcion === 'r') {
       this.ModelarRegimen(valor.id, valor.id_suc, tipo, this.empleados, this.selectionReg);
     }
     else if (this.opcion === 'c') {
