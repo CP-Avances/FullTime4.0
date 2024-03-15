@@ -88,6 +88,7 @@ export class PrincipalHorarioComponent implements OnInit {
 
   //VARIABLES PARA VALIDAR HORARIOS Y DETALLES
   dataHorarios: any;
+  mostrarbtnsubir: boolean = false;
   listaHorariosCorrectos: any = [];
   listaDetalleCorrectos: any = [];
 
@@ -220,6 +221,7 @@ export class PrincipalHorarioComponent implements OnInit {
     this.numero_paginaD = 1;
     this.tamanio_paginaH = 5;
     this.tamanio_paginaD = 5;
+    this.mostrarbtnsubir = false;
     this.formulario.setValue({
       nombreHorarioForm: '',
       descripcionForm: '',
@@ -280,6 +282,7 @@ export class PrincipalHorarioComponent implements OnInit {
 
   // LIMPIAR CAMPOS PLANTILLA
   LimpiarCamposPlantilla() {
+    this.mostrarbtnsubir = false;
     this.dataHorarios = null;
     this.archivoSubido = [];
     this.nameFile = '';
@@ -303,7 +306,7 @@ export class PrincipalHorarioComponent implements OnInit {
       let arrayItems = this.nameFile.split(".");
       let itemExtencion = arrayItems[arrayItems.length - 1];
       let itemName = arrayItems[0];
-      console.log("funcion horario", itemName.toLowerCase());
+
       if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
         if (itemName.toLowerCase() == 'plantillageneral') {
           this.VerificarPlantilla();
@@ -325,6 +328,8 @@ export class PrincipalHorarioComponent implements OnInit {
       });
       this.LimpiarCamposPlantilla();
     }
+    this.archivo1Form.reset();
+    this.mostrarbtnsubir = true;
   }
 
   VerificarPlantilla() {
@@ -350,6 +355,17 @@ export class PrincipalHorarioComponent implements OnInit {
       this.habilitarprogress = false;
       this.spinnerService.hide();
     });
+  }
+
+  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE HORARIOS Y DETALLES DEL ARCHIVO EXCEL
+  ConfirmarRegistroMultiple() {
+    const mensaje = 'registro';
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.RegistrarHorariosDetalles();
+        }
+      });
   }
 
   RegistrarHorariosDetalles() {
@@ -578,6 +594,10 @@ export class PrincipalHorarioComponent implements OnInit {
 
     if (observacion.startsWith('Formato') || (observacion.startsWith('Tipo'))) {
       return 'rgb(222, 162, 73)';
+    }
+
+    if(observacion.startsWith('Requerido') || observacion.startsWith('No cumple') || observacion.startsWith('Minutos de alimentación no')){
+      return 'rgb(238, 34, 207)';
     }
 
     switch(observacion) {
