@@ -109,13 +109,13 @@
                     <div class="col-md">
                         <div class="d-flex flex-wrap justify-content-center">
                             <mat-form-field>
-                                <mat-label>CI o pasaporte</mat-label>
+                                <mat-label>Cédula</mat-label>
                                 <input matInput placeholder="Buscar" [(ngModel)]="filtroCedula_" maxlength="10"
                                     (input)="Filtrar(filtroCedula_, 5)"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                     [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">
                                 <mat-icon matSuffix matTooltipPosition="right"
-                                    matTooltip="Búsqueda de datos de empleado por cédula de identificación o pasaporte.">
+                                    matTooltip="Búsqueda de datos de empleado por cédula de identificación.">
                                     help_outline
                                 </mat-icon>
                             </mat-form-field>

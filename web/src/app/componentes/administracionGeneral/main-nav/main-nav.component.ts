@@ -423,7 +423,7 @@ export class MainNavComponent implements OnInit {
             subtitulo: true,
             color: true,
             children: [
-              { name: 'Registrar Geolocalización', url: '/coordenadas', color: true },
+              { name: 'Registrar Geolocalización', url: '/coordenadas', color: true, ver: true },
             ]
           },
           {

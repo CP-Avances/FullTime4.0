@@ -152,7 +152,6 @@ export class PermisosMultiplesEmpleadosComponent implements OnInit {
     this.restR.GuardarCheckOpcion('');
     this.restR.DefaultFormCriterios();
     this.restR.DefaultValoresFiltros();
-    this.origen = [];
   }
 
   // BUSQUEDA DE DATOS ACTUALES DEL USUARIO
