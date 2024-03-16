@@ -284,7 +284,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
   //  METODO PARA VALIDAR INGRESO DE NUMEROSO
   IngresarSoloNumeros(evt: any) {
-    return this.IngresarSoloNumeros(evt);
+    return this.validar.IngresarSoloNumeros(evt);
   }
 
   // METODO PARA LISTAR USUARIOS
