@@ -284,7 +284,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
   //  METODO PARA VALIDAR INGRESO DE NUMEROSO
   IngresarSoloNumeros(evt: any) {
-    return this.IngresarSoloNumeros(evt);
+    return this.validar.IngresarSoloNumeros(evt);
   }
 
   // METODO PARA LISTAR USUARIOS
@@ -355,7 +355,7 @@ export class ListaEmpleadosComponent implements OnInit {
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (this.datosCodigo[0].automatico === true) {
+      if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true) {
         var itemName = arrayItems[0].slice(0, 18);
         if (itemName.toLowerCase() == 'empleadoautomatico') {
           console.log('entra_automatico');
@@ -507,7 +507,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
   registrarUsuariosMultiple(){
     if(this.listUsuariosCorrectas.length > 0){
-      if (this.datosCodigo[0].automatico === true){
+      if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true){
         this.rest.subirArchivoExcel_Automatico(this.listUsuariosCorrectas).subscribe(datos_archivo => {
           console.log('datos plantilla a enviar: ', this.listUsuariosCorrectas);
           this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
@@ -557,7 +557,7 @@ export class ListaEmpleadosComponent implements OnInit {
     }else if((arrayObservacion[0]+' '+arrayObservacion[1]) == 'Registro duplicado'){
       return 'rgb(156, 214, 255)';
     }else if((observacion ==  'El codigo ingresado es incorrecto') || 
-      (observacion ==  'El teléfono ingresada no es válido') ||
+      (observacion ==  'El teléfono ingresado no es válido') ||
       (observacion ==  'La cédula ingresada no es válida')
     ){
       return 'rgb(222, 162, 73)';
@@ -663,7 +663,7 @@ export class ListaEmpleadosComponent implements OnInit {
     this.datosCodigo = [];
     this.rest.ObtenerCodigo().subscribe(datos => {
       this.datosCodigo = datos;
-      if (datos[0].automatico === true) {
+      if (datos[0].automatico === true || datos[0].cedula === true) {
         this.link = `${environment.url}/plantillaD/documento/EmpleadoAutomatico.xlsx`
       } else {
         this.link = `${environment.url}/plantillaD/documento/EmpleadoManual.xlsx`
