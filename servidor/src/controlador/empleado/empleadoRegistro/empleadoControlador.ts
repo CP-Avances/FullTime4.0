@@ -1217,16 +1217,11 @@ class EmpleadoControlador {
     const VALOR = await pool.query('SELECT * FROM codigo');
     //TODO Revisar max codigo
     var codigo_dato = VALOR.rows[0].valor;
-    console.log('codigo dato 111: ',VALOR.rows[0]);
     var codigo = 0;
     if(codigo_dato!= null && codigo_dato != undefined && codigo_dato != ''){
       codigo = codigo_dato = parseInt(codigo_dato);
     }
-    var contador = 1;
-
-    console.log('codigo dato 222: ',codigo_dato);
-    console.log('codigo 111: ',codigo);
-    
+    var contador = 1;    
     
     plantilla.forEach(async (data: any) => {
 

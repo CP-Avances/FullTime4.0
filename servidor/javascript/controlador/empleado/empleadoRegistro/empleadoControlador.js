@@ -1115,14 +1115,11 @@ class EmpleadoControlador {
             const VALOR = yield database_1.default.query('SELECT * FROM codigo');
             //TODO Revisar max codigo
             var codigo_dato = VALOR.rows[0].valor;
-            console.log('codigo dato 111: ', VALOR.rows[0]);
             var codigo = 0;
             if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
                 codigo = codigo_dato = parseInt(codigo_dato);
             }
             var contador = 1;
-            console.log('codigo dato 222: ', codigo_dato);
-            console.log('codigo 111: ', codigo);
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                 var _a;
                 // Realiza un capital letter a los nombres y apellidos
