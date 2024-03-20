@@ -12,7 +12,7 @@ export class DatosGeneralesService {
     private http: HttpClient,
   ) { }
 
-  // METODO PARA CONSULTAR CON PERFIL ADMINISTRADOR LOS DATOS DE LOS EMPLEADOS
+  // METODO PARA CONSULTAR CON PERFIL SUPERADMINISTRADOR LOS DATOS DE LOS EMPLEADOS
   ObtenerInformacion_SUPERADMIN(estado: any) {
     return this.http.get<any>(`${environment.url}/generalidades/informacion-data-general-superior/${estado}`);
   }
@@ -23,10 +23,12 @@ export class DatosGeneralesService {
     return this.http.post<any>(`${environment.url}/generalidades/informacion-data-general/${estado}`, sucursales);
   }
 
-  // METODO PARA CONSULTAR CON PERFIL ADMINISTRADOR LOS DATOS DE LOS EMPLEADOS
+
+  // METODO PARA CONSULTAR CON PERFIL ADMINISTRADOR-JEFE LOS DATOS DE LOS EMPLEADOS
   ObtenerInformacion_JEFE(estado: any, data: any) {
     return this.http.post<any>(`${environment.url}/generalidades/informacion-data-general-jefe/${estado}`, data);
   }
+
 
   // METODO PARA CONSULTAR DATOS DE UN USUARIO ADMINISTRADOR - JEFE
   ObtenerInformacionUserRol(datos: any) {
@@ -34,9 +36,22 @@ export class DatosGeneralesService {
   }
 
 
+  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR COMUNICADOS SUPERADMIN
+  ObtenerInformacionComunicados_SUPERADMIN(estado: any) {
+    return this.http.get<any>(`${environment.url}/generalidades/datos_generales_comunicados-superior/${estado}`);
+  }
 
 
+  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR COMUNICADOS ADMIN
+  ObtenerInformacionComunicados_ADMIN(estado: any, sucursales: any) {
+    return this.http.post<any>(`${environment.url}/generalidades/datos_generales_comunicados-general/${estado}`, sucursales);
+  }
 
+
+  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR COMUNICADOS JEFE
+  ObtenerInformacionComunicados_JEFE(estado: any, data: any) {
+    return this.http.post<any>(`${environment.url}/generalidades/datos_generales_comunicados-jefe/${estado}`, data);
+  }
 
 
 
@@ -63,15 +78,8 @@ export class DatosGeneralesService {
     return this.http.post<any>(`${environment.url}/generalidades/informacion-general-cargo/${estado}`, sucursales);
   }
 
-  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR COMUNICADOS
-  ObtenerInformacionComunicados(estado: any) {
-    return this.http.get<any>(`${environment.url}/generalidades/datos_generales_comunicados/${estado}`);
-  }
 
-  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR COMUNICADOS
-  ObtenerCargosComunicados(estado: any) {
-    return this.http.get<any>(`${environment.url}/generalidades/datos_cargos_comunicados/${estado}`);
-  }
+
 
 
   // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR ASIGNADOS UBICACION

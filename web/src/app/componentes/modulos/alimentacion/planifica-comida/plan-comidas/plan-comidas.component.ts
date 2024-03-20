@@ -16,10 +16,10 @@ moment.locale('es');
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 
 import { ITableEmpleados } from 'src/app/model/reportes.model';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
   selector: 'app-plan-comidas',
@@ -51,7 +51,6 @@ export class PlanComidasComponent implements OnInit {
   departamentos: any = [];
   sucursales: any = [];
   empleados: any = [];
-  respuesta: any = [];
   regimen: any = [];
   cargos: any = [];
 
@@ -123,8 +122,8 @@ export class PlanComidasComponent implements OnInit {
     public validar: ValidacionesService,
     public informacion: DatosGeneralesService,
     public restUsuario: UsuarioService,
-    private toastr: ToastrService,
     private funciones: MainNavService,
+    private toastr: ToastrService,
   ) {
     this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -172,7 +171,6 @@ export class PlanComidasComponent implements OnInit {
     // LIMPIAR DATOS DE ALMACENAMIENTO
     this.departamentos = [];
     this.sucursales = [];
-    this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.cargos = [];
@@ -200,7 +198,7 @@ export class PlanComidasComponent implements OnInit {
       }
       else if (usuario.id_rol === 1 && usuario.jefe === true) {
         this.usua_sucursales = { id_sucursal: codigos, id_departamento: usuario.id_departamento };
-        this.BuscarInformacionJefer(this.usua_sucursales);
+        this.BuscarInformacionJefe(this.usua_sucursales);
       }
       else if (usuario.id_rol === 3) {
         this.BuscarInformacionSuperAdministrador();
@@ -227,7 +225,7 @@ export class PlanComidasComponent implements OnInit {
   }
 
   // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL ADMINISTRADOR - JEFE
-  BuscarInformacionJefer(buscar: string) {
+  BuscarInformacionJefe(buscar: string) {
     this.informacion.ObtenerInformacion_JEFE(1, buscar).subscribe((res: any[]) => {
       this.ProcesarDatos(res);
     }, err => {
@@ -590,7 +588,7 @@ export class PlanComidasComponent implements OnInit {
   // METODO PARA MOSTRAR DATOS DE SUCURSALES
   ModelarSucursal(id: number) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
         this.selectionSuc.selected.find(selec => {
           if (empl.id_suc === selec.id) {
@@ -613,7 +611,7 @@ export class PlanComidasComponent implements OnInit {
   // CONSULTA DE LOS DATOS REGIMEN
   ModelarRegimen(id: number, sucursal: any) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
         this.selectionReg.selected.find(selec => {
           if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
@@ -635,7 +633,7 @@ export class PlanComidasComponent implements OnInit {
   // METODO PARA MOSTRAR DATOS DE CARGOS
   ModelarCargo(id: number, sucursal: any) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
         this.selectionCarg.selected.find(selec => {
           if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
@@ -657,7 +655,7 @@ export class PlanComidasComponent implements OnInit {
   // METODO PARA MOSTRAR DATOS DE DEPARTAMENTOS
   ModelarDepartamentos(id: number, sucursal: any) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
         this.selectionDep.selected.find(selec => {
           if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
@@ -734,7 +732,6 @@ export class PlanComidasComponent implements OnInit {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();
-
       this._booleanOptions.bool_emp = false;
       this.selectionEmp.deselect();
       this.selectionEmp.clear();

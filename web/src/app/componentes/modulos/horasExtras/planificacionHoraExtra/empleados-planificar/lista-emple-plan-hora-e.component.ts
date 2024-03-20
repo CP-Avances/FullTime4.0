@@ -16,12 +16,12 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 moment.locale('es');
 
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 
 import { ITableEmpleados } from 'src/app/model/reportes.model';
-import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
   selector: 'app-lista-emple-plan-hora-e',
@@ -75,10 +75,8 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
   departamentos: any = [];
   sucursales: any = [];
   empleados: any = [];
-  respuesta: any = [];
   regimen: any = [];
   cargos: any = [];
-  origen: any = [];
 
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
   selectionCarg = new SelectionModel<ITableEmpleados>(true, []);
@@ -159,7 +157,6 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     this.restR.GuardarCheckOpcion('');
     this.restR.DefaultFormCriterios();
     this.restR.DefaultValoresFiltros();
-    this.origen = [];
   }
 
 
@@ -183,11 +180,9 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     // LIMPIAR DATOS DE ALMACENAMIENTO
     this.departamentos = [];
     this.sucursales = [];
-    this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.cargos = [];
-    this.origen = [];
 
     this.usua_sucursales = [];
     let respuesta: any = [];
@@ -212,7 +207,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
       }
       else if (usuario.id_rol === 1 && usuario.jefe === true) {
         this.usua_sucursales = { id_sucursal: codigos, id_departamento: usuario.id_departamento };
-        this.BuscarInformacionJefer(this.usua_sucursales);
+        this.BuscarInformacionJefe(this.usua_sucursales);
       }
       else if (usuario.id_rol === 3) {
         this.BuscarInformacionSuperAdministrador();
@@ -239,7 +234,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
   }
 
   // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL ADMINISTRADOR - JEFE
-  BuscarInformacionJefer(buscar: string) {
+  BuscarInformacionJefe(buscar: string) {
     this.informacion.ObtenerInformacion_JEFE(1, buscar).subscribe((res: any[]) => {
       this.ProcesarDatos(res);
     }, err => {
@@ -249,8 +244,6 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
 
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
-    this.origen = JSON.stringify(informacion);
-    //console.log('ver original ', this.origen)
     informacion.forEach(obj => {
       //console.log('ver obj ', obj)
       this.sucursales.push({
@@ -604,7 +597,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
   // METODO PARA MOSTRAR DATOS DE SUCURSALES
   ModelarSucursal(id: number) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
         this.selectionSuc.selected.find(selec => {
           if (empl.id_suc === selec.id) {
@@ -626,7 +619,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
   // CONSULTA DE LOS DATOS REGIMEN
   ModelarRegimen(id: number, sucursal: any) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
         this.selectionReg.selected.find(selec => {
           if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
@@ -648,7 +641,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
   // METODO PARA MOSTRAR DATOS DE CARGOS
   ModelarCargo(id: number, sucursal: any) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
         this.selectionCarg.selected.find(selec => {
           if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
@@ -670,7 +663,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
   // METODO PARA MOSTRAR DATOS DE DEPARTAMENTOS
   ModelarDepartamentos(id: number, sucursal: any) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
         this.selectionDep.selected.find(selec => {
           if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
