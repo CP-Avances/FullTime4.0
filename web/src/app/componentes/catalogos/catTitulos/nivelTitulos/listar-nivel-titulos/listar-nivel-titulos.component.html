@@ -1,4 +1,4 @@
-<div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;">
+<div class="container" style="padding-bottom: 10px; padding-top: 20px;">
     <div class="row">
         <div class="col-md">
             <div id="titulo">
@@ -6,15 +6,11 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                    <button *ngIf="!DataNivelesProfesionales" id="btn-raised"  class="btn btn-sm" (click)="AbrirVentanaNivelTitulo()">
+                    <button *ngIf="!DataNivelesProfesionales" id="btn-raised" class="btn btn-sm"
+                        (click)="AbrirVentanaNivelTitulo()">
                         Crear nivel título profesional
                     </button>
-                    <button *ngIf="DataNivelesProfesionales" id="btn-raised" class="btn btn-sm" (click)="registrarNiveles()" matSuffix 
-                        matTooltipPosition="right" 
-                        matTooltip="Guardar registro multiple.">
-                        Registrar
-                    </button>
-                    <button id="btn-raised"  class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
+                    <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
                         matTooltipPosition="right"
                         matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
                         Mostrar lista
@@ -29,30 +25,42 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="row">
-                    <div class="col-md" style="padding-top: 8px; padding-bottom: 6px; padding-left: 10px;">
-                        <div class="d-flex flex-wrap justify-content-around" style="padding-left: 12px;">
+                    <div class="col-md" style="padding-top: 5px;">
+                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
                             <form method="post" enctype="multipart/form-data" style="width: max-content;">
-                                <input type="file" (change)="FileChange($event)" [formControl]="archivoForm"
-                                    id="file"
+                                <input type="file" (change)="FileChange($event)" [formControl]="archivoForm" id="file"
                                     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
-                                    *ngIf="!mostrarbtnsubir"
-                                    style="height: 64px;"
+                                <label for="file" matSuffix matTooltipPosition="right"
+                                    *ngIf="!mostrarbtnsubir" style="height: 64px; padding-top: 25px;"
                                     matTooltip="Presionar para seleccionar Plantilla con nombre Niveles_profesionales.">
                                     Subir plantilla
                                 </label>
-                                <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
-                                    *ngIf="mostrarbtnsubir"
-                                    style="height: 64px;"
+                                <label for="file"  matSuffix matTooltipPosition="right"
+                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'" style="height: 64px; padding-top: 25px;"
                                     matTooltip="Presionar para seleccionar Plantilla con nombre Niveles_profesionales.">
-                                    Subir nuevamente la plantilla
+                                    Subir nueva plantilla
                                 </label>
                             </form>
                         </div>
                     </div>
-                    <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-around" >
-                           
+                    <div class="col-md" *ngIf="!DataNivelesProfesionales" style="padding-top: 5px; padding-bottom: 5px;" >
+                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                            <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                                matTooltip="Dar click para ver o descargar el documento."
+                                >
+                                <!--span class="material-icons">cloud_download</span-->
+                                <br>
+                                Descargar plantilla
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md" *ngIf="mostrarbtnsubir" style="padding-top: 5px; padding-bottom: 5px;" >
+                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                            <button *ngIf="DataNivelesProfesionales && messajeExcel != 'error'" id="descargar" class="btn btn-sm"
+                                (click)="ConfirmarRegistroMultiple()" matSuffix matTooltipPosition="right"
+                                 matTooltip="Guardar registro multiple.">
+                                Registrar
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -61,8 +69,9 @@
     </div>
 </div>
 
-<!------------------ LISTA DE NIVELES PROFESIONALES ------------------------------------------------->
-<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!DataNivelesProfesionales">
+<!-- ********************************  LISTA DE NIVELES PROFESIONALES  *************************************** -->
+<div class="container" style="padding-top: 15px; padding-bottom: 50px; text-align: center;"
+    *ngIf="!DataNivelesProfesionales && (messajeExcel == 'error' || messajeExcel == '')">
     <div class="mat-elevation-z8" style="background: white;">
         <div id="resultados">RESULTADO DE BÚSQUEDA</div>
         <div class="table-responsive">
@@ -131,8 +140,14 @@
     </div>
 </div>
 
-<!---------------------- TABLA DE DATOS DE LA CARGA MULTIPLE ----------------------------------->
-<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="DataNivelesProfesionales">
+<!-- ********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE  *************************************** -->
+<div class="container" style="padding-top: 10px; margin-bottom: 25px;" *ngIf="DataNivelesProfesionales && messajeExcel != 'error'">
+    <app-definicion-plantilla>
+    </app-definicion-plantilla>
+</div>
+
+<!-- ********************************  TABLA DE DATOS DE LA CARGA MULTIPLE  *************************************** -->
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="DataNivelesProfesionales && messajeExcel != 'error'">
     <div class="mat-elevation-z8" style="background: white;">
         <div id="resultados">
             REGISTRO MULTIPLE
@@ -141,17 +156,20 @@
             <table class="table table-hover table-sm ">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
+                        <th scope="col">Item</th>
                         <th scope="col">Nivel</th>
-                        
+
                         <th scope="col">Observación</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let data of DataNivelesProfesionales">
-                        <td [style.color]="stiloTextoCelda(data.nombre)">{{ data.nombre}}</td>
-                        <td>
+                    <tr *ngFor="let data of DataNivelesProfesionales | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                        <td style="font-size: 12px; width: 50px;" align="center">{{data.fila}}</td>
+                        <td style="font-size: 12px;" [style.color]="stiloTextoCelda(data.nombre)">{{ data.nombre}}</td>
+                        <td style="font-size: 12px;">
                             <div style="width: 270px; margin: auto;">
-                                <div id="t-editar" class="circulo"  [style.background-color]="stiloCelda(data.observacion)"></div>
+                                <div id="t-editar" class="circulo"
+                                    [style.background-color]="stiloCelda(data.observacion)"></div>
                                 {{ data.observacion}}
                             </div>
                         </td>
@@ -159,8 +177,8 @@
                 </tbody>
             </table>
         </div>
-        <mat-paginator id="pagina" [length]="DataNivelesProfesionales.length" [pageSize]="tamanio_pagina"
-            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        <mat-paginator id="pagina" [length]="DataNivelesProfesionales.length" [pageSize]="tamanio_paginaMul"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
         </mat-paginator>
     </div>
 </div>

@@ -3,44 +3,40 @@
         <div class="home-inner">
             <div class="container">
                 <div class="row">
-                    <div class="col d-flex align-items-center justify-content-center">
+                    <div class="col d-flex align-items-center justify-content-center">    
                         <mat-card class="mat-elevation-z8">
                             <img src="../../../../assets/imagenes/logo/logoAdmin.png"> <br><br>
                             <form [formGroup]="formulario">
                                 <mat-form-field>
                                     <mat-label>Ingresa tu Usuario</mat-label>
-                                    <input matInput style="font-size: 14px;" placeholder="pat@example.com"
-                                        [formControl]="userMail" required>
-                                    <mat-error *ngIf="userMail.invalid">
-                                        {{ObtenerMensajeCampoUsuarioError()}}
-                                    </mat-error>
+                                    <input matInput style="font-size: 14px;"
+                                        placeholder="juan.perez" 
+                                        [formControl]="userMail" 
+                                        required>
+                                        <mat-error *ngIf="userMail.invalid">{{ObtenerMensajeCampoUsuarioError()}}</mat-error>
                                 </mat-form-field>
                                 <br>
                                 <mat-form-field>
                                     <mat-label>Ingresa tu Contraseña</mat-label>
                                     <input matInput style="font-size: 13px;"
                                         (keyup.enter)="hide1 = true; ValidarUsuario(formulario.value)"
-                                        [formControl]="pass" [type]="hide1 ? 'password' : 'text'" required>
+                                        [formControl]="pass"
+                                        [type]="hide1 ? 'password' : 'text'" 
+                                        required>
                                     <button mat-icon-button matSuffix (click)="hide1 = !hide1">
                                         <mat-icon>{{hide1 ? 'visibility_off' : 'visibility'}}</mat-icon>
                                     </button>
-                                    <mat-error *ngIf="pass.invalid">
-                                        {{ObtenerMensajeCampoContraseniaError()}}
-                                    </mat-error>
+                                    <mat-error *ngIf="pass.invalid">{{ObtenerMensajeCampoContraseniaError()}}</mat-error>
                                 </mat-form-field>
                             </form>
                             <div class="caja1">
-                                <a [routerLink]="['/olvidar-contrasenia']" class="verde">
-                                    Olvidó su contraseña?
-                                </a>
+                                <a [routerLink]="['/olvidar-contrasenia']" class="verde">Olvidó su contraseña?</a>
                             </div>
                             <div style="margin: auto;">
-                                <button type="submit" class="btn btn-lg btn-block"
-                                    (click)="ValidarUsuario(formulario.value)" [disabled]="!formulario.valid">
-                                    Ingresar
-                                </button>
+                                <button type="submit" class="btn btn-lg btn-block" (click)="ValidarUsuario(formulario.value)"
+                                    [disabled]="!formulario.valid">Ingresar</button>
                             </div>
-                        </mat-card>
+                        </mat-card>                            
                     </div>
                 </div>
             </div>

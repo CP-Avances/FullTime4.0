@@ -27,16 +27,10 @@ class UsuarioRutas {
         this.router.put('/admin/comida', TokenValidation, USUARIO_CONTROLADOR.RegistrarAdminComida);
         // METODO PARA REGISTRAR FRASE DE SEGURIDAD
         this.router.put('/frase', TokenValidation, USUARIO_CONTROLADOR.ActualizarFrase);
-        // METODO PARA BUSCAR DATOS DE USUARIOS Y CARGOS TIMBRE WEB
-        this.router.get('/lista-web-cargos/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreWebCargos);
-        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB
-        this.router.get('/lista-web/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreWeb);
+
         // METODO PARA ACTUALIZAR ESTADO DE TIMBRE WEB
         this.router.put('/lista-web/', TokenValidation, USUARIO_CONTROLADOR.ActualizarEstadoTimbreWeb);
-        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
-        this.router.get('/lista-app-movil/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreMovil);
-        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
-        this.router.get('/lista-app-movil-cargos/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreMovilCargos);
+
         // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL
         this.router.put('/lista-app-movil/', TokenValidation, USUARIO_CONTROLADOR.ActualizarEstadoTimbreMovil);
         // LISTAR DISPOSITIVOS REGISTRADOS
@@ -48,6 +42,33 @@ class UsuarioRutas {
         // METODO PARA CAMBIAR FRASE DE SEGURIDAD
         this.router.post('/frase/restaurar-frase/nueva', USUARIO_CONTROLADOR.CambiarFrase);
 
+        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB SUPERADMINISTRADOR
+        this.router.get('/lista-web-superior/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreWeb_SUPERADMIN);
+        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB ADMINISTRADOR
+        this.router.post('/lista-web-general/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreWeb_ADMIN);
+        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB ADMINISTRADOR JEFE
+        this.router.post('/lista-web-jefe/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreWeb_JEFE);
+
+
+        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL SUPERADMINISTRADOR
+        this.router.get('/lista-app-movil-superior/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreMovil_SUPERADMIN);
+        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL ADMINISTRADOR
+        this.router.post('/lista-app-movil-general/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreMovil_ADMIN);
+        // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL SUPER ADMINISTRADOR
+        this.router.post('/lista-app-movil-jefe/:estado/activo/:habilitado', TokenValidation, USUARIO_CONTROLADOR.UsuariosTimbreMovil_JEFE);
+
+
+
+        // METODO PARA BUSCAR DATOS DE USUARIOS Y SUCURSALES
+        this.router.post('/buscar-usuario-sucursal', TokenValidation, USUARIO_CONTROLADOR.BuscarUsuarioSucursal);
+        // CREAR REGISTRO DE USUARIOS - SUCURSAL
+        this.router.post('/usuario-sucursal', TokenValidation, USUARIO_CONTROLADOR.CrearUsuarioSucursal);
+        // METODO PARA BUSCAR DATOS DE USUARIO SUCURSAL PRINCIPAL (TRUE)
+        this.router.post('/principal-usuario-sucursal', TokenValidation, USUARIO_CONTROLADOR.BuscarUsuarioSucursalPrincipal);
+        // METODO PARA ACTUALIZAR DATOS DE USUARIO - SUCURSAL
+        this.router.put('/actualizar-usuario-sucursal', TokenValidation, USUARIO_CONTROLADOR.ActualizarUsuarioSucursalPrincipal);
+        // METODO PARA ELIMINAR REGISTRO USUARIO - SUCURSAL
+        this.router.delete('/eliminar-usuario-sucursal/:id', TokenValidation, USUARIO_CONTROLADOR.EliminarUsuarioSucursal);
 
 
 
@@ -58,7 +79,6 @@ class UsuarioRutas {
 
         this.router.get('/', TokenValidation, USUARIO_CONTROLADOR.list);
         this.router.get('/busqueda/:usuario', TokenValidation, USUARIO_CONTROLADOR.getIdByUsuario);
-        this.router.get('/noEnrolados', TokenValidation, USUARIO_CONTROLADOR.ListarUsuriosNoEnrolados);
 
     }
 }

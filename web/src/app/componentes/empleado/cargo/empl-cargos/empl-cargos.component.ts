@@ -9,6 +9,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 @Component({
   selector: 'app-empl-cargos',
@@ -20,6 +21,7 @@ export class EmplCargosComponent implements OnInit {
 
   habilitarCargo: boolean = false;
   idEmpleado: string;
+  ver_jefe: boolean = false;
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS
   departamento: any = [];
@@ -37,6 +39,7 @@ export class EmplCargosComponent implements OnInit {
   sueldo = new FormControl('', [Validators.required]);
   cargoF = new FormControl('', [Validators.minLength(3)]);
   tipoF = new FormControl('');
+  jefeF = new FormControl(false);
 
   // AGREGAR CAMPOS DE FORMULARIO
   public formulario = new FormGroup({
@@ -47,7 +50,8 @@ export class EmplCargosComponent implements OnInit {
     idDeparForm: this.idDepartamento,
     sueldoForm: this.sueldo,
     cargoForm: this.cargoF,
-    tipoForm: this.tipoF
+    tipoForm: this.tipoF,
+    jefeForm: this.jefeF,
   });
 
   constructor(
@@ -57,6 +61,7 @@ export class EmplCargosComponent implements OnInit {
     private cargos: EmplCargosService,
     private toastr: ToastrService,
     public router: Router,
+    public usuario: UsuarioService,
     public ventana: MatDialogRef<EmplCargosComponent>,
     public validar: ValidacionesService,
     @Inject(MAT_DIALOG_DATA) public datoEmpleado: any,
@@ -65,6 +70,9 @@ export class EmplCargosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.datoEmpleado.idRol != 2) {
+      this.ver_jefe = true;
+    }
     this.FiltrarSucursales();
     this.BuscarTiposCargos();
     this.tipoCargo[this.tipoCargo.length] = { cargo: "OTRO" };
@@ -137,7 +145,7 @@ export class EmplCargosComponent implements OnInit {
     this.restEmpleado.BuscarFechaIdContrato(datosBusqueda).subscribe(response => {
       if (Date.parse(response[0].fec_ingreso.split('T')[0]) < Date.parse(form.fecInicioForm)) {
         if (Date.parse(form.fecInicioForm) < Date.parse(form.fecFinalForm)) {
-          this.insertarEmpleadoCargo(form);
+          this.RegistrarCargo(form);
         }
         else {
           this.toastr.info(
@@ -156,7 +164,7 @@ export class EmplCargosComponent implements OnInit {
   }
 
   // METODO PARA GUARDAR REGISTRO
-  insertarEmpleadoCargo(form: any) {
+  RegistrarCargo(form: any) {
     let cargo = {
       id_empl_contrato: this.datoEmpleado.idContrato,
       id_departamento: form.idDeparForm,
@@ -165,7 +173,8 @@ export class EmplCargosComponent implements OnInit {
       fec_inicio: form.fecInicioForm,
       fec_final: form.fecFinalForm,
       sueldo: form.sueldoForm,
-      cargo: form.tipoForm
+      cargo: form.tipoForm,
+      jefe: form.jefeForm,
     }
     // FORMATEAR HORAS
     if (cargo.hora_trabaja.split(':').length === 1) {
@@ -190,6 +199,7 @@ export class EmplCargosComponent implements OnInit {
         this.toastr.success('Operación exitosa.', 'Registro guardado.', {
           timeOut: 6000,
         });
+        this.BuscarUsuarioSucursal(form);
         this.CerrarVentana();
       });
     }
@@ -207,6 +217,7 @@ export class EmplCargosComponent implements OnInit {
           this.toastr.success('Operación exitosa.', 'Registro guardado.', {
             timeOut: 6000,
           });
+          this.BuscarUsuarioSucursal(form);
           this.CerrarVentana();
         });
       });
@@ -259,6 +270,49 @@ export class EmplCargosComponent implements OnInit {
     if (this.horaTrabaja.hasError('pattern')) {
       return 'Indicar horas y minutos. Ejemplo: 12:05';
     }
+  }
+
+
+  /** *************************************************************************************************** **
+   **                              METODOS TABLA USUARIO - SUCURSAL                                    ** **
+   ** *************************************************************************************************** **/
+
+  // METODO PARA REGISTRAR TIPO CARGO
+  IngresarUsuarioSucursal(form: any) {
+    let datos = {
+      id_empleado: this.idEmpleado,
+      id_sucursal: form.idSucursalForm,
+      principal: true
+    }
+    this.usuario.RegistrarUsuarioSucursal(datos).subscribe(res => {
+    });
+  }
+
+  // METODO PARA BUSCAR USUARIO - SUCURSAL
+  BuscarUsuarioSucursal(form: any) {
+    if (this.datoEmpleado.idRol != 2) {
+      let datos = {
+        id_empleado: this.idEmpleado,
+      }
+      this.usuario.BuscarUsuarioSucursalPrincipal(datos).subscribe(res => {
+        //console.log('ver datos ', res[0])
+        if (res[0].id_sucursal != form.idSucursalForm) {
+          this.ActualizarUsuarioSucursal(form);
+        }
+      }, vacio => {
+        this.IngresarUsuarioSucursal(form);
+      });
+    }
+  }
+
+  // METODO PARA ACTUALIZAR USUARIO - SUCURSAL
+  ActualizarUsuarioSucursal(form: any) {
+    let datos = {
+      id_sucursal: form.idSucursalForm,
+      id_empleado: this.idEmpleado,
+    }
+    this.usuario.ActualizarUsuarioSucursalPrincipal(datos).subscribe(res => {
+    });
   }
 
 }

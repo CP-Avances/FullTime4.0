@@ -2,7 +2,6 @@
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
@@ -24,6 +23,8 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
+import { ThemePalette } from '@angular/material/core';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-lista-sucursales',
@@ -55,8 +56,19 @@ export class ListaSucursalesComponent implements OnInit {
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
 
+  tamanio_paginaMul: number = 5;
+  numero_paginaMul: number = 1;
+
   empleado: any = [];
   idEmpleado: number;
+
+  expansion: boolean = false;
+
+  // VARIABLES PROGRESS SPINNER
+  progreso: boolean = false;
+  color: ThemePalette = 'primary';
+  mode: ProgressSpinnerMode = 'indeterminate';
+  value = 10;
 
   constructor(
     private rest: SucursalService,
@@ -116,6 +128,11 @@ export class ListaSucursalesComponent implements OnInit {
     this.tamanio_pagina = e.pageSize;
     this.numero_pagina = e.pageIndex + 1;
   }
+  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+  ManejarPaginaMulti(e: PageEvent) {
+    this.tamanio_paginaMul = e.pageSize;
+    this.numero_paginaMul = e.pageIndex + 1
+  }
 
   // METODO PARA BUSCAR SUCURSALES
   ObtenerSucursal() {
@@ -159,6 +176,7 @@ export class ListaSucursalesComponent implements OnInit {
     this.ObtenerSucursal();
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
+    this.messajeExcel = '';
   }
 
   // METODO PARA VALIDAR SOLO LETRAS
@@ -380,20 +398,21 @@ export class ListaSucursalesComponent implements OnInit {
     let itemName = arrayItems[0].slice(0, 10);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (itemName.toLowerCase() == 'sucursales') {
+        this.numero_paginaMul = 1;
+        this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
-        
       } else {
-        this.toastr.error('Seleccione plantilla con nombre Sucursales', 'Plantilla seleccionada incorrecta', {
+        this.toastr.error('Seleccione plantilla con nombre Sucursales.', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
         });
-        
+
         this.nameFile = '';
       }
     } else {
       this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
         timeOut: 6000,
       });
-      
+
       this.nameFile = '';
     }
     this.archivoForm.reset();
@@ -401,74 +420,107 @@ export class ListaSucursalesComponent implements OnInit {
   }
 
   Datasucursales: any;
+  messajeExcel: string = '';
   // METODO PARA ENVIAR MENSAJES DE ERROR O CARGAR DATOS SI LA PLANTILLA ES CORRECTA
-  Revisarplantilla(){
+  Revisarplantilla() {
     this.listSucursalesCorrectas = [];
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
-  
+
+    this.progreso = true;
+
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.Datasucursales = res.data;
-      this.Datasucursales.forEach(item => {
-        if(item.nom_sucursal == undefined || item.nom_sucursal == ''){
-          item.nom_sucursal = 'No registrado'
-        }else if(item.ciudad == undefined || item.ciudad == '' ){
-          item.ciudad = 'No registrado'
-        }
-      })
-      console.log('probando plantilla1', this.Datasucursales);
+      this.messajeExcel = res.message;
 
-      this.Datasucursales.forEach(item => {
-        if( item.observacion.toLowerCase() == 'ok'){
-          this.listSucursalesCorrectas.push(item);
+      if (this.messajeExcel == 'error') {
+        this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      } else {
+        //Separa llas filas que estan con la observacion OK para luego registrar en la base.
+        this.Datasucursales.forEach(item => {
+          if (item.observacion.toLowerCase() == 'ok') {
+            this.listSucursalesCorrectas.push(item);
+          }
+        });
+        if (this.listSucursalesCorrectas.length > 0) {
+          this.btn_registrar = false;
         }
-      });
-
-      if(this.listSucursalesCorrectas.length > 0){
-        this.btn_registrar = false;
       }
+
+
+
+    }, error => {
+      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
+      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+        timeOut: 4000,
+      });
+      this.progreso = false;
+      this.messajeExcel = 'error';
+    }, () => {
+      this.progreso = false;
     });
-      
+
   }
 
 
   // METODO PARA LISTAR CIUDADES
   datosCiudades: any = [];
   ciudad: any = [];
-  ListarCiudades(ciudadd): string{
+  ListarCiudades(ciudadd): string {
     this.ciudad = [];
     this.ciudad = this.datosCiudades.filter((item: any) => item.id == ciudadd);
-    if(this.ciudad[0]){
+    if (this.ciudad[0]) {
       return this.ciudad[0].nombre
-    }else{
+    } else {
       return 'No registrada'
     }
   }
 
+  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  ConfirmarRegistroMultiple() {
+    const mensaje = 'registro';
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.registrarSucursales();
+        }
+      });
+  }
+
   listSucursalesCorrectas: any = [];
   btn_registrar: boolean = true;
-  registrarSucursales(){
+  registrarSucursales() {
     var data = {
-      nombre: '', 
-      id_ciudad: '', 
+      nombre: '',
+      id_ciudad: '',
       id_empresa: ''
     }
 
-    if(this.listSucursalesCorrectas.length > 0){
-      console.log('lista sucursales correctas: ',this.listSucursalesCorrectas.length);
+    if (this.listSucursalesCorrectas.length > 0) {
+      console.log('lista sucursales correctas: ', this.listSucursalesCorrectas.length);
       var cont = 0;
       this.listSucursalesCorrectas.forEach(item => {
         this.datosCiudades.forEach(valor => {
-          if(item.ciudad.toLowerCase() == valor.nombre.toLowerCase()){
+          if (item.ciudad.toLowerCase() == valor.nombre.toLowerCase()) {
             data.nombre = item.nom_sucursal;
             data.id_ciudad = valor.id;
             data.id_empresa = '1';
+
+            // Capitalizar la primera letra de la primera palabra
+            const textonombre = data.nombre.charAt(0).toUpperCase();
+            const restoDelTexto = data.nombre.slice(1);
+
+            data.nombre = textonombre + restoDelTexto
+
             this.rest.RegistrarSucursal(data).subscribe(res => {
               cont = cont + 1;
-              if(this.listSucursalesCorrectas.length  == cont){
+              if (this.listSucursalesCorrectas.length == cont) {
                 this.toastr.success('Operación exitosa.', 'Plantilla de Sucursales importada.', {
                   timeOut: 10000,
                 });
@@ -479,8 +531,8 @@ export class ListaSucursalesComponent implements OnInit {
         })
 
       })
-    }else{
-      this.toastr.error('No exiten datos para registrar ingrese otra', 'Plantilla no aceptada', {
+    } else {
+      this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada', {
         timeOut: 4000,
       });
       this.archivoForm.reset();
@@ -494,27 +546,35 @@ export class ListaSucursalesComponent implements OnInit {
 
   //Metodo para dar color a las celdas y representar las validaciones
   colorCelda: string = ''
-  stiloCelda(observacion: string): string{
+  stiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
-    if(observacion == 'ok'){
+    arrayObservacion[0]
+    if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    }else if(observacion == 'Ya esta registrado en base'){
+    }
+    else if (observacion == 'Ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
-    }else if(arrayObservacion[0] == 'Ciudad' || arrayObservacion[0] == 'Sucursal'){
-      return 'rgb(246, 167, 143)';
-    }else if(observacion == 'Registro duplicado'){
+    }
+    else if (arrayObservacion[0] == 'Ciudad' && arrayObservacion[1] == 'no' && arrayObservacion[2] == 'existe') {
+      return 'rgb(255, 192, 203)';
+    }
+    else if (arrayObservacion[0] == 'Ciudad' || arrayObservacion[0] == 'Sucursal') {
+      return 'rgb(242, 21, 21)';
+    }
+    else if (observacion == 'Registro duplicado') {
       return 'rgb(156, 214, 255)';
-    }else{
+    }
+    else {
       return 'rgb(251, 73, 18)';
     }
   }
 
   colorTexto: string = '';
-  stiloTextoCelda(texto: string): string{
+  stiloTextoCelda(texto: string): string {
     let arrayObservacion = texto.split(" ");
-    if(arrayObservacion[0] == 'No'){
+    if (arrayObservacion[0] == 'No') {
       return 'rgb(255, 80, 80)';
-    }else{
+    } else {
       return 'black'
     }
   }

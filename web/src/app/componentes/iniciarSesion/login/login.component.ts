@@ -222,7 +222,8 @@ export class LoginComponent implements OnInit {
           timeOut: 6000,
         })
 
-        if (datos.rol === 1) { // ADMIN
+        if (datos.rol === 1 || datos.rol === 3) { // ADMIN
+          console.log('ver redireccionar ', localStorage.getItem("redireccionar"))
           if (!!localStorage.getItem("redireccionar")) {
             let redi = localStorage.getItem("redireccionar");
             this.router.navigate([redi], { relativeTo: this.route, skipLocationChange: false });

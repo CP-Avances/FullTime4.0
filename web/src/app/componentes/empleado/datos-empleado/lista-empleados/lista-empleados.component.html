@@ -5,8 +5,9 @@
                 <span>USUARIOS</span>
             </div>
             <mat-card class="example-card mat-elevation-z8">
-                <div class="d-flex flex-wrap justify-content-around" style="margin-top: 1%;">
-                    <button id="btn-raised" class="btn btn-sm" [routerLink]="['/registrarEmpleado']">
+                <div class="d-flex flex-wrap justify-content-around" style="margin-top: 1%; margin-bottom: 1%;">
+                    <button id="btn-raised" class="btn btn-sm" [routerLink]="['/registrarEmpleado']"
+                        *ngIf="!DataEmpleados">
                         Crear usuario
                     </button>
                     <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
@@ -15,7 +16,7 @@
                         Mostrar lista
                     </button>
                 </div>
-                <div class="d-flex flex-wrap justify-content-around" style="margin-top: 1%;">
+                <div class="d-flex flex-wrap justify-content-around" style="margin-top: 1%;" *ngIf="!DataEmpleados">
                     <button mat-raised-button id="btn_listar" *ngIf="lista_inactivos" (click)="ListarInactivos()"
                         style="margin-bottom: 20px;" matSuffix matTooltipPosition="right"
                         matTooltip="Mostrar u ocultar tabla con lista de empleados inactivos.">
@@ -36,31 +37,45 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="row">
-                    <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-around">
-                            <form method="post" enctype="multipart/form-data"
-                                class="d-flex flex-wrap justify-content-around" style="margin: 2% 0% -1% 0%;">
+                    <div class="col-md" style="padding-top: 5px;">
+                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                            <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
                                 <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
                                     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
-                                    style="height: 65px;"
+                                <label for="file" matSuffix matTooltipPosition="right"
+                                    *ngIf="!mostrarbtnsubir" style="height: 65px; padding-top: 25px;"
                                     matTooltip="Dar click para selecionar plantilla y cargar registros.">
                                     Subir plantilla
+                                </label>
+                                <label for="file"  matSuffix matTooltipPosition="right"
+                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'" style="height: 64px; padding-top: 25px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                    Subir nueva plantilla
                                 </label>
                             </form>
                         </div>
                     </div>
-                    <div class="col-md">
+                    <div class="col-md" *ngIf="!DataEmpleados">
                         <div class="d-flex flex-wrap justify-content-around">
                             <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                 style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
                                 href="{{link}}">
-                                <span class="material-icons">cloud_download</span>
+                                <!--span class="material-icons">cloud_download</span-->
                                 <br>
                                 Descargar plantilla usuarios
                             </a>
                         </div>
                     </div>
+                    <div class="col-md" *ngIf="DataEmpleados" style="padding-top: 5px; padding-bottom: 5px;" >
+                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                            <button id="descargar" class="btn btn-sm"
+                                (click)="ConfirmarRegistroMultiple()" matSuffix matTooltipPosition="right"
+                                 matTooltip="Guardar registro multiple.">
+                                Registrar
+                            </button>
+                        </div>
+                    </div>
+                    
                 </div>
             </mat-card>
         </div>
@@ -68,7 +83,7 @@
 </div>
 
 <!-- LISTA DE EMPLEADOS QUE HAN SIDO INACTIVADOS O QUE YA NO FORMAN PARTE DE LA EMPRESA -->
-<div *ngIf="Hab_Deshabilitados && !DataEmpleados" class="container" style="padding-bottom: 50px; text-align: center;" >
+<div *ngIf="Hab_Deshabilitados && !DataEmpleados && (messajeExcel == 'error' || messajeExcel == '')" class="container" style="padding-bottom: 50px; text-align: center;">
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
             <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccionDesactivados()" matSuffix
@@ -150,8 +165,8 @@
     </div>
 </div>
 
-<!-- LISTA DE EMPLEADOS QUE FORMAN PARTE DE LA EMPRESA -->
-<div *ngIf="tabla_activos && !DataEmpleados" class="container" style="padding-bottom: 50px; text-align: center;">
+<!-------------------- LISTA DE EMPLEADOS QUE FORMAN PARTE DE LA EMPRESA --------------------------------------->
+<div *ngIf="tabla_activos && !DataEmpleados && (messajeExcel == 'error' || messajeExcel == '')" class="container" style="padding-bottom: 50px; text-align: center;">
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
             <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
@@ -277,53 +292,75 @@
     </div>
 </div>
 
-<!-- LISTA DE EMPLEADOS DEL REGISTRO MULTIPLE -->
-<div style="padding-bottom: 50px; text-align: center;" *ngIf="DataEmpleados">
+<!------------------ INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ------------------------------------------------->
+<div class="container" style="padding-top: 10px; margin-bottom: 25px;" *ngIf="DataEmpleados && messajeExcel != 'error'">
+    <app-definicion-plantilla>
+    </app-definicion-plantilla>
+</div>
+
+<!------------------- LISTA DE EMPLEADOS DEL REGISTRO MULTIPLE ---------------------------------------------->
+<div style="padding-bottom: 50px; text-align: center;" *ngIf="DataEmpleados && messajeExcel != 'error'">
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
             <span class="w-100 bd-highlight">
-                LISTA DE USUARIOS MULTIPLES
+                LISTA DE USUARIOS
             </span>
         </div>
-        <div class="container_ table-responsive">
-            <table id="table_usuarios" class="table table-hover table-sm">
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
-                        <th id="td_usuario" scope="col">Nombre</th>
-                        <th id="td_usuario" scope="col">Apellido</th>
+                        <th id="td_usuario" scope="col">Item</th>
                         <th id="td_usuario" scope="col">Cédula</th>
-                        <th style="width: 400px;" scope="col">Fecha Nacimiento</th>
-                        <th id="td_usuario" scope="col">Genero</th>
-                        <th id="td_usuario" scope="col">Estado</th>
+                        <th id="td_usuario" scope="col" *ngIf="datosManuales">Codigo</th>
+                        <th id="td_usuario" scope="col">Apellido</th>
+                        <th id="td_usuario" scope="col">Nombre</th>
+                        <th id="td_usuario" scope="col">Estado civil</th>
+                        <th id="td_usuario" scope="col">Género</th>
+                        <th id="td_usuario" scope="col">Fecha nacimiento</th>
+                        <th id="td_usuario" scope="col">Domicilio</th>
+                        <th id="td_usuario" scope="col">Teléfono</th>
+                        <th id="td_usuario" scope="col">Nacionalidad</th>
                         <th id="td_usuario" scope="col">Correo</th>
-                        <th id="td_usuario" scope="col">Telefono</th>
+                        <th id="td_usuario" scope="col">Longitud</th>
+                        <th id="td_usuario" scope="col">Latitud</th>
                         <th id="td_usuario" scope="col">Usuario</th>
                         <th id="td_usuario" scope="col">Contraseña</th>
                         <th id="td_usuario" scope="col">Rol</th>
-                        <th style="width: 400px;" scope="col">Observación</th>
+                        <th id="td_usuario" scope="col">Observación</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr
-                        *ngFor="let e of DataEmpleados | emplCodigo: filtroCodigo | emplCedula: filtroCedula | emplNombre: filtroNombre | emplApellido: filtroApellido | paginate:tamanio_pagina:numero_pagina">
-                        <td [style.color]="stiloTextoCelda(e.nombre)">{{e.nombre}}</td>
-                        <td [style.color]="stiloTextoCelda(e.apellido)">{{e.apellido}}</td>
+                        *ngFor="let e of DataEmpleados | paginate:tamanio_paginaMul:numero_paginaMul ">
+                        <td style="font-size: 14px; width: 50px;" align="center">{{e.fila}}</td>
                         <td [style.color]="stiloTextoCelda(e.cedula)">{{e.cedula}}</td>
-                        <td [style.color]="stiloTextoCelda(e.fec_nacimiento)">{{e.fec_nacimiento}}</td>
+                        <td [style.color]="stiloTextoCelda(e.codigo)" *ngIf="datosManuales">{{e.codigo}}</td>
+                        <td [style.color]="stiloTextoCelda(e.apellido)">{{e.apellido}}</td>
+                        <td [style.color]="stiloTextoCelda(e.nombre)">{{e.nombre}}</td>
+                        <td [style.color]="stiloTextoCelda(e.estado_civil)">{{e.estado_civil}}</td>
                         <td [style.color]="stiloTextoCelda(e.genero)">{{e.genero}}</td>
-                        <td [style.color]="stiloTextoCelda(e.estado)">{{e.estado}}</td>
-                        <td [style.color]="stiloTextoCelda(e.correo)">{{e.correo}}</td>
+                        <td [style.color]="stiloTextoCelda(e.fec_nacimiento)">{{e.fec_nacimiento}}</td>
+                        <td [style.color]="stiloTextoCelda(e.domicilio)">{{e.domicilio}}</td>
                         <td [style.color]="stiloTextoCelda(e.telefono)">{{e.telefono}}</td>
+                        <td [style.color]="stiloTextoCelda(e.nacionalidad)">{{e.nacionalidad}}</td>
+                        <td [style.color]="stiloTextoCelda(e.correo)">{{e.correo}}</td>
+                        <td [style.color]="stiloTextoCelda(e.latitud)">{{e.latitud}}</td>
+                        <td [style.color]="stiloTextoCelda(e.longitud)">{{e.longitud}}</td>
                         <td [style.color]="stiloTextoCelda(e.usuario)">{{e.usuario}}</td>
                         <td [style.color]="stiloTextoCelda(e.contrasena)">{{e.contrasena}}</td>
                         <td [style.color]="stiloTextoCelda(e.rol)">{{e.rol}}</td>
-                        <td style="width: 400px;">{{e.observacion}}</td>
+                        <td style="width: 400px;">
+                            <div id="t-editar" class="circulo"  [style.background-color]="stiloCelda(e.observacion)"></div>
+                            {{e.observacion}}
+                        </td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        <mat-paginator id="pagina" [length]="empleado.length" [pageSize]="tamanio_pagina"
-            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+        <mat-paginator id="pagina" [length]="DataEmpleados.length" [pageSize]="tamanio_paginaMul"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)" showFirstLastButtons>
         </mat-paginator>
     </div>
 </div>
+

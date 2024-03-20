@@ -12,7 +12,8 @@ export class MetodosComponent implements OnInit {
 
   constructor(
     public ventana: MatDialogRef<MetodosComponent>,
-    @Inject(MAT_DIALOG_DATA) public mensaje: string) { }
+    @Inject(MAT_DIALOG_DATA) public mensaje: string
+  ){}
 
   eliminar: boolean = true;
 
