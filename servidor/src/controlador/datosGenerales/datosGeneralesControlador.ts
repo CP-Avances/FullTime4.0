@@ -9,8 +9,8 @@ class DatosGeneralesControlador {
         let estado = req.params.estado;
         // CONSULTA DE BUSQUEDA DE SUCURSALES
         let sucursal_ = await pool.query(
-            `SELECT ig.id_suc, ig.name_suc FROM informacion_general AS ig
-            GROUP BY ig.id_suc, ig.name_suc
+            `SELECT ig.id_suc, ig.name_suc, ig.ciudad FROM informacion_general AS ig
+            GROUP BY ig.id_suc, ig.name_suc, ig.ciudad
             ORDER BY ig.name_suc ASC
             `
         ).then((result: any) => { return result.rows });
@@ -155,10 +155,10 @@ class DatosGeneralesControlador {
         //console.log('ver id_sucursal ', id_sucursal)
         // CONSULTA DE BUSQUEDA DE SUCURSALES
         let sucursal_ = await pool.query(
-            "SELECT ig.id_suc, ig.name_suc " +
+            "SELECT ig.id_suc, ig.name_suc, ig.ciudad " +
             "FROM informacion_general AS ig " +
             "WHERE ig.id_suc IN (" + id_sucursal + ")" +
-            "GROUP BY ig.id_suc, ig.name_suc " +
+            "GROUP BY ig.id_suc, ig.name_suc, ig.ciudad " +
             "ORDER BY ig.name_suc ASC"
         ).then((result: any) => { return result.rows });
 
@@ -302,10 +302,10 @@ class DatosGeneralesControlador {
         //console.log('ver id_sucursal ', id_sucursal)
         // CONSULTA DE BUSQUEDA DE SUCURSALES
         let sucursal_ = await pool.query(
-            "SELECT ig.id_suc, ig.name_suc " +
+            "SELECT ig.id_suc, ig.name_suc, ciudad " +
             "FROM informacion_general AS ig " +
             "WHERE ig.id_suc IN (" + id_sucursal + ")" +
-            "GROUP BY ig.id_suc, ig.name_suc " +
+            "GROUP BY ig.id_suc, ig.name_suc, ig.ciudad " +
             "ORDER BY ig.name_suc ASC"
         ).then((result: any) => { return result.rows });
 

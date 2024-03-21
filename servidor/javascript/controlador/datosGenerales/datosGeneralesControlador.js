@@ -19,8 +19,8 @@ class DatosGeneralesControlador {
         return __awaiter(this, void 0, void 0, function* () {
             let estado = req.params.estado;
             // CONSULTA DE BUSQUEDA DE SUCURSALES
-            let sucursal_ = yield database_1.default.query(`SELECT ig.id_suc, ig.name_suc FROM informacion_general AS ig
-            GROUP BY ig.id_suc, ig.name_suc
+            let sucursal_ = yield database_1.default.query(`SELECT ig.id_suc, ig.name_suc, ig.ciudad FROM informacion_general AS ig
+            GROUP BY ig.id_suc, ig.name_suc, ig.ciudad
             ORDER BY ig.name_suc ASC
             `).then((result) => { return result.rows; });
             if (sucursal_.length === 0)
@@ -143,10 +143,10 @@ class DatosGeneralesControlador {
             let { id_sucursal } = req.body;
             //console.log('ver id_sucursal ', id_sucursal)
             // CONSULTA DE BUSQUEDA DE SUCURSALES
-            let sucursal_ = yield database_1.default.query("SELECT ig.id_suc, ig.name_suc " +
+            let sucursal_ = yield database_1.default.query("SELECT ig.id_suc, ig.name_suc, ig.ciudad " +
                 "FROM informacion_general AS ig " +
                 "WHERE ig.id_suc IN (" + id_sucursal + ")" +
-                "GROUP BY ig.id_suc, ig.name_suc " +
+                "GROUP BY ig.id_suc, ig.name_suc, ig.ciudad " +
                 "ORDER BY ig.name_suc ASC").then((result) => { return result.rows; });
             if (sucursal_.length === 0)
                 return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
@@ -268,10 +268,10 @@ class DatosGeneralesControlador {
             let { id_sucursal, id_departamento } = req.body;
             //console.log('ver id_sucursal ', id_sucursal)
             // CONSULTA DE BUSQUEDA DE SUCURSALES
-            let sucursal_ = yield database_1.default.query("SELECT ig.id_suc, ig.name_suc " +
+            let sucursal_ = yield database_1.default.query("SELECT ig.id_suc, ig.name_suc, ciudad " +
                 "FROM informacion_general AS ig " +
                 "WHERE ig.id_suc IN (" + id_sucursal + ")" +
-                "GROUP BY ig.id_suc, ig.name_suc " +
+                "GROUP BY ig.id_suc, ig.name_suc, ig.ciudad " +
                 "ORDER BY ig.name_suc ASC").then((result) => { return result.rows; });
             if (sucursal_.length === 0)
                 return res.status(404).jsonp({ message: 'No se han encontrado registros.' });
