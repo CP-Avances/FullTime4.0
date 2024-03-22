@@ -226,13 +226,12 @@
                             </mat-checkbox>
                         </th>
                         <th scope="col">Establecimiento</th>
-                        <th scope="col">Codigo</th>
-                        <th scope="col">Nombre</th>
                         <th scope="col">Cédula</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Codigo</th>
                         <th scope="col">Sucursal</th>
                         <th scope="col">Departamento</th>
                         <th scope="col">Cargo</th>
-                        <th scope="col">Correo</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -245,13 +244,12 @@
                             </mat-checkbox>
                         </td>
                         <td>{{e.sucursal}}</td>
-                        <td>{{e.codigo}}</td>
-                        <td>{{e.nombre}}</td>
                         <td>{{e.cedula}}</td>
+                        <td>{{e.nombre}}</td>
+                        <td>{{e.codigo}}</td>
                         <td>{{e.sucursal}}</td>
                         <td>{{e.departamento}}</td>
                         <td>{{e.cargo}}</td>
-                        <td>{{e.correo}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -279,11 +277,11 @@
                         <thead class="thead-light">
                             <tr style="text-align: center">
                                 <th class="t_horarios" scope="col" rowspan="2">N°</th>
-                                <th class="t_horarios" scope="col" rowspan="2">CÓDIGO</th>
-                                <th class="t_horarios" scope="col" rowspan="2">EMPLEADO</th>
                                 <th class="t_horarios" scope="col" rowspan="2">CÉDULA</th>
-                                <th class="t_horarios" scope="col" rowspan="2">SUCURSAL</th>
+                                <th class="t_horarios" scope="col" rowspan="2">EMPLEADO</th>
+                                <th class="t_horarios" scope="col" rowspan="2">CÓDIGO</th>
                                 <th class="t_horarios" scope="col" rowspan="2">CIUDAD</th>
+                                <th class="t_horarios" scope="col" rowspan="2">SUCURSAL</th>
                                 <th class="t_horarios" scope="col" rowspan="2">RÉGIMEN</th>
                                 <th class="t_horarios" scope="col" rowspan="2">DEPARTAMENTO</th>
                                 <th class="t_horarios" scope="col" rowspan="2">CARGO</th>
@@ -293,18 +291,14 @@
                         <tbody>
                             <tr *ngFor="let e of arr_emp | paginate:tamanio_pagina:numero_pagina">
                                 <td class="t_horarios">{{ e.n }}</td>
-                                <td class="t_horarios">{{ e.codigo }}</td>
-                                <td class="t_horarios">{{ e.apellido.toUpperCase() }} {{ e.nombre.toUpperCase() }}</td>
                                 <td class="t_horarios">{{ e.cedula }}</td>
-                                <td class="t_horarios" *ngIf="e.name_suc">{{ e.name_suc }}</td>
-                                <td class="t_horarios" *ngIf="e.sucursal">{{ e.sucursal }}</td>
+                                <td class="t_horarios">{{ e.apellido.toUpperCase() }} {{ e.nombre.toUpperCase() }}</td>
+                                <td class="t_horarios">{{ e.codigo }}</td>
+                                <td class="t_horarios">{{ e.name_suc }}</td>
                                 <td class="t_horarios">{{ e.ciudad }}</td>
-                                <td class="t_horarios" *ngIf="e.name_regimen">{{ e.name_regimen }}</td>
-                                <td class="t_horarios" *ngIf="e.regimen">{{ e.regimen }}</td>
-                                <td class="t_horarios" *ngIf="e.name_dep">{{ e.name_dep }}</td>
-                                <td class="t_horarios" *ngIf="e.departamento">{{ e.departamento }}</td>
-                                <td class="t_horarios" *ngIf="e.name_cargo">{{ e.name_cargo }}</td>
-                                <td class="t_horarios" *ngIf="e.cargo">{{ e.cargo }}</td>
+                                <td class="t_horarios">{{ e.name_regimen }}</td>
+                                <td class="t_horarios">{{ e.name_dep }}</td>
+                                <td class="t_horarios">{{ e.name_cargo }}</td>
                                 <td class="t_horarios">{{ e.correo }}</td>
                             </tr>
                         </tbody>
