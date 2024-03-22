@@ -1210,13 +1210,18 @@ class EmpleadoControlador {
   }
 
   public async CargarPlantilla_Automatico(req: Request, res: Response): Promise<void> {
-    const plantilla = req.body
+    
+    const plantilla = req.body;
     console.log('datos automatico: ', plantilla);
-
+    
     const VALOR = await pool.query('SELECT * FROM codigo');
     //TODO Revisar max codigo
-    var codigo = parseInt(VALOR.rows[0].valor);
-    var contador = 1;
+    var codigo_dato = VALOR.rows[0].valor;
+    var codigo = 0;
+    if(codigo_dato!= null && codigo_dato != undefined && codigo_dato != ''){
+      codigo = codigo_dato = parseInt(codigo_dato);
+    }
+    var contador = 1;    
     
     plantilla.forEach(async (data: any) => {
 
@@ -1303,8 +1308,16 @@ class EmpleadoControlador {
       //Obtener id del rol
       const id_rol = await pool.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [rol.toUpperCase()]);
 
-      // Incrementar el valor del código
-      codigo = codigo + 1;
+      console.log('codigo dato 222: ',codigo_dato);
+      console.log('codigo 222: ',codigo);
+      if(codigo_dato != null && codigo_dato != undefined && codigo_dato != ''){
+        // Incrementar el valor del código
+        codigo = codigo + 1;
+      }else{
+        codigo = cedula;
+      }
+      
+
       var fec_nacimi = new Date(moment(fec_nacimiento).format('YYYY-MM-DD'));
 
       console.log('codigo: ', codigo)
@@ -1333,7 +1346,9 @@ class EmpleadoControlador {
       if (contador === plantilla.length) {
         console.log('codigo_ver', codigo, VALOR.rows[0].id);
         // Actualización del código
-        await pool.query('UPDATE codigo SET valor = $1 WHERE id = $2', [codigo, VALOR.rows[0].id]);
+        if(codigo_dato != null && codigo_dato != undefined && codigo_dato != ''){
+          await pool.query('UPDATE codigo SET valor = $1 WHERE id = $2', [codigo, VALOR.rows[0].id]);
+        }
       }
 
       contador = contador + 1;
@@ -1343,7 +1358,6 @@ class EmpleadoControlador {
     setTimeout(() => {
       return res.jsonp({ message: 'correcto' });
     }, 1500)
-    
     
   }
 
@@ -1549,10 +1563,10 @@ class EmpleadoControlador {
           const regex = /^[0-9]+$/;
           if (regex.test(data.telefono)){
             if (data.telefono.toString().length != 10) {
-              data.observacion = 'El teléfono ingresada no es válido';
+              data.observacion = 'El teléfono ingresado no es válido';
             }
           } else {
-            data.observacion = 'El teléfono ingresada no es válido';
+            data.observacion = 'El teléfono ingresado no es válido';
           }
         }
 

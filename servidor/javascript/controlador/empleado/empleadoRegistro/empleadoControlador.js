@@ -1114,7 +1114,11 @@ class EmpleadoControlador {
             console.log('datos automatico: ', plantilla);
             const VALOR = yield database_1.default.query('SELECT * FROM codigo');
             //TODO Revisar max codigo
-            var codigo = parseInt(VALOR.rows[0].valor);
+            var codigo_dato = VALOR.rows[0].valor;
+            var codigo = 0;
+            if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
+                codigo = codigo_dato = parseInt(codigo_dato);
+            }
             var contador = 1;
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                 var _a;
@@ -1187,8 +1191,15 @@ class EmpleadoControlador {
                 const id_nacionalidad = yield database_1.default.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1', [nacionalidad.toUpperCase()]);
                 //Obtener id del rol
                 const id_rol = yield database_1.default.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [rol.toUpperCase()]);
-                // Incrementar el valor del código
-                codigo = codigo + 1;
+                console.log('codigo dato 222: ', codigo_dato);
+                console.log('codigo 222: ', codigo);
+                if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
+                    // Incrementar el valor del código
+                    codigo = codigo + 1;
+                }
+                else {
+                    codigo = cedula;
+                }
                 var fec_nacimi = new Date((0, moment_1.default)(fec_nacimiento).format('YYYY-MM-DD'));
                 console.log('codigo: ', codigo);
                 console.log('cedula: ', cedula, ' usuario: ', usuario, ' contrasena: ', contrasena);
@@ -1211,7 +1222,9 @@ class EmpleadoControlador {
                 if (contador === plantilla.length) {
                     console.log('codigo_ver', codigo, VALOR.rows[0].id);
                     // Actualización del código
-                    yield database_1.default.query('UPDATE codigo SET valor = $1 WHERE id = $2', [codigo, VALOR.rows[0].id]);
+                    if (codigo_dato != null && codigo_dato != undefined && codigo_dato != '') {
+                        yield database_1.default.query('UPDATE codigo SET valor = $1 WHERE id = $2', [codigo, VALOR.rows[0].id]);
+                    }
                 }
                 contador = contador + 1;
                 contrasena = undefined;
@@ -1434,11 +1447,11 @@ class EmpleadoControlador {
                         const regex = /^[0-9]+$/;
                         if (regex.test(data.telefono)) {
                             if (data.telefono.toString().length != 10) {
-                                data.observacion = 'El teléfono ingresada no es válido';
+                                data.observacion = 'El teléfono ingresado no es válido';
                             }
                         }
                         else {
-                            data.observacion = 'El teléfono ingresada no es válido';
+                            data.observacion = 'El teléfono ingresado no es válido';
                         }
                     }
                     if (codigo != undefined) {
