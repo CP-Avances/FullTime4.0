@@ -206,7 +206,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let s of sucursales | emplNombre: filtroNombreSuc | paginate:tamanio_pagina_suc:numero_pagina_suc">
+                                    *ngFor="let s of sucursales | sucNombre: filtroNombreSuc | paginate:tamanio_pagina_suc:numero_pagina_suc">
                                     <td>
                                         <mat-checkbox *ngIf="multiple_" (click)="$event.stopPropagation()"
                                             (change)="$event ? selectionSuc.toggle(s) : null"
@@ -360,7 +360,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let d of departamentos | emplNombre: filtroNombreSuc | departamento: filtroNombreDep  | paginate:tamanio_pagina_dep:numero_pagina_dep">
+                                    *ngFor="let d of departamentos | sucNombre: filtroNombreSuc | departamento: filtroNombreDep  | paginate:tamanio_pagina_dep:numero_pagina_dep">
                                     <td>
                                         <mat-checkbox *ngIf="multiple_" (click)="$event.stopPropagation()"
                                             (change)="$event ? selectionDep.toggle(d) : null"
