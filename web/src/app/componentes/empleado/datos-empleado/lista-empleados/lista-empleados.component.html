@@ -38,17 +38,19 @@
             <mat-card class="example-card mat-elevation-z9">
                 <div class="row">
                     <div class="col-md" style="padding-top: 5px;">
-                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                        <div class="d-flex flex-wrap justify-content-around"
+                            style="text-align: center; justify-content: center;">
                             <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
                                 <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
                                     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                <label for="file" matSuffix matTooltipPosition="right"
-                                    *ngIf="!mostrarbtnsubir" style="height: 65px; padding-top: 25px;"
+                                <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                    style="height: 65px; padding-top: 25px;"
                                     matTooltip="Dar click para selecionar plantilla y cargar registros.">
                                     Subir plantilla
                                 </label>
-                                <label for="file"  matSuffix matTooltipPosition="right"
-                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'" style="height: 64px; padding-top: 25px;"
+                                <label for="file" matSuffix matTooltipPosition="right"
+                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                    style="height: 64px; padding-top: 25px;"
                                     matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
                                     Subir nueva plantilla
                                 </label>
@@ -66,16 +68,16 @@
                             </a>
                         </div>
                     </div>
-                    <div class="col-md" *ngIf="DataEmpleados" style="padding-top: 5px; padding-bottom: 5px;" >
-                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
-                            <button id="descargar" class="btn btn-sm"
-                                (click)="ConfirmarRegistroMultiple()" matSuffix matTooltipPosition="right"
-                                 matTooltip="Guardar registro multiple.">
+                    <div class="col-md" *ngIf="DataEmpleados" style="padding-top: 5px; padding-bottom: 5px;">
+                        <div class="d-flex flex-wrap justify-content-around"
+                            style="text-align: center; justify-content: center;">
+                            <button id="descargar" class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
+                                matTooltipPosition="right" matTooltip="Guardar registro multiple.">
                                 Registrar
                             </button>
                         </div>
                     </div>
-                    
+
                 </div>
             </mat-card>
         </div>
@@ -83,7 +85,8 @@
 </div>
 
 <!-- LISTA DE EMPLEADOS QUE HAN SIDO INACTIVADOS O QUE YA NO FORMAN PARTE DE LA EMPRESA -->
-<div *ngIf="Hab_Deshabilitados && !DataEmpleados && (messajeExcel == 'error' || messajeExcel == '')" class="container" style="padding-bottom: 50px; text-align: center;">
+<div *ngIf="Hab_Deshabilitados && !DataEmpleados && (messajeExcel == 'error' || messajeExcel == '')" class="container"
+    style="padding-bottom: 50px; text-align: center;">
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
             <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccionDesactivados()" matSuffix
@@ -166,7 +169,8 @@
 </div>
 
 <!-------------------- LISTA DE EMPLEADOS QUE FORMAN PARTE DE LA EMPRESA --------------------------------------->
-<div *ngIf="tabla_activos && !DataEmpleados && (messajeExcel == 'error' || messajeExcel == '')" class="container" style="padding-bottom: 50px; text-align: center;">
+<div *ngIf="tabla_activos && !DataEmpleados && (messajeExcel == 'error' || messajeExcel == '')" class="container"
+    style="padding-bottom: 50px; text-align: center;">
     <div class="mat-elevation-z8" style="background: white;">
         <div class="d-flex bd-highlight" id="titulo">
             <mat-icon class="flex-shrink-1 bd-highlight" (click)="HabilitarSeleccion()" matSuffix
@@ -310,6 +314,7 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
+                        <th id="td_usuario" scope="col">Observación</th>
                         <th id="td_usuario" scope="col">Item</th>
                         <th id="td_usuario" scope="col">Cédula</th>
                         <th id="td_usuario" scope="col" *ngIf="datosManuales">Codigo</th>
@@ -327,12 +332,15 @@
                         <th id="td_usuario" scope="col">Usuario</th>
                         <th id="td_usuario" scope="col">Contraseña</th>
                         <th id="td_usuario" scope="col">Rol</th>
-                        <th id="td_usuario" scope="col">Observación</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr
-                        *ngFor="let e of DataEmpleados | paginate:tamanio_paginaMul:numero_paginaMul ">
+                    <tr *ngFor="let e of DataEmpleados | paginate:tamanio_paginaMul:numero_paginaMul ">
+                        <td style="width: 400px;">
+                            <div id="t-editar" class="circulo" [style.background-color]="stiloCelda(e.observacion)">
+                            </div>
+                            {{e.observacion}}
+                        </td>
                         <td style="font-size: 14px; width: 50px;" align="center">{{e.fila}}</td>
                         <td [style.color]="stiloTextoCelda(e.cedula)">{{e.cedula}}</td>
                         <td [style.color]="stiloTextoCelda(e.codigo)" *ngIf="datosManuales">{{e.codigo}}</td>
@@ -350,10 +358,6 @@
                         <td [style.color]="stiloTextoCelda(e.usuario)">{{e.usuario}}</td>
                         <td [style.color]="stiloTextoCelda(e.contrasena)">{{e.contrasena}}</td>
                         <td [style.color]="stiloTextoCelda(e.rol)">{{e.rol}}</td>
-                        <td style="width: 400px;">
-                            <div id="t-editar" class="circulo"  [style.background-color]="stiloCelda(e.observacion)"></div>
-                            {{e.observacion}}
-                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -363,4 +367,3 @@
         </mat-paginator>
     </div>
 </div>
-
