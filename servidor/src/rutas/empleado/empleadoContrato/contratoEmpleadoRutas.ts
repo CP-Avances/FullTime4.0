@@ -1,5 +1,6 @@
 import CONTRATO_EMPLEADO_CONTROLADOR from '../../../controlador/empleado/empleadoContrato/contratoEmpleadoControlador';
 import { ObtenerRutaContrato } from '../../../libs/accesoCarpetas';
+import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
 import { TokenValidation } from '../../../libs/verificarToken';
 import { Router } from 'express';
 import multer from 'multer';
@@ -11,6 +12,7 @@ const multipart = require('connect-multiparty');
 const multipartMiddleware = multipart({
     uploadDir: './contratos',
 });
+
 
 const storage = multer.diskStorage({
 
@@ -46,8 +48,22 @@ const storage = multer.diskStorage({
         cb(null, documento)
     }
 })
-
 const upload = multer({ storage: storage });
+
+
+const storage_plantilla = multer.diskStorage({
+
+    destination: function (req, file, cb) {
+        cb(null, ObtenerRutaLeerPlantillas())
+    },
+    filename: function (req, file, cb) {
+        let documento = file.originalname;
+
+        cb(null, documento);
+    }
+})
+const upload_plantilla = multer({ storage: storage_plantilla });
+
 
 class DepartamentoRutas {
     public router: Router = Router();
@@ -96,14 +112,6 @@ class DepartamentoRutas {
 
 
 
-
-
-
-
-
-
-
-
         this.router.get('/', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.ListarContratos);
         this.router.get('/:id/get', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.ObtenerUnContrato);
         this.router.get('/:id_empleado', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarIdContrato);
@@ -111,6 +119,11 @@ class DepartamentoRutas {
         this.router.post('/buscarFecha/contrato', TokenValidation, CONTRATO_EMPLEADO_CONTROLADOR.EncontrarFechaContratoId);
 
 
+        /** ********************************************************************************************* **
+         ** **            METODO PAARA LA LECTURA DEL REGISTRO MULTIPLE DE CONTRATOS                   ** **
+         ** ********************************************************************************************* **/
+         this.router.post('/upload/revision', [TokenValidation, upload_plantilla.single('uploads')], CONTRATO_EMPLEADO_CONTROLADOR.RevisarDatos);
+         
     }
 }
 

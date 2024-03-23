@@ -334,6 +334,10 @@ export class EmpleadoService {
   }
 
 
+  RevisarFormato(formData) {
+    return this.http.post<any>(environment.url + '/contratoEmpleado/upload/revision', formData);
+  }
+
 
 
 

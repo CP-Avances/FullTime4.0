@@ -17,6 +17,8 @@ const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const moment_1 = __importDefault(require("moment"));
 const accesoCarpetas_1 = require("../../../libs/accesoCarpetas");
+const accesoCarpetas_2 = require("../../../libs/accesoCarpetas");
+const xlsx_1 = __importDefault(require("xlsx"));
 class ContratoEmpleadoControlador {
     // REGISTRAR CONTRATOS
     CrearContrato(req, res) {
@@ -285,6 +287,18 @@ class ContratoEmpleadoControlador {
             else {
                 return res.status(404).jsonp({ text: 'Registro no encontrado' });
             }
+        });
+    }
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+    RevisarDatos(req, res) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+            let separador = path_1.default.sep;
+            let ruta = (0, accesoCarpetas_2.ObtenerRutaLeerPlantillas)() + separador + documento;
+            const workbook = xlsx_1.default.readFile(ruta);
+            const sheet_name_list = workbook.SheetNames;
+            const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
         });
     }
 }

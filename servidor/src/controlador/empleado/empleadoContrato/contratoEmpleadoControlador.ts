@@ -5,6 +5,9 @@ import path from 'path';
 import fs from 'fs';
 import moment from 'moment';
 import { ObtenerRutaContrato } from '../../../libs/accesoCarpetas';
+import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
+
+import excel from 'xlsx';
 
 class ContratoEmpleadoControlador {
 
@@ -321,6 +324,23 @@ class ContratoEmpleadoControlador {
             return res.status(404).jsonp({ text: 'Registro no encontrado' });
         }
     }
+
+
+
+
+     // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+    public async RevisarDatos(req: Request, res: Response): Promise<any> {
+        const documento = req.file?.originalname;
+        let separador = path.sep;
+        let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+
+        const workbook = excel.readFile(ruta);
+        const sheet_name_list = workbook.SheetNames;
+        const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+    }
+
+
+
 
 }
 
