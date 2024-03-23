@@ -327,7 +327,7 @@ export class ListaEmpleadosComponent implements OnInit {
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
     this.messajeExcel = '';
-    
+
   }
 
   // METODO PARA LISTAR NACIONALIDADES
@@ -363,7 +363,7 @@ export class ListaEmpleadosComponent implements OnInit {
           this.tamanio_paginaMul = 5;
           this.VerificarPlantillaAutomatico();
         } else {
-          this.toastr.error('Cargar la plantilla con nombre EmpleadoAutomatico', 'Plantilla seleccionada incorrecta', {
+          this.toastr.error('Cargar la plantilla con nombre EmpleadoAutomatico.', 'Plantilla seleccionada incorrecta.', {
             timeOut: 6000,
           });
           this.archivoForm.reset();
@@ -380,7 +380,7 @@ export class ListaEmpleadosComponent implements OnInit {
           this.tamanio_paginaMul = 5;
           this.VerificarPlantillaManual();
         } else {
-          this.toastr.error('Cargar la plantilla con nombre EmpleadoManual', 'Plantilla seleccionada incorrecta', {
+          this.toastr.error('Cargar la plantilla con nombre EmpleadoManual.', 'Plantilla seleccionada incorrecta.', {
             timeOut: 6000,
           });
           this.archivoForm.reset();
@@ -390,7 +390,7 @@ export class ListaEmpleadosComponent implements OnInit {
         }
       }
     } else {
-      this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
+      this.toastr.error('Error en el formato del documento.', 'Plantilla no aceptada.', {
         timeOut: 6000,
       });
       this.archivoForm.reset();
@@ -418,26 +418,25 @@ export class ListaEmpleadosComponent implements OnInit {
       this.DataEmpleados = res.data;
       this.messajeExcel = res.message;
 
-      if(this.messajeExcel == 'error'){
-        this.toastr.error('Revisar los datos de la columna N, debe enumerar correctamente.', 'Plantilla no aceptada', {
+      if (this.messajeExcel == 'error') {
+        this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      }else{
+      } else {
         this.DataEmpleados.forEach(item => {
-          if( item.observacion.toLowerCase() == 'ok'){
+          if (item.observacion.toLowerCase() == 'ok') {
             this.listUsuariosCorrectas.push(item);
           }
         });
       }
-
-    },error => {
-      console.log('Serivicio rest -> metodo verificarArchivoExcel_Automatico - ',error);
-      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+    }, error => {
+      console.log('Serivicio rest -> metodo verificarArchivoExcel_Automatico - ', error);
+      this.toastr.error('Error al cargar los datos.', 'Plantilla no aceptada.', {
         timeOut: 4000,
       });
       this.progreso = false;
-    },() => {
+    }, () => {
       this.progreso = false;
     });
 
@@ -452,7 +451,7 @@ export class ListaEmpleadosComponent implements OnInit {
   }
 
   datosManuales: boolean = false;
-  VerificarPlantillaManual(){
+  VerificarPlantillaManual() {
     this.listUsuariosCorrectas = [];
     this.datosManuales = false;
     let formData = new FormData();
@@ -466,28 +465,28 @@ export class ListaEmpleadosComponent implements OnInit {
       console.log('plantilla manual', res);
       this.DataEmpleados = res.data;
       this.messajeExcel = res.message;
-      if(this.messajeExcel == 'error'){
-        this.toastr.error('Revisar los datos de la columna N, debe enumerar correctamente.', 'Plantilla no aceptada', {
+      if (this.messajeExcel == 'error') {
+        this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      }else{
+      } else {
         this.DataEmpleados.forEach(item => {
-          if( item.observacion.toLowerCase() == 'ok'){
+          if (item.observacion.toLowerCase() == 'ok') {
             this.listUsuariosCorrectas.push(item);
           }
         });
         this.datosManuales = true;
       }
 
-    },error => {
-      console.log('Serivicio rest -> metodo verificarArchivoExcel_Automatico - ',error);
+    }, error => {
+      console.log('Serivicio rest -> metodo verificarArchivoExcel_Automatico - ', error);
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
       this.progreso = false;
       this.datosManuales = false;
-    },() => {
+    }, () => {
       this.progreso = false;
     });
 
@@ -496,7 +495,7 @@ export class ListaEmpleadosComponent implements OnInit {
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
     const mensaje = 'registro';
-    console.log('this.listUsuariosCorrectas: ',this.listUsuariosCorrectas.length);
+    console.log('this.listUsuariosCorrectas: ', this.listUsuariosCorrectas.length);
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
@@ -505,9 +504,9 @@ export class ListaEmpleadosComponent implements OnInit {
       });
   }
 
-  registrarUsuariosMultiple(){
-    if(this.listUsuariosCorrectas.length > 0){
-      if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true){
+  registrarUsuariosMultiple() {
+    if (this.listUsuariosCorrectas.length > 0) {
+      if (this.datosCodigo[0].automatico === true || this.datosCodigo[0].cedula === true) {
         this.rest.subirArchivoExcel_Automatico(this.listUsuariosCorrectas).subscribe(datos_archivo => {
           console.log('datos plantilla a enviar: ', this.listUsuariosCorrectas);
           this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
@@ -516,9 +515,9 @@ export class ListaEmpleadosComponent implements OnInit {
           window.location.reload();
           this.archivoForm.reset();
           this.nameFile = '';
-    
+
         });
-      }else{
+      } else {
         this.rest.subirArchivoExcel_Manual(this.listUsuariosCorrectas).subscribe(datos_archivo => {
           console.log('datos plantilla a enviar: ', this.listUsuariosCorrectas);
           this.toastr.success('Operación exitosa.', 'Plantilla de Empleados importada.', {
@@ -529,8 +528,8 @@ export class ListaEmpleadosComponent implements OnInit {
           this.nameFile = '';
         })
       }
-    }else{
-      this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada', {
+    } else {
+      this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
         timeOut: 4000,
       });
       this.archivoForm.reset();
@@ -542,41 +541,41 @@ export class ListaEmpleadosComponent implements OnInit {
 
   //Metodo para dar color a las celdas y representar las validaciones
   colorCelda: string = ''
-  stiloCelda(observacion: string): string{
+  stiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
-    if(observacion == 'ok'){
+    if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    }else if(observacion == 'Ya esta registrado en base'){
+    } else if (observacion == 'Ya esta registrado en base') {
       return 'rgb(239, 203, 106)';
-    }else if((arrayObservacion[0]+' '+arrayObservacion[1]) == 'Cédula ya' || 
-    (arrayObservacion[0]+' '+arrayObservacion[1]) == 'Usuario ya'  || 
-    (arrayObservacion[0]+' '+arrayObservacion[1]) == 'Codigo ya'){
+    } else if ((arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Cédula ya' ||
+      (arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Usuario ya' ||
+      (arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Codigo ya') {
       return 'rgb(239, 203, 106)';
-    }else if(arrayObservacion[0] == 'Cédula' || arrayObservacion[0] == 'Usuario'){
-        return 'rgb(222, 162, 73)';
-    }else if((arrayObservacion[0]+' '+arrayObservacion[1]) == 'Registro duplicado'){
-      return 'rgb(156, 214, 255)';
-    }else if((observacion ==  'El codigo ingresado es incorrecto') || 
-      (observacion ==  'El teléfono ingresado no es válido') ||
-      (observacion ==  'La cédula ingresada no es válida')
-    ){
+    } else if (arrayObservacion[0] == 'Cédula' || arrayObservacion[0] == 'Usuario') {
       return 'rgb(222, 162, 73)';
-    }else if((observacion ==  'El rol no existe en la base') || 
-    (observacion ==  'La nacionalidad no existe en la base')
-    ){
+    } else if ((arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Registro duplicado') {
+      return 'rgb(156, 214, 255)';
+    } else if ((observacion == 'Código ingresado no válido') ||
+      (observacion == 'Teléfono ingresado no es válido') ||
+      (observacion == 'Cédula ingresada no es válida')
+    ) {
+      return 'rgb(222, 162, 73)';
+    } else if ((observacion == 'Rol no existe en el sistema') ||
+      (observacion == 'Nacionalidad no existe en el sistema')
+    ) {
       return 'rgb(255, 192, 203)';
     }
-    else{
+    else {
       return 'rgb(251, 73, 18)';
     }
 
   }
 
   colorTexto: string = '';
-  stiloTextoCelda(texto: string): string{
-    if(texto == 'No registrado'){
-        return 'rgb(255, 80, 80)';
-    }else{   
+  stiloTextoCelda(texto: string): string {
+    if (texto == 'No registrado') {
+      return 'rgb(255, 80, 80)';
+    } else {
       return 'black'
     }
   }
@@ -626,7 +625,7 @@ export class ListaEmpleadosComponent implements OnInit {
         this.toastr.error('Para el buen funcionamiento del sistema verifique los datos de su plantilla, ' +
           'recuerde que la cédula, código y nombre de usuario son datos únicos por ende no deben constar ' +
           'en otros registros. Asegurese de que el rol ingresado exista en el sistema.',
-          'Registro Fallido. Verificar Plantilla', {
+          'Registro Fallido. Verificar Plantilla.', {
           timeOut: 6000,
         });
         this.archivoForm.reset();
@@ -638,7 +637,7 @@ export class ListaEmpleadosComponent implements OnInit {
             this.toastr.error('Para el buen funcionamiento del sistema verifique los datos de su plantilla, ' +
               'recuerde que la cédula, código y nombre de usuario son datos únicos por ende no deben constar ' +
               'en otros registros. Asegurese de que el rol ingresado exista en el sistema.',
-              'Registro Fallido. Verificar Plantilla', {
+              'Registro Fallido. Verificar Plantilla.', {
               timeOut: 6000,
             });
             this.archivoForm.reset();
@@ -669,7 +668,7 @@ export class ListaEmpleadosComponent implements OnInit {
         this.link = `${environment.url}/plantillaD/documento/EmpleadoManual.xlsx`
       }
     }, error => {
-      this.toastr.info('Para el correcto funcionamiento del sistema debe realizar la configuración del código de empleado', '', {
+      this.toastr.info('Para el correcto funcionamiento del sistema debe realizar la configuración del código de empleado.', '', {
         timeOut: 6000,
       });
       this.router.navigate(['/codigo/']);
@@ -684,7 +683,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
 
 
-  
+
 
   /** ************************************************************************************************* **
    ** **                             PARA LA EXPORTACION DE ARCHIVOS PDF                             ** **

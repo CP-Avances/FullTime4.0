@@ -37,7 +37,7 @@
             </mat-card>
         </div>
         <div class="col-lg-7">
-            <app-criterios-busqueda [num_option]="4" [limpiar]="limpiar" id="busqueda"></app-criterios-busqueda>
+            <app-criterios-busqueda [num_option]="5" [limpiar]="limpiar" id="busqueda"></app-criterios-busqueda>
         </div>
     </div>
 </div>
@@ -65,14 +65,14 @@
                 </thead>
                 <tbody>
                     <tr
-                        *ngFor="let s of sucursales | emplNombre: filtroNombreSuc | paginate:tamanio_pagina_suc:numero_pagina_suc">
+                        *ngFor="let s of sucursales | sucNombre: filtroNombreSuc | paginate:tamanio_pagina_suc:numero_pagina_suc">
                         <td>
                             <mat-checkbox (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionSuc.toggle(s) : null" [checked]="selectionSuc.isSelected(s)"
                                 [aria-label]="checkboxLabelSuc(s)">
                             </mat-checkbox>
                         </td>
-                        <td>{{s.nombre}}</td>
+                        <td>{{s.sucursal}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -100,7 +100,8 @@
                                 [aria-label]="checkboxLabelReg()">
                             </mat-checkbox>
                         </th>
-                        <th scope="col">Descripción</th>
+                        <th scope="col">Establecimiento</th>
+                        <th scope="col">Nombre</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -112,6 +113,7 @@
                                 [aria-label]="checkboxLabelReg(r)">
                             </mat-checkbox>
                         </td>
+                        <td>{{r.sucursal}}</td>
                         <td>{{r.nombre}}</td>
                     </tr>
                 </tbody>
@@ -141,6 +143,7 @@
                                 [aria-label]="checkboxLabelCar()">
                             </mat-checkbox>
                         </th>
+                        <th scope="col">Establecimiento</th>
                         <th scope="col">Nombre</th>
                     </tr>
                 </thead>
@@ -153,6 +156,7 @@
                                 [aria-label]="checkboxLabelCar(c)">
                             </mat-checkbox>
                         </td>
+                        <td>{{c.sucursal}}</td>
                         <td>{{c.nombre}}</td>
                     </tr>
                 </tbody>
@@ -182,6 +186,7 @@
                                 [aria-label]="checkboxLabelDep()">
                             </mat-checkbox>
                         </th>
+                        <th scope="col">Establecimiento</th>
                         <th scope="col">Nombre</th>
                     </tr>
                 </thead>
@@ -194,6 +199,7 @@
                                 [aria-label]="checkboxLabelDep(d)">
                             </mat-checkbox>
                         </td>
+                        <td>{{d.sucursal}}</td>
                         <td>{{d.departamento}}</td>
                     </tr>
                 </tbody>
@@ -219,13 +225,13 @@
                                 [aria-label]="checkboxLabelEmp()">
                             </mat-checkbox>
                         </th>
-                        <th scope="col">Codigo</th>
-                        <th scope="col">Nombre</th>
+                        <th scope="col">Establecimiento</th>
                         <th scope="col">Cédula</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Codigo</th>
                         <th scope="col">Sucursal</th>
                         <th scope="col">Departamento</th>
                         <th scope="col">Cargo</th>
-                        <th scope="col">Correo</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -237,13 +243,13 @@
                                 [aria-label]="checkboxLabelEmp(e)">
                             </mat-checkbox>
                         </td>
-                        <td>{{e.codigo}}</td>
-                        <td>{{e.nombre}}</td>
+                        <td>{{e.sucursal}}</td>
                         <td>{{e.cedula}}</td>
+                        <td>{{e.nombre}}</td>
+                        <td>{{e.codigo}}</td>
                         <td>{{e.sucursal}}</td>
                         <td>{{e.departamento}}</td>
                         <td>{{e.cargo}}</td>
-                        <td>{{e.correo}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -256,62 +262,63 @@
 </div>
 
 <div class="container" style="padding-top: 15px" [hidden]="!verDetalle">
-  <mat-card class="example-card mat-elevation-z8">
-    <div id="titulo">
-      <span>DETALLES DE USUARIOS {{opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}}</span>
-      <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
-        matTooltip="Regresar">
-        <i class="fas fa-arrow-left"></i>
-      </button>
-    </div>
-    <mat-card-content>
-      <div class="container" style="padding-bottom: 25px; text-align: center; margin-top: 0.5rem">
-        <div class="table-responsive">
-          <table class="table table-hover table-sm" id="detalle">
-            <thead class="thead-light">
-              <tr style="text-align: center">
-                <th class="t_horarios" scope="col" rowspan="2">N°</th>
-                <th class="t_horarios" scope="col" rowspan="2">CÓDIGO</th>
-                <th class="t_horarios" scope="col" rowspan="2">EMPLEADO</th>
-                <th class="t_horarios" scope="col" rowspan="2">CÉDULA</th>
-                <th class="t_horarios" scope="col" rowspan="2">SUCURSAL</th>
-                <th class="t_horarios" scope="col" rowspan="2">CIUDAD</th>
-                <th class="t_horarios" scope="col" rowspan="2">RÉGIMEN</th>
-                <th class="t_horarios" scope="col" rowspan="2">DEPARTAMENTO</th>
-                <th class="t_horarios" scope="col" rowspan="2">CARGO</th>
-                <th class="t_horarios" scope="col" colspan="2">CORREO</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let e of arr_emp | paginate : tamanio_pagina : numero_pagina">
-                <td class="t_horarios">{{ e.n }}</td>
-                <td class="t_horarios">{{ e.codigo }}</td>
-                <td class="t_horarios">{{ e.name_empleado.toUpperCase() }}</td>
-                <td class="t_horarios">{{ e.cedula }}</td>
-                <td class="t_horarios">{{ e.sucursal }}</td>
-                <td class="t_horarios">{{ e.ciudad }}</td>
-                <td class="t_horarios">{{ bool.bool_cargo? e.regimen : e.regimen[0].name_regimen }}</td>
-                <td class="t_horarios">{{ e.departamento }}</td>
-                <td class="t_horarios">{{ e.cargo }}</td>
-                <td class="t_horarios">{{ e.correo }}</td>
-              </tr>
-            </tbody>
-          </table>
+    <mat-card class="example-card mat-elevation-z8">
+        <div id="titulo">
+            <span>DETALLES DE USUARIOS {{opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}}</span>
+            <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
+                matTooltip="Regresar">
+                <i class="fas fa-arrow-left"></i>
+            </button>
         </div>
-        <mat-paginator [length]="arr_emp.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
-          (page)="ManejarPagina($event)" showFirstLastButtons aria-label="Seleccionar pagina">
-        </mat-paginator>
-      </div>
-      <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 0.5rem">
-        <i id="pdf" class="fas fa-file-pdf icon" matSuffix matTooltipPosition="right"
-          matTooltip="Descargar reporte en formato PDF." (click)="GenerarPDF('download')">
-          <p>PDF</p>
-        </i>
-        <i id="excel" class="fas fa-file-excel icon" matSuffix matTooltipPosition="right"
-          matTooltip="Descargar reporte en formato EXCEL." (click)="ValidarExcel()">
-          <p>XLSL</p>
-        </i>
-      </div>
-    </mat-card-content>
-  </mat-card>
+        <mat-card-content>
+            <div class="container" style="padding-bottom: 25px; text-align: center; margin-top: 0.5rem">
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm" id="detalle">
+                        <thead class="thead-light">
+                            <tr style="text-align: center">
+                                <th class="t_horarios" scope="col" rowspan="2">N°</th>
+                                <th class="t_horarios" scope="col" rowspan="2">CÉDULA</th>
+                                <th class="t_horarios" scope="col" rowspan="2">EMPLEADO</th>
+                                <th class="t_horarios" scope="col" rowspan="2">CÓDIGO</th>
+                                <th class="t_horarios" scope="col" rowspan="2">CIUDAD</th>
+                                <th class="t_horarios" scope="col" rowspan="2">SUCURSAL</th>
+                                <th class="t_horarios" scope="col" rowspan="2">RÉGIMEN</th>
+                                <th class="t_horarios" scope="col" rowspan="2">DEPARTAMENTO</th>
+                                <th class="t_horarios" scope="col" rowspan="2">CARGO</th>
+                                <th class="t_horarios" scope="col" colspan="2">CORREO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let e of arr_emp | paginate:tamanio_pagina:numero_pagina">
+                                <td class="t_horarios">{{ e.n }}</td>
+                                <td class="t_horarios">{{ e.cedula }}</td>
+                                <td class="t_horarios">{{ e.apellido.toUpperCase() }} {{ e.nombre.toUpperCase() }}</td>
+                                <td class="t_horarios">{{ e.codigo }}</td>
+                                <td class="t_horarios">{{ e.name_suc }}</td>
+                                <td class="t_horarios">{{ e.ciudad }}</td>
+                                <td class="t_horarios">{{ e.name_regimen }}</td>
+                                <td class="t_horarios">{{ e.name_dep }}</td>
+                                <td class="t_horarios">{{ e.name_cargo }}</td>
+                                <td class="t_horarios">{{ e.correo }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <mat-paginator id="pagina" [length]="arr_emp.length" [pageSize]="tamanio_pagina"
+                    [pageSizeOptions]="pageSizeOptions" (page)="ManejarPaginaDet($event)" showFirstLastButtons
+                    aria-label="Seleccionar pagina">
+                </mat-paginator>
+            </div>
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 0.5rem">
+                <i id="pdf" class="fas fa-file-pdf icon" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar reporte en formato PDF." (click)="GenerarPDF('download')">
+                    <p>PDF</p>
+                </i>
+                <i id="excel" class="fas fa-file-excel icon" matSuffix matTooltipPosition="right"
+                    matTooltip="Descargar reporte en formato EXCEL." (click)="ValidarExcel()">
+                    <p>XLSL</p>
+                </i>
+            </div>
+        </mat-card-content>
+    </mat-card>
 </div>

@@ -192,9 +192,16 @@ export class DatosEmpleadoComponent implements OnInit {
       var empleado = data[0].nombre + data[0].apellido;
       if (data[0]['imagen'] != null) {
         this.urlImagen = `${environment.url}/empleado/img/` + data[0].id + '/' + data[0].imagen;
-        //console.log('url empleado ', this.urlImagen)
+        console.log('url empleado ', this.urlImagen)
         this.restEmpleado.obtenerImagen(data[0].id, data[0].imagen).subscribe(data => {
-          this.imagenEmpleado = 'data:image/jpeg;base64,' + data.imagen;
+          if (data.imagen != 0) {
+            this.imagenEmpleado = 'data:image/jpeg;base64,' + data.imagen;
+          }
+          else {
+            this.ImagenLocalUsuario("assets/imagenes/user.png").then(
+              (result) => (this.imagenEmpleado = result)
+            );
+          }
         });
         this.mostrarImagen = true;
         this.textoBoton = 'Editar foto';
@@ -202,7 +209,7 @@ export class DatosEmpleadoComponent implements OnInit {
         this.iniciales = data[0].nombre.split(" ")[0].slice(0, 1) + data[0].apellido.split(" ")[0].slice(0, 1);
         this.mostrarImagen = false;
         this.textoBoton = 'Subir foto';
-        this.getImageDataUrlFromLocalPath1("assets/imagenes/user.png").then(
+        this.ImagenLocalUsuario("assets/imagenes/user.png").then(
           (result) => (this.imagenEmpleado = result)
         );
       }
@@ -211,7 +218,7 @@ export class DatosEmpleadoComponent implements OnInit {
   }
 
   // METODO PARA MOSTRAR IMAGEN EN PDF
-  getImageDataUrlFromLocalPath1(localPath: string): Promise<string> {
+  ImagenLocalUsuario(localPath: string): Promise<string> {
     return new Promise((resolve, reject) => {
       let canvas = document.createElement('canvas');
       let img = new Image();

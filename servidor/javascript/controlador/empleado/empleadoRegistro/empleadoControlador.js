@@ -825,7 +825,7 @@ class EmpleadoControlador {
                     }
                     if (genero == undefined) {
                         data.genero = 'No registrado';
-                        data.observacion = 'Genero ' + data.observacion;
+                        data.observacion = 'Género ' + data.observacion;
                     }
                     if (correo == undefined) {
                         data.correo = 'No registrado';
@@ -985,12 +985,12 @@ class EmpleadoControlador {
                                         }
                                     }
                                     else {
-                                        valor.observacion = 'La nacionalidad no existe en la base';
+                                        valor.observacion = 'Nacionalidad no existe en el sistema';
                                     }
                                 }
                             }
                             else {
-                                valor.observacion = 'El rol no existe en la base';
+                                valor.observacion = 'Rol no existe en el sistema';
                             }
                         }
                     }
@@ -1326,7 +1326,7 @@ class EmpleadoControlador {
                                             }
                                         }
                                         else {
-                                            data.observacion = 'El teléfono ingresada no es válido';
+                                            data.observacion = 'El teléfono ingresado no es válido';
                                         }
                                     }
                                 }
@@ -1335,7 +1335,7 @@ class EmpleadoControlador {
                                 }
                             }
                             else {
-                                data.observacion = 'El codigo ingresado es incorrecto';
+                                data.observacion = 'Formato de código incorrecto';
                             }
                         }
                     }
@@ -1386,7 +1386,7 @@ class EmpleadoControlador {
                     }
                     if (codigo == undefined) {
                         data.codigo = 'No registrado';
-                        data.observacion = 'Codigo ' + data.observacion;
+                        data.observacion = 'Código ' + data.observacion;
                     }
                     if (estado_civil == undefined) {
                         data.estado_civil = 'No registrado';
@@ -1394,7 +1394,7 @@ class EmpleadoControlador {
                     }
                     if (genero == undefined) {
                         data.genero = 'No registrado';
-                        data.observacion = 'Genero ' + data.observacion;
+                        data.observacion = 'Género ' + data.observacion;
                     }
                     if (correo == undefined) {
                         data.correo = 'No registrado';
@@ -1457,7 +1457,7 @@ class EmpleadoControlador {
                     if (codigo != undefined) {
                         const rege = /^[0-9]+$/;
                         if (!rege.test(data.codigo)) {
-                            data.observacion = 'El codigo ingresado es incorrecto';
+                            data.observacion = 'Formato de código incorrecto';
                         }
                     }
                     if (cedula == undefined) {
@@ -1535,12 +1535,12 @@ class EmpleadoControlador {
                                             }
                                         }
                                         else {
-                                            valor.observacion = 'La nacionalidad no existe en la base';
+                                            valor.observacion = 'Nacionalidad no existe en el sistema';
                                         }
                                     }
                                 }
                                 else {
-                                    valor.observacion = 'El rol no existe en la base';
+                                    valor.observacion = 'Rol no existe en el sistema';
                                 }
                             }
                         }

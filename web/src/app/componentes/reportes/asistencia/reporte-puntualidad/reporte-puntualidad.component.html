@@ -94,7 +94,7 @@
                 </thead>
                 <tbody>
                     <tr
-                        *ngFor="let s of sucursales | emplNombre: filtroNombreSuc | paginate:tamanio_pagina:numero_pagina">
+                        *ngFor="let s of sucursales | sucNombre: filtroNombreSuc | paginate:tamanio_pagina:numero_pagina">
                         <td>
                             <mat-checkbox (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionSuc.toggle(s) : null" [checked]="selectionSuc.isSelected(s)"

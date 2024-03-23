@@ -1,15 +1,12 @@
 export interface ITiempoLaboral{
+    datos: any[]
     id_horario: number,
     min_almuerzo: number,
-    datos: any[]
 }
-// h_ingreso: Date,
-// min_almuerzo: number,
-// h_trabaja: number
 
 export interface IAsistenciaDetalle  {
-    fecha: string,
     fecha_mostrar: string
+    fecha: string,
     E: {
         hora_default: string,
         hora_timbre: string,
@@ -31,8 +28,8 @@ export interface IAsistenciaDetalle  {
         descripcion: string
     },
     atraso: string,
-    sal_antes: string,
     almuerzo: string,
+    sal_antes: string,
     hora_trab: string,
     hora_supl: string,
     hora_ex_L_V: string,
@@ -41,8 +38,8 @@ export interface IAsistenciaDetalle  {
 
 export interface IReporteAtrasos {
     id_suc: number,
-    name_suc: string,
     ciudad: string,
+    name_suc: string,
     departamentos: Array <dep>
 }
 
@@ -54,14 +51,14 @@ export interface dep {
 
 export interface emp {
     id: number,
-    name_empleado: string,
     cedula: string,
     codigo: string | number,
-    genero?: string | number,
     cargo?: string,
-    contrato?: string,
-    timbres?: Array<any>,
+    genero?: string | number,
     faltas?: Array<any>
+    timbres?: Array<any>,
+    contrato?: string,
+    name_empleado: string,
 }
 
 export interface tim {
@@ -73,22 +70,20 @@ export interface tim {
 
 export interface IHorarioTrabajo {
     fecha: string,
+    timbres?: Array<any>
     horarios: Array<any>,
     total_timbres: string,
     total_horario?: string,
     total_diferencia?: string,
-    timbres?: Array<any>
 }
 
 
-/**
- * Para Reporte Puntualidad
- */
+// PARA REPORTE DE PUNTUALIDAD
 
 export interface IReportePuntualidad {
     id_suc: number,
-    name_suc: string,
     ciudad: string,
+    name_suc: string,
     departamentos: Array <dep_puntualidad>
 }
 
@@ -100,24 +95,22 @@ export interface dep_puntualidad {
 
 export interface emp_puntualidad {
     id: number,
-    name_empleado: string,
+    color: string
+    cargo?: string,
     cedula: string,
     codigo: string | number,
     genero?: string | number,
-    cargo?: string,
     contrato?: string,
     puntualidad?: Array<any> | number,
-    color: string
+    name_empleado: string,
 }
 
-/**
- * Para Reporte TIMBRES
- */
+// PARA REPORTE TIMBRES
 
 export interface IReporteTimbres {
     id_suc: number,
-    name_suc: string,
     ciudad: string,
+    name_suc: string,
     departamentos: Array <dep_tim>
 }
 
@@ -129,39 +122,40 @@ interface dep_tim {
 
 interface emp_tim {
     id: number,
-    name_empleado: string,
+    cargo?: string,
     cedula: string,
     codigo: string | number,
     genero?: string | number,
-    cargo?: string,
-    contrato?: string,
     timbres?: Array<timbre> | Array <tim_tabulado>,
+    contrato?: string,
+    name_empleado: string,
 }
 
 export interface timbre {
-    fec_hora_timbre: string, 
-    id_reloj: number, 
     accion: string, 
-    observacion: string, 
     latitud: string | number, 
+    id_reloj: number, 
     longitud: string | number
+    observacion: string, 
+    fec_hora_timbre: string, 
 }
 
 export interface tim_tabulado {
     fecha: string,
-    entrada: string,
     salida: string,
+    entrada: string,
     ent_Alm: string,
     sal_Alm: string,
     desconocido: string
 }
 
 
-// TIMBRE INCOMPLETO
+// PARA REPORTE DE TIMBRE INCOMPLETO
+
 export interface IReporteTimbresIncompletos {
     id_suc: number,
-    name_suc: string,
     ciudad: string,
+    name_suc: string,
     departamentos: Array<dep_tim_inc>
 }
 
@@ -173,13 +167,13 @@ interface dep_tim_inc {
 
 interface emp_tim_inc {
     id: number,
-    name_empleado: string,
+    cargo?: string,
     cedula: string,
     codigo: string | number,
     genero?: string | number,
-    cargo?: string,
-    contrato?: string,
     timbres?: Array<tim_Imcompleto>,
+    contrato?: string,
+    name_empleado: string,
 }
 
 interface tim_Imcompleto {

@@ -137,7 +137,6 @@ export class ListaAppComponent implements OnInit {
   departamentos_dh: any = [];
   sucursales_dh: any = [];
   empleados_dh: any = [];
-  respuesta_dh: any[];
   regimen_dh: any = [];
   cargos_dh: any = [];
 
@@ -1283,7 +1282,6 @@ export class ListaAppComponent implements OnInit {
         this.selectionCarg.deselect();
         this.selectionCarg.clear();
       }
-
 
       if (this._booleanOptions.bool_reg) {
         this.nombre_reg.reset();

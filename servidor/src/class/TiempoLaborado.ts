@@ -1,7 +1,7 @@
 export interface ReporteTiempoLaborado {
     id_suc: number,
-    name_suc: string,
     ciudad: string,
+    name_suc: string,
     departamentos: Array<depa_tiempo>
 }
 
@@ -13,11 +13,11 @@ interface depa_tiempo {
 
 interface emp_tiempo {
     id: number,
-    name_empleado: string,
+    cargo?: string,
     cedula: string,
     codigo: string | number,
     genero?: string | number,
-    cargo?: string,
-    contrato?: string,
     timbres?:  Array<any>
+    contrato?: string,
+    name_empleado: string,
 }

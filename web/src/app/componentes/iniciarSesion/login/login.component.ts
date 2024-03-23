@@ -75,7 +75,7 @@ export class LoginComponent implements OnInit {
               // NO ES POSIBLE ACCEDER A LA POSICION DEL USUARIO
               break;
             case objPositionError.POSITION_UNAVAILABLE:
-              // NO SE HA PODIDO ACCEDER A LA INFORMACIÓN DE SU POSICION
+              // NO SE HA PODIDO ACCEDER A LA INFORMACION DE SU POSICION
               break;
             case objPositionError.TIMEOUT:
               // EL SERVICIO HA TARDADO DEMASIADO TIEMPO EN RESPONDER
@@ -99,7 +99,7 @@ export class LoginComponent implements OnInit {
 
   ObtenerMensajeCampoContraseniaError() {
     if (this.pass.hasError('required')) {
-      return 'Ingresar su contraseña.';
+      return 'Ingresar contraseña.';
     }
   }
 
@@ -139,7 +139,7 @@ export class LoginComponent implements OnInit {
 
   // METODO PARA INICIAR SESION
   IniciarSesion(form: any) {
-    // CIFRADO DE CONTRASEÑA
+    // CIFRADO DE CONTRASENA
     const md5 = new Md5();
     let clave = md5.appendStr(form.passwordF).end();
 
@@ -155,7 +155,6 @@ export class LoginComponent implements OnInit {
 
     // VALIDACION DEL LOGIN
     this.rest.ValidarCredenciales(dataUsuario).subscribe(datos => {
-      console.log('ver datos ', datos)
       if (datos.message === 'error') {
         var f = moment();
         var espera = '00:01:00';
@@ -205,19 +204,20 @@ export class LoginComponent implements OnInit {
       }
 
       else {
-        localStorage.setItem('token', datos.token);
-        localStorage.setItem('usuario', datos.usuario);
         localStorage.setItem('rol', datos.rol);
-        localStorage.setItem('empleado', datos.empleado);
-        localStorage.setItem('empresa', datos.empresa);
-        localStorage.setItem('sucursal', datos.sucursal);
-        localStorage.setItem('departamento', datos.departamento);
-        localStorage.setItem('ultimoCargo', datos.cargo);
-        localStorage.setItem('ultimoContrato', datos.id_contrato);
-        localStorage.setItem('autoriza', datos.estado);
-        localStorage.setItem('bool_timbres', datos.acciones_timbres);
+        localStorage.setItem('token', datos.token);
         localStorage.setItem('ip', datos.ip_adress);
+        localStorage.setItem('usuario', datos.usuario);
+        localStorage.setItem('empresa', datos.empresa);
+        localStorage.setItem('autoriza', datos.estado);
+        localStorage.setItem('sucursal', datos.sucursal);
+        localStorage.setItem('ultimoCargo', datos.cargo);
+        localStorage.setItem('empleado', datos.empleado);
+        localStorage.setItem('departamento', datos.departamento);
+        localStorage.setItem('ultimoContrato', datos.id_contrato);
+        localStorage.setItem('bool_timbres', datos.acciones_timbres);
         localStorage.setItem('fec_caducidad_licencia', datos.caducidad_licencia);
+
         this.toastr.success('Ingreso Existoso! ' + datos.usuario + ' ' + datos.ip_adress, 'Usuario y contraseña válidos', {
           timeOut: 6000,
         })

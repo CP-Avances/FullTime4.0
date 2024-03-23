@@ -99,7 +99,8 @@ export interface IReporteAtrasos {
     id_suc: number,
     name_suc: string,
     ciudad: string,
-    departamentos: Array<dep>
+    departamentos: Array<dep>,
+    sucursal: string,
 }
 
 export interface IReporteFaltas {

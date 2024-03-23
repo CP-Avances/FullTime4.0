@@ -74,11 +74,12 @@
                             <td>{{departamento.departamento_padre | titlecase}}
                             </td>
                             <td class="justify-content-center">
-                                <i class="fa fa-arrows-v" matSuffix matTooltipPosition="right" id="t-detalles"
+                                <i class="fa fa-navicon" matSuffix matTooltipPosition="right" id="t-detalles"
                                     matTooltip="Registrar niveles de autorización."
                                     (click)="VerNiveles(departamento.id)">
                                     <p>Niveles</p>
                                 </i>
+                           
                                 <i id="t-editar" (click)="AbrirEditarDepartamento(departamento)" matSuffix
                                     matTooltipPosition="right" matTooltip="Modificar datos de este registro"
                                     class="fas fa-edit">

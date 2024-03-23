@@ -48,7 +48,6 @@ export class ListaWebComponent implements OnInit {
   // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA HABILITADOS
   departamentos: any = [];
   sucursales: any = [];
-  respuesta: any = [];
   empleados: any = [];
   regimen: any = [];
   cargos: any = [];
