@@ -10,11 +10,11 @@ import { checkOptions, FormCriteriosBusqueda } from 'src/app/model/reportes.mode
 import { ITableEmpleados } from 'src/app/model/reportes.model';
 
 // IMPORTAR SERVICIOS
+import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
-import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 
 @Component({
   selector: 'app-lista-app',
@@ -137,7 +137,6 @@ export class ListaAppComponent implements OnInit {
   departamentos_dh: any = [];
   sucursales_dh: any = [];
   empleados_dh: any = [];
-  respuesta_dh: any[];
   regimen_dh: any = [];
   cargos_dh: any = [];
 
@@ -431,7 +430,7 @@ export class ListaAppComponent implements OnInit {
                 id_regimen: obj.id_regimen,
                 id_depa: obj.id_depa,
                 id_cargo_: obj.id_cargo_, // TIPO DE CARGO
-                web_habilita: obj.web_habilita,
+                app_habilita: obj.app_habilita,
                 userid: obj.userid,
               }
               empleados_.push(elemento)
@@ -442,7 +441,6 @@ export class ListaAppComponent implements OnInit {
     })
 
     this.OmitirDuplicados(departamentos_, cargos_, estado);
-
 
     console.log('ver sucursales ', sucursales_)
     console.log('ver regimenes ', regimenes_)
@@ -582,7 +580,7 @@ export class ListaAppComponent implements OnInit {
     if (this.opcion_dh === 's') {
       this.ModelarSucursal(valor.id, tipo, this.empleados_dh, this.selectionSuc_dh);
     }
-    if (this.opcion_dh === 'r') {
+    else if (this.opcion_dh === 'r') {
       this.ModelarRegimen(valor.id, valor.id_suc, tipo, this.empleados_dh, this.selectionReg_dh);
     }
     else if (this.opcion_dh === 'c') {
@@ -1085,7 +1083,7 @@ export class ListaAppComponent implements OnInit {
   // METODO PARA PRESENTAR DATOS DE SUCURSALES
   ModelarSucursal(id: number, tipo: number, lista: any, selector: any) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       lista.forEach((empl: any) => {
         selector.selected.find(selec => {
           if (empl.id_suc === selec.id) {
@@ -1107,7 +1105,7 @@ export class ListaAppComponent implements OnInit {
   // METODO PARA PRESENTAR DATOS DE REGIMEN
   ModelarRegimen(id: number, sucursal: any, tipo: number, lista: any, selector: any) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       lista.forEach((empl: any) => {
         selector.selected.find(selec => {
           if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
@@ -1129,7 +1127,7 @@ export class ListaAppComponent implements OnInit {
   // METODO PARA MOSTRAR DATOS DE CARGOS
   ModelarCargo(id: number, sucursal: any, tipo: number, lista: any, selector: any) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       lista.forEach((empl: any) => {
         selector.selected.find(selec => {
           if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
@@ -1151,7 +1149,7 @@ export class ListaAppComponent implements OnInit {
   // METODO PARA PRESENTAR DATOS DE DEPARTAMENTOS
   ModelarDepartamentos(id: number, sucursal: any, tipo: number, lista: any, selector: any) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       lista.forEach((empl: any) => {
         selector.selected.find(selec => {
           if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
@@ -1194,13 +1192,14 @@ export class ListaAppComponent implements OnInit {
 
   // METODO DE VALIDACION DE SELECCION MULTIPLE
   RegistrarMultiple(data: any, tipo: number) {
-    if (data.length > 0) {
-      this.Registrar(data, tipo);
-    }
-    else {
+    if (data.length === 0) {
+      console.log('entra error')
       this.toastr.warning('No ha seleccionado usuarios.', '', {
         timeOut: 6000,
       });
+    }
+    else {
+      this.Registrar(data, tipo);
     }
   }
 
@@ -1213,8 +1212,8 @@ export class ListaAppComponent implements OnInit {
       this.toastr.success(res.message)
       this.individual = true;
       this.individual_dh = true;
-      this.LimpiarFormulario(tipo);
       this.PresentarInformacion();
+      this.LimpiarFormulario(tipo);
     }, err => {
       this.toastr.error(err.error.message)
     })
@@ -1226,7 +1225,7 @@ export class ListaAppComponent implements OnInit {
     if (this.opcion === 's') {
       this.ModelarSucursal(valor.id, tipo, this.empleados, this.selectionSuc);
     }
-    if (this.opcion === 'r') {
+    else if (this.opcion === 'r') {
       this.ModelarRegimen(valor.id, valor.id_suc, tipo, this.empleados, this.selectionReg);
     }
     else if (this.opcion === 'c') {
@@ -1245,6 +1244,7 @@ export class ListaAppComponent implements OnInit {
 
     this.activar_deshabilitados = false;
     this.activar_habilitados = false;
+    this.ver_imagen = true;
 
     if (this.sucursales.length > 0) {
       this.activar = true;
@@ -1282,7 +1282,6 @@ export class ListaAppComponent implements OnInit {
         this.selectionCarg.deselect();
         this.selectionCarg.clear();
       }
-
 
       if (this._booleanOptions.bool_reg) {
         this.nombre_reg.reset();

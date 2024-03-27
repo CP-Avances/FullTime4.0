@@ -901,7 +901,7 @@ class EmpleadoControlador {
         }
         if (genero == undefined) {
           data.genero = 'No registrado';
-          data.observacion = 'Genero ' + data.observacion;
+          data.observacion = 'Género ' + data.observacion;
         }
         if (correo == undefined) {
           data.correo = 'No registrado';
@@ -953,9 +953,8 @@ class EmpleadoControlador {
         //Valida si los datos de la columna telefono son numeros.
         if(telefono != undefined){
           const regex = /^[0-9]+$/;
-          console.log('telefono: ',telefono,' -> ',regex.test(telefono))
           if (regex.test(telefono)) {
-            if (data.telefono.toString().length < 10) {
+            if (data.telefono.toString().length != 10) {
               data.observacion = 'El teléfono ingresado no es válido';
             }
           } else {
@@ -1045,37 +1044,40 @@ class EmpleadoControlador {
         if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
           valor.observacion = 'Usuario ya existe en el sistema'
         } else {
-          var VERIFICAR_ROL = await pool.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [valor.rol.toUpperCase()]);
-          if (VERIFICAR_ROL.rows[0] != undefined && VERIFICAR_ROL.rows[0] != ''){
-            var VERIFICAR_NACIONALIDAD = await pool.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1',[valor.nacionalidad.toUpperCase()]);
-            if(VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != ''){
+          if(valor.rol != 'No registrado'){
+            var VERIFICAR_ROL = await pool.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [valor.rol.toUpperCase()]);
+            if (VERIFICAR_ROL.rows[0] != undefined && VERIFICAR_ROL.rows[0] != ''){
+              if(valor.nacionalidad != 'No registrado'){
+                var VERIFICAR_NACIONALIDAD = await pool.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1',[valor.nacionalidad.toUpperCase()]);
+                if(VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != ''){
 
-              // Discriminación de elementos iguales
-              if(duplicados1.find((p: any)=> p.cedula === valor.cedula) == undefined)
-              {
-                // Discriminación de elementos iguales
-                if(duplicados2.find((a: any)=> a.usuario === valor.usuario) == undefined)
-                {
-                  //valor.observacion = 'ok'
-                  duplicados2.push(valor);
-                }else{
-                  valor.observacion = '2'
-                }
+                  // Discriminación de elementos iguales
+                  if(duplicados1.find((p: any)=> p.cedula === valor.cedula) == undefined)
+                  {
+                    // Discriminación de elementos iguales
+                    if(duplicados2.find((a: any)=> a.usuario === valor.usuario) == undefined)
+                    {
+                      //valor.observacion = 'ok'
+                      duplicados2.push(valor);
+                    }else{
+                      valor.observacion = '2'
+                    }
 
-                duplicados1.push(valor);
+                    duplicados1.push(valor);
               
-              }else{
-                valor.observacion = '1'
+                  }else{
+                    valor.observacion = '1'
+                  }
+
+                }else{
+                  valor.observacion = 'Nacionalidad no existe en el sistema';
+                }
               }
-
             }else{
-              valor.observacion = 'La nacionalidad no existe en la base';
+              valor.observacion = 'Rol no existe en el sistema';
             }
-    
-          }else{
-            valor.observacion = 'El rol no existe en la base';
           }
-
+          
         }
       }
 
@@ -1208,13 +1210,18 @@ class EmpleadoControlador {
   }
 
   public async CargarPlantilla_Automatico(req: Request, res: Response): Promise<void> {
-    const plantilla = req.body
+    
+    const plantilla = req.body;
     console.log('datos automatico: ', plantilla);
-
+    
     const VALOR = await pool.query('SELECT * FROM codigo');
     //TODO Revisar max codigo
-    var codigo = parseInt(VALOR.rows[0].valor);
-    var contador = 1;
+    var codigo_dato = VALOR.rows[0].valor;
+    var codigo = 0;
+    if(codigo_dato!= null && codigo_dato != undefined && codigo_dato != ''){
+      codigo = codigo_dato = parseInt(codigo_dato);
+    }
+    var contador = 1;    
     
     plantilla.forEach(async (data: any) => {
 
@@ -1248,7 +1255,7 @@ class EmpleadoControlador {
       var contrasena = md5.appendStr(data.contrasena).end()?.toString();
 
       // Datos que se leen de la plantilla ingresada
-      const { cedula, estado_civil, genero, correo, fec_nacimiento, domicilio, telefono,
+      const { cedula, estado_civil, genero, correo, fec_nacimiento, domicilio, longitud, latitud, telefono,
         nacionalidad, usuario, rol } = data;
 
       //Obtener id del estado_civil
@@ -1278,6 +1285,17 @@ class EmpleadoControlador {
         id_genero = 2;
       }
 
+      var _longitud = null;
+      if(longitud != 'No registrado'){
+        _longitud = longitud;
+      }
+        
+
+      var _latitud = null
+      if(latitud != 'No registrado'){
+        _latitud = latitud;
+      }
+
       //OBTENER ID DEL ESTADO
       var id_estado = 1;
       var estado_user = true;
@@ -1290,22 +1308,31 @@ class EmpleadoControlador {
       //Obtener id del rol
       const id_rol = await pool.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [rol.toUpperCase()]);
 
-      // Incrementar el valor del código
-      codigo = codigo + 1;
+      console.log('codigo dato 222: ',codigo_dato);
+      console.log('codigo 222: ',codigo);
+      if(codigo_dato != null && codigo_dato != undefined && codigo_dato != ''){
+        // Incrementar el valor del código
+        codigo = codigo + 1;
+      }else{
+        codigo = cedula;
+      }
+      
+
       var fec_nacimi = new Date(moment(fec_nacimiento).format('YYYY-MM-DD'));
 
       console.log('codigo: ', codigo)
       console.log('cedula: ', cedula, ' usuario: ', usuario, ' contrasena: ', contrasena);
       console.log('nombre: ', nombreE, ' usuario: ', apellidoE, ' fecha nacimien: ', fec_nacimi, ' estado civil: ', id_estado_civil);
       console.log('genero: ', id_genero, ' estado: ', id_estado, ' nacionalidad: ', id_nacionalidad.rows, ' rol: ', id_rol);
+      console.log('longitud: ', _longitud, ' latitud: ', _latitud)
 
 
       // Registro de nuevo empleado
       await pool.query('INSERT INTO empleados (cedula, apellido, nombre, esta_civil, genero, correo, ' +
-        'fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo) VALUES ' +
-        '($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)', [cedula, apellidoE, nombreE,
+        'fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, longitud, latitud) VALUES ' +
+        '($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)', [cedula, apellidoE, nombreE,
         id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
-        domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo]);
+        domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud ]);
 
       // Obtener el id del empleado ingresado
       const oneEmpley = await pool.query('SELECT id FROM empleados WHERE cedula = $1', [cedula]);
@@ -1319,7 +1346,9 @@ class EmpleadoControlador {
       if (contador === plantilla.length) {
         console.log('codigo_ver', codigo, VALOR.rows[0].id);
         // Actualización del código
-        await pool.query('UPDATE codigo SET valor = $1 WHERE id = $2', [codigo, VALOR.rows[0].id]);
+        if(codigo_dato != null && codigo_dato != undefined && codigo_dato != ''){
+          await pool.query('UPDATE codigo SET valor = $1 WHERE id = $2', [codigo, VALOR.rows[0].id]);
+        }
       }
 
       contador = contador + 1;
@@ -1329,7 +1358,6 @@ class EmpleadoControlador {
     setTimeout(() => {
       return res.jsonp({ message: 'correcto' });
     }, 1500)
-    
     
   }
 
@@ -1419,7 +1447,7 @@ class EmpleadoControlador {
                       }
                     }
                   }else {
-                    data.observacion = 'El teléfono ingresada no es válido';
+                    data.observacion = 'El teléfono ingresado no es válido';
                   }
                 }
 
@@ -1427,7 +1455,7 @@ class EmpleadoControlador {
                 data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
               }
             }else{
-              data.observacion = 'El codigo ingresado es incorrecto';
+              data.observacion = 'Formato de código incorrecto';
             }
           }
         } else {
@@ -1473,7 +1501,7 @@ class EmpleadoControlador {
         }
         if (codigo == undefined) {
           data.codigo = 'No registrado';
-          data.observacion = 'Codigo ' + data.observacion;
+          data.observacion = 'Código ' + data.observacion;
         }
         if (estado_civil == undefined) {
           data.estado_civil = 'No registrado';
@@ -1481,7 +1509,7 @@ class EmpleadoControlador {
         }
         if (genero == undefined) {
           data.genero = 'No registrado';
-          data.observacion = 'Genero ' + data.observacion;
+          data.observacion = 'Género ' + data.observacion;
         }
         if (correo == undefined) {
           data.correo = 'No registrado';
@@ -1534,18 +1562,18 @@ class EmpleadoControlador {
         if(telefono != undefined){
           const regex = /^[0-9]+$/;
           if (regex.test(data.telefono)){
-            if (data.telefono.toString().length < 10) {
-              data.observacion = 'El teléfono ingresada no es válido';
+            if (data.telefono.toString().length != 10) {
+              data.observacion = 'El teléfono ingresado no es válido';
             }
           } else {
-            data.observacion = 'El teléfono ingresada no es válido';
+            data.observacion = 'El teléfono ingresado no es válido';
           }
         }
 
         if(codigo != undefined){
           const rege = /^[0-9]+$/;
           if (!rege.test(data.codigo)){
-            data.observacion = 'El codigo ingresado es incorrecto';
+            data.observacion = 'Formato de código incorrecto';
           }
         }
          
@@ -1598,48 +1626,51 @@ class EmpleadoControlador {
           if (VERIFICAR_USUARIO.rows[0] != undefined && VERIFICAR_USUARIO.rows[0] != '') {
             valor.observacion = 'Usuario ya existe en el sistema'
           } else {
+            if(valor.rol != 'No registrado'){
+              var VERIFICAR_ROL = await pool.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [valor.rol.toUpperCase()]);
+              if (VERIFICAR_ROL.rows[0] != undefined && VERIFICAR_ROL.rows[0] != ''){
+                if(valor.nacionalidad != 'No registrado'){
+                  var VERIFICAR_NACIONALIDAD = await pool.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1',[valor.nacionalidad.toUpperCase()]);
+                  if(VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != ''){
   
-            var VERIFICAR_ROL = await pool.query('SELECT * FROM cg_roles WHERE UPPER(nombre) = $1', [valor.rol.toUpperCase()]);
-            if (VERIFICAR_ROL.rows[0] != undefined && VERIFICAR_ROL.rows[0] != ''){
-              var VERIFICAR_NACIONALIDAD = await pool.query('SELECT * FROM nacionalidades WHERE UPPER(nombre) = $1',[valor.nacionalidad.toUpperCase()]);
-              if(VERIFICAR_NACIONALIDAD.rows[0] != undefined && VERIFICAR_NACIONALIDAD.rows[0] != ''){
-  
-                // Discriminación de elementos iguales
-                if(duplicados1.find((p: any)=> p.cedula === valor.cedula) == undefined)
-                {
                   // Discriminación de elementos iguales
-                  if(duplicados3.find((c: any) => c.codigo === valor.codigo) == undefined)
+                  if(duplicados1.find((p: any)=> p.cedula === valor.cedula) == undefined)
                   {
-                     // Discriminación de elementos iguales
-                    if(duplicados2.find((a: any)=> a.usuario === valor.usuario) == undefined)
+                    // Discriminación de elementos iguales
+                   if(duplicados3.find((c: any) => c.codigo === valor.codigo) == undefined)
                     {
-                      //valor.observacion = 'ok'
-                      duplicados2.push(valor);
+                      // Discriminación de elementos iguales
+                      if(duplicados2.find((a: any)=> a.usuario === valor.usuario) == undefined)
+                      {
+                        //valor.observacion = 'ok'
+                        duplicados2.push(valor);
+  
+                      }else{
+                        valor.observacion = '2';
+                      }
+  
+                      duplicados3.push(valor);
   
                     }else{
-                      valor.observacion = '2';
+                      valor.observacion = '3';
                     }
   
-                    duplicados3.push(valor);
-  
-                  }else{
-                    valor.observacion = '3';
-                  }
-  
-                  duplicados1.push(valor);
+                    duplicados1.push(valor);
                 
-                }else{
-                  valor.observacion = '1';
+                  }else{
+                    valor.observacion = '1';
+                 }
+                
+                  }else{
+                    valor.observacion = 'Nacionalidad no existe en el sistema';
+                  }
                 }
-  
+                
               }else{
-                valor.observacion = 'La nacionalidad no existe en la base';
+                valor.observacion = 'Rol no existe en el sistema';
               }
-      
-            }else{
-              valor.observacion = 'El rol no existe en la base';
             }
-  
+            
           }
         
         }
@@ -1875,18 +1906,6 @@ class EmpleadoControlador {
     
     var contador = 1;
     
-    /*
-    let list: any = req.files;
-    let cadena = list.uploads[0].path;
-    let filename = cadena.split("\\")[1];
-    var filePath = `./plantillas/${filename}`
-
-    const workbook = excel.readFile(filePath);
-    const sheet_name_list = workbook.SheetNames;
-    const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-    */
-
-    
     plantilla.forEach(async (data: any) => {
       // Realiza un capital letter a los nombres y apellidos
       var nombreE: any;
@@ -1918,7 +1937,7 @@ class EmpleadoControlador {
       const contrasena = md5.appendStr(data.contrasena).end();
 
       // Datos que se leen de la plantilla ingresada
-      const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, estado, domicilio,
+      const { cedula, codigo, estado_civil, genero, correo, fec_nacimiento, estado, domicilio, longitud, latitud,
         telefono, nacionalidad, usuario, rol} = data;
 
       //Obtener id del estado_civil
@@ -1948,6 +1967,17 @@ class EmpleadoControlador {
         id_genero = 2;
       }
 
+      var _longitud = null;
+      if(longitud != 'No registrado'){
+        _longitud = longitud;
+      }
+        
+
+      var _latitud = null
+      if(latitud != 'No registrado'){
+        _latitud = latitud;
+      }
+
       //OBTENER ID DEL ESTADO
       var id_estado = 1;
       var estado_user = true;
@@ -1962,10 +1992,10 @@ class EmpleadoControlador {
 
       // Registro de nuevo empleado
       await pool.query('INSERT INTO empleados ( cedula, apellido, nombre, esta_civil, genero, correo, ' +
-        'fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo) VALUES ' +
-        '($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)', [cedula, apellidoE, nombreE,
+        'fec_nacimiento, estado, domicilio, telefono, id_nacionalidad, codigo, longitud, latitud) VALUES ' +
+        '($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)', [cedula, apellidoE, nombreE,
         id_estado_civil, id_genero, correo, fec_nacimiento, id_estado,
-        domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo]);
+        domicilio, telefono, id_nacionalidad.rows[0]['id'], codigo, _longitud, _latitud]);
 
       // Obtener el id del empleado ingresado
       const oneEmpley = await pool.query('SELECT id FROM empleados WHERE cedula = $1', [cedula]);

@@ -26,9 +26,9 @@ table {
     margin-left: 10px;
 }
 
-.mat-mdc-radio-button ~ .mat-mdc-radio-button {
+.mat-mdc-radio-button~.mat-mdc-radio-button {
     margin-left: 16px;
-  }
+}
 
 #plan {
     color: rgb(52, 65, 84);
@@ -86,10 +86,14 @@ p {
 
 .avatar {
     /* cambia estos dos valores para definir el tamaño de tu círculo */
-    height: 100%;
-    width: 50%;
+    height: 90%;
+    width: 40%;
     /* los siguientes valores son independientes del tamaño del círculo */
     background-repeat: no-repeat;
     border-radius: 2%;
     background-size: 100% auto;
+}
+
+.fuente {
+    font-size: xx-small;
 }

@@ -63,11 +63,9 @@ export class TimbreMultipleComponent implements OnInit {
   // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA
   departamentos: any = [];
   sucursales: any = [];
-  respuesta: any[];
   empleados: any = [];
   regimen: any = [];
   cargos: any = [];
-  origen: any = [];
 
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
   selectionCarg = new SelectionModel<ITableEmpleados>(true, []);
@@ -151,7 +149,6 @@ export class TimbreMultipleComponent implements OnInit {
     this.restR.GuardarCheckOpcion('');
     this.restR.DefaultFormCriterios();
     this.restR.DefaultValoresFiltros();
-    this.origen = [];
   }
 
   // BUSQUEDA DE DATOS ACTUALES DEL USUARIO
@@ -174,11 +171,9 @@ export class TimbreMultipleComponent implements OnInit {
     // LIMPIAR DATOS DE ALMACENAMIENTO
     this.departamentos = [];
     this.sucursales = [];
-    this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.cargos = [];
-    this.origen = [];
 
     this.usua_sucursales = [];
     let respuesta: any = [];
@@ -203,7 +198,7 @@ export class TimbreMultipleComponent implements OnInit {
       }
       else if (usuario.id_rol === 1 && usuario.jefe === true) {
         this.usua_sucursales = { id_sucursal: codigos, id_departamento: usuario.id_departamento };
-        this.BuscarInformacionJefer(this.usua_sucursales);
+        this.BuscarInformacionJefe(this.usua_sucursales);
       }
       else if (usuario.id_rol === 3) {
         this.BuscarInformacionSuperAdministrador();
@@ -230,7 +225,7 @@ export class TimbreMultipleComponent implements OnInit {
   }
 
   // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL ADMINISTRADOR - JEFE
-  BuscarInformacionJefer(buscar: string) {
+  BuscarInformacionJefe(buscar: string) {
     this.informacion.ObtenerInformacion_JEFE(1, buscar).subscribe((res: any[]) => {
       this.ProcesarDatos(res);
     }, err => {
@@ -240,8 +235,6 @@ export class TimbreMultipleComponent implements OnInit {
 
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
-    this.origen = JSON.stringify(informacion);
-    //console.log('ver original ', this.origen)
     informacion.forEach(obj => {
       //console.log('ver obj ', obj)
       this.sucursales.push({
@@ -595,7 +588,7 @@ export class TimbreMultipleComponent implements OnInit {
   // CONSULTA DE LOS DATOS ESTABLECIMIENTOS
   ModelarSucursal(id: number) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
         this.selectionSuc.selected.find(selec => {
           if (empl.id_suc === selec.id) {
@@ -617,7 +610,7 @@ export class TimbreMultipleComponent implements OnInit {
   // CONSULTA DE LOS DATOS REGIMEN
   ModelarRegimen(id: number, sucursal: any) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
         this.selectionReg.selected.find(selec => {
           if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
@@ -640,7 +633,7 @@ export class TimbreMultipleComponent implements OnInit {
   // CONSULTA DE DATOS DE DEPARTAMENTOS
   ModelarDepartamentos(id: number, sucursal: number) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
         this.selectionDep.selected.find(selec => {
           if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
@@ -662,7 +655,7 @@ export class TimbreMultipleComponent implements OnInit {
   // METODO PARA MOSTRAR DATOS DE CARGOS
   ModelarCargo(id: number, sucursal: number) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
         this.selectionCarg.selected.find(selec => {
           if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
@@ -857,7 +850,6 @@ export class TimbreMultipleComponent implements OnInit {
       this.codigo.reset();
       this.cedula.reset();
       this.nombre_emp.reset();
-
       this._booleanOptions.bool_emp = false;
       this.selectionEmp.deselect();
       this.selectionEmp.clear();

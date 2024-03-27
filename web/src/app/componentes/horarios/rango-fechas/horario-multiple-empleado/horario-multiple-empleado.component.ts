@@ -5,6 +5,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { MatRadioChange } from '@angular/material/radio';
 import { Component, OnInit } from '@angular/core';
 import { Validators, FormControl, FormGroup } from '@angular/forms';
+import moment from 'moment';
 
 // IMPORTAR PLANTILLA DE MODELO DE DATOS
 import { ITableEmpleados } from 'src/app/model/reportes.model';
@@ -17,7 +18,6 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { PlanGeneralService } from 'src/app/servicios/planGeneral/plan-general.service';
 import { EmplCargosService } from 'src/app/servicios/empleado/empleadoCargo/empl-cargos.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
-import moment from 'moment';
 import { TimbresService } from 'src/app/servicios/timbres/timbres.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
@@ -81,10 +81,8 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA
   departamentos: any = [];
   sucursales: any = [];
-  respuesta: any = [];
   empleados: any = [];
   regimen: any = [];
-  origen: any = [];
   cargos: any = [];
 
   selectionCarg = new SelectionModel<ITableEmpleados>(true, []);
@@ -138,7 +136,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     this.restR.GuardarCheckOpcion('');
     this.restR.DefaultFormCriterios();
     this.restR.DefaultValoresFiltros();
-    this.origen = [];
   }
 
   // BUSQUEDA DE DATOS ACTUALES DEL USUARIO
@@ -161,11 +158,9 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     // LIMPIAR DATOS DE ALMACENAMIENTO
     this.departamentos = [];
     this.sucursales = [];
-    this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.cargos = [];
-    this.origen = [];
 
     this.usua_sucursales = [];
     let respuesta: any = [];
@@ -190,7 +185,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       }
       else if (usuario.id_rol === 1 && usuario.jefe === true) {
         this.usua_sucursales = { id_sucursal: codigos, id_departamento: usuario.id_departamento };
-        this.BuscarInformacionJefer(this.usua_sucursales);
+        this.BuscarInformacionJefe(this.usua_sucursales);
       }
       else if (usuario.id_rol === 3) {
         this.BuscarInformacionSuperAdministrador();
@@ -217,7 +212,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   }
 
   // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL ADMINISTRADOR - JEFE
-  BuscarInformacionJefer(buscar: string) {
+  BuscarInformacionJefe(buscar: string) {
     this.informacion.ObtenerInformacion_JEFE(1, buscar).subscribe((res: any[]) => {
       this.ProcesarDatos(res);
     }, err => {
@@ -227,7 +222,6 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
 
   // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
   ProcesarDatos(informacion: any) {
-    this.origen = JSON.stringify(informacion);
     //console.log('ver original ', this.origen)
     informacion.forEach(obj => {
       //console.log('ver obj ', obj)
@@ -555,7 +549,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   // CONSULTA DE LOS DATOS REGIMEN
   ModelarRegimen(id: number, tipo: string, sucursal: any) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
         this.selectionReg.selected.find(selec => {
           if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
@@ -577,7 +571,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   // METODO PARA MOSTRAR DATOS DE CARGOS
   ModelarCargo(id: number, tipo: string, sucursal: number) {
     let usuarios: any = [];
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
         this.selectionCarg.selected.find(selec => {
           if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
@@ -600,8 +594,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   // METODO PARA MOSTRAR DATOS DE DEPARTAMENTOS
   ModelarDepartamentos(id: number, tipo: string, sucursal: number) {
     let usuarios: any = [];
-    console.log('ver seleccion ', this.selectionDep.selected)
-    if (id === 0) {
+    if (id === 0 || id === undefined) {
       this.empleados.forEach((empl: any) => {
         this.selectionDep.selected.find(selec => {
           if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
@@ -775,7 +768,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionEmp.clear();
-      this.Filtrar('', 1);
+      this.Filtrar('', 7);
       this.Filtrar('', 6);
     }
     else if (this.opcion === 'c') {
