@@ -113,7 +113,7 @@ export class ListaEmpleadosComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
-      this.empleado.forEach(row => this.selectionUno.select(row));
+      this.empleado.forEach((row: any) => this.selectionUno.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -177,7 +177,7 @@ export class ListaEmpleadosComponent implements OnInit {
   masterToggleDos() {
     this.isAllSelectedDos() ?
       this.selectionDos.clear() :
-      this.desactivados.forEach(row => this.selectionDos.select(row));
+      this.desactivados.forEach((row: any) => this.selectionDos.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA

@@ -1438,7 +1438,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
   masterToggleSuc() {
     this.isAllSelectedSuc() ?
       this.selectionSuc.clear() :
-      this.sucursales.forEach(row => this.selectionSuc.select(row));
+      this.sucursales.forEach((row: any) => this.selectionSuc.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -1459,7 +1459,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
   masterToggleReg() {
     this.isAllSelectedReg()
       ? this.selectionReg.clear()
-      : this.regimen.forEach((row) => this.selectionReg.select(row));
+      : this.regimen.forEach((row: any) => this.selectionReg.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
@@ -1481,7 +1481,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
   masterToggleCar() {
     this.isAllSelectedCar() ?
       this.selectionCar.clear() :
-      this.cargos.forEach(row => this.selectionCar.select(row));
+      this.cargos.forEach((row: any) => this.selectionCar.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -1502,7 +1502,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionDep.clear() :
-      this.departamentos.forEach(row => this.selectionDep.select(row));
+      this.departamentos.forEach((row: any) => this.selectionDep.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -1523,7 +1523,7 @@ export class ReporteTimbresMultiplesComponent implements OnInit, OnDestroy {
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :
-      this.empleados.forEach(row => this.selectionEmp.select(row));
+      this.empleados.forEach((row: any) => this.selectionEmp.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA

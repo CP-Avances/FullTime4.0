@@ -14,12 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../../database"));
 class ReportesVacunasControlador {
+    // METODO DE BUSQUEDA DE DATOS DE VACUNAS LISTA sucursales[regimenes[departamentos[cargos[empleados]]]]
     ReporteVacunasMultiple(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log('datos recibidos', req.body);
             let datos = req.body;
             let n = yield Promise.all(datos.map((suc) => __awaiter(this, void 0, void 0, function* () {
-                console.log('ver suc ', suc);
                 suc.regimenes = yield Promise.all(suc.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
                     dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
                         car.cargos = yield Promise.all(car.cargos.map((empl) => __awaiter(this, void 0, void 0, function* () {
@@ -54,6 +54,7 @@ class ReportesVacunasControlador {
             return res.status(200).jsonp(nuevo);
         });
     }
+    // METODO DE BUSQUEDA DE DATOS DE VACUNAS LISTA sucursales[empleados]
     ReporteVacunasMultipleCargosRegimen(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log('datos recibidos', req.body);
@@ -66,7 +67,6 @@ class ReportesVacunasControlador {
                 })));
                 return obj;
             })));
-            console.log('n', n);
             let nuevo = n.map((obj) => {
                 obj.empleados = obj.empleados.filter((v) => { return v.vacunas.length > 0; });
                 return obj;
@@ -77,8 +77,7 @@ class ReportesVacunasControlador {
         });
     }
 }
-const VACUNAS_REPORTE_CONTROLADOR = new ReportesVacunasControlador();
-exports.default = VACUNAS_REPORTE_CONTROLADOR;
+// FUNCION DE BUSQUEDA DE REGISTROS DE VACUNAS
 const BuscarVacunas = function (id) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query(`
@@ -87,9 +86,12 @@ const BuscarVacunas = function (id) {
         FROM empl_vacunas AS ev, tipo_vacuna AS tv 
         WHERE ev.id_tipo_vacuna = tv.id
             AND ev.id_empleado = $1 
-        ORDER BY ev.id DESC`, [id])
+        ORDER BY ev.id DESC
+        `, [id])
             .then((res) => {
             return res.rows;
         });
     });
 };
+const VACUNAS_REPORTE_CONTROLADOR = new ReportesVacunasControlador();
+exports.default = VACUNAS_REPORTE_CONTROLADOR;

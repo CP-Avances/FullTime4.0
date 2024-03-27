@@ -109,7 +109,7 @@ export class AsistenciaConsolidadoComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selection.clear() :
-      this.empleados.forEach(row => this.selection.select(row));
+      this.empleados.forEach((row: any) => this.selection.select(row));
   }
 
   checkboxLabelDos(row?: EmpleadoElemento): string {

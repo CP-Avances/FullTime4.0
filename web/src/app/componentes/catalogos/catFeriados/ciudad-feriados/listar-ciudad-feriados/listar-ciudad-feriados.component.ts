@@ -235,7 +235,7 @@ export class ListarCiudadFeriadosComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selection.clear() :
-      this.datosCiudades.forEach(row => this.selection.select(row));
+      this.datosCiudades.forEach((row: any) => this.selection.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA

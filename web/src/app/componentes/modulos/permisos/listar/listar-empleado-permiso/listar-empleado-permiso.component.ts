@@ -376,7 +376,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
 
   filtrar(listafiltro: any){
     this.listaPermisosDeparta = listafiltro;
-    this.listaPermisosDeparta.forEach(row => this.selectionUno.select(row));
+    this.listaPermisosDeparta.forEach((row: any) => this.selectionUno.select(row));
   }
 
   limpiarFiltro(){

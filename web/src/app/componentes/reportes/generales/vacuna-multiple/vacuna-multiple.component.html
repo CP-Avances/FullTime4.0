@@ -314,7 +314,7 @@
                         </tbody>
                     </table>
                 </div>
-                <mat-paginator id="pagina" [length]="arr_vac.length" [pageSize]="tamanio_pagina"
+                <mat-paginator id="pagina" #paginatorDetalle  [length]="arr_vac.length" [pageSize]="tamanio_pagina"
                     [pageSizeOptions]="pageSizeOptions" (page)="ManejarPaginaDetalle($event)" showFirstLastButtons
                     aria-label="Seleccionar pagina">
                 </mat-paginator>

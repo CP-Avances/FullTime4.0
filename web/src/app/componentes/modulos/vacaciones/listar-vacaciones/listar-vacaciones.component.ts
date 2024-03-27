@@ -370,7 +370,7 @@ export class ListarVacacionesComponent implements OnInit {
 
   filtrar(listafiltro: any){
     this.listaVacacionDeparta = listafiltro;
-    this.listaVacacionDeparta.forEach(row => this.selectionUno.select(row));
+    this.listaVacacionDeparta.forEach((row: any) => this.selectionUno.select(row));
   }
 
   limpiarFiltro(){

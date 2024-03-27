@@ -718,7 +718,7 @@ export class ListaWebComponent implements OnInit {
   masterToggleSuc_DH() {
     this.isAllSelectedSuc_DH() ?
       this.selectionSuc_dh.clear() :
-      this.sucursales_dh.forEach(row => this.selectionSuc_dh.select(row));
+      this.sucursales_dh.forEach((row: any) => this.selectionSuc_dh.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -739,7 +739,7 @@ export class ListaWebComponent implements OnInit {
   masterToggleReg_DH() {
     this.isAllSelectedReg_DH() ?
       this.selectionReg_dh.clear() :
-      this.regimen_dh.forEach(row => this.selectionReg_dh.select(row));
+      this.regimen_dh.forEach((row: any) => this.selectionReg_dh.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -760,7 +760,7 @@ export class ListaWebComponent implements OnInit {
   masterToggleCarg_DH() {
     this.isAllSelectedCarg_DH() ?
       this.selectionCarg_dh.clear() :
-      this.cargos_dh.forEach(row => this.selectionCarg_dh.select(row));
+      this.cargos_dh.forEach((row: any) => this.selectionCarg_dh.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -781,7 +781,7 @@ export class ListaWebComponent implements OnInit {
   masterToggleDep_DH() {
     this.isAllSelectedDep_DH() ?
       this.selectionDep_dh.clear() :
-      this.departamentos_dh.forEach(row => this.selectionDep_dh.select(row));
+      this.departamentos_dh.forEach((row: any) => this.selectionDep_dh.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -802,7 +802,7 @@ export class ListaWebComponent implements OnInit {
   masterToggleEmp_DH() {
     this.isAllSelectedEmp_DH() ?
       this.selectionEmp_dh.clear() :
-      this.empleados_dh.forEach(row => this.selectionEmp_dh.select(row));
+      this.empleados_dh.forEach((row: any) => this.selectionEmp_dh.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -963,7 +963,7 @@ export class ListaWebComponent implements OnInit {
   masterToggleSuc() {
     this.isAllSelectedSuc() ?
       this.selectionSuc.clear() :
-      this.sucursales.forEach(row => this.selectionSuc.select(row));
+      this.sucursales.forEach((row: any) => this.selectionSuc.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -984,7 +984,7 @@ export class ListaWebComponent implements OnInit {
   masterToggleReg() {
     this.isAllSelectedReg() ?
       this.selectionReg.clear() :
-      this.regimen.forEach(row => this.selectionReg.select(row));
+      this.regimen.forEach((row: any) => this.selectionReg.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -1005,7 +1005,7 @@ export class ListaWebComponent implements OnInit {
   masterToggleCarg() {
     this.isAllSelectedCarg() ?
       this.selectionCarg.clear() :
-      this.cargos.forEach(row => this.selectionCarg.select(row));
+      this.cargos.forEach((row: any) => this.selectionCarg.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -1026,7 +1026,7 @@ export class ListaWebComponent implements OnInit {
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionDep.clear() :
-      this.departamentos.forEach(row => this.selectionDep.select(row));
+      this.departamentos.forEach((row: any) => this.selectionDep.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -1047,7 +1047,7 @@ export class ListaWebComponent implements OnInit {
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :
-      this.empleados.forEach(row => this.selectionEmp.select(row));
+      this.empleados.forEach((row: any) => this.selectionEmp.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA

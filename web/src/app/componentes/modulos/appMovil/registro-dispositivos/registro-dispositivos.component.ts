@@ -224,7 +224,7 @@ export class RegistroDispositivosComponent implements OnInit {
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :
-      this.dispositivosRegistrados.forEach(row => this.selectionEmp.select(row));
+      this.dispositivosRegistrados.forEach((row: any) => this.selectionEmp.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA 

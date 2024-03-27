@@ -1,6 +1,6 @@
 // IMPORTAR LIBRERIAS
-import { ITableEmpleados, vacuna, } from 'src/app/model/reportes.model';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ITableEmpleados, vacuna, } from 'src/app/model/reportes.model';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ToastrService } from 'ngx-toastr';
@@ -18,8 +18,8 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { VacunasService } from 'src/app/servicios/reportes/vacunas/vacunas.service';
-import { environment } from 'src/environments/environment';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-vacuna-multiple',
@@ -511,7 +511,6 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
         reg.push(objeto);
       });
     });
-
     this.data_pdf = [];
     this.R_vacuna.ReporteVacunasMultiplesCargoRegimen(reg).subscribe(
       (res) => {
@@ -564,7 +563,6 @@ export class VacunaMultipleComponent implements OnInit, OnDestroy {
         car.push(objeto);
       });
     });
-
     this.data_pdf = [];
     this.R_vacuna.ReporteVacunasMultiplesCargoRegimen(car).subscribe(
       (res) => {
