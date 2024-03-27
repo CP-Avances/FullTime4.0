@@ -1,13 +1,18 @@
+//IMPORTAR LIBRERIAS
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ThemePalette } from '@angular/material/core';
-import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { HorarioMultipleEmpleadoComponent } from '../../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
-import { BuscarPlanificacionComponent } from '../../rango-fechas/buscar-planificacion/buscar-planificacion.component';
 import { MatDatepicker } from '@angular/material/datepicker';
 import moment, { Moment } from 'moment';
 import * as XLSX from 'xlsx';
 
+//IMPORTAR SERVICIOS
+
+//IMPORTAR COMPONENTES
+import { HorarioMultipleEmpleadoComponent } from '../../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
+import { BuscarPlanificacionComponent } from '../../rango-fechas/buscar-planificacion/buscar-planificacion.component';
+import { SpinnerService } from 'src/app/servicios/spinner/spinner.service';
+import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-cargar-plantilla-planificacion',
   templateUrl: './cargar-plantilla-planificacion.component.html',
@@ -29,15 +34,15 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
   archivo1Form = new FormControl('');
 
-  // VARIABLES PROGRESS SPINNER
-  progreso: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
+  // VARIABLES USADAS EN SELECCION DE ARCHIVOS
+  archivo: Array<File>;
+  nombreArchivo: string;
 
   constructor(
     public componentem: HorarioMultipleEmpleadoComponent,
     public componenteb: BuscarPlanificacionComponent,
+    private spinnerService: SpinnerService,
+    private toastr: ToastrService
   ) { }
 
   ngOnInit(): void {
@@ -61,18 +66,65 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     // this.fechas_mes = [];
   }
 
+    // METODO PARA LIMPIAR FORMULARIO
+    LimpiarCampos() {
+      this.fechaInicialF.reset();
+      this.fechaFinalF.reset();
+      this.archivo1Form.reset();
+    }
+
+  /** ************************************************************************************************* **
+   ** **                              PLANTILLA CARGAR PLANIFICACION                                 ** **
+   ** ************************************************************************************************* **/
+
+  // LIMPIAR CAMPOS PLANTILLA
+  LimpiarCamposPlantilla() {
+    this.archivo1Form.reset();
+    this.spinnerService.hide();
+
+  }
+
   // DESCARGAR PLANTILLA EXCEL
   DescargarPlantilla() {
-    // this.progreso = true;
-    // setTimeout(() => {
-    //   this.progreso = false;
-    // }, 3000);
     this.GenerarExcel(this.fechaInicialF.value, this.fechaFinalF.value, this.datosSeleccionados.usuarios);
   }
 
   // METODO PARA CARGAR PLANTILLA
   CargarPlantilla(plantilla: any) {
-    console.log(plantilla);
+    if(plantilla.targer.files && plantilla.targer.files[0]){
+      this.archivo = plantilla.targer.files[0];
+      this.nombreArchivo = this.archivo[0].name;
+      let arrayItems = this.nombreArchivo.split(".");
+      let itemExtencion = arrayItems[arrayItems.length - 1];
+      let itemName = arrayItems[0];
+
+      if (itemExtencion === 'xlsx' || itemExtencion === 'xls') {
+        if (itemName === 'plantillaPlanificacionMultiple') {
+          this.VerificarPlantilla();
+        } else {
+          this.toastr.error('Solo se acepta plantillaPlanificacionMultiple', 'Plantilla seleccionada incorrecta', {
+            timeOut: 6000,
+          });
+        }
+
+      } else {
+        this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
+          timeOut: 6000,
+        });
+      }
+    } else {
+      this.toastr.error('Error al cargar el archivo', 'Ups!!! algo salio mal.', {
+        timeOut: 6000,
+      });
+    }
+  }
+
+  // METODO PARA VERIFICAR PLANTILLA
+  VerificarPlantilla() {
+    let formData = new FormData();
+    for (let i = 0; i < this.archivo.length; i++) {
+      formData.append("uploads", this.archivo[i], this.archivo[i].name);
+    }
   }
 
   GenerarExcel(fechaInicial: Moment, fechaFinal: Moment, usuarios: any[]) {

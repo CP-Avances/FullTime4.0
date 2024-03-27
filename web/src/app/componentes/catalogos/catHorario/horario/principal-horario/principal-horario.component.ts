@@ -20,6 +20,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { HorarioService } from 'src/app/servicios/catalogos/catHorarios/horario.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { SpinnerService } from '../../../../../servicios/spinner/spinner.service';
 
 // IMPORTAR COMPONENTES
 import { DetalleCatHorarioComponent } from 'src/app/componentes/catalogos/catHorario/detalle/detalle-cat-horario/detalle-cat-horario.component';
@@ -28,7 +29,6 @@ import { EditarHorarioComponent } from '../editar-horario/editar-horario.compone
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { ThemePalette } from '@angular/material/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
-import { SpinnerService } from '../../../../../servicios/spinner/spinner.service';
 
 @Component({
   selector: 'app-principal-horario',

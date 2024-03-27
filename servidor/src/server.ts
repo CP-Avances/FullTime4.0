@@ -18,6 +18,7 @@ import PROVINCIA_RUTA from './rutas/catalogos/catProvinciaRutas';
 import DEPARTAMENTO_RUTA from './rutas/catalogos/catDepartamentoRutas';
 import PROCESO_RUTA from './rutas/catalogos/catProcesoRutas';
 import HORARIO_RUTA from './rutas/catalogos/catHorarioRutas';
+import PLANIFICACION_HORARIA_RUTAS from './rutas/catalogos/catPlanificacionHorariaRutas';
 import USUARIO_RUTA from './rutas/usuarios/usuarioRutas';
 import HORAS_EXTRAS_RUTAS from './rutas/catalogos/catHorasExtrasRutas';
 import ROL_PERMISOS_RUTAS from './rutas/catalogos/catRolPermisosRutas';
@@ -161,6 +162,7 @@ class Servidor {
         this.app.use('/departamento', DEPARTAMENTO_RUTA);
         this.app.use('/proceso', PROCESO_RUTA);
         this.app.use('/horario', HORARIO_RUTA);
+        this.app.use('/planificacionHoraria', PLANIFICACION_HORARIA_RUTAS);
         this.app.use('/usuarios', USUARIO_RUTA);
         this.app.use('/horasExtras', HORAS_EXTRAS_RUTAS); // acceso controlado por ModuloHoraExtraValidation
         this.app.use('/rolPermisos', ROL_PERMISOS_RUTAS);

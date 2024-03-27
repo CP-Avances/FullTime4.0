@@ -22,6 +22,7 @@ const catProvinciaRutas_1 = __importDefault(require("./rutas/catalogos/catProvin
 const catDepartamentoRutas_1 = __importDefault(require("./rutas/catalogos/catDepartamentoRutas"));
 const catProcesoRutas_1 = __importDefault(require("./rutas/catalogos/catProcesoRutas"));
 const catHorarioRutas_1 = __importDefault(require("./rutas/catalogos/catHorarioRutas"));
+const catPlanificacionHorariaRutas_1 = __importDefault(require("./rutas/catalogos/catPlanificacionHorariaRutas"));
 const usuarioRutas_1 = __importDefault(require("./rutas/usuarios/usuarioRutas"));
 const catHorasExtrasRutas_1 = __importDefault(require("./rutas/catalogos/catHorasExtrasRutas"));
 const catRolPermisosRutas_1 = __importDefault(require("./rutas/catalogos/catRolPermisosRutas"));
@@ -146,6 +147,7 @@ class Servidor {
         this.app.use('/departamento', catDepartamentoRutas_1.default);
         this.app.use('/proceso', catProcesoRutas_1.default);
         this.app.use('/horario', catHorarioRutas_1.default);
+        this.app.use('/planificacionHoraria', catPlanificacionHorariaRutas_1.default);
         this.app.use('/usuarios', usuarioRutas_1.default);
         this.app.use('/horasExtras', catHorasExtrasRutas_1.default); // acceso controlado por ModuloHoraExtraValidation
         this.app.use('/rolPermisos', catRolPermisosRutas_1.default);
