@@ -61,9 +61,14 @@
                 <div class="row">
                   <div class="d-flex flex-wrap justify-content-center">
                     <div style="margin: 0 auto;">
-                        <button class="btn btn-sm" >
-                            Cargar plantilla
-                        </button>
+                      <input #fileInput (change)="CargarPlantilla($event)" type="file"
+                      [formControl]="archivo1Form" id="file1"
+                      accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                      style="display: none;">
+
+                  <button class="btn btn-sm" (click)="fileInput.click()">
+                      Cargar plantilla
+                  </button>
                     </div>
                     <div style="margin: 0 auto;">
                         <button class="btn btn-sm" >

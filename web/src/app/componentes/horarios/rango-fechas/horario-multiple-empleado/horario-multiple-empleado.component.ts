@@ -448,13 +448,13 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
    ** **                   METODOS DE SELECCION DE DATOS DE USUARIOS                      ** **
    ** ************************************************************************************** **/
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedReg() {
     const numSelected = this.selectionReg.selected.length;
     return numSelected === this.regimen.length
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleReg() {
     this.isAllSelectedReg() ?
       this.selectionReg.clear() :
@@ -600,6 +600,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   // METODO PARA MOSTRAR DATOS DE DEPARTAMENTOS
   ModelarDepartamentos(id: number, tipo: string, sucursal: number) {
     let usuarios: any = [];
+    console.log('ver seleccion ', this.selectionDep.selected)
     if (id === 0) {
       this.empleados.forEach((empl: any) => {
         this.selectionDep.selected.find(selec => {
@@ -616,6 +617,8 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
         }
       })
     }
+
+    console.log('ver usuarios ', usuarios);
 
     this.SeleccionarProceso(tipo, usuarios);
   }
@@ -651,7 +654,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     else if (tipo === 't') {
       this.CargarTimbres(datos);
     }
-    else if (tipo === 'd') {
+    else if (tipo === 'c') {
       this.CargarPlantilla(datos);
     }
   }
@@ -729,6 +732,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   cargar_plantilla: boolean = false;
   data_cargar: any = [];
   CargarPlantilla(data: any) {
+    console.log('data cargar ', data)
     this.data_cargar = [];
     if (data.length > 0) {
       this.data_cargar = {

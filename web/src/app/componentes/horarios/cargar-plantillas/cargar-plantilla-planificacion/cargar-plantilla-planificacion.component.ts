@@ -27,6 +27,8 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
   tamanio_pagina_emp: number = 5;
   numero_pagina_emp: number = 1;
 
+  archivo1Form = new FormControl('');
+
   // VARIABLES PROGRESS SPINNER
   progreso: boolean = false;
   color: ThemePalette = 'primary';
@@ -66,6 +68,11 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     //   this.progreso = false;
     // }, 3000);
     this.GenerarExcel(this.fechaInicialF.value, this.fechaFinalF.value, this.datosSeleccionados.usuarios);
+  }
+
+  // METODO PARA CARGAR PLANTILLA
+  CargarPlantilla(plantilla: any) {
+    console.log(plantilla);
   }
 
   GenerarExcel(fechaInicial: Moment, fechaFinal: Moment, usuarios: any[]) {
