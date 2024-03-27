@@ -29,9 +29,9 @@ class PlanificacionHorariaRutas{
 
     configuracion(): void {
         // VERIFICAR DATOS DE LA PLANIFICACION HORARIA
-        this.router.put('/verificarDatos', [TokenValidation, upload.single('uploads')], PLANIFICACION_HORARIA_CONTROLADOR.VerificarDatosPlanificacionHoraria);
+        this.router.post('/verificarDatos', [TokenValidation, upload.single('uploads')], PLANIFICACION_HORARIA_CONTROLADOR.VerificarDatosPlanificacionHoraria);
         // CARGAR PLANIFICACION HORARIA
-        this.router.put('/cargarPlanificacion', [TokenValidation, upload.single('uploads')], PLANIFICACION_HORARIA_CONTROLADOR.CargarPlanificacionHoraria);
+        this.router.post('/cargarPlanificacion', [TokenValidation, upload.single('uploads')], PLANIFICACION_HORARIA_CONTROLADOR.CargarPlanificacionHoraria);
     }
 }
 

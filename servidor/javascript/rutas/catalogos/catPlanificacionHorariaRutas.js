@@ -25,9 +25,9 @@ class PlanificacionHorariaRutas {
     }
     configuracion() {
         // VERIFICAR DATOS DE LA PLANIFICACION HORARIA
-        this.router.put('/verificarDatos', [verificarToken_1.TokenValidation, upload.single('uploads')], catPlanificacionHorariaControlador_1.default.VerificarDatosPlanificacionHoraria);
+        this.router.post('/verificarDatos', [verificarToken_1.TokenValidation, upload.single('uploads')], catPlanificacionHorariaControlador_1.default.VerificarDatosPlanificacionHoraria);
         // CARGAR PLANIFICACION HORARIA
-        this.router.put('/cargarPlanificacion', [verificarToken_1.TokenValidation, upload.single('uploads')], catPlanificacionHorariaControlador_1.default.CargarPlanificacionHoraria);
+        this.router.post('/cargarPlanificacion', [verificarToken_1.TokenValidation, upload.single('uploads')], catPlanificacionHorariaControlador_1.default.CargarPlanificacionHoraria);
     }
 }
 const PLANIFICACION_HORARIA_RUTAS = new PlanificacionHorariaRutas();

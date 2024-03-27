@@ -13,6 +13,7 @@ import { HorarioMultipleEmpleadoComponent } from '../../rango-fechas/horario-mul
 import { BuscarPlanificacionComponent } from '../../rango-fechas/buscar-planificacion/buscar-planificacion.component';
 import { SpinnerService } from 'src/app/servicios/spinner/spinner.service';
 import { ToastrService } from 'ngx-toastr';
+import { PlanificacionHorariaService } from 'src/app/servicios/catalogos/catPlanificacionHoraria/planificacionHoraria.service';
 @Component({
   selector: 'app-cargar-plantilla-planificacion',
   templateUrl: './cargar-plantilla-planificacion.component.html',
@@ -21,6 +22,7 @@ import { ToastrService } from 'ngx-toastr';
 export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
   @Input() datosSeleccionados: any;
+  usuarios: any;
 
   // FECHAS DE BUSQUEDA
   fechaInicialF = new FormControl;
@@ -42,11 +44,13 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     public componentem: HorarioMultipleEmpleadoComponent,
     public componenteb: BuscarPlanificacionComponent,
     private spinnerService: SpinnerService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private restP: PlanificacionHorariaService,
   ) { }
 
   ngOnInit(): void {
-    console.log(this.datosSeleccionados.usuarios);
+    console.log(this.datosSeleccionados.usuariosSeleccionados);
+    this.usuarios = this.datosSeleccionados.usuarios;
   }
 
 
@@ -58,12 +62,6 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     this.fechaInicialF.setValue(moment(inicio, 'DD/MM/YYYY'));
     this.fechaFinalF.setValue(moment(final, 'DD/MM/YYYY'));
     datepicker.close();
-    // this.ver_horario = false;
-    // this.ver_verificar = false;
-    // this.ver_guardar = false;
-    // this.ver_acciones = false;
-    // this.InicialiciarDatos();
-    // this.fechas_mes = [];
   }
 
     // METODO PARA LIMPIAR FORMULARIO
@@ -86,13 +84,14 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
   // DESCARGAR PLANTILLA EXCEL
   DescargarPlantilla() {
-    this.GenerarExcel(this.fechaInicialF.value, this.fechaFinalF.value, this.datosSeleccionados.usuarios);
+    this.GenerarExcel(this.fechaInicialF.value, this.fechaFinalF.value, this.datosSeleccionados.usuariosSeleccionados);
   }
 
   // METODO PARA CARGAR PLANTILLA
   CargarPlantilla(plantilla: any) {
-    if(plantilla.targer.files && plantilla.targer.files[0]){
-      this.archivo = plantilla.targer.files[0];
+    this.spinnerService.show();
+    if(plantilla.target.files && plantilla.target.files[0]){
+      this.archivo = plantilla.target.files;
       this.nombreArchivo = this.archivo[0].name;
       let arrayItems = this.nombreArchivo.split(".");
       let itemExtencion = arrayItems[arrayItems.length - 1];
@@ -125,6 +124,14 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     for (let i = 0; i < this.archivo.length; i++) {
       formData.append("uploads", this.archivo[i], this.archivo[i].name);
     }
+    this.restP.VerificarDatosPlanificacionHoraria(formData, this.usuarios).subscribe( (res: any) => {
+      console.log(res);
+      this.spinnerService.hide();
+      this.toastr.success('Plantilla verificada correctamente', 'Plantilla verificada', {
+        timeOut: 6000,
+      });
+    });
+
   }
 
   GenerarExcel(fechaInicial: Moment, fechaFinal: Moment, usuarios: any[]) {
@@ -177,18 +184,10 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
   // METODO PARA CERRAR VENTANA
   CerrarVentana() {
-    if (this.datosSeleccionados.pagina === 'multiple-empleado') {
       this.componentem.seleccionar = true;
-      this.componentem.plan_rotativo = false;
+      this.componentem.cargar_plantilla = false;
       this.componentem.LimpiarFormulario();
-    }
-    else if (this.datosSeleccionados.pagina === 'busqueda') {
-      this.componenteb.rotativo_multiple = false;
-      this.componenteb.seleccionar = true;
-      this.componenteb.buscar_fechas = true;
-      this.componenteb.auto_individual = true;
-      this.componenteb.multiple = true;
-    }
+
   }
 
 }

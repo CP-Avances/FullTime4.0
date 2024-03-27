@@ -729,7 +729,8 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
     this.data_cargar = [];
     if (data.length > 0) {
       this.data_cargar = {
-        usuarios: data,
+        usuariosSeleccionados: data,
+        usuarios: this.empleados,
         pagina: 'cargar-plantilla',
       }
       this.seleccionar = false;

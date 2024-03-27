@@ -12,13 +12,14 @@ export class PlanificacionHorariaService {
   ) { }
 
   // VERIFICAR DATOS DE LA PLANIFICACION HORARIA
-  VerificarDatosPlanificacionHoraria(formData: any) {
-    return this.http.put<any>(`${environment.url}/planificacionHoraria/verificarDatos`, formData);
+  VerificarDatosPlanificacionHoraria(formData: any, usuarios: any) {
+    formData.append('usuarios', JSON.stringify(usuarios));
+    return this.http.post<any>(`${environment.url}/planificacionHoraria/verificarDatos`, formData);
   }
 
   // CARGAR PLANIFICACION HORARIA
   CargarPlanificacionHoraria(formData: any) {
-    return this.http.put<any>(`${environment.url}/planificacionHoraria/cargarPlanificacion`, formData);
+    return this.http.post<any>(`${environment.url}/planificacionHoraria/cargarPlanificacion`, formData);
   }
 
 }
