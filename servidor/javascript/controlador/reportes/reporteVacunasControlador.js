@@ -18,24 +18,37 @@ class ReportesVacunasControlador {
         return __awaiter(this, void 0, void 0, function* () {
             console.log('datos recibidos', req.body);
             let datos = req.body;
-            let n = yield Promise.all(datos.map((obj) => __awaiter(this, void 0, void 0, function* () {
-                obj.departamentos = yield Promise.all(obj.departamentos.map((ele) => __awaiter(this, void 0, void 0, function* () {
-                    ele.empleado = yield Promise.all(ele.empleado.map((o) => __awaiter(this, void 0, void 0, function* () {
-                        o.vacunas = yield BuscarVacunas(o.id);
-                        console.log('Vacunas: ', o);
-                        return o;
+            let n = yield Promise.all(datos.map((suc) => __awaiter(this, void 0, void 0, function* () {
+                console.log('ver suc ', suc);
+                suc.regimenes = yield Promise.all(suc.regimenes.map((dep) => __awaiter(this, void 0, void 0, function* () {
+                    dep.departamentos = yield Promise.all(dep.departamentos.map((car) => __awaiter(this, void 0, void 0, function* () {
+                        car.cargos = yield Promise.all(car.cargos.map((empl) => __awaiter(this, void 0, void 0, function* () {
+                            empl.empleado = yield Promise.all(empl.empleado.map((o) => __awaiter(this, void 0, void 0, function* () {
+                                o.vacunas = yield BuscarVacunas(o.id);
+                                console.log('Vacunas: ', o);
+                                return o;
+                            })));
+                            return empl;
+                        })));
+                        return car;
                     })));
-                    return ele;
+                    return dep;
                 })));
-                return obj;
+                return suc;
             })));
-            let nuevo = n.map((obj) => {
-                obj.departamentos = obj.departamentos.map((e) => {
-                    e.empleado = e.empleado.filter((v) => { return v.vacunas.length > 0; });
-                    return e;
-                }).filter((e) => { return e.empleado.length > 0; });
-                return obj;
-            }).filter(obj => { return obj.departamentos.length > 0; });
+            let nuevo = n.map((suc) => {
+                suc.regimes = suc.regimenes.map((dep) => {
+                    dep.departamentos = dep.departamentos.map((car) => {
+                        car.cargos = car.cargos.map((empl) => {
+                            empl.empleado = empl.empleado.filter((v) => { return v.vacunas.length > 0; });
+                            return empl;
+                        }).filter((empl) => empl.empleado.length > 0);
+                        return car;
+                    }).filter((car) => { return car.cargos.length > 0; });
+                    return dep;
+                }).filter((dep) => { return dep.departamentos.length > 0; });
+                return suc;
+            }).filter((suc) => { return suc.regimenes.length > 0; });
             if (nuevo.length === 0)
                 return res.status(400).jsonp({ message: 'No se ha encontrado registro de vacunas.' });
             return res.status(200).jsonp(nuevo);

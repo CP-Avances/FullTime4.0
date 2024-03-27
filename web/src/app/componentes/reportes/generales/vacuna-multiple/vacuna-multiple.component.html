@@ -289,9 +289,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="
-                    let v of arr_vac | paginate : tamanio_pagina : numero_pagina
-                  ">
+                            <tr *ngFor="let v of arr_vac | paginate : tamanio_pagina : numero_pagina">
                                 <td class="t_horarios">{{ v.n }}</td>
                                 <td class="t_horarios">{{ v.cedula }}</td>
                                 <td class="t_horarios">{{ v.empleado.toUpperCase() }}</td>
@@ -316,17 +314,18 @@
                         </tbody>
                     </table>
                 </div>
-                <mat-paginator [length]="arr_vac.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
-                    (page)="ManejarPagina($event)" showFirstLastButtons aria-label="Seleccionar pagina">
+                <mat-paginator id="pagina" [length]="arr_vac.length" [pageSize]="tamanio_pagina"
+                    [pageSizeOptions]="pageSizeOptions" (page)="ManejarPaginaDetalle($event)" showFirstLastButtons
+                    aria-label="Seleccionar pagina">
                 </mat-paginator>
             </div>
             <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 0.5rem">
                 <i id="pdf" class="fas fa-file-pdf icon" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar reporte de vacunas en formato PDF." (click)="GenerarPDF('download')">
+                    matTooltip="Descargar reporte en formato PDF." (click)="GenerarPDF('download')">
                     <p>PDF</p>
                 </i>
                 <i id="excel" class="fas fa-file-excel icon" matSuffix matTooltipPosition="right"
-                    matTooltip="Descargar reporte de vacunas en formato EXCEL." (click)="ValidarExcel()">
+                    matTooltip="Descargar reporte en formato EXCEL." (click)="ValidarExcel()">
                     <p>XLSL</p>
                 </i>
             </div>

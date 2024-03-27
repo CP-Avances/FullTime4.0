@@ -58,7 +58,7 @@ import { PlanificacionComidasEmpleadoComponent } from './componentes/rolEmpleado
 import { ProcesosEmpleadoComponent } from './componentes/rolEmpleado/procesos-empleado/procesos-empleado.component';
 import { AutorizaEmpleadoComponent } from './componentes/rolEmpleado/autoriza-empleado/autoriza-empleado.component';
 import { ReporteKardexComponent } from './componentes/reportes/modulos/vacaciones/reporte-kardex/reporte-kardex.component';
-import { ReporteEmpleadosComponent } from './componentes/reportes/generales/empleados/reporte-empleados/reporte-empleados.component';
+import { ReporteEmpleadosComponent } from './componentes/reportes/generales/reporte-empleados/reporte-empleados.component';
 import { ListaArchivosComponent } from './componentes/documentos/lista-archivos/lista-archivos.component';
 import { TimbreWebComponent } from './componentes/modulos/timbreWeb/timbre-empleado/timbre-web.component';
 import { TimbreAdminComponent } from './componentes/timbres/timbre-admin/timbre-admin.component';
@@ -84,7 +84,7 @@ import { BuscarTimbreComponent } from './componentes/timbres/acciones-timbres/bu
 
 import { RecuperarFraseComponent } from './componentes/administracionGeneral/frase-seguridad/recuperar-frase/recuperar-frase.component';
 import { OlvidarFraseComponent } from './componentes/administracionGeneral/frase-seguridad/olvidar-frase/olvidar-frase.component';
-import { VacunaMultipleComponent } from './componentes/reportes/generales/vacunas/vacuna-multiple/vacuna-multiple.component';
+import { VacunaMultipleComponent } from './componentes/reportes/generales/vacuna-multiple/vacuna-multiple.component';
 import { AlimentosInvitadosComponent } from './componentes/reportes/modulos/alimentacion/alimentos-invitados/alimentos-invitados.component';
 import { TimbreIncompletoComponent } from './componentes/reportes/timbres/timbre-incompleto/timbre-incompleto.component';
 import { SalidasAntesComponent } from './componentes/reportes/asistencia/salidas-antes/salidas-antes.component';
@@ -135,8 +135,6 @@ import { ListaWebComponent } from './componentes/modulos/timbreWeb/lista-web/lis
 import { RegistroDispositivosComponent } from './componentes/modulos/appMovil/registro-dispositivos/registro-dispositivos.component';
 import { VistaElementosComponent } from './componentes/modulos/permisos/configurar-tipo-permiso/listarTipoPermisos/vista-elementos.component';
 import { TimbreMultipleComponent } from './componentes/timbres/timbre-multiple/timbre-multiple.component';
-import { VerEmpleadosDetalleComponent } from './componentes/reportes/generales/empleados/ver-empleados-detalle/ver-empleados-detalle.component';
-import { VerVacunasComponent } from './componentes/reportes/generales/vacunas/ver-vacunas/ver-vacunas.component';
 import { BuscarAsistenciaComponent } from './componentes/horarios/asistencia/buscar-asistencia/buscar-asistencia.component';
 import { ReporteTiempoAlimentacionComponent } from './componentes/reportes/asistencia/reporte-tiempo-alimentacion/reporte-tiempo-alimentacion.component';
 import { AnalisisDatosComponent } from './componentes/reportes/analisis-datos/analisis-datos.component';
@@ -201,9 +199,6 @@ const routes: Routes = [
   { path: 'reporte-timbre-reloj-virtual', component: TimbreVirtualComponent, canActivate: [AuthGuard], data: { roles: 4 } },
   { path: 'analisisDatos', component: AnalisisDatosComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
-  //DETALLE REPORTES
-  { path: 'ver-empleados-activos-detalle/:tipo', component: VerEmpleadosDetalleComponent, canActivate: [AuthGuard], data: { roles: 4 } },
-  { path: 'ver-vacunas-detalle/:tipo/:lista', component: VerVacunasComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // REPORTES ALIMENTACIÓN
   { path: 'alimentosGeneral', component: AlimentosGeneralComponent, canActivate: [AuthGuard], data: { roles: 4 } },
