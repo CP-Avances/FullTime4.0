@@ -33,15 +33,20 @@ class PlanificacionHorariaControlador {
             const plantillaPlanificacionHorariaFiltrada = plantillaPlanificacionHoraria.filter((data) => {
                 return Object.keys(data).length > 1;
             });
-            for (const [index, data] of plantillaPlanificacionHorariaFiltrada.entries()) {
+            console.log(plantillaPlanificacionHorariaFiltrada);
+            let plantillaPlanificacionHorariaEstructurada = plantillaPlanificacionHorariaFiltrada.map((data) => {
+                let nuevoObjeto = { USUARIO: data.USUARIO, DIAS: {} };
+                for (let propiedad in data) {
+                    if (propiedad !== 'USUARIO') {
+                        nuevoObjeto.DIAS[propiedad] = { HORARIOS: data[propiedad].split(',') };
+                    }
+                }
+                return nuevoObjeto;
+            });
+            for (const [index, data] of plantillaPlanificacionHorariaEstructurada.entries()) {
                 let { USUARIO } = data;
                 if (!USUARIO) {
                     data.OBSERVACION = 'Datos no registrados: USUARIO';
-                    continue;
-                }
-                // VERIFICAR EXISTENCIA DE USUARIO
-                if (!(yield VerificarUsuario(USUARIO))) {
-                    data.OBSERVACION = 'Usuario no registrado en la base de datos';
                     continue;
                 }
                 // VERIFICAR USUARIO DUPLICADO
@@ -49,8 +54,27 @@ class PlanificacionHorariaControlador {
                     data.OBSERVACION = 'Registro duplicado dentro de la plantilla';
                     continue;
                 }
+                // VERIFICAR EXISTENCIA DE USUARIO
+                if (!VerificarUsuario(USUARIO, usuarios)) {
+                    data.OBSERVACION = 'Usuario no valido';
+                    continue;
+                }
+                // VERIFICAR HORARIOS
+                for (const [dia, { HORARIOS }] of Object.entries(data.DIAS)) {
+                    let horariosNoValidos = [];
+                    for (const HORARIO of HORARIOS) {
+                        if (!(yield VerificarHorario(HORARIO))) {
+                            horariosNoValidos.push(HORARIO);
+                            data.DIAS.HORARIOS[HORARIO].OBSERVACION = 'Horario no valido';
+                        }
+                        else {
+                            data.DIAS.HORARIOS[HORARIO].OBSERVACION = 'OK';
+                        }
+                    }
+                    data.DIAS[dia].OBSERVACION = horariosNoValidos.length > 0 ? `Horarios no validos: ${horariosNoValidos.join(', ')}` : 'OK';
+                }
             }
-            res.json({ plantillaPlanificacionHoraria: plantillaPlanificacionHorariaFiltrada });
+            res.json({ plantillaPlanificacionHoraria: plantillaPlanificacionHorariaEstructurada });
         });
     }
     //METODO PARA CARGAR LA PLANIFICACION HORARIA
@@ -58,11 +82,23 @@ class PlanificacionHorariaControlador {
         return null;
     }
 }
-// FUNCION PARA VERIFICAR EXISTENCIA DE USUARIO EN LA BASE DE DATOS
-function VerificarUsuario(usuario) {
+// FUNCION PARA VERIFICAR EXISTENCIA DE USUARIO EN LA LISTA DE USUARIOS
+function VerificarUsuario(cedula, usuarios) {
+    let usuarioEncontrado = usuarios.find((usuario) => usuario.cedula === cedula);
+    return usuarioEncontrado && usuarioEncontrado.id_cargo ? true : false;
+}
+// FUNCION PARA VERIFICAR EXISTENCIA DE HORARIO EN LA BASE DE DATOS
+function VerificarHorario(codigo) {
     return __awaiter(this, void 0, void 0, function* () {
-        const result = yield database_1.default.query('SELECT * FROM USUARIOS WHERE USUARIO = ?', [usuario]);
-        return result.rowCount > 0;
+        // SELECT * FROM cg_horarios ORDER BY codigo ASC
+        const horario = yield database_1.default.query('SELECT hora_trabajo FROM cg_horarios WHERE LOWER(codigo) = $1', [codigo.toLowerCase()]);
+        // SI EXISTE HORARIO VERIFICAR SI horario.hora_trabajo este en formato hh:mm:ss
+        const existe = horario.rowCount > 0;
+        if (existe) {
+            const formatoHora = /^\d{2}:[0-5][0-9]:[0-5][0-9]$/;
+            return formatoHora.test(horario.rows[0].hora_trabajo);
+        }
+        return existe;
     });
 }
 exports.PLANIFICACION_HORARIA_CONTROLADOR = new PlanificacionHorariaControlador();
