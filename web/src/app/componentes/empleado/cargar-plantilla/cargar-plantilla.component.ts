@@ -191,7 +191,10 @@ export class CargarPlantillaComponent {
       return 'rgb(170, 129, 236)';
     } else if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
-    } else if (observacion == 'Cédula no existe en el sistema') {
+    } else if (observacion == 'Cédula no existe en el sistema' || 
+      observacion == 'Sucursal no existe en el sistema' ||
+      observacion == 'Departamento no existe en el sistema' ||
+      observacion == 'Cargo no existe en el sistema') {
       return 'rgb(255, 192, 203)';
     } else if (observacion == 'Registro duplicado - cédula') {
       return 'rgb(156, 214, 255)';
@@ -199,7 +202,7 @@ export class CargarPlantillaComponent {
       return 'rgb(230, 176, 96)';
     } else if (observacion == 'Pais ingresado no se encuentra registrado' ||
       observacion == 'Regimen ingresado no se encuentra registrado' ||
-      observacion == 'Cargo ingresado no se encuentra registrado'
+      observacion == 'Modalidad trabajo no se encuentra registrado' 
     ) {
       return 'rgb(242, 21, 21)';
     } else if (observacion == 'Regimen no corresponde al pais'){

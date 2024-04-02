@@ -309,7 +309,6 @@ class ContratoEmpleadoControlador {
                 fecha_salida: '',
                 control_asis: '',
                 control_vaca: '',
-                tipo_cargo: '',
                 observacion: ''
             };
             var listContratos = [];
@@ -333,7 +332,6 @@ class ContratoEmpleadoControlador {
                     data.fecha_salida = fecha_salida;
                     data.control_asis = controlar_asistencia;
                     data.control_vaca = controlar_vacaciones;
-                    data.tipo_cargo = tipo_cargo;
                     data.observacion = 'no registrado';
                     //Valida si los datos de la columna cedula son numeros.
                     const rege = /^[0-9]+$/;
@@ -369,7 +367,6 @@ class ContratoEmpleadoControlador {
                     data.fecha_salida = fecha_salida;
                     data.control_asis = controlar_asistencia;
                     data.control_vaca = controlar_vacaciones;
-                    data.tipo_cargo = tipo_cargo;
                     data.observacion = 'no registrado';
                     if (data.fila == '' || data.fila == undefined) {
                         data.fila = 'error';
@@ -402,10 +399,6 @@ class ContratoEmpleadoControlador {
                     if (controlar_vacaciones == undefined) {
                         data.control_vaca = 'No registrado';
                         data.observacion = 'Control vacaciones, ' + data.observacion;
-                    }
-                    if (tipo_cargo == undefined) {
-                        data.tipo_cargo = 'No registrado';
-                        data.observacion = 'Tipo cargo, ' + data.observacion;
                     }
                     // Verificar si la variable tiene el formato de fecha correcto con moment
                     if (data.fecha_ingreso != 'No registrado') {
@@ -461,9 +454,9 @@ class ContratoEmpleadoControlador {
                                 var VERIFICAR_REGIMENES = yield database_1.default.query('SELECT * FROM cg_regimenes WHERE UPPER(descripcion) = $1', [valor.regimen_la.toUpperCase()]);
                                 if (VERIFICAR_REGIMENES.rows[0] != undefined && VERIFICAR_REGIMENES.rows[0] != '') {
                                     if (id_pais == VERIFICAR_REGIMENES.rows[0].id_pais) {
-                                        if (valor.tipo_cargo != 'No registrado' && valor.tipo_cargo != '') {
-                                            var VERIFICAR_TIPOCARGO = yield database_1.default.query('SELECT * FROM tipo_cargo WHERE UPPER(cargo) = $1', [valor.tipo_cargo.toUpperCase()]);
-                                            if (VERIFICAR_TIPOCARGO.rows[0] != undefined && VERIFICAR_TIPOCARGO.rows[0] != '') {
+                                        if (valor.modalida_la != 'No registrado' && valor.modalida_la != '') {
+                                            var VERIFICAR_MODALIDAD = yield database_1.default.query('SELECT * FROM modal_trabajo WHERE UPPER(descripcion) = $1', [valor.modalida_la.toUpperCase()]);
+                                            if (VERIFICAR_MODALIDAD.rows[0] != undefined && VERIFICAR_MODALIDAD.rows[0] != '') {
                                                 // Discriminación de elementos iguales
                                                 if (duplicados.find((p) => p.cedula === valor.cedula) == undefined) {
                                                     duplicados.push(valor);
@@ -473,7 +466,7 @@ class ContratoEmpleadoControlador {
                                                 }
                                             }
                                             else {
-                                                valor.observacion = 'Cargo ingresado no se encuentra registrado';
+                                                valor.observacion = 'Modalidad trabajo no se encuentra registrado';
                                             }
                                         }
                                     }
@@ -544,11 +537,10 @@ class ContratoEmpleadoControlador {
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                 console.log('data: ', data);
                 // Datos que se guardaran de la plantilla ingresada
-                const { item, cedula, pais, regimen_la, modalidad_la, fecha_ingreso, fecha_salida, control_asis, control_vaca, tipo_cargo } = data;
-                console.log('regimen_laboral: ', data.regimen_la);
+                const { item, cedula, pais, regimen_la, modalida_la, fecha_ingreso, fecha_salida, control_asis, control_vaca } = data;
                 const ID_EMPLEADO = yield database_1.default.query('SELECT id FROM empleados WHERE UPPER(cedula) = $1', [cedula]);
                 const ID_REGIMEN = yield database_1.default.query('SELECT id FROM cg_regimenes WHERE UPPER(descripcion) = $1', [regimen_la.toUpperCase()]);
-                const ID_TIPO_CONTRATO = yield database_1.default.query('SELECT id FROM tipo_cargo WHERE UPPER(cargo) = $1', [tipo_cargo.toUpperCase()]);
+                const ID_TIPO_CONTRATO = yield database_1.default.query('SELECT id FROM modal_trabajo WHERE UPPER(descripcion) = $1', [modalida_la.toUpperCase()]);
                 //Transformar el string en booleano
                 var vaca_controla;
                 if (control_vaca.toUpperCase() === 'SI') {
