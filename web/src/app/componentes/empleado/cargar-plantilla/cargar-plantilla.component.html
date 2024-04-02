@@ -1,100 +1,243 @@
-<div class="container" style="padding-top: 15px;">
-    <div class="row">
-        <div class="col-md">
-            <div id="titulo">
-                <span>CARGAR PLANTILLAS</span>
-            </div>
-            <mat-card class="example-card mat-elevation-z9">
+<br>
+<mat-tab-group>
+        <!-- INFORMACION OFICIAL DEL EMPLEADO -->
+        <mat-tab>
+            <ng-template mat-tab-label>
+                <mat-icon class="example-tab-icon">file &nbsp;</mat-icon>
+                <h6 id="items" (click)="LimpiarCampos()">Cargar Contratos</h6>
+            </ng-template>
+            <div class="container" style="padding-top: 15px;">
                 <div class="row">
-                    <div class="col-md" style="padding-top: 5px;">
-                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
-                            <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
-                                <input type="file" [formControl]="archivoForm" id="file"
-                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                <label for="file" matSuffix matTooltipPosition="right"
-                                    style="height: 65px; padding-top: 25px;"
-                                    matTooltip="Dar click para selecionar plantilla y cargar registros.">
-                                    Subir plantilla
-                                </label>
-                                <label for="file"  matSuffix matTooltipPosition="right"
-                                    style="height: 64px; padding-top: 25px;"
-                                    matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
-                                    Subir nueva plantilla
-                                </label>
-                            </form>
-                        </div>
-                    </div>
                     <div class="col-md">
-                        <div class="d-flex flex-wrap justify-content-around">
-                            <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
-                                style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
-                                href="{{hipervinculo}}/plantillaD/documento/Feriados.xlsx">
-                                <!--span class="material-icons">cloud_download</span-->
-                                <br>
-                                Descargar plantilla usuarios
-                            </a>
+                        <div id="titulo">
+                            <span>CARGAR PLANTILLAS</span>
                         </div>
-                    </div>
-                    <div class="col-md" style="padding-top: 5px; padding-bottom: 5px;" >
-                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
-                            <button id="descargar" class="btn btn-sm"
-                                 matSuffix matTooltipPosition="right"
-                                 matTooltip="Guardar registro multiple.">
-                                Registrar
-                            </button>
-                        </div>
-                    </div>
-                    
-                </div>
-            </mat-card>
-        </div>
-    </div>
-</div>
-
-<!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
-<div class="container" style="padding-top: 10px; margin-bottom: 25px;">
-    <app-definicion-plantilla>
-    </app-definicion-plantilla>
-</div>
-
-<!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE FERIADOS ------------------------------------------------->
-<div class="container" style="padding-bottom: 10px; margin-bottom: 35px;">
-    <div class="mat-elevation-z8" style="background: white;">
-        <div id="titulo">REGISTRO MULTIPLE</div>
-        <div class="table-responsive">
-            <table class="table table-hover table-sm">
-                <thead class="thead-light">
-                    <tr style="text-align: center; font-size: 13px;">
-                        <th scope="col">Item</th>
-                        <th scope="col">Fecha</th>
-                        <th scope="col">Descripción</th>
-                        <th scope="col">Fecha recuperación</th>
-                        <th scope="col">Observación</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!--tr
-                        *ngFor="let f of DataFeriados | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
-                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{f.fila}}</td>
-                        <td [style.color]="stiloTextoCelda(f.fecha)" style="font-size: 12px;">{{f.fecha}}</td>
-                        <td [style.color]="stiloTextoCelda(f.descripcion)" id="letras" style="font-size: 12px;">
-                            {{f.descripcion}}</td>
-                        <td style="font-size: 12px;">{{f.fec_recuperacion}}</td>
-                        <td style="font-size: 12px;">
-                            <div style="width: 270px; margin: auto;">
-                                <div id="t-editar" class="circulo"
-                                    [style.background-color]="stiloCelda(f.observacion)"></div>
-                                {{f.observacion}}
+                        <mat-card class="example-card mat-elevation-z9">
+                            <div class="row">
+                                <div class="col-md" style="padding-top: 5px;">
+                                    <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                                        <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
+                                            <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
+                                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                            <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                                style="height: 65px; padding-top: 25px;"
+                                                matTooltip="Dar click para selecionar plantilla y cargar registros.">
+                                                Subir plantilla
+                                            </label>
+                                            <label for="file"  matSuffix matTooltipPosition="right"
+                                                *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                                style="height: 64px; padding-top: 25px;"
+                                                matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                                Subir nueva plantilla
+                                            </label>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="col-md" *ngIf="DatosContrato.length == 0">
+                                    <div class="d-flex flex-wrap justify-content-around">
+                                        <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                                            style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
+                                            href="{{hipervinculo}}/plantillaD/documento/Feriados.xlsx">
+                                            <!--span class="material-icons">cloud_download</span-->
+                                            <br>
+                                            Descargar plantilla usuarios
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-md" *ngIf="DatosContrato.length > 0" style="padding-top: 5px; padding-bottom: 5px;" >
+                                    <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                                        <button id="descargar" class="btn btn-sm" (click)="ConfirmarRegistroMultiple()"
+                                             matSuffix matTooltipPosition="right"
+                                             matTooltip="Guardar registro multiple.">
+                                            Registrar
+                                        </button>
+                                    </div>
+                                </div>
+                                
                             </div>
-                        </td>
-                    </tr-->
-                </tbody>
-            </table>
-        </div>
-        <mat-paginator [length]="10" [pageSize]="tamanio_paginaMul"
-            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
-            showFirstLastButtons>
-        </mat-paginator>
-    </div>
-</div>
+                        </mat-card>
+                    </div>
+                </div>
+            </div>
+            
+            <!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
+            <div class="container" style="padding-top: 10px; margin-bottom: 25px;">
+                <app-definicion-plantilla>
+                </app-definicion-plantilla>
+            </div>
+            
+            <!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE FERIADOS ------------------------------------------------->
+            <div *ngIf="DatosContrato.length > 0 " class="container" style="padding-bottom: 10px; margin-bottom: 35px;">
+                <div class="mat-elevation-z8" style="background: white;">
+                    <div id="titulo">REGISTRO MULTIPLE</div>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead class="thead-light">
+                                <tr style="text-align: center; font-size: 13px;">
+                                    <th scope="col">Item</th>
+                                    <th scope="col">Cédula</th>
+                                    <th scope="col">Pais</th>
+                                    <th scope="col">Regimen laboral</th>
+                                    <th scope="col">Modalidad laboral</th>
+                                    <th scope="col">Fecha ingreso</th>
+                                    <th scope="col">Fecha salida</th>
+                                    <th scope="col">Control asistencias</th>
+                                    <th scope="col">Control vacaciones</th>
+                                    <th scope="col">Tipo cargo</th>
+                                    <th scope="col">Observación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    *ngFor="let contrato of DatosContrato | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                                    <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{contrato.fila}}</td>
+                                    <td [style.color]="stiloTextoCelda(contrato.cedula)" style="font-size: 12px;">{{contrato.cedula}}</td>
+                                    <td [style.color]="stiloTextoCelda(contrato.pais)" style="font-size: 12px;">{{contrato.pais}}</td>
+                                    <td [style.color]="stiloTextoCelda(contrato.regimen_la)" style="font-size: 12px;">{{contrato.regimen_la}}</td>
+                                    <td [style.color]="stiloTextoCelda(contrato.modalida_la)" style="font-size: 12px;">{{contrato.modalida_la}}</td>
+                                    <td [style.color]="stiloTextoCelda(contrato.fecha_ingreso)" style="font-size: 12px;">{{contrato.fecha_ingreso}}</td>
+                                    <td [style.color]="stiloTextoCelda(contrato.fecha_salida)" style="font-size: 12px;">{{contrato.fecha_salida}}</td>
+                                    <td [style.color]="stiloTextoCelda(contrato.control_asis)" id="letras" style="font-size: 12px;">{{contrato.control_asis}}</td>
+                                    <td [style.color]="stiloTextoCelda(contrato.control_vaca)" id="letras" style="font-size: 12px;">{{contrato.control_vaca}}</td>
+                                    <td [style.color]="stiloTextoCelda(contrato.tipo_cargo)" style="font-size: 12px;">{{contrato.tipo_cargo}}</td>
+                                    <td style="font-size: 12px;">
+                                        <div style="width: 270px; margin: auto;">
+                                            <div id="t-editar" class="circulo"
+                                                [style.background-color]="stiloCelda(contrato.observacion)"></div>
+                                            {{contrato.observacion}}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <mat-paginator  [length]="DatosContrato.length!" [pageSize]="tamanio_paginaMul"
+                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+                        showFirstLastButtons>
+                    </mat-paginator>
+                </div>
+            </div>
+        </mat-tab>
+
+        <!-- REGISTRO MULTIPLE DE CARGOS -->
+        <mat-tab>
+            <ng-template mat-tab-label>
+                <mat-icon class="example-tab-icon">file &nbsp;</mat-icon>
+                <h6 id="items" (click)="LimpiarCampos()">Cargar Cargos</h6>
+            </ng-template>
+            <div class="container" style="padding-top: 15px;">
+                <div class="row">
+                    <div class="col-md">
+                        <div id="titulo">
+                            <span>CARGAR PLANTILLAS</span>
+                        </div>
+                        <mat-card class="example-card mat-elevation-z9">
+                            <div class="row">
+                                <div class="col-md" style="padding-top: 5px;">
+                                    <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                                        <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
+                                            <input (change)="FileChangeCargo($event)" type="file" [formControl]="archivoForm" id="file"
+                                                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                            <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                                style="height: 65px; padding-top: 25px;"
+                                                matTooltip="Dar click para selecionar plantilla y cargar registros.">
+                                                Subir plantilla
+                                            </label>
+                                            <label for="file"  matSuffix matTooltipPosition="right"
+                                                *ngIf="mostrarbtnsubir && messajeExcelCargos != 'error'"
+                                                style="height: 64px; padding-top: 25px;"
+                                                matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
+                                                Subir nueva plantilla
+                                            </label>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="col-md" *ngIf="!DatosCargos">
+                                    <div class="d-flex flex-wrap justify-content-around">
+                                        <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                                            style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
+                                            href="{{hipervinculo}}/plantillaD/documento/Feriados.xlsx">
+                                            <!--span class="material-icons">cloud_download</span-->
+                                            <br>
+                                            Descargar plantilla usuarios
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-md" *ngIf="DatosCargos" style="padding-top: 5px; padding-bottom: 5px;" >
+                                    <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                                        <button id="descargar" class="btn btn-sm"
+                                             matSuffix matTooltipPosition="right"
+                                             matTooltip="Guardar registro multiple.">
+                                            Registrar
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </mat-card>
+                    </div>
+                </div>
+            </div>
+            
+            <!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
+            <div class="container" style="padding-top: 10px; margin-bottom: 25px;">
+                <app-definicion-plantilla>
+                </app-definicion-plantilla>
+            </div>
+            
+            <!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE CARGOS ------------------------------------------------->
+            <div *ngIf="DatosCargos.length > 0" class="container" style="padding-bottom: 10px; margin-bottom: 35px;">
+                <div class="mat-elevation-z8" style="background: white;">
+                    <div id="titulo">REGISTRO MULTIPLE</div>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead class="thead-light">
+                                <tr style="text-align: center; font-size: 13px;">
+                                    <th scope="col">Item</th>
+                                    <th scope="col">Cédula</th>
+                                    <th scope="col">Departamento</th>
+                                    <th scope="col">Fecha inicio</th>
+                                    <th scope="col">Fecha final</th>
+                                    <th scope="col">Sucursal</th>
+                                    <th scope="col">Sueldo</th>
+                                    <th scope="col">Cargo</th>
+                                    <th scope="col">Hora de trabajo</th>
+                                    <th scope="col">Jefé</th>
+                                    <th scope="col">Observación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    *ngFor="let cargo of DatosCargos | paginate:tamanio_paginaMulCargo:numero_paginaMulCargo; let i = index">
+                                    <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{cargo.fila}}</td>
+                                    <td [style.color]="stiloTextoCelda(cargo.cedula)" style="font-size: 12px;">{{cargo.cedula}}</td>
+                                    <td [style.color]="stiloTextoCelda(cargo.departamento)" style="font-size: 12px;">{{cargo.departamento}}</td>
+                                    <td [style.color]="stiloTextoCelda(cargo.fecha_inicio)" style="font-size: 12px;">{{cargo.fecha_inicio}}</td>
+                                    <td [style.color]="stiloTextoCelda(cargo.fecha_final)" style="font-size: 12px;">{{cargo.fecha_final}}</td>
+                                    <td [style.color]="stiloTextoCelda(cargo.sucursal)" style="font-size: 12px;">{{cargo.sucursal}}</td>
+                                    <td [style.color]="stiloTextoCelda(cargo.sueldo)" style="font-size: 12px;">{{cargo.sueldo}}</td>
+                                    <td [style.color]="stiloTextoCelda(cargo.cargo)" id="letras" style="font-size: 12px;">{{cargo.cargo}}</td>
+                                    <td [style.color]="stiloTextoCelda(cargo.hora_traba)" id="letras" style="font-size: 12px;">{{cargo.hora_traba}}</td>
+                                    <td [style.color]="stiloTextoCelda(cargo.jefe)" style="font-size: 12px;">{{cargo.jefe}}</td>
+                                    <td style="font-size: 12px;">
+                                        <div style="width: 270px; margin: auto;">
+                                            <div id="t-editar" class="circulo"
+                                                [style.background-color]="stiloCelda(cargo.observacion)"></div>
+                                            {{cargo.observacion}}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <mat-paginator [length]="10" [pageSize]="tamanio_paginaMulCargo"
+                        [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+                        showFirstLastButtons>
+                    </mat-paginator>
+                </div>
+            </div>
+        </mat-tab>
+</mat-tab-group>
+
+
 

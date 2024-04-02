@@ -107,6 +107,7 @@ class DepartamentoRutas {
          ** **            METODO PAARA LA LECTURA DEL REGISTRO MULTIPLE DE CONTRATOS                   ** **
          ** ********************************************************************************************* **/
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload_plantilla.single('uploads')], contratoEmpleadoControlador_1.default.RevisarDatos);
+        this.router.post('/cargar_plantilla/', verificarToken_1.TokenValidation, contratoEmpleadoControlador_1.default.CargarPlantilla_contrato);
     }
 }
 const CONTRATO_EMPLEADO_RUTAS = new DepartamentoRutas();

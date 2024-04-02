@@ -861,7 +861,7 @@ class EmpleadoControlador {
                         data.observacion = 'Usuario ' + data.observacion;
                     }
                     if (contrasena == undefined) {
-                        data.contrasena = contrasena;
+                        data.contrasena = 'No registrado';
                         data.observacion = 'Contraseña ' + data.observacion;
                     }
                     if (rol == undefined) {
@@ -869,9 +869,11 @@ class EmpleadoControlador {
                         data.observacion = 'Rol ' + data.observacion;
                     }
                     // Verificar si la variable tiene el formato de fecha correcto con moment
-                    if ((0, moment_1.default)(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) { }
-                    else {
-                        data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                    if (data.fec_nacimiento != 'No registrado') {
+                        if ((0, moment_1.default)(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) { }
+                        else {
+                            data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                        }
                     }
                     //Valida si los datos de la columna telefono son numeros.
                     if (telefono != undefined) {
@@ -1342,14 +1344,6 @@ class EmpleadoControlador {
                     else {
                         data.observacion = 'La cédula ingresada no es válida';
                     }
-                    //TODO Revisar max codigo
-                    // Verificar que el código no se duplique en los registros
-                    //codigo = codigo + 1;
-                    //console.log('codigo_ver', codigo);
-                    //const VERIFICAR_CODIGO = await pool.query('SELECT * FROM empleados WHERE codigo = $1', [codigo]);
-                    //if (VERIFICAR_CODIGO.rowCount === 0) {
-                    //contarCodigo = contarCodigo + 1;
-                    //}
                     listEmpleadosManual.push(data);
                 }
                 else {
@@ -1438,9 +1432,11 @@ class EmpleadoControlador {
                         data.observacion = 'Rol ' + data.observacion;
                     }
                     // Verificar si la variable tiene el formato de fecha correcto con moment
-                    if ((0, moment_1.default)(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) { }
-                    else {
-                        data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                    if (data.fec_nacimiento != 'No registrado') {
+                        if ((0, moment_1.default)(fec_nacimiento, 'YYYY-MM-DD', true).isValid()) { }
+                        else {
+                            data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                        }
                     }
                     //Valida si los datos de la columna telefono son numeros.
                     if (telefono != undefined) {

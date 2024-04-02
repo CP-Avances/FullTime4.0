@@ -1,6 +1,12 @@
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import pool from '../../../database';
+import path from 'path';
+import fs from 'fs';
+import moment from 'moment';
+import { ObtenerRutaLeerPlantillas } from '../../../libs/accesoCarpetas';
+
+import excel from 'xlsx';
 
 class EmpleadoCargosControlador {
 
@@ -253,6 +259,270 @@ class EmpleadoCargosControlador {
       return res.status(404).jsonp({ message: 'error' })
     }
   }
+
+
+
+  // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+  public async RevisarDatos(req: Request, res: Response): Promise<any> {
+    const documento = req.file?.originalname;
+    let separador = path.sep;
+    let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+
+    const workbook = excel.readFile(ruta);
+    const sheet_name_list = workbook.SheetNames;
+    const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+
+    let data: any = {
+        fila: '',
+        cedula: '',
+        departamento: '',
+        fecha_inicio: '',
+        fecha_final: '',
+        sucursal: '',
+        sueldo: '',
+        cargo: '',
+        hora_traba: '',
+        jefe: '',
+        observacion: ''
+    };
+
+    var listCargos: any = [];
+    var duplicados: any = [];
+    var mensaje: string = 'correcto';
+
+    
+    // LECTURA DE LOS DATOS DE LA PLANTILLA
+    plantilla.forEach(async (dato: any, indice: any, array: any) => {
+        var {item, cedula, departamento, fecha_inicio, fecha_final, sucursal, sueldo,
+          cargo, hora_trabaja, jefe} = dato;
+        
+        console.log('dato: ',dato)
+
+        //Verificar que el registo no tenga datos vacios
+        if ((item != undefined && item != '') && (cedula != undefined) && (departamento != undefined) &&
+        (fecha_inicio != undefined) && (fecha_final != undefined) && (sucursal != undefined) &&
+        (sueldo != undefined) && (cargo != undefined) && (hora_trabaja != undefined) && 
+        (jefe != undefined)){
+            data.fila = item;
+            data.cedula = cedula; data.departamento = departamento;
+            data.fecha_inicio = fecha_inicio; data.fecha_final = fecha_final; 
+            data.sucursal = sucursal; data.sueldo = sueldo; 
+            data.cargo = cargo; data.hora_traba = hora_trabaja; 
+            data.jefe = jefe;
+
+            data.observacion = 'no registrado';
+
+            //Valida si los datos de la columna cedula son numeros.
+            const rege = /^[0-9]+$/;
+            if (rege.test(data.cedula)) {
+              if (data.cedula.toString().length != 10) {
+                data.observacion = 'La cédula ingresada no es válida';
+              }else{
+                // Verificar si la variable tiene el formato de fecha correcto con moment
+                if (moment(fecha_inicio, 'YYYY-MM-DD', true).isValid()) { } else {
+                    data.observacion = 'Formato de fecha ingreso incorrecto (YYYY-MM-DD)';
+                }
+
+                // Verificar si la variable tiene el formato de fecha correcto con moment
+                if (moment(fecha_final, 'YYYY-MM-DD', true).isValid()) { } else {
+                    data.observacion = 'Formato de fecha salida incorrecto (YYYY-MM-DD)';
+                }
+              }
+            } else {
+              data.observacion = 'La cédula ingresada no es válida';
+            } 
+
+            listCargos.push(data);
+
+        }else{
+          data.fila = item;
+          data.cedula = cedula; data.departamento = departamento;
+          data.fecha_inicio = fecha_inicio; data.fecha_final = fecha_final; 
+          data.sucursal = sucursal; data.sueldo = sueldo; 
+          data.cargo = cargo; data.hora_traba = hora_trabaja; 
+          data.jefe = jefe;
+          data.observacion = 'no registrado';
+
+            if(data.fila == '' || data.fila == undefined) {
+                data.fila = 'error';
+                mensaje = 'error'
+            }
+            if (departamento == undefined) {
+                data.departamento = 'No registrado';
+                data.observacion = 'Departamento, ' + data.observacion;
+            }
+            if (fecha_inicio == undefined) {
+                data.fecha_inicio = 'No registrado';
+                data.observacion = 'Fecha inicio, ' + data.observacion;
+            }
+            if (fecha_final == undefined) {
+                data.fecha_final = 'No registrado';
+                data.observacion = 'Fecha final, ' + data.observacion;
+            }
+              if (sucursal == undefined) {
+                data.sucursal = 'No registrado';
+                data.observacion = 'Sucursal, ' + data.observacion;
+              }
+              if (sueldo == undefined) {
+                data.sueldo = 'No registrado';
+                data.observacion = 'Sueldo, ' + data.observacion;
+              }
+              if (cargo == undefined) {
+                data.cargo = 'No registrado';
+                data.observacion = 'Cargo, ' + data.observacion;
+              }
+              if (hora_trabaja == undefined) {
+                data.hora_trabaja = 'No registrado';
+                data.observacion = 'Hora trabaja, ' + data.observacion;
+              }
+              if (jefe == undefined) {
+                data.jefe = 'No registrado';
+                data.observacion = 'Jefe, ' + data.observacion;
+              }
+
+            // Verificar si la variable tiene el formato de fecha correcto con moment
+            if(data.fecha_ingreso != 'No registrado'){
+                if (moment(fecha_inicio, 'YYYY-MM-DD', true).isValid()) { } else {
+                    data.observacion = 'Formato de fecha inicio incorrecto (YYYY-MM-DD)';
+                }
+            }
+
+            // Verificar si la variable tiene el formato de fecha correcto con moment
+            if(data.fecha_salida != 'No registrado'){
+                if (moment(fecha_final, 'YYYY-MM-DD', true).isValid()) { } else {
+                    data.observacion = 'Formato de fecha final incorrecto (YYYY-MM-DD)';
+                }
+            }
+
+
+              if (cedula == undefined) {
+                data.cedula = 'No registrado'
+                data.observacion = 'Cédula, ' + data.observacion;
+              } else {
+                //Valida si los datos de la columna cedula son numeros.
+                const rege = /^[0-9]+$/;
+                if (rege.test(data.cedula)) {
+                  if (data.cedula.toString().length != 10) {
+                    data.observacion = 'La cédula ingresada no es válida';
+                  }
+                } else {
+                  data.observacion = 'La cédula ingresada no es válida';
+                } 
+      
+              }
+      
+              listCargos.push(data);
+
+
+        }
+  
+        data = {}
+
+    });
+
+    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+    fs.access(ruta, fs.constants.F_OK, (err) => {
+        if (err) {
+        } else {
+            // ELIMINAR DEL SERVIDOR
+            fs.unlinkSync(ruta);
+        }
+    });
+
+    listCargos.forEach(async (valor: any) => {
+      if(valor.cedula != 'No registrado' &&  valor.pais != 'No registrado' && valor.pais != ''){
+        if(valor.observacion == 'no registrado'){
+          var VERIFICAR_CEDULA = await pool.query('SELECT * FROM empleados WHERE cedula = $1', [valor.cedula]);
+          if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
+            var VERIFICAR_DEPARTAMENTO = await pool.query('SELECT  * FROM cg_departamentos WHERE UPPER(nombre) = $1', [valor.departamento.toUpperCase()])
+            if(VERIFICAR_DEPARTAMENTO.rows[0] != undefined && VERIFICAR_DEPARTAMENTO.rows[0] != ''){
+              var VERIFICAR_SUCURSALES = await pool.query('SELECT * FROM sucursales WHERE UPPER(nombre) = $1', [valor.sucursal.toUpperCase()])
+              if(VERIFICAR_SUCURSALES.rows[0] != undefined && VERIFICAR_SUCURSALES.rows[0] != ''){
+                var VERFICAR_CARGO = await pool.query('SLECT * FROM tipo_cargo WHERE UPPER(cargo) = $1', [valor.cargo.toUpperCase()])
+                if(VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != ''){
+                   // Discriminación de elementos iguales
+                   if(duplicados.find((p: any)=> p.cedula === valor.cedula) == undefined)
+                   {
+                       duplicados.push(valor);
+                   }else{
+                       valor.observacion = '1';
+                   }
+                }else{
+                  valor.observacion = 'Cargo no existe en el sistema' 
+                }
+              }else{
+                valor.observacion = 'Sucursal no existe en el sistema' 
+              }
+            }else{
+              valor.observacion = 'Departamento no existe en el sistema' 
+            }
+          }else{
+              valor.observacion = 'Cédula no existe en el sistema'  
+          }
+        }
+        
+      } 
+
+    });
+
+    setTimeout(() => {
+
+      listCargos.sort((a: any, b: any) => {
+            // Compara los números de los objetos
+            if (a.fila < b.fila) {
+                return -1;
+            }
+            if (a.fila > b.fila) {
+                return 1;
+            }
+            return 0; // Son iguales
+        });
+
+        var filaDuplicada: number = 0;
+
+        listCargos.forEach((item:any) => {
+            if(item.observacion == '1') {
+                item.observacion = 'Registro duplicado - cédula'
+            }
+
+            if (item.observacion != undefined) {
+                let arrayObservacion = item.observacion.split(" ");
+                if (arrayObservacion[0] == 'no') {
+                  item.observacion = 'ok'
+                }
+            }
+
+            //Valida si los datos de la columna N son numeros.
+            if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+            //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                if(item.fila == filaDuplicada){
+                    mensaje = 'error';
+                }
+            }else{
+                return mensaje = 'error';
+            } 
+
+            filaDuplicada = item.fila;
+
+        });
+
+        if(mensaje == 'error'){
+          listCargos = undefined;
+        }
+
+        console.log('listContratos: ',listCargos);
+
+        return res.jsonp({ message: mensaje, data: listCargos});
+  
+    }, 1500)
+    
+}
+
+public async CargarPlantilla_contrato(req: Request, res: Response): Promise<void> {
+    const plantilla = req.body;
+    console.log('datos contrato: ', plantilla);
+
+}
 
 }
 
