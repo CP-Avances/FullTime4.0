@@ -124,7 +124,7 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     for (let i = 0; i < this.archivo.length; i++) {
       formData.append("uploads", this.archivo[i], this.archivo[i].name);
     }
-    this.restP.VerificarDatosPlanificacionHoraria(formData, this.usuarios).subscribe( (res: any) => {
+    this.restP.VerificarDatosPlanificacionHoraria(formData).subscribe( (res: any) => {
       console.log(res);
       this.spinnerService.hide();
       this.toastr.success('Plantilla verificada correctamente', 'Plantilla verificada', {

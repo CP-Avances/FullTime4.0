@@ -12,8 +12,7 @@ export class PlanificacionHorariaService {
   ) { }
 
   // VERIFICAR DATOS DE LA PLANIFICACION HORARIA
-  VerificarDatosPlanificacionHoraria(formData: any, usuarios: any) {
-    formData.append('usuarios', JSON.stringify(usuarios));
+  VerificarDatosPlanificacionHoraria(formData: any) {
     return this.http.post<any>(`${environment.url}/planificacionHoraria/verificarDatos`, formData);
   }
 

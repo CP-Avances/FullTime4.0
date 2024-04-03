@@ -3,14 +3,14 @@ import path from 'path';
 import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import excel from 'xlsx';
 import pool from '../../database';
+import moment from "moment";
 
 class PlanificacionHorariaControlador {
 
     //METODO PARA VERIFICAR LOS DATOS DE LA PLANTILLA DE PLANIFICACION HORARIA
     public async VerificarDatosPlanificacionHoraria(req: Request, res: Response) {
         const documento = req.file?.originalname;
-        const usuarios = JSON.parse(req.body.usuarios);
-        console.log(usuarios);
+
         let separador = path.sep;
         let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
         const workbook = excel.readFile(ruta);
@@ -21,13 +21,12 @@ class PlanificacionHorariaControlador {
             return Object.keys(data).length > 1;
         });
 
-        console.log(plantillaPlanificacionHorariaFiltrada);
         let plantillaPlanificacionHorariaEstructurada = plantillaPlanificacionHorariaFiltrada.map((data: any) => {
-            let nuevoObjeto: { USUARIO: string, DIAS: { [key: string]: { HORARIOS: { valor: string, OBSERVACION?: string }[] } } } = { USUARIO: data.USUARIO, DIAS: {} };
+            let nuevoObjeto: { usuario: string, dias: { [key: string]: { horarios: { valor: string, observacion?: string }[] } } } = { usuario: data.USUARIO, dias: {} };
         
             for (let propiedad in data) {
-                if (propiedad !== 'USUARIO') {
-                    nuevoObjeto.DIAS[propiedad] = { HORARIOS: data[propiedad].split(',').map((horario: string) => ({ CODIGO: horario })) };
+                if (propiedad !== 'usuario') {
+                    nuevoObjeto.dias[propiedad] = { horarios: data[propiedad].split(',').map((horario: string) => ({ codigo: horario })) };
                 }
             }
         
@@ -36,28 +35,38 @@ class PlanificacionHorariaControlador {
         
 
         for (const [index, data] of plantillaPlanificacionHorariaEstructurada.entries() ) {
-            let { USUARIO } = data;
+            let { usuario } = data;
 
-            if (!USUARIO) {
-                data.OBSERVACION = 'Datos no registrados: USUARIO';
+            if (!usuario) {
+                data.observacion = 'Datos no registrados: USUARIO';
                 continue;
             }
 
             // VERIFICAR USUARIO DUPLICADO
-            if (plantillaPlanificacionHorariaFiltrada.filter((data: any) => data.USUARIO === USUARIO).length > 1) {
-                data.OBSERVACION = 'Registro duplicado dentro de la plantilla';
+            if (plantillaPlanificacionHorariaEstructurada.filter((d: any) => d.usuario === usuario).length > 1) {
+                data.observacion = 'Usuario duplicado';
                 continue;
             }
 
             // VERIFICAR EXISTENCIA DE USUARIO
-            if (!VerificarUsuario(USUARIO, usuarios)) {
-                data.OBSERVACION = 'Usuario no valido';
+            const usuarioVerificado = await VerificarUsuario(usuario);
+            if (!usuarioVerificado) {
+                data.observacion = 'Usuario no valido';
                 continue;
+            } else {
+                data.codigo_usuario = usuarioVerificado.codigo;
             }
 
 
             // VERIFICAR HORARIOS
-            data.DIAS = await VerificarHorarios(data.DIAS);
+            data.dias = await VerificarHorarios(data.dias);
+
+            // VERIFICAR SOBREPOSICION DE HORARIOS
+           await VerificarSobreposicionHorariosPlantilla(data.dias);
+
+           // CONSULTAR PLANIFICACION HORARIA DEL USUARIO EN LA BASE DE DATOS
+           
+
             
         }
 
@@ -73,39 +82,52 @@ class PlanificacionHorariaControlador {
 
 }
 
-// FUNCION PARA VERIFICAR EXISTENCIA DE USUARIO EN LA LISTA DE USUARIOS
-function VerificarUsuario(cedula: string, usuarios: any): boolean{
- let usuarioEncontrado = usuarios.find((usuario: any) => usuario.cedula === cedula);
+// FUNCION PARA VERIFICAR EXISTENCIA DE USUARIO EN LA BASE DE DATOS
+async function VerificarUsuario(cedula: string): Promise<any>{
+    const usuario = await pool.query('SELECT * FROM empleados WHERE LOWER(cedula) = $1',
+     [cedula.toLowerCase()]);
 
- return usuarioEncontrado && usuarioEncontrado.id_cargo ? true : false;
+    return usuario.rowCount > 0 ? usuario.rows[0] : null;
+    
 }
 
 async function VerificarHorarios(dias: any) {
-    console.log("DIAS",dias);
-    for (const [dia, { HORARIOS }] of Object.entries(dias as { [key: string]: { HORARIOS: any[] } })) {
+    for (const [dia, { horarios }] of Object.entries(dias as { [key: string]: { horarios: any[] } })) {
         let horariosValidos: any[] = [];
         let horariosNoValidos: string[] = [];
-        console.log("HORARIOS",HORARIOS);
-        for (let i = 0; i < HORARIOS.length; i++) {
-            const HORARIO = HORARIOS[i];
+        
+        // VERIFICAR HORARIO DUPLICADO SI EXISTE PONER EN HORARIO OBSERVACION 'HORARIO DUPLICADO'
+        const horariosDuplicados = horarios.filter((horario, index) => horarios.findIndex((h) => h.CODIGO === horario.CODIGO) !== index);
+        if (horariosDuplicados.length > 0) {
+            horariosDuplicados.forEach((horario) => horario.observacion = 'Horario duplicado');
+            dias[dia].observacion = `Horarios duplicados: ${horariosDuplicados.map(horario => horario.CODIGO).join(', ')}`;
+            continue;
+        }
+
+        for (let i = 0; i < horarios.length; i++) {
+            const HORARIO = horarios[i];
             const horarioVerificado = await VerificarHorario(HORARIO.CODIGO); 
             if (!horarioVerificado[0]) {
                 horariosNoValidos.push(HORARIO);
-                HORARIO.OBSERVACION = 'Horario no valido';
+                HORARIO.observacion = 'Horario no valido';
         
                 // AÑADIR OBSERVACION A HORARIO
-                dias[dia].HORARIOS[i].OBSERVACION = 'Horario no valido';
+                dias[dia].horarios[i].observacion = 'Horario no valido';
                 
             } else {
-                dias[dia].HORARIOS[i].OBSERVACION = 'OK';
-                horariosValidos.push(horarioVerificado[1]);
+                // ANADIR PROPIEDADES DE HORARIOVERIFICADO A DIAS[DIA].HORARIOS[I]
+                dias[dia].horarios[i].ID = horarioVerificado[1].id;
+                dias[dia].horarios[i].NOMBRE = horarioVerificado[1].nombre;
+                dias[dia].horarios[i].DIA = dia;
+                dias[dia].horarios[i].HORA_TRABAJA = horarioVerificado[1].hora_trabajo;
+                dias[dia].horarios[i].TIPO = horarioVerificado[1].default_;
+                dias[dia].horarios[i].observacion = 'OK';
+                
             }
         }
-        dias[dia].OBSERVACION = horariosNoValidos.length > 0 ? `Horarios no validos: ${horariosNoValidos.join(', ')}` : 'OK';
+        
+        dias[dia].observacion = horariosNoValidos.length > 0 ? `Horarios no validos: ${horariosNoValidos.join(', ')}` : 'OK';
 
-        if (horariosValidos.length > 0) {
-            dias[dia].OBSERVACION = await VerificarSobreposicionHorariosPlantilla(horariosValidos) ? 'Rango de horario similares' : 'OK';
-        }
     }
     return dias;
 }
@@ -126,53 +148,68 @@ async function VerificarHorario(CODIGO: any): Promise<[boolean,any]>{
     return [existe, null];
 }
 
-async function VerificarSobreposicionHorariosPlantilla(horarios: any): Promise<boolean>{
-    const detallesHorarios = await pool.query(`SELECT * FROM deta_horarios WHERE id_horario IN (${horarios.map((horario: any) => horario.id).join(',')})`);
-    // AÑADIR A LOS HORARIOS LOS DETALLES DE HORARIOS
-    horarios.forEach((horario: any) => {
-        horario.detalles = detallesHorarios.rows.filter((detalle: any) => detalle.id_horario === horario.id);
-        horario.entrada = horario.detalles.find((detalle: any) => detalle.tipo_accion === 'E');
-        horario.salida = horario.detalles.find((detalle: any) => detalle.tipo_accion === 'S');
-    
-        // Convertir las horas a minutos desde la medianoche
-        horario.entrada.minutos = ConvertirHoraAMinutos(horario.entrada.hora);
-        horario.salida.minutos = ConvertirHoraAMinutos(horario.salida.hora);
-    });
-    
-    console.log("horarios",horarios);
-    
-    // VERIFICAR SOBREPOSICIÓN DE HORARIOS
-    for (let i = 0; i < horarios.length; i++) {
-        for (let j = i + 1; j < horarios.length; j++) {
-            const horario1 = horarios[i];
-            const horario2 = horarios[j];
-    
-            // Si la salida del horario1 es al día siguiente, consideramos que la salida es mayor que la entrada
-            // const salida1 = horario1.salida.segundo_dia ? horario1.salida.minutos + 24 * 60 : horario1.salida.minutos;
-            // const salida2 = horario2.salida.segundo_dia ? horario2.salida.minutos + 24 * 60 : horario2.salida.minutos;
+async function VerificarSobreposicionHorariosPlantilla(dias: any): Promise<boolean>{
 
-            // verificar salida al tercer y segundo dia
-            const salida1 = horario1.salida.tercer_dia ? horario1.salida.minutos + 48 * 60 : (horario1.salida.segundo_dia ? horario1.salida.minutos + 24 * 60 : horario1.salida.minutos);
-            const salida2 = horario2.salida.tercer_dia ? horario2.salida.minutos + 48 * 60 : (horario2.salida.segundo_dia ? horario2.salida.minutos + 24 * 60 : horario2.salida.minutos);
-    
-            // Verificar si los horarios se Sobreponen
-            if ((horario2.entrada.minutos >= horario1.entrada.minutos && horario2.entrada.minutos <= salida1)  ||
-                (salida2 <= salida1 && salida2 >= horario1.entrada.minutos)
-                ) {
-                return true; // Existe una sobreposición
+    let horarios: any[] = [];
+    let rangosSimilares: any = {};
+
+    // OBTENER TODOS LOS HORARIOS DE LA PLANIFICACION HORARIA DE LA PLANTILLA QUE EN dias[dia].OBSERVACION = 'OK'
+    for (const [dia, { horarios }] of Object.entries(dias as { [key: string]: { horarios: any[] } })) {
+        if (dias[dia].observacion === 'OK') {
+            for (let i = 0; i < horarios.length; i++) {
+                const HORARIO = horarios[i];
+                if (HORARIO.observacion === 'OK') {
+                    console.log("HORARIO",HORARIO);
+                    const detalles = await pool.query('SELECT * FROM deta_horarios WHERE id_horario = $1', [HORARIO.ID]);
+
+                    HORARIO.entrada = detalles.rows.find((detalle: any) => detalle.tipo_accion === 'E');
+                    HORARIO.salida = detalles.rows.find((detalle: any) => detalle.tipo_accion === 'S');
+
+                    let [diaSemana, fecha] = HORARIO.DIA.split(', ');
+                    let [dia, mes, ano] = fecha.split('/');
+                    let fechaFormateada = `${ano}-${mes}-${dia}`;
+                    let fechaEntrada = moment(`${fechaFormateada} ${HORARIO.entrada.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
+                    HORARIO.entrada.fecha = fechaEntrada;
+                    let fechaSalida = moment(`${fechaFormateada} ${HORARIO.salida.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
+                    if (HORARIO.salida.segundo_dia) {
+                        fechaSalida = moment(fechaSalida).add(1, 'days').toDate();
+                    } else if (HORARIO.salida.tercer_dia) {
+                        fechaSalida = moment(fechaSalida).add(2, 'days').toDate();
+                    }
+                    HORARIO.salida.fecha = fechaSalida;
+                    
+                    horarios.push(HORARIO);
+                }
             }
         }
     }
-    
-    return false; // No existe ninguna sobreposición
-}
 
-// Función para convertir una hora en formato "hh:mm:ss" a minutos desde la medianoche
-function ConvertirHoraAMinutos(hora: string): number {
-    const partes = hora.split(':');
-    const horas = parseInt(partes[0]);
-    const minutos = parseInt(partes[1]);
-    return horas * 60 + minutos;
+    
+    if (horarios.length > 0) {
+        // VERIFICAR SOBREPOSICIÓN DE HORARIOS
+        for (let i = 0; i < horarios.length; i++) {
+            for (let j = i + 1; j < horarios.length; j++) {
+                const horario1 = horarios[i];
+                const horario2 = horarios[j];
+        
+                // VERIFICAR SI LOS HORARIOS SE SOBREPONEN
+                if ((horario2.entrada.fecha >= horario1.entrada.fecha && horario2.entrada.fecha <= horario1.salida.fecha) ||
+                    (horario2.salida.fecha <= horario1.salida.fecha && horario2.salida.fecha >= horario1.entrada.fecha)) {
+
+                        horario1.observacion = `Se sobrepone con el horario ${horario2.CODIGO} dia ${horario2.DIA}`;
+                        horario2.observacion = `Se sobrepone con el horario ${horario1.CODIGO} dia ${horario1.CODIGO}`; // Existe una sobreposición
+                        rangosSimilares[horario1.DIA] = rangosSimilares[horario1.DIA] ? [...rangosSimilares[horario1.DIA], horario1.CODIGO, horario2.CODIGO] : [horario1.CODIGO, horario2.CODIGO];
+                    }
+            }
+        }
+
+        // ACTUALIZAR DIAS[DIA].OBSERVACION
+        for (const dia in rangosSimilares) {
+            dias[dia].observacion = `Rangos similares: ${[...new Set(rangosSimilares[dia])].join(', ')}`;
+        }
+    }
+    
+    return dias;
 }
 
 export const PLANIFICACION_HORARIA_CONTROLADOR = new PlanificacionHorariaControlador();
