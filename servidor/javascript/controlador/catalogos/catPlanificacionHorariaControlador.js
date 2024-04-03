@@ -29,6 +29,26 @@ class PlanificacionHorariaControlador {
             const workbook = xlsx_1.default.readFile(ruta);
             const sheet_name_list = workbook.SheetNames;
             const plantillaPlanificacionHoraria = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+            const plantillaPlanificacionHorariaHeaders = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]], { header: 1 });
+            // Acceder a la segunda columna de la primera fila (los índices comienzan en 0)
+            const segundaColumna = plantillaPlanificacionHorariaHeaders[0][1];
+            let [diaSemana, fecha] = segundaColumna.split(', ');
+            let [dia, mes, ano] = fecha.split('/');
+            let fechaFormateada = `${dia}/${mes}/${ano}`;
+            let fechaInicial;
+            let fechaFinal;
+            try {
+                let fechaEntrada = (0, moment_1.default)(`${fechaFormateada}`, 'DD/MM/YYYY').toDate();
+                // RESTAR 1 DIA A LA FECHA DE ENTRADA
+                fechaInicial = (0, moment_1.default)(fechaEntrada).subtract(1, 'days').format('YYYY-MM-DD');
+                // SUMAR 1 MES A LA FECHA DE ENTRADA
+                fechaFinal = (0, moment_1.default)(fechaEntrada).add(1, 'months').format('YYYY-MM-DD');
+                console.log("FECHAS", fechaInicial, fechaFinal);
+            }
+            catch (error) {
+                res.json({ error: 'Fecha no valida' });
+                return;
+            }
             const plantillaPlanificacionHorariaFiltrada = plantillaPlanificacionHoraria.filter((data) => {
                 return Object.keys(data).length > 1;
             });
@@ -63,9 +83,9 @@ class PlanificacionHorariaControlador {
                 }
                 // VERIFICAR HORARIOS
                 data.dias = yield VerificarHorarios(data.dias);
-                // VERIFICAR SOBREPOSICION DE HORARIOS
+                // VERIFICAR SOBREPOSICION DE HORARIOS DE LA PLANTILLA
                 yield VerificarSobreposicionHorariosPlantilla(data.dias);
-                // CONSULTAR PLANIFICACION HORARIA DEL USUARIO EN LA BASE DE DATOS
+                // VERIFICAR SOBREPOSICION DE HORARIOS DE LA PLANTILLA CON LA BASE DE DATOS
             }
             res.json({ plantillaPlanificacionHoraria: plantillaPlanificacionHorariaEstructurada });
         });
@@ -88,28 +108,28 @@ function VerificarHorarios(dias) {
             let horariosValidos = [];
             let horariosNoValidos = [];
             // VERIFICAR HORARIO DUPLICADO SI EXISTE PONER EN HORARIO OBSERVACION 'HORARIO DUPLICADO'
-            const horariosDuplicados = horarios.filter((horario, index) => horarios.findIndex((h) => h.CODIGO === horario.CODIGO) !== index);
+            const horariosDuplicados = horarios.filter((horario, index) => horarios.findIndex((h) => h.codigo === horario.codigo) !== index);
             if (horariosDuplicados.length > 0) {
                 horariosDuplicados.forEach((horario) => horario.observacion = 'Horario duplicado');
-                dias[dia].observacion = `Horarios duplicados: ${horariosDuplicados.map(horario => horario.CODIGO).join(', ')}`;
+                dias[dia].observacion = `Horarios duplicados: ${horariosDuplicados.map(horario => horario.codigo).join(', ')}`;
                 continue;
             }
             for (let i = 0; i < horarios.length; i++) {
-                const HORARIO = horarios[i];
-                const horarioVerificado = yield VerificarHorario(HORARIO.CODIGO);
+                const horario = horarios[i];
+                const horarioVerificado = yield VerificarHorario(horario.codigo);
                 if (!horarioVerificado[0]) {
-                    horariosNoValidos.push(HORARIO);
-                    HORARIO.observacion = 'Horario no valido';
+                    horariosNoValidos.push(horario);
+                    horario.observacion = 'Horario no valido';
                     // AÑADIR OBSERVACION A HORARIO
                     dias[dia].horarios[i].observacion = 'Horario no valido';
                 }
                 else {
                     // ANADIR PROPIEDADES DE HORARIOVERIFICADO A DIAS[DIA].HORARIOS[I]
-                    dias[dia].horarios[i].ID = horarioVerificado[1].id;
-                    dias[dia].horarios[i].NOMBRE = horarioVerificado[1].nombre;
-                    dias[dia].horarios[i].DIA = dia;
-                    dias[dia].horarios[i].HORA_TRABAJA = horarioVerificado[1].hora_trabajo;
-                    dias[dia].horarios[i].TIPO = horarioVerificado[1].default_;
+                    dias[dia].horarios[i].id = horarioVerificado[1].id;
+                    dias[dia].horarios[i].nombre = horarioVerificado[1].nombre;
+                    dias[dia].horarios[i].dia = dia;
+                    dias[dia].horarios[i].hora_trabaja = horarioVerificado[1].hora_trabajo;
+                    dias[dia].horarios[i].tipo = horarioVerificado[1].default_;
                     dias[dia].horarios[i].observacion = 'OK';
                 }
             }
@@ -119,9 +139,9 @@ function VerificarHorarios(dias) {
     });
 }
 // FUNCION PARA VERIFICAR EXISTENCIA DE HORARIO EN LA BASE DE DATOS
-function VerificarHorario(CODIGO) {
+function VerificarHorario(codigo) {
     return __awaiter(this, void 0, void 0, function* () {
-        const horario = yield database_1.default.query('SELECT * FROM cg_horarios WHERE LOWER(codigo) = $1', [CODIGO.toLowerCase()]);
+        const horario = yield database_1.default.query('SELECT * FROM cg_horarios WHERE LOWER(codigo) = $1', [codigo.toLowerCase()]);
         // SI EXISTE HORARIO VERIFICAR SI horario.hora_trabajo este en formato hh:mm:ss
         const existe = horario.rowCount > 0;
         if (existe) {
@@ -133,48 +153,48 @@ function VerificarHorario(CODIGO) {
 }
 function VerificarSobreposicionHorariosPlantilla(dias) {
     return __awaiter(this, void 0, void 0, function* () {
-        let horarios = [];
+        let horariosModificados = [];
         let rangosSimilares = {};
         // OBTENER TODOS LOS HORARIOS DE LA PLANIFICACION HORARIA DE LA PLANTILLA QUE EN dias[dia].OBSERVACION = 'OK'
         for (const [dia, { horarios }] of Object.entries(dias)) {
             if (dias[dia].observacion === 'OK') {
                 for (let i = 0; i < horarios.length; i++) {
-                    const HORARIO = horarios[i];
-                    if (HORARIO.observacion === 'OK') {
-                        console.log("HORARIO", HORARIO);
-                        const detalles = yield database_1.default.query('SELECT * FROM deta_horarios WHERE id_horario = $1', [HORARIO.ID]);
-                        HORARIO.entrada = detalles.rows.find((detalle) => detalle.tipo_accion === 'E');
-                        HORARIO.salida = detalles.rows.find((detalle) => detalle.tipo_accion === 'S');
-                        let [diaSemana, fecha] = HORARIO.DIA.split(', ');
+                    const horario = horarios[i];
+                    if (horario.observacion === 'OK') {
+                        console.log("HORARIO", horario);
+                        const detalles = yield database_1.default.query('SELECT * FROM deta_horarios WHERE id_horario = $1', [horario.id]);
+                        horario.entrada = detalles.rows.find((detalle) => detalle.tipo_accion === 'E');
+                        horario.salida = detalles.rows.find((detalle) => detalle.tipo_accion === 'S');
+                        let [diaSemana, fecha] = horario.dia.split(', ');
                         let [dia, mes, ano] = fecha.split('/');
                         let fechaFormateada = `${ano}-${mes}-${dia}`;
-                        let fechaEntrada = (0, moment_1.default)(`${fechaFormateada} ${HORARIO.entrada.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
-                        HORARIO.entrada.fecha = fechaEntrada;
-                        let fechaSalida = (0, moment_1.default)(`${fechaFormateada} ${HORARIO.salida.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
-                        if (HORARIO.salida.segundo_dia) {
+                        let fechaEntrada = (0, moment_1.default)(`${fechaFormateada} ${horario.entrada.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
+                        horario.entrada.fecha = fechaEntrada;
+                        let fechaSalida = (0, moment_1.default)(`${fechaFormateada} ${horario.salida.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
+                        if (horario.salida.segundo_dia) {
                             fechaSalida = (0, moment_1.default)(fechaSalida).add(1, 'days').toDate();
                         }
-                        else if (HORARIO.salida.tercer_dia) {
+                        else if (horario.salida.tercer_dia) {
                             fechaSalida = (0, moment_1.default)(fechaSalida).add(2, 'days').toDate();
                         }
-                        HORARIO.salida.fecha = fechaSalida;
-                        horarios.push(HORARIO);
+                        horario.salida.fecha = fechaSalida;
+                        horariosModificados.push(horario);
                     }
                 }
             }
         }
-        if (horarios.length > 0) {
+        if (horariosModificados.length > 0) {
             // VERIFICAR SOBREPOSICIÓN DE HORARIOS
-            for (let i = 0; i < horarios.length; i++) {
-                for (let j = i + 1; j < horarios.length; j++) {
-                    const horario1 = horarios[i];
-                    const horario2 = horarios[j];
+            for (let i = 0; i < horariosModificados.length; i++) {
+                for (let j = i + 1; j < horariosModificados.length; j++) {
+                    const horario1 = horariosModificados[i];
+                    const horario2 = horariosModificados[j];
                     // VERIFICAR SI LOS HORARIOS SE SOBREPONEN
                     if ((horario2.entrada.fecha >= horario1.entrada.fecha && horario2.entrada.fecha <= horario1.salida.fecha) ||
                         (horario2.salida.fecha <= horario1.salida.fecha && horario2.salida.fecha >= horario1.entrada.fecha)) {
-                        horario1.observacion = `Se sobrepone con el horario ${horario2.CODIGO} dia ${horario2.DIA}`;
-                        horario2.observacion = `Se sobrepone con el horario ${horario1.CODIGO} dia ${horario1.CODIGO}`; // Existe una sobreposición
-                        rangosSimilares[horario1.DIA] = rangosSimilares[horario1.DIA] ? [...rangosSimilares[horario1.DIA], horario1.CODIGO, horario2.CODIGO] : [horario1.CODIGO, horario2.CODIGO];
+                        horario1.observacion = `Se sobrepone con el horario ${horario2.codigo} dia ${horario2.dia}`;
+                        horario2.observacion = `Se sobrepone con el horario ${horario1.codigo} dia ${horario1.codigo}`; // Existe una sobreposición
+                        rangosSimilares[horario1.dia] = rangosSimilares[horario1.dias] ? [...rangosSimilares[horario1.dia], horario1.codigo, horario2.codigo] : [horario1.codigo, horario2.codigo];
                     }
                 }
             }
@@ -184,6 +204,40 @@ function VerificarSobreposicionHorariosPlantilla(dias) {
             }
         }
         return dias;
+    });
+}
+// METODO PARA VERIFICAR SOBREPOSICION DE HORARIOS DE LA PLANIFICACION HORARIA DE LA PLANTILLA CON LA BASE DE DATOS
+function VerificarSobreposicionHorariosBaseDatos(dias, planificacion) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return false;
+    });
+}
+// METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO   --**VERIFICADO
+function ListarPlanificacionHoraria(codigo, fecha_inicio, fecha_final) {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log("CODIGO", typeof codigo);
+        console.log("FECHA INICIO", fecha_inicio);
+        console.log("FECHA FINAL", fecha_final);
+        try {
+            const horario = yield database_1.default.query("SELECT p_g.codigo AS codigo_e, fec_horario AS fecha, " +
+                "CASE WHEN ((tipo_dia = 'L' OR tipo_dia = 'FD') AND (NOT estado_origen = 'HL' AND NOT estado_origen = 'HFD')) THEN tipo_dia ELSE horario.codigo END AS codigo_dia " +
+                "FROM plan_general p_g " +
+                "INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo IN ( '" + codigo + "' ) " +
+                "INNER JOIN cg_horarios horario ON horario.id = p_g.id_horario " +
+                "WHERE fec_horario BETWEEN $1 AND $2 " +
+                "GROUP BY codigo_e, fecha, codigo_dia, p_g.id_horario " +
+                "ORDER BY p_g.codigo, fecha, p_g.id_horario ", [fecha_inicio, fecha_final]);
+            if (horario.rowCount > 0) {
+                return horario.rows;
+            }
+            else {
+                return null;
+            }
+        }
+        catch (error) {
+            console.log("ERROR", error);
+            return null;
+        }
     });
 }
 exports.PLANIFICACION_HORARIA_CONTROLADOR = new PlanificacionHorariaControlador();

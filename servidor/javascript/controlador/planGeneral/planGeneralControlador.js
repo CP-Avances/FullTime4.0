@@ -149,6 +149,7 @@ class PlanGeneralControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { fecha_inicio, fecha_final, codigo } = req.body;
+                console.log('ver datos ', fecha_inicio, ' ', fecha_final, ' ', codigo);
                 const HORARIO = yield database_1.default.query("SELECT codigo_e, nombre_e, anio, mes, " +
                     "CASE WHEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') ELSE '-' END AS dia1, " +
                     "CASE WHEN STRING_AGG(CASE WHEN dia = 2 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 2 THEN codigo_dia end,', ') ELSE '-' END AS dia2, " +

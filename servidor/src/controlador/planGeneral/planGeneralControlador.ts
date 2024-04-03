@@ -153,6 +153,7 @@ class PlanGeneralControlador {
     public async ListarPlanificacionHoraria(req: Request, res: Response) {
         try {
             const { fecha_inicio, fecha_final, codigo } = req.body;
+            console.log('ver datos ', fecha_inicio, ' ', fecha_final, ' ', codigo)
             const HORARIO = await pool.query(
                 "SELECT codigo_e, nombre_e, anio, mes, " +
                 "CASE WHEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') IS NOT NULL THEN STRING_AGG(CASE WHEN dia = 1 THEN codigo_dia end,', ') ELSE '-' END AS dia1, " +
