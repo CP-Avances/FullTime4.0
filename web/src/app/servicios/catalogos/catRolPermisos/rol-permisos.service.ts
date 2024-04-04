@@ -35,4 +35,9 @@ export class RolPermisosService {
     return this.http.post(`${environment.url}/rolPermisos/denegado`, data);
   }
 
+  // ENLISTAR LINKS
+  getMenu() {
+    return this.http.get(`${environment.url}/rolPermisos/menu`);
+  }
+
 }

@@ -73,6 +73,8 @@ import VACACIONES_REPORTES_RUTAS from './rutas/reportes/solicitudVacacionesRutas
 import PARAMETROS_RUTAS from './rutas/parametrosGenerales/parametrosRutas';
 import UBICACION_RUTAS from './rutas/empleado/empleadoUbicacion/emplUbicacionRutas';
 
+
+
 import { createServer, Server } from 'http';
 
 var io: any;
@@ -242,6 +244,7 @@ class Servidor {
         // VACUNACIÓN
         this.app.use('/vacunas', VACUNA_RUTAS)
 
+        
     }
 
     start(): void {

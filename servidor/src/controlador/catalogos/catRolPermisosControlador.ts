@@ -23,14 +23,14 @@ class RolPermisosControlador {
     const rolPermisos = await pool.query('SELECT id FROM cg_rol_permisos');
     const ultimoDato = rolPermisos.rows.length - 1;
     const idRespuesta = rolPermisos.rows[ultimoDato].id;
-    res.jsonp({ message: 'Rol permiso Guardado', id: idRespuesta});
+    res.jsonp({ message: 'Rol permiso Guardado', id: idRespuesta });
   }
 
   public async createPermisoDenegado(req: Request, res: Response): Promise<void> {
     const { id_rol, id_permiso } = req.body;
     await pool.query('INSERT INTO rol_perm_denegado ( id_rol, id_permiso ) VALUES ($1, $2)', [id_rol, id_permiso]);
     console.log(req.body);
-    res.jsonp({ message: 'Permiso denegado Guardado'});
+    res.jsonp({ message: 'Permiso denegado Guardado' });
   }
 
   public async getPermisosUsuario(req: Request, res: Response): Promise<any> {
@@ -42,6 +42,24 @@ class RolPermisosControlador {
     }
     res.status(404).jsonp({ text: 'El rol no tiene permisos' });
   }
+
+
+  //METODO PARA ENLISTAR LINKS 
+  public async ListarMenuRoles(req: Request, res: Response) {
+    const Roles = await pool.query(
+      `
+      SELECT nombre FROM opciones_menu
+      `
+    );
+    if (Roles.rowCount > 0) {
+      return res.jsonp(Roles.rows);
+    }
+    else {
+      return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+    }
+  }
+
+
 
 }
 

@@ -61,6 +61,20 @@ class RolPermisosControlador {
             res.status(404).jsonp({ text: 'El rol no tiene permisos' });
         });
     }
+    //METODO PARA ENLISTAR LINKS 
+    ListarMenuRoles(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const Roles = yield database_1.default.query(`
+      SELECT nombre FROM opciones_menu
+      `);
+            if (Roles.rowCount > 0) {
+                return res.jsonp(Roles.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            }
+        });
+    }
 }
 exports.rolPermisosControlador = new RolPermisosControlador();
 exports.default = exports.rolPermisosControlador;

@@ -15,6 +15,10 @@ class RolPermisosRutas {
         this.router.post('/', TokenValidation, rolPermisosControlador.create);
         this.router.post('/denegado/', TokenValidation, rolPermisosControlador.createPermisoDenegado);
         this.router.get('/denegado/:id', TokenValidation, rolPermisosControlador.getPermisosUsuario);
+
+        // MENU ENLISTAR
+        this.router.get('/menu', TokenValidation, rolPermisosControlador.ListarMenuRoles);
+
     }
 }
 

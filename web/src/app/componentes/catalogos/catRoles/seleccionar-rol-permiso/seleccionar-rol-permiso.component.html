@@ -29,19 +29,8 @@
                             </mat-form-field>
                         </div>
                         <div class="col-sm">
-                            <mat-form-field>
-                                <mat-label>Seleccionar Links</mat-label>
-                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                    matTooltip="Secciones del sistema a las que va a afectar la función seleccionada">
-                                    help_outline
-                                </mat-icon>
-                                <mat-select [formControl]="link" required>
-                                    <mat-option *ngFor="let l of links" [value]="l.value">
-                                        {{l.viewValue}}
-                                    </mat-option>
-                                </mat-select>
-                                <mat-error *ngIf="link.invalid">{{obtenerMensajeErrorLink()}}</mat-error>
-                            </mat-form-field>
+                           
+
                         </div>
                         <div class="col-sm">
                             <mat-form-field>
@@ -64,10 +53,10 @@
         </mat-card-content>
         <mat-card-actions>
             <div class="container" style="text-align: center;">
-                <button id="btn-raised"  class="btn btn-sm" [routerLink]="['/roles']">Atrás</button>
-                <button id="btn-raised"  class="btn btn-sm" [disabled]="!nuevoRolPermisoForm.valid"
+                <button id="btn-raised" class="btn btn-sm" [routerLink]="['/roles']">Atrás</button>
+                <button id="btn-raised" class="btn btn-sm" [disabled]="!nuevoRolPermisoForm.valid"
                     (click)="insertarRolPermiso(nuevoRolPermisoForm.value)" value="Guardar">Guardar</button>
-                <button id="btn-raised"  class="btn btn-sm" (click)="limpliarCampos()" value="Cancelar">Cancelar</button>
+                <button id="btn-raised" class="btn btn-sm" (click)="limpliarCampos()" value="Cancelar">Cancelar</button>
             </div>
         </mat-card-actions>
     </mat-card>
