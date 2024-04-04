@@ -81,13 +81,14 @@ class PlanificacionHorariaControlador {
                 }
                 // VERIFICAR EXISTENCIA DE USUARIO
                 const usuarioVerificado = yield VerificarUsuario(usuario);
-                if (!usuarioVerificado) {
-                    data.observacion = 'Usuario no valido';
+                if (!usuarioVerificado[0]) {
+                    data.observacion = usuarioVerificado[2];
                     continue;
                 }
                 else {
-                    data.codigo_usuario = usuarioVerificado.codigo;
-                    data.id_usuario = usuarioVerificado.id;
+                    console.log('usuarioVerificado', usuarioVerificado);
+                    data.codigo_usuario = usuarioVerificado[1].codigo;
+                    data.id_usuario = usuarioVerificado[1].id;
                 }
                 // VERIFICAR HORARIOS
                 data.dias = yield VerificarHorarios(data.dias, fechaInicial, fechaFinal, data.id_usuario);
@@ -105,8 +106,25 @@ class PlanificacionHorariaControlador {
 // FUNCION PARA VERIFICAR EXISTENCIA DE USUARIO EN LA BASE DE DATOS
 function VerificarUsuario(cedula) {
     return __awaiter(this, void 0, void 0, function* () {
-        const usuario = yield database_1.default.query('SELECT * FROM empleados WHERE LOWER(cedula) = $1', [cedula.toLowerCase()]);
-        return usuario.rowCount > 0 ? usuario.rows[0] : null;
+        let observacion = '';
+        let usuarioValido = false;
+        const usuario = yield database_1.default.query(`
+        SELECT e.*, dae.id_cargo, ec.hora_trabaja 
+        FROM empleados e 
+        LEFT JOIN datos_actuales_empleado dae ON e.cedula = dae.cedula 
+        LEFT JOIN empl_cargos ec ON dae.id_cargo = ec.id 
+        WHERE LOWER(e.cedula) = $1
+    `, [cedula.toLowerCase()]);
+        if (usuario.rowCount === 0) {
+            observacion = 'Usuario no valido';
+        }
+        else if (usuario.rows[0].id_cargo === null) {
+            observacion = 'No tiene un cargo asignado';
+        }
+        else {
+            usuarioValido = true;
+        }
+        return [usuarioValido, usuario.rows[0], observacion];
     });
 }
 function VerificarHorarios(dias, fecha_inicio, fecha_final, id_usuario) {

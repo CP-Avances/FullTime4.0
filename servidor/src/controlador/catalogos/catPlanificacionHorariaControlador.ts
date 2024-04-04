@@ -82,12 +82,13 @@ class PlanificacionHorariaControlador {
 
             // VERIFICAR EXISTENCIA DE USUARIO
             const usuarioVerificado = await VerificarUsuario(usuario);
-            if (!usuarioVerificado) {
-                data.observacion = 'Usuario no valido';
+            if (!usuarioVerificado[0]) {
+                data.observacion = usuarioVerificado[2];
                 continue;
             } else {
-                data.codigo_usuario = usuarioVerificado.codigo;
-                data.id_usuario = usuarioVerificado.id;
+                console.log('usuarioVerificado', usuarioVerificado);
+                data.codigo_usuario = usuarioVerificado[1].codigo;
+                data.id_usuario = usuarioVerificado[1].id;
             }
 
             // VERIFICAR HORARIOS
@@ -112,12 +113,27 @@ class PlanificacionHorariaControlador {
 }
 
 // FUNCION PARA VERIFICAR EXISTENCIA DE USUARIO EN LA BASE DE DATOS
-async function VerificarUsuario(cedula: string): Promise<any>{
-    const usuario = await pool.query('SELECT * FROM empleados WHERE LOWER(cedula) = $1',
-     [cedula.toLowerCase()]);
+async function VerificarUsuario(cedula: string): Promise<[boolean, any, string]> {
+    let observacion = '';
+    let usuarioValido = false;
 
-    return usuario.rowCount > 0 ? usuario.rows[0] : null;
-    
+    const usuario = await pool.query(`
+        SELECT e.*, dae.id_cargo, ec.hora_trabaja 
+        FROM empleados e 
+        LEFT JOIN datos_actuales_empleado dae ON e.cedula = dae.cedula 
+        LEFT JOIN empl_cargos ec ON dae.id_cargo = ec.id 
+        WHERE LOWER(e.cedula) = $1
+    `, [cedula.toLowerCase()]);
+
+    if (usuario.rowCount === 0) {
+        observacion = 'Usuario no valido';
+    } else if (usuario.rows[0].id_cargo === null) {
+        observacion = 'No tiene un cargo asignado';
+    } else {
+        usuarioValido = true;
+    }
+
+    return [usuarioValido, usuario.rows[0], observacion];
 }
 
 async function VerificarHorarios(dias: any, fecha_inicio: string, fecha_final: string, id_usuario: number) {
