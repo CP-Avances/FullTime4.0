@@ -52,13 +52,17 @@ class PlanificacionHorariaControlador {
             
             // AGREGAR COLUMNAS DE LA PLANTILLA COMO DIAS AL HORARIO
             for (let propiedad in data) {
-                if (propiedad !== 'usuario') {
-                    nuevoObjeto.dias[propiedad] = { horarios: data[propiedad].split(',').map((horario: string) => ({ codigo: horario })) };
+                if (propiedad !== 'USUARIO') {
+                    let [diaSemana, fecha] = propiedad.split(', ');
+                    let [dia, mes, ano] = fecha.split('/');
+                    let fechaFormateada = `${ano}-${mes}-${dia}`;
+                    nuevoObjeto.dias[fechaFormateada] = { horarios: data[propiedad].split(',').map((horario: string) => ({ codigo: horario })) };
                 }
             }
          
             return nuevoObjeto;
         });
+
         
         // VERIFICAR USUARIO, HORARIOS Y SOBREPOSICION DE HORARIOS
         for (const [index, data] of plantillaPlanificacionHorariaEstructurada.entries() ) {
@@ -83,10 +87,11 @@ class PlanificacionHorariaControlador {
                 continue;
             } else {
                 data.codigo_usuario = usuarioVerificado.codigo;
+                data.id_usuario = usuarioVerificado.id;
             }
 
             // VERIFICAR HORARIOS
-            data.dias = await VerificarHorarios(data.dias);
+            data.dias = await VerificarHorarios(data.dias, fechaInicial, fechaFinal, data.id_usuario);
 
             // VERIFICAR SOBREPOSICION DE HORARIOS DE LA PLANTILLA
            await VerificarSobreposicionHorarios(data.dias, data.codigo_usuario, fechaInicial, fechaFinal);
@@ -115,7 +120,10 @@ async function VerificarUsuario(cedula: string): Promise<any>{
     
 }
 
-async function VerificarHorarios(dias: any) {
+async function VerificarHorarios(dias: any, fecha_inicio: string, fecha_final: string, id_usuario: number) {
+    // CONSULTAR FERIADOS
+    const feriados = await ConsultarFeriados(fecha_inicio, fecha_final, id_usuario);
+
     for (const [dia, { horarios }] of Object.entries(dias as { [key: string]: { horarios: any[] } })) {
         let horariosNoValidos: string[] = [];
         
@@ -126,6 +134,9 @@ async function VerificarHorarios(dias: any) {
             dias[dia].observacion = `Horarios duplicados: ${horariosDuplicados.map(horario => horario.codigo).join(', ')}`;
             continue;
         }
+
+        // VERIFICAR SI LA EL DIAS[DIA] ES FERIADO
+        let esFeriado = feriados ? feriados.find((feriado: any) => feriado.fecha === dia) : false;
 
         for (let i = 0; i < horarios.length; i++) {
             const horario = horarios[i];
@@ -144,8 +155,16 @@ async function VerificarHorarios(dias: any) {
                 dias[dia].horarios[i].dia = dia;
                 dias[dia].horarios[i].hora_trabaja = horarioVerificado[1].hora_trabajo;
                 dias[dia].horarios[i].tipo = horarioVerificado[1].default_;
-                dias[dia].horarios[i].observacion = 'OK';
                 
+                // SI ES FERIADO Y TIPO DE HORARIO ES LABORABLE AÑADIR OBSERVACION
+                if (esFeriado && dias[dia].horarios[i].tipo === 'N') {   
+                    dias[dia].horarios[i].observacion = `Este día no permite horarios laborables`;
+                    dias[dia].horarios[i].default = 'DEFAULT_FERIADO';    
+                    horariosNoValidos.push(horario);
+                } 
+
+                dias[dia].horarios[i].observacion = 'OK';
+                 
             }
         }
         
@@ -188,12 +207,10 @@ async function VerificarSobreposicionHorarios(dias: any, codigo: string, fecha_i
                     horario.entrada = detalles.rows.find((detalle: any) => detalle.tipo_accion === 'E');
                     horario.salida = detalles.rows.find((detalle: any) => detalle.tipo_accion === 'S');
 
-                    let [diaSemana, fecha] = horario.dia.split(', ');
-                    let [dia, mes, ano] = fecha.split('/');
-                    let fechaFormateada = `${ano}-${mes}-${dia}`;
-                    let fechaEntrada = moment(`${fechaFormateada} ${horario.entrada.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
+                   
+                    let fechaEntrada = moment(`${horario.dia} ${horario.entrada.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
                     horario.entrada.fecha = fechaEntrada;
-                    let fechaSalida = moment(`${fechaFormateada} ${horario.salida.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
+                    let fechaSalida = moment(`${horario.dia} ${horario.salida.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
                     if (horario.salida.segundo_dia) {
                         fechaSalida = moment(fechaSalida).add(1, 'days').toDate();
                     } else if (horario.salida.tercer_dia) {
@@ -212,7 +229,6 @@ async function VerificarSobreposicionHorarios(dias: any, codigo: string, fecha_i
 
     // SI EXISTE PLANIFICACION AÑADIR A HORARIOSMODIFICADOS
     if (planificacion) {
-        console.log("PLANIFICACION", planificacion);
         for (let i = 0; i < planificacion.length; i++) {
             const horario = planificacion[i];
 
@@ -272,9 +288,6 @@ async function VerificarSobreposicionHorarios(dias: any, codigo: string, fecha_i
 // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO   --**VERIFICADO
 async function ListarPlanificacionHoraria(codigo: string, fecha_inicio: string, fecha_final: string) {
 
-    console.log("CODIGO", typeof codigo);
-    console.log("FECHA INICIO", fecha_inicio);
-    console.log("FECHA FINAL", fecha_final);
     try {
 
         const horario = await pool.query(`
@@ -296,7 +309,31 @@ async function ListarPlanificacionHoraria(codigo: string, fecha_inicio: string, 
         }
     }
     catch (error) {
-        console.log("ERROR", error);
+        return null;
+    }
+}
+
+// FUNCION PARA CONSULTAR FERIADOS
+async function ConsultarFeriados(fecha_inicio: string, fecha_final: string, id_usuario: number){
+    try {
+        
+        const FERIADO = await pool.query(
+            `
+            SELECT TO_CHAR(f.fecha, 'YYYY-MM-DD') AS fecha, cf.id_ciudad, c.descripcion, s.nombre
+            FROM cg_feriados AS f, ciud_feriados AS cf, ciudades AS c, sucursales AS s, datos_actuales_empleado AS de
+            WHERE cf.id_feriado = f.id AND (f.fecha BETWEEN $1 AND $2) AND c.id = cf.id_ciudad 
+                AND s.id_ciudad = cf.id_ciudad AND de.id_sucursal = s.id AND de.id = $3
+            `
+            , [fecha_inicio, fecha_final, id_usuario]);
+
+        if (FERIADO.rowCount > 0) {
+            return FERIADO.rows;
+        }
+        else {
+            null
+        }
+    }
+    catch (error) {
         return null;
     }
 }

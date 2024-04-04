@@ -237,6 +237,7 @@ function VerificarSobreposicionHorarios(dias, codigo, fecha_inicio, fecha_final)
             }
             // ACTUALIZAR DIAS[DIA].OBSERVACION
             for (const dia in rangosSimilares) {
+                console.log(dia, rangosSimilares[dia]);
                 dias[dia].observacion = `Rangos similares: ${[...new Set(rangosSimilares[dia])].join(', ')}`;
             }
         }
