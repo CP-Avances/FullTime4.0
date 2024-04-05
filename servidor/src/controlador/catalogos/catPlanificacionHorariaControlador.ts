@@ -88,6 +88,7 @@ class PlanificacionHorariaControlador {
             } else {
                 data.codigo_usuario = usuarioVerificado[1].codigo;
                 data.id_usuario = usuarioVerificado[1].id;
+                data.nombre_usuario = `${usuarioVerificado[1].nombre} ${usuarioVerificado[1].apellido}`;
                 data.hora_trabaja = ConvertirHorasAMinutos(usuarioVerificado[1].hora_trabaja);
             }
 
@@ -101,8 +102,10 @@ class PlanificacionHorariaControlador {
         }
 
 
-    
-        res.json({plantillaPlanificacionHoraria: plantillaPlanificacionHorariaEstructurada});
+        const fechaInicioMes = moment(fechaInicial).add(1, 'days').format('YYYY-MM-DD');
+        const fechaFinalMes = moment(fechaFinal).subtract(1, 'days').format('YYYY-MM-DD');
+
+        res.json({planificacionHoraria: plantillaPlanificacionHorariaEstructurada, fechaInicioMes, fechaFinalMes});
     }
 
     //METODO PARA CARGAR LA PLANIFICACION HORARIA

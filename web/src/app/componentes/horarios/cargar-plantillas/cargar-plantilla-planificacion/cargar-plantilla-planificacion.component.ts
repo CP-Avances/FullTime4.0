@@ -40,6 +40,14 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
   archivo: Array<File>;
   nombreArchivo: string;
 
+  // VARIABLES PARA EL MANEJO DE LOS DIAS DEL MES
+  dias_mes: any[] = [];
+  dia_inicio: any;
+  dia_fin: any;
+
+  // VARIABLES PARA LAS PLANIFICACIONES HORARIAS DE LOS USUARIOS
+  planificacionesHorarias: any;
+
   constructor(
     public componentem: HorarioMultipleEmpleadoComponent,
     public componenteb: BuscarPlanificacionComponent,
@@ -53,6 +61,18 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     this.usuarios = this.datosSeleccionados.usuarios;
   }
 
+  // METODO PARA LIMPIAR FORMULARIO
+  LimpiarCampos() {
+    this.fechaInicialF.reset();
+    this.fechaFinalF.reset();
+    this.archivo1Form.reset();
+  }
+
+
+  /** **************************************************************************************** **
+   ** **                              FORMATO DE FECHAS Y HORAS                             ** **
+   ** **************************************************************************************** **/
+
 
   // METODO PARA MOSTRAR FECHA SELECCIONADA
   FormatearFecha(fecha: Moment, datepicker: MatDatepicker<Moment>) {
@@ -64,12 +84,24 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     datepicker.close();
   }
 
-    // METODO PARA LIMPIAR FORMULARIO
-    LimpiarCampos() {
-      this.fechaInicialF.reset();
-      this.fechaFinalF.reset();
-      this.archivo1Form.reset();
+  // GENERAR DIAS DEL MES
+  GenerarDiasMes() {
+    this.dias_mes = [];
+    let dia_inicio = moment(this.dia_inicio, 'YYYYY-MM-DD');
+    let dia_fin = moment(this.dia_fin, 'YYYYY-MM-DD');
+
+    while (dia_inicio <= dia_fin) {
+      let dia = {
+        fecha: dia_inicio.format('YYYY-MM-DD'),
+        fecha_formato: dia_inicio.format('dddd, DD/MM/YYYY').toUpperCase()
+      }
+      this.dias_mes.push(dia);
+      dia_inicio = dia_inicio.add(1, 'days');
     }
+  }
+
+
+
 
   /** ************************************************************************************************* **
    ** **                              PLANTILLA CARGAR PLANIFICACION                                 ** **
@@ -126,11 +158,49 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     }
     this.restP.VerificarDatosPlanificacionHoraria(formData).subscribe( (res: any) => {
       console.log(res);
+      this.OrganizarDatosPlanificacion(res);
       this.spinnerService.hide();
       this.toastr.success('Plantilla verificada correctamente', 'Plantilla verificada', {
         timeOut: 6000,
       });
     });
+
+  }
+
+  OrganizarDatosPlanificacion(data: any) {
+    this.planificacionesHorarias = [];
+    this.dias_mes = [];
+    this.dia_inicio = data.fechaInicioMes;
+    this.dia_fin = data.fechaFinalMes;
+
+    this.GenerarDiasMes();
+
+    console.log('dias_mes', this.dias_mes);
+
+
+    if (data.planificacionHoraria.length > 0) {
+      data.planificacionHoraria.forEach((planificacion: any) => {
+          this.dias_mes.forEach((dia: any) => {
+              // BUSCAR DENTRO DE PLANIFICACION.DIAS SI EXISTE EL DIA
+              if (!planificacion.dias.hasOwnProperty(dia.fecha)) {
+                  // SI EL DIA NO EXISTE EN PLANIFICACION.DIAS, AÑADIRLO
+                  planificacion.dias[dia.fecha] = {
+                      horarios: [],
+                      observacion: ''
+                  };
+              }
+          });
+
+          // CONVERTIR PLANIFICACION.DIAS A UN ARRAY DE OBJETOS
+          planificacion.dias = Object.keys(planificacion.dias).map(key => ({
+            fecha: key,
+            ...planificacion.dias[key]
+          }));
+      });
+
+      this.planificacionesHorarias = data.planificacionHoraria;
+      console.log('planificacionesHorarias', this.planificacionesHorarias);
+  }
 
   }
 
