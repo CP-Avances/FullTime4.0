@@ -86,12 +86,12 @@ class PlanificacionHorariaControlador {
                     continue;
                 }
                 else {
-                    console.log('usuarioVerificado', usuarioVerificado);
                     data.codigo_usuario = usuarioVerificado[1].codigo;
                     data.id_usuario = usuarioVerificado[1].id;
+                    data.hora_trabaja = ConvertirHorasAMinutos(usuarioVerificado[1].hora_trabaja);
                 }
                 // VERIFICAR HORARIOS
-                data.dias = yield VerificarHorarios(data.dias, fechaInicial, fechaFinal, data.id_usuario);
+                data.dias = yield VerificarHorarios(data.dias, fechaInicial, fechaFinal, data.id_usuario, data.hora_trabaja);
                 // VERIFICAR SOBREPOSICION DE HORARIOS DE LA PLANTILLA
                 yield VerificarSobreposicionHorarios(data.dias, data.codigo_usuario, fechaInicial, fechaFinal);
             }
@@ -127,12 +127,13 @@ function VerificarUsuario(cedula) {
         return [usuarioValido, usuario.rows[0], observacion];
     });
 }
-function VerificarHorarios(dias, fecha_inicio, fecha_final, id_usuario) {
+function VerificarHorarios(dias, fecha_inicio, fecha_final, id_usuario, hora_trabaja) {
     return __awaiter(this, void 0, void 0, function* () {
         // CONSULTAR FERIADOS
         const feriados = yield ConsultarFeriados(fecha_inicio, fecha_final, id_usuario);
         for (const [dia, { horarios }] of Object.entries(dias)) {
             let horariosNoValidos = [];
+            let horasTotales = 0;
             // VERIFICAR HORARIO DUPLICADO SI EXISTE PONER EN HORARIO OBSERVACION 'HORARIO DUPLICADO'
             const horariosDuplicados = horarios.filter((horario, index) => horarios.findIndex((h) => h.codigo === horario.codigo) !== index);
             if (horariosDuplicados.length > 0) {
@@ -164,10 +165,18 @@ function VerificarHorarios(dias, fecha_inicio, fecha_final, id_usuario) {
                         dias[dia].horarios[i].default = 'DEFAULT_FERIADO';
                         horariosNoValidos.push(horario);
                     }
-                    dias[dia].horarios[i].observacion = 'OK';
+                    else {
+                        dias[dia].horarios[i].observacion = 'OK';
+                        horasTotales += ConvertirHorasAMinutos(horarioVerificado[1].hora_trabajo);
+                    }
                 }
             }
             dias[dia].observacion = horariosNoValidos.length > 0 ? `Horarios no validos: ${horariosNoValidos.join(', ')}` : 'OK';
+            // VERIFICAR HORAS TOTALES DE HORARIOS
+            if (horasTotales > hora_trabaja) {
+                const horas = ConvertirMinutosAHoras(horasTotales);
+                dias[dia].observacion2 = `Jornada superada: ${horas} tiempo total`;
+            }
         }
         return dias;
     });
@@ -308,6 +317,17 @@ function ConsultarFeriados(fecha_inicio, fecha_final, id_usuario) {
             return null;
         }
     });
+}
+function ConvertirHorasAMinutos(hora) {
+    const partes = hora.split(':');
+    const horas = parseInt(partes[0], 10);
+    const minutos = parseInt(partes[1], 10);
+    return horas * 60 + minutos;
+}
+function ConvertirMinutosAHoras(minutos) {
+    const horas = Math.floor(minutos / 60);
+    const minutosRestantes = minutos % 60;
+    return `${horas}:${minutosRestantes < 10 ? '0' + minutosRestantes : minutosRestantes}:00`;
 }
 exports.PLANIFICACION_HORARIA_CONTROLADOR = new PlanificacionHorariaControlador();
 exports.default = exports.PLANIFICACION_HORARIA_CONTROLADOR;

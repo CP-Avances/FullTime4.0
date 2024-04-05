@@ -727,20 +727,19 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
   CargarPlantilla(data: any) {
     console.log('data cargar ', data)
     this.data_cargar = [];
-    if (data.length > 0) {
+    // if (data.length > 0) {
       this.data_cargar = {
         usuariosSeleccionados: data,
-        usuarios: this.empleados,
         pagina: 'cargar-plantilla',
       }
       this.seleccionar = false;
       this.cargar_plantilla = true;
-    }
-    else {
-      this.toastr.warning('No ha seleccionado usuarios.', '', {
-        timeOut: 6000,
-      });
-    }
+    // }
+    // else {
+    //   this.toastr.warning('No ha seleccionado usuarios.', '', {
+    //     timeOut: 6000,
+    //   });
+    // }
   }
 
   // METODO PARA TOMAR DATOS SELECCIONADOS

@@ -86,13 +86,13 @@ class PlanificacionHorariaControlador {
                 data.observacion = usuarioVerificado[2];
                 continue;
             } else {
-                console.log('usuarioVerificado', usuarioVerificado);
                 data.codigo_usuario = usuarioVerificado[1].codigo;
                 data.id_usuario = usuarioVerificado[1].id;
+                data.hora_trabaja = ConvertirHorasAMinutos(usuarioVerificado[1].hora_trabaja);
             }
 
             // VERIFICAR HORARIOS
-            data.dias = await VerificarHorarios(data.dias, fechaInicial, fechaFinal, data.id_usuario);
+            data.dias = await VerificarHorarios(data.dias, fechaInicial, fechaFinal, data.id_usuario, data.hora_trabaja);
 
             // VERIFICAR SOBREPOSICION DE HORARIOS DE LA PLANTILLA
            await VerificarSobreposicionHorarios(data.dias, data.codigo_usuario, fechaInicial, fechaFinal);
@@ -136,12 +136,13 @@ async function VerificarUsuario(cedula: string): Promise<[boolean, any, string]>
     return [usuarioValido, usuario.rows[0], observacion];
 }
 
-async function VerificarHorarios(dias: any, fecha_inicio: string, fecha_final: string, id_usuario: number) {
+async function VerificarHorarios(dias: any, fecha_inicio: string, fecha_final: string, id_usuario: number, hora_trabaja: number) {
     // CONSULTAR FERIADOS
     const feriados = await ConsultarFeriados(fecha_inicio, fecha_final, id_usuario);
 
     for (const [dia, { horarios }] of Object.entries(dias as { [key: string]: { horarios: any[] } })) {
         let horariosNoValidos: string[] = [];
+        let horasTotales = 0;
         
         // VERIFICAR HORARIO DUPLICADO SI EXISTE PONER EN HORARIO OBSERVACION 'HORARIO DUPLICADO'
         const horariosDuplicados = horarios.filter((horario, index) => horarios.findIndex((h) => h.codigo === horario.codigo) !== index);
@@ -172,20 +173,28 @@ async function VerificarHorarios(dias: any, fecha_inicio: string, fecha_final: s
                 dias[dia].horarios[i].hora_trabaja = horarioVerificado[1].hora_trabajo;
                 dias[dia].horarios[i].tipo = horarioVerificado[1].default_;
                 
+                
                 // SI ES FERIADO Y TIPO DE HORARIO ES LABORABLE AÑADIR OBSERVACION
                 if (esFeriado && dias[dia].horarios[i].tipo === 'N') {   
                     dias[dia].horarios[i].observacion = `Este día no permite horarios laborables`;
                     dias[dia].horarios[i].default = 'DEFAULT_FERIADO';    
                     horariosNoValidos.push(horario);
-                } 
-
-                dias[dia].horarios[i].observacion = 'OK';
+                } else {
+                    dias[dia].horarios[i].observacion = 'OK';
+                    horasTotales += ConvertirHorasAMinutos(horarioVerificado[1].hora_trabajo);
+                }
                  
             }
         }
         
         dias[dia].observacion = horariosNoValidos.length > 0 ? `Horarios no validos: ${horariosNoValidos.join(', ')}` : 'OK';
-
+        
+        // VERIFICAR HORAS TOTALES DE HORARIOS
+        if (horasTotales > hora_trabaja) {
+            const horas = ConvertirMinutosAHoras(horasTotales);
+            dias[dia].observacion2 = `Jornada superada: ${horas} tiempo total`;
+        }
+        
     }
     return dias;
 }
@@ -352,6 +361,19 @@ async function ConsultarFeriados(fecha_inicio: string, fecha_final: string, id_u
     catch (error) {
         return null;
     }
+}
+
+function ConvertirHorasAMinutos(hora: string): number {
+    const partes = hora.split(':');
+    const horas = parseInt(partes[0], 10);
+    const minutos = parseInt(partes[1], 10);
+    return horas * 60 + minutos;
+}
+
+function ConvertirMinutosAHoras(minutos: number): string {
+    const horas = Math.floor(minutos / 60);
+    const minutosRestantes = minutos % 60;
+    return `${horas}:${minutosRestantes < 10 ? '0' + minutosRestantes : minutosRestantes}:00`;
 }
 
 export const PLANIFICACION_HORARIA_CONTROLADOR = new PlanificacionHorariaControlador();
