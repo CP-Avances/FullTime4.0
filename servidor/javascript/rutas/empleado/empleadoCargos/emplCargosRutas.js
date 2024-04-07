@@ -53,7 +53,7 @@ class EmpleadosCargpsRutas {
          ** **            METODO PAARA LA LECTURA DEL REGISTRO MULTIPLE DE CARGOS                   ** **
          ** ********************************************************************************************* **/
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload_plantilla.single('uploads')], emplCargosControlador_1.default.RevisarDatos);
-        this.router.post('/cargar_plantilla/', verificarToken_1.TokenValidation, emplCargosControlador_1.default.CargarPlantilla_contrato);
+        this.router.post('/cargar_plantilla/', verificarToken_1.TokenValidation, emplCargosControlador_1.default.CargarPlantilla_cargos);
     }
 }
 const EMPLEADO_CARGO_RUTAS = new EmpleadosCargpsRutas();

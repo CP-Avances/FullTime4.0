@@ -83,7 +83,6 @@
                                     <th scope="col">Fecha salida</th>
                                     <th scope="col">Control asistencias</th>
                                     <th scope="col">Control vacaciones</th>
-                                    <th scope="col">Tipo cargo</th>
                                     <th scope="col">Observación</th>
                                 </tr>
                             </thead>
@@ -99,7 +98,6 @@
                                     <td [style.color]="stiloTextoCelda(contrato.fecha_salida)" style="font-size: 12px;">{{contrato.fecha_salida}}</td>
                                     <td [style.color]="stiloTextoCelda(contrato.control_asis)" id="letras" style="font-size: 12px;">{{contrato.control_asis}}</td>
                                     <td [style.color]="stiloTextoCelda(contrato.control_vaca)" id="letras" style="font-size: 12px;">{{contrato.control_vaca}}</td>
-                                    <td [style.color]="stiloTextoCelda(contrato.tipo_cargo)" style="font-size: 12px;">{{contrato.tipo_cargo}}</td>
                                     <td style="font-size: 12px;">
                                         <div style="width: 270px; margin: auto;">
                                             <div id="t-editar" class="circulo"
@@ -162,11 +160,11 @@
                                             Descargar plantilla usuarios
                                         </a>
                                     </div>
-                                </div>
+                                </div> 
                                 <div class="col-md" *ngIf="DatosCargos" style="padding-top: 5px; padding-bottom: 5px;" >
                                     <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
                                         <button id="descargar" class="btn btn-sm"
-                                             matSuffix matTooltipPosition="right"
+                                             matSuffix matTooltipPosition="right" (click)="ConfirmarRegistroMultipleCargos()"
                                              matTooltip="Guardar registro multiple.">
                                             Registrar
                                         </button>

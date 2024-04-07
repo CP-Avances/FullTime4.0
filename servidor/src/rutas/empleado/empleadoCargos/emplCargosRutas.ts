@@ -76,7 +76,7 @@ class EmpleadosCargpsRutas {
          ** **            METODO PAARA LA LECTURA DEL REGISTRO MULTIPLE DE CARGOS                   ** **
          ** ********************************************************************************************* **/
          this.router.post('/upload/revision', [TokenValidation, upload_plantilla.single('uploads')], EMPLEADO_CARGO_CONTROLADOR.RevisarDatos);
-         this.router.post('/cargar_plantilla/', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.CargarPlantilla_contrato);
+         this.router.post('/cargar_plantilla/', TokenValidation, EMPLEADO_CARGO_CONTROLADOR.CargarPlantilla_cargos);
     
     }
 }

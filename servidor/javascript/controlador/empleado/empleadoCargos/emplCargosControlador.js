@@ -288,6 +288,12 @@ class EmpleadoCargosControlador {
                             data.observacion = 'La cédula ingresada no es válida';
                         }
                         else {
+                            if (data.hora_trabaja != 'No registrado') {
+                                if ((0, moment_1.default)(hora_trabaja, 'HH:mm:ss', true).isValid()) { }
+                                else {
+                                    data.observacion = 'Formato de horas trabajo incorrecto (HH:mm:ss)';
+                                }
+                            }
                             // Verificar si la variable tiene el formato de fecha correcto con moment
                             if ((0, moment_1.default)(fecha_inicio, 'YYYY-MM-DD', true).isValid()) { }
                             else {
@@ -353,15 +359,21 @@ class EmpleadoCargosControlador {
                         data.jefe = 'No registrado';
                         data.observacion = 'Jefe, ' + data.observacion;
                     }
+                    if (data.hora_trabaja != 'No registrado') {
+                        if ((0, moment_1.default)(hora_trabaja, 'HH:mm:ss', true).isValid()) { }
+                        else {
+                            data.observacion = 'Formato de horas trabajo incorrecto (HH:mm:ss)';
+                        }
+                    }
                     // Verificar si la variable tiene el formato de fecha correcto con moment
-                    if (data.fecha_ingreso != 'No registrado') {
+                    if (data.fecha_inicio != 'No registrado') {
                         if ((0, moment_1.default)(fecha_inicio, 'YYYY-MM-DD', true).isValid()) { }
                         else {
                             data.observacion = 'Formato de fecha inicio incorrecto (YYYY-MM-DD)';
                         }
                     }
                     // Verificar si la variable tiene el formato de fecha correcto con moment
-                    if (data.fecha_salida != 'No registrado') {
+                    if (data.fecha_final != 'No registrado') {
                         if ((0, moment_1.default)(fecha_final, 'YYYY-MM-DD', true).isValid()) { }
                         else {
                             data.observacion = 'Formato de fecha final incorrecto (YYYY-MM-DD)';
@@ -401,30 +413,45 @@ class EmpleadoCargosControlador {
                     if (valor.observacion == 'no registrado') {
                         var VERIFICAR_CEDULA = yield database_1.default.query('SELECT * FROM empleados WHERE cedula = $1', [valor.cedula]);
                         if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-                            var VERIFICAR_DEPARTAMENTO = yield database_1.default.query('SELECT  * FROM cg_departamentos WHERE UPPER(nombre) = $1', [valor.departamento.toUpperCase()]);
-                            if (VERIFICAR_DEPARTAMENTO.rows[0] != undefined && VERIFICAR_DEPARTAMENTO.rows[0] != '') {
-                                var VERIFICAR_SUCURSALES = yield database_1.default.query('SELECT * FROM sucursales WHERE UPPER(nombre) = $1', [valor.sucursal.toUpperCase()]);
-                                if (VERIFICAR_SUCURSALES.rows[0] != undefined && VERIFICAR_SUCURSALES.rows[0] != '') {
-                                    var VERFICAR_CARGO = yield database_1.default.query('SLECT * FROM tipo_cargo WHERE UPPER(cargo) = $1', [valor.cargo.toUpperCase()]);
-                                    if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-                                        // Discriminación de elementos iguales
-                                        if (duplicados.find((p) => p.cedula === valor.cedula) == undefined) {
-                                            duplicados.push(valor);
+                            const ID_CONTRATO = yield database_1.default.query('SELECT id FROM empl_contratos WHERE id_empleado = $1', [VERIFICAR_CEDULA.rows[0].id]);
+                            if (ID_CONTRATO.rows[0] != undefined && ID_CONTRATO.rows[0] != '') {
+                                const fechaRango = yield database_1.default.query('SELECT * FROM empl_cargos ' +
+                                    'WHERE id_empl_contrato = $1 and ($2  between fec_inicio and fec_final or ' +
+                                    '$3 between fec_inicio and fec_final or ' +
+                                    'fec_inicio between $2 and $3)', [ID_CONTRATO.rows[0].id, valor.fecha_inicio, valor.fecha_final]);
+                                if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
+                                    valor.observacion = 'Existe un cargo vigente en esas fechas';
+                                }
+                                else {
+                                    var VERIFICAR_DEPARTAMENTO = yield database_1.default.query('SELECT  * FROM cg_departamentos WHERE UPPER(nombre) = $1', [valor.departamento.toUpperCase()]);
+                                    if (VERIFICAR_DEPARTAMENTO.rows[0] != undefined && VERIFICAR_DEPARTAMENTO.rows[0] != '') {
+                                        var VERIFICAR_SUCURSALES = yield database_1.default.query('SELECT * FROM sucursales WHERE UPPER(nombre) = $1', [valor.sucursal.toUpperCase()]);
+                                        if (VERIFICAR_SUCURSALES.rows[0] != undefined && VERIFICAR_SUCURSALES.rows[0] != '') {
+                                            var VERFICAR_CARGO = yield database_1.default.query('SELECT * FROM tipo_cargo WHERE UPPER(cargo) = $1', [valor.cargo.toUpperCase()]);
+                                            if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
+                                                // Discriminación de elementos iguales
+                                                if (duplicados.find((p) => p.cedula === valor.cedula) == undefined) {
+                                                    duplicados.push(valor);
+                                                }
+                                                else {
+                                                    valor.observacion = '1';
+                                                }
+                                            }
+                                            else {
+                                                valor.observacion = 'Cargo no existe en el sistema';
+                                            }
                                         }
                                         else {
-                                            valor.observacion = '1';
+                                            valor.observacion = 'Sucursal no existe en el sistema';
                                         }
                                     }
                                     else {
-                                        valor.observacion = 'Cargo no existe en el sistema';
+                                        valor.observacion = 'Departamento no existe en el sistema';
                                     }
-                                }
-                                else {
-                                    valor.observacion = 'Sucursal no existe en el sistema';
                                 }
                             }
                             else {
-                                valor.observacion = 'Departamento no existe en el sistema';
+                                valor.observacion = 'Cédula no tiene registrado un contrato';
                             }
                         }
                         else {
@@ -475,10 +502,57 @@ class EmpleadoCargosControlador {
             }, 1500);
         });
     }
-    CargarPlantilla_contrato(req, res) {
+    CargarPlantilla_cargos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const plantilla = req.body;
             console.log('datos contrato: ', plantilla);
+            plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
+                console.log('data: ', data);
+                // Datos que se guardaran de la plantilla ingresada
+                const { item, cedula, departamento, fecha_inicio, fecha_final, sucursal, sueldo, cargo, hora_traba, jefe } = data;
+                const ID_EMPLEADO = yield database_1.default.query('SELECT id FROM empleados WHERE UPPER(cedula) = $1', [cedula]);
+                const ID_CONTRATO = yield database_1.default.query('SELECT id FROM empl_contratos WHERE id_empleado = $1', [ID_EMPLEADO.rows[0].id]);
+                const ID_DEPARTAMENTO = yield database_1.default.query('SELECT id FROM cg_departamentos WHERE UPPER(nombre) = $1', [departamento.toUpperCase()]);
+                const ID_SUCURSAL = yield database_1.default.query('SELECT id FROM sucursales WHERE UPPER(nombre) = $1', [sucursal.toUpperCase()]);
+                const ID_TIPO_CARGO = yield database_1.default.query('SELECT id FROM tipo_cargo WHERE UPPER(cargo) = $1', [cargo.toUpperCase()]);
+                var Jefe;
+                if (jefe.toUpperCase() === 'SI') {
+                    Jefe = true;
+                }
+                else {
+                    Jefe = false;
+                }
+                var id_empleado = ID_EMPLEADO.rows[0].id;
+                var id_contrato = ID_CONTRATO.rows[0].id;
+                var id_departamento = ID_DEPARTAMENTO.rows[0].id;
+                var id_sucursal = ID_SUCURSAL.rows[0].id;
+                var id_cargo = ID_TIPO_CARGO.rows[0].id;
+                console.log('id_empleado: ', ID_EMPLEADO.rows[0].id);
+                console.log('id_empleado: ', ID_CONTRATO.rows[0].id);
+                console.log('fecha inicio: ', fecha_inicio);
+                console.log('fecha final: ', fecha_final);
+                console.log('departamento: ', ID_DEPARTAMENTO.rows[0].id);
+                console.log('sucursal: ', ID_SUCURSAL.rows[0].id);
+                console.log('sueldo: ', sueldo);
+                console.log('hora_trabaja: ', hora_traba);
+                console.log('tipo cargo: ', ID_TIPO_CARGO.rows[0].id);
+                console.log('Jefe: ', Jefe);
+                // Registro de los datos de contratos
+                const response = yield database_1.default.query(`INSERT INTO empl_cargos (id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, 
+            sueldo, cargo, hora_trabaja, jefe) 
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
+          `, [id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal, sueldo, id_cargo,
+                    hora_traba, Jefe]);
+                const [cargos] = response.rows;
+                setTimeout(() => {
+                    if (cargos) {
+                        return res.status(200).jsonp({ message: 'ok' });
+                    }
+                    else {
+                        return res.status(404).jsonp({ message: 'error' });
+                    }
+                }, 1500);
+            }));
         });
     }
 }

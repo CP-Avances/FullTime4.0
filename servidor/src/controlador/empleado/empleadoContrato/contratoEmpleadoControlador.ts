@@ -489,38 +489,47 @@ class ContratoEmpleadoControlador {
             var VERIFICAR_CEDULA = await pool.query('SELECT * FROM empleados WHERE cedula = $1', [valor.cedula]);
             if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
                 if(valor.cedula != 'No registrado' &&  valor.pais != 'No registrado' && valor.pais != ''){
-                    var VERIFICAR_PAISES = await pool.query('SELECT * FROM cg_paises WHERE UPPER(nombre) = $1', [valor.pais.toUpperCase()]);
-                    if(VERIFICAR_PAISES.rows[0] != undefined && VERIFICAR_PAISES.rows[0] != ''){
-                        var id_pais = VERIFICAR_PAISES.rows[0].id
-                        if(valor.regimen_la != 'No registrado' && valor.regimen_la != ''){
-                            var VERIFICAR_REGIMENES = await pool.query('SELECT * FROM cg_regimenes WHERE UPPER(descripcion) = $1', [valor.regimen_la.toUpperCase()])
-                            if(VERIFICAR_REGIMENES.rows[0] != undefined && VERIFICAR_REGIMENES.rows[0] != ''){
-                                if(id_pais == VERIFICAR_REGIMENES.rows[0].id_pais){
-                                    if(valor.modalida_la != 'No registrado' && valor.modalida_la != ''){
-                                        var VERIFICAR_MODALIDAD = await pool.query('SELECT * FROM modal_trabajo WHERE UPPER(descripcion) = $1', [valor.modalida_la.toUpperCase()])
-                                        if(VERIFICAR_MODALIDAD.rows[0] != undefined && VERIFICAR_MODALIDAD.rows[0] != ''){
-                                            // Discriminación de elementos iguales
-                                            if(duplicados.find((p: any)=> p.cedula === valor.cedula) == undefined)
-                                            {
-                                                duplicados.push(valor);
-                                            }else{
-                                                valor.observacion = '1';
-                                            }
-                                        }else{
-                                            valor.observacion = 'Modalidad trabajo no se encuentra registrado'
-                                        }
-                                    }
-                            
-                                }else{
-                                    valor.observacion = 'Regimen no corresponde al pais'
-                                }
-                        
-                            }else{
-                                valor.observacion = 'Regimen ingresado no se encuentra registrado'
-                            }
-                        }
+                    const fechaRango: any = await pool.query('SELECT * FROM empl_contratos '+ 
+                        'WHERE id_empleado = $1 and ($2  between fec_ingreso and fec_salida or '+
+                        '$3 between fec_ingreso and fec_salida or '+
+                        'fec_ingreso between $2 and $3)',[VERIFICAR_CEDULA.rows[0].id, valor.fecha_ingreso, valor.fecha_salida]) 
+                    
+                    if(fechaRango.rows[0] != undefined && fechaRango.rows[0] != ''){
+                        valor.observacion = 'Existe un contrato vigente en esas fechas'  
                     }else{
-                        valor.observacion = 'Pais ingresado no se encuentra registrado'
+                        var VERIFICAR_PAISES = await pool.query('SELECT * FROM cg_paises WHERE UPPER(nombre) = $1', [valor.pais.toUpperCase()]);
+                        if(VERIFICAR_PAISES.rows[0] != undefined && VERIFICAR_PAISES.rows[0] != ''){
+                            var id_pais = VERIFICAR_PAISES.rows[0].id
+                            if(valor.regimen_la != 'No registrado' && valor.regimen_la != ''){
+                                var VERIFICAR_REGIMENES = await pool.query('SELECT * FROM cg_regimenes WHERE UPPER(descripcion) = $1', [valor.regimen_la.toUpperCase()])
+                                if(VERIFICAR_REGIMENES.rows[0] != undefined && VERIFICAR_REGIMENES.rows[0] != ''){
+                                    if(id_pais == VERIFICAR_REGIMENES.rows[0].id_pais){
+                                        if(valor.modalida_la != 'No registrado' && valor.modalida_la != ''){
+                                            var VERIFICAR_MODALIDAD = await pool.query('SELECT * FROM modal_trabajo WHERE UPPER(descripcion) = $1', [valor.modalida_la.toUpperCase()])
+                                            if(VERIFICAR_MODALIDAD.rows[0] != undefined && VERIFICAR_MODALIDAD.rows[0] != ''){
+                                                // Discriminación de elementos iguales
+                                                if(duplicados.find((p: any)=> p.cedula === valor.cedula) == undefined)
+                                                {
+                                                    duplicados.push(valor);
+                                                }else{
+                                                    valor.observacion = '1';
+                                                }
+                                            }else{
+                                                valor.observacion = 'Modalidad trabajo no se encuentra registrado'
+                                            }
+                                        }
+                            
+                                    }else{
+                                        valor.observacion = 'Regimen no corresponde al pais'
+                                    }
+                        
+                                }else{
+                                    valor.observacion = 'Regimen ingresado no se encuentra registrado'
+                                }
+                            }
+                        }else{
+                            valor.observacion = 'Pais ingresado no se encuentra registrado'
+                        }
                     }
                 }
             }else{

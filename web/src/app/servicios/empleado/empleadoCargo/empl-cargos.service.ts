@@ -108,4 +108,8 @@ export class EmplCargosService {
     return this.http.post<any>(`${environment.url}/empleadoCargos/upload/revision`, formData);
   }
 
+  subirArchivoExcelCargo(formData) {
+    return this.http.post<any>(`${environment.url}/empleadoCargos/cargar_plantilla/`, formData);
+  }
+
 }

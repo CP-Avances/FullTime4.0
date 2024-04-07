@@ -194,7 +194,8 @@ export class CargarPlantillaComponent {
     } else if (observacion == 'Cédula no existe en el sistema' || 
       observacion == 'Sucursal no existe en el sistema' ||
       observacion == 'Departamento no existe en el sistema' ||
-      observacion == 'Cargo no existe en el sistema') {
+      observacion == 'Cargo no existe en el sistema' ||
+      observacion == 'Cédula no tiene registrado un contrato') {
       return 'rgb(255, 192, 203)';
     } else if (observacion == 'Registro duplicado - cédula') {
       return 'rgb(156, 214, 255)';
@@ -205,8 +206,13 @@ export class CargarPlantillaComponent {
       observacion == 'Modalidad trabajo no se encuentra registrado' 
     ) {
       return 'rgb(242, 21, 21)';
-    } else if (observacion == 'Regimen no corresponde al pais'){
+    }else if(observacion == 'Existe un cargo vigente en esas fechas' || 
+    observacion == 'Existe un contrato vigente en esas fechas'){
+      return 'rgb(239, 203, 106)';
+    }else if (observacion == 'Regimen no corresponde al pais'){
       return 'rgb(238, 34, 207)';
+    }else if (arrayObservacion[1]+' '+arrayObservacion[2] == 'no registrado'){
+      return 'rgb(242, 21, 21)';
     }else {
       return 'white'
     }
@@ -221,7 +227,6 @@ export class CargarPlantillaComponent {
     }
   }
       
-
 
 
   //CARGOS
@@ -265,13 +270,13 @@ export class CargarPlantillaComponent {
   }
 
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
-  ConfirmarRegistroMultipleCargos() {
+  ConfirmarRegistroMultipleCargos(){
     const mensaje = 'registro';
-    console.log('listaContratosCorrectas: ', this.listaCargosCorrectas.length);
+    console.log('listaCargosCorrectas: ',this.listaCargosCorrectas.length);
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          //this.registroCargos();
+          this.registroCargos();
         }
       });
   }
@@ -296,7 +301,7 @@ export class CargarPlantillaComponent {
         });
         this.mostrarbtnsubir = false;
       } else {
-        this.DatosContrato.forEach(item => {
+        this.DatosCargos.forEach(item => {
           if (item.observacion.toLowerCase() == 'ok') {
             this.listaCargosCorrectas.push(item);
           }
@@ -313,6 +318,26 @@ export class CargarPlantillaComponent {
       this.progreso = false;
     });
 
+  }
+
+  registroCargos(){
+    if (this.listaCargosCorrectas.length > 0) {
+      this.restCa.subirArchivoExcelCargo(this.listaCargosCorrectas).subscribe(response => {
+        console.log('respuesta: ',response);
+        this.toastr.success('Operación exitosa.', 'Plantilla de Contratos importada.', {
+          timeOut: 3000,
+        });
+        window.location.reload();
+        this.archivoForm.reset();
+        this.nameFile = '';
+      });
+    }else {
+      this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
+        timeOut: 4000,
+      });
+      this.archivoForm.reset();
+      this.nameFile = '';
+    }
   }
 
 }
