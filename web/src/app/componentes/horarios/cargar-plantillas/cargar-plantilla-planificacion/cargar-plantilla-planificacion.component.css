@@ -48,7 +48,7 @@ mat-progress-spinner {
   font-size: 11px;
 }
 
-#td_horarios {
+.td_horarios, .td_observaciones {
   border: 1px solid #ccc;
   padding: 8px;
   text-align: center;
@@ -101,7 +101,7 @@ mat-progress-spinner {
   left: 100px;
 }
 
-.table .sticky-3{
+/* .table .sticky-3{
   position: sticky;
   left: 200px;
 }
@@ -114,20 +114,35 @@ mat-progress-spinner {
 .table .sticky-5{
   position: sticky;
   right:0;
-}
+} */
 
 .table tbody tr .sticky,
-.table tbody tr .sticky-2,
-.table tbody tr .sticky-3,
-.table tbody tr .sticky-4,
-.table tbody tr .sticky-5{
+.table tbody tr .sticky-2
+{
   background-color: #fbfbfb;
 }
 
 .table tbody tr:nth-child(2n) .sticky,
-.table tbody tr:nth-child(2n) .sticky-2,
-.table tbody tr:nth-child(2n) .sticky-3,
-.table tbody tr:nth-child(2n) .sticky-4,
-.table tbody tr:nth-child(2n) .sticky-5{
+.table tbody tr:nth-child(2n) .sticky-2
+{
   background-color: #e6f3ff;
+}
+
+.td_horarios{
+  z-index: 1;
+}
+
+.td_observaciones{
+  position: relative
+}
+
+.icon-container {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+#ver{
+  color: indianred;
+  cursor: pointer;
 }

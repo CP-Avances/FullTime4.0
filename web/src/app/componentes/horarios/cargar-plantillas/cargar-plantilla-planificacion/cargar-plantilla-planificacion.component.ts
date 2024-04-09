@@ -14,6 +14,8 @@ import { BuscarPlanificacionComponent } from '../../rango-fechas/buscar-planific
 import { SpinnerService } from 'src/app/servicios/spinner/spinner.service';
 import { ToastrService } from 'ngx-toastr';
 import { PlanificacionHorariaService } from 'src/app/servicios/catalogos/catPlanificacionHoraria/planificacionHoraria.service';
+import { MatDialog } from '@angular/material/dialog';
+import { VisualizarObservacionComponent } from '../visualizar-observacion/visualizar-observacion/visualizar-observacion.component';
 @Component({
   selector: 'app-cargar-plantilla-planificacion',
   templateUrl: './cargar-plantilla-planificacion.component.html',
@@ -54,6 +56,7 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     private spinnerService: SpinnerService,
     private toastr: ToastrService,
     private restP: PlanificacionHorariaService,
+    public ventana: MatDialog,
   ) { }
 
   ngOnInit(): void {
@@ -249,6 +252,28 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
     // ESCRIBIR EL LIBRO DE TRABAJO EN UN ARCHIVO EXCEL
     XLSX.writeFile(wb, 'plantillaPlanificacionMultiple.xlsx');
+  }
+
+  MostrarVisualizarObservacion(dia: any): boolean {
+    return (dia.observacion != '' && dia.observacion != 'OK') || Boolean(dia.observacion2);
+  }
+
+
+  // METODO PARA ABRIR VENTANA DE VISUALIZACION DE OBSERVACIONES
+  VisualizarObservacion(planificacion: any) {
+    this.ventana.open(VisualizarObservacionComponent, {
+      data: planificacion,
+      width: '500px',
+      height: '300px',
+    });
+
+  }
+
+  // METODO PARA OBTENER EL COLOR DE LA OBSERVACION
+  ObtenerColorObservacion(observacion: string) {
+    if (observacion != 'OK'){
+      return 'rgb(242, 21, 21)';
+    }
   }
 
 

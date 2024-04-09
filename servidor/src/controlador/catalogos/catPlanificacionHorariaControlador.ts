@@ -150,8 +150,8 @@ async function VerificarHorarios(dias: any, fecha_inicio: string, fecha_final: s
         // VERIFICAR HORARIO DUPLICADO SI EXISTE PONER EN HORARIO OBSERVACION 'HORARIO DUPLICADO'
         const horariosDuplicados = horarios.filter((horario, index) => horarios.findIndex((h) => h.codigo === horario.codigo) !== index);
         if (horariosDuplicados.length > 0) {
-            horariosDuplicados.forEach((horario) => horario.observacion = 'Horario duplicado');
-            dias[dia].observacion = `Horarios duplicados: ${horariosDuplicados.map(horario => horario.codigo).join(', ')}`;
+            dias[dia].observacion = `Horarios duplicados`;
+            dias[dia].observacion2 = `Códigos de horarios duplicados: ${horariosDuplicados.map((horario) => horario.codigo).join(', ')}`;
             continue;
         }
 
@@ -163,10 +163,9 @@ async function VerificarHorarios(dias: any, fecha_inicio: string, fecha_final: s
             const horarioVerificado = await VerificarHorario(horario.codigo); 
             if (!horarioVerificado[0]) {
                 horariosNoValidos.push(horario);
-                horario.observacion = 'Horario no valido';
         
                 // AÑADIR OBSERVACION A HORARIO
-                dias[dia].horarios[i].observacion = 'Horario no valido';
+                dias[dia].horarios[i].observacion = `Horario no valido`;
                 
             } else {
                 // ANADIR PROPIEDADES DE HORARIOVERIFICADO A DIAS[DIA].HORARIOS[I]
@@ -180,6 +179,7 @@ async function VerificarHorarios(dias: any, fecha_inicio: string, fecha_final: s
                 // SI ES FERIADO Y TIPO DE HORARIO ES LABORABLE AÑADIR OBSERVACION
                 if (esFeriado && dias[dia].horarios[i].tipo === 'N') {   
                     dias[dia].horarios[i].observacion = `Este día no permite horarios laborables`;
+                    dias[dia].observacion3 = `Este día no permite horarios laborables`;
                     dias[dia].horarios[i].default = 'DEFAULT_FERIADO';    
                     horariosNoValidos.push(horario);
                 } else {
@@ -190,7 +190,7 @@ async function VerificarHorarios(dias: any, fecha_inicio: string, fecha_final: s
             }
         }
         
-        dias[dia].observacion = horariosNoValidos.length > 0 ? `Horarios no validos: ${horariosNoValidos.join(', ')}` : 'OK';
+        dias[dia].observacion = horariosNoValidos.length > 0 ? `Horarios no validos` : 'OK';
         
         // VERIFICAR HORAS TOTALES DE HORARIOS
         if (horasTotales > hora_trabaja) {
@@ -296,16 +296,20 @@ async function VerificarSobreposicionHorarios(dias: any, codigo: string, fecha_i
                 if ((horario2.entrada.fecha >= horario1.entrada.fecha && horario2.entrada.fecha <= horario1.salida.fecha) ||
                     (horario2.salida.fecha <= horario1.salida.fecha && horario2.salida.fecha >= horario1.entrada.fecha)) {
 
-                        horario1.observacion = `Se sobrepone con el horario ${horario2.codigo} dia ${horario2.dia}`;
-                        horario2.observacion = `Se sobrepone con el horario ${horario1.codigo} dia ${horario1.dia}`; // Existe una sobreposición
+                        horario1.observacion = `Se sobrepone con el horario ${horario2.codigo} del dia ${horario1.dia}`;
+                        horario2.observacion = `Se sobrepone con el horario ${horario1.codigo} del dia ${horario1.dia}`;
                         rangosSimilares[horario1.dia] = rangosSimilares[horario1.dias] ? [...rangosSimilares[horario1.dia], horario1.codigo, horario2.codigo] : [horario1.codigo, horario2.codigo];
+                        rangosSimilares[horario2.dia] = rangosSimilares[horario2.dias] ? [...rangosSimilares[horario2.dia], horario1.codigo, horario2.codigo] : [horario1.codigo, horario2.codigo];
                     }
             }
         }
 
         // ACTUALIZAR DIAS[DIA].OBSERVACION
         for (const dia in rangosSimilares) {
-            dias[dia].observacion = `Rangos similares: ${[...new Set(rangosSimilares[dia])].join(', ')}`;
+            dias[dia].observacion = `Rangos similares`;
+            console.log('Dia',dia,dias[dia]);
+            console.log('rangos similares',rangosSimilares[dia]);
+
         }
     }
     

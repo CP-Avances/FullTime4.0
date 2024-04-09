@@ -88,32 +88,38 @@
               <table id="table_horario" class="table table-hover table-sm">
                 <thead class="thead-light">
                   <tr style="text-align: center;">
-                      <th class="sticky colum_1" scope="col" id="td_horarios" rowspan="2">CÓDIGO</th>
-                      <th class="sticky-2 colum_1" scope="col" id="td_horarios" rowspan="2">USUARIO</th>
-                      <th class="sticky-3 colum_2" scope="col" id="td_horarios" rowspan="2">JORNADA</th>
+                      <th class="sticky colum_1 td_horarios" scope="col" rowspan="2">CÓDIGO</th>
+                      <th class="sticky-2 colum_1 td_horarios" scope="col"  rowspan="2">USUARIO</th>
 
-                      <th scope="col" id="td_horarios" colspan="31">DÍAS DEL MES</th>
-                      <th class="sticky-5 colum_1" scope="col" id="td_horarios"
-                                    rowspan="2">OBSERVACIONES</th>
+                      <th scope="col" class="td_horarios" colspan="31">DÍAS DEL MES</th>
                   </tr>
                   <tr style="text-align: center;">
-                      <th *ngFor="let dia of dias_mes" scope="col" id="td_horarios">{{dia.fecha_formato}}</th>
+                      <th *ngFor="let dia of dias_mes" scope="col" class="td_horarios">{{dia.fecha_formato}}</th>
                   </tr>
               </thead>
 
               <tbody>
                   <tr *ngFor="let usuario of planificacionesHorarias">
-                      <td class="sticky colum_1" id="td_horarios">{{usuario.codigo_usuario}}</td>
-                      <td class="sticky-2 colum_1" id="td_horarios">{{usuario.nombre_usuario}}</td>
-                      <td class="sticky-3 colum_2" id="td_horarios"></td>
-                      <td *ngFor="let dia of usuario.dias">
-                          <div *ngFor="let horario of dia.horarios">
-                              {{horario.codigo}}
-                          </div>
+                      <td class="sticky colum_1 td_horarios">{{usuario.codigo_usuario}}</td>
+                      <td class="sticky-2 colum_1 td_horarios">{{usuario.nombre_usuario}}</td>
+                      <td *ngFor="let dia of usuario.dias" class="td_observaciones">
+                        <div *ngFor="let horario of dia.horarios">
+                            {{horario.codigo}}
+                        </div>
+                        <div *ngIf="dia.observacion2">
+                          Jornada superada
+                        </div>
+                        <div [style.color]="ObtenerColorObservacion(dia.observacion)">
                           {{dia.observacion}}
-                      </td>
-                      <td class="sticky-5 colum_1" id="td_horarios">
-
+                        </div>
+                        <br>
+                        <div class="icon-container">
+                          <i id="ver" *ngIf="MostrarVisualizarObservacion(dia)"
+                            class="fa fa-eye" matSuffix matTooltipPosition="right"
+                            matTooltip="Visualizar observaciones completas"
+                            (click)="VisualizarObservacion(dia)">
+                          </i>
+                        </div>
                       </td>
                   </tr>
               </tbody>
