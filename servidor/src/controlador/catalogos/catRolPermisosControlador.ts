@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import { QueryResult } from 'pg';
+
 import pool from '../../database';
 
 class RolPermisosControlador {
@@ -47,9 +49,7 @@ class RolPermisosControlador {
   //METODO PARA ENLISTAR LINKS 
   public async ListarMenuRoles(req: Request, res: Response) {
     const Roles = await pool.query(
-      `
-      SELECT nombre FROM opciones_menu
-      `
+      `SELECT * FROM opciones_menu`
     );
     if (Roles.rowCount > 0) {
       return res.jsonp(Roles.rows);
@@ -57,6 +57,93 @@ class RolPermisosControlador {
     else {
       return res.status(404).jsonp({ text: 'Registro no encontrado.' });
     }
+  }
+
+  // METODO PARA BUSCAR ID DE PAGINAS
+  public async ObtenerIdPaginas(req: Request, res: Response): Promise<any> {
+    const { funcion, id_rol } = req.body;
+    const PAGINA_ROL = await pool.query(
+      `
+          SELECT * FROM cg_rol_permisos WHERE funcion = $1 AND id_rol = $2
+          `
+      , [funcion, id_rol]);
+    if (PAGINA_ROL.rowCount > 0) {
+      return res.jsonp(PAGINA_ROL.rows)
+    }
+    else {
+      return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+    }
+  }
+
+
+  // METODO PARA BUSCAR ID DE PAGINAS
+  public async ObtenerPaginasRol(req: Request, res: Response): Promise<any> {
+    const { id_rol } = req.body;
+    const PAGINA_ROL = await pool.query(
+      `
+          SELECT * FROM cg_rol_permisos WHERE id_rol = $1 
+          `
+      , [id_rol]);
+    if (PAGINA_ROL.rowCount > 0) {
+      return res.jsonp(PAGINA_ROL.rows)
+    }
+    else {
+      return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+    }
+  }
+
+  // METODO PARA ASIGNAR CIUDADES A FERIADO
+  public async AsignarPaginaRol(req: Request, res: Response) {
+    try {
+      const { funcion, link, id_rol } = req.body;
+      const response: QueryResult = await pool.query(
+        `
+            INSERT INTO cg_rol_permisos (funcion, link, id_rol) VALUES ($1, $2, $3) RETURNING *
+            `
+        , [funcion, link, id_rol]);
+
+      const [rol] = response.rows;
+
+      if (rol) {
+        return res.status(200).jsonp({ message: 'OK', reloj: rol })
+      }
+      else {
+        return res.status(404).jsonp({ message: 'error' })
+      }
+    } catch (error) {
+      return res.status(500).jsonp({ message: 'error' })
+    }
+
+  }
+
+
+  // METODO PARA ELIMINAR REGISTRO
+  public async EliminarPaginaRol(req: Request, res: Response): Promise<void> {
+   // const id = req.params.id;
+
+    const { funcion, id_rol } = req.body
+
+    console.log(funcion);
+    console.log(id_rol);
+    await pool.query(
+      `
+        DELETE FROM cg_rol_permisos WHERE funcion = $1 AND id_rol = $2
+        `
+      , [funcion, id_rol]);
+    res.jsonp({ message: 'Registro eliminado.' });
+  }
+
+  // METODO PARA BUSCAR ID DE PAGINAS
+  public async EliminarPaginaRol1(req: Request, res: Response):  Promise<void> {
+    const { funcion, id_rol } = req.body;
+    const PAGINA_ROL = await pool.query(
+      `
+      DELETE FROM cg_rol_permisos WHERE funcion = $1 AND id_rol = $2
+          `
+      , [funcion, id_rol]);
+   
+      res.jsonp({ message: 'Registro eliminado.' });
+
   }
 
 

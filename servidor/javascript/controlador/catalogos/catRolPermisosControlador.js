@@ -64,15 +64,87 @@ class RolPermisosControlador {
     //METODO PARA ENLISTAR LINKS 
     ListarMenuRoles(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const Roles = yield database_1.default.query(`
-      SELECT nombre FROM opciones_menu
-      `);
+            const Roles = yield database_1.default.query(`SELECT * FROM opciones_menu`);
             if (Roles.rowCount > 0) {
                 return res.jsonp(Roles.rows);
             }
             else {
                 return res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
+        });
+    }
+    // METODO PARA BUSCAR ID DE PAGINAS
+    ObtenerIdPaginas(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { funcion, id_rol } = req.body;
+            const PAGINA_ROL = yield database_1.default.query(`
+          SELECT * FROM cg_rol_permisos WHERE funcion = $1 AND id_rol = $2
+          `, [funcion, id_rol]);
+            if (PAGINA_ROL.rowCount > 0) {
+                return res.jsonp(PAGINA_ROL.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+            }
+        });
+    }
+    // METODO PARA BUSCAR ID DE PAGINAS
+    ObtenerPaginasRol(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id_rol } = req.body;
+            const PAGINA_ROL = yield database_1.default.query(`
+          SELECT * FROM cg_rol_permisos WHERE id_rol = $1 
+          `, [id_rol]);
+            if (PAGINA_ROL.rowCount > 0) {
+                return res.jsonp(PAGINA_ROL.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+            }
+        });
+    }
+    // METODO PARA ASIGNAR CIUDADES A FERIADO
+    AsignarPaginaRol(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { funcion, link, id_rol } = req.body;
+                const response = yield database_1.default.query(`
+            INSERT INTO cg_rol_permisos (funcion, link, id_rol) VALUES ($1, $2, $3) RETURNING *
+            `, [funcion, link, id_rol]);
+                const [rol] = response.rows;
+                if (rol) {
+                    return res.status(200).jsonp({ message: 'OK', reloj: rol });
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'error' });
+                }
+            }
+            catch (error) {
+                return res.status(500).jsonp({ message: 'error' });
+            }
+        });
+    }
+    // METODO PARA ELIMINAR REGISTRO
+    EliminarPaginaRol(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // const id = req.params.id;
+            const { funcion, id_rol } = req.body;
+            console.log(funcion);
+            console.log(id_rol);
+            yield database_1.default.query(`
+        DELETE FROM cg_rol_permisos WHERE funcion = $1 AND id_rol = $2
+        `, [funcion, id_rol]);
+            res.jsonp({ message: 'Registro eliminado.' });
+        });
+    }
+    // METODO PARA BUSCAR ID DE PAGINAS
+    EliminarPaginaRol1(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { funcion, id_rol } = req.body;
+            const PAGINA_ROL = yield database_1.default.query(`
+      DELETE FROM cg_rol_permisos WHERE funcion = $1 AND id_rol = $2
+          `, [funcion, id_rol]);
+            res.jsonp({ message: 'Registro eliminado.' });
         });
     }
 }

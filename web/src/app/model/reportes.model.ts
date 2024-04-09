@@ -448,3 +448,12 @@ export interface hora {
     planifica_nombre: string,
     planifica_apellido: string,
 }
+
+
+// PAGINAS ROLES
+
+export interface ITableFuncionesRoles {
+    
+    funcion: string,
+    
+}

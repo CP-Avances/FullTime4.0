@@ -18,7 +18,15 @@ class RolPermisosRutas {
         this.router.post('/denegado/', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.createPermisoDenegado);
         this.router.get('/denegado/:id', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.getPermisosUsuario);
         // MENU ENLISTAR
-        this.router.get('/menu', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarMenuRoles);
+        this.router.get('/menu/paginas', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarMenuRoles);
+        // METODO PARA BUSCAR LAS PAGINAS POR ID_ROL
+        this.router.post('/menu/paginas/ide', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerIdPaginas);
+        //METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL
+        this.router.post('/menu/todaspaginasrol', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerPaginasRol);
+        // METODO PARA REGISTRAR ASIGNACION DE PAGINAS  
+        this.router.post('/menu/paginas/insertar', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.AsignarPaginaRol);
+        // METODO PARA ELIMINAR LAS PAGINAS  
+        this.router.post('/menu/paginas/eliminar', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.EliminarPaginaRol);
     }
 }
 const rolPermisosRutas = new RolPermisosRutas();

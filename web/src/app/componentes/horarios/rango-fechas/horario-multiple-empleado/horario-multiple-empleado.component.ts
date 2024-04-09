@@ -524,6 +524,7 @@ export class HorarioMultipleEmpleadoComponent implements OnInit {
       return `${this.isAllSelectedEmp() ? 'select' : 'deselect'} all`;
     }
     return `${this.selectionEmp.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+
   }
 
   // EVENTO DE PAGINACION DE TABLAS
