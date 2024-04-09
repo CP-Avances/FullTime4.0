@@ -1,5 +1,5 @@
 //IMPORTAR LIBRERIAS
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ThemePalette } from '@angular/material/core';
 import { MatDatepicker } from '@angular/material/datepicker';
@@ -16,6 +16,7 @@ import { ToastrService } from 'ngx-toastr';
 import { PlanificacionHorariaService } from 'src/app/servicios/catalogos/catPlanificacionHoraria/planificacionHoraria.service';
 import { MatDialog } from '@angular/material/dialog';
 import { VisualizarObservacionComponent } from '../visualizar-observacion/visualizar-observacion/visualizar-observacion.component';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 @Component({
   selector: 'app-cargar-plantilla-planificacion',
   templateUrl: './cargar-plantilla-planificacion.component.html',
@@ -27,20 +28,22 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
   usuarios: any;
 
   // FECHAS DE BUSQUEDA
-  fechaInicialF = new FormControl;
+  fechaInicialF = new FormControl();
   fechaFinalF = new FormControl();
   fecHorario: boolean = true;
 
-  // ITEMS DE PAGINACION DE LA TABLA EMPLEADOS
-  pageSizeOptions_emp = [5, 10, 20, 50];
-  tamanio_pagina_emp: number = 5;
-  numero_pagina_emp: number = 1;
+  // ITEMS DE PAGINACION DE LA TABLA DE PLANIFICACIONES HORARIAS
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  pageSizeOptions_planificacion = [5, 10, 20, 50];
+  tamanio_pagina_planificacion: number = 5;
+  numero_pagina_planificacion: number = 1;
 
   archivo1Form = new FormControl('');
 
   // VARIABLES USADAS EN SELECCION DE ARCHIVOS
   archivo: Array<File>;
   nombreArchivo: string;
+  textoBoton: string = 'Cargar plantilla';
 
   // VARIABLES PARA EL MANEJO DE LOS DIAS DEL MES
   dias_mes: any[] = [];
@@ -107,19 +110,23 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
 
   /** ************************************************************************************************* **
-   ** **                              PLANTILLA CARGAR PLANIFICACION                                 ** **
+   ** **                   METODOS PARA EL MAJEJO DE LA PLANTILLA DE PLANIFICACION                   ** **
    ** ************************************************************************************************* **/
 
   // LIMPIAR CAMPOS PLANTILLA
   LimpiarCamposPlantilla() {
     this.archivo1Form.reset();
     this.spinnerService.hide();
-
+    this.textoBoton = 'Cargar nueva plantilla';
+    this.numero_pagina_planificacion = 1;
+    this.tamanio_pagina_planificacion = 5;
+    this.paginator.firstPage();
   }
 
   // DESCARGAR PLANTILLA EXCEL
   DescargarPlantilla() {
     this.GenerarExcel(this.fechaInicialF.value, this.fechaFinalF.value, this.datosSeleccionados.usuariosSeleccionados);
+    this.LimpiarCampos();
   }
 
   // METODO PARA CARGAR PLANTILLA
@@ -151,6 +158,8 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
         timeOut: 6000,
       });
     }
+    this.LimpiarCamposPlantilla();
+
   }
 
   // METODO PARA VERIFICAR PLANTILLA
@@ -160,9 +169,7 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
       formData.append("uploads", this.archivo[i], this.archivo[i].name);
     }
     this.restP.VerificarDatosPlanificacionHoraria(formData).subscribe( (res: any) => {
-      console.log(res);
       this.OrganizarDatosPlanificacion(res);
-      this.spinnerService.hide();
       this.toastr.success('Plantilla verificada correctamente', 'Plantilla verificada', {
         timeOut: 6000,
       });
@@ -209,6 +216,14 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
   GenerarExcel(fechaInicial: Moment, fechaFinal: Moment, usuarios: any[]) {
     // CONVERTIR MOMENT A DATE
+
+    if (fechaInicial === null || fechaFinal === null) {
+      this.toastr.error('Debe seleccionar una fecha inicial y una fecha final', 'Fechas no seleccionadas', {
+        timeOut: 6000,
+      });
+      return;
+    }
+
     const fechaInicio = fechaInicial.toDate();
     const fechaFin = fechaFinal.toDate();
 
@@ -271,9 +286,20 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
   // METODO PARA OBTENER EL COLOR DE LA OBSERVACION
   ObtenerColorObservacion(observacion: string) {
-    if (observacion != 'OK'){
-      return 'rgb(242, 21, 21)';
+
+    if(observacion.startsWith('Jornada superada')) return 'rgb(19, 192, 163)';
+
+    switch (observacion) {
+      case 'OK':
+        return 'rgb(19, 191, 65)';
+      default:
+        return 'rgb(242, 21, 21)';
     }
+  }
+
+  ManejarPaginaResultados(e: PageEvent) {
+    this.tamanio_pagina_planificacion = e.pageSize;
+    this.numero_pagina_planificacion = e.pageIndex + 1;
   }
 
 

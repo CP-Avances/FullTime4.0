@@ -576,7 +576,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     AsignarUsuarioComponent,
     DefinicionPlantillaComponent,
     VisualizarObservacionComponent,
-   
+
 
   ],
 

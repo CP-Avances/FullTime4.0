@@ -1,7 +1,7 @@
 <div class="container" style="padding-bottom: 15px;">
   <mat-card class="example-card mat-elevation-z8">
       <div id="titulo">
-          <span>CALENDARIO RANGO FECHAS</span>
+          <span>CARGAR PLANTILLA DE PLANIFICACIÓN HORARIA</span>
           <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">
               highlight_off
           </mat-icon>
@@ -10,7 +10,7 @@
           <div class="row">
               <div class="nota" style="margin-left: 15px; padding-top: 15px;" *ngIf="datosSeleccionados.usuariosSeleccionados.length > 0">
                   <span>
-                      NOTA: Para generar la plantilla debe ingresar el mes.
+                      NOTA: Para generar la plantilla debe seleccionar el mes de inicio.
                   </span>
               </div>
               <div class="col-md" *ngIf="datosSeleccionados.usuariosSeleccionados.length > 0">
@@ -22,7 +22,7 @@
                                       <mat-form-field style="width: 160px;">
                                           <mat-label>Mes inicio</mat-label>
                                           <input matInput [matDatepicker]="fec1" [formControl]="fechaInicialF"
-                                              placeholder="DD/MM/YYYY">
+                                              placeholder="DD/MM/YYYY" readonly>
                                           <mat-datepicker-toggle matIconSuffix [for]="fec1"></mat-datepicker-toggle>
                                           <mat-datepicker #fec1 startView="year"
                                               (monthSelected)="FormatearFecha($event, fec1)" touchUi>
@@ -52,8 +52,8 @@
               <div class="col-md" style="padding-top: 15px;">
                 <div class="row">
                   <div class="d-flex flex-wrap justify-content-center">
-                    <div style="margin: 0 auto;">
-                      <button class="btn btn-sm" (click)="DescargarPlantilla()">
+                    <div style="margin: 0 auto;" *ngIf="datosSeleccionados.usuariosSeleccionados.length > 0">
+                      <button class="btn btn-2" id="descarga" (click)="DescargarPlantilla()">
                           Descargar plantilla
                       </button>
                     </div>
@@ -63,12 +63,12 @@
                       accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                       style="display: none;">
 
-                  <button class="btn btn-sm" (click)="fileInput.click()">
-                      Cargar plantilla
-                  </button>
+                      <button class="btn btn-2" id="carga" (click)="fileInput.click()">
+                         {{ textoBoton }}
+                      </button>
                     </div>
                     <div style="margin: 0 auto;">
-                        <button class="btn btn-sm" >
+                        <button class="btn btn-2" id="registrar" >
                             Registar
                         </button>
                     </div>
@@ -77,7 +77,7 @@
               </div>
           </div>
 
-          <div class="mat-elevation-z8" style="background: white; padding-top: 15px;"  *ngIf="planificacionesHorarias">
+          <div class="mat-elevation-z8" style="background: white; margin-top: 15px;"  *ngIf="planificacionesHorarias">
             <div class="d-flex bd-highlight" id="resultados">
               <span class="w-100 bd-highlight">
                   PLANIFICACIÓN MÚLTIPLE
@@ -99,14 +99,14 @@
               </thead>
 
               <tbody>
-                  <tr *ngFor="let usuario of planificacionesHorarias">
+                  <tr *ngFor="let usuario of planificacionesHorarias | paginate:tamanio_pagina_planificacion:numero_pagina_planificacion">
                       <td class="sticky colum_1 td_horarios">{{usuario.codigo_usuario}}</td>
                       <td class="sticky-2 colum_1 td_horarios">{{usuario.nombre_usuario}}</td>
                       <td *ngFor="let dia of usuario.dias" class="td_observaciones">
                         <div *ngFor="let horario of dia.horarios">
                             {{horario.codigo}}
                         </div>
-                        <div *ngIf="dia.observacion2">
+                        <div *ngIf="dia.observacion2" [style.color]="ObtenerColorObservacion(dia.observacion2)">
                           Jornada superada
                         </div>
                         <div [style.color]="ObtenerColorObservacion(dia.observacion)">
@@ -126,7 +126,10 @@
 
               </table>
             </div>
-
+            <mat-paginator #paginator [length]="planificacionesHorarias.length" [pageSize]="tamanio_pagina_planificacion"
+              [pageSizeOptions]="pageSizeOptions_planificacion" (page)="ManejarPaginaResultados($event)"
+              showFirstLastButtons>
+            </mat-paginator>
 
           </div>
 

@@ -151,8 +151,8 @@
                     </tbody>
                 </table>
             </div>
-            <mat-paginator id="pagina" [length]="horarios.length" [pageSize]="tamanio_pagina"
-                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+            <mat-paginator #paginator id="pagina" [length]="horarios.length" [pageSize]="tamanio_pagina"
+                [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
             </mat-paginator>
             <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
                 <i (click)="GenerarPDF('download')" id="pdf" class="fas fa-file-pdf" matSuffix
@@ -225,7 +225,7 @@
               </tbody>
           </table>
       </div>
-      <mat-paginator id="paginaH" [length]="dataHorarios.plantillaHorarios.length" [pageSize]="tamanio_paginaH"
+      <mat-paginator #paginatorH [length]="dataHorarios.plantillaHorarios.length" [pageSize]="tamanio_paginaH"
           [pageSizeOptions]="pageSizeOptionsH" id="paginaH" (page)="ManejarPaginaH($event)" showFirstLastButtons>
       </mat-paginator>
   </div>
@@ -273,7 +273,7 @@
               </tbody>
           </table>
       </div>
-      <mat-paginator id="paginaD" [length]="dataHorarios.plantillaDetalles.length" [pageSize]="tamanio_paginaD"
+      <mat-paginator #paginatorD [length]="dataHorarios.plantillaDetalles.length" [pageSize]="tamanio_paginaD"
           [pageSizeOptions]="pageSizeOptionsD" id="paginaD" (page)="ManejarPaginaD($event)" showFirstLastButtons>
       </mat-paginator>
   </div>
