@@ -334,7 +334,7 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
    ** ************************************************************************************************* **/
 
   MostrarVisualizarObservacion(dia: any): boolean {
-    return (dia.observacion != '' && dia.observacion != 'OK') || Boolean(dia.observacion2);
+    return (dia.observacion != '' && dia.observacion != 'OK') || Boolean(dia.observacion2) || Boolean(dia.observacion3) || Boolean(dia.observacion4) ;
   }
 
 

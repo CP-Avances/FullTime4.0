@@ -110,7 +110,7 @@
                         <div *ngFor="let horario of dia.horarios">
                             {{horario.codigo}}
                         </div>
-                        <div *ngIf="dia.observacion2" [style.color]="ObtenerColorObservacion(dia.observacion2)">
+                        <div *ngIf="dia.observacion4" [style.color]="ObtenerColorObservacion(dia.observacion4)">
                           Jornada superada
                         </div>
                         <div [style.color]="ObtenerColorObservacion(dia.observacion)">

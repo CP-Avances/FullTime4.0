@@ -170,7 +170,7 @@ function VerificarHorarios(dias, fecha_inicio, fecha_final, id_usuario, hora_tra
                     dias[dia].horarios[i].tipo = horarioVerificado[1].default_;
                     // SI ES FERIADO Y TIPO DE HORARIO ES LABORABLE AÑADIR OBSERVACION
                     if (esFeriado && dias[dia].horarios[i].tipo === 'N') {
-                        dias[dia].horarios[i].observacion = `Este día no permite horarios laborables`;
+                        dias[dia].horarios[i].observacion = `Horario no valido para día feriado`;
                         dias[dia].observacion3 = `Este día no permite horarios laborables`;
                         dias[dia].horarios[i].default = 'DEFAULT_FERIADO';
                         horariosNoValidos.push(horario);
@@ -185,7 +185,7 @@ function VerificarHorarios(dias, fecha_inicio, fecha_final, id_usuario, hora_tra
             // VERIFICAR HORAS TOTALES DE HORARIOS
             if (horasTotales > hora_trabaja) {
                 const horas = ConvertirMinutosAHoras(horasTotales);
-                dias[dia].observacion2 = `Jornada superada: ${horas} tiempo total`;
+                dias[dia].observacion4 = `Jornada superada: ${horas} tiempo total`;
             }
         }
         return dias;

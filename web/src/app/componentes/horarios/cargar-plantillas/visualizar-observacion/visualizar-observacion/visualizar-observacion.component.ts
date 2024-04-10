@@ -28,6 +28,15 @@ export class VisualizarObservacionComponent {
 
     if (this.data.observacion2) {
       this.observaciones.push(this.data.observacion2);
+      return;
+    }
+
+    if (this.data.observacion3) {
+      this.observaciones.push(this.data.observacion3);
+    }
+
+    if (this.data.observacion4) {
+      this.observaciones.push(this.data.observacion4);
     }
 
     this.data.horarios.forEach((horario:any) => {
