@@ -108,9 +108,21 @@ class PlanificacionHorariaControlador {
         res.json({planificacionHoraria: plantillaPlanificacionHorariaEstructurada, fechaInicioMes, fechaFinalMes});
     }
 
-    //METODO PARA CARGAR LA PLANIFICACION HORARIA
-    public CargarPlanificacionHoraria(formData: any) {
-        return null;
+    //METODO PARA REGISTRAR LA PLANIFICACION HORARIA EN LA BASE DE DATOS
+    public RegistrarPlanificacionHoraria(req: Request, res: Response) {
+       
+       try {
+        const planificacionHoraria = req.body;
+        console.log('PLANIFICACION HORARIA',planificacionHoraria);
+
+        return res.status(200).jsonp({ message: 'correcto' })
+        
+       } catch (error) {
+
+        return res.status(400).jsonp({ message: error });
+        
+       }
+
     }
 
 }

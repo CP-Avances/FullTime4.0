@@ -3,20 +3,34 @@
   height: 64px;
 }
 
-#descarga {
+#descargar, #cargar, #registrar {
+  margin-top: 15px;
+  padding-bottom: 6px;
+  border-radius: 5px;
+  font-family: "Poppins", sans-serif;
+  font-weight: bold;
+  padding-top: 10px;
+  font-size: 14px;
+  overflow: hidden;
+  height: 65px;
+  width: 220px;
+}
+
+
+#descargar {
   background-color: #93a3c7;
   color: white;
 }
 
-#descarga:hover {
+#descargar:hover {
   background-color: rgb(0, 76, 255);
 }
 
-#carga {
+#cargar {
   background-color: rgb(150, 243, 141);
 }
 
-#carga:hover {
+#cargar:hover {
   background-color: rgb(21, 130, 1);
 }
 

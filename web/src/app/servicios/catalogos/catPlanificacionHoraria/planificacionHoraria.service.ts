@@ -17,8 +17,8 @@ export class PlanificacionHorariaService {
   }
 
   // CARGAR PLANIFICACION HORARIA
-  CargarPlanificacionHoraria(formData: any) {
-    return this.http.post<any>(`${environment.url}/planificacionHoraria/cargarPlanificacion`, formData);
+  RegistrarPlanificacionHoraria(formData: any) {
+    return this.http.post<any>(`${environment.url}/planificacionHoraria/registrarPlanificacion`, formData);
   }
 
 }

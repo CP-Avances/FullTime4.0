@@ -27,7 +27,7 @@ class PlanificacionHorariaRutas {
         // VERIFICAR DATOS DE LA PLANIFICACION HORARIA
         this.router.post('/verificarDatos', [verificarToken_1.TokenValidation, upload.single('uploads')], catPlanificacionHorariaControlador_1.default.VerificarDatosPlanificacionHoraria);
         // CARGAR PLANIFICACION HORARIA
-        this.router.post('/cargarPlanificacion', [verificarToken_1.TokenValidation, upload.single('uploads')], catPlanificacionHorariaControlador_1.default.CargarPlanificacionHoraria);
+        this.router.post('/registrarPlanificacion', [verificarToken_1.TokenValidation, upload.single('uploads')], catPlanificacionHorariaControlador_1.default.RegistrarPlanificacionHoraria);
     }
 }
 const PLANIFICACION_HORARIA_RUTAS = new PlanificacionHorariaRutas();

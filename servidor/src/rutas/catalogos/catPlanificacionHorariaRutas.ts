@@ -31,7 +31,7 @@ class PlanificacionHorariaRutas{
         // VERIFICAR DATOS DE LA PLANIFICACION HORARIA
         this.router.post('/verificarDatos', [TokenValidation, upload.single('uploads')], PLANIFICACION_HORARIA_CONTROLADOR.VerificarDatosPlanificacionHoraria);
         // CARGAR PLANIFICACION HORARIA
-        this.router.post('/cargarPlanificacion', [TokenValidation, upload.single('uploads')], PLANIFICACION_HORARIA_CONTROLADOR.CargarPlanificacionHoraria);
+        this.router.post('/registrarPlanificacion', [TokenValidation, upload.single('uploads')], PLANIFICACION_HORARIA_CONTROLADOR.RegistrarPlanificacionHoraria);
     }
 }
 

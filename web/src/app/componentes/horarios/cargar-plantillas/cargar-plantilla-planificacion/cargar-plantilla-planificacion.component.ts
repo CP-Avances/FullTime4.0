@@ -17,6 +17,7 @@ import { PlanificacionHorariaService } from 'src/app/servicios/catalogos/catPlan
 import { MatDialog } from '@angular/material/dialog';
 import { VisualizarObservacionComponent } from '../visualizar-observacion/visualizar-observacion/visualizar-observacion.component';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 @Component({
   selector: 'app-cargar-plantilla-planificacion',
   templateUrl: './cargar-plantilla-planificacion.component.html',
@@ -44,14 +45,17 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
   archivo: Array<File>;
   nombreArchivo: string;
   textoBoton: string = 'Cargar plantilla';
+  deshabilitarRegistro: boolean = true;
 
   // VARIABLES PARA EL MANEJO DE LOS DIAS DEL MES
   dias_mes: any[] = [];
   dia_inicio: any;
   dia_fin: any;
+  mes: string;
 
   // VARIABLES PARA LAS PLANIFICACIONES HORARIAS DE LOS USUARIOS
   planificacionesHorarias: any;
+  planificacionesCorrectas: any;
 
   constructor(
     public componentem: HorarioMultipleEmpleadoComponent,
@@ -96,6 +100,9 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     let dia_inicio = moment(this.dia_inicio, 'YYYYY-MM-DD');
     let dia_fin = moment(this.dia_fin, 'YYYYY-MM-DD');
 
+    this.mes = dia_inicio.format('MMMM').toUpperCase();
+
+
     while (dia_inicio <= dia_fin) {
       let dia = {
         fecha: dia_inicio.format('YYYY-MM-DD'),
@@ -118,9 +125,12 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     this.archivo1Form.reset();
     this.spinnerService.hide();
     this.textoBoton = 'Cargar nueva plantilla';
+    this.deshabilitarRegistro = false;
     this.numero_pagina_planificacion = 1;
     this.tamanio_pagina_planificacion = 5;
-    this.paginator.firstPage();
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
   }
 
   // DESCARGAR PLANTILLA EXCEL
@@ -177,6 +187,7 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
   }
 
+  // METODO PARA ORGANIZAR LOS DATOS DE LA PLANIFICACION
   OrganizarDatosPlanificacion(data: any) {
     this.planificacionesHorarias = [];
     this.dias_mes = [];
@@ -209,13 +220,62 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
       });
 
       this.planificacionesHorarias = data.planificacionHoraria;
+
+
+
       console.log('planificacionesHorarias', this.planificacionesHorarias);
+    }
   }
+
+  // METODO PARA SOLICITAR CONFIRMACION DE REGISTRO DE PLANIFICACIONES
+  ConfirmarRegistroPlanificaciones() {
+    const mensaje = 'registro';
+    this.ventana.open(MetodosComponent, { width: '450px', data:  mensaje  }).afterClosed().subscribe((confimado: Boolean) => {
+      if (confimado) {
+        console.log('Comenzando a registrar planificacion');
+        this.RegistrarPlanificaciones();
+      }
+    });
+  }
+
+  // METODO PARA REGISTRAR PLANIFICACIONES
+  RegistrarPlanificaciones() {
+    this.spinnerService.show();
+
+    this.planificacionesCorrectas = JSON.parse(JSON.stringify(this.planificacionesHorarias)).map((planificacion: any) => {
+      planificacion.dias = planificacion.dias.map((dia: any) => {
+        if (dia.observacion !== 'OK') {
+          dia.observacion = dia.observacion3 ? 'DEFAULT_FERIADO' : 'DEFAULT_LIBRE';
+          dia.horarios = dia.observacion3 ? [{codigo:'DEFAULT_FERIADO'}] : [{codigo:'DEFAULT_LIBRE'}];
+        }
+        return dia;
+      });
+      return planificacion;
+    });
+
+    this.restP.RegistrarPlanificacionHoraria(this.planificacionesCorrectas).subscribe( (res: any) => {
+      this.spinnerService.hide();
+      this.toastr.success('Plantilla de planificaciones horarias importada', 'operación exitosa', {
+        timeOut: 6000,
+      });
+    }, (error: any) => {
+      this.spinnerService.hide();
+      this.toastr.error('Error al importar la plantilla de planificaciones horarias', 'Ups!!! algo salio mal.', {
+        timeOut: 6000,
+      });
+    });
+    this.LimpiarCamposPlantilla();
+    this.CerrarVentana();
+    this.deshabilitarRegistro = true;
+
+    console.log('planificacionesCorrectas', this.planificacionesCorrectas);
 
   }
 
+
+  // METODO PARA GENERAR EXCEL
   GenerarExcel(fechaInicial: Moment, fechaFinal: Moment, usuarios: any[]) {
-    // CONVERTIR MOMENT A DATE
+
 
     if (fechaInicial === null || fechaFinal === null) {
       this.toastr.error('Debe seleccionar una fecha inicial y una fecha final', 'Fechas no seleccionadas', {
@@ -268,6 +328,10 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     // ESCRIBIR EL LIBRO DE TRABAJO EN UN ARCHIVO EXCEL
     XLSX.writeFile(wb, 'plantillaPlanificacionMultiple.xlsx');
   }
+
+  /** ************************************************************************************************* **
+   ** **                       METODOS PARA EL CONTROL DE ELEMENTOS DE LA VISTA                      ** **
+   ** ************************************************************************************************* **/
 
   MostrarVisualizarObservacion(dia: any): boolean {
     return (dia.observacion != '' && dia.observacion != 'OK') || Boolean(dia.observacion2);
