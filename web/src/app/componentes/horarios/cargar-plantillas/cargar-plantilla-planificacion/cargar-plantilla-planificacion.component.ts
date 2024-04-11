@@ -245,8 +245,8 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     this.planificacionesCorrectas = JSON.parse(JSON.stringify(this.planificacionesHorarias)).map((planificacion: any) => {
       planificacion.dias = planificacion.dias.map((dia: any) => {
         if (dia.observacion !== 'OK') {
-          dia.observacion = dia.observacion3 ? 'DEFAULT_FERIADO' : 'DEFAULT_LIBRE';
-          dia.horarios = dia.observacion3 ? [{codigo:'DEFAULT_FERIADO'}] : [{codigo:'DEFAULT_LIBRE'}];
+          dia.observacion = dia.observacion3 ? 'DEFAULT-FERIADO' : 'DEFAULT-LIBRE';
+          dia.horarios = dia.observacion3 ? [{codigo:'DEFAULT-FERIADO', dia: dia.fecha ,observacion: 'DEFAULT-FERIADO' }] : [{codigo:'DEFAULT-LIBRE', dia: dia.fecha, observacion: 'DEFAULT-LIBRE'}];
         }
         return dia;
       });

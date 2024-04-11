@@ -83,7 +83,7 @@ export class PlanificacionMultipleComponent implements OnInit {
   }
 
   /** **************************************************************************************** **
-   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** ** 
+   ** **                   BUSQUEDA DE FORMATOS DE FECHAS Y HORAS                           ** **
    ** **************************************************************************************** **/
   formato_hora: string = 'HH:mm:ss';
 
@@ -140,7 +140,7 @@ export class PlanificacionMultipleComponent implements OnInit {
   dia_inicio: any;
   dia_fin: any;
   ListarFechas(fecha_inicio: any, fecha_final: any) {
-    this.fechas_mes = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO 
+    this.fechas_mes = []; // ARRAY QUE CONTIENE TODAS LAS FECHAS DEL MES INDICADO
 
     this.dia_inicio = moment(fecha_inicio, 'YYYY-MM-DD').format('YYYY-MM-DD');
     this.dia_fin = moment(fecha_final, 'YYYY-MM-DD').format('YYYY-MM-DD');
@@ -1219,7 +1219,7 @@ export class PlanificacionMultipleComponent implements OnInit {
 
   // METODO PARA GUARDAR REGISTRO DE HORARIOS
   RegistrarPlanificacionMultiple() {
-    //console.log('ver plan ', this.plan_general);
+    console.log('ver plan ', this.plan_general);
 
     this.restP.CrearPlanGeneral(this.plan_general).subscribe(res => {
       if (res.message === 'OK') {
