@@ -20,7 +20,7 @@ class RolPermisosRutas {
         this.router.get('/menu/paginas', TokenValidation, rolPermisosControlador.ListarMenuRoles);
 
         // METODO PARA BUSCAR LAS PAGINAS POR ID_ROL
-          
+
         this.router.post('/menu/paginas/ide', TokenValidation, rolPermisosControlador.ObtenerIdPaginas);
 
 
@@ -29,12 +29,16 @@ class RolPermisosRutas {
 
 
         // METODO PARA REGISTRAR ASIGNACION DE PAGINAS  
-         this.router.post('/menu/paginas/insertar', TokenValidation, rolPermisosControlador.AsignarPaginaRol);
+        this.router.post('/menu/paginas/insertar', TokenValidation, rolPermisosControlador.AsignarPaginaRol);
 
 
 
-         // METODO PARA ELIMINAR LAS PAGINAS  
-         this.router.post('/menu/paginas/eliminar', TokenValidation, rolPermisosControlador.EliminarPaginaRol);
+        // METODO PARA ELIMINAR LAS PAGINAS  
+        this.router.post('/menu/paginas/eliminar', TokenValidation, rolPermisosControlador.EliminarPaginaRol);
+
+
+        // METODO PARA BUSCAR LAS ACCIONES DE LAS PAGINAS
+        this.router.post('/menu/paginas/acciones', TokenValidation, rolPermisosControlador.ObtenerAccionesPaginas);
     }
 }
 

@@ -137,14 +137,19 @@ class RolPermisosControlador {
             res.jsonp({ message: 'Registro eliminado.' });
         });
     }
-    // METODO PARA BUSCAR ID DE PAGINAS
-    EliminarPaginaRol1(req, res) {
+    // METODO PARA Buscar las acciones de cada pagina
+    ObtenerAccionesPaginas(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { funcion, id_rol } = req.body;
+            const { id_funcion } = req.body;
             const PAGINA_ROL = yield database_1.default.query(`
-      DELETE FROM cg_rol_permisos WHERE funcion = $1 AND id_rol = $2
-          `, [funcion, id_rol]);
-            res.jsonp({ message: 'Registro eliminado.' });
+          SELECT * FROM cg_acciones_roles WHERE id_funcion = $1 
+          `, [id_funcion]);
+            if (PAGINA_ROL.rowCount > 0) {
+                return res.jsonp(PAGINA_ROL.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+            }
         });
     }
 }

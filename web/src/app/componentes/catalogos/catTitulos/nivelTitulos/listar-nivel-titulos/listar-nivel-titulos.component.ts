@@ -354,6 +354,7 @@ export class ListarNivelTitulosComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Eliminar(datos.id);
+
         } else {
           this.router.navigate(['/nivelTitulos']);
         }

@@ -10,6 +10,7 @@ import { ITableFuncionesRoles } from 'src/app/model/reportes.model';
 import { MatDialog } from '@angular/material/dialog';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { Router } from '@angular/router';
+import { timeout } from 'rxjs';
 
 
 interface Funciones {
@@ -45,6 +46,11 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
   // MENU PARA ROLES
   nombresMenu: any = [];
+
+  //MENU PAREA ACCIONES
+
+  nombresAcciones: any = [];
+
 
 
   funciones: Funciones[] = [
@@ -84,11 +90,17 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   paginas: any = [];
   paginasEliminar: any = [];
 
+
+  // ITEMS ACCIONES DE PAGINAS
+
+  accionesPaginas: any = [];
+
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
 
   pageSizeOptions = [5, 10, 20, 50];
+  espera: boolean = false ;
 
   constructor(
     public location: Location,
@@ -310,6 +322,17 @@ export class SeleccionarRolPermisoComponent implements OnInit {
           this.rest.crearPaginaRol(rolPermisosbody).subscribe(response => {
             this.contador = this.contador + 1;
             this.ingresar = this.ingresar + 1;
+            this.toastr.success('Operación exitosa.', 'Registro guardado.', {
+              timeOut: 6000,
+            });
+
+
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+            
+
+
             //this.VerMensaje();
           }, error => {
             this.contador = this.contador + 1;
@@ -357,6 +380,12 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
   auto_individual: boolean = true;
   activar_seleccion: boolean = true;
+
+
+  seleccion_vacia: boolean = true;
+
+
+
 
 
 
@@ -422,7 +451,24 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.EliminarPaginaRol();
+
+          if (this.paginasEliminar.length != 0) {
+            this.EliminarPaginaRol();
+
+            
+            
+            
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+            
+            
+          } else {
+            this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+
+          }
         } else {
           this.router.navigate(['/seleccionarPermisos', this.idRol]);
         }
@@ -430,13 +476,32 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   }
 
 
+  //FUNCION PARA BUSCAR LAS ACCIONES DE LAS PAGINAS 
 
 
+  //guardar en n vector grande las acciones que stoy señallando con el checkbox
 
 
+  ObtenerAcciones(id: any) {
+
+    //this.nombresAcciones = [];
 
 
+    var buscarAcciones = {
+      id_funcion: id
+    };
 
 
+    this.rest.BuscarAccionesPaginas(buscarAcciones).subscribe(res => {
+      this.nombresAcciones.push(res);
+
+      
+      console.log("acciones",this.nombresAcciones)
+
+    }, error => {
+      console.log(error);
+    });
+
+  }
 
 }

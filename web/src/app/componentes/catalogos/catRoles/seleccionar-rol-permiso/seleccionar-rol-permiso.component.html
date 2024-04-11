@@ -33,11 +33,61 @@
                                                 *ngFor="let n of nombresMenu; index as i">
                                                 <input class="form-check-input" type="checkbox"
                                                     name="paginasSeleccionadas" id="paginasSeleccionadas{{i}}"
-                                                    (change)="SeleccionarIndividual($event, n)">
+                                                    (change)="SeleccionarIndividual($event, n)"
+                                                    (change)="ObtenerAcciones(n.id)">
                                                 <label style="margin-left: 10px; font-size: 14px;"
                                                     class="form-check-label" for="inlineCheckbox1">
                                                     {{n.nombre}}
+
+                                                    <div class="modal-body" style="margin-left: 60px; padding-top: 15px;">
+
+                                                        <!--Acciones de las paginas-->
+                                                        <div class="container-fluid">
+                                                            <input class="form-check-input" type="checkbox" id="seleccionar"
+                                                                [(ngModel)]="isChecked"
+                                                                (change)="SeleccionarTodas(isChecked)"
+                                                                [ngModelOptions]="{standalone: true}">
+                                                            <label class="form-check-label" for="inlineCheckbox1"
+                                                                style="margin-left: 10px; font-size: 14px; color: blue; font-weight: bold;">
+                                                                Todos las Paginas
+                                                            </label>
+    
+                                                            <div class="row" style="text-align: center; padding-top: 10px;">
+                                                                <div class="col-md-6 col-lg-6 col-6"
+                                                                    style="text-align:left; padding-bottom: 10px;"
+                                                                    *ngFor="let a of nombresAcciones; index as i">
+    
+    
+    
+                                                                    <label style="margin-left: 10px; font-size: 14px;"
+                                                                        class="form-check-label" for="inlineCheckbox1">
+                                                                        {{a.accion}}
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+    
+    
+    
+                                                            <div class="row" style="text-align: center; padding-top: 10px;">
+                                                                <div class="row"
+                                                                    style="text-align: center; padding-top: 10px;">
+    
+    
+    
+                                                                </div>
+    
+                                                            </div>
+                                                        </div>
+    
+    
+                                                    </div>
+
+
+
                                                 </label>
+                                                
+
+
                                             </div>
                                         </div>
                                     </div>
@@ -70,7 +120,8 @@
         <span class="w-100 bd-highlight">
             PAGINAS DE ACCESO
         </span>
-        <button  (click)="ConfirmarDelete()" class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px;" >Eliminar</button>
+        <button (click)="ConfirmarDelete()" class="btn btn-outline-light btn-sm"
+            style="float: right; margin-right: 10px;">Eliminar</button>
     </div>
     <div class="table-responsive">
         <table class="table table-hover table-sm">
@@ -87,20 +138,23 @@
                             [indeterminate]="selectionPaginas.hasValue() && !isAllSelectedPag()"
                             [aria-label]="checkboxLabelPag()">
                         </mat-checkbox>
+
+
+
                     </th>
-                    <th  scope="col">Funciones</th>
+                    <th scope="col">Funciones</th>
 
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let p of paginas "  style="text-align: left;" >
+                <tr *ngFor="let p of paginas " style="text-align: left;">
                     <td>
                         <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                             (change)="$event ? selectionPaginas.toggle(p) : null"
                             [checked]="selectionPaginas.isSelected(p)" [aria-label]="checkboxLabelPag(p)">
                         </mat-checkbox>
                     </td>
-                    <td  style="text-align: left;">{{p.funcion}}</td>
+                    <td style="text-align: left;">{{p.funcion}}</td>
 
                 </tr>
             </tbody>
