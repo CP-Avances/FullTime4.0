@@ -465,13 +465,6 @@ class ContratoEmpleadoControlador {
                                             if (valor.modalida_la != 'No registrado' && valor.modalida_la != '') {
                                                 var VERIFICAR_MODALIDAD = yield database_1.default.query('SELECT * FROM modal_trabajo WHERE UPPER(descripcion) = $1', [valor.modalida_la.toUpperCase()]);
                                                 if (VERIFICAR_MODALIDAD.rows[0] != undefined && VERIFICAR_MODALIDAD.rows[0] != '') {
-                                                    // Discriminación de elementos iguales
-                                                    if (duplicados.find((p) => p.cedula === valor.cedula) == undefined) {
-                                                        duplicados.push(valor);
-                                                    }
-                                                    else {
-                                                        valor.observacion = '1';
-                                                    }
                                                 }
                                                 else {
                                                     valor.observacion = 'Modalidad trabajo no se encuentra registrado';
@@ -491,6 +484,13 @@ class ContratoEmpleadoControlador {
                                 valor.observacion = 'Pais ingresado no se encuentra registrado';
                             }
                         }
+                    }
+                    // Discriminación de elementos iguales
+                    if (duplicados.find((p) => p.cedula === valor.cedula) == undefined) {
+                        duplicados.push(valor);
+                    }
+                    else {
+                        valor.observacion = '1';
                     }
                 }
                 else {

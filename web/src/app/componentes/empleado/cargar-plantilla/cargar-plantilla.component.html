@@ -150,7 +150,7 @@
                                         </form>
                                     </div>
                                 </div>
-                                <div class="col-md" *ngIf="!DatosCargos">
+                                <div class="col-md" *ngIf="DatosCargos.length == 0">
                                     <div class="d-flex flex-wrap justify-content-around">
                                         <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                             style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
@@ -161,7 +161,7 @@
                                         </a>
                                     </div>
                                 </div> 
-                                <div class="col-md" *ngIf="DatosCargos" style="padding-top: 5px; padding-bottom: 5px;" >
+                                <div class="col-md" *ngIf="DatosCargos.length > 0" style="padding-top: 5px; padding-bottom: 5px;" >
                                     <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
                                         <button id="descargar" class="btn btn-sm"
                                              matSuffix matTooltipPosition="right" (click)="ConfirmarRegistroMultipleCargos()"
@@ -228,7 +228,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <mat-paginator [length]="10" [pageSize]="tamanio_paginaMulCargo"
+                    <mat-paginator [length]="DatosCargos.length!" [pageSize]="tamanio_paginaMulCargo"
                         [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
                         showFirstLastButtons>
                     </mat-paginator>

@@ -411,14 +411,15 @@ class EmpleadoCargosControlador {
             listCargos.forEach((valor) => __awaiter(this, void 0, void 0, function* () {
                 if (valor.cedula != 'No registrado' && valor.pais != 'No registrado' && valor.pais != '') {
                     if (valor.observacion == 'no registrado') {
-                        var VERIFICAR_CEDULA = yield database_1.default.query('SELECT * FROM empleados WHERE cedula = $1', [valor.cedula]);
+                        var VERIFICAR_CEDULA = yield database_1.default.query('SELECT * FROM datos_actuales_empleado WHERE cedula = $1', [valor.cedula]);
                         if (VERIFICAR_CEDULA.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-                            const ID_CONTRATO = yield database_1.default.query('SELECT id FROM empl_contratos WHERE id_empleado = $1', [VERIFICAR_CEDULA.rows[0].id]);
-                            if (ID_CONTRATO.rows[0] != undefined && ID_CONTRATO.rows[0] != '') {
+                            const ID_CONTRATO = yield database_1.default.query('SELECT id_contrato FROM datos_contrato_actual WHERE cedula = $1', [valor.cedula]);
+                            if (ID_CONTRATO.rows[0] != undefined && ID_CONTRATO.rows[0].id_contrato != null &&
+                                ID_CONTRATO.rows[0].id_contrato != 0 && ID_CONTRATO.rows[0].id_contrato != '') {
                                 const fechaRango = yield database_1.default.query('SELECT * FROM empl_cargos ' +
                                     'WHERE id_empl_contrato = $1 and ($2  between fec_inicio and fec_final or ' +
                                     '$3 between fec_inicio and fec_final or ' +
-                                    'fec_inicio between $2 and $3)', [ID_CONTRATO.rows[0].id, valor.fecha_inicio, valor.fecha_final]);
+                                    'fec_inicio between $2 and $3)', [VERIFICAR_CEDULA.rows[0].id_contrato, valor.fecha_inicio, valor.fecha_final]);
                                 if (fechaRango.rows[0] != undefined && fechaRango.rows[0] != '') {
                                     valor.observacion = 'Existe un cargo vigente en esas fechas';
                                 }
@@ -429,13 +430,6 @@ class EmpleadoCargosControlador {
                                         if (VERIFICAR_SUCURSALES.rows[0] != undefined && VERIFICAR_SUCURSALES.rows[0] != '') {
                                             var VERFICAR_CARGO = yield database_1.default.query('SELECT * FROM tipo_cargo WHERE UPPER(cargo) = $1', [valor.cargo.toUpperCase()]);
                                             if (VERFICAR_CARGO.rows[0] != undefined && VERIFICAR_CEDULA.rows[0] != '') {
-                                                // Discriminación de elementos iguales
-                                                if (duplicados.find((p) => p.cedula === valor.cedula) == undefined) {
-                                                    duplicados.push(valor);
-                                                }
-                                                else {
-                                                    valor.observacion = '1';
-                                                }
                                             }
                                             else {
                                                 valor.observacion = 'Cargo no existe en el sistema';
@@ -456,6 +450,13 @@ class EmpleadoCargosControlador {
                         }
                         else {
                             valor.observacion = 'Cédula no existe en el sistema';
+                        }
+                        // Discriminación de elementos iguales
+                        if (duplicados.find((p) => p.cedula === valor.cedula) == undefined) {
+                            duplicados.push(valor);
+                        }
+                        else {
+                            valor.observacion = '1';
                         }
                     }
                 }

@@ -507,13 +507,7 @@ class ContratoEmpleadoControlador {
                                         if(valor.modalida_la != 'No registrado' && valor.modalida_la != ''){
                                             var VERIFICAR_MODALIDAD = await pool.query('SELECT * FROM modal_trabajo WHERE UPPER(descripcion) = $1', [valor.modalida_la.toUpperCase()])
                                             if(VERIFICAR_MODALIDAD.rows[0] != undefined && VERIFICAR_MODALIDAD.rows[0] != ''){
-                                                // Discriminación de elementos iguales
-                                                if(duplicados.find((p: any)=> p.cedula === valor.cedula) == undefined)
-                                                {
-                                                    duplicados.push(valor);
-                                                }else{
-                                                    valor.observacion = '1';
-                                                }
+                                                
                                             }else{
                                                 valor.observacion = 'Modalidad trabajo no se encuentra registrado'
                                             }
@@ -532,6 +526,15 @@ class ContratoEmpleadoControlador {
                         }
                     }
                 }
+
+                // Discriminación de elementos iguales
+                if(duplicados.find((p: any)=> p.cedula === valor.cedula) == undefined)
+                {
+                    duplicados.push(valor);
+                }else{
+                    valor.observacion = '1';
+                }
+
             }else{
                 valor.observacion = 'Cédula no existe en el sistema'  
             }
