@@ -143,6 +143,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.nombresMenu.forEach((pagina: any) => {
 
       this.nombresAccionesPorPagina[pagina.id] = [];
+
     })
 
 
@@ -233,6 +234,26 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   }
 
 
+
+
+  // METODO PARA BUSCAR LAS ACCIONES DEL SISTEMA
+
+  ObtenerAccionesPaginas() {
+    this.nombresMenu = [];
+    this.rest.getMenu().subscribe(res => {
+      this.nombresMenu = res;
+      this.nombrePaginas = res;
+
+      console.log(res.toString)
+    }, error => {
+      console.log(error);
+    });
+  }
+
+
+
+
+
   //
 
   ///aqui todos los metodos
@@ -245,14 +266,36 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
   // METODO PARA SELECCIONAR AGREGAR PAGINAS
   paginasSeleccionadas: any = [];
+  // ARREGLO PARA ALMACENAR LAS ACCIONES SELECCIONADAS
+
+
+  accionesSeleccionadas: any = [];
+
   AgregarPagina(data: string) {
     this.paginasSeleccionadas.push(data);
   }
+
+
+  // metodo para llenar el arreglo de las acciones seleccionadas
+
+  AgregarAccion(data: string) {
+    this.accionesSeleccionadas.push(data);
+  }
+
+
+
 
   // METODO PARA RETIRAR PAGINAS
   QuitarPagina(data: any) {
     this.paginasSeleccionadas = this.paginasSeleccionadas.filter(s => s !== data);
   }
+
+  // METODO PARA RETIRAR ACCIONES
+
+  QuitarAccion(data: any) {
+    this.accionesSeleccionadas = this.accionesSeleccionadas.filter(s => s !== data);
+  }
+
 
   AgregarTodos() {
     this.paginasSeleccionadas = this.nombrePaginas;
@@ -260,6 +303,16 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = true;
     }
   }
+
+
+  AgregarTodosAcciones() {
+    this.accionesSeleccionadas = this.nombrePaginas;
+    for (var i = 0; i <= this.nombrePaginas.length - 1; i++) {
+      (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = true;
+    }
+  }
+
+
 
   limpiarData: any = [];
   QuitarTodos() {
@@ -292,9 +345,19 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     const target = event.target as HTMLInputElement;
     if (target.checked === true) {
       this.AgregarPagina(valor);
+
+      //aqui tengo que poner agrgar accion
+
+      this.ObtenerAcciones(valor.id);
     }
     else {
       this.QuitarPagina(valor);
+
+      console.log("valor de id ", valor.id);
+      this.nombresAccionesPorPagina[valor.id] = [];
+
+
+
     }
   }
 
@@ -305,6 +368,9 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
   contador: number = 0;
   ingresar: number = 0;
+
+
+  //INSERTAR PAGINA
   InsertarPaginaRol() {
     this.ingresar = 0;
     this.contador = 0;
@@ -321,7 +387,9 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
           funcion: obj.nombre,
           link: obj.link,
-          id_rol: this.idRol
+          id_rol: this.idRol,
+
+          id_accion: this.idRol
         }
 
         // BUSCAR ID DE PAGINAS EXISTENTES

@@ -95,12 +95,12 @@ class RolPermisosControlador {
   // METODO PARA ASIGNAR CIUDADES A FERIADO
   public async AsignarPaginaRol(req: Request, res: Response) {
     try {
-      const { funcion, link, id_rol } = req.body;
+      const { funcion, link, id_rol, id_accion } = req.body;
       const response: QueryResult = await pool.query(
         `
-            INSERT INTO cg_rol_permisos (funcion, link, id_rol) VALUES ($1, $2, $3) RETURNING *
+            INSERT INTO cg_rol_permisos (funcion, link, id_rol, id_accion) VALUES ($1, $2, $3) RETURNING *
             `
-        , [funcion, link, id_rol]);
+        , [funcion, link, id_rol, id_accion]);
 
       const [rol] = response.rows;
 

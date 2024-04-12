@@ -9,7 +9,7 @@ export class RolPermisosService {
 
   constructor(
     private http: HttpClient
-  ) { 
+  ) {
   }
 
   // catalogo de ROL PERMISOS
@@ -42,7 +42,7 @@ export class RolPermisosService {
   }
 
   // METODO PARA BUSCAR LAS PAGINAS POR ID
-  
+
   BuscarIdPaginas(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/ide`, datos);
   }
@@ -68,11 +68,4 @@ export class RolPermisosService {
   BuscarAccionesPaginas(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/acciones`, datos);
   }
-
-
-
-
-
-
-
 }
