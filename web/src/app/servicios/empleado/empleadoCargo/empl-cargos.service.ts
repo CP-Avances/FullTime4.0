@@ -103,4 +103,13 @@ export class EmplCargosService {
     return this.http.get(`${environment.url}/empleadoCargos/buscar/cargo-regimen/${id}`);
   }
 
+
+  RevisarFormato(formData) {
+    return this.http.post<any>(`${environment.url}/empleadoCargos/upload/revision`, formData);
+  }
+
+  subirArchivoExcelCargo(formData) {
+    return this.http.post<any>(`${environment.url}/empleadoCargos/cargar_plantilla/`, formData);
+  }
+
 }

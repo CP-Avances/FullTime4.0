@@ -322,6 +322,7 @@ import { DefinicionPlantillaComponent } from './componentes/administracionGenera
 import { SpinnerModule } from './componentes/spinner/spinner.module';
 import { SpinnerComponent } from './componentes/spinner/spinner.component';
 import { SpinnerInterceptor } from './componentes/spinner/Interceptor/spinner.interceptor';
+import { CargarPlantillaComponent } from './componentes/empleado/cargar-plantilla/cargar-plantilla.component';
 
 
 const config: SocketIoConfig = { url: environment.url, options: {} };
@@ -574,6 +575,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     PrincipalSucursalUsuarioComponent,
     AsignarUsuarioComponent,
     DefinicionPlantillaComponent,
+    CargarPlantillaComponent,
    
 
   ],

@@ -279,6 +279,7 @@ export class MainNavComponent implements OnInit {
           { name: 'Nivel de Educación', url: '/nivelTitulos', color: true, ver: true },
           { name: 'Título Profesional', url: '/titulos', color: true, ver: true },
           { name: 'Empleados', url: '/empleado', color: true, ver: true },
+          { name: 'Cargar Plantillas', url: '/cargarPlantilla', color: true, ver: true },
           { name: 'Asignar Establecimientos', url: '/administrarSucursales', color: true, ver: this.superadmin },
         ]
       },

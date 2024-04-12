@@ -552,7 +552,7 @@ export class ListaEmpleadosComponent implements OnInit {
       (arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Codigo ya') {
       return 'rgb(239, 203, 106)';
     } else if (arrayObservacion[0] == 'Cédula' || arrayObservacion[0] == 'Usuario') {
-      return 'rgb(222, 162, 73)';
+      return 'rgb(251, 73, 18)';
     } else if ((arrayObservacion[0] + ' ' + arrayObservacion[1]) == 'Registro duplicado') {
       return 'rgb(156, 214, 255)';
     } else if ((observacion == 'Código ingresado no válido') ||
@@ -561,11 +561,12 @@ export class ListaEmpleadosComponent implements OnInit {
     ) {
       return 'rgb(222, 162, 73)';
     } else if ((observacion == 'Rol no existe en el sistema') ||
-      (observacion == 'Nacionalidad no existe en el sistema')
-    ) {
+      (observacion == 'Nacionalidad no existe en el sistema')) 
+    {
       return 'rgb(255, 192, 203)';
-    }
-    else {
+    }else if (arrayObservacion[0] == 'Formato') {
+      return 'rgb(222, 162, 73)';
+    }else {
       return 'rgb(251, 73, 18)';
     }
 
