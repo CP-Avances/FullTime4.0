@@ -84,7 +84,7 @@ class PlanificacionHorariaControlador {
 
             // VERIFICAR EXISTENCIA DE USUARIO
             const usuarioVerificado = await VerificarUsuario(usuario);
-            
+
             if (!usuarioVerificado[0]) {
                 data.observacion = usuarioVerificado[2];
                 continue;
@@ -734,7 +734,7 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion) : 
                 tolerancia, id_det_horario, tipo_entr_salida, tipo_dia, salida_otro_dia, min_antes, min_despues, 
                 estado_origen, min_alimentacion)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-            `, [salida.codigo, salida.id_empl_cargo, salida.id_horario, salida.fec_horario, 'DSDS354S5D', salida.tolerancia, 
+            `, [salida.codigo, salida.id_empl_cargo, salida.id_horario, salida.fec_horario, salida.fec_hora_horario, salida.tolerancia, 
                 salida.id_det_horario, salida.tipo_entr_salida, salida.tipo_dia, salida.salida_otro_dia, salida.min_antes, salida.min_despues, 
                 salida.estado_origen, salida.min_alimentacion]
         );
