@@ -67,7 +67,6 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
   ) { }
 
   ngOnInit(): void {
-    console.log(this.datosSeleccionados.usuariosSeleccionados);
     this.usuarios = this.datosSeleccionados.usuarios;
   }
 
@@ -196,9 +195,6 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
     this.GenerarDiasMes();
 
-    console.log('dias_mes', this.dias_mes);
-
-
     if (data.planificacionHoraria.length > 0) {
       data.planificacionHoraria.forEach((planificacion: any) => {
           this.dias_mes.forEach((dia: any) => {
@@ -221,9 +217,6 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
       this.planificacionesHorarias = data.planificacionHoraria;
 
-
-
-      console.log('planificacionesHorarias', this.planificacionesHorarias);
     }
   }
 
@@ -232,7 +225,6 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     const mensaje = 'registro';
     this.ventana.open(MetodosComponent, { width: '450px', data:  mensaje  }).afterClosed().subscribe((confimado: Boolean) => {
       if (confimado) {
-        console.log('Comenzando a registrar planificacion');
         this.RegistrarPlanificaciones();
       }
     });
@@ -268,8 +260,6 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     this.CerrarVentana();
     this.deshabilitarRegistro = true;
 
-    console.log('planificacionesCorrectas', this.planificacionesCorrectas);
-
   }
 
 
@@ -287,7 +277,6 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     const fechaInicio = fechaInicial.toDate();
     const fechaFin = fechaFinal.toDate();
 
-    console.log('usuarios', usuarios);
 
     // CREAR UN ARRAY PARA LAS FILAS DEL ARCHIVO EXCEL
     const filas: any[] = [];

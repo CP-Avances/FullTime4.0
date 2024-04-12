@@ -69,6 +69,7 @@ class PlanificacionHorariaControlador {
             // VERIFICAR USUARIO, HORARIOS Y SOBREPOSICION DE HORARIOS
             for (const [index, data] of plantillaPlanificacionHorariaEstructurada.entries()) {
                 let { usuario } = data;
+                usuario = usuario.toString();
                 // VERIFICAR DATO REQUERIDO USUARIO
                 if (!usuario) {
                     data.observacion = 'Datos no registrados: USUARIO';
@@ -81,7 +82,6 @@ class PlanificacionHorariaControlador {
                 }
                 // VERIFICAR EXISTENCIA DE USUARIO
                 const usuarioVerificado = yield VerificarUsuario(usuario);
-                // console.log('USUARIO VERIFICADO',usuarioVerificado);
                 if (!usuarioVerificado[0]) {
                     data.observacion = usuarioVerificado[2];
                     continue;
@@ -94,9 +94,22 @@ class PlanificacionHorariaControlador {
                     data.hora_trabaja = ConvertirHorasAMinutos(usuarioVerificado[1].hora_trabaja);
                 }
                 // VERIFICAR HORARIOS
-                data.dias = yield VerificarHorarios(data.dias, fechaInicial, fechaFinal, data.id_usuario, data.hora_trabaja);
+                const datosVerificacionHorarios = {
+                    dias: data.dias,
+                    fecha_inicio: fechaInicial,
+                    fecha_final: fechaFinal,
+                    id_usuario: data.id_usuario,
+                    hora_trabaja: data.hora_trabaja
+                };
+                data.dias = yield VerificarHorarios(datosVerificacionHorarios);
                 // VERIFICAR SOBREPOSICION DE HORARIOS DE LA PLANTILLA
-                yield VerificarSobreposicionHorarios(data.dias, data.codigo_usuario, fechaInicial, fechaFinal);
+                const datosVerificacionSobreposicionHorarios = {
+                    dias: data.dias,
+                    codigo_usuario: data.codigo_usuario,
+                    fecha_inicio: fechaInicial,
+                    fecha_final: fechaFinal
+                };
+                data.dias = yield VerificarSobreposicionHorarios(datosVerificacionSobreposicionHorarios);
             }
             const fechaInicioMes = (0, moment_1.default)(fechaInicial).add(1, 'days').format('YYYY-MM-DD');
             const fechaFinalMes = (0, moment_1.default)(fechaFinal).subtract(1, 'days').format('YYYY-MM-DD');
@@ -114,11 +127,11 @@ class PlanificacionHorariaControlador {
                 for (const data of planificacionHoraria) {
                     for (const [dia, { horarios }] of Object.entries(data.dias)) {
                         for (const horario of horarios) {
+                            let planificacion;
                             let entrada;
                             let inicioAlimentacion = null;
                             let finAlimentacion = null;
                             let salida;
-                            let planificacion;
                             if (horario.observacion === 'OK') {
                                 const origen = horario.tipo === 'N' ? horario.tipo : (horario.tipo === 'FD' ? 'DFD' : 'DL');
                                 entrada = {
@@ -297,180 +310,203 @@ class PlanificacionHorariaControlador {
 // FUNCION PARA VERIFICAR EXISTENCIA DE USUARIO EN LA BASE DE DATOS
 function VerificarUsuario(cedula) {
     return __awaiter(this, void 0, void 0, function* () {
-        let observacion = '';
-        let usuarioValido = false;
-        const usuario = yield database_1.default.query(`
-        SELECT e.*, dae.id_cargo, ec.hora_trabaja 
-        FROM empleados e 
-        LEFT JOIN datos_actuales_empleado dae ON e.cedula = dae.cedula 
-        LEFT JOIN empl_cargos ec ON dae.id_cargo = ec.id 
-        WHERE LOWER(e.cedula) = $1
-    `, [cedula.toLowerCase()]);
-        if (usuario.rowCount === 0) {
-            observacion = 'Usuario no valido';
+        try {
+            let observacion = '';
+            let usuarioValido = false;
+            const usuario = yield database_1.default.query(`
+            SELECT e.*, dae.id_cargo, ec.hora_trabaja 
+            FROM empleados e 
+            LEFT JOIN datos_actuales_empleado dae ON e.cedula = dae.cedula 
+            LEFT JOIN empl_cargos ec ON dae.id_cargo = ec.id 
+            WHERE LOWER(e.cedula) = $1
+        `, [cedula.toLowerCase()]);
+            if (usuario.rowCount === 0) {
+                observacion = 'Usuario no valido';
+            }
+            else if (usuario.rows[0].id_cargo === null) {
+                observacion = 'No tiene un cargo asignado';
+            }
+            else {
+                usuarioValido = true;
+            }
+            return [usuarioValido, usuario.rows[0], observacion];
         }
-        else if (usuario.rows[0].id_cargo === null) {
-            observacion = 'No tiene un cargo asignado';
+        catch (error) {
+            throw error;
         }
-        else {
-            usuarioValido = true;
-        }
-        return [usuarioValido, usuario.rows[0], observacion];
     });
 }
-function VerificarHorarios(dias, fecha_inicio, fecha_final, id_usuario, hora_trabaja) {
+function VerificarHorarios(datos) {
     return __awaiter(this, void 0, void 0, function* () {
-        // CONSULTAR FERIADOS
-        const feriados = yield ConsultarFeriados(fecha_inicio, fecha_final, id_usuario);
-        for (const [dia, { horarios }] of Object.entries(dias)) {
-            let horariosNoValidos = [];
-            let horasTotales = 0;
-            // VERIFICAR HORARIO DUPLICADO SI EXISTE PONER EN HORARIO OBSERVACION 'HORARIO DUPLICADO'
-            const horariosDuplicados = horarios.filter((horario, index) => horarios.findIndex((h) => h.codigo === horario.codigo) !== index);
-            if (horariosDuplicados.length > 0) {
-                dias[dia].observacion = `Horarios duplicados`;
-                dias[dia].observacion2 = `Códigos de horarios duplicados: ${horariosDuplicados.map((horario) => horario.codigo).join(', ')}`;
-                continue;
-            }
-            // VERIFICAR SI LA EL DIAS[DIA] ES FERIADO
-            let esFeriado = feriados ? feriados.find((feriado) => feriado.fecha === dia) : false;
-            for (let i = 0; i < horarios.length; i++) {
-                const horario = horarios[i];
-                const horarioVerificado = yield VerificarHorario(horario.codigo);
-                if (!horarioVerificado[0]) {
-                    horariosNoValidos.push(horario);
-                    // AÑADIR OBSERVACION A HORARIO
-                    dias[dia].horarios[i].observacion = `Horario no valido`;
+        try {
+            let { dias, fecha_inicio, fecha_final, id_usuario, hora_trabaja } = datos;
+            // CONSULTAR FERIADOS
+            const feriados = yield ConsultarFeriados(fecha_inicio, fecha_final, id_usuario);
+            for (const [dia, { horarios }] of Object.entries(dias)) {
+                let horariosNoValidos = [];
+                let horasTotales = 0;
+                // VERIFICAR HORARIO DUPLICADO SI EXISTE PONER EN HORARIO OBSERVACION 'HORARIO DUPLICADO'
+                const horariosDuplicados = horarios.filter((horario, index) => horarios.findIndex((h) => h.codigo === horario.codigo) !== index);
+                if (horariosDuplicados.length > 0) {
+                    dias[dia].observacion = `Horarios duplicados`;
+                    dias[dia].observacion2 = `Códigos de horarios duplicados: ${horariosDuplicados.map((horario) => horario.codigo).join(', ')}`;
+                    continue;
                 }
-                else {
-                    // ANADIR PROPIEDADES DE HORARIOVERIFICADO A DIAS[DIA].HORARIOS[I]
-                    dias[dia].horarios[i].id = horarioVerificado[1].id;
-                    dias[dia].horarios[i].nombre = horarioVerificado[1].nombre;
-                    dias[dia].horarios[i].dia = dia;
-                    dias[dia].horarios[i].hora_trabaja = horarioVerificado[1].hora_trabajo;
-                    dias[dia].horarios[i].tipo = horarioVerificado[1].default_;
-                    dias[dia].horarios[i].min_alimentacion = horarioVerificado[1].min_almuerzo;
-                    // SI ES FERIADO Y TIPO DE HORARIO ES LABORABLE AÑADIR OBSERVACION
-                    if (esFeriado && dias[dia].horarios[i].tipo === 'N') {
-                        dias[dia].horarios[i].observacion = `Horario no valido para día feriado`;
-                        dias[dia].observacion3 = `Este día no permite horarios laborables`;
-                        dias[dia].horarios[i].default = 'DEFAULT-FERIADO';
+                // VERIFICAR SI LA EL DIAS[DIA] ES FERIADO
+                let esFeriado = feriados ? feriados.find((feriado) => feriado.fecha === dia) : false;
+                for (let i = 0; i < horarios.length; i++) {
+                    const horario = horarios[i];
+                    horario.codigo = horario.codigo.toString();
+                    const horarioVerificado = yield VerificarHorario(horario.codigo);
+                    if (!horarioVerificado[0]) {
                         horariosNoValidos.push(horario);
+                        // AÑADIR OBSERVACION A HORARIO
+                        dias[dia].horarios[i].observacion = `Horario no valido`;
                     }
                     else {
-                        dias[dia].horarios[i].observacion = 'OK';
-                        horasTotales += ConvertirHorasAMinutos(horarioVerificado[1].hora_trabajo);
+                        // ANADIR PROPIEDADES DE HORARIOVERIFICADO A DIAS[DIA].HORARIOS[I]
+                        dias[dia].horarios[i].id = horarioVerificado[1].id;
+                        dias[dia].horarios[i].nombre = horarioVerificado[1].nombre;
+                        dias[dia].horarios[i].dia = dia;
+                        dias[dia].horarios[i].hora_trabaja = horarioVerificado[1].hora_trabajo;
+                        dias[dia].horarios[i].tipo = horarioVerificado[1].default_;
+                        dias[dia].horarios[i].min_alimentacion = horarioVerificado[1].min_almuerzo;
+                        // SI ES FERIADO Y TIPO DE HORARIO ES LABORABLE AÑADIR OBSERVACION
+                        if (esFeriado && dias[dia].horarios[i].tipo === 'N') {
+                            dias[dia].horarios[i].observacion = `Horario no valido para día feriado`;
+                            dias[dia].observacion3 = `Este día no permite horarios laborables`;
+                            dias[dia].horarios[i].default = 'DEFAULT-FERIADO';
+                            horariosNoValidos.push(horario);
+                        }
+                        else {
+                            dias[dia].horarios[i].observacion = 'OK';
+                            horasTotales += ConvertirHorasAMinutos(horarioVerificado[1].hora_trabajo);
+                        }
                     }
                 }
+                dias[dia].observacion = horariosNoValidos.length > 0 ? `Horarios no validos` : 'OK';
+                // VERIFICAR HORAS TOTALES DE HORARIOS
+                if (horasTotales > hora_trabaja) {
+                    const horas = ConvertirMinutosAHoras(horasTotales);
+                    dias[dia].observacion4 = `Jornada superada: ${horas} tiempo total`;
+                }
             }
-            dias[dia].observacion = horariosNoValidos.length > 0 ? `Horarios no validos` : 'OK';
-            // VERIFICAR HORAS TOTALES DE HORARIOS
-            if (horasTotales > hora_trabaja) {
-                const horas = ConvertirMinutosAHoras(horasTotales);
-                dias[dia].observacion4 = `Jornada superada: ${horas} tiempo total`;
-            }
+            return dias;
         }
-        return dias;
+        catch (error) {
+            throw error;
+        }
     });
 }
 // FUNCION PARA VERIFICAR EXISTENCIA DE HORARIO EN LA BASE DE DATOS
 function VerificarHorario(codigo) {
     return __awaiter(this, void 0, void 0, function* () {
-        const horario = yield database_1.default.query('SELECT * FROM cg_horarios WHERE LOWER(codigo) = $1', [codigo.toLowerCase()]);
-        // SI EXISTE HORARIO VERIFICAR SI horario.hora_trabajo este en formato hh:mm:ss
-        const existe = horario.rowCount > 0;
-        if (existe) {
-            const formatoHora = /^\d{2}:[0-5][0-9]:[0-5][0-9]$/;
-            return [formatoHora.test(horario.rows[0].hora_trabajo), horario.rows[0]];
+        try {
+            const horario = yield database_1.default.query('SELECT * FROM cg_horarios WHERE LOWER(codigo) = $1', [codigo.toLowerCase()]);
+            // SI EXISTE HORARIO VERIFICAR SI horario.hora_trabajo este en formato hh:mm:ss
+            const existe = horario.rowCount > 0;
+            if (existe) {
+                const formatoHora = /^\d{2}:[0-5][0-9]:[0-5][0-9]$/;
+                return [formatoHora.test(horario.rows[0].hora_trabajo), horario.rows[0]];
+            }
+            return [existe, null];
         }
-        return [existe, null];
+        catch (error) {
+            throw error;
+        }
     });
 }
 // FUNCION PARA VERIFICAR SOBREPOSICION DE HORARIOS
-function VerificarSobreposicionHorarios(dias, codigo, fecha_inicio, fecha_final) {
+function VerificarSobreposicionHorarios(datos) {
     return __awaiter(this, void 0, void 0, function* () {
-        let horariosModificados = [];
-        let rangosSimilares = {};
-        // OBTENER TODOS LOS HORARIOS DE LA PLANIFICACION HORARIA DE LA PLANTILLA QUE EN dias[dia].OBSERVACION = 'OK'
-        for (const [dia, { horarios }] of Object.entries(dias)) {
-            if (dias[dia].observacion === 'OK') {
-                for (let i = 0; i < horarios.length; i++) {
-                    const horario = horarios[i];
-                    if (horario.observacion === 'OK') {
-                        const detalles = yield database_1.default.query('SELECT * FROM deta_horarios WHERE id_horario = $1', [horario.id]);
-                        horario.entrada = detalles.rows.find((detalle) => detalle.tipo_accion === 'E');
-                        horario.salida = detalles.rows.find((detalle) => detalle.tipo_accion === 'S');
-                        horario.inicioAlimentacion = detalles.rows.find((detalle) => detalle.tipo_accion === 'I/A');
-                        horario.finAlimentacion = detalles.rows.find((detalle) => detalle.tipo_accion === 'F/A');
-                        let fechaEntrada = (0, moment_1.default)(`${horario.dia} ${horario.entrada.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
-                        horario.entrada.fecha = fechaEntrada;
-                        horario.entrada.fec_hora_horario = `${horario.dia} ${horario.entrada.hora}`;
-                        let fechaSalida = (0, moment_1.default)(`${horario.dia} ${horario.salida.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
-                        if (horario.salida.segundo_dia) {
-                            fechaSalida = (0, moment_1.default)(fechaSalida).add(1, 'days').toDate();
+        try {
+            let { dias, codigo_usuario, fecha_inicio, fecha_final } = datos;
+            let horariosModificados = [];
+            let rangosSimilares = {};
+            // OBTENER TODOS LOS HORARIOS DE LA PLANIFICACION HORARIA DE LA PLANTILLA QUE EN dias[dia].OBSERVACION = 'OK'
+            for (const [dia, { horarios }] of Object.entries(dias)) {
+                if (dias[dia].observacion === 'OK') {
+                    for (let i = 0; i < horarios.length; i++) {
+                        const horario = horarios[i];
+                        if (horario.observacion === 'OK') {
+                            const detalles = yield database_1.default.query('SELECT * FROM deta_horarios WHERE id_horario = $1', [horario.id]);
+                            horario.entrada = detalles.rows.find((detalle) => detalle.tipo_accion === 'E');
+                            horario.salida = detalles.rows.find((detalle) => detalle.tipo_accion === 'S');
+                            horario.inicioAlimentacion = detalles.rows.find((detalle) => detalle.tipo_accion === 'I/A');
+                            horario.finAlimentacion = detalles.rows.find((detalle) => detalle.tipo_accion === 'F/A');
+                            let fechaEntrada = (0, moment_1.default)(`${horario.dia} ${horario.entrada.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
+                            horario.entrada.fecha = fechaEntrada;
+                            horario.entrada.fec_hora_horario = `${horario.dia} ${horario.entrada.hora}`;
+                            let fechaSalida = (0, moment_1.default)(`${horario.dia} ${horario.salida.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
+                            if (horario.salida.segundo_dia) {
+                                fechaSalida = (0, moment_1.default)(fechaSalida).add(1, 'days').toDate();
+                            }
+                            else if (horario.salida.tercer_dia) {
+                                fechaSalida = (0, moment_1.default)(fechaSalida).add(2, 'days').toDate();
+                            }
+                            horario.salida.fecha = fechaSalida;
+                            horario.salida.fec_hora_horario = `${horario.dia} ${horario.salida.hora}`;
+                            if (horario.inicioAlimentacion) {
+                                horario.inicioAlimentacion.fec_hora_horario = `${horario.dia} ${horario.inicioAlimentacion.hora}`;
+                            }
+                            if (horario.finAlimentacion) {
+                                horario.finAlimentacion.fec_hora_horario = `${horario.dia} ${horario.finAlimentacion.hora}`;
+                            }
+                            horariosModificados.push(horario);
                         }
-                        else if (horario.salida.tercer_dia) {
-                            fechaSalida = (0, moment_1.default)(fechaSalida).add(2, 'days').toDate();
-                        }
-                        horario.salida.fecha = fechaSalida;
-                        horario.salida.fec_hora_horario = `${horario.dia} ${horario.salida.hora}`;
-                        if (horario.inicioAlimentacion) {
-                            horario.inicioAlimentacion.fec_hora_horario = `${horario.dia} ${horario.inicioAlimentacion.hora}`;
-                        }
-                        if (horario.finAlimentacion) {
-                            horario.finAlimentacion.fec_hora_horario = `${horario.dia} ${horario.finAlimentacion.hora}`;
-                        }
-                        horariosModificados.push(horario);
                     }
                 }
             }
-        }
-        // LISTAR PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO
-        const planificacion = yield ListarPlanificacionHoraria(codigo, fecha_inicio, fecha_final);
-        // SI EXISTE PLANIFICACION AÑADIR A HORARIOSMODIFICADOS
-        if (planificacion) {
-            for (let i = 0; i < planificacion.length; i++) {
-                const horario = planificacion[i];
-                const detalles = yield database_1.default.query('SELECT * FROM deta_horarios WHERE id_horario = $1', [horario.id]);
-                horario.entrada = detalles.rows.find((detalle) => detalle.tipo_accion === 'E');
-                horario.salida = detalles.rows.find((detalle) => detalle.tipo_accion === 'S');
-                let fecha = (0, moment_1.default)(horario.fecha).format('YYYY-MM-DD');
-                horario.dia = fecha;
-                let fechaEntrada = (0, moment_1.default)(`${fecha} ${horario.entrada.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
-                horario.entrada = fechaEntrada;
-                let fechaSalida = (0, moment_1.default)(`${fecha} ${horario.salida.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
-                if (horario.salida.segundo_dia) {
-                    fechaSalida = (0, moment_1.default)(fechaSalida).add(1, 'days').toDate();
+            // LISTAR PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO
+            const planificacion = yield ListarPlanificacionHoraria(codigo_usuario, fecha_inicio, fecha_final);
+            // SI EXISTE PLANIFICACION AÑADIR A HORARIOSMODIFICADOS
+            if (planificacion) {
+                for (let i = 0; i < planificacion.length; i++) {
+                    const horario = planificacion[i];
+                    const detalles = yield database_1.default.query('SELECT * FROM deta_horarios WHERE id_horario = $1', [horario.id]);
+                    horario.entrada = detalles.rows.find((detalle) => detalle.tipo_accion === 'E');
+                    horario.salida = detalles.rows.find((detalle) => detalle.tipo_accion === 'S');
+                    let fecha = (0, moment_1.default)(horario.fecha).format('YYYY-MM-DD');
+                    horario.dia = fecha;
+                    let fechaEntrada = (0, moment_1.default)(`${fecha} ${horario.entrada.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
+                    horario.entrada = fechaEntrada;
+                    let fechaSalida = (0, moment_1.default)(`${fecha} ${horario.salida.hora}`, 'YYYY-MM-DD HH:mm:ss').toDate();
+                    if (horario.salida.segundo_dia) {
+                        fechaSalida = (0, moment_1.default)(fechaSalida).add(1, 'days').toDate();
+                    }
+                    else if (horario.salida.tercer_dia) {
+                        fechaSalida = (0, moment_1.default)(fechaSalida).add(2, 'days').toDate();
+                    }
+                    horario.salida = fechaSalida;
+                    horario.codigo = horario.codigo_dia;
+                    horariosModificados.push(horario);
                 }
-                else if (horario.salida.tercer_dia) {
-                    fechaSalida = (0, moment_1.default)(fechaSalida).add(2, 'days').toDate();
-                }
-                horario.salida = fechaSalida;
-                horario.codigo = horario.codigo_dia;
-                horariosModificados.push(horario);
             }
-        }
-        if (horariosModificados.length > 0) {
-            // VERIFICAR SOBREPOSICIÓN DE HORARIOS
-            for (let i = 0; i < horariosModificados.length; i++) {
-                for (let j = i + 1; j < horariosModificados.length; j++) {
-                    const horario1 = horariosModificados[i];
-                    const horario2 = horariosModificados[j];
-                    if ((horario2.entrada.fecha >= horario1.entrada.fecha && horario2.entrada.fecha <= horario1.salida.fecha) ||
-                        (horario2.salida.fecha <= horario1.salida.fecha && horario2.salida.fecha >= horario1.entrada.fecha)) {
-                        horario1.observacion = `Se sobrepone con el horario ${horario2.codigo} del dia ${horario1.dia}`;
-                        horario2.observacion = `Se sobrepone con el horario ${horario1.codigo} del dia ${horario1.dia}`;
-                        rangosSimilares[horario1.dia] = rangosSimilares[horario1.dias] ? [...rangosSimilares[horario1.dia], horario1.codigo, horario2.codigo] : [horario1.codigo, horario2.codigo];
-                        rangosSimilares[horario2.dia] = rangosSimilares[horario2.dias] ? [...rangosSimilares[horario2.dia], horario1.codigo, horario2.codigo] : [horario1.codigo, horario2.codigo];
+            if (horariosModificados.length > 0) {
+                // VERIFICAR SOBREPOSICIÓN DE HORARIOS
+                for (let i = 0; i < horariosModificados.length; i++) {
+                    for (let j = i + 1; j < horariosModificados.length; j++) {
+                        const horario1 = horariosModificados[i];
+                        const horario2 = horariosModificados[j];
+                        if ((horario2.entrada.fecha >= horario1.entrada.fecha && horario2.entrada.fecha <= horario1.salida.fecha) ||
+                            (horario2.salida.fecha <= horario1.salida.fecha && horario2.salida.fecha >= horario1.entrada.fecha)) {
+                            horario1.observacion = `Se sobrepone con el horario ${horario2.codigo} del dia ${horario1.dia}`;
+                            horario2.observacion = `Se sobrepone con el horario ${horario1.codigo} del dia ${horario1.dia}`;
+                            rangosSimilares[horario1.dia] = rangosSimilares[horario1.dias] ? [...rangosSimilares[horario1.dia], horario1.codigo, horario2.codigo] : [horario1.codigo, horario2.codigo];
+                            rangosSimilares[horario2.dia] = rangosSimilares[horario2.dias] ? [...rangosSimilares[horario2.dia], horario1.codigo, horario2.codigo] : [horario1.codigo, horario2.codigo];
+                        }
                     }
                 }
+                // ACTUALIZAR DIAS[DIA].OBSERVACION
+                for (const dia in rangosSimilares) {
+                    dias[dia].observacion = `Rangos similares`;
+                }
             }
-            // ACTUALIZAR DIAS[DIA].OBSERVACION
-            for (const dia in rangosSimilares) {
-                dias[dia].observacion = `Rangos similares`;
-            }
+            return dias;
         }
-        return dias;
+        catch (error) {
+            throw error;
+        }
     });
 }
 // METODO PARA LISTAR LAS PLANIFICACIONES QUE TIENE REGISTRADAS EL USUARIO   --**VERIFICADO
@@ -495,7 +531,7 @@ function ListarPlanificacionHoraria(codigo, fecha_inicio, fecha_final) {
             }
         }
         catch (error) {
-            return null;
+            throw error;
         }
     });
 }
@@ -517,7 +553,7 @@ function ConsultarFeriados(fecha_inicio, fecha_final, id_usuario) {
             }
         }
         catch (error) {
-            return null;
+            throw error;
         }
     });
 }
@@ -547,7 +583,7 @@ function ConsultarHorarioDefault(codigo) {
             }
         }
         catch (error) {
-            return null;
+            throw error;
         }
     });
 }
@@ -557,33 +593,54 @@ function CrearPlanificacionHoraria(planificacionHoraria) {
         try {
             // DESESCTRUCTURAR PLANIFICACION HORARIA
             let { entrada, inicioAlimentacion, finAlimentacion, salida } = planificacionHoraria;
-            console.log('ENTRADA', entrada);
-            console.log('INICIO ALIMENTACION', inicioAlimentacion);
-            console.log('FIN ALIMENTACION', finAlimentacion);
-            console.log('SALIDA', salida);
-            // const insert = await pool.query(
-            // `
-            // INSERT INTO plan_general (codigo, id_empl_cargo, id_horario, fec_horario, fec_hora_horario, 
-            //     tolerancia, id_det_horario, tipo_entr_salida, tipo_dia, salida_otro_dia, min_antes, min_despues, 
-            //     estado_origen, min_alimentacion)
-            // VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
-            // `, [planificacionHoraria.codigo, planificacionHoraria.id_empl_cargo, planificacionHoraria.id_horario, 
-            //     planificacionHoraria.fec_horario, planificacionHoraria.fec_hora_horario, planificacionHoraria.tolerancia, 
-            //     planificacionHoraria.id_det_horario, planificacionHoraria.tipo_entr_salida, planificacionHoraria.tipo_dia, 
-            //     planificacionHoraria.salida_otro_dia, planificacionHoraria.min_antes, planificacionHoraria.min_despues, 
-            //     planificacionHoraria.estado_origen, planificacionHoraria.min_alimentacion]
-            // );
-            // if (insert.rowCount > 0) {
-            //     console.log('PLANIFICACION HORARIA CREADA',insert.rows);
-            //     return insert.rows;
-            // }
-            // else {
-            //     return null;
-            // }
+            // INICIAR TRANSACCION
+            yield database_1.default.query('BEGIN');
+            // CREAR ENTRADA
+            yield database_1.default.query(`
+            INSERT INTO plan_general (codigo, id_empl_cargo, id_horario, fec_horario, fec_hora_horario, 
+                tolerancia, id_det_horario, tipo_entr_salida, tipo_dia, salida_otro_dia, min_antes, min_despues, 
+                estado_origen, min_alimentacion)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+            `, [entrada.codigo, entrada.id_empl_cargo, entrada.id_horario, entrada.fec_horario, entrada.fec_hora_horario, entrada.tolerancia,
+                entrada.id_det_horario, entrada.tipo_entr_salida, entrada.tipo_dia, entrada.salida_otro_dia, entrada.min_antes, entrada.min_despues,
+                entrada.estado_origen, entrada.min_alimentacion]);
+            // CREAR INICIO ALIMENTACION
+            if (inicioAlimentacion) {
+                yield database_1.default.query(`
+                INSERT INTO plan_general (codigo, id_empl_cargo, id_horario, fec_horario, fec_hora_horario, 
+                    tolerancia, id_det_horario, tipo_entr_salida, tipo_dia, salida_otro_dia, min_antes, min_despues, 
+                    estado_origen, min_alimentacion)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+                `, [inicioAlimentacion.codigo, inicioAlimentacion.id_empl_cargo, inicioAlimentacion.id_horario, inicioAlimentacion.fec_horario, inicioAlimentacion.fec_hora_horario, inicioAlimentacion.tolerancia,
+                    inicioAlimentacion.id_det_horario, inicioAlimentacion.tipo_entr_salida, inicioAlimentacion.tipo_dia, inicioAlimentacion.salida_otro_dia, inicioAlimentacion.min_antes, inicioAlimentacion.min_despues,
+                    inicioAlimentacion.estado_origen, inicioAlimentacion.min_alimentacion]);
+            }
+            // CREAR FIN ALIMENTACION
+            if (finAlimentacion) {
+                yield database_1.default.query(`
+                INSERT INTO plan_general (codigo, id_empl_cargo, id_horario, fec_horario, fec_hora_horario, 
+                    tolerancia, id_det_horario, tipo_entr_salida, tipo_dia, salida_otro_dia, min_antes, min_despues, 
+                    estado_origen, min_alimentacion)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+                `, [finAlimentacion.codigo, finAlimentacion.id_empl_cargo, finAlimentacion.id_horario, finAlimentacion.fec_horario, finAlimentacion.fec_hora_horario, finAlimentacion.tolerancia,
+                    finAlimentacion.id_det_horario, finAlimentacion.tipo_entr_salida, finAlimentacion.tipo_dia, finAlimentacion.salida_otro_dia, finAlimentacion.min_antes, finAlimentacion.min_despues,
+                    finAlimentacion.estado_origen, finAlimentacion.min_alimentacion]);
+            }
+            // CREAR SALIDA
+            yield database_1.default.query(`
+            INSERT INTO plan_general (codigo, id_empl_cargo, id_horario, fec_horario, fec_hora_horario, 
+                tolerancia, id_det_horario, tipo_entr_salida, tipo_dia, salida_otro_dia, min_antes, min_despues, 
+                estado_origen, min_alimentacion)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+            `, [salida.codigo, salida.id_empl_cargo, salida.id_horario, salida.fec_horario, 'DSDS354S5D', salida.tolerancia,
+                salida.id_det_horario, salida.tipo_entr_salida, salida.tipo_dia, salida.salida_otro_dia, salida.min_antes, salida.min_despues,
+                salida.estado_origen, salida.min_alimentacion]);
+            // FINALIZAR TRANSACCION
+            yield database_1.default.query('COMMIT');
         }
         catch (error) {
-            console.log('ERROR', error);
-            return error;
+            yield database_1.default.query('ROLLBACK');
+            throw error;
         }
     });
 }
