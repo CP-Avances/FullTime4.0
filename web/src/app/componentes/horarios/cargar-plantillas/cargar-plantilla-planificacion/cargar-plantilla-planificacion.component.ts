@@ -255,7 +255,7 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
     this.restP.RegistrarPlanificacionHoraria(this.planificacionesCorrectas).subscribe( (res: any) => {
       this.spinnerService.hide();
-      this.toastr.success('Plantilla de planificaciones horarias importada', 'operación exitosa', {
+      this.toastr.success('Plantilla de planificaciones horarias importada', 'Operación exitosa', {
         timeOut: 6000,
       });
     }, (error: any) => {

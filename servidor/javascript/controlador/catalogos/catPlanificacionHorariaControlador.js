@@ -108,19 +108,20 @@ class PlanificacionHorariaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const planificacionHoraria = req.body;
-                // console.log('PLANIFICACION HORARIA',planificacionHoraria);
                 const horarioDefaultLibre = yield ConsultarHorarioDefault('DEFAULT-LIBRE');
-                // console.log('HORARIO DEFAULT LIBRE',horarioDefaultLibre);
                 const horarioDefaultFeriado = yield ConsultarHorarioDefault('DEFAULT-FERIADO');
-                // console.log('HORARIO DEFAULT FERIADO',horarioDefaultFeriado);
                 // CREAR PLANIFICACION HORARIA
                 for (const data of planificacionHoraria) {
                     for (const [dia, { horarios }] of Object.entries(data.dias)) {
                         for (const horario of horarios) {
-                            // console.log('HORARIO',horario.dia,horario.observacion);
+                            let entrada;
+                            let inicioAlimentacion = null;
+                            let finAlimentacion = null;
+                            let salida;
+                            let planificacion;
                             if (horario.observacion === 'OK') {
                                 const origen = horario.tipo === 'N' ? horario.tipo : (horario.tipo === 'FD' ? 'DFD' : 'DL');
-                                const planificacionEntrada = {
+                                entrada = {
                                     codigo: data.codigo_usuario,
                                     id_empl_cargo: data.id_empl_cargo,
                                     id_horario: horario.id,
@@ -136,9 +137,8 @@ class PlanificacionHorariaControlador {
                                     estado_origen: origen,
                                     min_alimentacion: horario.min_alimentacion
                                 };
-                                yield CrearPlanificacionHoraria(planificacionEntrada);
                                 if (horario.inicioAlimentacion) {
-                                    const planificacionInicioAlimentacion = {
+                                    inicioAlimentacion = {
                                         codigo: data.codigo_usuario,
                                         id_empl_cargo: data.id_empl_cargo,
                                         id_horario: horario.id,
@@ -154,10 +154,9 @@ class PlanificacionHorariaControlador {
                                         estado_origen: origen,
                                         min_alimentacion: horario.min_alimentacion
                                     };
-                                    yield CrearPlanificacionHoraria(planificacionInicioAlimentacion);
                                 }
                                 if (horario.finAlimentacion) {
-                                    const planificacionFinAlimentacion = {
+                                    finAlimentacion = {
                                         codigo: data.codigo_usuario,
                                         id_empl_cargo: data.id_empl_cargo,
                                         id_horario: horario.id,
@@ -173,9 +172,8 @@ class PlanificacionHorariaControlador {
                                         estado_origen: origen,
                                         min_alimentacion: horario.min_alimentacion
                                     };
-                                    yield CrearPlanificacionHoraria(planificacionFinAlimentacion);
                                 }
-                                const planificacionSalida = {
+                                salida = {
                                     codigo: data.codigo_usuario,
                                     id_empl_cargo: data.id_empl_cargo,
                                     id_horario: horario.id,
@@ -191,12 +189,18 @@ class PlanificacionHorariaControlador {
                                     estado_origen: origen,
                                     min_alimentacion: horario.min_alimentacion
                                 };
-                                yield CrearPlanificacionHoraria(planificacionSalida);
+                                planificacion = {
+                                    entrada,
+                                    inicioAlimentacion,
+                                    finAlimentacion,
+                                    salida
+                                };
+                                yield CrearPlanificacionHoraria(planificacion);
                             }
                             else if (horario.observacion === 'DEFAULT-LIBRE') {
                                 const fecha_horario_entrada = `${horario.dia} ${horarioDefaultLibre.entrada.hora}`;
                                 const fecha_horario_salida = `${horario.dia} ${horarioDefaultLibre.salida.hora}`;
-                                const planificacionEntradaLibre = {
+                                entrada = {
                                     codigo: data.codigo_usuario,
                                     id_empl_cargo: data.id_empl_cargo,
                                     id_horario: horarioDefaultLibre.entrada.id_horario,
@@ -212,8 +216,7 @@ class PlanificacionHorariaControlador {
                                     estado_origen: 'DL',
                                     min_alimentacion: horarioDefaultLibre.entrada.min_almuerzo
                                 };
-                                yield CrearPlanificacionHoraria(planificacionEntradaLibre);
-                                const planificacionSalidaLibre = {
+                                salida = {
                                     codigo: data.codigo_usuario,
                                     id_empl_cargo: data.id_empl_cargo,
                                     id_horario: horarioDefaultLibre.salida.id_horario,
@@ -229,12 +232,18 @@ class PlanificacionHorariaControlador {
                                     estado_origen: 'DL',
                                     min_alimentacion: horarioDefaultLibre.salida.min_almuerzo
                                 };
-                                yield CrearPlanificacionHoraria(planificacionSalidaLibre);
+                                planificacion = {
+                                    entrada,
+                                    inicioAlimentacion,
+                                    finAlimentacion,
+                                    salida
+                                };
+                                yield CrearPlanificacionHoraria(planificacion);
                             }
                             else if (horario.observacion === 'DEFAULT-FERIADO') {
                                 const fecha_horario_entrada = `${horario.dia} ${horarioDefaultFeriado.entrada.hora}`;
                                 const fecha_horario_salida = `${horario.dia} ${horarioDefaultFeriado.salida.hora}`;
-                                const planificacionEntradaFeriado = {
+                                entrada = {
                                     codigo: data.codigo_usuario,
                                     id_empl_cargo: data.id_empl_cargo,
                                     id_horario: horarioDefaultFeriado.entrada.id_horario,
@@ -250,8 +259,7 @@ class PlanificacionHorariaControlador {
                                     estado_origen: 'DFD',
                                     min_alimentacion: horarioDefaultFeriado.entrada.min_almuerzo
                                 };
-                                yield CrearPlanificacionHoraria(planificacionEntradaFeriado);
-                                const planificacionSalidaFeriado = {
+                                salida = {
                                     codigo: data.codigo_usuario,
                                     id_empl_cargo: data.id_empl_cargo,
                                     id_horario: horarioDefaultFeriado.salida.id_horario,
@@ -267,7 +275,13 @@ class PlanificacionHorariaControlador {
                                     estado_origen: 'DFD',
                                     min_alimentacion: horarioDefaultFeriado.salida.min_almuerzo
                                 };
-                                yield CrearPlanificacionHoraria(planificacionSalidaFeriado);
+                                planificacion = {
+                                    entrada,
+                                    inicioAlimentacion,
+                                    finAlimentacion,
+                                    salida
+                                };
+                                yield CrearPlanificacionHoraria(planificacion);
                             }
                         }
                     }
@@ -537,27 +551,35 @@ function ConsultarHorarioDefault(codigo) {
         }
     });
 }
+// FUNCION PARA CREAR PLANIFICACION HORARIA
 function CrearPlanificacionHoraria(planificacionHoraria) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            // console.log('PLANIFICACION HORARIA',planificacionHoraria);
-            const insert = yield database_1.default.query(`
-        INSERT INTO plan_general (codigo, id_empl_cargo, id_horario, fec_horario, fec_hora_horario, 
-            tolerancia, id_det_horario, tipo_entr_salida, tipo_dia, salida_otro_dia, min_antes, min_despues, 
-            estado_origen, min_alimentacion)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
-        `, [planificacionHoraria.codigo, planificacionHoraria.id_empl_cargo, planificacionHoraria.id_horario,
-                planificacionHoraria.fec_horario, planificacionHoraria.fec_hora_horario, planificacionHoraria.tolerancia,
-                planificacionHoraria.id_det_horario, planificacionHoraria.tipo_entr_salida, planificacionHoraria.tipo_dia,
-                planificacionHoraria.salida_otro_dia, planificacionHoraria.min_antes, planificacionHoraria.min_despues,
-                planificacionHoraria.estado_origen, planificacionHoraria.min_alimentacion]);
-            if (insert.rowCount > 0) {
-                console.log('PLANIFICACION HORARIA CREADA', insert.rows);
-                return insert.rows;
-            }
-            else {
-                return null;
-            }
+            // DESESCTRUCTURAR PLANIFICACION HORARIA
+            let { entrada, inicioAlimentacion, finAlimentacion, salida } = planificacionHoraria;
+            console.log('ENTRADA', entrada);
+            console.log('INICIO ALIMENTACION', inicioAlimentacion);
+            console.log('FIN ALIMENTACION', finAlimentacion);
+            console.log('SALIDA', salida);
+            // const insert = await pool.query(
+            // `
+            // INSERT INTO plan_general (codigo, id_empl_cargo, id_horario, fec_horario, fec_hora_horario, 
+            //     tolerancia, id_det_horario, tipo_entr_salida, tipo_dia, salida_otro_dia, min_antes, min_despues, 
+            //     estado_origen, min_alimentacion)
+            // VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
+            // `, [planificacionHoraria.codigo, planificacionHoraria.id_empl_cargo, planificacionHoraria.id_horario, 
+            //     planificacionHoraria.fec_horario, planificacionHoraria.fec_hora_horario, planificacionHoraria.tolerancia, 
+            //     planificacionHoraria.id_det_horario, planificacionHoraria.tipo_entr_salida, planificacionHoraria.tipo_dia, 
+            //     planificacionHoraria.salida_otro_dia, planificacionHoraria.min_antes, planificacionHoraria.min_despues, 
+            //     planificacionHoraria.estado_origen, planificacionHoraria.min_alimentacion]
+            // );
+            // if (insert.rowCount > 0) {
+            //     console.log('PLANIFICACION HORARIA CREADA',insert.rows);
+            //     return insert.rows;
+            // }
+            // else {
+            //     return null;
+            // }
         }
         catch (error) {
             console.log('ERROR', error);
