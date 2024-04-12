@@ -140,7 +140,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.ObtenerNombreMenu();
     this.MostrarPaginasRol();
 
-    this.nombresMenu.forEach((pagina: any)=> {
+    this.nombresMenu.forEach((pagina: any) => {
 
       this.nombresAccionesPorPagina[pagina.id] = [];
     })
@@ -395,18 +395,18 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.activar_seleccion = false;
   }
 
+  HabilitarSeleccionCheck() {
+    //this.auto_individual = false;
+    this.activar_seleccion_ckeck = true;
+  }
 
   auto_individual: boolean = true;
   activar_seleccion: boolean = true;
-
-
   seleccion_vacia: boolean = true;
 
 
-
-
-
-
+  //CHECK PAGINAS - ACCIONES
+  activar_seleccion_ckeck: boolean = false;
   selectionPaginas = new SelectionModel<ITableFuncionesRoles>(true, []);
 
 
@@ -515,9 +515,9 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       id_funcion: id
     };
     this.rest.BuscarAccionesPaginas(buscarAcciones).subscribe(res => {
-      this.nombresAcciones=res;
+      this.nombresAcciones = res;
       //console.log("acciones", this.nombresAcciones)
-      this.nombresAccionesPorPagina[id] =[res[0]] ;
+      this.nombresAccionesPorPagina[id] = [res];
       console.log("acciones", this.nombresAccionesPorPagina)
       console.log("acciones 2 ", this.nombresAcciones)
 
