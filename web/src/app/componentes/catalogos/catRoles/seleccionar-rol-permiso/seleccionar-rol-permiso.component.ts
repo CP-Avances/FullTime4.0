@@ -11,6 +11,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { Router } from '@angular/router';
 import { timeout } from 'rxjs';
+import { number } from 'echarts';
 
 
 interface Funciones {
@@ -100,7 +101,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   numero_pagina: number = 1;
 
   pageSizeOptions = [5, 10, 20, 50];
-  espera: boolean = false ;
+  espera: boolean = false;
 
   constructor(
     public location: Location,
@@ -110,6 +111,17 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     private router: Router,
 
     public ventana: MatDialog,
+
+
+
+    //this.nombresMenu.forEach()
+
+    // this.nombresMenu.forEach(padre => {
+    //this.itemsHijoPorPadre[padre.id] = [];
+    // });
+
+
+
 
 
   ) {
@@ -127,6 +139,12 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.obtenerPermisosRolUsuario();
     this.ObtenerNombreMenu();
     this.MostrarPaginasRol();
+
+    this.nombresMenu.forEach((pagina: any)=> {
+
+      this.nombresAccionesPorPagina[pagina.id] = [];
+    })
+
 
   }
 
@@ -330,7 +348,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
             setTimeout(() => {
               window.location.reload();
             }, 2000);
-            
+
 
 
             //this.VerMensaje();
@@ -455,14 +473,14 @@ export class SeleccionarRolPermisoComponent implements OnInit {
           if (this.paginasEliminar.length != 0) {
             this.EliminarPaginaRol();
 
-            
-            
-            
+
+
+
             setTimeout(() => {
               window.location.reload();
             }, 2000);
-            
-            
+
+
           } else {
             this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
@@ -482,21 +500,26 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   //guardar en n vector grande las acciones que stoy señallando con el checkbox
 
 
+  nombresAccionesPorPagina: { [id_funcion: number]: any[] } = {};
+
+
+  //this.nombresMenu.forEach()
+
+  // this.nombresMenu.forEach(padre => {
+  //this.itemsHijoPorPadre[padre.id] = [];
+  // });
+
   ObtenerAcciones(id: any) {
-
-    //this.nombresAcciones = [];
-
-
+    this.nombresAcciones = [];
     var buscarAcciones = {
       id_funcion: id
     };
-
-
     this.rest.BuscarAccionesPaginas(buscarAcciones).subscribe(res => {
-      this.nombresAcciones.push(res);
-
-      
-      console.log("acciones",this.nombresAcciones)
+      this.nombresAcciones=res;
+      //console.log("acciones", this.nombresAcciones)
+      this.nombresAccionesPorPagina[id] =[res[0]] ;
+      console.log("acciones", this.nombresAccionesPorPagina)
+      console.log("acciones 2 ", this.nombresAcciones)
 
     }, error => {
       console.log(error);
