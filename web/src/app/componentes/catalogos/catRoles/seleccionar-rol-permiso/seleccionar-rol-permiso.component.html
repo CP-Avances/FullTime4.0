@@ -34,7 +34,6 @@
                                                 <input class="form-check-input" type="checkbox"
                                                     name="paginasSeleccionadas" id="paginasSeleccionadas{{i}}"
                                                     (change)="SeleccionarIndividual($event, n)"
-                                                    (change)="HabilitarSeleccionCheck()"
                                                     style="text-align: center; margin-left: 10px;">
                                                 <label style="margin-left: 30px; font-size: 14px;"
                                                     class="form-check-label" for="inlineCheckbox1">
@@ -49,20 +48,24 @@
                                                         style="margin-left: 60px; padding-top: 15px;">
                                                         <div class="container-fluid">
                                                             <input class="form-check-input" type="checkbox"
-                                                                id="seleccionar">
+                                                                id="seleccionarAccion"
+                                                                (change)="SeleccionarTodasAcciones($event, n.id)">
                                                             <label class="form-check-label" for="inlineCheckbox1"
                                                                 style="margin-left: 10px; font-size: 14px; color: green; font-weight: bold;">
                                                                 Todos las acciones
                                                             </label>
-                                                            <div class="row" style="text-align: center; padding-top: 10px;"
-                                                                *ngFor="let a of nombresAccionesPorPagina[n.id]; index as i">
+                                                            <div class="row"
+                                                                style="text-align: center; padding-top: 10px;"
+                                                                *ngFor="let pagina of nombresAccionesPorPagina[n.id]; index as i">
 
 
                                                                 <div class="col-md-6 col-lg-6 col-6"
                                                                     style="text-align:left; padding-bottom: 10px;"
-                                                                    *ngFor="let accion of a; index as i" >
+                                                                    *ngFor="let accion of pagina; index as i">
                                                                     <input class="form-check-input" type="checkbox"
-                                                                        id="seleccionar">
+                                                                        name="accionesSeleccionadasPorPagina"
+                                                                        id="accionesSeleccionadasPorPagina{{i}}"
+                                                                        (change)="SeleccionarIndividualAccion($event, n.id, accion)">
                                                                     <label style="margin-left: 10px; font-size: 14px;"
                                                                         class="form-check-label" for="inlineCheckbox1">
                                                                         {{accion.accion}}

@@ -64,7 +64,7 @@ class RolPermisosControlador {
     const { funcion, id_rol } = req.body;
     const PAGINA_ROL = await pool.query(
       `
-          SELECT * FROM cg_rol_permisos WHERE funcion = $1 AND id_rol = $2
+          SELECT * FROM cg_rol_permisos WHERE funcion = $1  AND id_rol = $2 
           `
       , [funcion, id_rol]);
     if (PAGINA_ROL.rowCount > 0) {
@@ -74,6 +74,21 @@ class RolPermisosControlador {
       return res.status(404).jsonp({ text: 'Registros no encontrados.' });
     }
   }
+    // METODO PARA BUSCAR ID DE PAGINAS
+    public async ObtenerIdPaginasConAcciones(req: Request, res: Response): Promise<any> {
+      const { funcion, id_rol, id_accion } = req.body;
+      const PAGINA_ROL = await pool.query(
+        `
+            SELECT * FROM cg_rol_permisos WHERE funcion = $1  AND id_rol = $2 AND id_accion = $3
+            `
+        , [funcion, id_rol, id_accion]);
+      if (PAGINA_ROL.rowCount > 0) {
+        return res.jsonp(PAGINA_ROL.rows)
+      }
+      else {
+        return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+      }
+    }
 
 
   // METODO PARA BUSCAR ID DE PAGINAS
@@ -98,7 +113,7 @@ class RolPermisosControlador {
       const { funcion, link, id_rol, id_accion } = req.body;
       const response: QueryResult = await pool.query(
         `
-            INSERT INTO cg_rol_permisos (funcion, link, id_rol, id_accion) VALUES ($1, $2, $3) RETURNING *
+            INSERT INTO cg_rol_permisos (funcion, link, id_rol, id_accion) VALUES ($1, $2, $3, $4) RETURNING *
             `
         , [funcion, link, id_rol, id_accion]);
 
@@ -119,7 +134,7 @@ class RolPermisosControlador {
 
   // METODO PARA ELIMINAR REGISTRO
   public async EliminarPaginaRol(req: Request, res: Response): Promise<void> {
-   // const id = req.params.id;
+    // const id = req.params.id;
 
     const { funcion, id_rol } = req.body
 
@@ -136,7 +151,7 @@ class RolPermisosControlador {
   // METODO PARA Buscar las acciones de cada pagina
 
 
-   public async ObtenerAccionesPaginas(req: Request, res: Response): Promise<any> {
+  public async ObtenerAccionesPaginas(req: Request, res: Response): Promise<any> {
     const { id_funcion } = req.body;
     const PAGINA_ROL = await pool.query(
       `
@@ -150,7 +165,7 @@ class RolPermisosControlador {
       return res.status(404).jsonp({ text: 'Registros no encontrados.' });
     }
   }
- 
+
 
 
 

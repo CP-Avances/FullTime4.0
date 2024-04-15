@@ -78,8 +78,23 @@ class RolPermisosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { funcion, id_rol } = req.body;
             const PAGINA_ROL = yield database_1.default.query(`
-          SELECT * FROM cg_rol_permisos WHERE funcion = $1 AND id_rol = $2
+          SELECT * FROM cg_rol_permisos WHERE funcion = $1  AND id_rol = $2 
           `, [funcion, id_rol]);
+            if (PAGINA_ROL.rowCount > 0) {
+                return res.jsonp(PAGINA_ROL.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+            }
+        });
+    }
+    // METODO PARA BUSCAR ID DE PAGINAS
+    ObtenerIdPaginasConAcciones(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { funcion, id_rol, id_accion } = req.body;
+            const PAGINA_ROL = yield database_1.default.query(`
+            SELECT * FROM cg_rol_permisos WHERE funcion = $1  AND id_rol = $2 AND id_accion = $3
+            `, [funcion, id_rol, id_accion]);
             if (PAGINA_ROL.rowCount > 0) {
                 return res.jsonp(PAGINA_ROL.rows);
             }
@@ -109,7 +124,7 @@ class RolPermisosControlador {
             try {
                 const { funcion, link, id_rol, id_accion } = req.body;
                 const response = yield database_1.default.query(`
-            INSERT INTO cg_rol_permisos (funcion, link, id_rol, id_accion) VALUES ($1, $2, $3) RETURNING *
+            INSERT INTO cg_rol_permisos (funcion, link, id_rol, id_accion) VALUES ($1, $2, $3, $4) RETURNING *
             `, [funcion, link, id_rol, id_accion]);
                 const [rol] = response.rows;
                 if (rol) {

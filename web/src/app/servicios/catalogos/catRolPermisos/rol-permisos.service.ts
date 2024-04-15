@@ -47,6 +47,11 @@ export class RolPermisosService {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/ide`, datos);
   }
 
+  BuscarIdPaginasConAcciones(datos: any) {
+    return this.http.post(`${environment.url}/rolPermisos/menu/paginas/ideaccion`, datos);
+  }
+
+
 
   crearPaginaRol(data: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/insertar`, data);

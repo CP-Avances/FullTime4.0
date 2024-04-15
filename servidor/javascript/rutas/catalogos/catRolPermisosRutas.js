@@ -21,6 +21,7 @@ class RolPermisosRutas {
         this.router.get('/menu/paginas', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarMenuRoles);
         // METODO PARA BUSCAR LAS PAGINAS POR ID_ROL
         this.router.post('/menu/paginas/ide', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerIdPaginas);
+        this.router.post('/menu/paginas/ideaccion', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerIdPaginasConAcciones);
         //METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL
         this.router.post('/menu/todaspaginasrol', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerPaginasRol);
         // METODO PARA REGISTRAR ASIGNACION DE PAGINAS  

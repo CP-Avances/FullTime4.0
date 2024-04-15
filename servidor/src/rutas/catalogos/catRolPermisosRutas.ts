@@ -24,6 +24,8 @@ class RolPermisosRutas {
         this.router.post('/menu/paginas/ide', TokenValidation, rolPermisosControlador.ObtenerIdPaginas);
 
 
+        this.router.post('/menu/paginas/ideaccion', TokenValidation, rolPermisosControlador.ObtenerIdPaginasConAcciones);
+
         //METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL
         this.router.post('/menu/todaspaginasrol', TokenValidation, rolPermisosControlador.ObtenerPaginasRol);
 
