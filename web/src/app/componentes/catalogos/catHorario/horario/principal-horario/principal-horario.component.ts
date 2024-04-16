@@ -296,8 +296,12 @@ export class PrincipalHorarioComponent implements OnInit {
     this.numero_paginaD = 1;
     this.tamanio_paginaH = 5;
     this.tamanio_paginaD = 5;
-    this.paginatorH.firstPage();
-    this.paginatorD.firstPage();
+    if (this.paginatorH) {
+      this.paginatorH.firstPage();
+    }
+    if (this.paginatorD) {
+      this.paginatorD.firstPage();
+    }
   }
 
   CargarPlantillaGeneral(element: any) {

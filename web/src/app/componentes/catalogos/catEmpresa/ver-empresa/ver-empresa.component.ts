@@ -21,6 +21,7 @@ import { LogosComponent } from 'src/app/componentes/catalogos/catEmpresa/logos/l
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { SpinnerService } from 'src/app/servicios/spinner/spinner.service';
 
 
 @Component({
@@ -66,13 +67,13 @@ export class VerEmpresaComponent implements OnInit {
   verColores: boolean = false;
   verFrase: boolean = false;
 
-  /**
-   * VARIABLES PROGRESS SPINNER
-   */
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
-  habilitarprogress: boolean = false;
+  // /**
+  //  * VARIABLES PROGRESS SPINNER
+  //  */
+  // color: ThemePalette = 'primary';
+  // mode: ProgressSpinnerMode = 'indeterminate';
+  // value = 10;
+  // habilitarprogress: boolean = false;
 
   constructor(
     public ventana: MatDialog,
@@ -81,6 +82,7 @@ export class VerEmpresaComponent implements OnInit {
     public restS: SucursalService,
     public restE: EmpleadoService,
     private toastr: ToastrService,
+    private spinnerService: SpinnerService,
   ) {
     this.idEmpresa = parseInt(localStorage.getItem('empresa') as string,)
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
@@ -155,7 +157,7 @@ export class VerEmpresaComponent implements OnInit {
     });
   }
 
-  // VENTANA PARA EDITAR DATOS DE EMPRESA 
+  // VENTANA PARA EDITAR DATOS DE EMPRESA
   ver_informacion: boolean = true;
   ver_editar: boolean = false;
   EditarDatosEmpresa(): void {
@@ -211,7 +213,7 @@ export class VerEmpresaComponent implements OnInit {
       })
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_sucursal: number) {
     this.restS.EliminarRegistro(id_sucursal).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
@@ -221,7 +223,7 @@ export class VerEmpresaComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
@@ -243,7 +245,8 @@ export class VerEmpresaComponent implements OnInit {
 
   // METODO DE REGISTRO DE COLORES
   CambiarColores() {
-    this.habilitarprogress = true;
+    // this.habilitarprogress = true;
+    this.spinnerService.show();
     let datos = {
       color_p: this.p_color,
       color_s: this.s_color,
@@ -254,7 +257,8 @@ export class VerEmpresaComponent implements OnInit {
         timeOut: 6000,
       });
       this.ObtenerColores();
-      this.habilitarprogress = false;
+      // this.habilitarprogress = false;
+      this.spinnerService.hide();
     })
   }
 
@@ -270,7 +274,7 @@ export class VerEmpresaComponent implements OnInit {
     });
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -289,7 +293,7 @@ export class VerEmpresaComponent implements OnInit {
     this.pagina = 'datos-empresa';
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                 METODO PARA EXPORTAR A PDF                                   ** **
    ** ************************************************************************************************** **/
 

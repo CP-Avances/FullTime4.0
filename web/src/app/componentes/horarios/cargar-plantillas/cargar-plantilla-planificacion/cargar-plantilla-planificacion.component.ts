@@ -1,23 +1,22 @@
 //IMPORTAR LIBRERIAS
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { ThemePalette } from '@angular/material/core';
 import { MatDatepicker } from '@angular/material/datepicker';
 import moment, { Moment } from 'moment';
 import * as XLSX from 'xlsx';
 
 //IMPORTAR SERVICIOS
+import { SpinnerService } from 'src/app/servicios/spinner/spinner.service';
+import { PlanificacionHorariaService } from 'src/app/servicios/catalogos/catPlanificacionHoraria/planificacionHoraria.service';
+import { ToastrService } from 'ngx-toastr';
 
 //IMPORTAR COMPONENTES
 import { HorarioMultipleEmpleadoComponent } from '../../rango-fechas/horario-multiple-empleado/horario-multiple-empleado.component';
-import { BuscarPlanificacionComponent } from '../../rango-fechas/buscar-planificacion/buscar-planificacion.component';
-import { SpinnerService } from 'src/app/servicios/spinner/spinner.service';
-import { ToastrService } from 'ngx-toastr';
-import { PlanificacionHorariaService } from 'src/app/servicios/catalogos/catPlanificacionHoraria/planificacionHoraria.service';
-import { MatDialog } from '@angular/material/dialog';
 import { VisualizarObservacionComponent } from '../visualizar-observacion/visualizar-observacion/visualizar-observacion.component';
+import { BuscarPlanificacionComponent } from '../../rango-fechas/buscar-planificacion/buscar-planificacion.component';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-cargar-plantilla-planificacion',
@@ -282,7 +281,6 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
   // METODO PARA GENERAR EXCEL
   GenerarExcel(fechaInicial: Moment, fechaFinal: Moment, usuarios: any[]) {
-
 
     if (fechaInicial === null || fechaFinal === null) {
       this.toastr.error('Debe seleccionar una fecha inicial y una fecha final', 'Fechas no seleccionadas', {
