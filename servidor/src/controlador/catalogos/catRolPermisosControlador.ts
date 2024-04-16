@@ -166,6 +166,43 @@ class RolPermisosControlador {
     }
   }
 
+  public async ObtenerAccionPorId(req: Request, res: Response): Promise<any> {
+    const { id } = req.body;
+    const PAGINA_ROL = await pool.query(
+      `
+          SELECT * FROM cg_acciones_roles WHERE id = $1 
+          `
+      , [id]);
+    if (PAGINA_ROL.rowCount > 0) {
+      return res.jsonp(PAGINA_ROL.rows)
+    }
+    else {
+      return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+    }
+  }
+
+  
+
+  //METODO PARA ENLISTAR ACCIONES 
+  public async ListarAcciones(req: Request, res: Response) {
+    const Roles = await pool.query(
+      `SELECT * FROM cg_acciones_roles`
+    );
+    if (Roles.rowCount > 0) {
+      return res.jsonp(Roles.rows);
+    }
+    else {
+      return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+    }
+  }
+
+
+  
+
+
+
+
+
 
 
 

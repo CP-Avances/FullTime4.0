@@ -12,6 +12,9 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
 import { Router } from '@angular/router';
 import { filter, timeout } from 'rxjs';
 import { number } from 'echarts';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+
 
 
 interface Funciones {
@@ -147,6 +150,18 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
     })
 
+    this.ObtenerTodasAcciones();
+
+
+    this.acciones.map(x=>{
+
+      this.todasAcciones[x.id]=x.accion;
+
+    } )
+
+    console.log("todas las acciones",this.todasAcciones );
+    
+
 
   }
 
@@ -229,7 +244,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       this.nombresMenu = res;
       this.nombrePaginas = res;
 
-      console.log(res)
+      console.log("MENU",res)
     }, error => {
       console.log(error);
     });
@@ -237,17 +252,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
   // METODO PARA BUSCAR LAS ACCIONES DEL SISTEMA
 
-  ObtenerAccionesPaginas() {
-    this.nombresMenu = [];
-    this.rest.getMenu().subscribe(res => {
-      this.nombresMenu = res;
-      this.nombrePaginas = res;
-
-      console.log(res.toString)
-    }, error => {
-      console.log(error);
-    });
-  }
 
 
 
@@ -318,11 +322,15 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
   AgregarTodosAcciones(id: any) {
 
-    this.accionesSeleccionadasPorPagina[id] = this.nombresAccionesPorPagina[id][0];
+    //= this.nombresAccionesPorPagina[id];
 
+    this.nombresAccionesPorPagina[id].map(x => {
+      this.accionesSeleccionadasPorPagina[id] = x;
 
-    for (var i = 0; i <= this.nombresAccionesPorPagina[id][0].length - 1; i++) {
-      (<HTMLInputElement>document.getElementById('accionesSeleccionadasPorPagina' + i)).checked = true;
+    })
+
+    for (var i = 0; i <= this.accionesSeleccionadasPorPagina[id].length - 1; i++) {
+      // (<HTMLInputElement>document.getElementById('accionesSeleccionadasPorPagina' + i )).checked = true;
     }
   }
 
@@ -344,9 +352,9 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
   limpiarDataAcciones: any = [];
   QuitarTodosAccion(id: any) {
-    this.limpiarDataAcciones = this.nombresAccionesPorPagina[id][0];
+    this.limpiarDataAcciones = this.nombresAccionesPorPagina[id];
     for (var i = 0; i <= this.limpiarDataAcciones.length - 1; i++) {
-      (<HTMLInputElement>document.getElementById('accionesSeleccionadasPorPagina' + i)).checked = false;
+      // (<HTMLInputElement>document.getElementById('accionesSeleccionadasPorPagina' + i)).checked = false;
       //this.accionesSeleccionadasPorPagina[id] = this.accionesSeleccionadasPorPagina[id].filter(s => s !== this.nombresAccionesPorPagina[id][0]);
       delete this.accionesSeleccionadasPorPagina[id];
     }
@@ -368,7 +376,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     }
     else {
       this.QuitarTodos();
-      this.nombresAccionesPorPagina={};
+      this.nombresAccionesPorPagina = {};
 
     }
 
@@ -572,8 +580,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
         //this.accionesSeleccionadasPorPagina[obj.id] = [];
 
-
-
       }
 
 
@@ -746,5 +752,43 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     });
 
   }
+
+
+  // OBTENER ACCION POR ID
+
+  ObtenerAccionPorId(id: any): Observable<any> {
+    var buscarAcciones = {
+      id: id
+    };
+  
+    // Retorna el observable y utiliza el operador 'map' para transformar los datos emitidos
+    return this.rest.BuscarAccionesPorId(buscarAcciones).pipe(
+      map((accion: any) => {accion.accion
+
+        console.log("quiero ver que muestra", accion);
+      }) // Cambia 'nombre' por el nombre de la propiedad que contiene el valor de la acción
+    );
+
+  
+  }
+
+todasAcciones: { [id_funcion: number]: any } = {};
+
+acciones:any = [];
+
+ObtenerTodasAcciones(){
+  this.acciones= []; 
+  this.rest.ObtenerAcciones().subscribe(res => {
+    this.acciones = res;
+
+    console.log("ACCIONES",res)
+  }, error => {
+    console.log(error);
+  });
+}
+
+
+
+
 
 }

@@ -73,4 +73,19 @@ export class RolPermisosService {
   BuscarAccionesPaginas(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/acciones`, datos);
   }
+
+
+    // ELIMINAR  ACCIONES DE PAGINAS ROL
+    BuscarAccionesPorId(datos: any) {
+      return this.http.post(`${environment.url}/rolPermisos/menu/paginas/acciones/id`, datos);
+    }
+
+    
+  // ENLISTAR ACCIONES
+  ObtenerAcciones() {
+    return this.http.get(`${environment.url}/rolPermisos/menu/paginas/acciones/todas`);
+  }
+
+
+    
 }

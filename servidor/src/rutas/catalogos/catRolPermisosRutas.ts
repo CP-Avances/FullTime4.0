@@ -41,6 +41,14 @@ class RolPermisosRutas {
 
         // METODO PARA BUSCAR LAS ACCIONES DE LAS PAGINAS
         this.router.post('/menu/paginas/acciones', TokenValidation, rolPermisosControlador.ObtenerAccionesPaginas);
+
+
+         // METODO PARA BUSCAR LAS ACCIONES DE LAS PAGINAS
+         this.router.post('/menu/paginas/acciones/id', TokenValidation, rolPermisosControlador.ObtenerAccionPorId);
+
+
+         // METODO PARA OBTENER TODAS LAS ACCIONES
+         this.router.get('/menu/paginas/acciones/todas', TokenValidation, rolPermisosControlador.ListarAcciones);
     }
 }
 
