@@ -474,7 +474,7 @@ async function VerificarHorario(codigo: any): Promise<[boolean,any]>{
         const horario = await pool.query('SELECT * FROM cg_horarios WHERE LOWER(codigo) = $1',
          [codigo.toLowerCase()]);
     
-        // SI EXISTE HORARIO VERIFICAR SI horario.hora_trabajo este en formato hh:mm:ss
+        // SI EXISTE HORARIO VERIFICAR SI HORARIO.HORA_TRABAJO ESTE EN FORMATO HH:MM:SS
         const existe = horario.rowCount > 0;
     
         if(existe){

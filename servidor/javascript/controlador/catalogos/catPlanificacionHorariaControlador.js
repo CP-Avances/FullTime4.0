@@ -109,7 +109,7 @@ class PlanificacionHorariaControlador {
                     fecha_inicio: fechaInicial,
                     fecha_final: fechaFinal
                 };
-                data.dias = yield VerificarSobreposicionHorarios(datosVerificacionSobreposicionHorarios);
+                data.dias = yield VerificarSuperposicionHorarios(datosVerificacionSobreposicionHorarios);
             }
             const fechaInicioMes = moment_1.default.utc(fechaInicial).add(1, 'days').format('YYYY-MM-DD');
             const fechaFinalMes = moment_1.default.utc(fechaFinal).subtract(1, 'days').format('YYYY-MM-DD');
@@ -211,16 +211,13 @@ class PlanificacionHorariaControlador {
                                 yield CrearPlanificacionHoraria(planificacion);
                             }
                             else if (horario.observacion === 'DEFAULT-LIBRE') {
-                                console.log('DEFAULT-LIBRE', horario.dia, horario.observacion);
                                 // VERIFICIAR SI YA ESTA REGISTRADO EL HORARIO DEFAULT-LIBRE PARA EL USUARIO EN ESA FECHA
                                 const horarioRegistrado = yield database_1.default.query(`
                             SELECT * FROM plan_general WHERE codigo = $1 AND fec_horario = $2 AND id_horario = $3
                         `, [data.codigo_usuario, horario.dia, horarioDefaultLibre.entrada.id_horario]);
                                 if (horarioRegistrado.rowCount > 0) {
-                                    console.log('ya esta registrado', horario.dia);
                                     continue;
                                 }
-                                console.log('no esta registrado', horario.dia);
                                 const fecha_horario_entrada = `${horario.dia} ${horarioDefaultLibre.entrada.hora}`;
                                 const fecha_horario_salida = `${horario.dia} ${horarioDefaultLibre.salida.hora}`;
                                 entrada = {
@@ -261,7 +258,7 @@ class PlanificacionHorariaControlador {
                                     finAlimentacion,
                                     salida
                                 };
-                                // await CrearPlanificacionHoraria(planificacion);
+                                yield CrearPlanificacionHoraria(planificacion);
                             }
                             else if (horario.observacion === 'DEFAULT-FERIADO') {
                                 // VERIFICIAR SI YA ESTA REGISTRADO EL HORARIO DEFAULT-FERIADO PARA EL USUARIO EN ESA FECHA
@@ -269,10 +266,8 @@ class PlanificacionHorariaControlador {
                             SELECT * FROM plan_general WHERE codigo = $1 AND fec_horario = $2 AND id_horario = $3
                         `, [data.codigo_usuario, horario.dia, horarioDefaultFeriado.entrada.id_horario]);
                                 if (horarioRegistrado.rowCount > 0) {
-                                    console.log('ya esta registrado', horario.dia);
                                     continue;
                                 }
-                                console.log('no esta registrado', horario.dia);
                                 const fecha_horario_entrada = `${horario.dia} ${horarioDefaultFeriado.entrada.hora}`;
                                 const fecha_horario_salida = `${horario.dia} ${horarioDefaultFeriado.salida.hora}`;
                                 entrada = {
@@ -422,7 +417,7 @@ function VerificarHorario(codigo) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const horario = yield database_1.default.query('SELECT * FROM cg_horarios WHERE LOWER(codigo) = $1', [codigo.toLowerCase()]);
-            // SI EXISTE HORARIO VERIFICAR SI horario.hora_trabajo este en formato hh:mm:ss
+            // SI EXISTE HORARIO VERIFICAR SI HORARIO.HORA_TRABAJO ESTE EN FORMATO HH:MM:SS
             const existe = horario.rowCount > 0;
             if (existe) {
                 const formatoHora = /^\d{2}:[0-5][0-9]:[0-5][0-9]$/;
@@ -436,7 +431,7 @@ function VerificarHorario(codigo) {
     });
 }
 // FUNCION PARA VERIFICAR SOBREPOSICION DE HORARIOS
-function VerificarSobreposicionHorarios(datos) {
+function VerificarSuperposicionHorarios(datos) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             let { dias, codigo_usuario, fecha_inicio, fecha_final } = datos;
@@ -509,14 +504,14 @@ function VerificarSobreposicionHorarios(datos) {
                     // VERIFICAR SOBREPOSICIÓN ENTRE HORARIOSMODIFICADOS
                     for (let j = i + 1; j < horariosModificados.length; j++) {
                         const horario2 = horariosModificados[j];
-                        if (SeSobreponen(horario1, horario2)) {
+                        if (SeSuperponen(horario1, horario2)) {
                             ActualizarObservacionesYRangosSimilares(horario1, horario2, rangosSimilares, true);
                         }
                     }
                     // VERIFICAR SOBREPOSICIÓN CON HORARIOSPLANIFICACION
                     for (let j = 0; j < horariosPlanificacion.length; j++) {
                         const horario2 = horariosPlanificacion[j];
-                        if (SeSobreponen(horario1, horario2)) {
+                        if (SeSuperponen(horario1, horario2)) {
                             ActualizarObservacionesYRangosSimilares(horario1, horario2, rangosSimilares, false);
                         }
                     }
@@ -534,7 +529,7 @@ function VerificarSobreposicionHorarios(datos) {
     });
 }
 // FUNCIÓN PARA VERIFICAR SI DOS HORARIOS SE SOBREPONEN
-function SeSobreponen(horario1, horario2) {
+function SeSuperponen(horario1, horario2) {
     return (horario2.entrada.fecha >= horario1.entrada.fecha && horario2.entrada.fecha <= horario1.salida.fecha) ||
         (horario2.salida.fecha <= horario1.salida.fecha && horario2.salida.fecha >= horario1.entrada.fecha) ||
         (horario1.entrada.fecha >= horario2.entrada.fecha && horario1.entrada.fecha <= horario2.salida.fecha) ||
@@ -546,11 +541,11 @@ function ActualizarObservacionesYRangosSimilares(horario1, horario2, rangosSimil
         horario1.observacion = `Ya existe planificación`;
     }
     else {
-        horario1.observacion = `Se sobrepone con el horario ${horario2.codigo} del dia ${horario1.dia}`;
+        horario1.observacion = `Se superpone con el horario ${horario2.codigo} del dia ${horario1.dia}`;
     }
     rangosSimilares[horario1.dia] = rangosSimilares[horario1.dias] ? [...rangosSimilares[horario1.dia], horario1.codigo, horario2.codigo] : [horario1.codigo, horario2.codigo];
     if (horariosModificados) {
-        horario2.observacion = `Se sobrepone con el horario ${horario1.codigo} del dia ${horario1.dia}`;
+        horario2.observacion = `Se superpone con el horario ${horario1.codigo} del dia ${horario1.dia}`;
         rangosSimilares[horario2.dia] = rangosSimilares[horario2.dias] ? [...rangosSimilares[horario2.dia], horario1.codigo, horario2.codigo] : [horario1.codigo, horario2.codigo];
     }
 }
