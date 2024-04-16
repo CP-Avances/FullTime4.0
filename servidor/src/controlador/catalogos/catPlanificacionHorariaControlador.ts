@@ -236,8 +236,6 @@ class PlanificacionHorariaControlador {
                         
                     } else if (horario.observacion === 'DEFAULT-LIBRE')  {
 
-                        console.log('DEFAULT-LIBRE', horario.dia, horario.observacion);
-
                         // VERIFICIAR SI YA ESTA REGISTRADO EL HORARIO DEFAULT-LIBRE PARA EL USUARIO EN ESA FECHA
                         const horarioRegistrado = await pool.query(`
                             SELECT * FROM plan_general WHERE codigo = $1 AND fec_horario = $2 AND id_horario = $3
