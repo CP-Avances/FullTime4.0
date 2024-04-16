@@ -18,7 +18,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { VisualizarObservacionComponent } from '../visualizar-observacion/visualizar-observacion/visualizar-observacion.component';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
-import { map } from 'rxjs/operators';
+
 @Component({
   selector: 'app-cargar-plantilla-planificacion',
   templateUrl: './cargar-plantilla-planificacion.component.html',
@@ -220,7 +220,7 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
       this.planificacionesHorarias = data.planificacionHoraria;
 
-      console.log(this.planificacionesHorarias);
+        console.log(this.planificacionesHorarias);
 
     }
   }
@@ -243,10 +243,10 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
       planificacion.dias = planificacion.dias.map((dia: any) => {
         if (dia.observacion !== 'OK') {
 
-          dia.observacion = dia.observacion3 ? 'DEFAULT-FERIADO' : 'DEFAULT-LIBRE';
-          const existe = dia.horarios.find ( (horario: any) => { horario.observacion = 'Ya existe planificación'; });
+          const existePlanificacion = dia.horarios.some((horario: any) => horario.observacion === 'Ya existe planificación');
 
-          if (!existe) {
+          if (!existePlanificacion) {
+            dia.observacion = dia.observacion3 ? 'DEFAULT-FERIADO' : 'DEFAULT-LIBRE';
             dia.horarios = dia.observacion3 ? [{codigo:'DEFAULT-FERIADO', dia: dia.fecha ,observacion: 'DEFAULT-FERIADO' }] : [{codigo:'DEFAULT-LIBRE', dia: dia.fecha, observacion: 'DEFAULT-LIBRE'}];
           }
         }

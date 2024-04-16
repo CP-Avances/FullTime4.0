@@ -147,7 +147,6 @@ class PlanificacionHorariaControlador {
                     let salida: Plan;
 
 
-
                     if (horario.observacion === 'OK') {
 
                         const origen = horario.tipo === 'N' ? horario.tipo : (horario.tipo === 'FD' ? 'DFD' : 'DL');
@@ -638,7 +637,7 @@ async function ListarPlanificacionHoraria(codigo: string, fecha_inicio: string, 
 
         const horario = await pool.query(`
             SELECT p_g.codigo AS codigo_e, fec_horario AS fecha, id_horario AS id, 
-            CASE WHEN ((tipo_dia = 'L' OR tipo_dia = 'FD') AND (NOT estado_origen = 'HL' AND NOT estado_origen = 'HFD')) THEN tipo_dia ELSE horario.codigo END AS codigo_dia 
+            horario.codigo AS codigo_dia 
             FROM plan_general p_g 
             INNER JOIN empleados empleado ON empleado.codigo = p_g.codigo AND p_g.codigo = $3 
             INNER JOIN cg_horarios horario ON horario.id = p_g.id_horario 
