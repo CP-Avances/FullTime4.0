@@ -39,12 +39,30 @@
     </div>
     <mat-card-content *ngIf="eliminar">
         <div style="padding: 2%;">
-            <p>Se le recuerda que los datos que se subirán al sistema son aquellos que tienen como 
+            <p>Se le recuerda que los datos que se subirán al sistema son aquellos que tienen como
                 <b>observación “ok”</b>.
             </p>
             <p id="mensaje">¿ESTA SEGURO DE IMPORTAR LA PLANTILLA?</p>
         </div>
     </mat-card-content>
+</ng-container>
+
+<ng-container *ngIf="mensaje == 'registro-planificacion'">
+  <div id="resultados" >
+      <span cdkDrag cdkDragRootElement=".cdk-overlay-pane" id="mover">
+          IMPORTAR PLANTILLA
+      </span>
+  </div>
+  <mat-card-content *ngIf="eliminar">
+      <div style="padding: 2%;">
+          <p>Se le recuerda que los datos que se subirán al sistema son aquellos que tienen como
+              <b>observación “ok”</b>.
+              Los días que indiquen alguna observación diferente a “ok” se subirán como días libres,
+              o como días feriados si ya existe el registro en el sistema.
+          </p>
+          <p id="mensaje">¿ESTA SEGURO DE IMPORTAR LA PLANTILLA?</p>
+      </div>
+  </mat-card-content>
 </ng-container>
 
 

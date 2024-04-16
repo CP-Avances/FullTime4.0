@@ -18,6 +18,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { VisualizarObservacionComponent } from '../visualizar-observacion/visualizar-observacion/visualizar-observacion.component';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+import { map } from 'rxjs/operators';
 @Component({
   selector: 'app-cargar-plantilla-planificacion',
   templateUrl: './cargar-plantilla-planificacion.component.html',
@@ -208,21 +209,25 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
               }
           });
 
-          // CONVERTIR PLANIFICACION.DIAS A UN ARRAY DE OBJETOS
-          planificacion.dias = Object.keys(planificacion.dias).map(key => ({
-            fecha: key,
-            ...planificacion.dias[key]
+          // ORDENAR LOS DIAS DE LA PLANIFICACION POR FECHA Y CONVERTIR A UN ARRAY DE OBJETOS
+          planificacion.dias = Object.keys(planificacion.dias)
+          .sort()
+          .map(key => ({
+              fecha: key,
+              ...planificacion.dias[key]
           }));
       });
 
       this.planificacionesHorarias = data.planificacionHoraria;
+
+      console.log(this.planificacionesHorarias);
 
     }
   }
 
   // METODO PARA SOLICITAR CONFIRMACION DE REGISTRO DE PLANIFICACIONES
   ConfirmarRegistroPlanificaciones() {
-    const mensaje = 'registro';
+    const mensaje = 'registro-planificacion';
     this.ventana.open(MetodosComponent, { width: '450px', data:  mensaje  }).afterClosed().subscribe((confimado: Boolean) => {
       if (confimado) {
         this.RegistrarPlanificaciones();
@@ -237,8 +242,13 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     this.planificacionesCorrectas = JSON.parse(JSON.stringify(this.planificacionesHorarias)).map((planificacion: any) => {
       planificacion.dias = planificacion.dias.map((dia: any) => {
         if (dia.observacion !== 'OK') {
+
           dia.observacion = dia.observacion3 ? 'DEFAULT-FERIADO' : 'DEFAULT-LIBRE';
-          dia.horarios = dia.observacion3 ? [{codigo:'DEFAULT-FERIADO', dia: dia.fecha ,observacion: 'DEFAULT-FERIADO' }] : [{codigo:'DEFAULT-LIBRE', dia: dia.fecha, observacion: 'DEFAULT-LIBRE'}];
+          const existe = dia.horarios.find ( (horario: any) => { horario.observacion = 'Ya existe planificación'; });
+
+          if (!existe) {
+            dia.horarios = dia.observacion3 ? [{codigo:'DEFAULT-FERIADO', dia: dia.fecha ,observacion: 'DEFAULT-FERIADO' }] : [{codigo:'DEFAULT-LIBRE', dia: dia.fecha, observacion: 'DEFAULT-LIBRE'}];
+          }
         }
         return dia;
       });
