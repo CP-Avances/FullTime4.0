@@ -615,7 +615,7 @@ public async CargarPlantilla_cargos(req: Request, res: Response): Promise<void> 
         }, 1500)
         
 
-      });
+    });
 
   }
 

@@ -1,7 +1,12 @@
 import { Request, Response } from 'express';
-const builder = require('xmlbuilder');
-
+import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+import { QueryResult } from 'pg';
+import moment from 'moment';
+import excel from 'xlsx';
 import pool from '../../database';
+import path from 'path';
+import fs from 'fs';
+const builder = require('xmlbuilder');
 
 class DepartamentoControlador {
 
@@ -295,10 +300,177 @@ class DepartamentoControlador {
   }
 
 
+  /* 
+    * Metodo para revisar
+    */
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+    public async RevisarDatos(req: Request, res: Response): Promise<void> {
+      const documento = req.file?.originalname;
+      let separador = path.sep;
+      let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
 
+      const workbook = excel.readFile(ruta);
+      const sheet_name_list = workbook.SheetNames;
+      const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
+      let data: any = {
+        fila: '',
+        nombre: '',
+        sucursal: '',
+        observacion: ''
+      };
 
+      var listDepartamentos: any = [];
+      var duplicados: any = [];
+      var fecha_igual: any = [];
+      var mensaje: string = 'correcto';
 
+      // LECTURA DE LOS DATOS DE LA PLANTILLA
+      plantilla.forEach(async (dato: any, indice: any, array: any) => {
+        var {item, nombre, sucursal } = dato;
+        //Verificar que el registo no tenga datos vacios
+        if ((item != undefined && item != '') &&
+        (nombre != undefined) && (sucursal != undefined)){
+          data.fila = item;
+          data.nombre = nombre; data.sucursal = sucursal;
+          data.observacion = 'no registrado';
+
+          listDepartamentos.push(data);
+        }else{
+          data.fila = item;
+          data.nombre = nombre; data.sucursal = sucursal;
+          data.observacion = 'no registrado';
+
+          if (data.fila == '' || data.fila == undefined) {
+            data.fila = 'error';
+            mensaje = 'error'
+          }
+  
+          if (nombre == undefined) {
+            data.nombre = 'No registrado';
+            data.observacion = 'Nombre ' + data.observacion;
+          }
+          if (sucursal == undefined) {
+            data.sucursal = 'No registrado';
+            data.observacion = 'Sucursal ' + data.observacion;
+          }
+
+          listDepartamentos.push(data);
+
+        }
+
+        data = {};
+
+      });
+
+      // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+      fs.access(ruta, fs.constants.F_OK, (err) => {
+        if (err) {
+        } else {
+            // ELIMINAR DEL SERVIDOR
+            fs.unlinkSync(ruta);
+        }
+      });
+
+      listDepartamentos.forEach(async(item:any) => {
+          if(item.observacion == 'no registrado'){
+            var VERIFICAR_SUCURSAL = await pool.query('SELECT * FROM sucursales WHERE UPPER(nombre) = $1', [item.sucursal.toUpperCase()]);
+            if(VERIFICAR_SUCURSAL.rows[0] != undefined && VERIFICAR_SUCURSAL.rows[0] != ''){
+              var VERIFICAR_DEPARTAMENTO = await pool.query('SELECT * FROM cg_departamentos WHERE id_sucursal = $1 AND UPPER(nombre) = $2', [VERIFICAR_SUCURSAL.rows[0].id, item.nombre.toUpperCase()])
+              if(VERIFICAR_DEPARTAMENTO.rows[0] == undefined || VERIFICAR_DEPARTAMENTO.rows[0] == ''){
+                item.observacion = 'ok'
+              }else{
+                item.observacion = 'Ya existe en el sistema'
+              }
+            }else{
+              item.observacion = 'No existe la sucursal en el sistema'
+            }
+
+            // Discriminación de elementos iguales
+          if(duplicados.find((p: any)=> p.nombre === item.nombre && p.sucursal === item.sucursal) == undefined)
+            {
+                duplicados.push(item);
+            }else{
+                item.observacion = '1';
+            }
+          }
+      });
+
+    setTimeout(() => {
+      listDepartamentos.sort((a: any, b: any) => {
+            // Compara los números de los objetos
+            if (a.fila < b.fila) {
+                return -1;
+            }
+            if (a.fila > b.fila) {
+                return 1;
+            }
+            return 0; // Son iguales
+        });
+
+        var filaDuplicada: number = 0;
+
+        listDepartamentos.forEach(async(item:any) => {
+          if(item.observacion == '1') {
+            item.observacion = 'Registro duplicado'
+          }
+
+            //Valida si los datos de la columna N son numeros.
+            if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+            //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                if(item.fila == filaDuplicada){
+                    mensaje = 'error';
+                }
+            }else{
+                return mensaje = 'error';
+            } 
+
+            filaDuplicada = item.fila;
+
+        });
+
+        if(mensaje == 'error'){
+          listDepartamentos = undefined;
+        }
+
+        console.log('listDepartamentos: ',listDepartamentos);
+
+        return res.jsonp({ message: mensaje, data: listDepartamentos});
+  
+      }, 1500)
+    }
+
+    public async CargarPlantilla(req: Request, res: Response): Promise<void> {
+      const plantilla = req.body;
+      console.log('datos departamento: ', plantilla);
+
+      plantilla.forEach(async (data: any) => {
+        console.log('data: ',data);
+        // Datos que se guardaran de la plantilla ingresada
+        const {item, nombre, sucursal} = data;
+        const ID_SUCURSAL: any = await pool.query('SELECT id FROM sucursales WHERE UPPER(nombre) = $1', [sucursal.toUpperCase()]);
+
+        var nivel = 0;
+        var id_sucursal = ID_SUCURSAL.rows[0].id;
+
+        // Registro de los datos de contratos
+        const response: QueryResult = await pool.query(
+          `INSERT INTO cg_departamentos (nombre, id_sucursal) VALUES ($1, $2) RETURNING *
+          `,[nombre.toUpperCase(), id_sucursal]);
+
+        const [departamento] = response.rows;
+
+        setTimeout(() => {
+          if (departamento) {
+            return res.status(200).jsonp({message: 'ok'})
+          }else {
+            return res.status(404).jsonp({ message: 'error' })
+          }
+        }, 1500)
+
+      });
+
+    }
 
 
 

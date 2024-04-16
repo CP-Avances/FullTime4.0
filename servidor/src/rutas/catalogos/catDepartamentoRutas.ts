@@ -2,6 +2,29 @@ import { Router } from 'express';
 import DEPARTAMENTO_CONTROLADOR from '../../controlador/catalogos/catDepartamentoControlador';
 import { TokenValidation } from '../../libs/verificarToken';
 
+import multer from 'multer';
+import moment from 'moment';
+import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+
+const storage = multer.diskStorage({
+
+    destination: function (req, file, cb) {
+        cb(null, ObtenerRutaLeerPlantillas())
+    },
+    filename: function (req, file, cb) {
+        // FECHA DEL SISTEMA
+        //var fecha = moment();
+        //var anio = fecha.format('YYYY');
+        //var mes = fecha.format('MM');
+        //var dia = fecha.format('DD');
+        let documento = file.originalname;
+
+        cb(null, documento);
+    }
+})
+
+const upload = multer({ storage: storage });
+
 class DepartamentoRutas {
     public router: Router = Router();
 
@@ -62,6 +85,9 @@ class DepartamentoRutas {
 
         this.router.get('/buscar/regimen-departamento/:id', TokenValidation, DEPARTAMENTO_CONTROLADOR.ListarDepartamentosRegimen);
 
+
+        this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], DEPARTAMENTO_CONTROLADOR.RevisarDatos);
+        this.router.post('/cargar_plantilla/', TokenValidation, DEPARTAMENTO_CONTROLADOR.CargarPlantilla);
     }
 }
 

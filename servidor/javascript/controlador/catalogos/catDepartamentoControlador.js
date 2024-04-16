@@ -13,8 +13,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DEPARTAMENTO_CONTROLADOR = void 0;
-const builder = require('xmlbuilder');
+const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const xlsx_1 = __importDefault(require("xlsx"));
 const database_1 = __importDefault(require("../../database"));
+const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
+const builder = require('xmlbuilder');
 class DepartamentoControlador {
     // REGISTRAR DEPARTAMENTO
     CrearDepartamento(req, res) {
@@ -252,6 +256,157 @@ class DepartamentoControlador {
             catch (error) {
                 return res.jsonp({ message: 'error' });
             }
+        });
+    }
+    /*
+      * Metodo para revisar
+      */
+    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+    RevisarDatos(req, res) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            const documento = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
+            let separador = path_1.default.sep;
+            let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
+            const workbook = xlsx_1.default.readFile(ruta);
+            const sheet_name_list = workbook.SheetNames;
+            const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+            let data = {
+                fila: '',
+                nombre: '',
+                sucursal: '',
+                observacion: ''
+            };
+            var listDepartamentos = [];
+            var duplicados = [];
+            var fecha_igual = [];
+            var mensaje = 'correcto';
+            // LECTURA DE LOS DATOS DE LA PLANTILLA
+            plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
+                var { item, nombre, sucursal } = dato;
+                //Verificar que el registo no tenga datos vacios
+                if ((item != undefined && item != '') &&
+                    (nombre != undefined) && (sucursal != undefined)) {
+                    data.fila = item;
+                    data.nombre = nombre;
+                    data.sucursal = sucursal;
+                    data.observacion = 'no registrado';
+                    listDepartamentos.push(data);
+                }
+                else {
+                    data.fila = item;
+                    data.nombre = nombre;
+                    data.sucursal = sucursal;
+                    data.observacion = 'no registrado';
+                    if (data.fila == '' || data.fila == undefined) {
+                        data.fila = 'error';
+                        mensaje = 'error';
+                    }
+                    if (nombre == undefined) {
+                        data.nombre = 'No registrado';
+                        data.observacion = 'Nombre ' + data.observacion;
+                    }
+                    if (sucursal == undefined) {
+                        data.sucursal = 'No registrado';
+                        data.observacion = 'Sucursal ' + data.observacion;
+                    }
+                    listDepartamentos.push(data);
+                }
+                data = {};
+            }));
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs_1.default.access(ruta, fs_1.default.constants.F_OK, (err) => {
+                if (err) {
+                }
+                else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs_1.default.unlinkSync(ruta);
+                }
+            });
+            listDepartamentos.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                if (item.observacion == 'no registrado') {
+                    var VERIFICAR_SUCURSAL = yield database_1.default.query('SELECT * FROM sucursales WHERE UPPER(nombre) = $1', [item.sucursal.toUpperCase()]);
+                    if (VERIFICAR_SUCURSAL.rows[0] != undefined && VERIFICAR_SUCURSAL.rows[0] != '') {
+                        var VERIFICAR_DEPARTAMENTO = yield database_1.default.query('SELECT * FROM cg_departamentos WHERE id_sucursal = $1 AND UPPER(nombre) = $2', [VERIFICAR_SUCURSAL.rows[0].id, item.nombre.toUpperCase()]);
+                        if (VERIFICAR_DEPARTAMENTO.rows[0] == undefined || VERIFICAR_DEPARTAMENTO.rows[0] == '') {
+                            item.observacion = 'ok';
+                        }
+                        else {
+                            item.observacion = 'Ya existe en el sistema';
+                        }
+                    }
+                    else {
+                        item.observacion = 'No existe la sucursal en el sistema';
+                    }
+                    // Discriminación de elementos iguales
+                    if (duplicados.find((p) => p.nombre === item.nombre && p.sucursal === item.sucursal) == undefined) {
+                        duplicados.push(item);
+                    }
+                    else {
+                        item.observacion = '1';
+                    }
+                }
+            }));
+            setTimeout(() => {
+                listDepartamentos.sort((a, b) => {
+                    // Compara los números de los objetos
+                    if (a.fila < b.fila) {
+                        return -1;
+                    }
+                    if (a.fila > b.fila) {
+                        return 1;
+                    }
+                    return 0; // Son iguales
+                });
+                var filaDuplicada = 0;
+                listDepartamentos.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                    if (item.observacion == '1') {
+                        item.observacion = 'Registro duplicado';
+                    }
+                    //Valida si los datos de la columna N son numeros.
+                    if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+                        //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                        if (item.fila == filaDuplicada) {
+                            mensaje = 'error';
+                        }
+                    }
+                    else {
+                        return mensaje = 'error';
+                    }
+                    filaDuplicada = item.fila;
+                }));
+                if (mensaje == 'error') {
+                    listDepartamentos = undefined;
+                }
+                console.log('listDepartamentos: ', listDepartamentos);
+                return res.jsonp({ message: mensaje, data: listDepartamentos });
+            }, 1500);
+        });
+    }
+    CargarPlantilla(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const plantilla = req.body;
+            console.log('datos departamento: ', plantilla);
+            plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
+                console.log('data: ', data);
+                // Datos que se guardaran de la plantilla ingresada
+                const { item, nombre, sucursal } = data;
+                const ID_SUCURSAL = yield database_1.default.query('SELECT id FROM sucursales WHERE UPPER(nombre) = $1', [sucursal.toUpperCase()]);
+                var nivel = 0;
+                var id_sucursal = ID_SUCURSAL.rows[0].id;
+                // Registro de los datos de contratos
+                const response = yield database_1.default.query(`INSERT INTO cg_departamentos (nombre, id_sucursal) VALUES ($1, $2) RETURNING *
+          `, [nombre.toUpperCase(), id_sucursal]);
+                const [departamento] = response.rows;
+                setTimeout(() => {
+                    if (departamento) {
+                        return res.status(200).jsonp({ message: 'ok' });
+                    }
+                    else {
+                        return res.status(404).jsonp({ message: 'error' });
+                    }
+                }, 1500);
+            }));
         });
     }
     ListarNombreDepartamentos(req, res) {
