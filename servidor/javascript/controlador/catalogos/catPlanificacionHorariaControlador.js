@@ -123,6 +123,7 @@ class PlanificacionHorariaControlador {
                 const planificacionHoraria = req.body;
                 const horarioDefaultLibre = yield ConsultarHorarioDefault('DEFAULT-LIBRE');
                 const horarioDefaultFeriado = yield ConsultarHorarioDefault('DEFAULT-FERIADO');
+                let planificacionesImportadas = 0;
                 // CREAR PLANIFICACION HORARIA
                 for (const data of planificacionHoraria) {
                     for (const [dia, { horarios }] of Object.entries(data.dias)) {
@@ -209,6 +210,7 @@ class PlanificacionHorariaControlador {
                                     salida
                                 };
                                 yield CrearPlanificacionHoraria(planificacion);
+                                planificacionesImportadas++;
                             }
                             else if (horario.observacion === 'DEFAULT-LIBRE') {
                                 // VERIFICIAR SI YA ESTA REGISTRADO EL HORARIO DEFAULT-LIBRE PARA EL USUARIO EN ESA FECHA
@@ -259,6 +261,7 @@ class PlanificacionHorariaControlador {
                                     salida
                                 };
                                 yield CrearPlanificacionHoraria(planificacion);
+                                planificacionesImportadas++;
                             }
                             else if (horario.observacion === 'DEFAULT-FERIADO') {
                                 // VERIFICIAR SI YA ESTA REGISTRADO EL HORARIO DEFAULT-FERIADO PARA EL USUARIO EN ESA FECHA
@@ -309,9 +312,13 @@ class PlanificacionHorariaControlador {
                                     salida
                                 };
                                 yield CrearPlanificacionHoraria(planificacion);
+                                planificacionesImportadas++;
                             }
                         }
                     }
+                }
+                if (planificacionesImportadas === 0) {
+                    return res.status(200).jsonp({ message: 'No existen datos para registrar' });
                 }
                 return res.status(200).jsonp({ message: 'correcto' });
             }

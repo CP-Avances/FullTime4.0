@@ -257,9 +257,16 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
     this.restP.RegistrarPlanificacionHoraria(this.planificacionesCorrectas).subscribe( (res: any) => {
       this.spinnerService.hide();
-      this.toastr.success('Plantilla de planificaciones horarias importada', 'Operación exitosa', {
-        timeOut: 6000,
-      });
+
+      if (res.message === 'No existen datos para registrar') {
+        this.toastr.warning('No existen datos para registrar', 'Plantilla no importada.', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.success('Plantilla de planificaciones horarias importada', 'Operación exitosa', {
+          timeOut: 6000,
+        });
+    }
     }, (error: any) => {
       this.spinnerService.hide();
       this.toastr.error('Error al importar la plantilla de planificaciones horarias', 'Ups!!! algo salio mal.', {

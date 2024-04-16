@@ -134,6 +134,8 @@ class PlanificacionHorariaControlador {
         const horarioDefaultLibre = await ConsultarHorarioDefault('DEFAULT-LIBRE');
         const horarioDefaultFeriado = await ConsultarHorarioDefault('DEFAULT-FERIADO');
 
+        let planificacionesImportadas = 0;
+
         // CREAR PLANIFICACION HORARIA
         for (const data of planificacionHoraria) {
             for (const [dia, { horarios }] of Object.entries(data.dias as { [key: string]: { horarios: any[] } })) {
@@ -232,6 +234,7 @@ class PlanificacionHorariaControlador {
                         };
 
                         await CrearPlanificacionHoraria(planificacion);
+                        planificacionesImportadas++;
                         
                     } else if (horario.observacion === 'DEFAULT-LIBRE')  {
 
@@ -291,6 +294,7 @@ class PlanificacionHorariaControlador {
                         };
 
                         await CrearPlanificacionHoraria(planificacion);
+                        planificacionesImportadas++;
 
                     } else if (horario.observacion === 'DEFAULT-FERIADO') {
 
@@ -350,10 +354,15 @@ class PlanificacionHorariaControlador {
                         };
 
                         await CrearPlanificacionHoraria(planificacion);
+                        planificacionesImportadas++;
 
                     }
                 }
             }
+        }
+
+        if (planificacionesImportadas === 0) {
+            return res.status(200).jsonp({ message: 'No existen datos para registrar' });
         }
 
         return res.status(200).jsonp({ message: 'correcto' })
