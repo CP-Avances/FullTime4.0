@@ -507,6 +507,7 @@ class EmpleadoCargosControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const plantilla = req.body;
             console.log('datos contrato: ', plantilla);
+            var contador = 1;
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                 console.log('data: ', data);
                 // Datos que se guardaran de la plantilla ingresada
@@ -545,14 +546,15 @@ class EmpleadoCargosControlador {
           `, [id_contrato, id_departamento, fecha_inicio, fecha_final, id_sucursal, sueldo, id_cargo,
                     hora_traba, Jefe]);
                 const [cargos] = response.rows;
-                setTimeout(() => {
+                if (contador === plantilla.length) {
                     if (cargos) {
                         return res.status(200).jsonp({ message: 'ok' });
                     }
                     else {
                         return res.status(404).jsonp({ message: 'error' });
                     }
-                }, 1500);
+                }
+                contador = contador + 1;
             }));
         });
     }

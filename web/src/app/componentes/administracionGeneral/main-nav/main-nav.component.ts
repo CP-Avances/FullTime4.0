@@ -280,6 +280,8 @@ export class MainNavComponent implements OnInit {
           { name: 'Título Profesional', url: '/titulos', color: true, ver: true },
           { name: 'Empleados', url: '/empleado', color: true, ver: true },
           { name: 'Cargar Plantillas', url: '/cargarPlantilla', color: true, ver: true },
+          { name: 'Modalida Laboral', url: '/modalidaLaboral', color: true, ver: true },
+          { name: 'Tipo Cargos', url: '/tiposCargos', color: true, ver: true },
           { name: 'Asignar Establecimientos', url: '/administrarSucursales', color: true, ver: this.superadmin },
         ]
       },

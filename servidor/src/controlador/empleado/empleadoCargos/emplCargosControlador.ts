@@ -558,7 +558,7 @@ class EmpleadoCargosControlador {
 public async CargarPlantilla_cargos(req: Request, res: Response): Promise<void> {
     const plantilla = req.body;
     console.log('datos contrato: ', plantilla);
-
+    var contador = 1;
     plantilla.forEach(async (data: any) => {
       console.log('data: ',data);
 
@@ -606,14 +606,15 @@ public async CargarPlantilla_cargos(req: Request, res: Response): Promise<void> 
 
         const [cargos] = response.rows;
 
-        setTimeout(() => {
+        if (contador === plantilla.length) {
           if (cargos) {
-              return res.status(200).jsonp({message: 'ok'})
+            return res.status(200).jsonp({message: 'ok'})
           }else {
-              return res.status(404).jsonp({ message: 'error' })
+            return res.status(404).jsonp({ message: 'error' })
           }
-        }, 1500)
-        
+        }
+
+        contador = contador + 1;        
 
     });
 

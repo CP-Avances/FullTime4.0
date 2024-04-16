@@ -380,33 +380,41 @@ class DepartamentoControlador {
                 }
                 console.log('listDepartamentos: ', listDepartamentos);
                 return res.jsonp({ message: mensaje, data: listDepartamentos });
-            }, 1500);
+            }, 1000);
         });
     }
     CargarPlantilla(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const plantilla = req.body;
-            console.log('datos departamento: ', plantilla);
-            plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
-                console.log('data: ', data);
-                // Datos que se guardaran de la plantilla ingresada
-                const { item, nombre, sucursal } = data;
-                const ID_SUCURSAL = yield database_1.default.query('SELECT id FROM sucursales WHERE UPPER(nombre) = $1', [sucursal.toUpperCase()]);
-                var nivel = 0;
-                var id_sucursal = ID_SUCURSAL.rows[0].id;
-                // Registro de los datos de contratos
-                const response = yield database_1.default.query(`INSERT INTO cg_departamentos (nombre, id_sucursal) VALUES ($1, $2) RETURNING *
+            try {
+                const plantilla = req.body;
+                console.log('datos departamento: ', plantilla);
+                var contador = 1;
+                var respuesta;
+                plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
+                    console.log('data: ', data);
+                    // Datos que se guardaran de la plantilla ingresada
+                    const { item, nombre, sucursal } = data;
+                    const ID_SUCURSAL = yield database_1.default.query('SELECT id FROM sucursales WHERE UPPER(nombre) = $1', [sucursal.toUpperCase()]);
+                    var nivel = 0;
+                    var id_sucursal = ID_SUCURSAL.rows[0].id;
+                    // Registro de los datos de contratos
+                    const response = yield database_1.default.query(`INSERT INTO cg_departamentos (nombre, id_sucursal) VALUES ($1, $2) RETURNING *
           `, [nombre.toUpperCase(), id_sucursal]);
-                const [departamento] = response.rows;
-                setTimeout(() => {
-                    if (departamento) {
-                        return res.status(200).jsonp({ message: 'ok' });
+                    const [departamento] = response.rows;
+                    if (contador === plantilla.length) {
+                        if (departamento) {
+                            return respuesta = res.status(200).jsonp({ message: 'ok' });
+                        }
+                        else {
+                            return respuesta = res.status(404).jsonp({ message: 'error' });
+                        }
                     }
-                    else {
-                        return res.status(404).jsonp({ message: 'error' });
-                    }
-                }, 1500);
-            }));
+                    contador = contador + 1;
+                }));
+            }
+            catch (error) {
+                return res.status(500).jsonp({ message: error });
+            }
         });
     }
     ListarNombreDepartamentos(req, res) {

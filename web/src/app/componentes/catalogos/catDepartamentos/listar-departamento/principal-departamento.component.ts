@@ -364,8 +364,8 @@ export class PrincipalDepartamentoComponent implements OnInit {
   colorCelda: string = ''
   stiloCelda(observacion: string): string {
     let arrayObservacion = observacion.split(" ");
-    if (observacion == 'Fecha duplicada') {
-      return 'rgb(170, 129, 236)';
+    if (observacion == 'Registro duplicado') {
+      return 'rgb(156, 214, 255)';
     } else if (observacion == 'ok') {
       return 'rgb(159, 221, 154)';
     } else if (observacion == 'Ya existe en el sistema') {

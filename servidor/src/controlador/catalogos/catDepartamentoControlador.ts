@@ -387,7 +387,7 @@ class DepartamentoControlador {
             }
 
             // Discriminación de elementos iguales
-          if(duplicados.find((p: any)=> p.nombre === item.nombre && p.sucursal === item.sucursal) == undefined)
+            if(duplicados.find((p: any)=> p.nombre === item.nombre && p.sucursal === item.sucursal) == undefined)
             {
                 duplicados.push(item);
             }else{
@@ -437,14 +437,17 @@ class DepartamentoControlador {
 
         return res.jsonp({ message: mensaje, data: listDepartamentos});
   
-      }, 1500)
+      }, 1000)
     }
 
-    public async CargarPlantilla(req: Request, res: Response): Promise<void> {
-      const plantilla = req.body;
-      console.log('datos departamento: ', plantilla);
+    public async CargarPlantilla(req: Request, res: Response) {
+      try{
+        const plantilla = req.body;
+        console.log('datos departamento: ', plantilla);
+        var contador = 1; 
+        var respuesta: any
 
-      plantilla.forEach(async (data: any) => {
+        plantilla.forEach(async (data: any) => {
         console.log('data: ',data);
         // Datos que se guardaran de la plantilla ingresada
         const {item, nombre, sucursal} = data;
@@ -460,15 +463,21 @@ class DepartamentoControlador {
 
         const [departamento] = response.rows;
 
-        setTimeout(() => {
+        if (contador === plantilla.length) {
           if (departamento) {
-            return res.status(200).jsonp({message: 'ok'})
+            return respuesta = res.status(200).jsonp({message: 'ok'})
           }else {
-            return res.status(404).jsonp({ message: 'error' })
+            return respuesta = res.status(404).jsonp({ message: 'error' })
           }
-        }, 1500)
+        }
 
-      });
+        contador = contador + 1;
+
+        });
+
+      }catch (error) {
+        return res.status(500).jsonp({ message: error });
+      }
 
     }
 
