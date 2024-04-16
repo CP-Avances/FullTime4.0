@@ -66,7 +66,7 @@
                                                                     *ngFor="let accion of pagina; index as k">
                                                                     <input class="form-check-input" type="checkbox"
                                                                         name="accionesSeleccionadasPorPagina"
-                                                                        id="accionesSeleccionadasPorPagin{{k}}"
+                                                                        id="accionesSeleccionadasPorPagina{{n.id*k}}"
                                                                         (change)="SeleccionarIndividualAccion($event, n.id, accion)">
                                                                     <label style="margin-left: 10px; font-size: 14px;"
                                                                         class="form-check-label" for="inlineCheckbox1">
@@ -147,7 +147,8 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let p of paginas " style="text-align: left;">
+                <tr *ngFor="let p of paginas | paginate:tamanio_pagina:numero_pagina "
+                 style="text-align: left;">
                     <td>
                         <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
                             (change)="$event ? selectionPaginas.toggle(p) : null"
@@ -155,7 +156,7 @@
                         </mat-checkbox>
                     </td>
                     <td style="text-align: left;">{{p.funcion}}</td>
-                    <td style="text-align: left;">{{ObtenerAccionPorId(p.id_accion)}}</td>
+                    <td style="text-align: left;">{{MetodoParaMostrarAccion(p.id_accion)}}</td>
 
                 </tr>
             </tbody>

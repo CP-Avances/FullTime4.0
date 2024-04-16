@@ -153,14 +153,10 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.ObtenerTodasAcciones();
 
 
-    this.acciones.map(x=>{
 
-      this.todasAcciones[x.id]=x.accion;
 
-    } )
+    console.log("todas las acciones", this.todasAcciones);
 
-    console.log("todas las acciones",this.todasAcciones );
-    
 
 
   }
@@ -244,7 +240,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       this.nombresMenu = res;
       this.nombrePaginas = res;
 
-      console.log("MENU",res)
+      console.log("MENU", res)
     }, error => {
       console.log(error);
     });
@@ -329,9 +325,16 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
     })
 
+
+
+    //this.nombresAccionesPorPagina[id].filter(item => item.id !== datos.id)
+
+
+
     for (var i = 0; i <= this.accionesSeleccionadasPorPagina[id].length - 1; i++) {
-      // (<HTMLInputElement>document.getElementById('accionesSeleccionadasPorPagina' + i )).checked = true;
+      //(<HTMLInputElement>document.getElementById('accionesSeleccionadasPorPagina' + (id*i) ));
     }
+
   }
 
 
@@ -358,6 +361,9 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       //this.accionesSeleccionadasPorPagina[id] = this.accionesSeleccionadasPorPagina[id].filter(s => s !== this.nombresAccionesPorPagina[id][0]);
       delete this.accionesSeleccionadasPorPagina[id];
     }
+
+
+
 
 
   }
@@ -396,9 +402,14 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
     if (target.checked === true) {
       this.AgregarTodosAcciones(id);
+
+      delete this.nombresAccionesPorPagina[id][0];
+      ///target.checked == true;
     }
     else {
       this.QuitarTodosAccion(id);
+      this.nombresAccionesPorPagina[id]= this.accionesSeleccionadasPorPagina[id];
+
     }
 
     console.log("accionas al oprimir TODAS", this.accionesSeleccionadasPorPagina)
@@ -671,6 +682,14 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       console.log("Paginas eliminadas", this.paginasEliminar);
       console.log("Paginas eliminadas", datos.id_rol);
       console.log("Paginas eliminadas", datos.funcion);
+
+
+      this.paginas = this.paginas.filter(item => item.id !== datos.id);
+      /*
+            this.paginas.forEach(x => {
+              if (x.id == this.paginasEliminar.id) {
+              }
+            })*/
       var buscarPagina = {
         funcion: datos.funcion,
         id_rol: datos.id_rol
@@ -699,9 +718,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
 
 
-            setTimeout(() => {
-              window.location.reload();
-            }, 2000);
+           
 
 
           } else {
@@ -760,32 +777,51 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     var buscarAcciones = {
       id: id
     };
-  
+
     // Retorna el observable y utiliza el operador 'map' para transformar los datos emitidos
     return this.rest.BuscarAccionesPorId(buscarAcciones).pipe(
-      map((accion: any) => {accion.accion
+      map((accion: any) => {
+        accion.accion
 
         console.log("quiero ver que muestra", accion);
       }) // Cambia 'nombre' por el nombre de la propiedad que contiene el valor de la acción
     );
 
-  
+
   }
 
-todasAcciones: { [id_funcion: number]: any } = {};
+  todasAcciones: { [id_funcion: number]: any } = {};
 
-acciones:any = [];
+  acciones: any = [];
 
-ObtenerTodasAcciones(){
-  this.acciones= []; 
-  this.rest.ObtenerAcciones().subscribe(res => {
-    this.acciones = res;
+  ObtenerTodasAcciones() {
+    this.acciones = [];
+    this.rest.ObtenerAcciones().subscribe(res => {
+      this.acciones = res;
 
-    console.log("ACCIONES",res)
-  }, error => {
-    console.log(error);
-  });
-}
+      console.log("ACCIONES", res)
+
+      this.acciones.map(x => {
+        this.todasAcciones[x.id] = x;
+
+      })
+      console.log(" Objeto de acciones", this.todasAcciones);
+    }, error => {
+      console.log(error);
+    });
+  }
+
+  MetodoParaMostrarAccion(id: any): any {
+
+    if (id != null) {
+      return this.todasAcciones[id].accion;
+    } else {
+      return null;
+    }
+
+
+
+  }
 
 
 
