@@ -513,13 +513,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                     window.location.reload();
                   }, 2000);
 */
-                  (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
-                  for (var i = 0; i <= this.nombresMenu.length - 1; i++) {
-                    (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
-                  }
-                  //(<HTMLInputElement>document.getElementById('seleccionarAccion'+ obj.id)).checked = false;
-                  //(<HTMLInputElement>document.getElementById(obj.id+'accionesSeleccionadasPorPagina')).checked = false;
-                  delete this.nombresAccionesPorPagina[obj.id];
+             
 
                   //this.VerMensaje();
                 }, error => {
@@ -567,6 +561,14 @@ export class SeleccionarRolPermisoComponent implements OnInit {
               this.toastr.success('Operación exitosa.', 'Registro guardado.', {
                 timeOut: 6000,
               });
+
+
+              (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
+              for (var i = 0; i <= this.nombresMenu.length - 1; i++) {
+                (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
+              }
+              
+              delete this.nombresAccionesPorPagina[obj.id];
 
               /*
               setTimeout(() => {
