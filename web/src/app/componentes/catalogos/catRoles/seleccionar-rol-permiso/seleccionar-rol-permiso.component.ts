@@ -274,14 +274,11 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     if (!this.accionesSeleccionadasPorPagina[id]) {
 
       this.accionesSeleccionadasPorPagina[id] = [];
-      //this.accionesSeleccionadasPorPagina[id].push(data);
       this.accionesSeleccionadasPorPagina[id].push(data);
-      //this.accionesSeleccionadasPorPagina[id].map(arreglo => arreglo.push(data));
-
+      // nuevo  17/04
     } else {
 
       this.accionesSeleccionadasPorPagina[id].push(data);
-
     }
 
   }
@@ -299,7 +296,8 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
 
     this.accionesSeleccionadasPorPagina[id] = this.accionesSeleccionadasPorPagina[id].filter(s => s !== data);
-
+    //nuevo codigo 17/04
+    (<HTMLInputElement>document.getElementById('seleccionarAccion' + id)).checked = false;
 
   }
 
@@ -317,15 +315,13 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
 
   AgregarTodosAcciones(id: any) {
-
-
     this.nombresAccionesPorPagina[id].map(x => {
       this.accionesSeleccionadasPorPagina[id] = x;
 
     })
 
     for (var i = 0; i <= this.accionesSeleccionadasPorPagina[id].length - 1; i++) {
-      (<HTMLInputElement>document.getElementById(id+'accionesSeleccionadasPorPagina'+i)).checked = true;
+      (<HTMLInputElement>document.getElementById(id + 'accionesSeleccionadasPorPagina' + i)).checked = true;
     }
 
   }
@@ -339,26 +335,17 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
       this.paginasSeleccionadas = this.paginasSeleccionadas.filter(s => s !== this.nombrePaginas[i]);
     }
-
-    //this.paginasSeleccionadas.map(pagina => {
-
-    //})
   }
 
 
   limpiarDataAcciones: any = [];
   QuitarTodosAccion(id: any) {
-    this.limpiarDataAcciones = this.nombresAccionesPorPagina[id];
+    this.limpiarDataAcciones = this.nombresAccionesPorPagina[id][0];
     for (var i = 0; i <= this.limpiarDataAcciones.length - 1; i++) {
-      (<HTMLInputElement>document.getElementById('accionesSeleccionadasPorPagina' + i)).checked = false;
+      (<HTMLInputElement>document.getElementById(id + 'accionesSeleccionadasPorPagina' + i)).checked = false;
       //this.accionesSeleccionadasPorPagina[id] = this.accionesSeleccionadasPorPagina[id].filter(s => s !== this.nombresAccionesPorPagina[id][0]);
       delete this.accionesSeleccionadasPorPagina[id];
     }
-
-
-
-
-
   }
 
 
@@ -396,7 +383,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     if (target.checked === true) {
       this.AgregarTodosAcciones(id);
 
-     // delete this.nombresAccionesPorPagina[id][0];
+      // delete this.nombresAccionesPorPagina[id][0];
       ///target.checked == true;
     }
     else {
@@ -430,6 +417,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
 
 
+
     }
   }
 
@@ -440,11 +428,19 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     const target = event.target as HTMLInputElement;
     if (target.checked === true) {
       this.AgregarAccion(id, valor);
-      console.log("accion seleccionada", this.accionesSeleccionadasPorPagina)
+      console.log("accion seleccionada", this.accionesSeleccionadasPorPagina);
+
+      if (this.accionesSeleccionadasPorPagina[id].length == this.nombresAccionesPorPagina[id][0].length) {
+        (<HTMLInputElement>document.getElementById('seleccionarAccion' + id)).checked = true;
+
+
+      }
     }
     else {
       this.QuitarAccion(id, valor);
-      console.log("accion seleccionada", this.accionesSeleccionadasPorPagina)
+      console.log("accion seleccionada", this.accionesSeleccionadasPorPagina);
+
+
 
     }
     //console.log("acciones juntas",this.accionesSeleccionadasPorPagina[id]);
@@ -511,9 +507,20 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                   this.toastr.success('Operación exitosa.', 'Registro guardado.', {
                     timeOut: 6000,
                   });
+
+                  /*
                   setTimeout(() => {
                     window.location.reload();
                   }, 2000);
+*/
+                  (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
+                  for (var i = 0; i <= this.nombresMenu.length - 1; i++) {
+                    (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
+                  }
+                  //(<HTMLInputElement>document.getElementById('seleccionarAccion'+ obj.id)).checked = false;
+                  //(<HTMLInputElement>document.getElementById(obj.id+'accionesSeleccionadasPorPagina')).checked = false;
+                  delete this.nombresAccionesPorPagina[obj.id];
+
                   //this.VerMensaje();
                 }, error => {
                   this.contador = this.contador + 1;
@@ -561,10 +568,12 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                 timeOut: 6000,
               });
 
+              /*
               setTimeout(() => {
                 window.location.reload();
               }, 2000);
-
+*/
+              (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
 
 
               //this.VerMensaje();
@@ -711,7 +720,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
 
 
-           
+
 
 
           } else {
@@ -753,7 +762,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.rest.BuscarAccionesPaginas(buscarAcciones).subscribe(res => {
       this.nombresAcciones = res;
       //console.log("acciones", this.nombresAcciones)
-      this.nombresAccionesPorPagina[id] = [res];
+      this.nombresAccionesPorPagina[id] = this.nombresAccionesPorPagina[id] = [res];
       console.log("acciones", this.nombresAccionesPorPagina)
       //console.log("acciones 2 ", this.nombresAcciones)
 
