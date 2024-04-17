@@ -69,6 +69,12 @@ export class RolPermisosService {
   }
 
 
+  // ELIMINAR PAGINAS ROL
+  EliminarPaginasRolSinAccion(datos: any) {
+    return this.http.post(`${environment.url}/rolPermisos/menu/paginas/eliminarsinaccion`, datos);
+  }
+
+
   // ELIMINAR  ACCIONES DE PAGINAS ROL
   BuscarAccionesPaginas(datos: any) {
     return this.http.post(`${environment.url}/rolPermisos/menu/paginas/acciones`, datos);

@@ -28,6 +28,7 @@ class RolPermisosRutas {
         this.router.post('/menu/paginas/insertar', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.AsignarPaginaRol);
         // METODO PARA ELIMINAR LAS PAGINAS  
         this.router.post('/menu/paginas/eliminar', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.EliminarPaginaRol);
+        this.router.post('/menu/paginas/eliminarsinaccion', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.EliminarPaginaRolSinAccion);
         // METODO PARA BUSCAR LAS ACCIONES DE LAS PAGINAS
         this.router.post('/menu/paginas/acciones', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerAccionesPaginas);
         // METODO PARA BUSCAR LAS ACCIONES DE LAS PAGINAS

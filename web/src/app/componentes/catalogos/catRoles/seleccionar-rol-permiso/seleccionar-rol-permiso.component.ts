@@ -91,8 +91,8 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
 
   // ITEMS PAGINAS
-  paginas: any = [];
   paginasEliminar: any = [];
+  paginas: any = [];
 
 
   // ITEMS ACCIONES DE PAGINAS
@@ -483,6 +483,19 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                 this.paginasRol = datos;
                 this.habilitarprogress = false;
                 //this.VerMensaje();
+
+
+                (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
+                for (var i = 0; i <= this.nombresMenu.length - 1; i++) {
+                  (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
+                }
+
+                delete this.nombresAccionesPorPagina[obj.id];
+                delete this.accionesSeleccionadasPorPagina[obj.id];
+                this.paginasSeleccionadas = [];
+                this.rest.BuscarPaginasRol(buscarPagina).subscribe(datos => {
+                  this.paginas = datos;
+                })
                 this.toastr.info('Se indica que ' + obj.nombre + ' ya fue asignada a este Rol.', '', {
                   timeOut: 7000,
                 })
@@ -513,7 +526,17 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                     window.location.reload();
                   }, 2000);
 */
-             
+                  (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
+                  for (var i = 0; i <= this.nombresMenu.length - 1; i++) {
+                    (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
+                  }
+
+                  delete this.nombresAccionesPorPagina[obj.id];
+                  delete this.accionesSeleccionadasPorPagina[obj.id];
+                  this.paginasSeleccionadas = [];
+                  this.rest.BuscarPaginasRol(buscarPagina).subscribe(datos => {
+                    this.paginas = datos;
+                  })
 
                   //this.VerMensaje();
                 }, error => {
@@ -544,15 +567,32 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
 
 
+
+
           this.paginasRol = [];
           this.rest.BuscarIdPaginas(buscarPagina).subscribe(datos => {
             this.contador = this.contador + 1;
             this.paginasRol = datos;
             this.habilitarprogress = false;
             //this.VerMensaje();
+
+            (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
+            for (var i = 0; i <= this.nombresMenu.length - 1; i++) {
+              (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
+            }
+
+            delete this.nombresAccionesPorPagina[obj.id];
+            delete this.accionesSeleccionadasPorPagina[obj.id];
+            this.paginasSeleccionadas = [];
+            this.rest.BuscarPaginasRol(buscarPagina).subscribe(datos => {
+              this.paginas = datos;
+            })
+
             this.toastr.info('Se indica que ' + obj.nombre + ' ya fue asignada a este Rol.', '', {
               timeOut: 7000,
             })
+
+
           }, error => {
             //this.habilitarprogress = false;
             this.rest.crearPaginaRol(rolPermisosbody).subscribe(response => {
@@ -567,15 +607,26 @@ export class SeleccionarRolPermisoComponent implements OnInit {
               for (var i = 0; i <= this.nombresMenu.length - 1; i++) {
                 (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
               }
-              
+
               delete this.nombresAccionesPorPagina[obj.id];
+              delete this.accionesSeleccionadasPorPagina[obj.id];
+              this.paginasSeleccionadas = [];
+
+
+
+              this.rest.BuscarPaginasRol(rol).subscribe(datos => {
+                this.paginas = datos;
+              })
+
+
+
 
               /*
               setTimeout(() => {
                 window.location.reload();
               }, 2000);
 */
-              (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
+              //   (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
 
 
               //this.VerMensaje();
@@ -600,6 +651,14 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
 
       );
+
+      var rol = {
+        id_rol: this.idRol
+      };
+
+      this.rest.BuscarPaginasRol(rol).subscribe(datos => {
+        this.paginas = datos;
+      })
     }
     else {
       this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
@@ -633,10 +692,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.activar_seleccion = false;
   }
 
-  HabilitarSeleccionCheck() {
-    //this.auto_individual = false;
-    this.activar_seleccion_ckeck = true;
-  }
 
   auto_individual: boolean = true;
   activar_seleccion: boolean = true;
@@ -644,7 +699,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
 
   //CHECK PAGINAS - ACCIONES
-  activar_seleccion_ckeck: boolean = false;
   selectionPaginas = new SelectionModel<ITableFuncionesRoles>(true, []);
 
 
@@ -688,24 +742,45 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       console.log("Paginas eliminadas", datos.funcion);
 
 
-      this.paginas = this.paginas.filter(item => item.id !== datos.id);
-      /*
-            this.paginas.forEach(x => {
-              if (x.id == this.paginasEliminar.id) {
-              }
-            })*/
-      var buscarPagina = {
-        funcion: datos.funcion,
-        id_rol: datos.id_rol
-      };
-      this.rest.EliminarPaginasRol(buscarPagina).subscribe(
 
-        res => {
-          this.toastr.error('Registro eliminado.', '', {
-            timeOut: 6000,
-          });
-        }
-      )
+      if (datos.id_accion==null) {
+
+        this.paginas = this.paginas.filter(item => item.id !== datos.id);
+
+        var buscarPagina = {
+          funcion: datos.funcion,
+          id_rol: datos.id_rol
+        };
+        this.rest.EliminarPaginasRolSinAccion(buscarPagina).subscribe(
+
+          res => {
+            this.toastr.error('Registro eliminado.', '', {
+              timeOut: 6000,
+            });
+          }
+        )
+
+
+      } else {
+
+        this.paginas = this.paginas.filter(item => item.id !== datos.id);
+
+        var buscarPagina1 = {
+          funcion: datos.funcion,
+          id_rol: datos.id_rol,
+          id_accion: datos.id_accion
+        };
+        this.rest.EliminarPaginasRol(buscarPagina1).subscribe(
+
+          res => {
+            this.toastr.error('Registro eliminado.', '', {
+              timeOut: 6000,
+            });
+          }
+        )
+      }
+
+
     })
   }
 
@@ -718,7 +793,10 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
           if (this.paginasEliminar.length != 0) {
             this.EliminarPaginaRol();
+            this.activar_seleccion = true;
 
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
 
 
 

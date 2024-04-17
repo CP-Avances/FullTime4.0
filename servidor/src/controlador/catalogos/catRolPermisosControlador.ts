@@ -74,21 +74,21 @@ class RolPermisosControlador {
       return res.status(404).jsonp({ text: 'Registros no encontrados.' });
     }
   }
-    // METODO PARA BUSCAR ID DE PAGINAS
-    public async ObtenerIdPaginasConAcciones(req: Request, res: Response): Promise<any> {
-      const { funcion, id_rol, id_accion } = req.body;
-      const PAGINA_ROL = await pool.query(
-        `
+  // METODO PARA BUSCAR ID DE PAGINAS
+  public async ObtenerIdPaginasConAcciones(req: Request, res: Response): Promise<any> {
+    const { funcion, id_rol, id_accion } = req.body;
+    const PAGINA_ROL = await pool.query(
+      `
             SELECT * FROM cg_rol_permisos WHERE funcion = $1  AND id_rol = $2 AND id_accion = $3
             `
-        , [funcion, id_rol, id_accion]);
-      if (PAGINA_ROL.rowCount > 0) {
-        return res.jsonp(PAGINA_ROL.rows)
-      }
-      else {
-        return res.status(404).jsonp({ text: 'Registros no encontrados.' });
-      }
+      , [funcion, id_rol, id_accion]);
+    if (PAGINA_ROL.rowCount > 0) {
+      return res.jsonp(PAGINA_ROL.rows)
     }
+    else {
+      return res.status(404).jsonp({ text: 'Registros no encontrados.' });
+    }
+  }
 
 
   // METODO PARA BUSCAR ID DE PAGINAS
@@ -134,7 +134,21 @@ class RolPermisosControlador {
 
   // METODO PARA ELIMINAR REGISTRO
   public async EliminarPaginaRol(req: Request, res: Response): Promise<void> {
-    // const id = req.params.id;
+
+    const { funcion, id_rol, id_accion } = req.body
+
+    console.log(funcion);
+    console.log(id_rol);
+    await pool.query(
+      `
+        DELETE FROM cg_rol_permisos WHERE funcion = $1 AND id_rol = $2 AND id_accion = $3
+        `
+      , [funcion, id_rol, id_accion]);
+    res.jsonp({ message: 'Registro eliminado.' });
+  }
+
+
+  public async EliminarPaginaRolSinAccion(req: Request, res: Response): Promise<void> {
 
     const { funcion, id_rol } = req.body
 
@@ -147,6 +161,11 @@ class RolPermisosControlador {
       , [funcion, id_rol]);
     res.jsonp({ message: 'Registro eliminado.' });
   }
+
+
+
+
+
 
   // METODO PARA Buscar las acciones de cada pagina
 
@@ -181,7 +200,7 @@ class RolPermisosControlador {
     }
   }
 
-  
+
 
   //METODO PARA ENLISTAR ACCIONES 
   public async ListarAcciones(req: Request, res: Response) {
@@ -197,7 +216,7 @@ class RolPermisosControlador {
   }
 
 
-  
+
 
 
 
