@@ -181,7 +181,7 @@ class FeriadosControlador {
 
         const workbook = excel.readFile(ruta);
         const sheet_name_list = workbook.SheetNames;
-        const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+        const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[2]]);
 
         let data: any = {
             fila: '',
@@ -382,7 +382,7 @@ class FeriadosControlador {
 
         const workbook = excel.readFile(ruta);
         const sheet_name_list = workbook.SheetNames;
-        const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+        const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[2]]);
 
         // VARIABLES DE CONTADORES DE REGISTROS
         var lectura = 1;
@@ -487,7 +487,7 @@ class FeriadosControlador {
         var contador = 1;
         const workbook = excel.readFile(ruta);
         const sheet_name_list = workbook.SheetNames;
-        const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+        const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[2]]);
         // LECTURA DE DATOS DE LA PLANTILLA
         plantilla.forEach(async (data: any) => {
             const { fecha, descripcion, fec_recuperacion } = data;

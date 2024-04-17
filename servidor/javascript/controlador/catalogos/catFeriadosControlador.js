@@ -169,7 +169,7 @@ class FeriadosControlador {
             let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
             const workbook = xlsx_1.default.readFile(ruta);
             const sheet_name_list = workbook.SheetNames;
-            const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+            const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[2]]);
             let data = {
                 fila: '',
                 fecha: '',
@@ -337,7 +337,7 @@ class FeriadosControlador {
             let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
             const workbook = xlsx_1.default.readFile(ruta);
             const sheet_name_list = workbook.SheetNames;
-            const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+            const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[2]]);
             // VARIABLES DE CONTADORES DE REGISTROS
             var lectura = 1;
             var contador = 1;
@@ -436,7 +436,7 @@ class FeriadosControlador {
             var contador = 1;
             const workbook = xlsx_1.default.readFile(ruta);
             const sheet_name_list = workbook.SheetNames;
-            const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+            const plantilla = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[2]]);
             // LECTURA DE DATOS DE LA PLANTILLA
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                 const { fecha, descripcion, fec_recuperacion } = data;

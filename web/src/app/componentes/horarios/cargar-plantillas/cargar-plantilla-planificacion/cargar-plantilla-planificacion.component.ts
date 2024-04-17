@@ -6,7 +6,6 @@ import moment, { Moment } from 'moment';
 import * as XLSX from 'xlsx';
 
 //IMPORTAR SERVICIOS
-import { SpinnerService } from 'src/app/servicios/spinner/spinner.service';
 import { PlanificacionHorariaService } from 'src/app/servicios/catalogos/catPlanificacionHoraria/planificacionHoraria.service';
 import { ToastrService } from 'ngx-toastr';
 
@@ -60,7 +59,6 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
   constructor(
     public componentem: HorarioMultipleEmpleadoComponent,
     public componenteb: BuscarPlanificacionComponent,
-    private spinnerService: SpinnerService,
     private toastr: ToastrService,
     private restP: PlanificacionHorariaService,
     public ventana: MatDialog,
@@ -122,7 +120,6 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
   // LIMPIAR CAMPOS PLANTILLA
   LimpiarCamposPlantilla() {
     this.archivo1Form.reset();
-    this.spinnerService.hide();
     this.textoBoton = 'Cargar nueva plantilla';
     this.deshabilitarRegistro = false;
     this.numero_pagina_planificacion = 1;
@@ -140,7 +137,6 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
   // METODO PARA CARGAR PLANTILLA
   CargarPlantilla(plantilla: any) {
-    this.spinnerService.show();
     if(plantilla.target.files && plantilla.target.files[0]){
       this.archivo = plantilla.target.files;
       this.nombreArchivo = this.archivo[0].name;
@@ -236,8 +232,6 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
 
   // METODO PARA REGISTRAR PLANIFICACIONES
   RegistrarPlanificaciones() {
-    this.spinnerService.show();
-
     this.planificacionesCorrectas = JSON.parse(JSON.stringify(this.planificacionesHorarias)).map((planificacion: any) => {
       planificacion.dias = planificacion.dias.map((dia: any) => {
         if (dia.observacion !== 'OK') {
@@ -255,7 +249,6 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
     });
 
     this.restP.RegistrarPlanificacionHoraria(this.planificacionesCorrectas).subscribe( (res: any) => {
-      this.spinnerService.hide();
 
       if (res.message === 'No existen datos para registrar') {
         this.toastr.warning('No existen datos para registrar', 'Plantilla no importada.', {
@@ -267,7 +260,6 @@ export class CargarPlantillaPlanificacionComponent  implements OnInit{
         });
     }
     }, (error: any) => {
-      this.spinnerService.hide();
       this.toastr.error('Error al importar la plantilla de planificaciones horarias', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
       });

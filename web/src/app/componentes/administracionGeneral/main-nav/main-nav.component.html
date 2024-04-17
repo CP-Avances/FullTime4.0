@@ -99,14 +99,6 @@
         </p>
       </mat-card-content>
     </mat-card>
-
-    <!--  **********************************  SPINNER DE CARGA ***************************************** -->
-    <div class="pantalla-progress" *ngIf="spinnerService.visibility | async"
-      style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.5);">
-      <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
-      </mat-progress-spinner>
-    </div>
-
   </mat-sidenav>
 
 

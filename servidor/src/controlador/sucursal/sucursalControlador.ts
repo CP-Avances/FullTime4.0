@@ -134,7 +134,7 @@ class SucursalControlador {
 
     const workbook = excel.readFile(ruta);
     const sheet_name_list = workbook.SheetNames;
-    const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+    const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[3]]);
 
     let data: any = {
       fila: '',

@@ -21,8 +21,6 @@ import { LogosComponent } from 'src/app/componentes/catalogos/catEmpresa/logos/l
 import { SucursalService } from 'src/app/servicios/sucursales/sucursal.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
-import { SpinnerService } from 'src/app/servicios/spinner/spinner.service';
-
 
 @Component({
   selector: 'app-ver-empresa',
@@ -82,7 +80,6 @@ export class VerEmpresaComponent implements OnInit {
     public restS: SucursalService,
     public restE: EmpleadoService,
     private toastr: ToastrService,
-    private spinnerService: SpinnerService,
   ) {
     this.idEmpresa = parseInt(localStorage.getItem('empresa') as string,)
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
@@ -245,8 +242,7 @@ export class VerEmpresaComponent implements OnInit {
 
   // METODO DE REGISTRO DE COLORES
   CambiarColores() {
-    // this.habilitarprogress = true;
-    this.spinnerService.show();
+
     let datos = {
       color_p: this.p_color,
       color_s: this.s_color,
@@ -257,8 +253,6 @@ export class VerEmpresaComponent implements OnInit {
         timeOut: 6000,
       });
       this.ObtenerColores();
-      // this.habilitarprogress = false;
-      this.spinnerService.hide();
     })
   }
 

@@ -25,6 +25,7 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
 import { ThemePalette } from '@angular/material/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-lista-sucursales',
@@ -64,11 +65,14 @@ export class ListaSucursalesComponent implements OnInit {
 
   expansion: boolean = false;
 
-  // VARIABLES PROGRESS SPINNER
-  progreso: boolean = false;
-  color: ThemePalette = 'primary';
-  mode: ProgressSpinnerMode = 'indeterminate';
-  value = 10;
+  // VARIABLE PARA TOMAR RUTA DEL SISTEMA
+  hipervinculo: string = environment.url
+
+  // // VARIABLES PROGRESS SPINNER
+  // progreso: boolean = false;
+  // color: ThemePalette = 'primary';
+  // mode: ProgressSpinnerMode = 'indeterminate';
+  // value = 10;
 
   constructor(
     private rest: SucursalService,
@@ -95,7 +99,7 @@ export class ListaSucursalesComponent implements OnInit {
     });
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleado = [];
     this.restE.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -111,7 +115,7 @@ export class ListaSucursalesComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -184,7 +188,7 @@ export class ListaSucursalesComponent implements OnInit {
     return this.validar.IngresarSoloLetras(e);
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_sucursal: number) {
     this.rest.EliminarRegistro(id_sucursal).subscribe(res => {
       this.toastr.error('Registro eliminado.', '', {
@@ -218,7 +222,7 @@ export class ListaSucursalesComponent implements OnInit {
     this.ver_departamentos = true;
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                      METODO PARA EXPORTAR A PDF                              ** **
    ** ************************************************************************************************** **/
   generarPdf(action = 'open') {
@@ -311,7 +315,7 @@ export class ListaSucursalesComponent implements OnInit {
     };
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                      METODO PARA EXPORTAR A EXCEL                            ** **
    ** ************************************************************************************************** **/
   exportToExcel() {
@@ -321,7 +325,7 @@ export class ListaSucursalesComponent implements OnInit {
     xlsx.writeFile(wb, "Establecimientos" + '.xlsx');
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                      METODO PARA EXPORTAR A CSV                              ** **
    ** ************************************************************************************************** **/
 
@@ -395,14 +399,14 @@ export class ListaSucursalesComponent implements OnInit {
     this.nameFile = this.archivoSubido[0].name;
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
-    let itemName = arrayItems[0].slice(0, 10);
+    let itemName = arrayItems[0];
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
-      if (itemName.toLowerCase() == 'sucursales') {
+      if (itemName.toLowerCase() == 'plantillaconfiguraciongeneral') {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
       } else {
-        this.toastr.error('Seleccione plantilla con nombre Sucursales.', 'Plantilla seleccionada incorrecta', {
+        this.toastr.error('Seleccione plantilla con nombre plantillaConfiguracionGeneral.', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
         });
 
@@ -429,7 +433,7 @@ export class ListaSucursalesComponent implements OnInit {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
 
-    this.progreso = true;
+    // this.progreso = true;
 
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
@@ -460,10 +464,10 @@ export class ListaSucursalesComponent implements OnInit {
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
-      this.progreso = false;
+      // this.progreso = false;
       this.messajeExcel = 'error';
     }, () => {
-      this.progreso = false;
+      // this.progreso = false;
     });
 
   }
