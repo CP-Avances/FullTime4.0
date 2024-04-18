@@ -14,62 +14,62 @@ export class HorarioService {
 
   // REGISTRAR HORARIO
   RegistrarHorario(data: any) {
-    return this.http.post<any>(`${environment.url}/horario`, data);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/horario`, data);
   }
 
   // BUSCAR HORARIO POR EL NOMBRE
   BuscarHorarioNombre(datos: any) {
-    return this.http.post(`${environment.url}/horario/buscar-horario/nombre`, datos);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/horario/buscar-horario/nombre`, datos);
   }
 
   // CARGAR ARCHIVO DE RESPALDO   --**VERIFICADO
   SubirArchivo(formData: any, id: number, archivo: any, codigo: any) {
-    return this.http.put(`${environment.url}/horario/${id}/documento/${archivo}/verificar/${codigo}`, formData)
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/horario/${id}/documento/${archivo}/verificar/${codigo}`, formData)
   }
 
   // ACTUALIZACION DE HORARIO
   ActualizarHorario(id: number, data: any) {
-    return this.http.put(`${environment.url}/horario/editar/${id}`, data);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/horario/editar/${id}`, data);
   }
 
   // ELIMINAR DOCUMENTO DE CONTRATO
   EliminarArchivo(datos: any) {
-    return this.http.put(`${environment.url}/horario/eliminar_horario/base_servidor`, datos)
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/horario/eliminar_horario/base_servidor`, datos)
   }
 
   // ELIMINAR DOCUMENTO DE CONTRATO DEL SERVIDOR
   EliminarArchivoServidor(datos: any) {
-    return this.http.put(`${environment.url}/horario/eliminar_horario/servidor`, datos)
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/horario/eliminar_horario/servidor`, datos)
   }
 
   // BUSCAR LISTA DE CATALOGO DE HORARIOS         --** VERIFICADO
   BuscarListaHorarios() {
-    return this.http.get(`${environment.url}/horario`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/horario`);
   }
 
   // BUSCAR HORARIOS SIN CONSIDERAR UN HORARIO EN ESPECIFICO
   BuscarHorarioNombre_(datos: any) {
-    return this.http.post<any>(`${environment.url}/horario/buscar_horario/edicion`, datos);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/horario/buscar_horario/edicion`, datos);
   }
 
   // METODO PARA ELIMINAR REGISTRO
   EliminarRegistro(id: number) {
-    return this.http.delete(`${environment.url}/horario/eliminar/${id}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/horario/eliminar/${id}`);
   }
 
   // METODO PARA CREAR ARCHIVO XML
   CrearXML(data: any) {
-    return this.http.post(`${environment.url}/horario/xmlDownload`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/horario/xmlDownload`, data);
   }
 
   // BUSCAR DATOS DE UN HORARIO
   BuscarUnHorario(id: number) {
-    return this.http.get(`${environment.url}/horario/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/horario/${id}`);
   }
 
   // METODO PARA ACTUALIZAR HORAS DE TRABAJO
   ActualizarHorasTrabaja(id: number, data: any) {
-    return this.http.put(`${environment.url}/horario/update-horas-trabaja/${id}`, data);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/horario/update-horas-trabaja/${id}`, data);
   }
 
 
@@ -84,13 +84,13 @@ export class HorarioService {
 
   // VERIFICAR DATOS DE LA PLANTILLA DE CATÁLOGO HORARIO Y CARGAR AL SISTEMA
   VerificarDatosHorario(formData) {
-    return this.http.post<any>(`${environment.url}/horario/cargarHorario/verificarDatos/upload`, formData);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/horario/cargarHorario/verificarDatos/upload`, formData);
   }
   VerificarPlantillaHorario(formData) {
-    return this.http.post<any>(`${environment.url}/horario/cargarHorario/verificarPlantilla/upload`, formData);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/horario/cargarHorario/verificarPlantilla/upload`, formData);
   }
   CargarHorariosMultiples(formData) {
-    return this.http.post<any>(`${environment.url}/horario/cargarHorario/upload`, formData);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/horario/cargarHorario/upload`, formData);
   }
 
 }

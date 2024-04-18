@@ -940,7 +940,7 @@ export class ListaPedidoHoraExtraComponent implements OnInit {
     });
     this.restHE.CrearXML(arregloSolicitudes).subscribe(res => {
       this.data = res;
-      this.urlxml = `${environment.url}/horas-extras-pedidas/download/` + this.data.name;
+      this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/horas-extras-pedidas/download/` + this.data.name;
       window.open(this.urlxml, "_blank");
     });
   }

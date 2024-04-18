@@ -10,10 +10,10 @@ export class TiempoLaboradoService {
   constructor(private http: HttpClient) { }
 
   ReporteTiempoLaborado(data: any, desde: string, hasta: string) {
-    return this.http.put<any>(`${environment.url}/reporte-tiempo-laborado/tiempo-laborado-empleados/${desde}/${hasta}`, data);
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/reporte-tiempo-laborado/tiempo-laborado-empleados/${desde}/${hasta}`, data);
   }
 
   ReporteTiempoLaboradoRegimenCargo(data: any, desde: string, hasta: string) {
-    return this.http.put<any>(`${environment.url}/reporte-tiempo-laborado/tiempo-laborado-empleados-regimen-cargo/${desde}/${hasta}`, data);
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/reporte-tiempo-laborado/tiempo-laborado-empleados-regimen-cargo/${desde}/${hasta}`, data);
   }
 }

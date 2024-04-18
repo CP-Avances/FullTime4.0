@@ -36,6 +36,15 @@
                                     </button>
                                 </mat-form-field>
                                 <br>
+                                <mat-form-field>
+                                    <mat-label>Código empresarial</mat-label>
+                                    <input matInput formControlName="empresaPass" required autocomplete="off">
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresa el código empresarial.">
+                                        help_outline
+                                    </mat-icon>
+                                </mat-form-field>
+                                <br>
                                 <div style="margin: auto;">
                                     <button type="submit" class="btn" (onclick)="CompararContrasenia(formulario.value)"
                                         (click)="EnviarContraseniaConfirmacion(formulario.value)"

@@ -12,9 +12,9 @@ export class MultiplePlanHorarioService {
   ) { }
 
   CargarArchivoExcel(formData) {
-    return this.http.post(`${environment.url}/cargaMultiple/upload`, formData)
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/cargaMultiple/upload`, formData)
   }
   CargarHorarioFijoVarios(formData) {
-    return this.http.post(`${environment.url}/cargaMultiple/horarioFijo/upload`, formData)
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/cargaMultiple/horarioFijo/upload`, formData)
   }
 }

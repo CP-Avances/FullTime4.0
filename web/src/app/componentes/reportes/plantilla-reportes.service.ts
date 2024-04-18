@@ -51,7 +51,7 @@ export class PlantillaReportesService {
       // QUITAR NOMBRE DE EMPRESA
       localStorage.removeItem('name_empresa');
       // BUSCAR DATOS LOGO DE EMPRESA
-      this.http.get<any>(`${environment.url}/empresas/logo/codificado/${id}`).subscribe(res => {
+      this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/empresas/logo/codificado/${id}`).subscribe(res => {
         this.setLogoBase64('data:image/jpeg;base64,' + res.imagen);
         this.setNameEmpresa(res.nom_empresa);
         sessionStorage.setItem('logo', 'data:image/jpeg;base64,' + res.imagen)
@@ -74,7 +74,7 @@ export class PlantillaReportesService {
     // VERIFICAR EXISTENCIA DE DATOS
     if (p === null || s === null) {
       // BUSCAR DATOS DE COLORES
-      this.http.get(`${environment.url}/empresas/buscar/datos/${id}`).subscribe(res => {
+      this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empresas/buscar/datos/${id}`).subscribe(res => {
         this.setColorPrimary(res[0].color_p);
         this.setColorSecondary(res[0].color_s);
         sessionStorage.setItem('p_color', res[0].color_p)
@@ -93,7 +93,7 @@ export class PlantillaReportesService {
     // FRASE DE MARCA DE AGUA EN REPORTES
     sessionStorage.removeItem('marca');
     // BUSCAR DATOS DE MARCA DE AGUA
-    this.http.get(`${environment.url}/empresas/buscar/datos/${id}`).subscribe(res => {
+    this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empresas/buscar/datos/${id}`).subscribe(res => {
       this.setMarcaAgua(res[0].marca_agua);
       sessionStorage.setItem('marca', res[0].marca_agua)
     }, err => {

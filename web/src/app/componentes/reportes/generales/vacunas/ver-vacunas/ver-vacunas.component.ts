@@ -25,7 +25,7 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 
 export class VerVacunasComponent implements OnInit {
 
-  hipervinculo: string = environment.url; // VARIABLE DE MANEJO DE RUTAS CON URL
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string); // VARIABLE DE MANEJO DE RUTAS CON URL
 
   @Input() data: any;
   @Input() tipo: string;

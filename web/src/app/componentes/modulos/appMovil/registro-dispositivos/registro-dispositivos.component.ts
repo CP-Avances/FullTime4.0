@@ -72,7 +72,7 @@ export class RegistroDispositivosComponent implements OnInit {
   selectionEmp = new SelectionModel<ItableDispositivos>(true, []);
 
   // DIRECCIONAMIENTO DE RUTAS
-  hipervinculo: string = environment.url;
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string);
 
   // CONTROL DE BOTONES
   individual: boolean = true;
@@ -449,7 +449,7 @@ export class RegistroDispositivosComponent implements OnInit {
 
     this.rest.CrearXMLIdDispositivos(arregloDispositivos).subscribe(res => {
       this.data = res;
-      this.urlxml = `${environment.url}/relojes/downloadIdDispositivos/` + this.data.name;
+      this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/relojes/downloadIdDispositivos/` + this.data.name;
       window.open(this.urlxml, "_blank");
     });
   }

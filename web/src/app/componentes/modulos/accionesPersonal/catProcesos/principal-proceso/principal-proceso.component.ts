@@ -319,7 +319,7 @@ export class PrincipalProcesoComponent implements OnInit {
 
     this.rest.CrearXML(arregloProcesos).subscribe(res => {
       this.data = res;
-      this.urlxml = `${environment.url}/proceso/download/` + this.data.name;
+      this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/proceso/download/` + this.data.name;
       window.open(this.urlxml, "_blank");
     });
   }

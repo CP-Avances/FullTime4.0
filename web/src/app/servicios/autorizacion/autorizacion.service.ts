@@ -16,7 +16,7 @@ export class AutorizacionService {
 
   // METODO PARA BUSCAR APROBACIONES DE PERMISO
   BuscarAutorizacionPermiso(id_permiso: number) {
-    return this.http.get<any>(`${environment.url}/autorizaciones/by-permiso/${id_permiso}`);
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/autorizaciones/by-permiso/${id_permiso}`);
   }
 
 
@@ -30,38 +30,38 @@ export class AutorizacionService {
 
   // ACTUALIZACION DE APROBACION
   ActualizarAprobacion(id: number, datos: any) {
-    return this.http.put(`${environment.url}/autorizaciones/${id}/estado-aprobacion`, datos);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/autorizaciones/${id}/estado-aprobacion`, datos);
   }
 
 
   // catalogo de notificaciones
   getAutorizacionesRest() {
-    return this.http.get<any>(`${environment.url}/autorizaciones`);
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/autorizaciones`);
   }
 
 
   getUnaAutorizacionByVacacionRest(id_vacacion: number) {
-    return this.http.get<any>(`${environment.url}/autorizaciones/by-vacacion/${id_vacacion}`);
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/autorizaciones/by-vacacion/${id_vacacion}`);
   }
 
   getUnaAutorizacionByHoraExtraRest(id_hora_extra: number) {
-    return this.http.get<any>(`${environment.url}/autorizaciones/by-hora-extra/${id_hora_extra}`);
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/autorizaciones/by-hora-extra/${id_hora_extra}`);
   }
 
   postAutorizacionesRest(data: any) {
-    return this.http.post(`${environment.url}/autorizaciones`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/autorizaciones`, data);
   }
 
 
   PutEstadoAutoPermisoMultiple(datos: any) {
-    return this.http.put(`${environment.url}/autorizaciones/estado-permiso/multiple`, datos);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/autorizaciones/estado-permiso/multiple`, datos);
   }
 
   PutEstadoAutoHoraExtra(id: number, datos: any) {
-    return this.http.put(`${environment.url}/autorizaciones/${id}/estado-hora-extra`, datos);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/autorizaciones/${id}/estado-hora-extra`, datos);
   }
 
   PutEstadoAutoPlanHoraExtra(id: number, datos: any) {
-    return this.http.put(`${environment.url}/autorizaciones/${id}/estado-plan-hora-extra`, datos);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/autorizaciones/${id}/estado-plan-hora-extra`, datos);
   }
 }

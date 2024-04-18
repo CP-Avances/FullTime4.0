@@ -14,7 +14,7 @@ export class FuncionesService {
   
   // METODO PARA LISTAR FUNCIONES ACTIVAS DEL SISTEMA
   ListarFunciones() {
-    return this.http.get<any>(`${environment.url}/administracion/funcionalidad`)
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/administracion/funcionalidad`)
   }
 
 
@@ -31,11 +31,11 @@ export class FuncionesService {
 
 
   CrearFunciones(data: any) {
-    return this.http.post(`${environment.url}/administracion`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/administracion`, data);
   }
 
   EditarFunciones(id: number, data: any) {
-    return this.http.put(`${environment.url}/administracion/funcion/${id}`, data);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/administracion/funcion/${id}`, data);
   }
 
 

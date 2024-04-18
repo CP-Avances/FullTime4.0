@@ -37,7 +37,7 @@ export class VerHorarioDetalleComponent implements OnInit {
   pageSizeOptions = [5, 10, 20, 50];
 
   booleanMap = { 'true': 'Si', 'false': 'No' };
-  hipervinculo: string = environment.url;
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string);
 
   constructor(
     private toastr: ToastrService,

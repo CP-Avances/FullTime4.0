@@ -550,7 +550,7 @@ export class HoraExtraRealComponent implements OnInit {
       console.log(arregloEmpleado)
       this.data = res;
       console.log("prueba-empleado", res)
-      this.urlxml = `${environment.url}/empleado/download/` + this.data.name;
+      this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/empleado/download/` + this.data.name;
       window.open(this.urlxml, "_blank");
     });
   }

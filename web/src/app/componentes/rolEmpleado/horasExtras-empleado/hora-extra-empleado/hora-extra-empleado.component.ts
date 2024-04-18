@@ -29,7 +29,7 @@ export class HoraExtraEmpleadoComponent implements OnInit {
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
 
-  hipervinculo: string = environment.url
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string)
 
   constructor(
     private restHE: PedHoraExtraService,

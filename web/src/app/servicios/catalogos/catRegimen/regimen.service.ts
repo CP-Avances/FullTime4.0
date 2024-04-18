@@ -18,43 +18,43 @@ export class RegimenService {
 
   // REGISTRAR NUEVO REGIMEN LABORAL
   CrearNuevoRegimen(datos: any) {
-    return this.http.post(`${environment.url}/regimenLaboral`, datos).pipe(
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/regimenLaboral`, datos).pipe(
       catchError(datos));
   }
 
   // ACTUALIZAR REGISTRO DE REGIMEN LABORAL
   ActualizarRegimen(datos: any) {
-    return this.http.put(`${environment.url}/regimenLaboral`, datos);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/regimenLaboral`, datos);
   }
 
   // LISTAR REGISTROS DE REGIMEN LABORAL
   ConsultarNombresRegimen() {
-    return this.http.get(`${environment.url}/regimenLaboral/descripcion`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/regimenLaboral/descripcion`);
   }
 
   // LISTAR REGISTROS DE REGIMEN LABORAL
   ConsultarRegimen() {
-    return this.http.get(`${environment.url}/regimenLaboral`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/regimenLaboral`);
   }
 
   // BUSCAR UN REGISTRO DE REGIMEN LABORAL
   ConsultarUnRegimen(id: number) {
-    return this.http.get(`${environment.url}/regimenLaboral/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/regimenLaboral/${id}`);
   }
 
   // ELIMINAR REGISTRO DE REGIMEN LABORAL
   EliminarRegistro(id: number) {
-    return this.http.delete(`${environment.url}/regimenLaboral/eliminar/${id}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/regimenLaboral/eliminar/${id}`);
   }
 
   // BUSCAR REGISTRO DE REGIMEN LABORAL POR PAIS
   ConsultarRegimenPais(nombre: string) {
-    return this.http.get(`${environment.url}/regimenLaboral/pais-regimen/${nombre}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/regimenLaboral/pais-regimen/${nombre}`);
   }
 
   // METODO PARA CREAR ARCHIVO XML
   CrearXML(data: any) {
-    return this.http.post(`${environment.url}/regimenLaboral/xmlDownload`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/regimenLaboral/xmlDownload`, data);
   }
 
   /** ** *************************************************************************************** **
@@ -63,23 +63,23 @@ export class RegimenService {
 
   // REGISTRAR NUEVO PERIODO DE VACACIONES
   CrearNuevoPeriodo(datos: any) {
-    return this.http.post(`${environment.url}/regimenLaboral/periodo-vacaciones`, datos).pipe(
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/regimenLaboral/periodo-vacaciones`, datos).pipe(
       catchError(datos));
   }
 
   // ACTUALIZAR REGISTRO PERIODO DE VACACIONES
   ActualizarPeriodo(datos: any) {
-    return this.http.put(`${environment.url}/regimenLaboral/periodo-vacaciones`, datos);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/regimenLaboral/periodo-vacaciones`, datos);
   }
 
   // BUSCAR UN REGISTRO DE PERIODO DE VACACIONES
   ConsultarUnPeriodo(id: number) {
-    return this.http.get(`${environment.url}/regimenLaboral/periodo-vacaciones/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/regimenLaboral/periodo-vacaciones/${id}`);
   }
 
   // ELIMINAR REGISTRO DE PERIODO DE VACACIONES
   EliminarPeriodo(id: number) {
-    return this.http.delete(`${environment.url}/regimenLaboral/periodo-vacaciones/eliminar/${id}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/regimenLaboral/periodo-vacaciones/eliminar/${id}`);
   }
 
   /** ** *************************************************************************************** **
@@ -88,23 +88,23 @@ export class RegimenService {
 
   // REGISTRAR NUEVA ANTIGUEDAD DE VACACIONES
   CrearNuevaAntiguedad(datos: any) {
-    return this.http.post(`${environment.url}/regimenLaboral/antiguedad-vacaciones`, datos).pipe(
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/regimenLaboral/antiguedad-vacaciones`, datos).pipe(
       catchError(datos));
   }
 
   // ACTUALIZAR REGISTRO ANTIGUEDAD DE VACACIONES
   ActualizarAntiguedad(datos: any) {
-    return this.http.put(`${environment.url}/regimenLaboral/antiguedad-vacaciones`, datos);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/regimenLaboral/antiguedad-vacaciones`, datos);
   }
 
   // BUSCAR UN REGISTRO DE ANTIGUEDAD DE VACACIONES
   ConsultarAntiguedad(id: number) {
-    return this.http.get(`${environment.url}/regimenLaboral/antiguedad-vacaciones/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/regimenLaboral/antiguedad-vacaciones/${id}`);
   }
 
   // ELIMINAR REGISTRO DE ANTIGUEDAD DE VACACIONES
   EliminarAntiguedad(id: number) {
-    return this.http.delete(`${environment.url}/regimenLaboral/antiguedad-vacaciones/eliminar/${id}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/regimenLaboral/antiguedad-vacaciones/eliminar/${id}`);
   }
 
 
@@ -118,6 +118,6 @@ export class RegimenService {
   
 
   ConsultarRegimenSucursal(id: number) {
-    return this.http.get(`${environment.url}/regimenLaboral/sucursal-regimen/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/regimenLaboral/sucursal-regimen/${id}`);
   }
 }

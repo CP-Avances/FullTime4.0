@@ -13,22 +13,22 @@ export class BirthdayService {
 
   // METODO PARA VER MENSAJE DE CUMPLEAÑOS
   VerMensajeCumpleanios(id_empresa: number) {
-    return this.http.get(`${environment.url}/birthday/${id_empresa}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/birthday/${id_empresa}`);
   }
 
   // METODO PARA REGISTRAR MENSAJE
   CrearMensajeCumpleanios(data: any) {
-    return this.http.post(`${environment.url}/birthday`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/birthday`, data);
   }
 
   // METODO PARA CARGAR IMAGEN DE CUMPLEAÑOS
   SubirImagenBirthday(formData: any, id_empresa: number) {
-    return this.http.put(`${environment.url}/birthday/${id_empresa}/uploadImage`, formData)
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/birthday/${id_empresa}/uploadImage`, formData)
   }
 
   // METODO PARA ACTUALIZAR MENSAJE DE CUMPLEAÑOS
   EditarMensajeCumpleanios(id_birthday: number, data: any) {
-    return this.http.put(`${environment.url}/birthday/editar/${id_birthday}`, data)
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/birthday/editar/${id_birthday}`, data)
   }
 
 }

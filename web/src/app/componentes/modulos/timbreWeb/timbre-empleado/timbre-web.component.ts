@@ -84,6 +84,7 @@ export class TimbreWebComponent implements OnInit {
     this.parametro.ListarDetalleParametros(25).subscribe(
       res => {
         this.formato_fecha = res[0].descripcion;
+        console.log(this.formato_fecha);
         this.BuscarHora(this.formato_fecha)
       },
       vacio => {
@@ -96,6 +97,7 @@ export class TimbreWebComponent implements OnInit {
     this.parametro.ListarDetalleParametros(26).subscribe(
       res => {
         this.formato_hora = res[0].descripcion;
+        console.log(this.formato_hora);
         this.ObtenerListaTimbres(fecha, this.formato_hora);
       },
       vacio => {

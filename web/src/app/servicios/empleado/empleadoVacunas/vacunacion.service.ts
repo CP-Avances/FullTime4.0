@@ -14,47 +14,47 @@ export class VacunacionService {
 
   // METODO PARA BUSCAR REGISTROS DE VACUNA DE UN EMPLEADO
   ObtenerVacunaEmpleado(id_empleado: number) {
-    return this.http.get(`${environment.url}/vacunas/${id_empleado}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/vacunas/${id_empleado}`);
   }
 
   // LISTAR TIPO DE VACUNAS
   ListarTiposVacuna() {
-    return this.http.get(`${environment.url}/vacunas/lista/tipo_vacuna`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/vacunas/lista/tipo_vacuna`);
   }
 
   // SERVICIO REGISTROS DE VACUNACIÓN
   RegistrarVacunacion(data: any) {
-    return this.http.post<any>(`${environment.url}/vacunas`, data);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/vacunas`, data);
   }
 
   // METODO PARA SUBIR UN DOCUMENTO
   SubirDocumento(formData: any, id: number, nombre: string) {
-    return this.http.put(`${environment.url}/vacunas/${id}/documento/${nombre}`, formData)
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/vacunas/${id}/documento/${nombre}`, formData)
   }
 
   // METODO PARA ACTUALIZAR REGISTRO
   ActualizarVacunacion(id: number, data: any) {
-    return this.http.put(`${environment.url}/vacunas/${id}`, data);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/vacunas/${id}`, data);
   }
 
   // ELIMINAR CARNET DE VACUNA DEL SERVIDOR
   EliminarArchivoServidor(datos: any) {
-    return this.http.put(`${environment.url}/vacunas/eliminar_carnet/servidor`, datos)
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/vacunas/eliminar_carnet/servidor`, datos)
   }
 
   // ELIMINAR CARNET DE VACUNA
   EliminarArchivo(datos: any) {
-    return this.http.put(`${environment.url}/vacunas/eliminar_carnet/base_servidor`, datos)
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/vacunas/eliminar_carnet/base_servidor`, datos)
   }
 
   // METODO PARA ELIMINAR REGISTRO VACUNA EMPLEADO
   EliminarRegistroVacuna(id: number, documento: string) {
-    return this.http.delete(`${environment.url}/vacunas/eliminar/${id}/${documento}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/vacunas/eliminar/${id}/${documento}`);
   }
 
   // METODO DE REGISTROS DE TIPO DE VACUNACION
   CrearTipoVacuna(data: any) {
-    return this.http.post<any>(`${environment.url}/vacunas/tipo_vacuna`, data);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/vacunas/tipo_vacuna`, data);
   }
 
 

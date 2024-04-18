@@ -14,7 +14,7 @@ export class AuditoriaService {
   // catalogo de departamentos
 
   ConsultarAuditoria(data: any) {
-    return this.http.post(`${environment.url}/reportes-auditoria/auditar`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reportes-auditoria/auditar`, data);
   }
 
 }

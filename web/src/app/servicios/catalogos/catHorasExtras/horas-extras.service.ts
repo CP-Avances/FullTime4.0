@@ -14,26 +14,26 @@ export class HorasExtrasService {
   // catalogo de horas extras
 
   postHoraExtraRest(data: any) {
-    return this.http.post<any>(`${environment.url}/horasExtras`, data);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/horasExtras`, data);
   }
 
   ListarHorasExtras() {
-    return this.http.get(`${environment.url}/horasExtras`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/horasExtras`);
   }
 
   EliminarRegistro(id: number) {
-    return this.http.delete(`${environment.url}/horasExtras/eliminar/${id}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/horasExtras/eliminar/${id}`);
   }
 
   CrearXML(data: any) {
-    return this.http.post(`${environment.url}/horasExtras/xmlDownload`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/horasExtras/xmlDownload`, data);
   }
 
   ObtenerUnaHoraExtra(id: number) {
-    return this.http.get(`${environment.url}/horasExtras/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/horasExtras/${id}`);
   }
 
   ActualizarDatos(datos: any) {
-    return this.http.put(`${environment.url}/horasExtras`, datos);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/horasExtras`, datos);
   }
 }

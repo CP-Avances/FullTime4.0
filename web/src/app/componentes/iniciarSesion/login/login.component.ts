@@ -2,12 +2,12 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { Md5 } from 'ts-md5/dist/md5';
 import * as moment from 'moment';
 moment.locale('es');
 
 import { LoginService } from '../../../servicios/login/login.service';
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
+import { RsaKeysService } from 'src/app/servicios/llaves/rsa-keys.service';//Importacion de llaves
 
 @Component({
   selector: 'app-login',
@@ -21,6 +21,7 @@ export class LoginComponent implements OnInit {
   title = 'login';
   hide1 = true;
   url: string = '';
+  mensaje: any = [];//Variable para almacenar valor de empresa consultado
 
   // ALMACENAMIENTO DATOS USUARIO INGRESADO
   datosUsuarioIngresado: any = [];
@@ -28,10 +29,16 @@ export class LoginComponent implements OnInit {
   // VALIDACIONES DE CAMPOS DE FORMULARIO
   userMail = new FormControl('', Validators.required);
   pass = new FormControl('', Validators.required);
+  //Empresa
+  empresaSel = new FormControl('', Validators.required);
+  //Valor para encriptar codigo empresarial de la vista
+  datoEncriptado: string;
 
+  //Se aumenta el valor capturado de la vista para el codigo empresarial
   public formulario = new FormGroup({
     usuarioF: this.userMail,
-    passwordF: this.pass
+    passwordF: this.pass,
+    empresaF: this.empresaSel
   });
 
   constructor(
@@ -39,10 +46,12 @@ export class LoginComponent implements OnInit {
     public restU: UsuarioService,
     private router: Router,
     private route: ActivatedRoute,
-    private toastr: ToastrService) {
+    private toastr: ToastrService,
+    private rsaKeysService: RsaKeysService) {
     this.formulario.setValue({
       usuarioF: '',
-      passwordF: ''
+      passwordF: '',
+      empresaF: ''
     });
   }
 
@@ -108,41 +117,84 @@ export class LoginComponent implements OnInit {
     var f = moment();
     if (form.usuarioF.trim().length === 0) return;
     if (form.passwordF.trim().length === 0) return;
+    if (form.empresaF.trim().length === 0) return;
 
-    var local: boolean;
-    this.intentos = this.intentos + 1;
+    //Inicio Encriptacion codigo empresarial
+    console.log('Encriptando IP: ', form.empresaF, ' ', form.empresaF.length);
+    this.datoEncriptado = this.rsaKeysService.encriptarLogin(form.empresaF.toString());
+    console.log('Encrypted Data:', this.datoEncriptado, ' ', this.datoEncriptado.length);
+    //Fin Encriptacion codigo empresarial
 
-    var hora = localStorage.getItem('time_wait');
+    //Codigo empresarial encriptado a JSON para uso con servicio
+    let empresas = {
+      "codigo_empresa": this.datoEncriptado
+    };
 
-    if (hora != undefined) {
-      if (f.format('HH:mm:ss') > hora) {
-        localStorage.removeItem('time_wait');
-        this.intentos = 0;
-        local = false;
+    //Validacion de empresa para direccionamiento
+    this.rest.getEmpresa(empresas).subscribe(
+      {
+        next: (v) => 
+        {
+          //Segun el valor de la respuesta guardamos la IP o devolvemos error.
+          this.mensaje = v;
+          if (this.mensaje.message === 'ok') {
+            localStorage.setItem("empresaURL", this.mensaje.empresas[0].empresa_direccion);
+          }
+          else if (this.mensaje.message === 'vacio') {
+            this.toastr.error('Verifique codigo empresarial', 'Error.', {
+              timeOut: 3000,
+            });
+          }
+        },
+        error: (e) => 
+        {
+          //En caso de error, devolvemos error
+          this.toastr.error('Verifique codigo empresarial', 'Error.', {
+            timeOut: 3000,
+          });
+        },
+        complete: () => 
+        {
+          //Tras la validacion correcta de empresa, continuamos con el proceso normal de login
+          console.log('CONTINUAR LOGIN');          
+          ////login
+          var local: boolean;
+          this.intentos = this.intentos + 1;
+
+          var hora = localStorage.getItem('time_wait');
+
+          if (hora != undefined) {
+            if (f.format('HH:mm:ss') > hora) {
+              localStorage.removeItem('time_wait');
+              this.intentos = 0;
+              local = false;
+            }
+            else {
+              local = true;
+            }
+          }
+          else {
+            local = false;
+          }
+          if (local === false) {
+            this.IniciarSesion(form);
+          }
+          else {
+            this.toastr.error('Intentelo más tarde.', 'Ha excedido el número de intentos.', {
+              timeOut: 3000,
+            });
+          }
+          ////fin login
+        }
       }
-      else {
-        local = true;
-      }
-    }
-    else {
-      local = false;
-    }
-    if (local === false) {
-      this.IniciarSesion(form);
-    }
-    else {
-      this.toastr.error('Intentelo más tarde.', 'Ha excedido el número de intentos.', {
-        timeOut: 3000,
-      });
-    }
+    );
   }
 
   // METODO PARA INICIAR SESION
   IniciarSesion(form: any) {
     // CIFRADO DE CONTRASEÑA
-    const md5 = new Md5();
-    let clave = md5.appendStr(form.passwordF).end();
-
+    let clave = this.rsaKeysService.encriptarLogin(form.passwordF.toString());
+    
     let dataUsuario = {
       nombre_usuario: form.usuarioF,
       pass: clave,
@@ -150,12 +202,12 @@ export class LoginComponent implements OnInit {
 
     if (this.latitud === undefined) {
       this.Geolocalizar();
-      return this.toastr.error('Es necesario permitir el acceso a la ubicación del usuario.')
+      return this.toastr.error('Es necesario permitir el acceso a la ubicación del usuario.');
     }
 
     // VALIDACION DEL LOGIN
     this.rest.ValidarCredenciales(dataUsuario).subscribe(datos => {
-      console.log('ver datos ', datos)
+      console.log('ver datos ', datos);
       if (datos.message === 'error') {
         var f = moment();
         var espera = '00:01:00';
@@ -220,7 +272,7 @@ export class LoginComponent implements OnInit {
         localStorage.setItem('fec_caducidad_licencia', datos.caducidad_licencia);
         this.toastr.success('Ingreso Existoso! ' + datos.usuario + ' ' + datos.ip_adress, 'Usuario y contraseña válidos', {
           timeOut: 6000,
-        })
+        });
 
         if (datos.rol === 1) { // ADMIN
           if (!!localStorage.getItem("redireccionar")) {
@@ -236,6 +288,13 @@ export class LoginComponent implements OnInit {
         }
         this.IngresoSistema(form.usuarioF, 'Exitoso', datos.ip_adress);
 
+        //inicio recarga pagina al inicio, recarga valores iniciales por defecto
+        const paginaRecargada = sessionStorage.getItem('paginaRecargada');
+        if (!paginaRecargada) {
+          sessionStorage.setItem('paginaRecargada', 'true');
+          location.reload();
+        }
+        //fin recarga pagina al inicio, recarga valores iniciales por defecto
       }
     }, err => {
       this.toastr.error(err.error.message)

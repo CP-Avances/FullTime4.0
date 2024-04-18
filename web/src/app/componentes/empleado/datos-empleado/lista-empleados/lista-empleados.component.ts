@@ -477,9 +477,9 @@ export class ListaEmpleadosComponent implements OnInit {
     this.rest.ObtenerCodigo().subscribe(datos => {
       this.datosCodigo = datos;
       if (datos[0].automatico === true) {
-        this.link = `${environment.url}/plantillaD/documento/EmpleadoAutomatico.xlsx`
+        this.link = `${(localStorage.getItem('empresaURL') as string)}/plantillaD/documento/EmpleadoAutomatico.xlsx`
       } else {
-        this.link = `${environment.url}/plantillaD/documento/EmpleadoManual.xlsx`
+        this.link = `${(localStorage.getItem('empresaURL') as string)}/plantillaD/documento/EmpleadoManual.xlsx`
       }
     }, error => {
       this.toastr.info('Para el correcto funcionamiento del sistema debe realizar la configuración del código de empleado', '', {

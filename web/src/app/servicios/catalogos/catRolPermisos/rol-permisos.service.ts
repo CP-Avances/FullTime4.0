@@ -14,25 +14,25 @@ export class RolPermisosService {
   // catalogo de ROL PERMISOS
 
   getRolPermisoRest() {
-    return this.http.get(`${environment.url}/rolPermisos`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos`);
   }
 
   getOneRolPermisoRest(id: number) {
-    return this.http.get(`${environment.url}/rolPermisos/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/${id}`);
   }
 
   postRolPermisoRest(data: any) {
-    return this.http.post(`${environment.url}/rolPermisos`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos`, data);
   }
 
   // permisos denegado
 
   getPermisosUsuarioRolRest(id: number) {
-    return this.http.get(`${environment.url}/rolPermisos/denegado/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/denegado/${id}`);
   }
 
   postPermisoDenegadoRest(data: any) {
-    return this.http.post(`${environment.url}/rolPermisos/denegado`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rolPermisos/denegado`, data);
   }
 
 }

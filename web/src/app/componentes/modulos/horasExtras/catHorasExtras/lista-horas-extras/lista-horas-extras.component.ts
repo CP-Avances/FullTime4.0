@@ -412,7 +412,7 @@ export class ListaHorasExtrasComponent implements OnInit {
       this.rest.CrearXML(arreglohorasExtras).subscribe(res => {
         this.data = res;
         console.log("prueba data", res)
-        this.urlxml = `${environment.url}/horasExtras/download/` + this.data.name;
+        this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/horasExtras/download/` + this.data.name;
         window.open(this.urlxml, "_blank");
       }, err => {
         return this.validar.RedireccionarHomeAdmin(err.error)

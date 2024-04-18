@@ -14,7 +14,7 @@ export class VerDocumentacionComponent implements OnInit {
 
   archivos: any = [];
   Dirname: string;
-  hipervinculo: string = environment.url
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string)
   subir: boolean = false;
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO

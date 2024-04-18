@@ -781,7 +781,7 @@ export class ListaPlanificacionesComponent implements OnInit {
     });
     this.restPlan.CrearXML(arregloPlanificacion).subscribe(res => {
       this.data = res;
-      this.urlxml = `${environment.url}/planificacionHoraExtra/download/` + this.data.name;
+      this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/download/` + this.data.name;
       window.open(this.urlxml, "_blank");
     });
   }

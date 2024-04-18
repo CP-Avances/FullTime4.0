@@ -20,7 +20,7 @@ export class ContratoCargoEmpleadoComponent implements OnInit {
 
   idEmpleado: string = '';
   contratoEmpleado: any = [];
-  hipervinculo: string = environment.url
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string)
 
   constructor(
     public restEmpleado: EmpleadoService,

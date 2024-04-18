@@ -17,6 +17,16 @@
                                     </mat-icon>
                                     <mat-error *ngIf="correo.invalid">{{ObtenerMensajeError()}}</mat-error>
                                 </mat-form-field>
+                                <br>
+                                <mat-form-field>
+                                    <mat-label>Ingresa código empresarial</mat-label>
+                                    <input matInput [formControl]="empresa" required autocomplete="off">
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresar código empresarial.">
+                                        help_outline
+                                    </mat-icon>
+                                    <mat-error *ngIf="correo.invalid">{{ObtenerMensajeError()}}</mat-error>
+                                </mat-form-field>
                             </form>
                             <br>
                             <div style="margin: auto;">

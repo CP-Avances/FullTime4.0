@@ -692,7 +692,7 @@ export class ListarVacacionesComponent implements OnInit {
     });
     this.restV.CrearXML(arregloVacaciones).subscribe(res => {
       this.data = res;
-      this.urlxml = `${environment.url}/vacaciones/download/` + this.data.name;
+      this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/vacaciones/download/` + this.data.name;
       window.open(this.urlxml, "_blank");
     });
   }

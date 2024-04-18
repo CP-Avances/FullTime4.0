@@ -7,6 +7,8 @@ import { Router } from '@angular/router';
 // IMPORTAR SERVICIOS
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
+import { LoginService } from 'src/app/servicios/login/login.service';
+import { RsaKeysService } from 'src/app/servicios/llaves/rsa-keys.service';//Importacion encriptacion
 
 @Component({
   selector: 'app-olvidar-frase',
@@ -18,22 +20,27 @@ export class OlvidarFraseComponent implements OnInit {
 
   // VARIABLES DE FORMULARIO
   cadena: string;
+  mensaje: any = [];//Almacenamiento de codigo empresarial
+
   correo = new FormControl('', [Validators.required, Validators.email]);
+  empresa = new FormControl('', [Validators.required]);
 
   // FORMULARIO
   public formulario = new FormGroup({
     usuarioF: this.correo,
+    empresaF: this.empresa,
   });
 
   constructor(
+    public restLogin: LoginService,
     private toastr: ToastrService,
     public restE: EmpresaService,
     public rest: UsuarioService,
     private router: Router,
+    private rsaKeysService: RsaKeysService,
   ) { }
 
   ngOnInit(): void {
-    this.VerRuta();
   }
 
   // MENSAJES DE ERROR PARA EL USUARIO
@@ -44,36 +51,91 @@ export class OlvidarFraseComponent implements OnInit {
     if (this.correo.hasError('email')) {
       return 'No es un correo electrónico.';
     }
+    if (this.empresa.toString().trim().length === 0) {
+      return 'Ingrese codigo empresarial';
+    }
   }
 
   // METODO PARA ENVIAR CORREO ELECTRONICO
   respuesta: any = [];
   EnviarCorreoConfirmacion(form: any) {
-    let dataPass = {
-      correo: form.usuarioF,
-      url_page: this.cadena
-    }
-    this.rest.RecuperarFraseSeguridad(dataPass).subscribe(res => {
-      this.respuesta = res;
-      if (this.respuesta.message === 'ok') {
-        this.toastr.success('Operación exitosa.', 'Un link para cambiar su frase de seguridad fue enviado a su correo electrónico.', {
-          timeOut: 6000,
-        });
-        this.router.navigate(['/login']);
+    //JSON con codigo empresarial encriptado
+    let empresas = {
+      "codigo_empresa": this.rsaKeysService.encriptarLogin(form.empresaF.toString())
+    };
+    //Validacion de codigo empresarial
+    this.restLogin.getEmpresa(empresas).subscribe(
+      {
+        next: (v) => {
+          //Almacenamiento de ip dependiendo el resultado de la validacion
+          this.mensaje = v;
+          if (this.mensaje.message === 'ok') {
+            localStorage.setItem("empresaURL", this.mensaje.empresas[0].empresa_direccion);
+          }
+          else if (this.mensaje.message === 'vacio') {
+            this.toastr.error('Verifique codigo empresarial', 'Error.', {
+              timeOut: 3000,
+            });
+          }
+        },
+        error: (e) => {
+          this.toastr.error('Verifique codigo empresarial', 'Error 2.', {
+            timeOut: 3000,
+          });
+        },
+        complete: () => {
+          console.log('CONTINUAR RUTA');
+          //Consulta cadena IP para armar url en correo
+          this.restE.ConsultarEmpresaCadena().subscribe(
+            {
+              next: (v) => 
+                {
+                  this.cadena = v[0].cadena;
+                },
+              error: (e) =>
+                {
+                  this.toastr.error('No se ha definido ruta de instalación.', 'Ups!!! algo salio mal.', {
+                    timeOut: 6000,
+                  });
+                },
+              complete: () =>
+                {
+                  //Continua proceso normal
+                  console.log('CONTINUAR FRASE');
+                  //Inicio Frase
+                  let dataPass = {
+                    correo: form.usuarioF,
+                    url_page: this.cadena
+                  };
+
+                  this.rest.RecuperarFraseSeguridad(dataPass).subscribe(res => {
+                    this.respuesta = res;
+                    if (this.respuesta.message === 'ok') {
+                      this.toastr.success('Operación exitosa.', 'Un link para cambiar su frase de seguridad fue enviado a su correo electrónico.', {
+                        timeOut: 6000,
+                      });
+                      this.router.navigate(['/login']);
+                    }
+                    else {
+                      this.toastr.error('Revisar la configuración de correo electrónico.', 'Ups!!! algo salio mal.', {
+                        timeOut: 6000,
+                      });
+                      this.correo.reset();
+                      this.router.navigate(['/login']);
+                    }
+                  }, error => {
+                    this.toastr.error('El correo electrónico ingresado no consta en los registros.', 'Ups!!! algo salio mal.', {
+                      timeOut: 6000,
+                    });
+                    this.correo.reset();
+                  });
+                  //Fin Frase
+                }
+            }  
+          );
+        }
       }
-      else {
-        this.toastr.error('Revisar la configuración de correo electrónico.', 'Ups!!! algo salio mal.', {
-          timeOut: 6000,
-        });
-        this.correo.reset();
-        this.router.navigate(['/login']);
-      }
-    }, error => {
-      this.toastr.error('El correo electrónico ingresado no consta en los registros.', 'Ups!!! algo salio mal.', {
-        timeOut: 6000,
-      });
-      this.correo.reset();
-    })
+    );
   }
 
   // METODO PARA CANCELAR REGISTRO
@@ -84,8 +146,9 @@ export class OlvidarFraseComponent implements OnInit {
   // METODO PARA BUSCAR RUTA DEL SISTEMA
   VerRuta() {
     this.restE.ConsultarEmpresaCadena().subscribe(res => {
-      this.cadena = res[0].cadena
-    })
+      this.cadena = res[0].cadena;
+      console.log(this.cadena);
+    });
   }
 
 }

@@ -332,7 +332,7 @@ export class ListarCoordenadasComponent implements OnInit {
 
     this.restU.CrearXML(arregloCoordenadas).subscribe(res => {
       this.data = res;
-      this.urlxml = `${environment.url}/ubicacion/download/` + this.data.name;
+      this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/ubicacion/download/` + this.data.name;
       window.open(this.urlxml, "_blank");
     });
   }

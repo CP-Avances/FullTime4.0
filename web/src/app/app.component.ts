@@ -15,8 +15,10 @@ export class AppComponent {
   constructor(
     public router: Router,
     public location: Location,
-    public loginServices: LoginService,
-  ) { }
+    public loginServices: LoginService
+  ) 
+  { 
+  }
 
   removerForget() {
     var tituloPestania = this.location.prepareExternalUrl(this.location.path());

@@ -16,7 +16,7 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./cargar-plantillas.component.css']
 })
 export class CargarPlantillasComponent implements OnInit {
-  hipervinculo: string = environment.url
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string)
 
   constructor(
     private rest: EmpleadoHorariosService,

@@ -28,6 +28,13 @@
                                     </button>
                                     <mat-error *ngIf="pass.invalid">{{ObtenerMensajeCampoContraseniaError()}}</mat-error>
                                 </mat-form-field>
+                                <br>
+                                <mat-form-field>
+                                    <mat-label>Código Empresarial</mat-label>
+                                    <input matInput style="font-size: 13px;"
+                                        [formControl]="empresaSel"
+                                        required autocomplete="off">
+                                </mat-form-field>
                             </form>
                             <div class="caja1">
                                 <a [routerLink]="['/olvidar-contrasenia']" class="verde">Olvidó su contraseña?</a>

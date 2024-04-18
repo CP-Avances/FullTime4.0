@@ -13,32 +13,32 @@ export class HorasExtrasRealesService {
   ) { }
 
   ObtenerDatosContratoA() {
-    return this.http.get(`${environment.url}/reporte/horasExtrasReales`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/reporte/horasExtrasReales`);
   }
 
   ObtenerDatosCargoA(empleado_id: any) {
-    return this.http.get(`${environment.url}/reporte/horasExtrasReales/${empleado_id}`).pipe(
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/reporte/horasExtrasReales/${empleado_id}`).pipe(
       catchError(empleado_id));
   }
 
   ObtenerEntradaSalida(empleado_id: any, data: any) {
-    return this.http.post(`${environment.url}/reporte/horasExtrasReales/entradaSalida/${empleado_id}`, data)
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/horasExtrasReales/entradaSalida/${empleado_id}`, data)
   }
 
   ObtenerPedidos(empleado_id: any, data: any) {
-    return this.http.post(`${environment.url}/reporte/horasExtrasReales/listaPedidos/${empleado_id}`, data)
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/horasExtrasReales/listaPedidos/${empleado_id}`, data)
   }
 
   ObtenerEntradaSalidaTodos(data: any) {
-    return this.http.post(`${environment.url}/reporte/horasExtrasReales/entradaSalida/total/timbres`, data)
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/horasExtrasReales/entradaSalida/total/timbres`, data)
   }
 
   ObtenerPedidosTodos(data: any) {
-    return this.http.post(`${environment.url}/reporte/horasExtrasReales/listaPedidos/total/solicitudes`, data)
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/horasExtrasReales/listaPedidos/total/solicitudes`, data)
   }
 
   ObtenerTimbres(empleado_id: any) {
-    return this.http.get(`${environment.url}/reporte/horasExtrasReales/listaTimbres/${empleado_id}`)
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/reporte/horasExtrasReales/listaTimbres/${empleado_id}`)
   }
 
 }

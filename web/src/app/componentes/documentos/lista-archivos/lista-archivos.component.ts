@@ -16,7 +16,7 @@ import { DocumentosService } from 'src/app/servicios/documentos/documentos.servi
 
 export class ListaArchivosComponent implements OnInit {
 
-  hipervinculo: string = environment.url;
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string);
   archivos: any = [];
   Dirname: string;
   subir: boolean = false;

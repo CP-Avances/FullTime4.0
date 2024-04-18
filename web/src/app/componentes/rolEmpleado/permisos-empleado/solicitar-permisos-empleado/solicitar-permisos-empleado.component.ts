@@ -37,7 +37,7 @@ export class SolicitarPermisosEmpleadoComponent implements OnInit {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
 
-  hipervinculo: string = environment.url
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string)
 
   constructor(
     public restPermiso: PermisosService,

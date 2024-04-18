@@ -13,31 +13,31 @@ export class PlanHoraExtraService {
 
 
   AutorizarTiempoHoraExtra(id: number, hora: any) {
-    return this.http.put<any>(`${environment.url}/planificacionHoraExtra/tiempo-autorizado/${id}`, hora);
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/tiempo-autorizado/${id}`, hora);
   }
 
   ConsultarPlanHoraExtra() {
-    return this.http.get(`${environment.url}/planificacionHoraExtra`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra`);
   }
 
   ConsultarUltimoPlanHora() {
-    return this.http.get(`${environment.url}/planificacionHoraExtra/id_plan_hora`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/id_plan_hora`);
   }
 
   ConsultarPlanHoraExtraObservacion() {
-    return this.http.get(`${environment.url}/planificacionHoraExtra/justificar`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/justificar`);
   }
 
   ConsultarPlanHoraExtraAutorizada() {
-    return this.http.get(`${environment.url}/planificacionHoraExtra/autorizacion`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/autorizacion`);
   }
 
   EditarObservacion(id: number, datos: any) {
-    return this.http.put<any>(`${environment.url}/planificacionHoraExtra/observacion/${id}`, datos);
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/observacion/${id}`, datos);
   }
 
   EditarEstado(id: number, datos: any) {
-    return this.http.put<any>(`${environment.url}/planificacionHoraExtra/estado/${id}`, datos);
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/estado/${id}`, datos);
   }
 
 
@@ -47,36 +47,36 @@ export class PlanHoraExtraService {
 
   // CREAR PLANIFICACION DE HORA EXTRA
   CrearPlanificacionHoraExtra(data: any) {
-    return this.http.post<any>(`${environment.url}/planificacionHoraExtra`, data);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra`, data);
   }
   // CONSULTA DE DATOS DE PLANIFICACION DE HORAS EXTRAS
   ConsultarPlanificaciones() {
-    return this.http.get(`${environment.url}/planificacionHoraExtra/planificaciones`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/planificaciones`);
   }
   // CREAR PLANIFICACION DE HORA EXTRA POR USUARIO
   CrearPlanHoraExtraEmpleado(data: any) {
-    return this.http.post<any>(`${environment.url}/planificacionHoraExtra/hora_extra_empleado`, data);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/hora_extra_empleado`, data);
   }
   // BUSQUEDA DE DATOS DE PLANIFICACION POR ID DE PLANIFICACION
   BuscarPlanEmpleados(id_plan_hora: number) {
-    return this.http.get(`${environment.url}/planificacionHoraExtra/plan_empleado/${id_plan_hora}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/plan_empleado/${id_plan_hora}`);
   }
   // METODO PARA ELIMINAR PLANIFICACION DE HORA EXTRA
   EliminarRegistro(id: number) {
-    return this.http.delete(`${environment.url}/planificacionHoraExtra/eliminar/${id}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/eliminar/${id}`);
   }
   // ELIMINAR PLANIFICACIÓN DE HORA EXTRA DE UN USUARIO
   EliminarPlanEmpleado(id: number, id_empleado: number) {
-    return this.http.delete(`${environment.url}/planificacionHoraExtra/eliminar/plan-hora/${id}/${id_empleado}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/eliminar/plan-hora/${id}/${id_empleado}`);
   }
   // BUSQUEDA DE DATOS DE PLANIFICACION POR ID DE USUARIO
   ListarPlanificacionUsuario(id_empleado: number) {
-    return this.http.get(`${environment.url}/planificacionHoraExtra/listar-plan/${id_empleado}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/listar-plan/${id_empleado}`);
   }
 
    // METODO PARA CREAR ARCHIVO XML
    CrearXML(data: any) {
-    return this.http.post(`${environment.url}/planificacionHoraExtra/xmlDownload`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/xmlDownload`, data);
   }
 
 
@@ -86,7 +86,7 @@ export class PlanHoraExtraService {
 
   // CREACIÓN DE PLANIFICACIÓN DE HORAS EXTRAS
   EnviarCorreoPlanificacion(data: any) {
-    return this.http.post<any>(`${environment.url}/planificacionHoraExtra/send/correo-planifica/`, data);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/send/correo-planifica/`, data);
   }
 
 
@@ -96,11 +96,11 @@ export class PlanHoraExtraService {
 
   // CREACIÓN DE PLANIFICACIÓN DE HORAS EXTRAS
   EnviarNotiPlanificacion(data: any) {
-    return this.http.post<any>(`${environment.url}/planificacionHoraExtra/send/noti-planifica`, data);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/send/noti-planifica`, data);
   }
 
   BuscarDatosAutorizacion(id_hora_extra: number) {
-    return this.http.get(`${environment.url}/planificacionHoraExtra/datosAutorizacion/${id_hora_extra}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/planificacionHoraExtra/datosAutorizacion/${id_hora_extra}`);
   }
 
 

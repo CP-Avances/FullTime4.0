@@ -67,7 +67,7 @@ export class PrincipalHorarioComponent implements OnInit {
   idEmpleado: number;
 
   // VARIABLE DE NAVEGABILIDAD
-  hipervinculo: string = environment.url;
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string);
 
   constructor(
     public restEmpre: EmpresaService, // SERVICIO DATOS DE EMPRESA

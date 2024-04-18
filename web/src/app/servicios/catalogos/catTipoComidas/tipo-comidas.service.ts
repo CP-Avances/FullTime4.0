@@ -13,69 +13,69 @@ export class TipoComidasService {
 
   // Invocación del METODO post para crear nuevo tipo de comida
   CrearNuevoTipoComida(datos: any) {
-    return this.http.post<any>(`${environment.url}/tipoComidas`, datos);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/tipoComidas`, datos);
   }
 
   ConsultarTipoComida() {
-    return this.http.get(`${environment.url}/tipoComidas`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/tipoComidas`);
   }
 
   ConsultarTipoComidaDetalle() {
-    return this.http.get(`${environment.url}/tipoComidas/detalle`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/tipoComidas/detalle`);
   }
 
   ConsultarUnServicio(id: number) {
-    return this.http.get(`${environment.url}/tipoComidas/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/tipoComidas/${id}`);
   }
 
 
   ConsultarUnMenu(id: number) {
-    return this.http.get(`${environment.url}/tipoComidas/buscar/menu/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/tipoComidas/buscar/menu/${id}`);
   }
 
   ActualizarUnAlmuerzo(datos: any) {
-    return this.http.put(`${environment.url}/tipoComidas`, datos);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/tipoComidas`, datos);
   }
 
   CrearXML(data: any) {
-    return this.http.post(`${environment.url}/tipoComidas/xmlDownload`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/tipoComidas/xmlDownload`, data);
   }
 
   EliminarRegistro(id: number) {
-    return this.http.delete(`${environment.url}/tipoComidas/eliminar/${id}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/tipoComidas/eliminar/${id}`);
   }
 
   ObtenerUltimoId() {
-    return this.http.get(`${environment.url}/tipoComidas/registro/ultimo`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/tipoComidas/registro/ultimo`);
   }
 
   // Servicio para consultar datos de tabla detalle_menu
   ConsultarUnDetalleMenu(id: number) {
-    return this.http.get(`${environment.url}/tipoComidas/detalle/menu/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/tipoComidas/detalle/menu/${id}`);
   }
 
   CrearDetalleMenu(datos: any) {
-    return this.http.post(`${environment.url}/tipoComidas/detalle/menu`, datos);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/tipoComidas/detalle/menu`, datos);
   }
 
   ActualizarDetalleMenu(datos: any) {
-    return this.http.put(`${environment.url}/tipoComidas/detalle/menu`, datos);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/tipoComidas/detalle/menu`, datos);
   }
 
   EliminarDetalleMenu(id: number) {
-    return this.http.delete(`${environment.url}/tipoComidas/detalle/menu/eliminar/${id}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/tipoComidas/detalle/menu/eliminar/${id}`);
   }
 
   // Servicios para verificar y subir datos
   subirArchivoExcel(formData) {
-    return this.http.post<any>(environment.url + '/tipoComidas/upload', formData)
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/tipoComidas/upload', formData)
   }
 
   Verificar_Datos_ArchivoExcel(formData) {
-    return this.http.post<any>(environment.url + '/tipoComidas/verificar_datos/upload', formData)
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/tipoComidas/verificar_datos/upload', formData)
   }
 
   VerificarArchivoExcel(formData) {
-    return this.http.post<any>(environment.url + '/tipoComidas/verificar_plantilla/upload', formData)
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/tipoComidas/verificar_plantilla/upload', formData)
   }
 }

@@ -16,17 +16,17 @@ export class LoginService {
 
   // VALIDACIONES DE INGRESO AL SISTEMA 
   ValidarCredenciales(data: any) {
-    return this.http.post<any>(`${environment.url}/login`, data);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/login`, data);
   }
 
   // METODO PARA CAMBIAR CONTRASEÑA
   EnviarCorreoContrasena(data: any) {
-    return this.http.post(`${environment.url}/login/recuperar-contrasenia/`, data)
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/login/recuperar-contrasenia/`, data)
   }
 
   // METODO PARA CAMBIAR CONTRASEÑA
   ActualizarContrasenia(data: any) {
-    return this.http.post(`${environment.url}/login/cambiar-contrasenia`, data)
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/login/cambiar-contrasenia`, data)
   }
 
 
@@ -84,6 +84,12 @@ export class LoginService {
 
   // AUDITAR
   Auditar(data: any) {
-    return this.http.post(`${environment.url}/login/auditar`, data)
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/login/auditar`, data)
+  }
+
+
+  //SELECTOR DE EMPRESAS
+  getEmpresa(data: any){
+    return this.http.post<any>(`${environment.url}/fulltime`, data);
   }
 }

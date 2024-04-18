@@ -62,7 +62,7 @@ export class ListarRelojesComponent implements OnInit {
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
 
-  hipervinculo: string = environment.url;
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string);
 
   constructor(
     public restEmpre: EmpresaService,
@@ -462,7 +462,7 @@ export class ListarRelojesComponent implements OnInit {
 
     this.rest.CrearXML(arregloDispositivos).subscribe(res => {
       this.data = res;
-      this.urlxml = `${environment.url}/relojes/download/` + this.data.name;
+      this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/relojes/download/` + this.data.name;
       window.open(this.urlxml, "_blank");
     });
   }

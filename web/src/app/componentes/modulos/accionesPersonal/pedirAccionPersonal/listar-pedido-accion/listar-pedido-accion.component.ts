@@ -4183,7 +4183,7 @@ export class ListarPedidoAccionComponent implements OnInit {
     this.restAccion.CrearXML(arregloPedidos).subscribe((res) => {
       this.data = res;
       this.urlxml =
-        `${environment.url}/accionPersonal/download/` + this.data.name;
+        `${(localStorage.getItem('empresaURL') as string)}/accionPersonal/download/` + this.data.name;
       window.open(this.urlxml, "_blank");
     });
   }

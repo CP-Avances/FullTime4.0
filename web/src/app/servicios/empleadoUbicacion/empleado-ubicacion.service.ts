@@ -19,19 +19,19 @@ export class EmpleadoUbicacionService {
 
   // METODO PARA LISTAR COORDENADAS DE UN USUARIO
   ListarCoordenadasUsuario(id_empl: number) {
-    return this.http.get(`${environment.url}/ubicacion/coordenadas-usuario/${id_empl}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/ubicacion/coordenadas-usuario/${id_empl}`);
   }
 
   RegistrarCoordenadasUsuario(data: any) {
-    return this.http.post<any>(`${environment.url}/ubicacion/coordenadas-usuario`, data);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/ubicacion/coordenadas-usuario`, data);
   }
 
   ListarCoordenadasUsuarioU(id_ubicacion: number) {
-    return this.http.get(`${environment.url}/ubicacion/coordenadas-usuarios/general/${id_ubicacion}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/ubicacion/coordenadas-usuarios/general/${id_ubicacion}`);
   }
 
   EliminarCoordenadasUsuario(id: number) {
-    return this.http.delete<any>(`${environment.url}/ubicacion/eliminar-coordenadas-usuario/${id}`);
+    return this.http.delete<any>(`${(localStorage.getItem('empresaURL') as string)}/ubicacion/eliminar-coordenadas-usuario/${id}`);
   }
 
 
@@ -40,35 +40,35 @@ export class EmpleadoUbicacionService {
    ** ***************************************************************************************** **/
 
   RegistrarCoordenadas(data: any) {
-    return this.http.post<any>(`${environment.url}/ubicacion`, data);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/ubicacion`, data);
   }
 
   ActualizarCoordenadas(data: any) {
-    return this.http.put(`${environment.url}/ubicacion`, data);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/ubicacion`, data);
   }
 
   ListarCoordenadas() {
-    return this.http.get(`${environment.url}/ubicacion`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/ubicacion`);
   }
 
   ListarCoordenadasEspecificas(id: number) {
-    return this.http.get(`${environment.url}/ubicacion/especifico/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/ubicacion/especifico/${id}`);
   }
 
   ListarUnaCoordenada(id: number) {
-    return this.http.get<any>(`${environment.url}/ubicacion/determinada/${id}`);
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/ubicacion/determinada/${id}`);
   }
 
   ConsultarUltimoRegistro() {
-    return this.http.get(`${environment.url}/ubicacion/ultimo-registro`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/ubicacion/ultimo-registro`);
   }
 
   EliminarCoordenadas(id: number) {
-    return this.http.delete<any>(`${environment.url}/ubicacion/eliminar/${id}`);
+    return this.http.delete<any>(`${(localStorage.getItem('empresaURL') as string)}/ubicacion/eliminar/${id}`);
   }
 
   // METODO PARA CREAR ARCHIVO XML
   CrearXML(data: any) {
-    return this.http.post(`${environment.url}/ubicacion/xmlDownload`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/ubicacion/xmlDownload`, data);
   }
 }

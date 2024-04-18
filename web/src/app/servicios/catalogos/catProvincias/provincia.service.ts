@@ -14,47 +14,47 @@ export class ProvinciaService {
 
   // METODO PARA BUSCAR CONTINENTES
   BuscarContinente() {
-    return this.http.get(`${environment.url}/provincia/continentes`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/provincia/continentes`);
   }
 
   // METODO PARA BUSCAR LISTA DE PAISES
   BuscarPais(continente: string) {
-    return this.http.get(`${environment.url}/provincia/pais/${continente}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/provincia/pais/${continente}`);
   }
 
   // BUSCAR PROVINCIAS POR PAIS
   BuscarProvinciaPais(id_pais: number) {
-    return this.http.get(`${environment.url}/provincia/${id_pais}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/provincia/${id_pais}`);
   }
 
   // METODO PARA BUSCAR PROVINCIAS
   BuscarProvincias() {
-    return this.http.get(`${environment.url}/provincia`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/provincia`);
   }
 
   // METODO PARA ELIMINAR REGISTRO
   EliminarProvincia(id: number) {
-    return this.http.delete(`${environment.url}/provincia/eliminar/${id}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/provincia/eliminar/${id}`);
   }
 
   // METODO PARA CREAR ARCHIVO XML
   CrearXML(data: any) {
-    return this.http.post(`${environment.url}/provincia/xmlDownload`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/provincia/xmlDownload`, data);
   }
 
   // METODO PARA REGISTRAR PROVINCIA
   RegistrarProvincia(data: any) {
-    return this.http.post(`${environment.url}/provincia`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/provincia`, data);
   }
 
   // METODO PARA BUSCAR DATOS DE UNA PROVINCIA
   BuscarUnaProvinciaId(id: number) {
-    return this.http.get(`${environment.url}/provincia/buscar/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/provincia/buscar/${id}`);
   }
 
   // METODO PARA BUSCAR INFORMACION DE UN PAIS
   BuscarPaisId(id: number) {
-    return this.http.get(`${environment.url}/provincia/buscar/pais/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/provincia/buscar/pais/${id}`);
   }
 
 
@@ -62,11 +62,11 @@ export class ProvinciaService {
 
   
   getIdProvinciaRest(nombre: string) {
-    return this.http.get(`${environment.url}/provincia/nombreProvincia/${nombre}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/provincia/nombreProvincia/${nombre}`);
   }
 
   BuscarTodosPaises() {
-    return this.http.get(`${environment.url}/provincia/paises`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/provincia/paises`);
   }
 
 

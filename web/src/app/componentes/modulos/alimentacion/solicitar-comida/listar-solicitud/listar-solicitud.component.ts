@@ -686,7 +686,7 @@ export class ListarSolicitudComponent implements OnInit {
     });
     this.restC.CrearXML(arregloSolicitudes).subscribe(res => {
       this.data = res;
-      this.urlxml = `${environment.url}/planComidas/download/` + this.data.name;
+      this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/planComidas/download/` + this.data.name;
       window.open(this.urlxml, "_blank");
     });
   }

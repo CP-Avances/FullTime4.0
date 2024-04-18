@@ -367,7 +367,7 @@ export class VistaElementosComponent implements OnInit {
     this.rest.CrearXML(arregloTipoPermisos).subscribe(res => {
       this.data = res;
       console.log("prueba data", res)
-      this.urlxml = `${environment.url}/departamento/download/` + this.data.name;
+      this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/departamento/download/` + this.data.name;
       window.open(this.urlxml, "_blank");
     });
   }

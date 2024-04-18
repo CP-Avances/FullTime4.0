@@ -16,7 +16,7 @@ import { BirthdayService } from 'src/app/servicios/birthday/birthday.service';
 export class VerBirthdayComponent implements OnInit {
 
   HabilitarBtn: boolean = false;
-  API_URL: string = environment.url;
+  API_URL: string = (localStorage.getItem('empresaURL') as string);
   cumple: any = [];
 
   constructor(
@@ -26,7 +26,6 @@ export class VerBirthdayComponent implements OnInit {
 
   ngOnInit(): void {
     this.ObtenerMensajeCumple();
-    console.log('ver APIurl ', )
   }
 
   // METODO PARA BUSCAR MENSAJE DE CUMPLEAÑOS

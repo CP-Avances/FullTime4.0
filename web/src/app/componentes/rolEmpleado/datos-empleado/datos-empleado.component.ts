@@ -58,7 +58,7 @@ export class DatosEmpleadoComponent implements OnInit {
   tamanio_pagina: number = 5;
   pageSizeOptions = [5, 10, 20, 50];
 
-  hipervinculo: string = environment.url; // VARIABLE DE MANEJO DE RUTAS CON URL
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string); // VARIABLE DE MANEJO DE RUTAS CON URL
 
 
   constructor(
@@ -191,7 +191,7 @@ export class DatosEmpleadoComponent implements OnInit {
       this.empleadoUno[0].fec_nacimiento_ = this.validar.FormatearFecha(this.empleadoUno[0].fec_nacimiento, formato_fecha, this.validar.dia_abreviado);
       var empleado = data[0].nombre + data[0].apellido;
       if (data[0]['imagen'] != null) {
-        this.urlImagen = `${environment.url}/empleado/img/` + data[0].id + '/' + data[0].imagen;
+        this.urlImagen = `${(localStorage.getItem('empresaURL') as string)}/empleado/img/` + data[0].id + '/' + data[0].imagen;
         console.log('url empleado ', this.urlImagen)
         this.restEmpleado.obtenerImagen(data[0].id, data[0].imagen).subscribe(data => {
           if (data.imagen != 0) {

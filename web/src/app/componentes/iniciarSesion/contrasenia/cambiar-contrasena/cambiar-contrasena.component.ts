@@ -4,7 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { Md5 } from 'ts-md5';
+import { RsaKeysService } from 'src/app/servicios/llaves/rsa-keys.service';//Servicio para encriptar
 
 import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
@@ -37,6 +37,7 @@ export class CambiarContrasenaComponent implements OnInit {
     public router: Router,
     public ventana: MatDialogRef<CambiarContrasenaComponent>,
     public location: Location,
+    private rsaKeysService: RsaKeysService
   ) {
     this.usuario = localStorage.getItem('empleado') as string;
   }
@@ -46,8 +47,8 @@ export class CambiarContrasenaComponent implements OnInit {
 
   CompararContrasenia(form: any) {
     // CIFRADO DE CONTRASEÑA
-    const md5 = new Md5();
-    let pass = md5.appendStr(form.aPass).end();
+    let pass = this.rsaKeysService.encriptarLogin(form.aPass.toString());
+
     this.datosUser = [];
     this.restUser.BuscarDatosUser(parseInt(this.usuario)).subscribe(data => {
       this.datosUser = data;
@@ -72,8 +73,8 @@ export class CambiarContrasenaComponent implements OnInit {
   // METODO PARA ACTUALIZAR CONTRASEÑA
   EnviarContraseniaConfirmacion(form: any) {
     // CIFRADO DE CONTRASEÑA
-    const md5 = new Md5();
-    let clave = md5.appendStr(form.cPass).end();
+    let clave = this.rsaKeysService.encriptarLogin(form.cPass.toString());
+
     let datos = {
       id_empleado: parseInt(this.usuario),
       contrasena: clave

@@ -14,38 +14,38 @@ export class TituloService {
 
   // METODO PARA LISTAR TITULOS
   ListarTitulos() {
-    return this.http.get(`${environment.url}/titulo/`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/titulo/`);
   }
 
   // METODO PARA ELIMINAR REGISTRO
   EliminarRegistro(id: number) {
-    return this.http.delete(`${environment.url}/titulo/eliminar/${id}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/titulo/eliminar/${id}`);
   }
 
   // METODO PARA CREAR ARCHIVO XML
   CrearXML(data: any) {
-    return this.http.post(`${environment.url}/titulo/xmlDownload`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/titulo/xmlDownload`, data);
   }
 
   // METODO PARA REGISTRAR TITULO
   RegistrarTitulo(data: any) {
-    return this.http.post(`${environment.url}/titulo`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/titulo`, data);
   }
 
   // METODO PARA ACTUALIZAR REGISTRO DE TITULO
   ActualizarUnTitulo(datos: any) {
-    return this.http.put(`${environment.url}/titulo`, datos);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/titulo`, datos);
   }
 
   RevisarFormato(formData) {
-    return this.http.post<any>(environment.url + '/titulo/upload/revision', formData);
+    return this.http.post<any>((localStorage.getItem('empresaURL') as string) + '/titulo/upload/revision', formData);
   }
 
 
   // Catálogo de títulos
 
   getOneTituloRest(id: number) {
-    return this.http.get(`${environment.url}/titulo/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/titulo/${id}`);
   }
 
 

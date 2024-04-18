@@ -754,7 +754,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
     });
     this.restP.CrearXML(arregloPermisos).subscribe(res => {
       this.data = res;
-      this.urlxml = `${environment.url}/empleadoPermiso/download/` + this.data.name;
+      this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/empleadoPermiso/download/` + this.data.name;
       window.open(this.urlxml, "_blank");
     });
   }

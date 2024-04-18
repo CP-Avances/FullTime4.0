@@ -14,47 +14,47 @@ export class ReportesService {
   ) { }
 
   ObtenerTimbres(empleado_id: any, data: any) {
-    return this.http.post(`${environment.url}/reporte/reporteTimbres/listaTimbres/${empleado_id}`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reporteTimbres/listaTimbres/${empleado_id}`, data);
   }
 
   ObtenerPermisosHorarios(codigo: any) {
-    return this.http.get(`${environment.url}/reporte/reportePermisos/horarios/${codigo}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/reporte/reportePermisos/horarios/${codigo}`);
   }
 
   ObtenerPermisosPlanificacion(empleado_id: any) {
-    return this.http.get(`${environment.url}/reporte/reportePermisos/planificacion/${empleado_id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/reporte/reportePermisos/planificacion/${empleado_id}`);
   }
 
   ObtenerAutorizacionPermiso(empleado_id: any) {
-    return this.http.get(`${environment.url}/reporte/reportePermisos/autorizaciones/${empleado_id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/reporte/reportePermisos/autorizaciones/${empleado_id}`);
   }
 
   ObtenerTimbresAtrasosHorario(empleado_id: any, data: any) {
-    return this.http.post(`${environment.url}/reporte/reporteAtrasos/horarios/${empleado_id}`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reporteAtrasos/horarios/${empleado_id}`, data);
   }
 
   ObtenerTimbresAtrasosPlanificacion(empleado_id: any, data: any) {
-    return this.http.post(`${environment.url}/reporte/reporteAtrasos/planificacion/${empleado_id}`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reporteAtrasos/planificacion/${empleado_id}`, data);
   }
 
   ObtenerEntradaSalidaHorario(codigo: any, data: any) {
-    return this.http.post(`${environment.url}/reporte/reporteEntradaSalida/horarios/${codigo}`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reporteEntradaSalida/horarios/${codigo}`, data);
   }
 
   ObtenerEntradaSalidaPlanificacion(codigo: any, data: any) {
-    return this.http.post(`${environment.url}/reporte/reporteEntradaSalida/planificacion/${codigo}`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reporteEntradaSalida/planificacion/${codigo}`, data);
   }
 
   ObtenerPermisosHorariosFechas(codigo: any, data: any) {
-    return this.http.post(`${environment.url}/reporte/reportePermisos/fechas/horarios/${codigo}`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reportePermisos/fechas/horarios/${codigo}`, data);
   }
 
   ObtenerPermisosPlanificacionFechas(empleado_id: any, data: any) {
-    return this.http.post(`${environment.url}/reporte/reportePermisos/fechas/planificacion/${empleado_id}`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reportePermisos/fechas/planificacion/${empleado_id}`, data);
   }
 
   ObtenerPlanificacionEmpleado(codigo: any, data: any) {
-    return this.http.post(`${environment.url}/reporte/reporteTimbres/buscarPlan/${codigo}`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/reporte/reporteTimbres/buscarPlan/${codigo}`, data);
   }
 
   /**

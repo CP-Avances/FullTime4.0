@@ -14,32 +14,32 @@ export class EmpresaService {
 
   // CONSULTAR DATOS DE EMPRESA PARA RECUPERAR CUENTA
   ConsultarEmpresaCadena() {
-    return this.http.get(`${environment.url}/empresas/navegar`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empresas/navegar`);
   }
 
   // CONSULTAR DATOS DE EMPRESA
   ConsultarDatosEmpresa(id: number) {
-    return this.http.get(`${environment.url}/empresas/buscar/datos/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empresas/buscar/datos/${id}`);
   }
 
   // METODO PARA ACTUALIZAR DATOS EMPRESA
   ActualizarEmpresa(datos: any) {
-    return this.http.put(`${environment.url}/empresas`, datos);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/empresas`, datos);
   }
 
   // METODO PARA ACTUALIZAR COLORES DE REPORTES
   ActualizarColores(formData: any) {
-    return this.http.put<any>(`${environment.url}/empresas/colores`, formData);
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/empresas/colores`, formData);
   }
 
   // METODO PARA ACTUALIZAR MARCA DE AGUA
   ActualizarMarcaAgua(formData: any) {
-    return this.http.put<any>(`${environment.url}/empresas/reporte/marca`, formData);
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/empresas/reporte/marca`, formData);
   }
 
   // METODO PARA ACTUALIZAR NIVEL DE SEGURIDAD
   ActualizarSeguridad(formData: any) {
-    return this.http.put<any>(`${environment.url}/empresas/doble/seguridad`, formData);
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/empresas/doble/seguridad`, formData);
   }
 
 
@@ -50,42 +50,42 @@ export class EmpresaService {
 
   // METODO PARA OBTENER LOGO DE EMPRESA
   LogoEmpresaImagenBase64(id_empresa: string) {
-    return this.http.get<any>(`${environment.url}/empresas/logo/codificado/${parseInt(id_empresa)}`)
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/empresas/logo/codificado/${parseInt(id_empresa)}`)
   }
 
   // METODO PARA EDITAR LOGO DE EMPRESA
   EditarLogoEmpresa(id_empresa: number, formData: any) {
-    return this.http.put<any>(`${environment.url}/empresas/logo/${id_empresa}/uploadImage`, formData);
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/empresas/logo/${id_empresa}/uploadImage`, formData);
   }
 
   // METODO PARA BUSCAR IMAGEN DE CABECERA DE CORREO
   EditarCabeceraCorreo(id_empresa: number, formData: any) {
-    return this.http.put<any>(`${environment.url}/empresas/cabecera/${id_empresa}/uploadImage`, formData);
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/empresas/cabecera/${id_empresa}/uploadImage`, formData);
   }
 
   // METODO PARA BUSCAR LOGO CABECERA DE CORREO
   ObtenerCabeceraCorreo(id_empresa: string) {
-    return this.http.get<any>(`${environment.url}/empresas/cabecera/codificado/${parseInt(id_empresa)}`)
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/empresas/cabecera/codificado/${parseInt(id_empresa)}`)
   }
 
   // ACTUALIZAR LOGO DE PIE DE FIRMA DE CORREO
   EditarPieCorreo(id_empresa: number, formData: any) {
-    return this.http.put<any>(`${environment.url}/empresas/pie-firma/${id_empresa}/uploadImage`, formData);
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/empresas/pie-firma/${id_empresa}/uploadImage`, formData);
   }
 
   // METODO PARA BUSCAR LOGO PIE DE FIRMA DE CORREO
   ObtenerPieCorreo(id_empresa: string) {
-    return this.http.get<any>(`${environment.url}/empresas/pie-firma/codificado/${parseInt(id_empresa)}`)
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/empresas/pie-firma/codificado/${parseInt(id_empresa)}`)
   }
 
   // METODO PARA EDITAR DATOS DE CORREO
   EditarCredenciales(id_empresa: number, data: any) {
-    return this.http.put<any>(`${environment.url}/empresas/credenciales/${id_empresa}`, data);
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/empresas/credenciales/${id_empresa}`, data);
   }
 
   // ACTUALIZAR EMPRESA INDIAR USO DE ACCIONES
   ActualizarAccionesTimbres(formData: any) {
-    return this.http.put<any>(`${environment.url}/empresas/acciones-timbre`, formData);
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/empresas/acciones-timbre`, formData);
   }
 
 
@@ -99,25 +99,25 @@ export class EmpresaService {
   //Empresas
 
   ConsultarEmpresas() {
-    return this.http.get(`${environment.url}/empresas`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empresas`);
   }
 
   IngresarEmpresas(datos: any) {
-    return this.http.post(`${environment.url}/empresas`, datos);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empresas`, datos);
   }
 
 
 
   ConsultarUnaEmpresa(nombre: string) {
-    return this.http.get(`${environment.url}/empresas/buscar/${nombre}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empresas/buscar/${nombre}`);
   }
 
   CrearXML(data: any) {
-    return this.http.post(`${environment.url}/empresas/xmlDownload`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empresas/xmlDownload`, data);
   }
 
   EliminarRegistro(id: number) {
-    return this.http.delete(`${environment.url}/empresas/eliminar/${id}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/empresas/eliminar/${id}`);
   }
 
 

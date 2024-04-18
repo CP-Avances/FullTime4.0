@@ -19,15 +19,15 @@ export class VacacionesService {
   }
 
   ActualizarEstado(id: number, datos: any) {
-    return this.http.put(`${environment.url}/vacaciones/${id}/estado`, datos);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/${id}/estado`, datos);
   }
 
   ObtenerListaVacaciones() {
-    return this.http.get(`${environment.url}/vacaciones`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/vacaciones`);
   }
 
   ObtenerListaVacacionesAutorizadas() {
-    return this.http.get(`${environment.url}/vacaciones/estado-solicitud`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/estado-solicitud`);
   }
 
 
@@ -37,23 +37,23 @@ export class VacacionesService {
 
 
   ObtenerVacacionesPorIdPeriodo(id_peri_perido: number) {
-    return this.http.get<any>(`${environment.url}/vacaciones/${id_peri_perido}`)
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/${id_peri_perido}`)
   }
 
   BuscarFechasFeriado(datos: any) {
-    return this.http.post(`${environment.url}/vacaciones/fechasFeriado`, datos);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/fechasFeriado`, datos);
   }
 
   BuscarDatosSolicitud(id_emple_vacacion: number) {
-    return this.http.get(`${environment.url}/vacaciones/datosSolicitud/${id_emple_vacacion}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/datosSolicitud/${id_emple_vacacion}`);
   }
 
   BuscarDatosAutorizacion(id_vacaciones: number) {
-    return this.http.get(`${environment.url}/vacaciones/datosAutorizacion/${id_vacaciones}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/datosAutorizacion/${id_vacaciones}`);
   }
 
   EliminarVacacion(id_vacacion: number) {
-    return this.http.delete(`${environment.url}/vacaciones/eliminar/${id_vacacion}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/eliminar/${id_vacacion}`);
   }
 
 
@@ -62,38 +62,38 @@ export class VacacionesService {
 
   // REPORTE DE VACACIONES DE FORMA MÚLTIPLE
   BuscarSolicitudVacacion(datos: any, desde: string, hasta: string) {
-    return this.http.put(`${environment.url}/empleado-vacaciones-solicitudes/vacaciones-solicitudes/${desde}/${hasta}`, datos);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/empleado-vacaciones-solicitudes/vacaciones-solicitudes/${desde}/${hasta}`, datos);
   }
 
   // BUSQUEDA DE VACACIONES MEDIANTE ID
   ListarUnaVacacion(id: number) {
-    return this.http.get(`${environment.url}/vacaciones/listar/vacacion/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/listar/vacacion/${id}`);
   }
 
 
   // BUSQUEDA DE VACACIONES POR ID DE VACACIONES
   ObtenerUnaVacacion(id: number) {
-    return this.http.get(`${environment.url}/vacaciones/one/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/one/${id}`);
   }
 
   // CREAR SOLICITUD DE VACACIONES
   RegistrarVacaciones(datos: any) {
-    return this.http.post<any>(`${environment.url}/vacaciones`, datos);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/vacaciones`, datos);
   }
 
   // EDITAR SOLICITUD DE VACACIONES
   EditarVacacion(id: number, datos: any) {
-    return this.http.put<any>(`${environment.url}/vacaciones/${id}/vacacion-solicitada`, datos);
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/${id}/vacacion-solicitada`, datos);
   }
 
   // ENVIAR CORREOS DE SOLICITUDES DE VACACIONES
   EnviarCorreoVacaciones(datos: any) {
-    return this.http.post<any>(`${environment.url}/vacaciones/mail-noti`, datos);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/mail-noti`, datos);
   }
 
    // METODO PARA CREAR ARCHIVO XML
-   CrearXML(data: any) {
-    return this.http.post(`${environment.url}/vacaciones/xmlDownload`, data);
+  CrearXML(data: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/vacaciones/xmlDownload`, data);
   }
 
 }

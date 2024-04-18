@@ -12,23 +12,23 @@ export class RolesService {
 
   // METODO PARA LISTAR ROLES DEL SISTEMA
   BuscarRoles() {
-    return this.http.get<any>(`${environment.url}/rol`);
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/rol`);
   }
 
   // ELIMINAR REGISTRO DE ROL
   EliminarRoles(id: number) {
-    return this.http.delete(`${environment.url}/rol/eliminar/${id}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/rol/eliminar/${id}`);
   }
 
   // METODO PARA CREAR ARCHIVO XML
   CrearXML(data: any) {
-    return this.http.post(`${environment.url}/rol/xmlDownload`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rol/xmlDownload`, data);
   }
 
   // METODO PARA REGISTRAR ROL
   RegistraRol(data: any) {
     console.log(data);
-    return this.http.post(`${environment.url}/rol`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rol`, data);
   }
 
 
@@ -44,17 +44,17 @@ export class RolesService {
 
 
   getOneRol(id: number) {
-    return this.http.get<any>(`${environment.url}/rol/${id}`);
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/rol/${id}`);
   }
 
   ListarRolesActualiza(id: number) {
-    return this.http.get<any>(`${environment.url}/rol/actualiza/${id}`);
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/rol/actualiza/${id}`);
   }
 
 
 
   ActualizarRol(data: any) {
-    return this.http.put(`${environment.url}/rol`, data);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/rol`, data);
   }
 
 

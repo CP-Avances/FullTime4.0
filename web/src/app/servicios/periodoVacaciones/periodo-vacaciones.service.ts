@@ -13,7 +13,7 @@ export class PeriodoVacacionesService {
 
   // BUSCAR ID PERIODO DE VACACIONES
   BuscarIDPerVacaciones(id: number) {
-    return this.http.get(`${environment.url}/perVacacion/buscar/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/perVacacion/buscar/${id}`);
   }
 
 
@@ -29,32 +29,32 @@ export class PeriodoVacacionesService {
   // Período de Vacaciones
 
   ConsultarPerVacaciones() {
-    return this.http.get(`${environment.url}/perVacacion`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/perVacacion`);
   }
 
   CrearPerVacaciones(datos: any) {
-    return this.http.post(`${environment.url}/perVacacion`, datos);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/perVacacion`, datos);
   }
 
 
   ObtenerPeriodoVacaciones(codigo: string | number) {
-    return this.http.get<any>(`${environment.url}/perVacacion/infoPeriodo/${codigo}`);
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/perVacacion/infoPeriodo/${codigo}`);
   }
 
   ActualizarPeriodoV(datos: any) {
-    return this.http.put(`${environment.url}/perVacacion`, datos);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/perVacacion`, datos);
   }
 
   // Verificar datos de la plantilla de periodo de vacaciones y luego cargar al sistema
   CargarPeriodosMultiples(formData) {
-    return this.http.post<any>(`${environment.url}/perVacacion/cargarPeriodo/upload`, formData);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/perVacacion/cargarPeriodo/upload`, formData);
   }
 
   VerificarDatos(formData) {
-    return this.http.post<any>(`${environment.url}/perVacacion/cargarPeriodo/verificarDatos/upload`, formData);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/perVacacion/cargarPeriodo/verificarDatos/upload`, formData);
   }
 
   VerificarPlantilla(formData) {
-    return this.http.post<any>(`${environment.url}/perVacacion/cargarPeriodo/verificarPlantilla/upload`, formData);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/perVacacion/cargarPeriodo/verificarPlantilla/upload`, formData);
   }
 }

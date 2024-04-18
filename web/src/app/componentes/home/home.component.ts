@@ -101,7 +101,7 @@ export class HomeComponent implements OnInit {
       this.datosEmpleado = data[0];
       this.datosEmpleado.fec_nacimiento_ = this.validar.FormatearFecha(this.datosEmpleado.fec_nacimiento, formato_fecha, this.validar.dia_abreviado);
       if (data[0].imagen != null) {
-        this.urlImagen = `${environment.url}/empleado/img/` + data[0].id + '/' + data[0].imagen;
+        this.urlImagen = `${(localStorage.getItem('empresaURL') as string)}/empleado/img/` + data[0].id + '/' + data[0].imagen;
         this.restEmpleado.obtenerImagen(data[0].id, data[0].imagen).subscribe(data => {
           console.log('ver imagen data ', data)
           if (data.imagen != 0) {

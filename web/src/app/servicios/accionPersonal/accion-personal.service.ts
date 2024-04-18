@@ -13,112 +13,112 @@ export class AccionPersonalService {
 
   /** SERVICIOS PARA TABLA TIPO_ACCION_PERSONAL */
   ConsultarTipoAccionPersonal() {
-    return this.http.get(`${environment.url}/accionPersonal`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal`);
   }
 
   IngresarTipoAccionPersonal(datos: any) {
-    return this.http.post<any>(`${environment.url}/accionPersonal`, datos);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal`, datos);
   }
 
   BuscarTipoAccionPersonalId(id: any) {
-    return this.http.get(`${environment.url}/accionPersonal/tipo/accion/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/tipo/accion/${id}`);
   }
 
   ActualizarDatos(datos: any) {
-    return this.http.put(`${environment.url}/accionPersonal`, datos);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal`, datos);
   }
 
   EliminarRegistro(id: number) {
-    return this.http.delete(`${environment.url}/accionPersonal/eliminar/${id}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/eliminar/${id}`);
   }
 
   BuscarDatosTipoEdicion(id: any) {
-    return this.http.get(`${environment.url}/accionPersonal/editar/accion/tipo/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/editar/accion/tipo/${id}`);
   }
 
   /** SERVICIOS PARA TABLA TIPO_ACCION*/
   ConsultarTipoAccion() {
-    return this.http.get(`${environment.url}/accionPersonal/accion/tipo`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/accion/tipo`);
   }
 
   IngresarTipoAccion(datos: any) {
-    return this.http.post<any>(`${environment.url}/accionPersonal/accion/tipo`, datos);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/accion/tipo`, datos);
   }
 
   BuscarIdTipoAccion() {
-    return this.http.get(`${environment.url}/accionPersonal/ultimo/accion/tipo`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/ultimo/accion/tipo`);
   }
 
   /** SERVICIOS PARA TABLA CARGO_PROPUESTO*/
   ConsultarCargoPropuesto() {
-    return this.http.get(`${environment.url}/accionPersonal/cargo`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/cargo`);
   }
 
   ConsultarUnCargoPropuesto(id: number) {
-    return this.http.get(`${environment.url}/accionPersonal/cargo/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/cargo/${id}`);
   }
 
   IngresarCargoPropuesto(datos: any) {
-    return this.http.post(`${environment.url}/accionPersonal/cargo`, datos);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/cargo`, datos);
   }
 
   BuscarIdCargoPropuesto() {
-    return this.http.get(`${environment.url}/accionPersonal/tipo/cargo`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/tipo/cargo`);
   }
 
   /** SERVICIOS PARA TABLA DECRETO_ACUERDO_RESOLUCION*/
   ConsultarDecreto() {
-    return this.http.get(`${environment.url}/accionPersonal/decreto`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/decreto`);
   }
 
   ConsultarUnDecreto(id: number) {
-    return this.http.get(`${environment.url}/accionPersonal/decreto/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/decreto/${id}`);
   }
 
   IngresarDecreto(datos: any) {
-    return this.http.post(`${environment.url}/accionPersonal/decreto`, datos);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/decreto`, datos);
   }
 
   BuscarIdDecreto() {
-    return this.http.get(`${environment.url}/accionPersonal/tipo/decreto`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/tipo/decreto`);
   }
 
   /** SERVICIOS PARA TABLA PEDIDO_ACCION_EMPLEADO */
   IngresarPedidoAccion(datos: any) {
-    return this.http.post(`${environment.url}/accionPersonal/pedido/accion`, datos);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/pedido/accion`, datos);
   }
 
   ActualizarPedidoAccion(datos: any) {
-    return this.http.put(`${environment.url}/accionPersonal/pedido/accion/editar`, datos);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/pedido/accion/editar`, datos);
   }
 
   LogoImagenBase64() {
-    return this.http.get<any>(`${environment.url}/accionPersonal/logo/ministerio/codificado`);
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/logo/ministerio/codificado`);
   }
 
   /** CONSULTA DE DATOS DE PEDIDOS DE ACCION DE PERSONAL */
   BuscarDatosPedido() {
-    return this.http.get(`${environment.url}/accionPersonal/pedidos/accion`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/pedidos/accion`);
   }
 
   BuscarDatosPedidoEmpleados(id: any) {
-    return this.http.get(`${environment.url}/accionPersonal/pedidos/datos/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/pedidos/datos/${id}`);
   }
 
   BuscarDatosPedidoCiudades(id: any){
-    return this.http.get(`${environment.url}/accionPersonal/pedidos/ciudad/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/pedidos/ciudad/${id}`);
   }
 
   BuscarDatosPedidoId(id: any) {
-    return this.http.get(`${environment.url}/accionPersonal/pedido/informacion/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/pedido/informacion/${id}`);
   }
 
   Buscarprocesos(id: any) {
-    return this.http.get(`${environment.url}/accionPersonal/lista/procesos/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/lista/procesos/${id}`);
   }
 
   // METODO PARA CREAR ARCHIVO XML
   CrearXML(data: any) {
-    return this.http.post(`${environment.url}/accionPersonal/xmlDownload`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/accionPersonal/xmlDownload`, data);
   }
 }

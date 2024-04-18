@@ -16,6 +16,15 @@
                                         help_outline</mat-icon>
                                     <mat-error *ngIf="correo.invalid">{{ObtenerMensajeCampoUsuarioError()}}</mat-error>
                                 </mat-form-field>
+                                <br>
+                                <mat-form-field>
+                                    <mat-label>Ingrese código empresarial</mat-label>
+                                    <input matInput [formControl]="empresa" required>
+                                    <mat-icon matSuffix matTooltipPosition="right"
+                                        matTooltip="Ingresa el código empresarial.">
+                                        help_outline</mat-icon>
+                                    <mat-error *ngIf="correo.invalid">{{ObtenerMensajeCampoUsuarioError()}}</mat-error>
+                                </mat-form-field>
                             </form>
                             <br>
                             <div style="margin: auto;">

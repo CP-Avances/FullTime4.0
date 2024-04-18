@@ -14,7 +14,7 @@ export class UsuarioService {
 
   // REGISTRAR USUARIO
   RegistrarUsuario(data: any) {
-    return this.http.post(`${environment.url}/usuarios`, data)
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios`, data)
       .pipe(
         catchError(data)
       );
@@ -22,87 +22,87 @@ export class UsuarioService {
 
   // METODO DE BUSQUEDA DE DATOS DE USUARIO
   BuscarDatosUser(id: number) {
-    return this.http.get(`${environment.url}/usuarios/datos/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/usuarios/datos/${id}`);
   }
 
   ObtenerDepartamentoUsuarios(id: number) {
-    return this.http.get(`${environment.url}/usuarios/dato/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/usuarios/dato/${id}`);
   }
 
   // METODO PARA ACTUALIZAR REGISTRO DE USUARIO
   ActualizarDatos(data: any) {
-    return this.http.put(`${environment.url}/usuarios/actualizarDatos`, data).pipe(
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/usuarios/actualizarDatos`, data).pipe(
       catchError(data));
   }
 
   // METODO PARA REGISTRAR ACCESOS AL SISTEMA
   CrearAccesosSistema(data: any) {
-    return this.http.post(`${environment.url}/usuarios/acceso`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/acceso`, data);
   }
 
   // METODO PARA CAMBIAR PASSWORD
   ActualizarPassword(data: any) {
-    return this.http.put(`${environment.url}/usuarios`, data);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/usuarios`, data);
   }
 
   // ADMINISTRACION MODULO DE ALIMENTACION
   RegistrarAdminComida(data: any) {
-    return this.http.put(`${environment.url}/usuarios/admin/comida`, data);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/usuarios/admin/comida`, data);
   }
 
   // METODO PARA REGISTRAR FRASE DE SEGURIDAD
   ActualizarFrase(data: any) {
-    return this.http.put(`${environment.url}/usuarios/frase`, data);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/usuarios/frase`, data);
   }
 
   // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE WEB
   UsuariosTimbreWeb(estado: any, habilitado: boolean) {
-    return this.http.get<any>(`${environment.url}/usuarios/lista-web/${estado}/activo/${habilitado}`);
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/lista-web/${estado}/activo/${habilitado}`);
   }
 
   // METODO PARA BUSCAR DATOS DE USUARIOS Y CARGOS TIMBRE WEB
   UsuariosTimbreWebCargos(estado: any, habilitado: boolean) {
-    return this.http.get<any>(`${environment.url}/usuarios/lista-web-cargos/${estado}/activo/${habilitado}`);
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/lista-web-cargos/${estado}/activo/${habilitado}`);
   }
 
   // METODO PARA ACTUALIZAR ESTADO TIMBRE WEB
   ActualizarEstadoTimbreWeb(data: any) {
-    return this.http.put<any>(`${environment.url}/usuarios/lista-web/`, data);
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/lista-web/`, data);
   }
 
   // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
   UsuariosTimbreMovil(estado: any, habilitado: boolean) {
-    return this.http.get<any>(`${environment.url}/usuarios/lista-app-movil/${estado}/activo/${habilitado}`);
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/lista-app-movil/${estado}/activo/${habilitado}`);
   }
 
     // METODO PARA BUSCAR DATOS DE USUARIOS TIMBRE MOVIL
     UsuariosTimbreMovilCargos(estado: any, habilitado: boolean) {
-      return this.http.get<any>(`${environment.url}/usuarios/lista-app-movil-cargos/${estado}/activo/${habilitado}`);
+      return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/lista-app-movil-cargos/${estado}/activo/${habilitado}`);
     }
 
   // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL
   ActualizarEstadoTimbreMovil(data: any) {
-    return this.http.put<any>(`${environment.url}/usuarios/lista-app-movil/`, data);
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/lista-app-movil/`, data);
   }
 
   // METODO PARA BUSCAR DISPOSITIVOS REGISTRADOS
   BuscarDispositivoMovill() {
-    return this.http.get<any>(`${environment.url}/usuarios/registro-dispositivos`);
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/usuarios/registro-dispositivos`);
   }
 
   // METODO PARA ELIMINAR REGISTROS DISPOSITIVOS
   EliminarDispositivoMovil(data: any) {
-    return this.http.delete(`${environment.url}/usuarios/delete-registro-dispositivos/${data}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/usuarios/delete-registro-dispositivos/${data}`);
   }
 
   // METODO PARA ENVIAR CORREO CAMBIAR FRASE SEGURIDAD
   RecuperarFraseSeguridad(data: any) {
-    return this.http.post(`${environment.url}/usuarios/frase/olvido-frase`, data)
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/frase/olvido-frase`, data)
   }
 
   // METODO PARA CAMBIAR LA FRASE DE SEGURIDAD
   CambiarFrase(data: any) {
-    return this.http.post(`${environment.url}/usuarios/frase/restaurar-frase/nueva`, data)
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/usuarios/frase/restaurar-frase/nueva`, data)
   }
 
 
@@ -113,7 +113,7 @@ export class UsuarioService {
   // catalogo de usuarios
 
   getUsuariosRest() {
-    return this.http.get(`${environment.url}/usuarios`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/usuarios`);
   }
 
 
@@ -129,11 +129,11 @@ export class UsuarioService {
 
 
   BuscarUsersNoEnrolados() {
-    return this.http.get(`${environment.url}/usuarios/noEnrolados`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/usuarios/noEnrolados`);
   }
 
   getIdByUsuarioRest(usuario: string) {
-    return this.http.get(`${environment.url}/usuarios/busqueda/${usuario}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/usuarios/busqueda/${usuario}`);
   }
 
 

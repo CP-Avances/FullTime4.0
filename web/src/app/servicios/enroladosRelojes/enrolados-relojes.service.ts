@@ -14,23 +14,23 @@ export class EnroladosRelojesService {
   // Asignar Ciudad Feriado
 
   CrearEnroladoReloj(datos: any) {
-    return this.http.post(`${environment.url}/enroladosRelojes/insertar`, datos);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/enroladosRelojes/insertar`, datos);
   }
 
   BuscarIdReloj(datos: any) {
-    return this.http.post(`${environment.url}/enroladosRelojes/buscar`, datos);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/enroladosRelojes/buscar`, datos);
   }
 
   BuscarEnroladosReloj(id: number) {
-    return this.http.get(`${environment.url}/enroladosRelojes/nombresReloj/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/enroladosRelojes/nombresReloj/${id}`);
   }
 
   ActualizarDatos(datos: any) {
-    return this.http.put(`${environment.url}/enroladosRelojes`, datos);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/enroladosRelojes`, datos);
   }
 
   EliminarRegistro(id: number) {
-    return this.http.delete(`${environment.url}/enroladosRelojes/eliminar/${id}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/enroladosRelojes/eliminar/${id}`);
   }
 
 }

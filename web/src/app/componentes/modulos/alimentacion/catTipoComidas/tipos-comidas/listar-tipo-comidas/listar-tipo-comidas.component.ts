@@ -61,7 +61,7 @@ export class ListarTipoComidasComponent implements OnInit {
   numero_pagina: number = 1;
 
   // VARIABLE DE NAVEGACION ENTRE RUTAS
-  hipervinculo: string = environment.url
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string)
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
@@ -381,7 +381,7 @@ export class ListarTipoComidasComponent implements OnInit {
     });
     this.rest.CrearXML(arregloComidas).subscribe(res => {
       this.data = res;
-      this.urlxml = `${environment.url}/tipoComidas/download/` + this.data.name;
+      this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/tipoComidas/download/` + this.data.name;
       window.open(this.urlxml, "_blank");
     });
   }

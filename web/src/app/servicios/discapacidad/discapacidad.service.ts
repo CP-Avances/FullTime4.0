@@ -14,22 +14,22 @@ export class DiscapacidadService {
 
   // METODO PARA BUSCAR DATOS DE UN USUARIO
   BuscarDiscapacidadUsuario(id: number) {
-    return this.http.get(`${environment.url}/discapacidad/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/discapacidad/${id}`);
   }
 
   // METODO PARA REGISTRAR DISCAPACIDAD
   RegistroDiscapacidad(data: any) {
-    return this.http.post(`${environment.url}/discapacidad`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/discapacidad`, data);
   }
 
   // METODO PARA ACTUALIZACION DE REGISTRO
   ActualizarDiscapacidad(id: number, data: any) {
-    return this.http.put(`${environment.url}/discapacidad/${id}`, data);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/discapacidad/${id}`, data);
   }
 
   // METODO PARA ELIMINAR REGISTRO
   EliminarDiscapacidad(id: number) {
-    return this.http.delete(`${environment.url}/discapacidad/eliminar/${id}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/discapacidad/eliminar/${id}`);
   }
 
 
@@ -39,12 +39,12 @@ export class DiscapacidadService {
 
   // METODO PARA REGISTRAR TIPO DE DISCAPACIDAD
   RegistrarTipo(data: any) {
-    return this.http.post<any>(`${environment.url}/discapacidad/buscarTipo`, data);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/discapacidad/buscarTipo`, data);
   }
 
   // BUSCAR TIPO DE DISCAPACIDAD
   ListarTipoDiscapacidad() {
-    return this.http.get(`${environment.url}/discapacidad/buscarTipo/tipo`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/discapacidad/buscarTipo/tipo`);
   }
 
 
@@ -67,13 +67,13 @@ export class DiscapacidadService {
 
 
   BuscarTipoD(id: number) {
-    return this.http.get(`${environment.url}/discapacidad/buscarTipo/tipo/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/discapacidad/buscarTipo/tipo/${id}`);
   }
 
 
 
   ActualizarTipoD(id: number, data: any) {
-    return this.http.put(`${environment.url}/discapacidad/buscarTipo/${id}`, data);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/discapacidad/buscarTipo/${id}`, data);
   }
 
 

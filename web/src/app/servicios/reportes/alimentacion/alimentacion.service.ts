@@ -13,47 +13,47 @@ export class AlimentacionService {
   ) { }
 
   ObtenerPlanificadosConsumidos(datos: any) {
-    return this.http.post(`${environment.url}/alimentacion/planificados`, datos);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/alimentacion/planificados`, datos);
   }
 
   ObtenerSolicitadosConsumidos(datos: any) {
-    return this.http.post(`${environment.url}/alimentacion/solicitados`, datos);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/alimentacion/solicitados`, datos);
   }
 
   ObtenerExtrasPlanConsumidos(data: any) {
-    return this.http.post(`${environment.url}/alimentacion/extras/plan`, data)
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/alimentacion/extras/plan`, data)
   }
 
   ObtenerExtrasSolConsumidos(data: any) {
-    return this.http.post(`${environment.url}/alimentacion/extras/solicita`, data)
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/alimentacion/extras/solicita`, data)
   }
 
   ObtenerDetallesPlanificadosConsumidos(datos: any) {
-    return this.http.post(`${environment.url}/alimentacion/planificados/detalle`, datos);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/alimentacion/planificados/detalle`, datos);
   }
 
   ObtenerDetallesSolicitadosConsumidos(datos: any) {
-    return this.http.post(`${environment.url}/alimentacion/solicitados/detalle`, datos);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/alimentacion/solicitados/detalle`, datos);
   }
 
   ObtenerDetallesExtrasPlanConsumidos(data: any) {
-    return this.http.post(`${environment.url}/alimentacion/extras/detalle/plan`, data)
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/alimentacion/extras/detalle/plan`, data)
   }
 
   ObtenerDetallesExtrasSolConsumidos(data: any) {
-    return this.http.post(`${environment.url}/alimentacion/extras/detalle/solicita`, data)
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/alimentacion/extras/detalle/solicita`, data)
   }
 
   ObtenerDetallesInvitados(data: any) {
-    return this.http.post(`${environment.url}/alimentacion/servicios/invitados`, data)
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/alimentacion/servicios/invitados`, data)
   }
 
   BuscarTimbresAlimentacion(data: any, inicio: string, fin: string) {
-    return this.http.put<any>(`${environment.url}/alimentacion/timbres-alimentacion/${inicio}/${fin}`, data);
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/alimentacion/timbres-alimentacion/${inicio}/${fin}`, data);
   }
 
   BuscarTimbresAlimentacionRegimenCargo(data: any, inicio: string, fin: string) {
-    return this.http.put<any>(`${environment.url}/alimentacion/timbres-alimentacion-regimen-cargo/${inicio}/${fin}`, data);
+    return this.http.put<any>(`${(localStorage.getItem('empresaURL') as string)}/alimentacion/timbres-alimentacion-regimen-cargo/${inicio}/${fin}`, data);
   }
 
 }

@@ -12,6 +12,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
+//LLAVES
+import { RsaKeysService } from './servicios/llaves/rsa-keys.service';
 
 // COMPONENTES ADMINISTRADOR
 import { VistaRolesComponent } from './componentes/catalogos/catRoles/vista-roles/vista-roles.component';
@@ -315,8 +317,14 @@ import { EliminarIndividualComponent } from './componentes/horarios/eliminar-ind
 import { CargarPlantillasComponent } from './componentes/horarios/cargar-plantillas/cargar-plantillas.component';
 import { BuscarAsistenciaComponent } from './componentes/horarios/asistencia/buscar-asistencia/buscar-asistencia.component';
 
+//Seteo de ruta por defecto al iniciar front
+let url: string | null = localStorage.getItem('empresaURL');
+if (!url) {
+  url = environment.url;
+}
+//fin seteo de ruta por defecto al iniciar front
 
-const config: SocketIoConfig = { url: environment.url, options: {} };
+const config: SocketIoConfig = { url: String(url), options: {} };
 
 @NgModule({
   declarations: [
@@ -635,6 +643,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     ListaSucursalesComponent,
     VerEmpresaComponent,
     HorariosEmpleadoComponent,
+    RsaKeysService,
   ],
 
   bootstrap: [AppComponent]

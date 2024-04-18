@@ -51,7 +51,7 @@ export class VerEmpleadoPermisoComponent implements OnInit {
 
   fechaActual: any;
   habilitarActualizar: boolean = true;
-  hipervinculo: string = environment.url
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string)
 
   ocultar: boolean = true;
   esconder: boolean = false;

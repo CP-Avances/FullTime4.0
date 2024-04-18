@@ -14,31 +14,31 @@ export class ProcesoService {
   // catalogo de Procesos
 
   getProcesosRest() {
-    return this.http.get(`${environment.url}/proceso`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/proceso`);
   }
 
   getOneProcesoRest(id: number) {
-    return this.http.get(`${environment.url}/proceso/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/proceso/${id}`);
   }
 
   postProcesoRest(data: any) {
-    return this.http.post(`${environment.url}/proceso`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/proceso`, data);
   }
 
   deleteProcesoRest(id: number){
-    return this.http.delete(`${environment.url}/proceso/eliminar/${id}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/proceso/eliminar/${id}`);
   }
 
   getIdProcesoPadre(procesoPadre: string) {
-    return this.http.get(`${environment.url}/proceso/busqueda/${procesoPadre}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/proceso/busqueda/${procesoPadre}`);
   }
 
   ActualizarUnProceso(datos: any) {
-    return this.http.put(`${environment.url}/proceso`, datos);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/proceso`, datos);
   }
 
   CrearXML(data: any) {
-    return this.http.post(`${environment.url}/proceso/xmlDownload`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/proceso/xmlDownload`, data);
   }
 
 }

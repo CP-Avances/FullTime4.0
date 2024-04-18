@@ -104,7 +104,7 @@ export class VerEmpleadoComponent implements OnInit {
   editar: string = '';
 
   idEmpleadoLogueado: number; // VARIABLE DE ALMACENAMIENTO DE ID DE EMPLEADO QUE INICIA SESIÓN
-  hipervinculo: string = environment.url; // VARIABLE DE MANEJO DE RUTAS CON URL
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string); // VARIABLE DE MANEJO DE RUTAS CON URL
   FechaActual: any; // VARIBLE PARA ALMACENAR LA FECHA DEL DÍA DE HOY
 
   // ITEMS DE PAGINACION DE LA TABLA
@@ -339,7 +339,7 @@ export class VerEmpleadoComponent implements OnInit {
       this.empleadoUno[0].fec_nacimiento_ = this.validar.FormatearFecha(this.empleadoUno[0].fec_nacimiento, formato_fecha, this.validar.dia_abreviado);
       var empleado = data[0].nombre + data[0].apellido;
       if (data[0].imagen != null) {
-        this.urlImagen = `${environment.url}/empleado/img/` + data[0].id + '/' + data[0].imagen;
+        this.urlImagen = `${(localStorage.getItem('empresaURL') as string)}/empleado/img/` + data[0].id + '/' + data[0].imagen;
         this.restEmpleado.obtenerImagen(data[0].id, data[0].imagen).subscribe(data => {
           console.log('ver imagen data ', data)
           if (data.imagen != 0) {

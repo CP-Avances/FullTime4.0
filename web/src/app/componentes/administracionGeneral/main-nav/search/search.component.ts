@@ -43,8 +43,15 @@ export class SearchComponent implements OnInit {
   }
 
   BarraBusquedaEmpleados() {
-
+    //Verificacion de elementos para saber si esta o no el elemento inicial
+    let firstElement: string = '';
     if (!!sessionStorage.getItem('lista-empleados')) {
+      const jsonString = sessionStorage.getItem('lista-empleados') as string;
+      const jsonObject = JSON.parse(jsonString);
+      firstElement = jsonObject[Object.keys(jsonObject)[0]].id;
+    }
+
+    if (!!sessionStorage.getItem('lista-empleados') && firstElement != '0') { //se aumento -> &&
       // console.log('ya hay lista en la sesion iniciada');
       let empleados = JSON.parse(sessionStorage.getItem('lista-empleados') as string);
 

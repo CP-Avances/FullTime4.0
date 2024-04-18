@@ -63,7 +63,7 @@ export class ListarFeriadosComponent implements OnInit {
   archivoSubido: Array<File>;
 
   // VARIABLE PARA TOMAR RUTA DEL SISTEMA
-  hipervinculo: string = environment.url
+  hipervinculo: string = (localStorage.getItem('empresaURL') as string);
 
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
@@ -423,7 +423,7 @@ export class ListarFeriadosComponent implements OnInit {
         data.fec_recuperacion = datos.fecha_recuperacion;
         this.rest.CrearNuevoFeriado(data).subscribe(response => {
           cont = cont + 1;
-          if (response.message === 'error') {
+          if (response.message === 'error') { 
             this.toastr.error('La fecha del feriado o la fecha de recuperación se encuentran dentro de otro registro.', 'Upss!!! algo salio mal.', {
               timeOut: 5000,
             })

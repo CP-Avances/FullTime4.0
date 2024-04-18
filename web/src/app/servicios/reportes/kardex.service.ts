@@ -15,11 +15,11 @@ export class KardexService {
    * METODOS QUE OBTIENEN LA INFORMACION DEL KARDEX DE VACACIONES DIAS CALENDARIO.
    */
   ObtenerKardexVacacionDiasCalendarioByIdToken() {
-    return this.http.get(`${environment.url}/reportes/vacacion`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/reportes/vacacion`);
   }
   
   ObtenerKardexVacacionDiasCalendarioByIdEmpleado(id_empleado: number, desde: string, hasta: string) {
-    return this.http.get<any>(`${environment.url}/reportes/vacacion/${id_empleado}/${desde}/${hasta}`);
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/reportes/vacacion/${id_empleado}/${desde}/${hasta}`);
   }
 
   /**
@@ -29,7 +29,7 @@ export class KardexService {
    * @param hasta fecha finaliza el mes
    */
   ReporteAsistenciaDetalleConsolidado (id_empleado: number, desde: string, hasta: string) {
-    return this.http.get<any>(`${environment.url}/asistencia/${id_empleado}/${desde}/${hasta}`)
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/asistencia/${id_empleado}/${desde}/${hasta}`)
   }
 
   /**
@@ -37,12 +37,12 @@ export class KardexService {
    * @param id_empresa Id de la empresa que pertenecen los empleados
    */
   ListadoEmpleadosConDepartamentoRegimen(id_empresa: number) {
-    return this.http.get<any>(`${environment.url}/asistencia/lista-empleados/${id_empresa}`)
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/asistencia/lista-empleados/${id_empresa}`)
   }
 
   ReporteHorasExtras(id_empleado: number, desde: string, hasta: string) {
-    return this.http.get<any>(`${environment.url}/reportes/hora-extra/${id_empleado}/${desde}/${hasta}`)
-    // ${environment.url}/reportes/hora-extra/2/2020-12-01/2020-12-31
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/reportes/hora-extra/${id_empleado}/${desde}/${hasta}`)
+    // ${(localStorage.getItem('empresaURL') as string)}/reportes/hora-extra/2/2020-12-01/2020-12-31
   }
 
 }

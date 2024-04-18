@@ -322,7 +322,7 @@ export class ListarTipoAccionComponent implements OnInit {
     });
     this.rest.CrearXML(arregloTipoAcciones).subscribe(res => {
       this.data = res;
-      this.urlxml = `${environment.url}/departamento/download/` + this.data.name;
+      this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/departamento/download/` + this.data.name;
       window.open(this.urlxml, "_blank");
     });
   }

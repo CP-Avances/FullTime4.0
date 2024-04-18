@@ -15,12 +15,12 @@ export class EmplCargosService {
 
   // METODO DE BUSQUEDA DE TIPO DE CONTRATOS
   ObtenerTipoCargos() {
-    return this.http.get(`${environment.url}/empleadoCargos/listar/tiposCargo`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/listar/tiposCargo`);
   }
 
   // METODO PARA REGISTRAR TIPO DE CARGO
   CrearTipoCargo(data: any) {
-    return this.http.post<any>(`${environment.url}/empleadoCargos/tipo_cargo`, data);
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/tipo_cargo`, data);
   }
 
 
@@ -31,22 +31,22 @@ export class EmplCargosService {
 
   // METODO PARA REGISTRAR CARGO
   RegistrarCargo(data: any) {
-    return this.http.post(`${environment.url}/empleadoCargos`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos`, data);
   }
 
   // METODO PARA BUSCAR DATOS DE CARGO POR ID
   BuscarCargoID(id: number) {
-    return this.http.get<any>(`${environment.url}/empleadoCargos/${id}`);
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/${id}`);
   }
 
   // METODO DE ACTUALIZACION DE CARGO
   ActualizarContratoEmpleado(id: number, id_empl_contrato: number, data: any) {
-    return this.http.put(`${environment.url}/empleadoCargos/${id_empl_contrato}/${id}/actualizar`, data);
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/${id_empl_contrato}/${id}/actualizar`, data);
   }
 
   // METODO PARA BUSCAR DATOS DE CARGO POR ID CONTRATO
   BuscarCargoIDContrato(id_empl_contrato: number) {
-    return this.http.get<any>(`${environment.url}/empleadoCargos/cargoInfo/${id_empl_contrato}`);
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/cargoInfo/${id_empl_contrato}`);
   }
 
 
@@ -60,11 +60,11 @@ export class EmplCargosService {
 
 
   getEmpleadoCargosRest() {
-    return this.http.get(`${environment.url}/empleadoCargos`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos`);
   }
 
   getListaEmpleadoCargosRest() {
-    return this.http.get(`${environment.url}/empleadoCargos/lista-empleados`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/lista-empleados`);
   }
 
 
@@ -73,34 +73,34 @@ export class EmplCargosService {
 
 
   BuscarIDCargo(id: number) {
-    return this.http.get(`${environment.url}/empleadoCargos/buscar/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/buscar/${id}`);
   }
 
   BuscarIDCargoActual(id: number) {
-    return this.http.get(`${environment.url}/empleadoCargos/buscar/cargoActual/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/buscar/cargoActual/${id}`);
   }
 
 
 
   ListarEmpleadosAutorizacion(id: number) {
-    return this.http.get(`${environment.url}/empleadoCargos/empleadosAutorizan/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/empleadosAutorizan/${id}`);
   }
 
 
   ObtenerUnTipoCargo(id: number) {
-    return this.http.get(`${environment.url}/empleadoCargos/buscar/ultimoTipo/nombreCargo/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/buscar/ultimoTipo/nombreCargo/${id}`);
   }
 
   ObtenerCargoDepartamento(id: number) {
-    return this.http.get(`${environment.url}/empleadoCargos/buscar/cargo-departamento/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/buscar/cargo-departamento/${id}`);
   }
 
   ObtenerCargoSucursal(id: number) {
-    return this.http.get(`${environment.url}/empleadoCargos/buscar/cargo-sucursal/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/buscar/cargo-sucursal/${id}`);
   }
 
   ObtenerCargoRegimen(id: number) {
-    return this.http.get(`${environment.url}/empleadoCargos/buscar/cargo-regimen/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/empleadoCargos/buscar/cargo-regimen/${id}`);
   }
 
 }

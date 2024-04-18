@@ -15,81 +15,81 @@ export class DepartamentosService {
 
   // REGISTRAR DEPARTAMENTO
   RegistrarDepartamento(data: any) {
-    return this.http.post(`${environment.url}/departamento`, data).pipe(
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/departamento`, data).pipe(
       catchError(data)
     );
   }
 
   // BUSCAR DEPARTAMENTOS POR ID SUCURSAL 
   BuscarDepartamentoSucursal(id: number) {
-    return this.http.get(`${environment.url}/departamento/sucursal-departamento/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/departamento/sucursal-departamento/${id}`);
   }
 
   // BUSCAR DEPARTAMENTOS POR ID SUCURSAL EXCLUYENDO REGISTRO A EDITAR
   BuscarDepartamentoSucursal_(id_sucursal: number, id: number) {
-    return this.http.get(`${environment.url}/departamento/sucursal-departamento-edicion/${id_sucursal}/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/departamento/sucursal-departamento-edicion/${id_sucursal}/${id}`);
   }
 
   // BUSCAR DEPARTAMENTOS POR ID SUCURSAL EXCLUYENDO REGISTRO A EDITAR
   BuscarDepartamento(id: number) {
-    return this.http.get(`${environment.url}/departamento/infodepartamento/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/departamento/infodepartamento/${id}`);
   }
 
   // REGISTRAR ACTUALIZACION DE DEPARTAMENTO  --**VERIFICADO
   ActualizarDepartamento(idDepartamento: number, data: any) {
-    return this.http.put(`${environment.url}/departamento/${idDepartamento}`, data).pipe(
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/departamento/${idDepartamento}`, data).pipe(
       catchError(data)
     );
   }
 
   // METODO PARA LISTAR INFORMACION DE DEPARTAMENTOS POR ID DE SUCURSAL   --**VERIFICADO
   BuscarInformacionDepartamento(id_sucursal: number) {
-    return this.http.get(`${environment.url}/departamento/buscar/datosDepartamento/${id_sucursal}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/departamento/buscar/datosDepartamento/${id_sucursal}`);
   }
 
   // METODO PARA BUSCAR DEPARTAMENTOS   --**VERIFICADO
   ConsultarDepartamentos() {
-    return this.http.get(`${environment.url}/departamento/listarDepartamentos`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/departamento/listarDepartamentos`);
   }
 
   // METODO PARA ELIMINAR REGISTRO
   EliminarRegistro(id: number) {
-    return this.http.delete(`${environment.url}/departamento/eliminar/${id}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/departamento/eliminar/${id}`);
   }
 
   // METODO PARA CREAR ARCHIVO XML
   CrearXML(data: any) {
-    return this.http.post(`${environment.url}/departamento/xmlDownload`, data);
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/departamento/xmlDownload`, data);
   }
 
 
   // REGISTRAR NIVELDEPARTAMENTO  --**VERIFICADO
   RegistrarNivelDepartamento(data: any) {
-    return this.http.post(`${environment.url}/departamento/crearnivel`, data).pipe(
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/departamento/crearnivel`, data).pipe(
       catchError(data)
     );
   }
 
   // METODO PARA BUSCAR NIVELDEPARTAMENTOS   --**VERIFICADO
   ConsultarNivelDepartamento(id_departamento: number, id_establecimiento: number) {
-    return this.http.get(`${environment.url}/departamento/infoniveldepa/${id_departamento}/${id_establecimiento}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/departamento/infoniveldepa/${id_departamento}/${id_establecimiento}`);
   }
 
   // REGISTRAR ACTUALIZACION DE NIVEL DEPARTAMENTO    --**VERIFICADO
   ActualizarNivelDepa(id: number, data: any) {
-    return this.http.put(`${environment.url}/departamento/nivelactualizar/${id}`, data).pipe(
+    return this.http.put(`${(localStorage.getItem('empresaURL') as string)}/departamento/nivelactualizar/${id}`, data).pipe(
       catchError(data)
     );
   }
 
   // METODO PARA ELIMINAR REGISTRO NIVEL DEPARTAMENTO   --**VERIFICADO
   EliminarRegistroNivelDepa(id: number) {
-    return this.http.delete(`${environment.url}/departamento/eliminarniveldepa/${id}`);
+    return this.http.delete(`${(localStorage.getItem('empresaURL') as string)}/departamento/eliminarniveldepa/${id}`);
   }
 
   // REGISTRAR NIVELDEPARTAMENTO  --**VERIFICADO
   ActualizarNombreNivel(data: any) {
-    return this.http.post(`${environment.url}/departamento/actualizarNombrenivel`, data).pipe(
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/departamento/actualizarNombrenivel`, data).pipe(
       catchError(data)
     );
   }
@@ -100,27 +100,27 @@ export class DepartamentosService {
 
   // catalogo de departamentos
   ConsultarDepartamentoPorContrato(id_cargo: number) {
-    return this.http.get(`${environment.url}/departamento/busqueda-cargo/${id_cargo}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/departamento/busqueda-cargo/${id_cargo}`);
   }
 
   ConsultarNombreDepartamentos() {
-    return this.http.get(`${environment.url}/departamento/nombreDepartamento`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/departamento/nombreDepartamento`);
   }
 
   ConsultarIdNombreDepartamentos(nombreDepartamento: string) {
-    return this.http.get(`${environment.url}/departamento/idDepartamento/${nombreDepartamento}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/departamento/idDepartamento/${nombreDepartamento}`);
   }
 
 
 
   getIdDepartamentoPadre(departamentoPadre: string) {
-    return this.http.get(`${environment.url}/departamento/busqueda/${departamentoPadre}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/departamento/busqueda/${departamentoPadre}`);
   }
 
 
 
   EncontrarUnDepartamento(id: number) {
-    return this.http.get(`${environment.url}/departamento/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/departamento/${id}`);
   }
 
 
@@ -131,7 +131,7 @@ export class DepartamentosService {
 
 
   BuscarDepartamentoRegimen(id: number) {
-    return this.http.get(`${environment.url}/departamento/buscar/regimen-departamento/${id}`);
+    return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/departamento/buscar/regimen-departamento/${id}`);
   }
 
 }
