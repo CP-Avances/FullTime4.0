@@ -172,7 +172,7 @@ class TimbresControlador {
             }
 
             let timbresRows: any = 0;
-            //TODO merge
+         
             let timbres = await pool.query(
                 `
                 SELECT (da.nombre || ' ' || da.apellido) AS empleado, CAST(t.fec_hora_timbre AS VARCHAR), t.accion, 

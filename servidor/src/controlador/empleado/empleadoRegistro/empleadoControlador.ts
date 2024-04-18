@@ -51,7 +51,7 @@ class EmpleadoControlador {
         `
         SELECT MAX(codigo::BIGINT) AS codigo FROM empleados
         `
-      ); //TODO Revisar Instrucción SQL max codigo
+      );
       if (VALOR.rowCount > 0) {
         return res.jsonp(VALOR.rows)
       }
@@ -986,7 +986,7 @@ class EmpleadoControlador {
       data = {}
 
       /*
-      //TODO Revisar max codigo
+
       // Verificar que el código no se duplique en los registros
       codigo = codigo + 1;
       console.log('codigo_ver', codigo);
@@ -1215,7 +1215,6 @@ class EmpleadoControlador {
     console.log('datos automatico: ', plantilla);
     
     const VALOR = await pool.query('SELECT * FROM codigo');
-    //TODO Revisar max codigo
     var codigo_dato = VALOR.rows[0].valor;
     var codigo = 0;
     if(codigo_dato!= null && codigo_dato != undefined && codigo_dato != ''){
@@ -1461,8 +1460,6 @@ class EmpleadoControlador {
         } else {
           data.observacion = 'La cédula ingresada no es válida';
         }
-
-        //TODO Revisar max codigo
         // Verificar que el código no se duplique en los registros
         //codigo = codigo + 1;
         //console.log('codigo_ver', codigo);

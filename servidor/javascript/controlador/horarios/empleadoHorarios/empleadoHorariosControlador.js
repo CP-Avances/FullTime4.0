@@ -90,7 +90,6 @@ class EmpleadoHorariosControlador {
             }
         });
     }
-    //TODO Revisar tabla empl_horarios
     // METODO PARA BUSCAR HORARIOS DEL EMPLEADO EN DETERMINADA FECHA PROCESO EDICION
     VerificarHorariosExistentesEdicion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -112,7 +111,6 @@ class EmpleadoHorariosControlador {
             }
         });
     }
-    //TODO Revisar empl_horarios
     // METODO PARA CONSULTAR HORARIO DEL USUARIO POR DIAS Y NUMERO DE HORAS DE TRABAJO
     ObtenerHorarioDias(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

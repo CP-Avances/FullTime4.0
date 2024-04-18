@@ -50,7 +50,7 @@ export class ConfigurarCodigoComponent implements OnInit {
       }
       else {
         this.ActualizarManualCedula();
-      } 
+      }
     }, error => {
       if (this.automaticoF === true) {
         this.CrearAutomatico(form);
@@ -198,9 +198,7 @@ export class ConfigurarCodigoComponent implements OnInit {
     this.cedulaF = true;
   }
 
-  
 
-  //TODO obtener codigo max
   // METODO PARA BUSCAR EL ULTIMO CODIGO REGISTRADO EN EL SISTEMA
   valor_codigo: any;
   VerUltimoCodigo() {

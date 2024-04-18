@@ -35,7 +35,7 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
 
 export class ListaEmpleadosComponent implements OnInit {
 
-  // VARIABLES DE ALMACENAMIENTO DE DATOS 
+  // VARIABLES DE ALMACENAMIENTO DE DATOS
   nacionalidades: any = [];
   empleadoD: any = [];
   empleado: any = [];
@@ -102,14 +102,14 @@ export class ListaEmpleadosComponent implements OnInit {
     this.ObtenerLogo();
   }
 
-  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS. 
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelected() {
     const numSelected = this.selectionUno.selected.length;
     const numRows = this.empleado.length;
     return numSelected === numRows;
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTÁN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTÁN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
@@ -173,7 +173,7 @@ export class ListaEmpleadosComponent implements OnInit {
     return numSelected === numRows;
   }
 
-  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA. 
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterToggleDos() {
     this.isAllSelectedDos() ?
       this.selectionDos.clear() :
@@ -231,7 +231,7 @@ export class ListaEmpleadosComponent implements OnInit {
     }
   }
 
-  // METODO PARA VER LA INFORMACION DEL EMPLEADO 
+  // METODO PARA VER LA INFORMACION DEL EMPLEADO
   ObtenerEmpleados(idemploy: any) {
     this.empleadoD = [];
     this.rest.BuscarUnEmpleado(idemploy).subscribe(data => {
@@ -247,7 +247,7 @@ export class ListaEmpleadosComponent implements OnInit {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -300,7 +300,6 @@ export class ListaEmpleadosComponent implements OnInit {
     });
   }
 
-  //TODO ordenar Datos
   // ORDENAR LOS DATOS SEGUN EL  CODIGO
   OrdenarDatos(array: any) {
     function compare(a: any, b: any) {
@@ -927,7 +926,7 @@ export class ListaEmpleadosComponent implements OnInit {
     a.click();
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                 METODO PARA EXPORTAR A CSV                                   ** **
    ** ************************************************************************************************** **/
 

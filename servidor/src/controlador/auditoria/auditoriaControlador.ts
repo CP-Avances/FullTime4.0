@@ -17,6 +17,28 @@ class AuditoriaControlador {
         }
     }
 
+    // INSERTAR REGISTRO DE AUDITORIA
+    public async InsertarAuditoria(data: Auditoria) {
+        try {
+            const { tabla, usuario, accion, datosOriginales, datosNuevos, ip, observacion } = data;
+            await pool.query('INSERT INTO audit.auditoria (schema_name, table_name, user_name, action_tstamp, ' +
+                'action, original_data, new_data, ip, observacion) VALUES ($1, $2, $3, now(), $4, $5, $6, $7, $8)',
+                ['public', tabla, usuario, accion, datosOriginales, datosNuevos, ip, observacion]);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+}
+
+interface Auditoria {
+    tabla: string,
+    usuario: string,
+    accion: string,
+    datosOriginales: string,
+    datosNuevos: string,
+    ip: string,
+    observacion: string | null
 }
 
 export const AUDITORIA_CONTROLADOR = new AuditoriaControlador();

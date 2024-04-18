@@ -84,7 +84,7 @@ class EmpleadoHorariosControlador {
         }
     }
 
-    //TODO Revisar tabla empl_horarios
+   
     // METODO PARA BUSCAR HORARIOS DEL EMPLEADO EN DETERMINADA FECHA PROCESO EDICION
     public async VerificarHorariosExistentesEdicion(req: Request, res: Response): Promise<any> {
         const { fechaInicio, fechaFinal, id } = req.body;
@@ -107,7 +107,6 @@ class EmpleadoHorariosControlador {
         }
     }
 
-    //TODO Revisar empl_horarios
     // METODO PARA CONSULTAR HORARIO DEL USUARIO POR DIAS Y NUMERO DE HORAS DE TRABAJO
     public async ObtenerHorarioDias(req: Request, res: Response) {
         let { codigo, fecha_inicio, fecha_final } = req.body;

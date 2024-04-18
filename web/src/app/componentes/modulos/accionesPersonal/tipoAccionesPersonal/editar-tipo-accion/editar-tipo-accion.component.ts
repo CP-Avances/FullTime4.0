@@ -114,6 +114,7 @@ export class EditarTipoAccionComponent implements OnInit {
       })
     } else {
       this.rest.ActualizarDatos(datosAccion).subscribe(response => {
+        console.log(response);
         this.toastr.success('Operación exitosa.', 'Registro guardado.', {
           timeOut: 6000,
         })

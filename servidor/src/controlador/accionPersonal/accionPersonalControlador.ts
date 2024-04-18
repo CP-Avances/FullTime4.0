@@ -2,7 +2,7 @@ import { ImagenBase64LogosEmpresas } from '../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import pool from '../../database';
-import fs from 'fs';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 
 const builder = require('xmlbuilder');
 
@@ -20,43 +20,88 @@ class AccionPersonalControlador {
     }
 
     public async CrearTipoAccion(req: Request, res: Response) {
-        const { descripcion } = req.body;
+        try {
+            const { descripcion, user_name, ip } = req.body;
 
-        const response: QueryResult = await pool.query(
-            `
-            INSERT INTO tipo_accion (descripcion) VALUES($1) RETURNING *
-            `
-            , [descripcion]);
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+    
+            const response: QueryResult = await pool.query(
+                `
+                INSERT INTO tipo_accion (descripcion) VALUES($1) RETURNING *
+                `
+                , [descripcion]);
+    
+            const [datos] = response.rows;
+    
+            if (datos) {
+                // INSERTAR REGISTRO DE AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'tipo_accion',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{"descripcion": "${descripcion}"}`,
+                    ip,
+                    observacion: null
+                });
 
-        const [tipo] = response.rows;
-
-        if (tipo) {
-            return res.status(200).jsonp(tipo)
-        }
-        else {
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(200).jsonp(datos)
+            }
+            else {
+                await pool.query('ROLLBACK');
+                return res.status(404).jsonp({ message: 'error' })
+            }
+        } catch (error) {
+            await pool.query('ROLLBACK');
             return res.status(404).jsonp({ message: 'error' })
         }
     }
 
 
-    public async CrearTipoAccionPersonal(req: Request, res: Response) {
+    public async CrearTipoAccionPersonal(req: Request, res: Response): Promise<Response>{
 
-        const { id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion,
-            tipo_situacion_propuesta } = req.body;
+        try {
+            const { id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion,
+                tipo_situacion_propuesta, user_name, ip } = req.body;
 
-        const response: QueryResult = await pool.query(
-            `
-            INSERT INTO tipo_accion_personal (id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, 
-                tipo_situacion_propuesta) VALUES($1, $2, $3, $4, $5, $6) RETURNING*
-            `
-            , [id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta]);
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+    
+            const response: QueryResult = await pool.query(
+                `
+                INSERT INTO tipo_accion_personal (id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, 
+                    tipo_situacion_propuesta) VALUES($1, $2, $3, $4, $5, $6) RETURNING*
+                `
+                , [id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta]);
+    
+            const [datos] = response.rows;
+    
+            if (datos) {
+                // INSERTAR REGISTRO DE AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'tipo_accion_personal',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{"id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}", 
+                        "tipo_permiso": "${tipo_permiso}", "tipo_vacacion": "${tipo_vacacion}", "tipo_situacion_propuesta": "${tipo_situacion_propuesta}"}`,
+                    ip,
+                    observacion: null
+                });
 
-        const [tipo] = response.rows;
-
-        if (tipo) {
-            return res.status(200).jsonp(tipo)
-        }
-        else {
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(200).jsonp(datos)
+            }
+            else {
+                await pool.query('ROLLBACK');
+                return res.status(404).jsonp({ message: 'error' })
+            }
+        } catch (error) {
+            await pool.query('ROLLBACK');
             return res.status(404).jsonp({ message: 'error' })
         }
     }
@@ -83,11 +128,35 @@ class AccionPersonalControlador {
         }
     }
 
-    public async CrearCargoPropuesto(req: Request, res: Response): Promise<void> {
-        const { descripcion } = req.body;
-        await pool.query('INSERT INTO cargo_propuesto (descripcion) VALUES($1)',
-            [descripcion]);
-        res.jsonp({ message: 'Registro guardado' });
+    public async CrearCargoPropuesto(req: Request, res: Response): Promise<Response> {
+        try {
+            const { descripcion, user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            
+            await pool.query('INSERT INTO cargo_propuesto (descripcion) VALUES($1)',
+                [descripcion]);
+            
+            // INSERTAR REGISTRO DE AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'cargo_propuesto',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: `{"descripcion": "${descripcion}"}`,
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            return res.jsonp({ message: 'Registro guardado' });
+        } catch (error) {
+            await pool.query('ROLLBACK');
+            return res.status(404).jsonp({ message: 'error' });
+        }
     }
 
     public async EncontrarUltimoCargoP(req: Request, res: Response) {
@@ -122,11 +191,34 @@ class AccionPersonalControlador {
         }
     }
 
-    public async CrearDecreto(req: Request, res: Response): Promise<void> {
-        const { descripcion } = req.body;
-        await pool.query('INSERT INTO decreto_acuerdo_resol (descripcion) VALUES($1)',
-            [descripcion]);
-        res.jsonp({ message: 'Registro guardado' });
+    public async CrearDecreto(req: Request, res: Response): Promise<Response> {
+        try {
+            const { descripcion, user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            await pool.query('INSERT INTO decreto_acuerdo_resol (descripcion) VALUES($1)',
+                [descripcion]);
+            
+            // INSERTAR REGISTRO DE AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'decreto_acuerdo_resol',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: `{"descripcion": "${descripcion}"}`,
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.jsonp({ message: 'Registro guardado' });
+        } catch (error) {
+            await pool.query('ROLLBACK'); 
+            return res.status(404).jsonp({ message: 'error' });
+        }
     }
 
     public async EncontrarUltimoDecreto(req: Request, res: Response) {
@@ -190,68 +282,241 @@ class AccionPersonalControlador {
         }
     }
 
-    public async ActualizarTipoAccionPersonal(req: Request, res: Response): Promise<void> {
-        const { id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta, id } = req.body;
-        await pool.query('UPDATE tipo_accion_personal SET id_tipo = $1, descripcion = $2, base_legal = $3, ' +
-            'tipo_permiso = $4, tipo_vacacion = $5, tipo_situacion_propuesta = $6 WHERE id = $7',
-            [id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta, id]);
-        res.jsonp({ message: 'Registro exitoso' });
+    public async ActualizarTipoAccionPersonal(req: Request, res: Response): Promise<Response> {
+        try {
+            const { id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta, id, user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTAR DATOS ANTES DE ACTUALIZAR PARA PODER REALIZAR EL REGISTRO EN AUDITORIA EN EL CAMPO DE DATOS ORIGINALES
+            const response = await pool.query('SELECT * FROM tipo_accion_personal WHERE id = $1', [id]);
+            const [datos] = response.rows;
+
+           if (!datos) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'tipo_accion_personal',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al actualizar el registro con id: ${id}`
+                });
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'error' });     
+            } 
+
+            await pool.query('UPDATE tipo_accion_personal SET id_tipo = $1, descripcion = $2, base_legal = $3, ' +
+                    'tipo_permiso = $4, tipo_vacacion = $5, tipo_situacion_propuesta = $6 WHERE id = $7',
+                    [id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta, id]);
+                
+            // INSERTAR REGISTRO DE AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'tipo_accion_personal',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: JSON.stringify(datos),
+                datosNuevos: `{"id_tipo": "${id_tipo}", "descripcion": "${descripcion}", "base_legal": "${base_legal}", 
+                    "tipo_permiso": "${tipo_permiso}", "tipo_vacacion": "${tipo_vacacion}", "tipo_situacion_propuesta": "${tipo_situacion_propuesta}"}`,
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.status(200).jsonp({ message: 'Registro actualizado' });
+        } catch (error) {
+            await pool.query('ROLLBACK');
+            return res.status(404).jsonp({ message: 'error' });
+        }
     }
 
-    public async EliminarTipoAccionPersonal(req: Request, res: Response): Promise<void> {
-        const id = req.params.id;
-        await pool.query('DELETE FROM tipo_accion_personal WHERE id = $1', [id]);
-        res.jsonp({ message: 'Registro eliminado.' });
+    public async EliminarTipoAccionPersonal(req: Request, res: Response): Promise<Response> {
+        try {
+            const id  = req.params.id;
+            const { user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTAR DATOS ANTES DE ELIMINAR PARA PODER REALIZAR EL REGISTRO EN AUDITORIA
+            const response = await pool.query('SELECT * FROM tipo_accion_personal WHERE id = $1', [id]);
+            const [datos] = response.rows;  
+
+            if (!datos) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'tipo_accion_personal',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al eliminar el registro con id: ${id}`
+                });
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'error' });         
+            } 
+
+            await pool.query('DELETE FROM tipo_accion_personal WHERE id = $1', [id]);
+
+            // INSERTAR REGISTRO DE AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'tipo_accion_personal',
+                usuario: user_name,
+                accion: 'D',
+                datosOriginales: JSON.stringify(datos),
+                datosNuevos: '',
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.status(200).jsonp({ message: 'Registro eliminado' });
+        } catch (error) {
+            await pool.query('ROLLBACK');
+            return res.status(404).jsonp({ message: 'error' });
+            
+        }
     }
 
     /** TABLA ACCION_PERSONAL_EMPLEADO */
 
-    public async CrearPedidoAccionPersonal(req: Request, res: Response): Promise<void> {
-        const { id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida,
-            decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal,
-            tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta,
-            salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso,
-            fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp,
-            primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti } = req.body;
-        await pool.query('INSERT INTO accion_personal_empleado (id_empleado, fec_creacion, fec_rige_desde, ' +
-            'fec_rige_hasta, identi_accion_p, num_partida, decre_acue_resol, abrev_empl_uno, firma_empl_uno, ' +
-            'abrev_empl_dos, firma_empl_dos, adicion_legal, tipo_accion, cargo_propuesto, ' +
-            'proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad, id_empl_responsable, ' +
-            'num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp, puesto_reemp, ' +
-            'funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti) ' +
-            'VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, ' +
-            '$20, $21, $22, $23, $24, $25, $26, $27, $28, $29)',
-            [id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida,
-                decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal,
-                tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta,
-                salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso,
-                nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti]);
-        res.jsonp({ message: 'Registro realizado con éxito' });
-    }
-
-    public async ActualizarPedidoAccionPersonal(req: Request, res: Response): Promise<void> {
-        const { id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida,
-            decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal,
-            tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta,
-            salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso,
-            fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp,
-            primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, id } = req.body;
-        await pool.query('UPDATE accion_personal_empleado SET id_empleado = $1, fec_creacion = $2, ' +
-            'fec_rige_desde = $3, fec_rige_hasta = $4, identi_accion_p = $5, num_partida = $6, ' +
-            'decre_acue_resol = $7, abrev_empl_uno = $8, firma_empl_uno = $9, abrev_empl_dos = $10, ' +
-            'firma_empl_dos = $11, adicion_legal = $12, tipo_accion = $13, ' +
-            'cargo_propuesto = $14, proceso_propuesto = $15, num_partida_propuesta = $16, ' +
-            'salario_propuesto = $17, id_ciudad = $18, id_empl_responsable = $19, num_partida_individual = $20,' +
-            'act_final_concurso = $21, fec_act_final_concurso = $22, nombre_reemp = $23, puesto_reemp = $24, ' +
-            'funciones_reemp = $25, num_accion_reemp = $26, primera_fecha_reemp = $27, posesion_notificacion = $28, ' +
-            'descripcion_pose_noti = $29 WHERE id = $30',
-            [id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida,
+    public async CrearPedidoAccionPersonal(req: Request, res: Response): Promise<Response> {
+        try {
+            const { id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida,
                 decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal,
                 tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta,
                 salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso,
                 fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp,
-                primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, id]);
-        res.jsonp({ message: 'Registro realizado con éxito' });
+                primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, user_name, ip } = req.body;
+            
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            await pool.query('INSERT INTO accion_personal_empleado (id_empleado, fec_creacion, fec_rige_desde, ' +
+                'fec_rige_hasta, identi_accion_p, num_partida, decre_acue_resol, abrev_empl_uno, firma_empl_uno, ' +
+                'abrev_empl_dos, firma_empl_dos, adicion_legal, tipo_accion, cargo_propuesto, ' +
+                'proceso_propuesto, num_partida_propuesta, salario_propuesto, id_ciudad, id_empl_responsable, ' +
+                'num_partida_individual, act_final_concurso, fec_act_final_concurso, nombre_reemp, puesto_reemp, ' +
+                'funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti) ' +
+                'VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, ' +
+                '$20, $21, $22, $23, $24, $25, $26, $27, $28, $29)',
+                [id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida,
+                    decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal,
+                    tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta,
+                    salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso, fec_act_final_concurso,
+                    nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp, primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti]);
+            
+            // INSERTAR REGISTRO DE AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'accion_personal_empleado',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: `{"id_empleado": "${id_empleado}", "fec_creacion": "${fec_creacion}", "fec_rige_desde": "${fec_rige_desde}", 
+                    "fec_rige_hasta": "${fec_rige_hasta}", "identi_accion_p": "${identi_accion_p}", "num_partida": "${num_partida}", 
+                    "decre_acue_resol": "${decre_acue_resol}", "abrev_empl_uno": "${abrev_empl_uno}", "firma_empl_uno": "${firma_empl_uno}", 
+                    "abrev_empl_dos": "${abrev_empl_dos}", "firma_empl_dos": "${firma_empl_dos}", "adicion_legal": "${adicion_legal}", 
+                    "tipo_accion": "${tipo_accion}", "cargo_propuesto": "${cargo_propuesto}", "proceso_propuesto": "${proceso_propuesto}", 
+                    "num_partida_propuesta": "${num_partida_propuesta}", "salario_propuesto": "${salario_propuesto}", "id_ciudad": "${id_ciudad}", 
+                    "id_empl_responsable": "${id_empl_responsable}", "num_partida_individual": "${num_partida_individual}", 
+                    "act_final_concurso": "${act_final_concurso}", "fec_act_final_concurso": "${fec_act_final_concurso}", 
+                    "nombre_reemp": "${nombre_reemp}", "puesto_reemp": "${puesto_reemp}", "funciones_reemp": "${funciones_reemp}", 
+                    "num_accion_reemp": "${num_accion_reemp}", "primera_fecha_reemp": "${primera_fecha_reemp}", 
+                    "posesion_notificacion": "${posesion_notificacion}", "descripcion_pose_noti": "${descripcion_pose_noti}"}`,
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.jsonp({ message: 'Registro realizado con éxito' });
+        } catch (error) {
+            await pool.query('ROLLBACK');
+            return res.status(404).jsonp({ message: 'error' }); 
+        }
+    }
+
+    public async ActualizarPedidoAccionPersonal(req: Request, res: Response): Promise<Response> {
+        try {
+            const { id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida,
+                decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal,
+                tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta,
+                salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso,
+                fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp,
+                primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, id, user_name, ip } = req.body;
+            
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTAR DATOS ANTES DE ACTUALIZAR PARA PODER REALIZAR EL REGISTRO EN AUDITORIA
+            const response = await pool.query('SELECT * FROM accion_personal_empleado WHERE id = $1', [id]);
+            const [datos] = response.rows;
+
+            if (!datos) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'accion_personal_empleado',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al actualizar el registro con id: ${id}`
+                });
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'error' });
+            }
+    
+            await pool.query('UPDATE accion_personal_empleado SET id_empleado = $1, fec_creacion = $2, ' +
+                'fec_rige_desde = $3, fec_rige_hasta = $4, identi_accion_p = $5, num_partida = $6, ' +
+                'decre_acue_resol = $7, abrev_empl_uno = $8, firma_empl_uno = $9, abrev_empl_dos = $10, ' +
+                'firma_empl_dos = $11, adicion_legal = $12, tipo_accion = $13, ' +
+                'cargo_propuesto = $14, proceso_propuesto = $15, num_partida_propuesta = $16, ' +
+                'salario_propuesto = $17, id_ciudad = $18, id_empl_responsable = $19, num_partida_individual = $20,' +
+                'act_final_concurso = $21, fec_act_final_concurso = $22, nombre_reemp = $23, puesto_reemp = $24, ' +
+                'funciones_reemp = $25, num_accion_reemp = $26, primera_fecha_reemp = $27, posesion_notificacion = $28, ' +
+                'descripcion_pose_noti = $29 WHERE id = $30',
+                [id_empleado, fec_creacion, fec_rige_desde, fec_rige_hasta, identi_accion_p, num_partida,
+                    decre_acue_resol, abrev_empl_uno, firma_empl_uno, abrev_empl_dos, firma_empl_dos, adicion_legal,
+                    tipo_accion, cargo_propuesto, proceso_propuesto, num_partida_propuesta,
+                    salario_propuesto, id_ciudad, id_empl_responsable, num_partida_individual, act_final_concurso,
+                    fec_act_final_concurso, nombre_reemp, puesto_reemp, funciones_reemp, num_accion_reemp,
+                    primera_fecha_reemp, posesion_notificacion, descripcion_pose_noti, id]);
+
+            // INSERTAR REGISTRO DE AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'accion_personal_empleado',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: JSON.stringify(datos),
+                datosNuevos: `{"id_empleado": "${id_empleado}", "fec_creacion": "${fec_creacion}", "fec_rige_desde": "${fec_rige_desde}", 
+                    "fec_rige_hasta": "${fec_rige_hasta}", "identi_accion_p": "${identi_accion_p}", "num_partida": "${num_partida}", 
+                    "decre_acue_resol": "${decre_acue_resol}", "abrev_empl_uno": "${abrev_empl_uno}", "firma_empl_uno": "${firma_empl_uno}", 
+                    "abrev_empl_dos": "${abrev_empl_dos}", "firma_empl_dos": "${firma_empl_dos}", "adicion_legal": "${adicion_legal}", 
+                    "tipo_accion": "${tipo_accion}", "cargo_propuesto": "${cargo_propuesto}", "proceso_propuesto": "${proceso_propuesto}", 
+                    "num_partida_propuesta": "${num_partida_propuesta}", "salario_propuesto": "${salario_propuesto}", "id_ciudad": "${id_ciudad}", 
+                    "id_empl_responsable": "${id_empl_responsable}", "num_partida_individual": "${num_partida_individual}", 
+                    "act_final_concurso": "${act_final_concurso}", "fec_act_final_concurso": "${fec_act_final_concurso}", 
+                    "nombre_reemp": "${nombre_reemp}", "puesto_reemp": "${puesto_reemp}", "funciones_reemp": "${funciones_reemp}", 
+                    "num_accion_reemp": "${num_accion_reemp}", "primera_fecha_reemp": "${primera_fecha_reemp}", 
+                    "posesion_notificacion": "${posesion_notificacion}", "descripcion_pose_noti": "${descripcion_pose_noti}"}`,
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.jsonp({ message: 'Registro actualizado' });
+        } catch (error) {
+            await pool.query('ROLLBACK');
+            return res.status(404).jsonp({ message: 'error' });
+            
+        }
     }
 
     public async verLogoMinisterio(req: Request, res: Response): Promise<any> {

@@ -162,7 +162,6 @@ class TimbresControlador {
                     });
                 }
                 let timbresRows = 0;
-                //TODO merge
                 let timbres = yield database_1.default.query(`
                 SELECT (da.nombre || ' ' || da.apellido) AS empleado, CAST(t.fec_hora_timbre AS VARCHAR), t.accion, 
                     t.tecl_funcion, t.observacion, t.latitud, t.longitud, t.codigo, t.id_reloj, ubicacion, 
