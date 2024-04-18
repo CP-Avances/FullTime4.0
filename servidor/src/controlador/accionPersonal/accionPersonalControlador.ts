@@ -289,7 +289,7 @@ class AccionPersonalControlador {
             // INICIAR TRANSACCION
             await pool.query('BEGIN');
 
-            // CONSULTAR DATOS ANTES DE ACTUALIZAR PARA PODER REALIZAR EL REGISTRO EN AUDITORIA EN EL CAMPO DE DATOS ORIGINALES
+            // CONSULTAR DATOS ANTES DE ACTUALIZAR PARA PODER REALIZAR EL REGISTRO EN AUDITORIA
             const response = await pool.query('SELECT * FROM tipo_accion_personal WHERE id = $1', [id]);
             const [datos] = response.rows;
 

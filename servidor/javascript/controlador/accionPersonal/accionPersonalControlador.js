@@ -285,7 +285,7 @@ class AccionPersonalControlador {
                 const { id_tipo, descripcion, base_legal, tipo_permiso, tipo_vacacion, tipo_situacion_propuesta, id, user_name, ip } = req.body;
                 // INICIAR TRANSACCION
                 yield database_1.default.query('BEGIN');
-                // CONSULTAR DATOS ANTES DE ACTUALIZAR PARA PODER REALIZAR EL REGISTRO EN AUDITORIA EN EL CAMPO DE DATOS ORIGINALES
+                // CONSULTAR DATOS ANTES DE ACTUALIZAR PARA PODER REALIZAR EL REGISTRO EN AUDITORIA
                 const response = yield database_1.default.query('SELECT * FROM tipo_accion_personal WHERE id = $1', [id]);
                 const [datos] = response.rows;
                 if (!datos) {
