@@ -27,8 +27,8 @@ export class AuthGuard implements CanActivate {
         return true;
       }
 
-      if (route.data['roles'] === 4) {
-        if (this.loginService.getRol() === 1 || this.loginService.getRol() === 3) {
+      if (route.data['roles'] === 'otros') {
+        if (this.loginService.getRol() !=2) {
           //console.log('ingresa 5 ')
           //console.log('ver roles == roles --> ', this.loginService.getRol(), ' route  --> ', route.data['roles'])
           return true;
@@ -45,7 +45,7 @@ export class AuthGuard implements CanActivate {
         //console.log('ingresa 4 ')
         //console.log('ver roles !=', this.loginService.getRol())
 
-        if (this.loginService.getRol() === 1 || this.loginService.getRol() === 3) {
+        if (this.loginService.getRol() != 2) {
           //console.log('ingresa 4.1 ')
           //console.log('ver roles =1', this.loginService.getRol())
           this.router.navigate(['/home'], { relativeTo: this.active_route, skipLocationChange: false });

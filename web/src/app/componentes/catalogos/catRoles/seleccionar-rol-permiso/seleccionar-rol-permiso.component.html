@@ -1,6 +1,81 @@
+<br>
+
+<div class="mat-elevation-z8" style="background: white;">
+    <div class="d-flex bd-highlight" id="resultados">
+
+        <button  class="btn btn-outline-light btn-sm" [routerLink]="['/roles/']"
+            style="float: right; margin-right: 10px;">Atras</button>
+        <span class="w-100 bd-highlight">
+            FUNCIONES QUE TIENE EL ROL {{nombreRol}}        </span>
+        <button (click)="ConfirmarDelete()" class="btn btn-outline-light btn-sm"
+            style="float: right; margin-right: 10px;">Eliminar</button>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover table-sm">
+            <thead class="thead-light">
+                <tr style="text-align: left;">
+                    <th>
+                        <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
+                            matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
+                            id="SelectCheck" (click)="HabilitarSeleccion()">
+                            library_add_check
+                        </mat-icon>
+                        <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
+                            [checked]="selectionPaginas.hasValue() && isAllSelectedPag()"
+                            [indeterminate]="selectionPaginas.hasValue() && !isAllSelectedPag()"
+                            [aria-label]="checkboxLabelPag()">
+                        </mat-checkbox>
+
+
+
+                    </th>
+                    <th scope="col">Funciones</th>
+                    <th scope="col">Acciones</th>
+
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td></td>
+
+                    <td>
+                        <mat-form-field class="input-tables funcion" style="float: left;">
+                            <input matInput placeholder="Buscar" [(ngModel)]="filtrofuncion" [formControl]="funcion"
+                                type="text"   (keypress)="IngresarSoloLetras($event)">
+                        </mat-form-field>
+                    </td>
+                    <td></td>
+
+                </tr>
+
+                <tr *ngFor="let p of paginas | roles: filtrofuncion | paginate:tamanio_pagina:numero_pagina "
+                    style="text-align: left;">
+                    <td>
+                        <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                            (change)="$event ? selectionPaginas.toggle(p) : null"
+                            [checked]="selectionPaginas.isSelected(p)" [aria-label]="checkboxLabelPag(p)">
+                        </mat-checkbox>
+                    </td>
+                    <td style="text-align: left;">{{p.funcion}}</td>
+                    <td style="text-align: left;">{{MetodoParaMostrarAccion(p.id_accion)}}</td>
+
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <mat-paginator id="pagina" [length]="paginas.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
+        (page)="ManejarPagina($event)" showFirstLastButtons>
+    </mat-paginator>
+    <br>
+</div>
+
+<br>
+
+
 <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
     <div id="titulo">
-        <span>FUNCIONES QUE TENDRÁ EL ROL {{nombreRol}}</span>
+        <span>FUNCIONES DEL SISTEMA</span>
     </div>
     <mat-card class="example-card mat-elevation-z8">
         <!-- Formulario Completo -->
@@ -109,75 +184,4 @@
             </div>
         </mat-card-actions>
     </mat-card>
-</div>
-<br>
-<!---->
-
-<!-- TABLA PARA EMPLEADOS -->
-<div class="mat-elevation-z8" style="background: white;">
-    <div class="d-flex bd-highlight" id="resultados">
-        <span class="w-100 bd-highlight">
-            PAGINAS DE ACCESO
-        </span>
-        <button (click)="ConfirmarDelete()" class="btn btn-outline-light btn-sm"
-            style="float: right; margin-right: 10px;">Eliminar</button>
-    </div>
-    <div class="table-responsive">
-        <table class="table table-hover table-sm">
-            <thead class="thead-light">
-                <tr style="text-align: left;">
-                    <th>
-                        <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
-                            matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
-                            id="SelectCheck" (click)="HabilitarSeleccion()">
-                            library_add_check
-                        </mat-icon>
-                        <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
-                            [checked]="selectionPaginas.hasValue() && isAllSelectedPag()"
-                            [indeterminate]="selectionPaginas.hasValue() && !isAllSelectedPag()"
-                            [aria-label]="checkboxLabelPag()">
-                        </mat-checkbox>
-
-
-
-                    </th>
-                    <th scope="col">Funciones</th>
-                    <th scope="col">Acciones</th>
-
-                </tr>
-            </thead>
-            <tbody>
-
-                <tr>
-                    <td></td>
-
-                    <td>
-                        <mat-form-field class="input-tables funcion">
-                            <input matInput placeholder="Buscar" [(ngModel)]="filtrofuncion" [formControl]="funcion"
-                                type="text" (keypress)="IngresarSoloLetras($event)">
-                        </mat-form-field>
-                    </td>
-                    <td></td>
-
-                </tr>
-
-                <tr *ngFor="let p of paginas | roles: filtrofuncion | paginate:tamanio_pagina:numero_pagina "
-                 style="text-align: left;">
-                    <td>
-                        <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
-                            (change)="$event ? selectionPaginas.toggle(p) : null"
-                            [checked]="selectionPaginas.isSelected(p)" [aria-label]="checkboxLabelPag(p)">
-                        </mat-checkbox>
-                    </td>
-                    <td style="text-align: left;">{{p.funcion}}</td>
-                    <td style="text-align: left;">{{MetodoParaMostrarAccion(p.id_accion)}}</td>
-
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <mat-paginator id="pagina" [length]="paginas.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
-        (page)="ManejarPagina($event)" showFirstLastButtons>
-    </mat-paginator>
-    <br>
 </div>
