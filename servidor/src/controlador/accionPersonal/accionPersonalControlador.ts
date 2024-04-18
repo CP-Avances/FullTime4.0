@@ -613,7 +613,7 @@ class AccionPersonalControlador {
     }
 
 }
- 
+
 export const ACCION_PERSONAL_CONTROLADOR = new AccionPersonalControlador();
 
 export default ACCION_PERSONAL_CONTROLADOR;
