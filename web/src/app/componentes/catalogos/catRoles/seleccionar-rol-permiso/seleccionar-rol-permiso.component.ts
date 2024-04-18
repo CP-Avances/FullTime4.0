@@ -740,13 +740,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
     this.paginasEliminar = this.selectionPaginas.selected;
     this.paginasEliminar.forEach((datos: any) => {
-      //console.log("Paginas eliminadas", datos.id_rol);
-      //console.log("Paginas eliminadas", datos.funcion);
-
-
-
-      //if (datos.id_accion==null) {
-
+     
         this.paginas = this.paginas.filter(item => item.id !== datos.id);
 
         var buscarPagina = {
@@ -761,27 +755,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
             });
           }
         )
-
-/*
-      } else {
-
-        this.paginas = this.paginas.filter(item => item.id !== datos.id);
-
-        var buscarPagina1 = {
-          id: datos.id
-         
-        };
-        this.rest.EliminarPaginasRol(buscarPagina1).subscribe(
-
-          res => {
-            this.toastr.error('Registro eliminado.', '', {
-              timeOut: 6000,
-            });
-          }
-        )
-      }
-*/
-
     }
   )
 

@@ -457,3 +457,30 @@ export interface ITableFuncionesRoles {
     funcion: string,
     
 }
+
+//CREAR AQUI LAS NUEVAS INTERFACES
+
+//SUCURSALES
+
+export interface ITableSucursales {
+    nombre: string,
+    
+}
+
+
+export interface ITableDepartamentos {
+    nombre: string,
+    
+}
+
+
+export interface ITableRegimen {
+    nombre: string,
+    
+}
+
+
+export interface ITableProvincias {
+    nombre: string,
+    
+}

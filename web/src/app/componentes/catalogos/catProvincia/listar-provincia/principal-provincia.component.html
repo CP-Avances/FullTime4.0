@@ -6,10 +6,10 @@
             </div>
             <mat-card class="example-card mat-elevation-z8">
                 <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                    <button id="btn-raised"  class="btn btn-sm" (click)="AbrirVentanaRegistrarProvincia()">
+                    <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarProvincia()">
                         Crear provincia
                     </button>
-                    <button id="btn-raised"  class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
+                    <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
                         matTooltipPosition="right"
                         matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
                         Mostrar lista
@@ -26,6 +26,23 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
+
+                        <th>
+                            <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
+                                matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
+                                id="SelectCheck" (click)="HabilitarSeleccion()">
+                                library_add_check
+                            </mat-icon>
+                            <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
+                                [checked]="selectionProvincias.hasValue() && isAllSelectedPag()"
+                                [indeterminate]="selectionProvincias.hasValue() && !isAllSelectedPag()"
+                                [aria-label]="checkboxLabelPag()">
+                            </mat-checkbox>
+
+
+
+                        </th>
+
                         <th scope="col">País</th>
                         <th scope="col">Provincia-Departamento-Estado</th>
                         <th scope="col">Acción</th>
@@ -53,6 +70,13 @@
                     </tr>
                     <tr
                         *ngFor="let prov of provincias | provincia: filtroProvincia | bPaises: filtroPais | paginate:tamanio_pagina:numero_pagina">
+
+                        <td>
+                            <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionProvincias.toggle(prov) : null"
+                                [checked]="selectionProvincias.isSelected(prov)" [aria-label]="checkboxLabelPag(prov)">
+                            </mat-checkbox>
+                        </td>
                         <td>{{prov.pais}}</td>
                         <td>{{prov.nombre}}</td>
                         <td class="d-flex justify-content-center">
