@@ -14,6 +14,7 @@ import { filter, timeout } from 'rxjs';
 import { number } from 'echarts';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 
 
 
@@ -38,12 +39,20 @@ interface Etiquetas {
 })
 export class SeleccionarRolPermisoComponent implements OnInit {
 
-  funcion = new FormControl('', Validators.required);
+  funcion = new FormControl('', [Validators.minLength(2)]);
+
+
+
+  //filtros
+  filtrofuncion: '';
+
+
+  funcion1 = new FormControl('', Validators.required);
   link = new FormControl('', Validators.required);
   etiqueta = new FormControl('', Validators.required);
 
   public nuevoRolPermisoForm = new FormGroup({
-    funcionForm: this.funcion,
+    funcionForm: this.funcion1,
     linkForm: this.link,
     etiquetaForm: this.etiqueta
   });
@@ -112,6 +121,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     private toastr: ToastrService,
     private rol: RolesService,
     private router: Router,
+    private validar: ValidacionesService,
 
     public ventana: MatDialog,
 
@@ -171,7 +181,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   }
 
   obtenerMensajeErrorFuncion() {
-    if (this.funcion.hasError('required')) {
+    if (this.funcion1.hasError('required')) {
       return 'Debe ingresar alguna Función';
     }
   }
@@ -534,7 +544,9 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                   delete this.nombresAccionesPorPagina[obj.id];
                   delete this.accionesSeleccionadasPorPagina[obj.id];
                   this.paginasSeleccionadas = [];
-                  this.rest.BuscarPaginasRol(buscarPagina).subscribe(datos => {
+
+
+                  this.rest.BuscarPaginasRol(rol).subscribe(datos => {
                     this.paginas = datos;
                   })
 
@@ -584,7 +596,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
             delete this.nombresAccionesPorPagina[obj.id];
             delete this.accionesSeleccionadasPorPagina[obj.id];
             this.paginasSeleccionadas = [];
-            this.rest.BuscarPaginasRol(buscarPagina).subscribe(datos => {
+            this.rest.BuscarPaginasRol(rol).subscribe(datos => {
               this.paginas = datos;
             })
 
@@ -621,13 +633,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
 
 
-              /*
-              setTimeout(() => {
-                window.location.reload();
-              }, 2000);
-*/
-              //   (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
-
+            
 
               //this.VerMensaje();
             }, error => {
@@ -644,7 +650,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
         }
 
-        //this.accionesSeleccionadasPorPagina[obj.id] = [];
 
       }
 
@@ -656,9 +661,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
         id_rol: this.idRol
       };
 
-      this.rest.BuscarPaginasRol(rol).subscribe(datos => {
-        this.paginas = datos;
-      })
+      
     }
     else {
       this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
@@ -737,21 +740,20 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
     this.paginasEliminar = this.selectionPaginas.selected;
     this.paginasEliminar.forEach((datos: any) => {
-      console.log("Paginas eliminadas", this.paginasEliminar);
-      console.log("Paginas eliminadas", datos.id_rol);
-      console.log("Paginas eliminadas", datos.funcion);
+      //console.log("Paginas eliminadas", datos.id_rol);
+      //console.log("Paginas eliminadas", datos.funcion);
 
 
 
-      if (datos.id_accion==null) {
+      //if (datos.id_accion==null) {
 
         this.paginas = this.paginas.filter(item => item.id !== datos.id);
 
         var buscarPagina = {
-          funcion: datos.funcion,
-          id_rol: datos.id_rol
+          id: datos.id
+
         };
-        this.rest.EliminarPaginasRolSinAccion(buscarPagina).subscribe(
+        this.rest.EliminarPaginasRol(buscarPagina).subscribe(
 
           res => {
             this.toastr.error('Registro eliminado.', '', {
@@ -760,15 +762,14 @@ export class SeleccionarRolPermisoComponent implements OnInit {
           }
         )
 
-
+/*
       } else {
 
         this.paginas = this.paginas.filter(item => item.id !== datos.id);
 
         var buscarPagina1 = {
-          funcion: datos.funcion,
-          id_rol: datos.id_rol,
-          id_accion: datos.id_accion
+          id: datos.id
+         
         };
         this.rest.EliminarPaginasRol(buscarPagina1).subscribe(
 
@@ -779,9 +780,13 @@ export class SeleccionarRolPermisoComponent implements OnInit {
           }
         )
       }
+*/
 
+    }
+  )
 
-    })
+    console.log("Paginas eliminadas", this.paginasEliminar);
+
   }
 
 
@@ -900,9 +905,12 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     } else {
       return null;
     }
+  }
 
 
-
+   // METODO PARA VALIDAR INGRESO DE LETRAS
+   IngresarSoloLetras(e: any) {
+    return this.validar.IngresarSoloLetras(e);
   }
 
 

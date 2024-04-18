@@ -147,7 +147,21 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let p of paginas | paginate:tamanio_pagina:numero_pagina "
+
+                <tr>
+                    <td></td>
+
+                    <td>
+                        <mat-form-field class="input-tables funcion">
+                            <input matInput placeholder="Buscar" [(ngModel)]="filtrofuncion" [formControl]="funcion"
+                                type="text" (keypress)="IngresarSoloLetras($event)">
+                        </mat-form-field>
+                    </td>
+                    <td></td>
+
+                </tr>
+
+                <tr *ngFor="let p of paginas | roles: filtrofuncion | paginate:tamanio_pagina:numero_pagina "
                  style="text-align: left;">
                     <td>
                         <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"

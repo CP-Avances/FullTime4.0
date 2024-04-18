@@ -142,23 +142,21 @@ class RolPermisosControlador {
     // METODO PARA ELIMINAR REGISTRO
     EliminarPaginaRol(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { funcion, id_rol, id_accion } = req.body;
-            console.log(funcion);
-            console.log(id_rol);
+            const { id } = req.body;
+            //console.log(funcion);
+            //console.log(id_rol);
             yield database_1.default.query(`
-        DELETE FROM cg_rol_permisos WHERE funcion = $1 AND id_rol = $2 AND id_accion = $3
-        `, [funcion, id_rol, id_accion]);
+        DELETE FROM cg_rol_permisos WHERE id = $1
+        `, [id]);
             res.jsonp({ message: 'Registro eliminado.' });
         });
     }
     EliminarPaginaRolSinAccion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { funcion, id_rol } = req.body;
-            console.log(funcion);
-            console.log(id_rol);
+            const { id } = req.body;
             yield database_1.default.query(`
-        DELETE FROM cg_rol_permisos WHERE funcion = $1 AND id_rol = $2
-        `, [funcion, id_rol]);
+        DELETE FROM cg_rol_permisos WHERE id = $1 
+        `, [id]);
             res.jsonp({ message: 'Registro eliminado.' });
         });
     }

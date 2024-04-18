@@ -135,30 +135,29 @@ class RolPermisosControlador {
   // METODO PARA ELIMINAR REGISTRO
   public async EliminarPaginaRol(req: Request, res: Response): Promise<void> {
 
-    const { funcion, id_rol, id_accion } = req.body
+    const { id } = req.body
 
-    console.log(funcion);
-    console.log(id_rol);
+    //console.log(funcion);
+    //console.log(id_rol);
     await pool.query(
       `
-        DELETE FROM cg_rol_permisos WHERE funcion = $1 AND id_rol = $2 AND id_accion = $3
+        DELETE FROM cg_rol_permisos WHERE id = $1
         `
-      , [funcion, id_rol, id_accion]);
+      , [id]);
     res.jsonp({ message: 'Registro eliminado.' });
   }
 
 
   public async EliminarPaginaRolSinAccion(req: Request, res: Response): Promise<void> {
 
-    const { funcion, id_rol } = req.body
+    const { id } = req.body
 
-    console.log(funcion);
-    console.log(id_rol);
+    
     await pool.query(
       `
-        DELETE FROM cg_rol_permisos WHERE funcion = $1 AND id_rol = $2
+        DELETE FROM cg_rol_permisos WHERE id = $1 
         `
-      , [funcion, id_rol]);
+      , [id]);
     res.jsonp({ message: 'Registro eliminado.' });
   }
 
