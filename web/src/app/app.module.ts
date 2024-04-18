@@ -323,6 +323,7 @@ import { SpinnerModule } from './componentes/spinner/spinner.module';
 import { SpinnerComponent } from './componentes/spinner/spinner.component';
 import { SpinnerInterceptor } from './componentes/spinner/Interceptor/spinner.interceptor';
 import { CargarPlantillaComponent } from './componentes/empleado/cargar-plantilla/cargar-plantilla.component';
+import { CatModalidaLaboralComponent } from './componentes/catalogos/cat-modalida-laboral/cat-modalida-laboral.component';
 import { CatTipoCargosComponent } from './componentes/catalogos/cat-tipo-cargos/cat-tipo-cargos.component';
 
 
@@ -577,6 +578,7 @@ const config: SocketIoConfig = { url: environment.url, options: {} };
     AsignarUsuarioComponent,
     DefinicionPlantillaComponent,
     CargarPlantillaComponent,
+    CatModalidaLaboralComponent,
     CatTipoCargosComponent,
    
 

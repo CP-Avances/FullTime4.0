@@ -1,1 +1,83 @@
-<p>cat-modalida-laboral works!</p>
+<div class="container" style="padding-bottom: 15px; padding-top: 15px;">
+    <div class="row">
+        <div class="col-md">
+            <div id="titulo">
+                <span>MODALIDAD LABORAL</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9">
+                <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
+                    <button id="btn-raised" class="btn btn-sm"
+                        (click)="AbrirVentanaRegistrarModalidad()">
+                        Crear Modalidad Laboral
+                    </button>
+                    <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
+                        matTooltipPosition="right"
+                        matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
+                        Mostrar lista
+                    </button>
+                </div>
+            </mat-card>
+        </div>
+
+        <!------------------ Registro multiple de Modalidad Laboral ------------------------------------->
+        <div class="col-md">
+            <div id="titulo">
+                <span>REGISTRO MULTIPLE</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9">
+                <div class="row">
+                    <div class="col-md" style="padding-top: 5px;">
+                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                            <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
+                                <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
+                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                <label for="file" matSuffix matTooltipPosition="right"
+                                    style="height: 65px; padding-top: 25px;"
+                                    matTooltip="Dar click para selecionar plantilla y cargar registros.">
+                                    Subir plantilla
+                                </label>
+                                <label for="file"  matSuffix matTooltipPosition="right"
+                                    hidden = 'true'
+                                    style="height: 64px; padding-top: 25px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre Modalidad.">
+                                    Subir nueva plantilla
+                                </label>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-md" >
+                        <div class="d-flex flex-wrap justify-content-around">
+                            <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                                style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
+                                href="{{hipervinculo}}/plantillaD/documento/Modalidad.xlsx">
+                                
+                                <span class="material-icons">cloud_download</span>
+                                <br>
+                                Descargar plantilla usuarios
+                            </a>
+                        </div>
+                    </div>
+                    <!--div class="col-md"  style="padding-top: 5px; padding-bottom: 5px;" >
+                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                            <button id="descargar" class="btn btn-sm" (click)="ConfirmarRegistroMultiple()"
+                                 matSuffix matTooltipPosition="right"
+                                 matTooltip="Guardar registro multiple.">
+                                Registrar
+                            </button>
+                        </div>
+                    </div-->
+                    
+                </div>    
+            </mat-card>
+        </div>
+    </div>
+</div>
+
+<!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
+<div class="container" style="padding-top: 10px; margin-bottom: 25px;">
+    <app-definicion-plantilla>
+    </app-definicion-plantilla>
+</div>
+
+<!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE MODALIDAD LABORAL ------------------------------------------------->
+

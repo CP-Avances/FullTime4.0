@@ -142,6 +142,8 @@ import { ReporteTiempoAlimentacionComponent } from './componentes/reportes/asist
 import { AnalisisDatosComponent } from './componentes/reportes/analisis-datos/analisis-datos.component';
 import { PrincipalSucursalUsuarioComponent } from './componentes/empleado/sucursal-usuario/principal-sucursal-usuario/principal-sucursal-usuario.component';
 import { CargarPlantillaComponent } from './componentes/empleado/cargar-plantilla/cargar-plantilla.component';
+import { CatModalidaLaboralComponent } from './componentes/catalogos/cat-modalida-laboral/cat-modalida-laboral.component';
+import { CatTipoCargosComponent } from './componentes/catalogos/cat-tipo-cargos/cat-tipo-cargos.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -298,6 +300,8 @@ const routes: Routes = [
   { path: 'registrarEmpleado', component: RegistroComponent, canActivate: [AuthGuard], data: { roles: 4 } },
   { path: 'empleado', component: ListaEmpleadosComponent, canActivate: [AuthGuard], data: { roles: 4 } },
   { path: 'cargarPlantilla', component: CargarPlantillaComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'modalidaLaboral', component: CatModalidaLaboralComponent, canActivate: [AuthGuard], data: { roles: 4 } },
+  { path: 'tipoCargos', component: CatTipoCargosComponent, canActivate: [AuthGuard], data: { roles: 4 } },
 
   // ACCESO A RUTAS DE HORARIOS
   { path: 'horario', component: PrincipalHorarioComponent, canActivate: [AuthGuard], data: { roles: 4 } },
