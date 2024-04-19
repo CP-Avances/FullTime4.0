@@ -1,8 +1,8 @@
 import { ImagenBase64LogosEmpresas } from '../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-import pool from '../../database';
 import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
+import pool from '../../database';
 
 const builder = require('xmlbuilder');
 

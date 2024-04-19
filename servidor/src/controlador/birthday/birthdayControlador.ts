@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { ObtenerRutaBirthday } from '../../libs/accesoCarpetas';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
 import path from 'path';
 import fs from 'fs';
