@@ -484,3 +484,28 @@ export interface ITableProvincias {
     nombre: string,
     
 }
+
+
+export interface ITableCiudades {
+    nombre: string,
+    
+}
+
+export interface ITableSucursales {
+    nombre: string,
+    
+}
+
+export interface ITableDepartamentos {
+    nombre: string,
+    
+}
+
+
+
+export interface ITableNivelesEducacion {
+    nombre: string,
+    
+}
+
+

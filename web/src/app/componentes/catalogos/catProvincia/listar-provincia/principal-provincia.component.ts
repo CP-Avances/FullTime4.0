@@ -24,6 +24,7 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 
 import { SelectionModel } from '@angular/cdk/collections';
 import { ITableProvincias } from 'src/app/model/reportes.model';
+import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
 
 @Component({
   selector: 'app-principal-provincia',
@@ -64,6 +65,7 @@ export class PrincipalProvinciaComponent implements OnInit {
     private toastr: ToastrService,
     private router: Router,
     public rest: ProvinciaService,
+    public restc: CiudadService,
     public restE: EmpleadoService,
     public ventana: MatDialog,
     public validar: ValidacionesService,
@@ -356,12 +358,10 @@ export class PrincipalProvinciaComponent implements OnInit {
 
 
 
+  // METODOS PARA LA SELECCION MULTIPLE
+
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
-
-
-
-
 
   HabilitarSeleccion() {
     this.plan_multiple = true;
@@ -408,13 +408,29 @@ export class PrincipalProvinciaComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_prov: number) {
+
+
+
     this.rest.EliminarProvincia(id_prov).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ListarProvincias();
+
+
+      if (res.message === 'error') {
+        this.toastr.error('No se puede elminar.', '', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ListarProvincias();
+
+
+      }
+
     });
   }
+
+
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
@@ -438,12 +454,7 @@ export class PrincipalProvinciaComponent implements OnInit {
 
 
       //AQUI MODIFICAR EL METODO 
-      this.rest.EliminarProvincia(datos.id).subscribe(res => {
-        this.toastr.error('Registro eliminado.', '', {
-          timeOut: 6000,
-        });
-        this.ListarProvincias();
-      });
+      this.Eliminar(datos.id);
 
 
 

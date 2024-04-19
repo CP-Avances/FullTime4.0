@@ -78,6 +78,19 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
+
+                        <th>
+                            <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
+                                matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
+                                id="SelectCheck" (click)="HabilitarSeleccion()">
+                                library_add_check
+                            </mat-icon>
+                            <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
+                                [checked]="selectionProvincias.hasValue() && isAllSelectedPag()"
+                                [indeterminate]="selectionProvincias.hasValue() && !isAllSelectedPag()"
+                                [aria-label]="checkboxLabelPag()">
+                            </mat-checkbox>
+                        </th>
                         <th scope="col">Nombre</th>
                         <th scope="col">Acciones</th>
                     </tr>
@@ -98,6 +111,13 @@
                     </tr>
                     <tr
                         *ngFor="let t of nivelTitulos | filtrosNombres: filtradoNombre |  paginate:tamanio_pagina:numero_pagina">
+                        
+                        <td>
+                            <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionProvincias.toggle(prov) : null"
+                                [checked]="selectionProvincias.isSelected(prov)" [aria-label]="checkboxLabelPag(prov)">
+                            </mat-checkbox>
+                        </td>
                         <td>{{t.nombre}}</td>
                         <td class="d-flex justify-content-center">
                             <i class="fas fa-edit" (click)=AbrirVentanaEditarTitulo(t) matSuffix

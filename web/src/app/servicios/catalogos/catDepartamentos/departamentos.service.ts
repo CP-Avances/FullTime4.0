@@ -37,7 +37,7 @@ export class DepartamentosService {
 
   // REGISTRAR ACTUALIZACION DE DEPARTAMENTO  --**VERIFICADO
   ActualizarDepartamento(idDepartamento: number, data: any) {
-    return this.http.put(`${environment.url}/departamento/${idDepartamento}`, data).pipe(
+    return this.http.put(`${environment.url}/depatramento/${idDepartamento}`, data).pipe(
       catchError(data)
     );
   }
@@ -53,8 +53,8 @@ export class DepartamentosService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarRegistro(id: number) {
-    return this.http.delete(`${environment.url}/departamento/eliminar/${id}`);
+  EliminarRegistro(id: any) {
+    return this.http.delete(`${environment.url}/departamento/eliminar/${id}`).pipe(catchError(id));
   }
 
   // METODO PARA CREAR ARCHIVO XML

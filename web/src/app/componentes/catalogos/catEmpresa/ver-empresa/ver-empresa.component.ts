@@ -443,10 +443,20 @@ export class VerEmpresaComponent implements OnInit {
   Eliminar(id_sucursal: number) {
 
     this.restS.EliminarRegistro(id_sucursal).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ObtenerSucursal();
+
+      if (res.message === 'error') {
+
+        this.toastr.error('No se puede elminar.', '', {
+          timeOut: 6000,
+        });
+
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ObtenerSucursal();
+
+      }
     });
 
 
@@ -469,16 +479,8 @@ export class VerEmpresaComponent implements OnInit {
     this.sucursalesEliminar.forEach((datos: any) => {
 
       this.datosSucursales = this.datosSucursales.filter(item => item.id !== datos.id);
-
-
-
-      //AQUI MODIFICAR EL METODO 
-      this.restS.EliminarRegistro(datos.id).subscribe(res => {
-        this.toastr.error('Registro eliminado.', '', {
-          timeOut: 6000,
-        });
-        this.ObtenerSucursal();
-      });
+      
+      this.Eliminar(datos.id);
 
       this.restS.BuscarSucursal().subscribe(data => {
         this.datosSucursales = data;
