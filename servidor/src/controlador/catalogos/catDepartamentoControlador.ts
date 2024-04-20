@@ -322,7 +322,6 @@ class DepartamentoControlador {
 
       var listDepartamentos: any = [];
       var duplicados: any = [];
-      var fecha_igual: any = [];
       var mensaje: string = 'correcto';
 
       // LECTURA DE LOS DATOS DE LA PLANTILLA

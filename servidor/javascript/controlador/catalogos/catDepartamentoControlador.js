@@ -279,7 +279,6 @@ class DepartamentoControlador {
             };
             var listDepartamentos = [];
             var duplicados = [];
-            var fecha_igual = [];
             var mensaje = 'correcto';
             // LECTURA DE LOS DATOS DE LA PLANTILLA
             plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {

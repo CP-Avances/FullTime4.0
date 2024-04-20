@@ -52,6 +52,12 @@ export class CatModalidaLaboralComponent implements OnInit{
 
   }
 
+  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+  ManejarPaginaMulti(e: PageEvent) {
+    this.tamanio_paginaMul = e.pageSize;
+    this.numero_paginaMul = e.pageIndex + 1
+  }
+
   // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
   nameFile: string;
   archivoSubido: Array<File>;
@@ -104,40 +110,57 @@ export class CatModalidaLaboralComponent implements OnInit{
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this._ModalidaLaboral.RevisarFormato(formData).subscribe(res => {
       this.Datos_modalidad_laboral = res.data;
+      this.messajeExcel = res.message;
+      console.log('probando plantilla modalidad laboral', this.Datos_modalidad_laboral);
+
+      if (this.messajeExcel == 'error') {
+        this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      } else {
+        this.Datos_modalidad_laboral.forEach(item => {
+          if (item.observacion.toLowerCase() == 'ok') {
+            this.listaModalidadCorrectas.push(item);
+          }
+        });
+      }
+    }, error => {
+      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
+      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+        timeOut: 4000,
+      });
+      this.progreso = false;
+    }, () => {
+      this.progreso = false;
     });
   }
 
-  /*
-  archivoForm = new FormControl('', Validators.required);
-  // VARIABLE PARA TOMAR RUTA DEL SISTEMA
-  hipervinculo: string = environment.url
-
-  // ITEMS DE PAGINACION DE LA TABLA
-  pageSizeOptions = [5, 10, 20, 50];
-  tamanio_paginaMul: number = 5;
-  numero_paginaMul: number = 1;
-
-  constructor(
-    public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
-    private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
-  ){
-
+  //Metodo para dar color a las celdas y representar las validaciones
+  colorCelda: string = ''
+  stiloCelda(observacion: string): string {
+    let arrayObservacion = observacion.split(" ");
+    if (observacion == 'Registro duplicado') {
+      return 'rgb(156, 214, 255)';
+    } else if (observacion == 'ok') {
+      return 'rgb(159, 221, 154)';
+    } else if (observacion == 'Ya existe en el sistema') {
+      return 'rgb(239, 203, 106)';
+    } else if (arrayObservacion[0] == 'Nombre') {
+      return 'rgb(242, 21, 21)';
+    } else {
+      return 'white'
+    }
   }
-
-  ngOnInit(){
-  
+  colorTexto: string = '';
+  stiloTextoCelda(texto: string): string {
+    let arrayObservacion = texto.split(" ");
+    if (arrayObservacion[0] == 'No') {
+      return 'rgb(255, 80, 80)';
+    } else {
+      return 'black'
+    }
   }
-
-   // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
-   ManejarPaginaMulti(e: PageEvent) {
-    this.tamanio_paginaMul = e.pageSize;
-    this.numero_paginaMul = e.pageIndex + 1
-  }
-
-
-  
-
-
  
 
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
@@ -151,6 +174,6 @@ export class CatModalidaLaboralComponent implements OnInit{
         }
       });
   }
-*/
+
 
 }
