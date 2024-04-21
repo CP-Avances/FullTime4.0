@@ -22,7 +22,11 @@ export class CatModalidaLaboralComponent implements OnInit{
   hipervinculo: string = environment.url
 
   // ITEMS DE PAGINACION DE LA TABLA
+  tamanio_pagina: number = 5;
+  numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
+
+  // ITEMS DE PAGINACION DE LA TABLA
   tamanio_paginaMul: number = 5;
   numero_paginaMul: number = 1;
 
@@ -32,24 +36,60 @@ export class CatModalidaLaboralComponent implements OnInit{
   mode: ProgressSpinnerMode = 'indeterminate';
   value = 10;
 
+  listaModalida_Laboral: any
+
   constructor(
     private _ModalidaLaboral: CatModalidadLaboralService,
     public ventana: MatDialog, // VARIABLE DE MANEJO DE VENTANAS
     private toastr: ToastrService, // VARIABLE DE MENSAJES DE NOTIFICACIONES
-  ){
-
-  }
+  ){}
 
   ngOnInit(){
-  
+    this.listaModalida_Laboral = [];
+    this._ModalidaLaboral.listaModalidad_laboral().subscribe(res =>{
+      console.log('lista> ',res);
+      this.listaModalida_Laboral = res
+    }, error => {
+      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
+      this.toastr.error('Error al cargar los datos', 'Listado de Modalidad laboral', {
+        timeOut: 4000,
+      });
+    });
   }
 
-  LimpiarCampos(){
-
+  LimpiarCampos() {
+    this.Datos_modalidad_laboral = null;
+    this.archivoSubido = [];
+    this.nameFile = '';
+    this.ngOnInit();
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = false;
+    this.messajeExcel = '';
   }
 
   AbrirVentanaRegistrarModalidad(){
+    this._ModalidaLaboral.CrearModalidadLaboral('Dependiente').subscribe(res => {
+      
+    })
+  }
 
+  ConfirmarDelete(id: any){
+    const mensaje = 'eliminar';
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this._ModalidaLaboral.eliminar(id).subscribe(res => {
+            console.log('res eliminado: ',res);
+            this.ngOnInit();
+          })
+        }
+      });
+  }
+
+  // CONTROL DE PAGINACION
+  ManejarPagina(e: PageEvent) {
+    this.tamanio_pagina = e.pageSize;
+    this.numero_pagina = e.pageIndex + 1
   }
 
   // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
@@ -62,7 +102,7 @@ export class CatModalidaLaboralComponent implements OnInit{
   nameFile: string;
   archivoSubido: Array<File>;
   mostrarbtnsubir: boolean = false;
-  // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE FERIADOS -----------------------------------------------------------------
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS -----------------------------------------------------------------
   FileChange(element: any) {
     this.archivoSubido = [];
     this.nameFile = '';
@@ -146,7 +186,7 @@ export class CatModalidaLaboralComponent implements OnInit{
       return 'rgb(159, 221, 154)';
     } else if (observacion == 'Ya existe en el sistema') {
       return 'rgb(239, 203, 106)';
-    } else if (arrayObservacion[0] == 'Nombre') {
+    } else if (arrayObservacion[0] == 'Modalidad laboral ') {
       return 'rgb(242, 21, 21)';
     } else {
       return 'white'
@@ -170,9 +210,29 @@ export class CatModalidaLaboralComponent implements OnInit{
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          
+          this.subirDatosPlantillaModal()
         }
       });
+  }
+
+  subirDatosPlantillaModal(){
+    if (this.listaModalidadCorrectas.length > 0) {
+      this._ModalidaLaboral.subirArchivoExcel(this.listaModalidadCorrectas).subscribe(response => {
+        console.log('respuesta: ',response);
+        this.toastr.success('Operación exitosa.', 'Plantilla de Modalidad laboral importada.', {
+          timeOut: 2500,
+        });
+        window.location.reload();
+        this.archivoForm.reset();
+        this.nameFile = '';
+      });
+    }else {
+      this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
+        timeOut: 4000,
+      });
+      this.archivoForm.reset();
+      this.nameFile = '';
+    }
   }
 
 

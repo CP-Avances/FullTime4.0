@@ -37,7 +37,7 @@
                                     Subir plantilla
                                 </label>
                                 <label for="file"  matSuffix matTooltipPosition="right"
-                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'" hidden = 'true'
+                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
                                     style="height: 64px; padding-top: 25px;"
                                     matTooltip="Presionar para seleccionar Plantilla con nombre Modalidad.">
                                     Subir nueva plantilla
@@ -73,8 +73,53 @@
     </div>
 </div>
 
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!Datos_modalidad_laboral">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="resultados">RESULTADO DE BÚSQUEDA</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr>
+                        <th scope="col">Modalidad Laboral</th>
+                        <th scope="col">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <!--mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" [formControl]="buscarNombre"
+                                    [(ngModel)]="filtroNombreSuc">
+                            </mat-form-field-->
+                        </td>
+                        <td>
+                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda de departamentos de acurdo a cada columna de la tabla.">
+                                help_outline
+                            </mat-icon>
+                        </td>
+                    </tr>
+                    <tr
+                        *ngFor="let Modal of listaModalida_Laboral |  paginate:tamanio_pagina:numero_pagina">
+                        <td>{{Modal.descripcion}}</td>
+                        <td class="justify-content-center">
+                            <i (click)="ConfirmarDelete(Modal.id)" class="far fa-trash-alt" id="t-eliminar"
+                                matSuffix matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                <p>Eliminar</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="listaModalida_Laboral.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>
+
 <!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
-<div class="container" style="padding-top: 10px; margin-bottom: 25px;">
+<div class="container" style="padding-top: 10px; margin-bottom: 25px;" *ngIf="Datos_modalidad_laboral && messajeExcel != 'error'">
     <app-definicion-plantilla>
     </app-definicion-plantilla>
 </div>

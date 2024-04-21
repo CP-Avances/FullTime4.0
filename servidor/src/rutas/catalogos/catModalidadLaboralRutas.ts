@@ -31,6 +31,9 @@ class ModalidaLaboralRutas {
     }
 
     configuracion(): void {
+        this.router.get('/', TokenValidation, MODALIDADLABORAL_CONTROLADOR.listaModalidadLaboral);
+        this.router.post('/crearModalidad', TokenValidation, MODALIDADLABORAL_CONTROLADOR.CrearMadalidadLaboral);
+        this.router.delete('/eliminar/:id', TokenValidation, MODALIDADLABORAL_CONTROLADOR.eliminarRegistro);
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], MODALIDADLABORAL_CONTROLADOR.VerfificarPlantillaModalidadLaboral);
         this.router.post('/cargar_plantilla/', TokenValidation, MODALIDADLABORAL_CONTROLADOR.CargarPlantilla);
     

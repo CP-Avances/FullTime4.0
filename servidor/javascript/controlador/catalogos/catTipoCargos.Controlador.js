@@ -12,22 +12,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.modalidaLaboralControlador = void 0;
+exports.tiposCargosControlador = void 0;
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
 const xlsx_1 = __importDefault(require("xlsx"));
 const fs_1 = __importDefault(require("fs"));
 const builder = require('xmlbuilder');
-class ModalidaLaboralControlador {
-    listaModalidadLaboral(req, res) {
+class TiposCargosControlador {
+    listaTipoCargos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const MODALIDAL_LABORAL = yield database_1.default.query(`
-                SELECT * FROM modal_trabajo ORDER BY descripcion ASC
+                const TIPO_CARGO = yield database_1.default.query(`
+                SELECT * FROM tipo_cargo ORDER BY cargo ASC
                 `);
-                if (MODALIDAL_LABORAL.rowCount > 0) {
-                    return res.jsonp(MODALIDAL_LABORAL.rows);
+                if (TIPO_CARGO.rowCount > 0) {
+                    return res.jsonp(TIPO_CARGO.rows);
                 }
                 else {
                     return res.status(404).jsonp({ text: 'No se encuentran registros.' });
@@ -38,16 +38,13 @@ class ModalidaLaboralControlador {
             }
         });
     }
-    CrearMadalidadLaboral(req, res) {
+    CrearCargo(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const modalidad = req.body;
-                console.log('modalidad: ', modalidad);
-                //await pool.query(
-                //`
-                //INSERT INTO modal_trabajo (descripcion) VALUES ($1)
-                //`
-                //, [modalidad]);
+                const cargo = req.params.cargo;
+                yield database_1.default.query(`
+              INSERT INTO tipo_cargo (descripcion) VALUES ($1)
+              `, [cargo]);
                 res.jsonp({ message: 'Registro guardado.' });
             }
             catch (error) {
@@ -59,8 +56,9 @@ class ModalidaLaboralControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
+                console.log('id: ', id);
                 yield database_1.default.query(`
-                DELETE FROM modal_trabajo WHERE id = $1
+                DELETE FROM tipo_cargo WHERE id = $1
             `, [id]);
                 res.jsonp({ message: 'Registro eliminado.' });
             }
@@ -70,7 +68,7 @@ class ModalidaLaboralControlador {
         });
     }
     /** Lectura de los datos de la platilla Modalidad_cargo */
-    VerfificarPlantillaModalidadLaboral(req, res) {
+    VerfificarPlantillaTipoCargos(req, res) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -79,40 +77,39 @@ class ModalidaLaboralControlador {
                 let ruta = (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)() + separador + documento;
                 const workbook = xlsx_1.default.readFile(ruta);
                 const sheet_name_list = workbook.SheetNames;
-                const plantilla_modalidad_laboral = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-                //const plantilla_cargo = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[1]]);
+                const plantilla_cargo = xlsx_1.default.utils.sheet_to_json(workbook.Sheets[sheet_name_list[1]]);
                 let data = {
                     fila: '',
-                    modalida_laboral: '',
+                    tipo_cargo: '',
                     observacion: ''
                 };
-                var listModalidad = [];
+                var listCargos = [];
                 var duplicados = [];
                 var mensaje = 'correcto';
                 // LECTURA DE LOS DATOS DE LA PLANTILLA
-                plantilla_modalidad_laboral.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
-                    var { item, modalida_laboral } = dato;
+                plantilla_cargo.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
+                    var { item, cargo } = dato;
                     //Verificar que el registo no tenga datos vacios
                     if ((item != undefined && item != '') &&
-                        (modalida_laboral != undefined && modalida_laboral != '')) {
+                        (cargo != undefined && cargo != '')) {
                         data.fila = item;
-                        data.modalida_laboral = modalida_laboral;
+                        data.tipo_cargo = cargo;
                         data.observacion = 'no registrado';
-                        listModalidad.push(data);
+                        listCargos.push(data);
                     }
                     else {
                         data.fila = item;
-                        data.modalida_laboral = modalida_laboral;
+                        data.tipo_cargo = cargo;
                         data.observacion = 'no registrado';
                         if (data.fila == '' || data.fila == undefined) {
                             data.fila = 'error';
                             mensaje = 'error';
                         }
-                        if (modalida_laboral == undefined) {
-                            data.modalida_laboral = 'No registrado';
-                            data.observacion = 'Modalidad laboral ' + data.observacion;
+                        if (data.tipo_cargo == undefined) {
+                            data.tipo_cargo = 'No registrado';
+                            data.observacion = 'Cargo ' + data.observacion;
                         }
-                        listModalidad.push(data);
+                        listCargos.push(data);
                     }
                     data = {};
                 }));
@@ -125,17 +122,17 @@ class ModalidaLaboralControlador {
                         fs_1.default.unlinkSync(ruta);
                     }
                 });
-                listModalidad.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                listCargos.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                     if (item.observacion == 'no registrado') {
-                        var VERIFICAR_MODALIDAD = yield database_1.default.query('SELECT * FROM modal_trabajo WHERE UPPER(descripcion) = $1', [item.modalida_laboral.toUpperCase()]);
-                        if (VERIFICAR_MODALIDAD.rows[0] == undefined || VERIFICAR_MODALIDAD.rows[0] == '') {
+                        var VERIFICAR_CARGOS = yield database_1.default.query('SELECT * FROM tipo_cargo WHERE UPPER(cargo) = $1', [item.tipo_cargo.toUpperCase()]);
+                        if (VERIFICAR_CARGOS.rows[0] == undefined || VERIFICAR_CARGOS.rows[0] == '') {
                             item.observacion = 'ok';
                         }
                         else {
                             item.observacion = 'Ya existe en el sistema';
                         }
                         // Discriminación de elementos iguales
-                        if (duplicados.find((p) => p.modalida_laboral.toLowerCase() === item.modalida_laboral.toLowerCase()) == undefined) {
+                        if (duplicados.find((p) => p.tipo_cargo.toLowerCase() === item.tipo_cargo.toLowerCase()) == undefined) {
                             duplicados.push(item);
                         }
                         else {
@@ -144,7 +141,7 @@ class ModalidaLaboralControlador {
                     }
                 }));
                 setTimeout(() => {
-                    listModalidad.sort((a, b) => {
+                    listCargos.sort((a, b) => {
                         // Compara los números de los objetos
                         if (a.fila < b.fila) {
                             return -1;
@@ -155,7 +152,7 @@ class ModalidaLaboralControlador {
                         return 0; // Son iguales
                     });
                     var filaDuplicada = 0;
-                    listModalidad.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                    listCargos.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                         if (item.observacion == '1') {
                             item.observacion = 'Registro duplicado';
                         }
@@ -172,9 +169,9 @@ class ModalidaLaboralControlador {
                         filaDuplicada = item.fila;
                     }));
                     if (mensaje == 'error') {
-                        listModalidad = undefined;
+                        listCargos = undefined;
                     }
-                    return res.jsonp({ message: mensaje, data: listModalidad });
+                    return res.jsonp({ message: mensaje, data: listCargos });
                 }, 1000);
             }
             catch (error) {
@@ -187,19 +184,19 @@ class ModalidaLaboralControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const plantilla = req.body;
-                console.log('datos Modalidad laboral: ', plantilla);
+                console.log('datos Tipo Cargos: ', plantilla);
                 var contador = 1;
                 var respuesta;
                 plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                     // Datos que se guardaran de la plantilla ingresada
-                    const { item, modalida_laboral, observacion } = data;
-                    const modalidad = modalida_laboral.charAt(0).toUpperCase() + modalida_laboral.slice(1).toLowerCase();
+                    const { item, tipo_cargo, observacion } = data;
+                    const cargo = tipo_cargo.charAt(0).toUpperCase() + tipo_cargo.slice(1).toLowerCase();
                     // Registro de los datos de contratos
-                    const response = yield database_1.default.query(`INSERT INTO modal_trabajo (descripcion) VALUES ($1) RETURNING *
-                `, [modalidad]);
-                    const [modalidad_la] = response.rows;
+                    const response = yield database_1.default.query(`INSERT INTO tipo_cargo (cargo) VALUES ($1) RETURNING *
+                `, [cargo]);
+                    const [cargos] = response.rows;
                     if (contador === plantilla.length) {
-                        if (modalidad_la) {
+                        if (cargos) {
                             return respuesta = res.status(200).jsonp({ message: 'ok' });
                         }
                         else {
@@ -215,5 +212,5 @@ class ModalidaLaboralControlador {
         });
     }
 }
-exports.modalidaLaboralControlador = new ModalidaLaboralControlador();
-exports.default = exports.modalidaLaboralControlador;
+exports.tiposCargosControlador = new TiposCargosControlador();
+exports.default = exports.tiposCargosControlador;

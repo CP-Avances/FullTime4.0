@@ -12,12 +12,23 @@ export class CatModalidadLaboralService {
     private http: HttpClient,
   ) { }
 
+  listaModalidad_laboral(){
+    return this.http.get<any>(environment.url + '/modalidadLaboral');
+  }
+  CrearModalidadLaboral(modalidad: any){
+    console.log('modalidad: ',modalidad)
+    return this.http.post(`${environment.url}/modalidadLaboral/crearModalidad`, modalidad).pipe(
+      catchError(modalidad)
+    );
+  }
+  eliminar(id: any){
+    return this.http.delete<any>(`${environment.url}/modalidadLaboral/eliminar/${id}`)
+  }
   RevisarFormato(formData) {
-    console.log('formDataDepartamentos: ',formData);
     return this.http.post<any>(environment.url + '/modalidadLaboral/upload/revision', formData);
   }
   subirArchivoExcel(formData) {
-    return this.http.post<any>(`${environment.url}/modalidadLaboral/cargar_plantilla/`, formData);
+    return this.http.post<any>(`${environment.url}/modalidadLaboral/cargar_plantilla`, formData);
   }
 
 }
