@@ -26,39 +26,43 @@
             <mat-card class="example-card mat-elevation-z9">
                 <div class="row">
                     <div class="col-md" style="padding-top: 5px;">
-                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                        <div class="d-flex flex-wrap justify-content-around"
+                            style="text-align: center; justify-content: center;">
                             <form method="post" enctype="multipart/form-data" style="width: max-content;">
                                 <input type="file" (change)="FileChange($event)" [formControl]="archivoForm" id="file"
                                     accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                <label for="file" matSuffix matTooltipPosition="right"
-                                    *ngIf="!mostrarbtnsubir" style="height: 64px; padding-top: 25px;"
+                                <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                    style="height: 64px; padding-top: 25px;"
                                     matTooltip="Presionar para seleccionar Plantilla con nombre Niveles_profesionales.">
                                     Subir plantilla
                                 </label>
-                                <label for="file"  matSuffix matTooltipPosition="right"
-                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'" style="height: 64px; padding-top: 25px;"
+                                <label for="file" matSuffix matTooltipPosition="right"
+                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                    style="height: 64px; padding-top: 25px;"
                                     matTooltip="Presionar para seleccionar Plantilla con nombre Niveles_profesionales.">
                                     Subir nueva plantilla
                                 </label>
                             </form>
                         </div>
                     </div>
-                    <div class="col-md" *ngIf="!DataNivelesProfesionales" style="padding-top: 5px; padding-bottom: 5px;" >
-                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                    <div class="col-md" *ngIf="!DataNivelesProfesionales"
+                        style="padding-top: 5px; padding-bottom: 5px;">
+                        <div class="d-flex flex-wrap justify-content-around"
+                            style="text-align: center; justify-content: center;">
                             <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
-                                matTooltip="Dar click para ver o descargar el documento."
-                                >
+                                matTooltip="Dar click para ver o descargar el documento.">
                                 <!--span class="material-icons">cloud_download</span-->
                                 <br>
                                 Descargar plantilla
                             </a>
                         </div>
                     </div>
-                    <div class="col-md" *ngIf="mostrarbtnsubir" style="padding-top: 5px; padding-bottom: 5px;" >
-                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
-                            <button *ngIf="DataNivelesProfesionales && messajeExcel != 'error'" id="descargar" class="btn btn-sm"
-                                (click)="ConfirmarRegistroMultiple()" matSuffix matTooltipPosition="right"
-                                 matTooltip="Guardar registro multiple.">
+                    <div class="col-md" *ngIf="mostrarbtnsubir" style="padding-top: 5px; padding-bottom: 5px;">
+                        <div class="d-flex flex-wrap justify-content-around"
+                            style="text-align: center; justify-content: center;">
+                            <button *ngIf="DataNivelesProfesionales && messajeExcel != 'error'" id="descargar"
+                                class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
+                                matTooltipPosition="right" matTooltip="Guardar registro multiple.">
                                 Registrar
                             </button>
                         </div>
@@ -73,17 +77,48 @@
 <div class="container" style="padding-top: 15px; padding-bottom: 50px; text-align: center;"
     *ngIf="!DataNivelesProfesionales && (messajeExcel == 'error' || messajeExcel == '')">
     <div class="mat-elevation-z8" style="background: white;">
-        <div id="resultados">RESULTADO DE BÚSQUEDA</div>
+
+        <div class="d-flex bd-highlight" id="titulo">
+
+
+            <div class="w-100 bd-highlight">
+                <h5>
+                    RESULTADO DE BÚSQUEDA
+                </h5>
+            </div>
+
+
+            <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
+
+                <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
+                    (click)="ConfirmarDeleteMultiple()">Eliminar </button>
+            </div>
+        </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr style="text-align: center;">
+
+                        <th>
+                            <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
+                                matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
+                                id="SelectCheck" (click)="HabilitarSeleccion()">
+                                library_add_check
+                            </mat-icon>
+                            <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
+                                [checked]="selectionProvincias.hasValue() && isAllSelectedPag()"
+                                [indeterminate]="selectionProvincias.hasValue() && !isAllSelectedPag()"
+                                [aria-label]="checkboxLabelPag()">
+                            </mat-checkbox>
+                        </th>
                         <th scope="col">Nombre</th>
                         <th scope="col">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
+                        <td></td>
+
                         <td>
                             <mat-form-field id="t-inputs">
                                 <input matInput placeholder="Buscar" [formControl]="nombreF"
@@ -98,6 +133,13 @@
                     </tr>
                     <tr
                         *ngFor="let t of nivelTitulos | filtrosNombres: filtradoNombre |  paginate:tamanio_pagina:numero_pagina">
+
+                        <td>
+                            <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                                (change)="$event ? selectionProvincias.toggle(t) : null"
+                                [checked]="selectionProvincias.isSelected(t)" [aria-label]="checkboxLabelPag(t)">
+                            </mat-checkbox>
+                        </td>
                         <td>{{t.nombre}}</td>
                         <td class="d-flex justify-content-center">
                             <i class="fas fa-edit" (click)=AbrirVentanaEditarTitulo(t) matSuffix
@@ -141,13 +183,15 @@
 </div>
 
 <!-- ********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE  *************************************** -->
-<div class="container" style="padding-top: 10px; margin-bottom: 25px;" *ngIf="DataNivelesProfesionales && messajeExcel != 'error'">
+<div class="container" style="padding-top: 10px; margin-bottom: 25px;"
+    *ngIf="DataNivelesProfesionales && messajeExcel != 'error'">
     <app-definicion-plantilla>
     </app-definicion-plantilla>
 </div>
 
 <!-- ********************************  TABLA DE DATOS DE LA CARGA MULTIPLE  *************************************** -->
-<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="DataNivelesProfesionales && messajeExcel != 'error'">
+<div class="container" style="padding-bottom: 50px; text-align: center;"
+    *ngIf="DataNivelesProfesionales && messajeExcel != 'error'">
     <div class="mat-elevation-z8" style="background: white;">
         <div id="resultados">
             REGISTRO MULTIPLE
@@ -163,7 +207,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let data of DataNivelesProfesionales | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                    <tr
+                        *ngFor="let data of DataNivelesProfesionales | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
                         <td style="font-size: 12px; width: 50px;" align="center">{{data.fila}}</td>
                         <td style="font-size: 12px;" [style.color]="stiloTextoCelda(data.nombre)">{{ data.nombre}}</td>
                         <td style="font-size: 12px;">

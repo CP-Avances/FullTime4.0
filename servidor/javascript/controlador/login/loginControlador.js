@@ -144,7 +144,11 @@ class LoginControlador {
                     }
                     else {
                         // VALIDAR SI EL USUARIO QUE ACCEDE ES ADMINISTRADOR
+<<<<<<< HEAD
                         if (id_rol === 1 || id_rol == 3) {
+=======
+                        if (id_rol === 1 || id_rol === 3) {
+>>>>>>> 5a3a5511b51668e4fbbcf1e39562ab2b63c1d89d
                             const token = jsonwebtoken_1.default.sign({
                                 _licencia: public_key, codigo: codigo, _id: id, _id_empleado: id_empleado, rol: id_rol,
                                 _web_access: web_access, _empresa: id_empresa, ip_adress: ip_cliente, modulos: modulos

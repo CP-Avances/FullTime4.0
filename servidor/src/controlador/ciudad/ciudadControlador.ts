@@ -88,14 +88,23 @@ class CiudadControlador {
     }
 
     // METODO PARA ELIMINAR REGISTRO
-    public async EliminarCiudad(req: Request, res: Response): Promise<void> {
-        const id = req.params.id;
-        await pool.query(
-            `
-            DELETE FROM ciudades WHERE id = $1
-            `
-            , [id]);
-        res.jsonp({ message: 'Registro eliminado.' });
+    public async EliminarCiudad(req: Request, res: Response) {
+
+        try {
+            const id = req.params.id;
+            await pool.query(
+                `
+                DELETE FROM ciudades WHERE id = $1
+                `
+                , [id]);
+            res.jsonp({ message: 'Registro eliminado.' });
+
+        } catch {
+
+            return res.jsonp({ message: 'error' });
+
+        }
+
     }
 
     // METODO PARA CONSULTAR DATOS DE UNA CIUDAD

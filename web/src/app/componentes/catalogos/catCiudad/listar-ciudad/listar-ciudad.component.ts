@@ -21,6 +21,10 @@ import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
+import { SelectionModel } from '@angular/cdk/collections';
+import { ITableCiudades } from 'src/app/model/reportes.model';
+import { ProvinciaService } from 'src/app/servicios/catalogos/catProvincias/provincia.service';
+
 
 @Component({
   selector: 'app-listar-ciudad',
@@ -30,10 +34,13 @@ import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
 
 export class ListarCiudadComponent implements OnInit {
 
+  datosCiudadesEliminar: any = [];
+
   // ALMACENAMIENTO DE DATOS
   datosCiudades: any = [];
   filtroCiudad = '';
   filtroProvincias = '';
+  filtrodatosCiudades = '';
   empleado: any = [];
   idEmpleado: number;
 
@@ -57,6 +64,7 @@ export class ListarCiudadComponent implements OnInit {
     private router: Router,
     private toastr: ToastrService,
     public rest: CiudadService,
+    public restp: ProvinciaService,
     public restE: EmpleadoService,
     public ventana: MatDialog,
     public validar: ValidacionesService,
@@ -122,27 +130,7 @@ export class ListarCiudadComponent implements OnInit {
     });
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
-  Eliminar(id_ciu: number) {
-    this.rest.EliminarCiudad(id_ciu).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ListarCiudades();
-    });
-  }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
-  ConfirmarDelete(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.Eliminar(datos.id);
-        } else {
-          this.router.navigate(['/listarCiudades']);
-        }
-      });
-  }
 
   // METODO PARA VALIDAR INGRESO DE LETRAS
   IngresarSoloLetras(e: any) {
@@ -360,8 +348,139 @@ export class ListarCiudadComponent implements OnInit {
     a.download = 'Ciudades.xml';
     // Simular un clic en el enlace para iniciar la descarga
     a.click();
-    
+
   }
+
+
+  // METODOS PARA LA SELECCION MULTIPLE
+
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+
+
+
+
+
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+
+  selectiondatosCiudades = new SelectionModel<ITableCiudades>(true, []);
+
+
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectiondatosCiudades.selected.length;
+    return numSelected === this.datosCiudades.length;
+  }
+
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectiondatosCiudades.clear() :
+      this.datosCiudades.forEach((row: any) => this.selectiondatosCiudades.select(row));
+  }
+
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableCiudades): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.datosCiudadesEliminar = this.selectiondatosCiudades.selected;
+    //console.log('paginas para Eliminar',this.paginasEliminar);
+
+    //console.log(this.selectionPaginas.selected)
+    return `${this.selectiondatosCiudades.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
+
+  }
+
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  Eliminar(id_ciu: number) {
+
+
+    this.rest.EliminarCiudad(id_ciu).subscribe(res => {
+      if (res.message === 'error') {
+        this.toastr.error('No se puede elminar.', '', {
+          timeOut: 6000,
+        });
+      } else {
+
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ListarCiudades();
+
+      }
+
+
+    });
+  }
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos.id);
+        } else {
+          this.router.navigate(['/listarCiudades']);
+        }
+      });
+  }
+
+  EliminarMultiple() {
+
+    this.datosCiudadesEliminar = this.selectiondatosCiudades.selected;
+    this.datosCiudadesEliminar.forEach((datos: any) => {
+
+      this.datosCiudades = this.datosCiudades.filter(item => item.id !== datos.id);
+      this.Eliminar(datos.id);
+      this.rest.ListarNombreCiudadProvincia().subscribe(datos => {
+        this.datosCiudades = datos;
+      })
+
+    }
+    )
+  }
+
+
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+
+          if (this.datosCiudadesEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+
+
+
+
+
+
+          } else {
+            this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+
+          }
+        }
+      });
+  }
+
 
 
 }

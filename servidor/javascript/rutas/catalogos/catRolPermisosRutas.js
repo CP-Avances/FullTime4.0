@@ -17,6 +17,24 @@ class RolPermisosRutas {
         this.router.post('/', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.create);
         this.router.post('/denegado/', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.createPermisoDenegado);
         this.router.get('/denegado/:id', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.getPermisosUsuario);
+        // MENU ENLISTAR
+        this.router.get('/menu/paginas', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarMenuRoles);
+        // METODO PARA BUSCAR LAS PAGINAS POR ID_ROL
+        this.router.post('/menu/paginas/ide', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerIdPaginas);
+        this.router.post('/menu/paginas/ideaccion', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerIdPaginasConAcciones);
+        //METODO PARA BUSCAR TODAS LAS PAGINAS QUE TIENE EL ROL
+        this.router.post('/menu/todaspaginasrol', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerPaginasRol);
+        // METODO PARA REGISTRAR ASIGNACION DE PAGINAS  
+        this.router.post('/menu/paginas/insertar', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.AsignarPaginaRol);
+        // METODO PARA ELIMINAR LAS PAGINAS  
+        this.router.post('/menu/paginas/eliminar', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.EliminarPaginaRol);
+        this.router.post('/menu/paginas/eliminarsinaccion', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.EliminarPaginaRolSinAccion);
+        // METODO PARA BUSCAR LAS ACCIONES DE LAS PAGINAS
+        this.router.post('/menu/paginas/acciones', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerAccionesPaginas);
+        // METODO PARA BUSCAR LAS ACCIONES DE LAS PAGINAS
+        this.router.post('/menu/paginas/acciones/id', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerAccionPorId);
+        // METODO PARA OBTENER TODAS LAS ACCIONES
+        this.router.get('/menu/paginas/acciones/todas', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarAcciones);
     }
 }
 const rolPermisosRutas = new RolPermisosRutas();

@@ -193,14 +193,27 @@ class DepartamentoControlador {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  public async EliminarRegistros(req: Request, res: Response): Promise<void> {
-    const id = req.params.id;
-    await pool.query(
-      `
-      DELETE FROM cg_departamentos WHERE id = $1
-      `
-      , [id]);
-    res.jsonp({ message: 'Registro eliminado.' });
+  public async EliminarRegistros(req: Request, res: Response){
+
+
+    try{
+
+      const id = req.params.id;
+      await pool.query(
+        `
+        DELETE FROM cg_departamentos WHERE id = $1
+        `
+        , [id]);
+      res.jsonp({ message: 'Registro eliminado.' });
+
+
+    }catch(error){
+
+      return res.jsonp({ message: 'error' });
+
+
+    }
+   
   }
 
   //METODO PARA CREAR NIVELES JERARQUICOS POR DEPARTAMENTOS  --**VERIFICADO
@@ -270,6 +283,8 @@ class DepartamentoControlador {
       `
       , [id]);
     res.jsonp({ message: 'Registro eliminado.' });
+
+    
   }
 
   //METODO PARA CREAR NIVELES JERARQUICOS POR DEPARTAMENTOS  --**VERIFICADO

@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { catchError } from 'rxjs/operators';
+
 import { environment } from '../../../../environments/environment'
 
 @Injectable({
@@ -33,8 +35,10 @@ export class ProvinciaService {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  EliminarProvincia(id: number) {
-    return this.http.delete(`${environment.url}/provincia/eliminar/${id}`);
+  EliminarProvincia(id: any) {
+    return this.http.delete(`${environment.url}/provincia/eliminar/${id}`).pipe(
+      catchError(id)
+    );
   }
 
   // METODO PARA CREAR ARCHIVO XML

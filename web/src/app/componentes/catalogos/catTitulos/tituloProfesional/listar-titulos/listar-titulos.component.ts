@@ -28,6 +28,9 @@ import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulo
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ThemePalette } from '@angular/material/core';
 
+import { SelectionModel } from '@angular/cdk/collections';
+import { ITableProvincias } from 'src/app/model/reportes.model';
+
 @Component({
   selector: 'app-listar-titulos',
   templateUrl: './listar-titulos.component.html',
@@ -35,6 +38,7 @@ import { ThemePalette } from '@angular/material/core';
 })
 
 export class ListarTitulosComponent implements OnInit {
+  titulosEliminar: any = [];
 
   // VARIABLES USADAS PARA ALMACENAMIENTO DE DATOS
   verTitulos: any = [];
@@ -72,11 +76,11 @@ export class ListarTitulosComponent implements OnInit {
   get frase(): string { return this.plantillaPDF.marca_Agua }
   get logo(): string { return this.plantillaPDF.logoBase64 }
 
-   // VARIABLES PROGRESS SPINNER
-   progreso: boolean = false;
-   color: ThemePalette = 'primary';
-   mode: ProgressSpinnerMode = 'indeterminate';
-   value = 10;
+  // VARIABLES PROGRESS SPINNER
+  progreso: boolean = false;
+  color: ThemePalette = 'primary';
+  mode: ProgressSpinnerMode = 'indeterminate';
+  value = 10;
 
   constructor(
     public ventana: MatDialog, // VARIABLE QUE MANEJA EVENTOS CON VENTANAS
@@ -119,7 +123,7 @@ export class ListarTitulosComponent implements OnInit {
   ObtenerTitulos() {
     this.rest.ListarTitulos().subscribe(data => {
       this.verTitulos = data;
-      console.log('titulos: ',this.verTitulos);
+      console.log('titulos: ', this.verTitulos);
     });
   }
 
@@ -129,7 +133,7 @@ export class ListarTitulosComponent implements OnInit {
     this.nivelTitulos = [];
     this.nivel.ListarNiveles().subscribe(res => {
       this.nivelTitulos = res;
-      console.log('this.nivelTitulos: ',this.nivelTitulos);
+      console.log('this.nivelTitulos: ', this.nivelTitulos);
     });
   }
 
@@ -199,27 +203,7 @@ export class ListarTitulosComponent implements OnInit {
       });
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
-  Eliminar(id_titulo: number) {
-    this.rest.EliminarRegistro(id_titulo).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ObtenerTitulos();
-    });
-  }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
-  ConfirmarDelete(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.Eliminar(datos.id);
-        } else {
-          this.router.navigate(['/titulos']);
-        }
-      });
-  }
 
 
   // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
@@ -235,7 +219,7 @@ export class ListarTitulosComponent implements OnInit {
     let arrayItems = this.nameFile.split(".");
     let itemExtencion = arrayItems[arrayItems.length - 1];
     let itemName = arrayItems[0].slice(0, 25);
-    console.log('itemName: ',itemName);
+    console.log('itemName: ', itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (itemName.toLowerCase() == 'titulos_profesionales') {
         this.numero_paginaMul = 1;
@@ -245,14 +229,14 @@ export class ListarTitulosComponent implements OnInit {
         this.toastr.error('Seleccione plantilla con nombre Titulos_profesionales', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
         });
-        
+
         this.nameFile = '';
       }
     } else {
       this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
         timeOut: 6000,
       });
-      
+
       this.nameFile = '';
     }
     this.archivoForm.reset();
@@ -263,7 +247,7 @@ export class ListarTitulosComponent implements OnInit {
   listTitulosCorrectos: any = [];
   messajeExcel: string = '';
   // METODO PARA ENVIAR MENSAJES DE ERROR O CARGAR DATOS SI LA PLANTILLA ES CORRECTA
-  Revisarplantilla(){
+  Revisarplantilla() {
     this.listTitulosCorrectos = [];
     let formData = new FormData();
     for (var i = 0; i < this.archivoSubido.length; i++) {
@@ -271,63 +255,63 @@ export class ListarTitulosComponent implements OnInit {
     }
 
     this.progreso = true;
-  
+
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.DataTitulosProfesionales = res.data;
       this.messajeExcel = res.message;
 
-      if(this.messajeExcel == 'error'){
+      if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
           timeOut: 4500,
         });
         this.mostrarbtnsubir = false;
-      }else{
+      } else {
         this.DataTitulosProfesionales.forEach(item => {
-          if( item.observacion.toLowerCase() === 'ok'){
+          if (item.observacion.toLowerCase() === 'ok') {
             this.listTitulosCorrectos.push(item);
           }
-        }); 
+        });
       }
-     
-    },error => {
-      console.log('Serivicio rest -> metodo RevisarFormato - ',error);
+
+    }, error => {
+      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
       this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
       this.progreso = false;
-    },() => {
+    }, () => {
       this.progreso = false;
     });
-      
+
   }
 
-   //Metodo para dar color a las celdas y representar las validaciones
-   colorCelda: string = ''
-   stiloCelda(observacion: string): string{
-     if(observacion == 'ok'){
-       return 'rgb(159, 221, 154)';
-     }else if(observacion == 'Ya esta registrado en base'){
-       return 'rgb(239, 203, 106)';
-     }else if(observacion == 'Registro duplicado'){
-       return 'rgb(156, 214, 255)';
-     }else if(observacion == 'Nivel no existe en el sistema'){
+  //Metodo para dar color a las celdas y representar las validaciones
+  colorCelda: string = ''
+  stiloCelda(observacion: string): string {
+    if (observacion == 'ok') {
+      return 'rgb(159, 221, 154)';
+    } else if (observacion == 'Ya esta registrado en base') {
+      return 'rgb(239, 203, 106)';
+    } else if (observacion == 'Registro duplicado') {
+      return 'rgb(156, 214, 255)';
+    } else if (observacion == 'Nivel no existe en el sistema') {
       return 'rgb(255, 192, 203)';
-     }else{
-       return 'rgb(251, 73, 18)';
-     }
-   }
- 
-   colorTexto: string = '';
-   stiloTextoCelda(texto: string): any{  
-    let arrayObservacion = texto.split(" ");
-    if(arrayObservacion[0] == 'No'){
-       return 'rgb(255, 80, 80)';
-    }else{
-       return 'black'
+    } else {
+      return 'rgb(251, 73, 18)';
     }
-     
-   }
+  }
+
+  colorTexto: string = '';
+  stiloTextoCelda(texto: string): any {
+    let arrayObservacion = texto.split(" ");
+    if (arrayObservacion[0] == 'No') {
+      return 'rgb(255, 80, 80)';
+    } else {
+      return 'black'
+    }
+
+  }
 
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
   ConfirmarRegistroMultiple() {
@@ -340,23 +324,23 @@ export class ListarTitulosComponent implements OnInit {
       });
   }
 
-   registrarTitulos(){
+  registrarTitulos() {
     var data: any = {
       nombre: '',
       id_nivel: ''
     }
-    
-    if(this.listTitulosCorrectos.length > 0){
+
+    if (this.listTitulosCorrectos.length > 0) {
       console.log('listTitulosCorrectos', this.listTitulosCorrectos);
       var cont = 0;
       this.listTitulosCorrectos.forEach(item => {
         this.nivelTitulos.forEach(valor => {
-          if(item.nivel.toLowerCase() == valor.nombre.toLowerCase()){
+          if (item.nivel.toLowerCase() == valor.nombre.toLowerCase()) {
             data.nombre = item.titulo;
             data.id_nivel = valor.id;
             this.rest.RegistrarTitulo(data).subscribe(res => {
               cont = cont + 1;
-              if(this.listTitulosCorrectos.length  == cont){
+              if (this.listTitulosCorrectos.length == cont) {
                 this.toastr.success('Operación exitosa.', 'Plantilla de Titulos profesionales importada.', {
                   timeOut: 1500,
                 });
@@ -368,7 +352,7 @@ export class ListarTitulosComponent implements OnInit {
           }
         })
       })
-    }else{
+    } else {
       this.toastr.error('No exiten datos para registrar ingrese otra', 'Plantilla no aceptada', {
         timeOut: 4000,
       });
@@ -377,7 +361,7 @@ export class ListarTitulosComponent implements OnInit {
 
     this.archivoSubido = [];
     this.nameFile = '';
-   }
+  }
 
 
   /** ************************************************************************************************* **
@@ -557,6 +541,131 @@ export class ListarTitulosComponent implements OnInit {
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, "TitulosCSV" + '.csv');
     this.ObtenerTitulos();
+  }
+
+
+  // METODOS PARA LA SELECCION MULTIPLE
+
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+
+  selectionProvincias = new SelectionModel<ITableProvincias>(true, []);
+
+
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectionProvincias.selected.length;
+    return numSelected === this.verTitulos.length
+  }
+
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectionProvincias.clear() :
+      this.verTitulos.forEach((row: any) => this.selectionProvincias.select(row));
+  }
+
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableProvincias): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.titulosEliminar = this.selectionProvincias.selected;
+    //console.log('paginas para Eliminar',this.paginasEliminar);
+
+    //console.log(this.selectionPaginas.selected)
+    return `${this.selectionProvincias.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
+
+  }
+
+
+
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  Eliminar(id_titulo: number) {
+    this.rest.EliminarRegistro(id_titulo).subscribe(res => {
+      if (res.message === 'error') {
+        this.toastr.error('No se puede elminar.', '', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ObtenerTitulos();
+      }
+    });
+  }
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos.id);
+        } else {
+          this.router.navigate(['/titulos']);
+        }
+      });
+
+
+
+  }
+
+  EliminarMultiple() {
+
+    this.titulosEliminar = this.selectionProvincias.selected;
+    this.titulosEliminar.forEach((datos: any) => {
+
+      this.verTitulos = this.verTitulos.filter(item => item.id !== datos.id);
+      //AQUI MODIFICAR EL METODO 
+      this.Eliminar(datos.id);
+      this.ObtenerTitulos();
+
+
+    }
+    )
+  }
+
+
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+
+          if (this.titulosEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+
+
+
+
+
+
+          } else {
+            this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+
+          }
+        }
+      });
   }
 
 }

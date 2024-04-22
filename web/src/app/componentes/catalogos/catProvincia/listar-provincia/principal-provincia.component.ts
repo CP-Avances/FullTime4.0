@@ -22,6 +22,10 @@ import { ProvinciaService } from '../../../../servicios/catalogos/catProvincias/
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 
+import { SelectionModel } from '@angular/cdk/collections';
+import { ITableProvincias } from 'src/app/model/reportes.model';
+import { CiudadService } from 'src/app/servicios/ciudad/ciudad.service';
+
 @Component({
   selector: 'app-principal-provincia',
   templateUrl: './principal-provincia.component.html',
@@ -29,6 +33,9 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 })
 
 export class PrincipalProvinciaComponent implements OnInit {
+
+  provinciasEliminar: any = [];
+
 
   // ALMACENAMIENTO DE DATOS
   provincias: any = [];
@@ -58,6 +65,7 @@ export class PrincipalProvinciaComponent implements OnInit {
     private toastr: ToastrService,
     private router: Router,
     public rest: ProvinciaService,
+    public restc: CiudadService,
     public restE: EmpleadoService,
     public ventana: MatDialog,
     public validar: ValidacionesService,
@@ -127,27 +135,7 @@ export class PrincipalProvinciaComponent implements OnInit {
    ** **                       ELIMAR REGISTRO PROVINCIA                           ** **
    ** ******************************************************************************* **/
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
-  Eliminar(id_prov: number) {
-    this.rest.EliminarProvincia(id_prov).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ListarProvincias();
-    });
-  }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDelete(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.Eliminar(datos.id);
-        } else {
-          this.router.navigate(['/provincia']);
-        }
-      });
-  }
 
   // METODO PARA REGISTRAR SOLO LETRAS
   IngresarSoloLetras(e: any) {
@@ -365,7 +353,146 @@ export class PrincipalProvinciaComponent implements OnInit {
     a.download = 'Provincias.xml';
     // Simular un clic en el enlace para iniciar la descarga
     a.click();
-    
+
   }
+
+
+
+  // METODOS PARA LA SELECCION MULTIPLE
+
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+
+  selectionProvincias = new SelectionModel<ITableProvincias>(true, []);
+
+
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectionProvincias.selected.length;
+    return numSelected === this.provincias.length
+  }
+
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectionProvincias.clear() :
+      this.provincias.forEach((row: any) => this.selectionProvincias.select(row));
+  }
+
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableProvincias): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.provinciasEliminar = this.selectionProvincias.selected;
+    //console.log('paginas para Eliminar',this.paginasEliminar);
+
+    //console.log(this.selectionPaginas.selected)
+    return `${this.selectionProvincias.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
+
+  }
+
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
+  Eliminar(id_prov: number) {
+
+
+
+    this.rest.EliminarProvincia(id_prov).subscribe(res => {
+
+
+      if (res.message === 'error') {
+        this.toastr.error('No se puede elminar.', '', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ListarProvincias();
+
+
+      }
+
+    });
+  }
+
+
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos.id);
+        } else {
+          this.router.navigate(['/provincia']);
+        }
+      });
+  }
+
+  EliminarMultiple() {
+
+    this.provinciasEliminar = this.selectionProvincias.selected;
+    this.provinciasEliminar.forEach((datos: any) => {
+
+      this.provincias = this.provincias.filter(item => item.id !== datos.id);
+
+
+
+      //AQUI MODIFICAR EL METODO 
+      this.Eliminar(datos.id);
+
+
+
+      this.rest.BuscarProvincias().subscribe(datos => {
+        this.provincias = datos;
+      })
+
+    }
+    )
+  }
+
+
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+
+          if (this.provinciasEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+
+
+
+
+
+
+          } else {
+            this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+
+          }
+        }
+      });
+  }
+
 
 }

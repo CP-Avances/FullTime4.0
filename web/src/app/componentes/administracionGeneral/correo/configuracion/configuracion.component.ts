@@ -24,8 +24,8 @@ export class ConfiguracionComponent implements OnInit {
   // IMAGENES
   cabecera: string;
   pie: string;
-  imagen_default_c: boolean = true;
-  imagen_default_p: boolean = true;
+  imagen_default_c: boolean = true
+  imagen_default_p: boolean = true;;
 
   constructor(
     public restE: EmpresaService,

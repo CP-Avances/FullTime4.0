@@ -75,6 +75,8 @@ import UBICACION_RUTAS from './rutas/empleado/empleadoUbicacion/emplUbicacionRut
 import MODALIDAD_LABORAL_RUTAS from './rutas/catalogos/catModalidadLaboralRutas';
 import TIPO_CARGOS_RUTAS from './rutas/catalogos/catTiposCargosRutas'
 
+
+
 import { createServer, Server } from 'http';
 
 var io: any;
@@ -246,6 +248,7 @@ class Servidor {
         // VACUNACIÓN
         this.app.use('/vacunas', VACUNA_RUTAS)
 
+        
     }
 
     start(): void {

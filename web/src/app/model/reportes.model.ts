@@ -448,3 +448,67 @@ export interface hora {
     planifica_nombre: string,
     planifica_apellido: string,
 }
+
+
+// PAGINAS ROLES
+
+export interface ITableFuncionesRoles {
+    
+    funcion: string,
+    
+}
+
+//CREAR AQUI LAS NUEVAS INTERFACES
+
+//SUCURSALES
+
+export interface ITableSucursales {
+    nombre: string,
+    
+}
+
+
+export interface ITableDepartamentos {
+    nombre: string,
+    
+}
+
+
+export interface ITableRegimen {
+    nombre: string,
+    
+}
+
+
+export interface ITableProvincias {
+    nombre: string,
+    
+}
+
+
+export interface ITableCiudades {
+    nombre: string,
+    
+}
+
+export interface ITableSucursales {
+    nombre: string,
+    
+}
+
+export interface ITableDepartamentos {
+    nombre: string,
+    
+}
+
+
+
+export interface ITableNivelesEducacion {
+    nombre: string,
+    
+}
+
+export interface ITableTitulos {
+    nombre: string,
+    
+}

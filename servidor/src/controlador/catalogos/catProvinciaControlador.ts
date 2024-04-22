@@ -70,15 +70,27 @@ class ProvinciaControlador {
   }
 
   // METODO PARA ELIMINAR REGISTROS
-  public async EliminarProvincia(req: Request, res: Response): Promise<void> {
-    const id = req.params.id;
-    await pool.query(
-      `
+
+  public async EliminarProvincia(req: Request, res: Response) {
+
+
+    try {
+
+      const id = req.params.id;
+      await pool.query(
+        `
       DELETE FROM cg_provincias WHERE id = $1
       `
-      , [id]);
-    res.jsonp({ message: 'Registro eliminado.' });
+        , [id]);
+      res.jsonp({ message: 'Registro eliminado.' });
+    }
+    catch (error) {
+      return res.jsonp({ message: 'error' });
+    }
+
+
   }
+
 
   // METODO PARA REGISTRAR PROVINCIA
   public async CrearProvincia(req: Request, res: Response): Promise<void> {

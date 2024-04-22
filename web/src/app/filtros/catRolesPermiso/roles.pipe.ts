@@ -7,12 +7,12 @@ export class RolesPipe implements PipeTransform {
 
   transform(value: any, arg: any): any {
 
-    if(arg === '' || arg === null || arg.length < 2 ) return value;
+    if(arg === undefined || arg === null || arg.length < 2 ) return value;
 
     const resultadoRol: any = [];
 
     for(const rol of value){
-      if(rol.nombre.toLowerCase().indexOf(arg.toLowerCase()) > -1){
+      if(rol.funcion.toLowerCase().indexOf(arg.toLowerCase()) > -1){
         resultadoRol.push(rol);
       };
     };

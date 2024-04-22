@@ -27,6 +27,9 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
 import { ThemePalette } from '@angular/material/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 
+import { SelectionModel } from '@angular/cdk/collections';
+import { ITableDepartamentos } from 'src/app/model/reportes.model';
+
 @Component({
   selector: 'app-principal-departamento',
   templateUrl: './principal-departamento.component.html',
@@ -34,6 +37,10 @@ import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 })
 
 export class PrincipalDepartamentoComponent implements OnInit {
+
+
+  departamentosEliminar: any = [];
+
 
   // ALMACENAMIENTO DE DATOS CONSULTADOS Y FILTROS DE BUSQUEDA
   filtroNombre = '';
@@ -187,40 +194,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
   }
 
 
-  public departamentosNiveles: any = [];
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
-  Eliminar(id_dep: number, id_sucursal: number, nivel: number) {
-    this.rest.EliminarRegistro(id_dep).subscribe(res => {
-      this.departamentosNiveles = [];
-      var id_departamento = id_dep;
-      var id_establecimiento = id_sucursal;
-      if (nivel > 0) {
-        this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
-          this.departamentosNiveles = datos;
-          this.departamentosNiveles.filter(item => {
-            this.rest.EliminarRegistroNivelDepa(item.id).subscribe({})
-          })
-        })
-      }
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ListaDepartamentos();
-    });
-  }
 
-
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
-  ConfirmarDelete(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.Eliminar(datos.id, datos.id_sucursal, datos.nivel);
-        } else {
-          this.router.navigate(['/departamento']);
-        }
-      });
-  }
 
   // ORDENAR LOS DATOS SEGUN EL ID 
   OrdenarDatos(array: any) {
@@ -558,6 +532,180 @@ export class PrincipalDepartamentoComponent implements OnInit {
     // Simular un clic en el enlace para iniciar la descarga
     a.click();
   }
+
+
+  // METODOS PARA LA SELECCION MULTIPLE
+
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+
+
+
+
+
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+
+  selectionDepartamentos = new SelectionModel<ITableDepartamentos>(true, []);
+
+
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectionDepartamentos.selected.length;
+    return numSelected === this.departamentos.length
+  }
+
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectionDepartamentos.clear() :
+      this.departamentos.forEach((row: any) => this.selectionDepartamentos.select(row));
+  }
+
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableDepartamentos): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.departamentosEliminar = this.selectionDepartamentos.selected;
+    //console.log('paginas para Eliminar',this.paginasEliminar);
+
+    //console.log(this.selectionPaginas.selected)
+    return `${this.selectionDepartamentos.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
+
+  }
+
+
+
+
+
+  public departamentosNiveles: any = [];
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
+  Eliminar(id_dep: number, id_sucursal: number, nivel: number) {
+
+
+
+    this.rest.EliminarRegistro(id_dep).subscribe(res => {
+
+
+
+      if (res.message === 'error') {
+        this.toastr.error('No se puede elminar.', '', {
+          timeOut: 6000,
+        });
+
+
+      } else {
+
+        this.departamentosNiveles = [];
+        var id_departamento = id_dep;
+        var id_establecimiento = id_sucursal;
+        if (nivel > 0) {
+          this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
+            this.departamentosNiveles = datos;
+            this.departamentosNiveles.filter(item => {
+              this.rest.EliminarRegistroNivelDepa(item.id).subscribe({})
+              this.ListaDepartamentos();
+
+            })
+
+            this.ListaDepartamentos();
+
+          })
+        } else {
+          this.ListaDepartamentos();
+
+        }
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+
+        this.ListaDepartamentos();
+      }
+    });
+  }
+
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos.id, datos.id_sucursal, datos.nivel);
+        } else {
+          this.router.navigate(['/departamento']);
+        }
+      });
+  }
+
+
+  EliminarMultiple() {
+
+    this.departamentosEliminar = this.selectionDepartamentos.selected;
+    this.departamentosEliminar.forEach((datos: any) => {
+
+
+
+
+
+      //if(datos.nivel==0){
+
+        this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
+      //}else {
+      //  this.departamentos = this.departamentos.filter(item => item.id !== datos.id && item.nivel !== datos.nivel);
+
+      //}
+
+
+      this.Eliminar(datos.id, datos.id_sucursal, datos.nivel);
+
+
+      //ojo aqui
+      this.ListaDepartamentos();
+
+    }
+    )
+  }
+
+
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+
+          if (this.departamentosEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+
+
+
+
+
+
+          } else {
+            this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+
+          }
+        }
+      });
+  }
+
 
 }
 
