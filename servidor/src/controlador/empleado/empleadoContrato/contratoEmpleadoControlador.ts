@@ -597,7 +597,7 @@ class ContratoEmpleadoControlador {
     public async CargarPlantilla_contrato(req: Request, res: Response): Promise<void> {
         const plantilla = req.body;
         console.log('datos contrato: ', plantilla);
-
+        var contador = 0;
         plantilla.forEach(async (data: any) => {
             console.log('data: ',data);
             // Datos que se guardaran de la plantilla ingresada
@@ -642,13 +642,15 @@ class ContratoEmpleadoControlador {
 
             const [contrato] = response.rows;
 
-            setTimeout(() => {
+            if (contador === plantilla.length) {
                 if (contrato) {
                     return res.status(200).jsonp({message: 'ok'})
                 }else {
                     return res.status(404).jsonp({ message: 'error' })
                 }
-            }, 1500)
+              }
+      
+              contador = contador + 1;  
             
         });
     }

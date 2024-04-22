@@ -543,6 +543,7 @@ class ContratoEmpleadoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const plantilla = req.body;
             console.log('datos contrato: ', plantilla);
+            var contador = 0;
             plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                 console.log('data: ', data);
                 // Datos que se guardaran de la plantilla ingresada
@@ -578,14 +579,15 @@ class ContratoEmpleadoControlador {
                 `, [id_empleado, fecha_ingreso, fecha_salida, vaca_controla, asis_controla, id_regimen,
                     id_tipo_contrato]);
                 const [contrato] = response.rows;
-                setTimeout(() => {
+                if (contador === plantilla.length) {
                     if (contrato) {
                         return res.status(200).jsonp({ message: 'ok' });
                     }
                     else {
                         return res.status(404).jsonp({ message: 'error' });
                     }
-                }, 1500);
+                }
+                contador = contador + 1;
             }));
         });
     }

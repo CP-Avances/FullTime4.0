@@ -72,6 +72,8 @@ import AUDITORIA_RUTAS from './rutas/auditoria/auditoriaRutas';
 import VACACIONES_REPORTES_RUTAS from './rutas/reportes/solicitudVacacionesRutas';
 import PARAMETROS_RUTAS from './rutas/parametrosGenerales/parametrosRutas';
 import UBICACION_RUTAS from './rutas/empleado/empleadoUbicacion/emplUbicacionRutas';
+import MODALIDAD_LABORAL_RUTAS from './rutas/catalogos/catModalidadLaboralRutas';
+import TIPO_CARGOS_RUTAS from './rutas/catalogos/catTiposCargosRutas'
 
 import { createServer, Server } from 'http';
 
@@ -172,6 +174,8 @@ class Servidor {
         this.app.use('/nivel-titulo', NIVEL_TITULO_RUTAS);
         this.app.use('/autorizaciones', AUTORIZACIONES_RUTAS);
         this.app.use('/noti-real-time', NOTIFICACION_TIEMPO_REAL_RUTAS);
+        this.app.use('/modalidadLaboral', MODALIDAD_LABORAL_RUTAS);
+        this.app.use('/tipoCargos', TIPO_CARGOS_RUTAS)
 
         // Timbres
         this.app.use('/timbres', TIMBRES_RUTAS);

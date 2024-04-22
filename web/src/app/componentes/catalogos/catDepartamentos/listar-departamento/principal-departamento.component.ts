@@ -24,6 +24,8 @@ import { RegistroDepartamentoComponent } from 'src/app/componentes/catalogos/cat
 import { EditarDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/editar-departamento/editar-departamento.component';
 import { VerDepartamentoComponent } from 'src/app/componentes/catalogos/catDepartamentos/ver-departamento/ver-departamento.component';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
+import { ThemePalette } from '@angular/material/core';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-principal-departamento',
@@ -58,8 +60,25 @@ export class PrincipalDepartamentoComponent implements OnInit {
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
 
+  tamanio_paginaMul: number = 5;
+  numero_paginaMul: number = 1;
+
+  // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
+  nameFile: string;
+  archivoSubido: Array<File>;
+  archivoForm = new FormControl('', Validators.required);
+
+  // VARIABLE PARA TOMAR RUTA DEL SISTEMA
+  hipervinculo: string = environment.url
+
   empleado: any = [];
   idEmpleado: number;
+
+  // VARIABLES PROGRESS SPINNER
+  progreso: boolean = false;
+  color: ThemePalette = 'primary';
+  mode: ProgressSpinnerMode = 'indeterminate';
+  value = 10;
 
   constructor(
     private scriptService: ScriptService,
@@ -153,12 +172,18 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
   // METODO PARA LIMPIRA FORMULARIO
   LimpiarCampos() {
+    this.DataDepartamentos = null;
+    this.archivoSubido = [];
+    this.nameFile = '';
     this.formulario.setValue({
       departamentoForm: '',
       departamentoPadreForm: '',
       buscarNombreForm: '',
     });
     this.ListaDepartamentos();
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = false;
+    this.messajeExcel = '';
   }
 
 
@@ -211,6 +236,12 @@ export class PrincipalDepartamentoComponent implements OnInit {
     array.sort(compare);
   }
 
+  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+  ManejarPaginaMulti(e: PageEvent) {
+    this.tamanio_paginaMul = e.pageSize;
+    this.numero_paginaMul = e.pageIndex + 1
+  }
+
 
   // METODO PARA NAVEGAR A PANTALLA DE NIVELES
   data_id: number = 0;
@@ -222,6 +253,139 @@ export class PrincipalDepartamentoComponent implements OnInit {
     this.pagina = 'ver-departamento';
     this.ver_nivel = true;
     this.ver_departamentos = false;
+  }
+
+  mostrarbtnsubir: boolean = false;
+  // METODO PARA SELECCIONAR PLANTILLA DE DATOS DE FERIADOS
+  FileChange(element: any) {
+    this.archivoSubido = [];
+    this.nameFile = '';
+    this.archivoSubido = element.target.files;
+    this.nameFile = this.archivoSubido[0].name;
+    let arrayItems = this.nameFile.split(".");
+    let itemExtencion = arrayItems[arrayItems.length - 1];
+    let itemName = arrayItems[0].slice(0, 13);
+    if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
+      if (itemName.toLowerCase() == 'departamentos') {
+        this.numero_paginaMul = 1;
+        this.tamanio_paginaMul = 5;
+        this.Revisarplantilla();
+      } else {
+        this.toastr.error('Seleccione plantilla con nombre Departamentos', 'Plantilla seleccionada incorrecta', {
+          timeOut: 6000,
+        });
+        this.nameFile = '';
+      }
+    } else {
+      this.toastr.error('Error en el formato del documento', 'Plantilla no aceptada', {
+        timeOut: 6000,
+      });
+      this.nameFile = '';
+    }
+
+    this.archivoForm.reset();
+    this.mostrarbtnsubir = true;
+
+  }
+
+  DataDepartamentos: any;
+  listDepartamentosCorrectos: any = [];
+  messajeExcel: string = '';
+  Revisarplantilla(){
+    this.listDepartamentosCorrectos = [];
+    let formData = new FormData();
+    for (var i = 0; i < this.archivoSubido.length; i++) {
+      formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
+    }
+
+    this.progreso = true;
+
+    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    this.rest.RevisarFormato(formData).subscribe(res => {
+      this.DataDepartamentos = res.data;
+      this.messajeExcel = res.message;
+      console.log('probando plantilla1 departamentos', this.DataDepartamentos);
+
+      if (this.messajeExcel == 'error') {
+        this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      } else {
+        this.DataDepartamentos.forEach(item => {
+          if (item.observacion.toLowerCase() == 'ok') {
+            this.listDepartamentosCorrectos.push(item);
+          }
+        });
+      }
+    }, error => {
+      console.log('Serivicio rest -> metodo RevisarFormato - ', error);
+      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+        timeOut: 4000,
+      });
+      this.progreso = false;
+    }, () => {
+      this.progreso = false;
+    });
+  }
+
+  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  ConfirmarRegistroMultiple() {
+    const mensaje = 'registro';
+    console.log('listDepartamentosCorrectos: ', this.listDepartamentosCorrectos.length);
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.registrarDepartamentos();
+        }
+      });
+  }
+  registrarDepartamentos(){
+    if (this.listDepartamentosCorrectos.length > 0) {
+      this.rest.subirArchivoExcel(this.listDepartamentosCorrectos).subscribe(response => {
+        console.log('respuesta: ',response);
+        this.toastr.success('Operación exitosa.', 'Plantilla de Contratos importada.', {
+          timeOut: 3000,
+        });
+        window.location.reload();
+        this.archivoForm.reset();
+        this.nameFile = '';
+      });
+    }else {
+      this.toastr.error('No se ha encontrado datos para su registro.', 'Plantilla procesada.', {
+        timeOut: 4000,
+      });
+      this.archivoForm.reset();
+      this.nameFile = '';
+    }
+  }
+
+  //Metodo para dar color a las celdas y representar las validaciones
+  colorCelda: string = ''
+  stiloCelda(observacion: string): string {
+    let arrayObservacion = observacion.split(" ");
+    if (observacion == 'Registro duplicado') {
+      return 'rgb(156, 214, 255)';
+    } else if (observacion == 'ok') {
+      return 'rgb(159, 221, 154)';
+    } else if (observacion == 'Ya existe en el sistema') {
+      return 'rgb(239, 203, 106)';
+    } else if (observacion == 'No existe la sucursal en el sistema') {
+      return 'rgb(255, 192, 203)';
+    } else if (arrayObservacion[0] == 'Nombre' || arrayObservacion[0] == 'Sucursal') {
+      return 'rgb(242, 21, 21)';
+    } else {
+      return 'white'
+    }
+  }
+  colorTexto: string = '';
+  stiloTextoCelda(texto: string): string {
+    let arrayObservacion = texto.split(" ");
+    if (arrayObservacion[0] == 'No') {
+      return 'rgb(255, 80, 80)';
+    } else {
+      return 'black'
+    }
   }
 
 

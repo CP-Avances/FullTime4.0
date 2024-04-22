@@ -1,0 +1,161 @@
+<div class="container" style="padding-bottom: 15px; padding-top: 15px;">
+    <div class="row">
+        <div class="col-md">
+            <div id="titulo">
+                <span>MODALIDAD LABORAL</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9">
+                <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
+                    <button id="btn-raised" class="btn btn-sm"
+                        (click)="AbrirVentanaRegistrarModalidad()">
+                        Crear Modalidad Laboral
+                    </button>
+                    <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
+                        matTooltipPosition="right"
+                        matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
+                        Mostrar lista
+                    </button>
+                </div>
+            </mat-card>
+        </div>
+
+        <!------------------ Registro multiple de Modalidad Laboral ------------------------------------->
+        <div class="col-md">
+            <div id="titulo">
+                <span>REGISTRO MULTIPLE</span>
+            </div>
+            <mat-card class="example-card mat-elevation-z9">
+                <div class="row">
+                    <div class="col-md" style="padding-top: 5px;">
+                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                            <form method="post" class="btn-2" enctype="multipart/form-data" style="width: max-content;">
+                                <input (change)="FileChange($event)" type="file" [formControl]="archivoForm" id="file"
+                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                <label for="file" matSuffix matTooltipPosition="right"
+                                    *ngIf="!mostrarbtnsubir" style="height: 65px; padding-top: 25px;"
+                                    matTooltip="Dar click para selecionar plantilla y cargar registros.">
+                                    Subir plantilla
+                                </label>
+                                <label for="file"  matSuffix matTooltipPosition="right"
+                                    *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                    style="height: 64px; padding-top: 25px;"
+                                    matTooltip="Presionar para seleccionar Plantilla con nombre Modalidad.">
+                                    Subir nueva plantilla
+                                </label>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-md" *ngIf="!Datos_modalidad_laboral" style="padding-top: 5px; padding-bottom: 5px;">
+                        <div class="d-flex flex-wrap justify-content-around">
+                            <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                                style="margin: 2% 0% 3% 0%;" matTooltip="Dar click para ver o descargar el documento."
+                                href="{{hipervinculo}}/plantillaD/documento/Modalidad.xlsx">
+                                
+                                <span class="material-icons">cloud_download</span>
+                                <br>
+                                Descargar plantilla usuarios
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md"  style="padding-top: 5px; padding-bottom: 5px;" >
+                        <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                            <button *ngIf="Datos_modalidad_laboral && messajeExcel != 'error'" id="descargar" class="btn btn-sm" (click)="ConfirmarRegistroMultiple()"
+                                (click)="ConfirmarRegistroMultiple()" matSuffix matTooltipPosition="right"
+                                 matTooltip="Guardar registro multiple.">
+                                Registrar
+                            </button>
+                        </div>
+                    </div>
+                    
+                </div>    
+            </mat-card>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!Datos_modalidad_laboral">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="resultados">RESULTADO DE BÚSQUEDA</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr>
+                        <th scope="col">Modalidad Laboral</th>
+                        <th scope="col">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <!--mat-form-field id="t-inputs">
+                                <input matInput placeholder="Buscar" [formControl]="buscarNombre"
+                                    [(ngModel)]="filtroNombreSuc">
+                            </mat-form-field-->
+                        </td>
+                        <td>
+                            <mat-icon id="i-ayuda" matSuffix matTooltipPosition="right"
+                                matTooltip="Búsqueda de departamentos de acurdo a cada columna de la tabla.">
+                                help_outline
+                            </mat-icon>
+                        </td>
+                    </tr>
+                    <tr
+                        *ngFor="let Modal of listaModalida_Laboral |  paginate:tamanio_pagina:numero_pagina">
+                        <td>{{Modal.descripcion}}</td>
+                        <td class="justify-content-center">
+                            <i (click)="ConfirmarDelete(Modal.id)" class="far fa-trash-alt" id="t-eliminar"
+                                matSuffix matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                <p>Eliminar</p>
+                            </i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator id="pagina" [length]="listaModalida_Laboral.length" [pageSize]="tamanio_pagina"
+            [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>
+
+<!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
+<div class="container" style="padding-top: 10px; margin-bottom: 25px;" *ngIf="Datos_modalidad_laboral && messajeExcel != 'error'">
+    <app-definicion-plantilla>
+    </app-definicion-plantilla>
+</div>
+
+<!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE MODALIDAD LABORAL ------------------------------------------------->
+<div class="container" style="padding-bottom: 10px; margin-bottom: 35px;" *ngIf="Datos_modalidad_laboral && messajeExcel != 'error'">
+    <div class="mat-elevation-z8" style="background: white;">
+        <div id="titulo">REGISTRO MULTIPLE</div>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr style="text-align: center; font-size: 13px;">
+                        <th scope="col">Item</th>
+                        <th scope="col">Modalidad laboral</th>
+                        <th scope="col">Observación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let dm of Datos_modalidad_laboral | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                        <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{dm.fila}}</td>
+                        <td [style.color]="stiloTextoCelda(dm.modalida_laboral)" style="font-size: 12px;">{{dm.modalida_laboral}}</td>
+                        <td style="font-size: 12px;">
+                            <div style="width: 270px; margin: auto;">
+                                <div id="t-editar" class="circulo"
+                                    [style.background-color]="stiloCelda(dm.observacion)"></div>
+                                {{dm.observacion}}
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator [length]="Datos_modalidad_laboral.length" [pageSize]="tamanio_paginaMul"
+            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+            showFirstLastButtons>
+        </mat-paginator>
+    </div>
+</div>

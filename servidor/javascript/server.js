@@ -76,6 +76,8 @@ const auditoriaRutas_1 = __importDefault(require("./rutas/auditoria/auditoriaRut
 const solicitudVacacionesRutas_1 = __importDefault(require("./rutas/reportes/solicitudVacacionesRutas"));
 const parametrosRutas_1 = __importDefault(require("./rutas/parametrosGenerales/parametrosRutas"));
 const emplUbicacionRutas_1 = __importDefault(require("./rutas/empleado/empleadoUbicacion/emplUbicacionRutas"));
+const catModalidadLaboralRutas_1 = __importDefault(require("./rutas/catalogos/catModalidadLaboralRutas"));
+const catTiposCargosRutas_1 = __importDefault(require("./rutas/catalogos/catTiposCargosRutas"));
 const http_1 = require("http");
 var io;
 class Servidor {
@@ -157,6 +159,8 @@ class Servidor {
         this.app.use('/nivel-titulo', nivelTituloRutas_1.default);
         this.app.use('/autorizaciones', autorizacionesRutas_1.default);
         this.app.use('/noti-real-time', notificacionesRutas_1.default);
+        this.app.use('/modalidadLaboral', catModalidadLaboralRutas_1.default);
+        this.app.use('/tipoCargos', catTiposCargosRutas_1.default);
         // Timbres
         this.app.use('/timbres', timbresRutas_1.default);
         this.app.use('/planificacion_general', planGeneralRutas_1.default);
