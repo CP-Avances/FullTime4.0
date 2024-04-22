@@ -344,7 +344,7 @@ export class ListarNivelTitulosComponent implements OnInit {
       });
   }
 
-  
+
 
   /** ************************************************************************************************* **
    ** **                            PARA LA EXPORTACION DE ARCHIVOS PDF                              ** **
@@ -546,7 +546,7 @@ export class ListarNivelTitulosComponent implements OnInit {
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedPag() {
     const numSelected = this.selectionProvincias.selected.length;
-    return numSelected === this.provincias.length
+    return numSelected === this.nivelTitulos.length
   }
 
 
@@ -554,7 +554,7 @@ export class ListarNivelTitulosComponent implements OnInit {
   masterTogglePag() {
     this.isAllSelectedPag() ?
       this.selectionProvincias.clear() :
-      this.provincias.forEach((row: any) => this.selectionProvincias.select(row));
+      this.nivelTitulos.forEach((row: any) => this.selectionProvincias.select(row));
   }
 
 
@@ -563,7 +563,7 @@ export class ListarNivelTitulosComponent implements OnInit {
     if (!row) {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
-    this.provinciasEliminar = this.selectionProvincias.selected;
+    this.nivelesEliminar = this.selectionProvincias.selected;
     //console.log('paginas para Eliminar',this.paginasEliminar);
 
     //console.log(this.selectionPaginas.selected)
@@ -574,10 +574,17 @@ export class ListarNivelTitulosComponent implements OnInit {
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
   Eliminar(id_nivel: number) {
     this.nivel.EliminarNivel(id_nivel).subscribe(res => {
-      this.toastr.error("Registro eliminado.", '', {
-        timeOut: 6000,
-      });
-      this.ObtenerNiveles();
+
+      if (res.message === 'error') {
+        this.toastr.error('No se puede elminar.', '', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ObtenerNiveles();
+      }
     });
   }
 
@@ -596,21 +603,13 @@ export class ListarNivelTitulosComponent implements OnInit {
 
   EliminarMultiple() {
 
-    this.provinciasEliminar = this.selectionProvincias.selected;
-    this.provinciasEliminar.forEach((datos: any) => {
+    this.nivelesEliminar = this.selectionProvincias.selected;
+    this.nivelesEliminar.forEach((datos: any) => {
 
-      this.provincias = this.provincias.filter(item => item.id !== datos.id);
-
-
-
+      this.nivelTitulos = this.nivelTitulos.filter(item => item.id !== datos.id);
       //AQUI MODIFICAR EL METODO 
       this.Eliminar(datos.id);
-
-
-
-      this.rest.BuscarProvincias().subscribe(datos => {
-        this.provincias = datos;
-      })
+      this.ObtenerNiveles();
 
     }
     )
@@ -622,7 +621,7 @@ export class ListarNivelTitulosComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
 
-          if (this.provinciasEliminar.length != 0) {
+          if (this.nivelesEliminar.length != 0) {
             this.EliminarMultiple();
             this.activar_seleccion = true;
 

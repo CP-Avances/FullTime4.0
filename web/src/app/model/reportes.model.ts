@@ -508,4 +508,7 @@ export interface ITableNivelesEducacion {
     
 }
 
-
+export interface ITableTitulos {
+    nombre: string,
+    
+}
