@@ -39,7 +39,7 @@ class BirthdayControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empresa, titulo, link, mensaje } = req.body;
             yield database_1.default.query(`
-            INSERT INTO message_birthday (id_empresa, titulo, mensaje, url) VALUES ($1, $2, $3, $4)
+            INSERT INTO message_birthday (id_empresa, asunto, mensaje, link) VALUES ($1, $2, $3, $4)
             `, [id_empresa, titulo, mensaje, link]);
             const oneMessage = yield database_1.default.query(`
             SELECT id FROM message_birthday WHERE id_empresa = $1
@@ -78,20 +78,20 @@ class BirthdayControlador {
                                 }
                             });
                             yield database_1.default.query(`
-                            UPDATE message_birthday SET img = $2 WHERE id = $1
+                            UPDATE message_birthday SET imagen = $2 WHERE id = $1
                             `, [id, imagen]);
                             res.jsonp({ message: 'Imagen actualizada.' });
                         }
                         catch (error) {
                             yield database_1.default.query(`
-                            UPDATE message_birthday SET img = $2 WHERE id = $1
+                            UPDATE message_birthday SET imagen = $2 WHERE id = $1
                             `, [id, imagen]);
                             res.jsonp({ message: 'Imagen actualizada.' });
                         }
                     }
                     else {
                         yield database_1.default.query(`
-                        UPDATE message_birthday SET img = $2 WHERE id = $1
+                        UPDATE message_birthday SET imagen = $2 WHERE id = $1
                         `, [id, imagen]);
                         res.jsonp({ message: 'Imagen actualizada.' });
                     }
@@ -119,7 +119,7 @@ class BirthdayControlador {
             const { titulo, mensaje, link } = req.body;
             const { id_mensaje } = req.params;
             yield database_1.default.query(`
-            UPDATE message_birthday SET titulo = $1, mensaje = $2, url = $3 WHERE id = $4
+            UPDATE message_birthday SET asunto = $1, mensaje = $2, link = $3 WHERE id = $4
             `, [titulo, mensaje, link, id_mensaje]);
             res.jsonp({ message: 'Mensaje de cumpleaños actualizado.' });
         });

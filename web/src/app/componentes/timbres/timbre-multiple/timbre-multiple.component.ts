@@ -695,7 +695,7 @@ export class TimbreMultipleComponent implements OnInit {
   ConfirmarTimbre(empleado: any) {
     this.restEmpresa.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string))
       .subscribe(datos => {
-        if (datos[0].seg_frase === true) {
+        if (datos[0].seguridad_frase === true) {
           this.restUsuario.BuscarDatosUser(this.idEmpleadoLogueado).subscribe(data => {
             if (data[0].frase === null || data[0].frase === '') {
               this.toastr.info(
@@ -710,10 +710,10 @@ export class TimbreMultipleComponent implements OnInit {
             }
           });
         }
-        else if (datos[0].seg_contrasena === true) {
+        else if (datos[0].seguridad_contrasena === true) {
           this.AbrirVentana(empleado);
         }
-        else if (datos[0].seg_ninguna === true) {
+        else if (datos[0].seguridad_ninguna === true) {
           this.RegistrarTimbre(empleado);
         }
       });
@@ -771,7 +771,7 @@ export class TimbreMultipleComponent implements OnInit {
   VerificarSeguridad(seleccionados: any) {
     this.restEmpresa.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string))
       .subscribe(datos => {
-        if (datos[0].seg_frase === true) {
+        if (datos[0].seguridad_frase === true) {
           this.restUsuario.BuscarDatosUser(this.idEmpleadoLogueado).subscribe(data => {
             if (data[0].frase === null || data[0].frase === '') {
               this.toastr.info(
@@ -786,10 +786,10 @@ export class TimbreMultipleComponent implements OnInit {
             }
           });
         }
-        else if (datos[0].seg_contrasena === true) {
+        else if (datos[0].seguridad_contrasena === true) {
           this.AbrirSeguridad(seleccionados);
         }
-        else if (datos[0].seg_ninguna === true) {
+        else if (datos[0].seguridad_ninguna === true) {
           this.TimbrarVarios(seleccionados);
         }
       });

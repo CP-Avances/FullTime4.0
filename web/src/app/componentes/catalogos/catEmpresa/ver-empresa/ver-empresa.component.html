@@ -65,12 +65,12 @@
                                 <label id="datosF">Establecimientos:</label>
                                 <label>{{e.establecimiento}}</label>
                             </div>
-                            <div *ngIf="e.num_partida != null && e.num_partida != ''"
+                            <div *ngIf="e.numero_partida != null && e.numero_partida != ''"
                                 class="caja1 d-flex justify-content-start">
                                 <label id="datosF">Número partida presupuestaria:</label>
                             </div>
                             <div class="caja1 d-flex justify-content-start">
-                                <label id="num">{{e.num_partida}}</label>
+                                <label id="num">{{e.numero_partida}}</label>
                             </div>
                             <div style="text-align: right;">
                                 <i id="editarF" (click)="EditarDatosEmpresa()" matSuffix matTooltipPosition="right"
@@ -102,9 +102,9 @@
                             </div>
                             <div class="caja1 d-flex justify-content-start">
                                 <label id="datosF">Seguridad:</label>
-                                <label *ngIf="e.seg_ninguna === true">Ninguna</label>
-                                <label *ngIf="e.seg_frase === true">Usar una frase</label>
-                                <label *ngIf="e.seg_contrasena === true">Usar contraseña</label>
+                                <label *ngIf="e.seguridad_ninguna === true">Ninguna</label>
+                                <label *ngIf="e.seguridad_frase === true">Usar una frase</label>
+                                <label *ngIf="e.seguridad_contrasena === true">Usar contraseña</label>
                             </div>
                             <div class="d-flex justify-content-around text-center">
                                 <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaSeguridad(e)">Configurar

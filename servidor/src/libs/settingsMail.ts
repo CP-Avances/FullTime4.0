@@ -141,7 +141,7 @@ export const FormatearHora = async function (hora: string) {
 export const BuscarFecha = async function () {
   return {
     fecha: await pool.query(
-      `SELECT descripcion FROM detalle_tipo_parametro WHERE id_tipo_parametro = 25`
+      `SELECT descripcion FROM detalle_tipo_parametro WHERE id_parametro = 25`
     ).then(result => {
       if (result.rowCount != 0) {
         return result.rows[0].descripcion;
@@ -156,7 +156,7 @@ export const BuscarFecha = async function () {
 export const BuscarHora = async function () {
   return {
     hora: await pool.query(
-      `SELECT descripcion FROM detalle_tipo_parametro WHERE id_tipo_parametro = 26`
+      `SELECT descripcion FROM detalle_tipo_parametro WHERE id_parametro = 26`
     ).then(result => {
       if (result.rowCount != 0) {
         return result.rows[0].descripcion;

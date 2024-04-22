@@ -11,7 +11,7 @@ class ParametrosControlador {
         /**
           SELECT tp.id, tp.descripcion, dtp.descripcion AS detalle
             FROM tipo_parametro AS tp, detalle_tipo_parametro AS dtp
-            WHERE tp.id = dtp.id_tipo_parametro
+            WHERE tp.id = dtp.id_parametro
          */
         const PARAMETRO = await pool.query(
             `
@@ -77,7 +77,7 @@ class ParametrosControlador {
             `
             SELECT tp.id AS id_tipo, tp.descripcion AS tipo, dtp.id AS id_detalle, dtp.descripcion
             FROM tipo_parametro AS tp, detalle_tipo_parametro AS dtp
-            WHERE tp.id = dtp.id_tipo_parametro AND tp.id = $1
+            WHERE tp.id = dtp.id_parametro AND tp.id = $1
             `
             , [id]);
         if (PARAMETRO.rowCount > 0) {
@@ -110,7 +110,7 @@ class ParametrosControlador {
         await pool.query(
             `
             INSERT INTO detalle_tipo_parametro
-            (id_tipo_parametro, descripcion) VALUES ($1, $2)
+            (id_parametro, descripcion) VALUES ($1, $2)
             `
             , [id_tipo, descripcion]);
         res.jsonp({ message: 'Registro exitoso.' });

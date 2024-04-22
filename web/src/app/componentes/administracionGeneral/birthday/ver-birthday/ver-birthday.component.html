@@ -23,11 +23,11 @@
             <div style="padding-top: 15px;">
                 <div class="caja">
                     <label>Asunto:</label>
-                    <span>{{c.titulo}}</span>
+                    <span>{{c.asunto}}</span>
                 </div>
-                <div class="caja" *ngIf="c.url != null && c.url != ''">
+                <div class="caja" *ngIf="c.link != null && c.link != ''">
                     <label>Link:</label>
-                    <a href="{{c.url}}" target="_blank"> ! VER FELICITACIONES ! </a>
+                    <a href="{{c.link}}" target="_blank"> ! VER FELICITACIONES ! </a>
                 </div>
                 <div class="caja">
                     <label>Mensaje:</label>
@@ -35,7 +35,7 @@
                 </div>
                 <div class="caja" style="padding-bottom: 30px;">
                     <label>Imagen:</label><br>
-                    <img class="img-fluid rounded mx-auto d-block" src="{{API_URL}}/birthday/img/{{c.img}}">
+                    <img class="img-fluid rounded mx-auto d-block" src="{{API_URL}}/birthday/img/{{c.imagen}}">
                 </div>
             </div>
         </div>

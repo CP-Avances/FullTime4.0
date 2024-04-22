@@ -139,7 +139,7 @@ export class MainNavComponent implements OnInit {
   ConfigurarSeguridad() {
     this.restEmpresa.ConsultarDatosEmpresa(this.idEmpresa).subscribe(datos => {
       this.datosEmpresa = datos;
-      if (this.datosEmpresa[0].seg_frase === true) {
+      if (this.datosEmpresa[0].seguridad_frase === true) {
         this.restUsuario.BuscarDatosUser(this.id_empleado_logueado).subscribe(data => {
           if (data[0].id_rol === 1) {
             if (data[0].frase === null || data[0].frase === '') {

@@ -137,7 +137,7 @@ class EmpresaControlador {
             yield database_1.default.query(`
             UPDATE cg_empresa SET nombre = $1, ruc = $2, direccion = $3, telefono = $4, correo_empresa = $5,
             tipo_empresa = $6, representante = $7, establecimiento = $8, dias_cambio = $9, cambios = $10, 
-            num_partida = $11 WHERE id = $12
+            numero_partida = $11 WHERE id = $12
             `, [nombre, ruc, direccion, telefono, correo_empresa, tipo_empresa, representante, establecimiento,
                 dias_cambio, cambios, num_partida, id]);
             res.jsonp({ message: 'Registro actualizado.' });
@@ -148,7 +148,7 @@ class EmpresaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { color_p, color_s, id } = req.body;
             yield database_1.default.query(`
-            UPDATE cg_empresa SET color_p = $1, color_s = $2 WHERE id = $3
+            UPDATE cg_empresa SET color_principal = $1, color_secundario = $2 WHERE id = $3
             `, [color_p, color_s, id]);
             res.jsonp({ message: 'Registro actualizado.' });
         });
@@ -168,7 +168,7 @@ class EmpresaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { seg_contrasena, seg_frase, seg_ninguna, id } = req.body;
             yield database_1.default.query(`
-            UPDATE cg_empresa SET seg_contrasena = $1, seg_frase = $2, seg_ninguna = $3
+            UPDATE cg_empresa SET seguridad_contrasena = $1, seguridad_frase = $2, seguridad_ninguna = $3
             WHERE id = $4
             `, [seg_contrasena, seg_frase, seg_ninguna, id]);
             res.jsonp({ message: 'Registro actualizado.' });
@@ -351,7 +351,7 @@ class EmpresaControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const EMPRESA = yield database_1.default.query(`
             SELECT id, nombre, ruc, direccion, telefono, correo,
-            representante, tipo_empresa, establecimiento, logo, color_p, color_s, num_partida, marca_agua,
+            representante, tipo_empresa, establecimiento, logo, color_principal, color_secundario, numero_partida, marca_agua,
             correo_empresa FROM cg_empresa ORDER BY nombre ASC
             `);
             if (EMPRESA.rowCount > 0) {

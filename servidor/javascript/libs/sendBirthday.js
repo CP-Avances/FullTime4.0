@@ -32,7 +32,7 @@ const cumpleanios = function () {
             const felizCumple = yield database_1.default.query(`
                 SELECT da.nombre, da.apellido, da.correo, da.fec_nacimiento, s.id_empresa, 
                     ce.correo AS correo_empresa, ce.puerto, ce.password_correo, ce.servidor, 
-                    ce.pie_firma, ce.cabecera_firma, m.titulo, m.mensaje, m.img, m.url  
+                    ce.pie_firma, ce.cabecera_firma, m.asunto, m.mensaje, m.imagen, m.link  
                 FROM datos_actuales_empleado AS da, sucursales AS s, message_birthday AS m,
                     cg_empresa AS ce 
                 WHERE CAST(da.fec_nacimiento AS VARCHAR) LIKE '%' || $1 AND da.id_sucursal = s.id
@@ -44,7 +44,7 @@ const cumpleanios = function () {
                 console.log('ver infor correos', correos);
                 // ENVIAR MAIL A TODOS LOS QUE NACIERON EN LA FECHA SELECCIONADA
                 let message_url = `<p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;"></p>`;
-                if (felizCumple.rows[0].url != null) {
+                if (felizCumple.rows[0].link != null) {
                     message_url = `<p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; text-align: center;">
                     <a style="background-color: #199319; color: white; padding: 15px 15px 15px 15px; text-decoration: none;" href="${felizCumple.rows[0].url}">¡ VER FELICITACIONES !</a></p>`;
                 }
@@ -57,7 +57,7 @@ const cumpleanios = function () {
                 let data = {
                     to: correos,
                     from: felizCumple.rows[0].correo_empresa,
-                    subject: felizCumple.rows[0].titulo,
+                    subject: felizCumple.rows[0].asunto,
                     html: `
                             <body>
                                 <div style="text-align: center;">
@@ -99,7 +99,7 @@ const cumpleanios = function () {
                         },
                         {
                             filename: 'birthday1.jpg',
-                            path: `${path_folder_}/${felizCumple.rows[0].img}`,
+                            path: `${path_folder_}/${felizCumple.rows[0].imagen}`,
                             cid: 'cumple' // COLOCAR EL MISMO cid EN LA ETIQUETA html img src QUE CORRESPONDA
                         }
                     ]

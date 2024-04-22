@@ -2682,7 +2682,7 @@ export class VerEmpleadoComponent implements OnInit {
     this.empresa = [];
     this.restEmpresa.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(data => {
       this.empresa = data;
-      if (this.empresa[0].seg_frase === true) {
+      if (this.empresa[0].seguridad_frase === true) {
         this.activar_frase = true;
         this.restU.BuscarDatosUser(this.idEmpleadoLogueado).subscribe(data => {
           if (data[0].frase === null || data[0].frase === '') {

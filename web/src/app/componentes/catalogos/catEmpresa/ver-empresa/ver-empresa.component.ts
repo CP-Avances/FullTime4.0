@@ -104,8 +104,8 @@ export class VerEmpresaComponent implements OnInit {
     this.datosEmpresa = [];
     this.empresa.ConsultarDatosEmpresa(this.idEmpresa).subscribe(datos => {
       this.datosEmpresa = datos;
-      this.p_color = this.datosEmpresa[0].color_p;
-      this.s_color = this.datosEmpresa[0].color_s;
+      this.p_color = this.datosEmpresa[0].color_principal;
+      this.s_color = this.datosEmpresa[0].color_secundario;
       if (this.datosEmpresa[0].establecimiento === null || this.datosEmpresa[0].establecimiento === '' || this.datosEmpresa[0].establecimiento === undefined) {
         this.nombre_establecimiento = 'establecimientos';
       }
@@ -264,8 +264,8 @@ export class VerEmpresaComponent implements OnInit {
     this.empresas = [];
     this.empresa.ConsultarDatosEmpresa(this.datosEmpresa[0].id).subscribe(res => {
       this.empresas = res;
-      this.p_color = this.empresas[0].color_p;
-      this.s_color = this.empresas[0].color_s;
+      this.p_color = this.empresas[0].color_principal;
+      this.s_color = this.empresas[0].color_secundario;
       this.frase = this.empresas[0].marca_agua;
     });
   }

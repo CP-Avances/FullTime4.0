@@ -133,8 +133,8 @@ export class AuditoriaComponent implements OnInit {
   frase: any;
   ObtenerColores() {
     this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(res => {
-      this.p_color = res[0].color_p;
-      this.s_color = res[0].color_s;
+      this.p_color = res[0].color_principal;
+      this.s_color = res[0].color_secundario;
       this.frase = res[0].marca_agua;
     });
   }
@@ -304,7 +304,7 @@ export class AuditoriaComponent implements OnInit {
 
   VerificarSeguridad() {
     this.restEmpre.ConsultarDatosEmpresa(parseInt(localStorage.getItem('empresa') as string)).subscribe(datos => {
-      if (datos[0].seg_frase === true) {
+      if (datos[0].seguridad_frase === true) {
         this.restUsuario.BuscarDatosUser(this.idEmpleado).subscribe(data => {
           if (data[0].frase === null || data[0].frase === '') {
             this.toastr.info('Debe registrar su frase de seguridad.', 'Configuración doble seguridad', { timeOut: 10000 })
@@ -317,10 +317,10 @@ export class AuditoriaComponent implements OnInit {
           }
         });
       }
-      else if (datos[0].seg_contrasena === true) {
+      else if (datos[0].seguridad_contrasena === true) {
         this.AbrirSeguridad();
       }
-      else if (datos[0].seg_ninguna === true) {
+      else if (datos[0].seguridad_ninguna === true) {
         this.ver = true;
       }
     });
