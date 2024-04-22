@@ -137,7 +137,7 @@ export class ListarRegimenComponent implements OnInit {
    ** **          VENTANAS PARA REGISTRAR Y EDITAR DATOS DE UN REGIMEN LABORAL       ** **
    ** ********************************************************************************* **/
 
-  
+
 
   // METODO PARA ABRIR FORMULARIO REGISTRAR
   ver_lista: boolean = true;
@@ -448,7 +448,7 @@ export class ListarRegimenComponent implements OnInit {
     this.ObtenerRegimen();
   }
 
-//HABILITAR LOS CHECKS
+  //HABILITAR LOS CHECKS
 
   plan_multiple: boolean = false;
   plan_multiple_: boolean = false;
@@ -524,7 +524,7 @@ export class ListarRegimenComponent implements OnInit {
   }
 
 
-  
+
 
 
   ConfirmarDeleteMultiple() {
@@ -550,6 +550,12 @@ export class ListarRegimenComponent implements OnInit {
             })
 
           }
+
+          this.selectionRegimen.clear();
+
+        } else {
+          this.router.navigate(['/listarRegimen']);
+
         }
       });
   }
@@ -580,7 +586,7 @@ export class ListarRegimenComponent implements OnInit {
       });
   }
 
-  
+
 
 
 

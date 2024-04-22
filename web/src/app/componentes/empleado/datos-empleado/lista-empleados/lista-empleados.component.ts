@@ -35,6 +35,9 @@ import { MetodosComponent } from 'src/app/componentes/administracionGeneral/meto
 
 export class ListaEmpleadosComponent implements OnInit {
 
+  empleadosEliminarActivos: any = [];
+  empleadosEliminarInactivos: any = [];
+
   // VARIABLES DE ALMACENAMIENTO DE DATOS 
   nacionalidades: any = [];
   empleadoD: any = [];
@@ -965,5 +968,143 @@ export class ListaEmpleadosComponent implements OnInit {
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, "EmpleadosCSV" + '.csv');
   }
+
+  // Metodos para la eliminacion de empleados activos e inactivos
+
+  // METODOS PARA LA SELECCION MULTIPLE
+
+
+
+
+
+
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
+  Eliminar(id_empleado: number) {
+    this.rest.EliminarEmpleados(id_empleado).subscribe(res => {
+      if (res.message === 'error') {
+        this.toastr.error('No se puede elminar.', '', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.GetEmpleados();
+      }
+
+    });
+  }
+
+
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos.id);
+        } else {
+          this.router.navigate(['/empleados']);
+        }
+      });
+  }
+
+  ConfirmarDeleteMultipleActivos() {
+
+    let EliminarActivos = this.selectionUno.selected.map(obj => {
+      return {
+        id: obj.id,
+        empleado: obj.nombre + ' ' + obj.apellido
+      }
+    })
+
+
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+
+
+          if (EliminarActivos.length != 0) {
+            EliminarActivos.forEach((datos: any) => {
+
+              this.empleado = this.empleado.filter(item => item.id !== datos.id);
+              //AQUI MODIFICAR EL METODO 
+              this.Eliminar(datos.id);
+              this.GetEmpleados();
+            }
+            )
+            this.btnCheckHabilitar = false;
+
+
+          } else {
+            this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+          }
+
+          this.selectionUno.clear();
+
+
+        } else {
+          this.router.navigate(['/empleados']);
+        }
+
+      }
+      )
+  }
+
+
+
+
+
+  ConfirmarDeleteMultipleInactivos() {
+
+    let EliminarInactivos = this.selectionDos.selected.map(obj => {
+      return {
+        id: obj.id,
+        empleado: obj.nombre + ' ' + obj.apellido
+      }
+    })
+
+
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+
+
+          if (EliminarInactivos.length != 0) {
+
+            EliminarInactivos.forEach((datos: any) => {
+
+              this.empleado = this.empleado.filter(item => item.id !== datos.id);
+              //AQUI MODIFICAR EL METODO 
+              this.Eliminar(datos.id);
+              this.GetEmpleados();
+
+
+
+            }
+            )
+            this.btnCheckDeshabilitado = false;
+          } else {
+            this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+
+          }
+
+          this.selectionDos.clear();
+
+        } else {
+          this.router.navigate(['/empleados']);
+
+        }
+
+      }
+      )
+  }
+
+
+
 
 }

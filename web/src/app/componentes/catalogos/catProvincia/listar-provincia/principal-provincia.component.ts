@@ -490,7 +490,14 @@ export class PrincipalProvinciaComponent implements OnInit {
             })
 
           }
+
+          this.selectionProvincias.clear();
+
+        } else {
+          this.router.navigate(['/provincia']);
         }
+
+
       });
   }
 

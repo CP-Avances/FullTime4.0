@@ -115,8 +115,13 @@ export class EmpleadoService {
     return this.http.put(`${environment.url}/empleado/${idEmpleado}/uploadImage`, formData)
   }
 
-  obtenerImagen(id: any, imagen: any){
+  obtenerImagen(id: any, imagen: any) {
     return this.http.get<any>(`${environment.url}/empleado/img/codificado/${id}/${imagen}`)
+  }
+
+  // METODO PARA ELIMINAR REGISTRO
+  EliminarEmpleados(id: any) {
+    return this.http.delete(`${environment.url}/empleado/eliminar/${id}`).pipe(catchError(id));
   }
 
 
@@ -157,7 +162,7 @@ export class EmpleadoService {
   BuscarUbicacion(id: number) {
     return this.http.get<any>(`${environment.url}/empleado/ubicacion/${id}`);
   }
-  
+
 
   /** **************************************************************************************** **
    ** **                 METODOS MODALIDAD DE TRABAJO O TIPO DE CONTRATOS                   ** **

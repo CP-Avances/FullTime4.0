@@ -679,18 +679,21 @@ ConfirmarDelete(datos: any) {
 
             this.plan_multiple = false;
             this.plan_multiple_ = false;
-
-
-
-
-
-
           } else {
             this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
 
           }
+
+
+          this.selectionSucursales.clear();
+
+
+        }else{
+
+          this.router.navigate(['/sucursales']);
+
         }
       });
   }

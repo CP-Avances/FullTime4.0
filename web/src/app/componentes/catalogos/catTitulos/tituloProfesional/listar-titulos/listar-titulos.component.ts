@@ -560,13 +560,13 @@ export class ListarTitulosComponent implements OnInit {
   activar_seleccion: boolean = true;
   seleccion_vacia: boolean = true;
 
-  selectionProvincias = new SelectionModel<ITableProvincias>(true, []);
+  selectionTitulos = new SelectionModel<ITableProvincias>(true, []);
 
 
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedPag() {
-    const numSelected = this.selectionProvincias.selected.length;
+    const numSelected = this.selectionTitulos.selected.length;
     return numSelected === this.verTitulos.length
   }
 
@@ -574,8 +574,8 @@ export class ListarTitulosComponent implements OnInit {
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterTogglePag() {
     this.isAllSelectedPag() ?
-      this.selectionProvincias.clear() :
-      this.verTitulos.forEach((row: any) => this.selectionProvincias.select(row));
+      this.selectionTitulos.clear() :
+      this.verTitulos.forEach((row: any) => this.selectionTitulos.select(row));
   }
 
 
@@ -584,11 +584,11 @@ export class ListarTitulosComponent implements OnInit {
     if (!row) {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
-    this.titulosEliminar = this.selectionProvincias.selected;
+    this.titulosEliminar = this.selectionTitulos.selected;
     //console.log('paginas para Eliminar',this.paginasEliminar);
 
     //console.log(this.selectionPaginas.selected)
-    return `${this.selectionProvincias.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
+    return `${this.selectionTitulos.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
 
   }
 
@@ -627,7 +627,7 @@ export class ListarTitulosComponent implements OnInit {
 
   EliminarMultiple() {
 
-    this.titulosEliminar = this.selectionProvincias.selected;
+    this.titulosEliminar = this.selectionTitulos.selected;
     this.titulosEliminar.forEach((datos: any) => {
 
       this.verTitulos = this.verTitulos.filter(item => item.id !== datos.id);
@@ -664,6 +664,13 @@ export class ListarTitulosComponent implements OnInit {
             })
 
           }
+
+          this.selectionTitulos.clear();
+
+        }else{
+
+          this.router.navigate(['/titulos']);
+
         }
       });
   }

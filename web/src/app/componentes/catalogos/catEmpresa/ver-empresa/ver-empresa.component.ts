@@ -514,6 +514,12 @@ export class VerEmpresaComponent implements OnInit {
             })
 
           }
+
+          this.selectionSucursales.clear();
+
+        }else{
+          this.router.navigate(['/nivelTitulos']);
+
         }
       });
   }

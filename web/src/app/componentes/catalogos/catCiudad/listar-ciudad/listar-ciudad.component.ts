@@ -477,6 +477,13 @@ export class ListarCiudadComponent implements OnInit {
             })
 
           }
+
+          this.selectiondatosCiudades.clear();
+
+        } else {
+
+          this.router.navigate(['/listarCiudades']);
+
         }
       });
   }

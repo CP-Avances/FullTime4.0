@@ -538,6 +538,14 @@ export class PrincipalDepartamentoComponent implements OnInit {
             })
 
           }
+
+          this.selectionDepartamentos.clear();
+
+        }else{
+          this.router.navigate(['/departamento']);
+
+
+
         }
       });
   }

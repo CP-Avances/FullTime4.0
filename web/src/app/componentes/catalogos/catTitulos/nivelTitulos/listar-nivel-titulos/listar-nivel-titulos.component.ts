@@ -539,13 +539,13 @@ export class ListarNivelTitulosComponent implements OnInit {
   activar_seleccion: boolean = true;
   seleccion_vacia: boolean = true;
 
-  selectionProvincias = new SelectionModel<ITableNivelesEducacion>(true, []);
+  selectionNiveles = new SelectionModel<ITableNivelesEducacion>(true, []);
 
 
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedPag() {
-    const numSelected = this.selectionProvincias.selected.length;
+    const numSelected = this.selectionNiveles.selected.length;
     return numSelected === this.nivelTitulos.length
   }
 
@@ -553,8 +553,8 @@ export class ListarNivelTitulosComponent implements OnInit {
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterTogglePag() {
     this.isAllSelectedPag() ?
-      this.selectionProvincias.clear() :
-      this.nivelTitulos.forEach((row: any) => this.selectionProvincias.select(row));
+      this.selectionNiveles.clear() :
+      this.nivelTitulos.forEach((row: any) => this.selectionNiveles.select(row));
   }
 
 
@@ -563,11 +563,11 @@ export class ListarNivelTitulosComponent implements OnInit {
     if (!row) {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
-    this.nivelesEliminar = this.selectionProvincias.selected;
+    this.nivelesEliminar = this.selectionNiveles.selected;
     //console.log('paginas para Eliminar',this.paginasEliminar);
 
     //console.log(this.selectionPaginas.selected)
-    return `${this.selectionProvincias.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
+    return `${this.selectionNiveles.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
 
   }
 
@@ -603,7 +603,7 @@ export class ListarNivelTitulosComponent implements OnInit {
 
   EliminarMultiple() {
 
-    this.nivelesEliminar = this.selectionProvincias.selected;
+    this.nivelesEliminar = this.selectionNiveles.selected;
     this.nivelesEliminar.forEach((datos: any) => {
 
       this.nivelTitulos = this.nivelTitulos.filter(item => item.id !== datos.id);
@@ -639,6 +639,14 @@ export class ListarNivelTitulosComponent implements OnInit {
             })
 
           }
+
+          this.selectionNiveles.clear();
+
+        }else{
+          this.router.navigate(['/nivelTitulos']);
+
+
+
         }
       });
   }

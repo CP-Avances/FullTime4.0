@@ -106,8 +106,8 @@
                                 library_add_check
                             </mat-icon>
                             <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
-                                [checked]="selectionProvincias.hasValue() && isAllSelectedPag()"
-                                [indeterminate]="selectionProvincias.hasValue() && !isAllSelectedPag()"
+                                [checked]="selectionNiveles.hasValue() && isAllSelectedPag()"
+                                [indeterminate]="selectionNiveles.hasValue() && !isAllSelectedPag()"
                                 [aria-label]="checkboxLabelPag()">
                             </mat-checkbox>
                         </th>
@@ -136,8 +136,8 @@
 
                         <td>
                             <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
-                                (change)="$event ? selectionProvincias.toggle(t) : null"
-                                [checked]="selectionProvincias.isSelected(t)" [aria-label]="checkboxLabelPag(t)">
+                                (change)="$event ? selectionNiveles.toggle(t) : null"
+                                [checked]="selectionNiveles.isSelected(t)" [aria-label]="checkboxLabelPag(t)">
                             </mat-checkbox>
                         </td>
                         <td>{{t.nombre}}</td>

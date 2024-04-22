@@ -768,6 +768,36 @@ class EmpleadoControlador {
   }
 
 
+
+  // METODO PARA ELIMINAR USUARIOS
+
+  
+  // METODO PARA ELIMINAR REGISTROS
+
+  public async EliminarEmpleado(req: Request, res: Response) {
+
+
+    try {
+
+      const id = req.params.id;
+      await pool.query(
+        `
+      DELETE FROM empleados WHERE id = $1
+      `
+        , [id]);
+      res.jsonp({ message: 'Registro eliminado.' });
+    }
+    catch (error) {
+      return res.jsonp({ message: 'error' });
+    }
+
+
+  }
+
+
+
+
+
   /** **************************************************************************************** **
    ** **                      CARGAR INFORMACIÓN MEDIANTE PLANTILLA                            ** 
    ** **************************************************************************************** **/

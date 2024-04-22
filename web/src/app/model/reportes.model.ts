@@ -512,3 +512,12 @@ export interface ITableTitulos {
     nombre: string,
     
 }
+
+export interface ITableFeriados {
+    
+    descripcion: string,
+    
+}
+
+
+
