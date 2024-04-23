@@ -73,6 +73,24 @@ export class CatModalidaLaboralComponent implements OnInit{
     })
   }
 
+  AbrirEditar(item_modalidad: any){
+    console.log('item_modalidad: ',item_modalidad);
+    this._ModalidaLaboral.ActualizarModalidadLab(item_modalidad).subscribe(res => {
+      if (res.message === 'error') {
+        this.toastr.error(
+          'No se pudo actualizar la informacion.',
+          'Error actualizacón', {
+          timeOut: 6000,
+        })
+      }
+      else {
+        this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
+          timeOut: 6000,
+        })
+      }
+    })
+  }
+
   ConfirmarDelete(id: any){
     const mensaje = 'eliminar';
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()

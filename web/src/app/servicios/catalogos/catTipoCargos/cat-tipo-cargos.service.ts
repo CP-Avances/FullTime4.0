@@ -15,6 +15,12 @@ export class CatTipoCargosService {
   listaCargos(){
     return this.http.get<any>(environment.url + '/tipoCargos');
   }
+
+
+  ActualizarCargo(datos: any) {
+    return this.http.put(`${environment.url}/tipoCargos`, datos)
+    .pipe(catchError(datos));
+  }
   eliminar(id: any){
     return this.http.delete<any>(`${environment.url}/tipoCargos/eliminar/${id}`)
   }

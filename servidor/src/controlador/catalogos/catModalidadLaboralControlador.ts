@@ -44,6 +44,22 @@ class ModalidaLaboralControlador {
           }
     }
 
+    public async EditarModalidadLaboral(req: Request, res: Response){
+        try {
+            const { id, descripcion } = req.body;
+            await pool.query(
+                `
+                UPDATE modal_trabajo SET descripcion = $2
+                WHERE id = $1
+                `
+                , [id, descripcion]);
+            res.jsonp({ message: 'Registro actualizado.' });
+        }
+        catch (error) {
+            return res.jsonp({ message: 'error' });
+        }
+    }
+
     public async eliminarRegistro(req: Request, res: Response){
         try{
             const id = req.params.id;

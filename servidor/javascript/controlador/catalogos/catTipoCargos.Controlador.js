@@ -52,6 +52,21 @@ class TiposCargosControlador {
             }
         });
     }
+    EditarCargo(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id, cargo } = req.body;
+                yield database_1.default.query(`
+                UPDATE tipo_cargo SET cargo = $2
+                WHERE id = $1
+                `, [id, cargo]);
+                res.jsonp({ message: 'Registro actualizado.' });
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error' });
+            }
+        });
+    }
     eliminarRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

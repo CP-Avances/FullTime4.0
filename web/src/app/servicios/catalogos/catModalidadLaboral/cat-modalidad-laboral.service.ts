@@ -21,8 +21,14 @@ export class CatModalidadLaboralService {
       catchError(modalidad)
     );
   }
+  // METODO PARA ACTUALIZAR REGISTRO
+  ActualizarModalidadLab(datos: any) {
+    return this.http.put(`${environment.url}/modalidadLaboral`, datos)
+    .pipe(catchError(datos));
+  }
   eliminar(id: any){
     return this.http.delete<any>(`${environment.url}/modalidadLaboral/eliminar/${id}`)
+    .pipe(catchError(id))
   }
   RevisarFormato(formData) {
     return this.http.post<any>(environment.url + '/modalidadLaboral/upload/revision', formData);

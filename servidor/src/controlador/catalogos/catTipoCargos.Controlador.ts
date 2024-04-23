@@ -42,6 +42,22 @@ class TiposCargosControlador {
           }
     }
 
+    public async EditarCargo(req: Request, res: Response){
+        try {
+            const { id, cargo } = req.body;
+            await pool.query(
+                `
+                UPDATE tipo_cargo SET cargo = $2
+                WHERE id = $1
+                `
+                , [id, cargo]);
+            res.jsonp({ message: 'Registro actualizado.' });
+        }
+        catch (error) {
+            return res.jsonp({ message: 'error' });
+        }
+    }
+
     public async eliminarRegistro(req: Request, res: Response){
         try{
             const id = req.params.id;

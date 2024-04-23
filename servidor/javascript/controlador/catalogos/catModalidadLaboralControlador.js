@@ -55,6 +55,21 @@ class ModalidaLaboralControlador {
             }
         });
     }
+    EditarModalidadLaboral(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { id, descripcion } = req.body;
+                yield database_1.default.query(`
+                UPDATE modal_trabajo SET descripcion = $2
+                WHERE id = $1
+                `, [id, descripcion]);
+                res.jsonp({ message: 'Registro actualizado.' });
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error' });
+            }
+        });
+    }
     eliminarRegistro(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

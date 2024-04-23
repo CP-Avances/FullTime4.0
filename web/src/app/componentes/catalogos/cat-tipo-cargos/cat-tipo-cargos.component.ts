@@ -70,6 +70,9 @@ export class CatTipoCargosComponent {
   AbrirVentanaRegistrarModalidad(){
 
   }
+  AbrirEditar(){
+
+  }
 
   ConfirmarDelete(id: any){
     const mensaje = 'eliminar';

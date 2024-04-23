@@ -6,7 +6,7 @@
             </div>
             <mat-card class="example-card mat-elevation-z9">
                 <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                    <button id="btn-raised" class="btn btn-sm"
+                    <button *ngIf="!Datos_tipo_cargos" id="btn-raised" class="btn btn-sm"
                         (click)="AbrirVentanaRegistrarModalidad()">
                         Crear Cargos
                     </button>
@@ -106,6 +106,11 @@
                             <i (click)="ConfirmarDelete(cargo.id)" class="far fa-trash-alt" id="t-eliminar"
                                 matSuffix matTooltipPosition="right" matTooltip="Eliminar este registro.">
                                 <p>Eliminar</p>
+                            </i>
+                            <i id="t-editar" (click)="AbrirEditar()" matSuffix
+                                matTooltipPosition="right" matTooltip="Modificar datos de este registro"
+                                class="fas fa-edit">
+                                <p>Editar</p>
                             </i>
                         </td>
                     </tr>
