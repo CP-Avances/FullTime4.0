@@ -1,6 +1,7 @@
 import { ObtenerRutaHorarios, ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import fs from 'fs';
 import path from 'path';
 import pool from '../../database';
@@ -12,8 +13,11 @@ class HorarioControlador {
 
   // REGISTRAR HORARIO
   public async CrearHorario(req: Request, res: Response): Promise<Response> {
-    const { nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_ } = req.body;
+    const { nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_, user_name, ip } = req.body;
     try {
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
       const response: QueryResult = await pool.query(
         `
       INSERT INTO cg_horarios (nombre, min_almuerzo, hora_trabajo,
@@ -23,6 +27,20 @@ class HorarioControlador {
 
       const [horario] = response.rows;
 
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'cg_horarios',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: JSON.stringify(horario),
+        ip,
+        observacion: null
+      })
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
       if (horario) {
         return res.status(200).jsonp(horario)
       }
@@ -30,7 +48,8 @@ class HorarioControlador {
         return res.status(404).jsonp({ message: 'error' })
       }
     } catch (error) {
-      console.log('error ', error)
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
       return res.status(400).jsonp({ message: error });
     }
   }
@@ -56,10 +75,14 @@ class HorarioControlador {
   }
 
   // GUARDAR DOCUMENTO DE HORARIO
-  public async GuardarDocumentoHorario(req: Request, res: Response): Promise<void> {
+  public async GuardarDocumentoHorario(req: Request, res: Response): Promise<Response> {
 
     let id = req.params.id;
     let { archivo, codigo } = req.params;
+
+    // TODO ANALIZAR COMO OBTENER DESDE EL FRONT EL USERNAME Y LA IP
+    const { user_name, ip } = req.body;
+
     // FECHA DEL SISTEMA
     var fecha = moment();
     var anio = fecha.format('YYYY');
@@ -69,13 +92,54 @@ class HorarioControlador {
     let documento = id + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
     let separador = path.sep;
 
+    // INICIAR TRANSACCION
+    await pool.query('BEGIN');
+
+    // CONSULTAR DATOSORIGINALES
+
+    const horario = await pool.query(
+      `
+      SELECT * FROM cg_horarios WHERE id = $1
+      `
+      , [id]);
+    const [datosOriginales] = horario.rows;
+
+    if (!datosOriginales) {
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'cg_horarios',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: '',
+        datosNuevos: '',
+        ip,
+        observacion: `Error al actualizar el horario con id: ${id}`
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.status(404).jsonp({ message: 'error' });
+    }
+
     await pool.query(
       `
       UPDATE cg_horarios SET documento = $2 WHERE id = $1
       `
       , [id, documento]);
+    
+    // AUDITORIA
+    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+      tabla: 'cg_horarios',
+      usuario: user_name,
+      accion: 'U',
+      datosOriginales: JSON.stringify(datosOriginales),
+      datosNuevos: JSON.stringify({ documento }),
+      ip,
+      observacion: null
+    });
 
-    res.jsonp({ message: 'Documento actualizado.' });
+    // FINALIZAR TRANSACCION
+    await pool.query('COMMIT');
 
     if (archivo != 'null' && archivo != '' && archivo != null) {
       if (archivo != documento) {
@@ -90,14 +154,43 @@ class HorarioControlador {
         });
       }
     }
+
+    return res.jsonp({ message: 'Documento actualizado.' });
   }
 
   // METODO PARA ACTUALIZAR DATOS DE HORARIO
   public async EditarHorario(req: Request, res: Response): Promise<any> {
     const id = req.params.id;
-    const { nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_ } = req.body;
+    const { nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_, user_name, ip } = req.body;
 
     try {
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const horario = await pool.query(
+        `
+        SELECT * FROM cg_horarios WHERE id = $1
+        `
+        , [id]);
+      const [datosOriginales] = horario.rows;
+
+      if (!datosOriginales) {
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'cg_horarios',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar el horario con id: ${id}`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'error' });
+      }
       const respuesta = await pool.query(
         `
         UPDATE cg_horarios SET nombre = $1, min_almuerzo = $2, hora_trabajo = $3,  
@@ -107,26 +200,36 @@ class HorarioControlador {
         , [nombre, min_almuerzo, hora_trabajo, nocturno, detalle, codigo, default_, id,])
         .then((result: any) => { return result.rows })
 
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'cg_horarios',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{nombre: ${nombre}, min_almuerzo: ${min_almuerzo}, hora_trabajo: ${hora_trabajo}, nocturno: ${nocturno}, detalle: ${detalle}, codigo: ${codigo}, default_: ${default_}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
       if (respuesta.length === 0) return res.status(400).jsonp({ message: 'error' });
 
       return res.status(200).jsonp(respuesta);
 
     } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
       return res.status(400).jsonp({ message: error });
     }
   }
 
   // ELIMINAR DOCUMENTO HORARIO BASE DE DATOS - SERVIDOR
-  public async EliminarDocumento(req: Request, res: Response): Promise<void> {
-    let { documento, id } = req.body;
+  public async EliminarDocumento(req: Request, res: Response): Promise<Response> {
+    let { documento, id, user_name, ip } = req.body;
     let separador = path.sep;
-
-    await pool.query(
-      `
-            UPDATE cg_horarios SET documento = null WHERE id = $1
-            `
-      , [id]);
-
+    
     if (documento != 'null' && documento != '' && documento != null) {
       let ruta = ObtenerRutaHorarios() + separador + documento;
       // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
@@ -139,7 +242,60 @@ class HorarioControlador {
       });
     }
 
-    res.jsonp({ message: 'Documento actualizado.' });
+    try {
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const horario = await pool.query(
+        `
+        SELECT * FROM cg_horarios WHERE id = $1
+        `
+        , [id]);
+      const [datosOriginales] = horario.rows;
+
+      if (!datosOriginales) {
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'cg_horarios',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar el horario con id: ${id}`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'error' });
+      }
+
+      await pool.query(
+        `
+              UPDATE cg_horarios SET documento = null WHERE id = $1
+              `
+        , [id]);
+      
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'cg_horarios',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{documento: null}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Documento actualizado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(400).jsonp({ message: error }); 
+    }
   }
 
   // ELIMINAR DOCUMENTO HORARIO DEL SERVIDOR
@@ -197,14 +353,65 @@ class HorarioControlador {
   }
 
   // METODO PARA ELIMINAR REGISTROS
-  public async EliminarRegistros(req: Request, res: Response): Promise<void> {
-    const id = req.params.id;
-    await pool.query(
-      `
-      DELETE FROM cg_horarios WHERE id = $1
-      `
-      , [id]);
-    res.jsonp({ message: 'Registro eliminado.' });
+  public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
+    try {
+      // TODO ANALIZAR COMO OBTENER DESDE EL FRONT EL USERNAME Y LA IP
+      const { user_name, ip } = req.body;
+      const id = req.params.id;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const horario = await pool.query(
+        `
+        SELECT * FROM cg_horarios WHERE id = $1
+        `
+        , [id]);
+      const [datosOriginales] = horario.rows;
+
+      if (!datosOriginales) {
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'cg_horarios',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al eliminar el horario con id: ${id}`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'error' });
+      }
+
+      await pool.query(
+        `
+        DELETE FROM cg_horarios WHERE id = $1
+        `
+        , [id]);
+      
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'cg_horarios',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro eliminado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(400).jsonp({ message: error });
+    }
   }
 
   // METODO PARA BUSCAR DATOS DE UN HORARIO
@@ -226,20 +433,64 @@ class HorarioControlador {
   // METODO PARA EDITAR HORAS TRABAJADAS
   public async EditarHorasTrabaja(req: Request, res: Response): Promise<any> {
     const id = req.params.id;
-    const { hora_trabajo } = req.body;
+    const { hora_trabajo, user_name, ip } = req.body;
     try {
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const horario = await pool.query(
+        `
+        SELECT * FROM cg_horarios WHERE id = $1
+        `
+        , [id]);
+      const [datosOriginales] = horario.rows;
+
+      if (!datosOriginales) {
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'cg_horarios',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar el horario con id: ${id}`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'No actualizado.' });
+      }
+
       const respuesta = await pool.query(
         `
         UPDATE cg_horarios SET hora_trabajo = $1 WHERE id = $2 RETURNING *
         `
         , [hora_trabajo, id])
-        .then((result: any) => { return result.rows })
+        .then((result: any) => { return result.rows });
+      
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'cg_horarios',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{hora_trabajo: ${hora_trabajo}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
 
       if (respuesta.length === 0) return res.status(400).jsonp({ message: 'No actualizado.' });
 
       return res.status(200).jsonp(respuesta)
 
     } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
       return res.status(400).jsonp({ message: error });
     }
   }
@@ -261,7 +512,7 @@ class HorarioControlador {
   public async CargarHorarioPlantilla(req: Request, res: Response): Promise<Response> {
    
     try {
-      const { horarios, detalles } = req.body;
+      const { horarios, detalles, user_name, } = req.body;
       let horariosCargados = true;
       let detallesCargados = true;
       let codigosHorariosCargados = [];
@@ -269,58 +520,81 @@ class HorarioControlador {
       if (horarios.length > 0) {
         // CARGAR HORARIOS
         for (const horario of horarios) {
-          let { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOCTURNO } = horario;
-
-          horario.CODIGO_HORARIO = horario.CODIGO_HORARIO.toString();
-        
-          //CAMBIAR TIPO DE HORARIO Laborable = N, Libre = L, Feriado = FD
-          switch (TIPO_HORARIO) {
-            case 'Laborable':
-              TIPO_HORARIO = 'N';
-              break;
-            case 'Libre':
-              TIPO_HORARIO = 'L';
-              break;
-            case 'Feriado':
-              TIPO_HORARIO = 'FD';
-              break;
-          }
-
-          // CAMBIAR HORARIO_NOCTURNO
-          switch (HORARIO_NOCTURNO) {
-            case 'Si':
-              HORARIO_NOCTURNO = true;
-              break;
-            case 'No':
-              HORARIO_NOCTURNO = false;
-              break;
-            default:
-              HORARIO_NOCTURNO = false;
-              break;
-          }
-
-          // FORMATEAR HORAS_TOTALES
-          HORAS_TOTALES = FormatearHoras(horario.HORAS_TOTALES.toString(), horario.DETALLE);
+          try {
+            let { DESCRIPCION, CODIGO_HORARIO, HORAS_TOTALES, MIN_ALIMENTACION, TIPO_HORARIO, HORARIO_NOCTURNO } = horario;
   
-          // INSERTAR EN LA BASE DE DATOS
-          const response: QueryResult = await pool.query(
-            `
-            INSERT INTO cg_horarios (nombre, min_almuerzo, hora_trabajo,
-            nocturno, detalle, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
-            `
-            , [DESCRIPCION, MIN_ALIMENTACION, HORAS_TOTALES, HORARIO_NOCTURNO, true, CODIGO_HORARIO, TIPO_HORARIO]);
-
-          const [correcto] = response.rows;
+            horario.CODIGO_HORARIO = horario.CODIGO_HORARIO.toString();
           
-          if (correcto) {
-            horariosCargados = true;
-          }
-          else {
+            //CAMBIAR TIPO DE HORARIO Laborable = N, Libre = L, Feriado = FD
+            switch (TIPO_HORARIO) {
+              case 'Laborable':
+                TIPO_HORARIO = 'N';
+                break;
+              case 'Libre':
+                TIPO_HORARIO = 'L';
+                break;
+              case 'Feriado':
+                TIPO_HORARIO = 'FD';
+                break;
+            }
+  
+            // CAMBIAR HORARIO_NOCTURNO
+            switch (HORARIO_NOCTURNO) {
+              case 'Si':
+                HORARIO_NOCTURNO = true;
+                break;
+              case 'No':
+                HORARIO_NOCTURNO = false;
+                break;
+              default:
+                HORARIO_NOCTURNO = false;
+                break;
+            }
+  
+            // FORMATEAR HORAS_TOTALES
+            HORAS_TOTALES = FormatearHoras(horario.HORAS_TOTALES.toString(), horario.DETALLE);
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+    
+            // INSERTAR EN LA BASE DE DATOS
+            const response: QueryResult = await pool.query(
+              `
+              INSERT INTO cg_horarios (nombre, min_almuerzo, hora_trabajo,
+              nocturno, detalle, codigo, default_) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+              `
+              , [DESCRIPCION, MIN_ALIMENTACION, HORAS_TOTALES, HORARIO_NOCTURNO, true, CODIGO_HORARIO, TIPO_HORARIO]);
+  
+            const [correcto] = response.rows;
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'cg_horarios',
+              usuario: user_name,
+              accion: 'I',
+              datosOriginales: '',
+              datosNuevos: JSON.stringify(correcto),
+              ip: '',
+              observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            
+            if (correcto) {
+              horariosCargados = true;
+            }
+            else {
+              horariosCargados = false;
+            }
+            const idHorario = correcto.id;
+            const codigoHorario = correcto.codigo;
+            codigosHorariosCargados.push({codigoHorario, idHorario});
+          } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
             horariosCargados = false;
           }
-          const idHorario = correcto.id;
-          const codigoHorario = correcto.codigo;
-          codigosHorariosCargados.push({codigoHorario, idHorario});
         }
       }
   
@@ -328,68 +602,81 @@ class HorarioControlador {
       if (detalles.length > 0) {
         // CARGAR DETALLES
         for (const detalle of detalles) {
-          let { CODIGO_HORARIO, TIPO_ACCION, HORA, TOLERANCIA, ORDEN, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES, MIN_DESPUES } = detalle;
+          try {
+            let { CODIGO_HORARIO, TIPO_ACCION, HORA, TOLERANCIA, ORDEN, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES, MIN_DESPUES } = detalle;
+  
+            CODIGO_HORARIO = CODIGO_HORARIO.toString();
+  
+            // CAMBIAR TIPO DE ACCION Entrada = E, Inicio alimentacion = I/A, Fin alimentacion = F/A, Salida = S
+            switch (TIPO_ACCION) {
+              case 'Entrada':
+                TIPO_ACCION = 'E';
+                break;
+              case 'Inicio alimentación':
+                TIPO_ACCION = 'I/A';
+                break;
+              case 'Fin alimentación':
+                TIPO_ACCION = 'F/A';
+                break;
+              case 'Salida':
+                TIPO_ACCION = 'S';
+                break;
+            }
+  
+            // CAMBIAR SALIDA_SIGUIENTE_DIA
+            switch (SALIDA_SIGUIENTE_DIA) {
+              case 'Si':
+                SALIDA_SIGUIENTE_DIA = true;
+                break;
+              case 'No':
+                SALIDA_SIGUIENTE_DIA = false;
+                break;
+              default:
+                SALIDA_SIGUIENTE_DIA = false;
+                break;
+            }
+  
+            // CAMBIAR SALIDA_TERCER_DIA
+            switch (SALIDA_TERCER_DIA) {
+              case 'Si':
+                SALIDA_TERCER_DIA = true;
+                break;
+              case 'No':
+                SALIDA_TERCER_DIA = false;
+                break;
+              default:
+                SALIDA_TERCER_DIA = false;
+                break;
+            }
+  
+            // CAMBIAR TOLERANCIA
+            TOLERANCIA = TIPO_ACCION.toLowerCase() === 'e' ? TOLERANCIA : null;
+  
+            // CAMBIAR CODIGO_HORARIO POR EL ID DEL HORARIO CORRESPONDIENTE
+            const ID_HORARIO: number = (codigosHorariosCargados.find((codigo: any) => codigo.codigoHorario === CODIGO_HORARIO))?.idHorario;
+            
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+            
+            // INSERTAR EN LA BASE DE DATOS
+            const response2: QueryResult = await pool.query(
+              `
+              INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes,
+                  min_despues) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+              `
+              , [ORDEN, HORA, TOLERANCIA, ID_HORARIO, TIPO_ACCION, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES, MIN_DESPUES]);
 
-          CODIGO_HORARIO = CODIGO_HORARIO.toString();
-
-          // CAMBIAR TIPO DE ACCION Entrada = E, Inicio alimentacion = I/A, Fin alimentacion = F/A, Salida = S
-          switch (TIPO_ACCION) {
-            case 'Entrada':
-              TIPO_ACCION = 'E';
-              break;
-            case 'Inicio alimentación':
-              TIPO_ACCION = 'I/A';
-              break;
-            case 'Fin alimentación':
-              TIPO_ACCION = 'F/A';
-              break;
-            case 'Salida':
-              TIPO_ACCION = 'S';
-              break;
-          }
-
-          // CAMBIAR SALIDA_SIGUIENTE_DIA
-          switch (SALIDA_SIGUIENTE_DIA) {
-            case 'Si':
-              SALIDA_SIGUIENTE_DIA = true;
-              break;
-            case 'No':
-              SALIDA_SIGUIENTE_DIA = false;
-              break;
-            default:
-              SALIDA_SIGUIENTE_DIA = false;
-              break;
-          }
-
-          // CAMBIAR SALIDA_TERCER_DIA
-          switch (SALIDA_TERCER_DIA) {
-            case 'Si':
-              SALIDA_TERCER_DIA = true;
-              break;
-            case 'No':
-              SALIDA_TERCER_DIA = false;
-              break;
-            default:
-              SALIDA_TERCER_DIA = false;
-              break;
-          }
-
-          // CAMBIAR TOLERANCIA
-          TOLERANCIA = TIPO_ACCION.toLowerCase() === 'e' ? TOLERANCIA : null;
-
-          // CAMBIAR CODIGO_HORARIO POR EL ID DEL HORARIO CORRESPONDIENTE
-          const ID_HORARIO: number = (codigosHorariosCargados.find((codigo: any) => codigo.codigoHorario === CODIGO_HORARIO))?.idHorario;
-          // INSERTAR EN LA BASE DE DATOS
-          const response2: QueryResult = await pool.query(
-            `
-            INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes,
-                min_despues) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-            `
-            , [ORDEN, HORA, TOLERANCIA, ID_HORARIO, TIPO_ACCION, SALIDA_SIGUIENTE_DIA, SALIDA_TERCER_DIA, MIN_ANTES, MIN_DESPUES]);
-          
-          if (response2.rowCount > 0) {
-            detallesCargados = true;
-          } else {
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            
+            if (response2.rowCount > 0) {
+              detallesCargados = true;
+            } else {
+              detallesCargados = false;
+            }
+          } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
             detallesCargados = false;
           }
         }
