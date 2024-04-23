@@ -27,26 +27,29 @@
                 <mat-card class="example-card mat-elevation-z9">
                     <div class="row">
                         <div class="col-md" style="padding-top: 5px;">
-                            <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                            <div class="d-flex flex-wrap justify-content-around"
+                                style="text-align: center; justify-content: center;">
                                 <form method="post" enctype="multipart/form-data" style="width: max-content;">
                                     <input (change)="FileChange($event)" type="file" [formControl]="archivoForm"
                                         id="file"
                                         accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                    <label for="file" matSuffix matTooltipPosition="right"
-                                        *ngIf="!mostrarbtnsubir" style="height: 64px;  padding-top: 25px;"
+                                    <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                        style="height: 64px;  padding-top: 25px;"
                                         matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
                                         Subir plantilla
                                     </label>
                                     <label for="file" matSuffix matTooltipPosition="right"
-                                        *ngIf="mostrarbtnsubir && messajeExcel != 'error'" style="height: 64px;  padding-top: 25px;"
+                                        *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                        style="height: 64px;  padding-top: 25px;"
                                         matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
                                         Subir nueva plantilla
                                     </label>
                                 </form>
                             </div>
                         </div>
-                        <div class="col-md" *ngIf="!DataFeriados" style="padding-top: 5px; padding-bottom: 5px;" >
-                            <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
+                        <div class="col-md" *ngIf="!DataFeriados" style="padding-top: 5px; padding-bottom: 5px;">
+                            <div class="d-flex flex-wrap justify-content-around"
+                                style="text-align: center; justify-content: center;">
                                 <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
                                     matTooltip="Dar click para ver o descargar el documento."
                                     href="{{hipervinculo}}/plantillaD/documento/Feriados.xlsx">
@@ -56,11 +59,12 @@
                                 </a>
                             </div>
                         </div>
-                        <div class="col-md" *ngIf="mostrarbtnsubir" style="padding-top: 5px; padding-bottom: 5px;" >
-                            <div class="d-flex flex-wrap justify-content-around" style="text-align: center; justify-content: center;">
-                                <button *ngIf="DataFeriados && messajeExcel != 'error'" id="descargar" class="btn btn-sm"
-                                    (click)="ConfirmarRegistroMultiple()" matSuffix matTooltipPosition="right"
-                                     matTooltip="Guardar registro multiple.">
+                        <div class="col-md" *ngIf="mostrarbtnsubir" style="padding-top: 5px; padding-bottom: 5px;">
+                            <div class="d-flex flex-wrap justify-content-around"
+                                style="text-align: center; justify-content: center;">
+                                <button *ngIf="DataFeriados && messajeExcel != 'error'" id="descargar"
+                                    class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
+                                    matTooltipPosition="right" matTooltip="Guardar registro multiple.">
                                     Registrar
                                 </button>
                             </div>
@@ -74,11 +78,40 @@
     <!--  **************************************  LISTA DE FERIADOS ***************************************** -->
     <div class="container" style="padding-top: 15px; padding-bottom: 50px; margin-bottom: 35px;" *ngIf="!DataFeriados">
         <div class="mat-elevation-z8" style="background: white;">
-            <div id="titulo">LISTA DE FERIADOS</div>
+
+            <div class="d-flex bd-highlight" id="titulo">
+
+
+                <div class="w-100 bd-highlight">
+                    <h5>
+                        LISTA DE FERIADOS </h5>
+                </div>
+
+
+                <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
+
+                    <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
+                        (click)="ConfirmarDeleteMultiple()">Eliminar </button>
+                </div>
+            </div>
+
             <div class="table-responsive">
                 <table class="table table-hover table-sm">
                     <thead class="thead-light">
                         <tr style="text-align: center;">
+
+                            <th>
+                                <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
+                                    matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
+                                    id="SelectCheck" (click)="HabilitarSeleccion()">
+                                    library_add_check
+                                </mat-icon>
+                                <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
+                                    [checked]="selectionFeriados.hasValue() && isAllSelectedPag()"
+                                    [indeterminate]="selectionFeriados.hasValue() && !isAllSelectedPag()"
+                                    [aria-label]="checkboxLabelPag()">
+                                </mat-checkbox>
+                            </th>
                             <th scope="col">Descripción</th>
                             <th scope="col">Fecha</th>
                             <th scope="col">Fecha recuperación</th>
@@ -87,6 +120,8 @@
                     </thead>
                     <tbody>
                         <tr>
+                            <td></td>
+
                             <td>
                                 <mat-form-field id="t-inputs">
                                     <input matInput placeholder="Buscar" [formControl]="descripcionF"
@@ -109,6 +144,14 @@
                         </tr>
                         <tr
                             *ngFor="let f of feriados | filtroNombre: filtroDescripcion | filtroFecha: filtradoFecha | paginate:tamanio_pagina:numero_pagina ">
+
+
+                            <td>
+                                <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                                    (change)="$event ? selectionFeriados.toggle(f) : null"
+                                    [checked]="selectionFeriados.isSelected(f)" [aria-label]="checkboxLabelPag(f)">
+                                </mat-checkbox>
+                            </td>
                             <td id="letras">{{f.descripcion}}</td>
                             <td style="font-size: 12px;">{{f.fecha_}}</td>
                             <td style="font-size: 12px;">{{f.fec_recuperacion_}}</td>
@@ -166,13 +209,15 @@
     </div>
 
     <!--  **********************************  INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE ***************************************** -->
-    <div class="container" style="padding-top: 10px; margin-bottom: 25px;" *ngIf="DataFeriados && messajeExcel != 'error'">
+    <div class="container" style="padding-top: 10px; margin-bottom: 25px;"
+        *ngIf="DataFeriados && messajeExcel != 'error'">
         <app-definicion-plantilla>
         </app-definicion-plantilla>
     </div>
-    
+
     <!------------------ TABLA DE DATOS DE LA CARGA MULTIPLE DE FERIADOS ------------------------------------------------->
-    <div class="container" style="padding-bottom: 10px; margin-bottom: 35px;" *ngIf="DataFeriados && messajeExcel != 'error'">
+    <div class="container" style="padding-bottom: 10px; margin-bottom: 35px;"
+        *ngIf="DataFeriados && messajeExcel != 'error'">
         <div class="mat-elevation-z8" style="background: white;">
             <div id="titulo">REGISTRO MULTIPLE</div>
             <div class="table-responsive">
@@ -187,9 +232,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr
-                            *ngFor="let f of DataFeriados | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
-                            <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">{{f.fila}}</td>
+                        <tr *ngFor="let f of DataFeriados | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                            <td id="letras" style="font-size: 12px; padding-left: 3px; width: 50px;" align="center">
+                                {{f.fila}}</td>
                             <td [style.color]="stiloTextoCelda(f.fecha)" style="font-size: 12px;">{{f.fecha}}</td>
                             <td [style.color]="stiloTextoCelda(f.descripcion)" id="letras" style="font-size: 12px;">
                                 {{f.descripcion}}</td>

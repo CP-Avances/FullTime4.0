@@ -26,6 +26,11 @@ import { ParametrosService } from 'src/app/servicios/parametrosGenerales/paramet
 import { FeriadosService } from 'src/app/servicios/catalogos/catFeriados/feriados.service';
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { SpinnerService } from 'src/app/servicios/spinner/spinner.service';
+import { Router } from '@angular/router';
+
+
+import { SelectionModel } from '@angular/cdk/collections';
+import { ITableFeriados } from 'src/app/model/reportes.model';
 
 @Component({
   selector: 'app-listar-feriados',
@@ -34,6 +39,9 @@ import { SpinnerService } from 'src/app/servicios/spinner/spinner.service';
 })
 
 export class ListarFeriadosComponent implements OnInit {
+
+  feriadosEliminar: any = [];
+
 
   // CONTROL DE CAMPOS Y VALIDACIONES DEL FORMULARIO
   descripcionF = new FormControl('');
@@ -93,7 +101,9 @@ export class ListarFeriadosComponent implements OnInit {
     public ventana: MatDialog, // VARIABLE DE USO DE VENTANAS DE DIÁLOGO
     public validar: ValidacionesService,
     public parametro: ParametrosService,
-    public spinnerService: SpinnerService
+    public spinnerService: SpinnerService,
+    private router: Router,
+
   ) {
     this.idEmpleado = parseInt(localStorage.getItem('empleado') as string);
   }
@@ -179,25 +189,6 @@ export class ListarFeriadosComponent implements OnInit {
       });;
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
-  Eliminar(id_feriado: number) {
-    this.rest.EliminarFeriado(id_feriado).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.BuscarParametro();
-    });
-  }
-
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDelete(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.Eliminar(datos.id);
-        }
-      });
-  }
 
   // METODO PARA LIMPIAR FORMULARIO
   LimpiarCampos() {
@@ -652,6 +643,137 @@ export class ListarFeriadosComponent implements OnInit {
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, "FeriadosCSV" + '.csv');
     this.BuscarParametro();
+  }
+
+
+
+  // METODOS PARA LA SELECCION MULTIPLE
+
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+
+  selectionFeriados = new SelectionModel<ITableFeriados>(true, []);
+
+
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectionFeriados.selected.length;
+    return numSelected === this.feriados.length;
+  }
+
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectionFeriados.clear() :
+      this.feriados.forEach((row: any) => this.selectionFeriados.select(row));
+  }
+
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableFeriados): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.feriadosEliminar = this.selectionFeriados.selected;
+    //console.log('paginas para Eliminar',this.paginasEliminar);
+
+    //console.log(this.selectionPaginas.selected)
+    return `${this.selectionFeriados.isSelected(row) ? 'deselect' : 'select'} row ${row.descripcion + 1}`;
+
+  }
+
+
+
+
+  Eliminar(id_feriado: number) {
+    this.rest.EliminarFeriado(id_feriado).subscribe(res => {
+
+
+
+      if (res.message === 'error') {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.BuscarParametro();
+      }
+      
+    });
+  }
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos.id);
+        }
+      });
+  }
+
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+
+
+  EliminarMultiple() {
+
+    this.feriadosEliminar = this.selectionFeriados.selected;
+    this.feriadosEliminar.forEach((datos: any) => {
+
+      this.feriados = this.feriados.filter(item => item.id !== datos.id);
+      //AQUI MODIFICAR EL METODO 
+      this.Eliminar(datos.id);
+      this.BuscarParametro();
+
+    }
+    )
+  }
+
+
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+
+          if (this.feriadosEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+
+          } else {
+            this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+
+          }
+
+          this.selectionFeriados.clear();
+
+        } else {
+          this.router.navigate(['/listarFeriados']);
+
+
+
+        }
+      });
   }
 
 }

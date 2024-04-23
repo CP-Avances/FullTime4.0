@@ -30,6 +30,8 @@ import { ThemePalette } from '@angular/material/core';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { SpinnerService } from '../../../../../servicios/spinner/spinner.service';
 
+import { SelectionModel } from '@angular/cdk/collections';
+import { ITableHorarios } from 'src/app/model/reportes.model';
 @Component({
   selector: 'app-principal-horario',
   templateUrl: './principal-horario.component.html',
@@ -37,6 +39,9 @@ import { SpinnerService } from '../../../../../servicios/spinner/spinner.service
 })
 
 export class PrincipalHorarioComponent implements OnInit {
+
+
+  horariosEliminar: any = [];
 
   // ALMACENAMIENTO DE DATOS Y BUSQUEDA
   horarios: any = [];
@@ -243,27 +248,7 @@ export class PrincipalHorarioComponent implements OnInit {
       });
   }
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACIÓN
-  EliminarDetalle(id_horario: any) {
-    this.rest.EliminarRegistro(id_horario.id).subscribe(res => {
-      // METODO PARA AUDITAR CATÁLOGO HORARIOS
-      this.validar.Auditar('app-web', 'cg_horarios', id_horario, '', 'DELETE');
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ObtenerHorarios();
-    });
-  }
-
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDelete(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.EliminarDetalle(datos);
-        }
-      });
-  }
+ 
 
   // METODO PARA VISUALIZAR PANTALLA DE HORARIOS Y DETALLES
   ver_detalles: boolean = false;
@@ -392,7 +377,7 @@ export class PrincipalHorarioComponent implements OnInit {
           this.habilitarprogress = false;
           this.spinnerService.hide();
         } else {
-          this.toastr.success('Plantilla de horarios importada','Operación exitosa.', {
+          this.toastr.success('Plantilla de horarios importada', 'Operación exitosa.', {
             timeOut: 6000,
           });
           this.LimpiarCamposPlantilla();
@@ -587,7 +572,7 @@ export class PrincipalHorarioComponent implements OnInit {
 
 
   //METODO PARA DEFINIR EL COLOR DE LA OBSERVACION
-  ObtenerColorValidacion(observacion: string): string{
+  ObtenerColorValidacion(observacion: string): string {
     if (observacion.startsWith('Datos no registrados:')) {
       return 'rgb(242, 21, 21)';
     }
@@ -596,27 +581,173 @@ export class PrincipalHorarioComponent implements OnInit {
       return 'rgb(222, 162, 73)';
     }
 
-    if(observacion.startsWith('Requerido') || observacion.startsWith('No cumple') || observacion.startsWith('Minutos de alimentación no')){
+    if (observacion.startsWith('Requerido') || observacion.startsWith('No cumple') || observacion.startsWith('Minutos de alimentación no')) {
       return 'rgb(238, 34, 207)';
     }
 
-    switch(observacion) {
+    switch (observacion) {
       case 'Ok':
-          return 'rgb(159, 221, 154)';
+        return 'rgb(159, 221, 154)';
       case 'Ya existe en el sistema':
-          return 'rgb(239, 203, 106)';
+        return 'rgb(239, 203, 106)';
       case 'Codigo de horario no existe en los horarios validos':
-          return 'rgb(239, 203, 106)';
+        return 'rgb(239, 203, 106)';
       case 'Registro duplicado dentro de la plantilla':
-          return 'rgb(156, 214, 255)';
+        return 'rgb(156, 214, 255)';
       default:
-          return 'rgb(242, 21, 21)';
+        return 'rgb(242, 21, 21)';
     }
   }
 
-  ObtenerColorDatoRegistrado(dato: string){
-    if (dato == 'No registrado'){
+  ObtenerColorDatoRegistrado(dato: string) {
+    if (dato == 'No registrado') {
       return 'rgb(242, 21, 21)';
     }
   }
+
+  // METODOS PARA LA SELECCION MULTIPLE
+
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+
+  selectionHorarios = new SelectionModel<ITableHorarios>(true, []);
+
+
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectionHorarios.selected.length;
+    return numSelected === this.horarios.length
+  }
+
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectionHorarios.clear() :
+      this.horarios.forEach((row: any) => this.selectionHorarios.select(row));
+  }
+
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableHorarios): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.horariosEliminar = this.selectionHorarios.selected;
+    //console.log('paginas para Eliminar',this.paginasEliminar);
+
+    //console.log(this.selectionPaginas.selected)
+    return `${this.selectionHorarios.isSelected(row) ? 'deselect' : 'select'} row ${row.descripcion + 1}`;
+
+  }
+
+
+ // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACIÓN
+ EliminarDetalle(id_horario: any) {
+
+
+  this.rest.EliminarRegistro(id_horario).subscribe(res => {
+
+    if (res.message === 'error') {
+      this.toastr.error('No se puede elminar.', '', {
+        timeOut: 6000,
+      });
+
+    } else {
+
+      // METODO PARA AUDITAR CATÁLOGO HORARIOS
+      this.validar.Auditar('app-web', 'cg_horarios', id_horario, '', 'DELETE');
+      this.toastr.error('Registro eliminado.', '', {
+        timeOut: 6000,
+      });
+      this.ObtenerHorarios();
+
+    }
+
+
+  });
+}
+
+// FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+ConfirmarDelete(datos: any) {
+  this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+    .subscribe((confirmado: Boolean) => {
+      if (confirmado) {
+        this.EliminarDetalle(datos.id);
+      }
+    });
+}
+
+
+
+
+  EliminarMultiple() {
+
+
+    this.horariosEliminar = this.selectionHorarios.selected;
+    this.horariosEliminar.forEach((datos: any) => {
+
+      this.horarios = this.horarios.filter(item => item.id !== datos.id);
+
+
+
+      //AQUI MODIFICAR EL METODO 
+      this.EliminarDetalle(datos.id);
+
+
+
+      this.ObtenerHorarios();
+
+    }
+    )
+  }
+
+
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+
+          if (this.horariosEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+
+
+
+
+
+
+          } else {
+            this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+
+          }
+
+          this.selectionHorarios.clear();
+
+        } else {
+          this.router.navigate(['/horario']);
+        }
+
+
+      });
+  }
+
+
 }

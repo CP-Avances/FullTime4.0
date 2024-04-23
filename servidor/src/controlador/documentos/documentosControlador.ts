@@ -85,27 +85,38 @@ class DocumentosControlador {
     }
 
     // METODO PARA ELIMINAR REGISTROS DE DOCUMENTACION
-    public async EliminarRegistros(req: Request, res: Response): Promise<void> {
-        let { id, documento } = req.params;
-        await pool.query(
-            `
-            DELETE FROM documentacion WHERE id = $1
-            `
-            , [id]);
+    public async EliminarRegistros(req: Request, res: Response) {
 
-        let separador = path.sep;
 
-        let ruta = ObtenerRutaDocumento() + separador + documento;
-        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-        fs.access(ruta, fs.constants.F_OK, (err) => {
-            if (err) {
-            } else {
-                // ELIMINAR DEL SERVIDOR
-                fs.unlinkSync(ruta);
-            }
-        });
+        try {
 
-        res.jsonp({ message: 'Registro eliminado.' });
+            let { id, documento } = req.params;
+            await pool.query(
+                `
+                DELETE FROM documentacion WHERE id = $1
+                `
+                , [id]);
+
+            let separador = path.sep;
+
+            let ruta = ObtenerRutaDocumento() + separador + documento;
+            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+            fs.access(ruta, fs.constants.F_OK, (err) => {
+                if (err) {
+                } else {
+                    // ELIMINAR DEL SERVIDOR
+                    fs.unlinkSync(ruta);
+                }
+            });
+
+            res.jsonp({ message: 'Registro eliminado.' });
+
+
+        } catch (error) {
+            return res.jsonp({ message: 'error' });
+        }
+
+
     }
 
     // METODO PARA REGISTRAR UN DOCUMENTO    --**VERIFICADO

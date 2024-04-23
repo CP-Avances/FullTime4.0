@@ -21,6 +21,9 @@ import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/emp
 import { RelojesService } from 'src/app/servicios/catalogos/catRelojes/relojes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 
+import { SelectionModel } from '@angular/cdk/collections';
+import { ITableDispositivos } from 'src/app/model/reportes.model';
+
 @Component({
   selector: 'app-listar-relojes',
   templateUrl: './listar-relojes.component.html',
@@ -28,6 +31,9 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 })
 
 export class ListarRelojesComponent implements OnInit {
+
+  dispositivosEliminar: any = [];
+
 
   // ALMACENAMIENTO DE DATOS Y BUSQUEDA
   filtroDepartamentoReloj = '';
@@ -160,27 +166,7 @@ export class ListarRelojesComponent implements OnInit {
    ** **           VENTANAS PARA REGISTRAR Y EDITAR DATOS DE UN DISPOSITIVO          ** **
    ** ********************************************************************************* **/
 
-  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACION
-  EliminarRelojes(id_reloj: number) {
-    this.rest.EliminarRegistro(id_reloj).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ObtenerReloj();
-    });
-  }
 
-  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-  ConfirmarDelete(datos: any) {
-    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-      .subscribe((confirmado: Boolean) => {
-        if (confirmado) {
-          this.EliminarRelojes(datos.id);
-        } else {
-          this.router.navigate(['/listarRelojes/']);
-        }
-      });
-  }
 
   // VENTANA PARA REGISTRAR DATOS DE UN NUEVO DISPOSITIVO
   AbrirVentanaRegistrarReloj(): void {
@@ -467,4 +453,139 @@ export class ListarRelojesComponent implements OnInit {
     });
   }
 
+
+
+  // METODOS PARA LA SELECCION MULTIPLE
+
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+
+  selectionProvincias = new SelectionModel<ITableDispositivos>(true, []);
+
+
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectionProvincias.selected.length;
+    return numSelected === this.relojes.length
+  }
+
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectionProvincias.clear() :
+      this.relojes.forEach((row: any) => this.selectionProvincias.select(row));
+  }
+
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableDispositivos): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.dispositivosEliminar = this.selectionProvincias.selected;
+    //console.log('paginas para Eliminar',this.paginasEliminar);
+
+    //console.log(this.selectionPaginas.selected)
+    return `${this.selectionProvincias.isSelected(row) ? 'deselect' : 'select'} row ${row.codigo + 1}`;
+
+  }
+
+
+
+
+
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACION
+  EliminarRelojes(id_reloj: number) {
+    this.rest.EliminarRegistro(id_reloj).subscribe(res => {
+
+
+      if (res.message === 'error') {
+        this.toastr.error('No se puede elminar.', '', {
+          timeOut: 6000,
+        });
+
+
+      } else {
+
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+      }
+
+
+
+      this.ObtenerReloj();
+    });
+  }
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.EliminarRelojes(datos.id);
+        } else {
+          this.router.navigate(['/listarRelojes/']);
+        }
+      });
+  }
+
+
+  EliminarMultiple() {
+
+    this.dispositivosEliminar = this.selectionProvincias.selected;
+    this.dispositivosEliminar.forEach((datos: any) => {
+
+      this.relojes = this.relojes.filter(item => item.id !== datos.id);
+      //AQUI MODIFICAR EL METODO 
+      this.EliminarRelojes(datos.id);
+      this.ObtenerReloj();
+    }
+    )
+  }
+
+
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+
+          if (this.dispositivosEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+
+          } else {
+            this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+
+          }
+
+          this.selectionProvincias.clear();
+
+        } else {
+          this.router.navigate(['/listarRelojes/']);
+        }
+
+
+      });
+  }
 }
+
+

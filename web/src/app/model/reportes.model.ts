@@ -520,4 +520,21 @@ export interface ITableFeriados {
 }
 
 
+export interface ITableHorarios {
+    
+    descripcion: string,
+    
+}
+
+export interface ITableDispositivos {
+    
+    codigo: string,
+    
+}
+
+export interface ITableArchivos{
+
+    nombre: string,
+}
+
 
