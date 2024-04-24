@@ -19,6 +19,12 @@ class RolPermisosRutas {
         // MENU ENLISTAR
         this.router.get('/menu/paginas', TokenValidation, rolPermisosControlador.ListarMenuRoles);
 
+
+        //MENU ENLISTAR POR MODULO
+        this.router.post('/menu/paginasmodulos', TokenValidation, rolPermisosControlador.ListarMenuRolesModulos);
+
+        
+
         // METODO PARA BUSCAR LAS PAGINAS POR ID_ROL
 
         this.router.post('/menu/paginas/ide', TokenValidation, rolPermisosControlador.ObtenerIdPaginas);

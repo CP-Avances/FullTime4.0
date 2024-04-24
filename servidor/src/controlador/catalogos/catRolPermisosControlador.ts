@@ -46,10 +46,10 @@ class RolPermisosControlador {
   }
 
 
-  //METODO PARA ENLISTAR LINKS 
+  //METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS
   public async ListarMenuRoles(req: Request, res: Response) {
     const Roles = await pool.query(
-      `SELECT * FROM opciones_menu`
+      `SELECT * FROM opciones_menu WHERE modulo = false`
     );
     if (Roles.rowCount > 0) {
       return res.jsonp(Roles.rows);
@@ -58,6 +58,31 @@ class RolPermisosControlador {
       return res.status(404).jsonp({ text: 'Registro no encontrado.' });
     }
   }
+
+
+
+
+  //METODO PARA ENLISTAR PAGINAS QUE SON MODULOS, CLASIFICANDOLAS POR EL NOMBRE DEL MODULO
+ //METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS
+ public async ListarMenuRolesModulos(req: Request, res: Response) {
+
+  const { nombre_modulo } = req.body;
+
+  const Roles = await pool.query(
+    `SELECT * FROM opciones_menu WHERE nombre_modulo = $1`, [nombre_modulo]
+  );
+  if (Roles.rowCount > 0) {
+    return res.jsonp(Roles.rows);
+  }
+  else {
+    return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+  }
+}
+
+
+
+
+
 
   // METODO PARA BUSCAR ID DE PAGINAS
   public async ObtenerIdPaginas(req: Request, res: Response): Promise<any> {

@@ -41,6 +41,14 @@ export class RolPermisosService {
     return this.http.get(`${environment.url}/rolPermisos/menu/paginas`);
   }
 
+
+  //ENLISTAR PAGINAS MODULOS
+
+  getMenuModulos(datos) {
+    return this.http.post(`${environment.url}/rolPermisos/menu/paginasmodulos`, datos);
+  }
+
+
   // METODO PARA BUSCAR LAS PAGINAS POR ID
 
   BuscarIdPaginas(datos: any) {

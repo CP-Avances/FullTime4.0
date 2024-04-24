@@ -10,11 +10,12 @@ import { ITableFuncionesRoles } from 'src/app/model/reportes.model';
 import { MatDialog } from '@angular/material/dialog';
 import { MetodosComponent } from 'src/app/componentes/administracionGeneral/metodoEliminar/metodos.component';
 import { Router } from '@angular/router';
-import { filter, timeout } from 'rxjs';
-import { number } from 'echarts';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
+
+import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
+
 
 
 
@@ -39,6 +40,18 @@ interface Etiquetas {
 })
 export class SeleccionarRolPermisoComponent implements OnInit {
 
+
+
+  // BUSQUEDA DE FUNCIONES ACTIVAS
+  get geolocalizacion(): boolean { return this.varificarFunciones.geolocalizacion; }
+  get alimentacion(): boolean { return this.varificarFunciones.alimentacion; }
+  get horas_extras(): boolean { return this.varificarFunciones.horasExtras; }
+  get timbre_virtual(): boolean { return this.varificarFunciones.timbre_web; }
+  get vacaciones(): boolean { return this.varificarFunciones.vacaciones; }
+  get permisos(): boolean { return this.varificarFunciones.permisos; }
+  get acciones_personal(): boolean { return this.varificarFunciones.accionesPersonal; }
+  get reloj_virtual(): boolean { return this.varificarFunciones.app_movil; }
+
   funcion = new FormControl('', [Validators.minLength(2)]);
 
 
@@ -57,8 +70,11 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     etiquetaForm: this.etiqueta
   });
 
-  // MENU PARA ROLES
+  // MENU PARA PAGINAS
   nombresMenu: any = [];
+
+  //MENU PARA PAGINAS MODULOS
+
 
   //MENU PAREA ACCIONES
 
@@ -116,6 +132,8 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   espera: boolean = false;
 
   constructor(
+    private varificarFunciones: MainNavService,
+
     public location: Location,
     public rest: RolPermisosService,
     private toastr: ToastrService,
@@ -149,8 +167,8 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
   ngOnInit(): void {
     this.limpliarCampos();
-    this.obtenerPermisosRolUsuario();
-    this.ObtenerNombreMenu();
+    // this.obtenerPermisosRolUsuario();
+    this.ObtenerMenu();
     this.MostrarPaginasRol();
 
     this.nombresMenu.forEach((pagina: any) => {
@@ -167,7 +185,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
     console.log("todas las acciones", this.todasAcciones);
 
-
+    this.ObtenerMenuModulos()
 
   }
 
@@ -220,10 +238,11 @@ export class SeleccionarRolPermisoComponent implements OnInit {
         id_permiso: this.idPermiso
       };
 
-      // insertar id del cg_roles y cg_rol_permiso a la tabla rol_perm_denegado
-      this.rest.postPermisoDenegadoRest(dataPermisoDenegado).subscribe(respon => {
-        this.obtenerPermisosRolUsuario();
-      });
+      /* // insertar id del cg_roles y cg_rol_permiso a la tabla rol_perm_denegado
+       this.rest.postPermisoDenegadoRest(dataPermisoDenegado).subscribe(respon => {
+         this.obtenerPermisosRolUsuario();
+       });
+       */
     });
 
     this.limpliarCampos();
@@ -244,7 +263,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   nombrePaginas: any = [];
 
   // METODO PARA BUSCAR LOS NOMBRES DEL MENU DEL SISTEMA 
-  ObtenerNombreMenu() {
+  ObtenerMenu() {
     this.nombresMenu = [];
     this.rest.getMenu().subscribe(res => {
       this.nombresMenu = res;
@@ -255,6 +274,45 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       console.log(error);
     });
   }
+
+
+  // METODO PARA BUSCAR LOS NOMBRES DEL MENU QUE SON MODULOS
+
+
+
+  paginasModulos: { [modulos: string]: any } = {};
+
+  accionesSeleccionadasPorPagina: { [id_funcion: number]: any[] } = {};
+
+
+  nombreModulos: string[] = [
+    "permisos",
+    "vacaciones",
+    "horas_extras",
+    "alimentacion",
+    "acciones_personal",
+    "geolocalizacion",
+    "timbre_virtual",
+    "reloj_virtual",
+  ]
+
+  ObtenerMenuModulos() {
+    this.nombreModulos.map(nombre => {
+      var nombre_modulo = {
+        nombre_modulo: nombre
+      }
+      this.rest.getMenuModulos(nombre_modulo).subscribe(res => {
+        this.paginasModulos[nombre] = res;
+      }, error => {
+        console.log(error);
+      })
+    }
+    )
+
+    console.log("paginas con modulos", this.paginasModulos)
+  }
+
+
 
   // METODO PARA BUSCAR LAS ACCIONES DEL SISTEMA
 
@@ -268,10 +326,42 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
   // METODO PARA SELECCIONAR AGREGAR PAGINAS
   paginasSeleccionadas: any = [];
+
+
+  //METODOP PARA SELÑECCIONAR AGREGAR PAGINAS MODULOS 
+
+
+
+  paginasSeleccionadasModulos: { [modulos: string]: any } = {};
+
+
+
+
+
+
   // ARREGLO PARA ALMACENAR LAS ACCIONES SELECCIONADAS
   AgregarPagina(data: string) {
     this.paginasSeleccionadas.push(data);
   }
+
+  // METDO PARA AGREGAR PAGINAS MODULOS
+
+
+
+  AgregarPaginaModulo(data: string, modulo: string) {
+    if (!this.paginasSeleccionadasModulos[modulo]) {
+
+      this.paginasSeleccionadasModulos[modulo] = [];
+
+      this.paginasSeleccionadasModulos[modulo].push(data);
+    } else {
+
+      this.paginasSeleccionadasModulos[modulo].push(data);
+    }
+
+  }
+
+
 
 
   // metodo para llenar el arreglo de las acciones seleccionadas
@@ -300,6 +390,14 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.paginasSeleccionadas = this.paginasSeleccionadas.filter(s => s !== data);
   }
 
+
+  QuitarPaginaModulo(data: string, modulo: string) {
+    this.paginasSeleccionadasModulos[modulo] = this.paginasSeleccionadasModulos[modulo].filter(s => s !== data);
+  }
+
+
+
+
   // METODO PARA RETIRAR ACCIONES
 
   QuitarAccion(id: any, data: any) {
@@ -324,6 +422,35 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   }
 
 
+
+
+  AgregarTodosModulos(modulo: string) {
+
+
+
+    this.paginasSeleccionadasModulos[modulo] = this.paginasModulos[modulo];
+
+    for (var i = 0; i <= this.paginasModulos[modulo].length - 1; i++) {
+      (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = true;
+    }
+
+    this.paginasSeleccionadasModulos[modulo].map(pagina => {
+      this.ObtenerAcciones(pagina.id);
+    })
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
   AgregarTodosAcciones(id: any) {
     this.nombresAccionesPorPagina[id].map(x => {
       this.accionesSeleccionadasPorPagina[id] = x;
@@ -344,6 +471,20 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     for (var i = 0; i <= this.limpiarData.length - 1; i++) {
       (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
       this.paginasSeleccionadas = this.paginasSeleccionadas.filter(s => s !== this.nombrePaginas[i]);
+    }
+  }
+
+
+
+
+
+
+  limpiarDataModulos: any = [];
+  QuitarTodosModulos(modulo: string) {
+    this.limpiarData = this.paginasModulos[modulo];
+    for (var i = 0; i <= this.limpiarData.length - 1; i++) {
+      (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
+      this.paginasSeleccionadas = this.paginasSeleccionadasModulos[modulo].filter(s => s !== this.paginasModulos[modulo][i]);
     }
   }
 
@@ -378,6 +519,30 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
 
   }
+
+
+  // METODO PARA VERIFICAR SELECCION DE OPCION "Todas" EN MODULOS
+  isCheckedModulos: boolean = false;
+  SeleccionarTodasModulos(event: any) {
+    console.log(event)
+
+    if (event === true) {
+
+
+      this.nombreModulos.map(x => {
+        this.AgregarTodosModulos(x);
+
+
+      })
+    }
+    else {
+      this.nombreModulos.map(x => {
+        this.QuitarTodosModulos(x);
+      })
+      this.nombresAccionesPorPagina = {};
+    }
+  }
+
 
 
 
@@ -535,7 +700,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                   setTimeout(() => {
                     window.location.reload();
                   }, 2000);
-*/
+                  */
                   (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
                   for (var i = 0; i <= this.nombresMenu.length - 1; i++) {
                     (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
@@ -633,7 +798,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
 
 
-            
+
 
               //this.VerMensaje();
             }, error => {
@@ -661,7 +826,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
         id_rol: this.idRol
       };
 
-      
+
     }
     else {
       this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
@@ -669,6 +834,134 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       })
     }
   }
+
+
+
+
+  //INSERTAR PAGINA
+  InsertarPaginaModulosRol() {
+    this.ingresar = 0;
+    this.contador = 0;
+    // VALIDAR SI SE HA SELECCIONADO PAGINAS
+    if (Object.keys(this.paginasSeleccionadasModulos).length === 0) {
+      this.habilitarprogress = true;
+      // RECORRER LA LISTA DE PAGINAS SELECCIONADAS
+
+      this.nombreModulos.map(x => this.paginasSeleccionadasModulos[x].map(obj => {
+
+
+        if (this.accionesSeleccionadasPorPagina[obj.id]) {
+
+          this.accionesSeleccionadasPorPagina[obj.id].map(accion => {
+
+
+            var buscarPagina = {
+              funcion: obj.nombre,
+              id_rol: this.idRol,
+              id_accion: accion.id
+            };
+
+            // BUSCAR ID DE PAGINAS EXISTENTES
+            this.paginasRol = [];
+
+            this.rest.BuscarIdPaginasConAcciones(buscarPagina).subscribe(
+              datos => {
+                this.contador = this.contador + 1;
+                this.paginasRol = datos;
+                this.habilitarprogress = false;
+
+                (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
+                for (var i = 0; i <= this.nombresMenu.length - 1; i++) {
+                  (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
+                }
+
+                delete this.nombresAccionesPorPagina[obj.id];
+                delete this.accionesSeleccionadasPorPagina[obj.id];
+                this.paginasSeleccionadasModulos[x] = [];
+                this.rest.BuscarPaginasRol(buscarPagina).subscribe(datos => {
+                  this.paginas = datos;
+                })
+
+                this.toastr.info('Se indica que ' + obj.nombre + ' ya fue asignada a este Rol.', '', {
+                  timeOut: 7000,
+                })
+
+
+
+              }, error => {
+
+
+                var rolPermisosbody = {
+
+                  funcion: obj.nombre,
+                  link: obj.link,
+                  id_rol: this.idRol,
+                  id_accion: accion.id
+
+                }
+
+
+                this.rest.crearPaginaRol(rolPermisosbody).subscribe(response => {
+                  this.contador = this.contador + 1;
+                  this.ingresar = this.ingresar + 1;
+                  this.toastr.success('Operación exitosa.', 'Registro guardado.', {
+                    timeOut: 6000,
+                  });
+
+                  /*
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 2000);
+                  */
+                  (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
+                  for (var i = 0; i <= this.nombresMenu.length - 1; i++) {
+                    (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
+                  }
+
+                  delete this.nombresAccionesPorPagina[obj.id];
+                  delete this.accionesSeleccionadasPorPagina[obj.id];
+                  this.paginasSeleccionadasModulos[x] = [];
+
+
+                  this.rest.BuscarPaginasRol(rol).subscribe(datos => {
+                    this.paginas = datos;
+                  })
+
+                  //this.VerMensaje();
+                }, error => {
+                  this.contador = this.contador + 1;
+                  //this.VerMensaje();
+                  this.toastr.error('Ups!!! algo salio mal..', 'Ups!!! algo salio mal.', {
+                    timeOut: 6000,
+                  })
+                });
+              }
+            )
+          })
+        }
+
+      })
+
+
+
+      );
+
+      var rol = {
+        id_rol: this.idRol
+      };
+
+
+    } else {
+      this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+        timeOut: 6000,
+      })
+    }
+  }
+
+
+
+
+
 
   MostrarPaginasRol() {
 
@@ -740,23 +1033,23 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
     this.paginasEliminar = this.selectionPaginas.selected;
     this.paginasEliminar.forEach((datos: any) => {
-     
-        this.paginas = this.paginas.filter(item => item.id !== datos.id);
 
-        var buscarPagina = {
-          id: datos.id
+      this.paginas = this.paginas.filter(item => item.id !== datos.id);
 
-        };
-        this.rest.EliminarPaginasRol(buscarPagina).subscribe(
+      var buscarPagina = {
+        id: datos.id
 
-          res => {
-            this.toastr.error('Registro eliminado.', '', {
-              timeOut: 6000,
-            });
-          }
-        )
+      };
+      this.rest.EliminarPaginasRol(buscarPagina).subscribe(
+
+        res => {
+          this.toastr.error('Registro eliminado.', '', {
+            timeOut: 6000,
+          });
+        }
+      )
     }
-  )
+    )
 
     console.log("Paginas eliminadas", this.paginasEliminar);
 
@@ -803,7 +1096,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   nombresAccionesPorPagina: { [id_funcion: number]: any[] } = {};
 
 
-  accionesSeleccionadasPorPagina: { [id_funcion: number]: any[] } = {};
+  //accionesSeleccionadasPorPagina: { [id_funcion: number]: any[] } = {};
 
 
   //this.nombresMenu.forEach()
@@ -881,10 +1174,15 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   }
 
 
-   // METODO PARA VALIDAR INGRESO DE LETRAS
-   IngresarSoloLetras(e: any) {
+  // METODO PARA VALIDAR INGRESO DE LETRAS
+  IngresarSoloLetras(e: any) {
     return this.validar.IngresarSoloLetras(e);
   }
+
+
+
+  // METODOS PARA MOSTRAR SOLO LAS PAGINAS QUE SON MODULO
+
 
 
 

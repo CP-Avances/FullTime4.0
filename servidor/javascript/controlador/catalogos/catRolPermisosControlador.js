@@ -61,10 +61,24 @@ class RolPermisosControlador {
             res.status(404).jsonp({ text: 'El rol no tiene permisos' });
         });
     }
-    //METODO PARA ENLISTAR LINKS 
+    //METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS
     ListarMenuRoles(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const Roles = yield database_1.default.query(`SELECT * FROM opciones_menu`);
+            const Roles = yield database_1.default.query(`SELECT * FROM opciones_menu WHERE modulo = false`);
+            if (Roles.rowCount > 0) {
+                return res.jsonp(Roles.rows);
+            }
+            else {
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            }
+        });
+    }
+    //METODO PARA ENLISTAR PAGINAS QUE SON MODULOS, CLASIFICANDOLAS POR EL NOMBRE DEL MODULO
+    //METODO PARA ENLISTAR PAGINAS QUE NO SEAN MODULOS
+    ListarMenuRolesModulos(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { nombre_modulo } = req.body;
+            const Roles = yield database_1.default.query(`SELECT * FROM opciones_menu WHERE nombre_modulo = $1`, [nombre_modulo]);
             if (Roles.rowCount > 0) {
                 return res.jsonp(Roles.rows);
             }
