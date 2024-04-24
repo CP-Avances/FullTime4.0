@@ -759,7 +759,7 @@ export class ListarFeriadosComponent implements OnInit {
             this.plan_multiple_ = false;
 
           } else {
-            this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado FERIADOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
 

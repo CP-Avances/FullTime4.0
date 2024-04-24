@@ -538,3 +538,7 @@ export interface ITableArchivos{
 }
 
 
+export interface ITableNivel {
+    nivel: string,
+    
+}

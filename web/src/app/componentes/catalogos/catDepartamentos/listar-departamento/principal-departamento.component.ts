@@ -447,18 +447,15 @@ export class PrincipalDepartamentoComponent implements OnInit {
         this.departamentosNiveles = [];
         var id_departamento = id_dep;
         var id_establecimiento = id_sucursal;
-        if (nivel > 0) {
+        if (nivel != 0) {
           this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
             this.departamentosNiveles = datos;
             this.departamentosNiveles.filter(item => {
               this.rest.EliminarRegistroNivelDepa(item.id).subscribe({})
-              this.ListaDepartamentos();
-
             })
-
-            this.ListaDepartamentos();
-
           })
+          this.ListaDepartamentos();
+
         } else {
           this.ListaDepartamentos();
 
@@ -490,20 +487,8 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
     this.departamentosEliminar = this.selectionDepartamentos.selected;
     this.departamentosEliminar.forEach((datos: any) => {
-
-
-
-
-
-      //if(datos.nivel==0){
-
-        this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
-      //}else {
-      //  this.departamentos = this.departamentos.filter(item => item.id !== datos.id && item.nivel !== datos.nivel);
-
-      //}
-
-
+      this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
+    
       this.Eliminar(datos.id, datos.id_sucursal, datos.nivel);
 
 
@@ -533,7 +518,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
 
           } else {
-            this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado DEPARTAMENTOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
 
@@ -541,7 +526,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
           this.selectionDepartamentos.clear();
 
-        }else{
+        } else {
           this.router.navigate(['/departamento']);
 
 

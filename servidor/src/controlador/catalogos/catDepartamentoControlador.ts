@@ -270,14 +270,24 @@ class DepartamentoControlador {
   }
 
   // METODO PARA ELIMINAR REGISTRO DE NIVEL DE DEPARTAMENTO   --**VERIFICADO
-  public async EliminarRegistroNivelDepa(req: Request, res: Response): Promise<void> {
-    const id = req.params.id;
-    await pool.query(
-      `
-      DELETE FROM nivel_jerarquicodep WHERE id = $1
-      `
-      , [id]);
-    res.jsonp({ message: 'Registro eliminado.' });
+  public async EliminarRegistroNivelDepa(req: Request, res: Response){
+
+    try{
+      const id = req.params.id;
+      await pool.query(
+        `
+        DELETE FROM nivel_jerarquicodep WHERE id = $1
+        `
+        , [id]);
+      res.jsonp({ message: 'Registro eliminado.' });
+
+
+    }catch(error){
+      return res.jsonp({ message: 'error' });
+
+
+    }
+    
 
     
   }

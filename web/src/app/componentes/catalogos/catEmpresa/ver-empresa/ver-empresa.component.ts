@@ -509,7 +509,7 @@ export class VerEmpresaComponent implements OnInit {
 
 
           } else {
-            this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado SUCURSALES.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
 
@@ -518,7 +518,7 @@ export class VerEmpresaComponent implements OnInit {
           this.selectionSucursales.clear();
 
         }else{
-          this.router.navigate(['/nivelTitulos']);
+          this.router.navigate(['/vistaEmpresa']);
 
         }
       });
