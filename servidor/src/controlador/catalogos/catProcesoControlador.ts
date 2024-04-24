@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
-import fs from 'fs';
-const builder = require('xmlbuilder');
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 
 import pool from '../../database';
 
@@ -24,10 +23,34 @@ class ProcesoControlador {
   }
 
   public async create(req: Request, res: Response): Promise<void> {
-    const { nombre, nivel, proc_padre } = req.body;
-    await pool.query('INSERT INTO cg_procesos (nombre, nivel, proc_padre) VALUES ($1, $2, $3)', [nombre, nivel, proc_padre]);
-    console.log(req.body);
-    res.jsonp({ message: 'El departamento ha sido guardado en éxito' });
+    try {
+      const { nombre, nivel, proc_padre, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      await pool.query('INSERT INTO cg_procesos (nombre, nivel, proc_padre) VALUES ($1, $2, $3)', [nombre, nivel, proc_padre]);
+      console.log(req.body);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'cg_procesos',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{"nombre": "${nombre}", "nivel": "${nivel}", "proc_padre": "${proc_padre}"}`,
+        ip: ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      res.jsonp({ message: 'El departamento ha sido guardado en éxito' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      res.status(404).jsonp({ message: 'Error al guardar el departamento' });
+    }
   }
 
   public async getIdByNombre(req: Request, res: Response): Promise<any> {
@@ -39,10 +62,55 @@ class ProcesoControlador {
     res.status(404).jsonp({ text: 'El proceso no ha sido encontrado' });
   }
 
-  public async ActualizarProceso(req: Request, res: Response): Promise<void> {
-    const { nombre, nivel, proc_padre, id } = req.body;
-    await pool.query('UPDATE cg_procesos SET nombre = $1, nivel = $2, proc_padre = $3 WHERE id = $4', [nombre, nivel, proc_padre, id]);
-    res.jsonp({ message: 'El proceso actualizado exitosamente' });
+  public async ActualizarProceso(req: Request, res: Response): Promise<Response> {
+    try {
+      const { nombre, nivel, proc_padre, id, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const proceso = await pool.query('SELECT * FROM cg_procesos WHERE id = $1', [id]);
+      const [datosOriginales] = proceso.rows;
+
+      if (!datosOriginales) {
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'cg_procesos',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip: ip,
+          observacion: `Error al actualizar el registro con id: ${id}.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'error' });
+      }
+
+      await pool.query('UPDATE cg_procesos SET nombre = $1, nivel = $2, proc_padre = $3 WHERE id = $4', [nombre, nivel, proc_padre, id]);
+      
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'cg_procesos',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{"nombre": "${nombre}", "nivel": "${nivel}", "proc_padre": "${proc_padre}"}`,
+        ip: ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'El proceso actualizado exitosamente' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(404).jsonp({ message: error });
+    }
   }
 
   public async EliminarProceso(req: Request, res: Response): Promise<void> {
