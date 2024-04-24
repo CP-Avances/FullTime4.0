@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
-import path from 'path';
 import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+import AUDITORIA_CONTROLADOR from "../auditoria/auditoriaControlador";
+import path from 'path';
 import excel from 'xlsx';
 import pool from '../../database';
 import moment from "moment";
@@ -126,10 +127,11 @@ class PlanificacionHorariaControlador {
     }
 
     //METODO PARA REGISTRAR LA PLANIFICACION HORARIA EN LA BASE DE DATOS
-    public async RegistrarPlanificacionHoraria(req: Request, res: Response) {
+    public async RegistrarPlanificacionHoraria(req: Request, res: Response): Promise<Response> {
        
        try {
-        const planificacionHoraria = req.body;
+        const { planificacionHoraria, user_name, ip }= req.body;
+        const datosUsuario: DatosUsuario = { user_name, ip };
 
         const horarioDefaultLibre = await ConsultarHorarioDefault('DEFAULT-LIBRE');
         const horarioDefaultFeriado = await ConsultarHorarioDefault('DEFAULT-FERIADO');
@@ -233,7 +235,7 @@ class PlanificacionHorariaControlador {
                             salida
                         };
 
-                        await CrearPlanificacionHoraria(planificacion);
+                        await CrearPlanificacionHoraria(planificacion, datosUsuario);
                         planificacionesImportadas++;
                         
                     } else if (horario.observacion === 'DEFAULT-LIBRE')  {
@@ -293,7 +295,7 @@ class PlanificacionHorariaControlador {
                             salida
                         };
 
-                        await CrearPlanificacionHoraria(planificacion);
+                        await CrearPlanificacionHoraria(planificacion, datosUsuario);
                         planificacionesImportadas++;
 
                     } else if (horario.observacion === 'DEFAULT-FERIADO') {
@@ -353,7 +355,7 @@ class PlanificacionHorariaControlador {
                             salida
                         };
 
-                        await CrearPlanificacionHoraria(planificacion);
+                        await CrearPlanificacionHoraria(planificacion, datosUsuario);
                         planificacionesImportadas++;
 
                     }
@@ -728,7 +730,7 @@ async function ConsultarHorarioDefault(codigo:string): Promise<any> {
 }
 
 // FUNCION PARA CREAR PLANIFICACION HORARIA
-async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion) : Promise<any>{
+async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion, datosUsuario: DatosUsuario) : Promise<any>{
     try {
         
         // DESESCTRUCTURAR PLANIFICACION HORARIA
@@ -738,6 +740,9 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion) : 
             finAlimentacion, 
             salida
         } = planificacionHoraria;
+
+        // DESESTRUCTURAR DATOS USUARIO
+        let { user_name, ip } = datosUsuario;
 
         // INICIAR TRANSACCION
         await pool.query('BEGIN');
@@ -754,6 +759,17 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion) : 
                 entrada.estado_origen, entrada.min_alimentacion]
         );
 
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'plan_general',
+            usuario: user_name,
+            accion: 'I',
+            datosOriginales: '',
+            datosNuevos: JSON.stringify(entrada),
+            ip,
+            observacion: null
+        });
+
         // CREAR INICIO ALIMENTACION
         if (inicioAlimentacion) {
             await pool.query(
@@ -766,6 +782,17 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion) : 
                     inicioAlimentacion.id_det_horario, inicioAlimentacion.tipo_entr_salida, inicioAlimentacion.tipo_dia, inicioAlimentacion.salida_otro_dia, inicioAlimentacion.min_antes, inicioAlimentacion.min_despues, 
                     inicioAlimentacion.estado_origen, inicioAlimentacion.min_alimentacion]
             );
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'plan_general',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(inicioAlimentacion),
+                ip,
+                observacion: null
+            });
         }
 
         // CREAR FIN ALIMENTACION
@@ -780,6 +807,17 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion) : 
                     finAlimentacion.id_det_horario, finAlimentacion.tipo_entr_salida, finAlimentacion.tipo_dia, finAlimentacion.salida_otro_dia, finAlimentacion.min_antes, finAlimentacion.min_despues, 
                     finAlimentacion.estado_origen, finAlimentacion.min_alimentacion]
             );
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'plan_general',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(finAlimentacion),
+                ip,
+                observacion: null
+            });
         }
 
         // CREAR SALIDA
@@ -793,6 +831,17 @@ async function CrearPlanificacionHoraria(planificacionHoraria: Planificacion) : 
                 salida.id_det_horario, salida.tipo_entr_salida, salida.tipo_dia, salida.salida_otro_dia, salida.min_antes, salida.min_despues, 
                 salida.estado_origen, salida.min_alimentacion]
         );
+
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'plan_general',
+            usuario: user_name,
+            accion: 'I',
+            datosOriginales: '',
+            datosNuevos: JSON.stringify(salida),
+            ip,
+            observacion: null
+        });
 
         // FINALIZAR TRANSACCION
         await pool.query('COMMIT');
@@ -853,6 +902,11 @@ interface Planificacion {
     inicioAlimentacion: Plan | null,
     finAlimentacion: Plan | null,
     salida: Plan
+}
+
+interface DatosUsuario {
+    user_name: string,
+    ip: string,
 }
 
 export const PLANIFICACION_HORARIA_CONTROLADOR = new PlanificacionHorariaControlador();
