@@ -1,8 +1,7 @@
 // IMPORTAR LIBRERIAS
 import { Request, Response } from 'express';
-const builder = require('xmlbuilder');
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
-import fs from 'fs';
 
 class RolesControlador {
 
@@ -21,40 +20,98 @@ class RolesControlador {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  public async EliminarRol(req: Request, res: Response): Promise<void> {
-    const id = req.params.id;
-    await pool.query(
-      `
-      DELETE FROM cg_roles WHERE id = $1
-      `
-      , [id]);
-    res.jsonp({ message: 'Registro eliminado.' });
+  public async EliminarRol(req: Request, res: Response): Promise<Response> {
+    try {
+      // TODO ANALIZAR COMOOBTENER USER_NAME E IP DESDE EL FRONT
+      const { user_name, ip } = req.body;
+      const id = req.params.id;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const rol = await pool.query('SELECT * FROM cg_roles WHERE id = $1', [id]);
+      const [datosOriginales] = rol.rows;
+      
+      if (!datosOriginales) {
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'cg_roles',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al eliminar el rol con id ${id}`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
+      }
+      
+      await pool.query(
+        `
+        DELETE FROM cg_roles WHERE id = $1
+        `
+        , [id]);
+      
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'cg_roles',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro eliminado.' });
+    } catch (error) {
+      // FINALIZAR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
+    }
   }
 
   // METODO PARA REGISTRAR ROL
   public async CrearRol(req: Request, res: Response): Promise<void> {
-    const { nombre } = req.body;
-    await pool.query(
-      `
-       INSERT INTO cg_roles (nombre) VALUES ($1)
-       `
-      , [nombre]);
-    res.jsonp({ message: 'Registro guardado.' });
+    try {
+      const { nombre, user_name, ip } = req.body;
+      
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      await pool.query(
+        `
+         INSERT INTO cg_roles (nombre) VALUES ($1)
+         `
+        , [nombre]);
+      
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'cg_roles',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{nombre: ${nombre}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      res.jsonp({ message: 'Registro guardado.' });
+    } catch (error) {
+      // FINALIZAR TRANSACCION
+      await pool.query('ROLLBACK');
+      res.status(404).jsonp({ message: 'Error al guardar el registro.' });
+    }
 
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   public async ListarRolesActualiza(req: Request, res: Response) {
     const id = req.params.id;
@@ -78,15 +135,56 @@ class RolesControlador {
   }
 
 
-  public async ActualizarRol(req: Request, res: Response): Promise<void> {
-    const { nombre, id } = req.body;
-    await pool.query('UPDATE cg_roles SET nombre = $1 WHERE id = $2', [nombre, id]);
-    res.jsonp({ message: 'Registro Actualizado' });
+  public async ActualizarRol(req: Request, res: Response): Promise<Response> {
+    try {
+      const { nombre, id, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOS ORIGINALES
+      const rol = await pool.query('SELECT * FROM cg_roles WHERE id = $1', [id]);
+      const [datosOriginales] = rol.rows;
+
+      if (!datosOriginales) {
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'cg_roles',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar el rol con id ${id}`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
+      }
+
+      await pool.query('UPDATE cg_roles SET nombre = $1 WHERE id = $2', [nombre, id]);
+      
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'cg_roles',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{nombre: ${nombre}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro Actualizado' });
+    } catch (error) {
+      // FINALIZAR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
+    }
   }
-
-
-
-
 }
 
 const ROLES_CONTROLADOR = new RolesControlador();
