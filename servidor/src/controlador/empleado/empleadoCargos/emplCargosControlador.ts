@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
+import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import pool from '../../../database';
 
 class EmpleadoCargosControlador {
@@ -30,33 +31,103 @@ class EmpleadoCargosControlador {
 
   // METODO DE REGISTRO DE CARGO
   public async Crear(req: Request, res: Response): Promise<void> {
-    const { id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo,
-      jefe } = req.body;
-    await pool.query(
-      `
-      INSERT INTO empl_cargos (id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal,
-         sueldo, hora_trabaja, cargo, jefe) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-      `
-      , [id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe]);
+    try {
+      const { id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo,
+        jefe, user_name, ip } = req.body;
+      
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
-    res.jsonp({ message: 'Registro guardado.' });
+      await pool.query(
+        `
+        INSERT INTO empl_cargos (id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal,
+           sueldo, hora_trabaja, cargo, jefe) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        `
+        , [id_empl_contrato, id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe]);
+      
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'empl_cargos',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{id_empl_contrato: ${id_empl_contrato}, id_departamento: ${id_departamento}, fec_inicio: ${fec_inicio}, 
+                      fec_final: ${fec_final}, id_sucursal: ${id_sucursal}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}, cargo: ${cargo}, jefe: ${jefe}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+  
+      res.jsonp({ message: 'Registro guardado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      res.status(404).jsonp({ message: 'Error al guardar el registro.' });
+    }
   }
 
   // METODO PARA ACTUALIZAR REGISTRO
-  public async EditarCargo(req: Request, res: Response): Promise<any> {
-    const { id_empl_contrato, id } = req.params;
-    const { id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe } = req.body;
+  public async EditarCargo(req: Request, res: Response): Promise<Response> {
+    try {
+      const { id_empl_contrato, id } = req.params;
+      const { id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe, user_name, ip } = req.body;
+  
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
-    await pool.query(
-      `
-      UPDATE empl_cargos SET id_departamento = $1, fec_inicio = $2, fec_final = $3, id_sucursal = $4, 
-        sueldo = $5, hora_trabaja = $6, cargo = $7, jefe = $8  
-      WHERE id_empl_contrato = $9 AND id = $10
-      `
-      , [id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe,
-        id_empl_contrato, id]);
-    res.jsonp({ message: 'Registro actualizado exitosamente.' });
+      // CONSULTAR DATOSORIGINALES
+      const cargoConsulta = await pool.query('SELECT * FROM empl_cargos WHERE id = $1', [id]);
+      const [datosOriginales] = cargoConsulta.rows;
+
+      if (!datosOriginales) {
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'empl_cargos',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar el cargo con id ${id}`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
+      }
+
+      await pool.query(
+        `
+        UPDATE empl_cargos SET id_departamento = $1, fec_inicio = $2, fec_final = $3, id_sucursal = $4, 
+          sueldo = $5, hora_trabaja = $6, cargo = $7, jefe = $8  
+        WHERE id_empl_contrato = $9 AND id = $10
+        `
+        , [id_departamento, fec_inicio, fec_final, id_sucursal, sueldo, hora_trabaja, cargo, jefe,
+          id_empl_contrato, id]);
+        
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'empl_cargos',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{id_departamento: ${id_departamento}, fec_inicio: ${fec_inicio}, fec_final: ${fec_final}, 
+          id_sucursal: ${id_sucursal}, sueldo: ${sueldo}, hora_trabaja: ${hora_trabaja}, cargo: ${cargo}, jefe: ${jefe}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro actualizado exitosamente.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
+    }
   }
 
   // METODO PARA BUSCAR DATOS DE CARGO POR ID CONTRATO
@@ -77,16 +148,6 @@ class EmpleadoCargosControlador {
       return res.status(404).jsonp({ message: 'error' });
     }
   }
-
-
-
-
-
-
-
-
-
-
 
   public async list(req: Request, res: Response) {
     const Cargos = await pool.query('SELECT * FROM empl_cargos');
@@ -119,10 +180,6 @@ class EmpleadoCargosControlador {
     }
   }
 
-
-
-
-
   public async EncontrarIdCargo(req: Request, res: Response): Promise<any> {
     const { id_empleado } = req.params;
     const CARGO = await pool.query(
@@ -153,13 +210,6 @@ class EmpleadoCargosControlador {
       return res.status(404).jsonp({ text: 'Registro no encontrado' });
     }
   }
-
-
-
-
-
-
-
 
   public async BuscarUnTipo(req: Request, res: Response) {
     const id = req.params.id;
@@ -209,13 +259,6 @@ class EmpleadoCargosControlador {
     }
   }
 
-
-
-
-
-
-
-
   /** **************************************************************************************** **
    ** **                  METODOS DE CONSULTA DE TIPOS DE CARGOS                            ** ** 
    ** **************************************************************************************** **/
@@ -237,20 +280,44 @@ class EmpleadoCargosControlador {
 
   // METODO DE REGISTRO DE TIPO DE CARGO
   public async CrearTipoCargo(req: Request, res: Response): Promise<Response> {
-    const { cargo } = req.body;
-    const response: QueryResult = await pool.query(
-      `
-      INSERT INTO tipo_cargo (cargo) VALUES ($1) RETURNING *
-      `
-      , [cargo]);
+    try {
+      const { cargo, user_name, ip } = req.body;
 
-    const [tipo_cargo] = response.rows;
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
-    if (tipo_cargo) {
-      return res.status(200).jsonp(tipo_cargo)
-    }
-    else {
-      return res.status(404).jsonp({ message: 'error' })
+      const response: QueryResult = await pool.query(
+        `
+        INSERT INTO tipo_cargo (cargo) VALUES ($1) RETURNING *
+        `
+        , [cargo]);
+  
+      const [tipo_cargo] = response.rows;
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'tipo_cargo',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{cargo: ${cargo}}`,
+        ip,
+        observacion: null
+      });
+  
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
+      if (tipo_cargo) {
+        return res.status(200).jsonp(tipo_cargo)
+      }
+      else {
+        return res.status(404).jsonp({ message: 'error' })
+      }
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' })
     }
   }
 
