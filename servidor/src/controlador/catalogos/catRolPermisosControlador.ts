@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
 
 class RolPermisosControlador {
@@ -17,20 +18,67 @@ class RolPermisosControlador {
   }
 
   public async create(req: Request, res: Response): Promise<void> {
-    const { funcion, link, etiqueta } = req.body;
-    await pool.query('INSERT INTO cg_rol_permisos ( funcion, link, etiqueta ) VALUES ($1, $2, $3)', [funcion, link, etiqueta]);
-    console.log(req.body);
-    const rolPermisos = await pool.query('SELECT id FROM cg_rol_permisos');
-    const ultimoDato = rolPermisos.rows.length - 1;
-    const idRespuesta = rolPermisos.rows[ultimoDato].id;
-    res.jsonp({ message: 'Rol permiso Guardado', id: idRespuesta});
+    try {
+      const { funcion, link, etiqueta, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      await pool.query('INSERT INTO cg_rol_permisos ( funcion, link, etiqueta ) VALUES ($1, $2, $3)', [funcion, link, etiqueta]);
+      
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'cg_rol_permisos',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{funcion: ${funcion}, link: ${link}, etiqueta: ${etiqueta}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
+      const rolPermisos = await pool.query('SELECT id FROM cg_rol_permisos');
+      const ultimoDato = rolPermisos.rows.length - 1;
+      const idRespuesta = rolPermisos.rows[ultimoDato].id;
+      res.jsonp({ message: 'Rol permiso Guardado', id: idRespuesta});
+    } catch (error) {
+      // FINALIZAR TRANSACCION
+      await pool.query('ROLLBACK');
+      res.status(404).jsonp({ message: 'Error al guardar el rol permiso.' });
+    }
   }
 
   public async createPermisoDenegado(req: Request, res: Response): Promise<void> {
-    const { id_rol, id_permiso } = req.body;
-    await pool.query('INSERT INTO rol_perm_denegado ( id_rol, id_permiso ) VALUES ($1, $2)', [id_rol, id_permiso]);
-    console.log(req.body);
-    res.jsonp({ message: 'Permiso denegado Guardado'});
+    try {
+      const { id_rol, id_permiso, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      await pool.query('INSERT INTO rol_perm_denegado ( id_rol, id_permiso ) VALUES ($1, $2)', [id_rol, id_permiso]);
+      
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'rol_perm_denegado',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{id_rol: ${id_rol}, id_permiso: ${id_permiso}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      res.jsonp({ message: 'Permiso denegado Guardado'});
+    } catch (error) {
+      // FINALIZAR TRANSACCION
+      await pool.query('ROLLBACK');
+      res.status(404).jsonp({ message: 'Error al guardar el permiso denegado.' });
+    }
   }
 
   public async getPermisosUsuario(req: Request, res: Response): Promise<any> {
@@ -42,7 +90,6 @@ class RolPermisosControlador {
     }
     res.status(404).jsonp({ text: 'El rol no tiene permisos' });
   }
-
 }
 
 export const rolPermisosControlador = new RolPermisosControlador();
