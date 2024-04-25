@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
 import fs from 'fs';
-const builder = require('xmlbuilder');
 import excel from 'xlsx';
 import path from 'path';
 
@@ -22,36 +22,118 @@ class TituloControlador {
   }
 
   // METODO PARA ELIMINAR REGISTROS
-  public async EliminarRegistros(req: Request, res: Response): Promise<void> {
-    const id = req.params.id;
-    await pool.query(
-      `
-      DELETE FROM cg_titulos WHERE id = $1
-      `
-      , [id]);
-    res.jsonp({ message: 'Registro eliminado.' });
+  public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
+    try {
+      // TODO ANALIZAR COMOOBTENER USER_NAME E IP DESDE EL FRONT
+      const { user_name, ip } = req.body;
+      const id = req.params.id;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const rol = await pool.query('SELECT * FROM cg_titulos WHERE id = $1', [id]);
+      const [datosOriginales] = rol.rows;
+
+      if (!datosOriginales) {
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'cg_titulos',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al eliminar el título con id ${id}`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
+      }
+      
+      await pool.query(
+        `
+        DELETE FROM cg_titulos WHERE id = $1
+        `
+        , [id]);
+      
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'cg_titulos',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro eliminado.' });
+    } catch (error) {
+      // FINALIZAR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
+    }
   }
 
   // METODO PARA ACTUALIZAR REGISTRO
-  public async ActualizarTitulo(req: Request, res: Response): Promise<void> {
-    const { nombre, id_nivel, id } = req.body;
-    await pool.query(
-      `
-      UPDATE cg_titulos SET nombre = $1, id_nivel = $2 WHERE id = $3
-      `
-      , [nombre, id_nivel, id]);
-    res.jsonp({ message: 'Registro actualizado.' });
+  public async ActualizarTitulo(req: Request, res: Response): Promise<Response> {
+    try {
+      const { nombre, id_nivel, id, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const rol = await pool.query('SELECT * FROM cg_titulos WHERE id = $1', [id]);
+      const [datosOriginales] = rol.rows;
+
+      if (!datosOriginales) {
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'cg_titulos',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar el título con id ${id}`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
+      }
+
+      await pool.query(
+        `
+        UPDATE cg_titulos SET nombre = $1, id_nivel = $2 WHERE id = $3
+        `
+        , [nombre, id_nivel, id]);
+      
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'cg_titulos',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{nombre: ${nombre}, id_nivel: ${id_nivel}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro actualizado.' });
+    } catch (error) {
+      // FINALIZAR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
+    }
   }
-
-
-
-
-
-
-
-
-
-
 
   public async getOne(req: Request, res: Response): Promise<any> {
     const { id } = req.params;
@@ -63,13 +145,34 @@ class TituloControlador {
   }
 
   public async create(req: Request, res: Response): Promise<void> {
-    const { nombre, id_nivel } = req.body;
-    await pool.query('INSERT INTO cg_titulos ( nombre, id_nivel ) VALUES ($1, $2)', [nombre, id_nivel]);
-    console.log(req.body);
-    res.jsonp({ message: 'Título guardado' });
+    try {
+      const { nombre, id_nivel, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      await pool.query('INSERT INTO cg_titulos ( nombre, id_nivel ) VALUES ($1, $2)', [nombre, id_nivel]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'cg_titulos',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{nombre: ${nombre}, id_nivel: ${id_nivel}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      res.jsonp({ message: 'Título guardado' });
+    } catch (error) {
+      // FINALIZAR TRANSACCION
+      await pool.query('ROLLBACK');
+      res.status(404).jsonp({ message: 'Error al guardar el título.' });
+    }
   }
-
-
 
   // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
   public async RevisarDatos(req: Request, res: Response): Promise<any> {
@@ -102,7 +205,7 @@ class TituloControlador {
       if((data.fila != undefined && data.fila != '') && 
         (data.titulo != undefined && data.titulo != '') && 
         (data.nivel != undefined && data.nivel != '') ){
-        //Validar primero que exista niveles en la tabla niveles
+        // VALIDAR PRIMERO QUE EXISTA NIVELES EN LA TABLA NIVELES
         const existe_nivel = await pool.query('SELECT id FROM nivel_titulo WHERE UPPER(nombre) = UPPER($1)', [nivel]);
         var id_nivel = existe_nivel.rows[0];
         if(id_nivel != undefined && id_nivel != ''){
@@ -188,14 +291,14 @@ class TituloControlador {
     setTimeout(() => {
 
       listTitulosProfesionales.sort((a: any, b: any) => {
-        // Compara los números de los objetos
+        // COMPARA LOS NÚMEROS DE LOS OBJETOS
         if (a.fila < b.fila) {
             return -1;
         }
         if (a.fila > b.fila) {
             return 1;
         }
-        return 0; // Son iguales
+        return 0; // SON IGUALES
       });
 
       var filaDuplicada: number = 0;
@@ -205,9 +308,9 @@ class TituloControlador {
           item.observacion = 'Registro duplicado'
         }
 
-        //Valida si los datos de la columna N son numeros.
+        // VALIDA SI LOS DATOS DE LA COLUMNA N SON NUMEROS.
         if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-          //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+          // CONDICION PARA VALIDAR SI EN LA NUMERACION EXISTE UN NUMERO QUE SE REPITE DARA ERROR.
               if(item.fila == filaDuplicada){
                   mensaje = 'error';
               }
@@ -226,8 +329,6 @@ class TituloControlador {
 
     }, 1500)
   }
-
-
 
 }
 
