@@ -187,6 +187,11 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
     this.ObtenerMenuModulos()
 
+
+    this.nombreModulos.map(x =>
+
+      this.paginasSeleccionadasModulos[x] = [])
+
   }
 
   ManejarPagina(e: PageEvent) {
@@ -572,7 +577,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   }
 
 
-  // METODO PARA VERIFICAR SELECCION DE CIUDADES
+  // METODO PARA VERIFICAR SELECCION DE PAGINAS
   isChecked_: boolean = false;
 
   SeleccionarIndividual(event: any, valor: any) {
@@ -595,6 +600,32 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
     }
   }
+
+
+  SeleccionarIndividualModulos(event: any, valor: any, modulo: string) {
+    const target = event.target as HTMLInputElement;
+    if (target.checked === true) {
+      this.AgregarPaginaModulo(valor, modulo);
+
+      console.log("modulo seleccionado", this.paginasSeleccionadasModulos);
+
+      this.ObtenerAcciones(valor.id);
+    }
+    else {
+      this.QuitarPaginaModulo(valor, modulo);
+
+      console.log("valor de id ", valor.id);
+      this.nombresAccionesPorPagina[valor.id] = [];
+
+
+
+
+    }
+  }
+
+
+
+
 
 
   isCheckedAccion_: boolean = false;
@@ -657,7 +688,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                 this.contador = this.contador + 1;
                 this.paginasRol = datos;
                 this.habilitarprogress = false;
-                //this.VerMensaje();
 
 
                 (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
@@ -844,75 +874,44 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.contador = 0;
     // VALIDAR SI SE HA SELECCIONADO PAGINAS
     if (Object.keys(this.paginasSeleccionadasModulos).length === 0) {
+
+      this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+        timeOut: 6000,
+      })
+
+    } else {
+
+
+
       this.habilitarprogress = true;
       // RECORRER LA LISTA DE PAGINAS SELECCIONADAS
 
-      this.nombreModulos.map(x => this.paginasSeleccionadasModulos[x].map(obj => {
+
+      this.nombreModulos.map(x =>
+
+        this.paginasSeleccionadasModulos[x].map(obj => {
 
 
-        if (this.accionesSeleccionadasPorPagina[obj.id]) {
+          if (this.accionesSeleccionadasPorPagina[obj.id]) {
 
-          this.accionesSeleccionadasPorPagina[obj.id].map(accion => {
-
-
-            var buscarPagina = {
-              funcion: obj.nombre,
-              id_rol: this.idRol,
-              id_accion: accion.id
-            };
-
-            // BUSCAR ID DE PAGINAS EXISTENTES
-            this.paginasRol = [];
-
-            this.rest.BuscarIdPaginasConAcciones(buscarPagina).subscribe(
-              datos => {
-                this.contador = this.contador + 1;
-                this.paginasRol = datos;
-                this.habilitarprogress = false;
-
-                (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
-                for (var i = 0; i <= this.nombresMenu.length - 1; i++) {
-                  (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
-                }
-
-                delete this.nombresAccionesPorPagina[obj.id];
-                delete this.accionesSeleccionadasPorPagina[obj.id];
-                this.paginasSeleccionadasModulos[x] = [];
-                this.rest.BuscarPaginasRol(buscarPagina).subscribe(datos => {
-                  this.paginas = datos;
-                })
-
-                this.toastr.info('Se indica que ' + obj.nombre + ' ya fue asignada a este Rol.', '', {
-                  timeOut: 7000,
-                })
+            this.accionesSeleccionadasPorPagina[obj.id].map(accion => {
 
 
+              var buscarPagina = {
+                funcion: obj.nombre,
+                id_rol: this.idRol,
+                id_accion: accion.id
+              };
 
-              }, error => {
+              // BUSCAR ID DE PAGINAS EXISTENTES
+              this.paginasRol = [];
 
-
-                var rolPermisosbody = {
-
-                  funcion: obj.nombre,
-                  link: obj.link,
-                  id_rol: this.idRol,
-                  id_accion: accion.id
-
-                }
-
-
-                this.rest.crearPaginaRol(rolPermisosbody).subscribe(response => {
+              this.rest.BuscarIdPaginasConAcciones(buscarPagina).subscribe(
+                datos => {
                   this.contador = this.contador + 1;
-                  this.ingresar = this.ingresar + 1;
-                  this.toastr.success('Operación exitosa.', 'Registro guardado.', {
-                    timeOut: 6000,
-                  });
+                  this.paginasRol = datos;
+                  this.habilitarprogress = false;
 
-                  /*
-                  setTimeout(() => {
-                    window.location.reload();
-                  }, 2000);
-                  */
                   (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
                   for (var i = 0; i <= this.nombresMenu.length - 1; i++) {
                     (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
@@ -921,26 +920,69 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                   delete this.nombresAccionesPorPagina[obj.id];
                   delete this.accionesSeleccionadasPorPagina[obj.id];
                   this.paginasSeleccionadasModulos[x] = [];
-
-
-                  this.rest.BuscarPaginasRol(rol).subscribe(datos => {
+                  this.rest.BuscarPaginasRol(buscarPagina).subscribe(datos => {
                     this.paginas = datos;
                   })
 
-                  //this.VerMensaje();
-                }, error => {
-                  this.contador = this.contador + 1;
-                  //this.VerMensaje();
-                  this.toastr.error('Ups!!! algo salio mal..', 'Ups!!! algo salio mal.', {
-                    timeOut: 6000,
+                  this.toastr.info('Se indica que ' + obj.nombre + ' ya fue asignada a este Rol.', '', {
+                    timeOut: 7000,
                   })
-                });
-              }
-            )
-          })
-        }
 
-      })
+
+
+                }, error => {
+
+
+                  var rolPermisosbody = {
+
+                    funcion: obj.nombre,
+                    link: obj.link,
+                    id_rol: this.idRol,
+                    id_accion: accion.id
+
+                  }
+
+
+                  this.rest.crearPaginaRol(rolPermisosbody).subscribe(response => {
+                    this.contador = this.contador + 1;
+                    this.ingresar = this.ingresar + 1;
+                    this.toastr.success('Operación exitosa.', 'Registro guardado.', {
+                      timeOut: 6000,
+                    });
+
+                    /*
+                    setTimeout(() => {
+                      window.location.reload();
+                    }, 2000);
+                    */
+                    (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
+                    for (var i = 0; i <= this.nombresMenu.length - 1; i++) {
+                      (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
+                    }
+
+                    delete this.nombresAccionesPorPagina[obj.id];
+                    delete this.accionesSeleccionadasPorPagina[obj.id];
+                    this.paginasSeleccionadasModulos[x] = [];
+
+
+                    this.rest.BuscarPaginasRol(rol).subscribe(datos => {
+                      this.paginas = datos;
+                    })
+
+                    //this.VerMensaje();
+                  }, error => {
+                    this.contador = this.contador + 1;
+                    //this.VerMensaje();
+                    this.toastr.error('Ups!!! algo salio mal..', 'Ups!!! algo salio mal.', {
+                      timeOut: 6000,
+                    })
+                  });
+                }
+              )
+            })
+          }
+
+        })
 
 
 
@@ -949,12 +991,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       var rol = {
         id_rol: this.idRol
       };
-
-
-    } else {
-      this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
-        timeOut: 6000,
-      })
     }
   }
 

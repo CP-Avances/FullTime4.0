@@ -224,7 +224,7 @@
                                                 id="verticalLine">
                                                 <input class="form-check-input" type="checkbox"
                                                     name="paginasSeleccionadas" id="paginasSeleccionadas{{i}}"
-                                                    (change)="SeleccionarIndividual($event, n)"
+                                                    (change)="SeleccionarIndividualModulos($event, n, 'permisos')"
                                                     style="text-align: center; margin-left: 10px;">
                                                 <label style="margin-left: 30px; font-size: 14px;"
                                                     class="form-check-label" for="inlineCheckbox1">
@@ -287,7 +287,7 @@
                                                 id="verticalLine">
                                                 <input class="form-check-input" type="checkbox"
                                                     name="paginasSeleccionadas" id="paginasSeleccionadas{{i}}"
-                                                    (change)="SeleccionarIndividual($event, n)"
+                                                    (change)="SeleccionarIndividualModulos($event, n, 'vacaciones')"
                                                     style="text-align: center; margin-left: 10px;">
                                                 <label style="margin-left: 30px; font-size: 14px;"
                                                     class="form-check-label" for="inlineCheckbox1">
@@ -351,7 +351,7 @@
                                                 id="verticalLine">
                                                 <input class="form-check-input" type="checkbox"
                                                     name="paginasSeleccionadas" id="paginasSeleccionadas{{i}}"
-                                                    (change)="SeleccionarIndividual($event, n)"
+                                                    (change)="SeleccionarIndividualModulos($event, n,'horas_extras')"
                                                     style="text-align: center; margin-left: 10px;">
                                                 <label style="margin-left: 30px; font-size: 14px;"
                                                     class="form-check-label" for="inlineCheckbox1">
@@ -413,7 +413,7 @@
                                                 id="verticalLine">
                                                 <input class="form-check-input" type="checkbox"
                                                     name="paginasSeleccionadas" id="paginasSeleccionadas{{i}}"
-                                                    (change)="SeleccionarIndividual($event, n)"
+                                                    (change)="SeleccionarIndividualModulos($event, n, 'alimentacion')"
                                                     style="text-align: center; margin-left: 10px;">
                                                 <label style="margin-left: 30px; font-size: 14px;"
                                                     class="form-check-label" for="inlineCheckbox1">
@@ -476,7 +476,7 @@
                                                 id="verticalLine">
                                                 <input class="form-check-input" type="checkbox"
                                                     name="paginasSeleccionadas" id="paginasSeleccionadas{{i}}"
-                                                    (change)="SeleccionarIndividual($event, n)"
+                                                    (change)="SeleccionarIndividualModulos($event, n,'acciones_personal')"
                                                     style="text-align: center; margin-left: 10px;">
                                                 <label style="margin-left: 30px; font-size: 14px;"
                                                     class="form-check-label" for="inlineCheckbox1">
@@ -539,7 +539,7 @@
                                                 id="verticalLine">
                                                 <input class="form-check-input" type="checkbox"
                                                     name="paginasSeleccionadas" id="paginasSeleccionadas{{i}}"
-                                                    (change)="SeleccionarIndividual($event, n)"
+                                                    (change)="SeleccionarIndividualModulos($event, n, 'geolocalizacion')"
                                                     style="text-align: center; margin-left: 10px;">
                                                 <label style="margin-left: 30px; font-size: 14px;"
                                                     class="form-check-label" for="inlineCheckbox1">
@@ -602,7 +602,7 @@
                                                 id="verticalLine">
                                                 <input class="form-check-input" type="checkbox"
                                                     name="paginasSeleccionadas" id="paginasSeleccionadas{{i}}"
-                                                    (change)="SeleccionarIndividual($event, n)"
+                                                    (change)="SeleccionarIndividualModulos($event, n,'timbre_virtual')"
                                                     style="text-align: center; margin-left: 10px;">
                                                 <label style="margin-left: 30px; font-size: 14px;"
                                                     class="form-check-label" for="inlineCheckbox1">
@@ -665,7 +665,7 @@
                                                 id="verticalLine">
                                                 <input class="form-check-input" type="checkbox"
                                                     name="paginasSeleccionadas" id="paginasSeleccionadas{{i}}"
-                                                    (change)="SeleccionarIndividual($event, n)"
+                                                    (change)="SeleccionarIndividualModulos($event, n,'reloj_virtual')"
                                                     style="text-align: center; margin-left: 10px;">
                                                 <label style="margin-left: 30px; font-size: 14px;"
                                                     class="form-check-label" for="inlineCheckbox1">
@@ -745,7 +745,7 @@
         </mat-card-content>
         <mat-card-actions>
             <div class="container" style="text-align: center;">
-                <button id="btn-raised" class="btn btn-sm" (click)="InsertarPaginaRol()"
+                <button id="btn-raised" class="btn btn-sm" (click)="InsertarPaginaModulosRol()"
                     value="Guardar">Guardar</button>
             </div>
         </mat-card-actions>
