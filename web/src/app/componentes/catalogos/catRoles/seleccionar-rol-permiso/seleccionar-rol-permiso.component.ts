@@ -70,6 +70,13 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     etiquetaForm: this.etiqueta
   });
 
+
+  public nuevoRolPermisoForm1 = new FormGroup({
+    funcionForm: this.funcion1,
+    linkForm: this.link,
+    etiquetaForm: this.etiqueta
+  });
+
   // MENU PARA PAGINAS
   nombresMenu: any = [];
 
@@ -188,9 +195,16 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.ObtenerMenuModulos()
 
 
-    this.nombreModulos.map(x =>
+    this.nombreModulos.map(x => {
 
-      this.paginasSeleccionadasModulos[x] = [])
+      console.log("nombres modulos: " + x)
+      this.paginasSeleccionadasModulos[x] = []
+    }
+
+
+
+
+    )
 
   }
 
@@ -291,14 +305,14 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
 
   nombreModulos: string[] = [
-    "permisos",
-    "vacaciones",
-    "horas_extras",
-    "alimentacion",
-    "acciones_personal",
-    "geolocalizacion",
-    "timbre_virtual",
-    "reloj_virtual",
+    'permisos',
+    'vacaciones',
+    'horas_extras',
+    'alimentacion',
+    'acciones_personal',
+    'geolocalizacion',
+    'timbre_virtual',
+    'reloj_virtual',
   ]
 
   ObtenerMenuModulos() {
@@ -429,30 +443,24 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
 
 
+
+  // con nombre del modulo
   AgregarTodosModulos(modulo: string) {
-
-
 
     this.paginasSeleccionadasModulos[modulo] = this.paginasModulos[modulo];
 
+
     for (var i = 0; i <= this.paginasModulos[modulo].length - 1; i++) {
-      (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = true;
+      //console.log("para saber si funciona", modulo + 'paginasSeleccionadasModulos');
+      (<HTMLInputElement>document.getElementById('paginasSeleccionadasModulos' + i + modulo)).checked = true;
     }
 
     this.paginasSeleccionadasModulos[modulo].map(pagina => {
       this.ObtenerAcciones(pagina.id);
     })
 
+
   }
-
-
-
-
-
-
-
-
-
 
 
 
@@ -486,10 +494,10 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
   limpiarDataModulos: any = [];
   QuitarTodosModulos(modulo: string) {
-    this.limpiarData = this.paginasModulos[modulo];
-    for (var i = 0; i <= this.limpiarData.length - 1; i++) {
-      (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
-      this.paginasSeleccionadas = this.paginasSeleccionadasModulos[modulo].filter(s => s !== this.paginasModulos[modulo][i]);
+    this.limpiarDataModulos = this.paginasModulos[modulo];
+    for (var i = 0; i <= this.limpiarDataModulos.length - 1; i++) {
+      (<HTMLInputElement>document.getElementById('paginasSeleccionadasModulos' + i + modulo)).checked = false;
+      this.paginasSeleccionadasModulos[modulo] = this.paginasSeleccionadasModulos[modulo].filter(s => s !== this.paginasModulos[modulo][i]);
     }
   }
 
@@ -528,22 +536,16 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
   // METODO PARA VERIFICAR SELECCION DE OPCION "Todas" EN MODULOS
   isCheckedModulos: boolean = false;
-  SeleccionarTodasModulos(event: any) {
-    console.log(event)
-
-    if (event === true) {
+  SeleccionarTodasModulos(event: any, modulo: string) {
+    const target = event.target as HTMLInputElement;
 
 
-      this.nombreModulos.map(x => {
-        this.AgregarTodosModulos(x);
-
-
-      })
+    if (target.checked === true) {
+      this.AgregarTodosModulos(modulo);
     }
     else {
-      this.nombreModulos.map(x => {
-        this.QuitarTodosModulos(x);
-      })
+
+      this.QuitarTodosModulos(modulo);
       this.nombresAccionesPorPagina = {};
     }
   }
@@ -698,7 +700,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                 delete this.nombresAccionesPorPagina[obj.id];
                 delete this.accionesSeleccionadasPorPagina[obj.id];
                 this.paginasSeleccionadas = [];
-                this.rest.BuscarPaginasRol(buscarPagina).subscribe(datos => {
+                this.rest.BuscarPaginasRol(rol).subscribe(datos => {
                   this.paginas = datos;
                 })
                 this.toastr.info('Se indica que ' + obj.nombre + ' ya fue asignada a este Rol.', '', {
@@ -726,12 +728,10 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                     timeOut: 6000,
                   });
 
-                  /*
-                  setTimeout(() => {
-                    window.location.reload();
-                  }, 2000);
-                  */
+
                   (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
+
+
                   for (var i = 0; i <= this.nombresMenu.length - 1; i++) {
                     (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
                   }
@@ -874,28 +874,18 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.contador = 0;
     // VALIDAR SI SE HA SELECCIONADO PAGINAS
     if (Object.keys(this.paginasSeleccionadasModulos).length === 0) {
-
       this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
         timeOut: 6000,
       })
-
     } else {
-
-
-
       this.habilitarprogress = true;
       // RECORRER LA LISTA DE PAGINAS SELECCIONADAS
-
-
       this.nombreModulos.map(x =>
-
         this.paginasSeleccionadasModulos[x].map(obj => {
 
-
+          // en el caso de que existan acciones en esta pagina
           if (this.accionesSeleccionadasPorPagina[obj.id]) {
-
             this.accionesSeleccionadasPorPagina[obj.id].map(accion => {
-
 
               var buscarPagina = {
                 funcion: obj.nombre,
@@ -912,14 +902,23 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                   this.paginasRol = datos;
                   this.habilitarprogress = false;
 
-                  (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
-                  for (var i = 0; i <= this.nombresMenu.length - 1; i++) {
-                    (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
+                  // SE ENCARGA DE LOS CHECKS
+
+                  (<HTMLInputElement>document.getElementById('seleccionarmodulo')).checked = false;
+
+                  //   this.nombreModulos.map(modulo => {
+
+                  for (var i = 0; i <= this.paginasModulos[x].length - 1; i++) {
+                    (<HTMLInputElement>document.getElementById('paginasSeleccionadasModulos' + i + x)).checked = false;
                   }
+
+
+                  // })
+
 
                   delete this.nombresAccionesPorPagina[obj.id];
                   delete this.accionesSeleccionadasPorPagina[obj.id];
-                  this.paginasSeleccionadasModulos[x] = [];
+                  delete this.paginasSeleccionadasModulos[x];
                   this.rest.BuscarPaginasRol(buscarPagina).subscribe(datos => {
                     this.paginas = datos;
                   })
@@ -928,20 +927,15 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                     timeOut: 7000,
                   })
 
-
-
+                  // ESTA BIEN
                 }, error => {
 
-
                   var rolPermisosbody = {
-
                     funcion: obj.nombre,
                     link: obj.link,
                     id_rol: this.idRol,
                     id_accion: accion.id
-
                   }
-
 
                   this.rest.crearPaginaRol(rolPermisosbody).subscribe(response => {
                     this.contador = this.contador + 1;
@@ -950,29 +944,28 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                       timeOut: 6000,
                     });
 
-                    /*
-                    setTimeout(() => {
-                      window.location.reload();
-                    }, 2000);
-                    */
-                    (<HTMLInputElement>document.getElementById('seleccionar')).checked = false;
-                    for (var i = 0; i <= this.nombresMenu.length - 1; i++) {
-                      (<HTMLInputElement>document.getElementById('paginasSeleccionadas' + i)).checked = false;
+                    (<HTMLInputElement>document.getElementById('seleccionarmodulo')).checked = false;
+
+
+                    for (var i = 0; i <= this.paginasModulos[x].length - 1; i++) {
+                      (<HTMLInputElement>document.getElementById('paginasSeleccionadasModulos' + i + x)).checked = false;
                     }
+
+
+
 
                     delete this.nombresAccionesPorPagina[obj.id];
                     delete this.accionesSeleccionadasPorPagina[obj.id];
-                    this.paginasSeleccionadasModulos[x] = [];
+                    delete this.paginasSeleccionadasModulos[x];
 
+                    // ASIGNACION DE PAGINAS SELECCIONADAS AL ARREGLO QUE SE MUESTRA EN LA TABLA  
 
                     this.rest.BuscarPaginasRol(rol).subscribe(datos => {
                       this.paginas = datos;
                     })
 
-                    //this.VerMensaje();
                   }, error => {
                     this.contador = this.contador + 1;
-                    //this.VerMensaje();
                     this.toastr.error('Ups!!! algo salio mal..', 'Ups!!! algo salio mal.', {
                       timeOut: 6000,
                     })
@@ -980,6 +973,94 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                 }
               )
             })
+          } else {
+
+            // si no exiten accionen seleccionadas
+
+            var buscarPagina = {
+              funcion: obj.nombre,
+              id_rol: this.idRol
+            };
+            var rolPermisosbody = {
+
+              funcion: obj.nombre,
+              link: obj.link,
+              id_rol: this.idRol,
+
+              id_accion: null
+            }
+
+
+
+
+
+            this.paginasRol = [];
+            this.rest.BuscarIdPaginas(buscarPagina).subscribe(datos => {
+              this.contador = this.contador + 1;
+              this.paginasRol = datos;
+              this.habilitarprogress = false;
+              //this.VerMensaje();
+
+              (<HTMLInputElement>document.getElementById('seleccionarmodulo')).checked = false;
+
+              //    this.nombreModulos.map(modulo => {
+
+              for (var i = 0; i <= this.paginasModulos[x].length - 1; i++) {
+                (<HTMLInputElement>document.getElementById('paginasSeleccionadasModulos' + i + x)).checked = false;
+              }
+
+
+              //   })
+
+              delete this.nombresAccionesPorPagina[obj.id];
+              delete this.accionesSeleccionadasPorPagina[obj.id];
+              delete this.paginasSeleccionadasModulos[x];
+              this.rest.BuscarPaginasRol(rol).subscribe(datos => {
+                this.paginas = datos;
+              })
+
+              this.toastr.info('Se indica que ' + obj.nombre + ' ya fue asignada a este Rol.', '', {
+                timeOut: 7000,
+              })
+
+
+            }, error => {
+              //this.habilitarprogress = false;
+              this.rest.crearPaginaRol(rolPermisosbody).subscribe(response => {
+                this.contador = this.contador + 1;
+                this.ingresar = this.ingresar + 1;
+                this.toastr.success('Operación exitosa.', 'Registro guardado.', {
+                  timeOut: 6000,
+                });
+
+                (<HTMLInputElement>document.getElementById('seleccionarmodulo')).checked = false;
+
+                // this.nombreModulos.map(modulo => {
+
+                for (var i = 0; i <= this.paginasModulos[x].length - 1; i++) {
+                  (<HTMLInputElement>document.getElementById('paginasSeleccionadasModulos' + i + x)).checked = false;
+                }
+
+
+                // })
+
+                delete this.nombresAccionesPorPagina[obj.id];
+                delete this.accionesSeleccionadasPorPagina[obj.id];
+
+                delete this.paginasSeleccionadasModulos[x];
+
+                this.rest.BuscarPaginasRol(rol).subscribe(datos => {
+                  this.paginas = datos;
+                })
+              }, error => {
+                this.contador = this.contador + 1;
+                this.toastr.error('Ups!!! algo salio mal..', 'Ups!!! algo salio mal.', {
+                  timeOut: 6000,
+                })
+
+              });
+            }
+            );
           }
 
         })
