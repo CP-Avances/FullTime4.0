@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
-import fs from 'fs';
-const builder = require('xmlbuilder');
 
 class CiudadControlador {
 
@@ -60,13 +59,37 @@ class CiudadControlador {
 
     // REGISTRAR CIUDAD
     public async CrearCiudad(req: Request, res: Response): Promise<void> {
-        const { id_provincia, descripcion } = req.body;
-        await pool.query(
-            `
-            INSERT INTO ciudades (id_provincia, descripcion) VALUES ($1, $2)
-            `
-            , [id_provincia, descripcion]);
-        res.jsonp({ message: 'Registro guardado.' });
+        try {
+            const { id_provincia, descripcion, user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            await pool.query(
+                `
+                INSERT INTO ciudades (id_provincia, descripcion) VALUES ($1, $2)
+                `
+                , [id_provincia, descripcion]);
+            
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'ciudades',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: `{id_provincia: ${id_provincia}, descripcion: ${descripcion}}`,
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            res.jsonp({ message: 'Registro guardado.' });
+        } catch (error) {
+            // FINALIZAR TRANSACCION
+            await pool.query('ROLLBACK');
+            res.status(404).jsonp({ message: 'Error al guardar el registro.' });
+        }
     }
 
     // METODO PARA LISTAR NOMBRE DE CIUDADES - PROVINCIAS
@@ -88,14 +111,61 @@ class CiudadControlador {
     }
 
     // METODO PARA ELIMINAR REGISTRO
-    public async EliminarCiudad(req: Request, res: Response): Promise<void> {
-        const id = req.params.id;
-        await pool.query(
-            `
-            DELETE FROM ciudades WHERE id = $1
-            `
-            , [id]);
-        res.jsonp({ message: 'Registro eliminado.' });
+    public async EliminarCiudad(req: Request, res: Response): Promise<Response> {
+        try {
+            // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
+            const { user_name, ip } = req.body;
+            const id = req.params.id;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTAR DATOS ORIGINALES
+            const ciudad = await pool.query('SELECT * FROM ciudades WHERE id = $1', [id]);
+            const [datosOriginales] = ciudad.rows;
+
+            if (!datosOriginales) {
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'ciudades',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al eliminar la ciudad con id ${id}`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
+            }
+
+            await pool.query(
+                `
+                DELETE FROM ciudades WHERE id = $1
+                `
+                , [id]);
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'ciudades',
+                usuario: user_name,
+                accion: 'D',
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: '',
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.jsonp({ message: 'Registro eliminado.' });
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
+        }
     }
 
     // METODO PARA CONSULTAR DATOS DE UNA CIUDAD
