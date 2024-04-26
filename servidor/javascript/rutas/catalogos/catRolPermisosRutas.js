@@ -19,6 +19,8 @@ class RolPermisosRutas {
         this.router.get('/denegado/:id', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.getPermisosUsuario);
         // MENU ENLISTAR
         this.router.get('/menu/paginas', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarMenuRoles);
+        // MENU ENLISTAR Modulo
+        this.router.get('/menu/modulos', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarMenuModulosRoles);
         //MENU ENLISTAR POR MODULO
         this.router.post('/menu/paginasmodulos', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarMenuRolesModulos);
         // METODO PARA BUSCAR LAS PAGINAS POR ID_ROL
@@ -33,6 +35,7 @@ class RolPermisosRutas {
         this.router.post('/menu/paginas/eliminarsinaccion', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.EliminarPaginaRolSinAccion);
         // METODO PARA BUSCAR LAS ACCIONES DE LAS PAGINAS
         this.router.post('/menu/paginas/acciones', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerAccionesPaginas);
+        this.router.post('/menu/paginas/accionesexistentes', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerAccionesPaginasExistentes);
         // METODO PARA BUSCAR LAS ACCIONES DE LAS PAGINAS
         this.router.post('/menu/paginas/acciones/id', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ObtenerAccionPorId);
         // METODO PARA OBTENER TODAS LAS ACCIONES
