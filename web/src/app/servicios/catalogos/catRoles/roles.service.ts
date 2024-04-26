@@ -30,15 +30,7 @@ export class RolesService {
     console.log(data);
     return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/rol`, data);
   }
-
-
-
-
-
-
-
   
-
   // Roles
 
 

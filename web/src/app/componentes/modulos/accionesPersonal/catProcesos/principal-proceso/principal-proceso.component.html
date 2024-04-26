@@ -6,7 +6,7 @@
             </div>
             <mat-card class="example-card mat-elevation-z8">
                 <div class="d-flex justify-content-around" style="margin-top: 1%; margin-bottom: 2%;">
-                    <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarProceso()">
+                    <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrarProceso()" *ngIf="getCrearProceso()">
                         Crear proceso
                     </button>
                     <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampoBuscar()" matSuffix
@@ -60,11 +60,11 @@
                         <td>{{proceso.proc_padre}}</td>
                         <td>
                             <i class="fas fa-edit" (click)="AbrirVentanaEditar(proceso)" id="accion" matSuffix
-                                matTooltipPosition="right" matTooltip="Modificar los datos generales del registro.">
+                                matTooltipPosition="right" matTooltip="Modificar los datos generales del registro." *ngIf="getEditar()">
                                 <p>Editar</p>
                             </i>
                             <i class="far fa-trash-alt" (click)="ConfirmarDelete(proceso)" id="t-eliminar" matSuffix
-                                matTooltipPosition="right" matTooltip="Eliminar registro.">
+                                matTooltipPosition="right" matTooltip="Eliminar registro." *ngIf="getEliminar()">
                                 <p>Eliminar</p>
                             </i>
                         </td>
@@ -75,7 +75,7 @@
         <mat-paginator id="pagina" [length]="procesos.length" [pageSize]="tamanio_pagina"
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px">
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px" *ngIf="getDescargarReportes()">
             <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de Procesos de Acciones de Personal en formato PDF.">
                 <p>PDF</p>

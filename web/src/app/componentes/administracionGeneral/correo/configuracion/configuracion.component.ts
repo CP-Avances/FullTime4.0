@@ -9,6 +9,7 @@ import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.s
 // SECCION DE COMPONENTES
 import { CorreoEmpresaComponent } from 'src/app/componentes/administracionGeneral/correo/correo-empresa/correo-empresa.component';
 import { LogosComponent } from 'src/app/componentes/catalogos/catEmpresa/logos/logos.component';
+import { EndOfLineState } from 'typescript';
 
 @Component({
   selector: 'app-configuracion',
@@ -105,6 +106,44 @@ export class ConfiguracionComponent implements OnInit {
           }
         }
       })
+  }
+
+  getConfigurarImagenes(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Configurar imágenes de correo');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
+  getConfigurarServidor(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Configurar Servidor');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
   }
 
 }

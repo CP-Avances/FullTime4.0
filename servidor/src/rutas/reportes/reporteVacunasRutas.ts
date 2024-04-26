@@ -10,11 +10,12 @@ class ReportesAsistenciasRutas {
     }
 
     configuracion(): void {
-        // REPORTE DE VACUNAS MÚLTIPLES
+
+        // METODO DE BUSQUEDA DE DATOS DE VACUNAS LISTA sucursales[regimenes[departamentos[cargos[empleados]]]]
         this.router.put('/vacunas-multiples/', TokenValidation, VACUNAS_REPORTE_CONTROLADOR.ReporteVacunasMultiple);
 
 
-        // REPORTE DE VACUNAS MÚLTIPLES CARGOS
+        // METODO DE BUSQUEDA DE DATOS DE VACUNAS LISTA sucursales[empleados]]
         this.router.put('/vacunas-multiples-cargos-regimen/', TokenValidation, VACUNAS_REPORTE_CONTROLADOR.ReporteVacunasMultipleCargosRegimen);
     }
 }

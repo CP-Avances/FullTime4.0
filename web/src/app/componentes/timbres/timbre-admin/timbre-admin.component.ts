@@ -170,4 +170,15 @@ export class TimbreAdminComponent implements OnInit {
     this.lista = false;
     this.timbres = [];
   }
+
+  //Control Botones
+  getVerTimbres(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Ver Timbres');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+    }
+  }
 }

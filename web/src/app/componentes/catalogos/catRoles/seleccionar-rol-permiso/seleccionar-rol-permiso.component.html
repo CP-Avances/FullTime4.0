@@ -1,6 +1,81 @@
+<br>
+
+<div class="mat-elevation-z8" style="background: white;">
+    <div class="d-flex bd-highlight" id="resultados">
+
+        <button  class="btn btn-outline-light btn-sm" [routerLink]="['/roles/']"
+            style="float: right; margin-right: 10px;">Atras</button>
+        <span class="w-100 bd-highlight">
+            FUNCIONES QUE TIENE EL ROL {{nombreRol}}        </span>
+        <button (click)="ConfirmarDelete()" class="btn btn-outline-light btn-sm"
+            style="float: right; margin-right: 10px;">Eliminar</button>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover table-sm">
+            <thead class="thead-light">
+                <tr style="text-align: left;">
+                    <th>
+                        <mat-icon *ngIf="activar_seleccion" class="flex-shrink-1 bd-highlight" matSuffix
+                            matTooltipPosition="right" matTooltip="Dar clic para activar selección múltiple."
+                            id="SelectCheck" (click)="HabilitarSeleccion()">
+                            library_add_check
+                        </mat-icon>
+                        <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
+                            [checked]="selectionPaginas.hasValue() && isAllSelectedPag()"
+                            [indeterminate]="selectionPaginas.hasValue() && !isAllSelectedPag()"
+                            [aria-label]="checkboxLabelPag()">
+                        </mat-checkbox>
+
+
+
+                    </th>
+                    <th scope="col">Funciones</th>
+                    <th scope="col">Acciones</th>
+
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td></td>
+
+                    <td>
+                        <mat-form-field class="input-tables funcion" style="float: left;">
+                            <input matInput placeholder="Buscar" [(ngModel)]="filtrofuncion" [formControl]="funcion"
+                                type="text"   (keypress)="IngresarSoloLetras($event)">
+                        </mat-form-field>
+                    </td>
+                    <td></td>
+
+                </tr>
+
+                <tr *ngFor="let p of paginas | roles: filtrofuncion | paginate:tamanio_pagina:numero_pagina "
+                    style="text-align: left;">
+                    <td>
+                        <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
+                            (change)="$event ? selectionPaginas.toggle(p) : null"
+                            [checked]="selectionPaginas.isSelected(p)" [aria-label]="checkboxLabelPag(p)">
+                        </mat-checkbox>
+                    </td>
+                    <td style="text-align: left;">{{p.funcion}}</td>
+                    <td style="text-align: left;">{{MetodoParaMostrarAccion(p.id_accion)}}</td>
+
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <mat-paginator id="pagina" [length]="paginas.length" [pageSize]="tamanio_pagina" [pageSizeOptions]="pageSizeOptions"
+        (page)="ManejarPagina($event)" showFirstLastButtons>
+    </mat-paginator>
+    <br>
+</div>
+
+<br>
+
+
 <div class="container" style="padding-top: 15px; padding-bottom: 25px;">
     <div id="titulo">
-        <span>FUNCIONES QUE TENDRÁ EL ROL {{nombreRol.toUpperCase()}}</span>
+        <span>FUNCIONES DEL SISTEMA</span>
     </div>
     <mat-card class="example-card mat-elevation-z8">
         <!-- Formulario Completo -->
@@ -11,94 +86,102 @@
                 </span>
             </div>
             <form [formGroup]="nuevoRolPermisoForm">
-                <div class="container" style="text-align: center;">
+                <div class="container">
                     <div class="row">
+
                         <div class="col-sm">
-                            <mat-form-field>
-                                <mat-label>Seleccionar Función</mat-label>
-                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                    matTooltip="Lista de funciones que se podrán realizar en el sistema">
-                                    help_outline
-                                </mat-icon>
-                                <mat-select [formControl]="funcion" required>
-                                    <mat-option *ngFor="let f of funciones" [value]="f.value">
-                                        {{f.value}}
-                                    </mat-option>
-                                </mat-select>
-                                <mat-error *ngIf="funcion.invalid">{{obtenerMensajeErrorFuncion()}}</mat-error>
-                            </mat-form-field>
+                            <!-- Tabla de menu -->
+
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <div class="modal-body" style="margin-left: 60px; padding-top: 15px;">
+                                    <div class="container-fluid">
+                                        <input class="form-check-input" type="checkbox" id="seleccionar"
+                                            [(ngModel)]="isChecked" (change)="SeleccionarTodas(isChecked)"
+                                            [ngModelOptions]="{standalone: true}">
+                                        <label class="form-check-label" for="inlineCheckbox1"
+                                            style="margin-left: 10px; font-size: 14px; color: blue; font-weight: bold;">
+                                            Todos los links
+                                        </label>
+                                        <div class="row" style="text-align: center; padding-top: 10px;">
+                                            <div class="col-md-6 col-lg-6 col-6"
+                                                style="text-align:left; padding-bottom: 10px;"
+                                                *ngFor="let n of nombresMenu; index as i" id="verticalLine">
+                                                <input class="form-check-input" type="checkbox"
+                                                    name="paginasSeleccionadas" id="paginasSeleccionadas{{i}}"
+                                                    (change)="SeleccionarIndividual($event, n)"
+                                                    style="text-align: center; margin-left: 10px;">
+                                                <label style="margin-left: 30px; font-size: 14px;"
+                                                    class="form-check-label" for="inlineCheckbox1">
+                                                    {{n.nombre}}
+                                                    <!--Acciones de las paginas-->
+
+
+                                                </label>
+
+                                                <div class="d-flex flex-wrap justify-content-start">
+                                                    <div class="modal-body"
+                                                        style="margin-left: 60px; padding-top: 15px;">
+                                                        <div class="container-fluid">
+
+                                                            <div class="row"
+                                                                style="text-align: left; padding-top: 10px;"
+                                                                *ngFor="let pagina of nombresAccionesPorPagina[n.id]; index as j">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                    id="seleccionarAccion{{n.id}}"
+                                                                    (change)="SeleccionarTodasAcciones($event, n.id)">
+
+                                                                <label class="form-check-label" for="inlineCheckbox1"
+                                                                    style="margin-left: 1px; font-size: 14px; color: green; font-weight: bold; padding-bottom: 10px;">
+                                                                    Todos las acciones
+                                                                </label>
+
+
+                                                                <div class="col-md-6 col-lg-6 col-6"
+                                                                    style="text-align:left; padding-bottom: 10px; "
+                                                                    *ngFor="let accion of pagina; index as i">
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                        name="accionesSeleccionadasPorPagina"
+                                                                        id="{{n.id}}accionesSeleccionadasPorPagina{{i}}"
+                                                                        (change)="SeleccionarIndividualAccion($event, n.id, accion)">
+                                                                    <label style="margin-left: 10px; font-size: 14px;"
+                                                                        class="form-check-label" for="inlineCheckbox1">
+                                                                        {{accion.accion}}
+                                                                    </label>
+                                                                </div>
+
+
+
+                                                            </div>
+
+
+                                                        </div>
+                                                    </div>
+
+
+                                                </div>
+
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
                         </div>
-                        <div class="col-sm">
-                            <mat-form-field>
-                                <mat-label>Seleccionar Links</mat-label>
-                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                    matTooltip="Secciones del sistema a las que va a afectar la función seleccionada">
-                                    help_outline
-                                </mat-icon>
-                                <mat-select [formControl]="link" required>
-                                    <mat-option *ngFor="let l of links" [value]="l.value">
-                                        {{l.viewValue}}
-                                    </mat-option>
-                                </mat-select>
-                                <mat-error *ngIf="link.invalid">{{obtenerMensajeErrorLink()}}</mat-error>
-                            </mat-form-field>
-                        </div>
-                        <div class="col-sm">
-                            <mat-form-field>
-                                <mat-label id="funcion">Seleccionar Etiquetas</mat-label>
-                                <mat-icon id="i-cursor" matSuffix matTooltipPosition="right"
-                                    matTooltip="Lista de nombres que referencian las funciones que se pueden realizar en el sistema">
-                                    help_outline
-                                </mat-icon>
-                                <mat-select [formControl]="etiqueta" required>
-                                    <mat-option *ngFor="let e of etiquetas" [value]="e.value">
-                                        {{e.value}}
-                                    </mat-option>
-                                </mat-select>
-                                <mat-error *ngIf="etiqueta.invalid">{{obtenerMensajeErrorEtiqueta()}}</mat-error>
-                            </mat-form-field>
-                        </div>
+
+
                     </div>
                 </div>
             </form>
         </mat-card-content>
         <mat-card-actions>
             <div class="container" style="text-align: center;">
-                <button id="btn-raised"  class="btn btn-sm" [routerLink]="['/roles']">Atrás</button>
-                <button id="btn-raised"  class="btn btn-sm" [disabled]="!nuevoRolPermisoForm.valid"
-                    (click)="insertarRolPermiso(nuevoRolPermisoForm.value)" value="Guardar">Guardar</button>
-                <button id="btn-raised"  class="btn btn-sm" (click)="limpliarCampos()" value="Cancelar">Cancelar</button>
+                <button id="btn-raised" class="btn btn-sm" (click)="InsertarPaginaRol()"
+                    value="Guardar">Guardar</button>
             </div>
         </mat-card-actions>
     </mat-card>
-</div>
-<br>
-<div class="container" style="padding-bottom: 10px; margin-bottom: 35px;">
-    <div class="mat-elevation-z8" style="background: white;">
-        <div id="resultados">RESULTADO DE BÚSQUEDA</div>
-        <div class="table-responsive">
-            <table class="table table-hover table-sm">
-                <thead class="thead-light">
-                    <tr style="text-align: center;">
-                        <th scope="col">Id </th>
-                        <th scope="col">Funcion</th>
-                        <th scope="col">Link</th>
-                        <th scope="col">Etiqueta</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Falta paginacion -->
-                    <tr *ngFor="let g of guardarRoles | paginate:tamanio_pagina:numero_pagina">
-                        <th style="padding-top: 10px; text-align: center;" scope="row">{{g.id}}</th>
-                        <td style="padding-top: 10px;">{{g.funcion}}</td>
-                        <td style="padding-top: 10px;">{{g.link}}</td>
-                        <td style="padding-top: 10px;">{{g.etiqueta}}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <mat-paginator id="pagina" [length]="guardarRoles.length" [pageSize]="tamanio_pagina"
-            [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
-        </mat-paginator>
-    </div>
 </div>

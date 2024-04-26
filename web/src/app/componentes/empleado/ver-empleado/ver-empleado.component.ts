@@ -195,7 +195,11 @@ export class VerEmpleadoComponent implements OnInit {
   aprobacion: boolean = false;
 
   VerFuncionalidades() {
-    this.restF.ListarFunciones().subscribe(datos => {
+    let funcionesSistema = {
+      "direccion": (localStorage.getItem('empresaURL') as string)
+    }
+
+    this.restF.ListarFunciones(funcionesSistema).subscribe(datos => {
       if (datos[0].hora_extra === true) {
         if (this.idEmpleadoLogueado === parseInt(this.idEmpleado)) {
           this.HabilitarHorasE = true;
@@ -860,7 +864,7 @@ export class VerEmpleadoComponent implements OnInit {
   AbrirVentanaCargo(): void {
     if (this.datoActual.id_contrato != undefined) {
       this.ventana.open(EmplCargosComponent,
-        { width: '1000px', data: { idEmpleado: this.idEmpleado, idContrato: this.datoActual.id_contrato } }).
+        { width: '1000px', data: { idEmpleado: this.idEmpleado, idContrato: this.datoActual.id_contrato, idRol: this.datoActual.id_rol } }).
         afterClosed().subscribe(item => {
           this.VerDatosActuales(this.formato_fecha);
         });

@@ -55,5 +55,15 @@ export class VerBirthdayComponent implements OnInit {
       })
   }
 
+  //Control Botones
+  getEditarCumpleanos(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Editar' && item.id_funcion === 45);
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+    }
+  }
 
 }

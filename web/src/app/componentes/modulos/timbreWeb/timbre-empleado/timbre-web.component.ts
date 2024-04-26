@@ -182,4 +182,15 @@ export class TimbreWebComponent implements OnInit {
       });
   }
 
+  //Control Botones
+  getTimbreVirtual(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.link === 'timbres-personal');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+    }
+  }
+
 }

@@ -16,6 +16,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 moment.locale('es');
 
 import { MainNavService } from 'src/app/componentes/administracionGeneral/main-nav/main-nav.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
@@ -70,12 +71,12 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
   get filtroNombreReg() { return this.restR.filtroNombreReg };
 
   // PRESENTACION DE INFORMACION DE ACUERDO AL CRITERIO DE BUSQUEDA
+  idEmpleadoLogueado: any;
   departamentos: any = [];
   sucursales: any = [];
   empleados: any = [];
-  respuesta: any[];
   regimen: any = [];
-  origen: any = [];
+  cargos: any = [];
 
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
   selectionCarg = new SelectionModel<ITableEmpleados>(true, []);
@@ -129,8 +130,11 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     public validar: ValidacionesService,
     private toastr: ToastrService,
     public informacion: DatosGeneralesService,
+    public restUsuario: UsuarioService,
     private funciones: MainNavService
-  ) { }
+  ) {
+    this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
+  }
 
   ngOnInit(): void {
     if (this.habilitarHorasE === false) {
@@ -144,8 +148,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     }
     else {
       this.check = this.restR.checkOptions([{ opcion: 'c' }, { opcion: 'r' }, { opcion: 's' }, { opcion: 'd' }, { opcion: 'e' }]);
-      this.BuscarInformacion();
-      this.BuscarCargos();
+      this.PresentarInformacion();
     }
   }
 
@@ -154,113 +157,203 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     this.restR.GuardarCheckOpcion('');
     this.restR.DefaultFormCriterios();
     this.restR.DefaultValoresFiltros();
-    this.origen = [];
-    this.origen_cargo = [];
   }
 
-  // METODO PARA FILTRAR POR CARGOS
-  empleados_cargos: any = [];
-  origen_cargo: any = [];
-  cargos: any = [];
-  BuscarCargos() {
-    this.empleados_cargos = [];
-    this.origen_cargo = [];
+
+  // BUSQUEDA DE DATOS ACTUALES DEL USUARIO
+  PresentarInformacion() {
+    let informacion = { id_empleado: this.idEmpleadoLogueado };
+    let respuesta: any = [];
+    this.informacion.ObtenerInformacionUserRol(informacion).subscribe(res => {
+      respuesta = res[0];
+      this.AdministrarInformacion(respuesta, informacion);
+    }, vacio => {
+      this.toastr.info('No se han encontrado registros.', '', {
+        timeOut: 4000,
+      });
+    });
+  }
+
+  // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
+  usua_sucursales: any = [];
+  AdministrarInformacion(usuario: any, empleado: any) {
+    // LIMPIAR DATOS DE ALMACENAMIENTO
+    this.departamentos = [];
+    this.sucursales = [];
+    this.empleados = [];
+    this.regimen = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionCargo(1).subscribe((res: any[]) => {
-      this.origen_cargo = JSON.stringify(res);
 
-      res.forEach(obj => {
-        this.cargos.push({
-          id: obj.id_cargo,
-          nombre: obj.name_cargo
-        })
+    this.usua_sucursales = [];
+    let respuesta: any = [];
+    let codigos = '';
+    //console.log('empleado ', empleado)
+    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe(data => {
+      respuesta = data;
+      respuesta.forEach((obj: any) => {
+        if (codigos === '') {
+          codigos = '\'' + obj.id_sucursal + '\''
+        }
+        else {
+          codigos = codigos + ', \'' + obj.id_sucursal + '\''
+        }
       })
+      //console.log('ver sucursales ', codigos);
 
-      res.forEach(obj => {
-        obj.empleados.forEach(r => {
-          this.empleados_cargos.push({
-            id: r.id,
-            nombre: r.name_empleado,
-            codigo: r.codigo,
-            cedula: r.cedula,
-            correo: r.correo,
-            id_cargo: r.id_cargo,
-            id_contrato: r.id_contrato,
-            hora_trabaja: r.hora_trabaja
-          })
-        })
-      })
+      // VERIFICACION DE BUSQUEDA DE INFORMACION SEGUN PRIVILEGIOS DE USUARIO
+      if (usuario.id_rol === 1 && usuario.jefe === false) {
+        this.usua_sucursales = { id_sucursal: codigos };
+        this.BuscarInformacionAdministrador(this.usua_sucursales);
+      }
+      else if (usuario.id_rol === 1 && usuario.jefe === true) {
+        this.usua_sucursales = { id_sucursal: codigos, id_departamento: usuario.id_departamento };
+        this.BuscarInformacionJefe(this.usua_sucursales);
+      }
+      else if (usuario.id_rol === 3) {
+        this.BuscarInformacionSuperAdministrador();
+      }
+    });
+  }
+
+  // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL SUPERADMINISTRADOR
+  BuscarInformacionSuperAdministrador() {
+    this.informacion.ObtenerInformacion_SUPERADMIN(1).subscribe((res: any[]) => {
+      this.ProcesarDatos(res);
     }, err => {
       this.toastr.error(err.error.message)
     })
   }
 
-  // METODO PARA BUSCAR INFORMACION DE USUARIOS
-  BuscarInformacion() {
-    this.departamentos = [];
-    this.sucursales = [];
-    this.respuesta = [];
-    this.empleados = [];
-    this.regimen = [];
-    this.origen = [];
-    this.informacion.ObtenerInformacion(1).subscribe((res: any[]) => {
-      this.origen = JSON.stringify(res);
+  // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL ADMINISTRADOR
+  BuscarInformacionAdministrador(buscar: string) {
+    this.informacion.ObtenerInformacion_ADMIN(1, buscar).subscribe((res: any[]) => {
+      this.ProcesarDatos(res);
+    }, err => {
+      this.toastr.error(err.error.message)
+    })
+  }
 
-      res.forEach(obj => {
-        this.sucursales.push({
-          id: obj.id_suc,
-          nombre: obj.name_suc
+  // METODO DE BUSQUEDA DE DATOS QUE VISUALIZA EL ADMINISTRADOR - JEFE
+  BuscarInformacionJefe(buscar: string) {
+    this.informacion.ObtenerInformacion_JEFE(1, buscar).subscribe((res: any[]) => {
+      this.ProcesarDatos(res);
+    }, err => {
+      this.toastr.error(err.error.message)
+    })
+  }
+
+  // METODO PARA PROCESAR LA INFORMACION DE LOS EMPLEADOS
+  ProcesarDatos(informacion: any) {
+    informacion.forEach(obj => {
+      //console.log('ver obj ', obj)
+      this.sucursales.push({
+        id: obj.id_suc,
+        sucursal: obj.name_suc
+      })
+    })
+
+    informacion.forEach(reg => {
+      reg.regimenes.forEach(obj => {
+        this.regimen.push({
+          id: obj.id_regimen,
+          nombre: obj.name_regimen,
+          sucursal: obj.name_suc,
+          id_suc: reg.id_suc
         })
       })
+    })
 
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
+    informacion.forEach(reg => {
+      reg.regimenes.forEach(dep => {
+        dep.departamentos.forEach(obj => {
           this.departamentos.push({
-            id: ele.id_depa,
-            departamento: ele.name_dep,
-            nombre: ele.sucursal
+            id: obj.id_depa,
+            departamento: obj.name_dep,
+            sucursal: obj.name_suc,
+            id_suc: reg.id_suc,
+            id_regimen: obj.id_regimen,
           })
         })
       })
+    })
 
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
-          ele.empleado.forEach(r => {
-            let elemento = {
-              id: r.id,
-              nombre: r.name_empleado,
-              codigo: r.codigo,
-              cedula: r.cedula,
-              correo: r.correo,
-              id_cargo: r.id_cargo,
-              id_contrato: r.id_contrato
-            }
-            this.empleados.push(elemento)
-          })
-        })
-      })
-
-      res.forEach(obj => {
-        obj.departamentos.forEach(ele => {
-          ele.empleado.forEach(reg => {
-            reg.regimen.forEach(r => {
-              this.regimen.push({
-                id: r.id_regimen,
-                nombre: r.name_regimen
-              })
+    informacion.forEach(reg => {
+      reg.regimenes.forEach(dep => {
+        dep.departamentos.forEach(car => {
+          car.cargos.forEach(obj => {
+            this.cargos.push({
+              id: obj.id_cargo_,
+              nombre: obj.name_cargo,
+              sucursal: obj.name_suc,
+              id_suc: reg.id_suc
             })
           })
         })
       })
-
-      this.regimen = this.regimen.filter((obj, index, self) =>
-        index === self.findIndex((o) => o.id === obj.id)
-      );
-
-    }, err => {
-      this.toastr.error(err.error.message)
     })
+
+    informacion.forEach(reg => {
+      reg.regimenes.forEach(dep => {
+        dep.departamentos.forEach(car => {
+          car.cargos.forEach(empl => {
+            empl.empleado.forEach(obj => {
+              let elemento = {
+                id: obj.id,
+                nombre: obj.nombre + ' ' + obj.apellido,
+                codigo: obj.codigo,
+                cedula: obj.cedula,
+                correo: obj.correo,
+                id_cargo: obj.id_cargo,
+                id_contrato: obj.id_contrato,
+                sucursal: obj.name_suc,
+                id_suc: obj.id_suc,
+                id_regimen: obj.id_regimen,
+                id_depa: obj.id_depa,
+                id_cargo_: obj.id_cargo_ // TIPO DE CARGO
+              }
+              this.empleados.push(elemento)
+            })
+          })
+        })
+      })
+    })
+
+    this.OmitirDuplicados();
+
+    console.log('ver sucursales ', this.sucursales)
+    console.log('ver regimenes ', this.regimen)
+    console.log('ver departamentos ', this.departamentos)
+    console.log('ver cargos ', this.cargos)
+    console.log('ver empleados ', this.empleados)
   }
+
+  // METODO PARA RETIRAR DUPLICADOS SOLO EN LA VISTA DE DATOS
+  OmitirDuplicados() {
+    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION DEPARTAMENTOS
+    let verificados_dep = this.departamentos.filter((objeto, indice, valor) => {
+      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
+      for (let i = 0; i < indice; i++) {
+        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
+          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+        }
+      }
+      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
+    });
+    this.departamentos = verificados_dep;
+
+    // OMITIR DATOS DUPLICADOS EN LA VISTA DE SELECCION CARGOS
+    let verificados_car = this.cargos.filter((objeto, indice, valor) => {
+      // COMPARA EL OBJETO ACTUAL CON LOS OBJETOS ANTERIORES EN EL ARRAY
+      for (let i = 0; i < indice; i++) {
+        if (valor[i].id === objeto.id && valor[i].id_suc === objeto.id_suc) {
+          return false; // SI ES UN DUPLICADO, RETORNA FALSO PARA EXCLUIRLO DEL RESULTADO
+        }
+      }
+      return true; // SI ES UNICO, RETORNA VERDADERO PARA INCLUIRLO EN EL RESULTADO
+    });
+    this.cargos = verificados_car;
+  }
+
 
   // METODO PARA ACTIVAR SELECCION MULTIPLE
   plan_multiple: boolean = false;
@@ -382,7 +475,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
   masterToggleSuc() {
     this.isAllSelectedSuc() ?
       this.selectionSuc.clear() :
-      this.sucursales.forEach(row => this.selectionSuc.select(row));
+      this.sucursales.forEach((row: any) => this.selectionSuc.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
@@ -403,7 +496,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
   masterToggleReg() {
     this.isAllSelectedReg() ?
       this.selectionReg.clear() :
-      this.regimen.forEach(row => this.selectionReg.select(row));
+      this.regimen.forEach((row: any) => this.selectionReg.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -424,7 +517,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
   masterToggleCarg() {
     this.isAllSelectedCarg() ?
       this.selectionCarg.clear() :
-      this.cargos.forEach(row => this.selectionCarg.select(row));
+      this.cargos.forEach((row: any) => this.selectionCarg.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -445,7 +538,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionDep.clear() :
-      this.departamentos.forEach(row => this.selectionDep.select(row));
+      this.departamentos.forEach((row: any) => this.selectionDep.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
@@ -466,7 +559,7 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :
-      this.empleados.forEach(row => this.selectionEmp.select(row));
+      this.empleados.forEach((row: any) => this.selectionEmp.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
@@ -504,91 +597,63 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
   // METODO PARA MOSTRAR DATOS DE SUCURSALES
   ModelarSucursal(id: number) {
     let usuarios: any = [];
-    let respuesta = JSON.parse(this.origen)
-    if (id === 0) {
-      respuesta.forEach((obj: any) => {
-        this.selectionSuc.selected.find(obj1 => {
-          if (obj.id_suc === obj1.id) {
-            obj.departamentos.forEach((obj2: any) => {
-              obj2.empleado.forEach((obj3: any) => {
-                usuarios.push(obj3)
-              })
-            })
+    if (id === 0 || id === undefined) {
+      this.empleados.forEach((empl: any) => {
+        this.selectionSuc.selected.find(selec => {
+          if (empl.id_suc === selec.id) {
+            usuarios.push(empl)
           }
         })
       })
     }
     else {
-      respuesta.forEach((obj: any) => {
-        if (obj.id_suc === id) {
-          obj.departamentos.forEach((obj2: any) => {
-            obj2.empleado.forEach((obj3: any) => {
-              usuarios.push(obj3)
-            })
-          })
+      this.empleados.forEach((empl: any) => {
+        if (empl.id_suc === id) {
+          usuarios.push(empl)
         }
       })
     }
-
     this.PlanificarMultiple(usuarios);
   }
 
   // CONSULTA DE LOS DATOS REGIMEN
-  ModelarRegimen(id: number) {
+  ModelarRegimen(id: number, sucursal: any) {
     let usuarios: any = [];
-    let respuesta = JSON.parse(this.origen)
-    if (id === 0) {
-      respuesta.forEach((obj: any) => {
-        obj.departamentos.forEach((obj1: any) => {
-          obj1.empleado.forEach((obj2: any) => {
-            this.selectionReg.selected.find(obj3 => {
-              obj2.regimen.forEach((obj4: any) => {
-                if (obj3.id === obj4.id_regimen) {
-                  usuarios.push(obj2);
-                }
-              })
-            })
-          })
+    if (id === 0 || id === undefined) {
+      this.empleados.forEach((empl: any) => {
+        this.selectionReg.selected.find(selec => {
+          if (empl.id_regimen === selec.id && empl.id_suc === selec.id_suc) {
+            usuarios.push(empl)
+          }
         })
       })
     }
     else {
-      respuesta.forEach((obj: any) => {
-        obj.departamentos.forEach((obj2: any) => {
-          obj2.empleado.forEach((obj3: any) => {
-            obj3.regimen.forEach((obj4: any) => {
-              if (obj4.id_regimen === id) {
-                usuarios.push(obj3)
-              }
-            })
-          })
-        })
+      this.empleados.forEach((empl: any) => {
+        if (empl.id_regimen === id && empl.id_suc === sucursal) {
+          usuarios.push(empl)
+        }
       })
     }
     this.PlanificarMultiple(usuarios);
   }
 
   // METODO PARA MOSTRAR DATOS DE CARGOS
-  ModelarCargo(id: number) {
+  ModelarCargo(id: number, sucursal: any) {
     let usuarios: any = [];
-    let respuesta = JSON.parse(this.origen_cargo)
-    if (id === 0) {
-      respuesta.forEach((obj: any) => {
-        this.selectionCarg.selected.find(obj1 => {
-          if (obj.id_cargo === obj1.id) {
-            obj.empleados.forEach((obj3: any) => {
-              usuarios.push(obj3)
-            })
+    if (id === 0 || id === undefined) {
+      this.empleados.forEach((empl: any) => {
+        this.selectionCarg.selected.find(selec => {
+          if (empl.id_cargo_ === selec.id && empl.id_suc === selec.id_suc) {
+            usuarios.push(empl)
           }
         })
       })
     }
     else {
-      respuesta.forEach((obj: any) => {
-        if (obj.id_cargo === id) {
-          obj.empleados.forEach((obj3: any) => {
-            usuarios.push(obj3)
-          })
+      this.empleados.forEach((empl: any) => {
+        if (empl.id_cargo_ === id && empl.id_suc === sucursal) {
+          usuarios.push(empl)
         }
       })
     }
@@ -596,35 +661,24 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
   }
 
   // METODO PARA MOSTRAR DATOS DE DEPARTAMENTOS
-  ModelarDepartamentos(id: number) {
+  ModelarDepartamentos(id: number, sucursal: any) {
     let usuarios: any = [];
-    let respuesta = JSON.parse(this.origen)
-
-    if (id === 0) {
-      respuesta.forEach((obj: any) => {
-        obj.departamentos.forEach((obj1: any) => {
-          this.selectionDep.selected.find(obj2 => {
-            if (obj1.id_depa === obj2.id) {
-              obj1.empleado.forEach((obj3: any) => {
-                usuarios.push(obj3)
-              })
-            }
-          })
-        })
-      })
-    }
-    else {
-      respuesta.forEach((obj: any) => {
-        obj.departamentos.forEach((obj1: any) => {
-          if (obj1.id_depa === id) {
-            obj1.empleado.forEach((obj3: any) => {
-              usuarios.push(obj3)
-            })
+    if (id === 0 || id === undefined) {
+      this.empleados.forEach((empl: any) => {
+        this.selectionDep.selected.find(selec => {
+          if (empl.id_depa === selec.id && empl.id_suc === selec.id_suc) {
+            usuarios.push(empl)
           }
         })
       })
     }
-
+    else {
+      this.empleados.forEach((empl: any) => {
+        if (empl.id_depa === id && empl.id_suc === sucursal) {
+          usuarios.push(empl)
+        }
+      })
+    }
     this.PlanificarMultiple(usuarios);
   }
 
@@ -647,19 +701,6 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
   // METODO PARA ABRIR FORMULARIO DE INGRESO DE PLANIFICACION DE HE
   Planificar(seleccionados: any) {
     this.VerPlanificar(seleccionados);
-    /*
-    this.ventana.open(
-      PlanHoraExtraComponent,
-      {
-        width: '800px',
-        data: { planifica: seleccionados, actualizar: false }
-      })
-      .afterClosed().subscribe(item => {
-        this.auto_individual = true;
-        this.LimpiarFormulario();
-      });
-      */
-
   }
 
   // METODO DE VALIDACION DE SELECCION MULTIPLE
@@ -675,18 +716,18 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
   }
 
   // METODO PARA TOMAR DATOS SELECCIONADOS
-  GuardarRegistros(id: number) {
+  GuardarRegistros(valor: any) {
     if (this.opcion === 's') {
-      this.ModelarSucursal(id);
+      this.ModelarSucursal(valor.id);
     }
     else if (this.opcion === 'r') {
-      this.ModelarRegimen(id);
+      this.ModelarRegimen(valor.id, valor.id_suc);
     }
     else if (this.opcion === 'c') {
-      this.ModelarCargo(id);
+      this.ModelarCargo(valor.id, valor.id_suc);
     }
     else if (this.opcion === 'd') {
-      this.ModelarDepartamentos(id);
+      this.ModelarDepartamentos(valor.id, valor.id_suc);
     }
     else {
       this.ModelarEmpleados();
@@ -751,19 +792,25 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
     else if (this.opcion === 'r') {
       this.nombre_reg.reset();
       this.filtroNombreReg_ = '';
+      this.nombre_suc.reset();
+      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionEmp.clear();
       this.selectionSuc.clear();
+      this.Filtrar('', 1);
       this.Filtrar('', 7)
     }
     else if (this.opcion === 'c') {
       this.nombre_carg.reset();
       this.filtroNombreCarg_ = '';
+      this.nombre_suc.reset();
+      this.filtroNombreSuc_ = '';
       this.selectionEmp.clear();
       this.selectionDep.clear();
       this.selectionSuc.clear();
       this.selectionReg.clear();
+      this.Filtrar('', 1);
       this.Filtrar('', 2)
     }
     else if (this.opcion === 'd') {
@@ -785,10 +832,13 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
       this.filtroCodigo_ = '';
       this.filtroCedula_ = '';
       this.filtroNombreEmp_ = '';
+      this.nombre_suc.reset();
+      this.filtroNombreSuc_ = '';
       this.selectionDep.clear();
       this.selectionCarg.clear();
       this.selectionSuc.clear();
       this.selectionReg.clear();
+      this.Filtrar('', 1);
       this.Filtrar('', 4)
       this.Filtrar('', 5)
       this.Filtrar('', 6)
@@ -812,6 +862,26 @@ export class ListaEmplePlanHoraEComponent implements OnInit {
 
   IngresarSoloNumeros(evt: any) {
     return this.validar.IngresarSoloNumeros(evt);
+  }
+
+  //Control Botones
+  getPlanificacionMultiple(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Planificación Multiple');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
   }
 
 }

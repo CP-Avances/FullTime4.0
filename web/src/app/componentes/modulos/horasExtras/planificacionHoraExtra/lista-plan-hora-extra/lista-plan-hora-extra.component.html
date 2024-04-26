@@ -150,7 +150,7 @@
                                     help_outline</mat-icon>
                             </mat-form-field>-->
                             <mat-form-field>
-                                <mat-label>Ingresar CI o pasaporte</mat-label>
+                                <mat-label>Ingresar Cédula</mat-label>
                                 <input matInput placeholder="Ej: " [(ngModel)]="filtroCedulaO" maxlength="10"
                                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                     [formControl]="cedula" type="text" (keypress)="IngresarSoloNumeros($event)">

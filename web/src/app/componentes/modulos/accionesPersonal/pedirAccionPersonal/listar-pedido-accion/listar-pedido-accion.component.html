@@ -75,23 +75,23 @@
                             <td class="justify-content-center" style="margin-right: 1rem;">
                                 <i matSuffix matTooltipPosition="right"
                                     matTooltip="Ver datos generales de este registro." class="fas fa-eye" id="t-ver"
-                                    (click)="VerDatosPedidos(a.id)">
+                                    (click)="VerDatosPedidos(a.id)" *ngIf="getVer()">
                                     <p>Ver</p>
                                 </i>
                                 <i class="fas fa-edit" id="t-editar" matSuffix matTooltipPosition="right"
                                     matTooltip="Modificar los datos generales de este registro."
-                                    (click)="AbrirEditar(a.id)">
+                                    (click)="AbrirEditar(a.id)" *ngIf="getEditar()">
                                     <p>Editar</p>
                                 </i>
                                 <i (click)="MostrarInformacion(a.id, 'pdf')" id="pdf_" class="fas fa-file-pdf" matSuffix
                                     matTooltipPosition="right"
-                                    matTooltip="Ver pedido de Acción de Personal en formato PDF.">
+                                    matTooltip="Ver pedido de Acción de Personal en formato PDF." *ngIf="getVerPedidoPdf()">
                                     <p>PDF</p>
                                 </i>
                                 <i (click)="MostrarInformacion(a.id, 'excel')" id="excel_" class="fas fa-file-excel"
                                     matSuffix matTooltipPosition="right"
-                                    matTooltip="Ver pedido de Acción de Personal en formato EXCEL.">
-                                    <p>XLSL</p>
+                                    matTooltip="Ver pedido de Acción de Personal en formato EXCEL." *ngIf="getVerPedidoExcel()">
+                                    <p>XLSX</p>
                                 </i>
                             </td>
                         </tr>

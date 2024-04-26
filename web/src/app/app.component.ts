@@ -12,6 +12,7 @@ export class AppComponent {
   title = 'Full Time';
 
   ruta: string = '';
+
   constructor(
     public router: Router,
     public location: Location,

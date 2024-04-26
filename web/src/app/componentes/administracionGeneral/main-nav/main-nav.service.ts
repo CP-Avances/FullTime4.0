@@ -17,7 +17,10 @@ export class MainNavService {
   LogicaFunciones() {
     this.consultarFuncionalidad = sessionStorage.getItem('queryFuncionalidad');
     if (this.consultarFuncionalidad === null) {
-      this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/administracion/funcionalidad`).subscribe((res: any) => {
+      let funcionesSistema = {
+        "direccion": (localStorage.getItem('empresaURL') as string)
+      }
+      this.http.post<any>(`${environment.url}/administracion/funcionalidad`, funcionesSistema).subscribe((res: any) => {
         const [result] = res;
         sessionStorage.setItem('queryFuncionalidad', JSON.stringify(result));
         this.ValueFuncionalidad(result);

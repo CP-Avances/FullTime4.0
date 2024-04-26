@@ -4,7 +4,7 @@ mat-form-field {
 
 table {
     width: 100%;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 tr {
@@ -67,6 +67,7 @@ mat-icon {
 #detalle {
     width: 100%;
     font-size: 12px;
+    border-spacing: 0;
     border-collapse: collapse;
 }
 #detalle .t_horarios, .coloresItem, .colores{
@@ -74,10 +75,6 @@ mat-icon {
     padding: 8px;
     text-align: center;
     vertical-align: middle;
-}
-
-#detalle {
-    border-spacing: 0;
 }
 
 #detalle th,
@@ -92,4 +89,8 @@ mat-icon {
 
 #detalle tbody tr:nth-child(2n) {
     background-color: #e6f3ff;
+}
+
+.timbre{
+  background-color: #dadeec !important;
 }

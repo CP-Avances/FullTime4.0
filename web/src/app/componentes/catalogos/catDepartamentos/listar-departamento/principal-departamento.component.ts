@@ -395,6 +395,83 @@ export class PrincipalDepartamentoComponent implements OnInit {
     a.click();
   }
 
+  //CONTROL BOTONES
+  getCrearDepartamento(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Crear Departamento');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
+  getEditarDepartamento(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Editar Departamento');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
+  getEliminarDepartamento(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Eliminar Departamento');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
+  getNiveles(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Niveles');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
 }
 
 

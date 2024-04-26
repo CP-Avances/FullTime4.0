@@ -8,7 +8,7 @@
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
                     <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                        <button mat-raised-button id="btn-raised" [routerLink]="['/registrarRelojes']">
+                        <button mat-raised-button id="btn-raised" [routerLink]="['/registrarRelojes']" *ngIf="getCrearDispositivos()">
                             Crear dispositivo
                         </button>
                         <button mat-raised-button id="btn-raised" (click)="LimpiarCampos()" matSuffix
@@ -24,7 +24,7 @@
                     <span>REGISTRO MULTIPLE DE DISPOSITIVOS</span>
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
-                    <div class="row">
+                    <div class="row" *ngIf="getPlantilla()">
                         <div class="col-md">
                             <div class="d-flex flex-wrap justify-content-around">
                                 <form method="post" enctype="multipart/form-data"
@@ -122,16 +122,16 @@
                             <td class="justify-content-center">
                                 <i matSuffix matTooltipPosition="right"
                                     matTooltip="Ver datos generales de este registro." class="fas fa-eye" id="t-ver"
-                                    (click)="VerDatosReloj(reloj.id)">
+                                    (click)="VerDatosReloj(reloj.id)" *ngIf="getVerDispositivos()">
                                     <p>Ver</p>
                                 </i>
                                 <i class="fas fa-edit" id="t-editar" (click)="VerEditarReloj(reloj.id)" matSuffix
                                     matTooltipPosition="right"
-                                    matTooltip="Modificar los datos generales de este registro.">
+                                    matTooltip="Modificar los datos generales de este registro." *ngIf="getEditarDispositivos()">
                                     <p>Editar</p>
                                 </i>
                                 <i matSuffix matTooltipPosition="right" matTooltip="Eliminar registro."
-                                    class="far fa-trash-alt" id="t-eliminar" (click)="ConfirmarDelete(reloj)">
+                                    class="far fa-trash-alt" id="t-eliminar" (click)="ConfirmarDelete(reloj)" *ngIf="getEliminarDispositivos()">
                                     <p>Eliminar</p>
                                 </i>
                             </td>
@@ -142,7 +142,7 @@
             <mat-paginator id="pagina" [length]="relojes.length" [pageSize]="tamanio_pagina"
                 [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
             </mat-paginator>
-            <div class="d-flex justify-content-end" style="margin-right: 2%; margin: 10px;">
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin: 10px;" *ngIf="getDescargarReportes()">
                 <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
                     matTooltipPosition="right" matTooltip="Descargar Lista de Dispositivos en formato PDF.">
                     <p>PDF</p>

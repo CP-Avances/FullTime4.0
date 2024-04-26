@@ -12,29 +12,70 @@ export class DatosGeneralesService {
     private http: HttpClient,
   ) { }
 
+  // METODO PARA CONSULTAR CON PERFIL SUPERADMINISTRADOR LOS DATOS DE LOS EMPLEADOS
+  ObtenerInformacion_SUPERADMIN(estado: any) {
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/informacion-data-general-superior/${estado}`);
+  }
+
+
+  // METODO PARA CONSULTAR CON PERFIL ADMINISTRADOR LOS DATOS DE LOS EMPLEADOS
+  ObtenerInformacion_ADMIN(estado: any, sucursales: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/informacion-data-general/${estado}`, sucursales);
+  }
+
+
+  // METODO PARA CONSULTAR CON PERFIL ADMINISTRADOR-JEFE LOS DATOS DE LOS EMPLEADOS
+  ObtenerInformacion_JEFE(estado: any, data: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/informacion-data-general-jefe/${estado}`, data);
+  }
+
+
+  // METODO PARA CONSULTAR DATOS DE UN USUARIO ADMINISTRADOR - JEFE
+  ObtenerInformacionUserRol(datos: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/generalidades/datos-actuales-usuario-rol`, datos);
+  }
+
+
+  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR COMUNICADOS SUPERADMIN
+  ObtenerInformacionComunicados_SUPERADMIN(estado: any) {
+    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/datos_generales_comunicados-superior/${estado}`);
+  }
+
+
+  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR COMUNICADOS ADMIN
+  ObtenerInformacionComunicados_ADMIN(estado: any, sucursales: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/datos_generales_comunicados-general/${estado}`, sucursales);
+  }
+
+
+  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR COMUNICADOS JEFE
+  ObtenerInformacionComunicados_JEFE(estado: any, data: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/datos_generales_comunicados-jefe/${estado}`, data);
+  }
+
+
+
+
+
+
+
+
+
+
   // METODO PARA CONSULTAR DATOS DEL USUARIO
   ObtenerDatosActuales(id_empleado: number) {
     return this.http.get(`${(localStorage.getItem('empresaURL') as string)}/generalidades/datos-actuales/${id_empleado}`);
   }
 
+
   // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR
-  ObtenerInformacion(estado: any) {
-    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/informacion-general/${estado}`);
+  ObtenerInformacion(estado: any, sucursales: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/informacion-general/${estado}`, sucursales);
   }
 
   // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR CARGOS
-  ObtenerInformacionCargo(estado: any) {
-    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/informacion-general-cargo/${estado}`);
-  }
-
-  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR COMUNICADOS
-  ObtenerInformacionComunicados(estado: any) { 
-    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/datos_generales_comunicados/${estado}`);
-  }
-
-  // CONSULTA DE INFORMACION GENERAL DEL COLABORADOR COMUNICADOS
-  ObtenerCargosComunicados(estado: any) {
-    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/datos_cargos_comunicados/${estado}`);
+  ObtenerInformacionCargo(estado: any, sucursales: any) {
+    return this.http.post<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/informacion-general-cargo/${estado}`, sucursales);
   }
 
 
@@ -67,6 +108,14 @@ export class DatosGeneralesService {
   ObtenerInfoConfiguracion(id_empleado: number) {
     return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/generalidades/info-configuracion/${id_empleado}`);
   }
+
+
+  // METODO PARA CONSULTAR DATOS DE ADMINISTRADORES Y JEFES
+  ObtenerAdminJefes(datos: any) {
+    return this.http.post(`${(localStorage.getItem('empresaURL') as string)}/generalidades/datos-actuales-sucursales`, datos);
+  }
+
+
 
 
 }

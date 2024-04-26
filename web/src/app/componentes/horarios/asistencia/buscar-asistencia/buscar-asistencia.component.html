@@ -115,7 +115,7 @@
                                 <td>{{a.tipo_}}</td>
                                 <td class="justify-content-center">
                                     <i class="fas fa-eye" id="t-ver" matSuffix matTooltipPosition="right"
-                                        matTooltip="Ver detalle del registro." (click)="VerDetalle(a)">
+                                        matTooltip="Ver detalle del registro." (click)="VerDetalle(a)" *ngIf="getRevisarRegistro()">
                                         <p>Revisar</p>
                                     </i>
                                 </td>

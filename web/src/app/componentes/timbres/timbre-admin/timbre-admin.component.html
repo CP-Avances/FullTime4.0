@@ -125,7 +125,7 @@
                         <td>{{d.cargo}}</td>
                         <td class="justify-content-center">
                             <i matSuffix matTooltipPosition="right" matTooltip="Ver lista de timbres del empleado."
-                                class="fas fa-eye" id="t-ver" (click)="ObtenerListaTimbres(d.id, d.nombre, d.apellido)">
+                                class="fas fa-eye" id="t-ver" (click)="ObtenerListaTimbres(d.id, d.nombre, d.apellido)" *ngIf="getVerTimbres()">
                                 <p>Ver</p>
                             </i>
                         </td>

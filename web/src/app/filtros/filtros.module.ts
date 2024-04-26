@@ -50,6 +50,8 @@ import { TipoPipe } from './comidas/tipoServicio/tipo.pipe';
 import { CustomMatPaginatorIntl } from './pipes/paginator-es';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { FiltroProvinciaPipe } from './catProvincias/filtro-provincia/filtro-provincia.pipe';
+import { FiltroCodigoPipe } from './catHorarios/filtro-codigo/filtro-codigo.pipe';
+import { FiltroDescripcionPipe } from './catHorarios/filtro-descripcion/filtro-descripcion.pipe';
 
 @NgModule({
   declarations: [
@@ -104,6 +106,8 @@ import { FiltroProvinciaPipe } from './catProvincias/filtro-provincia/filtro-pro
     TipoPipe,
     NombreApellidoPipe,
     FiltroProvinciaPipe,
+    FiltroCodigoPipe,
+    FiltroDescripcionPipe,
   ],
   exports: [
     DepartamentoPipe,
@@ -114,6 +118,8 @@ import { FiltroProvinciaPipe } from './catProvincias/filtro-provincia/filtro-pro
     DepartamentoPadrePipe,
     ProvinciaPipe,
     BPaisesPipe,
+    FiltroCodigoPipe,
+    FiltroDescripcionPipe,
     FiltroRegionPipe,
     FiltroNombrePipe,
     FiltroFechaPipe,
@@ -153,7 +159,7 @@ import { FiltroProvinciaPipe } from './catProvincias/filtro-provincia/filtro-pro
     AvisoFechPipe,
     AvisoEstadoPipe,
     FecTimbrePipe,
-    TimbreEmpleadoPipe, 
+    TimbreEmpleadoPipe,
     TipoPipe,
     NombreApellidoPipe,
     FiltroProvinciaPipe,

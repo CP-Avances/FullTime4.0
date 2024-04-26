@@ -6,7 +6,6 @@ import {
 }
   from '../../libs/settingsMail'
 import { QueryResult } from 'pg';
-import fs from 'fs';
 import pool from '../../database';
 import path from 'path';
 

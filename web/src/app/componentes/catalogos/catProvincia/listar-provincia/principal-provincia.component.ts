@@ -368,4 +368,62 @@ export class PrincipalProvinciaComponent implements OnInit {
     
   }
 
+  //CONTROL DE BOTONES
+  getCrearProvincia(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Crear Provincia');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
+  getEliminarProvincia(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Eliminar Provincia');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
+  getDescargarReportes(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => (item.accion === 'Descargar Reportes' && item.id_funcion === 6));
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
 }

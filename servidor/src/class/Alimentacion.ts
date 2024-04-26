@@ -1,7 +1,7 @@
 export interface ReporteAlimentacion {
     id_suc: number,
-    name_suc: string,
     ciudad: string,
+    name_suc: string,
     departamentos: Array<depa_alimentacion>
 }
 
@@ -13,21 +13,21 @@ interface depa_alimentacion {
 
 interface emp_alimentacion {
     id: number,
-    name_empleado: string,
     cedula: string,
     codigo: string | number,
-    genero?: string | number,
     cargo?: string,
-    contrato?: string,
+    genero?: string | number,
     timbres?: Array<timbre> | Array<tim_tabulado>,
+    contrato?: string,
+    name_empleado: string,
 }
 
 export interface timbre {
-    fecha: string,
     hora: string,
+    fecha: string,
 }
 
 export interface tim_tabulado {
-    fecha: string,
     hora: string,
+    fecha: string,
 }

@@ -460,4 +460,101 @@ export class ListarRegimenComponent implements OnInit {
     FileSaver.saveAs(data, "RegimenCSV" + ".csv");
     this.ObtenerRegimen();
   }
+
+  // CONTROL DE VISIBILIDAD DE BOTONES
+  getCrearRegimenLaboral(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Crear Régimen Laboral');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
+  getVerRegimenLaboral(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Ver Régimen Laboral');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
+  getEditarRegimenLaboral(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Editar Régimen Laboral');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
+  getEliminarRegimenLaboral(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Eliminar Régimen Laboral');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
+  getDescargarReportes(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => (item.accion === 'Descargar Reportes' && item.id_funcion === 5));
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
 }

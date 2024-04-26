@@ -81,6 +81,9 @@ export interface ITableEmpleados {
     codigo?: string,
     apellido?: string,
     cedula?: string,
+    id_usucursal?: number,
+    id_suc?: number,
+    id_regimen?: number,
 }
 
 export interface ItableDispositivos {
@@ -96,7 +99,8 @@ export interface IReporteAtrasos {
     id_suc: number,
     name_suc: string,
     ciudad: string,
-    departamentos: Array<dep>
+    departamentos: Array<dep>,
+    sucursal: string,
 }
 
 export interface IReporteFaltas {
@@ -443,4 +447,13 @@ export interface hora {
     horas_totales: string,
     planifica_nombre: string,
     planifica_apellido: string,
+}
+
+
+// PAGINAS ROLES
+
+export interface ITableFuncionesRoles {
+    
+    funcion: string,
+    
 }

@@ -167,6 +167,12 @@
 
                                     <div style="text-align: center;">
 
+                                        <div *ngIf="mostrar_feriados" style="padding-top: 10px; margin: 0 auto;">
+                                            <button class="btn btn-sm" (click)="MostrarFeriados()">
+                                                Mostrar Feriados
+                                            </button>
+                                        </div>
+
                                         <div *ngIf="ver_verificar" style="padding-top: 10px; margin: 0 auto;">
                                             <button class="btn btn-sm" (click)="VerificarAsignados()">
                                                 Verificar

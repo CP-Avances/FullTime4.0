@@ -18,6 +18,7 @@ const TokenValidation = (req, res, next) => {
         return res.status(401).send('No contienen token de autenticación.');
     }
     try {
+        //next();
         // SI EL TOKEN NO ESTA VACIO
         // SE EXTRAE LOS DATOS DEL TOKEN 
         const payload = jsonwebtoken_1.default.verify(token, process.env.TOKEN_SECRET || 'llaveSecreta');

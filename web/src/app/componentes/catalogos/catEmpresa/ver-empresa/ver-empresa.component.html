@@ -9,7 +9,7 @@
                 <div class="container" style="padding-top: 15px;">
                     <div class="row">
                         <div class="col-3"></div>
-                        <div class="col-6" style="text-align: center;">
+                        <div class="col-6" style="text-align: center;" *ngIf="getEditarInformacionGeneral()">
                             <!--  ************************* LOGO DE EMPRESA ******************************** -->
                             <figure>
                                 <div *ngIf="imagen_default; else logoEmpresa">
@@ -74,7 +74,7 @@
                             </div>
                             <div style="text-align: right;">
                                 <i id="editarF" (click)="EditarDatosEmpresa()" matSuffix matTooltipPosition="right"
-                                    matTooltip="Modificar datos de este registro." class="fas fa-edit">
+                                    matTooltip="Modificar datos de este registro." class="fas fa-edit" *ngIf="getEditarInformacionGeneral()">
                                     <p>Editar</p>
                                 </i>
                             </div>
@@ -107,7 +107,7 @@
                                 <label *ngIf="e.seg_contrasena === true">Usar contraseña</label>
                             </div>
                             <div class="d-flex justify-content-around text-center">
-                                <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaSeguridad(e)">Configurar
+                                <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaSeguridad(e)" *ngIf="getConfigurarNivelSeguridad()">Configurar
                                     seguridad</button>
                             </div>
                         </div>
@@ -143,8 +143,8 @@
                             </div>
                             <div class="d-flex justify-content-around text-center">
                                 <button id="btn-raised" class="btn btn-sm"
-                                    (click)="GenerarPdf('open')">Visualizar</button>
-                                <button id="btn-raised" class="btn btn-sm" (click)="CambiarColores()">Guardar</button>
+                                    (click)="GenerarPdf('open')" *ngIf="getConfigurarReportes()">Visualizar</button>
+                                <button id="btn-raised" class="btn btn-sm" (click)="CambiarColores()" *ngIf="getConfigurarReportes()">Guardar</button>
                             </div>
                         </div>
                         <br>
@@ -159,7 +159,7 @@
                                 <label *ngIf="e.marca_agua != ''">{{e.marca_agua}}</label>
                             </div>
                             <div class="d-flex justify-content-around text-center">
-                                <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaReportes(e, 'frase')">
+                                <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaReportes(e, 'frase')" *ngIf="getConfigurarReportes()">
                                     Configurar frase
                                 </button>
                             </div>
@@ -178,7 +178,7 @@
                             </div>
                             <div class="flex-shrink-1 bd-highlight" style="margin-right: 10px;">
                                 <button type="submit" class="btn btn-outline-light btn-sm" style="margin-top: -3px;"
-                                    (click)="AbrirVentanaRegistrarSucursal()">Crear {{e.establecimiento}}</button>
+                                    (click)="AbrirVentanaRegistrarSucursal()" *ngIf="getCrearSucursales()">Crear {{e.establecimiento}}</button>
                             </div>
                         </div>
                         <div class="table-responsive">
@@ -197,16 +197,16 @@
                                         <td>
                                             <i matSuffix matTooltipPosition="right"
                                                 matTooltip="Registrar departamentos." class="fa fa-building" id="ver"
-                                                (click)="VerDepartamentos(ds.id)">
+                                                (click)="VerDepartamentos(ds.id)" *ngIf="getSucursalesDepartamento()">
                                                 <p>Departamento</p>
                                             </i>
                                             <i id="t-editar" (click)="AbrirVentanaEditarSucursal(ds)" matSuffix
                                                 matTooltipPosition="right"
-                                                matTooltip="Modificar datos de este registro." class="fas fa-edit">
+                                                matTooltip="Modificar datos de este registro." class="fas fa-edit" *ngIf="getEditarSucursales()">
                                                 <p>Editar</p>
                                             </i>
                                             <i class="far fa-trash-alt" (click)="ConfirmarDelete(ds)" id="t-eliminar"
-                                                matSuffix matTooltipPosition="right" matTooltip="Eliminar registro.">
+                                                matSuffix matTooltipPosition="right" matTooltip="Eliminar registro." *ngIf="getEliminarSucursales()">
                                                 <p>Eliminar</p>
                                             </i>
                                         </td>

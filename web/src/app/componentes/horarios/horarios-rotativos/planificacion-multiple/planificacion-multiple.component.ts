@@ -128,7 +128,8 @@ export class PlanificacionMultipleComponent implements OnInit {
     this.mes_asignar = ('DE ' + moment(this.fechaInicialF.value).format('MMMM')).toUpperCase();
     this.ListarFechas(this.fechaInicialF.value, this.fechaFinalF.value);
     this.ver_horario = true;
-    this.ver_verificar = true;
+    this.mostrar_feriados = true;
+    this.ver_verificar = false;
     this.ver_guardar = false;
     this.cargar = false;
     this.InicialiciarDatos();
@@ -342,6 +343,7 @@ export class PlanificacionMultipleComponent implements OnInit {
   }
 
   // INICIALIZACION DE VARIABLES
+  mostrar_feriados: boolean = false;
   ver_verificar: boolean = false;
   ver_horario: boolean = false;
   ver_guardar: boolean = false;
@@ -921,13 +923,13 @@ export class PlanificacionMultipleComponent implements OnInit {
     }
 
     usuario.asignado = usuario.asignado.concat(lista_feriados)
-    //console.log('ver datos de usuarios---- ', usuario)
+    console.log('ver datos de usuarios---- ', usuario)
   }
 
   // METODO PARA VERIFICAR HORARIOS ASIGNADOS
   VerificarAsignados() {
     let usuarios: any = [];
-    //console.log('usuarios entrantes ', this.datosSeleccionados.usuarios);
+    console.log('usuarios entrantes ', this.datosSeleccionados.usuarios);
     this.datosSeleccionados.usuarios.forEach(usu => {
       if (usu.asignado.length != 0) {
         usuarios = usuarios.concat(usu);
@@ -940,12 +942,12 @@ export class PlanificacionMultipleComponent implements OnInit {
         timeOut: 6000,
       });
     } else {
-      this.BuscarFeriados(this.fechaInicialF.value, this.fechaFinalF.value, usuarios);
+      this.BuscarFeriados(this.fechaInicialF.value, this.fechaFinalF.value, usuarios, true);
     }
   }
 
   // METODO PARA BUSCAR FERIADOS
-  BuscarFeriados(inicio: any, fin: any, validos: any) {
+  BuscarFeriados(inicio: any, fin: any, validos: any, verificar: boolean) {
     //console.log('ver validos feriados . ', validos)
     let cont = 0;
     validos.forEach(val => {
@@ -981,7 +983,7 @@ export class PlanificacionMultipleComponent implements OnInit {
           //console.log('usuarios validos ', validos);
           //console.log('usuarios validos original ', this.datosSeleccionados.usuario);
           //console.log('usuarios eliminar ', this.eliminar_lista);
-          this.CrearDataHorario(validos);
+          this.CrearDataHorario(validos, verificar);
         }
       }, vacio => {
         cont = cont + 1;
@@ -990,7 +992,7 @@ export class PlanificacionMultipleComponent implements OnInit {
           //console.log('usuarios validos ', validos);
           //console.log('usuarios validos original ', this.datosSeleccionados.usuario);
           //console.log('usuarios eliminar ', this.eliminar_lista);
-          this.CrearDataHorario(validos);
+          this.CrearDataHorario(validos, verificar);
         }
       })
     })
@@ -998,7 +1000,7 @@ export class PlanificacionMultipleComponent implements OnInit {
 
   // METODO PARA CREAR LA DATA DE REGISTRO DE HORARIO
   plan_general: any = [];
-  CrearDataHorario(lista: any) {
+  CrearDataHorario(lista: any, validar: boolean) {
 
     //console.log('validos ', lista)
     var contador = 0;
@@ -1092,11 +1094,13 @@ export class PlanificacionMultipleComponent implements OnInit {
               }
               // ALMACENAMIENTO DE PLANIFICACION GENERAL
               this.plan_general = this.plan_general.concat(plan);
-              //console.log('ver plan_general ', this.plan_general)
+              console.log('ver plan_general ', this.plan_general)
             })
 
             if (contador === asignados) {
-              this.ValidarRangos(this.plan_general)
+              if (validar === true) {
+                this.ValidarRangos(this.plan_general)
+              }
             }
 
           })
@@ -1353,6 +1357,13 @@ export class PlanificacionMultipleComponent implements OnInit {
       this.componenteb.auto_individual = true;
       this.componenteb.multiple = true;
     }
+  }
+
+  // METODO PARA MOSTRAR FERIADOS EXISTENTES EN EL CALENDARIO
+  MostrarFeriados() {
+    this.BuscarFeriados(this.fechaInicialF.value, this.fechaFinalF.value, this.datosSeleccionados.usuarios, false);
+    this.ver_verificar = true;
+    this.mostrar_feriados = false;
   }
 
 }

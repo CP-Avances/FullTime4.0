@@ -10,10 +10,10 @@ import { ITableEmpleados, IReporteTimbres, TimbreMrl } from 'src/app/model/repor
 // IMPORTAR SERVICIOS
 import { DatosGeneralesService } from 'src/app/servicios/datosGenerales/datos-generales.service';
 import { ValidacionesService } from 'src/app/servicios/validaciones/validaciones.service';
-import { ParametrosService } from 'src/app/servicios/parametrosGenerales/parametros.service';
 import { ReportesService } from 'src/app/servicios/reportes/reportes.service';
 import { EmpresaService } from 'src/app/servicios/catalogos/catEmpresa/empresa.service';
 import { MrlService } from 'src/app/servicios/reportes/mrl/mrl.service';
+import { UsuarioService } from 'src/app/servicios/usuarios/usuario.service';
 
 
 @Component({
@@ -31,6 +31,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
 
 
   // VARIABLES DE ALMACENAMIENTO DE DATOS
+  idEmpleadoLogueado: any;
   departamentos: any = [];
   sucursales: any = [];
   empleados: any = [];
@@ -113,15 +114,16 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
     private restEmpre: EmpresaService,
     private mrlService: MrlService,
     private toastr: ToastrService,
+    public restUsuario: UsuarioService,
   ) {
+    this.idEmpleadoLogueado = parseInt(localStorage.getItem('empleado') as string);
     this.ObtenerLogo();
     this.ObtenerColores();
   }
 
   ngOnInit(): void {
-    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
-    this.BuscarInformacion(this.opcionBusqueda);
-    this.BuscarCargos(this.opcionBusqueda);
+    this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
+    this.AdministrarSucursalesUsuario(this.opcionBusqueda);
   }
 
   ngOnDestroy() {
@@ -138,15 +140,39 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
    ** **                           BUSQUEDA Y MODELAMIENTO DE DATOS                           ** **
    ** ****************************************************************************************** **/
 
+  // METODO PARA BUSCAR SUCURSALES QUE ADMINSITRA EL USUARIO
+  usua_sucursales: any = [];
+  AdministrarSucursalesUsuario(opcion: number) {
+    let empleado = { id_empleado: this.idEmpleadoLogueado };
+    let respuesta: any = [];
+    let codigos = '';
+    //console.log('empleado ', empleado)
+    this.restUsuario.BuscarUsuarioSucursal(empleado).subscribe(data => {
+      respuesta = data;
+      respuesta.forEach((obj: any) => {
+        if (codigos === '') {
+          codigos = '\'' + obj.id_sucursal + '\''
+        }
+        else {
+          codigos = codigos + ', \'' + obj.id_sucursal + '\''
+        }
+      })
+      console.log('ver sucursales ', codigos);
+      this.usua_sucursales = { id_sucursal: codigos };
+      this.BuscarInformacion(opcion, this.usua_sucursales);
+      this.BuscarCargos(opcion, this.usua_sucursales);
+    });
+  }
+
   // METODO DE BUSQUEDA DE DATOS
-  BuscarInformacion(opcion: number) {
+  BuscarInformacion(opcion: number, buscar: any) {
     this.departamentos = [];
     this.sucursales = [];
     this.respuesta = [];
     this.empleados = [];
     this.regimen = [];
     this.origen = [];
-    this.informacion.ObtenerInformacion(opcion).subscribe(
+    this.informacion.ObtenerInformacion(opcion, buscar).subscribe(
       (res: any[]) => {
         this.origen = JSON.stringify(res);
         res.forEach((obj: any) => {
@@ -214,11 +240,11 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
   // METODO PARA FILTRAR POR CARGOS
   empleados_cargos: any = [];
   origen_cargo: any = [];
-  BuscarCargos(opcion: number) {
+  BuscarCargos(opcion: number, buscar: any) {
     this.empleados_cargos = [];
     this.origen_cargo = [];
     this.cargos = [];
-    this.informacion.ObtenerInformacionCargo(opcion).subscribe(
+    this.informacion.ObtenerInformacionCargo(opcion, buscar).subscribe(
       (res: any[]) => {
         this.origen_cargo = JSON.stringify(res);
 
@@ -247,17 +273,16 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
       });
   }
 
-  ObtenerTipoUsuario($event: string){
+  ObtenerTipoUsuario($event: string) {
     this.tipoUsuario = $event;
-    this.opcionBusqueda = this.tipoUsuario==='activo'? 1 : 2;
+    this.opcionBusqueda = this.tipoUsuario === 'activo' ? 1 : 2;
     this.limpiar = this.opcionBusqueda;
     this.selectionSuc.clear();
     this.selectionDep.clear();
     this.selectionCar.clear();
     this.selectionReg.clear();
     this.selectionEmp.clear();
-    this.BuscarInformacion(this.opcionBusqueda);
-    this.BuscarCargos(this.opcionBusqueda);
+    this.AdministrarSucursalesUsuario(this.opcionBusqueda);
   }
 
   // VALIDACIONES DE OPCIONES DE REPORTE
@@ -416,7 +441,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
     let respuesta = JSON.parse(this.origen)
     console.log('empleados', this.selectionEmp);
     respuesta.forEach((obj: any) => {
-      obj.departamentos.forEach((departamento:any) => {
+      obj.departamentos.forEach((departamento: any) => {
         departamento.empleado = departamento.empleado.filter((o: any) => {
           var bool = this.selectionEmp.selected.find(obj1 => {
             return obj1.id === o.id
@@ -479,19 +504,18 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
     this.timbres = [];
     let n = 0;
     let accionT = '';
-    console.log(this.data_pdf);
     this.data_pdf.forEach((obj1: IReporteTimbres) => {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach((obj3: any) => {
           obj3.timbres.forEach((obj4: any) => {
             n = n + 1;
-            const  servidor_fecha = this.validacionService.FormatearFecha(
-                obj4.fec_hora_timbre_servidor.split(' ')[0],
-                this.formato_fecha,
-                'no');
+            const servidor_fecha = this.validacionService.FormatearFecha(
+              obj4.fec_hora_timbre_servidor.split(' ')[0],
+              this.formato_fecha,
+              'no');
             const servidor_hora = this.validacionService.FormatearHora(
-                obj4.fec_hora_timbre_servidor.split(' ')[1],
-                this.formato_hora);
+              obj4.fec_hora_timbre_servidor.split(' ')[1],
+              this.formato_hora);
 
             switch (obj4.accion) {
               case 'EoS': accionT = '1'; break;
@@ -505,11 +529,11 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
               case 'F/P': accionT = '3'; break;
               default: accionT = '9'; break;
             }
-              let ele = {
-                cedula: obj3.cedula,
-                fecha_hora: `${servidor_fecha} ${servidor_hora}`,
-                accion: accionT,
-              }
+            let ele = {
+              cedula: obj3.cedula,
+              fecha_hora: `${servidor_fecha} ${servidor_hora}`,
+              accion: accionT,
+            }
 
             this.timbres.push(ele);
           })
@@ -530,12 +554,12 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
         obj2.timbres.forEach((obj3: any) => {
           n = n + 1;
           const servidor_fecha = this.validacionService.FormatearFecha(
-              obj3.fec_hora_timbre_servidor.split(' ')[0],
-              this.formato_fecha,
-              this.validacionService.dia_abreviado);
+            obj3.fec_hora_timbre_servidor.split(' ')[0],
+            this.formato_fecha,
+            this.validacionService.dia_abreviado);
           const servidor_hora = this.validacionService.FormatearHora(
-              obj3.fec_hora_timbre_servidor.split(' ')[1],
-              this.formato_hora);
+            obj3.fec_hora_timbre_servidor.split(' ')[1],
+            this.formato_hora);
 
           switch (obj3.accion) {
             case 'EoS': accionT = '1'; break;
@@ -567,13 +591,13 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
    **                                              TXT                                           **
    ** ****************************************************************************************** **/
 
-   // EXPORTAR TIMBRES A TXT
-   ExportarTimbres() {
+  // EXPORTAR TIMBRES A TXT
+  ExportarTimbres() {
     const txt = this.timbres.map((timbre: TimbreMrl) => {
       return [
         timbre.cedula,
-        timbre.fecha_hora,
         timbre.accion,
+        timbre.fecha_hora,
       ].join(";");
     }).join("\n");
 
@@ -582,7 +606,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
 
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'Timbres_mrl.txt';
+    a.download = `Timbres_mrl_usuarios_${this.opcionBusqueda == 1 ? 'activos' : 'inactivos'}.txt`;
 
     document.body.appendChild(a);
     a.click();
@@ -606,7 +630,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
   masterToggleSuc() {
     this.isAllSelectedSuc() ?
       this.selectionSuc.clear() :
-      this.sucursales.forEach(row => this.selectionSuc.select(row));
+      this.sucursales.forEach((row: any) => this.selectionSuc.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -627,7 +651,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
   masterToggleReg() {
     this.isAllSelectedReg()
       ? this.selectionReg.clear()
-      : this.regimen.forEach((row) => this.selectionReg.select(row));
+      : this.regimen.forEach((row: any) => this.selectionReg.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
@@ -649,7 +673,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
   masterToggleCar() {
     this.isAllSelectedCar() ?
       this.selectionCar.clear() :
-      this.cargos.forEach(row => this.selectionCar.select(row));
+      this.cargos.forEach((row: any) => this.selectionCar.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -670,7 +694,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionDep.clear() :
-      this.departamentos.forEach(row => this.selectionDep.select(row));
+      this.departamentos.forEach((row: any) => this.selectionDep.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -691,7 +715,7 @@ export class TimbreMrlComponent implements OnInit, OnDestroy {
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :
-      this.empleados.forEach(row => this.selectionEmp.select(row));
+      this.empleados.forEach((row: any) => this.selectionEmp.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA

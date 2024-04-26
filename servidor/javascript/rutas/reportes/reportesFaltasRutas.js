@@ -12,9 +12,9 @@ class FaltasRutas {
         this.configuracion();
     }
     configuracion() {
-        // CONSULTA DE TIMBRES CON SALIDAS ANTICIPADAS
+        // METODO DE BUSQUEDA DE DATOS DE FALTAS LISTA sucursales[regimenes[departamentos[cargos[empleados]]]]
         this.router.put('/faltas/:desde/:hasta', verificarToken_1.TokenValidation, reportesFaltasControlador_1.default.ReporteFaltas);
-        // CONSULTA DE TIMBRES CON SALIDAS ANTICIPADAS PARA REGIMEN CARGO
+        // METODO DE BUSQUEDA DE DATOS DE FALTAS LISTA sucursales[empleados]]
         this.router.put('/faltas-regimen-cargo/:desde/:hasta', verificarToken_1.TokenValidation, reportesFaltasControlador_1.default.ReporteFaltasRegimenCargo);
     }
 }

@@ -68,7 +68,7 @@
                     </button>
                 </div>
                 <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
-                    <app-opcion-usuario (tipoUsuarioChange)="ObtenerTipoUsuario($event)"></app-opcion-usuario>
+                    <app-opcion-usuario (tipoUsuarioCambio)="ObtenerTipoUsuario($event)"></app-opcion-usuario>
                 </div>
             </mat-card>
         </div>
@@ -100,7 +100,7 @@
                 </thead>
                 <tbody>
                     <tr
-                        *ngFor="let s of sucursales | emplNombre: filtroNombreSuc | paginate:tamanio_pagina_suc:numero_pagina_suc">
+                        *ngFor="let s of sucursales | sucNombre: filtroNombreSuc | paginate:tamanio_pagina_suc:numero_pagina_suc">
                         <td>
                             <mat-checkbox (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionSuc.toggle(s) : null" [checked]="selectionSuc.isSelected(s)"
@@ -287,7 +287,7 @@
 
 <div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 15px;" [hidden]="!verDetalle">
         <div id="titulo" style="margin-bottom: 25px;">
-            <span>DETALLES</span>
+            <span>DETALLES  - USUARIOS {{opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}}</span>
             <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
             matTooltip="Regresar">
             <i class="fas fa-arrow-left"></i>
@@ -379,6 +379,7 @@
                     <table id="table_horario" class="table table-hover table-sm">
                         <thead class="thead-light">
                             <tr style="text-align: center;">
+                                <th class="sticky colum_1" scope="col" id="td_horarios" rowspan="2">N°</th>
                                 <th class="sticky colum_1" scope="col" id="td_horarios" rowspan="2">CÓDIGO</th>
                                 <th class="sticky-2 colum_1" scope="col" id="td_horarios" rowspan="2">EMPLEADO</th>
                                 <th class="sticky-3 colum_2" scope="col" id="td_horarios" rowspan="2">AÑO</th>
@@ -421,6 +422,10 @@
                         </thead>
                         <tbody>
                             <tr *ngFor="let e of horarios | paginate : tamanio_pagina_res : numero_pagina_res">
+                                <td class="sticky colum_1" id="td_horarios"
+                                [ngStyle]="{'background':CambiarColores(e.color)}">
+                                {{e.n}}
+                                </td>
                                 <td class="sticky colum_1" id="td_horarios"
                                 [ngStyle]="{'background':CambiarColores(e.color)}">
                                 {{e.codigo}}
@@ -655,8 +660,8 @@
                                     </div>
                                 </td>
                             </tr>
-                        </tbody>    
-                    </table>    
+                        </tbody>
+                    </table>
                 </div>
                 <mat-paginator #paginatorResultado [length]="horarios.length" [pageSize]="tamanio_pagina_res"
                     [pageSizeOptions]="pageSizeOptions_res" (page)="ManejarPaginaResultados($event)"

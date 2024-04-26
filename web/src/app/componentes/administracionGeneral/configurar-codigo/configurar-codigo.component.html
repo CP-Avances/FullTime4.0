@@ -51,7 +51,7 @@
                 </form>
                 <mat-card-actions class="d-flex flex-wrap justify-content-center">
                     <button id="btn-raised" class="btn btn-sm" (click)="RegistrarConfiguracion(formulario.value)"
-                        [disabled]="registrar">Guardar</button>
+                        [disabled]="registrar" *ngIf="getConfigurar()">Guardar</button>
                     <button id="btn-raised" class="btn btn-sm" [routerLink]="['/home']">Cancelar</button>
                 </mat-card-actions>
             </mat-card>

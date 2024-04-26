@@ -332,4 +332,104 @@ export class VistaRolesComponent implements OnInit {
     FileSaver.saveAs(data, "RolesCSV" + '.csv');
     this.ObtenerRoles();
   }
+
+  /** ************************************************************************************************** ** 
+   ** **                                     RESTRICCION DE BOTONES                                   ** **
+   ** ************************************************************************************************** **/
+  getCrearRol() {
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Crear Rol');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    } else {
+      if (parseInt(localStorage.getItem('rol') as string) != 3) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
+
+  getDescargarReportes() {
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => (item.accion === 'Descargar Reportes' && item.id_funcion === 4));
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    } else {
+      if (parseInt(localStorage.getItem('rol') as string) != 3) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
+
+  getFuncionesRol() {
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    var rolEmpl = parseInt(localStorage.getItem('rol') as string);
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Funciones Rol');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    } else {
+      if (rolEmpl != 3) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
+
+  getEditarRol() {
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Editar Rol');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    } else {
+      if (parseInt(localStorage.getItem('rol') as string) != 3) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
+
+  getEliminarRol() {
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Eliminar Rol');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    } else {
+      if (parseInt(localStorage.getItem('rol') as string) != 3) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
+
 }

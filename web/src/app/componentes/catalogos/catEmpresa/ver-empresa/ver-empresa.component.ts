@@ -387,4 +387,126 @@ export class VerEmpresaComponent implements OnInit {
     };
   }
 
+  getEliminarSucursales() {
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Eliminar Sucursales');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    } else {
+      if (parseInt(localStorage.getItem('rol') as string) != 3) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
+
+  getEditarSucursales() {
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Editar Sucursales');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    } else {
+      if (parseInt(localStorage.getItem('rol') as string) != 3) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
+
+  getCrearSucursales() {
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Crear Sucursales');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    } else {
+      if (parseInt(localStorage.getItem('rol') as string) != 3) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
+
+  getConfigurarReportes() {
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Configurar Reportes');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    } else {
+      if (parseInt(localStorage.getItem('rol') as string) != 3) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
+
+  getConfigurarNivelSeguridad() {
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Configurar nivel de seguridad');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    } else {
+      if (parseInt(localStorage.getItem('rol') as string) != 3) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
+
+  getEditarInformacionGeneral() {
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Editar Información General');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    } else {
+      if (parseInt(localStorage.getItem('rol') as string) != 3) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
+
+  getSucursalesDepartamento() {
+    if (parseInt(localStorage.getItem('rol') as string) != 3) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
 }

@@ -1,61 +1,71 @@
 <!--  ********************  VER LISTA DE SUCURSALES  ************************  -->
 <div *ngIf="ver_lista">
-    <div class="container" style="margin-bottom: 25px; padding-bottom: 10px; padding-top: 20px;">
+    <div class="container" style="padding-bottom: 10px; padding-top: 20px;">
         <div class="row">
             <div class="col-md">
                 <div id="titulo">
                     <span>ESTABLECIMIENTOS</span>
-                    </div>
-                    <mat-card class="example-card mat-elevation-z9">
-                    <div
-                    class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                        <button *ngIf="!Datasucursales" id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrar()">
+                </div>
+                <mat-card class="example-card mat-elevation-z9">
+                    <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
+                        <button *ngIf="!Datasucursales && getCrearEstablecimiento()" id="btn-raised" class="btn btn-sm"
+                            (click)="AbrirVentanaRegistrar()">
                             Crear establecimiento
                         </button>
-                        <button *ngIf="Datasucursales" id="btn-raised" class="btn btn-sm" (click)="registrarSucursales()" matSuffix 
-                            matTooltipPosition="right" 
-                            matTooltip="Guardar registro multiple.">
-                            Registrar
-                         </button>
                         <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampoBuscar()" matSuffix
                             matTooltipPosition="right"
                             matTooltip="Limpiar campos de búsqueda de la tabla y mostrar todos los datos.">
                             Mostrar lista
                         </button>
                     </div>
-                    </mat-card>
+                </mat-card>
             </div>
-<!------------------ Registro multiple de establecimientos ------------------------------------->
+            <!------------------ Registro multiple de establecimientos ------------------------------------->
             <div class="col-md">
                 <div id="titulo">
                     <span>REGISTRO MULTIPLE</span>
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
                     <div class="row">
-                        <div class="col-md" style="padding-top: 8px; padding-bottom: 6px; padding-left: 10px;">
-                            <div class="d-flex flex-wrap justify-content-around" style="padding-left: 12px;">
+                        <div class="col-md" style="padding-top: 5px;">
+                            <div class="d-flex flex-wrap justify-content-around"
+                                style="text-align: center; justify-content: center;">
                                 <form method="post" enctype="multipart/form-data" style="width: max-content;">
                                     <input type="file" (change)="FileChange($event)" [formControl]="archivoForm"
                                         id="file"
                                         accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                                    <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
-                                        *ngIf="!mostrarbtnsubir"
-                                        style="height: 64px;"
+                                    <label for="file" matSuffix matTooltipPosition="right" *ngIf="!mostrarbtnsubir"
+                                        style="height: 64px; padding-top: 25px;"
                                         matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
                                         Subir plantilla
                                     </label>
-                                    <label for="file" class="btn-2" matSuffix matTooltipPosition="right"
-                                        *ngIf="mostrarbtnsubir"
-                                        style="height: 64px;"
+                                    <label for="file" matSuffix matTooltipPosition="right"
+                                        *ngIf="mostrarbtnsubir && messajeExcel != 'error'"
+                                        style="height: 64px; padding-top: 25px;"
                                         matTooltip="Presionar para seleccionar Plantilla con nombre Feriados.">
-                                        Subir nuevamente la plantilla
+                                        Subir nueva plantilla
                                     </label>
                                 </form>
                             </div>
                         </div>
-                        <div class="col-md">
-                            <div class="d-flex flex-wrap justify-content-around" >
-                               
+                        <div class="col-md" *ngIf="!Datasucursales" style="padding-top: 5px; padding-bottom: 5px;">
+                            <div class="d-flex flex-wrap justify-content-around"
+                                style="text-align: center; justify-content: center;">
+                                <a id="descargar" class="btn btn-sm" matSuffix matTooltipPosition="right"
+                                    matTooltip="Dar click para ver o descargar el documento.">
+                                    <br>
+                                    Descargar plantilla
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md" *ngIf="mostrarbtnsubir" style="padding-top: 5px; padding-bottom: 5px;">
+                            <div class="d-flex flex-wrap justify-content-around"
+                                style="text-align: center; justify-content: center;">
+                                <button *ngIf="Datasucursales && messajeExcel != 'error'" id="descargar"
+                                    class="btn btn-sm" (click)="ConfirmarRegistroMultiple()" matSuffix
+                                    matTooltipPosition="right" matTooltip="Guardar registro multiple.">
+                                    Registrar
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -63,15 +73,14 @@
             </div>
         </div>
     </div>
-<!------------------ LISTA DE ESTABLECIMIENTOS ------------------------------------------------->
-    <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="!Datasucursales">
+    <!-- *******************************  LISTA DE ESTABLECIMIENTOS  ***************************************** -->
+    <div class="container" style="padding-top: 15px; padding-bottom: 50px; text-align: center;" *ngIf="!Datasucursales">
         <div class="mat-elevation-z8" style="background: white;">
             <div id="resultados">RESULTADO DE BÚSQUEDA</div>
             <div class="table-responsive">
                 <table class="table table-hover table-sm ">
                     <thead class="thead-light">
                         <tr style="text-align: center;">
-                            <th scope="col">Empresa</th>
                             <th scope="col">Establecimiento</th>
                             <th scope="col">Ciudad</th>
                             <th scope="col">Acciones</th>
@@ -79,7 +88,6 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td></td>
                             <td>
                                 <mat-form-field id="t-inputs">
                                     <input matInput placeholder="Buscar" [formControl]="buscarNombre"
@@ -101,22 +109,21 @@
                         </tr>
                         <tr
                             *ngFor="let s of sucursales | sucCiudad: filtroCiudadSuc | sucNombre: filtroNombreSuc | paginate:tamanio_pagina:numero_pagina">
-                            <td>{{s.nomempresa}}</td>
                             <td>{{s.nombre}}</td>
                             <td>{{s.descripcion}}</td>
                             <td class="justify-content-center">
                                 <i matSuffix matTooltipPosition="right"
                                     matTooltip="Ver lista de departamentos del establecimiento." class="fa fa-building"
-                                    id="ver" (click)="VerDepartamentos(s.id)">
+                                    id="ver" (click)="VerDepartamentos(s.id)" *ngIf="getDepartamentoEstablecimiento()">
                                     <p>Departamento</p>
                                 </i>
                                 <i id="t-editar" class="fas fa-edit" (click)="AbrirVentanaEditar(s)" matSuffix
                                     matTooltipPosition="right"
-                                    matTooltip="Modificar los datos generales de este registro.">
+                                    matTooltip="Modificar los datos generales de este registro." *ngIf="getEditarEstablecimiento()">
                                     <p>Editar</p>
                                 </i>
                                 <i (click)="ConfirmarDelete(s)" id="t-eliminar" class="far fa-trash-alt" matSuffix
-                                    matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                    matTooltipPosition="right" matTooltip="Eliminar este registro." *ngIf="getEliminarEstablecimiento()">
                                     <p>Eliminar</p>
                                 </i>
                             </td>
@@ -152,8 +159,16 @@
         </div>
     </div>
 
-<!---------------------- TABLA DE DATOS DE LA CARGA MULTIPLE ----------------------------------->
-    <div class="container" style="padding-bottom: 50px; text-align: center;" *ngIf="Datasucursales">
+    <!-- ******************************* INFORMACION DE LAS OBSERVACIONES DEL REGISTRO MULTIPLE  ***************************************** -->
+    <div class="container" style="padding-top: 10px; margin-bottom: 25px;"
+        *ngIf="Datasucursales && messajeExcel != 'error'">
+        <app-definicion-plantilla>
+        </app-definicion-plantilla>
+    </div>
+
+    <!-- ******************************* TABLA DE DATOS DE LA CARGA MULTIPLE  ***************************************** -->
+    <div class="container" style="padding-bottom: 50px; text-align: center;"
+        *ngIf="Datasucursales && messajeExcel != 'error'">
         <div class="mat-elevation-z8" style="background: white;">
             <div id="resultados">
                 REGISTRO MULTIPLE
@@ -162,19 +177,23 @@
                 <table class="table table-hover table-sm ">
                     <thead class="thead-light">
                         <tr style="text-align: center;">
+                            <th scope="col">Item</th>
                             <th scope="col">Establecimiento</th>
                             <th scope="col">Ciudad</th>
-                            
+
                             <th scope="col">Observación</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let data of Datasucursales">
+                        <tr
+                            *ngFor="let data of Datasucursales | paginate:tamanio_paginaMul:numero_paginaMul; let i = index">
+                            <td style="width: 50px;" align="center">{{data.fila}}</td>
                             <td [style.color]="stiloTextoCelda(data.nom_sucursal)">{{ data.nom_sucursal}}</td>
                             <td [style.color]="stiloTextoCelda(data.ciudad)">{{ data.ciudad}}</td>
                             <td>
                                 <div style="width: 270px; margin: auto;">
-                                    <div id="t-editar" class="circulo"  [style.background-color]="stiloCelda(data.observacion)"></div>
+                                    <div id="t-editar" class="circulo"
+                                        [style.background-color]="stiloCelda(data.observacion)"></div>
                                     {{ data.observacion}}
                                 </div>
                             </td>
@@ -182,12 +201,12 @@
                     </tbody>
                 </table>
             </div>
-            <mat-paginator id="pagina" [length]="Datasucursales.length" [pageSize]="tamanio_pagina"
-                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
+            <mat-paginator id="pagina" [length]="Datasucursales.length" [pageSize]="tamanio_paginaMul"
+                [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPaginaMulti($event)"
+                showFirstLastButtons>
             </mat-paginator>
         </div>
     </div>
-
 </div>
 
 <!--  ********************  VER DEPARTAMETOS DE SUCURSALES  ************************  -->

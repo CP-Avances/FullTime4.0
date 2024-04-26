@@ -149,3 +149,7 @@ mat-progress-spinner {
     left: 200px;
     background-color: #f0f0f0;
 }
+
+:host ::ng-deep .mat-expansion-indicator::after {
+    color: white;
+}

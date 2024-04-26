@@ -4215,4 +4215,45 @@ export class ListarPedidoAccionComponent implements OnInit {
       "PedidosAccionesPersonalCSV" + new Date().getTime() + ".csv"
     );
   }
+
+  //Control Botones
+  getVer(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Ver' && item.id_funcion === 33);
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+    }
+  }
+
+  getEditar(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Editar' && item.id_funcion === 33);
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+    }
+  }
+
+  getVerPedidoPdf(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Ver Pedido en formatro PDF');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+    }
+  }
+
+  getVerPedidoExcel(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Ver Pedido en formato EXCEL');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+    }
+  }
 }

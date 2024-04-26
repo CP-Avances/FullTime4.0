@@ -1,0 +1,84 @@
+<div class="container" style="padding-bottom: 15px;">
+  <mat-card class="example-card mat-elevation-z8">
+      <div id="titulo">
+          <span>CALENDARIO RANGO FECHAS</span>
+          <mat-icon class="float-right" id="cerrar" (click)="CerrarVentana()">
+              highlight_off
+          </mat-icon>
+      </div>
+      <mat-card-content>
+          <div class="row">
+              <div class="nota" style="margin-left: 15px; padding-top: 15px;">
+                  <span>
+                      NOTA: Al presionar Generar calendario se visualizará todos los días del mes actual. Para generar
+                      un calendario de manera personalizada ingresar mes de inicio y fin de periodo.
+                  </span>
+              </div>
+              <div class="col-md">
+                  <div class="row">
+                      <div class="col-md">
+                          <div class="row">
+                              <div class="col-md">
+                                  <div class="d-flex flex-wrap justify-content-center">
+                                      <mat-form-field style="width: 160px;">
+                                          <mat-label>Mes inicio</mat-label>
+                                          <input matInput [matDatepicker]="fec1" [formControl]="fechaInicialF"
+                                              placeholder="DD/MM/YYYY">
+                                          <mat-datepicker-toggle matIconSuffix [for]="fec1"></mat-datepicker-toggle>
+                                          <mat-datepicker #fec1 startView="year"
+                                              (monthSelected)="FormatearFecha($event, fec1)" touchUi>
+                                          </mat-datepicker>
+                                      </mat-form-field>
+                                  </div>
+                              </div>
+                              <div class="col-md">
+                                  <div class="d-flex flex-wrap justify-content-center">
+                                      <mat-form-field style="width: 160px;">
+                                          <mat-label>Mes final</mat-label>
+                                          <input matInput [matDatepicker]="fec2" [formControl]="fechaFinalF"
+                                              placeholder="DD/MM/YYYY" readonly>
+                                          <mat-datepicker-toggle matIconSuffix [for]="fec2"
+                                              [disabled]="true"></mat-datepicker-toggle>
+                                          <mat-datepicker #fec2 startView="year">
+                                          </mat-datepicker>
+                                      </mat-form-field>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="d-flex flex-wrap justify-content-center">
+                              <div style="margin: 0 auto;">
+                                  <button class="btn btn-sm" (click)="DescargarPlantilla()">
+                                      Descargar plantilla
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+
+
+                  </div>
+              </div>
+              <div class="col-md">
+                <div class="row">
+                  <div class="d-flex flex-wrap justify-content-center">
+                    <div style="margin: 0 auto;">
+                        <button class="btn btn-sm" >
+                            Cargar plantilla
+                        </button>
+                    </div>
+                    <div style="margin: 0 auto;">
+                        <button class="btn btn-sm" >
+                            Registar
+                        </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </div>
+
+      </mat-card-content>
+      <div class="pantalla-progress" *ngIf="progreso">
+          <mat-progress-spinner class="progress" [color]="color" [mode]="mode" [value]="value">
+          </mat-progress-spinner>
+      </div>
+  </mat-card>
+</div>

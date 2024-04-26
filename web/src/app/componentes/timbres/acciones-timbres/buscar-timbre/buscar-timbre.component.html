@@ -119,13 +119,13 @@
                                     <td class="justify-content-center">
                                         <i id="t-ver" class="fas fa-eye" style="margin-right: 20px;" matSuffix
                                             matTooltipPosition="left" matTooltip="Ver timbre."
-                                            (click)="AbrirVentanaVerInfoTimbre(t)">
+                                            (click)="AbrirVentanaVerInfoTimbre(t)" *ngIf="getVerInformacionTimbre()">
                                             <p>Ver</p>
                                         </i>
                                         <i id="t-editar" class="fas fa-edit" style="margin-right: 20px;" matSuffix
                                             matTooltipPosition="right"
                                             matTooltip="Modificar los datos generales de este registro"
-                                            (click)="AbrirVentanaEditar(t, formulario.value)">
+                                            (click)="AbrirVentanaEditar(t, formulario.value)" *ngIf="getEditarTimbre()">
                                             <p>Editar</p>
                                         </i>
                                     </td>

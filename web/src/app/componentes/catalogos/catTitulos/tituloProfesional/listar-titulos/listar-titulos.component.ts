@@ -25,6 +25,8 @@ import { PlantillaReportesService } from 'src/app/componentes/reportes/plantilla
 import { EmpleadoService } from 'src/app/servicios/empleado/empleadoRegistro/empleado.service';
 import { TituloService } from 'src/app/servicios/catalogos/catTitulos/titulo.service';
 import { NivelTitulosService } from 'src/app/servicios/nivelTitulos/nivel-titulos.service';
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
+import { ThemePalette } from '@angular/material/core';
 
 @Component({
   selector: 'app-listar-titulos',
@@ -61,11 +63,20 @@ export class ListarTitulosComponent implements OnInit {
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
 
+  tamanio_paginaMul: number = 5;
+  numero_paginaMul: number = 1;
+
   // METODO DE LLAMADO DE DATOS DE EMPRESA COLORES - LOGO - MARCA DE AGUA
   get s_color(): string { return this.plantillaPDF.color_Secundary }
   get p_color(): string { return this.plantillaPDF.color_Primary }
   get frase(): string { return this.plantillaPDF.marca_Agua }
   get logo(): string { return this.plantillaPDF.logoBase64 }
+
+   // VARIABLES PROGRESS SPINNER
+   progreso: boolean = false;
+   color: ThemePalette = 'primary';
+   mode: ProgressSpinnerMode = 'indeterminate';
+   value = 10;
 
   constructor(
     public ventana: MatDialog, // VARIABLE QUE MANEJA EVENTOS CON VENTANAS
@@ -88,6 +99,12 @@ export class ListarTitulosComponent implements OnInit {
   ManejarPagina(e: PageEvent) {
     this.numero_pagina = e.pageIndex + 1;
     this.tamanio_pagina = e.pageSize;
+  }
+
+  // EVENTO PARA MOSTRAR FILAS DETERMINADAS EN LA TABLA
+  ManejarPaginaMulti(e: PageEvent) {
+    this.tamanio_paginaMul = e.pageSize;
+    this.numero_paginaMul = e.pageIndex + 1
   }
 
   // METODO PARA VER LA INFORMACION DEL EMPLEADO 
@@ -148,6 +165,7 @@ export class ListarTitulosComponent implements OnInit {
     this.ObtenerTitulos();
     this.archivoForm.reset();
     this.mostrarbtnsubir = false;
+    this.messajeExcel = '';
   }
 
   // METODO PARA VALIDAR INGRESO DE LETRAS
@@ -220,6 +238,8 @@ export class ListarTitulosComponent implements OnInit {
     console.log('itemName: ',itemName);
     if (itemExtencion == 'xlsx' || itemExtencion == 'xls') {
       if (itemName.toLowerCase() == 'titulos_profesionales') {
+        this.numero_paginaMul = 1;
+        this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
       } else {
         this.toastr.error('Seleccione plantilla con nombre Titulos_profesionales', 'Plantilla seleccionada incorrecta', {
@@ -241,6 +261,7 @@ export class ListarTitulosComponent implements OnInit {
 
   DataTitulosProfesionales: any;
   listTitulosCorrectos: any = [];
+  messajeExcel: string = '';
   // METODO PARA ENVIAR MENSAJES DE ERROR O CARGAR DATOS SI LA PLANTILLA ES CORRECTA
   Revisarplantilla(){
     this.listTitulosCorrectos = [];
@@ -248,19 +269,35 @@ export class ListarTitulosComponent implements OnInit {
     for (var i = 0; i < this.archivoSubido.length; i++) {
       formData.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
     }
+
+    this.progreso = true;
   
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.DataTitulosProfesionales = res.data;
-      
-      console.log('probando plantilla1', this.DataTitulosProfesionales);
+      this.messajeExcel = res.message;
 
-      this.DataTitulosProfesionales.forEach(item => {
-        if( item.observacion.toLowerCase() === 'ok'){
-          this.listTitulosCorrectos.push(item);
-        }
+      if(this.messajeExcel == 'error'){
+        this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
+          timeOut: 4500,
+        });
+        this.mostrarbtnsubir = false;
+      }else{
+        this.DataTitulosProfesionales.forEach(item => {
+          if( item.observacion.toLowerCase() === 'ok'){
+            this.listTitulosCorrectos.push(item);
+          }
+        }); 
+      }
+     
+    },error => {
+      console.log('Serivicio rest -> metodo RevisarFormato - ',error);
+      this.toastr.error('Error al cargar los datos', 'Plantilla no aceptada', {
+        timeOut: 4000,
       });
-      
+      this.progreso = false;
+    },() => {
+      this.progreso = false;
     });
       
   }
@@ -274,21 +311,34 @@ export class ListarTitulosComponent implements OnInit {
        return 'rgb(239, 203, 106)';
      }else if(observacion == 'Registro duplicado'){
        return 'rgb(156, 214, 255)';
+     }else if(observacion == 'Nivel no existe en el sistema'){
+      return 'rgb(255, 192, 203)';
      }else{
        return 'rgb(251, 73, 18)';
      }
    }
  
    colorTexto: string = '';
-   stiloTextoCelda(texto: string): string{    
-     let arrayObservacion = texto.split(" ");
-     if(arrayObservacion[0] == 'No'){
+   stiloTextoCelda(texto: string): any{  
+    let arrayObservacion = texto.split(" ");
+    if(arrayObservacion[0] == 'No'){
        return 'rgb(255, 80, 80)';
-     }else{
+    }else{
        return 'black'
-     }
+    }
      
    }
+
+  //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL
+  ConfirmarRegistroMultiple() {
+    const mensaje = 'registro';
+    this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.registrarTitulos();
+        }
+      });
+  }
 
    registrarTitulos(){
     var data: any = {
@@ -507,6 +557,102 @@ export class ListarTitulosComponent implements OnInit {
     const data: Blob = new Blob([csvDataC], { type: 'text/csv;charset=utf-8;' });
     FileSaver.saveAs(data, "TitulosCSV" + '.csv');
     this.ObtenerTitulos();
+  }
+
+  //Control Botones
+  getCrearTituloProfesional(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Crear título profesional');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
+  getPlantilla(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => (item.accion === 'Plantilla' && item.id_funcion === 12));
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
+  getEditarTituloProfesional(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Editar título profesional');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
+  getEliminarTituloProfesional(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Eliminar título profesional');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
+  getDescargarReportes(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => (item.accion === 'Descargar reportes' && item.id_funcion === 12));
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
   }
 
 }

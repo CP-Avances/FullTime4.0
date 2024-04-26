@@ -16,7 +16,7 @@
             <div id="titulo">
                 <span>CONFIGURACIÓN MENSAJE DE CUMPLEAÑOS</span>
                 <button class="btn btn-outline-light btn-sm" style="float: right; margin-right: 10px; margin-top: -3px;"
-                    (click)="EditarMensaje(c)">
+                    (click)="EditarMensaje(c)" *ngIf="getEditarCumpleanos()">
                     Editar
                 </button>
             </div>

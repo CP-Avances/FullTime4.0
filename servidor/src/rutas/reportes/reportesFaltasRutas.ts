@@ -10,10 +10,11 @@ class FaltasRutas {
     }
 
     configuracion(): void {
-        // CONSULTA DE TIMBRES CON SALIDAS ANTICIPADAS
+
+        // METODO DE BUSQUEDA DE DATOS DE FALTAS LISTA sucursales[regimenes[departamentos[cargos[empleados]]]]
         this.router.put('/faltas/:desde/:hasta', TokenValidation, FALTAS_CONTROLADOR.ReporteFaltas);
-        
-        // CONSULTA DE TIMBRES CON SALIDAS ANTICIPADAS PARA REGIMEN CARGO
+
+        // METODO DE BUSQUEDA DE DATOS DE FALTAS LISTA sucursales[empleados]]
         this.router.put('/faltas-regimen-cargo/:desde/:hasta', TokenValidation, FALTAS_CONTROLADOR.ReporteFaltasRegimenCargo);
 
     }

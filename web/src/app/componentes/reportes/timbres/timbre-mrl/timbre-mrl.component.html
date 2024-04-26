@@ -13,7 +13,7 @@
           </div>
           <mat-card class="example-card mat-elevation-z9">
               <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
-                <app-opcion-usuario (tipoUsuarioChange)="ObtenerTipoUsuario($event)"></app-opcion-usuario>
+                <app-opcion-usuario (tipoUsuarioCambio)="ObtenerTipoUsuario($event)"></app-opcion-usuario>
                   <button mat-icon-button (click)="ValidarReporte('ver')" matTooltipPosition="right"
                       matTooltip="Previsualizar reporte en el navegador.">
                       <mat-icon class="ver">visibility</mat-icon>
@@ -53,7 +53,7 @@
               </thead>
               <tbody>
                   <tr
-                      *ngFor="let s of sucursales | emplNombre: filtroNombreSuc | paginate:tamanio_pagina_suc:numero_pagina_suc">
+                      *ngFor="let s of sucursales | sucNombre: filtroNombreSuc | paginate:tamanio_pagina_suc:numero_pagina_suc">
                       <td>
                           <mat-checkbox (click)="$event.stopPropagation()"
                               (change)="$event ? selectionSuc.toggle(s) : null" [checked]="selectionSuc.isSelected(s)"
@@ -242,7 +242,7 @@
 <div class="container" style="padding-top: 15px" [hidden]="!verDetalle">
   <mat-card class="example-card mat-elevation-z8">
       <div id="titulo">
-          <span>DETALLES DE TIMBRES</span>
+          <span>DETALLES DE TIMBRES - USUARIOS {{opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}}</span>
           <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
               matTooltip="Regresar">
               <i class="fas fa-arrow-left"></i>

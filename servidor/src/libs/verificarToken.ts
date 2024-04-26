@@ -20,6 +20,7 @@ interface IPayload {
 }
 
 export const TokenValidation = (req: Request, res: Response, next: NextFunction) => {
+    
     // VERIFICA SI EN LA PETICION EXISTE LA CABECERA AUTORIZACION 
     if (!req.headers.authorization) {
         return res.status(401).send('No puede solicitar, permiso denegado.');
@@ -32,6 +33,8 @@ export const TokenValidation = (req: Request, res: Response, next: NextFunction)
     }
 
     try {
+        //next();
+        
         // SI EL TOKEN NO ESTA VACIO
         // SE EXTRAE LOS DATOS DEL TOKEN 
         const payload = jwt.verify(token, process.env.TOKEN_SECRET || 'llaveSecreta') as IPayload;
@@ -68,7 +71,9 @@ export const TokenValidation = (req: Request, res: Response, next: NextFunction)
                 return res.status(401).send('Ups!!! La licencia a expirado.');
             }
         })
+        
     } catch (error) {
         return res.status(401).send(error.message);
     }
+    
 }

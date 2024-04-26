@@ -8,7 +8,7 @@
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
                     <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                        <button id="btn-raised" class="btn btn-sm" (click)="AbrirRegistrar()">
+                        <button id="btn-raised" class="btn btn-sm" (click)="AbrirRegistrar()" *ngIf="getCrearRegimenLaboral()">
                             Crear régimen laboral
                         </button>
                         <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
@@ -68,16 +68,16 @@
                             <td class="justify-content-center">
                                 <i matSuffix matTooltipPosition="right"
                                     matTooltip="Ver datos generales de este registro." class="fas fa-eye" id="t-ver"
-                                    (click)="VerDatosRegimen(regimenL.id)">
+                                    (click)="VerDatosRegimen(regimenL.id)" *ngIf="getVerRegimenLaboral()">
                                     <p>Ver</p>
                                 </i>
                                 <i class="fas fa-edit" id="t-editar" (click)="AbrirEditar(regimenL.id)" matSuffix
                                     matTooltipPosition="right"
-                                    matTooltip="Editar los datos generales de este registro.">
+                                    matTooltip="Editar los datos generales de este registro." *ngIf="getEditarRegimenLaboral()">
                                     <p>Editar</p>
                                 </i>
                                 <i class="far fa-trash-alt" id="t-eliminar" matSuffix matTooltipPosition="right"
-                                    matTooltip="Eliminar este registro." (click)="ConfirmarDelete(regimenL)">
+                                    matTooltip="Eliminar este registro." (click)="ConfirmarDelete(regimenL)" *ngIf="getEliminarRegimenLaboral()">
                                     <p>Eliminar</p>
                                 </i>
                             </td>
@@ -88,7 +88,7 @@
             <mat-paginator id="pagina" [length]="regimen.length" [pageSize]="tamanio_pagina"
                 [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
             </mat-paginator>
-            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;" *ngIf="getDescargarReportes()">
                 <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
                     matTooltipPosition="right" matTooltip="Descargar Lista de Regímenes Laborales en formato PDF.">
                     <p>PDF</p>

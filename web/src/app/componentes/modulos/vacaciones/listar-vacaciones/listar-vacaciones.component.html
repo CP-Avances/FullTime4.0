@@ -26,7 +26,7 @@
                     <thead class="thead-light">
                         <tr style="text-align: center;">
                             <th>
-                                <mat-checkbox *ngIf="btnCheckHabilitar" (change)="$event ? masterToggle() : null"
+                                <mat-checkbox *ngIf="getAprobarMultipleVacacion()" (change)="$event ? masterToggle() : null"
                                     [checked]="selectionUno.hasValue() && isAllSelected()"
                                     [indeterminate]="selectionUno.hasValue() && !isAllSelected()"
                                     [aria-label]="checkboxLabel()">

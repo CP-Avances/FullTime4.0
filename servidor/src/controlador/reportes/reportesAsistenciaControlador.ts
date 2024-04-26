@@ -1159,7 +1159,7 @@ const BuscarTimbresIncompletos = async function (fec_inicio: string, fec_final: 
     return await pool.query('SELECT CAST(fec_hora_horario AS VARCHAR), codigo, estado_timbre, tipo_entr_salida AS accion, tipo_dia, estado_origen ' +
         'FROM plan_general WHERE CAST(fec_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' ' +
         'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 ' +
-        'AND fec_hora_timbre IS null AND tipo_dia NOT IN (\'L\', \'FD\') ' +
+        'AND fec_hora_timbre IS null AND estado_origen IN (\'N\',\'HL\', \'HFD\') ' +
         'ORDER BY fec_hora_horario ASC', [fec_inicio, fec_final, codigo])
         .then(res => {
             return res.rows;

@@ -25,43 +25,43 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
   get opcion () { return this.reporteService.opcion; }
 
   get bool() { return this.reporteService.criteriosBusqueda; }
-  
+
   public ParametrosForm = new FormGroup({
     menor: new FormControl('', Validators.required),
     intermedio: new FormControl(''),
     mayor: new FormControl('', Validators.required)
   })
-  
+
   respuesta: any [];
   sucursales: any = [];
   departamentos: any = [];
   empleados: any = [];
-  
+
   data_pdf: any = [];
 
   selectionSuc = new SelectionModel<ITableEmpleados>(true, []);
   selectionDep = new SelectionModel<ITableEmpleados>(true, []);
   selectionEmp = new SelectionModel<ITableEmpleados>(true, []);
-  
+
   // ITEMS DE PAGINACION DE LA TABLA
   tamanio_pagina: number = 5;
   numero_pagina: number = 1;
   pageSizeOptions = [5, 10, 20, 50];
 
   get filtroNombreSuc() { return this.reporteService.filtroNombreSuc }
-  
+
   get filtroNombreDep() { return this.reporteService.filtroNombreDep }
 
   get filtroCodigo() { return this.reporteService.filtroCodigo };
   get filtroCedula() { return this.reporteService.filtroCedula };
   get filtroNombreEmp() { return this.reporteService.filtroNombreEmp };
-  
+
   constructor(
     private toastr: ToastrService,
     private reporteService: ReportesService,
     private R_asistencias: ReportesAsistenciasService,
     private restEmpre: EmpresaService
-  ) { 
+  ) {
     this.ObtenerLogo();
     this.ObtenerColores();
   }
@@ -101,7 +101,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
       console.log('SUCURSALES',this.sucursales);
       console.log('DEPARTAMENTOS',this.departamentos);
       console.log('EMPLEADOS',this.empleados);
-      
+
     }, err => {
       this.toastr.error(err.error.message)
     })
@@ -116,7 +116,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
 
   parametrizacion: any = '';
   onSubmitParametros(){
-    this.parametrizacion = this.ParametrosForm.value; 
+    this.parametrizacion = this.ParametrosForm.value;
     // console.log(this.ParametrosForm.value);
     this.toastr.success('Parametros Guardados')
   }
@@ -130,10 +130,10 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
    */
   validacionReporte(action) {
 
-    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de busqueda') 
-    if (this.bool.bool_suc === false && this.bool.bool_dep === false && this.bool.bool_emp === false) return this.toastr.error('Seleccione un criterio de búsqueda') 
-    if (this.parametrizacion === '') return this.toastr.error('Ingrese rango de semaforización para generar Reporte','Falta Semaforización') 
-    
+    if (this.rangoFechas.fec_inico === '' || this.rangoFechas.fec_final === '') return this.toastr.error('Primero valide fechas de busqueda')
+    if (this.bool.bool_suc === false && this.bool.bool_dep === false && this.bool.bool_emp === false) return this.toastr.error('Seleccione un criterio de búsqueda')
+    if (this.parametrizacion === '') return this.toastr.error('Ingrese rango de semaforización para generar Reporte','Falta Semaforización')
+
     switch (this.opcion) {
       case 's':
         if (this.selectionSuc.selected.length === 0) return this.toastr.error('No a seleccionado ninguno', 'Seleccione sucursal')
@@ -179,7 +179,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
   }
 
   ModelarDepartamento(accion) {
-    
+
     let respuesta = JSON.parse(sessionStorage.getItem('reporte_puntualidad') as any)
 
     respuesta.forEach((obj: any) => {
@@ -190,7 +190,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
         return bool != undefined
       })
     })
-    let dep = respuesta.filter(obj => { 
+    let dep = respuesta.filter(obj => {
       return obj.departamentos.length > 0
     });
     console.log('DEPARTAMENTOS', dep);
@@ -222,16 +222,16 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
         })
       });
     })
-    respuesta.forEach(obj => { 
+    respuesta.forEach(obj => {
       obj.departamentos = obj.departamentos.filter(e => {
         return e.empleado.length > 0
       })
     });
 
-    let emp = respuesta.filter(obj => { 
+    let emp = respuesta.filter(obj => {
       return obj.departamentos.length > 0
     });
-    
+
     console.log('EMPLEADOS', emp);
     this.data_pdf = [];
     this.R_asistencias.ReportePuntualidadMultiple(emp, this.rangoFechas.fec_inico, this.rangoFechas.fec_final, this.parametrizacion).subscribe(res => {
@@ -248,9 +248,9 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
 
 
   /***************************
-   * 
+   *
    * COLORES Y LOGO PARA EL REPORTE
-   * 
+   *
    *****************************/
 
   logo: any = String;
@@ -260,7 +260,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     });
   }
 
-  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA 
+  // METODO PARA OBTENER COLORES Y MARCA DE AGUA DE EMPRESA
   p_color: any;
   s_color: any;
   frase: any;
@@ -273,9 +273,9 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
   }
 
   /******************************************************
-   * 
+   *
    *          PDF
-   * 
+   *
    *******************************************/
 
   generarPdf(action) {
@@ -305,14 +305,14 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
         fecha = f.format('YYYY-MM-DD');
         h.setUTCHours(h.getHours());
         var time = h.toJSON().split("T")[1].split(".")[0];
-        
+
         return {
           margin: 10,
           columns: [
             { text: 'Fecha: ' + fecha + ' Hora: ' + time, opacity: 0.3 },
             { text: [
                 {
-                  text: '© Pag ' + currentPage.toString() + ' of ' + pageCount,
+                  text: '© Pag ' + currentPage.toString() + ' de ' + pageCount,
                   alignment: 'right', opacity: 0.3
                 }
               ],
@@ -321,7 +321,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
           fontSize: 10
         }
       },
-      //  | 
+      //  |
       content: [
         { image: this.logo, width: 100, margin: [10, -25, 0, 5] },
         { text: localStorage.getItem('name_empresa'), bold: true, fontSize: 21, alignment: 'center', margin: [0, -40, 0, 10] },
@@ -342,7 +342,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     };
   }
 
-  impresionDatosPDF(data: any []): Array<any>{    
+  impresionDatosPDF(data: any []): Array<any>{
     let n: any = []
     let c = 0;
     let arr_aux: Array<model_pdf_puntualidad> = [];
@@ -364,7 +364,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
             name_empleado: obj2.name_empleado,
             puntualidad: obj2.puntualidad
           } as model_pdf_puntualidad;
-          
+
           console.log(e);
           if (e.color === '#06F313') {
             cont_color_verde = cont_color_verde + 1;
@@ -373,7 +373,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
           } else if (e.color === '#F38306') {
             cont_color_naranja = cont_color_naranja + 1;
           }
-          
+
           arr_aux.push(e);
         });
       });
@@ -421,38 +421,38 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
           bold: true, fontSize: 8, margin: [0, 5, 2, 5],
           text: 'Color Verde:', color: '#06F313'
         },
-				{ 
+				{
           bold: true, fontSize: 8, margin: [0, 5, 0, 5],
-          text: 'Mayor o igual a ' + this.parametrizacion.mayor +' días significa que el o los empleados con esta cantidad de días son muy putuales.' 
+          text: 'Mayor o igual a ' + this.parametrizacion.mayor +' días significa que el o los empleados con esta cantidad de días son muy putuales.'
         }
 			]
     })
-    n.push({ 
+    n.push({
       columns: [
 				{ width: 'auto',
           bold: true, fontSize: 8, margin: [0, 5, 2, 5],
           text: 'Color Naranja:', color: '#F38306'
         },
-				{ 
+				{
           bold: true, fontSize: 8, margin: [0, 5, 0, 5],
-          text: ' Días entre ' + this.parametrizacion.mayor + ' y ' +  this.parametrizacion.menor +' son empleados que tienen un margen de puntualidad aceptable' 
+          text: ' Días entre ' + this.parametrizacion.mayor + ' y ' +  this.parametrizacion.menor +' son empleados que tienen un margen de puntualidad aceptable'
         }
 			]
     })
-    n.push({ 
+    n.push({
       columns: [
 				{ width: 'auto',
           bold: true, fontSize: 8, margin: [0, 5, 2, 5],
           text: 'Color Rojo:', color: '#EC2E05'
         },
-				{ 
+				{
           bold: true, fontSize: 8, margin: [0, 5, 0, 5],
           text: 'Menor o igual a ' + this.parametrizacion.menor + ' días significa que el o los empleados con esta cantidad de días tienen más atrasos laborales que días puntuales.'
         }
 			]
     })
 
-    n.push({ 
+    n.push({
       columns: [
 				{ width: 250, text: '' },
         {
@@ -486,11 +486,11 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
 				{ width: 250, text: '' }
 			]
     });
-   
+
     return n
   }
 
-  /** ************************************************************************************************** ** 
+  /** ************************************************************************************************** **
    ** **                                     METODO PARA EXPORTAR A EXCEL                             ** **
    ** ************************************************************************************************** **/
    exportToExcel(): void {
@@ -499,7 +499,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
     const wb: xlsx.WorkBook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(wb, wsr, 'Puntualidad');
     xlsx.writeFile(wb, "Puntualidad " + new Date().getTime() + '.xlsx');
-    
+
   }
 
   MapingDataPdfDefault(array: Array<any>) {
@@ -508,7 +508,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
       obj1.departamentos.forEach(obj2 => {
         obj2.empleado.forEach(obj3 => {
           let ele = {
-            'Id Sucursal': obj1.id_suc, 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc, 
+            'Id Sucursal': obj1.id_suc, 'Ciudad': obj1.ciudad, 'Sucursal': obj1.name_suc,
             'Id Departamento': obj2.id_depa, 'Departamento': obj2.name_dep,
             'Id Empleado': obj3.id, 'Nombre Empleado': obj3.name_empleado, 'Cédula': obj3.cedula, 'Código': obj3.codigo,
             'Género': obj3.genero, 'Contrato': obj3.contrato, 'Cargo': obj3.cargo, 'Puntualidad': obj3.puntualidad
@@ -531,7 +531,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
   masterToggleSuc() {
     this.isAllSelectedSuc() ?
       this.selectionSuc.clear() :
-      this.sucursales.forEach(row => this.selectionSuc.select(row));
+      this.sucursales.forEach((row: any) => this.selectionSuc.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -552,7 +552,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
   masterToggleDep() {
     this.isAllSelectedDep() ?
       this.selectionDep.clear() :
-      this.departamentos.forEach(row => this.selectionDep.select(row));
+      this.departamentos.forEach((row: any) => this.selectionDep.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
@@ -573,7 +573,7 @@ export class ReportePuntualidadComponent implements OnInit, OnDestroy {
   masterToggleEmp() {
     this.isAllSelectedEmp() ?
       this.selectionEmp.clear() :
-      this.empleados.forEach(row => this.selectionEmp.select(row));
+      this.empleados.forEach((row: any) => this.selectionEmp.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA

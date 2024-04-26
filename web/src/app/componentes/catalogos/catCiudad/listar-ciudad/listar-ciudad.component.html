@@ -6,7 +6,7 @@
             </div>
             <mat-card class="example-card mat-elevation-z8">
                 <div class="d-flex justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                    <button id="btn-raised"  class="btn btn-sm" (click)="AbrirVentanaRegistrarCiudad()">
+                    <button id="btn-raised"  class="btn btn-sm" (click)="AbrirVentanaRegistrarCiudad()" *ngIf="getCrearCiudad()">
                         Crear ciudad
                     </button>
                     <button id="btn-raised"  class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
@@ -58,7 +58,7 @@
                         <td>{{ciudad.nombre}}</td>
                         <td class="d-flex justify-content-center">
                             <i (click)="ConfirmarDelete(ciudad)" class="far fa-trash-alt" matSuffix
-                                matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                matTooltipPosition="right" matTooltip="Eliminar este registro." *ngIf="getEliminarCiudad()">
                                 <p>Eliminar</p>
                             </i>
                         </td>
@@ -70,7 +70,7 @@
             [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
         </mat-paginator>
 
-        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+        <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;" *ngIf="getDescargarReportes()">
             <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix matTooltipPosition="right"
                 matTooltip="Descargar Lista de Ciudades en formato PDF.">
                 <p>PDF</p>

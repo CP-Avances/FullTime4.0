@@ -13,14 +13,11 @@ export class FuncionesService {
 
   
   // METODO PARA LISTAR FUNCIONES ACTIVAS DEL SISTEMA
-  ListarFunciones() {
-    return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/administracion/funcionalidad`)
+  ListarFunciones(data: any) {
+    //return this.http.post<any>(`${environment.url}/fulltime`, data);
+    //return this.http.get<any>(`${(localStorage.getItem('empresaURL') as string)}/administracion/funcionalidad`)
+    return this.http.post<any>(`${environment.url}/administracion/funcionalidad`, data)
   }
-
-
-
-
-
 
 
 

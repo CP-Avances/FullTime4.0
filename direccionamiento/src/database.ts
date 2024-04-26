@@ -12,9 +12,9 @@ const pool = new Pool({
 
 pool.query('SELECT NOW()', (err, res) => {
   if (err) {
-    console.log("Error durante la conexión", err)
+    console.log("Error durante la conexión", err);
   } else {
-    console.log("Conexión exitosa")
+    console.log("Conexión exitosa");
   }
 })
 

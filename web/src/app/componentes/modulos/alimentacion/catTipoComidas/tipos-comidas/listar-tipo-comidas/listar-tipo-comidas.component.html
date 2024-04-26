@@ -8,7 +8,7 @@
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
                     <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                        <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrar()">
+                        <button id="btn-raised" class="btn btn-sm" (click)="AbrirVentanaRegistrar()" *ngIf="getCrearNuevoMenu()">
                             Crear nuevo menú
                         </button>
                         <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
@@ -67,20 +67,20 @@
                             <td class="justify-content-center align-self-center">
                                 <i matSuffix matTooltipPosition="right"
                                     matTooltip="Ver datos generales de este registro." class="fas fa-eye" id="t-ver"
-                                    (click)="VerListaDetalles(comida.id)">
+                                    (click)="VerListaDetalles(comida.id)" *ngIf="getVerMenu()">
                                     <p>Ver</p>
                                 </i>
                                 <i matSuffix matTooltipPosition="right" matTooltip="Agregar Detalles de Menú."
-                                    class="far fa-list-alt" id="t-detalles" (click)="AbrirVentanaDetalles(comida)">
+                                    class="far fa-list-alt" id="t-detalles" (click)="AbrirVentanaDetalles(comida)" *ngIf="getDetalleMenu()">
                                     <p>Detalle</p>
                                 </i>
                                 <i class="fas fa-edit" (click)="AbrirVentanaEditar(comida)" id="t-editar" matSuffix
                                     matTooltipPosition="right"
-                                    matTooltip="Editar los datos generales de este registro.">
+                                    matTooltip="Editar los datos generales de este registro." *ngIf="getEditarMenu()">
                                     <p>Editar</p>
                                 </i>
                                 <i (click)="ConfirmarDelete(comida)" class="far fa-trash-alt" id="t-eliminar" matSuffix
-                                    matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                    matTooltipPosition="right" matTooltip="Eliminar este registro." *ngIf="getEliminarMenu()">
                                     <p>Eliminar</p>
                                 </i>
                             </td>
@@ -91,7 +91,7 @@
             <mat-paginator id="pagina" [length]="tipoComidas.length" [pageSize]="tamanio_pagina"
                 [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
             </mat-paginator>
-            <div class="d-flex justify-content-end" style="margin-right: 2%;">
+            <div class="d-flex justify-content-end" style="margin-right: 2%;" *ngIf="getDescargarReportes()">
                 <i (click)="GenerarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
                     matTooltipPosition="right" matTooltip="Descargar Lista de Comidas en formato PDF.">
                     <p>PDF</p>

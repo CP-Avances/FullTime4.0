@@ -370,7 +370,7 @@ export class ListarVacacionesComponent implements OnInit {
 
   filtrar(listafiltro: any){
     this.listaVacacionDeparta = listafiltro;
-    this.listaVacacionDeparta.forEach(row => this.selectionUno.select(row));
+    this.listaVacacionDeparta.forEach((row: any) => this.selectionUno.select(row));
   }
 
   limpiarFiltro(){
@@ -697,4 +697,26 @@ export class ListarVacacionesComponent implements OnInit {
     });
   }
 
+  //Control Botones
+  getAprobarMultipleVacacion(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Aprobar múltiple vacación');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
 }
+
+

@@ -67,7 +67,11 @@ export class RegistrarTimbreComponent implements OnInit {
   // METODO PARA CONSULTAR FUNCIONES ACTIVAS DEL SISTEMA
   funciones: any = [];
   VerificarFunciones() {
-    this.restF.ListarFunciones().subscribe(res => {
+    let funcionesSistema = {
+      "direccion": (localStorage.getItem('empresaURL') as string)
+    }
+
+    this.restF.ListarFunciones(funcionesSistema).subscribe(res => {
       this.funciones = res;
     })
   }

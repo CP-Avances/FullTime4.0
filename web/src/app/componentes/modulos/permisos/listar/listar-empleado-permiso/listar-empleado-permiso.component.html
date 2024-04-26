@@ -11,7 +11,7 @@
                 id="SelectCheck">
                 library_add_check
             </mat-icon>
-            <button *ngIf="btnCheckHabilitar" class="btn btn-primary" (click)="AutorizarPermisosMultiple()"
+            <button *ngIf="getAprobar()" class="btn btn-primary" (click)="AutorizarPermisosMultiple()"
                 style="float: left; margin-left: 10px;">
                 Autorizar
             </button>

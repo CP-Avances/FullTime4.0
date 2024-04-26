@@ -229,7 +229,7 @@ export class ListarSolicitudComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
       this.selectionUno.clear() :
-      this.lista_solicitudes_filtradas.forEach(row => this.selectionUno.select(row));
+      this.lista_solicitudes_filtradas.forEach((row: any) => this.selectionUno.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA.
@@ -355,7 +355,7 @@ export class ListarSolicitudComponent implements OnInit {
   masterToggleEstado() {
     this.isAllSelectedEstado() ?
       this.selectionUnoEstado.clear() :
-      this.solicitudesAutorizadas_filtradas.forEach(row => this.selectionUnoEstado.select(row));
+      this.solicitudesAutorizadas_filtradas.forEach((row: any) => this.selectionUnoEstado.select(row));
   }
 
   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA..
@@ -689,5 +689,25 @@ export class ListarSolicitudComponent implements OnInit {
       this.urlxml = `${(localStorage.getItem('empresaURL') as string)}/planComidas/download/` + this.data.name;
       window.open(this.urlxml, "_blank");
     });
+  }
+
+  //Control Botones
+  getAprobar(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => (item.accion === 'Aprobar' && item.id_funcion === 29));
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
   }
 }

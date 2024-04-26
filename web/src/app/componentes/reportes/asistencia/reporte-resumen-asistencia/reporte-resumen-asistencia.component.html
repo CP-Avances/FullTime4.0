@@ -35,7 +35,7 @@
                     </button>
                 </div>
                 <div class="d-flex flex-wrap justify-content-around" style="margin: 0px 10px 0px 10px;">
-                    <app-opcion-usuario (tipoUsuarioChange)="ObtenerTipoUsuario($event)"></app-opcion-usuario>
+                    <app-opcion-usuario (tipoUsuarioCambio)="ObtenerTipoUsuario($event)"></app-opcion-usuario>
                 </div>
             </mat-card>
         </div>
@@ -67,7 +67,7 @@
                 </thead>
                 <tbody>
                     <tr
-                        *ngFor="let s of sucursales | emplNombre: filtroNombreSuc | paginate:tamanio_pagina_suc:numero_pagina_suc">
+                        *ngFor="let s of sucursales | sucNombre: filtroNombreSuc | paginate:tamanio_pagina_suc:numero_pagina_suc">
                         <td>
                             <mat-checkbox (click)="$event.stopPropagation()"
                                 (change)="$event ? selectionSuc.toggle(s) : null" [checked]="selectionSuc.isSelected(s)"
@@ -256,7 +256,7 @@
 <div class="container" style="padding-top: 15px" [hidden]="!verDetalle">
     <mat-card class="example-card mat-elevation-z8">
         <div id="titulo">
-            <span>DETALLES RESUMEN ASISTENCIA</span>
+            <span>DETALLES RESUMEN ASISTENCIA - USUARIOS {{opcionBusqueda==1 ? 'ACTIVOS': 'INACTIVOS'}}</span>
             <button class="btn btn-outline-light btn-sm" style="float: left; margin-left: 10px" (click)="Regresar()"
                 matTooltip="Regresar">
                 <i class="fas fa-arrow-left"></i>
@@ -301,13 +301,13 @@
                             </tr>
                             <tr style="text-align: center">
                                 <th class="t_horarios" scope="col" rowspan="1">HORARIO</th>
-                                <th class="t_horarios" scope="col" rowspan="1">TIMBRE</th>
+                                <th class="t_horarios timbre" scope="col" rowspan="1">TIMBRE</th>
                                 <th class="t_horarios" scope="col" rowspan="1">HORARIO</th>
-                                <th class="t_horarios" scope="col" rowspan="1">TIMBRE</th>
+                                <th class="t_horarios timbre" scope="col" rowspan="1">TIMBRE</th>
                                 <th class="t_horarios" scope="col" rowspan="1">HORARIO</th>
-                                <th class="t_horarios" scope="col" rowspan="1">TIMBRE</th>
+                                <th class="t_horarios timbre" scope="col" rowspan="1">TIMBRE</th>
                                 <th class="t_horarios" scope="col" rowspan="1">HORARIO</th>
-                                <th class="t_horarios" scope="col" rowspan="1">TIMBRE</th>
+                                <th class="t_horarios timbre" scope="col" rowspan="1">TIMBRE</th>
                                 <th class="t_horarios" scope="col" rowspan="1">ASIGNADO</th>
                                 <th class="t_horarios" scope="col" rowspan="1">TOMADO</th>
                             </tr>
@@ -328,7 +328,7 @@
                                 <td [ngClass]="ObtenerClaseTimbre(t.salida)">{{ t.salida }}</td>
                                 <td [ngClass]="ObtenerClaseAtrasoSalida(t.minutosAtraso, 'A')" >{{ t.tiempoAtraso }}</td>
                                 <td [ngClass]="ObtenerClaseAtrasoSalida(t.minutosSalidaAnticipada, 'S')" >{{ t.tiempoSalidaAnticipada }}</td>
-                                <td>{{ t.alimentacion_asignada }}</td>
+                                <td>{{ MinutosAHorasMinutosSegundos(t.alimentacion_asignada) }}</td>
                                 <td [ngClass]="ObtenerClaseAlimentacion(t.alimentacion_asignada, t.minutosAlimentacion)">{{ t.tiempoAlimentacion }}</td>
                                 <td>{{ t.tiempoLaborado }}</td>
                                 <td></td>

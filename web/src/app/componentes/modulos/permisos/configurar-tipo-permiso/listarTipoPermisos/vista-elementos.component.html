@@ -6,7 +6,7 @@
         </div>
         <mat-card class="example-card mat-elevation-z9">
             <div class="d-flex justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                <button id="btn-raised" class="btn btn-sm" (click)="VerFormularioRegistrar()">
+                <button id="btn-raised" class="btn btn-sm" (click)="VerFormularioRegistrar()" *ngIf="getCrearTipoPermiso()">
                     Crear tipo permiso
                 </button>
                 <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
@@ -81,16 +81,16 @@
                             <td class="justify-content-center">
                                 <i matSuffix matTooltipPosition="right"
                                     matTooltip="Ver datos generales de este registro." class="fas fa-eye" id="t-ver"
-                                    (click)="VerDatosPermiso(tp.id)">
+                                    (click)="VerDatosPermiso(tp.id)" *ngIf="getVerPermiso()">
                                     <p>Ver</p>
                                 </i>
                                 <i id="t-editar" class="fas fa-edit" matSuffix matTooltipPosition="right"
                                     (click)="VerFormularioEditar(tp.id)"
-                                    matTooltip="Modificar los datos generales de este registro.">
+                                    matTooltip="Modificar los datos generales de este registro." *ngIf="getEditarPermiso()">
                                     <p>Editar</p>
                                 </i>
                                 <i (click)="ConfirmarDelete(tp)" id="t-eliminar" class="far fa-trash-alt" matSuffix
-                                    matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                    matTooltipPosition="right" matTooltip="Eliminar este registro." *ngIf="getEliminarPermiso()">
                                     <p>Eliminar</p>
                                 </i>
                             </td>
@@ -101,7 +101,7 @@
             <mat-paginator id="pagina" [length]="tipoPermiso.length" [pageSize]="tamanio_pagina"
                 [pageSizeOptions]="pageSizeOptions" (page)="ManejarPagina($event)" showFirstLastButtons>
             </mat-paginator>
-            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;" *ngIf="getDescargarReportes()">
                 <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
                     matTooltipPosition="right" matTooltip="Descargar Lista de Tipo de Permisos en formato PDF.">
                     <p>PDF</p>

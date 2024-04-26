@@ -1,17 +1,10 @@
 table {
     width: 100%;
+    font-size: 14px;
 }
 
 p {
     font-size: x-small;
-}
-
-h5 {
-    text-align: center;
-}
-
-.upload {
-    cursor: pointer;
 }
 
 .button {
@@ -41,14 +34,14 @@ td {
 }
 
 [type="file"]+label {
-    background: #f15d22;
+    background-color: rgb(83, 157, 76);
     border: none;
     border-radius: 5px;
     color: #fff;
     cursor: pointer;
     display: inline-block;
     font-family: "Poppins", sans-serif;
-    font-size: inherit;
+    font-size: 12px;
     font-weight: 600;
     margin-bottom: 1rem;
     outline: none;
@@ -94,8 +87,8 @@ td {
     font-weight: bold;
     font-family: "Poppins", sans-serif;
     margin-left: 5px;
-    padding-top: 10px;
-    font-size: 14px;
+    padding-top: 8px;
+    font-size: 12px;
     height: 66px;
     width: 220px;
 }
@@ -107,8 +100,8 @@ td {
     font-family: "Poppins", sans-serif;
     font-weight: bold;
     margin-left: 5px;
-    padding-top: 10px;
-    font-size: 14px;
+    padding-top: 8px;
+    font-size: 12px;
     overflow: hidden;
     height: 65px;
     width: 220px;

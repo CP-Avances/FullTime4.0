@@ -8,7 +8,7 @@
                 </div>
                 <mat-card class="example-card mat-elevation-z9">
                     <div class="d-flex flex-wrap justify-content-center" style="margin-top: 1%; margin-bottom: 2%;">
-                        <button id="btn-raised" class="btn btn-sm" (click)="CrearParametro()">
+                        <button id="btn-raised" class="btn btn-sm" (click)="CrearParametro()" *ngIf="getRegistrarPerimetro()">
                             Registrar perímetro
                         </button>
                         <button id="btn-raised" class="btn btn-sm" (click)="LimpiarCampos()" matSuffix
@@ -50,16 +50,16 @@
                             <td style="padding-top: 10px;text-align: center;" class="justify-content-center">
                                 <i matSuffix matTooltipPosition="right"
                                     matTooltip="Ver datos generales de este registro." class="fas fa-eye" id="t-ver"
-                                    (click)="VerDetallesCoordenadas(tp.id)">
+                                    (click)="VerDetallesCoordenadas(tp.id)" *ngIf="getVer()">
                                     <p>Ver</p>
                                 </i>
                                 <i id="t-editar" class="fas fa-edit" matSuffix matTooltipPosition="right"
                                     (click)="AbrirEditar(tp)"
-                                    matTooltip="Modificar los datos generales de este registro.">
+                                    matTooltip="Modificar los datos generales de este registro." *ngIf="getEditar()">
                                     <p>Editar</p>
                                 </i>
                                 <i (click)="ConfirmarDelete(tp)" id="t-eliminar" class="far fa-trash-alt" matSuffix
-                                    matTooltipPosition="right" matTooltip="Eliminar este registro.">
+                                    matTooltipPosition="right" matTooltip="Eliminar este registro." *ngIf="getEliminar()">
                                     <p>Eliminar</p>
                                 </i>
                             </td>
@@ -70,7 +70,7 @@
             <mat-paginator id="pagina" [length]="coordenadas.length" [pageSize]="tamanio_pagina"
                 [pageSizeOptions]="pageSizeOptions" id="pagina" (page)="ManejarPagina($event)" showFirstLastButtons>
             </mat-paginator>
-            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;">
+            <div class="d-flex justify-content-end" style="margin-right: 2%; margin-top: 10px;" *ngIf="getDescargarReportes()">
                 <i (click)="generarPdf('download')" id="pdf" class="fas fa-file-pdf" matSuffix
                     matTooltipPosition="right" matTooltip="Descargar Lista de Tipo de Permisos en formato PDF.">
                     <p>PDF</p>

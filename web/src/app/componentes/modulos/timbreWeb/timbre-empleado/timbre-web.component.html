@@ -36,7 +36,7 @@
     <div class="row">
         <div class="col-sm-4">
         </div>
-        <div class="col-sm-4">
+        <div class="col-sm-4" *ngIf="getTimbreVirtual()">
             <button class="timbre btn btn-md btn-block" (click)="VerMensaje()" *ngIf="activar_timbre">
                 Timbre Virtual
             </button>

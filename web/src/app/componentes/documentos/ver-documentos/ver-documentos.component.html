@@ -11,7 +11,7 @@
 
     <div class="d-flex flex-wrap justify-content-center" style="margin-bottom: 25px">
         <div *ngFor="let c of array_carpetas" style="padding: 20px 20px 20px 20px; height: 120px; width: 120px;">
-            <button class="btn btn-sm" type="button" id="cajas-carpetas" (click)="AbrirCarpeta(c.filename)">
+            <button class="btn btn-sm" type="button" id="cajas-carpetas" (click)="AbrirCarpeta(c.filename)" *ngIf="verificarValorBoton(c.nombre)">
                 <mat-icon id="i-cursor" style="color:rgb(0, 65, 163);">folder</mat-icon>
                 <h5 id="letras">{{c.nombre}}</h5>
             </button>

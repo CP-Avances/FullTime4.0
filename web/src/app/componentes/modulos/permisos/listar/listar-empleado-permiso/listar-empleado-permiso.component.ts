@@ -376,7 +376,7 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
 
   filtrar(listafiltro: any){
     this.listaPermisosDeparta = listafiltro;
-    this.listaPermisosDeparta.forEach(row => this.selectionUno.select(row));
+    this.listaPermisosDeparta.forEach((row: any) => this.selectionUno.select(row));
   }
 
   limpiarFiltro(){
@@ -758,4 +758,25 @@ export class ListarEmpleadoPermisoComponent implements OnInit {
       window.open(this.urlxml, "_blank");
     });
   }
+
+  //Control Botones
+  getAprobar(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => (item.accion === 'Aprobar' && item.id_funcion === 20));
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
 }

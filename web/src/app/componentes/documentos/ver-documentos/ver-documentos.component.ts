@@ -36,4 +36,59 @@ export class VerDocumentosComponent implements OnInit {
     this.router.navigate([nombre_carpeta], { relativeTo: this.route, skipLocationChange: false });
   }
 
+  //Control Botones
+  getContratos(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Contratos');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+    }
+  }
+  
+  getRespaldosHorarios(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Respaldos horarios');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+    }
+  }
+
+  getRespaldoPermisos(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Respaldos Permisos');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+    }
+  }
+
+  getDocumentacion(){
+    const datosRecuperados = sessionStorage.getItem('paginaRol');
+    if (datosRecuperados) {
+      var datos = JSON.parse(datosRecuperados);
+      return datos.some(item => item.accion === 'Documentación');
+    }else{
+      return !(parseInt(localStorage.getItem('rol') as string) !== 3);
+    }
+  }
+
+  verificarValorBoton(nombre: string): boolean {
+    switch(nombre){
+      case 'Contratos':
+        return this.getContratos();
+      case 'Respaldos Horarios':
+        return this.getRespaldosHorarios();
+      case 'Respaldos Permisos':
+          return this.getRespaldoPermisos();
+      case 'Documentacion':
+        return this.getDocumentacion();
+      default: 
+        return false;
+    }
+  }
 }

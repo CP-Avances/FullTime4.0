@@ -163,5 +163,24 @@ export class BuscarAsistenciaComponent implements OnInit {
     this.asistencia = [];
   }
 
+  //Control Botones
+  getRevisarRegistro(){
+    var datosRecuperados = sessionStorage.getItem('paginaRol');
+    if(datosRecuperados){
+      var datos = JSON.parse(datosRecuperados);
+      var encontrado = false;
+      const index = datos.findIndex(item => item.accion === 'Revisar Registro');
+      if (index !== -1) {
+        encontrado = true;
+      }
+      return encontrado;
+    }else{
+      if(parseInt(localStorage.getItem('rol') as string) != 3){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
 
 }
