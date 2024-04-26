@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { ObtenerRutaVacuna } from '../../../libs/accesoCarpetas';
 import { QueryResult } from 'pg';
+import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import pool from '../../../database';
 import path from 'path';
 import fs from 'fs';
@@ -45,68 +46,179 @@ class VacunasControlador {
 
     // CREAR REGISTRO DE VACUNACION
     public async CrearRegistro(req: Request, res: Response): Promise<Response> {
-        const { id_empleado, descripcion, fecha, id_tipo_vacuna } = req.body;
-        const response: QueryResult = await pool.query(
-            `
-            INSERT INTO empl_vacunas (id_empleado, descripcion, fecha, id_tipo_vacuna) 
-            VALUES ($1, $2, $3, $4) RETURNING *
-            `
-            , [id_empleado, descripcion, fecha, id_tipo_vacuna]);
+        try {
+            const { id_empleado, descripcion, fecha, id_tipo_vacuna, user_name, ip } = req.body;
 
-        const [vacuna] = response.rows;
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
 
-        if (vacuna) {
-            return res.status(200).jsonp(vacuna)
-        }
-        else {
-            return res.status(404).jsonp({ message: 'error' })
+            const response: QueryResult = await pool.query(
+                `
+                INSERT INTO empl_vacunas (id_empleado, descripcion, fecha, id_tipo_vacuna) 
+                VALUES ($1, $2, $3, $4) RETURNING *
+                `
+                , [id_empleado, descripcion, fecha, id_tipo_vacuna]);
+    
+            const [vacuna] = response.rows;
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'empl_vacunas',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: `{id_empleado: ${id_empleado}, descripcion: ${descripcion}, fecha: ${fecha}, id_tipo_vacuna: ${id_tipo_vacuna}}`,
+                ip, 
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION|
+            await pool.query('COMMIT');
+    
+            if (vacuna) {
+                return res.status(200).jsonp(vacuna)
+            }
+            else {
+                return res.status(404).jsonp({ message: 'error' })
+            }
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(404).jsonp({ message: 'Error al guardar registro.' });
         }
     }
 
-
     // REGISTRO DE CERTIFICADO O CARNET DE VACUNACION
-    public async GuardarDocumento(req: Request, res: Response): Promise<void> {
+    public async GuardarDocumento(req: Request, res: Response): Promise<Response> {
 
-        // FECHA DEL SISTEMA
-        var fecha = moment();
-        var anio = fecha.format('YYYY');
-        var mes = fecha.format('MM');
-        var dia = fecha.format('DD');
+        try {
+            // FECHA DEL SISTEMA
+            var fecha = moment();
+            var anio = fecha.format('YYYY');
+            var mes = fecha.format('MM');
+            var dia = fecha.format('DD');
+    
+            // TODO ANALIZAR COMO OBTENER USER_NAME, IP DESDE EL FRONT
+            const { user_name, ip } = req.body;
+            let id = req.params.id;
+            let id_empleado = req.params.id_empleado;
 
-        let id = req.params.id;
-        let id_empleado = req.params.id_empleado;
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+    
+            const response: QueryResult = await pool.query(
+                `
+                SELECT codigo FROM empleados WHERE id = $1
+                `
+                , [id_empleado]);
+    
+            const [vacuna] = response.rows;
+    
+            let documento = vacuna.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
 
-        const response: QueryResult = await pool.query(
-            `
-            SELECT codigo FROM empleados WHERE id = $1
-            `
-            , [id_empleado]);
+            // CONSULTAR DATOSORIGINALES
+            const vacuna1 = await pool.query('SELECT * FROM empl_vacunas WHERE id = $1', [id]);
+            const [datosOriginales] = vacuna1.rows;
 
-        const [vacuna] = response.rows;
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'empl_vacunas',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip, 
+                    observacion: `Error al guardar documento de vacuna con id: ${id}`
+                });
+    
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+            }
+    
+            await pool.query(
+                `
+                UPDATE empl_vacunas SET carnet = $2 WHERE id = $1
+                `
+                , [id, documento]);
+            
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'empl_vacunas',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: '',
+                datosNuevos: `{carnet: ${documento}}`,
+                ip, 
+                observacion: null
+            });
 
-        let documento = vacuna.codigo + '_' + anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
-
-        await pool.query(
-            `
-            UPDATE empl_vacunas SET carnet = $2 WHERE id = $1
-            `
-            , [id, documento]);
-
-        res.jsonp({ message: 'Registro guardado.' });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+    
+            return res.jsonp({ message: 'Registro guardado.' });
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(404).jsonp({ message: 'Error al guardar registro.' });
+        }
     }
 
     // ACTUALIZAR REGISTRO DE VACUNACION
-    public async ActualizarRegistro(req: Request, res: Response): Promise<void> {
-        const { id } = req.params;
-        const { id_empleado, descripcion, fecha, id_tipo_vacuna } = req.body;
-        await pool.query(
-            `
-            UPDATE empl_vacunas SET id_empleado = $1, descripcion = $2, fecha = $3, 
-            id_tipo_vacuna = $4 WHERE id = $5
-            `
-            , [id_empleado, descripcion, fecha, id_tipo_vacuna, id]);
+    public async ActualizarRegistro(req: Request, res: Response): Promise<Response> {
+        try {
+            const { id } = req.params;
+            const { id_empleado, descripcion, fecha, id_tipo_vacuna, user_name, ip } = req.body;
 
-        res.jsonp({ message: 'Registro actualizado.' });
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTAR DATOSORIGINALES
+            const vacuna = await pool.query('SELECT * FROM empl_vacunas WHERE id = $1', [id]);
+            const [datosOriginales] = vacuna.rows;
+
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'empl_vacunas',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos:'',
+                    ip, 
+                    observacion: `Error al actualizar vacuna con id: ${id}`
+                });
+    
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+            }
+
+            await pool.query(
+                `
+                UPDATE empl_vacunas SET id_empleado = $1, descripcion = $2, fecha = $3, 
+                id_tipo_vacuna = $4 WHERE id = $5
+                `
+                , [id_empleado, descripcion, fecha, id_tipo_vacuna, id]);
+            
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'empl_vacunas',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: `{id_empleado: ${id_empleado}, descripcion: ${descripcion}, fecha: ${fecha}, id_tipo_vacuna: ${id_tipo_vacuna}}`,
+                ip, 
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.jsonp({ message: 'Registro actualizado.' });
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(404).jsonp({ message: 'Error al actualizar registro.' });
+        }
     }
 
     // ELIMINAR DOCUMENTO CARNET DE VACUNACION DEL SERVIDOR
@@ -129,63 +241,152 @@ class VacunasControlador {
     }
 
     // ELIMINAR DOCUMENTO CARNET DE VACUNACION
-    public async EliminarDocumento(req: Request, res: Response): Promise<void> {
-        let separador = path.sep;
-        let { documento, id } = req.body;
+    public async EliminarDocumento(req: Request, res: Response): Promise<Response> {
+        try {
+            let separador = path.sep;
+            let { documento, id, user_name, ip } = req.body;
 
-        const response: QueryResult = await pool.query(
-            `
-            UPDATE empl_vacunas SET carnet = null WHERE id = $1 RETURNING *
-            `
-            , [id]);
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
 
-        const [vacuna] = response.rows;
+            // CONSULTAR DATOSORIGINALES
+            const vacunaconsulta = await pool.query('SELECT * FROM empl_vacunas WHERE id = $1', [id]);
+            const [datosOriginales] = vacunaconsulta.rows;
 
-        if (documento != 'null' && documento != '' && documento != null) {
-            let ruta = await ObtenerRutaVacuna(vacuna.id_empleado) + separador + documento;
-            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs.access(ruta, fs.constants.F_OK, (err) => {
-                if (err) {
-                } else {
-                    // ELIMINAR DEL SERVIDOR
-                    fs.unlinkSync(ruta);
-                }
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'empl_vacunas',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos:'',
+                    ip, 
+                    observacion: `Error al eliminar documento de vacuna con id: ${id}`
+                });
+    
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+            }
+    
+            const response: QueryResult = await pool.query(
+                `
+                UPDATE empl_vacunas SET carnet = null WHERE id = $1 RETURNING *
+                `
+                , [id]);
+    
+            const [vacuna] = response.rows;
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'empl_vacunas',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: `{carnet: null}`,
+                ip, 
+                observacion: null
             });
-        }
 
-        res.jsonp({ message: 'Documento eliminado.' });
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+    
+            if (documento != 'null' && documento != '' && documento != null) {
+                let ruta = await ObtenerRutaVacuna(vacuna.id_empleado) + separador + documento;
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs.access(ruta, fs.constants.F_OK, (err) => {
+                    if (err) {
+                    } else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs.unlinkSync(ruta);
+                    }
+                });
+            }
+    
+            return res.jsonp({ message: 'Documento eliminado.' });
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(404).jsonp({ message: 'Error al eliminar documento.' });
+        }
     }
 
     // ELIMINAR REGISTRO DE VACUNACION
-    public async EliminarRegistro(req: Request, res: Response): Promise<void> {
-        let separador = path.sep;
-        const { id, documento } = req.params;
-        const response: QueryResult = await pool.query(
-            `
-            DELETE FROM empl_vacunas WHERE id = $1 RETURNING *
-            `
-            , [id]);
+    public async EliminarRegistro(req: Request, res: Response): Promise<Response> {
+        try {
+            let separador = path.sep;
+            // TODO ANALIZAR COMO OBTENER USER_NAME, IP DESDE EL FRONT
+            const { user_name, ip } = req.body;
+            const { id, documento } = req.params;
 
-        const [vacuna] = response.rows;
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
 
-        if (documento != 'null' && documento != '' && documento != null) {
-            let ruta = await ObtenerRutaVacuna(vacuna.id_empleado) + separador + documento;
-            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs.access(ruta, fs.constants.F_OK, (err) => {
-                if (err) {
-                } else {
-                    // ELIMINAR DEL SERVIDOR
-                    fs.unlinkSync(ruta);
-                }
+            // CONSULTAR DATOSORIGINALES
+            const vacunaconsulta = await pool.query('SELECT * FROM empl_vacunas WHERE id = $1', [id]);
+            const [datosOriginales] = vacunaconsulta.rows;
+
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'empl_vacunas',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos:'',
+                    ip, 
+                    observacion: `Error al eliminar vacuna con id: ${id}`
+                });
+    
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+            }
+
+            const response: QueryResult = await pool.query(
+                `
+                DELETE FROM empl_vacunas WHERE id = $1 RETURNING *
+                `
+                , [id]);
+    
+            const [vacuna] = response.rows;
+    
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'empl_vacunas',
+                usuario: user_name,
+                accion: 'D',
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos:'',
+                ip, 
+                observacion: null
             });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            if (documento != 'null' && documento != '' && documento != null) {
+                let ruta = await ObtenerRutaVacuna(vacuna.id_empleado) + separador + documento;
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs.access(ruta, fs.constants.F_OK, (err) => {
+                    if (err) {
+                    } else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs.unlinkSync(ruta);
+                    }
+                });
+            }
+            return res.jsonp({ message: 'Registro eliminado.' });
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(404).jsonp({ message: 'Error al eliminar registro.' });  
         }
-        res.jsonp({ message: 'Registro eliminado.' });
     }
 
     // CREAR REGISTRO DE TIPO DE VACUNA
     public async CrearTipoVacuna(req: Request, res: Response): Promise<Response> {
         try {
-            const { nombre } = req.body;
+            const { nombre, user_name, ip } = req.body;
 
             const response: QueryResult = await pool.query(
                 `
@@ -195,6 +396,20 @@ class VacunasControlador {
 
             const [vacunas] = response.rows;
 
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'tipo_vacuna',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: `{nombre: ${nombre}}`,
+                ip, 
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
             if (vacunas) {
                 return res.status(200).jsonp(vacunas)
             }
@@ -203,6 +418,8 @@ class VacunasControlador {
             }
 
         } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
             return res.jsonp({ message: 'error' });
         }
     }
@@ -221,28 +438,6 @@ class VacunasControlador {
             }
           });
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     // LISTAR TODOS LOS REGISTROS DE VACUNACIÓN
     public async ListarRegistro(req: Request, res: Response) {
