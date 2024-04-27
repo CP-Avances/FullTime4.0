@@ -940,14 +940,11 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
     // VALIDAR SI SE HA SELECCIONADO PAGINAS
     if (this.paginasSeleccionadasM.length != 0) {
-      //this.nombreModulos.map(x => {
 
 
       this.habilitarprogress = true;
-      // RECORRER LA LISTA DE PAGINAS SELECCIONADAS
+      // RECORRER LA LISTA DE PAGINS-MODULOS SELECCIONADAS
       this.paginasSeleccionadasM.map(obj => {
-        // var algo = this.ObtenerTodasModulosAcciones()[obj.id];
-        //algo=[];
 
 
         if ((this.ObtenerTodasModulosAcciones()[obj.id]).length != 0) {
@@ -976,8 +973,11 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
                   //(<HTMLInputElement>document.getElementById('seleccionarmodulo')).checked = false;
 
+                  /*
                   this.nombreModulos.map(modulo => {
 
+                    //nuevo
+                    // 
 
                     for (var i = 0; i <= this.paginasSeleccionadasModulos[modulo].length - 1; i++) {
                       (<HTMLInputElement>document.getElementById('paginasSeleccionadasModulos' + i + modulo)).checked = false;
@@ -985,16 +985,19 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
 
                   })
+                */
+                  //this.paginasSeleccionadasModulos[modulo];
 
 
                   delete this.nombresAccionesPorPagina[obj.id];
                   delete this.accionesSeleccionadasPorPagina[obj.id];
                   this.paginasSeleccionadasM = [];
+
                   this.rest.BuscarPaginasRol(buscarPagina).subscribe(datos => {
                     this.paginas = datos;
                   })
 
-                  this.toastr.info('Se indica que ' + obj.nombre + ' ya fue asignada a este Rol.', '', {
+                  this.toastr.info('Se indica que ' + obj.nombre + 'con accion ' + this.MetodoParaMostrarAccion(accion.id) + ' ya fue asignada a este Rol.', '', {
                     timeOut: 7000,
                   })
 
@@ -1017,7 +1020,9 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                       timeOut: 6000,
                     });
 
-                    // (<HTMLInputElement>document.getElementById('seleccionarmodulo')).checked = false;
+
+                    (<HTMLInputElement>document.getElementById('seleccionarmodulo' + obj.nombre_modulo)).checked = false;
+
                     this.nombreModulos.map(modulo => {
                       this.paginasSeleccionadasModulos[modulo] = [];
 
@@ -1049,9 +1054,12 @@ export class SeleccionarRolPermisoComponent implements OnInit {
             });
           } else {
 
+
             this.toastr.warning('No ha seleccionado ACCIONES.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
+            this.ObtenerMenuModulos();
+
 
           }
         } else {
@@ -1071,28 +1079,43 @@ export class SeleccionarRolPermisoComponent implements OnInit {
             id_accion: null
           }
 
-
-
-
-
           this.paginasRol = [];
           this.rest.BuscarIdPaginas(buscarPagina).subscribe(datos => {
             this.contador = this.contador + 1;
             this.paginasRol = datos;
             this.habilitarprogress = false;
 
-            //(<HTMLInputElement>document.getElementById('seleccionarmodulo')).checked = false;
 
 
 
-            // delete this.paginasSeleccionadasModulos[x];
+            this.nombreModulos.map(modulo => {
+              this.paginasSeleccionadasModulos[modulo] = [];
+
+
+
+              for (var i = 0; i <= this.paginasSeleccionadasModulos[modulo].length - 1; i++) {
+                (<HTMLInputElement>document.getElementById('paginasSeleccionadasModulos' + i + modulo)).checked = false;
+              }
+
+            })
+            delete this.nombresAccionesPorPagina[obj.id];
+            delete this.accionesSeleccionadasPorPagina[obj.id];
+            this.paginasSeleccionadasM = [];
+
+
+
             this.rest.BuscarPaginasRol(rol).subscribe(datos => {
               this.paginas = datos;
             })
+            this.ObtenerMenuModulos();
+
 
             this.toastr.info('Se indica que ' + obj.nombre + ' ya fue asignada a este Rol.', '', {
               timeOut: 7000,
             })
+
+
+
 
 
           }, error => {
@@ -1106,7 +1129,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
 
 
-              (<HTMLInputElement>document.getElementById('seleccionarmodulo'+ obj.nombre_modulo)).checked = false;
+              (<HTMLInputElement>document.getElementById('seleccionarmodulo' + obj.nombre_modulo)).checked = false;
 
               this.nombreModulos.map(modulo => {
                 this.paginasSeleccionadasModulos[modulo] = [];
