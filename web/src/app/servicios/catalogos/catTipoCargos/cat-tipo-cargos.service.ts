@@ -15,7 +15,12 @@ export class CatTipoCargosService {
   listaCargos(){
     return this.http.get<any>(environment.url + '/tipoCargos');
   }
-
+  
+  CrearCargo(cargo: any){
+    console.log('cargo: ',cargo)
+    return this.http.post(`${environment.url}/tipoCargos/crearCargo`, cargo)
+    .pipe(catchError(cargo));
+  }
 
   ActualizarCargo(datos: any) {
     return this.http.put(`${environment.url}/tipoCargos`, datos)

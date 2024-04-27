@@ -32,7 +32,7 @@ class TiposCargosRutas {
 
     configuracion(): void {
         this.router.get('/', TokenValidation, TIPOCARGOS_CONTROLADOR.listaTipoCargos);
-        this.router.post('/:cargo', TokenValidation, TIPOCARGOS_CONTROLADOR.CrearCargo);
+        this.router.post('/crearCargo', TokenValidation, TIPOCARGOS_CONTROLADOR.CrearCargo);
         this.router.put('/', TokenValidation, TIPOCARGOS_CONTROLADOR.EditarCargo);
         this.router.delete('/eliminar/:id', TokenValidation, TIPOCARGOS_CONTROLADOR.eliminarRegistro);
         this.router.post('/upload/revision', [TokenValidation, upload.single('uploads')], TIPOCARGOS_CONTROLADOR.VerfificarPlantillaTipoCargos);

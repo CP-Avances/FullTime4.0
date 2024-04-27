@@ -8,6 +8,8 @@ import { PageEvent } from '@angular/material/paginator';
 import { CatModalidadLaboralService } from 'src/app/servicios/catalogos/catModalidadLaboral/cat-modalidad-laboral.service';
 import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 import { ThemePalette } from '@angular/material/core';
+import { RegistroModalidadComponent } from './registroModalidad/registro-modalidad/registro-modalidad.component';
+import { EditarModalidadComponent } from './editarModalidad/editar-modalidad/editar-modalidad.component';
 
 @Component({
   selector: 'app-cat-modalida-laboral',
@@ -67,38 +69,44 @@ export class CatModalidaLaboralComponent implements OnInit{
     this.messajeExcel = '';
   }
 
-  AbrirVentanaRegistrarModalidad(){
-    this._ModalidaLaboral.CrearModalidadLaboral('Dependiente').subscribe(res => {
-      
-    })
+  AbrirVentanaRegistrarModalidad(): void{
+    this.ventana.open(RegistroModalidadComponent, { width: '500px' })
+      .afterClosed().subscribe(items => {
+        this.ngOnInit();
+      });
   }
 
-  AbrirEditar(item_modalidad: any){
-    console.log('item_modalidad: ',item_modalidad);
-    this._ModalidaLaboral.ActualizarModalidadLab(item_modalidad).subscribe(res => {
-      if (res.message === 'error') {
-        this.toastr.error(
-          'No se pudo actualizar la informacion.',
-          'Error actualizacón', {
-          timeOut: 6000,
-        })
-      }
-      else {
-        this.toastr.success('Operación exitosa.', 'Registro actualizado.', {
-          timeOut: 6000,
-        })
-      }
-    })
+  // METODO PARA EDITAR MODALIDAD LABORAL
+  AbrirEditar(item_modalidad: any): void {
+    this.ventana.open(EditarModalidadComponent, { width: '450px', data: item_modalidad })
+      .afterClosed().subscribe(items => {
+        this.ngOnInit();
+      });
   }
 
-  ConfirmarDelete(id: any){
+  ConfirmarDelete(modalidad: any){
     const mensaje = 'eliminar';
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this._ModalidaLaboral.eliminar(id).subscribe(res => {
+          this._ModalidaLaboral.eliminar(modalidad.id).subscribe(res => {
             console.log('res eliminado: ',res);
+            this.toastr.error(modalidad.descripcion+' se elimino', res.message, {
+              timeOut: 4000,
+            });
             this.ngOnInit();
+          }, error => {
+            console.log('error: ',error);
+            if(error.error.code == "23503"){
+              this.toastr.error(modalidad.descripcion+" todavía es referida desde la tabla «empl_contratos».",'Error al eliminar dato', {
+                timeOut: 4000,
+              });
+            }else{
+              this.toastr.error(error.error.message,'Error al eliminar dato', {
+                timeOut: 4000,
+              });
+            }
+            
           })
         }
       });

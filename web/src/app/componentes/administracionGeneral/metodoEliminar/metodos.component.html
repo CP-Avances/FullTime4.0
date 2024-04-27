@@ -49,6 +49,20 @@
 
 
 
+<!-- Componentes del notificacion de registro multiple -->
+<ng-container *ngIf="mensaje == 'eliminar'">
+    <div id="resultados" >
+        <span cdkDrag cdkDragRootElement=".cdk-overlay-pane" id="mover">
+            ELIMINAR REGISTRO
+        </span>
+    </div>
+    <mat-card-content *ngIf="eliminar">
+        <div style="padding: 2%;">
+            <p id="mensaje">¿ESTA SEGURO DE ELIMINAR EL REGITRO SELECIONADO?</p>
+        </div>
+    </mat-card-content>
+</ng-container>
+
 <div style="text-align: center; margin-bottom: 3%;">
     <button mat-raised-button id="aceptar" class="btn-sm" color="primary" (click)="Confirmar()">
         Aceptar

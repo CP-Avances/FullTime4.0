@@ -41,32 +41,53 @@ class ModalidaLaboralControlador {
     CrearMadalidadLaboral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const modalidad = req.body;
-                console.log('modalidad: ', modalidad);
-                //await pool.query(
-                //`
-                //INSERT INTO modal_trabajo (descripcion) VALUES ($1)
-                //`
-                //, [modalidad]);
-                res.jsonp({ message: 'Registro guardado.' });
+                const { modalidad } = req.body;
+                var VERIFICAR_MODALIDAD = yield database_1.default.query('SELECT * FROM modal_trabajo WHERE UPPER(descripcion) = $1', [modalidad.toUpperCase()]);
+                console.log('VERIFICAR_MODALIDAD: ', VERIFICAR_MODALIDAD.rows[0]);
+                if (VERIFICAR_MODALIDAD.rows[0] == undefined || VERIFICAR_MODALIDAD.rows[0] == '') {
+                    // Dar formato a la palabra de modalidad
+                    const modali = modalidad.charAt(0).toUpperCase() + modalidad.slice(1).toLowerCase();
+                    const response = yield database_1.default.query(`
+                        INSERT INTO modal_trabajo (descripcion) VALUES ($1) RETURNING *
+                    `, [modali]);
+                    const [modalidadLaboral] = response.rows;
+                    if (modalidadLaboral) {
+                        return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' });
+                    }
+                    else {
+                        return res.status(404).jsonp({ message: 'No se pudo guardar', status: '400' });
+                    }
+                }
+                else {
+                    return res.jsonp({ message: 'Ya existe la modalidad laboral', status: '300' });
+                }
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                return res.status(500).jsonp({ message: 'error', status: '500' });
             }
         });
     }
     EditarModalidadLaboral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { id, descripcion } = req.body;
-                yield database_1.default.query(`
+                const { id, modalidad } = req.body;
+                console.log('id: ', id, 'descripcion: ', modalidad);
+                // Dar formato a la palabra de modalidad
+                const modali = modalidad.charAt(0).toUpperCase() + modalidad.slice(1).toLowerCase();
+                const response = yield database_1.default.query(`
                 UPDATE modal_trabajo SET descripcion = $2
-                WHERE id = $1
-                `, [id, descripcion]);
-                res.jsonp({ message: 'Registro actualizado.' });
+                WHERE id = $1 RETURNING *
+                `, [id, modali]);
+                const [modalidadLaboral] = response.rows;
+                if (modalidadLaboral) {
+                    return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' });
+                }
+                else {
+                    return res.status(404).jsonp({ message: 'No se pudo actualizar', status: '400' });
+                }
             }
             catch (error) {
-                return res.jsonp({ message: 'error' });
+                return res.status(500).jsonp({ message: 'error', status: '500' });
             }
         });
     }
@@ -74,13 +95,15 @@ class ModalidaLaboralControlador {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = req.params.id;
+                console.log('id: ', id);
                 yield database_1.default.query(`
                 DELETE FROM modal_trabajo WHERE id = $1
             `, [id]);
-                res.jsonp({ message: 'Registro eliminado.' });
+                res.jsonp({ message: 'Registro eliminado.', code: '200' });
             }
             catch (error) {
-                return res.status(500).jsonp({ message: error });
+                console.log('error: ', error.code);
+                return res.status(500).jsonp({ message: error.detail, code: error.code });
             }
         });
     }
