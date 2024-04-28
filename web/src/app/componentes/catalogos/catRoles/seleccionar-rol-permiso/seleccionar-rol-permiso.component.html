@@ -208,10 +208,11 @@
 
                             <div class="d-flex flex-wrap justify-content-start">
                                 <div class="modal-body" style="margin-left: 60px; padding-top: 15px;">
-                                    <div class="container-fluid"  *ngFor="let modulo of nombreModulos; index as j">
+                                    <div class="container-fluid" *ngFor="let modulo of nombreModulos; index as j">
                                         <div class="row" *ngIf="diccionarioFuncionesActivas[modulo]">
 
-                                            <input class="form-check-input" type="checkbox" id="seleccionarmodulo{{modulo}}"
+                                            <input class="form-check-input" type="checkbox"
+                                                id="seleccionarmodulo{{modulo}}"
                                                 (change)="SeleccionarTodasModulos($event, modulo)">
                                             <label class="form-check-label" for="inlineCheckbox1"
                                                 style="margin-left: 10px; font-size: 14px; color: blue; font-weight: bold;">
@@ -219,8 +220,7 @@
                                             </label>
                                             <div class="col-md-6 col-lg-6 col-6"
                                                 style="text-align:left; padding-bottom: 10px;"
-                                                *ngFor="let n of paginasModulos[modulo]; index as i"
-                                                id="verticalLine">
+                                                *ngFor="let n of paginasModulos[modulo]; index as i" id="verticalLine">
                                                 <input class="form-check-input" type="checkbox"
                                                     name="paginasSeleccionadasModulos"
                                                     id="paginasSeleccionadasModulos{{i}}{{modulo}}"
@@ -279,7 +279,7 @@
 
                                         </div>
 
-                                        
+
                                     </div>
                                 </div>
                             </div>
