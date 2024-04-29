@@ -152,7 +152,7 @@ class DocumentosControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
+            return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
         }
     }
 
@@ -196,7 +196,7 @@ class DocumentosControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            res.status(404).jsonp({ message: 'Error al guardar el registro.' });
+            res.status(500).jsonp({ message: 'Error al guardar el registro.' });
         }
     }
 

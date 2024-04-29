@@ -370,7 +370,7 @@ class PlanificacionHorariaControlador {
         return res.status(200).jsonp({ message: 'correcto' })
         
        } catch (error) {
-        return res.status(400).jsonp({ message: error });
+        return res.status(500).jsonp({ message: error });
         
        }
 

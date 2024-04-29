@@ -105,7 +105,7 @@ class RegimenControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query("ROLLBACK");
-      return res.jsonp({ message: "error" });
+      return res.status(500).jsonp({ message: "error" });
     }
   }
 
@@ -237,7 +237,7 @@ class RegimenControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query("ROLLBACK");
-      return res.jsonp({ message: "error" });
+      return res.status(500).jsonp({ message: "error" });
     }
   }
 
@@ -361,7 +361,7 @@ class RegimenControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query("ROLLBACK");
-      return res.status(404).jsonp({ message: error });
+      return res.status(500).jsonp({ message: error });
     }
   }
 
@@ -409,7 +409,7 @@ class RegimenControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query("ROLLBACK");
-      return res.jsonp({ message: "error" });
+      return res.status(500).jsonp({ message: "error" });
     }
   }
 
@@ -472,7 +472,7 @@ class RegimenControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.jsonp({ message: "error" });
+      return res.status(500).jsonp({ message: 'error' });
       
     }
   }
@@ -550,7 +550,7 @@ class RegimenControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query("ROLLBACK");
-      return res.status(404).jsonp({ message: error });
+      return res.status(500).jsonp({ message: error });
     }
   }
 
@@ -598,7 +598,7 @@ class RegimenControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query("ROLLBACK");
-      return res.jsonp({ message: "error" });
+      return res.status(500).jsonp({ message: "error" });
     }
   }
 
@@ -663,7 +663,7 @@ class RegimenControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query("ROLLBACK");
-      return res.jsonp({ message: "error" });
+      return res.status(500).jsonp({ message: "error" });
     }
   }
 
@@ -746,7 +746,7 @@ class RegimenControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query("ROLLBACK");
-      return res.status(404).jsonp({ message: error });
+      return res.status(500).jsonp({ message: error });
     }
   }
 

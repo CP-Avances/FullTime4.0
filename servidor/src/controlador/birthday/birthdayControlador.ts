@@ -62,7 +62,7 @@ class BirthdayControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ text: 'Error al guardar el registro.' });
+            return res.status(500).jsonp({ text: 'Error al guardar el registro.' });
         }
     }
 
@@ -144,7 +144,7 @@ class BirthdayControlador {
             return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
             
         } catch (error) {
-            return res.status(404).jsonp({ message: 'Error al actualizar la imagen.' });
+            return res.status(500).jsonp({ message: 'Error al actualizar la imagen.' });
             
         }    
         
@@ -214,7 +214,7 @@ class BirthdayControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'Error al actualizar el mensaje de cumpleaños.' });
+            return res.status(500).jsonp({ message: 'Error al actualizar el mensaje de cumpleaños.' });
             
         }
     }

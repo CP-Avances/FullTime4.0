@@ -71,7 +71,7 @@ class PeriodoVacacionControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query("ROLLBACK");
-      res.status(404).jsonp({ message: "Error al guardar período de vacación." });
+      res.status(500).jsonp({ message: "Error al guardar período de vacación." });
     }
   }
 
@@ -143,7 +143,7 @@ class PeriodoVacacionControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query("ROLLBACK");
-      return res.status(404).jsonp({ message: "Error al actualizar período de vacaciones." });
+      return res.status(500).jsonp({ message: "Error al actualizar período de vacaciones." });
     }
   }
 
@@ -371,7 +371,7 @@ class PeriodoVacacionControlador {
       } catch (error) {
         // REVERTIR TRANSACCION
         await pool.query("ROLLBACK");
-        return res.status(404).jsonp({ message: "Error al guardar período de vacaciones." });
+        return res.status(500).jsonp({ message: "Error al guardar período de vacaciones." });
       }
     });
 

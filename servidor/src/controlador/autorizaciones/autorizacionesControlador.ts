@@ -87,7 +87,7 @@ class AutorizacionesControlador {
         } catch (error) {
             // CANCELAR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ text: 'error' });
+            return res.status(500).jsonp({ text: 'error' });
         }
     }
 
@@ -139,7 +139,7 @@ class AutorizacionesControlador {
         } catch (error) {
             // CANCELAR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ text: 'error' });
+            return res.status(500).jsonp({ text: 'error' });
         }
     }
 
@@ -285,7 +285,7 @@ class AutorizacionesControlador {
             } catch (error) {
                 // CANCELAR TRANSACCION
                 await pool.query('ROLLBACK');
-                return res.status(404).jsonp({ text: 'error' });
+                return res.status(500).jsonp({ text: 'error' });
             }
         }
         else {
@@ -351,7 +351,7 @@ class AutorizacionesControlador {
         } catch (error) {
             // CANCELAR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ text: 'error' });
+            return res.status(500).jsonp({ text: 'error' });
             
         }
     }

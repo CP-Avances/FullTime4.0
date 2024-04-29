@@ -36,7 +36,7 @@ class EmpleadoProcesoControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      res.status(404).jsonp({ message: 'Error al guardar procesos del empleado.' });
+      res.status(500).jsonp({ message: 'Error al guardar procesos del empleado.' });
     }
   }
 
@@ -91,7 +91,7 @@ class EmpleadoProcesoControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(404).jsonp({ message: 'Error al actualizar proceso.' });
+      return res.status(500).jsonp({ message: 'Error al actualizar proceso.' });
     }
   }
 
@@ -175,7 +175,7 @@ class EmpleadoProcesoControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(404).jsonp({ message: 'Error al eliminar registro.' });
+      return res.status(500).jsonp({ message: 'Error al eliminar registro.' });
     }
   }
 

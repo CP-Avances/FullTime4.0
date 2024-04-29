@@ -37,7 +37,9 @@ class DepartamentoControlador {
       return res.jsonp({ message: 'Registro guardado.' });
     }
     catch (error) {
-      return res.status(404).jsonp({ message: 'error' });
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
@@ -96,7 +98,7 @@ class DepartamentoControlador {
     catch (error) {
       // REVERTIR TRANSACCIÓN
       await pool.query('ROLLBACK');
-      return res.jsonp({ message: 'error' });
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
@@ -297,7 +299,7 @@ class DepartamentoControlador {
     } catch (error) {
       // REVERTIR TRANSACCIÓN
       await pool.query('ROLLBACK');
-      return res.jsonp({ message: 'error' });
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
@@ -337,7 +339,7 @@ class DepartamentoControlador {
     catch (error) {
       // REVERTIR TRANSACCIÓN
       await pool.query('ROLLBACK');
-      return res.jsonp({ message: 'error' });
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
@@ -414,7 +416,7 @@ class DepartamentoControlador {
     catch (error) {
       // REVERTIR TRANSACCIÓN
       await pool.query('ROLLBACK');
-      return res.jsonp({ message: 'error' });
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
@@ -470,8 +472,7 @@ class DepartamentoControlador {
     } catch (error) {
       // REVERTIR TRANSACCIÓN
       await pool.query('ROLLBACK');
-      return res.jsonp({ message: 'error' });
-      
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
@@ -547,7 +548,7 @@ class DepartamentoControlador {
     catch (error) {
       // REVERTIR TRANSACCIÓN
       await pool.query('ROLLBACK');
-      return res.jsonp({ message: 'error' });
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 

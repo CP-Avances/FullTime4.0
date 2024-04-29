@@ -47,7 +47,7 @@ class RolPermisosControlador {
     } catch (error) {
       // FINALIZAR TRANSACCION
       await pool.query('ROLLBACK');
-      res.status(404).jsonp({ message: 'Error al guardar el rol permiso.' });
+      res.status(500).jsonp({ message: 'Error al guardar el rol permiso.' });
     }
   }
 
@@ -77,7 +77,7 @@ class RolPermisosControlador {
     } catch (error) {
       // FINALIZAR TRANSACCION
       await pool.query('ROLLBACK');
-      res.status(404).jsonp({ message: 'Error al guardar el permiso denegado.' });
+      res.status(500).jsonp({ message: 'Error al guardar el permiso denegado.' });
     }
   }
 

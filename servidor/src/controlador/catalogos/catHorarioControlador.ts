@@ -50,7 +50,7 @@ class HorarioControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(400).jsonp({ message: error });
+      return res.status(500).jsonp({ message: error });
     }
   }
 
@@ -77,85 +77,91 @@ class HorarioControlador {
   // GUARDAR DOCUMENTO DE HORARIO
   public async GuardarDocumentoHorario(req: Request, res: Response): Promise<Response> {
 
-    let id = req.params.id;
-    let { archivo, codigo } = req.params;
-
-    // TODO ANALIZAR COMO OBTENER DESDE EL FRONT EL USERNAME Y LA IP
-    const { user_name, ip } = req.body;
-
-    // FECHA DEL SISTEMA
-    var fecha = moment();
-    var anio = fecha.format('YYYY');
-    var mes = fecha.format('MM');
-    var dia = fecha.format('DD');
-    // LEER DATOS DE IMAGEN
-    let documento = id + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
-    let separador = path.sep;
-
-    // INICIAR TRANSACCION
-    await pool.query('BEGIN');
-
-    // CONSULTAR DATOSORIGINALES
-
-    const horario = await pool.query(
-      `
-      SELECT * FROM cg_horarios WHERE id = $1
-      `
-      , [id]);
-    const [datosOriginales] = horario.rows;
-
-    if (!datosOriginales) {
+    try {
+      let id = req.params.id;
+      let { archivo, codigo } = req.params;
+  
+      // TODO ANALIZAR COMO OBTENER DESDE EL FRONT EL USERNAME Y LA IP
+      const { user_name, ip } = req.body;
+  
+      // FECHA DEL SISTEMA
+      var fecha = moment();
+      var anio = fecha.format('YYYY');
+      var mes = fecha.format('MM');
+      var dia = fecha.format('DD');
+      // LEER DATOS DE IMAGEN
+      let documento = id + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
+      let separador = path.sep;
+  
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+  
+      // CONSULTAR DATOSORIGINALES
+  
+      const horario = await pool.query(
+        `
+        SELECT * FROM cg_horarios WHERE id = $1
+        `
+        , [id]);
+      const [datosOriginales] = horario.rows;
+  
+      if (!datosOriginales) {
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'cg_horarios',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar el horario con id: ${id}`
+        });
+  
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'error' });
+      }
+  
+      await pool.query(
+        `
+        UPDATE cg_horarios SET documento = $2 WHERE id = $1
+        `
+        , [id, documento]);
+      
       // AUDITORIA
       await AUDITORIA_CONTROLADOR.InsertarAuditoria({
         tabla: 'cg_horarios',
         usuario: user_name,
         accion: 'U',
-        datosOriginales: '',
-        datosNuevos: '',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: JSON.stringify({ documento }),
         ip,
-        observacion: `Error al actualizar el horario con id: ${id}`
+        observacion: null
       });
-
+  
       // FINALIZAR TRANSACCION
       await pool.query('COMMIT');
-      return res.status(404).jsonp({ message: 'error' });
-    }
-
-    await pool.query(
-      `
-      UPDATE cg_horarios SET documento = $2 WHERE id = $1
-      `
-      , [id, documento]);
-    
-    // AUDITORIA
-    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
-      tabla: 'cg_horarios',
-      usuario: user_name,
-      accion: 'U',
-      datosOriginales: JSON.stringify(datosOriginales),
-      datosNuevos: JSON.stringify({ documento }),
-      ip,
-      observacion: null
-    });
-
-    // FINALIZAR TRANSACCION
-    await pool.query('COMMIT');
-
-    if (archivo != 'null' && archivo != '' && archivo != null) {
-      if (archivo != documento) {
-        let ruta = ObtenerRutaHorarios() + separador + archivo;
-        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-        fs.access(ruta, fs.constants.F_OK, (err) => {
-          if (err) {
-          } else {
-            // ELIMINAR DEL SERVIDOR
-            fs.unlinkSync(ruta);
-          }
-        });
+  
+      if (archivo != 'null' && archivo != '' && archivo != null) {
+        if (archivo != documento) {
+          let ruta = ObtenerRutaHorarios() + separador + archivo;
+          // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+          fs.access(ruta, fs.constants.F_OK, (err) => {
+            if (err) {
+            } else {
+              // ELIMINAR DEL SERVIDOR
+              fs.unlinkSync(ruta);
+            }
+          });
+        }
       }
+  
+      return res.jsonp({ message: 'Documento actualizado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: error });
     }
-
-    return res.jsonp({ message: 'Documento actualizado.' });
   }
 
   // METODO PARA ACTUALIZAR DATOS DE HORARIO
@@ -221,7 +227,7 @@ class HorarioControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(400).jsonp({ message: error });
+      return res.status(500).jsonp({ message: error });
     }
   }
 
@@ -294,7 +300,7 @@ class HorarioControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(400).jsonp({ message: error }); 
+      return res.status(500).jsonp({ message: error }); 
     }
   }
 
@@ -348,7 +354,7 @@ class HorarioControlador {
 
       return res.status(404).jsonp({ message: 'No existe horario. Continua.' })
     } catch (error) {
-      return res.status(400).jsonp({ message: error });
+      return res.status(500).jsonp({ message: error });
     }
   }
 
@@ -410,7 +416,7 @@ class HorarioControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(400).jsonp({ message: error });
+      return res.status(500).jsonp({ message: error });
     }
   }
 
@@ -491,7 +497,7 @@ class HorarioControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(400).jsonp({ message: error });
+      return res.status(500).jsonp({ message: error });
     }
   }
 
@@ -685,10 +691,10 @@ class HorarioControlador {
       if (horariosCargados && detallesCargados) {
         return res.status(200).jsonp({ message: 'correcto' })
       } else {
-        return res.status(400).jsonp({ message: 'error' })
+        return res.status(500).jsonp({ message: 'error' })
       }
     } catch (error) {
-      return res.status(400).jsonp({ message: error });
+      return res.status(500).jsonp({ message: error });
     }
   }
 

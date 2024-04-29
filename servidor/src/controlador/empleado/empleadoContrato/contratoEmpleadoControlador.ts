@@ -54,7 +54,7 @@ class ContratoEmpleadoControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'Error al guardar el registro.' });
+            return res.status(500).jsonp({ message: 'Error al guardar el registro.' });
         }
     }
 
@@ -130,7 +130,7 @@ class ContratoEmpleadoControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'Error al guardar el documento.' });
+            return res.status(500).jsonp({ message: 'Error al guardar el documento.' });
         }
     }
 
@@ -224,7 +224,7 @@ class ContratoEmpleadoControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
+            return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
         }
     }
 
@@ -296,7 +296,7 @@ class ContratoEmpleadoControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'Error al eliminar el documento.' });
+            return res.status(500).jsonp({ message: 'Error al eliminar el documento.' });
         }
     }
 
@@ -435,7 +435,7 @@ class ContratoEmpleadoControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'Error al guardar el registro.' });
+            return res.status(500).jsonp({ message: 'Error al guardar el registro.' });
         }
 
     }

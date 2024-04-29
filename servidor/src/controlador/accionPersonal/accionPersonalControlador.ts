@@ -52,11 +52,11 @@ class AccionPersonalControlador {
             }
             else {
                 await pool.query('ROLLBACK');
-                return res.status(404).jsonp({ message: 'error' })
+                return res.status(500).jsonp({ message: 'error' })
             }
         } catch (error) {
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'error' })
+            return res.status(500).jsonp({ message: 'error' })
         }
     }
 
@@ -98,11 +98,11 @@ class AccionPersonalControlador {
             }
             else {
                 await pool.query('ROLLBACK');
-                return res.status(404).jsonp({ message: 'error' })
+                return res.status(500).jsonp({ message: 'error' })
             }
         } catch (error) {
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'error' })
+            return res.status(500).jsonp({ message: 'error' })
         }
     }
 
@@ -155,7 +155,7 @@ class AccionPersonalControlador {
             return res.jsonp({ message: 'Registro guardado' });
         } catch (error) {
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'error' });
+            return res.status(500).jsonp({ message: 'error' });
         }
     }
 
@@ -217,7 +217,7 @@ class AccionPersonalControlador {
             return res.jsonp({ message: 'Registro guardado' });
         } catch (error) {
             await pool.query('ROLLBACK'); 
-            return res.status(404).jsonp({ message: 'error' });
+            return res.status(500).jsonp({ message: 'error' });
         }
     }
 
@@ -329,7 +329,7 @@ class AccionPersonalControlador {
             return res.status(200).jsonp({ message: 'Registro actualizado' });
         } catch (error) {
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'error' });
+            return res.status(500).jsonp({ message: 'error' });
         }
     }
 
@@ -378,7 +378,7 @@ class AccionPersonalControlador {
             return res.status(200).jsonp({ message: 'Registro eliminado' });
         } catch (error) {
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'error' });
+            return res.status(500).jsonp({ message: 'error' });
             
         }
     }
@@ -437,7 +437,7 @@ class AccionPersonalControlador {
             return res.jsonp({ message: 'Registro realizado con éxito' });
         } catch (error) {
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'error' }); 
+            return res.status(500).jsonp({ message: 'error' }); 
         }
     }
 
@@ -514,7 +514,7 @@ class AccionPersonalControlador {
             return res.jsonp({ message: 'Registro actualizado' });
         } catch (error) {
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'error' });
+            return res.status(500).jsonp({ message: 'error' });
             
         }
     }

@@ -63,7 +63,7 @@ class EmpleadoControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      res.status(404).jsonp({ message: 'Error al guardar código.' });
+      res.status(500).jsonp({ message: 'Error al guardar código.' });
     }
   }
 
@@ -138,7 +138,7 @@ class EmpleadoControlador {
     } catch (error) {
       //REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(404).jsonp({ message: 'Error al actualizar código.' });
+      return res.status(500).jsonp({ message: 'Error al actualizar código.' });
     }
   }
 
@@ -193,7 +193,7 @@ class EmpleadoControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(404).jsonp({ message: 'Error al actualizar código.' });
+      return res.status(500).jsonp({ message: 'Error al actualizar código.' });
     }
   }
 
@@ -303,7 +303,7 @@ class EmpleadoControlador {
     catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.jsonp({ message: 'error' });
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
@@ -469,7 +469,7 @@ class EmpleadoControlador {
     catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.jsonp({ message: 'error' });
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
@@ -886,7 +886,7 @@ class EmpleadoControlador {
       } catch (error) {
         // REVERTIR TRANSACCION
         await pool.query('ROLLBACK');
-        res.status(404).jsonp({ message: 'Error al actualizar imagen de empleado.' });
+        res.status(500).jsonp({ message: 'Error al actualizar imagen de empleado.' });
       }
     });
 
@@ -948,7 +948,7 @@ class EmpleadoControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(400).jsonp({ message: error });
+      return res.status(500).jsonp({ message: error });
     }
   }
 
@@ -1006,7 +1006,7 @@ class EmpleadoControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      res.status(400).jsonp({ message: 'error' });
+      res.status(500).jsonp({ message: 'error' });
     }
   }
 
@@ -1062,7 +1062,7 @@ class EmpleadoControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(400).jsonp({ message: 'error' });
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
@@ -1119,7 +1119,7 @@ class EmpleadoControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(400).jsonp({ message: 'error' });
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
@@ -1241,7 +1241,7 @@ class EmpleadoControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      res.status(400).jsonp({ message: error });
+      res.status(500).jsonp({ message: error });
     }
   }
 
@@ -1297,7 +1297,7 @@ class EmpleadoControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(400).jsonp({ message: error });
+      return res.status(500).jsonp({ message: error });
     }
   }
 
@@ -1354,7 +1354,7 @@ class EmpleadoControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(400).jsonp({ message: error });
+      return res.status(500).jsonp({ message: error });
     }
   }
 
@@ -1411,7 +1411,7 @@ class EmpleadoControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(400).jsonp({ message: error });
+      return res.status(500).jsonp({ message: error });
     }
   }
 
@@ -2042,7 +2042,7 @@ class EmpleadoControlador {
       } catch (error) {
         // REVERTIR TRANSACCION
         await pool.query('ROLLBACK');
-        return res.status(400).jsonp({ message: error });
+        return res.status(500).jsonp({ message: error });
       }
     });
 
@@ -2752,7 +2752,7 @@ class EmpleadoControlador {
       } catch (error) {
         // REVERTIR TRANSACCION
         await pool.query('ROLLBACK');
-        return res.status(400).jsonp({ message: error });
+        return res.status(500).jsonp({ message: error });
       }
     });
   }

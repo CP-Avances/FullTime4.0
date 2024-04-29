@@ -54,7 +54,7 @@ class DiscapacidadControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      res.status(404).jsonp({ message: 'Error al guardar discapacidad.' });
+      res.status(500).jsonp({ message: 'Error al guardar discapacidad.' });
     }
   }
 
@@ -108,7 +108,7 @@ class DiscapacidadControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(404).jsonp({ message: 'Error al actualizar registro.' });
+      return res.status(500).jsonp({ message: 'Error al actualizar registro.' });
     }
   }
 
@@ -161,7 +161,7 @@ class DiscapacidadControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(404).jsonp({ message: 'Error al eliminar registro.' });
+      return res.status(500).jsonp({ message: 'Error al eliminar registro.' });
     }
   }
 
@@ -209,7 +209,7 @@ class DiscapacidadControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(404).jsonp({ message: 'Error al guardar registro.' });      
+      return res.status(500).jsonp({ message: 'Error al guardar registro.' });      
     }
   }
 
@@ -298,7 +298,7 @@ class DiscapacidadControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(404).jsonp({ message: 'Error al actualizar registro.' });
+      return res.status(500).jsonp({ message: 'Error al actualizar registro.' });
     }
   }
 

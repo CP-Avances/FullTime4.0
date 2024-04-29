@@ -49,7 +49,7 @@ class ProcesoControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      res.status(404).jsonp({ message: 'Error al guardar el departamento' });
+      res.status(500).jsonp({ message: 'Error al guardar el departamento' });
     }
   }
 
@@ -109,14 +109,61 @@ class ProcesoControlador {
     } catch (error) {
       // REVERTIR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(404).jsonp({ message: error });
+      return res.status(500).jsonp({ message: error });
     }
   }
 
-  public async EliminarProceso(req: Request, res: Response): Promise<void> {
-    const id = req.params.id;
-    await pool.query('DELETE FROM cg_procesos WHERE id = $1', [id]);
-    res.jsonp({ message: 'Registro eliminado.' });
+  public async EliminarProceso(req: Request, res: Response): Promise<Response> {
+    try {
+      const id = req.params.id;
+      // TODO ANALIZAR COMOOBTNER USER_NAME E IP DESDE EL FRONT
+      const { user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const proceso = await pool.query('SELECT * FROM cg_procesos WHERE id = $1', [id]);
+      const [datosOriginales] = proceso.rows;
+
+      if (!datosOriginales) {
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'cg_procesos',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip: ip,
+          observacion: `Error al eliminar el registro con id: ${id}.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
+      await pool.query('DELETE FROM cg_procesos WHERE id = $1', [id]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'cg_procesos',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: '',
+        ip: ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro eliminado.' })
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: error });
+    };
   }
 
 

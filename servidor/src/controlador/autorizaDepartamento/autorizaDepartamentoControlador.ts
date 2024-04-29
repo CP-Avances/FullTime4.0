@@ -86,7 +86,7 @@ class AutorizaDepartamentoControlador {
         } catch (error) {
             // CANCELAR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'Error al guardar registro.' }); 
+            return res.status(500).jsonp({ message: 'Error al guardar registro.' }); 
         }
     }
 
@@ -140,7 +140,7 @@ class AutorizaDepartamentoControlador {
         } catch (error) {
             // CANCELAR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'Error al actualizar registro.' });
+            return res.status(500).jsonp({ message: 'Error al actualizar registro.' });
         }
     }
 
@@ -196,7 +196,7 @@ class AutorizaDepartamentoControlador {
         } catch (error) {
             // CANCELAR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'Error al eliminar registro.' });
+            return res.status(500).jsonp({ message: 'Error al eliminar registro.' });
         }
     }
 

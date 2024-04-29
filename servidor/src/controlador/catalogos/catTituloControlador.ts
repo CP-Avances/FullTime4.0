@@ -75,7 +75,7 @@ class TituloControlador {
     } catch (error) {
       // FINALIZAR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(404).jsonp({ message: 'Error al eliminar el registro.' });
+      return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
     }
   }
 
@@ -131,7 +131,7 @@ class TituloControlador {
     } catch (error) {
       // FINALIZAR TRANSACCION
       await pool.query('ROLLBACK');
-      return res.status(404).jsonp({ message: 'Error al actualizar el registro.' });
+      return res.status(500).jsonp({ message: 'Error al actualizar el registro.' });
     }
   }
 
@@ -170,7 +170,7 @@ class TituloControlador {
     } catch (error) {
       // FINALIZAR TRANSACCION
       await pool.query('ROLLBACK');
-      res.status(404).jsonp({ message: 'Error al guardar el título.' });
+      res.status(500).jsonp({ message: 'Error al guardar el título.' });
     }
   }
 

@@ -84,7 +84,7 @@ class VacunasControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'Error al guardar registro.' });
+            return res.status(500).jsonp({ message: 'Error al guardar registro.' });
         }
     }
 
@@ -160,7 +160,7 @@ class VacunasControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'Error al guardar registro.' });
+            return res.status(500).jsonp({ message: 'Error al guardar registro.' });
         }
     }
 
@@ -217,7 +217,7 @@ class VacunasControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'Error al actualizar registro.' });
+            return res.status(500).jsonp({ message: 'Error al actualizar registro.' });
         }
     }
 
@@ -307,7 +307,7 @@ class VacunasControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'Error al eliminar documento.' });
+            return res.status(500).jsonp({ message: 'Error al eliminar documento.' });
         }
     }
 
@@ -379,7 +379,7 @@ class VacunasControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'Error al eliminar registro.' });  
+            return res.status(500).jsonp({ message: 'Error al eliminar registro.' });  
         }
     }
 
@@ -387,6 +387,9 @@ class VacunasControlador {
     public async CrearTipoVacuna(req: Request, res: Response): Promise<Response> {
         try {
             const { nombre, user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
 
             const response: QueryResult = await pool.query(
                 `
@@ -420,7 +423,7 @@ class VacunasControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.jsonp({ message: 'error' });
+            return res.status(500).jsonp({ message: 'Error al guardar registro.' });
         }
     }
 

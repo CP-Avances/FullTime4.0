@@ -49,7 +49,7 @@ class UbicacionControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'error' });
+            return res.status(500).jsonp({ message: 'error' });
         }
     }
 
@@ -102,7 +102,7 @@ class UbicacionControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'Error al guardar registro.' });
+            return res.status(500).jsonp({ message: 'Error al guardar registro.' });
         }
     }
 
@@ -202,7 +202,7 @@ class UbicacionControlador {
         catch {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.jsonp({ message: 'false' });
+            return res.status(500).jsonp({ message: 'false' });
         }
     }
 
@@ -258,7 +258,7 @@ class UbicacionControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            res.status(404).jsonp({ message: 'Error al guardar registro.' });
+            res.status(500).jsonp({ message: 'Error al guardar registro.' });
         }
     }
 
@@ -327,7 +327,7 @@ class UbicacionControlador {
         } catch (error) {
             // REVERTIR TRANSACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'Error al eliminar registro.' });
+            return res.status(500).jsonp({ message: 'Error al eliminar registro.' });
         }
     }
 

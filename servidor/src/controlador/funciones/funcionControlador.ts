@@ -47,7 +47,7 @@ class FuncionesControlador {
         } catch (error) {
             // REVERTIR TRNASACCION
             await pool.query('ROLLBACK');
-            res.status(404).jsonp({ message: 'Error al registrar funciones' });
+            res.status(500).jsonp({ message: 'Error al registrar funciones' });
         }
     }
 
@@ -100,7 +100,7 @@ class FuncionesControlador {
         } catch (error) {
             // REVERTIR TRNASACCION
             await pool.query('ROLLBACK');
-            return res.status(404).jsonp({ message: 'Error al actualizar funciones' });
+            return res.status(500).jsonp({ message: 'Error al actualizar funciones' });
         }
     }
 
