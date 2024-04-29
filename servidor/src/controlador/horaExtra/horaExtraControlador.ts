@@ -4,9 +4,9 @@ import { ReporteHoraExtra } from '../../class/HorasExtras';
 import {
   enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, fechaHora, Credenciales,
   FormatearFecha, FormatearHora, dia_completo
-}
-  from '../../libs/settingsMail';
+} from '../../libs/settingsMail';
 import { QueryResult } from 'pg';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
 import path from 'path';
 import fs from 'fs';
@@ -209,9 +209,6 @@ class HorasExtrasPedidasControlador {
   }
 
 
-
-
-
   /** ************************************************************************************************* **
    ** **                       METODO PARA MANEJO DE HORAS EXTRAS                                    ** ** 
    ** ************************************************************************************************* **/
@@ -221,7 +218,10 @@ class HorasExtrasPedidasControlador {
     try {
 
       const { id_empl_cargo, id_usua_solicita, fec_inicio, fec_final, fec_solicita, num_hora,
-        descripcion, estado, observacion, tipo_funcion, depa_user_loggin, codigo } = req.body;
+        descripcion, estado, observacion, tipo_funcion, depa_user_loggin, codigo, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
       const response: QueryResult = await pool.query(
         `
@@ -232,6 +232,23 @@ class HorasExtrasPedidasControlador {
         [id_empl_cargo, id_usua_solicita, fec_inicio, fec_final, fec_solicita, num_hora, descripcion,
           estado, observacion, tipo_funcion, codigo])
       const [objetoHoraExtra] = response.rows;
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'hora_extr_pedidos',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{ id_empl_cargo: ${id_empl_cargo}, id_usua_solicita: ${id_usua_solicita}, 
+          fec_inicio: ${fec_inicio}, fec_final: ${fec_final}, fec_solicita: ${fec_solicita}, 
+          num_hora: ${num_hora}, descripcion: ${descripcion}, estado: ${estado}, observacion: ${observacion}, 
+          tipo_funcion: ${tipo_funcion}, codigo: ${codigo} }`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
 
       if (!objetoHoraExtra) return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
 
@@ -292,6 +309,8 @@ class HorasExtrasPedidasControlador {
         return res.status(200).jsonp(hora_extra);
       }
     } catch (error) {
+      // REVERTIR TRNASACCION
+      await pool.query('ROLLBACK');
       return res.status(500)
         .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
@@ -300,76 +319,119 @@ class HorasExtrasPedidasControlador {
   // METODO PARA EDITAR HORA EXTRA
   public async EditarHoraExtra(req: Request, res: Response): Promise<Response> {
 
-    const id = req.params.id
+    try {
+      const id = req.params.id
+  
+      const { fec_inicio, fec_final, num_hora, descripcion, estado, tipo_funcion, depa_user_loggin, user_name, ip } = req.body;
 
-    const { fec_inicio, fec_final, num_hora, descripcion, estado, tipo_funcion, depa_user_loggin } = req.body;
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
-    const response: QueryResult = await pool.query(
-      `
-        UPDATE hora_extr_pedidos SET fec_inicio = $1, fec_final = $2, num_hora = $3, descripcion = $4, 
-        estado = $5, tipo_funcion = $6 WHERE id = $7 RETURNING *
-      `
-      , [fec_inicio, fec_final, num_hora, descripcion, estado, tipo_funcion, id]);
+      // CONSULTAR DATOSORIGINALES
+      const datosOriginales = await pool.query('SELECT * FROM hora_extr_pedidos WHERE id = $1', [id]);
+      const [objetoHoraExtraOriginal] = datosOriginales.rows;
 
-    const [objetoHoraExtra] = response.rows;
+      if (!objetoHoraExtraOriginal) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'hora_extr_pedidos',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar hora extra con id ${id}`
+        });
 
-    if (!objetoHoraExtra) return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'error' });
+      }
+  
+      const response: QueryResult = await pool.query(
+        `
+          UPDATE hora_extr_pedidos SET fec_inicio = $1, fec_final = $2, num_hora = $3, descripcion = $4, 
+          estado = $5, tipo_funcion = $6 WHERE id = $7 RETURNING *
+        `
+        , [fec_inicio, fec_final, num_hora, descripcion, estado, tipo_funcion, id]);
+  
+      const [objetoHoraExtra] = response.rows;
 
-    const hora_extra = objetoHoraExtra;
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'hora_extr_pedidos',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
+        datosNuevos: `{ fec_inicio: ${fec_inicio}, fec_final: ${fec_final}, num_hora: ${num_hora}, descripcion: ${descripcion}, estado: ${estado}, tipo_funcion: ${tipo_funcion} }`,
+        ip,
+        observacion: null
+      });
 
-    const JefesDepartamentos = await pool.query(`
-        SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc,
-        cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato,
-        e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname , e.cedula, e.correo, 
-        c.hora_extra_mail, c.hora_extra_noti
-        FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-        sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-        WHERE da.id_departamento = $1 AND 
-        da.id_empl_cargo = ecr.id AND 
-        da.id_departamento = cg.id AND 
-        da.estado = true AND 
-        cg.id_sucursal = s.id AND 
-        ecr.id_empl_contrato = ecn.id AND 
-        ecn.id_empleado = e.id AND 
-        e.id = c.id_empleado
-        `, [depa_user_loggin])
-      .then((result: any) => {
-        return result.rows
-      })
-
-    if (JefesDepartamentos.length === 0) return res.status(400)
-      .jsonp({ message: 'Ups !!! algo salio mal. Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.' });
-
-    const [obj] = JefesDepartamentos;
-    let depa_padre = obj.depa_padre;
-    let JefeDepaPadre;
-
-    if (depa_padre !== null) {
-      do {
-        JefeDepaPadre = await pool.query(
-          `
-              SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, 
-              cg.nivel, s.id AS id_suc, cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, 
-              ecn.id AS contrato, e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname, e.cedula, 
-              e.correo, c.hora_extra_mail, c.hora_extra_noti 
-              FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
-              sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
-              WHERE da.id_departamento = $1 AND da.id_empl_cargo = ecr.id AND da.id_departamento = cg.id AND 
-              da.estado = true AND cg.id_sucursal = s.id AND ecr.id_empl_contrato = ecn.id AND 
-              ecn.id_empleado = e.id AND e.id = c.id_empleado
-              `
-          , [depa_padre]);
-
-        depa_padre = JefeDepaPadre.rows[0].depa_padre;
-        JefesDepartamentos.push(JefeDepaPadre.rows[0]);
-
-      } while (depa_padre !== null);
-      hora_extra.EmpleadosSendNotiEmail = JefesDepartamentos
-      return res.status(200).jsonp(hora_extra);
-
-    } else {
-      hora_extra.EmpleadosSendNotiEmail = JefesDepartamentos
-      return res.status(200).jsonp(hora_extra);
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+  
+      if (!objetoHoraExtra) return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
+  
+      const hora_extra = objetoHoraExtra;
+  
+      const JefesDepartamentos = await pool.query(`
+          SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, cg.nivel, s.id AS id_suc,
+          cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, ecn.id AS contrato,
+          e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname , e.cedula, e.correo, 
+          c.hora_extra_mail, c.hora_extra_noti
+          FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
+          sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
+          WHERE da.id_departamento = $1 AND 
+          da.id_empl_cargo = ecr.id AND 
+          da.id_departamento = cg.id AND 
+          da.estado = true AND 
+          cg.id_sucursal = s.id AND 
+          ecr.id_empl_contrato = ecn.id AND 
+          ecn.id_empleado = e.id AND 
+          e.id = c.id_empleado
+          `, [depa_user_loggin])
+        .then((result: any) => {
+          return result.rows
+        })
+  
+      if (JefesDepartamentos.length === 0) return res.status(400)
+        .jsonp({ message: 'Ups !!! algo salio mal. Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.' });
+  
+      const [obj] = JefesDepartamentos;
+      let depa_padre = obj.depa_padre;
+      let JefeDepaPadre;
+  
+      if (depa_padre !== null) {
+        do {
+          JefeDepaPadre = await pool.query(
+            `
+                SELECT da.id, da.estado, cg.id AS id_dep, cg.depa_padre, 
+                cg.nivel, s.id AS id_suc, cg.nombre AS departamento, s.nombre AS sucursal, ecr.id AS cargo, 
+                ecn.id AS contrato, e.id AS empleado, (e.nombre || ' ' || e.apellido) as fullname, e.cedula, 
+                e.correo, c.hora_extra_mail, c.hora_extra_noti 
+                FROM depa_autorizaciones AS da, empl_cargos AS ecr, cg_departamentos AS cg, 
+                sucursales AS s, empl_contratos AS ecn,empleados AS e, config_noti AS c 
+                WHERE da.id_departamento = $1 AND da.id_empl_cargo = ecr.id AND da.id_departamento = cg.id AND 
+                da.estado = true AND cg.id_sucursal = s.id AND ecr.id_empl_contrato = ecn.id AND 
+                ecn.id_empleado = e.id AND e.id = c.id_empleado
+                `
+            , [depa_padre]);
+  
+          depa_padre = JefeDepaPadre.rows[0].depa_padre;
+          JefesDepartamentos.push(JefeDepaPadre.rows[0]);
+  
+        } while (depa_padre !== null);
+        hora_extra.EmpleadosSendNotiEmail = JefesDepartamentos
+        return res.status(200).jsonp(hora_extra);
+  
+      } else {
+        hora_extra.EmpleadosSendNotiEmail = JefesDepartamentos
+        return res.status(200).jsonp(hora_extra);
+      }
+    } catch (error) {
+      // REVERTIR TRNASACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
     }
 
 
@@ -377,46 +439,153 @@ class HorasExtrasPedidasControlador {
 
   // ELIMINAR REGISTRO DE HORAS EXTRAS
   public async EliminarHoraExtra(req: Request, res: Response): Promise<Response> {
-    const { id_hora_extra, documento } = req.params;
+    try {
+      const { id_hora_extra, documento } = req.params;
+      // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
+      const { user_name, ip } = req.body;
 
-    await pool.query(
-      `
-      DELETE FROM realtime_noti WHERE id_hora_extra = $1
-      `
-      , [id_hora_extra]);
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
-    await pool.query(
-      `
-      DELETE FROM autorizaciones WHERE id_hora_extra = $1
-      `
-      , [id_hora_extra]);
+      // CONSULTAR DATOSORIGINALES REALTIME_NOTI
+      const datosOriginalesRealTime = await pool.query('SELECT * FROM realtime_noti WHERE id_hora_extra = $1', [id_hora_extra]);
+      const [objetoRealTime] = datosOriginalesRealTime.rows;
 
-    const response: QueryResult = await pool.query(
-      `
-      DELETE FROM hora_extr_pedidos WHERE id = $1 RETURNING *
-      `
-      , [id_hora_extra]);
+      if (!objetoRealTime) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'realtime_noti',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al eliminar registro de realtime_noti con id_hora_extra ${id_hora_extra}`
+        });
 
-    if (documento != 'null' && documento != '' && documento != null) {
-      let filePath = `servidor\\horasExtras\\${documento}`
-      let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-      // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-      fs.access(direccionCompleta, fs.constants.F_OK, (err) => {
-        if (err) {
-        } else {
-          // ELIMINAR DEL SERVIDOR
-          fs.unlinkSync(direccionCompleta);
-        }
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'error' });
+      }
+  
+      await pool.query(
+        `
+        DELETE FROM realtime_noti WHERE id_hora_extra = $1
+        `
+        , [id_hora_extra]);
+      
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'realtime_noti',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(objetoRealTime),
+        datosNuevos: '',
+        ip,
+        observacion: null
       });
-    }
 
-    const [objetoHoraExtra] = response.rows;
+      // CONSULTAR DATOSORIGINALES AUTORIZACIONES
+      const datosOriginalesAutorizaciones = await pool.query('SELECT * FROM autorizaciones WHERE id_hora_extra = $1', [id_hora_extra]);
+      const [objetoAutorizaciones] = datosOriginalesAutorizaciones.rows;
 
-    if (objetoHoraExtra) {
-      return res.status(200).jsonp(objetoHoraExtra)
-    }
-    else {
-      return res.status(404).jsonp({ message: 'Solicitud no eliminada.' })
+      if (!objetoAutorizaciones) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'autorizaciones',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al eliminar registro de autorizaciones con id_hora_extra ${id_hora_extra}`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'error' });
+      }
+  
+      await pool.query(
+        `
+        DELETE FROM autorizaciones WHERE id_hora_extra = $1
+        `
+        , [id_hora_extra]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'autorizaciones',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(objetoAutorizaciones),
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+  
+      // CONSULTAR DATOSORIGINALES HORA_EXTR_PEDIDOS
+      const datosOriginalesHoraExtra = await pool.query('SELECT * FROM hora_extr_pedidos WHERE id = $1', [id_hora_extra]);
+      const [objetoHoraExtraOriginal] = datosOriginalesHoraExtra.rows;
+
+      if (!objetoHoraExtraOriginal) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'hora_extr_pedidos',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al eliminar registro de hora_extr_pedidos con id ${id_hora_extra}`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'error' });
+      }
+
+      const response: QueryResult = await pool.query(
+        `
+        DELETE FROM hora_extr_pedidos WHERE id = $1 RETURNING *
+        `
+        , [id_hora_extra]);
+
+      const [objetoHoraExtra] = response.rows;
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'hora_extr_pedidos',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+  
+      if (documento != 'null' && documento != '' && documento != null) {
+        let filePath = `servidor\\horasExtras\\${documento}`
+        let direccionCompleta = __dirname.split("servidor")[0] + filePath;
+        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+        fs.access(direccionCompleta, fs.constants.F_OK, (err) => {
+          if (err) {
+          } else {
+            // ELIMINAR DEL SERVIDOR
+            fs.unlinkSync(direccionCompleta);
+          }
+        });
+      }
+  
+      if (objetoHoraExtra) {
+        return res.status(200).jsonp(objetoHoraExtra)
+      }
+      else {
+        return res.status(404).jsonp({ message: 'Solicitud no eliminada.' })
+      }
+    } catch (error) {
+      // REVERTIR TRNASACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
@@ -440,7 +609,31 @@ class HorasExtrasPedidasControlador {
   public async TiempoAutorizado(req: Request, res: Response): Promise<Response> {
     try {
       const id_hora = parseInt(req.params.id_hora);
-      const { hora } = req.body;
+      const { hora, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const datosOriginales = await pool.query('SELECT * FROM hora_extr_pedidos WHERE id = $1', [id_hora]);
+      const [objetoHoraExtraOriginal] = datosOriginales.rows;
+
+      if (!objetoHoraExtraOriginal) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'hora_extr_pedidos',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar hora extra con id ${id_hora}`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'error' });
+      }
+
       const response: QueryResult = await pool.query(
         `
         UPDATE hora_extr_pedidos SET tiempo_autorizado = $2 WHERE id = $1 RETURNING *
@@ -448,6 +641,20 @@ class HorasExtrasPedidasControlador {
         , [id_hora, hora])
 
       const [horaExtra] = response.rows;
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'hora_extr_pedidos',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
+        datosNuevos: `{ tiempo_autorizado: ${hora} }`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
 
       if (!horaExtra) {
         return res.status(400)
@@ -458,6 +665,8 @@ class HorasExtrasPedidasControlador {
       }
 
     } catch (error) {
+      // REVERTIR TRNASACCION
+      await pool.query('ROLLBACK');
       return res.status(500)
         .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
@@ -469,7 +678,30 @@ class HorasExtrasPedidasControlador {
 
     try {
       const id = req.params.id;
-      const { estado } = req.body;
+      const { estado, usser_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const datosOriginales = await pool.query('SELECT * FROM hora_extr_pedidos WHERE id = $1', [id]);
+      const [objetoHoraExtraOriginal] = datosOriginales.rows;
+
+      if (!objetoHoraExtraOriginal) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'hora_extr_pedidos',
+          usuario: usser_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar hora extra con id ${id}`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'error' });
+      }
 
       const response: QueryResult = await pool.query(
         `
@@ -479,6 +711,20 @@ class HorasExtrasPedidasControlador {
 
       const [horaExtra] = response.rows;
 
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'hora_extr_pedidos',
+        usuario: usser_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
+        datosNuevos: `{ estado: ${estado} }`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
       if (!horaExtra) {
         return res.status(400)
           .jsonp({ message: 'Upps !!! algo salio mal. Solicitud de hora extra no ingresada' })
@@ -488,6 +734,8 @@ class HorasExtrasPedidasControlador {
       }
 
     } catch (error) {
+      // REVERTIR TRNASACCION
+      await pool.query('ROLLBACK');
       return res.status(500)
         .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
@@ -497,7 +745,30 @@ class HorasExtrasPedidasControlador {
   public async ActualizarObservacion(req: Request, res: Response): Promise<Response> {
     try {
       const id = req.params.id;
-      const { observacion } = req.body;
+      const { observacion, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const datosOriginales = await pool.query('SELECT * FROM hora_extr_pedidos WHERE id = $1', [id]);
+      const [objetoHoraExtraOriginal] = datosOriginales.rows;
+
+      if (!objetoHoraExtraOriginal) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'hora_extr_pedidos',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar hora extra con id ${id}`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'error' });
+      }
 
       const response: QueryResult = await pool.query(
         `
@@ -507,6 +778,20 @@ class HorasExtrasPedidasControlador {
 
       const [horaExtra] = response.rows;
 
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'hora_extr_pedidos',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
+        datosNuevos: `{ observacion: ${observacion} }`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
       if (!horaExtra) {
         return res.status(400)
           .jsonp({ message: 'Upps !!! algo salio mal. Solicitud de hora extra no ingresada' })
@@ -515,6 +800,8 @@ class HorasExtrasPedidasControlador {
         return res.status(200).jsonp(horaExtra);
       }
     } catch (error) {
+      // REVERTIR TRNASACCION
+      await pool.query('ROLLBACK');    
       return res.status(500)
         .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
@@ -542,43 +829,133 @@ class HorasExtrasPedidasControlador {
   }
 
   // REGISTRAR DOCUMENTO DE RESPALDO DE HORAS EXTRAS 
-  public async GuardarDocumentoHoras(req: Request, res: Response): Promise<void> {
-    let list: any = req.files;
-    let doc = list.uploads[0].path.split("\\")[1];
-    let { nombre } = req.params;
-    let id = req.params.id;
-    await pool.query(
-      `
-      UPDATE hora_extr_pedidos SET documento = $2, docu_nombre = $3 WHERE id = $1
-      `
-      , [id, doc, nombre]);
-    res.jsonp({ message: 'Documento Actualizado' });
+  public async GuardarDocumentoHoras(req: Request, res: Response): Promise<Response> {
+    try {
+      let list: any = req.files;
+      let doc = list.uploads[0].path.split("\\")[1];
+      let { nombre } = req.params;
+      let id = req.params.id;
+
+      // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
+      const { user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const datosOriginales = await pool.query('SELECT * FROM hora_extr_pedidos WHERE id = $1', [id]);
+      const [objetoHoraExtraOriginal] = datosOriginales.rows;
+
+      if (!objetoHoraExtraOriginal) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'hora_extr_pedidos',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar hora extra con id ${id}`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'error' });
+      }
+
+      await pool.query(
+        `
+        UPDATE hora_extr_pedidos SET documento = $2, docu_nombre = $3 WHERE id = $1
+        `
+        , [id, doc, nombre]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'hora_extr_pedidos',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
+        datosNuevos: `{ documento: ${doc}, docu_nombre: ${nombre} }`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Documento Actualizado' });
+    } catch (error) {
+      // REVERTIR TRNASACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+    }
   }
 
   // ELIMINAR DOCUMENTO DE RESPALDO DE HORAS EXTRAS 
-  public async EliminarDocumentoHoras(req: Request, res: Response): Promise<void> {
-    let { documento, id } = req.body;
+  public async EliminarDocumentoHoras(req: Request, res: Response): Promise<Response> {
+    try {
+      let { documento, id, user_name, ip } = req.body;
 
-    await pool.query(
-      `
-      UPDATE hora_extr_pedidos SET documento = null, docu_nombre = null WHERE id = $1
-      `
-      , [id]);
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
-    if (documento != 'null' && documento != '' && documento != null) {
-      let filePath = `servidor\\horasExtras\\${documento}`
-      let direccionCompleta = __dirname.split("servidor")[0] + filePath;
-      // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-      fs.access(direccionCompleta, fs.constants.F_OK, (err) => {
-        if (err) {
-        } else {
-          // ELIMINAR DEL SERVIDOR
-          fs.unlinkSync(direccionCompleta);
-        }
+      // CONSULTAR DATOSORIGINALES
+      const datosOriginales = await pool.query('SELECT * FROM hora_extr_pedidos WHERE id = $1', [id]);
+      const [objetoHoraExtraOriginal] = datosOriginales.rows;
+
+      if (!objetoHoraExtraOriginal) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'hora_extr_pedidos',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar hora extra con id ${id}`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'error' });
+      }
+  
+      await pool.query(
+        `
+        UPDATE hora_extr_pedidos SET documento = null, docu_nombre = null WHERE id = $1
+        `
+        , [id]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'hora_extr_pedidos',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(objetoHoraExtraOriginal),
+        datosNuevos: `{ documento: null, docu_nombre: null }`,
+        ip,
+        observacion: null
       });
-    }
 
-    res.jsonp({ message: 'Documento Actualizado' });
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+  
+      if (documento != 'null' && documento != '' && documento != null) {
+        let filePath = `servidor\\horasExtras\\${documento}`
+        let direccionCompleta = __dirname.split("servidor")[0] + filePath;
+        // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+        fs.access(direccionCompleta, fs.constants.F_OK, (err) => {
+          if (err) {
+          } else {
+            // ELIMINAR DEL SERVIDOR
+            fs.unlinkSync(direccionCompleta);
+          }
+        });
+      }
+  
+      return res.jsonp({ message: 'Documento Actualizado' });
+    } catch (error) {
+      // REVERTIR TRNASACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+    }
   }
 
   // ELIMINAR DOCUMENTO DE PERMISO DESDE APLICACION MOVIL
