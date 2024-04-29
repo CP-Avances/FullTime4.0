@@ -61,8 +61,10 @@ export class MainNavComponent implements OnInit {
   value = 10;
 
   //COMPONENTES DEL MENU
-  menuGeneral0: any = [];
-  paginasMG: any = [];
+  menuGeneralUsuarios: any = [];//Menu General
+  menuGeneralAdministrador: any = [];//Menu Administrador
+  paginasMG: any = []; //Variable para guardar los permisos de acceso a botones que tiene asignado
+  
   itemConfiguracion: boolean = false;
   subItemConfiguracionParametrizacion: boolean = false;
   childrenParametrizacion: any = [];
@@ -352,8 +354,6 @@ export class MainNavComponent implements OnInit {
       this.restEmpresa.ConsultarEmpresas().subscribe(res => {
         localStorage.setItem('name_empresa', res[0].nombre);
         this.MetodoSubSelectMenu(res[0].nombre);
-        //console.log("Informacion: ", res)
-        //console.log("Estado: ", this.HabilitarAlimentacion);
       });
     }
   }
@@ -363,13 +363,13 @@ export class MainNavComponent implements OnInit {
     if (this.inicio.getRolMenu() === true) {
       this.dataSource.data = this.MenuAdministracion(nombre) as MenuNode[];
     } else {
-      this.dataSource.data = this.menuGeneral0 as MenuNode[];
+      this.dataSource.data = this.menuGeneralUsuarios as MenuNode[];
     }
   }
 
   // MENU PERFIL ADMINISTRADOR
   MenuAdministracion(nombre: string) {
-    return [
+    this.menuGeneralAdministrador = [
       {
         name: 'Configuración',
         accion: true,
@@ -460,7 +460,7 @@ export class MainNavComponent implements OnInit {
             ]
           },
           {
-            name: 'Permisos',
+            name: 'Permisos.',
             accion: !this.HabilitarPermisos,
             estado: !this.HabilitarPermisos,
             color: false,
@@ -480,7 +480,7 @@ export class MainNavComponent implements OnInit {
             ]
           },
           {
-            name: 'Vacaciones',
+            name: 'Vacaciones.',
             accion: !this.HabilitarVacaciones,
             estado: !this.HabilitarVacaciones,
             activo: this.HabilitarVacaciones,
@@ -503,7 +503,7 @@ export class MainNavComponent implements OnInit {
             ]
           },
           {
-            name: 'Horas Extras',
+            name: 'Horas Extras.',
             accion: !this.HabilitarHoraExtra,
             estado: !this.HabilitarHoraExtra,
             activo: this.HabilitarHoraExtra,
@@ -526,7 +526,7 @@ export class MainNavComponent implements OnInit {
             ]
           },
           {
-            name: 'Alimentación',
+            name: 'Alimentación.',
             accion: !this.HabilitarAlimentacion,
             estado: !this.HabilitarAlimentacion,
             activo: this.HabilitarAlimentacion,
@@ -549,7 +549,7 @@ export class MainNavComponent implements OnInit {
             ]
           },
           {
-            name: 'Acción Personal',
+            name: 'Acción Personal.',
             accion: !this.HabilitarAccion,
             estado: !this.HabilitarAccion,
             activo: this.HabilitarAccion,
@@ -569,7 +569,7 @@ export class MainNavComponent implements OnInit {
             ]
           },
           {
-            name: 'Geolocalización',
+            name: 'Geolocalización.',
             accion: !this.HabilitarGeolocalizacion,
             estado: !this.HabilitarGeolocalizacion,
             activo: this.HabilitarGeolocalizacion,
@@ -590,7 +590,7 @@ export class MainNavComponent implements OnInit {
             ]
           },
           {
-            name: 'Timbre Virtual',
+            name: 'Timbre Virtual.',
             accion: !this.HabilitarTimbreWeb,
             estado: !this.HabilitarTimbreWeb,
             activo: this.HabilitarTimbreWeb,
@@ -611,7 +611,7 @@ export class MainNavComponent implements OnInit {
             ]
           },
           {
-            name: 'Aplicación Móvil',
+            name: 'Aplicación Móvil.',
             accion: !this.HabilitarMovil,
             estado: !this.HabilitarMovil,
             activo: this.HabilitarMovil,
@@ -658,7 +658,7 @@ export class MainNavComponent implements OnInit {
         color: true,
         children: [
           {
-            name: 'Generales',
+            name: 'R. Generales',
             accion: true,
             estado: true,
             subtitulo: true,
@@ -670,7 +670,7 @@ export class MainNavComponent implements OnInit {
             ]
           },
           {
-            name: 'Asistencia',
+            name: 'R. Asistencia',
             accion: true,
             estado: true,
             subtitulo: true,
@@ -679,18 +679,15 @@ export class MainNavComponent implements OnInit {
             children: [
               { name: 'Faltas', url: '/reporte-faltas', color: true, ver: true },
               { name: 'Atrasos', url: '/reporte-atrasos-multiples', color: true, ver: true },
-              // { name: 'Puntualidad', url: '/reporte-puntualidad', color: true, ver: true },
               { name: 'Tiempo Laborado', url: '/reporte-horas-trabajadas', color: true, ver: true },
               { name: 'Tiempo Alimentación', url: '/tiempo-alimentacion', color: true, ver: true },
               { name: 'Salidas Anticipadas', url: '/salidas-anticipadas', color: true, ver: true },
               { name: 'Resumen Asistencia', url: '/reporte-resumen-asistencia', color: true, ver: true },
-              { name: 'Planificación Horaria', url: '/reporte-planificacion-horaria', color: true, ver: true },
-              //{ name: 'Entradas Salidas', url: '/reporteEntradaSalida', color: true, ver: true },
-              //{ name: 'Asistencia Detalle Consolidado', url: '/reporteAsistenciaConsolidado', color: true, ver: true },
+              { name: 'Planificación Horaria', url: '/reporte-planificacion-horaria', color: true, ver: true }
             ]
           },
           {
-            name: 'Timbres',
+            name: 'R. Timbres',
             accion: true,
             estado: true,
             subtitulo: true,
@@ -704,7 +701,7 @@ export class MainNavComponent implements OnInit {
             ]
           },
           {
-            name: 'Permisos',
+            name: 'R. Permisos',
             accion: this.HabilitarPermisos,
             estado: this.HabilitarPermisos,
             icono: 'insert_emoticon',
@@ -715,7 +712,16 @@ export class MainNavComponent implements OnInit {
             ]
           },
           {
-            name: 'Vacaciones',
+            name: 'R. Permisos.',
+            accion: !this.HabilitarPermisos,
+            estado: !this.HabilitarPermisos,
+            color: false,
+            activo: this.HabilitarPermisos,
+            icono: 'insert_emoticon',
+            url: '/home'
+          },
+          {
+            name: 'R. Vacaciones',
             accion: this.HabilitarVacaciones,
             estado: this.HabilitarVacaciones,
             icono: 'flight',
@@ -727,7 +733,16 @@ export class MainNavComponent implements OnInit {
             ]
           },
           {
-            name: 'Horas Extras',
+            name: 'R. Vacaciones.',
+            accion: !this.HabilitarVacaciones,
+            estado: !this.HabilitarVacaciones,
+            color: false,
+            activo: this.HabilitarVacaciones,
+            icono: 'flight',
+            url: '/home'
+          },
+          {
+            name: 'R. Horas Extras',
             accion: this.HabilitarHoraExtra,
             estado: this.HabilitarHoraExtra,
             icono: 'schedule',
@@ -741,7 +756,16 @@ export class MainNavComponent implements OnInit {
             ]
           },
           {
-            name: 'Aplicación Móvil',
+            name: 'R. Horas Extras.',
+            accion: !this.HabilitarHoraExtra,
+            estado: !this.HabilitarHoraExtra,
+            color: false,
+            activo: this.HabilitarHoraExtra,
+            icono: 'schedule',
+            url: '/home'
+          },
+          {
+            name: 'R. Aplicación Móvil',
             accion: this.HabilitarMovil,
             estado: this.HabilitarMovil,
             icono: 'phone_android',
@@ -752,7 +776,16 @@ export class MainNavComponent implements OnInit {
             ]
           },
           {
-            name: 'Timbre Virtual',
+            name: 'R. Aplicación Móvil.',
+            accion: !this.HabilitarMovil,
+            estado: !this.HabilitarMovil,
+            color: false,
+            activo: this.HabilitarMovil,
+            icono: 'schedule',
+            url: '/home'
+          },
+          {
+            name: 'R. Timbre Virtual',
             accion: this.HabilitarTimbreWeb,
             estado: this.HabilitarTimbreWeb,
             icono: 'computer',
@@ -763,7 +796,16 @@ export class MainNavComponent implements OnInit {
             ]
           },
           {
-            name: 'Alimentación',
+            name: 'R. Timbre Virtual.',
+            accion: !this.HabilitarTimbreWeb,
+            estado: !this.HabilitarTimbreWeb,
+            color: false,
+            activo: this.HabilitarTimbreWeb,
+            icono: 'computer',
+            url: '/home'
+          },
+          {
+            name: 'R. Alimentación',
             accion: this.HabilitarAlimentacion,
             estado: true,
             icono: 'restaurant',
@@ -776,7 +818,16 @@ export class MainNavComponent implements OnInit {
             ]
           },
           {
-            name: 'Análisis Datos',
+            name: 'R. Alimentación.',
+            accion: !this.HabilitarAlimentacion,
+            estado: !this.HabilitarAlimentacion,
+            color: false,
+            activo: this.HabilitarAlimentacion,
+            icono: 'restaurant',
+            url: '/home'
+          },
+          {
+            name: 'R. Análisis Datos',
             accion: this.HabilitarAlimentacion,
             estado: true,
             icono: 'dashboard',
@@ -785,53 +836,188 @@ export class MainNavComponent implements OnInit {
             children: [
               { name: 'Análisis Datos', url: '/analisisDatos', color: true, ver: true },
             ]
-          },
-          /*   {
-               name: 'Estadísticos',
-               accion: true,
-               estado: true,
-               subtitulo: true,
-               icono: 'leaderboard',
-               color: true,
-               children: [
-                 { name: 'Atrasos', url: '/macro/retrasos', color: true, ver: true },
-                 { name: 'Timbres', url: '/macro/marcaciones', color: true, ver: true },
-                 { name: 'Asistencia', url: '/macro/asistencia', color: true, ver: true },
-                 { name: 'Inasistencia', url: '/macro/inasistencia', color: true, ver: true },
-                 { name: 'Salidas antes', url: '/macro/tiempo-jornada-vs-hora-ext', color: true, ver: true },
-               ]
-             },
-             {
-               name: 'Notificaciones',
-               accion: true,
-               estado: true,
-               subtitulo: true,
-               icono: 'notifications_active',
-               color: true,
-               children: [
-                 { name: 'Todos', url: '/listaAllNotificaciones', color: true, ver: true },
-                 { name: 'Usuarios', url: '/listaNotifacionUsuario', color: true, ver: true },
-               ]
-             },
-             {
-               name: 'Auditoría',
-               accion: true,
-               estado: true,
-               subtitulo: true,
-               icono: 'gavel',
-               color: true,
-               children: [
-                 { name: 'Auditoria', url: '/auditoria', color: true, ver: true },
-               ]
-             },*/
+          }
         ]
       },
     ];
+
+    //Complemento de elementos
+    //Modulos-Permisos              
+    if (!this.HabilitarPermisos) {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'Permisos');
+      }
+    } else {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'Permisos.');
+      }
+    }
+    //Modulos-Vacaciones
+    if (!this.HabilitarVacaciones) {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'Vacaciones');
+      }
+    } else {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'Vacaciones.');
+      }
+    }
+    //Modulos-HorasExtras
+    if (!this.HabilitarHoraExtra) {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'Horas Extras');
+      }
+    } else {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'Horas Extras.');
+      }
+    }
+    //Modulos-Alimentacion
+    if (!this.HabilitarAlimentacion) {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'Alimentación');
+      }
+    } else {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'Alimentación.');
+      }
+    }
+    //Modulos-AccionPersonal
+    if (!this.HabilitarAccion) {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'Acción Personal');
+      }
+    } else {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'Acción Personal.');
+      }
+    }
+    //Modulos-Geolocalizacion
+    if (!this.HabilitarGeolocalizacion) {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'Geolocalización');
+      }
+    } else {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'Geolocalización.');
+      }
+    }
+    //Modulos-TimbreVirtual
+    if (!this.HabilitarTimbreWeb) {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'Timbre Virtual');
+      }
+    } else {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'Timbre Virtual.');
+      }
+    }
+    //Modulos-AplicacionMovil
+    if (!this.HabilitarMovil) {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'Aplicación Móvil');
+      }
+    } else {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Módulos');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'Aplicación Móvil.');
+      }
+    }
+    //Reportes-Permisos
+    if (!this.HabilitarPermisos) {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'R. Permisos');
+      }
+    } else {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'R. Permisos.');
+      }
+    }
+    //Reportes-Vacaciones
+    if (!this.HabilitarVacaciones) {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'R. Vacaciones');
+      }
+    } else {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'R. Vacaciones.');
+      }
+    }
+    //Reportes-HorasExtras
+    if (!this.HabilitarHoraExtra) {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'R. Horas Extras');
+      }
+    } else {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'R. Horas Extras.');
+      }
+    }
+    //Reportes-Aplicación Móvil
+    if (!this.HabilitarMovil) {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'R. Aplicación Móvil');
+      }
+    } else {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'R. Aplicación Móvil.');
+      }
+    }
+    //Reportes-Timbre Virtual
+    if (!this.HabilitarTimbreWeb) {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'R. Timbre Virtual');
+      }
+    } else {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'R. Timbre Virtual.');
+      }
+    }
+    //Reportes-Alimentación
+    if (!this.HabilitarAlimentacion) {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'R. Alimentación');
+      }
+    } else {
+      const configurationItem = this.menuGeneralAdministrador.findIndex(item => item.name === 'Reportes');
+      if (configurationItem !== -1 && this.menuGeneralAdministrador[configurationItem].children) {
+        this.filterMenuChildrenAdministrador(configurationItem, 'R. Alimentación.');
+      }
+    }
+    //Fin Complemento de elementos
+
+    return this.menuGeneralAdministrador;
   }
 
   MenuGeneral(){
     var buscarPagina = {id_rol: this.inicio.getRol()};
-    if(this.menuGeneral0.length < 1 && buscarPagina.id_rol !== 3){
+    if(this.menuGeneralUsuarios.length < 1 && buscarPagina.id_rol !== 3){
       this.restRolPermiso.BuscarPaginasMenuRol(buscarPagina).subscribe(
         {
           next: (v) => 
@@ -841,7 +1027,7 @@ export class MainNavComponent implements OnInit {
           error: (e) =>
             {
               //Armado de json con elementos de menu ERROR
-              this.menuGeneral0 = [
+              this.menuGeneralUsuarios = [
                 {
                   name: 'Módulos',
                   accion: true,
@@ -851,145 +1037,73 @@ export class MainNavComponent implements OnInit {
                   icono: 'games',
                   children: [
                     {
-                      name: 'Permisos',
-                      accion: this.HabilitarPermisos && this.subItemModulosPermisos ? true : false,
-                      estado: this.HabilitarPermisos && this.subItemModulosPermisos ? true : false,
-                      color: true,
-                      subtitulo: true,
-                      icono: 'insert_emoticon',
-                      children: this.childrenPermisos
-                    },
-                    {
                       name: 'Permisos.',
-                      accion: !this.HabilitarPermisos || !this.subItemModulosPermisos,
-                      estado: !this.HabilitarPermisos || !this.subItemModulosPermisos,
+                      accion: !this.HabilitarPermisos,
+                      estado: !this.HabilitarPermisos,
                       color: false,
-                      activo: !this.subItemModulosPermisos && this.HabilitarPermisos ? this.subItemModulosPermisos : this.HabilitarPermisos,//this.HabilitarPermisos
+                      activo: false,
                       icono: 'insert_emoticon',
                       url: this.HabilitarPermisos ? '/home' : '/verTipoPermiso',//this.HabilitarPermisos
                     },
                     {
-                      name: 'Vacaciones',
-                      accion: this.HabilitarVacaciones && this.subItemModulosVacaciones ? true : false,
-                      estado: this.HabilitarVacaciones && this.subItemModulosVacaciones ? true : false,
-                      icono: 'flight',
-                      subtitulo: true,
-                      color: true,
-                      children: this.childrenVacaciones
-                    },
-                    {
                       name: 'Vacaciones.',
-                      accion: !this.HabilitarVacaciones || !this.subItemModulosVacaciones,
-                      estado: !this.HabilitarVacaciones || !this.subItemModulosVacaciones,
-                      activo: !this.subItemModulosVacaciones && this.HabilitarVacaciones ? this.subItemModulosVacaciones : this.HabilitarVacaciones,
+                      accion: !this.HabilitarVacaciones,
+                      estado: !this.HabilitarVacaciones,
+                      activo: false,
                       icono: 'flight',
                       color: false,
                       url: this.HabilitarVacaciones ? '/home' : '/vacaciones-solicitados'
                     },
                     {
-                      name: 'Horas Extras',
-                      accion: this.HabilitarHoraExtra && this.subItemModulosHorasExtras ? true : false,
-                      estado: this.HabilitarHoraExtra && this.subItemModulosHorasExtras ? true : false,
-                      color: true,
-                      subtitulo: true,
-                      icono: 'schedule',
-                      children: this.childrenHorasExtras
-                    },
-                    {
                       name: 'Horas Extras.',
-                      accion: !this.HabilitarHoraExtra || !this.subItemModulosHorasExtras,
-                      estado: !this.HabilitarHoraExtra || !this.subItemModulosHorasExtras,
-                      activo: !this.subItemModulosHorasExtras && this.HabilitarHoraExtra ? this.subItemModulosHorasExtras : this.HabilitarHoraExtra,
+                      accion: !this.HabilitarHoraExtra,
+                      estado: !this.HabilitarHoraExtra,
+                      activo: false,
                       icono: 'schedule',
                       color: false,
                       url: this.HabilitarHoraExtra ? '/home' : '/listaHorasExtras'
                     },
                     {
-                      name: 'Alimentación',
-                      accion: this.HabilitarAlimentacion && this.subItemModulosAlimentacion ? true : false,
-                      estado: this.HabilitarAlimentacion && this.subItemModulosAlimentacion ? true : false,
-                      subtitulo: true,
-                      icono: 'local_dining',
-                      color: true,
-                      children: this.childrenAlimentacion
-                    },
-                    {
                       name: 'Alimentación.',
-                      accion: !this.HabilitarAlimentacion || !this.subItemModulosAlimentacion,
-                      estado: !this.HabilitarAlimentacion || !this.subItemModulosAlimentacion,
-                      activo: this.HabilitarAlimentacion && !this.subItemModulosAlimentacion ? this.subItemModulosAlimentacion : this.HabilitarAlimentacion,
+                      accion: !this.HabilitarAlimentacion,
+                      estado: !this.HabilitarAlimentacion,
+                      activo: false,
                       icono: 'local_dining',
                       color: false,
                       url: this.HabilitarAlimentacion ? '/home' : '/listarTipoComidas'
                     },
                     {
-                      name: 'Acción Personal',
-                      accion: this.HabilitarAccion && this.subItemModulosAccionPersonal,
-                      estado: this.HabilitarAccion && this.subItemModulosAccionPersonal,
-                      icono: 'how_to_reg',
-                      color: true,
-                      subtitulo: true,
-                      children: this.childrenAccionPersonal
-                    },
-                    {
                       name: 'Acción Personal.',
-                      accion: !this.HabilitarAccion || !this.subItemModulosAccionPersonal,
-                      estado: !this.HabilitarAccion || !this.subItemModulosAccionPersonal,
-                      activo: this.HabilitarAccion && !this.subItemModulosAccionPersonal ? this.subItemModulosAccionPersonal : this.HabilitarAccion,
+                      accion: !this.HabilitarAccion,
+                      estado: !this.HabilitarAccion,
+                      activo: false,
                       icono: 'how_to_reg',
                       color: false,
                       url: this.HabilitarAccion ? '/home' : '/proceso'
                     },
                     {
-                      name: 'Geolocalización',
-                      accion: this.HabilitarGeolocalizacion && this.subItemModulosGeolocalizacion,
-                      estado: this.HabilitarGeolocalizacion && this.subItemModulosGeolocalizacion,
-                      icono: 'my_location',
-                      subtitulo: true,
-                      color: true,
-                      children: this.childrenGeolocalizacion
-                    },
-                    {
                       name: 'Geolocalización.',
-                      accion: !this.HabilitarGeolocalizacion || !this.subItemModulosGeolocalizacion,
-                      estado: !this.HabilitarGeolocalizacion || !this.subItemModulosGeolocalizacion,
-                      activo: this.HabilitarGeolocalizacion && !this.subItemModulosGeolocalizacion ? this.subItemModulosGeolocalizacion : this.HabilitarGeolocalizacion,
+                      accion: !this.HabilitarGeolocalizacion,
+                      estado: !this.HabilitarGeolocalizacion,
+                      activo: false,
                       icono: 'my_location',
                       color: false,
                       url: this.HabilitarGeolocalizacion ? '/home' : '/coordenadas'
                     },
                     {
-                      name: 'Timbre Virtual',
-                      accion: this.HabilitarTimbreWeb && this.subItemModulosTimbreVirtual,
-                      estado: this.HabilitarTimbreWeb && this.subItemModulosTimbreVirtual,
-                      icono: 'computer',
-                      color: true,
-                      subtitulo: true,
-                      children: this.childrenTimbreVirtual
-                    },
-                    {
                       name: 'Timbre Virtual.',
-                      accion: !this.HabilitarTimbreWeb || !this.subItemModulosTimbreVirtual,
-                      estado: !this.HabilitarTimbreWeb || !this.subItemModulosTimbreVirtual,
-                      activo: this.HabilitarTimbreWeb && !this.subItemModulosTimbreVirtual ? this.subItemModulosTimbreVirtual : this.HabilitarTimbreWeb,
+                      accion: !this.HabilitarTimbreWeb,
+                      estado: !this.HabilitarTimbreWeb,
+                      activo: false,
                       icono: 'computer',
                       color: false,
                       url: this.HabilitarTimbreWeb ? '/home' : '/timbresWeb'
                     },
                     {
-                      name: 'Aplicación Móvil',
-                      accion: this.HabilitarMovil && this.subItemModulosAplicacionMovil,
-                      estado: this.HabilitarMovil && this.subItemModulosAplicacionMovil,
-                      icono: 'phone_android',
-                      color: true,
-                      subtitulo: true,
-                      children: this.childrenAplicacionMovil
-                    },
-                    {
                       name: 'Aplicación Móvil.',
-                      accion: !this.HabilitarMovil || !this.subItemModulosAplicacionMovil,
-                      estado: !this.HabilitarMovil || !this.subItemModulosAplicacionMovil,
-                      activo: this.HabilitarMovil && !this.subItemModulosAplicacionMovil ? this.subItemModulosAplicacionMovil : this.HabilitarMovil,
+                      accion: !this.HabilitarMovil,
+                      estado: !this.HabilitarMovil,
+                      activo: false,
                       icono: 'phone_android',
                       color: false,
                       url: this.HabilitarMovil ? '/home' : '/app-movil'
@@ -1005,182 +1119,92 @@ export class MainNavComponent implements OnInit {
                   color: true,
                   children: [
                     {
-                      name: 'Generales',
-                      accion: this.subItemReportesGenerales,
-                      estado: this.subItemReportesGenerales,
-                      subtitulo: true,
-                      icono: 'group',
-                      color: true,
-                      children: this.childrenGenerales
-                    },
-                    {
-                      name: 'Generales.',
+                      name: 'R. Generales.',
                       accion: !this.subItemReportesGenerales,
                       estado: !this.subItemReportesGenerales,
                       color: false,
-                      activo: this.subItemReportesGenerales,
+                      activo: false,
                       icono: 'group',
                       url: '/home'
                     },
                     {
-                      name: 'Asistencia',
-                      accion: this.subItemReportesAsistencia,
-                      estado: this.subItemReportesAsistencia,
-                      subtitulo: true,
-                      icono: 'check_circle_outline',
-                      color: true,
-                      children: this.childrenAsistencia
-                    },
-                    {
-                      name: 'Asistencia.',
+                      name: 'R. Asistencia.',
                       accion: !this.subItemReportesAsistencia,
                       estado: !this.subItemReportesAsistencia,
                       color: false,
-                      activo: this.subItemReportesAsistencia,
+                      activo: false,
                       icono: 'check_circle_outline',
                       url: '/home'
                     },
                     {
-                      name: 'Timbres',
-                      accion: this.subItemReportesTimbres,
-                      estado: this.subItemReportesTimbres,
-                      subtitulo: true,
-                      icono: 'touch_app',
-                      color: true,
-                      children: this.childrenReportesTimbres
-                    },
-                    {
-                      name: 'Timbres.',
+                      name: 'R. Timbres.',
                       accion: !this.subItemReportesTimbres,
                       estado: !this.subItemReportesTimbres,
                       color: false,
-                      activo: this.subItemReportesTimbres,
+                      activo: false,
                       icono: 'touch_app',
                       url: '/home'
                     },
                     {
-                      name: 'Permisos',
-                      accion: this.HabilitarPermisos && this.subItemReportesPermisos ? true : false,
-                      estado: this.HabilitarPermisos && this.subItemReportesPermisos ? true : false,
-                      icono: 'insert_emoticon',
-                      color: true,
-                      subtitulo: true,
-                      children: this.childrenReportesPermisos
-                    },
-                    {
-                      name: 'Permisos.',
-                      accion: !this.HabilitarPermisos || !this.subItemReportesTimbres,
-                      estado: !this.HabilitarPermisos || !this.subItemReportesTimbres,
+                      name: 'R. Permisos.',
+                      accion: !this.HabilitarPermisos,
+                      estado: !this.HabilitarPermisos,
                       color: false,
-                      activo: !this.subItemReportesTimbres && this.HabilitarPermisos ? this.subItemReportesPermisos : this.HabilitarPermisos,
+                      activo: false,
                       icono: 'insert_emoticon',
                       url: '/home'
                     },
                     {
-                      name: 'Vacaciones',
-                      accion: this.HabilitarVacaciones && this.subItemReportesVacaciones ? true : false,
-                      estado: this.HabilitarVacaciones && this.subItemReportesVacaciones ? true : false,
-                      icono: 'flight',
-                      color: true,
-                      subtitulo: true,
-                      children: this.childrenReportesVacaciones
-                    },
-                    {
-                      name: 'Vacaciones.',
-                      accion: !this.HabilitarVacaciones || !this.subItemReportesVacaciones,
-                      estado: !this.HabilitarVacaciones || !this.subItemReportesVacaciones,
+                      name: 'R. Vacaciones.',
+                      accion: !this.HabilitarVacaciones,
+                      estado: !this.HabilitarVacaciones,
                       color: false,
-                      activo: !this.subItemReportesVacaciones && this.HabilitarVacaciones ? this.subItemReportesVacaciones : this.HabilitarVacaciones,
+                      activo: false,
                       icono: 'flight',
                       url: '/home'
                     },
                     {
-                      name: 'Horas Extras',
-                      accion: this.HabilitarHoraExtra && this.subItemReportesHorasExtras ? true : false,
-                      estado: this.HabilitarHoraExtra && this.subItemReportesHorasExtras ? true : false,
-                      icono: 'schedule',
-                      color: true,
-                      subtitulo: true,
-                      children: this.childrenReportesHorasExtras
-                    },
-                    {
-                      name: 'Horas Extras.',
-                      accion: !this.HabilitarHoraExtra || !this.subItemReportesHorasExtras,
-                      estado: !this.HabilitarHoraExtra || !this.subItemReportesHorasExtras,
+                      name: 'R. Horas Extras.',
+                      accion: !this.HabilitarHoraExtra,
+                      estado: !this.HabilitarHoraExtra,
                       color: false,
-                      activo: !this.subItemReportesHorasExtras && this.HabilitarHoraExtra ? this.subItemReportesHorasExtras : this.HabilitarHoraExtra,
+                      activo: false,
                       icono: 'schedule',
                       url: '/home'
                     },
                     {
-                      name: 'Aplicación Móvil',
-                      accion: this.HabilitarMovil,
-                      estado: this.HabilitarMovil,
-                      icono: 'phone_android',
-                      subtitulo: true,
-                      color: true,
-                      children: this.childrenReportesAplicacionMovil
-                    },
-                    {
-                      name: 'Aplicación Móvil.',
-                      accion: !this.HabilitarMovil || !this.subItemReportesAplicacionMovil,
-                      estado: !this.HabilitarMovil || !this.subItemReportesAplicacionMovil,
+                      name: 'R. Aplicación Móvil.',
+                      accion: !this.HabilitarMovil,
+                      estado: !this.HabilitarMovil,
                       color: false,
-                      activo: !this.subItemReportesAplicacionMovil && this.HabilitarMovil ? this.subItemReportesAplicacionMovil : this.HabilitarMovil,
+                      activo: false,
                       icono: 'phone_android',
                       url: '/home'
                     },
                     {
-                      name: 'Timbre Virtual',
-                      accion: this.HabilitarTimbreWeb,
-                      estado: this.HabilitarTimbreWeb,
-                      icono: 'computer',
-                      subtitulo: true,
-                      color: true,
-                      children: this.childrenReportesTimbreVirtual
-                    },
-                    {
-                      name: 'Timbre Virtual.',
-                      accion: !this.HabilitarTimbreWeb || !this.subItemReportesTimbreVirtual,
-                      estado: !this.HabilitarTimbreWeb || !this.subItemReportesTimbreVirtual,
+                      name: 'R. Timbre Virtual.',
+                      accion: !this.HabilitarTimbreWeb,
+                      estado: !this.HabilitarTimbreWeb,
                       color: false,
-                      activo: !this.subItemReportesTimbreVirtual && this.HabilitarTimbreWeb ? this.subItemReportesTimbreVirtual : this.HabilitarTimbreWeb,
+                      activo: false,
                       icono: 'computer',
                       url: '/home'
                     },
                     {
-                      name: 'Alimentación',
-                      accion: this.HabilitarAlimentacion,
-                      estado: true,
-                      icono: 'restaurant',
-                      subtitulo: true,
-                      color: true,
-                      children: this.childrenReportesAlimentacion
-                    },
-                    {
-                      name: 'Alimentación.',
-                      accion: !this.HabilitarAlimentacion || !this.subItemReportesAlimentacion,
-                      estado: !this.HabilitarAlimentacion || !this.subItemReportesAlimentacion,
+                      name: 'R. Alimentación.',
+                      accion: !this.HabilitarAlimentacion,
+                      estado: !this.HabilitarAlimentacion,
                       color: false,
-                      activo: !this.subItemReportesAlimentacion && this.HabilitarAlimentacion ? this.subItemReportesAlimentacion : this.HabilitarAlimentacion,
+                      activo: false,
                       icono: 'restaurant',
                       url: '/home'
                     },
                     {
-                      name: 'Análisis Datos',
-                      accion: this.HabilitarAlimentacion,
-                      estado: true,
-                      icono: 'dashboard',
-                      subtitulo: true,
-                      color: true,
-                      children: this.childrenReportesAnalisisDatos
-                    },
-                    {
-                      name: 'Análisis Datos.',
-                      accion: !this.HabilitarAlimentacion || !this.subItemReportesAnalisisDatos,
-                      estado: !this.HabilitarAlimentacion || !this.subItemReportesAnalisisDatos,
+                      name: 'R. Análisis Datos.',
+                      accion: !this.HabilitarAlimentacion,
+                      estado: !this.HabilitarAlimentacion,
                       color: false,
-                      activo: !this.subItemReportesAnalisisDatos && this.HabilitarAlimentacion ? this.subItemReportesAnalisisDatos : this.HabilitarAlimentacion,
+                      activo: false,
                       icono: 'dashboard',
                       url: '/home'
                     }
@@ -1189,226 +1213,8 @@ export class MainNavComponent implements OnInit {
                 },
               ]
               //Fin Armado de json con elementos de menu ERROR
-
-              //Configuracion Elementos
-              //Modulos-Permisos
-              if(!this.subItemModulosPermisos){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Módulos');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Permisos');
-                }
-              }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Módulos');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Permisos.');
-                }
-              }
-              //Modulos-Vacaciones
-              if(!this.subItemModulosVacaciones){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Módulos');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Vacaciones');
-                }
-              }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Módulos');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Vacaciones.');
-                }
-              }
-              //Modulos-HorasExtras
-              if(!this.subItemModulosHorasExtras){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Módulos');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Horas Extras');
-                }
-              }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Módulos');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Horas Extras.');
-                }
-              }
-              //Modulos-Alimentacion
-              if(!this.subItemModulosAlimentacion){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Módulos');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Alimentación');
-                }
-              }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Módulos');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Alimentación.');
-                }
-              }
-              //Modulos-AccionPersonal
-              if(!this.subItemModulosAccionPersonal){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Módulos');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Acción Personal');
-                }
-              }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Módulos');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Acción Personal.');
-                }
-              }
-              //Modulos-Geolocalizacion
-              if(!this.subItemModulosGeolocalizacion){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Módulos');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Geolocalización');
-                }
-              }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Módulos');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Geolocalización.');
-                }
-              }
-              //Modulos-TimbreVirtual
-              if(!this.subItemModulosTimbreVirtual){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Módulos');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Timbre Virtual');
-                }
-              }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Módulos');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Timbre Virtual.');
-                }
-              }
-              //Modulos-AplicacionMovil
-              if(!this.subItemModulosAplicacionMovil){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Módulos');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Aplicación Móvil');
-                }
-              }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Módulos');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Aplicación Móvil.');
-                }
-              }
-              //Reportes-Generales
-              if(!this.subItemReportesGenerales){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Generales');
-                }
-              }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Generales.');
-                }
-              }
-              //Reportes-Asistencia
-              if(!this.subItemReportesAsistencia){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Asistencia');
-                }
-              }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Asistencia.');
-                }
-              }
-              //Reportes-timbres
-              if(!this.subItemReportesTimbres){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Timbres');
-                }
-              }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Timbres.');
-                }
-              }
-              //Reportes-Permisos
-              if(!this.subItemReportesPermisos){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Permisos');
-                }
-              }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Permisos.');
-                }
-              }
-              //Reportes-Vacaciones
-              if(!this.subItemReportesVacaciones){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Vacaciones');
-                }
-              }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Vacaciones.');
-                }
-              }
-              //Reportes-HorasExtras
-              if(!this.subItemReportesHorasExtras){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Horas Extras');
-                }
-              }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Horas Extras.');
-                }
-              }
-              //Reportes-Aplicación Móvil
-              if(!this.subItemReportesAplicacionMovil){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Aplicación Móvil');
-                }
-              }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Aplicación Móvil.');
-                }
-              }
-              //Reportes-Timbre Virtual
-              if(!this.subItemReportesTimbreVirtual){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Timbre Virtual');
-                }
-              }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Timbre Virtual.');
-                }
-              }
-              //Reportes-Alimentación
-              if(!this.subItemReportesAlimentacion){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Alimentación');
-                }
-              }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Alimentación.');
-                }
-              }
-              //Reportes-Analisis
-              if(!this.subItemReportesAnalisisDatos){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Análisis Datos');
-                }
-              }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Análisis Datos.');
-                }
-              }
-              //Fin configuracion Elementos
-              console.log('Error servicio');
+              sessionStorage.setItem('paginaRol', JSON.stringify(this.datosPaginaRol));
+              
               this.LlamarDatos();
             },
           complete: () => 
@@ -2287,7 +2093,7 @@ export class MainNavComponent implements OnInit {
               sessionStorage.setItem('paginaRol', JSON.stringify(this.datosPaginaRol));
 
               //Armado de json con elementos de menu COMPLETE
-              this.menuGeneral0 = [
+              this.menuGeneralUsuarios = [
                 {
                   name: 'Configuración',
                   accion: this.itemConfiguracion,
@@ -2515,7 +2321,7 @@ export class MainNavComponent implements OnInit {
                   color: true,
                   children: [
                     {
-                      name: 'Generales',
+                      name: 'R. Generales',
                       accion: this.subItemReportesGenerales,
                       estado: this.subItemReportesGenerales,
                       subtitulo: true,
@@ -2524,7 +2330,7 @@ export class MainNavComponent implements OnInit {
                       children: this.childrenGenerales
                     },
                     {
-                      name: 'Generales.',
+                      name: 'R. Generales.',
                       accion: !this.subItemReportesGenerales,
                       estado: !this.subItemReportesGenerales,
                       color: false,
@@ -2533,7 +2339,7 @@ export class MainNavComponent implements OnInit {
                       url: '/home'
                     },
                     {
-                      name: 'Asistencia',
+                      name: 'R. Asistencia',
                       accion: this.subItemReportesAsistencia,
                       estado: this.subItemReportesAsistencia,
                       subtitulo: true,
@@ -2542,7 +2348,7 @@ export class MainNavComponent implements OnInit {
                       children: this.childrenAsistencia
                     },
                     {
-                      name: 'Asistencia.',
+                      name: 'R. Asistencia.',
                       accion: !this.subItemReportesAsistencia,
                       estado: !this.subItemReportesAsistencia,
                       color: false,
@@ -2551,7 +2357,7 @@ export class MainNavComponent implements OnInit {
                       url: '/home'
                     },
                     {
-                      name: 'Timbres',
+                      name: 'R. Timbres',
                       accion: this.subItemReportesTimbres,
                       estado: this.subItemReportesTimbres,
                       subtitulo: true,
@@ -2560,7 +2366,7 @@ export class MainNavComponent implements OnInit {
                       children: this.childrenReportesTimbres
                     },
                     {
-                      name: 'Timbres.',
+                      name: 'R. Timbres.',
                       accion: !this.subItemReportesTimbres,
                       estado: !this.subItemReportesTimbres,
                       color: false,
@@ -2569,7 +2375,7 @@ export class MainNavComponent implements OnInit {
                       url: '/home'
                     },
                     {
-                      name: 'Permisos',
+                      name: 'R. Permisos',
                       accion: this.HabilitarPermisos && this.subItemReportesPermisos ? true : false,
                       estado: this.HabilitarPermisos && this.subItemReportesPermisos ? true : false,
                       icono: 'insert_emoticon',
@@ -2578,7 +2384,7 @@ export class MainNavComponent implements OnInit {
                       children: this.childrenReportesPermisos
                     },
                     {
-                      name: 'Permisos.',
+                      name: 'R. Permisos.',
                       accion: !this.HabilitarPermisos || !this.subItemReportesTimbres,
                       estado: !this.HabilitarPermisos || !this.subItemReportesTimbres,
                       color: false,
@@ -2587,7 +2393,7 @@ export class MainNavComponent implements OnInit {
                       url: '/home'
                     },
                     {
-                      name: 'Vacaciones',
+                      name: 'R. Vacaciones',
                       accion: this.HabilitarVacaciones && this.subItemReportesVacaciones ? true : false,
                       estado: this.HabilitarVacaciones && this.subItemReportesVacaciones ? true : false,
                       icono: 'flight',
@@ -2596,7 +2402,7 @@ export class MainNavComponent implements OnInit {
                       children: this.childrenReportesVacaciones
                     },
                     {
-                      name: 'Vacaciones.',
+                      name: 'R. Vacaciones.',
                       accion: !this.HabilitarVacaciones || !this.subItemReportesVacaciones,
                       estado: !this.HabilitarVacaciones || !this.subItemReportesVacaciones,
                       color: false,
@@ -2605,7 +2411,7 @@ export class MainNavComponent implements OnInit {
                       url: '/home'
                     },
                     {
-                      name: 'Horas Extras',
+                      name: 'R. Horas Extras',
                       accion: this.HabilitarHoraExtra && this.subItemReportesHorasExtras ? true : false,
                       estado: this.HabilitarHoraExtra && this.subItemReportesHorasExtras ? true : false,
                       icono: 'schedule',
@@ -2614,7 +2420,7 @@ export class MainNavComponent implements OnInit {
                       children: this.childrenReportesHorasExtras
                     },
                     {
-                      name: 'Horas Extras.',
+                      name: 'R. Horas Extras.',
                       accion: !this.HabilitarHoraExtra || !this.subItemReportesHorasExtras,
                       estado: !this.HabilitarHoraExtra || !this.subItemReportesHorasExtras,
                       color: false,
@@ -2623,7 +2429,7 @@ export class MainNavComponent implements OnInit {
                       url: '/home'
                     },
                     {
-                      name: 'Aplicación Móvil',
+                      name: 'R. Aplicación Móvil',
                       accion: this.HabilitarMovil,
                       estado: this.HabilitarMovil,
                       icono: 'phone_android',
@@ -2632,7 +2438,7 @@ export class MainNavComponent implements OnInit {
                       children: this.childrenReportesAplicacionMovil
                     },
                     {
-                      name: 'Aplicación Móvil.',
+                      name: 'R. Aplicación Móvil.',
                       accion: !this.HabilitarMovil || !this.subItemReportesAplicacionMovil,
                       estado: !this.HabilitarMovil || !this.subItemReportesAplicacionMovil,
                       color: false,
@@ -2641,7 +2447,7 @@ export class MainNavComponent implements OnInit {
                       url: '/home'
                     },
                     {
-                      name: 'Timbre Virtual',
+                      name: 'R. Timbre Virtual',
                       accion: this.HabilitarTimbreWeb,
                       estado: this.HabilitarTimbreWeb,
                       icono: 'computer',
@@ -2650,7 +2456,7 @@ export class MainNavComponent implements OnInit {
                       children: this.childrenReportesTimbreVirtual
                     },
                     {
-                      name: 'Timbre Virtual.',
+                      name: 'R. Timbre Virtual.',
                       accion: !this.HabilitarTimbreWeb || !this.subItemReportesTimbreVirtual,
                       estado: !this.HabilitarTimbreWeb || !this.subItemReportesTimbreVirtual,
                       color: false,
@@ -2659,7 +2465,7 @@ export class MainNavComponent implements OnInit {
                       url: '/home'
                     },
                     {
-                      name: 'Alimentación',
+                      name: 'R. Alimentación',
                       accion: this.HabilitarAlimentacion,
                       estado: true,
                       icono: 'restaurant',
@@ -2668,7 +2474,7 @@ export class MainNavComponent implements OnInit {
                       children: this.childrenReportesAlimentacion
                     },
                     {
-                      name: 'Alimentación.',
+                      name: 'R. Alimentación.',
                       accion: !this.HabilitarAlimentacion || !this.subItemReportesAlimentacion,
                       estado: !this.HabilitarAlimentacion || !this.subItemReportesAlimentacion,
                       color: false,
@@ -2677,7 +2483,7 @@ export class MainNavComponent implements OnInit {
                       url: '/home'
                     },
                     {
-                      name: 'Análisis Datos',
+                      name: 'R. Análisis Datos',
                       accion: this.HabilitarAlimentacion,
                       estado: true,
                       icono: 'dashboard',
@@ -2686,7 +2492,7 @@ export class MainNavComponent implements OnInit {
                       children: this.childrenReportesAnalisisDatos
                     },
                     {
-                      name: 'Análisis Datos.',
+                      name: 'R. Análisis Datos.',
                       accion: !this.HabilitarAlimentacion || !this.subItemReportesAnalisisDatos,
                       estado: !this.HabilitarAlimentacion || !this.subItemReportesAnalisisDatos,
                       color: false,
@@ -2703,267 +2509,267 @@ export class MainNavComponent implements OnInit {
               //Complemento de elementos
               //Configuracion
               if(!this.itemConfiguracion){
-                const indexConfiguracion = this.menuGeneral0.findIndex(item => item.name === 'Configuración');
+                const indexConfiguracion = this.menuGeneralUsuarios.findIndex(item => item.name === 'Configuración');
                 if (indexConfiguracion !== -1) {
-                  this.menuGeneral0.splice(indexConfiguracion, 1);
+                  this.menuGeneralUsuarios.splice(indexConfiguracion, 1);
                 }
               }
               //Configuracion-Parametrizacion
               if(!this.subItemConfiguracionParametrizacion){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Configuración');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Parametrización');
+                const configuracionItem = this.menuGeneralUsuarios.findIndex(item => item.name == 'Configuración');
+                if(configuracionItem !== -1 && this.menuGeneralUsuarios[configuracionItem].children){
+                  this.menuGeneralUsuarios[configuracionItem].children = this.menuGeneralUsuarios[configuracionItem].children.filter(child => child.name !== 'Parametrización');
                 }
               }
               //Configuracion-Localizacion
               if(!this.subItemConfiguracionLocalizacion){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Configuración');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Localización');
+                const configuracionItem = this.menuGeneralUsuarios.findIndex(item => item.name == 'Configuración');
+                if(configuracionItem !== -1 && this.menuGeneralUsuarios[configuracionItem].children){
+                  this.menuGeneralUsuarios[configuracionItem].children = this.menuGeneralUsuarios[configuracionItem].children.filter(child => child.name !== 'Localización');
                 }
               }
               //Usuarios
               if(!this.itemUsuarios){
-                const indexUsuarios = this.menuGeneral0.findIndex(item => item.name === 'Usuarios');
+                const indexUsuarios = this.menuGeneralUsuarios.findIndex(item => item.name === 'Usuarios');
                 if (indexUsuarios !== -1) {
-                  this.menuGeneral0.splice(indexUsuarios, 1);
+                  this.menuGeneralUsuarios.splice(indexUsuarios, 1);
                 }
               }
               //Horarios
               if(!this.itemHorarios){
-                const indexHorarios = this.menuGeneral0.findIndex(item => item.name === 'Horarios');
+                const indexHorarios = this.menuGeneralUsuarios.findIndex(item => item.name === 'Horarios');
                 if (indexHorarios !== -1) {
-                  this.menuGeneral0.splice(indexHorarios, 1);
+                  this.menuGeneralUsuarios.splice(indexHorarios, 1);
                 }
               }
               //Timbres
               if(!this.itemTimbres){
-                const indexTimbres = this.menuGeneral0.findIndex(item => item.name === 'Timbres');
+                const indexTimbres = this.menuGeneralUsuarios.findIndex(item => item.name === 'Timbres');
                 if (indexTimbres !== -1) {
-                  this.menuGeneral0.splice(indexTimbres, 1);
+                  this.menuGeneralUsuarios.splice(indexTimbres, 1);
                 }
               }
               //Notificaciones
               if(!this.itemNotificaciones){
-                const indexNotificaciones = this.menuGeneral0.findIndex(item => item.name === 'Notificaciones');
+                const indexNotificaciones = this.menuGeneralUsuarios.findIndex(item => item.name === 'Notificaciones');
                 if (indexNotificaciones !== -1) {
-                  this.menuGeneral0.splice(indexNotificaciones, 1);
+                  this.menuGeneralUsuarios.splice(indexNotificaciones, 1);
                 }
               }
               //Modulos-Permisos              
               if (!this.HabilitarPermisos || !this.subItemModulosPermisos) {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Módulos');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Módulos');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
                   this.filterMenuChildren(configurationItem, 'Permisos');
                 }
               } else {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Módulos');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Módulos');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
                   this.filterMenuChildren(configurationItem, 'Permisos.');
                 }
               }
               //Modulos-Vacaciones
               if (!this.HabilitarVacaciones || !this.subItemModulosVacaciones) {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Módulos');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Módulos');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
                   this.filterMenuChildren(configurationItem, 'Vacaciones');
                 }
               } else {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Módulos');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Módulos');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
                   this.filterMenuChildren(configurationItem, 'Vacaciones.');
                 }
               }
               //Modulos-HorasExtras
               if (!this.HabilitarHoraExtra || !this.subItemModulosHorasExtras) {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Módulos');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Módulos');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
                   this.filterMenuChildren(configurationItem, 'Horas Extras');
                 }
               } else {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Módulos');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Módulos');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
                   this.filterMenuChildren(configurationItem, 'Horas Extras.');
                 }
               }
               //Modulos-Alimentacion
               if (!this.HabilitarAlimentacion || !this.subItemModulosAlimentacion) {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Módulos');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Módulos');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
                   this.filterMenuChildren(configurationItem, 'Alimentación');
                 }
               } else {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Módulos');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Módulos');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
                   this.filterMenuChildren(configurationItem, 'Alimentación.');
                 }
               }
               //Modulos-AccionPersonal
               if (!this.HabilitarAccion || !this.subItemModulosAccionPersonal) {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Módulos');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Módulos');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
                   this.filterMenuChildren(configurationItem, 'Acción Personal');
                 }
               } else {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Módulos');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Módulos');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
                   this.filterMenuChildren(configurationItem, 'Acción Personal.');
                 }
               }
               //Modulos-Geolocalizacion
               if (!this.HabilitarGeolocalizacion || !this.subItemModulosGeolocalizacion) {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Módulos');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Módulos');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
                   this.filterMenuChildren(configurationItem, 'Geolocalización');
                 }
               } else {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Módulos');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Módulos');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
                   this.filterMenuChildren(configurationItem, 'Geolocalización.');
                 }
               }
               //Modulos-TimbreVirtual
               if (!this.HabilitarTimbreWeb || !this.subItemModulosTimbreVirtual) {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Módulos');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Módulos');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
                   this.filterMenuChildren(configurationItem, 'Timbre Virtual');
                 }
               } else {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Módulos');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Módulos');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
                   this.filterMenuChildren(configurationItem, 'Timbre Virtual.');
                 }
               }
               //Modulos-AplicacionMovil
               if (!this.HabilitarMovil || !this.subItemModulosAplicacionMovil) {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Módulos');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Módulos');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
                   this.filterMenuChildren(configurationItem, 'Aplicación Móvil');
                 }
               } else {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Módulos');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Módulos');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
                   this.filterMenuChildren(configurationItem, 'Aplicación Móvil.');
                 }
               }
               //Reportes-Generales
               if(!this.subItemReportesGenerales){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Generales');
+                const configuracionItem = this.menuGeneralUsuarios.findIndex(item => item.name == 'Reportes');
+                if(configuracionItem !== -1 && this.menuGeneralUsuarios[configuracionItem].children){
+                  this.menuGeneralUsuarios[configuracionItem].children = this.menuGeneralUsuarios[configuracionItem].children.filter(child => child.name !== 'R. Generales');
                 }
               }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Generales.');
+                const configuracionItem = this.menuGeneralUsuarios.findIndex(item => item.name == 'Reportes');
+                if(configuracionItem !== -1 && this.menuGeneralUsuarios[configuracionItem].children){
+                  this.menuGeneralUsuarios[configuracionItem].children = this.menuGeneralUsuarios[configuracionItem].children.filter(child => child.name !== 'R. Generales.');
                 }
               }
               //Reportes-Asistencia
               if(!this.subItemReportesAsistencia){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Asistencia');
+                const configuracionItem = this.menuGeneralUsuarios.findIndex(item => item.name == 'Reportes');
+                if(configuracionItem !== -1 && this.menuGeneralUsuarios[configuracionItem].children){
+                  this.menuGeneralUsuarios[configuracionItem].children = this.menuGeneralUsuarios[configuracionItem].children.filter(child => child.name !== 'R. Asistencia');
                 }
               }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Asistencia.');
+                const configuracionItem = this.menuGeneralUsuarios.findIndex(item => item.name == 'Reportes');
+                if(configuracionItem !== -1 && this.menuGeneralUsuarios[configuracionItem].children){
+                  this.menuGeneralUsuarios[configuracionItem].children = this.menuGeneralUsuarios[configuracionItem].children.filter(child => child.name !== 'R. Asistencia.');
                 }
               }
               //Reportes-timbres
               if(!this.subItemReportesTimbres){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Timbres');
+                const configuracionItem = this.menuGeneralUsuarios.findIndex(item => item.name == 'Reportes');
+                if(configuracionItem !== -1 && this.menuGeneralUsuarios[configuracionItem].children){
+                  this.menuGeneralUsuarios[configuracionItem].children = this.menuGeneralUsuarios[configuracionItem].children.filter(child => child.name !== 'R. Timbres');
                 }
               }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Timbres.');
+                const configuracionItem = this.menuGeneralUsuarios.findIndex(item => item.name == 'Reportes');
+                if(configuracionItem !== -1 && this.menuGeneralUsuarios[configuracionItem].children){
+                  this.menuGeneralUsuarios[configuracionItem].children = this.menuGeneralUsuarios[configuracionItem].children.filter(child => child.name !== 'R. Timbres.');
                 }
               }
               //Reportes-Permisos
               if (!this.HabilitarPermisos || !this.subItemReportesPermisos) {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Reportes');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
-                  this.filterMenuChildren(configurationItem, 'Permisos');
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Reportes');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
+                  this.filterMenuChildren(configurationItem, 'R. Permisos');
                 }
               } else {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Reportes');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
-                  this.filterMenuChildren(configurationItem, 'Permisos.');
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Reportes');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
+                  this.filterMenuChildren(configurationItem, 'R. Permisos.');
                 }
               }
               //Reportes-Vacaciones
               if (!this.HabilitarVacaciones || !this.subItemReportesVacaciones) {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Reportes');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
-                  this.filterMenuChildren(configurationItem, 'Vacaciones');
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Reportes');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
+                  this.filterMenuChildren(configurationItem, 'R. Vacaciones');
                 }
               } else {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Reportes');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
-                  this.filterMenuChildren(configurationItem, 'Vacaciones.');
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Reportes');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
+                  this.filterMenuChildren(configurationItem, 'R. Vacaciones.');
                 }
               }
               //Reportes-HorasExtras
               if (!this.HabilitarHoraExtra || !this.subItemReportesHorasExtras) {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Reportes');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
-                  this.filterMenuChildren(configurationItem, 'Horas Extras');
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Reportes');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
+                  this.filterMenuChildren(configurationItem, 'R. Horas Extras');
                 }
               } else {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Reportes');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
-                  this.filterMenuChildren(configurationItem, 'Horas Extras.');
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Reportes');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
+                  this.filterMenuChildren(configurationItem, 'R. Horas Extras.');
                 }
               }
               //Reportes-Aplicación Móvil
               if (!this.HabilitarMovil || !this.subItemReportesAplicacionMovil) {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Reportes');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
-                  this.filterMenuChildren(configurationItem, 'Aplicación Móvil');
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Reportes');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
+                  this.filterMenuChildren(configurationItem, 'R. Aplicación Móvil');
                 }
               } else {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Reportes');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
-                  this.filterMenuChildren(configurationItem, 'Aplicación Móvil.');
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Reportes');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
+                  this.filterMenuChildren(configurationItem, 'R. Aplicación Móvil.');
                 }
               }
               //Reportes-Timbre Virtual
               if (!this.HabilitarTimbreWeb || !this.subItemReportesTimbreVirtual) {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Reportes');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
-                  this.filterMenuChildren(configurationItem, 'Timbre Virtual');
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Reportes');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
+                  this.filterMenuChildren(configurationItem, 'R. Timbre Virtual');
                 }
               } else {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Reportes');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
-                  this.filterMenuChildren(configurationItem, 'Timbre Virtual.');
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Reportes');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
+                  this.filterMenuChildren(configurationItem, 'R. Timbre Virtual.');
                 }
               }
               //Reportes-Alimentación
               if (!this.HabilitarAlimentacion || !this.subItemReportesAlimentacion) {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Reportes');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
-                  this.filterMenuChildren(configurationItem, 'Alimentación');
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Reportes');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
+                  this.filterMenuChildren(configurationItem, 'R. Alimentación');
                 }
               } else {
-                const configurationItem = this.menuGeneral0.findIndex(item => item.name === 'Reportes');
-                if (configurationItem !== -1 && this.menuGeneral0[configurationItem].children) {
-                  this.filterMenuChildren(configurationItem, 'Alimentación.');
+                const configurationItem = this.menuGeneralUsuarios.findIndex(item => item.name === 'Reportes');
+                if (configurationItem !== -1 && this.menuGeneralUsuarios[configurationItem].children) {
+                  this.filterMenuChildren(configurationItem, 'R. Alimentación.');
                 }
               }
               //Reportes-Analisis
               if(!this.subItemReportesAnalisisDatos){
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Análisis Datos');
+                const configuracionItem = this.menuGeneralUsuarios.findIndex(item => item.name == 'Reportes');
+                if(configuracionItem !== -1 && this.menuGeneralUsuarios[configuracionItem].children){
+                  this.menuGeneralUsuarios[configuracionItem].children = this.menuGeneralUsuarios[configuracionItem].children.filter(child => child.name !== 'R. Análisis Datos');
                 }
               }else{
-                const configuracionItem = this.menuGeneral0.findIndex(item => item.name == 'Reportes');
-                if(configuracionItem !== -1 && this.menuGeneral0[configuracionItem].children){
-                  this.menuGeneral0[configuracionItem].children = this.menuGeneral0[configuracionItem].children.filter(child => child.name !== 'Análisis Datos.');
+                const configuracionItem = this.menuGeneralUsuarios.findIndex(item => item.name == 'Reportes');
+                if(configuracionItem !== -1 && this.menuGeneralUsuarios[configuracionItem].children){
+                  this.menuGeneralUsuarios[configuracionItem].children = this.menuGeneralUsuarios[configuracionItem].children.filter(child => child.name !== 'R. Análisis Datos.');
                 }
               }
               //Fin Complemento de elementos
@@ -2977,8 +2783,13 @@ export class MainNavComponent implements OnInit {
     
   }
 
+  //Elimina elementos que cumplan con los parametros de entrada, quitar elementos sobrantes de menu lateral
   filterMenuChildren(index, itemName) {
-    this.menuGeneral0[index].children = this.menuGeneral0[index].children.filter(child => child.name !== itemName);
+    this.menuGeneralUsuarios[index].children = this.menuGeneralUsuarios[index].children.filter(child => child.name !== itemName);
+  }
+
+  filterMenuChildrenAdministrador(index, itemName) {
+    this.menuGeneralAdministrador[index].children = this.menuGeneralAdministrador[index].children.filter(child => child.name !== itemName);
   }
 
 }
