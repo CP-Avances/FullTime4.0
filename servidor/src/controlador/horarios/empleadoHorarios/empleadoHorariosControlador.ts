@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import pool from '../../../database';
 import excel from 'xlsx';
 import fs from 'fs';
@@ -28,24 +29,71 @@ class EmpleadoHorariosControlador {
 
     // CREACION DE HORARIO
     public async CrearEmpleadoHorarios(req: Request, res: Response): Promise<void> {
-        const { id_empl_cargo, fec_inicio, fec_final, lunes, martes, miercoles, jueves,
-            viernes, sabado, domingo, id_horarios, estado, codigo } = req.body;
-        await pool.query(
-            `
-            INSERT INTO empl_horarios (id_empl_cargo, fec_inicio, fec_final, 
-            lunes, martes, miercoles, jueves, viernes, sabado, domingo, id_horarios, estado, codigo) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-            `
-            , [id_empl_cargo, fec_inicio, fec_final, lunes, martes, miercoles, jueves,
-                viernes, sabado, domingo, id_horarios, estado, codigo]);
-        res.jsonp({ message: 'Registro guardado.' });
+        try {
+            const { id_empl_cargo, fec_inicio, fec_final, lunes, martes, miercoles, jueves,
+                viernes, sabado, domingo, id_horarios, estado, codigo, user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            await pool.query(
+                `
+                INSERT INTO empl_horarios (id_empl_cargo, fec_inicio, fec_final, 
+                lunes, martes, miercoles, jueves, viernes, sabado, domingo, id_horarios, estado, codigo) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+                `
+                , [id_empl_cargo, fec_inicio, fec_final, lunes, martes, miercoles, jueves,
+                    viernes, sabado, domingo, id_horarios, estado, codigo]);
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+               tabla: 'empl_horarios',
+               usuario: user_name,
+               accion: 'I',
+                datosOriginales: '',
+                datosNuevos: `{id_empl_cargo: ${id_empl_cargo}, fec_inicio: ${fec_inicio}, fec_final: ${fec_final}, lunes: ${lunes}, martes: ${martes}, miercoles: ${miercoles}, jueves: ${jueves}, viernes: ${viernes}, sabado: ${sabado}, domingo: ${domingo}, id_horarios: ${id_horarios}, estado: ${estado}, codigo: ${codigo}}`, 
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            res.jsonp({ message: 'Registro guardado.' });
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            res.status(500).jsonp({ message: 'Error al guardar el registro.' });  
+        }
     }
 
     // ACTUALIZAR HORARIO ASIGNADO AL USUARIO
-    public async ActualizarEmpleadoHorarios(req: Request, res: Response): Promise<any> {
+    public async ActualizarEmpleadoHorarios(req: Request, res: Response): Promise<Response> {
         const { id_empl_cargo, fec_inicio, fec_final, lunes, martes, miercoles,
-            jueves, viernes, sabado, domingo, id_horarios, estado, id } = req.body;
+            jueves, viernes, sabado, domingo, id_horarios, estado, id, user_name, ip } = req.body;
         try {
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTAR DATOSORIGINALES
+            const HORARIO = await pool.query('SELECT * FROM empl_horarios WHERE id = $1', [id]);
+            const [datosOriginales] = HORARIO.rows;
+
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'empl_horarios',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al actualizar el registro con id: ${id}`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+            }
+
             const [result] = await pool.query(
                 `
                 UPDATE empl_horarios SET id_empl_cargo = $1, fec_inicio = $2, fec_final = $3, lunes = $4, 
@@ -58,8 +106,24 @@ class EmpleadoHorariosControlador {
 
             if (result === undefined) return res.status(404).jsonp({ message: 'Horario no actualizado.' })
 
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'empl_horarios',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: JSON.stringify(result),
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
             return res.status(200).jsonp({ message: 'El horario del empleado se registró con éxito.' });
         } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
             return res.status(500).jsonp({ message: 'Registros no encontrados.' });
         }
     }
@@ -339,21 +403,6 @@ class EmpleadoHorariosControlador {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public async ListarEmpleadoHorarios(req: Request, res: Response) {
         const HORARIOS = await pool.query('SELECT * FROM empl_horarios WHERE estado = 1');
         if (HORARIOS.rowCount > 0) {
@@ -525,8 +574,6 @@ class EmpleadoHorariosControlador {
             contador_arreglo = contador_arreglo + 1;
         }
 
-        console.log('intermedios', contarFechas)
-
         if (contarFechas != 0) {
             return res.jsonp({ message: 'error' });
         }
@@ -559,19 +606,48 @@ class EmpleadoHorariosControlador {
         const sheet_name_list = workbook.SheetNames; // Array de hojas de calculo
         const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
+        // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
+        const { user_name, ip } = req.body;
+
         plantilla.forEach(async (data: any) => {
-            const { id } = req.params;
-            const { codigo } = req.params;
-            var { fecha_inicio, fecha_final, lunes, martes, miercoles, jueves, viernes, sabado, domingo, nombre_horario, estado } = data;
-            const id_cargo = await pool.query('SELECT MAX(ec.id) FROM empl_cargos AS ec, empl_contratos AS ce, empleados AS e WHERE ce.id_empleado = e.id AND ec.id_empl_contrato = ce.id AND e.id = $1', [id]);
-            var id_empl_cargo = id_cargo.rows[0]['max'];;
-            var nombre = nombre_horario;
-            const idHorario = await pool.query('SELECT id FROM cg_horarios WHERE UPPER(nombre) = $1', [nombre.toUpperCase()]);
-            var id_horarios = idHorario.rows[0]['id'];
-            var id_hora = 1;
-            await pool.query('INSERT INTO empl_horarios (id_empl_cargo, id_hora, fec_inicio, fec_final, lunes, martes, miercoles, jueves, viernes, sabado, domingo, id_horarios, estado, codigo) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)',
-                [id_empl_cargo, id_hora, fecha_inicio, fecha_final, lunes, martes, miercoles, jueves, viernes, sabado, domingo, id_horarios, estado.split("-")[0], codigo]);
-            res.jsonp({ message: 'correcto' });
+            try {
+                const { id } = req.params;
+                const { codigo } = req.params;
+                let { fecha_inicio, fecha_final, lunes, martes, miercoles, jueves, viernes, sabado, domingo, nombre_horario, estado } = data;
+                
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+
+                const id_cargo = await pool.query('SELECT MAX(ec.id) FROM empl_cargos AS ec, empl_contratos AS ce, empleados AS e WHERE ce.id_empleado = e.id AND ec.id_empl_contrato = ce.id AND e.id = $1', [id]);
+                let id_empl_cargo = id_cargo.rows[0]['max'];;
+                let nombre = nombre_horario;
+                const idHorario = await pool.query('SELECT id FROM cg_horarios WHERE UPPER(nombre) = $1', [nombre.toUpperCase()]);
+                let id_horarios = idHorario.rows[0]['id'];
+                let id_hora = 1;
+
+                await pool.query('INSERT INTO empl_horarios (id_empl_cargo, id_hora, fec_inicio, fec_final, lunes, martes, miercoles, jueves, viernes, sabado, domingo, id_horarios, estado, codigo) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)',
+                    [id_empl_cargo, id_hora, fecha_inicio, fecha_final, lunes, martes, miercoles, jueves, viernes, sabado, domingo, id_horarios, estado.split("-")[0], codigo]);
+                
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'empl_horarios',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{id_empl_cargo: ${id_empl_cargo}, id_hora: ${id_hora}, fec_inicio: ${fecha_inicio}, fec_final: ${fecha_final}, lunes: ${lunes}, martes: ${martes}, miercoles: ${miercoles}, jueves: ${jueves}, viernes: ${viernes}, sabado: ${sabado}, domingo: ${domingo}, id_horarios: ${id_horarios}, estado: ${estado}, codigo: ${codigo}}`,
+                    ip,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                
+                res.jsonp({ message: 'correcto' });
+            } catch (error) {
+                // REVERTIR TRANSACCION
+                await pool.query('ROLLBACK');
+                res.status(500).jsonp({ message: 'error' });
+            }
         });
         // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
         fs.access(filePath, fs.constants.F_OK, (err) => {
@@ -593,6 +669,10 @@ class EmpleadoHorariosControlador {
         const sheet_name_list = workbook.SheetNames;
         const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
         var arrayDetalles: any = [];
+
+        // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
+        const { user_name, ip } = req.body;
+
         //Leer la plantilla para llenar un array con los datos cedula y usuario para verificar que no sean duplicados
         plantilla.forEach(async (data: any) => {
             const { id } = req.params;
@@ -644,15 +724,38 @@ class EmpleadoHorariosControlador {
             }
             fechasHorario.map(obj => {
                 arrayDetalles.map(async (element: any) => {
-                    var accion = 0;
-                    if (element.tipo_accion === 'E') {
-                        accion = element.minu_espera;
-                    }
-                    var estado = null;
-                    await pool.query('INSERT INTO plan_general (fec_hora_horario, tolerancia, estado, id_det_horario, ' +
-                        'fec_horario, id_empl_cargo, tipo_entr_salida, codigo, id_horario) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
-                        [obj + ' ' + element.hora, accion, estado, element.id,
-                            obj, CARGO.rows[0]['max'], element.tipo_accion, codigo, HORARIO.rows[0]['id']]);
+                    try {
+                        var accion = 0;
+                        if (element.tipo_accion === 'E') {
+                            accion = element.minu_espera;
+                        }
+                        var estado = null;
+    
+                        // INICIAR TRANSACCION
+                        await pool.query('BEGIN');
+                        
+                        await pool.query('INSERT INTO plan_general (fec_hora_horario, tolerancia, estado, id_det_horario, ' +
+                            'fec_horario, id_empl_cargo, tipo_entr_salida, codigo, id_horario) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+                            [obj + ' ' + element.hora, accion, estado, element.id,
+                                obj, CARGO.rows[0]['max'], element.tipo_accion, codigo, HORARIO.rows[0]['id']]);
+                        
+                        // AUDITORIA
+                        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                            tabla: 'plan_general',
+                            usuario: user_name,
+                            accion: 'I',
+                            datosOriginales: '',
+                            datosNuevos: `{fec_hora_horario: ${obj + ' ' + element.hora}, tolerancia: ${accion}, estado: ${estado}, id_det_horario: ${element.id}, fec_horario: ${obj}, id_empl_cargo: ${CARGO.rows[0]['max']}, tipo_entr_salida: ${element.tipo_accion}, codigo: ${codigo}, id_horario: ${HORARIO.rows[0]['id']}}`,
+                            ip,
+                            observacion: null
+                        });
+
+                        // FINALIZAR TRANSACCION
+                        await pool.query('COMMIT');
+                   } catch (error) {
+                        // REVERTIR TRANSACCION
+                        await pool.query('ROLLBACK');
+                   }
                 })
             })
             return res.jsonp({ message: 'correcto' });
@@ -678,18 +781,43 @@ class EmpleadoHorariosControlador {
         const sheet_name_list = workbook.SheetNames; // Array de hojas de calculo
         const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
+        // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
+        const { user_name, ip } = req.body;
+
         plantilla.forEach(async (data: any) => {
-            var { cedula, fecha_inicio, fecha_final, lunes, martes, miercoles, jueves, viernes, sabado, domingo, nombre_horario, estado } = data;
-            const id_cargo = await pool.query('SELECT MAX(ecargo.id) FROM empl_cargos AS ecargo, empl_contratos AS econtrato, empleados AS e WHERE econtrato.id_empleado = e.id AND ecargo.id_empl_contrato = econtrato.id AND e.cedula = $1', [cedula]);
-            var id_empl_cargo = id_cargo.rows[0]['max'];;
-            var nombre = nombre_horario;
-            const idHorario = await pool.query('SELECT id FROM cg_horarios WHERE nombre = $1', [nombre]);
-            var id_horarios = idHorario.rows[0]['id'];
-            var id_hora = 1;
-            await pool.query('INSERT INTO empl_horarios (id_empl_cargo, id_hora, fec_inicio, fec_final, lunes, martes, miercoles, jueves, viernes, sabado, domingo, id_horarios, estado) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)', [id_empl_cargo, id_hora, fecha_inicio, fecha_final, lunes, martes, miercoles, jueves, viernes, sabado, domingo, id_horarios, estado.split("-")[0]]);
-            console.log("carga exitosa");
+            try {
+                var { cedula, fecha_inicio, fecha_final, lunes, martes, miercoles, jueves, viernes, sabado, domingo, nombre_horario, estado } = data;
+                
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+
+                const id_cargo = await pool.query('SELECT MAX(ecargo.id) FROM empl_cargos AS ecargo, empl_contratos AS econtrato, empleados AS e WHERE econtrato.id_empleado = e.id AND ecargo.id_empl_contrato = econtrato.id AND e.cedula = $1', [cedula]);
+                var id_empl_cargo = id_cargo.rows[0]['max'];;
+                var nombre = nombre_horario;
+                const idHorario = await pool.query('SELECT id FROM cg_horarios WHERE nombre = $1', [nombre]);
+                var id_horarios = idHorario.rows[0]['id'];
+                var id_hora = 1;
+                await pool.query('INSERT INTO empl_horarios (id_empl_cargo, id_hora, fec_inicio, fec_final, lunes, martes, miercoles, jueves, viernes, sabado, domingo, id_horarios, estado) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)', [id_empl_cargo, id_hora, fecha_inicio, fecha_final, lunes, martes, miercoles, jueves, viernes, sabado, domingo, id_horarios, estado.split("-")[0]]);
+                
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'empl_horarios',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{id_empl_cargo: ${id_empl_cargo}, id_hora: ${id_hora}, fec_inicio: ${fecha_inicio}, fec_final: ${fecha_final}, lunes: ${lunes}, martes: ${martes}, miercoles: ${miercoles}, jueves: ${jueves}, viernes: ${viernes}, sabado: ${sabado}, domingo: ${domingo}, id_horarios: ${id_horarios}, estado: ${estado}}`,
+                    ip,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+            } catch (error) {
+                // REVERTIR TRANSACCION
+                await pool.query('ROLLBACK');
+            }
         });
-        res.jsonp({ message: 'La plantilla a sido receptada' });
+        res.jsonp({ message: 'La plantilla ha sido receptada' });
         // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
         fs.access(filePath, fs.constants.F_OK, (err) => {
             if (err) {
@@ -703,10 +831,56 @@ class EmpleadoHorariosControlador {
 
 
 
-    public async EliminarRegistros(req: Request, res: Response): Promise<void> {
-        const id = req.params.id;
-        await pool.query('DELETE FROM empl_horarios WHERE id = $1', [id]);
-        res.jsonp({ message: 'Registro eliminado.' });
+    public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
+        try {
+            const id = req.params.id;
+            // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
+            const { user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTAR DATOSORIGINALES
+            const consulta = await pool.query('SELECT * FROM empl_horarios WHERE id = $1', [id]);
+            const [datosOriginales] = consulta.rows;
+
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'empl_horarios',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al eliminar el registro con id: ${id}`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ text: 'Registro no encontrado.' });
+            }
+
+            await pool.query('DELETE FROM empl_horarios WHERE id = $1', [id]);
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'empl_horarios',
+                usuario: user_name,
+                accion: 'D',
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: '',
+                ip,
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.jsonp({ message: 'Registro eliminado.' });
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+        }
     }
 
     public async ObtenerHorariosEmpleadoFechas(req: Request, res: Response): Promise<any> { //Falta verificar q los estados esten con estado 1
@@ -724,9 +898,6 @@ class EmpleadoHorariosControlador {
             return res.status(404).jsonp({ text: 'Registros no encontrados' });
         }
     }
-
-
-
 
     public async VerificarFechasHorarioEdicion(req: Request, res: Response): Promise<any> {
         const id = req.params.id;
