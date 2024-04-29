@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import AUDITORIA_CONTROLADOR from '../../auditoria/auditoriaControlador';
 import pool from '../../../database';
 import excel from 'xlsx';
 import fs from 'fs';
@@ -55,56 +56,157 @@ class DetalleCatalogoHorarioControlador {
     }
 
     // METODO PARA ELIMINAR REGISTRO
-    public async EliminarRegistros(req: Request, res: Response): Promise<void> {
-        const id = req.params.id;
-        await pool.query(
-            `
-            DELETE FROM deta_horarios WHERE id = $1
-            `
-            , [id]);
-        res.jsonp({ message: 'Registro eliminado.' });
+    public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
+        try {
+            const id = req.params.id;
+
+            // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
+            const { user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // OBTENER DATOSORIGINALES
+            const consulta = await pool.query('SELECT * FROM deta_horarios WHERE id = $1', [id]);
+            const [datosOriginales] = consulta.rows;
+
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'deta_horarios',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al eliminar registro con id ${id}`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
+            }
+
+            await pool.query(
+                `
+                DELETE FROM deta_horarios WHERE id = $1
+                `
+                , [id]);
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'deta_horarios',
+                usuario: user_name,
+                accion: 'D',
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: '',
+                ip,
+                observacion: ''
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.jsonp({ message: 'Registro eliminado.' });
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'Error al eliminar registro.' });
+        }
     }
 
     // METODO PARA REGISTRAR DETALLES
     public async CrearDetalleHorarios(req: Request, res: Response): Promise<void> {
-        const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues } = req.body;
-        await pool.query(
-            `
-            INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes,
-                min_despues) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-            `
-            , [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues]);
-        res.jsonp({ message: 'Registro guardado.' });
+        try {
+            const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, user_name, ip } = req.body;
+            
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            await pool.query(
+                `
+                INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes,
+                    min_despues) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                `
+                , [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues]);
+            
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'deta_horarios',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: `{orden: ${orden}, hora: ${hora}, minu_espera: ${minu_espera}, id_horario: ${id_horario}, tipo_accion: ${tipo_accion}, segundo_dia: ${segundo_dia}, tercer_dia: ${tercer_dia}, min_antes: ${min_antes}, min_despues: ${min_despues}}`,
+                ip,
+                observacion: ''
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            res.jsonp({ message: 'Registro guardado.' });
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            res.status(500).jsonp({ message: 'Error al guardar registro.' });
+        }
     }
 
     // METODO PARA ACTUALIZAR DETALLE DE HORARIO
-    public async ActualizarDetalleHorarios(req: Request, res: Response): Promise<void> {
-        const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues,
-            id } = req.body;
-        await pool.query(
-            `
-                UPDATE deta_horarios SET orden = $1, hora = $2, minu_espera = $3, id_horario = $4,
-                tipo_accion = $5, segundo_dia = $6, tercer_dia = $7, min_antes = $8, min_despues= $9 WHERE id = $10
+    public async ActualizarDetalleHorarios(req: Request, res: Response): Promise<Response> {
+        try {
+            const { orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues,
+                id, user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // OBTENER DATOSORIGINALES
+            const consulta = await pool.query('SELECT * FROM deta_horarios WHERE id = $1', [id]);
+            const [datosOriginales] = consulta.rows;
+
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'deta_horarios',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al actualizar registro con id ${id}`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'No se encuentra el registro.' });
+            }
+
+            await pool.query(
                 `
-            , [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, id]);
-        res.jsonp({ message: 'Registro actualizado.' });
+                    UPDATE deta_horarios SET orden = $1, hora = $2, minu_espera = $3, id_horario = $4,
+                    tipo_accion = $5, segundo_dia = $6, tercer_dia = $7, min_antes = $8, min_despues= $9 WHERE id = $10
+                    `
+                , [orden, hora, minu_espera, id_horario, tipo_accion, segundo_dia, tercer_dia, min_antes, min_despues, id]);
+            
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'deta_horarios',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: `{orden: ${orden}, hora: ${hora}, minu_espera: ${minu_espera}, id_horario: ${id_horario}, tipo_accion: ${tipo_accion}, segundo_dia: ${segundo_dia}, tercer_dia: ${tercer_dia}, min_antes: ${min_antes}, min_despues: ${min_despues}}`,
+                ip,
+                observacion: ''
+            });
 
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            
+            return res.jsonp({ message: 'Registro actualizado.' });
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'Error al actualizar registro.' });
+        }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     public async ListarDetalleHorarios(req: Request, res: Response) {
         const HORARIO = await pool.query('SELECT * FROM deta_horarios');
@@ -115,9 +217,6 @@ class DetalleCatalogoHorarioControlador {
             return res.status(404).jsonp({ text: 'No se encuentran registros' });
         }
     }
-
-
-
 
 
     /** Verificar que el nombre del horario exista dentro del sistema */
@@ -184,20 +283,48 @@ class DetalleCatalogoHorarioControlador {
         const sheet_name_list = workbook.SheetNames; // Array de hojas de calculo
         const plantillaD = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
+        // TODO ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
+        const { user_name, ip } = req.body;
+
         /** Detalle de Horarios */
         plantillaD.forEach(async (data: any) => {
-            var { nombre_horario, orden, hora, tipo_accion, minutos_espera } = data;
-            var nombre = nombre_horario;
-            const idHorario = await pool.query('SELECT id FROM cg_horarios WHERE UPPER(nombre) = $1', [nombre.toUpperCase()]);
-            var id_horario = idHorario.rows[0]['id'];
-            if (minutos_espera != undefined) {
-                await pool.query('INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion) VALUES ($1, $2, $3, $4, $5)', [orden, hora, minutos_espera, id_horario, tipo_accion.split("=")[0]]);
-                res.jsonp({ message: 'correcto' });
-            }
-            else {
-                minutos_espera = 0;
-                await pool.query('INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion) VALUES ($1, $2, $3, $4, $5)', [orden, hora, minutos_espera, id_horario, tipo_accion.split("=")[0]]);
-                res.jsonp({ message: 'correcto' });
+            try {
+                let { nombre_horario, orden, hora, tipo_accion, minutos_espera } = data;
+                let nombre = nombre_horario;
+                const idHorario = await pool.query('SELECT id FROM cg_horarios WHERE UPPER(nombre) = $1', [nombre.toUpperCase()]);
+                let id_horario = idHorario.rows[0]['id'];
+
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
+
+                if (minutos_espera != undefined) {
+                    await pool.query('INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion) VALUES ($1, $2, $3, $4, $5)', [orden, hora, minutos_espera, id_horario, tipo_accion.split("=")[0]]);
+                    res.jsonp({ message: 'correcto' });
+                }
+                else {
+                    minutos_espera = 0;
+                    await pool.query('INSERT INTO deta_horarios (orden, hora, minu_espera, id_horario, tipo_accion) VALUES ($1, $2, $3, $4, $5)', [orden, hora, minutos_espera, id_horario, tipo_accion.split("=")[0]]);
+                    res.jsonp({ message: 'correcto' });
+                }
+
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'deta_horarios',
+                    usuario: user_name,
+                    accion: 'I',
+                    datosOriginales: '',
+                    datosNuevos: `{orden: ${orden}, hora: ${hora}, minu_espera: ${minutos_espera}, id_horario: ${id_horario}, tipo_accion: ${tipo_accion.split("=")[0]}}`,
+                    ip,
+                    observacion: ''
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+
+            } catch (error) {
+                // REVERTIR TRANSACCION
+                await pool.query('ROLLBACK');
+                res.status(500).jsonp({ message: 'Error al guardar registro.' });
             }
         });
         // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
@@ -209,10 +336,6 @@ class DetalleCatalogoHorarioControlador {
             }
         });
     }
-
-
-
-
 
 }
 
