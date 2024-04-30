@@ -499,7 +499,8 @@ export class VerEmpresaComponent implements OnInit {
           this.toastr.error('No se puede elminar.', 'la: '+ datos.nombre, {
             timeOut: 6000,
           });
-  
+          this.contador = this.contador - 1;
+
         } else {
            if (!this.ingresar) {
              this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
@@ -515,13 +516,14 @@ export class VerEmpresaComponent implements OnInit {
         }
       });
   
+      this.ObtenerSucursal();
 
-      this.restS.BuscarSucursal().subscribe(data => {
-        this.datosSucursales = data;
-      });
 
     }
     )
+
+    this.ObtenerSucursal();
+
   }
 
 

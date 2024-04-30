@@ -408,9 +408,6 @@ export class PrincipalProvinciaComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_prov: number) {
-
-
-
     this.rest.EliminarProvincia(id_prov).subscribe(res => {
 
 
@@ -425,7 +422,7 @@ export class PrincipalProvinciaComponent implements OnInit {
         this.ListarProvincias();
 
 
-      }
+     }
 
     });
   }
@@ -444,19 +441,46 @@ export class PrincipalProvinciaComponent implements OnInit {
       });
   }
 
+
+  contador: number = 0;
+  ingresar: boolean = false;
   EliminarMultiple() {
+
+    
+    this.ingresar = false;
+    this.contador = 0;
 
     this.provinciasEliminar = this.selectionProvincias.selected;
     this.provinciasEliminar.forEach((datos: any) => {
 
       this.provincias = this.provincias.filter(item => item.id !== datos.id);
 
+      this.contador = this.contador + 1;
+
+      this.rest.EliminarProvincia(datos.id).subscribe(res => {
 
 
-      //AQUI MODIFICAR EL METODO 
-      this.Eliminar(datos.id);
+        if (res.message === 'error') {
+          this.toastr.error('No se puede elminar ', datos.nombre, {
+            timeOut: 6000,
+          });
 
 
+          this.contador = this.contador - 1;
+
+        } else {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+
+          this.ListarProvincias();
+
+        }
+  
+      });
 
       this.rest.BuscarProvincias().subscribe(datos => {
         this.provincias = datos;
@@ -478,12 +502,6 @@ export class PrincipalProvinciaComponent implements OnInit {
 
             this.plan_multiple = false;
             this.plan_multiple_ = false;
-
-
-
-
-
-
           } else {
             this.toastr.warning('No ha seleccionado PROVINCIAS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,

@@ -625,19 +625,43 @@ export class ListarTitulosComponent implements OnInit {
 
   }
 
+
+  contador: number = 0;
+  ingresar: boolean = false;
+
   EliminarMultiple() {
 
     this.titulosEliminar = this.selectionTitulos.selected;
     this.titulosEliminar.forEach((datos: any) => {
 
       this.verTitulos = this.verTitulos.filter(item => item.id !== datos.id);
-      //AQUI MODIFICAR EL METODO 
-      this.Eliminar(datos.id);
+      this.contador = this.contador + 1;
+
+
+      this.rest.EliminarRegistro(datos.id).subscribe(res => {
+        if (res.message === 'error') {
+          this.toastr.error('No se puede elminar.', '', {
+            timeOut: 6000,
+          });
+
+          this.contador = this.contador - 1;
+
+        } else {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+            this.ObtenerTitulos();
+          }
+        }
+      });
       this.ObtenerTitulos();
-
-
     }
     )
+
+
+    
   }
 
 
@@ -667,7 +691,7 @@ export class ListarTitulosComponent implements OnInit {
 
           this.selectionTitulos.clear();
 
-        }else{
+        } else {
 
           this.router.navigate(['/titulos']);
 

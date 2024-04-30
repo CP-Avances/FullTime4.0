@@ -333,8 +333,8 @@ export class VerDepartamentoComponent implements OnInit {
 
       this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
 
-      //AQUI MODIFICAR EL METODO 
-      //this.Eliminar(datos.id, datos);
+      this.contador = this.contador + 1;
+
 
       this.rest.EliminarRegistroNivelDepa(datos.id).subscribe(res => {
 
@@ -344,6 +344,9 @@ export class VerDepartamentoComponent implements OnInit {
           this.toastr.error('No se puede elminar ',  datos.nombre, {
             timeOut: 6000,
           });
+
+          this.contador = this.contador - 1;
+
   
         } else {
            if (!this.ingresar) {

@@ -189,7 +189,7 @@ export class ListaSucursalesComponent implements OnInit {
     return this.validar.IngresarSoloLetras(e);
   }
 
-  
+
   // METODO PARA VER DATOS DE DEPARTAMENTOS DE SUCURSAL
   ver_departamentos: boolean = false;
   sucursal_id: number;
@@ -617,51 +617,73 @@ export class ListaSucursalesComponent implements OnInit {
 
   }
 
- // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
- Eliminar(id_sucursal: number) {
-  this.rest.EliminarRegistro(id_sucursal).subscribe(res => {
-    this.toastr.error('Registro eliminado.', '', {
-      timeOut: 6000,
-    });
-    this.ObtenerSucursal();
-  });
-}
-
-// FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-ConfirmarDelete(datos: any) {
-  this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-    .subscribe((confirmado: Boolean) => {
-      if (confirmado) {
-        this.Eliminar(datos.id);
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
+  Eliminar(id_sucursal: number) {
+    this.rest.EliminarRegistro(id_sucursal).subscribe(res => {
+      if (res.message === 'error') {
+        this.toastr.error('No se puede elminar.', '', {
+          timeOut: 6000,
+        });
       } else {
-        this.router.navigate(['/sucursales']);
-      }
-    });
-}
-
-  EliminarMultiple() {
-
-    this.sucursalesEliminar = this.selectionSucursales.selected;
-    this.sucursalesEliminar.forEach((datos: any) => {
-
-      this.datosCiudades = this.datosCiudades.filter(item => item.id !== datos.id);
-
-
-
-     
-
-      this.rest.EliminarRegistro(datos.id).subscribe(res => {
         this.toastr.error('Registro eliminado.', '', {
           timeOut: 6000,
         });
         this.ObtenerSucursal();
-      });
+      }
+    });
+  }
 
-      
-
-      this.rest.BuscarSucursal().subscribe(data => {
-        this.sucursales = data;
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos.id);
+        } else {
+          this.router.navigate(['/sucursales']);
+        }
       });
+  }
+
+
+  contador: number = 0;
+  ingresar: boolean = false;
+  EliminarMultiple() {
+
+
+    this.ingresar = false;
+    this.contador = 0;
+
+    this.sucursalesEliminar = this.selectionSucursales.selected;
+    this.sucursalesEliminar.forEach((datos: any) => {
+
+
+
+      this.datosCiudades = this.datosCiudades.filter(item => item.id !== datos.id);
+
+      this.contador = this.contador + 1;
+      this.rest.EliminarRegistro(datos.id).subscribe(res => {
+        if (res.message === 'error') {
+
+          this.toastr.error('No se puede elminar ', datos.nombre, {
+            timeOut: 6000,
+          });
+
+          this.contador = this.contador - 1;
+
+
+        } else {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+           }
+          this.ObtenerSucursal();
+
+        }
+      });
+     
 
     }
     )
@@ -690,7 +712,7 @@ ConfirmarDelete(datos: any) {
           this.selectionSucursales.clear();
 
 
-        }else{
+        } else {
 
           this.router.navigate(['/sucursales']);
 

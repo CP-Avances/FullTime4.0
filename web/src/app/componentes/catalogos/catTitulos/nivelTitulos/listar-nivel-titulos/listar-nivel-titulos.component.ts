@@ -600,19 +600,47 @@ export class ListarNivelTitulosComponent implements OnInit {
         }
       });
   }
+  contador: number = 0;
+  ingresar: boolean = false;
 
   EliminarMultiple() {
+
+        
+    this.ingresar = false;
+    this.contador = 0;
 
     this.nivelesEliminar = this.selectionNiveles.selected;
     this.nivelesEliminar.forEach((datos: any) => {
 
       this.nivelTitulos = this.nivelTitulos.filter(item => item.id !== datos.id);
-      //AQUI MODIFICAR EL METODO 
-      this.Eliminar(datos.id);
-      this.ObtenerNiveles();
+
+
+      this.contador = this.contador + 1;
+
+      this.nivel.EliminarNivel(datos.id).subscribe(res => {
+
+        if (res.message === 'error') {
+          this.toastr.error('No se puede elminar.', '', {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
+
+
+        } else {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.ObtenerNiveles();
+
+        }
+      });
 
     }
     )
+
   }
 
 
@@ -642,7 +670,7 @@ export class ListarNivelTitulosComponent implements OnInit {
 
           this.selectionNiveles.clear();
 
-        }else{
+        } else {
           this.router.navigate(['/nivelTitulos']);
 
 

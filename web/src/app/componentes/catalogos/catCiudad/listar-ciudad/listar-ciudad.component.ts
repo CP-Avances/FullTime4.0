@@ -438,14 +438,52 @@ export class ListarCiudadComponent implements OnInit {
       });
   }
 
+  contador: number = 0;
+  ingresar: boolean = false;
+
   EliminarMultiple() {
+
+      
+    this.ingresar = false;
+    this.contador = 0;
 
     this.datosCiudadesEliminar = this.selectiondatosCiudades.selected;
     this.datosCiudadesEliminar.forEach((datos: any) => {
+      
+
 
       this.datosCiudades = this.datosCiudades.filter(item => item.id !== datos.id);
-      this.Eliminar(datos.id);
-      this.rest.ListarNombreCiudadProvincia().subscribe(datos => {
+
+      this.contador = this.contador + 1;
+
+
+      this.rest.EliminarCiudad(datos.id).subscribe(res => {
+      
+
+        if (res.message === 'error') {
+          this.toastr.error('No se puede elminar ', datos.nombre, {
+            timeOut: 6000,
+          });
+
+
+          this.contador = this.contador - 1;
+
+        } else {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+
+          this.ListarCiudades();
+
+        }
+  
+  
+      });
+
+        this.rest.ListarNombreCiudadProvincia().subscribe(datos => {
         this.datosCiudades = datos;
       })
 
