@@ -5,6 +5,8 @@ import {
   FormatearFecha, FormatearHora, dia_completo
 }
   from '../../libs/settingsMail';
+
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import path from 'path';
 import { QueryResult } from 'pg';
 
@@ -12,7 +14,7 @@ class NotificacionTiempoRealControlador {
 
   // METODO PARA ELIMINAR NOTIFICACIONES DE PERMISOS - VACACIONES - HORAS EXTRAS  --**VERIFICACION
   public async EliminarMultiplesNotificaciones(req: Request, res: Response): Promise<any> {
-    const arregloNotificaciones = req.body;
+    const {arregloNotificaciones, user_name, ip} = req.body;
     let contador: number = 0;
 
     console.log('VER IDS', arregloNotificaciones);
@@ -20,29 +22,65 @@ class NotificacionTiempoRealControlador {
     if (arregloNotificaciones.length > 0) {
       contador = 0;
       arregloNotificaciones.forEach(async (obj: number) => {
-        await pool.query('DELETE FROM realtime_noti WHERE id = $1', [obj])
-          .then((result: any) => {
-            contador = contador + 1;
-            if (contador === arregloNotificaciones.length) {
-              return res.jsonp({ message: 'OK' });
-            }
-            console.log(result.command, 'REALTIME ELIMINADO ====>', obj);
+
+        try {
+
+          // INICIAR TRANSACCION
+          await pool.query('BEGIN');
+
+          // OBTENER DATOSORIGINALES
+          const consulta = await pool.query('SELECT * FROM realtime_noti WHERE id = $1', [obj]);
+          const [datosOriginales] = consulta.rows;
+
+          if (!datosOriginales) {
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'realtime_noti',
+              usuario: user_name,
+              accion: 'D',
+              datosOriginales: '',
+              datosNuevos: '',
+              ip,
+              observacion: `Error al eliminar el registro con id ${obj}. No existe el registro en la base de datos.`
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+          }
+
+          await pool.query('DELETE FROM realtime_noti WHERE id = $1', [obj])
+            .then((result: any) => {
+              contador = contador + 1;
+              console.log(result.command, 'REALTIME ELIMINADO ====>', obj);
+            });
+
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'realtime_noti',
+            usuario: user_name,
+            accion: 'D',
+            datosOriginales: JSON.stringify(datosOriginales),
+            datosNuevos: '',
+            ip,
+            observacion: null
           });
+
+          // FINALIZAR TRANSACCION
+          await pool.query('COMMIT');
+        } catch (error) {
+          // ROEVERTIR TRANSACCION
+          await pool.query('ROLLBACK');
+          return res.status(500).jsonp({ message: 'Error al eliminar el registro.' });
+        }
       });
+
+      return res.jsonp({ message: 'OK' });
     }
     else {
       return res.jsonp({ message: 'error' });
     }
 
   }
-
-
-
-
-
-
-
-
 
   // METODO PARA LISTAR CONFIGURACION DE RECEPCION DE NOTIFICACIONES
   public async ObtenerConfigEmpleado(req: Request, res: Response): Promise<any> {
@@ -72,9 +110,12 @@ class NotificacionTiempoRealControlador {
       var tiempo = fechaHora();
 
       const { id_send_empl, id_receives_empl, id_receives_depa, estado, id_permiso,
-        id_vacaciones, id_hora_extra, mensaje, tipo } = req.body;
+        id_vacaciones, id_hora_extra, mensaje, tipo, user_name, ip } = req.body;
 
       let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
       const response: QueryResult = await pool.query(
         `
@@ -86,6 +127,20 @@ class NotificacionTiempoRealControlador {
           id_hora_extra, mensaje, tipo]);
 
       const [notificiacion] = response.rows;
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'realtime_noti',
+        usuario: user_name,
+        accion: 'C',
+        datosOriginales: '',
+        datosNuevos: JSON.stringify(notificiacion),
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
 
       if (!notificiacion) return res.status(400).jsonp({ message: 'Notificación no ingresada.' });
 
@@ -102,21 +157,12 @@ class NotificacionTiempoRealControlador {
         .jsonp({ message: 'Se ha enviado la respectiva notificación.', respuesta: notificiacion });
 
     } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
       return res.status(500)
         .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
     }
   }
-
-
-
-
-
-
-
-
-
-
-
 
   public async ListarNotificacion(req: Request, res: Response) {
     const REAL_TIME_NOTIFICACION = await pool.query('SELECT * FROM realtime_noti ORDER BY id DESC');
@@ -183,16 +229,55 @@ class NotificacionTiempoRealControlador {
     }
   }
 
+  public async ActualizarVista(req: Request, res: Response): Promise<Response> {
+    try {
+      const id = req.params.id;
+      const { visto, user_name, ip } = req.body;
+      
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
+      // OBTENER DATOSORIGINALES
+      const consulta = await pool.query('SELECT * FROM realtime_noti WHERE id = $1', [id]);
+      const [datosOriginales] = consulta.rows;
 
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'realtime_noti',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al modificar el registro con id ${id}. No existe el registro en la base de datos.`
+        });
 
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
 
+      await pool.query('UPDATE realtime_noti SET visto = $1 WHERE id = $2', [visto, id]);
 
-  public async ActualizarVista(req: Request, res: Response): Promise<void> {
-    const id = req.params.id;
-    const { visto } = req.body;
-    await pool.query('UPDATE realtime_noti SET visto = $1 WHERE id = $2', [visto, id]);
-    res.jsonp({ message: 'Vista modificado' });
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'realtime_noti',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{"visto": "${visto}"}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Vista modificado' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'Error al modificar el registro.' });
+    }
   }
 
 
@@ -203,33 +288,97 @@ class NotificacionTiempoRealControlador {
 
   // METODO PARA REGISTRAR CONFIGURACIÓN DE RECEPCIÓN DE NOTIFICACIONES
   public async CrearConfiguracion(req: Request, res: Response): Promise<void> {
-    const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail,
-      hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti } = req.body;
-    await pool.query('INSERT INTO config_noti ( id_empleado, vaca_mail, vaca_noti, permiso_mail, ' +
-      'permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, ' +
-      'comunicado_noti) ' +
-      'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)', [id_empleado, vaca_mail, vaca_noti,
-      permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti,
-      comunicado_mail, comunicado_noti]);
-    res.jsonp({ message: 'Configuracion guardada' });
-  }
+    try {
+      const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail,
+        hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip } = req.body;
+      
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
 
+      await pool.query('INSERT INTO config_noti ( id_empleado, vaca_mail, vaca_noti, permiso_mail, ' +
+        'permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, ' +
+        'comunicado_noti) ' +
+        'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)', [id_empleado, vaca_mail, vaca_noti,
+        permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti,
+        comunicado_mail, comunicado_noti]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'config_noti',
+        usuario: user_name,
+        accion: 'C',
+        datosOriginales: '',
+        datosNuevos: `{"id_empleado": "${id_empleado}", "vaca_mail": "${vaca_mail}", "vaca_noti": "${vaca_noti}", permiso_mail: "${permiso_mail}", permiso_noti: "${permiso_noti}", hora_extra_mail: "${hora_extra_mail}", hora_extra_noti: "${hora_extra_noti}", comida_mail: "${comida_mail}", comida_noti: "${comida_noti}", comunicado_mail: "${comunicado_mail}", comunicado_noti: "${comunicado_noti}"}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      res.jsonp({ message: 'Configuracion guardada' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      res.status(500).jsonp({ message: 'Error al guardar la configuración.' });
+    }
+  }
 
   // METODO PARA ACTUALIZAR CONFIGURACIÓN DE RECEPCIÓN DE NOTIFICACIONES
-  public async ActualizarConfigEmpleado(req: Request, res: Response): Promise<void> {
-    const { vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail,
-      hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti } = req.body;
-    const id_empleado = req.params.id;
-    await pool.query('UPDATE config_noti SET vaca_mail = $1, vaca_noti = $2, permiso_mail = $3, ' +
-      'permiso_noti = $4, hora_extra_mail = $5, hora_extra_noti = $6, comida_mail = $7, comida_noti = $8, ' +
-      'comunicado_mail = $9, comunicado_noti = $10 WHERE id_empleado = $11',
-      [vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti,
-        comida_mail, comida_noti, comunicado_mail, comunicado_noti, id_empleado]);
-    res.jsonp({ message: 'Configuración actualizada.' });
+  public async ActualizarConfigEmpleado(req: Request, res: Response): Promise<Response> {
+    try {
+      const { vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail,
+        hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti, user_name, ip } = req.body;
+      const id_empleado = req.params.id;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // OBTENER DATOSORIGINALES
+      const consulta = await pool.query('SELECT * FROM config_noti WHERE id_empleado = $1', [id_empleado]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'config_noti',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al modificar el registro con id ${id_empleado}. No existe el registro en la base de datos.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
+      await pool.query('UPDATE config_noti SET vaca_mail = $1, vaca_noti = $2, permiso_mail = $3, ' +
+        'permiso_noti = $4, hora_extra_mail = $5, hora_extra_noti = $6, comida_mail = $7, comida_noti = $8, ' +
+        'comunicado_mail = $9, comunicado_noti = $10 WHERE id_empleado = $11',
+        [vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti,
+          comida_mail, comida_noti, comunicado_mail, comunicado_noti, id_empleado]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'config_noti',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{"vaca_mail": "${vaca_mail}", "vaca_noti": "${vaca_noti}", permiso_mail: "${permiso_mail}", permiso_noti: "${permiso_noti}", hora_extra_mail: "${hora_extra_mail}", hora_extra_noti: "${hora_extra_noti}", comida_mail: "${comida_mail}", comida_noti: "${comida_noti}", comunicado_mail: "${comunicado_mail}", comunicado_noti: "${comunicado_noti}"}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Configuración actualizada.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'Error al modificar el registro.' });
+    }
   }
-
-
-
 
   /** ******************************************************************************************** **
    ** **                               CONSULTAS DE NOTIFICACIONES                              ** ** 
@@ -372,18 +521,6 @@ class NotificacionTiempoRealControlador {
     }
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
   /** ***************************************************************************************** **
    ** **                          MANEJO DE COMUNICADOS                                      ** ** 
    ** ***************************************************************************************** **/
@@ -474,32 +611,56 @@ class NotificacionTiempoRealControlador {
 
   // NOTIFICACIONES GENERALES
   public async EnviarNotificacionGeneral(req: Request, res: Response): Promise<Response> {
-    let { id_empl_envia, id_empl_recive, mensaje, tipo } = req.body;
-    var tiempo = fechaHora();
-    let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
+    try {
+      let { id_empl_envia, id_empl_recive, mensaje, tipo, user_name, ip } = req.body;
+      var tiempo = fechaHora();
+      let create_at = tiempo.fecha_formato + ' ' + tiempo.hora;
 
-    const response: QueryResult = await pool.query(
-      `
-          INSERT INTO realtime_timbres(create_at, id_send_empl, id_receives_empl, descripcion, tipo) 
-          VALUES($1, $2, $3, $4, $5) RETURNING *
-        `,
-      [create_at, id_empl_envia, id_empl_recive, mensaje, tipo]);
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+  
+      const response: QueryResult = await pool.query(
+        `
+            INSERT INTO realtime_timbres(create_at, id_send_empl, id_receives_empl, descripcion, tipo) 
+            VALUES($1, $2, $3, $4, $5) RETURNING *
+          `,
+        [create_at, id_empl_envia, id_empl_recive, mensaje, tipo]);
+  
+      const [notificiacion] = response.rows;
 
-    const [notificiacion] = response.rows;
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'realtime_timbres',
+        usuario: user_name,
+        accion: 'C',
+        datosOriginales: '',
+        datosNuevos: JSON.stringify(notificiacion),
+        ip,
+        observacion: null
+      });
 
-    if (!notificiacion) return res.status(400).jsonp({ message: 'Notificación no ingresada.' });
-
-    const USUARIO = await pool.query(
-      `
-        SELECT (nombre || ' ' || apellido) AS usuario
-        FROM empleados WHERE id = $1
-        `,
-      [id_empl_envia]);
-
-    notificiacion.usuario = USUARIO.rows[0].usuario;
-
-    return res.status(200)
-      .jsonp({ message: 'Comunicado enviado exitosamente.', respuesta: notificiacion });
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+  
+      if (!notificiacion) return res.status(400).jsonp({ message: 'Notificación no ingresada.' });
+  
+      const USUARIO = await pool.query(
+        `
+          SELECT (nombre || ' ' || apellido) AS usuario
+          FROM empleados WHERE id = $1
+          `,
+        [id_empl_envia]);
+  
+      notificiacion.usuario = USUARIO.rows[0].usuario;
+  
+      return res.status(200)
+        .jsonp({ message: 'Comunicado enviado exitosamente.', respuesta: notificiacion });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500)
+        .jsonp({ message: 'Contactese con el Administrador del sistema (593) 2 – 252-7663 o https://casapazmino.com.ec' });
+    }
 
   }
 
