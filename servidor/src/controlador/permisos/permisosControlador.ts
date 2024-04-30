@@ -5,6 +5,7 @@ import {
     FormatearFecha, FormatearHora, dia_completo
 } from '../../libs/settingsMail';
 import { ObtenerRutaPermisos } from '../../libs/accesoCarpetas';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import fs from 'fs';
 import pool from '../../database';
 import path from 'path';
@@ -157,114 +158,175 @@ class PermisosControlador {
     // METODO PARA CREAR PERMISOS
     public async CrearPermisos(req: Request, res: Response): Promise<Response> {
 
-        const { fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
-            id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
-            estado, id_empl_cargo, hora_salida, hora_ingreso, codigo,
-            depa_user_loggin } = req.body;
-
-        const response: QueryResult = await pool.query(
-            `
-            INSERT INTO permisos (fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, 
-                dia_libre, id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso, 
-                estado, id_empl_cargo, hora_salida, hora_ingreso, codigo) 
-            VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17 ) 
-                RETURNING * 
-            `,
-            [fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
+        try {
+            const { fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
                 id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
-                estado, id_empl_cargo, hora_salida, hora_ingreso, codigo]);
+                estado, id_empl_cargo, hora_salida, hora_ingreso, codigo,
+                depa_user_loggin, user_name, ip } = req.body;
 
-        const [objetoPermiso] = response.rows;
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+    
+            const response: QueryResult = await pool.query(
+                `
+                INSERT INTO permisos (fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, 
+                    dia_libre, id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso, 
+                    estado, id_empl_cargo, hora_salida, hora_ingreso, codigo) 
+                VALUES( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17 ) 
+                    RETURNING * 
+                `,
+                [fec_creacion, descripcion, fec_inicio, fec_final, dia, legalizado, dia_libre,
+                    id_tipo_permiso, id_empl_contrato, id_peri_vacacion, hora_numero, num_permiso,
+                    estado, id_empl_cargo, hora_salida, hora_ingreso, codigo]);
+    
+            const [objetoPermiso] = response.rows;
 
-        if (!objetoPermiso) return res.status(404).jsonp({ message: 'Solicitud no registrada.' })
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'permisos',
+                usuario: user_name,
+                accion: 'I',
+                datosOriginales: '',
+                datosNuevos: JSON.stringify(objetoPermiso),
+                ip, observacion: null
+            });
 
-        const permiso = objetoPermiso
-        const JefesDepartamentos = await pool.query(
-            `
-            SELECT n.id_departamento, cg.nombre, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel,
-                da.estado, dae.id_contrato, da.id_empl_cargo, (dae.nombre || ' ' || dae.apellido) as fullname,
-                dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti, dae.id AS id_aprueba 
-            FROM nivel_jerarquicodep AS n, depa_autorizaciones AS da, datos_actuales_empleado AS dae,
-                config_noti AS c, cg_departamentos AS cg
-            WHERE n.id_departamento = $1
-                AND da.id_departamento = n.id_dep_nivel
-                AND dae.id_cargo = da.id_empl_cargo
-                AND dae.id = c.id_empleado
-                AND cg.id = n.id_departamento
-            ORDER BY nivel ASC
-            `
-            ,
-            [depa_user_loggin]).then((result: any) => { return result.rows });
-
-        if (JefesDepartamentos.length === 0) {
-            return res.status(400)
-                .jsonp({
-                    message: `Ups!!! algo salio mal. 
-            Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.`,
-                    permiso: permiso
-                });
-        }
-        else {
-            permiso.EmpleadosSendNotiEmail = JefesDepartamentos
-            return res.status(200).jsonp(permiso);
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+    
+            if (!objetoPermiso) return res.status(404).jsonp({ message: 'Solicitud no registrada.' })
+    
+            const permiso = objetoPermiso
+            const JefesDepartamentos = await pool.query(
+                `
+                SELECT n.id_departamento, cg.nombre, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel,
+                    da.estado, dae.id_contrato, da.id_empl_cargo, (dae.nombre || ' ' || dae.apellido) as fullname,
+                    dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti, dae.id AS id_aprueba 
+                FROM nivel_jerarquicodep AS n, depa_autorizaciones AS da, datos_actuales_empleado AS dae,
+                    config_noti AS c, cg_departamentos AS cg
+                WHERE n.id_departamento = $1
+                    AND da.id_departamento = n.id_dep_nivel
+                    AND dae.id_cargo = da.id_empl_cargo
+                    AND dae.id = c.id_empleado
+                    AND cg.id = n.id_departamento
+                ORDER BY nivel ASC
+                `
+                ,
+                [depa_user_loggin]).then((result: any) => { return result.rows });
+    
+            if (JefesDepartamentos.length === 0) {
+                return res.status(400)
+                    .jsonp({
+                        message: `Ups!!! algo salio mal. 
+                Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.`,
+                        permiso: permiso
+                    });
+            }
+            else {
+                permiso.EmpleadosSendNotiEmail = JefesDepartamentos
+                return res.status(200).jsonp(permiso);
+            }
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'error' });
         }
     }
 
     // METODO PARA EDITAR SOLICITUD DE PERMISOS
     public async EditarPermiso(req: Request, res: Response): Promise<Response> {
 
-        const id = req.params.id;
+        try {
+            const id = req.params.id;
+    
+            const { descripcion, fec_inicio, fec_final, dia, dia_libre, id_tipo_permiso, hora_numero, num_permiso,
+                hora_salida, hora_ingreso, depa_user_loggin, id_peri_vacacion, fec_edicion, user_name, ip } = req.body;
+    
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
 
-        const { descripcion, fec_inicio, fec_final, dia, dia_libre, id_tipo_permiso, hora_numero, num_permiso,
-            hora_salida, hora_ingreso, depa_user_loggin, id_peri_vacacion, fec_edicion } = req.body;
+            // CONSULTAR DATOSORIGINALES
+            const consulta = await pool.query(`SELECT * FROM permisos WHERE id = $1`, [id]);
+            const [datosOriginales] = consulta.rows;
 
-        console.log('entra ver permiso')
-        const response: QueryResult = await pool.query(
-            `
-                    UPDATE permisos SET descripcion = $1, fec_inicio = $2, fec_final = $3, dia = $4, dia_libre = $5, 
-                    id_tipo_permiso = $6, hora_numero = $7, num_permiso = $8, hora_salida = $9, hora_ingreso = $10,
-                    id_peri_vacacion = $11, fec_edicion = $12
-                    WHERE id = $13 RETURNING *
-                `
-            , [descripcion, fec_inicio, fec_final, dia, dia_libre, id_tipo_permiso, hora_numero, num_permiso,
-                hora_salida, hora_ingreso, id_peri_vacacion, fec_edicion, id]);
-
-        const [objetoPermiso] = response.rows;
-
-        if (!objetoPermiso) return res.status(404).jsonp({ message: 'Solicitud no registrada.' })
-
-        const permiso = objetoPermiso
-        console.log(permiso);
-        console.log(req.query);
-
-        const JefesDepartamentos = await pool.query(
-            `
-            SELECT n.id_departamento, cg.nombre, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel,
-                da.estado, dae.id_contrato, da.id_empl_cargo, (dae.nombre || ' ' || dae.apellido) as fullname,
-                dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti 
-            FROM nivel_jerarquicodep AS n, depa_autorizaciones AS da, datos_actuales_empleado AS dae,
-                config_noti AS c, cg_departamentos AS cg 
-            WHERE n.id_departamento = $1
-                AND da.id_departamento = n.id_dep_nivel
-                AND dae.id_cargo = da.id_empl_cargo
-                AND dae.id = c.id_empleado
-                AND cg.id = n.id_departamento
-            ORDER BY nivel ASC
-            `
-            ,
-            [depa_user_loggin]).then((result: any) => { return result.rows });
-
-        if (JefesDepartamentos.length === 0) {
-            return res.status(400)
-                .jsonp({
-                    message: `Ups!!! algo salio mal. 
-                Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.`,
-                    permiso: permiso
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'permisos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip, 
+                    observacion: `Error al intentar actualizar permiso con id: ${id}`
                 });
-        }
-        else {
-            permiso.EmpleadosSendNotiEmail = JefesDepartamentos
-            return res.status(200).jsonp(permiso);
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
+            }
+
+            const response: QueryResult = await pool.query(
+                `
+                        UPDATE permisos SET descripcion = $1, fec_inicio = $2, fec_final = $3, dia = $4, dia_libre = $5, 
+                        id_tipo_permiso = $6, hora_numero = $7, num_permiso = $8, hora_salida = $9, hora_ingreso = $10,
+                        id_peri_vacacion = $11, fec_edicion = $12
+                        WHERE id = $13 RETURNING *
+                    `
+                , [descripcion, fec_inicio, fec_final, dia, dia_libre, id_tipo_permiso, hora_numero, num_permiso,
+                    hora_salida, hora_ingreso, id_peri_vacacion, fec_edicion, id]);
+    
+            const [objetoPermiso] = response.rows;
+    
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'permisos',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: JSON.stringify(objetoPermiso),
+                ip, observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            if (!objetoPermiso) return res.status(404).jsonp({ message: 'Solicitud no registrada.' })
+    
+            const permiso = objetoPermiso;
+    
+            const JefesDepartamentos = await pool.query(
+                `
+                SELECT n.id_departamento, cg.nombre, n.id_dep_nivel, n.dep_nivel_nombre, n.nivel,
+                    da.estado, dae.id_contrato, da.id_empl_cargo, (dae.nombre || ' ' || dae.apellido) as fullname,
+                    dae.cedula, dae.correo, c.permiso_mail, c.permiso_noti 
+                FROM nivel_jerarquicodep AS n, depa_autorizaciones AS da, datos_actuales_empleado AS dae,
+                    config_noti AS c, cg_departamentos AS cg 
+                WHERE n.id_departamento = $1
+                    AND da.id_departamento = n.id_dep_nivel
+                    AND dae.id_cargo = da.id_empl_cargo
+                    AND dae.id = c.id_empleado
+                    AND cg.id = n.id_departamento
+                ORDER BY nivel ASC
+                `
+                ,
+                [depa_user_loggin]).then((result: any) => { return result.rows });
+    
+            if (JefesDepartamentos.length === 0) {
+                return res.status(400)
+                    .jsonp({
+                        message: `Ups!!! algo salio mal. 
+                    Solicitud ingresada, pero es necesario verificar configuraciones jefes de departamento.`,
+                        permiso: permiso
+                    });
+            }
+            else {
+                permiso.EmpleadosSendNotiEmail = JefesDepartamentos
+                return res.status(200).jsonp(permiso);
+            }
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'error' });
         }
     }
 
@@ -273,35 +335,139 @@ class PermisosControlador {
     // REGISTRAR DOCUMENTO DE RESPALDO DE PERMISO  
     public async GuardarDocumentoPermiso(req: Request, res: Response): Promise<any> {
 
-        // FECHA DEL SISTEMA
-        var fecha = moment();
-        var anio = fecha.format('YYYY');
-        var mes = fecha.format('MM');
-        var dia = fecha.format('DD');
+        try {
+            // FECHA DEL SISTEMA
+            var fecha = moment();
+            var anio = fecha.format('YYYY');
+            var mes = fecha.format('MM');
+            var dia = fecha.format('DD');
+    
+            // LEER DATOS DE IMAGEN
+            let id = req.params.id
+            let { archivo, codigo } = req.params;
 
-        // LEER DATOS DE IMAGEN
-        let id = req.params.id
-        let { archivo, codigo } = req.params;
+            // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
+            const { user_name, ip } = req.body;
 
-        const permiso = await pool.query(
-            `
-            SELECT num_permiso FROM permisos WHERE id = $1
-            `
-            , [id]);
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+    
+            const permiso = await pool.query(
+                `
+                SELECT num_permiso FROM permisos WHERE id = $1
+                `
+                , [id]);
+    
+            let documento = permiso.rows[0].num_permiso + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
+            let separador = path.sep;
 
-        let documento = permiso.rows[0].num_permiso + '_' + codigo + '_' + anio + '_' + mes + '_' + dia + '_' + req.file?.originalname;
-        let separador = path.sep;
+            // CONSULTAR DATOSORIGINALES
+            const consulta = await pool.query(`SELECT * FROM permisos WHERE id = $1`, [id]);
+            const [datosOriginales] = consulta.rows;
 
-        // ACTUALIZAR REGISTRO
-        await pool.query(
-            `
-             UPDATE permisos SET documento = $2 WHERE id = $1
-             `, [id, documento]);
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'permisos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip, 
+                    observacion: `Error al intentar actualizar permiso con id: ${id}`
+                });
 
-        res.jsonp({ message: 'Documento actualizado.' });
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
+            }
+    
+            // ACTUALIZAR REGISTRO
+            await pool.query(`UPDATE permisos SET documento = $2 WHERE id = $1`, [id, documento]);
 
-        if (archivo != 'null' && archivo != '' && archivo != null) {
-            if (archivo != documento) {
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'permisos',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: `{"documento": "${documento}"}`,
+                ip, 
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+    
+            res.jsonp({ message: 'Documento actualizado.' });
+    
+            if (archivo != 'null' && archivo != '' && archivo != null) {
+                if (archivo != documento) {
+                    let ruta = await ObtenerRutaPermisos(codigo) + separador + archivo;
+                    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                    fs.access(ruta, fs.constants.F_OK, (err) => {
+                        if (err) {
+                        } else {
+                            // ELIMINAR DEL SERVIDOR
+                            fs.unlinkSync(ruta);
+                        }
+                    });
+                }
+            }
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'error' });
+        }
+    }
+
+    // ELIMINAR DOCUMENTO DE RESPALDO DE PERMISO  
+    public async EliminarDocumentoPermiso(req: Request, res: Response): Promise<Response> {
+
+        try {
+            const { id, archivo, codigo, user_name, ip } = req.body
+            let separador = path.sep;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTAR DATOSORIGINALES
+            const consulta = await pool.query(`SELECT * FROM permisos WHERE id = $1`, [id]);
+            const [datosOriginales] = consulta.rows;
+
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'permisos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip, 
+                    observacion: `Error al intentar actualizar permiso con id: ${id}`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
+            }
+    
+            // ACTUALIZAR REGISTRO
+            await pool.query(`UPDATE permisos SET documento = null WHERE id = $1`, [id]);
+    
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'permisos',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: '{"documento": null}',
+                ip, 
+                observacion: null
+            });
+            
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            if (archivo != 'null' && archivo != '' && archivo != null) {
                 let ruta = await ObtenerRutaPermisos(codigo) + separador + archivo;
                 // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
                 fs.access(ruta, fs.constants.F_OK, (err) => {
@@ -312,34 +478,12 @@ class PermisosControlador {
                     }
                 });
             }
-        }
-    }
 
-    // ELIMINAR DOCUMENTO DE RESPALDO DE PERMISO  
-    public async EliminarDocumentoPermiso(req: Request, res: Response): Promise<void> {
-
-        const { id, archivo, codigo } = req.body
-        let separador = path.sep;
-
-        // ACTUALIZAR REGISTRO
-        await pool.query(
-            `
-            UPDATE permisos SET documento = null WHERE id = $1
-            `
-            , [id]);
-
-        res.jsonp({ message: 'Documento eliminado.' });
-
-        if (archivo != 'null' && archivo != '' && archivo != null) {
-            let ruta = await ObtenerRutaPermisos(codigo) + separador + archivo;
-            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs.access(ruta, fs.constants.F_OK, (err) => {
-                if (err) {
-                } else {
-                    // ELIMINAR DEL SERVIDOR
-                    fs.unlinkSync(ruta);
-                }
-            });
+            return res.jsonp({ message: 'Documento eliminado.' });
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'error' });
         }
     }
 
@@ -391,46 +535,154 @@ class PermisosControlador {
 
     // METODO PARA ELIMINAR PERMISO
     public async EliminarPermiso(req: Request, res: Response): Promise<Response> {
-        let { id_permiso, doc, codigo } = req.params;
-        let separador = path.sep;
-        await pool.query(
-            `
-            DELETE FROM realtime_noti where id_permiso = $1
-            `
-            , [id_permiso]);
+        try {
+            // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONT
+            const { user_name, ip } = req.body;
+            let { id_permiso, doc, codigo } = req.params;
+            let separador = path.sep;
 
-        await pool.query(
-            `
-            DELETE FROM autorizaciones WHERE id_permiso = $1
-            `
-            , [id_permiso]);
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
 
-        const response: QueryResult = await pool.query(
-            `
-            DELETE FROM permisos WHERE id = $1 RETURNING *
-            `
-            , [id_permiso]);
+            // CONSULTAR DATOSORIGINALES
+            const consulta = await pool.query(`SELECT * FROM realtime_noti WHERE id_permiso = $1`, [id_permiso]);
+            const [datosOriginalesRealTime] = consulta.rows;
 
-        if (doc != 'null' && doc != '' && doc != null) {
-            console.log(id_permiso, doc, ' entra ');
-            let ruta = await ObtenerRutaPermisos(codigo) + separador + doc;
-            // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-            fs.access(ruta, fs.constants.F_OK, (err) => {
-                if (err) {
-                } else {
-                    // ELIMINAR DEL SERVIDOR
-                    fs.unlinkSync(ruta);
-                }
+            if (!datosOriginalesRealTime) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'permisos',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip, 
+                    observacion: `Error al intentar eliminar permiso con id: ${id_permiso}`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
+            }
+
+            await pool.query(
+                `
+                DELETE FROM realtime_noti where id_permiso = $1
+                `
+                , [id_permiso]);
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'permisos',
+                usuario: user_name,
+                accion: 'D',
+                datosOriginales: JSON.stringify(datosOriginalesRealTime),
+                datosNuevos: '',
+                ip, 
+                observacion: null
             });
-        }
 
-        const [objetoPermiso] = response.rows;
+            // CONSULTAR DATOSORIGINALESAUTORIZACIONES
+            const consultaAutorizaciones = await pool.query(`SELECT * FROM autorizaciones WHERE id_permiso = $1`, [id_permiso]);
+            const [datosOriginalesAutorizaciones] = consultaAutorizaciones.rows;
 
-        if (objetoPermiso) {
-            return res.status(200).jsonp(objetoPermiso)
-        }
-        else {
-            return res.status(404).jsonp({ message: 'Solicitud no eliminada.' })
+            if (!datosOriginalesAutorizaciones) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'permisos',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip, 
+                    observacion: `Error al intentar eliminar permiso con id: ${id_permiso}`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
+            }
+           
+            await pool.query(
+                `
+                DELETE FROM autorizaciones WHERE id_permiso = $1
+                `
+                , [id_permiso]);
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'permisos',
+                usuario: user_name,
+                accion: 'D',
+                datosOriginales: JSON.stringify(datosOriginalesAutorizaciones),
+                datosNuevos: '',
+                ip, 
+                observacion: null
+            });
+
+            // CONSULTAR DATOSORIGINALESPERMISOS
+            const consultaPermisos = await pool.query(`SELECT * FROM permisos WHERE id = $1`, [id_permiso]);
+            const [datosOriginalesPermisos] = consultaPermisos.rows;
+
+            if (!datosOriginalesPermisos) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'permisos',
+                    usuario: user_name,
+                    accion: 'D',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip, 
+                    observacion: `Error al intentar eliminar permiso con id: ${id_permiso}`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'Solicitud no registrada.' });
+            }
+    
+            const response: QueryResult = await pool.query(
+                `
+                DELETE FROM permisos WHERE id = $1 RETURNING *
+                `
+                , [id_permiso]);
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'permisos',
+                usuario: user_name,
+                accion: 'D',
+                datosOriginales: JSON.stringify(datosOriginalesPermisos),
+                datosNuevos: '',
+                ip, 
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+    
+            if (doc != 'null' && doc != '' && doc != null) {
+                console.log(id_permiso, doc, ' entra ');
+                let ruta = await ObtenerRutaPermisos(codigo) + separador + doc;
+                // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+                fs.access(ruta, fs.constants.F_OK, (err) => {
+                    if (err) {
+                    } else {
+                        // ELIMINAR DEL SERVIDOR
+                        fs.unlinkSync(ruta);
+                    }
+                });
+            }
+    
+            const [objetoPermiso] = response.rows;
+    
+            if (objetoPermiso) {
+                return res.status(200).jsonp(objetoPermiso)
+            }
+            else {
+                return res.status(404).jsonp({ message: 'Solicitud no eliminada.' })
+            }
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'error' });
         }
     }
 
@@ -1029,14 +1281,58 @@ class PermisosControlador {
     }
 
     // METODO PARA ACTUALIZAR ESTADO DEL PERMISO
-    public async ActualizarEstado(req: Request, res: Response): Promise<void> {
-        const id = req.params.id;
-        const { estado } = req.body;
-        await pool.query(
-            `
-            UPDATE permisos SET estado = $1 WHERE id = $2
-            `
-            , [estado, id]);
+    public async ActualizarEstado(req: Request, res: Response): Promise<Response> {
+        try {
+            const id = req.params.id;
+            const { estado, user_name, ip } = req.body;
+
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTAR DATOSORIGINALES
+            const consulta = await pool.query('SELECT estado FROM permisos WHERE id = $1', [id]);
+            const [datosOriginales] = consulta.rows;
+
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'permisos',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip, 
+                    observacion: `Error al actualizar estado del permiso con id ${id}`
+                });
+                await pool.query('ROLLBACK');
+                return res.status(404).jsonp({ message: 'No se encuentran registros' });
+            }
+
+            await pool.query(
+                `
+                UPDATE permisos SET estado = $1 WHERE id = $2
+                `
+                , [estado, id]);
+            
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'permisos',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: `{"estado": ${estado}}`,
+                ip, 
+                observacion: null
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+
+            return res.jsonp({ message: 'ok' });
+        } catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
+            return res.status(500).jsonp({ message: 'Error al actualizar estado del permiso' });   
+        }
     }
 
     // METODO PARA OBTENER INFORMACION DE UN PERMISO
@@ -1061,11 +1357,6 @@ class PermisosControlador {
         }
     }
 
-
-
-
-
-
     // ENVIO DE CORREO AL CREAR UN PERMISO MEDIANTE APLICACION MOVIL
     public async EnviarCorreoPermisoMovil(req: Request, res: Response): Promise<void> {
 
@@ -1077,14 +1368,10 @@ class PermisosControlador {
 
         var datos = await Credenciales(parseInt(req.params.id_empresa));
 
-        console.log('datos: ', datos);
-
         if (datos === 'ok') {
             const { id_empl_contrato, id_dep, correo,
                 id_suc, desde, hasta, h_inicio, h_fin, observacion, estado_p, solicitud, tipo_permiso,
                 dias_permiso, horas_permiso, solicitado_por, asunto, tipo_solicitud, proceso } = req.body;
-
-            console.log('req.body: ', req.body);
 
             const correoInfoPidePermiso = await pool.query('SELECT e.id, e.correo, e.nombre, e.apellido, ' +
                 'e.cedula, ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, ' +
@@ -1195,8 +1482,6 @@ class PermisosControlador {
                 dias_permiso, horas_permiso, solicitado_por, asunto, tipo_solicitud, proceso,
                 adesde, ahasta, ah_inicio, ah_fin, aobservacion, aestado_p, asolicitud, atipo_permiso, adias_permiso,
                 ahoras_permiso } = req.body;
-
-            console.log('req.body: ', req.body);
 
             const correoInfoPidePermiso = await pool.query('SELECT e.id, e.correo, e.nombre, e.apellido, ' +
                 'e.cedula, ecr.id_departamento, ecr.id_sucursal, ecr.id AS cargo, tc.cargo AS tipo_cargo, ' +
