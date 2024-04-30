@@ -2,7 +2,9 @@
 import {
   enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, Credenciales, fechaHora,
   FormatearFecha, FormatearHora, dia_completo
-} from '../../libs/settingsMail'
+} from '../../libs/settingsMail';
+
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 
 import { Request, Response } from 'express';
 import { Licencias } from '../../class/Licencia';
@@ -301,17 +303,66 @@ class LoginControlador {
   }
 
   // METODO PARA CAMBIAR CONTRASEÑA
-  public async CambiarContrasenia(req: Request, res: Response) {
-    var token = req.body.token;
-    var contrasena = req.body.contrasena;
+  public async CambiarContrasenia(req: Request, res: Response): Promise<Response> {
+    let { token, contrasena, user_name, ip } = req.body;
+
     try {
       const payload = jwt.verify(token, process.env.TOKEN_SECRET_MAIL || 'llaveEmail') as IPayload;
       const id_empleado = payload._id;
-      await pool.query(
-        `
-        UPDATE usuarios SET contrasena = $2 WHERE id_empleado = $1
-        `
-        , [id_empleado, contrasena]);
+      try {
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
+
+        // OBTENER DATOSORIGINALES
+        const datosOriginales = await pool.query(
+          `
+          SELECT contrasena FROM usuarios WHERE id_empleado = $1
+          `
+          , [id_empleado]);
+
+        const [contrasenaOriginal] = datosOriginales.rows;
+
+        if (!contrasenaOriginal) {
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'usuarios',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: '',
+            datosNuevos: '',
+            ip,
+            observacion: `Error al cambiar la contraseña del usuario con id ${id_empleado}`
+          });
+
+          // FINALIZAR TRANSACCION
+          await pool.query('COMMIT');
+          return res.status(404).jsonp({ message: 'error' });
+        }
+        
+        
+        await pool.query(
+          `
+          UPDATE usuarios SET contrasena = $2 WHERE id_empleado = $1
+          `
+          , [id_empleado, contrasena]);
+
+        // AUDITORIA
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'usuarios',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: JSON.stringify(contrasenaOriginal),
+          datosNuevos: `{"contrasena": "${contrasena}"}`,
+          ip,
+          observacion: `Cambio de contraseña del usuario con id ${id_empleado}`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+      } catch (error) {
+        // ROLLBACK
+        await pool.query('ROLLBACK');
+        return res.status(500).jsonp({ message: 'error' });
+      }
       return res.jsonp({
         expiro: 'no',
         message: "Contraseña actualizada. Intente ingresar con la nueva contraseña."
@@ -322,26 +373,6 @@ class LoginControlador {
         message: "Tiempo para cambiar contraseña ha expirado. Vuelva a solicitar cambio de contraseña."
       });
     }
-  }
-
-
-
-
-
-
-
-
-
-
-  // PRUEBA AUDITAR
-  public async Auditar(req: Request, res: Response): Promise<void> {
-    const { esquema, tabla, user, ip, old_data, new_data, accion } = req.body;
-    await pool.query(' INSERT INTO audit.auditoria (schema_name, table_name, user_name, action, ' +
-      'original_data, new_data, ip) ' +
-      'VALUES ($1, $2, $3, substring($7,1,1), $4, $5, $6)',
-      [esquema, tabla, user, old_data, new_data, ip, accion]);
-    console.log('req auditar', req.body);
-    res.jsonp({ message: 'Auditar' });
   }
 
 }
