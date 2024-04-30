@@ -424,7 +424,8 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
 
 
-
+  contador: number = 0;
+  ingresar: boolean = false;
 
   public departamentosNiveles: any = [];
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
@@ -484,12 +485,60 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
 
   EliminarMultiple() {
+    
+    this.ingresar = false;
+    this.contador = 0;
 
     this.departamentosEliminar = this.selectionDepartamentos.selected;
     this.departamentosEliminar.forEach((datos: any) => {
       this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
-    
-      this.Eliminar(datos.id, datos.id_sucursal, datos.nivel);
+
+      // this.Eliminar(datos.id, datos.id_sucursal, datos.nivel);
+
+      this.contador = this.contador + 1;
+
+
+      this.rest.EliminarRegistro(datos.id).subscribe(res => {
+
+
+        if (res.message === 'error') {
+
+          this.toastr.error('No se puede elminar.', 'la: ' + datos.nombre, {
+            timeOut: 6000,
+          });
+
+        } else {
+          this.departamentosNiveles = [];
+          var id_departamento = datos.id;
+          var id_establecimiento = datos.id_sucursal;
+          if (datos.nivel != 0) {
+            this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
+              this.departamentosNiveles = datos;
+              this.departamentosNiveles.filter(item => {
+                this.rest.EliminarRegistroNivelDepa(item.id).subscribe({})
+              })
+            })
+            this.ListaDepartamentos();
+
+          } else {
+            this.ListaDepartamentos();
+
+          }
+
+
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+
+
+            this.ingresar = true;
+
+            this.ListaDepartamentos();
+          }
+
+        }
+      });
 
 
       //ojo aqui
@@ -512,11 +561,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
             this.plan_multiple = false;
             this.plan_multiple_ = false;
 
-
-
-
-
-
           } else {
             this.toastr.warning('No ha seleccionado DEPARTAMENTOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
@@ -528,8 +572,6 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
         } else {
           this.router.navigate(['/departamento']);
-
-
 
         }
       });

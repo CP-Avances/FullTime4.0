@@ -440,9 +440,12 @@ export class VerEmpresaComponent implements OnInit {
   }
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
-  Eliminar(id_sucursal: number) {
 
+  contador: number = 0;
+  ingresar: boolean = false;
+  Eliminar(id_sucursal: number) {
     this.restS.EliminarRegistro(id_sucursal).subscribe(res => {
+
 
       if (res.message === 'error') {
 
@@ -455,7 +458,6 @@ export class VerEmpresaComponent implements OnInit {
           timeOut: 6000,
         });
         this.ObtenerSucursal();
-
       }
     });
 
@@ -473,14 +475,46 @@ export class VerEmpresaComponent implements OnInit {
       });
   }
 
+
+
+
   EliminarMultiple() {
+
+    this.ingresar = false;
+    this.contador = 0;
+
 
     this.sucursalesEliminar = this.selectionSucursales.selected;
     this.sucursalesEliminar.forEach((datos: any) => {
 
       this.datosSucursales = this.datosSucursales.filter(item => item.id !== datos.id);
-      
-      this.Eliminar(datos.id);
+      this.contador = this.contador + 1;
+
+
+      this.restS.EliminarRegistro(datos.id).subscribe(res => {
+
+
+        if (res.message === 'error') {
+  
+          this.toastr.error('No se puede elminar.', 'la: '+ datos.nombre, {
+            timeOut: 6000,
+          });
+  
+        } else {
+           if (!this.ingresar) {
+             this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+  
+  
+            this.ingresar = true;
+  
+            this.ObtenerSucursal();
+          }
+  
+        }
+      });
+  
 
       this.restS.BuscarSucursal().subscribe(data => {
         this.datosSucursales = data;
@@ -502,22 +536,14 @@ export class VerEmpresaComponent implements OnInit {
 
             this.plan_multiple = false;
             this.plan_multiple_ = false;
-
-
-
-
-
-
           } else {
             this.toastr.warning('No ha seleccionado SUCURSALES.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
 
           }
-
           this.selectionSucursales.clear();
-
-        }else{
+        } else {
           this.router.navigate(['/vistaEmpresa']);
 
         }

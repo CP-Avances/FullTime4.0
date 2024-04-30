@@ -778,10 +778,10 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   // METODO PARA ASIGNAR PAGINAS A ESTE ROL
 
   contador: number = 0;
-  ingresar: number = 0;
+  ingresar: boolean = false;
   //INSERTAR PAGINA
   InsertarPaginaRol() {
-    this.ingresar = 0;
+    this.ingresar = false;
     this.contador = 0;
     // VALIDAR SI SE HA SELECCIONADO PAGINAS
     if (this.paginasSeleccionadas.length != 0) {
@@ -809,7 +809,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                   this.habilitarprogress = false;
 
 
-                  this.toastr.info('Se indica que ' + obj.nombre + 'con accion ' + this.MetodoParaMostrarAccion(accion.id) + ' ya fue asignada a este Rol.', '', {
+                  this.toastr.info('Se indica que ' + obj.nombre + ' con accion ' + this.MetodoParaMostrarAccion(accion.id) + ' ya fue asignada a este Rol.', '', {
                     timeOut: 7000,
                   })
                 }, error => {
@@ -822,13 +822,23 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                     id_rol: this.idRol,
                     id_accion: accion.id
                   }
+                  this.contador = this.contador + 1;
 
                   this.rest.crearPaginaRol(rolPermisosbody).subscribe(response => {
-                    this.contador = this.contador + 1;
-                    this.ingresar = this.ingresar + 1;
-                    this.toastr.success('Operación exitosa.', 'Registro guardado.', {
-                      timeOut: 6000,
-                    });
+                    ///this.ingresar = this.ingresar + 1;
+
+                    if (!this.ingresar) {
+                      // this.contador = this.contador + 1;
+
+                      this.toastr.success('Operación exitosa.', 'Se ha guardado ' + this.contador + ' registros.', {
+                        timeOut: 6000,
+                      })
+
+                      this.ingresar = true;
+
+                    }
+
+
 
                     this.rest.BuscarPaginasRol(rol).subscribe(datos => {
                       this.paginas = datos;
@@ -840,12 +850,16 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                       timeOut: 6000,
                     })
                   });
+
+
+
+
                 }
               );
             })
           } else {
 
-            this.toastr.warning('No ha seleccionado ACCIONES.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado ACCIONES en ' + obj.nombre + '.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
 
@@ -875,12 +889,22 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
 
           }, error => {
+            this.contador = this.contador + 1;
+
             this.rest.crearPaginaRol(rolPermisosbody).subscribe(response => {
-              this.contador = this.contador + 1;
-              this.ingresar = this.ingresar + 1;
-              this.toastr.success('Operación exitosa.', 'Registro guardado.', {
-                timeOut: 6000,
-              });
+              ///this.ingresar = this.ingresar + 1;
+
+              if (!this.ingresar) {
+                // this.contador = this.contador + 1;
+
+                this.toastr.success('Operación exitosa.', 'Se ha guardado ' + this.contador + ' registros.', {
+                  timeOut: 6000,
+                })
+
+                this.ingresar = true;
+
+              }
+
 
               this.rest.BuscarPaginasRol(rol).subscribe(datos => {
                 this.paginas = datos;
@@ -913,6 +937,9 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       var rol = {
         id_rol: this.idRol
       };
+
+
+
     }
     else {
       this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
@@ -930,7 +957,8 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
   //INSERTAR PAGINA
   InsertarPaginaModulosRol() {
-
+    this.ingresar = false;
+    this.contador = 0;
 
 
     // VALIDAR SI SE HA SELECCIONADO PAGINAS
@@ -978,13 +1006,21 @@ export class SeleccionarRolPermisoComponent implements OnInit {
                     id_accion: accion.id
                   }
 
-                  this.rest.crearPaginaRol(rolPermisosbody).subscribe(response => {
-                    this.contador = this.contador + 1;
-                    this.ingresar = this.ingresar + 1;
-                    this.toastr.success('Operación exitosa.', 'Registro guardado.', {
-                      timeOut: 6000,
-                    });
+                  this.contador = this.contador + 1;
 
+                  this.rest.crearPaginaRol(rolPermisosbody).subscribe(response => {
+                    ///this.ingresar = this.ingresar + 1;
+
+                    if (!this.ingresar) {
+                      // this.contador = this.contador + 1;
+
+                      this.toastr.success('Operación exitosa.', 'Se ha guardado ' + this.contador + ' registros.', {
+                        timeOut: 6000,
+                      })
+
+                      this.ingresar = true;
+
+                    }
 
                     this.rest.BuscarPaginasRol(rol).subscribe(datos => {
                       this.paginas = datos;
@@ -1004,7 +1040,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
             });
           } else {
 
-            this.toastr.warning('No ha seleccionado ACCIONES.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado ACCIONES en ' + obj.nombre + '.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
 
@@ -1039,12 +1075,21 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
 
           }, error => {
+            this.contador = this.contador + 1;
+
             this.rest.crearPaginaRol(rolPermisosbody).subscribe(response => {
-              this.contador = this.contador + 1;
-              this.ingresar = this.ingresar + 1;
-              this.toastr.success('Operación exitosa.', 'Registro guardado.' + obj.nombre, {
-                timeOut: 6000,
-              });
+              ///this.ingresar = this.ingresar + 1;
+
+              if (!this.ingresar) {
+                // this.contador = this.contador + 1;
+
+                this.toastr.success('Operación exitosa.', 'Se ha guardado ' + this.contador + ' registros.', {
+                  timeOut: 6000,
+                })
+
+                this.ingresar = true;
+
+              }
               (<HTMLInputElement>document.getElementById('seleccionarmodulo' + obj.nombre_modulo)).checked = false;
 
 
@@ -1162,6 +1207,10 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
   EliminarPaginaRol() {
 
+    this.ingresar = false;
+    this.contador = 0;
+
+
     this.paginasEliminar = this.selectionPaginas.selected;
     this.paginasEliminar.forEach((datos: any) => {
 
@@ -1171,14 +1220,35 @@ export class SeleccionarRolPermisoComponent implements OnInit {
         id: datos.id
 
       };
+
+      this.contador = this.contador + 1;
+
       this.rest.EliminarPaginasRol(buscarPagina).subscribe(
 
         res => {
-          this.toastr.error('Registro eliminado.', '', {
-            timeOut: 6000,
-          });
-          this.MostrarPaginasRol();
 
+          if (res.message === 'error') {
+  
+            this.toastr.error('No se puede elminar.', 'la: '+ datos.nombre, {
+              timeOut: 6000,
+            });
+    
+          } else {
+            if (!this.ingresar) {
+    
+              this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '',{
+                timeOut: 6000,
+              });
+  
+  
+              this.ingresar = true;
+  
+              this.MostrarPaginasRol();
+            }
+          }
+
+          
+          
         }
       )
     }

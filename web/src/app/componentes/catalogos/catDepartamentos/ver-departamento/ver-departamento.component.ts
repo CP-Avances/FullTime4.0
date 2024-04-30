@@ -291,6 +291,9 @@ export class VerDepartamentoComponent implements OnInit {
 
   }
 
+  contador: number = 0;
+  ingresar: boolean = false;
+
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_dep: number, datos: any) {
 
@@ -331,8 +334,29 @@ export class VerDepartamentoComponent implements OnInit {
       this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
 
       //AQUI MODIFICAR EL METODO 
-      this.Eliminar(datos.id, datos);
-     
+      //this.Eliminar(datos.id, datos);
+
+      this.rest.EliminarRegistroNivelDepa(datos.id).subscribe(res => {
+
+
+        if (res.message === 'error') {
+  
+          this.toastr.error('No se puede elminar ',  datos.nombre, {
+            timeOut: 6000,
+          });
+  
+        } else {
+           if (!this.ingresar) {
+             this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+  
+  
+            this.ingresar = true;
+            }
+  
+        }
+      });
       this.ActualizarRegistros(datos);
 
     }
