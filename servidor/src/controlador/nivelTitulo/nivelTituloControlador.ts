@@ -69,7 +69,7 @@ class NivelTituloControlador {
         datosOriginales: JSON.stringify(datosOriginales),
         datosNuevos: '',
         ip,
-        observacion: ''
+        observacion: null
       });
 
       // FINALIZAR TRANSACCION
@@ -106,7 +106,7 @@ class NivelTituloControlador {
         datosOriginales: '',
         datosNuevos: `{"nombre": "${nombre}"}`,
         ip,
-        observacion: ''
+        observacion: null
       });
 
       // FINALIZAR TRANSACCION

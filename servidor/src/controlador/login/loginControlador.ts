@@ -353,7 +353,7 @@ class LoginControlador {
           datosOriginales: JSON.stringify(contrasenaOriginal),
           datosNuevos: `{"contrasena": "${contrasena}"}`,
           ip,
-          observacion: `Cambio de contraseña del usuario con id ${id_empleado}`
+          observacion: null
         });
 
         // FINALIZAR TRANSACCION
