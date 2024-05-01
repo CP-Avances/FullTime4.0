@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 
 import pool from '../../database';
 import excel from 'xlsx';
 import fs from 'fs';
 import path from 'path';
-const builder = require('xmlbuilder');
 
 
 class SucursalControlador {
@@ -31,34 +31,100 @@ class SucursalControlador {
   // GUARDAR REGISTRO DE SUCURSAL
   public async CrearSucursal(req: Request, res: Response): Promise<Response> {
 
-    const { nombre, id_ciudad, id_empresa } = req.body;
+    try {
+      const { nombre, id_ciudad, id_empresa, user_name, ip } = req.body;
 
-    const response: QueryResult = await pool.query(
-      `
-      INSERT INTO sucursales (nombre, id_ciudad, id_empresa) VALUES ($1, $2, $3) RETURNING *
-      `
-      , [nombre, id_ciudad, id_empresa]);
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+  
+      const response: QueryResult = await pool.query(
+        `
+        INSERT INTO sucursales (nombre, id_ciudad, id_empresa) VALUES ($1, $2, $3) RETURNING *
+        `
+        , [nombre, id_ciudad, id_empresa]);
+  
+      const [sucursal] = response.rows;
 
-    const [sucursal] = response.rows;
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'sucursales',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: JSON.stringify(sucursal),
+        ip,
+        observacion: null
+      });
 
-    if (sucursal) {
-      return res.status(200).jsonp(sucursal)
-    }
-    else {
-      return res.status(404).jsonp({ message: 'error' })
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+  
+      if (sucursal) {
+        return res.status(200).jsonp(sucursal)
+      }
+      else {
+        return res.status(404).jsonp({ message: 'error' })
+      }
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
   // ACTUALIZAR REGISTRO DE ESTABLECIMIENTO
-  public async ActualizarSucursal(req: Request, res: Response): Promise<void> {
-    const { nombre, id_ciudad, id } = req.body;
-    await pool.query(
-      `
-      UPDATE sucursales SET nombre = $1, id_ciudad = $2 WHERE id = $3
-      `
-      , [nombre, id_ciudad, id]);
+  public async ActualizarSucursal(req: Request, res: Response): Promise<Response> {
+    try {
+      const { nombre, id_ciudad, id, user_name, ip } = req.body;
 
-    res.jsonp({ message: 'Registro actualizado.' });
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const consulta = await pool.query('SELECT * FROM sucursales WHERE id = $1', [id]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'sucursales',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar el registro con id: ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
+      await pool.query(
+        `
+        UPDATE sucursales SET nombre = $1, id_ciudad = $2 WHERE id = $3
+        `
+        , [nombre, id_ciudad, id]);
+  
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'sucursales',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{ "nombre": "${nombre}", "id_ciudad": "${id_ciudad}" }`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro actualizado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+    }
   }
 
   // BUSCAR SUCURSAL POR ID DE EMPRESA
@@ -96,14 +162,61 @@ class SucursalControlador {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  public async EliminarRegistros(req: Request, res: Response): Promise<void> {
-    const id = req.params.id;
-    await pool.query(
-      `
-      DELETE FROM sucursales WHERE id = $1
-      `
-      , [id]);
-    res.jsonp({ message: 'Registro eliminado.' });
+  public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
+    try {
+      // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
+      const { user_name, ip } = req.body;
+
+      const id = req.params.id;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const consulta = await pool.query('SELECT * FROM sucursales WHERE id = $1', [id]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'sucursales',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al eliminar el registro con id: ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
+      await pool.query(
+        `
+        DELETE FROM sucursales WHERE id = $1
+        `
+        , [id]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'sucursales',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro eliminado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+    }
   }
 
   // METODO PARA BUSCAR DATOS DE UNA SUCURSAL
