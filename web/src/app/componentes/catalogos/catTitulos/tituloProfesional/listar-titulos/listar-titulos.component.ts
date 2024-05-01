@@ -621,8 +621,7 @@ export class ListarTitulosComponent implements OnInit {
         }
       });
 
-
-
+    this.ObtenerTitulos();
   }
 
 
@@ -652,16 +651,14 @@ export class ListarTitulosComponent implements OnInit {
               timeOut: 6000,
             });
             this.ingresar = true;
-            this.ObtenerTitulos();
           }
+          this.ObtenerTitulos();
+
         }
       });
-      this.ObtenerTitulos();
     }
     )
 
-
-    
   }
 
 
@@ -676,12 +673,6 @@ export class ListarTitulosComponent implements OnInit {
 
             this.plan_multiple = false;
             this.plan_multiple_ = false;
-
-
-
-
-
-
           } else {
             this.toastr.warning('No ha seleccionado TÍTULOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
@@ -697,6 +688,7 @@ export class ListarTitulosComponent implements OnInit {
 
         }
       });
+    this.ObtenerTitulos();
   }
 
 }

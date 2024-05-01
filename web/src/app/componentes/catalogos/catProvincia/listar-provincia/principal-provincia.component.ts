@@ -487,7 +487,8 @@ export class PrincipalProvinciaComponent implements OnInit {
       })
 
     }
-    )
+    );
+
   }
 
 
@@ -517,6 +518,8 @@ export class PrincipalProvinciaComponent implements OnInit {
 
 
       });
+      this.ListarProvincias();
+
   }
 
 

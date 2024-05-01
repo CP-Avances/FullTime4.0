@@ -171,9 +171,11 @@ export class VerDepartamentoComponent implements OnInit {
     if (contador === arreglo.length) {
       this.CargarDatos(this.info);
       this.CargarDatos(this.info);
+
+      /*
       this.toastr.error('Registro eliminado.', '', {
         timeOut: 1000,
-      });
+      });*/
     }
   }
 
@@ -305,28 +307,40 @@ export class VerDepartamentoComponent implements OnInit {
           timeOut: 6000,
         });
       } else {
+        
         this.toastr.error('Registro eliminado.', '', {
           timeOut: 6000,
         });
+        
         this.ActualizarRegistros(datos);
       }
     });
   }
 
 
-    // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
-    ConfirmarDelete(datos: any) {
-      this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-        .subscribe((confirmado: Boolean) => {
-          if (confirmado) {
-            this.Eliminar(datos.id, datos);
-          }
-        });
-    }
-  
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.Eliminar(datos.id, datos);
+        }else{
+          this.router.navigate(['/departamento']);
+
+        }
+      });
+
+    this.ActualizarRegistros(datos);
+
+  }
+
 
 
   EliminarMultiple() {
+
+
+    this.ingresar = false;
+    this.contador = 0;
 
     this.nivelesEliminar = this.selectionNivel.selected;
     this.nivelesEliminar.forEach((datos: any) => {
@@ -340,27 +354,23 @@ export class VerDepartamentoComponent implements OnInit {
 
 
         if (res.message === 'error') {
-  
-          this.toastr.error('No se puede elminar ',  datos.nombre, {
+
+          this.toastr.error('No se puede elminar ', datos.nombre, {
             timeOut: 6000,
           });
-
           this.contador = this.contador - 1;
-
-  
         } else {
-           if (!this.ingresar) {
-             this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
               timeOut: 6000,
             });
-  
-  
             this.ingresar = true;
-            }
-  
+          }
+          this.ActualizarRegistros(datos);
+
+          //this.CargarDatos(datos);
         }
       });
-      this.ActualizarRegistros(datos);
 
     }
     )
@@ -379,11 +389,6 @@ export class VerDepartamentoComponent implements OnInit {
             this.plan_multiple = false;
             this.plan_multiple_ = false;
 
-
-
-
-
-
           } else {
             this.toastr.warning('No ha seleccionado NIVEL.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
@@ -391,12 +396,20 @@ export class VerDepartamentoComponent implements OnInit {
 
           }
 
+          
+
           this.selectionNivel.clear();
+          this.router.navigate(['/departamento']);
 
-        } 
+        }else{
+          this.router.navigate(['/departamento']);
 
-
+        }
       });
+
+
+
+      
   }
 
 

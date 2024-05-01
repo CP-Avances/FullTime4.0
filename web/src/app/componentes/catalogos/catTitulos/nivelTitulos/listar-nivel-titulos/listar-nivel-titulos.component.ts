@@ -599,6 +599,9 @@ export class ListarNivelTitulosComponent implements OnInit {
           this.router.navigate(['/nivelTitulos']);
         }
       });
+
+      this.ObtenerNiveles();
+
   }
   contador: number = 0;
   ingresar: boolean = false;
@@ -656,11 +659,6 @@ export class ListarNivelTitulosComponent implements OnInit {
             this.plan_multiple = false;
             this.plan_multiple_ = false;
 
-
-
-
-
-
           } else {
             this.toastr.warning('No ha seleccionado NIVELES DE EDUCACIÓN.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
@@ -672,11 +670,10 @@ export class ListarNivelTitulosComponent implements OnInit {
 
         } else {
           this.router.navigate(['/nivelTitulos']);
-
-
-
         }
       });
+      this.ObtenerNiveles();
+
   }
 
 

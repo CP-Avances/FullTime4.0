@@ -452,7 +452,26 @@ export class PrincipalDepartamentoComponent implements OnInit {
           this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
             this.departamentosNiveles = datos;
             this.departamentosNiveles.filter(item => {
-              this.rest.EliminarRegistroNivelDepa(item.id).subscribe({})
+              this.rest.EliminarRegistroNivelDepa(item.id).subscribe(
+                res => {
+
+                  if (res.message === 'error') {
+                    this.toastr.error('No se puede elminar.', '', {
+                      timeOut: 6000,
+                    });
+
+
+                  } else {
+                    this.toastr.error('Nivel eliminado de: ' + item.departamento, '', {
+                      timeOut: 6000,
+                    });
+                    this.ListaDepartamentos();
+
+                  }
+
+                }
+              );
+
             })
           })
           this.ListaDepartamentos();
@@ -481,25 +500,21 @@ export class PrincipalDepartamentoComponent implements OnInit {
           this.router.navigate(['/departamento']);
         }
       });
+    this.ListaDepartamentos();
+
   }
 
 
   EliminarMultiple() {
-    
+
     this.ingresar = false;
     this.contador = 0;
 
     this.departamentosEliminar = this.selectionDepartamentos.selected;
     this.departamentosEliminar.forEach((datos: any) => {
       this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
-
-      // this.Eliminar(datos.id, datos.id_sucursal, datos.nivel);
-
       this.contador = this.contador + 1;
-
-
       this.rest.EliminarRegistro(datos.id).subscribe(res => {
-
 
         if (res.message === 'error') {
 
@@ -515,7 +530,27 @@ export class PrincipalDepartamentoComponent implements OnInit {
             this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
               this.departamentosNiveles = datos;
               this.departamentosNiveles.filter(item => {
-                this.rest.EliminarRegistroNivelDepa(item.id).subscribe({})
+                this.rest.EliminarRegistroNivelDepa(item.id).subscribe(
+                  res => {
+
+                    if (res.message === 'error') {
+                      this.toastr.error('No se puede elminar.', '', {
+                        timeOut: 6000,
+                      });
+  
+  
+                    } else {
+                      this.toastr.error('Nivel eliminado de: ' + item.departamento, '', {
+                        timeOut: 6000,
+                      });
+                      this.ListaDepartamentos();
+  
+                    }
+  
+                  }
+                )
+                this.ListaDepartamentos();
+
               })
             })
             this.ListaDepartamentos();
@@ -530,18 +565,14 @@ export class PrincipalDepartamentoComponent implements OnInit {
             this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
               timeOut: 6000,
             });
-
-
             this.ingresar = true;
 
-            this.ListaDepartamentos();
           }
+          this.ListaDepartamentos();
 
         }
       });
 
-
-      //ojo aqui
       this.ListaDepartamentos();
 
     }
@@ -575,6 +606,8 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
         }
       });
+    this.ListaDepartamentos();
+
   }
 
 

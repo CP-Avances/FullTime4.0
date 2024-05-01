@@ -142,7 +142,7 @@ export class ListaSucursalesComponent implements OnInit {
   // METODO PARA BUSCAR SUCURSALES
   ObtenerSucursal() {
 
-    this.sucursales=[];
+    this.sucursales = [];
     this.rest.BuscarSucursal().subscribe(data => {
       this.sucursales = data;
     });
@@ -646,7 +646,7 @@ export class ListaSucursalesComponent implements OnInit {
         }
       });
 
-      this.ObtenerSucursal();
+    this.ObtenerSucursal();
 
   }
 
@@ -683,12 +683,12 @@ export class ListaSucursalesComponent implements OnInit {
               timeOut: 6000,
             });
             this.ingresar = true;
-           }
+          }
           this.ObtenerSucursal();
 
         }
       });
-     
+
 
     }
     )
@@ -706,27 +706,19 @@ export class ListaSucursalesComponent implements OnInit {
 
             this.plan_multiple = false;
             this.plan_multiple_ = false;
-
             this.selectionSucursales.clear();
 
           } else {
             this.toastr.warning('No ha seleccionado SUCURSALES.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
-
           }
-
-
-
-
         } else {
-
           this.router.navigate(['/sucursales']);
-
         }
       });
 
-      this.ObtenerSucursal();
+    this.ObtenerSucursal();
 
   }
 

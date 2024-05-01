@@ -436,6 +436,9 @@ export class ListarCiudadComponent implements OnInit {
           this.router.navigate(['/listarCiudades']);
         }
       });
+
+      this.ListarCiudades();
+
   }
 
   contador: number = 0;
@@ -450,24 +453,17 @@ export class ListarCiudadComponent implements OnInit {
     this.datosCiudadesEliminar = this.selectiondatosCiudades.selected;
     this.datosCiudadesEliminar.forEach((datos: any) => {
       
-
-
       this.datosCiudades = this.datosCiudades.filter(item => item.id !== datos.id);
-
-      this.contador = this.contador + 1;
-
+this.contador = this.contador + 1;
 
       this.rest.EliminarCiudad(datos.id).subscribe(res => {
       
-
         if (res.message === 'error') {
           this.toastr.error('No se puede elminar ', datos.nombre, {
             timeOut: 6000,
           });
 
-
           this.contador = this.contador - 1;
-
         } else {
           if (!this.ingresar) {
             this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
@@ -483,10 +479,7 @@ export class ListarCiudadComponent implements OnInit {
   
       });
 
-        this.rest.ListarNombreCiudadProvincia().subscribe(datos => {
-        this.datosCiudades = datos;
-      })
-
+  
     }
     )
   }
@@ -504,26 +497,19 @@ export class ListarCiudadComponent implements OnInit {
             this.plan_multiple = false;
             this.plan_multiple_ = false;
 
-
-
-
-
-
           } else {
             this.toastr.warning('No ha seleccionado CIUDADES.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
 
           }
-
           this.selectiondatosCiudades.clear();
-
         } else {
-
           this.router.navigate(['/listarCiudades']);
-
         }
       });
+      this.ListarCiudades();
+
   }
 
 
