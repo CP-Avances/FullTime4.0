@@ -82,14 +82,14 @@ export class ListaArchivosComponent implements OnInit {
       this.rest.ListarDocumentacion(nombre_carpeta).subscribe(res => {
         this.archivos = res
         this.archivosFiltro = [...this.archivos];
-        console.log('archivosFiltro: ',this.archivosFiltro);
+        console.log('archivosFiltro: ', this.archivosFiltro);
       })
     }
     else if (this.Dirname === 'contratos') {
       this.rest.ListarContratos(nombre_carpeta).subscribe(res => {
         this.archivos = res;
         this.archivosFiltro = [...this.archivos];
-        console.log('archivosFiltro: ',this.archivosFiltro);
+        console.log('archivosFiltro: ', this.archivosFiltro);
         console.log('contratos ', res)
       })
     }
@@ -97,7 +97,7 @@ export class ListaArchivosComponent implements OnInit {
       this.rest.ListarPermisos(nombre_carpeta).subscribe(res => {
         this.archivos = res
         this.archivosFiltro = [...this.archivos];
-        console.log('archivosFiltro: ',this.archivosFiltro);
+        console.log('archivosFiltro: ', this.archivosFiltro);
         //console.log('permisos ', res)
       })
     }
@@ -105,14 +105,14 @@ export class ListaArchivosComponent implements OnInit {
       this.rest.ListarHorarios(nombre_carpeta).subscribe(res => {
         this.archivos = res
         this.archivosFiltro = [...this.archivos];
-        console.log('archivosFiltro: ',this.archivosFiltro);
+        console.log('archivosFiltro: ', this.archivosFiltro);
       })
     }
     else {
       this.rest.ListarArchivosDeCarpeta(nombre_carpeta).subscribe(res => {
         this.archivos = res
         this.archivosFiltro = [...this.archivos];
-        console.log('archivosFiltro: ',this.archivosFiltro);
+        console.log('archivosFiltro: ', this.archivosFiltro);
       })
     }
   }
@@ -137,9 +137,11 @@ export class ListaArchivosComponent implements OnInit {
         this.rest.ListarDocumentacion('documentacion').subscribe(res => {
           this.archivos = res
           this.archivosFiltro = [...this.archivos];
-          console.log('archivosFiltro: ',this.archivosFiltro);
+          console.log('archivosFiltro: ', this.archivosFiltro);
         })
       });
+
+      
   }
 
   // METODO PARA VER LISTA DE ARCHIVOS DE PERMISOS
@@ -151,7 +153,7 @@ export class ListaArchivosComponent implements OnInit {
     this.rest.ListarArchivosIndividuales(nombre_carpeta, tipo).subscribe(res => {
       this.archivos = res
       this.archivosFiltro = [...this.archivos];
-      console.log('archivosFiltro: ',this.archivosFiltro);
+      console.log('archivosFiltro: ', this.archivosFiltro);
     })
   }
 
@@ -162,74 +164,74 @@ export class ListaArchivosComponent implements OnInit {
   }
 
 
-  Filtrar(e: any, tipo: string){
-    console.log('e: ',e.target.value);
+  Filtrar(e: any, tipo: string) {
+    console.log('e: ', e.target.value);
     const query: string = e.target.value;
-    const filtro = this.archivos.filter((o:any) => {
-      console.log('o: ',o);
-      if(tipo == 'carpeta'){
+    const filtro = this.archivos.filter((o: any) => {
+      console.log('o: ', o);
+      if (tipo == 'carpeta') {
         return (o.indexOf(query) > -1);
-      }else{
+      } else {
         return (o.nombre.indexOf(query) > -1);
       }
-      
+
     })
     this.archivosFiltro = filtro;
   }
 
 
 
-   // METODOS PARA LA SELECCION MULTIPLE
+  // METODOS PARA LA SELECCION MULTIPLE
 
-   plan_multiple: boolean = false;
-   plan_multiple_: boolean = false;
- 
-   HabilitarSeleccion() {
-     this.plan_multiple = true;
-     this.plan_multiple_ = true;
-     this.auto_individual = false;
-     this.activar_seleccion = false;
-   }
- 
-   auto_individual: boolean = true;
-   activar_seleccion: boolean = true;
-   seleccion_vacia: boolean = true;
- 
-   selectionArchivos = new SelectionModel<ITableArchivos>(true, []);
- 
- 
- 
-   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
-   isAllSelectedPag() {
-     const numSelected = this.selectionArchivos.selected.length;
-     return numSelected === this.archivosFiltro.length
-   }
- 
- 
-   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
-   masterTogglePag() {
-     this.isAllSelectedPag() ?
-       this.selectionArchivos.clear() :
-       this.archivosFiltro.forEach((row: any) => this.selectionArchivos.select(row));
-   }
- 
- 
-   // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
-   checkboxLabelPag(row?: ITableArchivos): string {
-     if (!row) {
-       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
-     }
-     this.archivosEliminar= this.selectionArchivos.selected;
-     //console.log('paginas para Eliminar',this.paginasEliminar);
- 
-     //console.log(this.selectionPaginas.selected)
-     return `${this.selectionArchivos.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
- 
-   }
- 
+  plan_multiple: boolean = false;
+  plan_multiple_: boolean = false;
+
+  HabilitarSeleccion() {
+    this.plan_multiple = true;
+    this.plan_multiple_ = true;
+    this.auto_individual = false;
+    this.activar_seleccion = false;
+  }
+
+  auto_individual: boolean = true;
+  activar_seleccion: boolean = true;
+  seleccion_vacia: boolean = true;
+
+  selectionArchivos = new SelectionModel<ITableArchivos>(true, []);
 
 
-    // METODO PARA ELIMINAR ARCHIVOS
+
+  // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
+  isAllSelectedPag() {
+    const numSelected = this.selectionArchivos.selected.length;
+    return numSelected === this.archivosFiltro.length
+  }
+
+
+  // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
+  masterTogglePag() {
+    this.isAllSelectedPag() ?
+      this.selectionArchivos.clear() :
+      this.archivosFiltro.forEach((row: any) => this.selectionArchivos.select(row));
+  }
+
+
+  // LA ETIQUETA DE LA CASILLA DE VERIFICACION EN LA FILA PASADA
+  checkboxLabelPag(row?: ITableArchivos): string {
+    if (!row) {
+      return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
+    }
+    this.archivosEliminar = this.selectionArchivos.selected;
+    //console.log('paginas para Eliminar',this.paginasEliminar);
+
+    //console.log(this.selectionPaginas.selected)
+    return `${this.selectionArchivos.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
+
+  }
+
+
+
+  // METODO PARA ELIMINAR ARCHIVOS
   EliminarArchivo(filename: string, id: number) {
     this.rest.EliminarRegistro(id, filename).subscribe(res => {
 
@@ -238,7 +240,7 @@ export class ListaArchivosComponent implements OnInit {
         this.toastr.error('No se puede elminar.', '', {
           timeOut: 6000,
         });
-      }else{
+      } else {
         this.toastr.error('Registro eliminado.', '', {
           timeOut: 6000,
         });
@@ -251,73 +253,99 @@ export class ListaArchivosComponent implements OnInit {
 
   }
 
- 
- 
-   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-   ConfirmarDelete(datos: any) {
-     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-       .subscribe((confirmado: Boolean) => {
-         if (confirmado) {
-           this.EliminarArchivo(datos.filename, datos.id);
-         } else {
-           this.router.navigate(['/archivos/documentacion']);
-         }
-       });
-   }
- 
-   EliminarMultiple() {
- 
-     this.archivosEliminar = this.selectionArchivos.selected;
-     this.archivosEliminar.forEach((datos: any) => {
- 
-       this.archivosFiltro = this.archivosFiltro.filter(item => item.id !== datos.id);
- 
- 
- 
-       //AQUI MODIFICAR EL METODO 
-       this.EliminarArchivo(datos.filename, datos.id);
- 
-       this.MostrarArchivos();
 
- 
-     }
-     )
-   }
- 
- 
-   ConfirmarDeleteMultiple() {
-     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-       .subscribe((confirmado: Boolean) => {
-         if (confirmado) {
- 
-           if (this.archivosEliminar.length != 0) {
-             this.EliminarMultiple();
-             this.activar_seleccion = true;
- 
-             this.plan_multiple = false;
-             this.plan_multiple_ = false;
- 
- 
- 
- 
- 
- 
-           } else {
-             this.toastr.warning('No ha seleccionado ARCHIVOS.', 'Ups!!! algo salio mal.', {
-               timeOut: 6000,
-             })
- 
-           }
- 
-           this.selectionArchivos.clear();
- 
-         } else {
-           this.router.navigate(['/archivos/documentacion']);
-         }
- 
- 
-       });
-   }
- 
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.EliminarArchivo(datos.filename, datos.id);
+        } else {
+          this.router.navigate(['/archivos/documentacion']);
+        }
+      });
+
+    this.MostrarArchivos();
+
+  }
+
+
+
+  contador: number = 0;
+  ingresar: boolean = false;
+  EliminarMultiple() {
+
+    this.ingresar = false;
+    this.contador = 0;
+
+    this.archivosEliminar = this.selectionArchivos.selected;
+    this.archivosEliminar.forEach((datos: any) => {
+
+      this.archivosFiltro = this.archivosFiltro.filter(item => item.id !== datos.id);
+
+      this.contador = this.contador + 1;
+
+      this.rest.EliminarRegistro(datos.id, datos.filename).subscribe(res => {
+
+
+        if (res.message === 'error') {
+          this.toastr.error('No se puede elminar.', '', {
+            timeOut: 6000,
+          });
+
+          this.contador = this.contador - 1;
+
+        } else {
+
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.MostrarArchivos();
+
+        }
+      })
+
+      this.MostrarArchivos();
+
+
+    }
+    )
+  }
+
+
+  ConfirmarDeleteMultiple() {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+
+          if (this.archivosEliminar.length != 0) {
+            this.EliminarMultiple();
+            this.activar_seleccion = true;
+            this.plan_multiple = false;
+            this.plan_multiple_ = false;
+          } else {
+            this.toastr.warning('No ha seleccionado ARCHIVOS.', 'Ups!!! algo salio mal.', {
+              timeOut: 6000,
+            })
+
+          }
+
+          this.selectionArchivos.clear();
+
+        } else {
+          this.router.navigate(['/archivos/documentacion']);
+        }
+
+
+      });
+
+      this.MostrarArchivos();
+
+  }
+
 
 }

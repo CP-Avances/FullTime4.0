@@ -299,6 +299,17 @@ export class ListarNivelTitulosComponent implements OnInit {
       .afterClosed().subscribe(items => {
         this.ObtenerNiveles();
       });
+
+    this.activar_seleccion = true;
+
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionNiveles.clear();
+    this.nivelesEliminar = [];
+
+
+    
+
   }
 
   // METODO PARA LIMPIAR FORMULARIO
@@ -595,12 +606,19 @@ export class ListarNivelTitulosComponent implements OnInit {
         if (confirmado) {
           this.Eliminar(datos.id);
 
+          this.activar_seleccion = true;
+
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.nivelesEliminar = [];
+          this.selectionNiveles.clear();
+
+          this.ObtenerNiveles();
+
         } else {
           this.router.navigate(['/nivelTitulos']);
         }
       });
-
-      this.ObtenerNiveles();
 
   }
   contador: number = 0;
@@ -608,7 +626,7 @@ export class ListarNivelTitulosComponent implements OnInit {
 
   EliminarMultiple() {
 
-        
+
     this.ingresar = false;
     this.contador = 0;
 
@@ -659,20 +677,27 @@ export class ListarNivelTitulosComponent implements OnInit {
             this.plan_multiple = false;
             this.plan_multiple_ = false;
 
+            this.nivelesEliminar = [];
+
+
           } else {
             this.toastr.warning('No ha seleccionado NIVELES DE EDUCACIÓN.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
 
+
           }
 
           this.selectionNiveles.clear();
+          //this.ObtenerNiveles();
 
         } else {
           this.router.navigate(['/nivelTitulos']);
         }
+
+
       });
-      this.ObtenerNiveles();
+     this.ObtenerNiveles();
 
   }
 

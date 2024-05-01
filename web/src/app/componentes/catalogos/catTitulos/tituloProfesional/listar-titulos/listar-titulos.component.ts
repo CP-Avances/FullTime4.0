@@ -630,6 +630,10 @@ export class ListarTitulosComponent implements OnInit {
 
   EliminarMultiple() {
 
+    
+    this.ingresar = false;
+    this.contador = 0;
+
     this.titulosEliminar = this.selectionTitulos.selected;
     this.titulosEliminar.forEach((datos: any) => {
 

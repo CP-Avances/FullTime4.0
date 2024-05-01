@@ -510,23 +510,15 @@ export class ListarRelojesComponent implements OnInit {
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACION
   EliminarRelojes(id_reloj: number) {
     this.rest.EliminarRegistro(id_reloj).subscribe(res => {
-
-
       if (res.message === 'error') {
         this.toastr.error('No se puede elminar.', '', {
           timeOut: 6000,
         });
-
-
       } else {
-
         this.toastr.error('Registro eliminado.', '', {
           timeOut: 6000,
         });
       }
-
-
-
       this.ObtenerReloj();
     });
   }
@@ -541,18 +533,50 @@ export class ListarRelojesComponent implements OnInit {
           this.router.navigate(['/listarRelojes/']);
         }
       });
+
+    this.ObtenerReloj();
   }
 
 
+  contador: number = 0;
+  ingresar: boolean = false;
+
   EliminarMultiple() {
+
+
+    this.ingresar = false;
+    this.contador = 0;
 
     this.dispositivosEliminar = this.selectionProvincias.selected;
     this.dispositivosEliminar.forEach((datos: any) => {
 
       this.relojes = this.relojes.filter(item => item.id !== datos.id);
       //AQUI MODIFICAR EL METODO 
-      this.EliminarRelojes(datos.id);
-      this.ObtenerReloj();
+
+      this.contador = this.contador + 1;
+
+      this.rest.EliminarRegistro(datos.id).subscribe(res => {
+
+
+        if (res.message === 'error') {
+          this.toastr.error('No se puede elminar.', '', {
+            timeOut: 6000,
+          });
+
+          this.contador = this.contador - 1;
+
+        } else {
+
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+
+          this.ObtenerReloj();
+        }
+      });
     }
     )
   }
@@ -582,9 +606,9 @@ export class ListarRelojesComponent implements OnInit {
         } else {
           this.router.navigate(['/listarRelojes/']);
         }
-
-
       });
+    this.ObtenerReloj();
+
   }
 }
 

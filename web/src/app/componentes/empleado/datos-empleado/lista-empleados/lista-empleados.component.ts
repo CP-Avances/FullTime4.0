@@ -996,6 +996,8 @@ export class ListaEmpleadosComponent implements OnInit {
   }
 
 
+  contador: number = 0;
+  ingresar: boolean = false;
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
   ConfirmarDelete(datos: any) {
@@ -1007,9 +1009,16 @@ export class ListaEmpleadosComponent implements OnInit {
           this.router.navigate(['/empleados']);
         }
       });
+
+    this.GetEmpleados();
+
   }
 
   ConfirmarDeleteMultipleActivos() {
+
+    this.ingresar = false;
+    this.contador = 0;
+
 
     let EliminarActivos = this.selectionUno.selected.map(obj => {
       return {
@@ -1022,14 +1031,38 @@ export class ListaEmpleadosComponent implements OnInit {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-
-
           if (EliminarActivos.length != 0) {
             EliminarActivos.forEach((datos: any) => {
 
               this.empleado = this.empleado.filter(item => item.id !== datos.id);
               //AQUI MODIFICAR EL METODO 
-              this.Eliminar(datos.id);
+              this.contador = this.contador + 1;
+
+              this.rest.EliminarEmpleados(datos.id).subscribe(res => {
+                if (res.message === 'error') {
+                  this.toastr.error('No se puede elminar.', '', {
+                    timeOut: 6000,
+                  });
+
+                  this.contador = this.contador - 1;
+
+                } else {
+
+                  if (!this.ingresar) {
+                    this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+                      timeOut: 6000,
+                    });
+                    this.ingresar = true;
+                  }
+
+                  this.GetEmpleados();
+                }
+
+              });
+
+
+
+              //this.Eliminar(datos.id);
               this.GetEmpleados();
             }
             )
@@ -1050,14 +1083,20 @@ export class ListaEmpleadosComponent implements OnInit {
         }
 
       }
-      )
+      );
+      this.GetEmpleados();
+
   }
+  
 
 
 
 
 
   ConfirmarDeleteMultipleInactivos() {
+
+    this.ingresar = false;
+    this.contador = 0;
 
     let EliminarInactivos = this.selectionDos.selected.map(obj => {
       return {
@@ -1077,12 +1116,33 @@ export class ListaEmpleadosComponent implements OnInit {
             EliminarInactivos.forEach((datos: any) => {
 
               this.empleado = this.empleado.filter(item => item.id !== datos.id);
-              //AQUI MODIFICAR EL METODO 
-              this.Eliminar(datos.id);
+
+              this.contador = this.contador + 1;
+
+
+              this.rest.EliminarEmpleados(datos.id).subscribe(res => {
+                if (res.message === 'error') {
+                  this.toastr.error('No se puede elminar.', '', {
+                    timeOut: 6000,
+                  });
+
+                  this.contador = this.contador - 1;
+
+                } else {
+
+                  if (!this.ingresar) {
+                    this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+                      timeOut: 6000,
+                    });
+                    this.ingresar = true;
+                  }
+
+                  this.GetEmpleados();
+                }
+
+              });
+
               this.GetEmpleados();
-
-
-
             }
             )
             this.btnCheckDeshabilitado = false;
@@ -1101,7 +1161,10 @@ export class ListaEmpleadosComponent implements OnInit {
         }
 
       }
-      )
+      );
+    this.GetEmpleados();
+
+
   }
 
 

@@ -379,7 +379,7 @@ export class ListarFeriadosComponent implements OnInit {
 
   // METODO PARA ASIGNAR CIUDADES A FERIADO
   contadorc: number = 0;
-  ingresar: number = 0;
+  ingresarc: number = 0;
   /*
  InsertarFeriadoCiudad(id: number) {
    this.ingresar = 0;
@@ -700,11 +700,8 @@ export class ListarFeriadosComponent implements OnInit {
 
   Eliminar(id_feriado: number) {
     this.rest.EliminarFeriado(id_feriado).subscribe(res => {
-
-
-
       if (res.message === 'error') {
-        this.toastr.error('Registro eliminado.', '', {
+        this.toastr.error('No se puede elminar.', '', {
           timeOut: 6000,
         });
       } else {
@@ -713,7 +710,7 @@ export class ListarFeriadosComponent implements OnInit {
         });
         this.BuscarParametro();
       }
-      
+
     });
   }
 
@@ -725,21 +722,54 @@ export class ListarFeriadosComponent implements OnInit {
           this.Eliminar(datos.id);
         }
       });
+
+    this.BuscarParametro();
+
   }
 
 
   // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO 
 
 
+  contador: number = 0;
+  ingresar: boolean = false;
+
   EliminarMultiple() {
+
+
+    this.ingresar = false;
+    this.contador = 0;
 
     this.feriadosEliminar = this.selectionFeriados.selected;
     this.feriadosEliminar.forEach((datos: any) => {
 
       this.feriados = this.feriados.filter(item => item.id !== datos.id);
-      //AQUI MODIFICAR EL METODO 
-      this.Eliminar(datos.id);
-      this.BuscarParametro();
+
+      this.contador = this.contador + 1;
+
+
+      this.rest.EliminarFeriado(datos.id).subscribe(res => {
+        if (res.message === 'error') {
+          this.toastr.error('No se puede elminar.', '', {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
+
+        } else {
+
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+
+          this.BuscarParametro();
+        }
+
+      });
+
+
 
     }
     )
@@ -769,11 +799,11 @@ export class ListarFeriadosComponent implements OnInit {
 
         } else {
           this.router.navigate(['/listarFeriados']);
-
-
-
         }
       });
+
+      this.BuscarParametro();
+
   }
 
 }

@@ -661,9 +661,6 @@ export class ListaSucursalesComponent implements OnInit {
 
     this.sucursalesEliminar = this.selectionSucursales.selected;
     this.sucursalesEliminar.forEach((datos: any) => {
-
-
-
       this.datosCiudades = this.datosCiudades.filter(item => item.id !== datos.id);
 
       this.contador = this.contador + 1;
@@ -675,8 +672,6 @@ export class ListaSucursalesComponent implements OnInit {
           });
 
           this.contador = this.contador - 1;
-
-
         } else {
           if (!this.ingresar) {
             this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
@@ -688,8 +683,6 @@ export class ListaSucursalesComponent implements OnInit {
 
         }
       });
-
-
     }
     )
   }

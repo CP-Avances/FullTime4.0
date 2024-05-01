@@ -248,7 +248,7 @@ export class PrincipalHorarioComponent implements OnInit {
       });
   }
 
- 
+
 
   // METODO PARA VISUALIZAR PANTALLA DE HORARIOS Y DETALLES
   ver_detalles: boolean = false;
@@ -654,62 +654,82 @@ export class PrincipalHorarioComponent implements OnInit {
   }
 
 
- // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACIÓN
- EliminarDetalle(id_horario: any) {
+  // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO PLANIFICACIÓN
+  EliminarDetalle(id_horario: any) {
 
 
-  this.rest.EliminarRegistro(id_horario).subscribe(res => {
+    this.rest.EliminarRegistro(id_horario).subscribe(res => {
 
-    if (res.message === 'error') {
-      this.toastr.error('No se puede elminar.', '', {
-        timeOut: 6000,
-      });
+      if (res.message === 'error') {
+        this.toastr.error('No se puede elminar.', '', {
+          timeOut: 6000,
+        });
 
-    } else {
+      } else {
 
-      // METODO PARA AUDITAR CATÁLOGO HORARIOS
-      this.validar.Auditar('app-web', 'cg_horarios', id_horario, '', 'DELETE');
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ObtenerHorarios();
+        // METODO PARA AUDITAR CATÁLOGO HORARIOS
+        this.validar.Auditar('app-web', 'cg_horarios', id_horario, '', 'DELETE');
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ObtenerHorarios();
 
-    }
-
-
-  });
-}
-
-// FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
-ConfirmarDelete(datos: any) {
-  this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
-    .subscribe((confirmado: Boolean) => {
-      if (confirmado) {
-        this.EliminarDetalle(datos.id);
       }
+
+
     });
-}
+  }
 
 
 
+
+  // FUNCION PARA CONFIRMAR SI SE ELIMINA O NO UN REGISTRO
+  ConfirmarDelete(datos: any) {
+    this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
+      .subscribe((confirmado: Boolean) => {
+        if (confirmado) {
+          this.EliminarDetalle(datos.id);
+        }
+      });
+  }
+
+
+  contador: number = 0;
+  ingresar: boolean = false;
 
   EliminarMultiple() {
 
-
+    this.ingresar = false;
+    this.contador = 0;
     this.horariosEliminar = this.selectionHorarios.selected;
     this.horariosEliminar.forEach((datos: any) => {
 
       this.horarios = this.horarios.filter(item => item.id !== datos.id);
 
+      this.contador = this.contador + 1;
 
+      this.rest.EliminarRegistro(datos.id).subscribe(res => {
 
-      //AQUI MODIFICAR EL METODO 
-      this.EliminarDetalle(datos.id);
+        if (res.message === 'error') {
+          this.toastr.error('No se puede elminar.', '', {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
 
+        } else {
 
+          // METODO PARA AUDITAR CATÁLOGO HORARIOS
+          this.validar.Auditar('app-web', 'cg_horarios', datos.id, '', 'DELETE');
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.ObtenerHorarios();
 
-      this.ObtenerHorarios();
-
+        }
+      });
     }
     )
   }
@@ -726,12 +746,6 @@ ConfirmarDelete(datos: any) {
 
             this.plan_multiple = false;
             this.plan_multiple_ = false;
-
-
-
-
-
-
           } else {
             this.toastr.warning('No ha seleccionado HORARIOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
@@ -747,6 +761,8 @@ ConfirmarDelete(datos: any) {
 
 
       });
+    this.ObtenerHorarios();
+
   }
 
 

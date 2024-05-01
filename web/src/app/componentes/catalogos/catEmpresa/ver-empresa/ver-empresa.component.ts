@@ -197,6 +197,12 @@ export class VerEmpresaComponent implements OnInit {
           }
         }
       });
+      this.activar_seleccion = true;
+
+      this.plan_multiple = false;
+      this.plan_multiple_ = false;
+      this.selectionSucursales.clear();
+      this.sucursalesEliminar = [];
   }
 
   // VENTANA PARA REVISAR FORMATO DE REPORTES COLORES
@@ -470,6 +476,13 @@ export class VerEmpresaComponent implements OnInit {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
+
+          this.activar_seleccion = true;
+
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.selectionSucursales.clear();
+          this.sucursalesEliminar = [];
           this.Eliminar(datos.id);
         }
       });
@@ -545,11 +558,16 @@ export class VerEmpresaComponent implements OnInit {
 
           }
           this.selectionSucursales.clear();
+          this.ObtenerSucursal();
+
         } else {
           this.router.navigate(['/vistaEmpresa']);
 
         }
       });
+
+      this.ObtenerSucursal();
+
   }
 
 
