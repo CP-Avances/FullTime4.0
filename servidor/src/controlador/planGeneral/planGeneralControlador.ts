@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import pool from '../../database';
 
 class PlanGeneralControlador {
@@ -14,46 +15,71 @@ class PlanGeneralControlador {
         iterar = 0;
         cont = 0;
 
+        const {user_name, ip } = req.body;
+
         for (var i = 0; i < req.body.length; i++) {
 
-            pool.query(
-                `
-                INSERT INTO plan_general (fec_hora_horario, tolerancia, estado_timbre, id_det_horario,
-                    fec_horario, id_empl_cargo, tipo_entr_salida, codigo, id_horario, tipo_dia, salida_otro_dia,
-                    min_antes, min_despues, estado_origen, min_alimentacion) 
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
-                `,
-                [req.body[i].fec_hora_horario, req.body[i].tolerancia, req.body[i].estado_timbre,
-                req.body[i].id_det_horario, req.body[i].fec_horario, req.body[i].id_empl_cargo,
-                req.body[i].tipo_entr_salida, req.body[i].codigo, req.body[i].id_horario, req.body[i].tipo_dia,
-                req.body[i].salida_otro_dia, req.body[i].min_antes, req.body[i].min_despues, req.body[i].estado_origen,
-                req.body[i].min_alimentacion]
-                , (error) => {
+            try {
 
-                    iterar = iterar + 1;
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
 
-                    try {
-                        console.log('if ', error)
-                        if (error) {
-                            errores = errores + 1;
-                            if (iterar === req.body.length && errores > 0) {
-                                return res.status(200).jsonp({ message: 'error' });
+                pool.query(
+                    `
+                    INSERT INTO plan_general (fec_hora_horario, tolerancia, estado_timbre, id_det_horario,
+                        fec_horario, id_empl_cargo, tipo_entr_salida, codigo, id_horario, tipo_dia, salida_otro_dia,
+                        min_antes, min_despues, estado_origen, min_alimentacion) 
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *
+                    `,
+                    [req.body[i].fec_hora_horario, req.body[i].tolerancia, req.body[i].estado_timbre,
+                    req.body[i].id_det_horario, req.body[i].fec_horario, req.body[i].id_empl_cargo,
+                    req.body[i].tipo_entr_salida, req.body[i].codigo, req.body[i].id_horario, req.body[i].tipo_dia,
+                    req.body[i].salida_otro_dia, req.body[i].min_antes, req.body[i].min_despues, req.body[i].estado_origen,
+                    req.body[i].min_alimentacion]
+                    , async (error, results) => {
+    
+                        iterar = iterar + 1;
+
+                        // AUDITORIA
+                        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                            tabla: 'plan_general',
+                            usuario: user_name,
+                            accion: 'I',
+                            datosOriginales: '',
+                            datosNuevos: JSON.stringify(results.rows),
+                            ip,
+                            observacion: null
+                        });
+
+                        // FINALIZAR TRANSACCION
+                        await pool.query('COMMIT');
+    
+                        try {
+                            console.log('if ', error)
+                            if (error) {
+                                errores = errores + 1;
+                                if (iterar === req.body.length && errores > 0) {
+                                    return res.status(200).jsonp({ message: 'error' });
+                                }
+                            } else {
+                                cont = cont + 1;
+                                if (iterar === req.body.length && cont === req.body.length) {
+                                    return res.status(200).jsonp({ message: 'OK' });
+                                }
+                                else if (iterar === req.body.length && cont != req.body.length) {
+                                    return res.status(200).jsonp({ message: 'error' });
+                                }
                             }
-                        } else {
-                            cont = cont + 1;
-                            if (iterar === req.body.length && cont === req.body.length) {
-                                return res.status(200).jsonp({ message: 'OK' });
-                            }
-                            else if (iterar === req.body.length && cont != req.body.length) {
-                                return res.status(200).jsonp({ message: 'error' });
-                            }
+    
+                        } catch (error) {
+                            throw error;
                         }
-
-                    } catch (error) {
-                        console.log('ver el error ', error)
-                        return res.status(500).jsonp({ message: 'Se ha producido un error en el proceso.' });
-                    }
-                });
+                    });
+            } catch (error) {
+                // REVERTIR TRANSACCION
+                await pool.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Se ha producido un error en el proceso.' });
+            }
         }
     }
 
@@ -75,7 +101,7 @@ class PlanGeneralControlador {
     }
 
     // METODO PARA ELIMINAR REGISTROS    --**VERIFICADO
-    public async EliminarRegistros(req: Request, res: Response): Promise<void> {
+    public async EliminarRegistros(req: Request, res: Response): Promise<Response> {
 
         var errores: number = 0;
         var iterar: number = 0;
@@ -86,38 +112,84 @@ class PlanGeneralControlador {
         iterar = 0;
         cont = 0;
 
+        const {user_name, ip } = req.body;
+
         for (var i = 0; i < req.body.length; i++) {
 
-            pool.query(
-                `
-                DELETE FROM plan_general WHERE id = $1
-                `,
-                [req.body[i].id]
-                , (error) => {
+            try {
+                // INICIAR TRANSACCION
+                await pool.query('BEGIN');
 
-                    iterar = iterar + 1;
+                // CONSULTAR DATOSORIGINALES
+                const consulta = await pool.query(`SELECT * FROM plan_general WHERE id = $1`, [req.body[i].id]);
+                const [datosOriginales] = consulta.rows;
 
-                    try {
-                        if (error) {
-                            errores = errores + 1;
-                            if (iterar === req.body.length && errores > 0) {
-                                return res.status(200).jsonp({ message: 'error' });
+                if (!datosOriginales) {
+                    await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                        tabla: 'plan_general',
+                        usuario: user_name,
+                        accion: 'D',
+                        datosOriginales: '',
+                        datosNuevos: '',
+                        ip,
+                        observacion: `Error al eliminar el registro con id ${req.body[i].id}. Registro no encontrado.`
+                    });
+
+                    // FINALIZAR TRANSACCION
+                    await pool.query('COMMIT');
+                    return res.status(404).jsonp({ message: 'error' });
+                }
+
+                pool.query(
+                    `
+                    DELETE FROM plan_general WHERE id = $1
+                    `,
+                    [req.body[i].id]
+                    , async (error) => {
+    
+                        iterar = iterar + 1;
+
+                        // AUDITORIA
+                        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                            tabla: 'plan_general',
+                            usuario: user_name,
+                            accion: 'D',
+                            datosOriginales: JSON.stringify(datosOriginales),
+                            datosNuevos: '',
+                            ip,
+                            observacion: null
+                        });
+
+                        // FINALIZAR TRANSACCION
+                        await pool.query('COMMIT');
+    
+                        try {
+                            if (error) {
+                                errores = errores + 1;
+                                if (iterar === req.body.length && errores > 0) {
+                                    return res.status(200).jsonp({ message: 'error' });
+                                }
+                            } else {
+                                cont = cont + 1;
+                                if (iterar === req.body.length && cont === req.body.length) {
+                                    return res.status(200).jsonp({ message: 'OK' });
+                                }
+                                else if (iterar === req.body.length && cont != req.body.length) {
+                                    return res.status(200).jsonp({ message: 'error' });
+                                }
                             }
-                        } else {
-                            cont = cont + 1;
-                            if (iterar === req.body.length && cont === req.body.length) {
-                                return res.status(200).jsonp({ message: 'OK' });
-                            }
-                            else if (iterar === req.body.length && cont != req.body.length) {
-                                return res.status(200).jsonp({ message: 'error' });
-                            }
+    
+                        } catch (error) {
+                            throw error;
                         }
-
-                    } catch (error) {
-                        return res.status(500).jsonp({ message: 'Se ha producido un error en el proceso.' });
-                    }
-                });
+                    });
+            } catch (error) {
+                // REVERTIR TRANSACCION
+                await pool.query('ROLLBACK');
+                return res.status(500).jsonp({ message: 'Se ha producido un error en el proceso.' });
+            }
         }
+        return res.status(200).jsonp({ message: 'OK' });
     }
 
     // METODO PARA BUSCAR PLANIFICACION EN UN RANGO DE FECHAS
@@ -380,7 +452,7 @@ class PlanGeneralControlador {
     // METODO PARA ACTUALIZAR ASISTENCIA MANUAL
     public async ActualizarManual(req: Request, res: Response) {
         try {
-            const { codigo, fecha, id, accion, id_timbre } = req.body;
+            const { codigo, fecha, id, accion, id_timbre, user_name, ip } = req.body;
             console.log('ver datos ', codigo, ' ', fecha, ' ', id)
             const ASIGNADO = await pool.query(
                 `
@@ -389,11 +461,45 @@ class PlanGeneralControlador {
                 , [fecha, codigo]);
             //console.log('ver asignado ', ASIGNADO)
 
+            // INICIAR TRANSACCION
+            await pool.query('BEGIN');
+
+            // CONSULTAR DATOSORIGINALES
+            const consulta = await pool.query(`SELECT * FROM plan_general WHERE id = $1`, [id]);
+            const [datosOriginales] = consulta.rows;
+
+            if (!datosOriginales) {
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'plan_general',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: '',
+                    ip,
+                    observacion: `Error al actualizar el registro con id ${id}. Registro no encontrado.`
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
+                return res.status(404).jsonp({ message: 'error' });
+            }
+
             const PLAN = await pool.query(
                 `
                 UPDATE plan_general SET fec_hora_timbre = $1, estado_timbre = 'R' WHERE id = $2 RETURNING *
                 `
                 , [fecha, id]);
+
+            // AUDITORIA
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'plan_general',
+                usuario: user_name,
+                accion: 'U',
+                datosOriginales: JSON.stringify(datosOriginales),
+                datosNuevos: JSON.stringify(PLAN.rows),
+                ip,
+                observacion: null
+            });
 
 
             if (PLAN.rowCount > 0) {
@@ -403,49 +509,35 @@ class PlanGeneralControlador {
                     UPDATE timbres SET accion = $1 WHERE id = $2
                     `
                     , [accion, id_timbre]);
+                
+                // AUDITORIA
+                await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                    tabla: 'timbres',
+                    usuario: user_name,
+                    accion: 'U',
+                    datosOriginales: '',
+                    datosNuevos: JSON.stringify(TIMBRE.rows),
+                    ip,
+                    observacion: null
+                });
+
+                // FINALIZAR TRANSACCION
+                await pool.query('COMMIT');
 
                 return res.jsonp({ message: 'OK', respuesta: PLAN.rows })
             }
             else {
+                // REVERTIR TRANSACCION
+                await pool.query('ROLLBACK');
                 res.status(404).jsonp({ message: 'error' });
             }
         }
         catch (error) {
+            // REVERTIR TRANSACCION
+            await pool.query('ROLLBACK');
             return res.jsonp({ message: 'error', error: error });
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     public async BuscarFecha(req: Request, res: Response) {
         const { fec_inicio, id_horario, codigo } = req.body;
