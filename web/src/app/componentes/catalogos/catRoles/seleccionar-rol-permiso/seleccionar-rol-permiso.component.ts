@@ -1222,39 +1222,40 @@ export class SeleccionarRolPermisoComponent implements OnInit {
       };
 
       this.contador = this.contador + 1;
-
       this.rest.EliminarPaginasRol(buscarPagina).subscribe(
-
         res => {
 
           if (res.message === 'error') {
-  
-            this.toastr.error('No se puede elminar.', 'la: '+ datos.nombre, {
+
+            this.toastr.error('No se puede elminar.', 'la: ' + datos.nombre, {
               timeOut: 6000,
             });
-    
+
           } else {
             if (!this.ingresar) {
-    
-              this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '',{
+
+              this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
                 timeOut: 6000,
               });
-  
-  
               this.ingresar = true;
-  
-              this.MostrarPaginasRol();
-            }
-          }
 
-          
-          
+
+              //this.MostrarPaginasRol();
+            }
+
+            this.MostrarPaginasRol();
+          }
         }
       )
     }
     )
 
+
+   // this.MostrarPaginasRol();
+
     console.log("Paginas eliminadas", this.paginasEliminar);
+
+    //this.selectionPaginas.clear();
 
   }
 
@@ -1267,6 +1268,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
           if (this.paginasEliminar.length != 0) {
             this.EliminarPaginaRol();
+            
             this.activar_seleccion = true;
             this.plan_multiple = false;
             this.plan_multiple_ = false;
@@ -1276,13 +1278,17 @@ export class SeleccionarRolPermisoComponent implements OnInit {
             this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
-            //this.selectionPaginas.clear();
 
           }
+
+
         } else {
           this.router.navigate(['/seleccionarPermisos', this.idRol]);
         }
       });
+
+     // this.MostrarPaginasRol();
+
   }
 
 

@@ -420,11 +420,11 @@ export class PrincipalProvinciaComponent implements OnInit {
           timeOut: 6000,
         });
         this.ListarProvincias();
-
-
-     }
-
+      }
+      // this.ListarProvincias();
     });
+
+    //this.ListarProvincias();
   }
 
 
@@ -446,7 +446,7 @@ export class PrincipalProvinciaComponent implements OnInit {
   ingresar: boolean = false;
   EliminarMultiple() {
 
-    
+
     this.ingresar = false;
     this.contador = 0;
 
@@ -479,7 +479,7 @@ export class PrincipalProvinciaComponent implements OnInit {
           this.ListarProvincias();
 
         }
-  
+
       });
 
       this.rest.BuscarProvincias().subscribe(datos => {
