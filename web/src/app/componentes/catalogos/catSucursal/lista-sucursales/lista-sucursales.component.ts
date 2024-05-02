@@ -661,6 +661,7 @@ export class ListaSucursalesComponent implements OnInit {
 
     this.sucursalesEliminar = this.selectionSucursales.selected;
     this.sucursalesEliminar.forEach((datos: any) => {
+      
       this.datosCiudades = this.datosCiudades.filter(item => item.id !== datos.id);
 
       this.contador = this.contador + 1;

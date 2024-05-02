@@ -197,12 +197,12 @@ export class VerEmpresaComponent implements OnInit {
           }
         }
       });
-      this.activar_seleccion = true;
+    this.activar_seleccion = true;
 
-      this.plan_multiple = false;
-      this.plan_multiple_ = false;
-      this.selectionSucursales.clear();
-      this.sucursalesEliminar = [];
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionSucursales.clear();
+    this.sucursalesEliminar = [];
   }
 
   // VENTANA PARA REVISAR FORMATO DE REPORTES COLORES
@@ -501,42 +501,31 @@ export class VerEmpresaComponent implements OnInit {
     this.sucursalesEliminar.forEach((datos: any) => {
 
       this.datosSucursales = this.datosSucursales.filter(item => item.id !== datos.id);
+
       this.contador = this.contador + 1;
-
-
       this.restS.EliminarRegistro(datos.id).subscribe(res => {
 
-
         if (res.message === 'error') {
-  
-          this.toastr.error('No se puede elminar.', 'la: '+ datos.nombre, {
+
+          this.toastr.error('No se puede elminar.', 'la: ' + datos.nombre, {
             timeOut: 6000,
           });
           this.contador = this.contador - 1;
 
         } else {
-           if (!this.ingresar) {
-             this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
               timeOut: 6000,
             });
-  
-  
             this.ingresar = true;
-  
-            this.ObtenerSucursal();
           }
-  
+          this.ObtenerSucursal();
+
+
         }
       });
-  
-      this.ObtenerSucursal();
-
-
     }
     )
-
-    this.ObtenerSucursal();
-
   }
 
 
@@ -551,22 +540,20 @@ export class VerEmpresaComponent implements OnInit {
 
             this.plan_multiple = false;
             this.plan_multiple_ = false;
+            this.selectionSucursales.clear();
+
           } else {
             this.toastr.warning('No ha seleccionado SUCURSALES.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
 
           }
-          this.selectionSucursales.clear();
-          this.ObtenerSucursal();
-
         } else {
           this.router.navigate(['/vistaEmpresa']);
-
         }
       });
 
-      this.ObtenerSucursal();
+    this.ObtenerSucursal();
 
   }
 
