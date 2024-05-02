@@ -72,6 +72,8 @@ export class VerSucursalComponent implements OnInit {
   // METODO PARA LISTAR DEPARTAMENTOS
   ListaDepartamentos() {
     this.datosDepartamentos = []
+
+
     this.restD.BuscarInformacionDepartamento(this.idSucursal).subscribe(datos => {
       this.datosDepartamentos = datos;
       this.OrdenarDatos(this.datosDepartamentos);
@@ -121,6 +123,11 @@ export class VerSucursalComponent implements OnInit {
       afterClosed().subscribe(item => {
         this.ListaDepartamentos();
       });
+    this.activar_seleccion = true;
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionDepartamentos.clear();
+    this.departamentosEliminar = [];
   }
 
 
@@ -211,14 +218,66 @@ export class VerSucursalComponent implements OnInit {
   }
 
 
+  public departamentosNiveles: any = [];
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO 
-  Eliminar(id_dep: number) {
+  Eliminar(id_dep: number, id_sucursal: number, nivel: number) {
+
     this.restD.EliminarRegistro(id_dep).subscribe(res => {
-      this.toastr.error('Registro eliminado.', '', {
-        timeOut: 6000,
-      });
-      this.ListaDepartamentos();
+
+      if (res.message === 'error') {
+        this.toastr.error('No se puede elminar.', '', {
+          timeOut: 6000,
+        });
+      } else {
+
+
+        this.departamentosNiveles = [];
+        var id_departamento = id_dep;
+        var id_establecimiento = id_sucursal;
+
+
+        if (nivel != 0) {
+          this.restD.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
+            this.departamentosNiveles = datos;
+            this.departamentosNiveles.filter(item => {
+              this.restD.EliminarRegistroNivelDepa(item.id).subscribe(
+                res => {
+
+                  if (res.message === 'error') {
+                    this.toastr.error('No se puede elminar.', '', {
+                      timeOut: 6000,
+                    });
+
+
+                  } else {
+                    this.toastr.error('Nivel eliminado de: ' + item.departamento, '', {
+                      timeOut: 6000,
+                    });
+                    this.ListaDepartamentos();
+
+                  }
+
+                }
+              );
+
+            })
+          })
+          this.ListaDepartamentos();
+
+        } else {
+          this.ListaDepartamentos();
+
+        }
+
+
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ListaDepartamentos();
+      }
+
+
     });
   }
 
@@ -227,28 +286,94 @@ export class VerSucursalComponent implements OnInit {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this.Eliminar(datos.id);
+          this.Eliminar(datos.id, datos.id_sucursal, datos.nivel);
+
+
+          this.activar_seleccion = true;
+
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.departamentosEliminar = [];
+          this.selectionDepartamentos.clear();
+
+          this.ListaDepartamentos();
+
         }
       });
   }
 
+  contador: number = 0;
+  ingresar: boolean = false;
+
+
 
   EliminarMultiple() {
 
+
+    this.ingresar = false;
+    this.contador = 0;
     this.departamentosEliminar = this.selectionDepartamentos.selected;
     this.departamentosEliminar.forEach((datos: any) => {
 
       this.datosDepartamentos = this.datosDepartamentos.filter(item => item.id !== datos.id);
       //AQUI MODIFICAR EL METODO 
+      this.contador = this.contador + 1;
+
       this.restD.EliminarRegistro(datos.id).subscribe(res => {
-        this.toastr.error('Registro eliminado.', '', {
-          timeOut: 6000,
-        });
-        this.ListaDepartamentos();
-      });
-      this.restD.BuscarInformacionDepartamento(this.idSucursal).subscribe(datos => {
-        this.datosDepartamentos = datos;
-       this.OrdenarDatos(this.datosDepartamentos);
+        if (res.message === 'error') {
+          this.toastr.error('No se puede eliminar.', '', {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
+
+
+        } else {
+
+          this.departamentosNiveles = [];
+          var id_departamento = datos.id;
+          var id_establecimiento = datos.id_sucursal;
+          if (datos.nivel != 0) {
+            this.restD.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
+              this.departamentosNiveles = datos;
+              this.departamentosNiveles.filter(item => {
+                this.restD.EliminarRegistroNivelDepa(item.id).subscribe(
+                  res => {
+
+                    if (res.message === 'error') {
+                      this.toastr.error('No se puede eliminar.', '', {
+                        timeOut: 6000,
+                      });
+
+
+                    } else {
+                      this.toastr.error('Nivel eliminado de: ' + item.departamento, '', {
+                        timeOut: 6000,
+                      });
+                      this.ListaDepartamentos();
+
+                    }
+
+                  }
+                )
+                this.ListaDepartamentos();
+
+              })
+            })
+            this.ListaDepartamentos();
+
+          } else {
+            this.ListaDepartamentos();
+
+          }
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.ListaDepartamentos();
+
+        }
       });
     }
     )
@@ -267,6 +392,11 @@ export class VerSucursalComponent implements OnInit {
 
             this.plan_multiple = false;
             this.plan_multiple_ = false;
+            this.departamentosEliminar = [];
+            this.selectionDepartamentos.clear();
+
+            this.ListaDepartamentos();
+
           } else {
             this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,

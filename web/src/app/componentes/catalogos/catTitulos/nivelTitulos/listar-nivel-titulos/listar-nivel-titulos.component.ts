@@ -301,14 +301,11 @@ export class ListarNivelTitulosComponent implements OnInit {
       });
 
     this.activar_seleccion = true;
-
     this.plan_multiple = false;
     this.plan_multiple_ = false;
     this.selectionNiveles.clear();
     this.nivelesEliminar = [];
 
-
-    
 
   }
 
@@ -641,13 +638,15 @@ export class ListarNivelTitulosComponent implements OnInit {
       this.nivel.EliminarNivel(datos.id).subscribe(res => {
 
         if (res.message === 'error') {
-          this.toastr.error('No se puede elminar.', '', {
+          this.toastr.error('No se puede eliminar.', '', {
             timeOut: 6000,
           });
           this.contador = this.contador - 1;
 
 
         } else {
+
+          
           if (!this.ingresar) {
             this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
               timeOut: 6000,
@@ -658,10 +657,8 @@ export class ListarNivelTitulosComponent implements OnInit {
 
         }
       });
-
     }
     )
-
   }
 
 
@@ -678,26 +675,21 @@ export class ListarNivelTitulosComponent implements OnInit {
             this.plan_multiple_ = false;
 
             this.nivelesEliminar = [];
+            this.selectionNiveles.clear();
+
+            this.ObtenerNiveles();
 
 
           } else {
             this.toastr.warning('No ha seleccionado NIVELES DE EDUCACIÓN.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
-
-
           }
-
-          this.selectionNiveles.clear();
-          //this.ObtenerNiveles();
-
         } else {
           this.router.navigate(['/nivelTitulos']);
         }
 
-
       });
-     this.ObtenerNiveles();
 
   }
 

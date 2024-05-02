@@ -89,8 +89,8 @@
                                     library_add_check
                                 </mat-icon>
                                 <mat-checkbox *ngIf="plan_multiple" (change)="$event ? masterTogglePag() : null"
-                                    [checked]="selectionProvincias.hasValue() && isAllSelectedPag()"
-                                    [indeterminate]="selectionProvincias.hasValue() && !isAllSelectedPag()"
+                                    [checked]="selectionDispositivos.hasValue() && isAllSelectedPag()"
+                                    [indeterminate]="selectionDispositivos.hasValue() && !isAllSelectedPag()"
                                     [aria-label]="checkboxLabelPag()">
                                 </mat-checkbox>
                             </th>
@@ -144,8 +144,8 @@
                             *ngFor="let reloj of relojes | filtrosNombres: filtroNombreReloj  | filtroSucursalR: filtroSucursalReloj | filtroIp: filtroIpReloj | filtroDepartamentoR: filtroDepartamentoReloj | filtroEmpresaR: filtroEmpresaReloj | paginate:tamanio_pagina:numero_pagina">
                             <td>
                                 <mat-checkbox *ngIf="plan_multiple_" (click)="$event.stopPropagation()"
-                                    (change)="$event ? selectionProvincias.toggle(reloj) : null"
-                                    [checked]="selectionProvincias.isSelected(reloj)"
+                                    (change)="$event ? selectionDispositivos.toggle(reloj) : null"
+                                    [checked]="selectionDispositivos.isSelected(reloj)"
                                     [aria-label]="checkboxLabelPag(reloj)">
                                 </mat-checkbox>
                             </td>

@@ -158,6 +158,16 @@ export class ListaSucursalesComponent implements OnInit {
           }
         }
       });
+      this.ObtenerSucursal();
+
+
+      this.activar_seleccion = true;
+
+      this.plan_multiple = false;
+      this.plan_multiple_ = false;
+      this.selectionSucursales.clear();
+      this.sucursalesEliminar = [];
+  
   }
 
   // METODO PARA EDITAR SUCURSAL
@@ -641,12 +651,20 @@ export class ListaSucursalesComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Eliminar(datos.id);
+
+          this.activar_seleccion = true;
+
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.sucursalesEliminar = [];
+          this.selectionSucursales.clear();
+          this.ObtenerSucursal();
+
         } else {
           this.router.navigate(['/sucursales']);
         }
       });
 
-    this.ObtenerSucursal();
 
   }
 
@@ -661,7 +679,7 @@ export class ListaSucursalesComponent implements OnInit {
 
     this.sucursalesEliminar = this.selectionSucursales.selected;
     this.sucursalesEliminar.forEach((datos: any) => {
-      
+
       this.datosCiudades = this.datosCiudades.filter(item => item.id !== datos.id);
 
       this.contador = this.contador + 1;
@@ -700,7 +718,10 @@ export class ListaSucursalesComponent implements OnInit {
 
             this.plan_multiple = false;
             this.plan_multiple_ = false;
+            this.sucursalesEliminar = [];
             this.selectionSucursales.clear();
+            this.ObtenerSucursal();
+
 
           } else {
             this.toastr.warning('No ha seleccionado SUCURSALES.', 'Ups!!! algo salio mal.', {
@@ -712,7 +733,6 @@ export class ListaSucursalesComponent implements OnInit {
         }
       });
 
-    this.ObtenerSucursal();
 
   }
 

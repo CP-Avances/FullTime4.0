@@ -139,6 +139,12 @@ export class PrincipalDepartamentoComponent implements OnInit {
       { width: '500px' }).afterClosed().subscribe(item => {
         this.ListaDepartamentos();
       });
+      this.activar_seleccion = true;
+
+      this.plan_multiple = false;
+      this.plan_multiple_ = false;
+      this.selectionDepartamentos.clear();
+      this.departamentosEliminar = [];
   }
 
   // VENTANA PARA EDITAR DATOS DE DEPARTAMENTO 
@@ -496,12 +502,19 @@ export class PrincipalDepartamentoComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Eliminar(datos.id, datos.id_sucursal, datos.nivel);
+
+          this.activar_seleccion = true;
+
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.departamentosEliminar = [];
+          this.selectionDepartamentos.clear();
+
+          this.ListaDepartamentos();
         } else {
           this.router.navigate(['/departamento']);
         }
       });
-    this.ListaDepartamentos();
-
   }
 
 
@@ -521,6 +534,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
           this.toastr.error('No se puede elminar.', 'la: ' + datos.nombre, {
             timeOut: 6000,
           });
+          this.contador = this.contador - 1;
 
         } else {
           this.departamentosNiveles = [];
@@ -534,7 +548,7 @@ export class PrincipalDepartamentoComponent implements OnInit {
                   res => {
 
                     if (res.message === 'error') {
-                      this.toastr.error('No se puede elminar.', '', {
+                      this.toastr.error('No se puede eliminar.', '', {
                         timeOut: 6000,
                       });
   
@@ -569,11 +583,9 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
           }
           this.ListaDepartamentos();
-
         }
       });
 
-      this.ListaDepartamentos();
 
     }
     )
@@ -592,6 +604,12 @@ export class PrincipalDepartamentoComponent implements OnInit {
             this.plan_multiple = false;
             this.plan_multiple_ = false;
 
+            this.departamentosEliminar = [];
+            this.selectionDepartamentos.clear();
+
+            this.ListaDepartamentos();
+
+
           } else {
             this.toastr.warning('No ha seleccionado DEPARTAMENTOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
@@ -599,14 +617,12 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
           }
 
-          this.selectionDepartamentos.clear();
 
         } else {
           this.router.navigate(['/departamento']);
 
         }
       });
-    this.ListaDepartamentos();
 
   }
 

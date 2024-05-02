@@ -471,13 +471,13 @@ export class ListarRelojesComponent implements OnInit {
   activar_seleccion: boolean = true;
   seleccion_vacia: boolean = true;
 
-  selectionProvincias = new SelectionModel<ITableDispositivos>(true, []);
+  selectionDispositivos = new SelectionModel<ITableDispositivos>(true, []);
 
 
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedPag() {
-    const numSelected = this.selectionProvincias.selected.length;
+    const numSelected = this.selectionDispositivos.selected.length;
     return numSelected === this.relojes.length
   }
 
@@ -485,8 +485,8 @@ export class ListarRelojesComponent implements OnInit {
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterTogglePag() {
     this.isAllSelectedPag() ?
-      this.selectionProvincias.clear() :
-      this.relojes.forEach((row: any) => this.selectionProvincias.select(row));
+      this.selectionDispositivos.clear() :
+      this.relojes.forEach((row: any) => this.selectionDispositivos.select(row));
   }
 
 
@@ -495,11 +495,11 @@ export class ListarRelojesComponent implements OnInit {
     if (!row) {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
-    this.dispositivosEliminar = this.selectionProvincias.selected;
+    this.dispositivosEliminar = this.selectionDispositivos.selected;
     //console.log('paginas para Eliminar',this.paginasEliminar);
 
     //console.log(this.selectionPaginas.selected)
-    return `${this.selectionProvincias.isSelected(row) ? 'deselect' : 'select'} row ${row.codigo + 1}`;
+    return `${this.selectionDispositivos.isSelected(row) ? 'deselect' : 'select'} row ${row.codigo + 1}`;
 
   }
 
@@ -529,12 +529,18 @@ export class ListarRelojesComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.EliminarRelojes(datos.id);
+          this.activar_seleccion = true;
+
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.dispositivosEliminar = [];
+          this.selectionDispositivos.clear();
+
+          this.ObtenerReloj();
         } else {
           this.router.navigate(['/listarRelojes/']);
         }
       });
-
-    this.ObtenerReloj();
   }
 
 
@@ -547,7 +553,7 @@ export class ListarRelojesComponent implements OnInit {
     this.ingresar = false;
     this.contador = 0;
 
-    this.dispositivosEliminar = this.selectionProvincias.selected;
+    this.dispositivosEliminar = this.selectionDispositivos.selected;
     this.dispositivosEliminar.forEach((datos: any) => {
 
       this.relojes = this.relojes.filter(item => item.id !== datos.id);
@@ -594,6 +600,12 @@ export class ListarRelojesComponent implements OnInit {
             this.plan_multiple = false;
             this.plan_multiple_ = false;
 
+            this.dispositivosEliminar = [];
+            this.selectionDispositivos.clear();
+
+            this.ObtenerReloj();
+
+
           } else {
             this.toastr.warning('No ha seleccionado DISPOSITIVOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
@@ -601,13 +613,11 @@ export class ListarRelojesComponent implements OnInit {
 
           }
 
-          this.selectionProvincias.clear();
 
         } else {
           this.router.navigate(['/listarRelojes/']);
         }
       });
-    this.ObtenerReloj();
 
   }
 }

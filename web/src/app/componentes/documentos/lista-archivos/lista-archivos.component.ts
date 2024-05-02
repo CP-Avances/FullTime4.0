@@ -140,8 +140,14 @@ export class ListaArchivosComponent implements OnInit {
           console.log('archivosFiltro: ', this.archivosFiltro);
         })
       });
+    this.MostrarArchivos();
+    this.activar_seleccion = true;
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionArchivos.clear();
+    this.archivosEliminar = [];
 
-      
+
   }
 
   // METODO PARA VER LISTA DE ARCHIVOS DE PERMISOS
@@ -261,12 +267,21 @@ export class ListaArchivosComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.EliminarArchivo(datos.filename, datos.id);
+          this.activar_seleccion = true;
+
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.archivosEliminar = [];
+          this.selectionArchivos.clear();
+
+
+          this.MostrarArchivos();
+
         } else {
           this.router.navigate(['/archivos/documentacion']);
         }
       });
 
-    this.MostrarArchivos();
 
   }
 
@@ -290,7 +305,7 @@ export class ListaArchivosComponent implements OnInit {
 
 
         if (res.message === 'error') {
-          this.toastr.error('No se puede elminar.', '', {
+          this.toastr.error('No se puede eliminar.', '', {
             timeOut: 6000,
           });
 
@@ -308,10 +323,6 @@ export class ListaArchivosComponent implements OnInit {
 
         }
       })
-
-      this.MostrarArchivos();
-
-
     }
     )
   }
@@ -327,6 +338,11 @@ export class ListaArchivosComponent implements OnInit {
             this.activar_seleccion = true;
             this.plan_multiple = false;
             this.plan_multiple_ = false;
+            this.archivosEliminar = [];
+            this.selectionArchivos.clear();
+
+            this.MostrarArchivos();
+
           } else {
             this.toastr.warning('No ha seleccionado ARCHIVOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
@@ -343,7 +359,6 @@ export class ListaArchivosComponent implements OnInit {
 
       });
 
-      this.MostrarArchivos();
 
   }
 

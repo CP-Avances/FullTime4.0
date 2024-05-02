@@ -129,6 +129,14 @@ export class PrincipalProvinciaComponent implements OnInit {
     this.ventana.open(RegistroProvinciaComponent, { width: '550px' }).afterClosed().subscribe(item => {
       this.ListarProvincias();
     });
+
+    this.activar_seleccion = true;
+
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionProvincias.clear();
+    this.provinciasEliminar = [];
+
   }
 
   /** ******************************************************************************* **
@@ -421,10 +429,7 @@ export class PrincipalProvinciaComponent implements OnInit {
         });
         this.ListarProvincias();
       }
-      // this.ListarProvincias();
     });
-
-    //this.ListarProvincias();
   }
 
 
@@ -435,6 +440,14 @@ export class PrincipalProvinciaComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Eliminar(datos.id);
+          this.activar_seleccion = true;
+
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.provinciasEliminar = [];
+          this.selectionProvincias.clear();
+
+          this.ListarProvincias();
         } else {
           this.router.navigate(['/provincia']);
         }
@@ -461,11 +474,9 @@ export class PrincipalProvinciaComponent implements OnInit {
 
 
         if (res.message === 'error') {
-          this.toastr.error('No se puede elminar ', datos.nombre, {
+          this.toastr.error('No se puede eliminar ', datos.nombre, {
             timeOut: 6000,
           });
-
-
           this.contador = this.contador - 1;
 
         } else {
@@ -477,15 +488,8 @@ export class PrincipalProvinciaComponent implements OnInit {
           }
 
           this.ListarProvincias();
-
         }
-
       });
-
-      this.rest.BuscarProvincias().subscribe(datos => {
-        this.provincias = datos;
-      })
-
     }
     );
 
@@ -503,22 +507,24 @@ export class PrincipalProvinciaComponent implements OnInit {
 
             this.plan_multiple = false;
             this.plan_multiple_ = false;
+
+            this.provinciasEliminar = [];
+            this.selectionProvincias.clear();
+
+            this.ListarProvincias();
+
+
+
           } else {
             this.toastr.warning('No ha seleccionado PROVINCIAS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
 
           }
-
-          this.selectionProvincias.clear();
-
         } else {
           this.router.navigate(['/provincia']);
         }
-
-
       });
-      this.ListarProvincias();
 
   }
 

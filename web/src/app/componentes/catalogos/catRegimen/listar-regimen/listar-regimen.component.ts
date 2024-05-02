@@ -145,6 +145,15 @@ export class ListarRegimenComponent implements OnInit {
   AbrirRegistrar() {
     this.ver_lista = false;
     this.ver_registrar = true;
+
+
+
+    this.ObtenerRegimen();
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionRegimen.clear();
+    this.regimenesEliminar = [];
+
   }
 
   // METODO PARA VER DATOS DE REGIMEN LABORAL
@@ -496,27 +505,40 @@ export class ListarRegimenComponent implements OnInit {
     return `${this.selectionRegimen.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
 
   }
+  contador: number = 0;
+  ingresar: boolean = false;
 
 
   EliminarMultiple() {
 
+    this.ingresar = false;
+    this.contador = 0;
     this.regimenesEliminar = this.selectionRegimen.selected;
     this.regimenesEliminar.forEach((datos: any) => {
 
       this.regimen = this.regimen.filter(item => item.id !== datos.id);
 
-
+      this.contador = this.contador + 1;
 
       //AQUI MODIFICAR EL METODO 
       this.rest.EliminarRegistro(datos.id).subscribe(res => {
-        this.toastr.error('Registro eliminado.', '', {
-          timeOut: 6000,
-        });
-        this.ObtenerRegimen();
-      });
 
-      this.rest.ConsultarRegimen().subscribe((datos) => {
-        this.regimen = datos;
+        if (res.message === 'error') {
+          this.toastr.error('No se puede eliminar.', '', {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
+
+
+        } else {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.ObtenerRegimen();
+        }
       });
 
     }
@@ -538,10 +560,10 @@ export class ListarRegimenComponent implements OnInit {
 
             this.plan_multiple = false;
             this.plan_multiple_ = false;
+            this.regimenesEliminar = [];
+            this.selectionRegimen.clear();
 
-
-
-
+            this.ObtenerRegimen();
 
 
           } else {
@@ -551,7 +573,6 @@ export class ListarRegimenComponent implements OnInit {
 
           }
 
-          this.selectionRegimen.clear();
 
         } else {
           this.router.navigate(['/listarRegimen']);
@@ -565,10 +586,17 @@ export class ListarRegimenComponent implements OnInit {
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_regimen: number) {
     this.rest.EliminarRegistro(id_regimen).subscribe((res) => {
-      this.toastr.error("Registro eliminado.", "", {
-        timeOut: 6000,
-      });
-      this.ObtenerRegimen();
+
+      if (res.message === 'error') {
+        this.toastr.error('No se puede elminar.', '', {
+          timeOut: 6000,
+        });
+      } else {
+        this.toastr.error('Registro eliminado.', '', {
+          timeOut: 6000,
+        });
+        this.ObtenerRegimen();
+      }
     });
   }
 
@@ -580,6 +608,16 @@ export class ListarRegimenComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Eliminar(datos.id);
+          this.activar_seleccion = true;
+
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.regimenesEliminar = [];
+          this.selectionRegimen.clear();
+
+          this.ObtenerRegimen();
+
+
         } else {
           this.router.navigate(["/listarRegimen"]);
         }

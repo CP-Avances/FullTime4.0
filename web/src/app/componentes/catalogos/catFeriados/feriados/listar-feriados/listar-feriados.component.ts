@@ -173,6 +173,12 @@ export class ListarFeriadosComponent implements OnInit {
   AbrirVentanaRegistrarFeriado(): void {
     this.ver_lista = false;
     this.ver_registrar = true;
+
+    this.activar_seleccion = true;
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionFeriados.clear();
+    this.feriadosEliminar = [];
   }
 
   // METODO PARA EDITAR FERIADOS
@@ -720,10 +726,20 @@ export class ListarFeriadosComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Eliminar(datos.id);
+
+          this.activar_seleccion = true;
+
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.feriadosEliminar = [];
+          this.selectionFeriados.clear();
+
+          this.BuscarParametro();
+
+
         }
       });
 
-    this.BuscarParametro();
 
   }
 
@@ -750,7 +766,7 @@ export class ListarFeriadosComponent implements OnInit {
 
       this.rest.EliminarFeriado(datos.id).subscribe(res => {
         if (res.message === 'error') {
-          this.toastr.error('No se puede elminar.', '', {
+          this.toastr.error('No se puede eliminar.', '', {
             timeOut: 6000,
           });
           this.contador = this.contador - 1;
@@ -769,8 +785,6 @@ export class ListarFeriadosComponent implements OnInit {
 
       });
 
-
-
     }
     )
   }
@@ -787,6 +801,10 @@ export class ListarFeriadosComponent implements OnInit {
 
             this.plan_multiple = false;
             this.plan_multiple_ = false;
+            this.feriadosEliminar = [];
+            this.selectionFeriados.clear();
+
+            this.BuscarParametro();
 
           } else {
             this.toastr.warning('No ha seleccionado FERIADOS.', 'Ups!!! algo salio mal.', {
@@ -795,14 +813,11 @@ export class ListarFeriadosComponent implements OnInit {
 
           }
 
-          this.selectionFeriados.clear();
-
         } else {
           this.router.navigate(['/listarFeriados']);
         }
       });
 
-      this.BuscarParametro();
 
   }
 

@@ -204,6 +204,14 @@ export class PrincipalHorarioComponent implements OnInit {
           this.ObtenerHorarios();
         }
       });
+      this.activar_seleccion = true;
+      this.plan_multiple = false;
+      this.plan_multiple_ = false;
+      this.selectionHorarios.clear();
+      this.horariosEliminar = [];
+  
+
+
   }
 
   // METODO PARA ABRIR VENTANA REGISTRAR DETALLE DE HORARIO
@@ -689,6 +697,17 @@ export class PrincipalHorarioComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.EliminarDetalle(datos.id);
+          this.activar_seleccion = true;
+
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.horariosEliminar = [];
+          this.selectionHorarios.clear();
+
+          this.ObtenerHorarios();
+
+
+
         }
       });
   }
@@ -711,7 +730,7 @@ export class PrincipalHorarioComponent implements OnInit {
       this.rest.EliminarRegistro(datos.id).subscribe(res => {
 
         if (res.message === 'error') {
-          this.toastr.error('No se puede elminar.', '', {
+          this.toastr.error('No se puede eliminar.', '', {
             timeOut: 6000,
           });
           this.contador = this.contador - 1;
@@ -746,6 +765,10 @@ export class PrincipalHorarioComponent implements OnInit {
 
             this.plan_multiple = false;
             this.plan_multiple_ = false;
+
+            this.horariosEliminar= [];
+            this.selectionHorarios.clear();
+            this.ObtenerHorarios();
           } else {
             this.toastr.warning('No ha seleccionado HORARIOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
@@ -761,7 +784,6 @@ export class PrincipalHorarioComponent implements OnInit {
 
 
       });
-    this.ObtenerHorarios();
 
   }
 

@@ -1032,10 +1032,12 @@ export class ListaEmpleadosComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           if (EliminarActivos.length != 0) {
+
+              //ELIMINAR EMPLEADO
+
             EliminarActivos.forEach((datos: any) => {
 
               this.empleado = this.empleado.filter(item => item.id !== datos.id);
-              //AQUI MODIFICAR EL METODO 
               this.contador = this.contador + 1;
 
               this.rest.EliminarEmpleados(datos.id).subscribe(res => {
@@ -1060,13 +1062,17 @@ export class ListaEmpleadosComponent implements OnInit {
 
               });
 
+              
 
-
-              //this.Eliminar(datos.id);
-              this.GetEmpleados();
+              //this.GetEmpleados();
             }
             )
+
+
             this.btnCheckHabilitar = false;
+            this.empleadosEliminarActivos=[];
+            this.selectionUno.clear();
+            this.GetEmpleados();
 
 
           } else {
@@ -1074,17 +1080,13 @@ export class ListaEmpleadosComponent implements OnInit {
               timeOut: 6000,
             })
           }
-
           this.selectionUno.clear();
-
-
         } else {
           this.router.navigate(['/empleados']);
         }
-
       }
       );
-      this.GetEmpleados();
+      //this.GetEmpleados();
 
   }
   
@@ -1142,10 +1144,17 @@ export class ListaEmpleadosComponent implements OnInit {
 
               });
 
-              this.GetEmpleados();
+              //this.GetEmpleados();
             }
             )
             this.btnCheckDeshabilitado = false;
+
+
+            this.empleadosEliminarActivos=[];
+            this.selectionUno.clear();
+            this.GetEmpleados();
+
+
           } else {
             this.toastr.warning('No ha seleccionado USUARIOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
@@ -1162,7 +1171,7 @@ export class ListaEmpleadosComponent implements OnInit {
 
       }
       );
-    this.GetEmpleados();
+    //this.GetEmpleados();
 
 
   }

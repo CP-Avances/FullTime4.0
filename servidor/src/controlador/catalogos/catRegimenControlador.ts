@@ -222,15 +222,20 @@ class RegimenControlador {
   }
 
   // ELIMINAR REGISTRO DE REGIMEN LABORAL
-  public async EliminarRegistros(req: Request, res: Response): Promise<void> {
-    const id = req.params.id;
-    await pool.query(
-      `
-      DELETE FROM cg_regimenes WHERE id = $1
-      `
-      , [id]
-    );
-    res.jsonp({ message: "Registro eliminado." });
+  public async EliminarRegistros(req: Request, res: Response) {
+    try {
+      const id = req.params.id;
+      await pool.query(
+        `
+        DELETE FROM cg_regimenes WHERE id = $1
+        `
+        , [id]
+      );
+      res.jsonp({ message: "Registro eliminado." });
+    } catch (error) {
+
+      return res.jsonp({ message: 'error' });
+    }
   }
 
   /** ** ************************************************************************************************ **

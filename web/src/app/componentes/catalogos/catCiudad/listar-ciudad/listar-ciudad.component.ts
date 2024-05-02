@@ -128,6 +128,13 @@ export class ListarCiudadComponent implements OnInit {
     this.ventana.open(RegistrarCiudadComponent, { width: '600px' }).afterClosed().subscribe(item => {
       this.ListarCiudades();
     });
+
+    this.activar_seleccion = true;
+
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectiondatosCiudades.clear();
+    this.datosCiudadesEliminar = [];
   }
 
 
@@ -421,8 +428,6 @@ export class ListarCiudadComponent implements OnInit {
         this.ListarCiudades();
 
       }
-
-
     });
   }
 
@@ -432,13 +437,17 @@ export class ListarCiudadComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Eliminar(datos.id);
+
+          this.activar_seleccion = true;
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.datosCiudadesEliminar = [];
+          this.selectiondatosCiudades.clear();
+          this.ListarCiudades();
         } else {
           this.router.navigate(['/listarCiudades']);
         }
       });
-
-      this.ListarCiudades();
-
   }
 
   contador: number = 0;
@@ -446,20 +455,20 @@ export class ListarCiudadComponent implements OnInit {
 
   EliminarMultiple() {
 
-      
+
     this.ingresar = false;
     this.contador = 0;
 
     this.datosCiudadesEliminar = this.selectiondatosCiudades.selected;
     this.datosCiudadesEliminar.forEach((datos: any) => {
-      
+
       this.datosCiudades = this.datosCiudades.filter(item => item.id !== datos.id);
-this.contador = this.contador + 1;
+      this.contador = this.contador + 1;
 
       this.rest.EliminarCiudad(datos.id).subscribe(res => {
-      
+
         if (res.message === 'error') {
-          this.toastr.error('No se puede elminar ', datos.nombre, {
+          this.toastr.error('No se puede eliminar ', datos.nombre, {
             timeOut: 6000,
           });
 
@@ -473,13 +482,8 @@ this.contador = this.contador + 1;
           }
 
           this.ListarCiudades();
-
         }
-  
-  
       });
-
-  
     }
     )
   }
@@ -497,21 +501,21 @@ this.contador = this.contador + 1;
             this.plan_multiple = false;
             this.plan_multiple_ = false;
 
+            this.datosCiudadesEliminar = [];
+            this.selectiondatosCiudades.clear();
+
+            this.ListarCiudades();
+
           } else {
             this.toastr.warning('No ha seleccionado CIUDADES.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
 
           }
-          this.selectiondatosCiudades.clear();
         } else {
           this.router.navigate(['/listarCiudades']);
         }
       });
-      this.ListarCiudades();
 
   }
-
-
-
 }

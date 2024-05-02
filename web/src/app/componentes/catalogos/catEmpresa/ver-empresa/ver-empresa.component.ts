@@ -162,6 +162,7 @@ export class VerEmpresaComponent implements OnInit {
 
   // METODO PARA MOSTRAR LISTA DE SUCURSALES
   ObtenerSucursal() {
+    this.datosSucursales= [];
     this.restS.BuscarSucursal().subscribe(data => {
       this.datosSucursales = data;
     });
@@ -454,7 +455,6 @@ export class VerEmpresaComponent implements OnInit {
 
 
       if (res.message === 'error') {
-
         this.toastr.error('No se puede elminar.', '', {
           timeOut: 6000,
         });
@@ -476,6 +476,7 @@ export class VerEmpresaComponent implements OnInit {
     this.ventana.open(MetodosComponent, { width: '450px' }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
+          this.Eliminar(datos.id);
 
           this.activar_seleccion = true;
 
@@ -483,7 +484,8 @@ export class VerEmpresaComponent implements OnInit {
           this.plan_multiple_ = false;
           this.selectionSucursales.clear();
           this.sucursalesEliminar = [];
-          this.Eliminar(datos.id);
+
+          this.ObtenerSucursal();
         }
       });
   }
@@ -507,7 +509,7 @@ export class VerEmpresaComponent implements OnInit {
 
         if (res.message === 'error') {
 
-          this.toastr.error('No se puede elminar.', 'la: ' + datos.nombre, {
+          this.toastr.error('No se puede eliminar.', 'la: ' + datos.nombre, {
             timeOut: 6000,
           });
           this.contador = this.contador - 1;
@@ -540,7 +542,12 @@ export class VerEmpresaComponent implements OnInit {
 
             this.plan_multiple = false;
             this.plan_multiple_ = false;
+
+            this.sucursalesEliminar = [];
             this.selectionSucursales.clear();
+
+            this.ObtenerSucursal();
+
 
           } else {
             this.toastr.warning('No ha seleccionado SUCURSALES.', 'Ups!!! algo salio mal.', {
@@ -553,14 +560,6 @@ export class VerEmpresaComponent implements OnInit {
         }
       });
 
-    this.ObtenerSucursal();
 
   }
-
-
-
-
-
-
-
 }

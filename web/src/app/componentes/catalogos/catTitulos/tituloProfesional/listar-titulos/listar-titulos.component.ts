@@ -121,6 +121,8 @@ export class ListarTitulosComponent implements OnInit {
 
   // METODO PARA LISTAR TITULOS
   ObtenerTitulos() {
+
+    this.verTitulos = [];
     this.rest.ListarTitulos().subscribe(data => {
       this.verTitulos = data;
       console.log('titulos: ', this.verTitulos);
@@ -157,6 +159,11 @@ export class ListarTitulosComponent implements OnInit {
       .afterClosed().subscribe(items => {
         this.ObtenerTitulos();
       });
+    this.activar_seleccion = true;
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionTitulos.clear();
+    this.titulosEliminar = [];
   }
 
   // METODO PARA LIMPIAR FORMULARIO
@@ -616,12 +623,21 @@ export class ListarTitulosComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Eliminar(datos.id);
+          this.activar_seleccion = true;
+
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.titulosEliminar = [];
+          this.selectionTitulos.clear();
+
+
+          this.ObtenerTitulos();
+
         } else {
           this.router.navigate(['/titulos']);
         }
       });
 
-    this.ObtenerTitulos();
   }
 
 
@@ -630,7 +646,7 @@ export class ListarTitulosComponent implements OnInit {
 
   EliminarMultiple() {
 
-    
+
     this.ingresar = false;
     this.contador = 0;
 
@@ -677,22 +693,20 @@ export class ListarTitulosComponent implements OnInit {
 
             this.plan_multiple = false;
             this.plan_multiple_ = false;
+
+            this.titulosEliminar = [];
+            this.selectionTitulos.clear();
+
+            this.ObtenerTitulos();
           } else {
             this.toastr.warning('No ha seleccionado TÍTULOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
-
           }
-
-          this.selectionTitulos.clear();
-
         } else {
-
           this.router.navigate(['/titulos']);
-
         }
       });
-    this.ObtenerTitulos();
   }
 
 }

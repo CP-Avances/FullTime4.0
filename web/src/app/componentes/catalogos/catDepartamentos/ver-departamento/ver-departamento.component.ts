@@ -202,6 +202,12 @@ export class VerDepartamentoComponent implements OnInit {
         this.CargarDatos(this.info);
       }
       );
+      this.activar_seleccion = true;
+      this.plan_multiple = false;
+      this.plan_multiple_ = false;
+      this.selectionNivel.clear();
+      this.nivelesEliminar = [];
+
   }
 
   // METODO PARA VISUALIZAR LISTA DE USUARIOS QUE AUTORIZAN
@@ -307,11 +313,11 @@ export class VerDepartamentoComponent implements OnInit {
           timeOut: 6000,
         });
       } else {
-        
+
         this.toastr.error('Registro eliminado.', '', {
           timeOut: 6000,
         });
-        
+
         this.ActualizarRegistros(datos);
       }
     });
@@ -324,7 +330,7 @@ export class VerDepartamentoComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Eliminar(datos.id, datos);
-        }else{
+        } else {
           this.router.navigate(['/departamento']);
 
         }
@@ -367,10 +373,11 @@ export class VerDepartamentoComponent implements OnInit {
             this.ingresar = true;
           }
           this.ActualizarRegistros(datos);
+         // this.ListaDepartamentos();
 
-          //this.CargarDatos(datos);
         }
       });
+      this.ActualizarRegistros(datos);
 
     }
     )
@@ -388,6 +395,8 @@ export class VerDepartamentoComponent implements OnInit {
 
             this.plan_multiple = false;
             this.plan_multiple_ = false;
+            this.nivelesEliminar = [];
+            this.selectionNivel.clear();
 
           } else {
             this.toastr.warning('No ha seleccionado NIVEL.', 'Ups!!! algo salio mal.', {
@@ -395,21 +404,11 @@ export class VerDepartamentoComponent implements OnInit {
             })
 
           }
-
-          
-
-          this.selectionNivel.clear();
-          this.router.navigate(['/departamento']);
-
-        }else{
+        } else {
           this.router.navigate(['/departamento']);
 
         }
       });
-
-
-
-      
   }
 
 
