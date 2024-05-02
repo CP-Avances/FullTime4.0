@@ -3,6 +3,7 @@ import {
   FormatearFecha, FormatearHora, dia_completo
 } from '../../libs/settingsMail'
 import { Request, Response } from 'express';
+import AUDITORIA_CONTROLADOR from '../auditoria/auditoriaControlador';
 import path from 'path';
 import pool from '../../database';
 import jwt from 'jsonwebtoken';
@@ -16,7 +17,11 @@ class UsuarioControlador {
   // CREAR REGISTRO DE USUARIOS
   public async CrearUsuario(req: Request, res: Response) {
     try {
-      const { usuario, contrasena, estado, id_rol, id_empleado } = req.body;
+      const { usuario, contrasena, estado, id_rol, id_empleado, user_name, ip } = req.body;
+
+      // INCIAR TRANSACCION
+      await pool.query('BEGIN');
+
       await pool.query(
         `
         INSERT INTO usuarios (usuario, contrasena, estado, id_rol, id_empleado) 
@@ -24,9 +29,25 @@ class UsuarioControlador {
         `
         , [usuario, contrasena, estado, id_rol, id_empleado]);
 
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'usuarios',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{usuario: ${usuario}, contrasena: ${contrasena}, estado: ${estado}, id_rol: ${id_rol}, id_empleado: ${id_empleado}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+
       res.jsonp({ message: 'Usuario Guardado' });
     }
     catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
       return res.jsonp({ message: 'error' });
     }
   }
@@ -66,42 +87,170 @@ class UsuarioControlador {
 
 
   // METODO PARA ACTUALIZAR DATOS DE USUARIO
-  public async ActualizarUsuario(req: Request, res: Response) {
+  public async ActualizarUsuario(req: Request, res: Response): Promise<Response> {
     try {
-      const { usuario, contrasena, id_rol, id_empleado } = req.body;
+      const { usuario, contrasena, id_rol, id_empleado, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const consulta = await pool.query(`SELECT * FROM usuarios WHERE id_empleado = $1`, [id_empleado]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'usuarios',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
       await pool.query(
         `
         UPDATE usuarios SET usuario = $1, contrasena = $2, id_rol = $3 WHERE id_empleado = $4
         `
         , [usuario, contrasena, id_rol, id_empleado]);
-      res.jsonp({ message: 'Registro actualizado.' });
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'usuarios',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{usuario: ${usuario}, contrasena: ${contrasena}, id_rol: ${id_rol}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro actualizado.' });
     }
     catch (error) {
-      return res.jsonp({ message: 'error' });
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
     }
   }
 
   // METODO PARA ACTUALIZAR CONTRASEÑA
-  public async CambiarPasswordUsuario(req: Request, res: Response): Promise<any> {
-    const { contrasena, id_empleado } = req.body;
-    await pool.query(
-      `
-      UPDATE usuarios SET contrasena = $1 WHERE id_empleado = $2
-      `
-      , [contrasena, id_empleado]);
-    res.jsonp({ message: 'Registro actualizado.' });
+  public async CambiarPasswordUsuario(req: Request, res: Response): Promise<Response> {
+    try {
+      const { contrasena, id_empleado, user_name, ip } = req.body;
+  
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+  
+      // CONSULTAR DATOSORIGINALES
+      const consulta = await pool.query(`SELECT * FROM usuarios WHERE id_empleado = $1`, [id_empleado]);
+      const [datosOriginales] = consulta.rows;
+  
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'usuarios',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
+        });
+  
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+  
+      await pool.query(
+        `
+        UPDATE usuarios SET contrasena = $1 WHERE id_empleado = $2
+        `
+        , [contrasena, id_empleado]);
+  
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'usuarios',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{contrasena: ${contrasena}}`,
+        ip,
+        observacion: null
+      });
+  
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro actualizado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+    }
   }
 
 
   // ADMINISTRACION DEL MODULO DE ALIMENTACION
-  public async RegistrarAdminComida(req: Request, res: Response): Promise<void> {
-    const { admin_comida, id_empleado } = req.body;
-    await pool.query(
-      `
-      UPDATE usuarios SET admin_comida = $1 WHERE id_empleado = $2
-      `
-      , [admin_comida, id_empleado]);
-    res.jsonp({ message: 'Registro guardado.' });
+  public async RegistrarAdminComida(req: Request, res: Response): Promise<Response> {
+    try {
+      const { admin_comida, id_empleado, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const consulta = await pool.query(`SELECT * FROM usuarios WHERE id_empleado = $1`, [id_empleado]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'usuarios',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
+      await pool.query(
+        `
+        UPDATE usuarios SET admin_comida = $1 WHERE id_empleado = $2
+        `
+        , [admin_comida, id_empleado]);
+      
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'usuarios',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{admin_comida: ${admin_comida}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro guardado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+    }
   }
 
   /** ************************************************************************************* ** 
@@ -109,14 +258,58 @@ class UsuarioControlador {
    ** ************************************************************************************* **/
 
   // METODO PARA GUARDAR FRASE DE SEGURIDAD
-  public async ActualizarFrase(req: Request, res: Response): Promise<void> {
-    const { frase, id_empleado } = req.body;
-    await pool.query(
-      `
-      UPDATE usuarios SET frase = $1 WHERE id_empleado = $2
-      `
-      , [frase, id_empleado]);
-    res.jsonp({ message: 'Registro guardado.' });
+  public async ActualizarFrase(req: Request, res: Response): Promise<Response> {
+    try {
+      const { frase, id_empleado, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTAR DATOSORIGINALES
+      const consulta = await pool.query(`SELECT * FROM usuarios WHERE id_empleado = $1`, [id_empleado]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'usuarios',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar usuario con id_empleado: ${id_empleado}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
+      await pool.query(
+        `
+        UPDATE usuarios SET frase = $1 WHERE id_empleado = $2
+        `
+        , [frase, id_empleado]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'usuarios',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{frase: ${frase}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro guardado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+    }
   }
 
 
@@ -577,21 +770,60 @@ class UsuarioControlador {
   // METODO PARA ACTUALIZAR ESTADO DE TIMBRE WEB
   public async ActualizarEstadoTimbreWeb(req: Request, res: Response) {
     try {
-      const array = req.body;
+      const {array, user_name, ip} = req.body;
 
       if (array.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registros.' })
 
       const nuevo = await Promise.all(array.map(async (o: any) => {
 
         try {
+          // INICIA TRANSACCION
+          await pool.query('BEGIN');
+
+          // CONSULTA DATOSORIGINALES
+          const consulta = await pool.query(`SELECT * FROM usuarios WHERE id = $1`, [o.userid]);
+          const [datosOriginales] = consulta.rows;
+
+          if (!datosOriginales) {
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'usuarios',
+              usuario: user_name,
+              accion: 'U',
+              datosOriginales: '',
+              datosNuevos: '',
+              ip,
+              observacion: `Error al actualizar usuario con id: ${o.userid}. Registro no encontrado.`
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+          }
+
           const [result] = await pool.query(
             `
             UPDATE usuarios SET web_habilita = $1 WHERE id = $2 RETURNING id
             `
             , [!o.web_habilita, o.userid])
-            .then((result: any) => { return result.rows })
+            .then((result: any) => { return result.rows });
+
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'usuarios',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: JSON.stringify(datosOriginales),
+            datosNuevos: `{web_habilita: ${!o.web_habilita}}`,
+            ip,
+            observacion: null
+          });
+
+          // FINALIZAR TRANSACCION
+          await pool.query('COMMIT');
           return result
         } catch (error) {
+          // REVERTIR TRANSACCION
+          await pool.query('ROLLBACK');
           return { error: error.toString() }
         }
 
@@ -1061,22 +1293,61 @@ class UsuarioControlador {
   // METODO PARA ACTUALIZAR ESTADO DE TIMBRE MOVIL
   public async ActualizarEstadoTimbreMovil(req: Request, res: Response) {
     try {
-      console.log(req.body);
-      const array = req.body;
+      const {array, user_name, ip} = req.body;
 
       if (array.length === 0) return res.status(400).jsonp({ message: 'No se ha encontrado registros.' })
 
       const nuevo = await Promise.all(array.map(async (o: any) => {
 
         try {
+          // INICIA TRANSACCION
+          await pool.query('BEGIN');
+
+          // CONSULTA DATOSORIGINALES
+          const consulta = await pool.query(`SELECT * FROM usuarios WHERE id = $1`, [o.userid]);
+          const [datosOriginales] = consulta.rows;
+
+          if (!datosOriginales) {
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'usuarios',
+              usuario: user_name,
+              accion: 'U',
+              datosOriginales: '',
+              datosNuevos: '',
+              ip,
+              observacion: `Error al actualizar usuario con id: ${o.userid}. Registro no encontrado.`
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+          }
+
           const [result] = await pool.query(
             `
             UPDATE usuarios SET app_habilita = $1 WHERE id = $2 RETURNING id
             `
             , [!o.app_habilita, o.userid])
-            .then((result: any) => { return result.rows })
+            .then((result: any) => { return result.rows });
+
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'usuarios',
+            usuario: user_name,
+            accion: 'U',
+            datosOriginales: JSON.stringify(datosOriginales),
+            datosNuevos: `{"app_habilita": ${!o.app_habilita}}`,
+            ip,
+            observacion: null
+          });
+
+          // FINALIZAR TRANSACCION
+          await pool.query('COMMIT');
+
           return result
         } catch (error) {
+          // REVERTIR TRANSACCION
+          await pool.query('ROLLBACK');
           return { error: error.toString() }
         }
       }))
@@ -1115,6 +1386,9 @@ class UsuarioControlador {
   // METODO PARA ELIMINAR REGISTROS DE DISPOSITIVOS MOVILES
   public async EliminarDispositivoMovil(req: Request, res: Response) {
     try {
+      // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
+      const { user_name, ip } = req.body;
+
       const array = req.params.dispositivo;
 
       let dispositivos = array.split(',');
@@ -1123,14 +1397,54 @@ class UsuarioControlador {
 
       const nuevo = await Promise.all(dispositivos.map(async (id_dispo: any) => {
         try {
+          // INICIAR TRANSACCION
+          await pool.query('BEGIN');
+
+          // CONSULTA DATOSORIGINALES
+          const consulta = await pool.query(`SELECT * FROM id_dispositivos WHERE id_dispositivo = $1`, [id_dispo]);
+          const [datosOriginales] = consulta.rows;
+
+          if (!datosOriginales) {
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+              tabla: 'id_dispositivos',
+              usuario: user_name,
+              accion: 'D',
+              datosOriginales: '',
+              datosNuevos: '',
+              ip,
+              observacion: `Error al eliminar dispositivo con id: ${id_dispo}. Registro no encontrado.`
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+          }
+
           const [result] = await pool.query(
             `
             DELETE FROM id_dispositivos WHERE id_dispositivo = $1 RETURNING *
             `
             , [id_dispo])
-            .then((result: any) => { return result.rows })
+            .then((result: any) => { return result.rows });
+
+          // AUDITORIA
+          await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+            tabla: 'id_dispositivos',
+            usuario: user_name,
+            accion: 'D',
+            datosOriginales: JSON.stringify(datosOriginales),
+            datosNuevos: '',
+            ip,
+            observacion: null
+          });
+
+          // FINALIZAR TRANSACCION
+          await pool.query('COMMIT');
+
           return result
         } catch (error) {
+          // REVERTIR TRANSACCION
+          await pool.query('ROLLBACK');
           return { error: error.toString() }
         }
       }))
@@ -1242,45 +1556,63 @@ class UsuarioControlador {
   }
 
   // METODO PARA CAMBIAR FRASE DE SEGURIDAD
-  public async CambiarFrase(req: Request, res: Response) {
+  public async CambiarFrase(req: Request, res: Response): Promise<Response> {
     var token = req.body.token;
     var frase = req.body.frase;
+    const {user_name, ip} = req.body;
     try {
       const payload = jwt.verify(token, process.env.TOKEN_SECRET_MAIL || 'llaveEmail') as IPayload;
       const id_empleado = payload._id;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTA DATOSORIGINALES
+      const consulta = await pool.query(`SELECT * FROM usuarios WHERE id_empleado = $1`, [id_empleado]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'usuarios',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar usuario con id: ${id_empleado}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
       await pool.query(
         `
         UPDATE usuarios SET frase = $2 WHERE id_empleado = $1
         `
         , [id_empleado, frase]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'usuarios',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{"frase": "${frase}"}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
       return res.jsonp({ expiro: 'no', message: "Frase de seguridad actualizada." });
     } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
       return res.jsonp({ expiro: 'si', message: "Tiempo para cambiar su frase de seguridad ha expirado." });
     }
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   public async list(req: Request, res: Response) {
     const USUARIOS = await pool.query('SELECT * FROM usuarios');
@@ -1327,7 +1659,11 @@ class UsuarioControlador {
   // CREAR REGISTRO DE USUARIOS - SUCURSAL
   public async CrearUsuarioSucursal(req: Request, res: Response) {
     try {
-      const { id_empleado, id_sucursal, principal } = req.body;
+      const { id_empleado, id_sucursal, principal, user_name, ip } = req.body;
+
+      // INICIA TRANSACCION
+      await pool.query('BEGIN');
+
       await pool.query(
         `
         INSERT INTO usuario_sucursal (id_empleado, id_sucursal, principal) 
@@ -1335,9 +1671,24 @@ class UsuarioControlador {
         `
         , [id_empleado, id_sucursal, principal]);
 
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'usuario_sucursal',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{"id_empleado": ${id_empleado}, "id_sucursal": ${id_sucursal}, "principal": ${principal}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
       res.jsonp({ message: 'Registro guardado.' });
     }
     catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
       return res.jsonp({ message: 'error' });
     }
   }
@@ -1360,43 +1711,150 @@ class UsuarioControlador {
   }
 
   // METODO PARA ACTUALIZAR DATOS DE USUARIO - SUCURSAL
-  public async ActualizarUsuarioSucursalPrincipal(req: Request, res: Response) {
+  public async ActualizarUsuarioSucursalPrincipal(req: Request, res: Response): Promise<Response> {
     try {
-      const { id_sucursal, id_empleado } = req.body;
+      const { id_sucursal, id_empleado, user_name, ip } = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTA DATOSORIGINALES
+      const consulta = await pool.query(`SELECT * FROM usuario_sucursal WHERE id_empleado = $1 AND principal = true`, [id_empleado]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'usuario_sucursal',
+          usuario: user_name,
+          accion: 'U',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al actualizar usuario con id: ${id_empleado}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
       await pool.query(
         `
         UPDATE usuario_sucursal SET id_sucursal = $1 WHERE id_empleado = $2 AND principal = true;
         `
         , [id_sucursal, id_empleado]);
-      res.jsonp({ message: 'Registro actualizado.' });
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'usuario_sucursal',
+        usuario: user_name,
+        accion: 'U',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: `{"id_sucursal": ${id_sucursal}}`,
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro actualizado.' });
     }
     catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
       return res.jsonp({ message: 'error' });
     }
   }
 
 
   // METODO PARA ELIMINAR REGISTROS
-  public async EliminarUsuarioSucursal(req: Request, res: Response): Promise<void> {
-    const id = req.params.id;
-    await pool.query(
-      `
-      DELETE FROM usuario_sucursal WHERE id = $1
-      `
-      , [id]);
-    res.jsonp({ message: 'Registro eliminado.' });
+  public async EliminarUsuarioSucursal(req: Request, res: Response): Promise<Response> {
+    try {
+      // TODO: ANALIZAR COMO OBTENER USER_NAME E IP DESDE EL FRONTEND
+      const { user_name, ip } = req.body;
+      const id = req.params.id;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      // CONSULTA DATOSORIGINALES
+      const consulta = await pool.query(`SELECT * FROM usuario_sucursal WHERE id = $1`, [id]);
+      const [datosOriginales] = consulta.rows;
+
+      if (!datosOriginales) {
+        await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+          tabla: 'usuario_sucursal',
+          usuario: user_name,
+          accion: 'D',
+          datosOriginales: '',
+          datosNuevos: '',
+          ip,
+          observacion: `Error al eliminar usuario_sucursal con id: ${id}. Registro no encontrado.`
+        });
+
+        // FINALIZAR TRANSACCION
+        await pool.query('COMMIT');
+        return res.status(404).jsonp({ message: 'Registro no encontrado.' });
+      }
+
+      await pool.query(
+        `
+        DELETE FROM usuario_sucursal WHERE id = $1
+        `
+        , [id]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'usuario_sucursal',
+        usuario: user_name,
+        accion: 'D',
+        datosOriginales: JSON.stringify(datosOriginales),
+        datosNuevos: '',
+        ip,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Registro eliminado.' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+    }
   }
-
-
-
-
 
   //ACCESOS AL SISTEMA
   public async AuditarAcceso(req: Request, res: Response) {
-    const { modulo, user_name, fecha, hora, acceso, ip_address } = req.body;
-    await pool.query('INSERT INTO logged_user ( modulo, user_name, fecha, hora, acceso, ip_address ) ' +
-      'VALUES ($1, $2, $3, $4, $5, $6)', [modulo, user_name, fecha, hora, acceso, ip_address]);
-    return res.jsonp({ message: 'Auditoria Realizada' });
+    try {
+      // TODO: VER SI EL USER_NAME Y EL IP_ADDRES SON LOS DATOSQUE NECESITA LA AUDITORIA
+      const { modulo, user_name, fecha, hora, acceso, ip_address} = req.body;
+
+      // INICIAR TRANSACCION
+      await pool.query('BEGIN');
+
+      await pool.query('INSERT INTO logged_user ( modulo, user_name, fecha, hora, acceso, ip_address ) ' +
+        'VALUES ($1, $2, $3, $4, $5, $6)', [modulo, user_name, fecha, hora, acceso, ip_address]);
+
+      // AUDITORIA
+      await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+        tabla: 'logged_user',
+        usuario: user_name,
+        accion: 'I',
+        datosOriginales: '',
+        datosNuevos: `{"modulo": "${modulo}", "user_name": "${user_name}", "fecha": "${fecha}", "hora": "${hora}", "acceso": "${acceso}", "ip_address": "${ip_address}"}`,
+        ip: ip_address,
+        observacion: null
+      });
+
+      // FINALIZAR TRANSACCION
+      await pool.query('COMMIT');
+      return res.jsonp({ message: 'Auditoria Realizada' });
+    } catch (error) {
+      // REVERTIR TRANSACCION
+      await pool.query('ROLLBACK');
+      return res.status(500).jsonp({ message: 'error' });
+    }
   }
 
 }
