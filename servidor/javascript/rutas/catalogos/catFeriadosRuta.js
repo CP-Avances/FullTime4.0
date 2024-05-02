@@ -22,7 +22,22 @@ const storage = multer_1.default.diskStorage({
         cb(null, documento);
     }
 });
+const storage1 = multer_1.default.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, (0, accesoCarpetas_1.ObtenerRutaLeerPlantillas)());
+    },
+    filename: function (req, file, cb) {
+        // FECHA DEL SISTEMA
+        //var fecha = moment();
+        //var anio = fecha.format('YYYY');
+        //var mes = fecha.format('MM');
+        //var dia = fecha.format('DD');
+        let documento = file.originalname;
+        cb(null, documento);
+    }
+});
 const upload = (0, multer_1.default)({ storage: storage });
+const upload1 = (0, multer_1.default)({ storage: storage1 });
 class FeriadosRuta {
     constructor() {
         this.router = (0, express_1.Router)();
@@ -48,6 +63,7 @@ class FeriadosRuta {
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], catFeriadosControlador_1.default.RevisarDatos);
         this.router.post('/upload/revision_data', [verificarToken_1.TokenValidation, upload.single('uploads')], catFeriadosControlador_1.default.RevisarDatos_Duplicados);
         this.router.post('/upload', [verificarToken_1.TokenValidation, upload.single('uploads')], catFeriadosControlador_1.default.CrearFeriadoPlantilla);
+        this.router.post('/upload/revisionFeriadoCiudad', [verificarToken_1.TokenValidation, upload1.single('uploads')], catFeriadosControlador_1.default.RivisarDatosFeriado_Ciudad);
     }
 }
 const FERIADOS_RUTA = new FeriadosRuta();
