@@ -1,6 +1,7 @@
 import pool from '../database'
+import AUDITORIA_CONTROLADOR from '../controlador/auditoria/auditoriaControlador';
 
-export const RestarPeriodoVacacionAutorizada = async function (id_vacacion: number) {
+export const RestarPeriodoVacacionAutorizada = async function (id_vacacion: number, user_name: string, ip: string) {
 
     let vacacion = await ConsultarVacacion(id_vacacion);
 
@@ -31,8 +32,36 @@ export const RestarPeriodoVacacionAutorizada = async function (id_vacacion: numb
     console.log('Total ===>', total);
     console.log(total_DHM);
 
-    await pool.query('UPDATE peri_vacaciones SET dia_vacacion = $1, horas_vacaciones = $2, min_vacaciones = $3 WHERE id = $4', [total_DHM.dias, total_DHM.horas, total_DHM.min, vacacion.id_peri_vacacion])
+    try {
+        // INICIAR TRANSACCION
+        await pool.query('BEGIN');
 
+        // CONSULTAR DATOSORIGINALES
+        const consulta = await pool.query('SELECT * FROM peri_vacaciones WHERE id = $1', [vacacion.id_peri_vacacion]);
+        const [datosOriginales] = consulta.rows;
+
+        if (!datosOriginales) {
+            await AUDITORIA_CONTROLADOR.InsertarAuditoria({
+                tabla: 'peri_vacaciones',
+                usuario: user_name,
+                accion:'U',
+                datosOriginales: '',
+                datosNuevos: '',
+                ip,
+                observacion: `Error al actualizar periodo de vacaciones con id ${vacacion.id_peri_vacacion}. Registro no encontrado`
+            });
+
+            // FINALIZAR TRANSACCION
+            await pool.query('COMMIT');
+            return;
+        }
+        await pool.query('UPDATE peri_vacaciones SET dia_vacacion = $1, horas_vacaciones = $2, min_vacaciones = $3 WHERE id = $4', [total_DHM.dias, total_DHM.horas, total_DHM.min, vacacion.id_peri_vacacion])
+        
+    } catch (error) {
+        // REVERTIR TRANSACCION
+        await pool.query('ROLLBACK');
+        return;
+    }
 }
 
 async function ConsultarVacacion(id_vacacion: number) {

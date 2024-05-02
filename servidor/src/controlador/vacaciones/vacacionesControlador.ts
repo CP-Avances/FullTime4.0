@@ -547,7 +547,7 @@ class VacacionesControlador {
       await pool.query('COMMIT');
   
       if (3 === estado) {
-        RestarPeriodoVacacionAutorizada(parseInt(id));
+        RestarPeriodoVacacionAutorizada(parseInt(id), user_name, ip);
       }
     } catch (error) {
       // REVERTIR TRANSACCIÓN
