@@ -86,11 +86,11 @@ export class EditarPeriodoVacacionesComponent implements OnInit {
       diaVacacionForm: this.data.datosPeriodo.dia_vacacion,
       diaAntiguedadForm: this.data.datosPeriodo.dia_antiguedad,
       estadoForm: this.data.datosPeriodo.estado,
-      fechaFinForm: this.data.datosPeriodo.fec_final,
-      fechaInicioForm: this.data.datosPeriodo.fec_inicio,
+      fechaFinForm: this.data.datosPeriodo.fecha_final,
+      fechaInicioForm: this.data.datosPeriodo.fecha_inicio,
       diaPerdidoForm: this.data.datosPeriodo.dia_perdido,
       horaVacacionForm: this.data.datosPeriodo.horas_vacaciones,
-      minVacacionForm: this.data.datosPeriodo.min_vacaciones,
+      minVacacionForm: this.data.datosPeriodo.minutos_vacaciones,
     });
     console.log("estado", this.data.datosPeriodo.estado)
     if (this.data.datosPeriodo.estado === 1) {

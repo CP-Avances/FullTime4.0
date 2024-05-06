@@ -179,7 +179,7 @@ export class VerPedidoHoraExtraComponent implements OnInit {
     this.restA.getUnaAutorizacionByHoraExtraRest(this.dataParams.id).subscribe(res1 => {
       this.autorizacion = res1;
       // METODO PARA OBTENER EMPLEADOS Y ESTADOS
-      var autorizaciones = this.autorizacion[0].id_documento.split(',');
+      var autorizaciones = this.autorizacion[0].id_autoriza_estado.split(',');
       autorizaciones.map((obj: string) => {
         this.lectura = this.lectura + 1;
         if (obj != '') {

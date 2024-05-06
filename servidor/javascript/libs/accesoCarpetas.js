@@ -21,7 +21,7 @@ const ObtenerRutaUsuario = function (id) {
         let ruta = '';
         let separador = path_1.default.sep;
         const usuario = yield database_1.default.query(`
-        SELECT codigo, cedula FROM empleados WHERE id = $1
+        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
         `, [id]);
         ruta = path_1.default.join(__dirname, `..${separador}..`);
         return ruta + separador + 'imagenesEmpleados' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
@@ -34,7 +34,7 @@ const ObtenerRutaVacuna = function (id) {
         let ruta = '';
         let separador = path_1.default.sep;
         const usuario = yield database_1.default.query(`
-        SELECT codigo, cedula FROM empleados WHERE id = $1
+        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
         `, [id]);
         ruta = path_1.default.join(__dirname, `..${separador}..`);
         return ruta + separador + 'carnetVacuna' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;
@@ -47,7 +47,7 @@ const ObtenerRutaPermisos = function (codigo) {
         let ruta = '';
         let separador = path_1.default.sep;
         const usuario = yield database_1.default.query(`
-        SELECT cedula FROM empleados WHERE codigo = $1
+        SELECT cedula FROM eu_empleados WHERE codigo = $1
         `, [codigo]);
         ruta = path_1.default.join(__dirname, `..${separador}..`);
         return ruta + separador + 'permisos' + separador + codigo + '_' + usuario.rows[0].cedula;
@@ -91,7 +91,7 @@ const ObtenerRutaContrato = function (id) {
         let ruta = '';
         let separador = path_1.default.sep;
         const usuario = yield database_1.default.query(`
-        SELECT codigo, cedula FROM empleados WHERE id = $1
+        SELECT codigo, cedula FROM eu_empleados WHERE id = $1
         `, [id]);
         ruta = path_1.default.join(__dirname, `..${separador}..`);
         return ruta + separador + 'contratos' + separador + usuario.rows[0].codigo + '_' + usuario.rows[0].cedula;

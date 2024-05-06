@@ -232,7 +232,7 @@ export class RegistroContratoComponent implements OnInit {
       var ingreso = String(moment(datos.fec_ingreso, "YYYY/MM/DD").format("YYYY-MM-DD"));
       // COMPARACION DE CADA REGISTRO
       for (var i = 0; i <= this.revisarFecha.length - 1; i++) {
-        var fecha = String(moment(this.revisarFecha[i].fec_ingreso, "YYYY/MM/DD").format("YYYY-MM-DD"));
+        var fecha = String(moment(this.revisarFecha[i].fecha_ingreso, "YYYY/MM/DD").format("YYYY-MM-DD"));
         if (fecha === ingreso) {
           this.contador = 1;
         }

@@ -7,7 +7,7 @@ class FuncionesControlador {
     public async ConsultarFunciones(req: Request, res: Response) {
         const FUNCIONES = await pool.query(
             `
-            SELECT * FROM funciones
+            SELECT * FROM e_funciones
             `
         );
         if (FUNCIONES.rowCount > 0) {
@@ -24,19 +24,26 @@ class FuncionesControlador {
 
     public async RegistrarFunciones(req: Request, res: Response): Promise<void> {
         const { id, hora_extra, accion_personal, alimentacion, permisos } = req.body;
-        await pool.query('INSERT INTO funciones ( id, hora_extra, accion_personal, alimentacion, permisos ) ' +
-            'VALUES ($1, $2, $3, $4, $5)',
+        await pool.query(
+            `
+            INSERT INTO e_funciones (id, hora_extra, accion_personal, alimentacion, permisos)
+            VALUES ($1, $2, $3, $4, $5)
+            `
+            ,
             [id, hora_extra, accion_personal, alimentacion, permisos]);
-        res.jsonp({ message: 'Funciones Registradas' });
+        res.jsonp({ message: 'Registro guardado.' });
     }
 
     public async EditarFunciones(req: Request, res: Response) {
         const id = req.params.id;
         const { hora_extra, accion_personal, alimentacion, permisos } = req.body;
-        await pool.query('UPDATE funciones SET hora_extra = $2, accion_personal = $3, alimentacion = $4, ' +
-            'permisos = $5 WHERE id = $1 ',
-            [id, hora_extra, accion_personal, alimentacion, permisos]);
-        res.jsonp({ message: 'Funciones Actualizados' });
+        await pool.query(
+            `
+            UPDATE e_funciones SET hora_extra = $2, accion_personal = $3, alimentacion = $4, ' +
+                permisos = $5 WHERE id = $1
+            `
+            , [id, hora_extra, accion_personal, alimentacion, permisos]);
+        res.jsonp({ message: 'Registro actualizado.' });
     }
 
 }

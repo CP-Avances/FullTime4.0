@@ -14,9 +14,6 @@ class RolPermisosRutas {
     configuracion() {
         this.router.get('/', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.list);
         this.router.get('/:id', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.getOne);
-        this.router.post('/', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.create);
-        this.router.post('/denegado/', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.createPermisoDenegado);
-        this.router.get('/denegado/:id', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.getPermisosUsuario);
         // MENU ENLISTAR
         this.router.get('/menu/paginas', verificarToken_1.TokenValidation, catRolPermisosControlador_1.default.ListarMenuRoles);
         // METODO PARA BUSCAR LAS PAGINAS POR ID_ROL

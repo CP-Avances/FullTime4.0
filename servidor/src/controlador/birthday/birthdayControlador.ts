@@ -1,9 +1,9 @@
-import { Request, Response } from 'express';
 import { ObtenerRutaBirthday } from '../../libs/accesoCarpetas';
+import { Request, Response } from 'express';
+import moment from 'moment';
 import pool from '../../database';
 import path from 'path';
 import fs from 'fs';
-import moment from 'moment';
 
 class BirthdayControlador {
 
@@ -12,7 +12,7 @@ class BirthdayControlador {
         const { id_empresa } = req.params;
         const DAY = await pool.query(
             `
-            SELECT * FROM Message_birthday WHERE id_empresa = $1
+            SELECT * FROM e_message_birthday WHERE id_empresa = $1
             `
             , [id_empresa]);
         if (DAY.rowCount > 0) {
@@ -28,14 +28,16 @@ class BirthdayControlador {
         const { id_empresa, titulo, link, mensaje } = req.body;
         await pool.query(
             `
-            INSERT INTO message_birthday (id_empresa, asunto, mensaje, link) VALUES ($1, $2, $3, $4)
+            INSERT INTO e_message_birthday (id_empresa, asunto, mensaje, link) VALUES ($1, $2, $3, $4)
             `
             , [id_empresa, titulo, mensaje, link]);
+
         const oneMessage = await pool.query(
             `
             SELECT id FROM message_birthday WHERE id_empresa = $1
             `
             , [id_empresa]);
+
         const idMessageGuardado = oneMessage.rows[0].id;
         res.jsonp([{ message: 'Registro guardado.', id: idMessageGuardado }]);
     }
@@ -54,7 +56,7 @@ class BirthdayControlador {
 
         const unEmpleado = await pool.query(
             `
-            SELECT * FROM message_birthday WHERE id = $1
+            SELECT * FROM e_message_birthday WHERE id = $1
             `
             , [id]);
         if (unEmpleado.rowCount > 0) {
@@ -75,7 +77,7 @@ class BirthdayControlador {
                         });
                         await pool.query(
                             `
-                            UPDATE message_birthday SET imagen = $2 WHERE id = $1
+                            UPDATE e_message_birthday SET imagen = $2 WHERE id = $1
                             `
                             , [id, imagen]);
                         res.jsonp({ message: 'Imagen actualizada.' });
@@ -83,7 +85,7 @@ class BirthdayControlador {
                     } catch (error) {
                         await pool.query(
                             `
-                            UPDATE message_birthday SET imagen = $2 WHERE id = $1
+                            UPDATE e_message_birthday SET imagen = $2 WHERE id = $1
                             `
                             , [id, imagen]);
                         res.jsonp({ message: 'Imagen actualizada.' });
@@ -92,7 +94,7 @@ class BirthdayControlador {
                 } else {
                     await pool.query(
                         `
-                        UPDATE message_birthday SET imagen = $2 WHERE id = $1
+                        UPDATE e_message_birthday SET imagen = $2 WHERE id = $1
                         `
                         , [id, imagen]);
                     res.jsonp({ message: 'Imagen actualizada.' });
@@ -100,6 +102,7 @@ class BirthdayControlador {
             });
         }
     }
+
 
     // METODO PARA VER IMAGENES
     public async getImagen(req: Request, res: Response): Promise<any> {
@@ -120,7 +123,7 @@ class BirthdayControlador {
         const { id_mensaje } = req.params;
         await pool.query(
             `
-            UPDATE message_birthday SET asunto = $1, mensaje = $2, link = $3 WHERE id = $4
+            UPDATE e_message_birthday SET asunto = $1, mensaje = $2, link = $3 WHERE id = $4
             `
             , [titulo, mensaje, link, id_mensaje]);
         res.jsonp({ message: 'Mensaje de cumpleaños actualizado.' });

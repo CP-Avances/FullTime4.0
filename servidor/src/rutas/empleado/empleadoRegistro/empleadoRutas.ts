@@ -182,33 +182,6 @@ class EmpleadoRutas {
         this.router.post('/cargar_manual/plantillaExcel/', TokenValidation, EMPLEADO_CONTROLADOR.CargarPlantilla_Manual);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        // HABILITACIÓN Y DESHABILITACIÓN DE USUARIOS
-
-
-
-        // METODOS PARA CONTROL DE MARCACIONES DENTRO DE UNA UBICACIÓN GEOGRÁFICA 
-        this.router.post('/geolocalizacion-domicilio/:id/:codigo', TokenValidation, EMPLEADO_CONTROLADOR.IngresarGelocalizacion);
-
-        this.router.put('/geolocalizacion-trabajo/:id', TokenValidation, EMPLEADO_CONTROLADOR.ActualizarTrabajo);
-        this.router.put('/geolocalizacion-nuevo-domicilio/:id', TokenValidation, EMPLEADO_CONTROLADOR.ActualizarDomicilio);
-        this.router.put('/actualizar-geolocalizacion/:id', TokenValidation, EMPLEADO_CONTROLADOR.ActualizarGeolocalizacion);
-
     }
 
 }

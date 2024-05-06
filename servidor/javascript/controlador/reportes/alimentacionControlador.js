@@ -18,15 +18,17 @@ class AlimentacionControlador {
     ListarPlanificadosConsumidos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fec_inicio, fec_final } = req.body;
-            const DATOS = yield database_1.default.query('SELECT tc.nombre AS comida_tipo, ctc.tipo_comida AS id_comida, ' +
-                'ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, ' +
-                '(COUNT(dm.nombre) * dm.valor) AS total ' +
-                'FROM tipo_comida AS tc, cg_tipo_comidas AS ctc, detalle_menu AS dm, plan_comidas AS pc, ' +
-                'plan_comida_empleado AS pce ' +
-                'WHERE tc.id = ctc.tipo_comida AND dm.id_menu = ctc.id AND pc.id_comida = dm.id ' +
-                'AND pc.extra = false AND pce.consumido = true AND pce.id_plan_comida = pc.id AND ' +
-                'pce.fecha BETWEEN $1 AND $2 ' +
-                'GROUP BY tc.nombre, ctc.tipo_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion', [fec_inicio, fec_final]);
+            const DATOS = yield database_1.default.query(`
+            SELECT tc.nombre AS comida_tipo, ctc.id_comida AS id_comida, 
+                ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, 
+                (COUNT(dm.nombre) * dm.valor) AS total 
+            FROM e_cat_tipo_comida AS tc, ma_horario_comidas AS ctc, ma_detalle_comida AS dm, ma_detalle_plan_comida AS pc, 
+                ma_empleado_plan_comida_general AS pce 
+            WHERE tc.id = ctc.id_comida AND dm.id_horario_comida = ctc.id AND pc.id_detalle_comida = dm.id 
+                AND pc.extra = false AND pce.consumido = true AND pce.id_detalle_plan = pc.id AND 
+                pce.fecha BETWEEN $1 AND $2 
+            GROUP BY tc.nombre, ctc.id_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion
+            `, [fec_inicio, fec_final]);
             if (DATOS.rowCount > 0) {
                 return res.jsonp(DATOS.rows);
             }
@@ -38,15 +40,17 @@ class AlimentacionControlador {
     ListarSolicitadosConsumidos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fec_inicio, fec_final } = req.body;
-            const DATOS = yield database_1.default.query('SELECT tc.nombre AS comida_tipo, ctc.tipo_comida AS id_comida, ' +
-                'ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, ' +
-                '(COUNT(dm.nombre) * dm.valor) AS total ' +
-                'FROM tipo_comida AS tc, cg_tipo_comidas AS ctc, detalle_menu AS dm, solicita_comidas AS sc, ' +
-                'plan_comida_empleado AS pce ' +
-                'WHERE tc.id = ctc.tipo_comida AND dm.id_menu = ctc.id AND sc.id_comida = dm.id ' +
-                'AND sc.extra = false AND pce.consumido = true AND sc.fec_comida BETWEEN $1 AND $2 AND ' +
-                'pce.id_sol_comida = sc.id ' +
-                'GROUP BY tc.nombre, ctc.tipo_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion', [fec_inicio, fec_final]);
+            const DATOS = yield database_1.default.query(`
+            SELECT tc.nombre AS comida_tipo, ctc.id_comida AS id_comida, 
+                ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, 
+                (COUNT(dm.nombre) * dm.valor) AS total 
+            FROM e_cat_tipo_comida AS tc, ma_horario_comidas AS ctc, ma_detalle_comida AS dm, ma_solicitud_comida AS sc, 
+                ma_empleado_plan_comida_general AS pce 
+            WHERE tc.id = ctc.id_comida AND dm.id_horario_comida = ctc.id AND sc.id_detalle_comida = dm.id 
+                AND sc.extra = false AND pce.consumido = true AND sc.fecha_comida BETWEEN $1 AND $2 AND 
+                pce.id_solicitud_comida = sc.id 
+            GROUP BY tc.nombre, ctc.id_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion
+            `, [fec_inicio, fec_final]);
             if (DATOS.rowCount > 0) {
                 return res.jsonp(DATOS.rows);
             }
@@ -58,15 +62,17 @@ class AlimentacionControlador {
     ListarExtrasPlanConsumidos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fec_inicio, fec_final } = req.body;
-            const DATOS = yield database_1.default.query('SELECT tc.nombre AS comida_tipo, ctc.tipo_comida AS id_comida, ' +
-                'ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, ' +
-                '(COUNT(dm.nombre) * dm.valor) AS total ' +
-                'FROM tipo_comida AS tc, cg_tipo_comidas AS ctc, detalle_menu AS dm, plan_comidas AS pc, ' +
-                'plan_comida_empleado AS pce ' +
-                'WHERE tc.id = ctc.tipo_comida AND dm.id_menu = ctc.id AND pc.id_comida = dm.id ' +
-                'AND pc.extra = true AND pce.consumido = true AND pce.id_plan_comida = pc.id AND ' +
-                'pc.fecha BETWEEN $1 AND $2 ' +
-                'GROUP BY tc.nombre, ctc.tipo_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion', [fec_inicio, fec_final]);
+            const DATOS = yield database_1.default.query(`
+            SELECT tc.nombre AS comida_tipo, ctc.id_comida AS id_comida, 
+                ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, 
+                (COUNT(dm.nombre) * dm.valor) AS total 
+            FROM e_cat_tipo_comida AS tc, ma_horario_comidas AS ctc, ma_detalle_comida AS dm, ma_detalle_plan_comida AS pc, 
+                ma_empleado_plan_comida_general AS pce 
+            WHERE tc.id = ctc.id_comida AND dm.id_horario_comida = ctc.id AND pc.id_detalle_comida = dm.id 
+                AND pc.extra = true AND pce.consumido = true AND pce.id_detalle_plan = pc.id AND 
+                pc.fecha BETWEEN $1 AND $2 
+            GROUP BY tc.nombre, ctc.id_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion
+            `, [fec_inicio, fec_final]);
             if (DATOS.rowCount > 0) {
                 return res.jsonp(DATOS.rows);
             }
@@ -78,15 +84,17 @@ class AlimentacionControlador {
     ListarExtrasSolConsumidos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fec_inicio, fec_final } = req.body;
-            const DATOS = yield database_1.default.query('SELECT tc.nombre AS comida_tipo, ctc.tipo_comida AS id_comida, ' +
-                'ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, ' +
-                '(COUNT(dm.nombre) * dm.valor) AS total ' +
-                'FROM tipo_comida AS tc, cg_tipo_comidas AS ctc, detalle_menu AS dm, solicita_comidas AS sc, ' +
-                'plan_comida_empleado AS pce ' +
-                'WHERE tc.id = ctc.tipo_comida AND dm.id_menu = ctc.id AND sc.id_comida = dm.id ' +
-                'AND sc.extra = true AND pce.consumido = true AND sc.fec_comida BETWEEN $1 AND $2 AND ' +
-                'pce.id_sol_comida = sc.id ' +
-                'GROUP BY tc.nombre, ctc.tipo_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion', [fec_inicio, fec_final]);
+            const DATOS = yield database_1.default.query(`
+            SELECT tc.nombre AS comida_tipo, ctc.id_comida AS id_comida, 
+                ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad,
+                (COUNT(dm.nombre) * dm.valor) AS total 
+            FROM e_cat_tipo_comida AS tc, ma_horario_comidas AS ctc, ma_detalle_comida AS dm, ma_solicitud_comida AS sc, 
+                ma_empleado_plan_comida_general AS pce 
+            WHERE tc.id = ctc.id_comida AND dm.id_horario_comida = ctc.id AND sc.id_detalle_comida = dm.id 
+                AND sc.extra = true AND pce.consumido = true AND sc.fecha_comida BETWEEN $1 AND $2 AND 
+                pce.id_solicitud_comida = sc.id 
+            GROUP BY tc.nombre, ctc.id_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion
+            `, [fec_inicio, fec_final]);
             if (DATOS.rowCount > 0) {
                 return res.jsonp(DATOS.rows);
             }
@@ -98,17 +106,19 @@ class AlimentacionControlador {
     DetallarPlanificadosConsumidos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fec_inicio, fec_final } = req.body;
-            const DATOS = yield database_1.default.query('SELECT e.nombre, e.apellido, e.cedula, e.codigo, ' +
-                'tc.nombre AS comida_tipo, ctc.tipo_comida AS id_comida, ' +
-                'ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, ' +
-                '(COUNT(dm.nombre) * dm.valor) AS total ' +
-                'FROM tipo_comida AS tc, cg_tipo_comidas AS ctc, detalle_menu AS dm, plan_comidas AS pc, ' +
-                'empleados AS e, plan_comida_empleado AS pce ' +
-                'WHERE tc.id = ctc.tipo_comida AND dm.id_menu = ctc.id AND pc.id_comida = dm.id ' +
-                'AND pc.extra = false AND pce.consumido = true AND e.id = pce.id_empleado AND ' +
-                'pc.id = pce.id_plan_comida AND pc.fecha BETWEEN $1 AND $2 ' +
-                'GROUP BY tc.nombre, ctc.tipo_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion, e.nombre, ' +
-                'e.apellido, e.cedula, e.codigo ORDER BY e.apellido ASC', [fec_inicio, fec_final]);
+            const DATOS = yield database_1.default.query(`
+            SELECT e.nombre, e.apellido, e.cedula, e.codigo, 
+                tc.nombre AS comida_tipo, ctc.id_comida AS id_comida, 
+                ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, 
+                (COUNT(dm.nombre) * dm.valor) AS total 
+            FROM e_cat_tipo_comida AS tc, ma_horario_comidas AS ctc, ma_detalle_comida AS dm, ma_detalle_plan_comida AS pc, 
+                eu_empleados AS e, ma_empleado_plan_comida_general AS pce 
+            WHERE tc.id = ctc.id_comida AND dm.id_horario_comida = ctc.id AND pc.id_detalle_comida = dm.id 
+                AND pc.extra = false AND pce.consumido = true AND e.id = pce.id_empleado AND 
+                pc.id = pce.id_detalle_plan AND pc.fecha BETWEEN $1 AND $2 
+            GROUP BY tc.nombre, ctc.id_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion, e.nombre, 
+                e.apellido, e.cedula, e.codigo ORDER BY e.apellido ASC
+            `, [fec_inicio, fec_final]);
             if (DATOS.rowCount > 0) {
                 return res.jsonp(DATOS.rows);
             }
@@ -120,17 +130,20 @@ class AlimentacionControlador {
     DetallarSolicitudConsumidos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fec_inicio, fec_final } = req.body;
-            const DATOS = yield database_1.default.query('SELECT e.nombre, e.apellido, e.cedula, e.codigo, ' +
-                'tc.nombre AS comida_tipo, ctc.tipo_comida AS id_comida, ' +
-                'ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, ' +
-                '(COUNT(dm.nombre) * dm.valor) AS total ' +
-                'FROM tipo_comida AS tc, cg_tipo_comidas AS ctc, detalle_menu AS dm, solicita_comidas AS sc, ' +
-                'plan_comida_empleado AS pce, empleados AS e ' +
-                'WHERE tc.id = ctc.tipo_comida AND dm.id_menu = ctc.id AND sc.id_comida = dm.id ' +
-                'AND sc.extra = false AND pce.consumido = true AND e.id = sc.id_empleado AND ' +
-                'sc.fec_comida BETWEEN $1 AND $2  AND pce.id_sol_comida = sc.id ' +
-                'GROUP BY tc.nombre, ctc.tipo_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion, e.nombre, ' +
-                'e.apellido, e.cedula, e.codigo ORDER BY e.apellido ASC', [fec_inicio, fec_final]);
+            const DATOS = yield database_1.default.query(`
+            SELECT e.nombre, e.apellido, e.cedula, e.codigo,
+                tc.nombre AS comida_tipo, ctc.id_comida AS id_comida, 
+                ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, 
+                (COUNT(dm.nombre) * dm.valor) AS total 
+            FROM e_cat_tipo_comida AS tc, ma_horario_comidas AS ctc, ma_detalle_comida AS dm, ma_solicitud_comida AS sc, 
+                ma_empleado_plan_comida_general AS pce, eu_empleados AS e 
+            WHERE tc.id = ctc.id_comida AND dm.id_horario_comida = ctc.id AND sc.id_detalle_comida = dm.id 
+                AND sc.extra = false AND pce.consumido = true AND e.id = sc.id_empleado AND 
+                sc.fecha_comida BETWEEN $1 AND $2  AND pce.id_solicitud_comida = sc.id 
+            GROUP BY tc.nombre, ctc.id_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion, e.nombre, 
+                e.apellido, e.cedula, e.codigo 
+            ORDER BY e.apellido ASC
+            `, [fec_inicio, fec_final]);
             if (DATOS.rowCount > 0) {
                 return res.jsonp(DATOS.rows);
             }
@@ -142,17 +155,20 @@ class AlimentacionControlador {
     DetallarExtrasPlanConsumidos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fec_inicio, fec_final } = req.body;
-            const DATOS = yield database_1.default.query('SELECT e.nombre, e.apellido, e.cedula, e.codigo, ' +
-                'tc.nombre AS comida_tipo, ctc.tipo_comida AS id_comida, ' +
-                'ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, ' +
-                '(COUNT(dm.nombre) * dm.valor) AS total ' +
-                'FROM tipo_comida AS tc, cg_tipo_comidas AS ctc, detalle_menu AS dm, plan_comidas AS pc, ' +
-                'empleados AS e, plan_comida_empleado AS pce ' +
-                'WHERE tc.id = ctc.tipo_comida AND dm.id_menu = ctc.id AND pc.id_comida = dm.id ' +
-                'AND pc.extra = true AND pce.consumido = true AND e.id = pce.id_empleado AND ' +
-                'pc.id = pce.id_plan_comida AND pc.fecha BETWEEN $1 AND $2 ' +
-                'GROUP BY tc.nombre, ctc.tipo_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion, e.nombre, ' +
-                'e.apellido, e.cedula, e.codigo ORDER BY e.apellido ASC', [fec_inicio, fec_final]);
+            const DATOS = yield database_1.default.query(`
+            SELECT e.nombre, e.apellido, e.cedula, e.codigo, 
+                tc.nombre AS comida_tipo, ctc.id_comida AS id_comida, 
+                ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, 
+                (COUNT(dm.nombre) * dm.valor) AS total 
+            FROM e_cat_tipo_comida AS tc, ma_horario_comidas AS ctc, ma_detalle_comida AS dm, ma_detalle_plan_comida AS pc, 
+                eu_empleados AS e, ma_empleado_plan_comida_general AS pce 
+            WHERE tc.id = ctc.id_comida AND dm.id_horario_comida = ctc.id AND pc.id_detalle_comida = dm.id 
+                AND pc.extra = true AND pce.consumido = true AND e.id = pce.id_empleado AND 
+                pc.id = pce.id_detalle_plan AND pc.fecha BETWEEN $1 AND $2 
+            GROUP BY tc.nombre, ctc.id_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion, e.nombre, 
+                e.apellido, e.cedula, e.codigo 
+            ORDER BY e.apellido ASC
+            `, [fec_inicio, fec_final]);
             if (DATOS.rowCount > 0) {
                 return res.jsonp(DATOS.rows);
             }
@@ -164,17 +180,20 @@ class AlimentacionControlador {
     DetallarExtrasSolConsumidos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fec_inicio, fec_final } = req.body;
-            const DATOS = yield database_1.default.query('SELECT e.nombre, e.apellido, e.cedula, e.codigo, ' +
-                'tc.nombre AS comida_tipo, ctc.tipo_comida AS id_comida, ' +
-                'ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, ' +
-                '(COUNT(dm.nombre) * dm.valor) AS total ' +
-                'FROM tipo_comida AS tc, cg_tipo_comidas AS ctc, detalle_menu AS dm, solicita_comidas AS sc, ' +
-                'plan_comida_empleado AS pce, empleados AS e ' +
-                'WHERE tc.id = ctc.tipo_comida AND dm.id_menu = ctc.id AND sc.id_comida = dm.id ' +
-                'AND sc.extra = true AND pce.consumido = true AND e.id = sc.id_empleado AND ' +
-                'sc.fec_comida BETWEEN $1 AND $2  AND pce.id_sol_comida = sc.id ' +
-                'GROUP BY tc.nombre, ctc.tipo_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion, e.nombre, ' +
-                'e.apellido, e.cedula, e.codigo ORDER BY e.apellido ASC', [fec_inicio, fec_final]);
+            const DATOS = yield database_1.default.query(`
+            SELECT e.nombre, e.apellido, e.cedula, e.codigo,
+                tc.nombre AS comida_tipo, ctc.id_comida AS id_comida, 
+                ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, 
+                (COUNT(dm.nombre) * dm.valor) AS total 
+            FROM e_cat_tipo_comida AS tc, ma_horario_comidas AS ctc, ma_detalle_comida AS dm, ma_solicitud_comida AS sc, 
+                ma_empleado_plan_comida_general AS pce, eu_empleados AS e 
+            WHERE tc.id = ctc.id_comida AND dm.id_horario_comida = ctc.id AND sc.id_detalle_comida = dm.id 
+                AND sc.extra = true AND pce.consumido = true AND e.id = sc.id_empleado AND 
+                sc.fecha_comida BETWEEN $1 AND $2  AND pce.id_solicitud_comida = sc.id 
+            GROUP BY tc.nombre, ctc.id_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion, e.nombre, 
+                e.apellido, e.cedula, e.codigo 
+            ORDER BY e.apellido ASC
+            `, [fec_inicio, fec_final]);
             if (DATOS.rowCount > 0) {
                 return res.jsonp(DATOS.rows);
             }
@@ -186,15 +205,17 @@ class AlimentacionControlador {
     DetallarServiciosInvitados(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { fec_inicio, fec_final } = req.body;
-            const DATOS = yield database_1.default.query('SELECT ci.nombre_invitado, ci.apellido_invitado, ci.cedula_invitado, ' +
-                'tc.nombre AS comida_tipo, ctc.tipo_comida AS id_comida, ci.ticket, ' +
-                'ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, ' +
-                '(COUNT(dm.nombre) * dm.valor) AS total ' +
-                'FROM tipo_comida AS tc, cg_tipo_comidas AS ctc, detalle_menu AS dm, comida_invitados AS ci ' +
-                'WHERE tc.id = ctc.tipo_comida AND dm.id_menu = ctc.id AND ci.id_detalle_menu = dm.id ' +
-                'AND ci.fecha BETWEEN $1 AND $2 ' +
-                'GROUP BY tc.nombre, ctc.tipo_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion, ' +
-                'ci.nombre_invitado, ci.apellido_invitado, ci.cedula_invitado, ci.ticket', [fec_inicio, fec_final]);
+            const DATOS = yield database_1.default.query(`
+            SELECT ci.nombre_invitado, ci.apellido_invitado, ci.cedula_invitado,
+                tc.nombre AS comida_tipo, ctc.id_comida AS id_comida, ci.ticket, 
+                ctc.nombre AS menu, dm.nombre AS plato, dm.valor, dm.observacion, COUNT(dm.nombre) AS cantidad, 
+                (COUNT(dm.nombre) * dm.valor) AS total 
+            FROM e_cat_tipo_comida AS tc, ma_horario_comidas AS ctc, ma_detalle_comida AS dm, ma_invitados_comida AS ci 
+            WHERE tc.id = ctc.id_comida AND dm.id_horario_comida = ctc.id AND ci.id_detalle_comida = dm.id 
+                AND ci.fecha BETWEEN $1 AND $2 
+            GROUP BY tc.nombre, ctc.id_comida, ctc.nombre, dm.nombre, dm.valor, dm.observacion, 
+                ci.nombre_invitado, ci.apellido_invitado, ci.cedula_invitado, ci.ticket
+            `, [fec_inicio, fec_final]);
             if (DATOS.rowCount > 0) {
                 return res.jsonp(DATOS.rows);
             }
@@ -260,12 +281,15 @@ exports.ALIMENTACION_CONTROLADOR = new AlimentacionControlador();
 exports.default = exports.ALIMENTACION_CONTROLADOR;
 const BuscarAlimentacion = function (fec_inicio, fec_final, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield database_1.default.query('SELECT CAST(fec_horario AS VARCHAR), CAST(fec_hora_horario AS VARCHAR), CAST(fec_hora_timbre AS VARCHAR), ' +
-            'codigo, estado_timbre, tipo_entr_salida AS accion, min_alimentacion ' +
-            'FROM plan_general WHERE CAST(fec_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' ' +
-            'AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 ' +
-            'AND tipo_entr_salida IN (\'I/A\', \'F/A\') ' +
-            'ORDER BY codigo, fec_hora_horario ASC', [fec_inicio, fec_final, codigo])
+        return yield database_1.default.query(`
+        SELECT CAST(fecha_horario AS VARCHAR), CAST(fecha_hora_horario AS VARCHAR), CAST(fecha_hora_timbre AS VARCHAR),
+            codigo, estado_timbre, tipo_accion AS accion, minutos_alimentacion 
+        FROM eu_asistencia_general 
+        WHERE CAST(fecha_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' 
+            AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 
+            AND tipo_accion IN (\'I/A\', \'F/A\') 
+        ORDER BY codigo, fecha_hora_horario ASC
+        `, [fec_inicio, fec_final, codigo])
             .then(res => {
             return res.rows;
         });

@@ -14,17 +14,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NIVEL_TITULO_CONTROLADOR = void 0;
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
-const database_1 = __importDefault(require("../../database"));
 const xlsx_1 = __importDefault(require("xlsx"));
-const fs_1 = __importDefault(require("fs"));
+const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
-const builder = require('xmlbuilder');
+const fs_1 = __importDefault(require("fs"));
 class NivelTituloControlador {
     // METODO PARA LISTAR NIVELES DE TITULO PROFESIONAL
     ListarNivel(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const titulo = yield database_1.default.query(`
-      SELECT * FROM nivel_titulo ORDER BY nombre ASC
+      SELECT * FROM et_cat_nivel_titulo ORDER BY nombre ASC
       `);
             if (titulo.rowCount > 0) {
                 return res.jsonp(titulo.rows);
@@ -40,7 +39,7 @@ class NivelTituloControlador {
             try {
                 const id = req.params.id;
                 yield database_1.default.query(`
-        DELETE FROM nivel_titulo WHERE id = $1
+        DELETE FROM et_cat_nivel_titulo WHERE id = $1
         `, [id]);
                 res.jsonp({ message: 'Registro eliminado.' });
             }
@@ -55,7 +54,7 @@ class NivelTituloControlador {
             const { nombre } = req.body;
             console.log('nombre ingresado: ', nombre);
             const response = yield database_1.default.query(`
-      INSERT INTO nivel_titulo (nombre) VALUES ($1) RETURNING *
+      INSERT INTO et_cat_nivel_titulo (nombre) VALUES ($1) RETURNING *
       `, [nombre]);
             const [nivel] = response.rows;
             if (nivel) {
@@ -71,7 +70,7 @@ class NivelTituloControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre, id } = req.body;
             yield database_1.default.query(`
-      UPDATE nivel_titulo SET nombre = $1 WHERE id = $2
+      UPDATE et_cat_nivel_titulo SET nombre = $1 WHERE id = $2
       `, [nombre, id]);
             res.jsonp({ message: 'Registro actualizado.' });
         });
@@ -81,25 +80,27 @@ class NivelTituloControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre } = req.params;
             const unNivelTitulo = yield database_1.default.query(`
-      SELECT * FROM nivel_titulo WHERE nombre = $1
+      SELECT * FROM et_cat_nivel_titulo WHERE nombre = $1
       `, [nombre]);
             if (unNivelTitulo.rowCount > 0) {
                 return res.jsonp(unNivelTitulo.rows);
             }
             else {
-                res.status(404).jsonp({ text: 'Registro no encontrado' });
+                res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
         });
     }
     getOne(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            const unNivelTitulo = yield database_1.default.query('SELECT * FROM nivel_titulo WHERE id = $1', [id]);
+            const unNivelTitulo = yield database_1.default.query(`
+      SELECT * FROM et_cat_nivel_titulo WHERE id = $1
+      `, [id]);
             if (unNivelTitulo.rowCount > 0) {
                 return res.jsonp(unNivelTitulo.rows);
             }
             else {
-                res.status(404).jsonp({ text: 'Registro no encontrado' });
+                res.status(404).jsonp({ text: 'Registro no encontrado.' });
             }
         });
     }
@@ -129,7 +130,9 @@ class NivelTituloControlador {
                 if ((data.fila != undefined && data.fila != '') &&
                     (data.nombre != undefined && data.nombre != '' && data.nombre != null)) {
                     //Validar primero que exista la ciudad en la tabla ciudades
-                    const existe_nivelProfecional = yield database_1.default.query('SELECT nombre FROM nivel_titulo WHERE UPPER(nombre) = UPPER($1)', [data.nombre]);
+                    const existe_nivelProfecional = yield database_1.default.query(`
+          SELECT nombre FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
+          `, [data.nombre]);
                     if (existe_nivelProfecional.rowCount == 0) {
                         data.fila = item;
                         data.nombre = nombre;

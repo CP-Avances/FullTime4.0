@@ -306,7 +306,7 @@ export class ComunicadosComponent implements OnInit {
                 id_depa: obj.id_depa,
                 id_cargo_: obj.id_cargo_, // TIPO DE CARGO
                 comunicado_mail: obj.comunicado_mail,
-                comunicado_noti: obj.comunicado_noti
+                comunicado_noti: obj.comunicado_notificacion
               }
               this.empleados.push(elemento)
             })

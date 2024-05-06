@@ -1,11 +1,10 @@
 import { ImagenBase64LogosEmpresas } from '../../libs/ImagenCodificacion';
 import { Request, Response } from 'express';
 import { ObtenerRutaLogos } from '../../libs/accesoCarpetas';
+import moment from 'moment';
 import path from 'path';
 import pool from '../../database';
-import moment from 'moment';
 import fs from 'fs';
-const builder = require('xmlbuilder');
 
 class EmpresaControlador {
 
@@ -13,7 +12,7 @@ class EmpresaControlador {
     public async BuscarCadena(req: Request, res: Response) {
         const EMPRESA = await pool.query(
             `
-            SELECT cadena FROM cg_empresa
+            SELECT cadena FROM e_empresa
             `
         );
         if (EMPRESA.rowCount > 0) {
@@ -29,7 +28,7 @@ class EmpresaControlador {
 
         const file_name = await pool.query(
             `
-            SELECT nombre, logo FROM cg_empresa WHERE id = $1
+            SELECT nombre, logo FROM e_empresa WHERE id = $1
             `
             , [req.params.id_empresa])
             .then((result: any) => {
@@ -68,7 +67,7 @@ class EmpresaControlador {
         // CONSULTAR SI EXISTE UNA IMAGEN
         const logo_name = await pool.query(
             `
-            SELECT nombre, logo FROM cg_empresa WHERE id = $1
+            SELECT nombre, logo FROM e_empresa WHERE id = $1
             `
             , [id]);
 
@@ -93,7 +92,7 @@ class EmpresaControlador {
                         // ACTUALIZAR REGISTRO DE IMAGEN
                         await pool.query(
                             `
-                            UPDATE cg_empresa SET logo = $2 WHERE id = $1
+                            UPDATE e_empresa SET logo = $2 WHERE id = $1
                             `
                             , [id, logo]);
                     }
@@ -101,7 +100,7 @@ class EmpresaControlador {
                     // ACTUALIZAR REGISTRO DE IMAGEN SI ESTA NO CONSTA EN EL SERVIDOR
                     await pool.query(
                         `
-                            UPDATE cg_empresa SET logo = $2 WHERE id = $1
+                            UPDATE e_empresa SET logo = $2 WHERE id = $1
                             `
                         , [id, logo]);
                 }
@@ -109,7 +108,7 @@ class EmpresaControlador {
                 // SI NO EXISTE UNA IMAGEN SE REGISTRA EN LA BASE DE DATOS Y EL SERVIDOR
                 await pool.query(
                     `
-                        UPDATE cg_empresa SET logo = $2 WHERE id = $1
+                        UPDATE e_empresa SET logo = $2 WHERE id = $1
                         `
                     , [id, logo]);
             }
@@ -117,7 +116,7 @@ class EmpresaControlador {
 
         // LEER DATOS DE IMAGEN
         const codificado = await ImagenBase64LogosEmpresas(logo);
-        res.send({ imagen: codificado, nom_empresa: logo_name.rows[0].nombre, message: 'Logo actualizado' })
+        res.send({ imagen: codificado, nom_empresa: logo_name.rows[0].nombre, message: 'Logo actualizado.' })
     }
 
     // METODO PARA BUSCAR DATOS GENERALES DE EMPRESA
@@ -125,7 +124,7 @@ class EmpresaControlador {
         const { id } = req.params;
         const EMPRESA = await pool.query(
             `
-            SELECT * FROM cg_empresa WHERE id = $1
+            SELECT * FROM e_empresa WHERE id = $1
             `
             , [id]);
         if (EMPRESA.rowCount > 0) {
@@ -142,9 +141,9 @@ class EmpresaControlador {
             establecimiento, dias_cambio, cambios, num_partida, id } = req.body;
         await pool.query(
             `
-            UPDATE cg_empresa SET nombre = $1, ruc = $2, direccion = $3, telefono = $4, correo_empresa = $5,
-            tipo_empresa = $6, representante = $7, establecimiento = $8, dias_cambio = $9, cambios = $10, 
-            numero_partida = $11 WHERE id = $12
+            UPDATE e_empresa SET nombre = $1, ruc = $2, direccion = $3, telefono = $4, correo_empresa = $5,
+                tipo_empresa = $6, representante = $7, establecimiento = $8, dias_cambio = $9, cambios = $10, 
+                numero_partida = $11 WHERE id = $12
             `
             , [nombre, ruc, direccion, telefono, correo_empresa, tipo_empresa, representante, establecimiento,
                 dias_cambio, cambios, num_partida, id]);
@@ -156,7 +155,7 @@ class EmpresaControlador {
         const { color_p, color_s, id } = req.body;
         await pool.query(
             `
-            UPDATE cg_empresa SET color_principal = $1, color_secundario = $2 WHERE id = $3
+            UPDATE e_empresa SET color_principal = $1, color_secundario = $2 WHERE id = $3
             `
             , [color_p, color_s, id]);
         res.jsonp({ message: 'Registro actualizado.' });
@@ -167,7 +166,7 @@ class EmpresaControlador {
         const { marca_agua, id } = req.body;
         await pool.query(
             `
-            UPDATE cg_empresa SET marca_agua = $1 WHERE id = $2
+            UPDATE e_empresa SET marca_agua = $1 WHERE id = $2
             `
             , [marca_agua, id]);
         res.jsonp({ message: 'Registro actualizado.' });
@@ -178,7 +177,7 @@ class EmpresaControlador {
         const { seg_contrasena, seg_frase, seg_ninguna, id } = req.body;
         await pool.query(
             `
-            UPDATE cg_empresa SET seguridad_contrasena = $1, seguridad_frase = $2, seguridad_ninguna = $3
+            UPDATE e_empresa SET seguridad_contrasena = $1, seguridad_frase = $2, seguridad_ninguna = $3
             WHERE id = $4
             `
             , [seg_contrasena, seg_frase, seg_ninguna, id]);
@@ -201,7 +200,7 @@ class EmpresaControlador {
 
         const logo_name = await pool.query(
             `
-            SELECT cabecera_firma FROM cg_empresa WHERE id = $1
+            SELECT cabecera_firma FROM e_empresa WHERE id = $1
             `
             , [id]);
 
@@ -227,21 +226,21 @@ class EmpresaControlador {
                         // ACTUALIZAR REGISTRO DE IMAGEN
                         await pool.query(
                             `
-                            UPDATE cg_empresa SET cabecera_firma = $2 WHERE id = $1
+                            UPDATE e_empresa SET cabecera_firma = $2 WHERE id = $1
                             `
                             , [id, logo]);
                     }
                 } catch (error) {
                     await pool.query(
                         `
-                        UPDATE cg_empresa SET cabecera_firma = $2 WHERE id = $1
+                        UPDATE e_empresa SET cabecera_firma = $2 WHERE id = $1
                         `
                         , [id, logo]);
                 }
             } else {
                 await pool.query(
                     `
-                    UPDATE cg_empresa SET cabecera_firma = $2 WHERE id = $1
+                    UPDATE e_empresa SET cabecera_firma = $2 WHERE id = $1
                     `
                     , [id, logo]);
             }
@@ -257,7 +256,7 @@ class EmpresaControlador {
         const file_name =
             await pool.query(
                 `
-                SELECT cabecera_firma FROM cg_empresa WHERE id = $1
+                SELECT cabecera_firma FROM e_empresa WHERE id = $1
                 `
                 , [req.params.id_empresa])
                 .then((result: any) => {
@@ -287,7 +286,7 @@ class EmpresaControlador {
 
         const logo_name = await pool.query(
             `
-            SELECT pie_firma FROM cg_empresa WHERE id = $1
+            SELECT pie_firma FROM e_empresa WHERE id = $1
             `
             , [id]);
 
@@ -312,21 +311,21 @@ class EmpresaControlador {
                         // ACTUALIZAR REGISTRO DE IMAGEN
                         await pool.query(
                             `
-                            UPDATE cg_empresa SET pie_firma = $2 WHERE id = $1
+                            UPDATE e_empresa SET pie_firma = $2 WHERE id = $1
                             `
                             , [id, logo]);
                     }
                 } catch (error) {
                     await pool.query(
                         `
-                        UPDATE cg_empresa SET pie_firma = $2 WHERE id = $1
+                        UPDATE e_empresa SET pie_firma = $2 WHERE id = $1
                         `
                         , [id, logo]);
                 }
             } else {
                 await pool.query(
                     `
-                    UPDATE cg_empresa SET pie_firma = $2 WHERE id = $1
+                    UPDATE e_empresa SET pie_firma = $2 WHERE id = $1
                     `
                     , [id, logo]);
             }
@@ -341,7 +340,7 @@ class EmpresaControlador {
         const file_name =
             await pool.query(
                 `
-                SELECT pie_firma FROM cg_empresa WHERE id = $1
+                SELECT pie_firma FROM e_empresa WHERE id = $1
                 `
                 , [req.params.id_empresa])
                 .then((result: any) => {
@@ -362,7 +361,7 @@ class EmpresaControlador {
 
         await pool.query(
             `
-            UPDATE cg_empresa SET correo = $1, password_correo = $2, servidor = $3, puerto = $4
+            UPDATE e_empresa SET correo = $1, password_correo = $2, servidor = $3, puerto = $4
             WHERE id = $5
             `
             , [correo, password_correo, servidor, puerto, id]);
@@ -375,7 +374,7 @@ class EmpresaControlador {
             const { id, bool_acciones } = req.body;
             await pool.query(
                 `
-                UPDATE cg_empresa SET acciones_timbres = $1 WHERE id = $2
+                UPDATE e_empresa SET acciones_timbres = $1 WHERE id = $2
                 `
                 , [bool_acciones, id]);
             res.status(200).jsonp({
@@ -390,9 +389,9 @@ class EmpresaControlador {
     public async ListarEmpresa(req: Request, res: Response) {
         const EMPRESA = await pool.query(
             `
-            SELECT id, nombre, ruc, direccion, telefono, correo,
-            representante, tipo_empresa, establecimiento, logo, color_principal, color_secundario, numero_partida, marca_agua,
-            correo_empresa FROM cg_empresa ORDER BY nombre ASC
+            SELECT id, nombre, ruc, direccion, telefono, correo, representante, tipo_empresa, establecimiento, logo, 
+                color_principal, color_secundario, numero_partida, marca_agua, correo_empresa 
+            FROM e_empresa ORDER BY nombre ASC
             `
         );
         if (EMPRESA.rowCount > 0) {

@@ -35,7 +35,7 @@ const ListarDocumentos = function (nombre_carpeta) {
         let Lista_Archivos = fs_1.default.readdirSync(ruta);
         // CONSULTA DE BUSQUEDA DE DOCUMENTOS
         let documentos = yield database_1.default.query(`
-        SELECT * FROM documentacion ORDER BY id
+        SELECT * FROM e_documentacion ORDER BY id
         `).then(result => { return result.rows; });
         if (documentos.length != 0) {
             documentos.forEach((doc) => {
@@ -102,7 +102,7 @@ const ListarHorarios = function (nombre_carpeta) {
         let Lista_Archivos = fs_1.default.readdirSync(ruta);
         // CONSULTA DE BUSQUEDA DE DOCUMENTOS
         let documentos = yield database_1.default.query(`
-        SELECT * FROM cg_horarios WHERE documento NOTNULL ORDER BY id
+        SELECT * FROM eh_cat_horarios WHERE documento NOTNULL ORDER BY id
         `).then(result => { return result.rows; });
         if (documentos.length != 0) {
             documentos.forEach((doc) => {
@@ -141,7 +141,7 @@ const VerCarpeta = function () {
         let carpeta = 'casa_pazmino';
         // CONSULTA DE BUSQUEDA DE DOCUMENTOS
         let documentos = yield database_1.default.query(`
-         SELECT * FROM documentacion ORDER BY id
+         SELECT * FROM e_documentacion ORDER BY id
          `).then(result => { return result.rows; });
         if (documentos.length != 0) {
             documentos.forEach((doc) => {

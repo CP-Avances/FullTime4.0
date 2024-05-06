@@ -1,13 +1,10 @@
+import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-
-import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
-
-import pool from '../../database';
 import excel from 'xlsx';
-import fs from 'fs';
+import pool from '../../database';
 import path from 'path';
-const builder = require('xmlbuilder');
+import fs from 'fs';
 
 class NivelTituloControlador {
 
@@ -15,7 +12,7 @@ class NivelTituloControlador {
   public async ListarNivel(req: Request, res: Response) {
     const titulo = await pool.query(
       `
-      SELECT * FROM nivel_titulo ORDER BY nombre ASC
+      SELECT * FROM et_cat_nivel_titulo ORDER BY nombre ASC
       `
     );
     if (titulo.rowCount > 0) {
@@ -34,12 +31,12 @@ class NivelTituloControlador {
       const id = req.params.id;
       await pool.query(
         `
-        DELETE FROM nivel_titulo WHERE id = $1
+        DELETE FROM et_cat_nivel_titulo WHERE id = $1
         `
         , [id]);
       res.jsonp({ message: 'Registro eliminado.' });
 
-    } catch(error){
+    } catch (error) {
       return res.jsonp({ message: 'error' });
 
     }
@@ -54,7 +51,7 @@ class NivelTituloControlador {
 
     const response: QueryResult = await pool.query(
       `
-      INSERT INTO nivel_titulo (nombre) VALUES ($1) RETURNING *
+      INSERT INTO et_cat_nivel_titulo (nombre) VALUES ($1) RETURNING *
       `
       , [nombre]);
 
@@ -73,7 +70,7 @@ class NivelTituloControlador {
     const { nombre, id } = req.body;
     await pool.query(
       `
-      UPDATE nivel_titulo SET nombre = $1 WHERE id = $2
+      UPDATE et_cat_nivel_titulo SET nombre = $1 WHERE id = $2
       `
       , [nombre, id]);
     res.jsonp({ message: 'Registro actualizado.' });
@@ -84,7 +81,7 @@ class NivelTituloControlador {
     const { nombre } = req.params;
     const unNivelTitulo = await pool.query(
       `
-      SELECT * FROM nivel_titulo WHERE nombre = $1
+      SELECT * FROM et_cat_nivel_titulo WHERE nombre = $1
       `
       , [nombre]);
 
@@ -92,7 +89,7 @@ class NivelTituloControlador {
       return res.jsonp(unNivelTitulo.rows)
     }
     else {
-      res.status(404).jsonp({ text: 'Registro no encontrado' });
+      res.status(404).jsonp({ text: 'Registro no encontrado.' });
     }
   }
 
@@ -106,12 +103,16 @@ class NivelTituloControlador {
 
   public async getOne(req: Request, res: Response): Promise<any> {
     const { id } = req.params;
-    const unNivelTitulo = await pool.query('SELECT * FROM nivel_titulo WHERE id = $1', [id]);
+    const unNivelTitulo = await pool.query(
+      `
+      SELECT * FROM et_cat_nivel_titulo WHERE id = $1
+      `
+      , [id]);
     if (unNivelTitulo.rowCount > 0) {
       return res.jsonp(unNivelTitulo.rows)
     }
     else {
-      res.status(404).jsonp({ text: 'Registro no encontrado' });
+      res.status(404).jsonp({ text: 'Registro no encontrado.' });
     }
 
   }
@@ -146,7 +147,11 @@ class NivelTituloControlador {
       if ((data.fila != undefined && data.fila != '') &&
         (data.nombre != undefined && data.nombre != '' && data.nombre != null)) {
         //Validar primero que exista la ciudad en la tabla ciudades
-        const existe_nivelProfecional = await pool.query('SELECT nombre FROM nivel_titulo WHERE UPPER(nombre) = UPPER($1)', [data.nombre]);
+        const existe_nivelProfecional = await pool.query(
+          `
+          SELECT nombre FROM et_cat_nivel_titulo WHERE UPPER(nombre) = UPPER($1)
+          `
+          , [data.nombre]);
         if (existe_nivelProfecional.rowCount == 0) {
           data.fila = item
           data.nombre = nombre;

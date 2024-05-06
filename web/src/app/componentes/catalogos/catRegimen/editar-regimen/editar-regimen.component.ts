@@ -50,13 +50,8 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
   periodoUnoF = new FormControl('');
   periodoDosF = new FormControl('');
   diasLibresF = new FormControl('');
-  licenciasF = new FormControl(false);
-  permisosF = new FormControl(false);
-  feriadosF = new FormControl(false);
   periodosF = new FormControl(false);
   acumularF = new FormControl(false);
-  libresF = new FormControl(false);
-  faltasF = new FormControl(false);
 
   // TERCER FORMULARIO
   vacaciones_cuatroF = new FormControl('');
@@ -134,13 +129,8 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
       periodoUnoForm: this.periodoUnoF,
       periodoDosForm: this.periodoDosF,
       diasLibresForm: this.diasLibresF,
-      licenciasForm: this.licenciasF,
-      permisosForm: this.permisosF,
-      feriadosForm: this.feriadosF,
       periodosForm: this.periodosF,
       acumularForm: this.acumularF,
-      libresForm: this.libresF,
-      faltasForm: this.faltasF,
     });
 
     this.tercerFormulario = this.formulario.group({
@@ -334,17 +324,12 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
     this.validar_dias = false;
     this.correcto_dias = true;
     this.escritura_dias = true;
-    // CONTABILIZA EN SOLICITUDES
-    this.feriadosF.setValue(this.data.contar_feriados);
-    this.libresF.setValue(this.data.contar_dias_libres);
-    this.faltasF.setValue(this.data.contar_faltas);
-    this.licenciasF.setValue(this.data.contar_licencias);
-    this.permisosF.setValue(this.data.contar_permiso);
+
     // ACUMULACION DE VACACIONES
     if (this.data.acumular === true) {
       this.acumular = true;
       this.acumularF.setValue(this.data.acumular);
-      this.diasAcumulacionF.setValue(this.data.dias_max_acumulacion);
+      this.diasAcumulacionF.setValue(this.data.dias_maximo_acumulacion);
     }
     // PERIODOS DE VACACIONES
     if (this.data.vacacion_divisible === true) {
@@ -1411,11 +1396,6 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
         vacacion_dias_calendario: parseFloat(form2.diasCalendarioForm),
         acumular: form2.acumularForm,
         dias_max_acumulacion: 0,
-        contar_feriados: form2.feriadosForm,
-        contar_dias_libres: form2.libresForm,
-        contar_licencias: form2.licenciasForm,
-        contar_faltas: form2.faltasForm,
-        contar_permiso: form2.permisosForm,
         vacacion_divisible: form2.periodosForm,
 
         antiguedad: form3.antiguedadActivaForm,
@@ -1458,7 +1438,7 @@ export class EditarRegimenComponent implements AfterViewInit, OnInit, AfterConte
       regimen.vacacion_dias_calendario = 0;
     }
     if (regimen.acumular === true) {
-      regimen.dias_max_acumulacion = parseFloat(form2.diasAcumulacionForm);
+      regimen.dias_maximo_acumulacion = parseFloat(form2.diasAcumulacionForm);
     }
 
     if (this.fija === true) {

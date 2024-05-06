@@ -53,7 +53,7 @@ class LoginControlador {
         let ACTIVO = await pool.query(
           `
           SELECT e.estado AS empleado, u.estado AS usuario, e.codigo, e.web_access 
-          FROM empleados AS e, usuarios AS u WHERE e.id = u.id_empleado AND u.id = $1
+          FROM eu_empleados AS e, eu_usuarios AS u WHERE e.id = u.id_empleado AND u.id = $1
           `
           , [USUARIO.rows[0].id])
           .then((result: any) => {
@@ -74,14 +74,14 @@ class LoginControlador {
         // BUSQUEDA DE MODULOS DEL SISTEMA
         const [modulos] = await pool.query(
           `
-          SELECT * FROM funciones LIMIT 1
+          SELECT * FROM e_funciones LIMIT 1
           `
         ).then((result: any) => { return result.rows; })
 
         // BUSQUEDA DE CLAVE DE LICENCIA
         const EMPRESA = await pool.query(
           `
-          SELECT public_key, id AS id_empresa FROM cg_empresa
+          SELECT public_key, id AS id_empresa FROM e_empresa
           `
         );
 
@@ -111,18 +111,19 @@ class LoginControlador {
         // BUSQUEDA DE INFORMACION
         const INFORMACION = await pool.query(
           `
-              SELECT e.id as id_contrato, c.hora_trabaja, c.id_departamento, c.id_sucursal, s.id_empresa, 
-                c.id AS id_cargo, cg_e.acciones_timbres, cg_e.public_key, 
-                (SELECT id FROM peri_vacaciones pv WHERE pv.codigo = empl.codigo 
-                  ORDER BY pv.fec_inicio DESC LIMIT 1 ) as id_peri_vacacion, 
-                (SELECT nombre FROM cg_departamentos cd WHERE cd.id = c.id_departamento ) AS ndepartamento 
-              FROM empl_contratos AS e, empl_cargos AS c, sucursales AS s, cg_empresa AS cg_e, 
-                empleados AS empl 
-              WHERE e.id_empleado = $1 AND e.id_empleado = empl.id AND 
-                (SELECT id_contrato FROM datos_actuales_empleado WHERE id = e.id_empleado) = e.id AND 
-                (SELECT id_cargo FROM datos_actuales_empleado WHERE id = e.id_empleado) = c.id AND 
-                c.id_sucursal = s.id AND s.id_empresa = cg_e.id ORDER BY c.fec_inicio DESC LIMIT 1
-            `
+          SELECT e.id as id_contrato, c.hora_trabaja, c.id_departamento, c.id_sucursal, s.id_empresa, 
+            c.id AS id_cargo, cg_e.acciones_timbres, cg_e.public_key, 
+            (SELECT id FROM mv_periodo_vacacion pv WHERE pv.codigo = empl.codigo 
+            ORDER BY pv.fecha_inicio DESC LIMIT 1 ) as id_peri_vacacion, 
+            (SELECT nombre FROM ed_departamentos cd WHERE cd.id = c.id_departamento ) AS ndepartamento 
+          FROM eu_empleado_contratos AS e, eu_empleado_cargos AS c, e_sucursales AS s, e_empresa AS cg_e, 
+            eu_empleados AS empl 
+          WHERE e.id_empleado = $1 AND e.id_empleado = empl.id AND 
+            (SELECT id_contrato FROM datos_actuales_empleado WHERE id = e.id_empleado) = e.id AND 
+            (SELECT id_cargo FROM datos_actuales_empleado WHERE id = e.id_empleado) = c.id AND 
+            c.id_sucursal = s.id AND s.id_empresa = cg_e.id 
+          ORDER BY c.fecha_inicio DESC LIMIT 1
+          `
           , [USUARIO.rows[0].id_empleado]);
 
         // VALIDACION DE ACCESO CON LICENCIA 
@@ -135,8 +136,8 @@ class LoginControlador {
 
             const AUTORIZA = await pool.query(
               `
-              SELECT estado FROM depa_autorizaciones
-              WHERE id_empl_cargo = $1 AND id_departamento = $2
+              SELECT estado FROM ed_autoriza_departamento
+              WHERE id_empleado_cargo = $1 AND id_departamento = $2
               `
               , [id_cargo, id_departamento])
 
@@ -218,8 +219,8 @@ class LoginControlador {
     const correoValido = await pool.query(
       `
       SELECT e.id, e.nombre, e.apellido, e.correo, u.usuario, u.contrasena 
-      FROM empleados AS e, usuarios AS u 
-      WHERE E.correo = $1 AND u.id_empleado = e.id
+      FROM eu_empleados AS e, eu_usuarios AS u 
+      WHERE e.correo = $1 AND u.id_empleado = e.id
       `
       , [correo]);
 
@@ -238,36 +239,38 @@ class LoginControlador {
         to: correoValido.rows[0].correo,
         from: email,
         subject: 'FULLTIME CAMBIO DE CONTRASEÑA',
-        html: `
-                <body>
-                    <div style="text-align: center;">
-                        <img width="25%" height="25%" src="cid:cabeceraf"/>
-                    </div>
-                    <br>
-                    <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                        El presente correo es para informar que se ha enviado un link para cambiar su contraseña. <br>  
-                    </p>
-                    <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
-                    <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                        <b>Empresa:</b> ${nombre} <br>   
-                        <b>Asunto:</b> CAMBIAR CONTRASEÑA DE ACCESO <br> 
-                        <b>Colaborador que envía:</b> ${correoValido.rows[0].nombre} ${correoValido.rows[0].apellido} <br>
-                        <b>Generado mediante:</b> Aplicación Web <br>
-                        <b>Fecha de envío:</b> ${fecha} <br> 
-                        <b>Hora de envío:</b> ${hora} <br><br> 
-                    </p>
-                    <h3 style="font-family: Arial; text-align: center;">CAMBIAR CONTRASEÑA DE USUARIO</h3>
-                        <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                            <b>Ingrese al siguiente link y registre una nueva contraseña.</b> <br>   
-                            <a href="${url}/${token}">${url}/${token}</a>  
-                        </p>
-                        <p style="font-family: Arial; font-size:12px; line-height: 1em;">
-                            <b>Gracias por la atención</b><br>
-                            <b>Saludos cordiales,</b> <br><br>
-                        </p>
-                        <img src="cid:pief" width="50%" height="50%"/>
-                </body>
-            `,
+        html:
+          `
+          <body>
+            <div style="text-align: center;">
+               <img width="25%" height="25%" src="cid:cabeceraf"/>
+            </div>
+            <br>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              El presente correo es para informar que se ha enviado un link para cambiar su contraseña. <br>  
+            </p>
+            <h3 style="font-family: Arial; text-align: center;">DATOS DEL SOLICITANTE</h3>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Empresa:</b> ${nombre} <br>   
+              <b>Asunto:</b> CAMBIAR CONTRASEÑA DE ACCESO <br> 
+              <b>Colaborador que envía:</b> ${correoValido.rows[0].nombre} ${correoValido.rows[0].apellido} <br>
+              <b>Generado mediante:</b> Aplicación Web <br>
+              <b>Fecha de envío:</b> ${fecha} <br> 
+              <b>Hora de envío:</b> ${hora} <br><br> 
+            </p>
+              <h3 style="font-family: Arial; text-align: center;">CAMBIAR CONTRASEÑA DE USUARIO</h3>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Ingrese al siguiente link y registre una nueva contraseña.</b> <br>   
+              <a href="${url}/${token}">${url}/${token}</a>  
+            </p>
+            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Gracias por la atención</b><br>
+              <b>Saludos cordiales,</b> <br><br>
+            </p>
+            <img src="cid:pief" width="50%" height="50%"/>
+          </body>
+          `
+        ,
         attachments: [
           {
             filename: 'cabecera_firma.jpg',
@@ -309,7 +312,7 @@ class LoginControlador {
       const id_empleado = payload._id;
       await pool.query(
         `
-        UPDATE usuarios SET contrasena = $2 WHERE id_empleado = $1
+        UPDATE eu_usuarios SET contrasena = $2 WHERE id_empleado = $1
         `
         , [id_empleado, contrasena]);
       return res.jsonp({
@@ -336,8 +339,8 @@ class LoginControlador {
   // PRUEBA AUDITAR
   public async Auditar(req: Request, res: Response): Promise<void> {
     const { esquema, tabla, user, ip, old_data, new_data, accion } = req.body;
-    await pool.query(' INSERT INTO audit.auditoria (schema_name, table_name, user_name, action, ' +
-      'original_data, new_data, ip) ' +
+    await pool.query(' INSERT INTO audit.auditoria (plataforma, table_name, user_name, action, ' +
+      'original_data, new_data, ip_address) ' +
       'VALUES ($1, $2, $3, substring($7,1,1), $4, $5, $6)',
       [esquema, tabla, user, old_data, new_data, ip, accion]);
     console.log('req auditar', req.body);

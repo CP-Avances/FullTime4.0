@@ -50,7 +50,7 @@ class ReportesVacunasControlador {
                 return suc;
             }).filter((suc) => { return suc.regimenes.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No se ha encontrado registro de vacunas.' });
+                return res.status(400).jsonp({ message: 'No se ha encontrado registros.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -72,7 +72,7 @@ class ReportesVacunasControlador {
                 return obj;
             }).filter(obj => { return obj.empleados.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No se ha encontrado registro de vacunas.' });
+                return res.status(400).jsonp({ message: 'No se ha encontrado registros.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -83,8 +83,8 @@ const BuscarVacunas = function (id) {
         return yield database_1.default.query(`
         SELECT ev.id, ev.id_empleado, tv.nombre AS tipo_vacuna, 
             ev.carnet, ev.fecha, ev.descripcion
-        FROM empl_vacunas AS ev, tipo_vacuna AS tv 
-        WHERE ev.id_tipo_vacuna = tv.id
+        FROM eu_empleado_vacunas AS ev, e_cat_vacuna AS tv 
+        WHERE ev.id_vacuna = tv.id
             AND ev.id_empleado = $1 
         ORDER BY ev.id DESC
         `, [id])

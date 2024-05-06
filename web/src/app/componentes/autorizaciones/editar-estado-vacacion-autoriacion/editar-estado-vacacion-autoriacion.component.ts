@@ -132,8 +132,8 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
         }
         this.solInfo = [];
         this.solInfo = {
-          vaca_mail: res.vaca_mail,
-          vaca_noti: res.vaca_noti,
+          vaca_mail: res.vacacion_mail,
+          vaca_noti: res.vacacion_notificacion,
           empleado: res.id_empleado,
           id_dep: res.id_departamento,
           id_suc: res.id_sucursal,
@@ -149,7 +149,7 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
   // METODO DE APROBACION DE SOLICITUD DE VACACIONES
   ActualizarEstadoAprobacion(form: any) {
     let aprobacion = {
-      id_documento: this.data.auto.id_documento + localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
+      id_documento: this.data.auto.id_autoriza_estado + localStorage.getItem('empleado') as string + '_' + form.estadoF + ',',
       estado: form.estadoF,
     }
 
@@ -215,7 +215,7 @@ export class EditarEstadoVacacionAutoriacionComponent implements OnInit {
     this.restA.getUnaAutorizacionByVacacionRest(this.data.vacacion.id).subscribe(res1 => {
       this.autorizacion = res1;
       // METODO PARA OBTENER EMPLEADOS Y ESTADOS
-      var autorizaciones = this.autorizacion[0].id_documento.split(',');
+      var autorizaciones = this.autorizacion[0].id_autoriza_estado.split(',');
       autorizaciones.map((obj: string) => {
         this.lectura = this.lectura + 1;
         if (obj != '') {

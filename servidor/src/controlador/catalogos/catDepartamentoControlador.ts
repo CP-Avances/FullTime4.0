@@ -1,12 +1,10 @@
-import { Request, Response } from 'express';
 import { ObtenerRutaLeerPlantillas } from '../../libs/accesoCarpetas';
+import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
-import moment from 'moment';
 import excel from 'xlsx';
 import pool from '../../database';
 import path from 'path';
 import fs from 'fs';
-const builder = require('xmlbuilder');
 
 class DepartamentoControlador {
 
@@ -16,7 +14,7 @@ class DepartamentoControlador {
       const { nombre, id_sucursal } = req.body;
       await pool.query(
         `
-        INSERT INTO cg_departamentos (nombre, id_sucursal ) VALUES ($1, $2)
+        INSERT INTO ed_departamentos (nombre, id_sucursal ) VALUES ($1, $2)
         `
         , [nombre, id_sucursal]);
 
@@ -36,7 +34,7 @@ class DepartamentoControlador {
       console.log(id);
       await pool.query(
         `
-        UPDATE cg_departamentos set nombre = $1, id_sucursal = $2 
+        UPDATE ed_departamentos set nombre = $1, id_sucursal = $2 
         WHERE id = $3
         `
         , [nombre, id_sucursal, id]);
@@ -54,7 +52,7 @@ class DepartamentoControlador {
     const DEPARTAMENTO = await pool.query(
       `
       SELECT d.*, s.nombre AS sucursal
-      FROM cg_departamentos AS d, sucursales AS s 
+      FROM ed_departamentos AS d, e_sucursales AS s 
       WHERE d.id = $1 AND s.id = d.id_sucursal
       `
       , [id]);
@@ -70,13 +68,13 @@ class DepartamentoControlador {
     const { id_sucursal } = req.params;
     const DEPARTAMENTO = await pool.query(
       `
-      SELECT * FROM cg_departamentos WHERE id_sucursal = $1
+      SELECT * FROM ed_departamentos WHERE id_sucursal = $1
       `
       , [id_sucursal]);
     if (DEPARTAMENTO.rowCount > 0) {
       return res.jsonp(DEPARTAMENTO.rows)
     }
-    res.status(404).jsonp({ text: 'El departamento no ha sido encontrado' });
+    res.status(404).jsonp({ text: 'El departamento no ha sido encontrado.' });
   }
 
   // METODO PARA BUSCAR LISTA DE DEPARTAMENTOS POR ID SUCURSAL Y EXCLUIR DEPARTAMENTO ACTUALIZADO
@@ -84,13 +82,13 @@ class DepartamentoControlador {
     const { id_sucursal, id } = req.params;
     const DEPARTAMENTO = await pool.query(
       `
-        SELECT * FROM cg_departamentos WHERE id_sucursal = $1 AND NOT id = $2
+        SELECT * FROM ed_departamentos WHERE id_sucursal = $1 AND NOT id = $2
         `
       , [id_sucursal, id]);
     if (DEPARTAMENTO.rowCount > 0) {
       return res.jsonp(DEPARTAMENTO.rows)
     }
-    res.status(404).jsonp({ text: 'El departamento no ha sido encontrado' });
+    res.status(404).jsonp({ text: 'El departamento no ha sido encontrado.' });
   }
 
 
@@ -101,10 +99,10 @@ class DepartamentoControlador {
     const NIVELES = await pool.query(
       `
       SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, n.id_departamento AS id, 
-        n.departamento AS nombre, n.nivel, n.dep_nivel_nombre AS departamento_padre
-      FROM nivel_jerarquicodep AS n, sucursales AS s
-      WHERE n.id_establecimiento = s.id AND 
-        n.nivel = (SELECT MAX(nivel) FROM nivel_jerarquicodep WHERE id_departamento = n.id_departamento)
+        n.departamento AS nombre, n.nivel, n.departamento_nombre_nivel AS departamento_padre
+      FROM ed_niveles_departamento AS n, e_sucursales AS s
+      WHERE n.id_sucursal = s.id AND 
+        n.nivel = (SELECT MAX(nivel) FROM ed_niveles_departamento WHERE id_departamento = n.id_departamento)
       ORDER BY s.nombre, n.departamento ASC
       `
     );
@@ -113,8 +111,8 @@ class DepartamentoControlador {
       `
       SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, cd.id, cd.nombre,
       0 AS NIVEL, null AS departamento_padre
-      FROM cg_departamentos AS cd, sucursales AS s
-      WHERE NOT cd.id IN (SELECT id_departamento FROM nivel_jerarquicodep) AND
+      FROM ed_departamentos AS cd, e_sucursales AS s
+      WHERE NOT cd.id IN (SELECT id_departamento FROM ed_niveles_departamento) AND
       s.id = cd.id_sucursal
       ORDER BY s.nombre, cd.nombre ASC;
       `
@@ -149,10 +147,10 @@ class DepartamentoControlador {
     const NIVEL = await pool.query(
       `
       SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, n.id_departamento AS id, 
-        n.departamento AS nombre, n.nivel, n.dep_nivel_nombre AS departamento_padre
-      FROM nivel_jerarquicodep AS n, sucursales AS s
-      WHERE n.id_establecimiento = s.id AND 
-        n.nivel = (SELECT MAX(nivel) FROM nivel_jerarquicodep WHERE id_departamento = n.id_departamento)
+        n.departamento AS nombre, n.nivel, n.departamento_nombre_nivel AS departamento_padre
+      FROM ed_niveles_departamento AS n, e_sucursales AS s
+      WHERE n.id_sucursal = s.id AND 
+        n.nivel = (SELECT MAX(nivel) FROM ed_niveles_departamento WHERE id_departamento = n.id_departamento)
         AND s.id = $1
       ORDER BY s.nombre, n.departamento ASC
       `
@@ -163,8 +161,8 @@ class DepartamentoControlador {
       `
       SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, cd.id, cd.nombre,
         0 AS NIVEL, null AS departamento_padre
-      FROM cg_departamentos AS cd, sucursales AS s
-      WHERE NOT cd.id IN (SELECT id_departamento FROM nivel_jerarquicodep) AND
+      FROM ed_departamentos AS cd, e_sucursales AS s
+      WHERE NOT cd.id IN (SELECT id_departamento FROM ed_niveles_departamento) AND
         s.id = cd.id_sucursal AND s.id = $1
       ORDER BY s.nombre, cd.nombre ASC
       `
@@ -193,27 +191,27 @@ class DepartamentoControlador {
   }
 
   // METODO PARA ELIMINAR REGISTRO
-  public async EliminarRegistros(req: Request, res: Response){
+  public async EliminarRegistros(req: Request, res: Response) {
 
 
-    try{
+    try {
 
       const id = req.params.id;
       await pool.query(
         `
-        DELETE FROM cg_departamentos WHERE id = $1
+        DELETE FROM ed_departamentos WHERE id = $1
         `
         , [id]);
       res.jsonp({ message: 'Registro eliminado.' });
 
 
-    }catch(error){
+    } catch (error) {
 
       return res.jsonp({ message: 'error' });
 
 
     }
-   
+
   }
 
   //METODO PARA CREAR NIVELES JERARQUICOS POR DEPARTAMENTOS  --**VERIFICADO
@@ -224,8 +222,9 @@ class DepartamentoControlador {
 
       await pool.query(
         `
-        INSERT INTO nivel_jerarquicodep (departamento, id_departamento, nivel, dep_nivel_nombre, id_dep_nivel, 
-          id_establecimiento, id_suc_dep_nivel ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+        INSERT INTO ed_niveles_departamento (departamento, id_departamento, nivel, departamento_nombre_nivel, 
+          id_departamento_nivel, id_sucursal, id_sucursal_departamento_nivel ) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
         `
         , [departamento, id_departamento, nivel, dep_nivel_nombre, dep_nivel, id_establecimiento, id_suc_dep_nivel]);
 
@@ -244,9 +243,9 @@ class DepartamentoControlador {
     const NIVELESDEP = await pool.query(
       `
       SELECT n.*, s.nombre AS suc_nivel
-      FROM nivel_jerarquicodep AS n, sucursales AS s
-      WHERE id_departamento = $1 AND id_establecimiento = $2 
-        AND s.id = n.id_suc_dep_nivel
+      FROM ed_niveles_departamento AS n, e_sucursales AS s
+      WHERE id_departamento = $1 AND id_sucursal = $2 
+        AND s.id = n.id_sucursal_departamento_nivel
       ORDER BY nivel DESC 
       `
       , [id_departamento, id_establecimiento]);
@@ -263,7 +262,7 @@ class DepartamentoControlador {
       const id = req.params.id;
       await pool.query(
         `
-        UPDATE nivel_jerarquicodep set nivel = $1 
+        UPDATE ed_niveles_departamento set nivel = $1 
         WHERE id = $2
         `
         , [nivel, id]);
@@ -279,12 +278,12 @@ class DepartamentoControlador {
     const id = req.params.id;
     await pool.query(
       `
-      DELETE FROM nivel_jerarquicodep WHERE id = $1
+      DELETE FROM ed_niveles_departamento WHERE id = $1
       `
       , [id]);
     res.jsonp({ message: 'Registro eliminado.' });
 
-    
+
   }
 
   //METODO PARA CREAR NIVELES JERARQUICOS POR DEPARTAMENTOS  --**VERIFICADO
@@ -294,15 +293,15 @@ class DepartamentoControlador {
 
       await pool.query(
         `
-        UPDATE nivel_jerarquicodep SET departamento = $1
+        UPDATE ed_niveles_departamento SET departamento = $1
         WHERE id_departamento = $2
         `
         , [departamento, id_departamento]);
 
       await pool.query(
         `
-        UPDATE nivel_jerarquicodep SET dep_nivel_nombre = $1
-        WHERE id_dep_nivel = $2
+        UPDATE ed_niveles_departamento SET departamento_nombre_nivel = $1
+        WHERE id_departamento_nivel = $2
         `
         , [departamento, id_departamento]);
 
@@ -318,182 +317,194 @@ class DepartamentoControlador {
   /* 
     * Metodo para revisar
     */
-    // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
-    public async RevisarDatos(req: Request, res: Response): Promise<void> {
-      const documento = req.file?.originalname;
-      let separador = path.sep;
-      let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
+  // METODO PARA REVISAR LOS DATOS DE LA PLANTILLA DENTRO DEL SISTEMA - MENSAJES DE CADA ERROR
+  public async RevisarDatos(req: Request, res: Response): Promise<void> {
+    const documento = req.file?.originalname;
+    let separador = path.sep;
+    let ruta = ObtenerRutaLeerPlantillas() + separador + documento;
 
-      const workbook = excel.readFile(ruta);
-      const sheet_name_list = workbook.SheetNames;
-      const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+    const workbook = excel.readFile(ruta);
+    const sheet_name_list = workbook.SheetNames;
+    const plantilla = excel.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
-      let data: any = {
-        fila: '',
-        nombre: '',
-        sucursal: '',
-        observacion: ''
-      };
+    let data: any = {
+      fila: '',
+      nombre: '',
+      sucursal: '',
+      observacion: ''
+    };
 
-      var listDepartamentos: any = [];
-      var duplicados: any = [];
-      var mensaje: string = 'correcto';
+    var listDepartamentos: any = [];
+    var duplicados: any = [];
+    var mensaje: string = 'correcto';
 
-      // LECTURA DE LOS DATOS DE LA PLANTILLA
-      plantilla.forEach(async (dato: any, indice: any, array: any) => {
-        var {item, nombre, sucursal } = dato;
-        //Verificar que el registo no tenga datos vacios
-        if ((item != undefined && item != '') &&
-        (nombre != undefined) && (sucursal != undefined)){
-          data.fila = item;
-          data.nombre = nombre; data.sucursal = sucursal;
-          data.observacion = 'no registrado';
+    // LECTURA DE LOS DATOS DE LA PLANTILLA
+    plantilla.forEach(async (dato: any, indice: any, array: any) => {
+      var { item, nombre, sucursal } = dato;
+      //Verificar que el registo no tenga datos vacios
+      if ((item != undefined && item != '') &&
+        (nombre != undefined) && (sucursal != undefined)) {
+        data.fila = item;
+        data.nombre = nombre; data.sucursal = sucursal;
+        data.observacion = 'no registrado';
 
-          listDepartamentos.push(data);
-        }else{
-          data.fila = item;
-          data.nombre = nombre; data.sucursal = sucursal;
-          data.observacion = 'no registrado';
+        listDepartamentos.push(data);
+      } else {
+        data.fila = item;
+        data.nombre = nombre; data.sucursal = sucursal;
+        data.observacion = 'no registrado';
 
-          if (data.fila == '' || data.fila == undefined) {
-            data.fila = 'error';
-            mensaje = 'error'
-          }
-  
-          if (nombre == undefined) {
-            data.nombre = 'No registrado';
-            data.observacion = 'Nombre ' + data.observacion;
-          }
-          if (sucursal == undefined) {
-            data.sucursal = 'No registrado';
-            data.observacion = 'Sucursal ' + data.observacion;
-          }
-
-          listDepartamentos.push(data);
-
+        if (data.fila == '' || data.fila == undefined) {
+          data.fila = 'error';
+          mensaje = 'error'
         }
 
-        data = {};
+        if (nombre == undefined) {
+          data.nombre = 'No registrado';
+          data.observacion = 'Nombre ' + data.observacion;
+        }
+        if (sucursal == undefined) {
+          data.sucursal = 'No registrado';
+          data.observacion = 'Sucursal ' + data.observacion;
+        }
 
-      });
+        listDepartamentos.push(data);
 
-      // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
-      fs.access(ruta, fs.constants.F_OK, (err) => {
-        if (err) {
+      }
+
+      data = {};
+
+    });
+
+    // VERIFICAR EXISTENCIA DE CARPETA O ARCHIVO
+    fs.access(ruta, fs.constants.F_OK, (err) => {
+      if (err) {
+      } else {
+        // ELIMINAR DEL SERVIDOR
+        fs.unlinkSync(ruta);
+      }
+    });
+
+    listDepartamentos.forEach(async (item: any) => {
+      if (item.observacion == 'no registrado') {
+        var VERIFICAR_SUCURSAL = await pool.query(
+          `
+          SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1
+          `
+          , [item.sucursal.toUpperCase()]);
+        if (VERIFICAR_SUCURSAL.rows[0] != undefined && VERIFICAR_SUCURSAL.rows[0] != '') {
+          var VERIFICAR_DEPARTAMENTO = await pool.query(
+            `
+            SELECT * FROM ed_departamentos WHERE id_sucursal = $1 AND UPPER(nombre) = $2
+            `
+            , [VERIFICAR_SUCURSAL.rows[0].id, item.nombre.toUpperCase()])
+          if (VERIFICAR_DEPARTAMENTO.rows[0] == undefined || VERIFICAR_DEPARTAMENTO.rows[0] == '') {
+            item.observacion = 'ok'
+          } else {
+            item.observacion = 'Ya existe en el sistema'
+          }
         } else {
-            // ELIMINAR DEL SERVIDOR
-            fs.unlinkSync(ruta);
+          item.observacion = 'No existe la sucursal en el sistema'
         }
-      });
 
-      listDepartamentos.forEach(async(item:any) => {
-          if(item.observacion == 'no registrado'){
-            var VERIFICAR_SUCURSAL = await pool.query('SELECT * FROM sucursales WHERE UPPER(nombre) = $1', [item.sucursal.toUpperCase()]);
-            if(VERIFICAR_SUCURSAL.rows[0] != undefined && VERIFICAR_SUCURSAL.rows[0] != ''){
-              var VERIFICAR_DEPARTAMENTO = await pool.query('SELECT * FROM cg_departamentos WHERE id_sucursal = $1 AND UPPER(nombre) = $2', [VERIFICAR_SUCURSAL.rows[0].id, item.nombre.toUpperCase()])
-              if(VERIFICAR_DEPARTAMENTO.rows[0] == undefined || VERIFICAR_DEPARTAMENTO.rows[0] == ''){
-                item.observacion = 'ok'
-              }else{
-                item.observacion = 'Ya existe en el sistema'
-              }
-            }else{
-              item.observacion = 'No existe la sucursal en el sistema'
-            }
-
-            // Discriminación de elementos iguales
-            if(duplicados.find((p: any)=> p.nombre === item.nombre && p.sucursal === item.sucursal) == undefined)
-            {
-                duplicados.push(item);
-            }else{
-                item.observacion = '1';
-            }
-          }
-      });
+        // Discriminación de elementos iguales
+        if (duplicados.find((p: any) => p.nombre === item.nombre && p.sucursal === item.sucursal) == undefined) {
+          duplicados.push(item);
+        } else {
+          item.observacion = '1';
+        }
+      }
+    });
 
     setTimeout(() => {
       listDepartamentos.sort((a: any, b: any) => {
-            // Compara los números de los objetos
-            if (a.fila < b.fila) {
-                return -1;
-            }
-            if (a.fila > b.fila) {
-                return 1;
-            }
-            return 0; // Son iguales
-        });
+        // Compara los números de los objetos
+        if (a.fila < b.fila) {
+          return -1;
+        }
+        if (a.fila > b.fila) {
+          return 1;
+        }
+        return 0; // Son iguales
+      });
 
-        var filaDuplicada: number = 0;
+      var filaDuplicada: number = 0;
 
-        listDepartamentos.forEach(async(item:any) => {
-          if(item.observacion == '1') {
-            item.observacion = 'Registro duplicado'
-          }
-
-            //Valida si los datos de la columna N son numeros.
-            if (typeof item.fila === 'number' && !isNaN(item.fila)) {
-            //Condicion para validar si en la numeracion existe un numero que se repite dara error.
-                if(item.fila == filaDuplicada){
-                    mensaje = 'error';
-                }
-            }else{
-                return mensaje = 'error';
-            } 
-
-            filaDuplicada = item.fila;
-
-        });
-
-        if(mensaje == 'error'){
-          listDepartamentos = undefined;
+      listDepartamentos.forEach(async (item: any) => {
+        if (item.observacion == '1') {
+          item.observacion = 'Registro duplicado'
         }
 
-        console.log('listDepartamentos: ',listDepartamentos);
+        //Valida si los datos de la columna N son numeros.
+        if (typeof item.fila === 'number' && !isNaN(item.fila)) {
+          //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+          if (item.fila == filaDuplicada) {
+            mensaje = 'error';
+          }
+        } else {
+          return mensaje = 'error';
+        }
 
-        return res.jsonp({ message: mensaje, data: listDepartamentos});
-  
-      }, 1000)
-    }
+        filaDuplicada = item.fila;
 
-    public async CargarPlantilla(req: Request, res: Response) {
-      try{
-        const plantilla = req.body;
-        console.log('datos departamento: ', plantilla);
-        var contador = 1; 
-        var respuesta: any
+      });
 
-        plantilla.forEach(async (data: any) => {
-        console.log('data: ',data);
+      if (mensaje == 'error') {
+        listDepartamentos = undefined;
+      }
+
+      console.log('listDepartamentos: ', listDepartamentos);
+
+      return res.jsonp({ message: mensaje, data: listDepartamentos });
+
+    }, 1000)
+  }
+
+  public async CargarPlantilla(req: Request, res: Response) {
+    try {
+      const plantilla = req.body;
+      console.log('datos departamento: ', plantilla);
+      var contador = 1;
+      var respuesta: any
+
+      plantilla.forEach(async (data: any) => {
+        console.log('data: ', data);
         // Datos que se guardaran de la plantilla ingresada
-        const {item, nombre, sucursal} = data;
-        const ID_SUCURSAL: any = await pool.query('SELECT id FROM sucursales WHERE UPPER(nombre) = $1', [sucursal.toUpperCase()]);
+        const { item, nombre, sucursal } = data;
+        const ID_SUCURSAL: any = await pool.query(
+          `
+          SELECT id FROM e_sucursales WHERE UPPER(nombre) = $1
+          `
+          , [sucursal.toUpperCase()]);
 
         var nivel = 0;
         var id_sucursal = ID_SUCURSAL.rows[0].id;
 
         // Registro de los datos de contratos
         const response: QueryResult = await pool.query(
-          `INSERT INTO cg_departamentos (nombre, id_sucursal) VALUES ($1, $2) RETURNING *
-          `,[nombre.toUpperCase(), id_sucursal]);
+          `INSERT INTO ed_departamentos (nombre, id_sucursal) VALUES ($1, $2) RETURNING *
+          `
+          , [nombre.toUpperCase(), id_sucursal]);
 
         const [departamento] = response.rows;
 
         if (contador === plantilla.length) {
           if (departamento) {
-            return respuesta = res.status(200).jsonp({message: 'ok'})
-          }else {
+            return respuesta = res.status(200).jsonp({ message: 'ok' })
+          } else {
             return respuesta = res.status(404).jsonp({ message: 'error' })
           }
         }
 
         contador = contador + 1;
 
-        });
+      });
 
-      }catch (error) {
-        return res.status(500).jsonp({ message: error });
-      }
-
+    } catch (error) {
+      return res.status(500).jsonp({ message: error });
     }
+
+  }
 
 
 
@@ -510,38 +521,54 @@ class DepartamentoControlador {
 
 
   public async ListarNombreDepartamentos(req: Request, res: Response) {
-    const DEPARTAMENTOS = await pool.query('SELECT * FROM cg_departamentos');
+    const DEPARTAMENTOS = await pool.query(
+      `
+      SELECT * FROM ed_departamentos
+      `
+      );
     if (DEPARTAMENTOS.rowCount > 0) {
       return res.jsonp(DEPARTAMENTOS.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
   public async ListarIdDepartamentoNombre(req: Request, res: Response): Promise<any> {
     const { nombre } = req.params;
-    const DEPARTAMENTOS = await pool.query('SELECT * FROM cg_departamentos WHERE nombre = $1', [nombre]);
+    const DEPARTAMENTOS = await pool.query(
+      `
+      SELECT * FROM ed_departamentos WHERE nombre = $1
+      `
+      , [nombre]);
     if (DEPARTAMENTOS.rowCount > 0) {
       return res.jsonp(DEPARTAMENTOS.rows)
     }
     else {
-      return res.status(404).jsonp({ text: 'No se encuentran registros' });
+      return res.status(404).jsonp({ text: 'No se encuentran registros.' });
     }
   }
 
   public async ObtenerIdDepartamento(req: Request, res: Response): Promise<any> {
     const { nombre } = req.params;
-    const DEPARTAMENTO = await pool.query('SELECT id FROM cg_departamentos WHERE nombre = $1', [nombre]);
+    const DEPARTAMENTO = await pool.query(
+      `
+      SELECT id FROM ed_departamentos WHERE nombre = $1
+      `
+      , [nombre]);
     if (DEPARTAMENTO.rowCount > 0) {
       return res.jsonp(DEPARTAMENTO.rows);
     }
-    res.status(404).jsonp({ text: 'El departamento no ha sido encontrado' });
+    res.status(404).jsonp({ text: 'El departamento no ha sido encontrado.' });
   }
 
   public async ObtenerUnDepartamento(req: Request, res: Response): Promise<any> {
     const { id } = req.params;
-    const DEPARTAMENTO = await pool.query('SELECT * FROM cg_departamentos WHERE id = $1', [id]);
+    const DEPARTAMENTO = await pool.query(
+      `
+      SELECT * FROM ed_departamentos WHERE id = $1
+      `
+      , [id]);
     if (DEPARTAMENTO.rowCount > 0) {
       return res.jsonp(DEPARTAMENTO.rows[0])
     }
@@ -557,9 +584,14 @@ class DepartamentoControlador {
 
   public async BuscarDepartamentoPorCargo(req: Request, res: Response) {
     const id = req.params.id_cargo
-    const departamento = await pool.query('SELECT ec.id_departamento, d.nombre, ec.id AS cargo ' +
-      'FROM empl_cargos AS ec, cg_departamentos AS d WHERE d.id = ec.id_departamento AND ec.id = $1 ' +
-      'ORDER BY cargo DESC', [id]);
+    const departamento = await pool.query(
+      `
+      SELECT ec.id_departamento, d.nombre, ec.id AS cargo
+      FROM eu_empleado_cargos AS ec, ed_departamentos AS d 
+      WHERE d.id = ec.id_departamento AND ec.id = $1
+      ORDER BY cargo DESC
+      `
+      , [id]);
     if (departamento.rowCount > 0) {
       return res.json([departamento.rows[0]]);
     } else {
@@ -573,9 +605,14 @@ class DepartamentoControlador {
 
   public async ListarDepartamentosRegimen(req: Request, res: Response) {
     const id = req.params.id;
-    const DEPARTAMENTOS = await pool.query('SELECT d.id, d.nombre FROM cg_regimenes AS r, empl_cargos AS ec, ' +
-      'empl_contratos AS c, cg_departamentos AS d WHERE c.id_regimen = r.id AND c.id = ec.id_empl_contrato AND ' +
-      'ec.id_departamento = d.id AND r.id = $1 GROUP BY d.id, d.nombre', [id]);
+    const DEPARTAMENTOS = await pool.query(
+      `
+      SELECT d.id, d.nombre 
+      FROM ere_cat_regimenes AS r, eu_empleado_cargos AS ec, eu_empleado_contratos AS c, ed_departamentos AS d 
+      WHERE c.id_regimen = r.id AND c.id = ec.id_contrato AND ec.id_departamento = d.id AND r.id = $1 
+      GROUP BY d.id, d.nombre
+      `
+      , [id]);
     if (DEPARTAMENTOS.rowCount > 0) {
       res.jsonp(DEPARTAMENTOS.rows);
     }

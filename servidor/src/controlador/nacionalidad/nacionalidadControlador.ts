@@ -6,7 +6,7 @@ class NacionalidadControlador {
   public async ListarNacionalidades(req: Request, res: Response) {
     const nacinalidad = await pool.query(
       `
-      SELECT * FROM nacionalidades
+      SELECT * FROM e_cat_nacionalidades
       `
     );
     res.jsonp(nacinalidad.rows);

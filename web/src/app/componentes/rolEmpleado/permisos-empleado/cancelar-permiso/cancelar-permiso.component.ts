@@ -88,7 +88,7 @@ export class CancelarPermisoComponent implements OnInit {
         this.solInfo = [];
         this.solInfo = {
           permiso_mail: res.permiso_mail,
-          permiso_noti: res.permiso_noti,
+          permiso_noti: res.permiso_notificacion,
           empleado: res.id_empleado,
           id_dep: res.id_departamento,
           id_suc: res.id_sucursal,

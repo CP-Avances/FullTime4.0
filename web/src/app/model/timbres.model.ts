@@ -29,7 +29,7 @@ export interface HorarioTimbre{
 }
 
 export interface EntradasSalidas {
-    fec_hora_timbre: string,
+    fecha_hora_timbre: string,
     accion: string | null,
     tecl_funcion: string | null,
     observacion: string,

@@ -19,8 +19,6 @@ class UsuarioRutas {
         this.router.get('/dato/:id_empleado', TokenValidation, USUARIO_CONTROLADOR.ObtenerDepartamentoUsuarios);
         // METODO PARA ACTUALIZAR DATOS DE USUARIO
         this.router.put('/actualizarDatos', TokenValidation, USUARIO_CONTROLADOR.ActualizarUsuario);
-        // METODO PARA REGISTRAR ACCESOS AL SISTEMA
-        this.router.post('/acceso', USUARIO_CONTROLADOR.AuditarAcceso);
         // METODO PARA ACTUALIZAR CONTRASEÑA
         this.router.put('/', TokenValidation, USUARIO_CONTROLADOR.CambiarPasswordUsuario);
         // ADMINISTRACION MODULO DE ALIMENTACION

@@ -1,9 +1,9 @@
 import { DescargarArchivo, listaCarpetas, ListarContratos, ListarDocumentos, ListarHorarios, ListarPermisos, ListarDocumentosIndividuales, DescargarArchivoIndividuales } from '../../libs/listarArchivos';
 import { ObtenerRutaDocumento } from '../../libs/accesoCarpetas';
 import { Request, Response } from 'express';
+import fs from 'fs';
 import pool from '../../database';
 import path from 'path';
-import fs from 'fs';
 import moment from 'moment';
 export var carpeta: any;
 
@@ -89,7 +89,7 @@ class DocumentosControlador {
         let { id, documento } = req.params;
         await pool.query(
             `
-            DELETE FROM documentacion WHERE id = $1
+            DELETE FROM e_documentacion WHERE id = $1
             `
             , [id]);
 
@@ -120,7 +120,7 @@ class DocumentosControlador {
 
         await pool.query(
             `
-            INSERT INTO documentacion (documento) VALUES ($1)
+            INSERT INTO e_documentacion (documento) VALUES ($1)
             `
             , [documento]);
         res.jsonp({ message: 'Registro guardado.' });

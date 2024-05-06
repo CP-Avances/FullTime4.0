@@ -56,7 +56,7 @@ export class DiscapacidadComponent implements OnInit {
     if (this.editar == 'editar') {
       this.rest.BuscarDiscapacidadUsuario(parseInt(this.idEmploy)).subscribe(data => {
         this.userDiscapacidad = data;
-        this.carnet.setValue(this.userDiscapacidad[0].carn_conadis);
+        this.carnet.setValue(this.userDiscapacidad[0].carnet_conadis);
         this.porcentaje.setValue(this.userDiscapacidad[0].porcentaje);
         this.tipo.setValue(this.userDiscapacidad[0].tipo);
         this.texto = 'MODIFICAR'

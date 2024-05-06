@@ -72,7 +72,7 @@ export class VerListadoNivelComponent implements OnInit {
 
   // METODO PARA IMPRIMIR DATOS EN FORMULARIO
   CargarDatos() {
-    var id_depa = this.info.id_dep_nivel;
+    var id_depa = this.info.id_departamento_nivel;
     //var id_establecimiento = this.info.id_sucursal;
     this.auto.BuscarListaEmpleadosAutorizan(id_depa).subscribe(datos => {
       this.empleados = datos;

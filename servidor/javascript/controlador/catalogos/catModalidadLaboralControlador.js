@@ -14,17 +14,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.modalidaLaboralControlador = void 0;
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
+const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const database_1 = __importDefault(require("../../database"));
 const xlsx_1 = __importDefault(require("xlsx"));
-const fs_1 = __importDefault(require("fs"));
-const builder = require('xmlbuilder');
 class ModalidaLaboralControlador {
     listaModalidadLaboral(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const MODALIDAL_LABORAL = yield database_1.default.query(`
-                SELECT * FROM modal_trabajo ORDER BY descripcion ASC
+                SELECT * FROM e_cat_modalidad_trabajo ORDER BY descripcion ASC
                 `);
                 if (MODALIDAL_LABORAL.rowCount > 0) {
                     return res.jsonp(MODALIDAL_LABORAL.rows);
@@ -45,7 +44,7 @@ class ModalidaLaboralControlador {
                 console.log('modalidad: ', modalidad);
                 //await pool.query(
                 //`
-                //INSERT INTO modal_trabajo (descripcion) VALUES ($1)
+                //INSERT INTO e_cat_modalidad_trabajo (descripcion) VALUES ($1)
                 //`
                 //, [modalidad]);
                 res.jsonp({ message: 'Registro guardado.' });
@@ -60,8 +59,8 @@ class ModalidaLaboralControlador {
             try {
                 const id = req.params.id;
                 yield database_1.default.query(`
-                DELETE FROM modal_trabajo WHERE id = $1
-            `, [id]);
+                DELETE FROM e_cat_modalidad_trabajo WHERE id = $1
+                `, [id]);
                 res.jsonp({ message: 'Registro eliminado.' });
             }
             catch (error) {
@@ -127,7 +126,9 @@ class ModalidaLaboralControlador {
                 });
                 listModalidad.forEach((item) => __awaiter(this, void 0, void 0, function* () {
                     if (item.observacion == 'no registrado') {
-                        var VERIFICAR_MODALIDAD = yield database_1.default.query('SELECT * FROM modal_trabajo WHERE UPPER(descripcion) = $1', [item.modalida_laboral.toUpperCase()]);
+                        var VERIFICAR_MODALIDAD = yield database_1.default.query(`
+                        SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                        `, [item.modalida_laboral.toUpperCase()]);
                         if (VERIFICAR_MODALIDAD.rows[0] == undefined || VERIFICAR_MODALIDAD.rows[0] == '') {
                             item.observacion = 'ok';
                         }
@@ -195,8 +196,9 @@ class ModalidaLaboralControlador {
                     const { item, modalida_laboral, observacion } = data;
                     const modalidad = modalida_laboral.charAt(0).toUpperCase() + modalida_laboral.slice(1).toLowerCase();
                     // Registro de los datos de contratos
-                    const response = yield database_1.default.query(`INSERT INTO modal_trabajo (descripcion) VALUES ($1) RETURNING *
-                `, [modalidad]);
+                    const response = yield database_1.default.query(`
+                    INSERT INTO e_cat_modalidad_trabajo (descripcion) VALUES ($1) RETURNING *
+                    `, [modalidad]);
                     const [modalidad_la] = response.rows;
                     if (contador === plantilla.length) {
                         if (modalidad_la) {

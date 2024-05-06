@@ -137,8 +137,8 @@ export class ListarFeriadosComponent implements OnInit {
       this.feriados = datos;
       this.feriados.forEach(data => {
         data.fecha_ = this.validar.FormatearFecha(data.fecha, formato, this.validar.dia_abreviado);
-        if (data.fec_recuperacion != null) {
-          data.fec_recuperacion_ = this.validar.FormatearFecha(data.fec_recuperacion, formato, this.validar.dia_abreviado);
+        if (data.fecha_recuperacion != null) {
+          data.fec_recuperacion_ = this.validar.FormatearFecha(data.fecha_recuperacion, formato, this.validar.dia_abreviado);
         }
       })
     })
@@ -442,7 +442,7 @@ export class ListarFeriadosComponent implements OnInit {
       return 'rgb(170, 129, 236)';
     } else if (observacion == 'Registro duplicado') {
       return 'rgb(156, 214, 255)';
-    } else if (observacion == 'Formato de fec_recuperacion incorrecto (YYYY-MM-DD)') {
+    } else if (observacion == 'Formato de fecha_recuperacion incorrecto (YYYY-MM-DD)') {
       return 'rgb(156, 214, 255)';
     } else if (observacion == 'Formato de fecha incorrecto (YYYY-MM-DD)') {
       return 'rgb(230, 176, 96)';

@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
-import pool from '../../database';
+import { QueryResult } from 'pg';
 import {
   enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, fechaHora, Credenciales,
   FormatearFecha, FormatearHora, dia_completo
 }
   from '../../libs/settingsMail';
+import pool from '../../database';
 import path from 'path';
-import { QueryResult } from 'pg';
 
 class NotificacionTiempoRealControlador {
 
@@ -20,7 +20,11 @@ class NotificacionTiempoRealControlador {
     if (arregloNotificaciones.length > 0) {
       contador = 0;
       arregloNotificaciones.forEach(async (obj: number) => {
-        await pool.query('DELETE FROM realtime_noti WHERE id = $1', [obj])
+        await pool.query(
+          `
+          DELETE FROM ecm_realtime_notificacion WHERE id = $1
+          `
+          , [obj])
           .then((result: any) => {
             contador = contador + 1;
             if (contador === arregloNotificaciones.length) {
@@ -50,7 +54,7 @@ class NotificacionTiempoRealControlador {
     if (id_empleado != 'NaN') {
       const CONFIG_NOTI = await pool.query(
         `
-        SELECT * FROM config_noti WHERE id_empleado = $1
+        SELECT * FROM eu_configurar_alertas WHERE id_empleado = $1
         `
         , [id_empleado]);
       if (CONFIG_NOTI.rowCount > 0) {
@@ -78,8 +82,8 @@ class NotificacionTiempoRealControlador {
 
       const response: QueryResult = await pool.query(
         `
-        INSERT INTO realtime_noti( id_send_empl, id_receives_empl, id_receives_depa, estado, create_at, 
-          id_permiso, id_vacaciones, id_hora_extra, mensaje, tipo ) 
+        INSERT INTO ecm_realtime_notificacion (id_empleado_envia, id_empleado_recibe, id_departamento_recibe, estado, 
+          fecha_hora, id_permiso, id_vacaciones, id_hora_extra, mensaje, tipo) 
         VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10 ) RETURNING * 
         `,
         [id_send_empl, id_receives_empl, id_receives_depa, estado, create_at, id_permiso, id_vacaciones,
@@ -92,9 +96,9 @@ class NotificacionTiempoRealControlador {
       const USUARIO = await pool.query(
         `
         SELECT (nombre || ' ' || apellido) AS usuario
-        FROM empleados WHERE id = $1
-        `,
-        [id_send_empl]);
+        FROM eu_empleados WHERE id = $1
+        `
+        , [id_send_empl]);
 
       notificiacion.usuario = USUARIO.rows[0].usuario;
 
@@ -119,20 +123,29 @@ class NotificacionTiempoRealControlador {
 
 
   public async ListarNotificacion(req: Request, res: Response) {
-    const REAL_TIME_NOTIFICACION = await pool.query('SELECT * FROM realtime_noti ORDER BY id DESC');
+    const REAL_TIME_NOTIFICACION = await pool.query(
+      `
+      SELECT * FROM ecm_realtime_notificacion ORDER BY id DESC
+      `
+    );
 
     if (REAL_TIME_NOTIFICACION.rowCount > 0) {
       return res.jsonp(REAL_TIME_NOTIFICACION.rows);
     }
     else {
-      return res.status(404).jsonp({ text: 'Registro no encontrado' });
+      return res.status(404).jsonp({ text: 'Registro no encontrado.' });
     }
   }
 
   public async ListaPorEmpleado(req: Request, res: Response): Promise<any> {
     const id = req.params.id_send;
-    const REAL_TIME_NOTIFICACION = await pool.query('SELECT * FROM realtime_noti WHERE id_send_empl = $1 ' +
-      'ORDER BY id DESC', [id]).
+    const REAL_TIME_NOTIFICACION = await pool.query(
+      `
+      SELECT * FROM ecm_realtime_notificacion 
+      WHERE id_empleado_envia = $1 ' +
+      ORDER BY id DESC
+      `
+      , [id]).
       then((result: any) => {
         return result.rows.map((obj: any) => {
           obj
@@ -143,7 +156,7 @@ class NotificacionTiempoRealControlador {
       return res.jsonp(REAL_TIME_NOTIFICACION);
     }
     else {
-      return res.status(404).jsonp({ text: 'Registro no encontrado' });
+      return res.status(404).jsonp({ text: 'Registro no encontrado.' });
     }
   }
 
@@ -151,21 +164,23 @@ class NotificacionTiempoRealControlador {
     const id = req.params.id_receive;
     const REAL_TIME_NOTIFICACION = await pool.query(
       `
-        SELECT r.id, r.id_send_empl, r.id_receives_empl, r.id_receives_depa, r.estado, r.create_at, 
-          r.id_permiso, r.id_vacaciones, r.id_hora_extra, r.visto, r.mensaje, e.nombre, e.apellido 
-        FROM realtime_noti AS r, empleados AS e 
-        WHERE r.id_receives_empl = $1 AND e.id = r.id_send_empl ORDER BY id DESC
-      `, [id])
+      SELECT r.id, r.id_empleado_envia, r.id_empleado_recibe, r.id_departamento_recibe, r.estado, r.fecha_hora, 
+        r.id_permiso, r.id_vacaciones, r.id_hora_extra, r.visto, r.mensaje, e.nombre, e.apellido 
+      FROM ecm_realtime_notificacion AS r, eu_empleados AS e 
+      WHERE r.id_empleado_recibe = $1 AND e.id = r.id_empleado_envia 
+      ORDER BY id DESC
+      `
+      , [id])
       .then((result: any) => {
         return result.rows.map((obj: any) => {
           console.log(obj);
           return {
             id: obj.id,
-            id_send_empl: obj.id_send_empl,
-            id_receives_empl: obj.id_receives_empl,
-            id_receives_depa: obj.id_receives_depa,
+            id_send_empl: obj.id_empleado_envia,
+            id_receives_empl: obj.id_empleado_recibe,
+            id_receives_depa: obj.id_departamento_recibe,
             estado: obj.estado,
-            create_at: obj.create_at,
+            create_at: obj.fecha_hora,
             id_permiso: obj.id_permiso,
             id_vacaciones: obj.id_vacaciones,
             id_hora_extra: obj.id_hora_extra,
@@ -191,8 +206,12 @@ class NotificacionTiempoRealControlador {
   public async ActualizarVista(req: Request, res: Response): Promise<void> {
     const id = req.params.id;
     const { visto } = req.body;
-    await pool.query('UPDATE realtime_noti SET visto = $1 WHERE id = $2', [visto, id]);
-    res.jsonp({ message: 'Vista modificado' });
+    await pool.query(
+      `
+      UPDATE ecm_realtime_notificacion SET visto = $1 WHERE id = $2
+      `
+      , [visto, id]);
+    res.jsonp({ message: 'Vista modificado.' });
   }
 
 
@@ -205,13 +224,16 @@ class NotificacionTiempoRealControlador {
   public async CrearConfiguracion(req: Request, res: Response): Promise<void> {
     const { id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail,
       hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti } = req.body;
-    await pool.query('INSERT INTO config_noti ( id_empleado, vaca_mail, vaca_noti, permiso_mail, ' +
-      'permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti, comunicado_mail, ' +
-      'comunicado_noti) ' +
-      'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)', [id_empleado, vaca_mail, vaca_noti,
-      permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti,
-      comunicado_mail, comunicado_noti]);
-    res.jsonp({ message: 'Configuracion guardada' });
+    await pool.query(
+      `
+      INSERT INTO eu_configurar_alertas (id_empleado, vacacion_mail, vacacion_notificacion, permiso_mail,
+        permiso_notificacion, hora_extra_mail, hora_extra_notificacion, comida_mail, comida_notificacion, comunicado_mail,
+      comunicado_notificacion)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      `
+      , [id_empleado, vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail,
+        comida_noti, comunicado_mail, comunicado_noti]);
+    res.jsonp({ message: 'REgistro guardado.' });
   }
 
 
@@ -220,12 +242,16 @@ class NotificacionTiempoRealControlador {
     const { vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail,
       hora_extra_noti, comida_mail, comida_noti, comunicado_mail, comunicado_noti } = req.body;
     const id_empleado = req.params.id;
-    await pool.query('UPDATE config_noti SET vaca_mail = $1, vaca_noti = $2, permiso_mail = $3, ' +
-      'permiso_noti = $4, hora_extra_mail = $5, hora_extra_noti = $6, comida_mail = $7, comida_noti = $8, ' +
-      'comunicado_mail = $9, comunicado_noti = $10 WHERE id_empleado = $11',
-      [vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti,
-        comida_mail, comida_noti, comunicado_mail, comunicado_noti, id_empleado]);
-    res.jsonp({ message: 'Configuración actualizada.' });
+    await pool.query(
+      `
+      UPDATE eu_configurar_alertas SET vacacion_mail = $1, vacacion_noti = $2, permiso_mail = $3,
+        permiso_notificacion = $4, hora_extra_mail = $5, hora_extra_notificacion = $6, comida_mail = $7, 
+        comida_notificacion = $8, comunicado_mail = $9, comunicado_notificacion = $10 
+      WHERE id_empleado = $11
+      `
+      , [vaca_mail, vaca_noti, permiso_mail, permiso_noti, hora_extra_mail, hora_extra_noti, comida_mail, comida_noti,
+        comunicado_mail, comunicado_noti, id_empleado]);
+    res.jsonp({ message: 'Registro guardado.' });
   }
 
 
@@ -241,11 +267,11 @@ class NotificacionTiempoRealControlador {
     if (id != 'NaN') {
       const REAL_TIME_NOTIFICACION = await pool.query(
         `
-        SELECT r.id, r.id_send_empl, r.id_receives_empl, r.id_receives_depa, r.estado, 
-          to_char(r.create_at, 'yyyy-MM-dd HH:mi:ss') AS create_at, r.id_permiso, r.id_vacaciones, 
+        SELECT r.id, r.id_empleado_envia, r.id_empleado_recibe, r.id_departamento_recibe, r.estado, 
+          to_char(r.fecha_hora, 'yyyy-MM-dd HH:mi:ss') AS fecha_hora, r.id_permiso, r.id_vacaciones, 
           r.id_hora_extra, r.visto, r.mensaje, r.tipo, e.nombre, e.apellido 
-        FROM realtime_noti AS r, empleados AS e 
-        WHERE r.id_receives_empl = $1 AND e.id = r.id_send_empl 
+        FROM ecm_realtime_notificacion AS r, eu_empleados AS e 
+        WHERE r.id_empleado_recibe = $1 AND e.id = r.id_empleado_envia 
         ORDER BY (visto is FALSE) DESC, id DESC LIMIT 20
         `
         , [id]);
@@ -266,11 +292,11 @@ class NotificacionTiempoRealControlador {
     const id = req.params.id;
     const REAL_TIME_NOTIFICACION_VACACIONES = await pool.query(
       `
-      SELECT r.id, r.id_send_empl, r.id_receives_empl, r.id_receives_depa, r.estado, 
-      r.create_at, r.id_permiso, r.id_vacaciones, r.tipo, r.id_hora_extra, r.visto, 
-      r.mensaje, e.nombre, e.apellido 
-      FROM realtime_noti AS r, empleados AS e 
-      WHERE r.id = $1 AND e.id = r.id_send_empl
+      SELECT r.id, r.id_empleado_envia, r.id_empleado_recibe, r.id_departamento_recibe, r.estado, 
+        r.fecha_hora, r.id_permiso, r.id_vacaciones, r.tipo, r.id_hora_extra, r.visto, 
+        r.mensaje, e.nombre, e.apellido 
+      FROM ecm_realtime_notificacion AS r, eu_empleados AS e 
+      WHERE r.id = $1 AND e.id = r.id_empleado_envia
       `
       , [id]);
     if (REAL_TIME_NOTIFICACION_VACACIONES.rowCount > 0) {
@@ -304,42 +330,49 @@ class NotificacionTiempoRealControlador {
 
     if (datos === 'ok') {
 
-      const USUARIO_ENVIA = await pool.query('SELECT e.id, e.correo, e.nombre, e.apellido, e.cedula, ' +
-        'tc.cargo, d.nombre AS departamento ' +
-        'FROM datos_actuales_empleado AS e, empl_cargos AS ec, tipo_cargo AS tc, cg_departamentos AS d ' +
-        'WHERE e.id = $1 AND ec.id = e.id_cargo AND tc.id = ec.cargo AND d.id = ec.id_departamento',
+      const USUARIO_ENVIA = await pool.query(
+        `
+        SELECT e.id, e.correo, e.nombre, e.apellido, e.cedula,
+          tc.cargo, d.nombre AS departamento
+        FROM datos_actuales_empleado AS e, eu_empleado_cargos AS ec, e_cat_tipo_cargo AS tc, ed_departamentos AS d
+        WHERE e.id = $1 AND ec.id = e.id_cargo AND tc.id = ec.id_tipo_cargo AND d.id = ec.id_departamento
+        `
+        ,
         [id_envia]);
 
       let data = {
         to: correo,
         from: email,
         subject: asunto,
-        html: `<body>
-                <div style="text-align: center;">
-                  <img width="25%" height="25%" src="cid:cabeceraf"/>
-                </div>
-                <br>
-                <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                  El presente correo es para informar el siguiente comunicado: <br>  
-                </p>
-                <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
-                  <b>Empresa:</b> ${nombre}<br>
-                  <b>Asunto:</b> ${asunto} <br>
-                  <b>Colaborador que envía:</b> ${USUARIO_ENVIA.rows[0].nombre} ${USUARIO_ENVIA.rows[0].apellido} <br>
-                  <b>Cargo:</b> ${USUARIO_ENVIA.rows[0].cargo} <br>
-                  <b>Departamento:</b> ${USUARIO_ENVIA.rows[0].departamento} <br>
-                  <b>Generado mediante:</b> Aplicación Móvil <br>
-                  <b>Fecha de envío:</b> ${fecha} <br> 
-                  <b>Hora de envío:</b> ${hora} <br><br>                   
-                  <b>Mensaje:</b> ${mensaje} <br><br>
-                </p>
-                <p style="font-family: Arial; font-size:12px; line-height: 1em;">
-                  <b>Gracias por la atención</b><br>
-                  <b>Saludos cordiales,</b> <br><br>
-                </p>
-                <img src="cid:pief" width="50%" height="50%"/>
-            </body>
-            `,
+        html:
+          `
+          <body>
+            <div style="text-align: center;">
+              <img width="25%" height="25%" src="cid:cabeceraf"/>
+            </div>
+            <br>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              El presente correo es para informar el siguiente comunicado: <br>  
+            </p>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
+              <b>Empresa:</b> ${nombre}<br>
+              <b>Asunto:</b> ${asunto} <br>
+              <b>Colaborador que envía:</b> ${USUARIO_ENVIA.rows[0].nombre} ${USUARIO_ENVIA.rows[0].apellido} <br>
+              <b>Cargo:</b> ${USUARIO_ENVIA.rows[0].cargo} <br>
+              <b>Departamento:</b> ${USUARIO_ENVIA.rows[0].departamento} <br>
+              <b>Generado mediante:</b> Aplicación Móvil <br>
+              <b>Fecha de envío:</b> ${fecha} <br> 
+              <b>Hora de envío:</b> ${hora} <br><br>                   
+              <b>Mensaje:</b> ${mensaje} <br><br>
+            </p>
+            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Gracias por la atención</b><br>
+              <b>Saludos cordiales,</b> <br><br>
+            </p>
+            <img src="cid:pief" width="50%" height="50%"/>
+          </body>
+        `
+        ,
         attachments: [
           {
             filename: 'cabecera_firma.jpg',
@@ -368,7 +401,7 @@ class NotificacionTiempoRealControlador {
 
     }
     else {
-      res.jsonp({ message: 'Ups! algo salio mal!!! No fue posible enviar correo electrónico.' });
+      res.jsonp({ message: 'Ups! algo salio mal. No fue posible enviar correo electrónico.' });
     }
   }
 
@@ -407,8 +440,8 @@ class NotificacionTiempoRealControlador {
         `
         SELECT e.id, e.correo, e.nombre, e.apellido, e.cedula,
           tc.cargo, d.nombre AS departamento 
-        FROM datos_actuales_empleado AS e, empl_cargos AS ec, tipo_cargo AS tc, cg_departamentos AS d 
-        WHERE e.id = $1 AND ec.id = e.id_cargo AND tc.id = ec.cargo AND d.id = ec.id_departamento
+        FROM datos_actuales_empleado AS e, eu_empleado_cargos AS ec, e_cat_tipo_cargo AS tc, ed_departamentos AS d 
+        WHERE e.id = $1 AND ec.id = e.id_cargo AND tc.id = ec.id_tipo_cargo AND d.id = ec.id_departamento
         `
         , [id_envia]);
 
@@ -416,32 +449,35 @@ class NotificacionTiempoRealControlador {
         to: correo,
         from: email,
         subject: asunto,
-        html: `<body>
-                <div style="text-align: center;">
-                  <img width="25%" height="25%" src="cid:cabeceraf"/>
-                </div>
-                <br>
-                <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                  El presente correo es para informar el siguiente comunicado: <br>  
-                </p>
-                <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
-                  <b>Empresa:</b> ${nombre}<br>
-                  <b>Asunto:</b> ${asunto} <br>
-                  <b>Colaborador que envía:</b> ${USUARIO_ENVIA.rows[0].nombre} ${USUARIO_ENVIA.rows[0].apellido} <br>
-                  <b>Cargo:</b> ${USUARIO_ENVIA.rows[0].cargo} <br>
-                  <b>Departamento:</b> ${USUARIO_ENVIA.rows[0].departamento} <br>
-                  <b>Generado mediante:</b> Sistema Web <br>
-                  <b>Fecha de envío:</b> ${fecha} <br> 
-                  <b>Hora de envío:</b> ${hora} <br><br>                  
-                  <b>Mensaje:</b> ${mensaje} <br><br>
-                </p>
-                <p style="font-family: Arial; font-size:12px; line-height: 1em;">
-                  <b>Gracias por la atención</b><br>
-                  <b>Saludos cordiales,</b> <br><br>
-                </p>
-                <img src="cid:pief" width="50%" height="50%"/>
-            </body>
-            `,
+        html:
+          `
+          <body>
+            <div style="text-align: center;">
+              <img width="25%" height="25%" src="cid:cabeceraf"/>
+            </div>
+            <br>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              El presente correo es para informar el siguiente comunicado: <br>  
+            </p>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
+              <b>Empresa:</b> ${nombre}<br>
+              <b>Asunto:</b> ${asunto} <br>
+              <b>Colaborador que envía:</b> ${USUARIO_ENVIA.rows[0].nombre} ${USUARIO_ENVIA.rows[0].apellido} <br>
+              <b>Cargo:</b> ${USUARIO_ENVIA.rows[0].cargo} <br>
+              <b>Departamento:</b> ${USUARIO_ENVIA.rows[0].departamento} <br>
+              <b>Generado mediante:</b> Sistema Web <br>
+              <b>Fecha de envío:</b> ${fecha} <br> 
+              <b>Hora de envío:</b> ${hora} <br><br>                  
+              <b>Mensaje:</b> ${mensaje} <br><br>
+            </p>
+            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Gracias por la atención</b><br>
+              <b>Saludos cordiales,</b> <br><br>
+            </p>
+            <img src="cid:pief" width="50%" height="50%"/>
+          </body>
+          `
+        ,
         attachments: [
           {
             filename: 'cabecera_firma.jpg',
@@ -468,7 +504,7 @@ class NotificacionTiempoRealControlador {
       });
 
     } else {
-      res.jsonp({ message: 'Ups! algo salio mal!!! No fue posible enviar correo electrónico.' });
+      res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
     }
   }
 
@@ -480,10 +516,10 @@ class NotificacionTiempoRealControlador {
 
     const response: QueryResult = await pool.query(
       `
-          INSERT INTO realtime_timbres(create_at, id_send_empl, id_receives_empl, descripcion, tipo) 
-          VALUES($1, $2, $3, $4, $5) RETURNING *
-        `,
-      [create_at, id_empl_envia, id_empl_recive, mensaje, tipo]);
+      INSERT INTO ecm_realtime_timbres (fecha_hora, id_empleado_envia, id_empleado_recibe, descripcion, tipo) 
+      VALUES($1, $2, $3, $4, $5) RETURNING *
+      `
+      , [create_at, id_empl_envia, id_empl_recive, mensaje, tipo]);
 
     const [notificiacion] = response.rows;
 
@@ -491,10 +527,10 @@ class NotificacionTiempoRealControlador {
 
     const USUARIO = await pool.query(
       `
-        SELECT (nombre || ' ' || apellido) AS usuario
-        FROM empleados WHERE id = $1
-        `,
-      [id_empl_envia]);
+      SELECT (nombre || ' ' || apellido) AS usuario
+      FROM eu_empleados WHERE id = $1
+      `
+      , [id_empl_envia]);
 
     notificiacion.usuario = USUARIO.rows[0].usuario;
 
@@ -519,28 +555,28 @@ class NotificacionTiempoRealControlador {
 
     const path_folder = path.resolve('logos');
 
-    const { id_envia, correo, mensaje, asunto} = req.body.datosCorreo;
+    const { id_envia, correo, mensaje, asunto } = req.body.datosCorreo;
     const solicitudes = req.body.solicitudes;
 
-    console.log('req.body.movil: ',req.body.movil);
-    if(req.body.movil === true){
+    console.log('req.body.movil: ', req.body.movil);
+    if (req.body.movil === true) {
       dispositivo = 'Aprobado desde aplicación móvil';
       var datos = await Credenciales(req.body.id_empresa);
       tablaHTML = await generarTablaHTMLMovil(solicitudes);
-    }else{
+    } else {
       dispositivo = 'Aprobado desde la aplicacion web';
       var datos = await Credenciales(req.id_empresa);
       tablaHTML = await generarTablaHTMLWeb(solicitudes);
     }
-    
+
     if (datos === 'ok') {
 
       const USUARIO_ENVIA = await pool.query(
         `
         SELECT e.id, e.correo, e.nombre, e.apellido, e.cedula,
           tc.cargo, d.nombre AS departamento 
-        FROM datos_actuales_empleado AS e, empl_cargos AS ec, tipo_cargo AS tc, cg_departamentos AS d 
-        WHERE e.id = $1 AND ec.id = e.id_cargo AND tc.id = ec.cargo AND d.id = ec.id_departamento
+        FROM datos_actuales_empleado AS e, eu_empleado_cargos AS ec, e_cat_tipo_cargo AS tc, ed_departamentos AS d 
+        WHERE e.id = $1 AND ec.id = e.id_cargo AND tc.id = ec.id_tipo_cargo AND d.id = ec.id_departamento
         `
         , [id_envia]);
 
@@ -548,37 +584,40 @@ class NotificacionTiempoRealControlador {
         to: correo,
         from: email,
         subject: asunto,
-        html: `<body>
-                <div style="text-align: center;">
-                  <img width="25%" height="25%" src="cid:cabeceraf"/>
-                </div>
-                <br>
-                <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
-                  El presente correo es para informar el siguiente comunicado: <br>  
-                </p>
-                <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
-                  <b>Empresa:</b> ${nombre}<br>
-                  <b>Asunto:</b> ${asunto} <br>
-                  <b>Colaborador que envía:</b> ${USUARIO_ENVIA.rows[0].nombre} ${USUARIO_ENVIA.rows[0].apellido} <br>
-                  <b>Cargo:</b> ${USUARIO_ENVIA.rows[0].cargo} <br>
-                  <b>Departamento:</b> ${USUARIO_ENVIA.rows[0].departamento} <br>
-                  <b>Generado mediante:</b> Sistema Web <br>
-                  <b>Fecha de envío:</b> ${fecha} <br> 
-                  <b>Hora de envío:</b> ${hora} <br><br>                  
-                  <b>Mensaje:</b> ${dispositivo} 
-                </p>
-                <div style="font-family: Arial; font-size:15px; margin: auto; text-align: center;">
-                  <p><b>LISTADO DE PERMISOS</b></p>
-                  ${tablaHTML}
-                  <br><br>
-                </div>
-                <p style="font-family: Arial; font-size:12px; line-height: 1em;">
-                  <b>Gracias por la atención</b><br>
-                  <b>Saludos cordiales,</b> <br><br>
-                </p>
-                <img src="cid:pief" width="50%" height="50%"/>
-              </body>
-            `,
+        html:
+          `
+          <body>
+            <div style="text-align: center;">
+              <img width="25%" height="25%" src="cid:cabeceraf"/>
+            </div>
+            <br>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;">
+              El presente correo es para informar el siguiente comunicado: <br>  
+            </p>
+            <p style="color:rgb(11, 22, 121); font-family: Arial; font-size:12px; line-height: 1em;" >
+              <b>Empresa:</b> ${nombre}<br>
+              <b>Asunto:</b> ${asunto} <br>
+              <b>Colaborador que envía:</b> ${USUARIO_ENVIA.rows[0].nombre} ${USUARIO_ENVIA.rows[0].apellido} <br>
+              <b>Cargo:</b> ${USUARIO_ENVIA.rows[0].cargo} <br>
+              <b>Departamento:</b> ${USUARIO_ENVIA.rows[0].departamento} <br>
+              <b>Generado mediante:</b> Sistema Web <br>
+              <b>Fecha de envío:</b> ${fecha} <br> 
+              <b>Hora de envío:</b> ${hora} <br><br>                  
+              <b>Mensaje:</b> ${dispositivo} 
+            </p>
+            <div style="font-family: Arial; font-size:15px; margin: auto; text-align: center;">
+              <p><b>LISTADO DE PERMISOS</b></p>
+              ${tablaHTML}
+              <br><br>
+            </div>
+            <p style="font-family: Arial; font-size:12px; line-height: 1em;">
+              <b>Gracias por la atención</b><br>
+              <b>Saludos cordiales,</b> <br><br>
+            </p>
+            <img src="cid:pief" width="50%" height="50%"/>
+          </body>
+          `
+        ,
         attachments: [
           {
             filename: 'cabecera_firma.jpg',
@@ -604,68 +643,68 @@ class NotificacionTiempoRealControlador {
       });
 
     } else {
-      res.jsonp({ message: 'Ups! algo salio mal!!! No fue posible enviar correo electrónico.' });
+      res.jsonp({ message: 'Ups!!! algo salio mal. No fue posible enviar correo electrónico.' });
     }
   }
 
 }
 
-const generarTablaHTMLWeb = async function (datos: any []): Promise<string> {
+const generarTablaHTMLWeb = async function (datos: any[]): Promise<string> {
   let tablaHtml = "<table style='border-collapse: collapse; width: 100%;'>";
   tablaHtml += "<tr style='background-color: #f2f2f2; text-align: center; font-size: 14px;'>";
   tablaHtml += "<th scope='col'>Permiso</th><th scope='col'>Departamento</th><th scope='col'>Empleado</th><th scope='col'>Aprobado</th><th scope='col'>Estado</th><th scope='col'>Observación</th>";
   tablaHtml += "</tr>";
 
-    for(const dato of datos){
-      let colorText = "black";
+  for (const dato of datos) {
+    let colorText = "black";
 
-      if(dato.aprobar === "SI"){
-        colorText = "green";
-      }else if(dato.aprobar === "NO"){
-        colorText = "red";
-      }
-
-      tablaHtml += "<tr style='text-align: center; font-size: 14px;'>"
-      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.id}</td>`;
-      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.nombre_depa}</td>`;
-      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.empleado}</td>`;
-      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px; color: ${colorText};'>${dato.aprobar}</td>`;
-      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.estado}</td>`
-      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.observacion}</td>`;
-      tablaHtml += "<tr>"
+    if (dato.aprobar === "SI") {
+      colorText = "green";
+    } else if (dato.aprobar === "NO") {
+      colorText = "red";
     }
 
-    tablaHtml += "</table>"
-    return tablaHtml;
+    tablaHtml += "<tr style='text-align: center; font-size: 14px;'>"
+    tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.id}</td>`;
+    tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.nombre_depa}</td>`;
+    tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.empleado}</td>`;
+    tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px; color: ${colorText};'>${dato.aprobar}</td>`;
+    tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.estado}</td>`
+    tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.observacion}</td>`;
+    tablaHtml += "<tr>"
+  }
+
+  tablaHtml += "</table>"
+  return tablaHtml;
 };
 
-const generarTablaHTMLMovil = async function (datos: any []): Promise<string> {
+const generarTablaHTMLMovil = async function (datos: any[]): Promise<string> {
   let tablaHtml = "<table style='border-collapse: collapse; width: 100%;'>";
   tablaHtml += "<tr style='background-color: #f2f2f2; text-align: center; font-size: 14px;'>";
   tablaHtml += "<th scope='col'>Permiso</th><th scope='col'>Departamento</th><th scope='col'>Empleado</th><th scope='col'>Aprobado</th><th scope='col'>Estado</th><th scope='col'>Observación</th>";
   tablaHtml += "</tr>";
 
-    for(const dato of datos){
-      let colorText = "black";
+  for (const dato of datos) {
+    let colorText = "black";
 
-      if(dato.aprobacion === "SI"){
-        colorText = "green";
-      }else if(dato.aprobacion === "NO"){
-        colorText = "red";
-      }
-
-      tablaHtml += "<tr style='text-align: center; font-size: 14px;'>"
-      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.id}</td>`;
-      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.nombre_depa}</td>`;
-      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.nempleado}</td>`;
-      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px; color: ${colorText};'>${dato.aprobacion}</td>`;
-      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.estado}</td>`
-      tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.observacion}</td>`;
-      tablaHtml += "<tr>"
+    if (dato.aprobacion === "SI") {
+      colorText = "green";
+    } else if (dato.aprobacion === "NO") {
+      colorText = "red";
     }
 
-    tablaHtml += "</table>"
-    return tablaHtml;
+    tablaHtml += "<tr style='text-align: center; font-size: 14px;'>"
+    tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.id}</td>`;
+    tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.nombre_depa}</td>`;
+    tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.nempleado}</td>`;
+    tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px; color: ${colorText};'>${dato.aprobacion}</td>`;
+    tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.estado}</td>`
+    tablaHtml += `<td style='border: 1px solid #ddd; padding: 8px;'>${dato.observacion}</td>`;
+    tablaHtml += "<tr>"
+  }
+
+  tablaHtml += "</table>"
+  return tablaHtml;
 };
 
 

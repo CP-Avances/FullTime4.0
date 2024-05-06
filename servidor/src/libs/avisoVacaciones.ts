@@ -1,7 +1,7 @@
-import pool from '../database';
-import { enviarMail, email, nombre, cabecera_firma, pie_firma, servidor, puerto, fechaHora, Credenciales }
+import { enviarMail, email, servidor, puerto, Credenciales }
     from './settingsMail';
-import PVacacion from '../class/periVacacion';
+import pool from '../database';
+
 
 const HORA_ENVIO_VACACION_AUTOMATICO = 23;
 const HORA_ENVIO_AVISO_CINCO_DIAS = 0;
@@ -24,7 +24,11 @@ function DescripcionPeriodo() {
 }
 
 async function RegimenEmpleado(idRegimen: number): Promise<any> {
-    let consulta = await pool.query('SELECT * FROM cg_regimenes WHERE id = $1', [idRegimen]);
+    let consulta = await pool.query(
+        `
+        SELECT * FROM ere_cat_regimenes WHERE id = $1
+        `
+        , [idRegimen]);
     return consulta.rows[0];
 }
 
@@ -36,15 +40,23 @@ async function AniosEmpleado(idEmpleado: number): Promise<number> {
     let anioHoy = f.toJSON().split("-")[0];
 
     let anioInicio: string = await pool.query(
-        `SELECT pv.fec_inicio FROM empl_contratos co, peri_vacaciones pv 
-    WHERE co.id_empleado = $1 AND pv.id_empl_contrato = co.id ORDER BY pv.fec_inicio ASC limit 1`,
-        [idEmpleado]).then((result: any) => {
+        `
+        SELECT pv.fecha_inicio 
+        FROM eu_empleado_contratos co, mv_periodo_vacacion pv 
+        WHERE co.id_empleado = $1 AND pv.id_empleado_contrato = co.id 
+        ORDER BY pv.fecha_inicio ASC limit 1
+        `
+        , [idEmpleado]).then((result: any) => {
             return JSON.stringify(result.rows[0].fec_inicio);
         });
     let anioPresente: string = await pool.query(
-        `SELECT pv.fec_final FROM empl_contratos co, peri_vacaciones pv 
-        WHERE co.id_empleado = $1 AND pv.id_empl_contrato = co.id AND 
-        CAST(pv.fec_final AS VARCHAR) like $2 || \'%\'`, [idEmpleado, anioHoy]).then((result: any) => {
+        `
+        SELECT pv.fecha_final 
+        FROM eu_empleado_contratos co, mv_periodo_vacacion pv
+        WHERE co.id_empleado = $1 AND pv.id_empleado_contrato = co.id 
+            AND CAST(pv.fecha_final AS VARCHAR) like $2 || \'%\'
+        `
+        , [idEmpleado, anioHoy]).then((result: any) => {
             return JSON.stringify(result.rows[0].fec_final);
         });
     const total = parseInt(anioPresente.slice(1, 5)) - parseInt(anioInicio.slice(1, 5));
@@ -54,7 +66,13 @@ async function AniosEmpleado(idEmpleado: number): Promise<number> {
 
 async function ObtenerIdEmpleado(idContrato: number): Promise<any> {
     let id_empleado =
-        await pool.query('SELECT e.id FROM empl_contratos co, empleados e WHERE co.id = $1 AND co.id_empleado = e.id AND e.estado = 1 LIMIT 1', [idContrato])
+        await pool.query(
+            `
+            SELECT e.id 
+            FROM eu_empleado_contratos co, eu_empleados e 
+            WHERE co.id = $1 AND co.id_empleado = e.id AND e.estado = 1 LIMIT 1
+            `
+            , [idContrato])
             .then(async (result: any) => {
                 let id = await result.rows.map((obj: any) => { return obj.id });
                 return id[0];
@@ -79,7 +97,15 @@ async function CrearNuevoPeriodo(Obj: any, descripcion: string, dia: Date, anio:
     }
 
     // console.log(nuevo);
-    await pool.query('INSERT INTO peri_vacaciones(id_empl_contrato, descripcion, dia_vacacion, dia_antiguedad, estado, fec_inicio, fec_final, dia_perdido, horas_vacaciones, min_vacaciones) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10 )', [Obj.id_empl_contrato, descripcion, regimen.dia_anio_vacacion, antiguedad, 1, dia, anio, Obj.dia_perdido, Obj.horas_vacaciones, Obj.min_vacaciones])
+    await pool.query(
+        `
+        INSERT INTO mv_periodo_vacacion (id_empleado_contrato, descripcion, dia_vacacion, dia_antiguedad, estado, 
+            fecha_inicio, fecha_final, dia_perdido, horas_vacaciones, minutos_vacaciones) 
+        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10 )
+        `
+        ,
+        [Obj.id_empl_contrato, descripcion, regimen.dia_anio_vacacion, antiguedad, 1, dia, anio, Obj.dia_perdido,
+        Obj.horas_vacaciones, Obj.minutos_vacaciones])
         .then(() => {
             console.log('Registros insertados');
         }).catch((err: any) => {
@@ -89,13 +115,16 @@ async function CrearNuevoPeriodo(Obj: any, descripcion: string, dia: Date, anio:
 
 async function PeriVacacionHoy(fechaHoy: string) {
     // consulta para q devuelva los periodos de vacaciones q finalizan el dia de hoy ******* y si esta o no activo el empleado ===> Activo = 1; Inactivo = 2;
-    // let expira_peri_hoy = await pool.query('select pv.id, pv.id_empl_contrato, pv.dia_vacacion, pv.dia_antiguedad, pv.fec_inicio, pv.fec_final, pv.dia_perdido, pv.horas_vacaciones, pv.min_vacaciones, co.id_regimen from peri_vacaciones pv, empl_contratos co, empleados e where CAST(pv.fec_final AS VARCHAR) like $1 || \'%\' AND pv.estado = 1 AND co.id = pv.id_empl_contrato AND co.id_empleado = e.id AND e.estado = 1', [fechaHoy]);    
+    // let expira_peri_hoy = await pool.query('select pv.id, pv.id_empl_contrato, pv.dia_vacacion, pv.dia_antiguedad, pv.fec_inicio, pv.fec_final, pv.dia_perdido, pv.horas_vacaciones, pv.min_vacaciones, co.id_regimen from mv_periodo_vacacion pv, eu_empleado_contratos co, eu_empleados e where CAST(pv.fec_final AS VARCHAR) like $1 || \'%\' AND pv.estado = 1 AND co.id = pv.id_empl_contrato AND co.id_empleado = e.id AND e.estado = 1', [fechaHoy]);    
     let expira_peri_hoy = await pool.query(
-        `SELECT pv.id, pv.id_empl_contrato, pv.dia_vacacion, pv.dia_antiguedad, pv.fec_final, pv.dia_perdido, 
-    pv.horas_vacaciones, pv.min_vacaciones, co.id_regimen 
-    FROM peri_vacaciones pv, empl_contratos co, empleados e 
-    WHERE CAST(pv.fec_final AS VARCHAR) like $1 || \'%\' AND co.id = pv.id_empl_contrato AND 
-    co.id_empleado = e.id AND e.estado = 1`, [fechaHoy]);
+        `
+        SELECT pv.id, pv.id_empleado_contrato, pv.dia_vacacion, pv.dia_antiguedad, pv.fecha_final, pv.dia_perdido, 
+        pv.horas_vacaciones, pv.minutos_vacaciones, co.id_regimen 
+        FROM mv_periodo_vacacion pv, eu_empleado_contratos co, eu_empleados e 
+        WHERE CAST(pv.fecha_final AS VARCHAR) like $1 || \'%\' AND co.id = pv.id_empleado_contrato 
+            AND co.id_empleado = e.id AND e.estado = 1
+        `
+        , [fechaHoy]);
     return expira_peri_hoy.rows;
 }
 
@@ -146,10 +175,13 @@ export const beforeFiveDays = function () {
         if (hora === HORA_ENVIO_AVISO_CINCO_DIAS) {
 
             const avisoVacacion = await pool.query(
-                `SELECT pv.fec_inicio, pv.fec_final, e.nombre, e.apellido, e.correo 
-            FROM peri_vacaciones AS pv, empl_contratos AS ec, empleados AS e 
-            WHERE pv.id_empl_contrato = ec.id AND ec.id_empleado = e.id AND 
-            pv.fec_inicio = $1`, [diaIncrementado]);
+                `
+                SELECT pv.fecha_inicio, pv.fecha_final, e.nombre, e.apellido, e.correo 
+                FROM mv_periodo_vacacion AS pv, eu_empleado_contratos AS ec, eu_empleados AS e 
+                WHERE pv.id_empleado_contrato = ec.id AND ec.id_empleado = e.id 
+                    AND pv.fecha_inicio = $1
+                `
+                , [diaIncrementado]);
             console.log(avisoVacacion.rows);
             if (avisoVacacion.rowCount > 0) {
                 // Enviar mail a todos los que nacieron en la fecha seleccionada
@@ -159,13 +191,17 @@ export const beforeFiveDays = function () {
                     let data = {
                         to: obj.correo,
                         from: email,
-                        subject: 'Aviso toma de vacaciones',
-                        html: `
-                        <h2> <b> ¡Tienes 5 días para tomar vacaciones! </b> </h2>
-                        <p> <b>${obj.nombre.split(" ")[0]} ${obj.apellido.split(" ")[0]}</b> se le da un aviso de que en 5 días, usted debe
-                        tomar vacaciones como esta prestablecido desde el dia <b> ${obj.fec_inicio.toLocaleDateString().split("T")[0]} </b>
-                        hasta el dia <b>${obj.fec_final.toLocaleDateString().split("T")[0]}</b>.</p>
-                        `
+                        subject: 'AVISO TOMA DE VACACIONES',
+                        html:
+                            `
+                            <h2> <b> ¡Tienes 5 días para tomar vacaciones! </b> </h2>
+                            <p> 
+                                <b>${obj.nombre.split(" ")[0]} ${obj.apellido.split(" ")[0]}</b> se le da un aviso de que 
+                                en 5 días, usted debe tomar vacaciones como esta prestablecido desde el día 
+                                <b> ${obj.fecha_inicio.toLocaleDateString().split("T")[0]} </b> hasta el dia 
+                                <b>${obj.fecha_final.toLocaleDateString().split("T")[0]}</b>.
+                            </p>
+                            `
                     };
                     console.log(data)
                     let port = 465;
@@ -191,10 +227,13 @@ export const beforeTwoDays = function () {
 
         if (hora === HORA_ENVIO_AVISO_DOS_DIAS) {
             const avisoVacacion = await pool.query(
-                `SELECT pv.fec_inicio, pv.fec_final, e.nombre, e.apellido, e.correo 
-                FROM peri_vacaciones AS pv, empl_contratos AS ec, empleados AS e 
-                WHERE pv.id_empl_contrato = ec.id AND ec.id_empleado = e.id AND 
-                pv.fec_inicio = $1`, [diaIncrementado]);
+                `
+                SELECT pv.fecha_inicio, pv.fecha_final, e.nombre, e.apellido, e.correo 
+                FROM mv_periodo_vacacion AS pv, eu_empleado_contratos AS ec, eu_empleados AS e 
+                WHERE pv.id_empleado_contrato = ec.id AND ec.id_empleado = e.id 
+                    AND pv.fecha_inicio = $1
+                `
+                , [diaIncrementado]);
             console.log(avisoVacacion.rows);
             if (avisoVacacion.rowCount > 0) {
                 // Enviar mail a todos los que nacieron en la fecha seleccionada
@@ -204,13 +243,16 @@ export const beforeTwoDays = function () {
                     let data = {
                         to: obj.correo,
                         from: email,
-                        subject: 'Aviso toma de vacaciones',
-                        html: `
-                        <h2> <b> ¡Tienes 2 días para tomar vacaciones! </b> </h2>
-                        <p> <b>${obj.nombre.split(" ")[0]} ${obj.apellido.split(" ")[0]}</b> se le da un aviso de que en 2 días, usted debe
-                        tomar vacaciones como esta prestablecido desde el dia <b> ${obj.fec_inicio.toLocaleDateString().split("T")[0]} </b>
-                        hasta el dia <b>${obj.fec_final.toLocaleDateString().split("T")[0]}</b>.</p>
-                        `
+                        subject: 'AVISO TOMA DE VACACIONES',
+                        html:
+                            `
+                            <h2> <b> ¡Tienes 2 días para tomar vacaciones! </b> </h2>
+                            <p> <b>${obj.nombre.split(" ")[0]} ${obj.apellido.split(" ")[0]}</b> se le da un aviso de que 
+                                en 2 días, usted debe tomar vacaciones como esta prestablecido desde el dia 
+                                <b> ${obj.fecha_inicio.toLocaleDateString().split("T")[0]} </b> hasta el dia 
+                                <b>${obj.fecha_final.toLocaleDateString().split("T")[0]}</b>.
+                            </p>
+                            `
                     };
                     console.log(data)
                     let port = 465;

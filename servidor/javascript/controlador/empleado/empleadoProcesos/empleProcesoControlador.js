@@ -19,46 +19,46 @@ class EmpleadoProcesoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id, id_empleado, id_empl_cargo, fec_inicio, fec_final } = req.body;
             yield database_1.default.query(`
-      INSERT INTO empl_procesos (id, id_empleado, id_empl_cargo, fec_inicio, fec_final) 
+      INSERT INTO map_empleado_procesos (id_proceso, id_empleado, id_empleado_cargo, fecha_inicio, fecha_final) 
       VALUES ($1, $2, $3, $4, $5)
       `, [id, id_empleado, id_empl_cargo, fec_inicio, fec_final]);
-            res.jsonp({ message: 'Procesos del empleado guardados con éxito' });
+            res.jsonp({ message: 'Registro guardado.' });
         });
     }
     ActualizarProcesoEmpleado(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id, id_empl_cargo, fec_inicio, fec_final, id_p } = req.body;
             yield database_1.default.query(`
-      UPDATE empl_procesos SET id = $1, id_empl_cargo = $2, fec_inicio = $3, fec_final = $4 
-      WHERE id_p = $5
+      UPDATE map_empleado_procesos SET id = $1, id_empleado_cargo = $2, fecha_inicio = $3, fecha_final = $4 
+      WHERE id = $5
       `, [id, id_empl_cargo, fec_inicio, fec_final, id_p]);
-            res.jsonp({ message: 'Proceso actualizado exitosamente' });
+            res.jsonp({ message: 'Registro actualizado.' });
         });
     }
     BuscarProcesoUsuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empleado } = req.params;
             const HORARIO_CARGO = yield database_1.default.query(`
-      SELECT ep.id_p, ep.id, ep.id_empl_cargo, ep.fec_inicio, ep.fec_final, cp.nombre AS proceso 
-      FROM empl_procesos AS ep, cg_procesos AS cp 
-      WHERE ep.id_empleado = $1 AND ep.id = cp.id
+      SELECT ep.id, ep.id_proceso, ep.id_empleado_cargo, ep.fecha_inicio, ep.fecha_final, cp.nombre AS proceso 
+      FROM map_empleado_procesos AS ep, map_cat_procesos AS cp 
+      WHERE ep.id_empleado = $1 AND ep.id_proceso = cp.id
       `, [id_empleado]);
             if (HORARIO_CARGO.rowCount > 0) {
                 return res.jsonp(HORARIO_CARGO.rows);
             }
-            res.status(404).jsonp({ text: 'Registro no encontrado' });
+            res.status(404).jsonp({ text: 'Registro no encontrado.' });
         });
     }
     ListarEmpleProcesos(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const PROCESOS = yield database_1.default.query(`
-      SELECT *FROM empl_procesos
+      SELECT * FROM map_empleado_procesos
       `);
             if (PROCESOS.rowCount > 0) {
                 return res.jsonp(PROCESOS.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
@@ -66,7 +66,7 @@ class EmpleadoProcesoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
             yield database_1.default.query(`
-      DELETE FROM empl_procesos WHERE id = $1
+      DELETE FROM map_empleado_procesos WHERE id = $1
       `, [id]);
             res.jsonp({ message: 'Registro eliminado.' });
         });

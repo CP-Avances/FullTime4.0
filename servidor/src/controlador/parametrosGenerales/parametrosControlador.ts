@@ -1,22 +1,15 @@
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import pool from '../../database';
-import fs from 'fs';
-const builder = require('xmlbuilder');
 
 class ParametrosControlador {
 
     // METODO PARA LISTAR PARAMETROS GENERALES
     public async ListarParametros(req: Request, res: Response) {
-        /**
-          SELECT tp.id, tp.descripcion, dtp.descripcion AS detalle
-            FROM tipo_parametro AS tp, detalle_tipo_parametro AS dtp
-            WHERE tp.id = dtp.id_parametro
-         */
         const PARAMETRO = await pool.query(
             `
             SELECT tp.id, tp.descripcion
-            FROM tipo_parametro AS tp
+            FROM ep_parametro AS tp
             `
         );
         if (PARAMETRO.rowCount > 0) {
@@ -33,7 +26,7 @@ class ParametrosControlador {
             const id = req.params.id;
             await pool.query(
                 `
-                DELETE FROM tipo_parametro WHERE id = $1
+                DELETE FROM ep_parametro WHERE id = $1
                 `
                 , [id]);
             res.jsonp({ message: 'Registro eliminado.' });
@@ -48,7 +41,7 @@ class ParametrosControlador {
         const { descripcion, id } = req.body;
         await pool.query(
             `
-            UPDATE tipo_parametro SET descripcion = $1 WHERE id = $2
+            UPDATE ep_parametro SET descripcion = $1 WHERE id = $2
             `
             , [descripcion, id]);
         res.jsonp({ message: 'Registro exitoso.' });
@@ -59,7 +52,7 @@ class ParametrosControlador {
         const { id } = req.params;
         const PARAMETRO = await pool.query(
             `
-            SELECT * FROM tipo_parametro WHERE id = $1
+            SELECT * FROM ep_parametro WHERE id = $1
             `
             , [id]);
         if (PARAMETRO.rowCount > 0) {
@@ -76,7 +69,7 @@ class ParametrosControlador {
         const PARAMETRO = await pool.query(
             `
             SELECT tp.id AS id_tipo, tp.descripcion AS tipo, dtp.id AS id_detalle, dtp.descripcion
-            FROM tipo_parametro AS tp, detalle_tipo_parametro AS dtp
+            FROM ep_parametro AS tp, ep_detalle_parametro AS dtp
             WHERE tp.id = dtp.id_parametro AND tp.id = $1
             `
             , [id]);
@@ -109,7 +102,7 @@ class ParametrosControlador {
         const { id_tipo, descripcion } = req.body;
         await pool.query(
             `
-            INSERT INTO detalle_tipo_parametro
+            INSERT INTO ep_detalle_parametro
             (id_parametro, descripcion) VALUES ($1, $2)
             `
             , [id_tipo, descripcion]);
@@ -121,7 +114,7 @@ class ParametrosControlador {
         const { id, descripcion } = req.body;
         await pool.query(
             `
-            UPDATE detalle_tipo_parametro SET descripcion = $1 WHERE id = $2
+            UPDATE ep_detalle_parametro SET descripcion = $1 WHERE id = $2
             `
             , [descripcion, id]);
         res.jsonp({ message: 'Registro exitoso.' });
@@ -132,7 +125,7 @@ class ParametrosControlador {
         const { descripcion } = req.body;
         const response: QueryResult = await pool.query(
             `
-            INSERT INTO tipo_parametro (descripcion) VALUES ($1) RETURNING *
+            INSERT INTO ep_parametro (descripcion) VALUES ($1) RETURNING *
             `
             , [descripcion]);
 

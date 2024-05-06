@@ -51,7 +51,7 @@ class FaltasControlador {
                 return suc;
             }).filter((suc) => { return suc.regimenes.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No se ha encontrado registro de faltas.' });
+                return res.status(400).jsonp({ message: 'No se ha encontrado registros.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -74,7 +74,7 @@ class FaltasControlador {
                 return e;
             }).filter(e => { return e.empleados.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No se ha encontrado registro de faltas.' });
+                return res.status(400).jsonp({ message: 'No se ha encontrado registros.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -83,12 +83,12 @@ class FaltasControlador {
 const BuscarFaltas = function (fec_inicio, fec_final, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query(`
-        SELECT codigo, CAST(fec_horario AS VARCHAR)
-        FROM plan_general WHERE fec_horario BETWEEN $1 AND $2 AND codigo = $3
+        SELECT codigo, CAST(fecha_horario AS VARCHAR)
+        FROM eu_asistencia_gneral WHERE fecha_horario BETWEEN $1 AND $2 AND codigo = $3
             AND tipo_dia NOT IN (\'L\', \'FD\')
-        GROUP BY codigo, fec_horario
-        HAVING COUNT(fec_hora_timbre) = 0 
-        ORDER BY fec_horario ASC
+        GROUP BY codigo, fecha_horario
+        HAVING COUNT(fecha_hora_timbre) = 0 
+        ORDER BY fecha_horario ASC
         `, [fec_inicio, fec_final, codigo])
             .then(res => {
             return res.rows;

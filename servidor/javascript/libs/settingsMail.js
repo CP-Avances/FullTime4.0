@@ -35,8 +35,11 @@ const Credenciales = function (id_empresa, correo = process.env.EMAIL, password 
 exports.Credenciales = Credenciales;
 function DatosCorreo(id_empresa) {
     return __awaiter(this, void 0, void 0, function* () {
-        let credenciales = yield database_1.default.query('SELECT correo, password_correo, nombre, logo, pie_firma, cabecera_firma, servidor, puerto ' +
-            'FROM cg_empresa WHERE id = $1', [id_empresa])
+        let credenciales = yield database_1.default.query(`
+    SELECT correo, password_correo, nombre, logo, pie_firma, cabecera_firma, servidor, puerto
+    FROM e_empresa 
+    WHERE id = $1
+    `, [id_empresa])
             .then(result => {
             return result.rows;
         });
@@ -145,7 +148,9 @@ exports.FormatearHora = FormatearHora;
 const BuscarFecha = function () {
     return __awaiter(this, void 0, void 0, function* () {
         return {
-            fecha: yield database_1.default.query(`SELECT descripcion FROM detalle_tipo_parametro WHERE id_tipo_parametro = 25`).then(result => {
+            fecha: yield database_1.default.query(`
+      SELECT descripcion FROM ep_detalle_parametro WHERE id_parametro = 25
+      `).then(result => {
                 if (result.rowCount != 0) {
                     return result.rows[0].descripcion;
                 }
@@ -160,7 +165,9 @@ exports.BuscarFecha = BuscarFecha;
 const BuscarHora = function () {
     return __awaiter(this, void 0, void 0, function* () {
         return {
-            hora: yield database_1.default.query(`SELECT descripcion FROM detalle_tipo_parametro WHERE id_tipo_parametro = 26`).then(result => {
+            hora: yield database_1.default.query(`
+      SELECT descripcion FROM ep_detalle_parametro WHERE id_parametro = 26
+      `).then(result => {
                 if (result.rowCount != 0) {
                     return result.rows[0].descripcion;
                 }

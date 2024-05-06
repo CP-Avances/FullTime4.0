@@ -46,7 +46,6 @@ import HORA_EXTRA_PEDIDA_RUTAS from './rutas/horaExtra/horaExtraRutas';
 import BIRTHDAY_RUTAS from './rutas/birthday/birthdayRutas';
 import KARDEX_VACACION_RUTAS from './rutas/reportes/kardexVacacionesRutas';
 import ASISTENCIA_RUTAS from './rutas/reportes/asistenciaRutas';
-import CARGA_MULTIPLE_RUTAS from './rutas/cargaMultiple/cargaMultipleRutas';
 import REPORTES_RUTAS from './rutas/reportes/reportesRutas';
 import PLAN_HORAS_EXTRAS_RUTAS from './rutas/planHoraExtra/planHoraExtraRutas';
 import DATOS_GENERALES_RUTAS from './rutas/datosGenerales/datosGeneralesRutas';
@@ -221,9 +220,6 @@ class Servidor {
         // HORAS EXTRAS
         this.app.use('/planificacionHoraExtra', PLAN_HORAS_EXTRAS_RUTAS); // acceso controlado por ModuloHoraExtraValidation
 
-        // CARGA MULTIPLE
-        this.app.use('/cargaMultiple', CARGA_MULTIPLE_RUTAS);
-
         // DATOS GENERALES QUE COMPARTEN VARIOS ARCHIVOS
         this.app.use('/generalidades', DATOS_GENERALES_RUTAS);
 
@@ -268,11 +264,11 @@ class Servidor {
             socket.on("nueva_notificacion", (data: any) => {
                 let data_llega = {
                     id: data.id,
-                    id_send_empl: data.id_send_empl,
-                    id_receives_empl: data.id_receives_empl,
-                    id_receives_depa: data.id_receives_depa,
+                    id_send_empl: data.id_empleado_envia,
+                    id_receives_empl: data.id_empleado_recibe,
+                    id_receives_depa: data.id_departamento_recibe,
                     estado: data.estado,
-                    create_at: data.create_at,
+                    create_at: data.fecha_hora,
                     id_permiso: data.id_permiso,
                     id_vacaciones: data.id_vacaciones,
                     id_hora_extra: data.id_hora_extra,
@@ -289,8 +285,8 @@ class Servidor {
                 let data_llega = {
                     id: data.id,
                     create_at: data.create_at,
-                    id_send_empl: data.id_send_empl,
-                    id_receives_empl: data.id_receives_empl,
+                    id_send_empl: data.id_empleado_envia,
+                    id_receives_empl: data.id_empleado_recibe,
                     visto: data.visto,
                     descripcion: data.descripcion,
                     id_timbre: data.id_timbre,
@@ -314,10 +310,7 @@ import { cumpleanios } from './libs/sendBirthday';
 
 import { beforeFiveDays, beforeTwoDays, Peri_Vacacion_Automatico } from './libs/avisoVacaciones';
 import { RegistrarAsistenciaByTimbres } from './libs/ContarHoras';
-import { NotificacionTimbreAutomatica } from './libs/NotiTimbres'
-import { NotificacionSinTimbres } from './libs/SinTimbres'
 import { DesactivarFinContratoEmpleado } from './libs/DesactivarEmpleado'
-import { generarTimbres } from './script/scriptTimbres';
 
 // LLAMA AL MEODO DE CUMPLEAÑOS
 cumpleanios();
@@ -333,10 +326,6 @@ Peri_Vacacion_Automatico();
 RegistrarAsistenciaByTimbres();
 
 // ----------// conteoPermisos();
-
-NotificacionTimbreAutomatica();
-
-NotificacionSinTimbres();
 
 DesactivarFinContratoEmpleado();
 

@@ -107,7 +107,7 @@ export class EditarHorarioComponent implements OnInit {
     }
 
     this.formulario.patchValue({
-      horarioMinAlmuerzoForm: this.data.horario.min_almuerzo,
+      horarioMinAlmuerzoForm: this.data.horario.minutos_comida,
       nombreForm: this.data.horario.nombre,
       codigoForm: this.data.horario.codigo,
       tipoForm: this.data.horario.nocturno,

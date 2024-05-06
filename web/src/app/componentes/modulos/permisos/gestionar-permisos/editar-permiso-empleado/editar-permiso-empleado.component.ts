@@ -992,7 +992,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
       // HORARIOS CON FINALIZACION DE JORNADA EN UN MISMO DIA
       if (informacion.message === 'CASO_1') {
         for (let i = 0; i < datos.length; i++) {
-          this.CalcularHoras(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i].min_almuerzo);
+          this.CalcularHoras(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i].almuerzo_min);
         }
       }
       // HORARIOS CON FINALIZACION DE JORNADA AL SIGUIENTE DIA
@@ -1009,7 +1009,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
               ((hora_inicio_ <= datos[i].hora_inicio || hora_inicio_ >= datos[i].hora_inicio) &&
                 hora_inicio_ >= horario_.hora_inicio)) {
               console.log('entra if entrada = fecha_inicio')
-              this.CalcularHoras(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i].min_almuerzo);
+              this.CalcularHoras(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i].almuerzo_min);
               break;
             }
             else {
@@ -1024,7 +1024,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
                 ((hora_final_ >= datos[i].hora_final || hora_final_ <= datos[i].hora_final) &&
                   hora_final_ <= horario_.hora_final)) {
                 console.log('entra if salida = fecha_inicio')
-                this.CalcularHoras(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i].min_almuerzo);
+                this.CalcularHoras(form, fecha_inicio, fecha_final, hora_inicio_, hora_final_, datos[i].almuerzo_min);
                 break;
               }
               else {
@@ -1491,7 +1491,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
     if (this.recuperar.length != 0) {
       this.fechas_solicitud.map((obj: any) => {
         for (let j = 0; j < this.recuperar.length; j++) {
-          if (moment(this.recuperar[j].fec_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
+          if (moment(this.recuperar[j].fecha_recuperacion, 'YYYY-MM-DD').format('YYYY-MM-DD') === obj) {
             this.contar_recuperables = this.contar_recuperables + 1;
             break;
           }
@@ -1501,10 +1501,10 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
 
     if (this.horario.length != 0) {
       for (let k = 0; k < this.horario.length; k++) {
-        if (this.horario[k].estado_origen === 'L' && this.horario[k].tipo_entr_salida === 'E') {
+        if (this.horario[k].estado_origen === 'L' && this.horario[k].tipo_accion === 'E') {
           this.contar_libres = this.contar_libres + 1;
         }
-        if (this.horario[k].estado_origen === 'N' && this.horario[k].tipo_entr_salida === 'E') {
+        if (this.horario[k].estado_origen === 'N' && this.horario[k].tipo_accion === 'E') {
           this.contar_laborables = this.contar_laborables + 1;
         }
       }
@@ -1814,7 +1814,7 @@ export class EditarPermisoEmpleadoComponent implements OnInit {
         this.solInfo = [];
         this.solInfo = {
           permiso_mail: res.permiso_mail,
-          permiso_noti: res.permiso_noti,
+          permiso_noti: res.permiso_notificacion,
           empleado: res.id_empleado,
           id_dep: res.id_departamento,
           id_suc: res.id_sucursal,

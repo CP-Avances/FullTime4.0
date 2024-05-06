@@ -1,8 +1,6 @@
 // IMPORTAR LIBRERIAS
 import { Request, Response } from 'express';
-const builder = require('xmlbuilder');
 import pool from '../../database';
-import fs from 'fs';
 
 class RolesControlador {
 
@@ -10,7 +8,7 @@ class RolesControlador {
   public async ListarRoles(req: Request, res: Response) {
     const ROL = await pool.query(
       `
-      SELECT id, nombre FROM cg_roles ORDER BY nombre ASC
+      SELECT id, nombre FROM ero_cat_roles ORDER BY nombre ASC
       `
     );
     if (ROL.rowCount > 0) {
@@ -25,7 +23,7 @@ class RolesControlador {
     const id = req.params.id;
     await pool.query(
       `
-      DELETE FROM cg_roles WHERE id = $1
+      DELETE FROM ero_cat_roles WHERE id = $1
       `
       , [id]);
     res.jsonp({ message: 'Registro eliminado.' });
@@ -36,7 +34,7 @@ class RolesControlador {
     const { nombre } = req.body;
     await pool.query(
       `
-       INSERT INTO cg_roles (nombre) VALUES ($1)
+       INSERT INTO ero_cat_roles (nombre) VALUES ($1)
        `
       , [nombre]);
     res.jsonp({ message: 'Registro guardado.' });
@@ -58,7 +56,11 @@ class RolesControlador {
 
   public async ListarRolesActualiza(req: Request, res: Response) {
     const id = req.params.id;
-    const ROL = await pool.query('SELECT * FROM cg_roles WHERE NOT id = $1', [id]);
+    const ROL = await pool.query(
+      `
+      SELECT * FROM ero_cat_roles WHERE NOT id = $1
+      `
+      , [id]);
     if (ROL.rowCount > 0) {
       return res.jsonp(ROL.rows)
     }
@@ -69,7 +71,11 @@ class RolesControlador {
 
   public async ObtnenerUnRol(req: Request, res: Response): Promise<any> {
     const { id } = req.params;
-    const ROL = await pool.query('SELECT * FROM cg_roles WHERE id = $1', [id]);
+    const ROL = await pool.query(
+      `
+      SELECT * FROM ero_cat_roles WHERE id = $1
+      `
+      , [id]);
     if (ROL.rowCount > 0) {
       return res.jsonp(ROL.rows)
     } else {
@@ -80,12 +86,13 @@ class RolesControlador {
 
   public async ActualizarRol(req: Request, res: Response): Promise<void> {
     const { nombre, id } = req.body;
-    await pool.query('UPDATE cg_roles SET nombre = $1 WHERE id = $2', [nombre, id]);
-    res.jsonp({ message: 'Registro Actualizado' });
+    await pool.query(
+      `
+      UPDATE ero_cat_roles SET nombre = $1 WHERE id = $2
+      `
+      , [nombre, id]);
+    res.jsonp({ message: 'Registro actualizado.' });
   }
-
-
-
 
 }
 

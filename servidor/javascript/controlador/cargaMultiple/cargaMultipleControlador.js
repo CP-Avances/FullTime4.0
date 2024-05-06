@@ -33,18 +33,24 @@ class CargaMultipleControlador {
                 const { cedula_empleado } = data;
                 console.log('entra_empleado', cedula_empleado);
                 // Buscar el id del empleado
-                const id_empleado = yield database_1.default.query('SELECT id FROM empleados WHERE cedula = $1', [cedula_empleado]);
+                const id_empleado = yield database_1.default.query(`
+                SELECT id FROM eu_empleados WHERE cedula = $1
+                `, [cedula_empleado]);
                 // Buscar el id_cargo actual del empleado
-                const id_cargo_empleado = yield database_1.default.query('SELECT MAX(e_cargo.id) ' +
-                    'FROM empl_cargos AS e_cargo, empl_contratos AS contrato_e, empleados AS e ' +
-                    'WHERE contrato_e.id_empleado = e.id AND e_cargo.id_empl_contrato = contrato_e.id ' +
-                    'AND e.id = $1', [id_empleado.rows[0]['id']]);
+                const id_cargo_empleado = yield database_1.default.query(`
+                SELECT MAX(e_cargo.id)
+                FROM eu_empleado_cargos AS e_cargo, eu_empleado_contratos AS contrato_e, eu_empleados AS e 
+                WHERE contrato_e.id_empleado = e.id AND e_cargo.id_contrato = contrato_e.id 
+                    AND e.id = $1
+                `, [id_empleado.rows[0]['id']]);
                 // Registrar planificacion de horario al empleado   
                 plan.forEach((data2) => __awaiter(this, void 0, void 0, function* () {
                     const { fecha_inicio, fecha_final } = data2;
                     console.log('horario', cedula_empleado, fecha_inicio, fecha_final);
-                    yield database_1.default.query('INSERT INTO plan_horarios ( id_cargo, fec_inicio, fec_final ) ' +
-                        'VALUES ($1, $2, $3)', [id_cargo_empleado.rows[0]['max'], fecha_inicio, fecha_final]);
+                    yield database_1.default.query(`
+                    INSERT INTO plan_horarios ( id_cargo, fec_inicio, fec_final )
+                    VALUES ($1, $2, $3)
+                    `, [id_cargo_empleado.rows[0]['max'], fecha_inicio, fecha_final]);
                     // Registrar detalle de la planificación del horario
                     detalle.forEach((data3) => __awaiter(this, void 0, void 0, function* () {
                         const { fecha, tipo_dia, horario } = data3;
@@ -89,7 +95,7 @@ class CargaMultipleControlador {
                 // Buscar el id_cargo actual del empleado
                 const id_cargo_empleado = yield database_1.default.query('SELECT MAX(e_cargo.id) ' +
                     'FROM empl_cargos AS e_cargo, empl_contratos AS contrato_e, empleados AS e ' +
-                    'WHERE contrato_e.id_empleado = e.id AND e_cargo.id_empl_contrato = contrato_e.id ' +
+                    'WHERE contrato_e.id_empleado = e.id AND e_cargo.id_contrato = contrato_e.id ' +
                     'AND e.id = $1', [id_empleado.rows[0]['id']]);
                 // Arreglo de horario fijo
                 horarios.forEach((data) => __awaiter(this, void 0, void 0, function* () {

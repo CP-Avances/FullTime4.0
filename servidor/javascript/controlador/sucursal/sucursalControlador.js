@@ -14,24 +14,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SUCURSAL_CONTROLADOR = void 0;
 const accesoCarpetas_1 = require("../../libs/accesoCarpetas");
-const database_1 = __importDefault(require("../../database"));
 const xlsx_1 = __importDefault(require("xlsx"));
-const fs_1 = __importDefault(require("fs"));
+const database_1 = __importDefault(require("../../database"));
 const path_1 = __importDefault(require("path"));
-const builder = require('xmlbuilder');
+const fs_1 = __importDefault(require("fs"));
 class SucursalControlador {
     // BUSCAR SUCURSALES POR EL NOMBRE
     BuscarNombreSucursal(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre } = req.body;
             const SUCURSAL = yield database_1.default.query(`
-      SELECT * FROM sucursales WHERE UPPER(nombre) = $1
+      SELECT * FROM e_sucursales WHERE UPPER(nombre) = $1
       `, [nombre]);
             if (SUCURSAL.rowCount > 0) {
                 return res.jsonp(SUCURSAL.rows);
             }
             else {
-                return res.status(404).jsonp({ text: 'No se encuentran registros' });
+                return res.status(404).jsonp({ text: 'No se encuentran registros.' });
             }
         });
     }
@@ -40,7 +39,7 @@ class SucursalControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre, id_ciudad, id_empresa } = req.body;
             const response = yield database_1.default.query(`
-      INSERT INTO sucursales (nombre, id_ciudad, id_empresa) VALUES ($1, $2, $3) RETURNING *
+      INSERT INTO e_sucursales (nombre, id_ciudad, id_empresa) VALUES ($1, $2, $3) RETURNING *
       `, [nombre, id_ciudad, id_empresa]);
             const [sucursal] = response.rows;
             if (sucursal) {
@@ -56,7 +55,7 @@ class SucursalControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { nombre, id_ciudad, id } = req.body;
             yield database_1.default.query(`
-      UPDATE sucursales SET nombre = $1, id_ciudad = $2 WHERE id = $3
+      UPDATE e_sucursales SET nombre = $1, id_ciudad = $2 WHERE id = $3
       `, [nombre, id_ciudad, id]);
             res.jsonp({ message: 'Registro actualizado.' });
         });
@@ -66,7 +65,7 @@ class SucursalControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_empresa } = req.params;
             const SUCURSAL = yield database_1.default.query(`
-      SELECT * FROM sucursales WHERE id_empresa = $1
+      SELECT * FROM e_sucursales WHERE id_empresa = $1
       `, [id_empresa]);
             if (SUCURSAL.rowCount > 0) {
                 return res.jsonp(SUCURSAL.rows);
@@ -81,7 +80,7 @@ class SucursalControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const SUCURSAL = yield database_1.default.query(`
       SELECT s.id, s.nombre, s.id_ciudad, c.descripcion, s.id_empresa, ce.nombre AS nomempresa
-      FROM sucursales s, ciudades c, cg_empresa ce
+      FROM e_sucursales s, e_ciudades c, e_empresa ce
       WHERE s.id_ciudad = c.id AND s.id_empresa = ce.id
       ORDER BY s.id
       `);
@@ -99,7 +98,7 @@ class SucursalControlador {
             try {
                 const id = req.params.id;
                 yield database_1.default.query(`
-        DELETE FROM sucursales WHERE id = $1
+        DELETE FROM e_sucursales WHERE id = $1
         `, [id]);
                 res.jsonp({ message: 'Registro eliminado.' });
             }
@@ -114,7 +113,7 @@ class SucursalControlador {
             const { id } = req.params;
             const SUCURSAL = yield database_1.default.query(`
       SELECT s.id, s.nombre, s.id_ciudad, c.descripcion, s.id_empresa, ce.nombre AS nomempresa
-      FROM sucursales s, ciudades c, cg_empresa ce
+      FROM e_sucursales s, e_ciudades c, e_empresa ce
       WHERE s.id_ciudad = c.id AND s.id_empresa = ce.id AND s.id = $1
       `, [id]);
             if (SUCURSAL.rowCount > 0) {
@@ -154,12 +153,16 @@ class SucursalControlador {
                     (data.nom_sucursal != undefined && data.nom_sucursal != '') &&
                     (data.ciudad != undefined && data.ciudad != '')) {
                     //Validar primero que exista la ciudad en la tabla ciudades
-                    const existe_ciudad = yield database_1.default.query('SELECT id FROM ciudades WHERE UPPER(descripcion) = UPPER($1)', [ciudad]);
+                    const existe_ciudad = yield database_1.default.query(`
+          SELECT id FROM e_ciudades WHERE UPPER(descripcion) = UPPER($1)
+          `, [ciudad]);
                     var id_ciudad = existe_ciudad.rows[0];
                     if (id_ciudad != undefined && id_ciudad != '') {
                         // VERIFICACIÓN SI LA SUCURSAL NO ESTE REGISTRADA EN EL SISTEMA
-                        const VERIFICAR_SUCURSAL = yield database_1.default.query('SELECT * FROM sucursales ' +
-                            'WHERE UPPER(nombre) = UPPER($1) AND id_ciudad = $2', [nombre, id_ciudad.id]);
+                        const VERIFICAR_SUCURSAL = yield database_1.default.query(`
+            SELECT * FROM e_sucursales 
+            WHERE UPPER(nombre) = UPPER($1) AND id_ciudad = $2
+            `, [nombre, id_ciudad.id]);
                         if (VERIFICAR_SUCURSAL.rowCount === 0) {
                             data.fila = item;
                             data.nom_sucursal = nombre;

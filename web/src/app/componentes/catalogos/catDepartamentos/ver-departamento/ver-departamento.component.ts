@@ -215,8 +215,8 @@ export class VerDepartamentoComponent implements OnInit {
   depa: string;
   AbrirVentanaVerListadoEmpleados(departamento: any) {
     this.habilitarprogress = true;
-    var id_depa = departamento.id_dep_nivel;
-    this.depa = departamento.dep_nivel_nombre;
+    var id_depa = departamento.id_departamento_nivel;
+    this.depa = departamento.departamento_nombre_nivel;
     this.auto.BuscarListaEmpleadosAutorizan(id_depa).subscribe(datos => {
       this.empleados = datos;
       this.habilitarprogress = false;

@@ -489,7 +489,7 @@ export class PrincipalHorarioComponent implements OnInit {
                 return [
                   { text: obj.id, style: 'itemsTableC' },
                   { text: obj.nombre, style: 'itemsTable' },
-                  { text: obj.min_almuerzo, style: 'itemsTableC' },
+                  { text: obj.minutos_comida, style: 'itemsTableC' },
                   { text: obj.hora_trabajo, style: 'itemsTableC' },
                   { text: obj.noturno == true ? 'Sí' : 'No', style: 'itemsTableC' },
                   { text: obj.detalle == true ? 'Sí' : 'No', style: 'itemsTableC' },
@@ -547,7 +547,7 @@ export class PrincipalHorarioComponent implements OnInit {
         "horario": {
           "$": { "id": obj.id },
           "nombre": obj.nombre,
-          "min_almuerzo": obj.min_almuerzo,
+          "min_almuerzo": obj.minutos_comida,
           "hora_trabajo": obj.hora_trabajo,
           "noturno": obj.nocturno,
           "requiere_detalle": obj.detalle,

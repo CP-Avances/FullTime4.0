@@ -1,5 +1,5 @@
-import { Request, Response } from 'express'
 import { CalcularHoraExtra } from '../../libs/CalcularHorasExtras';
+import { Request, Response } from 'express';
 
 class ReporteHoraExtraControlador {
 
@@ -19,4 +19,5 @@ class ReporteHoraExtraControlador {
 }
 
 const REPORTE_HORA_EXTRA_CONTROLADOR = new ReporteHoraExtraControlador();
+
 export default REPORTE_HORA_EXTRA_CONTROLADOR  

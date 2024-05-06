@@ -143,7 +143,7 @@ export class EmplCargosComponent implements OnInit {
       id_contrato: this.datoEmpleado.idContrato,
     }
     this.restEmpleado.BuscarFechaIdContrato(datosBusqueda).subscribe(response => {
-      if (Date.parse(response[0].fec_ingreso.split('T')[0]) < Date.parse(form.fecInicioForm)) {
+      if (Date.parse(response[0].fecha_ingreso.split('T')[0]) < Date.parse(form.fecInicioForm)) {
         if (Date.parse(form.fecInicioForm) < Date.parse(form.fecFinalForm)) {
           this.RegistrarCargo(form);
         }

@@ -689,7 +689,7 @@ export class ReporteEntradaSalidaComponent implements OnInit {
 
             // BUSQUEDA de los datos
             this.totalEntradasSalidas.forEach(element => {
-              fecha_timbre = moment(element.fec_hora_timbre).format('DD/MM/YYYY');
+              fecha_timbre = moment(element.fecha_hora_timbre).format('DD/MM/YYYY');
               // TIMBRE EXISTENTE - ESTADO Y HORA DEL TIMBRE
 
               //console.log('ver fecha2 map ', fecha_timbre, element.accion);
@@ -699,25 +699,25 @@ export class ReporteEntradaSalidaComponent implements OnInit {
                 console.log('entrada ', fecha_timbre, element.accion);
                 entrada = 'REGISTRADO'
                 horarioE = element.hora;
-                timbreE = moment(element.fec_hora_timbre).format('HH:mm:ss')
+                timbreE = moment(element.fecha_hora_timbre).format('HH:mm:ss')
               }
               else if (dayFecha === fecha_timbre && element.accion === 'S') {
                 console.log('salida ', fecha_timbre, element.accion);
                 salida = 'REGISTRADO'
                 horarioS = element.hora;
-                timbreS = moment(element.fec_hora_timbre).format('HH:mm:ss')
+                timbreS = moment(element.fecha_hora_timbre).format('HH:mm:ss')
               }
               else if (dayFecha === fecha_timbre && element.accion === 'I/A') {
                 console.log('inicio comida ', fecha_timbre, element.accion);
                 almuerzoS = 'REGISTRADO'
                 horarioAS = element.hora;
-                timbreAlmuerzoS = moment(element.fec_hora_timbre).format('HH:mm:ss')
+                timbreAlmuerzoS = moment(element.fecha_hora_timbre).format('HH:mm:ss')
               }
               else if (dayFecha === fecha_timbre && element.accion === 'F/A') {
                 console.log('fin comida ', fecha_timbre, element.accion);
                 almuerzoE = 'REGISTRADO'
                 horarioAE = element.hora;
-                timbreAlmuerzoE = moment(element.fec_hora_timbre).format('HH:mm:ss')
+                timbreAlmuerzoE = moment(element.fecha_hora_timbre).format('HH:mm:ss')
               }
               // NO EXISTE TIMBRE
               else {
@@ -1001,27 +1001,27 @@ export class ReporteEntradaSalidaComponent implements OnInit {
 
       // BUSQUEDA de los datos
       this.totalEntradasSalidas.forEach(element => {
-        fecha_timbre = moment(element.fec_hora_timbre).format('DD/MM/YYYY');
+        fecha_timbre = moment(element.fecha_hora_timbre).format('DD/MM/YYYY');
         // TIMBRE EXISTENTE - ESTADO Y HORA DEL TIMBRE
         if (dayFecha === fecha_timbre && element.accion === 'E') {
           entrada = 'REGISTRADO'
           horarioE = element.hora;
-          timbreE = moment(element.fec_hora_timbre).format('HH:mm:ss')
+          timbreE = moment(element.fecha_hora_timbre).format('HH:mm:ss')
         }
         else if (dayFecha === fecha_timbre && element.accion === 'S') {
           salida = 'REGISTRADO'
           horarioS = element.hora;
-          timbreS = moment(element.fec_hora_timbre).format('HH:mm:ss')
+          timbreS = moment(element.fecha_hora_timbre).format('HH:mm:ss')
         }
         else if (dayFecha === fecha_timbre && element.accion === 'I/A') {
           almuerzoS = 'REGISTRADO'
           horarioAS = element.hora;
-          timbreAlmuerzoS = moment(element.fec_hora_timbre).format('HH:mm:ss')
+          timbreAlmuerzoS = moment(element.fecha_hora_timbre).format('HH:mm:ss')
         }
         else if (dayFecha === fecha_timbre && element.accion === 'F/A') {
           almuerzoE = 'REGISTRADO'
           horarioAE = element.hora;
-          timbreAlmuerzoE = moment(element.fec_hora_timbre).format('HH:mm:ss')
+          timbreAlmuerzoE = moment(element.fecha_hora_timbre).format('HH:mm:ss')
         }
         // NO EXISTE TIMBRE
         else {

@@ -52,7 +52,7 @@ class ReportesTiempoLaboradoControlador {
                 return suc;
             }).filter((suc) => { return suc.regimenes.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No se ha encontrado registro de tiempo laborado.' });
+                return res.status(400).jsonp({ message: 'No se ha encontrado registros.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -76,7 +76,7 @@ class ReportesTiempoLaboradoControlador {
                 return e;
             }).filter(e => { return e.empleados.length > 0; });
             if (nuevo.length === 0)
-                return res.status(400).jsonp({ message: 'No se ha encontrado registro de tiempo laborado.' });
+                return res.status(400).jsonp({ message: 'No se ha encontrado registros.' });
             return res.status(200).jsonp(nuevo);
         });
     }
@@ -85,13 +85,13 @@ class ReportesTiempoLaboradoControlador {
 const BuscarTiempoLaborado = function (fec_inicio, fec_final, codigo) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield database_1.default.query(`
-        SELECT CAST(fec_horario AS VARCHAR), CAST(fec_hora_horario AS VARCHAR), CAST(fec_hora_timbre AS VARCHAR),
-            codigo, estado_timbre, tipo_entr_salida AS accion, min_alimentacion, tipo_dia, id_horario, 
+        SELECT CAST(fecha_horario AS VARCHAR), CAST(fecha_hora_horario AS VARCHAR), CAST(fecha_hora_timbre AS VARCHAR),
+            codigo, estado_timbre, tipo_accion AS accion, minutos_alimentacion, tipo_dia, id_horario, 
             estado_origen, tolerancia 
-        FROM plan_general WHERE CAST(fec_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' 
+        FROM eu_asistencia_general WHERE CAST(fecha_hora_horario AS VARCHAR) BETWEEN $1 || \'%\' 
             AND ($2::timestamp + \'1 DAY\') || \'%\' AND codigo = $3 
-            AND tipo_entr_salida IN (\'E\',\'I/A\', \'F/A\', \'S\') 
-        ORDER BY codigo, fec_hora_horario ASC
+            AND tipo_accion IN (\'E\',\'I/A\', \'F/A\', \'S\') 
+        ORDER BY codigo, fecha_hora_horario ASC
         `, [fec_inicio, fec_final, codigo])
             .then(res => {
             return res.rows;

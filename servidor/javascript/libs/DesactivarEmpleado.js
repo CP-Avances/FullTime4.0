@@ -24,7 +24,9 @@ const DesactivarFinContratoEmpleado = function () {
         let fecha = (0, moment_1.default)(f).format('YYYY-MM-DD');
         if (hora === HORA_EJECUTA) {
             let idsEmpleados_FinContrato = yield database_1.default.query(`
-                SELECT DISTINCT id_empleado FROM empl_contratos WHERE CAST(fec_salida AS VARCHAR) LIKE $1 || \'%\' 
+                SELECT DISTINCT id_empleado 
+                FROM eu_empleado_contratos 
+                WHERE CAST(fecha_salida AS VARCHAR) LIKE $1 || \'%\' 
                 ORDER BY id_empleado DESC
                 `, [fecha])
                 .then(result => {
@@ -33,11 +35,12 @@ const DesactivarFinContratoEmpleado = function () {
             if (idsEmpleados_FinContrato.length > 0) {
                 idsEmpleados_FinContrato.forEach((obj) => __awaiter(this, void 0, void 0, function* () {
                     yield database_1.default.query(`
-                        UPDATE empleados SET estado = 2 WHERE id = $1
+                        UPDATE eu_empleados SET estado = 2 WHERE id = $1
                         `, [obj.id_empleado]) // 2 => DESACTIVADO O INACTIVO
                         .then(result => { });
                     yield database_1.default.query(`
-                        UPDATE usuarios SET estado = false, app_habilita = false WHERE id_empleado = $1
+                        UPDATE eu_usuarios SET estado = false, app_habilita = false 
+                        WHERE id_empleado = $1
                         `, [obj.id_empleado]) // false => YA NO TIENE ACCESO
                         .then(result => { });
                 }));
