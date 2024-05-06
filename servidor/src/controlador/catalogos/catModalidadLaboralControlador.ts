@@ -25,35 +25,83 @@ class ModalidaLaboralControlador {
         }
     }
 
-    public async CrearMadalidadLaboral(req: Request, res: Response) {
+    public async CrearMadalidadLaboral(req: Request, res: Response): Promise<Response> {
         try {
-            const modalidad = req.body;
-            console.log('modalidad: ', modalidad);
-            //await pool.query(
-            //`
-            //INSERT INTO e_cat_modalidad_trabajo (descripcion) VALUES ($1)
-            //`
-            //, [modalidad]);
+            const { modalidad } = req.body;
+            var VERIFICAR_MODALIDAD = await pool.query(
+                `
+                SELECT * FROM e_cat_modalidad_trabajo WHERE UPPER(descripcion) = $1
+                `
+                , [modalidad.toUpperCase()])
+            console.log('VERIFICAR_MODALIDAD: ', VERIFICAR_MODALIDAD.rows[0]);
+            if (VERIFICAR_MODALIDAD.rows[0] == undefined || VERIFICAR_MODALIDAD.rows[0] == '') {
+                // Dar formato a la palabra de modalidad
+                const modali = modalidad.charAt(0).toUpperCase() + modalidad.slice(1).toLowerCase();
 
-            res.jsonp({ message: 'Registro guardado.' });
+                const response: QueryResult = await pool.query(
+                    `
+                    INSERT INTO e_cat_modalidad_trabajo (descripcion) VALUES ($1) RETURNING *
+                    `
+                    , [modali]);
+
+                const [modalidadLaboral] = response.rows;
+
+                if (modalidadLaboral) {
+                    return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' })
+                } else {
+                    return res.status(404).jsonp({ message: 'No se pudo guardar', status: '400' })
+                }
+            } else {
+                return res.jsonp({ message: 'Ya existe la modalidad laboral', status: '300' })
+            }
+
+
         }
         catch (error) {
-            return res.jsonp({ message: 'error' });
+            return res.status(500).jsonp({ message: 'error', status: '500' });
+        }
+    }
+
+    public async EditarModalidadLaboral(req: Request, res: Response): Promise<Response> {
+        try {
+            const { id, modalidad } = req.body;
+            console.log('id: ', id, 'descripcion: ', modalidad);
+            // Dar formato a la palabra de modalidad
+            const modali = modalidad.charAt(0).toUpperCase() + modalidad.slice(1).toLowerCase();
+            const response: QueryResult = await pool.query(
+                `
+                UPDATE e_cat_modalidad_trabajo SET descripcion = $2
+                WHERE id = $1 RETURNING *
+                `
+                , [id, modali]);
+
+            const [modalidadLaboral] = response.rows;
+
+            if (modalidadLaboral) {
+                return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' })
+            } else {
+                return res.status(404).jsonp({ message: 'No se pudo actualizar', status: '400' })
+            }
+        }
+        catch (error) {
+            return res.status(500).jsonp({ message: 'error', status: '500' });
         }
     }
 
     public async eliminarRegistro(req: Request, res: Response) {
         try {
             const id = req.params.id;
+            console.log('id: ', id)
             await pool.query(
                 `
                 DELETE FROM e_cat_modalidad_trabajo WHERE id = $1
-                `
+            `
                 , [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            res.jsonp({ message: 'Registro eliminado.', code: '200' });
 
         } catch (error) {
-            return res.status(500).jsonp({ message: error });
+            console.log('error: ', error.code);
+            return res.status(500).jsonp({ message: error.detail, code: error.code });
         }
     }
 
@@ -237,4 +285,5 @@ class ModalidaLaboralControlador {
 }
 
 export const modalidaLaboralControlador = new ModalidaLaboralControlador();
+
 export default modalidaLaboralControlador;

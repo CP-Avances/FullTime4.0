@@ -100,3 +100,11 @@ export const ObtenerRutaLeerPlantillas = function () {
     ruta = path.join(__dirname, `..${separador}..`);
     return ruta + separador + 'leerPlantillas';
 }
+
+// METODO DE BUSQUEDA DE RUTAS DE ALMACENAMIENTO DE ARCHIVOS DE DATOS
+export const ObtenerRutaLeerPlantillas1 = function () {
+    let ruta = '';
+    let separador = path.sep;
+    ruta = path.join(__dirname, `..${separador}..`);
+    return ruta + separador + 'leerPlantillas';
+}

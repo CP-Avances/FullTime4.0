@@ -64,6 +64,9 @@ export class ListarFeriadosComponent implements OnInit {
   tamanio_paginaMul: number = 5;
   numero_paginaMul: number = 1;
 
+  tamanio_paginaMul2: number = 5;
+  numero_paginaMul2: number = 1;
+
   // VARIABLES DE MANEJO DE PLANTILLA DE DATOS
   nameFile: string;
   archivoSubido: Array<File>;
@@ -271,6 +274,7 @@ export class ListarFeriadosComponent implements OnInit {
         this.numero_paginaMul = 1;
         this.tamanio_paginaMul = 5;
         this.Revisarplantilla();
+        //this.Revisarplantilla_feriado_ciudad();
       } else {
         this.toastr.error('Seleccione plantilla con nombre Feriados', 'Plantilla seleccionada incorrecta', {
           timeOut: 6000,
@@ -304,8 +308,9 @@ export class ListarFeriadosComponent implements OnInit {
     // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
     this.rest.RevisarFormato(formData).subscribe(res => {
       this.DataFeriados = res.data;
+      this.DataFerieados_ciudades = res.datafc;
       this.messajeExcel = res.message;
-      console.log('probando plantilla1 feriados', this.DataFeriados);
+      console.log('probando plantilla1 feriados', res);
 
       if (this.messajeExcel == 'error') {
         this.toastr.error('Revisar que la numeración de la columna "item" sea correcta.', 'Plantilla no aceptada.', {
@@ -329,6 +334,45 @@ export class ListarFeriadosComponent implements OnInit {
     }, () => {
       this.progreso = false;
     });
+  }
+
+  DataFerieados_ciudades: any = [];
+  messajeExcel2: string = ''; 
+  Revisarplantilla_feriado_ciudad(){
+    let form = new FormData();
+    for (var i = 0; i < this.archivoSubido.length; i++) {
+      form.append("uploads", this.archivoSubido[i], this.archivoSubido[i].name);
+    }
+
+    this.progreso = true;
+
+    // VERIFICACIÓN DE DATOS FORMATO - DUPLICIDAD DENTRO DEL SISTEMA
+    setTimeout(() => {
+      this.rest.RevisarDatos_feriados_ciudad(form).subscribe(res => {
+        this.DataFerieados_ciudades = res.data;
+        this.messajeExcel2 = res.message;
+        console.log('probando plantilla1 feriados ciudad', this.DataFerieados_ciudades);
+
+        if (this.messajeExcel2 == 'error') {
+          this.toastr.error('Revisar que la numeración de la columna "item" sea correcta en FeriadoCiudad.', 'Plantilla no aceptada.', {
+            timeOut: 4500,
+          });
+          this.mostrarbtnsubir = false;
+        } else {
+          
+        }
+
+      }, error => {
+        console.log('Serivicio rest -> metodo RevisarFormato - ', error);
+        this.toastr.error('Error al cargar los datos FeriadoCiudad', 'Plantilla no aceptada', {
+          timeOut: 4000,
+        });
+        this.progreso = false;
+      }, () => {
+        this.progreso = false;
+      });
+    },500)
+    
   }
 
   //FUNCION PARA CONFIRMAR EL REGISTRO MULTIPLE DE LOS FERIADOS DEL ARCHIVO EXCEL

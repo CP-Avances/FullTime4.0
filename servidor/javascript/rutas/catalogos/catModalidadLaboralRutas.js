@@ -31,6 +31,7 @@ class ModalidaLaboralRutas {
     configuracion() {
         this.router.get('/', verificarToken_1.TokenValidation, catModalidadLaboralControlador_1.default.listaModalidadLaboral);
         this.router.post('/crearModalidad', verificarToken_1.TokenValidation, catModalidadLaboralControlador_1.default.CrearMadalidadLaboral);
+        this.router.put('/', verificarToken_1.TokenValidation, catModalidadLaboralControlador_1.default.EditarModalidadLaboral);
         this.router.delete('/eliminar/:id', verificarToken_1.TokenValidation, catModalidadLaboralControlador_1.default.eliminarRegistro);
         this.router.post('/upload/revision', [verificarToken_1.TokenValidation, upload.single('uploads')], catModalidadLaboralControlador_1.default.VerfificarPlantillaModalidadLaboral);
         this.router.post('/cargar_plantilla/', verificarToken_1.TokenValidation, catModalidadLaboralControlador_1.default.CargarPlantilla);

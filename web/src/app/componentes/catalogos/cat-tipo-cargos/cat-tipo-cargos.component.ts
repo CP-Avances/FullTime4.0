@@ -8,6 +8,8 @@ import { environment } from 'src/environments/environment';
 import { MetodosComponent } from '../../administracionGeneral/metodoEliminar/metodos.component';
 import { PageEvent } from '@angular/material/paginator';
 import { CatTipoCargosService } from 'src/app/servicios/catalogos/catTipoCargos/cat-tipo-cargos.service';
+import { RegistrarCargoComponent } from './registrarCargo/registrar-cargo/registrar-cargo.component';
+import { EditarCargosComponent } from './editarCargo/editar-cargo/editar-cargo.component';
 
 @Component({
   selector: 'app-cat-tipo-cargos',
@@ -67,18 +69,40 @@ export class CatTipoCargosComponent {
     this.messajeExcel = '';
   }
 
-  AbrirVentanaRegistrarModalidad(){
-
+  AbrirVentanaRegistrarCargo(): void{
+    this.ventana.open(RegistrarCargoComponent, { width: '500px' })
+      .afterClosed().subscribe(items => {
+        this.ngOnInit();
+      });
+  }
+  AbrirEditar(item_cargo: any): void{
+    this.ventana.open(EditarCargosComponent, { width: '450px', data: item_cargo })
+      .afterClosed().subscribe(items => {
+        this.ngOnInit();
+      });
   }
 
-  ConfirmarDelete(id: any){
+  ConfirmarDelete(cargo: any){
     const mensaje = 'eliminar';
     this.ventana.open(MetodosComponent, { width: '450px', data: mensaje }).afterClosed()
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
-          this._TipoCargos.eliminar(id).subscribe(res => {
+          this._TipoCargos.eliminar(cargo.id).subscribe(res => {
             console.log('res eliminado: ',res);
+            this.toastr.error(cargo.cargo+' se elimino', res.message, {
+              timeOut: 4000,
+            });
             this.ngOnInit();
+          }, error => {
+            if(error.error.code == "23503"){
+              this.toastr.error(cargo.cargo+" todavía es referida desde la tabla «empl_cargos».",'Error al eliminar dato', {
+                timeOut: 4000,
+              });
+            }else{
+              this.toastr.error(error.error.message,'Error al eliminar dato', {
+                timeOut: 4000,
+              });
+            }
           })
         }
       });

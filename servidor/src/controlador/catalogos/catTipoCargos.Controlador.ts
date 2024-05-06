@@ -25,19 +25,67 @@ class TiposCargosControlador {
         }
     }
 
-    public async CrearCargo(req: Request, res: Response) {
+    public async CrearCargo(req: Request, res: Response): Promise<Response> {
         try {
-            const cargo = req.params.cargo;
-            await pool.query(
+            const { cargo } = req.body;
+            var VERIFICAR_CARGO = await pool.query(
                 `
-                INSERT INTO e_cat_tipo_cargo (descripcion) VALUES ($1)
+                SELECT * FROM e_cat_tipo_cargo WHERE UPPER(cargo) = $1
                 `
-                , [cargo]);
+                , [cargo.toUpperCase()])
+            console.log('VERIFICAR_MODALIDAD: ', VERIFICAR_CARGO.rows[0]);
+            if (VERIFICAR_CARGO.rows[0] == undefined || VERIFICAR_CARGO.rows[0] == '') {
+                // Dar formato a la palabra de modalidad
+                const tipoCargo = cargo.charAt(0).toUpperCase() + cargo.slice(1).toLowerCase();
 
-            res.jsonp({ message: 'Registro guardado.' });
+                const response: QueryResult = await pool.query(
+                    `
+                    INSERT INTO e_cat_tipo_cargo (cargo) VALUES ($1) RETURNING *
+                    `
+                    , [tipoCargo]);
+
+                const [TipoCargos] = response.rows;
+
+                if (TipoCargos) {
+                    return res.status(200).jsonp({ message: 'Registro guardado.', status: '200' })
+                } else {
+                    return res.status(404).jsonp({ message: 'No se pudo guardar', status: '400' })
+                }
+            } else {
+                return res.jsonp({ message: 'Ya existe un cargo laboral', status: '300' })
+            }
+
+
         }
         catch (error) {
-            return res.jsonp({ message: 'error' });
+            return res.status(500).jsonp({ message: 'error', status: '500' });
+        }
+
+    }
+
+    public async EditarCargo(req: Request, res: Response): Promise<Response> {
+        try {
+            const { id, cargo } = req.body;
+            console.log('id: ', id, 'cargo: ', cargo);
+            // Dar formato a la palabra de cargo
+            const tipoCargo = cargo.charAt(0).toUpperCase() + cargo.slice(1).toLowerCase();
+            const response: QueryResult = await pool.query(
+                `
+                UPDATE e_cat_tipo_cargo SET cargo = $2
+                WHERE id = $1 RETURNING *
+                `
+                , [id, tipoCargo]);
+
+            const [TipoCargos] = response.rows;
+
+            if (TipoCargos) {
+                return res.status(200).jsonp({ message: 'Registro actualizado.', status: '200' })
+            } else {
+                return res.status(404).jsonp({ message: 'No se pudo actualizar', status: '400' })
+            }
+        }
+        catch (error) {
+            return res.status(500).jsonp({ message: 'error', status: '500' });
         }
     }
 
@@ -50,10 +98,10 @@ class TiposCargosControlador {
                 DELETE FROM e_cat_tipo_cargo WHERE id = $1
                 `
                 , [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            res.jsonp({ message: 'Registro eliminado.', code: '200' });
 
         } catch (error) {
-            return res.status(500).jsonp({ message: error });
+            return res.status(500).jsonp({ message: error.detail, code: error.code });
         }
     }
 
@@ -231,4 +279,5 @@ class TiposCargosControlador {
 }
 
 export const tiposCargosControlador = new TiposCargosControlador();
+
 export default tiposCargosControlador;
