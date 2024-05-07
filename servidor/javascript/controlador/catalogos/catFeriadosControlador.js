@@ -189,86 +189,35 @@ class FeriadosControlador {
             // LECTURA DE LOS DATOS DE LA PLANTILLA
             plantilla.forEach((dato, indice, array) => __awaiter(this, void 0, void 0, function* () {
                 var { item, fecha, descripcion, fec_recuperacion } = dato;
-                data.fila = item;
-                data.fecha = fecha;
-                data.descripcion = descripcion;
-                data.fec_recuperacion = fec_recuperacion;
-                data.observacion = 'no registrada';
-                if (data.fila == '' || data.fila == undefined) {
-                    data.fila = 'error';
-                    mensaje = 'error';
-                }
-                if (data.fecha == undefined || data.descripcion == '') {
-                    data.fecha = 'No registrado';
-                    data.observacion = 'Fecha ' + data.observacion;
-                }
-                if (data.descripcion == undefined || data.descripcion == '') {
-                    data.descripcion = 'No registrado';
-                    data.observacion = 'Descripción ' + data.observacion;
-                }
-                //VERIFICA SI EXISTE EN LAs COLUMNA DATOS REGISTRADOS
-                if (data.fila != 'error' && data.fecha != 'No registrado' && data.descripcion != 'No registrado') {
-                    // Verificar si la variable tiene el formato de fecha correcto con moment
-                    if ((0, moment_1.default)(data.fecha, 'YYYY-MM-DD', true).isValid()) {
-                        fecha_correcta = true;
-                    }
-                    else {
-                        fecha_correcta = false;
-                        data.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
-                    }
-                    if (fecha_correcta == true) {
-                        // VERIFICACIÓN SI LA FECHA DEL FERIADO NO ESTE REGISTRADA EN EL SISTEMA
-                        const VERIFICAR_FECHA = yield database_1.default.query(`
-                        SELECT * FROM ef_cat_feriados 
-                        WHERE fecha = $1 OR fecha_recuperacion = $1
-                        `, [data.fecha]);
-                        data.fila = dato.item;
-                        data.fecha = dato.fecha;
-                        data.descripcion = dato.descripcion;
-                        if (VERIFICAR_FECHA.rowCount === 0) {
-                            data.fec_recuperacion = dato.fec_recuperacion;
-                            if (data.fec_recuperacion == undefined) {
-                                data.fec_recuperacion = '-';
-                                fec_recuperacion_correcta = true;
-                                // Discriminación de elementos iguales
-                                if (duplicados.find((p) => p.fecha === data.fecha || p.fecha === data.fec_recuperacion) == undefined) {
-                                    data.observacion = 'ok';
-                                    duplicados.push(dato);
-                                }
-                            }
-                            else {
-                                if ((0, moment_1.default)(data.fec_recuperacion, 'YYYY-MM-DD', true).isValid()) {
-                                    fec_recuperacion_correcta = true;
-                                    // Discriminación de elementos iguales
-                                    if (duplicados.find((p) => p.fecha === dato.fecha) == undefined) {
-                                        data.observacion = 'ok';
-                                        duplicados.push(dato);
-                                    }
-                                }
-                                else {
-                                    fec_recuperacion_correcta = false;
-                                    data.observacion = 'Formato de fec_recuperacion incorrecto (YYYY-MM-DD)';
-                                }
-                            }
-                            listFeriados.push(data);
-                        }
-                        else {
-                            data.fec_recuperacion = dato.fec_recuperacion;
-                            if (data.fec_recuperacion == undefined) {
-                                data.fec_recuperacion = '-';
-                            }
-                            data.observacion = 'Ya existe en el sistema';
-                            listFeriados.push(data);
-                        }
-                    }
-                    else {
-                        if (data.fec_recuperacion == undefined) {
-                            data.fec_recuperacion = '-';
-                        }
-                        listFeriados.push(data);
-                    }
+                if ((item != undefined && item != '') &&
+                    (fecha != undefined) && (fecha != '') &&
+                    (descripcion != undefined) && (descripcion != '') &&
+                    (fec_recuperacion != undefined) && (fec_recuperacion != '')) {
+                    data.fila = item;
+                    data.fecha = fecha;
+                    data.descripcion = descripcion;
+                    data.fec_recuperacion = fec_recuperacion;
+                    data.observacion = 'no registrada';
+                    listFeriados.push(data);
                 }
                 else {
+                    data.fila = item;
+                    data.fecha = fecha;
+                    data.descripcion = descripcion;
+                    data.fec_recuperacion = fec_recuperacion;
+                    data.observacion = 'no registrada';
+                    if (data.fila == '' || data.fila == undefined) {
+                        data.fila = 'error';
+                        mensaje = 'error';
+                    }
+                    if (data.fecha == undefined || data.descripcion == '') {
+                        data.fecha = 'No registrado';
+                        data.observacion = 'Fecha ' + data.observacion;
+                    }
+                    if (data.descripcion == undefined || data.descripcion == '') {
+                        data.descripcion = 'No registrado';
+                        data.observacion = 'Descripción ' + data.observacion;
+                    }
                     data.fec_recuperacion = dato.fec_recuperacion;
                     if (data.fecha == 'No registrado' && data.descripcion == 'No registrado') {
                         data.observacion = 'Fecha y descripción no registrada';
@@ -340,7 +289,53 @@ class FeriadosControlador {
                 }
             });
             var filaDuplicada = 0;
-            listFeriados.forEach((item) => {
+            listFeriados.forEach((item) => __awaiter(this, void 0, void 0, function* () {
+                //VERIFICA SI EXISTE EN LAs COLUMNA DATOS REGISTRADOS
+                if (item.fila != 'error' && item.fecha != 'No registrado' && item.descripcion != 'No registrado') {
+                    // Verificar si la variable tiene el formato de fecha correcto con moment
+                    if ((0, moment_1.default)(item.fecha, 'YYYY-MM-DD', true).isValid()) {
+                        fecha_correcta = true;
+                    }
+                    else {
+                        fecha_correcta = false;
+                        item.observacion = 'Formato de fecha incorrecto (YYYY-MM-DD)';
+                    }
+                    if (fecha_correcta == true) {
+                        // VERIFICACIÓN SI LA FECHA DEL FERIADO NO ESTE REGISTRADA EN EL SISTEMA
+                        const VERIFICAR_FECHA = yield database_1.default.query(`
+                        SELECT * FROM ef_cat_feriados 
+                        WHERE fecha = $1 OR fecha_recuperacion = $1
+                        `, [item.fecha]);
+                        if (VERIFICAR_FECHA.rowCount === 0) {
+                            if (item.fec_recuperacion == undefined) {
+                                item.fec_recuperacion = '-';
+                                fec_recuperacion_correcta = true;
+                                // Discriminación de elementos iguales
+                                if (duplicados.find((p) => p.fecha === item.fecha || p.fecha === item.fec_recuperacion) == undefined) {
+                                    item.observacion = 'ok';
+                                    duplicados.push(item);
+                                }
+                            }
+                            else {
+                                if ((0, moment_1.default)(item.fec_recuperacion, 'YYYY-MM-DD', true).isValid()) {
+                                    fec_recuperacion_correcta = true;
+                                    // Discriminación de elementos iguales
+                                    if (duplicados.find((p) => p.fecha === item.fecha) == undefined) {
+                                        data.observacion = 'ok';
+                                        duplicados.push(item);
+                                    }
+                                }
+                                else {
+                                    fec_recuperacion_correcta = false;
+                                    item.observacion = 'Formato de fec_recuperacion incorrecto (YYYY-MM-DD)';
+                                }
+                            }
+                        }
+                        else {
+                            data.observacion = 'Ya existe en el sistema';
+                        }
+                    }
+                }
                 if (item.observacion != undefined && item.observacion != 'no registrada' && item.observacion != '') {
                     fecha_igual.forEach((valor) => {
                         if (valor.fecha == item.fec_recuperacion) {
@@ -362,7 +357,8 @@ class FeriadosControlador {
                     return mensaje = 'error';
                 }
                 filaDuplicada = item.fila;
-            });
+            }));
+            var filaDuplicada_fc = 0;
             listFeriados_ciudades.forEach((value) => __awaiter(this, void 0, void 0, function* () {
                 if (value.provincia != 'No registrado') {
                     //consultamos la id la provincia para validar que exista la ciudad registrada
@@ -387,6 +383,17 @@ class FeriadosControlador {
                         value.observacion = 'La provincia ingresada no existe en la base';
                     }
                 }
+                //Valida si los datos de la columna N son numeros.
+                if (typeof value.fila === 'number' && !isNaN(value.fila)) {
+                    //Condicion para validar si en la numeracion existe un numero que se repite dara error.
+                    if (value.fila == filaDuplicada_fc) {
+                        mensaje = 'error';
+                    }
+                }
+                else {
+                    return mensaje = 'error';
+                }
+                filaDuplicada_fc = value.fila;
             }));
             setTimeout(() => {
                 //console.log('lista feriados: ',listFeriados);
@@ -430,7 +437,6 @@ class FeriadosControlador {
                                     console.log(listFeriados[i].descripcion.toLowerCase() == listFeriados_ciudades[x].feriado.toLowerCase());
                                     listFeriados_ciudades[x].observacion = 'ok';
                                 }
-                                console.log('values: ', listFeriados_ciudades[x]);
                             }
                         }
                     }
@@ -457,20 +463,32 @@ class FeriadosControlador {
                 const plantilla = req.body;
                 console.log('datos manual: ', plantilla);
                 var contador = 1;
+                var respuesta;
                 plantilla.forEach((data) => __awaiter(this, void 0, void 0, function* () {
                     // Datos que se leen de la plantilla ingresada
                     const { provincia, ciudad, feriado, observacion } = data;
                     //Obtener id de la ciudad
                     const id_ciudad = yield database_1.default.query('SELECT id FROM e_ciudades WHERE UPPER(descripcion) = $1', [ciudad.toUpperCase()]);
                     const id_feriado = yield database_1.default.query('SELECT id FROM ef_cat_feriados WHERE UPPER(descripcion) = $1', [feriado.toUpperCase()]);
+                    console.log('id_ciudad: ', id_ciudad.rows[0].id);
+                    console.log('id_feriado: ', id_feriado.rows[0].id);
                     // Registro de los datos
-                    const response = yield database_1.default.query(`INSERT INTO ciud_feriados (id_feriado, id_ciudad) VALUES ($1, $2) RETURNING *
-                    `, [id_feriado, id_ciudad]);
+                    const response = yield database_1.default.query(`INSERT INTO ef_ciudad_feriado (id_feriado, id_ciudad) VALUES ($1, $2) RETURNING *
+                    `, [id_feriado.rows[0].id, id_ciudad.rows[0].id]);
                     const [ciudad_feria] = response.rows;
+                    if (contador === plantilla.length) {
+                        if (ciudad_feria) {
+                            return respuesta = res.status(200).jsonp({ message: 'ok' });
+                        }
+                        else {
+                            return respuesta = res.status(404).jsonp({ message: 'error' });
+                        }
+                    }
+                    contador = contador + 1;
                 }));
             }
             catch (error) {
-                console.log('error_ ', error);
+                return res.status(500).jsonp({ message: error });
             }
         });
     }

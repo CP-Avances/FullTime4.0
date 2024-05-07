@@ -376,7 +376,7 @@ export class ListarFeriadosComponent implements OnInit {
       console.log('lista sucursales correctas: ', this.listFeriadosCorrectos);
       var cont = 0;
       this.Crear_feriado_ciudad();
-      /*
+      
       this.listFeriadosCorrectos.forEach(datos => {
         data.fecha = datos.fecha;
         data.descripcion = datos.descripcion;
@@ -399,7 +399,7 @@ export class ListarFeriadosComponent implements OnInit {
         });
 
       })
-      */
+      
     } else {
       this.toastr.error('No se ha encontrado datos para su registro', 'Plantilla procesada', {
         timeOut: 4000,
