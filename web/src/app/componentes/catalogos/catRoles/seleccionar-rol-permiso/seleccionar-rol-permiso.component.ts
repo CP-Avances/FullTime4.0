@@ -55,10 +55,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
   funcion = new FormControl('', [Validators.minLength(2)]);
 
 
-
-
-  //funcionesActivas : any = [this.geolocalizacion];
-
   diccionarioFuncionesActivas: { [id_funcion: string]: boolean } = {
     "permisos": this.permisos,
     "geolocalizacion": this.geolocalizacion,
@@ -608,15 +604,7 @@ export class SeleccionarRolPermisoComponent implements OnInit {
 
 
       this.paginasSeleccionadasM = this.paginasSeleccionadasM.filter(s => s !== this.paginasModulos[modulo][i]);
-
-      //this.paginasSeleccionadasM=[];
-
-
     }
-
-
-
-    // console.log("modulos", this.paginasSeleccionadasModulos)
 
   }
 
@@ -626,7 +614,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
     this.limpiarDataAcciones = this.nombresAccionesPorPagina[id][0];
     for (var i = 0; i <= this.limpiarDataAcciones.length - 1; i++) {
       (<HTMLInputElement>document.getElementById(id + 'accionesSeleccionadasPorPagina' + i)).checked = false;
-      //this.accionesSeleccionadasPorPagina[id] = this.accionesSeleccionadasPorPagina[id].filter(s => s !== this.nombresAccionesPorPagina[id][0]);
       this.accionesSeleccionadasPorPagina[id] = [];
     }
   }
@@ -1054,7 +1041,6 @@ export class SeleccionarRolPermisoComponent implements OnInit {
           }
         } else {
 
-          // si no exiten accionen seleccionadas
 
           var buscarPagina = {
             funcion: obj.nombre,
