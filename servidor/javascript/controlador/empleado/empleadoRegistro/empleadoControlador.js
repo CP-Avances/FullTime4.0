@@ -616,6 +616,21 @@ class EmpleadoControlador {
             }
         });
     }
+    // METODO PARA ELIMINAR REGISTROS
+    EliminarEmpleado(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const id = req.params.id;
+                yield database_1.default.query(`
+        DELETE FROM eu_empleados WHERE id = $1
+        `, [id]);
+                res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error' });
+            }
+        });
+    }
     /** **************************************************************************************** **
      ** **                      CARGAR INFORMACIÓN MEDIANTE PLANTILLA                            **
      ** **************************************************************************************** **/

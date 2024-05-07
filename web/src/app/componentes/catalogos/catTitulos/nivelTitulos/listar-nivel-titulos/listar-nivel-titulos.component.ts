@@ -299,6 +299,14 @@ export class ListarNivelTitulosComponent implements OnInit {
       .afterClosed().subscribe(items => {
         this.ObtenerNiveles();
       });
+
+    this.activar_seleccion = true;
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionNiveles.clear();
+    this.nivelesEliminar = [];
+
+
   }
 
   // METODO PARA LIMPIAR FORMULARIO
@@ -539,13 +547,13 @@ export class ListarNivelTitulosComponent implements OnInit {
   activar_seleccion: boolean = true;
   seleccion_vacia: boolean = true;
 
-  selectionProvincias = new SelectionModel<ITableNivelesEducacion>(true, []);
+  selectionNiveles = new SelectionModel<ITableNivelesEducacion>(true, []);
 
 
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedPag() {
-    const numSelected = this.selectionProvincias.selected.length;
+    const numSelected = this.selectionNiveles.selected.length;
     return numSelected === this.nivelTitulos.length
   }
 
@@ -553,8 +561,8 @@ export class ListarNivelTitulosComponent implements OnInit {
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterTogglePag() {
     this.isAllSelectedPag() ?
-      this.selectionProvincias.clear() :
-      this.nivelTitulos.forEach((row: any) => this.selectionProvincias.select(row));
+      this.selectionNiveles.clear() :
+      this.nivelTitulos.forEach((row: any) => this.selectionNiveles.select(row));
   }
 
 
@@ -563,11 +571,11 @@ export class ListarNivelTitulosComponent implements OnInit {
     if (!row) {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
-    this.nivelesEliminar = this.selectionProvincias.selected;
+    this.nivelesEliminar = this.selectionNiveles.selected;
     //console.log('paginas para Eliminar',this.paginasEliminar);
 
     //console.log(this.selectionPaginas.selected)
-    return `${this.selectionProvincias.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
+    return `${this.selectionNiveles.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
 
   }
 
@@ -595,22 +603,60 @@ export class ListarNivelTitulosComponent implements OnInit {
         if (confirmado) {
           this.Eliminar(datos.id);
 
+          this.activar_seleccion = true;
+
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.nivelesEliminar = [];
+          this.selectionNiveles.clear();
+
+          this.ObtenerNiveles();
+
         } else {
           this.router.navigate(['/nivelTitulos']);
         }
       });
+
   }
+  contador: number = 0;
+  ingresar: boolean = false;
 
   EliminarMultiple() {
 
-    this.nivelesEliminar = this.selectionProvincias.selected;
+
+    this.ingresar = false;
+    this.contador = 0;
+
+    this.nivelesEliminar = this.selectionNiveles.selected;
     this.nivelesEliminar.forEach((datos: any) => {
 
       this.nivelTitulos = this.nivelTitulos.filter(item => item.id !== datos.id);
-      //AQUI MODIFICAR EL METODO 
-      this.Eliminar(datos.id);
-      this.ObtenerNiveles();
 
+
+      this.contador = this.contador + 1;
+
+      this.nivel.EliminarNivel(datos.id).subscribe(res => {
+
+        if (res.message === 'error') {
+          this.toastr.error('No se puede eliminar.', '', {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
+
+
+        } else {
+
+          
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.ObtenerNiveles();
+
+        }
+      });
     }
     )
   }
@@ -628,19 +674,23 @@ export class ListarNivelTitulosComponent implements OnInit {
             this.plan_multiple = false;
             this.plan_multiple_ = false;
 
+            this.nivelesEliminar = [];
+            this.selectionNiveles.clear();
 
-
-
+            this.ObtenerNiveles();
 
 
           } else {
-            this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado NIVELES DE EDUCACIÓN.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
-
           }
+        } else {
+          this.router.navigate(['/nivelTitulos']);
         }
+
       });
+
   }
 
 

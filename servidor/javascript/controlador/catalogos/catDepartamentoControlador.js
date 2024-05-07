@@ -85,8 +85,8 @@ class DepartamentoControlador {
         return __awaiter(this, void 0, void 0, function* () {
             const { id_sucursal, id } = req.params;
             const DEPARTAMENTO = yield database_1.default.query(`
-        SELECT * FROM ed_departamentos WHERE id_sucursal = $1 AND NOT id = $2
-        `, [id_sucursal, id]);
+      SELECT * FROM ed_departamentos WHERE id_sucursal = $1 AND NOT id = $2
+      `, [id_sucursal, id]);
             if (DEPARTAMENTO.rowCount > 0) {
                 return res.jsonp(DEPARTAMENTO.rows);
             }
@@ -106,10 +106,10 @@ class DepartamentoControlador {
       `);
             const DEPARTAMENTOS = yield database_1.default.query(`
       SELECT s.id AS id_sucursal, s.nombre AS nomsucursal, cd.id, cd.nombre,
-      0 AS NIVEL, null AS departamento_padre
+        0 AS NIVEL, null AS departamento_padre
       FROM ed_departamentos AS cd, e_sucursales AS s
       WHERE NOT cd.id IN (SELECT id_departamento FROM ed_niveles_departamento) AND
-      s.id = cd.id_sucursal
+        s.id = cd.id_sucursal
       ORDER BY s.nombre, cd.nombre ASC;
       `);
             if (DEPARTAMENTOS.rowCount > 0 && NIVELES.rowCount > 0) {
@@ -236,11 +236,16 @@ class DepartamentoControlador {
     // METODO PARA ELIMINAR REGISTRO DE NIVEL DE DEPARTAMENTO   --**VERIFICADO
     EliminarRegistroNivelDepa(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.params.id;
-            yield database_1.default.query(`
-      DELETE FROM ed_niveles_departamento WHERE id = $1
-      `, [id]);
-            res.jsonp({ message: 'Registro eliminado.' });
+            try {
+                const id = req.params.id;
+                yield database_1.default.query(`
+        DELETE FROM ed_niveles_departamento WHERE id = $1
+        `, [id]);
+                res.jsonp({ message: 'Registro eliminado.' });
+            }
+            catch (error) {
+                return res.jsonp({ message: 'error' });
+            }
         });
     }
     //METODO PARA CREAR NIVELES JERARQUICOS POR DEPARTAMENTOS  --**VERIFICADO

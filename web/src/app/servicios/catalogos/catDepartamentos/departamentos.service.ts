@@ -83,8 +83,10 @@ export class DepartamentosService {
   }
 
   // METODO PARA ELIMINAR REGISTRO NIVEL DEPARTAMENTO   --**VERIFICADO
-  EliminarRegistroNivelDepa(id: number) {
-    return this.http.delete(`${environment.url}/departamento/eliminarniveldepa/${id}`);
+  EliminarRegistroNivelDepa(id: any) {
+    return this.http.delete(`${environment.url}/departamento/eliminarniveldepa/${id}`).pipe(
+      catchError(id)
+    );
   }
 
   // REGISTRAR NIVELDEPARTAMENTO  --**VERIFICADO

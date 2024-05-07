@@ -512,3 +512,33 @@ export interface ITableTitulos {
     nombre: string,
     
 }
+
+export interface ITableFeriados {
+    
+    descripcion: string,
+    
+}
+
+
+export interface ITableHorarios {
+    
+    descripcion: string,
+    
+}
+
+export interface ITableDispositivos {
+    
+    codigo: string,
+    
+}
+
+export interface ITableArchivos{
+
+    nombre: string,
+}
+
+
+export interface ITableNivel {
+    nivel: string,
+    
+}

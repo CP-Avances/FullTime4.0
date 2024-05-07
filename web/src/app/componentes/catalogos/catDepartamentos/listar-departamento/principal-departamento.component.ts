@@ -158,6 +158,12 @@ export class PrincipalDepartamentoComponent implements OnInit {
       { width: '500px' }).afterClosed().subscribe(item => {
         this.ListaDepartamentos();
       });
+      this.activar_seleccion = true;
+
+      this.plan_multiple = false;
+      this.plan_multiple_ = false;
+      this.selectionDepartamentos.clear();
+      this.departamentosEliminar = [];
   }
 
   // VENTANA PARA EDITAR DATOS DE DEPARTAMENTO 
@@ -588,7 +594,8 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
 
 
-
+  contador: number = 0;
+  ingresar: boolean = false;
 
   public departamentosNiveles: any = [];
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
@@ -611,18 +618,34 @@ export class PrincipalDepartamentoComponent implements OnInit {
         this.departamentosNiveles = [];
         var id_departamento = id_dep;
         var id_establecimiento = id_sucursal;
-        if (nivel > 0) {
+        if (nivel != 0) {
           this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
             this.departamentosNiveles = datos;
             this.departamentosNiveles.filter(item => {
-              this.rest.EliminarRegistroNivelDepa(item.id).subscribe({})
-              this.ListaDepartamentos();
+              this.rest.EliminarRegistroNivelDepa(item.id).subscribe(
+                res => {
+
+                  if (res.message === 'error') {
+                    this.toastr.error('No se puede elminar.', '', {
+                      timeOut: 6000,
+                    });
+
+
+                  } else {
+                    this.toastr.error('Nivel eliminado de: ' + item.departamento, '', {
+                      timeOut: 6000,
+                    });
+                    this.ListaDepartamentos();
+
+                  }
+
+                }
+              );
 
             })
-
-            this.ListaDepartamentos();
-
           })
+          this.ListaDepartamentos();
+
         } else {
           this.ListaDepartamentos();
 
@@ -643,6 +666,15 @@ export class PrincipalDepartamentoComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Eliminar(datos.id, datos.id_sucursal, datos.nivel);
+
+          this.activar_seleccion = true;
+
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.departamentosEliminar = [];
+          this.selectionDepartamentos.clear();
+
+          this.ListaDepartamentos();
         } else {
           this.router.navigate(['/departamento']);
         }
@@ -652,27 +684,72 @@ export class PrincipalDepartamentoComponent implements OnInit {
 
   EliminarMultiple() {
 
+    this.ingresar = false;
+    this.contador = 0;
+
     this.departamentosEliminar = this.selectionDepartamentos.selected;
     this.departamentosEliminar.forEach((datos: any) => {
+      this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
+      this.contador = this.contador + 1;
+      this.rest.EliminarRegistro(datos.id).subscribe(res => {
+
+        if (res.message === 'error') {
+
+          this.toastr.error('No se puede elminar.', 'la: ' + datos.nombre, {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
+
+        } else {
+          this.departamentosNiveles = [];
+          var id_departamento = datos.id;
+          var id_establecimiento = datos.id_sucursal;
+          if (datos.nivel != 0) {
+            this.rest.ConsultarNivelDepartamento(id_departamento, id_establecimiento).subscribe(datos => {
+              this.departamentosNiveles = datos;
+              this.departamentosNiveles.filter(item => {
+                this.rest.EliminarRegistroNivelDepa(item.id).subscribe(
+                  res => {
+
+                    if (res.message === 'error') {
+                      this.toastr.error('No se puede eliminar.', '', {
+                        timeOut: 6000,
+                      });
+  
+  
+                    } else {
+                      this.toastr.error('Nivel eliminado de: ' + item.departamento, '', {
+                        timeOut: 6000,
+                      });
+                      this.ListaDepartamentos();
+  
+                    }
+  
+                  }
+                )
+                this.ListaDepartamentos();
+
+              })
+            })
+            this.ListaDepartamentos();
+
+          } else {
+            this.ListaDepartamentos();
+
+          }
 
 
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
 
+          }
+          this.ListaDepartamentos();
+        }
+      });
 
-
-      //if(datos.nivel==0){
-
-        this.departamentos = this.departamentos.filter(item => item.id !== datos.id);
-      //}else {
-      //  this.departamentos = this.departamentos.filter(item => item.id !== datos.id && item.nivel !== datos.nivel);
-
-      //}
-
-
-      this.Eliminar(datos.id, datos.id_sucursal, datos.nivel);
-
-
-      //ojo aqui
-      this.ListaDepartamentos();
 
     }
     )
@@ -691,19 +768,26 @@ export class PrincipalDepartamentoComponent implements OnInit {
             this.plan_multiple = false;
             this.plan_multiple_ = false;
 
+            this.departamentosEliminar = [];
+            this.selectionDepartamentos.clear();
 
-
-
+            this.ListaDepartamentos();
 
 
           } else {
-            this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado DEPARTAMENTOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
 
           }
+
+
+        } else {
+          this.router.navigate(['/departamento']);
+
         }
       });
+
   }
 
 

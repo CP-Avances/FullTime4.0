@@ -197,14 +197,22 @@ class HorarioControlador {
   }
 
   // METODO PARA ELIMINAR REGISTROS
-  public async EliminarRegistros(req: Request, res: Response): Promise<void> {
-    const id = req.params.id;
-    await pool.query(
-      `
-      DELETE FROM eh_cat_horarios WHERE id = $1
-      `
-      , [id]);
-    res.jsonp({ message: 'Registro eliminado.' });
+  public async EliminarRegistros(req: Request, res: Response) {
+
+    try {
+
+      const id = req.params.id;
+      await pool.query(
+        `
+        DELETE FROM eh_cat_horarios WHERE id = $1
+        `
+        , [id]);
+      res.jsonp({ message: 'Registro eliminado.' });
+    } catch (error) {
+      return res.jsonp({ message: 'error' });
+
+    }
+
   }
 
   // METODO PARA BUSCAR DATOS DE UN HORARIO

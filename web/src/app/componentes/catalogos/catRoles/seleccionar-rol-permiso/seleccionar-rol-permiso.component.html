@@ -3,10 +3,10 @@
 <div class="mat-elevation-z8" style="background: white;">
     <div class="d-flex bd-highlight" id="resultados">
 
-        <button  class="btn btn-outline-light btn-sm" [routerLink]="['/roles/']"
+        <button class="btn btn-outline-light btn-sm" [routerLink]="['/roles/']"
             style="float: right; margin-right: 10px;">Atras</button>
         <span class="w-100 bd-highlight">
-            FUNCIONES QUE TIENE EL ROL {{nombreRol}}        </span>
+            FUNCIONES QUE TIENE EL ROL {{nombreRol}} </span>
         <button (click)="ConfirmarDelete()" class="btn btn-outline-light btn-sm"
             style="float: right; margin-right: 10px;">Eliminar</button>
     </div>
@@ -42,7 +42,7 @@
                     <td>
                         <mat-form-field class="input-tables funcion" style="float: left;">
                             <input matInput placeholder="Buscar" [(ngModel)]="filtrofuncion" [formControl]="funcion"
-                                type="text"   (keypress)="IngresarSoloLetras($event)">
+                                type="text" (keypress)="IngresarSoloLetras($event)">
                         </mat-form-field>
                     </td>
                     <td></td>
@@ -180,6 +180,122 @@
         <mat-card-actions>
             <div class="container" style="text-align: center;">
                 <button id="btn-raised" class="btn btn-sm" (click)="InsertarPaginaRol()"
+                    value="Guardar">Guardar</button>
+            </div>
+        </mat-card-actions>
+    </mat-card>
+</div>
+
+
+<div class="container" style="padding-top: 15px; padding-bottom: 25px;">
+    <div id="titulo">
+        <span>MODULOS DEL SISTEMA</span>
+    </div>
+    <mat-card class="example-card mat-elevation-z8">
+        <!-- Formulario Completo -->
+        <mat-card-content>
+            <div class="nota">
+                <span>
+                    Seleccionar las funciones o acciones que puede realizar el rol {{nombreRol}} dentro del sistema.
+                </span>
+            </div>
+            <form [formGroup]="nuevoRolPermisoForm">
+                <div class="container">
+                    <div class="row">
+
+                        <div class="col-sm">
+                            <!-- Tabla de menu -->
+
+                            <div class="d-flex flex-wrap justify-content-start">
+                                <div class="modal-body" style="margin-left: 60px; padding-top: 15px;">
+                                    <div class="container-fluid" *ngFor="let modulo of nombreModulos; index as j">
+                                        <div class="row" *ngIf="diccionarioFuncionesActivas[modulo]">
+
+                                            <input class="form-check-input" type="checkbox"
+                                                id="seleccionarmodulo{{modulo}}"
+                                                (change)="SeleccionarTodasModulos($event, modulo)">
+                                            <label class="form-check-label" for="inlineCheckbox1"
+                                                style="margin-left: 10px; font-size: 14px; color: blue; font-weight: bold;">
+                                                Todos los links de {{modulo}}
+                                            </label>
+                                            <div class="col-md-6 col-lg-6 col-6"
+                                                style="text-align:left; padding-bottom: 10px;"
+                                                *ngFor="let n of paginasModulos[modulo]; index as i" id="verticalLine">
+                                                <input class="form-check-input" type="checkbox"
+                                                    name="paginasSeleccionadasModulos"
+                                                    id="paginasSeleccionadasModulos{{i}}{{modulo}}"
+                                                    (change)="SeleccionarIndividualModulos($event, n,modulo )"
+                                                    style="text-align: center; margin-left: 10px;">
+                                                <label style="margin-left: 30px; font-size: 14px;"
+                                                    class="form-check-label" for="inlineCheckbox1">
+                                                    {{n.nombre}}
+                                                    <!--Acciones de las paginas-->
+
+                                                </label>
+
+                                                <div class="d-flex flex-wrap justify-content-start">
+                                                    <div class="modal-body"
+                                                        style="margin-left: 60px; padding-top: 15px;">
+                                                        <div class="container-fluid">
+
+                                                            <div class="row"
+                                                                style="text-align: left; padding-top: 10px;"
+                                                                *ngFor="let pagina of nombresAccionesPorPagina[n.id]; index as j">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                    id="seleccionarAccion{{n.id}}"
+                                                                    (change)="SeleccionarTodasAcciones($event, n.id)">
+
+                                                                <label class="form-check-label" for="inlineCheckbox1"
+                                                                    style="margin-left: 1px; font-size: 14px; color: green; font-weight: bold; padding-bottom: 10px;">
+                                                                    Todos las acciones
+                                                                </label>
+
+
+                                                                <div class="col-md-6 col-lg-6 col-6"
+                                                                    style="text-align:left; padding-bottom: 10px; "
+                                                                    *ngFor="let accion of pagina; index as i">
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                        name="accionesSeleccionadasPorPagina"
+                                                                        id="{{n.id}}accionesSeleccionadasPorPagina{{i}}"
+                                                                        (change)="SeleccionarIndividualAccion($event, n.id, accion)">
+                                                                    <label style="margin-left: 10px; font-size: 14px;"
+                                                                        class="form-check-label" for="inlineCheckbox1">
+                                                                        {{accion.accion}}
+                                                                    </label>
+                                                                </div>
+
+
+
+                                                            </div>
+
+
+                                                        </div>
+                                                    </div>
+
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+
+
+                    </div>
+                </div>
+            </form>
+        </mat-card-content>
+        <mat-card-actions>
+            <div class="container" style="text-align: center;">
+                <button id="btn-raised" class="btn btn-sm" (click)="InsertarPaginaModulosRol()"
                     value="Guardar">Guardar</button>
             </div>
         </mat-card-actions>

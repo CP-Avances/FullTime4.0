@@ -27,13 +27,21 @@ class FeriadosControlador {
 
     // METODO PARA ELIMINAR UN REGISTRO DE FERIADOS
     public async EliminarFeriado(req: Request, res: Response): Promise<any> {
-        const id = req.params.id;
-        await pool.query(
-            `
-            DELETE FROM ef_cat_feriados WHERE id = $1
-            `
-            , [id]);
-        res.jsonp({ text: 'Registro eliminado.' });
+
+        try {
+
+            const id = req.params.id;
+            await pool.query(
+                `
+                DELETE FROM ef_cat_feriados WHERE id = $1
+                `
+                , [id]);
+            res.jsonp({ text: 'Registro eliminado.' });
+        } catch (error) {
+            return res.jsonp({ message: 'error' });
+
+        }
+
     }
 
     // METODO PARA CREAR REGISTRO DE FERIADO

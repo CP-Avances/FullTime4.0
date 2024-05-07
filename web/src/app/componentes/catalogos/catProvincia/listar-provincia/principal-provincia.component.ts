@@ -129,6 +129,14 @@ export class PrincipalProvinciaComponent implements OnInit {
     this.ventana.open(RegistroProvinciaComponent, { width: '550px' }).afterClosed().subscribe(item => {
       this.ListarProvincias();
     });
+
+    this.activar_seleccion = true;
+
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionProvincias.clear();
+    this.provinciasEliminar = [];
+
   }
 
   /** ******************************************************************************* **
@@ -408,9 +416,6 @@ export class PrincipalProvinciaComponent implements OnInit {
 
   // FUNCION PARA ELIMINAR REGISTRO SELECCIONADO
   Eliminar(id_prov: number) {
-
-
-
     this.rest.EliminarProvincia(id_prov).subscribe(res => {
 
 
@@ -423,10 +428,7 @@ export class PrincipalProvinciaComponent implements OnInit {
           timeOut: 6000,
         });
         this.ListarProvincias();
-
-
       }
-
     });
   }
 
@@ -438,32 +440,59 @@ export class PrincipalProvinciaComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Eliminar(datos.id);
+          this.activar_seleccion = true;
+
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.provinciasEliminar = [];
+          this.selectionProvincias.clear();
+
+          this.ListarProvincias();
         } else {
           this.router.navigate(['/provincia']);
         }
       });
   }
 
+
+  contador: number = 0;
+  ingresar: boolean = false;
   EliminarMultiple() {
+
+
+    this.ingresar = false;
+    this.contador = 0;
 
     this.provinciasEliminar = this.selectionProvincias.selected;
     this.provinciasEliminar.forEach((datos: any) => {
 
       this.provincias = this.provincias.filter(item => item.id !== datos.id);
 
+      this.contador = this.contador + 1;
+
+      this.rest.EliminarProvincia(datos.id).subscribe(res => {
 
 
-      //AQUI MODIFICAR EL METODO 
-      this.Eliminar(datos.id);
+        if (res.message === 'error') {
+          this.toastr.error('No se puede eliminar ', datos.nombre, {
+            timeOut: 6000,
+          });
+          this.contador = this.contador - 1;
 
+        } else {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
 
-
-      this.rest.BuscarProvincias().subscribe(datos => {
-        this.provincias = datos;
-      })
-
+          this.ListarProvincias();
+        }
+      });
     }
-    )
+    );
+
   }
 
 
@@ -479,19 +508,24 @@ export class PrincipalProvinciaComponent implements OnInit {
             this.plan_multiple = false;
             this.plan_multiple_ = false;
 
+            this.provinciasEliminar = [];
+            this.selectionProvincias.clear();
 
-
+            this.ListarProvincias();
 
 
 
           } else {
-            this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado PROVINCIAS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
 
           }
+        } else {
+          this.router.navigate(['/provincia']);
         }
       });
+
   }
 
 

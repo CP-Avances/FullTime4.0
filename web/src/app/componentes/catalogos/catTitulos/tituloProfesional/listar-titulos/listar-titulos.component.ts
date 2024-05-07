@@ -121,6 +121,8 @@ export class ListarTitulosComponent implements OnInit {
 
   // METODO PARA LISTAR TITULOS
   ObtenerTitulos() {
+
+    this.verTitulos = [];
     this.rest.ListarTitulos().subscribe(data => {
       this.verTitulos = data;
       console.log('titulos: ', this.verTitulos);
@@ -157,6 +159,11 @@ export class ListarTitulosComponent implements OnInit {
       .afterClosed().subscribe(items => {
         this.ObtenerTitulos();
       });
+    this.activar_seleccion = true;
+    this.plan_multiple = false;
+    this.plan_multiple_ = false;
+    this.selectionTitulos.clear();
+    this.titulosEliminar = [];
   }
 
   // METODO PARA LIMPIAR FORMULARIO
@@ -560,13 +567,13 @@ export class ListarTitulosComponent implements OnInit {
   activar_seleccion: boolean = true;
   seleccion_vacia: boolean = true;
 
-  selectionProvincias = new SelectionModel<ITableProvincias>(true, []);
+  selectionTitulos = new SelectionModel<ITableProvincias>(true, []);
 
 
 
   // SI EL NUMERO DE ELEMENTOS SELECCIONADOS COINCIDE CON EL NUMERO TOTAL DE FILAS.
   isAllSelectedPag() {
-    const numSelected = this.selectionProvincias.selected.length;
+    const numSelected = this.selectionTitulos.selected.length;
     return numSelected === this.verTitulos.length
   }
 
@@ -574,8 +581,8 @@ export class ListarTitulosComponent implements OnInit {
   // SELECCIONA TODAS LAS FILAS SI NO ESTAN TODAS SELECCIONADAS; DE LO CONTRARIO, SELECCION CLARA.
   masterTogglePag() {
     this.isAllSelectedPag() ?
-      this.selectionProvincias.clear() :
-      this.verTitulos.forEach((row: any) => this.selectionProvincias.select(row));
+      this.selectionTitulos.clear() :
+      this.verTitulos.forEach((row: any) => this.selectionTitulos.select(row));
   }
 
 
@@ -584,11 +591,11 @@ export class ListarTitulosComponent implements OnInit {
     if (!row) {
       return `${this.isAllSelectedPag() ? 'select' : 'deselect'} all`;
     }
-    this.titulosEliminar = this.selectionProvincias.selected;
+    this.titulosEliminar = this.selectionTitulos.selected;
     //console.log('paginas para Eliminar',this.paginasEliminar);
 
     //console.log(this.selectionPaginas.selected)
-    return `${this.selectionProvincias.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
+    return `${this.selectionTitulos.isSelected(row) ? 'deselect' : 'select'} row ${row.nombre + 1}`;
 
   }
 
@@ -616,28 +623,62 @@ export class ListarTitulosComponent implements OnInit {
       .subscribe((confirmado: Boolean) => {
         if (confirmado) {
           this.Eliminar(datos.id);
+          this.activar_seleccion = true;
+
+          this.plan_multiple = false;
+          this.plan_multiple_ = false;
+          this.titulosEliminar = [];
+          this.selectionTitulos.clear();
+
+
+          this.ObtenerTitulos();
+
         } else {
           this.router.navigate(['/titulos']);
         }
       });
 
-
-
   }
+
+
+  contador: number = 0;
+  ingresar: boolean = false;
 
   EliminarMultiple() {
 
-    this.titulosEliminar = this.selectionProvincias.selected;
+
+    this.ingresar = false;
+    this.contador = 0;
+
+    this.titulosEliminar = this.selectionTitulos.selected;
     this.titulosEliminar.forEach((datos: any) => {
 
       this.verTitulos = this.verTitulos.filter(item => item.id !== datos.id);
-      //AQUI MODIFICAR EL METODO 
-      this.Eliminar(datos.id);
-      this.ObtenerTitulos();
+      this.contador = this.contador + 1;
 
 
+      this.rest.EliminarRegistro(datos.id).subscribe(res => {
+        if (res.message === 'error') {
+          this.toastr.error('No se puede elminar.', '', {
+            timeOut: 6000,
+          });
+
+          this.contador = this.contador - 1;
+
+        } else {
+          if (!this.ingresar) {
+            this.toastr.error('Se ha Eliminado ' + this.contador + ' registros.', '', {
+              timeOut: 6000,
+            });
+            this.ingresar = true;
+          }
+          this.ObtenerTitulos();
+
+        }
+      });
     }
     )
+
   }
 
 
@@ -653,17 +694,17 @@ export class ListarTitulosComponent implements OnInit {
             this.plan_multiple = false;
             this.plan_multiple_ = false;
 
+            this.titulosEliminar = [];
+            this.selectionTitulos.clear();
 
-
-
-
-
+            this.ObtenerTitulos();
           } else {
-            this.toastr.warning('No ha seleccionado PAGINAS.', 'Ups!!! algo salio mal.', {
+            this.toastr.warning('No ha seleccionado TÍTULOS.', 'Ups!!! algo salio mal.', {
               timeOut: 6000,
             })
-
           }
+        } else {
+          this.router.navigate(['/titulos']);
         }
       });
   }
